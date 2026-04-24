@@ -1,0 +1,4053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NOWSBANSIU — Shabdapathy</title>
+
+<!-- PWA: Installable as a home screen app -->
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIk5PV1NCQU5TSVUgXHUyMDE0IFNoYWJkYXBhdGh5IiwgInNob3J0X25hbWUiOiAiTm93c3NCIiwgImRlc2NyaXB0aW9uIjogIk5hdHVyYWwgT3JpZ2luIFdvcmQgU2NpZW5jZSIsICJzdGFydF91cmwiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDYwYzE4IiwgInRoZW1lX2NvbG9yIjogIiMwNjBjMTgiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQtcHJpbWFyeSIsICJpY29ucyI6IFt7InNyYyI6ICJodHRwczovL3Jlcy5jbG91ZGluYXJ5LmNvbS9ka3p4dzMzbG4vaW1hZ2UvdXBsb2FkL2NfZmlsbCxnX2NlbnRlcix3XzE5MixoXzE5Mi9xX2F1dG8vZl9hdXRvL3YxNzc2ODcxOTk3L2dyb2tfaW1hZ2VfMTc3Njg3MTgxNjg5OF8zX2xsN2MwbS5qcGciLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL2pwZWciLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifSwgeyJzcmMiOiAiaHR0cHM6Ly9yZXMuY2xvdWRpbmFyeS5jb20vZGt6eHczM2xuL2ltYWdlL3VwbG9hZC9jX2ZpbGwsZ19jZW50ZXIsd181MTIsaF81MTIvcV9hdXRvL2ZfYXV0by92MTc3Njg3MTk5Ny9ncm9rX2ltYWdlXzE3NzY4NzE4MTY4OThfM19sbDdjMG0uanBnIiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9qcGVnIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIn1dfQ==">
+<meta name="theme-color" content="#060c18">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- iOS / Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NOWSBANSIU">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dkzxw33ln/image/upload/c_fill,g_center,w_512,h_512/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg">
+<link rel="apple-touch-startup-image" href="https://res.cloudinary.com/dkzxw33ln/image/upload/c_fill,g_center,w_512,h_512/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg">
+<!-- Favicon -->
+<link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/dkzxw33ln/image/upload/c_fill,g_center,w_512,h_512/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --glass-bg: rgba(255,255,255,0.08);
+    --glass-bg-strong: rgba(255,255,255,0.14);
+    --glass-bg-white: rgba(255,255,255,0.11);
+    --glass-border: rgba(255,255,255,0.22);
+    --glass-border-strong: rgba(255,255,255,0.38);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+    --glass-shadow-deep: 0 20px 60px rgba(0,0,0,0.45), 0 4px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+    --text-primary: rgba(255,255,255,0.97);
+    --text-secondary: rgba(255,255,255,0.62);
+    --text-tertiary: rgba(255,255,255,0.38);
+    --accent: #c8e8f5;
+    --accent-gold: #e8d5a3;
+    --accent-glow: rgba(200,232,245,0.22);
+  }
+
+  /* ══ GLOBAL BRAND TEXT SYSTEM ══
+     .brand-name  → "Nowsb" bold + "ansiu" thin, always
+     .brand-tag   → "Natural Origin of Word Science" small caps accent line
+  ══════════════════════════════════ */
+  .brand-name {
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.05;
+    display: inline-block;
+  }
+  .brand-name .b { font-weight: 800; color: #fff; }
+  .brand-name .t { font-weight: 200; color: rgba(255,255,255,0.88); }
+
+  .brand-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.75);
+    display: inline-block;
+  }
+  .brand-tag strong {
+    font-weight: 700;
+    color: #fff;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; border-radius:0 !important; }
+
+  html, body {
+    width:100%; height:100%;
+    overflow:hidden;
+    font-family:'DM Sans', sans-serif;
+    background:#060c18;
+  }
+
+  /* ── GLOBAL BG — rotates per screen ── */
+  .app-bg {
+    position:fixed; inset:0; z-index:0;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+  }
+  /* second layer for cross-fade between home backgrounds */
+  .app-bg-layer2 {
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    opacity:0;
+    transition: opacity 1.1s cubic-bezier(0.4,0,0.2,1);
+  }
+  .app-bg::after {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(160deg,
+      rgba(3,8,20,0.38) 0%,
+      rgba(5,15,35,0.30) 40%,
+      rgba(8,25,45,0.42) 100%);
+  }
+  .app-bg::before {
+    content:'';
+    position:absolute; inset:0; z-index:1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity:0.45; pointer-events:none;
+  }
+
+  /* ── SCREEN SYSTEM ── */
+  .screen {
+    position:fixed; inset:0; z-index:10;
+    display:flex; flex-direction:column;
+    align-items:center;
+    padding: 0;
+    padding-top: max(env(safe-area-inset-top, 20px), 20px);
+    padding-bottom: max(env(safe-area-inset-bottom, 20px), 20px);
+    opacity:0; pointer-events:none;
+    transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    transform: translateY(22px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+  .screen.active {
+    opacity:1; pointer-events:all; transform:translateY(0);
+  }
+  .screen.exit {
+    opacity:0; transform:translateY(-22px);
+  }
+
+  /* ══════════════════════════════════════
+     SCREEN 1 — SPLASH
+  ══════════════════════════════════════ */
+  #splash {
+    justify-content:center;
+    align-items:center;
+    padding:0;
+    overflow:hidden;
+  }
+
+  /* Full-bleed splash image — NO logo animation */
+  .splash-bg-image {
+    position:absolute; inset:0;
+    background: url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850574/1000033073-ezremove_gdnkep.png') center/cover no-repeat;
+    z-index:0;
+  }
+  .splash-bg-image::after {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(
+      to bottom,
+      rgba(4,10,22,0.10) 0%,
+      rgba(4,10,22,0.0) 30%,
+      rgba(4,10,22,0.35) 70%,
+      rgba(4,10,22,0.72) 100%
+    );
+  }
+
+  .splash-bottom {
+    position:absolute;
+    bottom: max(env(safe-area-inset-bottom, 56px), 56px);
+    left:0; right:0;
+    display:flex; flex-direction:column;
+    align-items:center; gap:20px;
+    z-index:2;
+    padding:0 32px;
+    animation: splashFadeUp 1.2s 0.4s both cubic-bezier(0.16,1,0.3,1);
+  }
+
+  @keyframes splashFadeUp {
+    from { opacity:0; transform:translateY(28px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  .splash-title {
+    font-family:'Cormorant Garamond', serif;
+    font-size:40px; font-weight:600;
+    letter-spacing:7px;
+    color:var(--text-primary);
+    text-transform:uppercase;
+    text-align:center;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6), 0 0 40px rgba(200,232,245,0.25);
+  }
+  .splash-subtitle {
+    font-size:11px; font-weight:300;
+    letter-spacing:4px; text-transform:uppercase;
+    color:var(--accent);
+    text-align:center;
+    text-shadow: 0 0 20px rgba(200,232,245,0.4);
+  }
+
+  .splash-progress {
+    width:180px; height:1px;
+    background:rgba(255,255,255,0.2);
+    position:relative; overflow:hidden;
+  }
+  .splash-progress-bar {
+    position:absolute; left:0; top:0; height:100%;
+    background: linear-gradient(90deg, transparent, var(--accent), rgba(255,255,255,0.9), var(--accent), transparent);
+    animation: splashLoad 3.2s 0.8s both cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes splashLoad {
+    from { width:0%; }
+    to { width:100%; }
+  }
+
+  /* ══════════════════════════════════════
+     SCREEN 2 — LOGIN
+  ══════════════════════════════════════ */
+  #login {
+    padding-left: 10%; padding-right: 10%;
+    justify-content:flex-start;
+    gap:0;
+  }
+
+  .login-header {
+    width:100%; text-align:left; margin-bottom:32px;
+    padding-top:16px;
+    flex-shrink:0;
+  }
+  .login-logo-small {
+    display:flex; align-items:center; gap:12px; margin-bottom:28px;
+  }
+  .login-logo-icon {
+    width:58px; height:58px;
+    background:transparent;
+    border:none;
+    box-shadow:none;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    overflow:visible;
+  }
+  .login-title {
+    font-family:'Cormorant Garamond', serif;
+    font-size:36px; font-weight:500;
+    color:var(--text-primary);
+    letter-spacing:0.5px;
+    line-height:1.1;
+  }
+  .login-title span {
+    color:var(--accent);
+    display:block; font-size:12px;
+    font-family:'DM Sans', sans-serif;
+    font-weight:300; letter-spacing:4px;
+    text-transform:uppercase; margin-top:7px;
+  }
+
+  /* White/glass iOS panel */
+  .glass-panel {
+    width:100%;
+    background: rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.28);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.32), 0 2px 8px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.22);
+    padding:26px 22px;
+    position:relative;
+    backdrop-filter:blur(32px) saturate(1.4);
+    -webkit-backdrop-filter:blur(32px) saturate(1.4);
+    margin-bottom:14px;
+    flex-shrink:0;
+  }
+  .glass-panel::before {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  }
+
+  .field-label {
+    font-size:10px; font-weight:500;
+    letter-spacing:3px; text-transform:uppercase;
+    color:var(--text-secondary);
+    margin-bottom:9px; display:block;
+  }
+
+  .glass-input-wrap {
+    position:relative; margin-bottom:18px;
+  }
+  .glass-input-wrap:last-of-type { margin-bottom:0; }
+
+  .glass-input {
+    width:100%; height:52px;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.2);
+    color:var(--text-primary);
+    font-family:'DM Sans', sans-serif;
+    font-size:15px; font-weight:300;
+    padding:0 48px 0 48px;
+    outline:none;
+    transition:border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    -webkit-appearance:none;
+    backdrop-filter:blur(8px);
+  }
+  .glass-input::placeholder { color:var(--text-tertiary); }
+  .glass-input:focus {
+    border-color:var(--accent);
+    background:rgba(200,232,245,0.07);
+    box-shadow: 0 0 0 1px rgba(200,232,245,0.22), inset 0 0 20px rgba(200,232,245,0.04);
+  }
+
+  .input-icon {
+    position:absolute; left:16px; top:50%; transform:translateY(-50%);
+    opacity:0.55;
+  }
+  .input-icon-right {
+    position:absolute; right:16px; top:50%; transform:translateY(-50%);
+    opacity:0.45; cursor:pointer;
+    transition:opacity 0.2s;
+  }
+  .input-icon-right:active { opacity:0.8; }
+
+  .btn-primary {
+    width:100%; height:54px;
+    background:rgba(255,255,255,0.95);
+    border:none; cursor:pointer;
+    font-family:'DM Sans', sans-serif;
+    font-size:13px; font-weight:500;
+    letter-spacing:3px; text-transform:uppercase;
+    color:#07101f;
+    position:relative; overflow:hidden;
+    margin-top:20px;
+    box-shadow: 0 4px 24px rgba(255,255,255,0.18), 0 2px 8px rgba(0,0,0,0.28);
+    transition:transform 0.15s, box-shadow 0.15s, background 0.15s;
+    -webkit-appearance:none;
+    flex-shrink:0;
+  }
+  .btn-primary::before {
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(200,232,245,0.18), transparent);
+  }
+  .btn-primary:active {
+    transform:scale(0.985) translateY(1px);
+    box-shadow: 0 2px 12px rgba(255,255,255,0.12);
+    background:rgba(235,245,252,0.95);
+  }
+
+  .btn-ghost {
+    width:100%; height:52px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.22);
+    cursor:pointer;
+    font-family:'DM Sans', sans-serif;
+    font-size:13px; font-weight:400;
+    letter-spacing:1px;
+    color:var(--text-primary);
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    transition:background 0.2s, border-color 0.2s;
+    -webkit-appearance:none;
+    backdrop-filter:blur(16px);
+    flex-shrink:0;
+  }
+  .btn-ghost:active { background:rgba(255,255,255,0.14); }
+
+  .divider-row {
+    display:flex; align-items:center; gap:16px;
+    margin:16px 0;
+    width:100%;
+    flex-shrink:0;
+  }
+  .divider-line {
+    flex:1; height:1px;
+    background:rgba(255,255,255,0.18);
+  }
+  .divider-text {
+    font-size:10px; color:var(--text-tertiary);
+    letter-spacing:2px; text-transform:uppercase;
+  }
+
+  .forgot-link {
+    display:block; text-align:center;
+    margin-top:16px;
+    font-size:12px; color:var(--text-secondary);
+    letter-spacing:1px; cursor:pointer;
+    width:fit-content; margin-left:auto; margin-right:auto;
+  }
+
+  .signup-row {
+    width:100%; margin-top:0;
+    display:flex; align-items:center;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.2);
+    height:54px;
+    flex-shrink:0;
+    backdrop-filter:blur(16px);
+  }
+  .signup-left {
+    flex:1; text-align:center;
+    font-size:13px; color:var(--text-secondary);
+    letter-spacing:0.5px;
+  }
+  .signup-btn {
+    height:100%; padding:0 26px;
+    background:rgba(200,232,245,0.14);
+    border:none; border-left:1px solid rgba(255,255,255,0.2);
+    color:var(--accent); font-family:'DM Sans', sans-serif;
+    font-size:12px; font-weight:500; letter-spacing:2px;
+    text-transform:uppercase; cursor:pointer;
+    transition:background 0.2s;
+    -webkit-appearance:none;
+  }
+  .signup-btn:active { background:rgba(200,232,245,0.24); }
+
+  /* ══════════════════════════════════════
+     SCREEN 3 — ONBOARDING
+  ══════════════════════════════════════ */
+  #onboarding {
+    padding-left: 10%; padding-right: 10%;
+    justify-content:flex-start;
+    padding-top: max(env(safe-area-inset-top, 20px), 20px);
+    padding-bottom: 10vh;
+    gap:0; overflow:hidden;
+  }
+  .ob-inner {
+    flex:1; min-height:0; width:100%;
+    display:flex; flex-direction:column;
+    overflow-y:auto; overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .ob-nav {
+    width:100%; display:flex;
+    align-items:center; justify-content:space-between;
+    margin-bottom:28px; padding-top:14px;
+    flex-shrink:0;
+  }
+  .btn-back {
+    width:40px; height:40px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:background 0.2s;
+    flex-shrink:0;
+  }
+  .btn-back:active { background:rgba(255,255,255,0.15); }
+
+  .ob-step-text {
+    font-size:11px; letter-spacing:3px;
+    text-transform:uppercase; color:var(--text-secondary);
+  }
+
+  .btn-skip {
+    font-size:11px; letter-spacing:2px;
+    text-transform:uppercase; color:var(--text-secondary);
+    background:none; border:none; cursor:pointer;
+    padding:8px 0;
+    transition:color 0.2s;
+    font-family:'DM Sans', sans-serif;
+  }
+  .btn-skip:active { color:var(--text-primary); }
+
+  .ob-progress-bar {
+    width:100%; height:2px;
+    background:rgba(255,255,255,0.15);
+    margin-bottom:28px; position:relative;
+    flex-shrink:0;
+  }
+  .ob-progress-fill {
+    height:100%;
+    background:linear-gradient(90deg, var(--accent), rgba(200,232,245,0.55));
+    transition:width 0.5s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+  .ob-progress-ticks {
+    position:absolute; top:-2px; left:0; right:0;
+    display:flex; justify-content:space-between;
+    padding: 0 1px;
+  }
+  .ob-tick {
+    width:6px; height:6px;
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.2);
+    transition:background 0.3s;
+    flex-shrink:0;
+  }
+  .ob-tick.done { background:var(--accent); border-color:var(--accent); }
+
+  .ob-question {
+    width:100%; margin-bottom:28px;
+    flex-shrink:0;
+  }
+  .ob-q-label {
+    font-size:10px; font-weight:500;
+    letter-spacing:3px; text-transform:uppercase;
+    color:var(--accent); margin-bottom:12px;
+    display:block;
+  }
+  .ob-q-text {
+    font-family:'Cormorant Garamond', serif;
+    font-size:28px; font-weight:500;
+    color:var(--text-primary); line-height:1.25;
+    letter-spacing:0.2px;
+  }
+
+  .ob-options {
+    width:100%; display:flex; flex-direction:column; gap:10px;
+    margin-bottom:24px;
+    flex-shrink:0;
+  }
+
+  .ob-option {
+    width:100%; padding:17px 18px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer;
+    transition:background 0.2s, border-color 0.2s;
+    position:relative; overflow:hidden;
+    backdrop-filter:blur(20px);
+  }
+  .ob-option::before {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  }
+  .ob-option:active { background:rgba(255,255,255,0.13); }
+  .ob-option.selected {
+    border-color:var(--accent);
+    background:rgba(200,232,245,0.11);
+    box-shadow: 0 0 18px rgba(200,232,245,0.12), inset 0 0 18px rgba(200,232,245,0.04);
+  }
+
+  .ob-option-text {
+    font-size:14px; font-weight:300;
+    color:var(--text-primary); letter-spacing:0.3px;
+    position:relative; z-index:1;
+  }
+  .ob-option-check {
+    width:20px; height:20px;
+    border:1px solid rgba(255,255,255,0.25);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    transition:border-color 0.2s, background 0.2s;
+    position:relative; z-index:1;
+  }
+  .ob-option.selected .ob-option-check {
+    border-color:var(--accent);
+    background:var(--accent);
+  }
+
+  /* ══════════════════════════════════════
+     SCREEN 4 — ANALYSIS
+  ══════════════════════════════════════ */
+  #analysis {
+    padding-left: 10%; padding-right: 10%;
+    justify-content:flex-start;
+    padding-top: max(env(safe-area-inset-top, 20px), 20px);
+    padding-bottom: 10vh;
+    gap:0; overflow:hidden;
+  }
+  /* Scroll area for ring + checklist */
+  .analysis-scroll {
+    flex:1; min-height:0; width:100%;
+    overflow-y:auto; overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    display:flex; flex-direction:column;
+    padding-bottom:16px;
+  }
+  /* Scroll hint arrow at bottom of scroll area */
+  .scroll-hint {
+    display:flex; justify-content:center;
+    padding:8px 0 4px;
+    animation: bounceDown 1.4s ease-in-out infinite;
+    opacity:0.55;
+  }
+  @keyframes bounceDown {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(6px); }
+  }
+  /* START YOUR JOURNEY — always visible, pinned inside glass panel */
+  .analysis-cta {
+    flex-shrink:0;
+    width:100%;
+    padding-top:10px;
+  }
+
+  .analysis-header {
+    width:100%; text-align:center;
+    padding-top:20px; margin-bottom:20px;
+    flex-shrink:0;
+  }
+
+  .analysis-ring-wrap {
+    display:flex; justify-content:center;
+    margin: 0 0 32px;
+    position:relative;
+    flex-shrink:0;
+  }
+  .ring-svg {
+    transform:rotate(-90deg);
+    filter: drop-shadow(0 0 16px var(--accent-glow));
+  }
+  .ring-bg { stroke:rgba(255,255,255,0.15); fill:none; }
+  .ring-fill {
+    stroke:var(--accent); fill:none;
+    stroke-linecap:square;
+    stroke-dasharray:440;
+    stroke-dashoffset:440;
+    animation:ringFill 2.8s 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  @keyframes ringFill {
+    to { stroke-dashoffset:0; }
+  }
+  .ring-inner {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:4px;
+  }
+  .ring-percent {
+    font-family:'Cormorant Garamond', serif;
+    font-size:38px; font-weight:600;
+    color:var(--text-primary);
+  }
+  .ring-label {
+    font-size:10px; letter-spacing:3px;
+    text-transform:uppercase; color:var(--text-secondary);
+  }
+
+  .analysis-title {
+    font-family:'Cormorant Garamond', serif;
+    font-size:27px; font-weight:500;
+    color:var(--text-primary); text-align:center;
+    margin-bottom:8px; letter-spacing:0.3px;
+    flex-shrink:0;
+  }
+  .analysis-sub {
+    font-size:13px; font-weight:300;
+    color:var(--text-secondary); text-align:center;
+    line-height:1.7; max-width:280px; margin:0 auto 28px;
+    flex-shrink:0;
+  }
+
+  .checklist {
+    width:100%;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    box-shadow: var(--glass-shadow);
+    overflow:hidden;
+    backdrop-filter:blur(28px);
+    flex-shrink:0;
+    margin-bottom:24px;
+  }
+  .checklist::before {
+    content:'';
+    display:block; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  }
+  .check-item {
+    display:flex; align-items:center; gap:14px;
+    padding:15px 18px;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+    opacity:0; transform:translateX(-12px);
+    transition:opacity 0.4s, transform 0.4s;
+  }
+  .check-item:last-child { border-bottom:none; }
+  .check-item.visible { opacity:1; transform:translateX(0); }
+
+  .check-icon-wrap {
+    width:34px; height:34px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.18);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .check-text {
+    flex:1;
+    font-size:13px; font-weight:300;
+    color:var(--text-primary); letter-spacing:0.2px;
+  }
+  .check-status {
+    width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .check-done {
+    width:22px; height:22px;
+    background:rgba(200,232,245,0.18);
+    border:1px solid var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0;
+    transition:opacity 0.3s;
+  }
+  .check-done.show { opacity:1; }
+
+  /* ══════════════════════════════════════
+     SCREEN 5 — HOME
+  ══════════════════════════════════════ */
+  #home {
+    justify-content:flex-start;
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    gap:0;
+  }
+  /* Padded wrapper for all home content below the hero */
+  .home-body {
+    width: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .home-header {
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    padding-top:14px; margin-bottom:28px; flex-shrink:0;
+  }
+  .home-logo {
+    display:flex; align-items:center; gap:10px;
+  }
+  .home-greeting {
+    font-family:'Cormorant Garamond', serif;
+    font-size:32px; font-weight:500;
+    color:var(--text-primary); line-height:1.2;
+    width:100%; margin-bottom:6px; flex-shrink:0;
+  }
+  .home-tagline {
+    font-size:12px; font-weight:300; letter-spacing:2px;
+    color:var(--text-secondary); text-transform:uppercase;
+    margin-bottom:32px; flex-shrink:0;
+  }
+  .home-card {
+    width:100%; padding:22px 20px;
+    background:rgba(255,255,255,0.09);
+    border:1px solid rgba(255,255,255,0.22);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter:blur(28px);
+    -webkit-backdrop-filter:blur(28px);
+    margin-bottom:14px; flex-shrink:0;
+    position:relative; overflow:hidden;
+    cursor:pointer; transition:background 0.2s;
+  }
+  .home-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.38), transparent);
+  }
+  .home-card:active { background:rgba(255,255,255,0.14); }
+  .home-card-label {
+    font-size:9px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--accent); margin-bottom:8px; display:block;
+  }
+  .home-card-title {
+    font-family:'Cormorant Garamond', serif;
+    font-size:22px; font-weight:500; color:var(--text-primary);
+    margin-bottom:6px;
+  }
+  .home-card-sub {
+    font-size:12px; font-weight:300; color:var(--text-secondary);
+    line-height:1.6;
+  }
+  .home-card-arrow {
+    position:absolute; right:20px; top:50%; transform:translateY(-50%);
+    opacity:0.45;
+    animation: arrowBounce 1.6s ease-in-out infinite;
+  }
+  .home-card:last-of-type .home-card-arrow { animation-delay: 0.8s; }
+  /* strip w100's side padding from krm-section so search box never overflows */
+  .krm-section.w100 { padding-left: 0; padding-right: 0; }
+  .home-grid {
+    width:100%; display:grid; grid-template-columns:1fr 1fr;
+    gap:12px; margin-bottom:14px; flex-shrink:0;
+  }
+  /* ── LIQUID SHIMMER ── */
+  @keyframes liquidShimmer {
+    0%   { transform: translateX(-120%) skewX(-15deg); opacity:0; }
+    15%  { opacity:1; }
+    85%  { opacity:1; }
+    100% { transform: translateX(240%) skewX(-15deg); opacity:0; }
+  }
+  @keyframes arrowBounce {
+    0%, 100% { transform: translateX(0); }
+    50%       { transform: translateX(5px); }
+  }
+
+  .home-tile {
+    padding:26px 18px 22px;
+    min-height:115px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    backdrop-filter:blur(20px);
+    cursor:pointer; transition:background 0.2s, transform 0.18s ease, box-shadow 0.18s ease;
+    position:relative; overflow:hidden;
+    transform-style:preserve-3d;
+  }
+  .home-tile::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  }
+  /* liquid shimmer layer */
+  .home-tile::after {
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background: linear-gradient(105deg,
+      transparent 30%,
+      rgba(255,255,255,0.13) 48%,
+      rgba(200,232,245,0.10) 52%,
+      transparent 70%);
+    animation: liquidShimmer 3.8s ease-in-out infinite;
+  }
+  .home-tile:nth-child(1)::after { animation-delay: 0.0s; }
+  .home-tile:nth-child(2)::after { animation-delay: 0.9s; }
+  .home-tile:nth-child(3)::after { animation-delay: 1.8s; }
+  .home-tile:nth-child(4)::after { animation-delay: 2.7s; }
+
+  .home-tile:active {
+    background:rgba(255,255,255,0.15);
+    transform: perspective(600px) scale(0.97) rotateX(3deg);
+    box-shadow: 0 6px 28px rgba(0,0,0,0.35);
+  }
+  .home-tile-icon {
+    margin-bottom:12px; opacity:0.75;
+  }
+  .home-tile-title {
+    font-size:14px; font-weight:500; color:var(--text-primary);
+    letter-spacing:0.3px; margin-bottom:4px;
+  }
+  .home-tile-sub {
+    font-size:10px; font-weight:300; color:var(--text-secondary);
+    letter-spacing:0.5px;
+  }
+  /* animated arrow on each tile */
+  .home-tile-arrow {
+    position:absolute; bottom:14px; right:14px;
+    opacity:0.45;
+    animation: arrowBounce 1.6s ease-in-out infinite;
+  }
+  .home-tile:nth-child(2) .home-tile-arrow { animation-delay:0.4s; }
+  .home-tile:nth-child(3) .home-tile-arrow { animation-delay:0.8s; }
+  .home-tile:nth-child(4) .home-tile-arrow { animation-delay:1.2s; }
+
+  /* liquid shimmer on home-card too */
+  .home-card::after {
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background: linear-gradient(105deg,
+      transparent 30%,
+      rgba(255,255,255,0.10) 48%,
+      rgba(200,232,245,0.08) 52%,
+      transparent 70%);
+    animation: liquidShimmer 4.2s ease-in-out infinite;
+  }
+  .home-card:first-of-type::after  { animation-delay: 0.5s; }
+  .home-card:last-of-type::after   { animation-delay: 2.1s; }
+
+  /* ══ SHARED UTILITY ══ */
+  .w100 { width:100%; padding-left: 10%; padding-right: 10%; }
+  .home-card.w100 { width:calc(100% - 32px); margin-left:16px; margin-right:16px; padding-left:20px; padding-right:20px; }
+  .home-grid.w100 { width:calc(100% - 32px); margin-left:16px; margin-right:16px; padding-left:0; padding-right:0; }
+  .mt8 { margin-top:8px; }
+  .mt16 { margin-top:16px; }
+
+  /* ══════════════════════════════════════
+     HERO HEADER SECTION
+  ══════════════════════════════════════ */
+
+  /* Fixed hamburger header — always at the very top */
+  .home-header {
+    position: fixed !important;
+    top: 0; left: 0; right: 0; z-index: 50;
+    width: 100%;
+    padding: max(env(safe-area-inset-top, 14px), 14px) 20px 14px !important;
+    margin-bottom: 0 !important;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.18);
+    flex-shrink: 0;
+  }
+  .home-header::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+    pointer-events: none;
+  }
+
+  /* Hero — naturally full width (parent has no side padding) */
+  .hero-section {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    flex-shrink: 0;
+    overflow: visible;
+    margin-bottom: 32px;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  /* Internal cycling backgrounds */
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center top;
+    opacity: 0;
+    transition: opacity 1.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .hero-bg.on { opacity: 1; }
+  .hero-bg::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom,
+      rgba(0,0,0,0.62) 0%,
+      rgba(0,0,0,0.30) 22%,
+      rgba(0,0,0,0.00) 48%,
+      rgba(0,0,0,0.82) 100%);
+  }
+
+  /* Hero content — heading top, cards bottom */
+  .hero-content {
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 160px 24px 28px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Sans', sans-serif; font-weight: 300;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.36); margin-bottom: 8px;
+  }
+  .hero-h-light {
+    font-family: 'DM Sans', sans-serif; font-weight: 200;
+    font-size: clamp(28px, 8vw, 48px);
+    line-height: 1.05; color: rgba(255,255,255,0.90);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+  }
+  .hero-h-bold {
+    font-family: 'DM Sans', sans-serif; font-weight: 800;
+    font-size: clamp(28px, 8vw, 48px);
+    line-height: 1.05; color: #fff;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+  }
+
+  .hero-bottom {
+    width: 100%;
+    display: flex; flex-direction: column;
+    align-items: center;
+  }
+
+  /* Glass panel — fixed height, no bottom padding, overflow visible for peek */
+  .hero-glass {
+    position: relative; width: 100%;
+    padding: 10px 8px 0;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10);
+    height: 140px;
+    flex-shrink: 0;
+    overflow: visible;
+    clip-path: none;
+  }
+  .hero-glass::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(130deg, rgba(255,255,255,0.06) 0%, transparent 55%);
+  }
+
+  /* 5 cards row — fills the fixed glass height */
+  .hero-cards {
+    display: flex; flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 5px; position: relative; z-index: 1;
+    height: 100%;
+    overflow: visible;
+    width: 100%;
+  }
+  .hero-card {
+    flex: 0.72;
+    min-width: 0;
+    height: 100%;
+    aspect-ratio: unset;
+    background-size: cover; background-position: center top;
+    border: 1px solid rgba(255,255,255,0.14);
+    overflow: hidden; position: relative;
+    transition: transform 0.65s cubic-bezier(0.4,0,0.2,1),
+                filter 0.65s ease, flex 0.65s ease, box-shadow 0.65s ease,
+                height 0.65s cubic-bezier(0.4,0,0.2,1);
+    filter: brightness(0.40) saturate(0.35);
+    background-color: rgba(255,255,255,0.06);
+  }
+  .hero-card::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(155deg, rgba(255,255,255,0.09) 0%, transparent 55%);
+    pointer-events: none; z-index: 2;
+  }
+  .hero-card.active {
+    flex: 1.3; filter: brightness(1) saturate(1);
+    transform: translateY(-22px);
+    height: calc(100% + 22px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.28);
+    z-index: 10;
+    border-color: rgba(255,255,255,0.30);
+  }
+
+  /* Cycling word */
+  .hero-word-wrap {
+    margin-top: 12px; height: 48px;
+    overflow: hidden; display: flex;
+    align-items: center; justify-content: center; width: 100%;
+  }
+  .hero-word {
+    font-family: 'Cormorant Garamond', serif; font-weight: 600;
+    font-size: 36px; color: #fff;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    line-height: 1; display: block;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.55);
+  }
+  .hero-word.hw-out { animation: hwOut 0.26s ease forwards; }
+  .hero-word.hw-in  { animation: hwIn  0.34s ease forwards; }
+  @keyframes taglineReveal {
+    from { opacity:0; transform:translateY(12px) skewX(-4deg); letter-spacing:6px; }
+    to   { opacity:1; transform:translateY(0)    skewX(0deg);  letter-spacing:2px; }
+  }
+
+  @keyframes hwOut { to { transform: translateY(-48px); opacity: 0; } }
+  @keyframes hwIn  { from { transform: translateY(48px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* Hero buttons */
+  .hero-btns {
+    display: flex; gap: 10px;
+    align-items: center; margin-top: 14px;
+  }
+  .hero-btn {
+    font-family: 'DM Sans', sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    cursor: pointer; border: none; background: none;
+    padding: 10px 22px; transition: all 0.25s ease; color: #fff;
+  }
+  .hero-btn-p {
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.35);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .hero-btn-p:active { background: rgba(255,255,255,0.18); }
+  .hero-btn-s { border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.58); }
+  .hero-btn-s:active { border-color: rgba(255,255,255,0.42); color: #fff; }
+
+  /* floating particles */
+  .particles {
+    position:fixed; inset:0; z-index:1;
+    pointer-events:none; overflow:hidden;
+  }
+  .particle {
+    position:absolute;
+    width:1px; height:1px;
+    background:rgba(200,232,245,0.55);
+    box-shadow: 0 0 4px rgba(200,232,245,0.35);
+    animation:particleFloat linear infinite;
+  }
+  @keyframes particleFloat {
+    from { transform:translateY(110vh) translateX(0); opacity:0; }
+    10% { opacity:1; }
+    90% { opacity:1; }
+    to { transform:translateY(-10vh) translateX(24px); opacity:0; }
+  }
+
+  /* ══════════════════════════════════════
+     DOWNLOAD POPUP
+  ══════════════════════════════════════ */
+  .dl-fab {
+    position: fixed;
+    bottom: max(env(safe-area-inset-bottom, 28px), 28px);
+    right: 24px;
+    z-index: 200;
+    width: 52px; height: 52px;
+    background: rgba(200,232,245,0.18);
+    border: 1px solid rgba(200,232,245,0.45);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.22);
+    display: none;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .dl-fab:active { transform: scale(0.93); background: rgba(200,232,245,0.28); }
+
+  .dl-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(3,8,20,0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: none;
+    align-items: flex-end; justify-content: center;
+    padding-bottom: max(env(safe-area-inset-bottom, 24px), 24px);
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .dl-overlay.open {
+    display: flex;
+    opacity: 0;
+    animation: dlFadeIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  @keyframes dlFadeIn { to { opacity: 1; } }
+
+  .dl-sheet {
+    width: calc(100% - 48px);
+    max-width: 420px;
+    background: rgba(12,22,42,0.92);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 -4px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14);
+    backdrop-filter: blur(40px) saturate(1.6);
+    -webkit-backdrop-filter: blur(40px) saturate(1.6);
+    padding: 28px 24px 24px;
+    position: relative;
+    transform: translateY(40px);
+    animation: dlSlideUp 0.38s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  @keyframes dlSlideUp { to { transform: translateY(0); } }
+
+  .dl-sheet::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  }
+
+  .dl-handle {
+    width: 36px; height: 3px;
+    background: rgba(255,255,255,0.25);
+    margin: 0 auto 22px;
+  }
+  .dl-icon-wrap {
+    width: 56px; height: 56px;
+    background: rgba(200,232,245,0.10);
+    border: 1px solid rgba(200,232,245,0.28);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .dl-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 500;
+    color: var(--text-primary);
+    text-align: center; margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+  .dl-sub {
+    font-size: 12px; font-weight: 300;
+    color: var(--text-secondary);
+    text-align: center; line-height: 1.7;
+    margin-bottom: 24px; letter-spacing: 0.2px;
+  }
+  .dl-btn {
+    width: 100%; height: 54px;
+    background: rgba(255,255,255,0.95);
+    border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: #07101f;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    box-shadow: 0 4px 24px rgba(255,255,255,0.14), 0 2px 8px rgba(0,0,0,0.28);
+    transition: transform 0.15s, background 0.15s;
+    position: relative; overflow: hidden; margin-bottom: 10px;
+  }
+  .dl-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(200,232,245,0.18), transparent);
+  }
+  .dl-btn:active { transform: scale(0.985) translateY(1px); background: rgba(225,240,250,0.95); }
+  .dl-cancel {
+    width: 100%; height: 48px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.18);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 400;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-secondary);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .dl-cancel:active { border-color: rgba(255,255,255,0.4); color: var(--text-primary); }
+
+  .dl-ios-step {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .dl-ios-step:last-child { border-bottom: none; }
+  .dl-step-num {
+    width: 26px; height: 26px; flex-shrink: 0;
+    background: rgba(200,232,245,0.14);
+    border: 1px solid rgba(200,232,245,0.32);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500;
+    color: var(--accent); letter-spacing: 0;
+    margin-top: 1px;
+  }
+  .dl-step-text {
+    font-size: 13px; font-weight: 300;
+    color: var(--text-primary); line-height: 1.6;
+  }
+
+  /* ══ HAMBURGER DRAWER ══ */
+  .menu-overlay {
+    position:fixed;inset:0;z-index:400;
+    background:rgba(2,6,16,0.60);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    opacity:0;pointer-events:none;transition:opacity 0.35s ease;
+  }
+  .menu-overlay.open{opacity:1;pointer-events:all;}
+
+  .menu-drawer {
+    position:fixed;top:0;right:0;bottom:0;z-index:500;
+    width:82vw;max-width:340px;
+    background:
+      linear-gradient(160deg, rgba(3,10,24,0.82) 0%, rgba(5,14,32,0.72) 40%, rgba(2,8,20,0.88) 100%),
+      url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png') center top / cover no-repeat;
+    border-left:1px solid rgba(255,255,255,0.18);
+    box-shadow:-16px 0 64px rgba(0,0,0,0.7), inset 1px 0 0 rgba(255,255,255,0.12);
+    display:flex;flex-direction:column;
+    padding:0 0 max(env(safe-area-inset-bottom,28px),28px);
+    transform:translateX(100%);
+    transition:transform 0.40s cubic-bezier(0.16,1,0.3,1);
+    overflow:hidden;
+  }
+  .menu-drawer.open{transform:translateX(0);}
+
+  /* Top shimmer line */
+  .menu-drawer-head {
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 22px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.12);
+    margin-bottom:6px;
+    position:relative;
+  }
+  .menu-drawer-head::after {
+    content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(200,232,245,0.35),transparent);
+  }
+  .menu-drawer-logo {
+    white-space: nowrap;
+  }
+  .menu-drawer-logo .drawer-sub {
+    display:block;font-family:'DM Sans',sans-serif;
+    font-size:9px;font-weight:300;letter-spacing:5px;
+    text-transform:uppercase;color:var(--accent);margin-top:4px;
+    text-shadow:0 0 20px rgba(200,232,245,0.6);
+  }
+  .menu-close {
+    width:38px;height:38px;
+    background:rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.22);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:background 0.2s;
+  }
+  .menu-close:active{background:rgba(255,255,255,0.22);}
+
+  .menu-nav-item {
+    display:flex;align-items:center;gap:16px;padding:15px 22px;cursor:pointer;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+    transition:background 0.18s;
+    position:relative;overflow:hidden;
+  }
+  .menu-nav-item:active{ background:rgba(200,232,245,0.10); }
+
+  .menu-nav-icon {
+    width:38px;height:38px;flex-shrink:0;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .menu-nav-label{font-size:14px;font-weight:400;color:rgba(255,255,255,0.94);letter-spacing:0.2px;}
+  .menu-nav-sub{font-size:10px;font-weight:300;color:rgba(200,232,245,0.55);letter-spacing:0.5px;margin-top:2px;}
+
+  .menu-footer-note {
+    margin-top:auto;padding:24px 22px 0;
+    font-size:9px;font-weight:300;
+    color:rgba(255,255,255,0.30);
+    letter-spacing:3px;text-transform:uppercase;
+  }
+
+  /* ══ MENU BANNER ══ */
+  .menu-banner {
+    width:100%;height:180px;
+    position:relative;flex-shrink:0;
+    overflow:hidden;
+  }
+  .menu-banner img {
+    width:100%;height:100%;
+    object-fit:cover;object-position:center 20%;
+    display:block;
+  }
+  .menu-banner-fade {
+    position:absolute;inset:0;
+    background:linear-gradient(
+      to bottom,
+      rgba(3,10,24,0.55) 0%,
+      rgba(3,10,24,0.10) 45%,
+      rgba(3,10,24,0.85) 100%
+    );
+  }
+  .menu-banner-brand {
+    position:absolute;top:14px;left:16px;
+    display:flex;align-items:center;gap:10px;
+    z-index:3;
+  }
+  .menu-banner-brand .logo-img {
+    width:44px;height:44px;
+    object-fit:contain;
+    filter:drop-shadow(0 2px 10px rgba(0,0,0,0.8));
+  }
+  .menu-banner-tag {
+    position:absolute;bottom:14px;left:22px;
+    font-family:'DM Sans',sans-serif;
+    font-size:9px;font-weight:300;
+    letter-spacing:5px;text-transform:uppercase;
+    color:var(--accent);
+    text-shadow:0 0 20px rgba(200,232,245,0.8);
+  }
+
+  /* ══ LOGO ══ */
+  .logo-img {
+    width:62px;height:62px;flex-shrink:0;
+    display:block;
+    object-fit:contain;
+  }
+  .sub-screen {
+    position:fixed;inset:0;z-index:600;
+    background:#060c18;display:flex;flex-direction:column;
+    transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.16,1,0.3,1);
+    overflow:hidden;
+  }
+  .sub-screen.open{transform:translateX(0);}
+
+  /* Background image layer for sub-screens that have one */
+  .sub-screen-bg {
+    position:absolute;inset:0;z-index:0;
+    background-size:cover;background-position:center;background-repeat:no-repeat;
+  }
+  .sub-screen-bg::after {
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(
+      180deg,
+      rgba(4,10,24,0.18) 0%,
+      rgba(4,10,24,0.22) 45%,
+      rgba(3,8,20,0.72) 100%
+    );
+  }
+
+  /* Sub-screen with bg: make header + body sit above bg layer */
+  .sub-screen .sub-header,
+  .sub-screen .sub-body { position:relative;z-index:2; }
+
+  .sub-header {
+    display:flex;align-items:center;gap:14px;
+    padding:max(env(safe-area-inset-top,16px),16px) 20px 16px;
+    background:rgba(4,10,24,0.55);
+    backdrop-filter:blur(28px) saturate(1.5);
+    -webkit-backdrop-filter:blur(28px) saturate(1.5);
+    border-bottom:1px solid rgba(255,255,255,0.12);flex-shrink:0;position:relative;
+    box-shadow:0 4px 24px rgba(0,0,0,0.28);
+  }
+  .sub-header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);}
+  .sub-back {
+    width:38px;height:38px;flex-shrink:0;
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.22);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;
+    backdrop-filter:blur(12px);
+  }
+  .sub-back:active{background:rgba(255,255,255,0.18);}
+  .sub-header-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--text-primary);text-shadow:0 1px 12px rgba(0,0,0,0.5);}
+  .sub-header-tag{font-size:9px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-top:2px;}
+  .sub-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:24px 20px;}
+  .sub-section-label{font-size:9px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:block;text-shadow:0 0 16px rgba(200,232,245,0.3);}
+
+  /* ── TRUE GLASSMORPHISM cards ── */
+  .sub-card {
+    width:100%;padding:20px 18px;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.18);
+    margin-bottom:12px;position:relative;overflow:hidden;cursor:pointer;
+    transition:background 0.2s,border-color 0.2s,box-shadow 0.2s;
+    backdrop-filter:blur(28px) saturate(1.4);
+    -webkit-backdrop-filter:blur(28px) saturate(1.4);
+    box-shadow:0 4px 24px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.14);
+  }
+  .sub-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.32),transparent);
+  }
+  .sub-card:active{
+    background:rgba(255,255,255,0.13);
+    border-color:rgba(255,255,255,0.28);
+    box-shadow:0 6px 32px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .sub-card-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--text-primary);margin-bottom:5px;text-shadow:0 1px 8px rgba(0,0,0,0.4);}
+  .sub-card-sub{font-size:12px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.6;}
+
+  /* Frequency */
+  .freq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+  .freq-card {
+    padding:16px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);
+    cursor:pointer;transition:background 0.2s;position:relative;overflow:hidden;
+  }
+  .freq-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);}
+  .freq-card:active{background:rgba(255,255,255,0.13);}
+  .freq-hz{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--accent);margin-bottom:4px;}
+  .freq-name{font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--text-primary);margin-bottom:3px;}
+  .freq-sub{font-size:10px;font-weight:300;color:var(--text-secondary);line-height:1.5;}
+
+  /* Progress */
+  .streak-row{display:flex;align-items:center;gap:16px;padding:20px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.16);margin-bottom:20px;}
+  .streak-num{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:var(--accent-gold);line-height:1;}
+  .week-row{display:flex;gap:6px;margin-bottom:20px;width:100%;}
+  .week-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .week-day-dot{width:32px;height:32px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:400;color:var(--text-tertiary);}
+  .week-day-dot.done{background:rgba(200,232,245,0.18);border-color:var(--accent);color:var(--accent);}
+  .week-day-dot.today{border-color:var(--accent-gold);color:var(--accent-gold);}
+  .week-day-name{font-size:9px;color:var(--text-tertiary);letter-spacing:1px;}
+
+  .letter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+  .letter-chip{
+    padding:10px 14px;
+    background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);
+    cursor:pointer;transition:background 0.2s,border-color 0.2s,box-shadow 0.2s;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .letter-chip.active-chip,.letter-chip:active{
+    background:rgba(200,232,245,0.15);border-color:var(--accent);
+    box-shadow:0 4px 16px rgba(200,232,245,0.12);
+  }
+  .letter-chip-letter{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text-primary);display:block;}
+  .letter-chip-meaning{font-size:9px;font-weight:300;color:var(--accent);letter-spacing:1px;text-transform:uppercase;}
+  .letter-detail{
+    padding:20px;
+    background:rgba(200,232,245,0.07);
+    border:1px solid rgba(200,232,245,0.22);
+    margin-bottom:20px;
+    backdrop-filter:blur(28px) saturate(1.3);
+    -webkit-backdrop-filter:blur(28px) saturate(1.3);
+    box-shadow:0 4px 24px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+  .letter-detail-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--accent);margin-bottom:6px;}
+  .letter-detail-text{font-size:13px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.7;}
+
+  /* Profile */
+  .profile-avatar{width:80px;height:80px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+  .profile-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--text-primary);text-align:center;margin-bottom:4px;}
+  .profile-email{font-size:12px;font-weight:300;color:var(--text-secondary);text-align:center;margin-bottom:28px;}
+  .profile-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+  .profile-row-label{font-size:13px;font-weight:400;color:var(--text-primary);}
+  .profile-row-val{font-size:12px;font-weight:300;color:var(--text-secondary);}
+  .btn-signout{width:100%;height:50px;margin-top:28px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.25);color:rgba(255,120,120,0.9);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
+  .btn-signout:active{background:rgba(255,80,80,0.18);}
+
+  /* Practice */
+  .practice-step{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+  .practice-step-num{width:32px;height:32px;flex-shrink:0;background:rgba(200,232,245,0.10);border:1px solid rgba(200,232,245,0.28);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--accent);margin-top:2px;}
+  .practice-step-title{font-size:14px;font-weight:500;color:var(--text-primary);margin-bottom:4px;}
+  .practice-step-desc{font-size:12px;font-weight:300;color:var(--text-secondary);line-height:1.6;}
+  .practice-duration{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-top:4px;}
+
+  /* ══ WORD SEARCH SECTION ══ */
+  .word-search-section{width:calc(100% - 32px);margin-left:16px;margin-right:16px;position:relative;margin-bottom:24px;overflow:hidden;height:420px;}
+  .word-search-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:0;}
+  .word-search-overlay{
+    position:absolute;inset:0;z-index:1;
+    background:linear-gradient(
+      to bottom,
+      rgba(2,6,16,0.08) 0%,
+      rgba(4,12,28,0.10) 40%,
+      rgba(6,18,38,0.55) 75%,
+      rgba(2,6,18,0.72) 100%
+    );
+  }
+  /* Subtle shimmer line at top */
+  .word-search-overlay::after{
+    content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(200,232,245,0.28),transparent);
+  }
+  .word-search-content{
+    position:relative;z-index:2;
+    padding:36px 10% 30px;
+    height:100%;
+    display:flex;flex-direction:column;justify-content:flex-end;
+  }
+  .word-search-label{
+    font-size:9px;font-weight:500;letter-spacing:4px;text-transform:uppercase;
+    color:var(--accent);margin-bottom:10px;display:block;
+    text-shadow:0 0 20px rgba(200,232,245,0.4);
+  }
+  .word-search-title{
+    font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:500;
+    color:#fff;margin-bottom:8px;line-height:1.05;
+    text-shadow:0 2px 24px rgba(0,0,0,0.8);
+  }
+  .word-search-sub{
+    font-size:12px;font-weight:300;color:rgba(255,255,255,0.62);
+    letter-spacing:0.4px;margin-bottom:24px;line-height:1.7;
+    max-width:85%;
+  }
+  .word-search-input-wrap{
+    position:relative;width:100%;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.28);
+    backdrop-filter:blur(24px) saturate(1.4);
+    -webkit-backdrop-filter:blur(24px) saturate(1.4);
+    box-shadow:0 8px 32px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.14);
+  }
+  .word-search-input{width:100%;height:56px;background:transparent;border:none;color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;padding:0 60px 0 20px;outline:none;-webkit-appearance:none;transition:border-color 0.2s,background 0.2s;letter-spacing:0.3px;}
+  .word-search-input::placeholder{color:rgba(255,255,255,0.32);letter-spacing:0.3px;}
+  .word-search-input:focus{background:rgba(200,232,245,0.05);}
+  .word-search-btn{position:absolute;right:0;top:0;bottom:0;width:56px;background:rgba(200,232,245,0.14);border:none;border-left:1px solid rgba(255,255,255,0.18);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+  .word-search-btn:active{background:rgba(200,232,245,0.28);}
+  .word-search-result{
+    margin-top:14px;padding:18px 20px;
+    background:rgba(10,20,40,0.72);
+    border:1px solid rgba(200,232,245,0.22);
+    backdrop-filter:blur(28px);
+    -webkit-backdrop-filter:blur(28px);
+    display:none;
+    box-shadow:0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .word-search-result.show{display:block;}
+  .wsr-word{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--accent);margin-bottom:4px;}
+  .wsr-origin{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--accent-gold);margin-bottom:8px;}
+  .wsr-meaning{font-size:13px;font-weight:300;color:var(--text-primary);line-height:1.7;}
+
+  /* ══ VIDEO BANNER — 16:9, full-bleed, above footer ══ */
+  .home-video-banner {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+  /* Glass panel that holds the video banner */
+  .hvb-glass-wrap {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    margin: 0 0 0 0;
+    position: relative;
+  }
+  .hvb-glass-wrap::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.38), transparent);
+  }
+  .hvb-video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+  /* top + bottom dark fade */
+  .hvb-fade {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(3,8,20,0.55) 0%,
+      transparent 28%,
+      transparent 65%,
+      rgba(3,8,20,0.75) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+  }
+  /* logo watermark cover — bottom right */
+  .hvb-logo-cover {
+    position: absolute;
+    bottom: 8px; right: 8px;
+    width: 52px; height: 52px;
+    z-index: 3;
+    object-fit: contain;
+    opacity: 0.92;
+    /* slight dark bg to blend over watermark */
+    background: radial-gradient(circle, rgba(3,8,20,0.65) 40%, transparent 100%);
+    border-radius: 50%;
+    padding: 4px;
+  }
+  /* optional text label */
+  .hvb-label {
+    position: absolute;
+    bottom: 14px; left: 16px;
+    z-index: 2;
+    font-size: 9px; font-weight: 400;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(200,232,245,0.65);
+  }
+
+  /* ── BIG TEXT OVERLAY on video banner ── */
+  .hvb-text {
+    position: absolute;
+    top: 38%; left: 0; right: 0;
+    transform: translateY(-50%);
+    z-index: 2;
+    text-align: left;
+    padding: 0 24px;
+    pointer-events: none;
+  }
+  .hvb-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px; font-weight: 300;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(200,232,245,0.5);
+    display: block;
+    margin-bottom: 12px;
+  }
+  .hvb-big {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 26px; font-weight: 200;
+    color: rgba(255,255,255,0.92);
+    line-height: 1.3;
+    text-shadow: 0 4px 32px rgba(0,0,0,0.9);
+    margin-bottom: 0;
+  }
+  .hvb-meta {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 300;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(200,232,245,0.38);
+    margin-top: 16px;
+    display: block;
+  }
+
+  /* ── DASH-IN FROM LEFT, ONE LINE AT A TIME ── */
+  .hvb-line {
+    display: block;
+    opacity: 0;
+    animation: dashLeft 8.5s cubic-bezier(0.16,1,0.3,1) infinite;
+    will-change: transform, opacity;
+  }
+  @keyframes dashLeft {
+    0%    { opacity:0; transform: translateX(-110px) skewX(-8deg) scale(0.88); }
+    8%    { opacity:1; transform: translateX(14px)   skewX(3deg)  scale(1.06); }
+    12%   { transform: translateX(-7px) skewX(-2deg) scale(0.97); }
+    16%   { transform: translateX(4px)  skewX(1deg)  scale(1.02); }
+    20%   { transform: translateX(0)    skewX(0)     scale(1); }
+    68%   { opacity:1; transform: translateX(0)    skewX(0)     scale(1); }
+    76%   { opacity:0; transform: translateX(50px) skewX(5deg)  scale(0.9); }
+    100%  { opacity:0; transform: translateX(-110px) skewX(-8deg) scale(0.88); }
+  }
+  .hvb-line-1 { animation-delay: 0s; }
+  .hvb-line-2 { animation-delay: 0.45s; }
+  .hvb-line-3 { animation-delay: 0.90s; }
+
+  /* flowing red on line 3 */
+  .hvb-line-3 {
+    font-weight: 800;
+    background: linear-gradient(90deg, #FFD60A, #FFCC00, #FFB340, #FFD60A, #FFC200, #FFD60A);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: dashLeft 8.5s cubic-bezier(0.16,1,0.3,1) infinite, flowingColor 3s linear infinite;
+    animation-delay: 0.90s, 0s;
+  }
+  @keyframes flowingColor {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+
+  /* ── FOOTER INTRO — above carousel ── */
+  .footer-intro {
+    position: relative;
+    z-index: 2;
+    text-align: left;
+    padding: 44px 24px 16px;
+    width: 100%;
+  }
+  .footer-intro-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px; font-weight: 300;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(200,232,245,0.42);
+    display: block;
+    margin-bottom: 14px;
+  }
+  .footer-intro-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 40px; font-weight: 200;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.1;
+    margin-bottom: 14px;
+    text-shadow: 0 4px 32px rgba(0,0,0,0.7);
+  }
+  .footer-intro-title .fi-bold {
+    font-weight: 800;
+    color: #fff;
+    display: block;
+  }
+  .footer-intro-title .fi-accent {
+    font-weight: 800;
+    color: #e8d5a3;
+    display: block;
+  }
+  .footer-intro-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 300;
+    letter-spacing: 0.2px; line-height: 1.65;
+    color: rgba(255,255,255,0.38);
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  /* ══ HOME FOOTER — full-bleed ══ */
+  .home-footer {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    min-height: 660px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: max(env(safe-area-inset-bottom, 40px), 40px);
+  }
+  .footer-bg-img {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.6s ease;
+    z-index: 0;
+    /* Second bg layer for crossfade */
+  }
+  .footer-bg-img::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  .footer-bg-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(3,8,20,0.15) 0%,
+      rgba(3,8,20,0.05) 30%,
+      rgba(3,8,20,0.25) 70%,
+      rgba(3,8,20,0.75) 100%
+    );
+    z-index: 1;
+  }
+
+  /* ── 3D CAROUSEL ── */
+  .footer-carousel {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    perspective: 1000px;
+    perspective-origin: 50% 50%;
+    z-index: 2;
+    margin-bottom: 36px;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+  .footer-carousel-track {
+    width: 100%; height: 100%;
+    position: relative;
+  }
+  .fci {
+    position: absolute;
+    width: 162px; height: 228px;
+    top: 50%; left: 50%;
+    margin-left: -81px; margin-top: -114px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow:
+      0 24px 60px rgba(0,0,0,0.7),
+      0 4px 12px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.22),
+      inset 0 -1px 0 rgba(0,0,0,0.3);
+    cursor: pointer;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    opacity: 0;
+  }
+  .fci img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    pointer-events: none;
+  }
+  /* glass shine overlay on each card */
+  .fci::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  /* subtle bottom gradient */
+  .fci::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
+    z-index: 2;
+    background: linear-gradient(to bottom, transparent, rgba(3,8,20,0.65));
+    pointer-events: none;
+  }
+  /* carousel dot indicators */
+  .footer-carousel-dots {
+    position: absolute;
+    bottom: -20px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 6px;
+    z-index: 3;
+  }
+  .fcd {
+    width: 4px; height: 4px;
+    background: rgba(200,232,245,0.3);
+    transition: all 0.4s ease;
+    flex-shrink: 0;
+  }
+  .fcd.active {
+    width: 20px;
+    background: rgba(200,232,245,0.9);
+    box-shadow: 0 0 8px rgba(200,232,245,0.5);
+  }
+
+  /* ── BRAND PANEL — GLASS + NEUMORPHISM + SKEUOMORPHISM ── */
+  .footer-panel {
+    position: relative;
+    z-index: 3;
+    width: calc(100% - 40px);
+    max-width: 400px;
+    /* GLASSMORPHISM */
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    /* NEUMORPHISM shadow depth */
+    box-shadow:
+      0 -2px 40px rgba(0,0,0,0.5),
+      0 8px 32px rgba(0,0,0,0.4),
+      4px 4px 16px rgba(0,0,0,0.35),
+      -2px -2px 10px rgba(255,255,255,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      inset 0 -1px 0 rgba(0,0,0,0.2);
+    padding: 24px 22px 20px;
+    text-align: center;
+  }
+  /* SKEUOMORPHISM top glint */
+  .footer-panel::before {
+    content: '';
+    position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  }
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 20px rgba(200,232,245,0.3);
+  }
+  .footer-tagline {
+    font-size: 9px; font-weight: 400;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 18px;
+  }
+  .footer-divider {
+    width: 32px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,232,245,0.4), transparent);
+    margin: 0 auto 18px;
+  }
+  .footer-links {
+    display: flex; flex-wrap: wrap;
+    gap: 6px 16px;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+  .footer-link {
+    font-size: 10px; font-weight: 400;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .footer-link:active { color: var(--accent); }
+  .footer-copy {
+    font-size: 9px; font-weight: 300;
+    color: var(--text-tertiary);
+    letter-spacing: 1px;
+    opacity: 0.7;
+  }
+
+  /* ══════════════════════════════════════
+     REAL MEANING SECTION
+  ══════════════════════════════════════ */
+  .real-meaning-section {
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .rm-header {
+    margin-bottom: 20px;
+  }
+  .rm-eyebrow {
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--accent); display: block;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(200,232,245,0.4);
+  }
+  .rm-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 34px; font-weight: 600;
+    color: var(--text-primary); line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .rm-sub {
+    font-size: 12px; font-weight: 300;
+    color: var(--text-secondary); line-height: 1.7;
+  }
+
+  /* Horizontal scroll cards row */
+  .rm-cards-row {
+    display: flex; gap: 12px;
+    overflow-x: auto; overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 0 16px;
+    scroll-snap-type: x mandatory;
+    margin: 0 -10%;
+    padding-left: 10%;
+    padding-right: 10%;
+  }
+  .rm-cards-row::-webkit-scrollbar { display: none; }
+
+  .rm-card {
+    flex-shrink: 0;
+    width: 160px; height: 220px;
+    position: relative; overflow: hidden;
+    scroll-snap-align: start;
+    cursor: pointer;
+    /* SKEUOMORPHISM — physical card feel */
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.45),
+      0 2px 4px rgba(0,0,0,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.25),
+      inset 0 -1px 0 rgba(0,0,0,0.2);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease;
+    transform-style: preserve-3d;
+  }
+  .rm-card:active {
+    transform: scale(0.96) translateY(2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  .rm-card-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center center;
+    transition: transform 0.6s ease;
+  }
+  .rm-card:active .rm-card-img { transform: scale(1.04); }
+
+  .rm-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(3,8,20,0.08) 0%,
+      rgba(3,8,20,0.12) 40%,
+      rgba(3,8,20,0.82) 100%
+    );
+    /* GLASSMORPHISM top shine */
+    backdrop-filter: blur(0px);
+  }
+  .rm-card-overlay::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+  }
+
+  .rm-card-body {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 14px 12px;
+    /* GLASSMORPHISM bottom panel */
+    background: rgba(4,10,24,0.55);
+    backdrop-filter: blur(16px) saturate(1.6);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    border-top: 1px solid rgba(255,255,255,0.14);
+  }
+  .rm-card-q {
+    font-size: 9px; font-weight: 300;
+    letter-spacing: 1.5px; color: rgba(200,232,245,0.7);
+    text-transform: uppercase;
+  }
+  .rm-card-word {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 600;
+    color: #fff; line-height: 1.1;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  }
+
+  /* NEUMORPHISM glow dot */
+  .rm-card-glow {
+    position: absolute; bottom: 52px; right: 10px;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(200,232,245,0.9), 0 0 20px rgba(200,232,245,0.4);
+    animation: rmGlowPulse 2s ease-in-out infinite;
+  }
+  @keyframes rmGlowPulse {
+    0%,100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  .rm-cta {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; padding: 14px;
+    /* NEUMORPHISM button */
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow:
+      4px 4px 12px rgba(0,0,0,0.35),
+      -2px -2px 8px rgba(255,255,255,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.12);
+    cursor: pointer;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent);
+    transition: all 0.2s ease;
+    margin-top: 4px;
+  }
+  .rm-cta:active {
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4), inset 0 1px 4px rgba(0,0,0,0.3);
+    transform: translateY(1px);
+  }
+
+  /* ══ REAL MEANING SUB-SCREEN ══ */
+  .rm-search-wrap {
+    margin-bottom: 20px;
+  }
+  .rm-search-inner {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 16px;
+    height: 52px;
+    /* GLASSMORPHISM */
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+  .rm-search-input {
+    flex: 1; background: none; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 300;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+  }
+  .rm-search-input::placeholder { color: var(--text-tertiary); }
+  .rm-search-btn {
+    background: rgba(200,232,245,0.15);
+    border: 1px solid rgba(200,232,245,0.3);
+    color: var(--accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 6px 14px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .rm-search-btn:active { background: rgba(200,232,245,0.28); }
+
+  /* Feature image card — SKEUOMORPHISM physical depth */
+  .rm-feature-card {
+    width: 100%; height: 300px;
+    position: relative; overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow:
+      0 16px 48px rgba(0,0,0,0.55),
+      0 4px 8px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.22),
+      inset 0 -1px 0 rgba(0,0,0,0.25);
+    transition: transform 0.4s ease;
+  }
+  .rm-feature-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: top center;
+    transition: transform 0.7s ease;
+  }
+  .rm-feature-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(3,8,20,0.05) 0%, rgba(3,8,20,0.08) 55%, rgba(3,8,20,0.72) 100%);
+  }
+  .rm-feature-overlay::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  }
+  .rm-feature-content {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 20px;
+    /* GLASSMORPHISM */
+    background: rgba(4,10,24,0.5);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .rm-feature-eyebrow {
+    font-size: 9px; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--accent);
+    display: block; margin-bottom: 4px;
+  }
+  .rm-feature-word {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px; font-weight: 600;
+    color: #fff; line-height: 1; margin-bottom: 4px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.7);
+  }
+  .rm-feature-root {
+    font-size: 11px; font-weight: 300;
+    color: rgba(200,232,245,0.7); letter-spacing: 1px;
+  }
+
+  /* Meaning panel — NEUMORPHISM + GLASSMORPHISM hybrid */
+  .rm-meaning-panel {
+    position: relative; overflow: hidden;
+    padding: 22px 20px;
+    margin-bottom: 16px;
+    /* Neumorphic depth */
+    background: rgba(8,16,36,0.72);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow:
+      6px 6px 18px rgba(0,0,0,0.45),
+      -3px -3px 10px rgba(255,255,255,0.03),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 0 40px rgba(200,232,245,0.03);
+    backdrop-filter: blur(32px) saturate(1.5);
+    -webkit-backdrop-filter: blur(32px) saturate(1.5);
+  }
+  .rm-meaning-shimmer {
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,232,245,0.5), transparent);
+  }
+  .rm-meaning-label {
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+    text-shadow: 0 0 16px rgba(200,232,245,0.5);
+  }
+  .rm-meaning-text {
+    font-size: 14px; font-weight: 300;
+    color: rgba(255,255,255,0.82); line-height: 1.85;
+    letter-spacing: 0.2px;
+  }
+  .rm-meaning-text em {
+    font-style: italic; color: var(--accent);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+  }
+
+  /* Sound breakdown panel */
+  .rm-sound-panel {
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 4px 4px 16px rgba(0,0,0,0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .rm-sound-label {
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-secondary); margin-bottom: 14px;
+  }
+  .rm-sound-chips {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .rm-sound-chip {
+    padding: 8px 14px;
+    /* NEUMORPHISM chips */
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.3), -1px -1px 4px rgba(255,255,255,0.04);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    min-width: 48px;
+  }
+  .rm-chip-letter {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--accent); line-height: 1;
+  }
+  .rm-chip-meaning {
+    font-size: 8px; font-weight: 300;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  /* Word pills */
+  .rm-pills {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .rm-pill {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.12);
+    font-size: 12px; font-weight: 400;
+    color: var(--text-primary); cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+  }
+  /* ══ KNOW THE REAL MEANING SECTION ══ */
+  .krm-section {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+    margin-bottom: 0;
+    width: calc(100% - 32px);
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+  .krm-video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    z-index: 0;
+  }
+  .krm-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(
+      160deg,
+      rgba(3,8,20,0.18) 0%,
+      rgba(4,12,28,0.10) 40%,
+      rgba(3,8,20,0.28) 100%
+    );
+  }
+  .krm-overlay::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+    background: linear-gradient(to bottom, transparent, rgba(6,12,24,0.88));
+  }
+  .krm-content {
+    position: relative; z-index: 2;
+    height: 100%;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 48px 24px 36px;
+    gap: 0;
+  }
+  .krm-eyebrow-wrap {
+    overflow: hidden; margin-bottom: 14px;
+  }
+  .krm-eyebrow {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 5px; text-transform: uppercase;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(200,232,245,0.6);
+    animation: krmEyebrowIn 0.8s both cubic-bezier(0.16,1,0.3,1);
+  }
+  @keyframes krmEyebrowIn {
+    from { opacity:0; transform: translateY(14px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .krm-title {
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.05;
+    margin-bottom: 20px;
+  }
+  .krm-title-light {
+    font-size: clamp(28px,8vw,44px);
+    font-weight: 200;
+    color: rgba(255,255,255,0.92);
+    text-shadow: 0 2px 32px rgba(0,0,0,0.9), 0 0 60px rgba(0,0,0,0.7);
+    display: block;
+  }
+  .krm-title-bold {
+    font-size: clamp(28px,8vw,44px);
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 2px 32px rgba(0,0,0,0.9), 0 0 60px rgba(0,0,0,0.7);
+    display: block;
+  }
+
+  /* Cycling question — hero word style */
+  .krm-question-wrap {
+    height: 52px; overflow: hidden;
+    margin-bottom: 24px;
+    display: flex; align-items: center;
+  }
+  .krm-question {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 500;
+    color: rgba(255,255,255,0.95);
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.8);
+  }
+  .krm-question em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .krm-q-out { animation: krmQOut 0.24s ease forwards; }
+  .krm-q-in  { animation: krmQIn  0.34s ease forwards; }
+  @keyframes krmQOut { to { transform: translateY(-52px); opacity: 0; } }
+  @keyframes krmQIn  { from { transform: translateY(52px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* Search bar — glassmorphism */
+  .krm-search-wrap { width: 100%; margin-bottom: 16px; }
+  .krm-search-box {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 6px 0 16px;
+    height: 54px;
+    background: rgba(3,8,20,0.55);
+    border: 1px solid rgba(255,255,255,0.38);
+    backdrop-filter: blur(32px) saturate(1.8);
+    -webkit-backdrop-filter: blur(32px) saturate(1.8);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.28);
+  }
+  .krm-input {
+    flex: 1; background: none; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 300;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+  }
+  .krm-input::placeholder { color: rgba(255,255,255,0.35); }
+  .krm-btn {
+    width: 42px; height: 42px; flex-shrink: 0;
+    background: rgba(255,255,255,0.92);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .krm-btn:active { background: rgba(200,232,245,0.95); transform: scale(0.94); }
+
+  .krm-hint {
+    font-size: 10px; font-weight: 300;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND — changes per screen -->
+<div class="app-bg" id="appBg"></div>
+<!-- SECONDARY BG LAYER — cross-fades in when Word Search scrolls into view -->
+<div class="app-bg-layer2" id="appBgLayer2"></div>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- ══ SCREEN 1: SPLASH ══ -->
+<div class="screen active" id="splash">
+  <div class="splash-bg-image"></div>
+  <div class="splash-bottom">
+    <div class="splash-subtitle">Natural Origin Word Science</div>
+    <div class="splash-progress">
+      <div class="splash-progress-bar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: LOGIN ══ -->
+<div class="screen" id="login">
+  <div class="login-header">
+    <div class="login-logo-small">
+      <img class="logo-img" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776888809/1000033338_no_bg-1776888417038_hc6hyu.png" alt="NowsBansiu">
+      <span class="brand-name" style="font-size:18px;"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
+    </div>
+    <div class="login-title">
+      Welcome<br>Back
+      <span>Sign in to continue</span>
+    </div>
+  </div>
+
+  <div class="glass-panel">
+    <label class="field-label">Email Address</label>
+    <div class="glass-input-wrap">
+      <div class="input-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="3" width="14" height="10" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+          <path d="M1 3 L8 9 L15 3" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <input class="glass-input" type="email" placeholder="your@email.com">
+    </div>
+
+    <label class="field-label">Password</label>
+    <div class="glass-input-wrap">
+      <div class="input-icon">
+        <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
+          <rect x="2" y="8" width="12" height="9" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+          <path d="M4 8 V6 Q4 2 8 2 Q12 2 12 6 V8" stroke="rgba(255,255,255,0.55)" stroke-width="1.2" fill="none"/>
+          <circle cx="8" cy="12.5" r="1.5" fill="rgba(255,255,255,0.55)"/>
+        </svg>
+      </div>
+      <input class="glass-input" type="password" placeholder="Enter your password" id="pwInput">
+      <div class="input-icon-right" onclick="togglePw()">
+        <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+          <path d="M9 1C5 1 1.5 4 0.5 7C1.5 10 5 13 9 13C13 13 16.5 10 17.5 7C16.5 4 13 1 9 1Z" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
+          <circle cx="9" cy="7" r="3" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
+        </svg>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="goTo('onboarding')">Sign In</button>
+    <a class="forgot-link">Forgot Password?</a>
+  </div>
+
+  <div class="divider-row">
+    <div class="divider-line"></div>
+    <span class="divider-text">or</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <button class="btn-ghost w100" onclick="goTo('onboarding')">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.1 9.2c0-.6-.1-1.2-.2-1.8H9v3.3h4.6c-.2 1-.8 1.9-1.7 2.4v2h2.7c1.6-1.4 2.5-3.6 2.5-5.9z" fill="#4285F4"/>
+      <path d="M9 18c2.3 0 4.2-.8 5.6-2.1l-2.7-2c-.8.5-1.8.8-2.9.8-2.2 0-4.1-1.5-4.8-3.5H1.4v2.1C2.8 16.1 5.7 18 9 18z" fill="#34A853"/>
+      <path d="M4.2 11.2c-.2-.5-.3-1-.3-1.6s.1-1.1.3-1.6V5.9H1.4C.5 7.4 0 9.1 0 10.9s.5 3.5 1.4 5l2.8-4.7z" fill="#FBBC05"/>
+      <path d="M9 3.6c1.2 0 2.3.4 3.2 1.2L14.8 2C13.3.7 11.3 0 9 0 5.7 0 2.8 1.9 1.4 4.6l2.8 2.1C4.9 5.1 6.8 3.6 9 3.6z" fill="#EA4335"/>
+    </svg>
+    Continue with Google
+  </button>
+
+  <div class="signup-row mt16">
+    <span class="signup-left">Not a member?</span>
+    <button class="signup-btn" onclick="goTo('onboarding')">Sign Up</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: ONBOARDING ══ -->
+<div class="screen" id="onboarding">
+  <div class="ob-nav w100">
+    <div class="btn-back" onclick="goTo('login')">
+      <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+        <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="square"/>
+        <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <span class="ob-step-text" id="stepText">Step 1 of 3</span>
+    <button class="btn-skip" onclick="skipOnboarding()">Skip</button>
+  </div>
+
+  <div class="ob-inner">
+    <div class="ob-progress-bar w100">
+      <div class="ob-progress-fill" id="obProgress" style="width:33%"></div>
+      <div class="ob-progress-ticks">
+        <div class="ob-tick done" id="tick0"></div>
+        <div class="ob-tick" id="tick1"></div>
+        <div class="ob-tick" id="tick2"></div>
+      </div>
+    </div>
+    <div class="ob-question w100" id="obQuestion">
+      <span class="ob-q-label">Personalise Your Journey</span>
+      <div class="ob-q-text" id="obQText">What brings you to Shabdapathy?</div>
+    </div>
+    <div class="ob-options w100" id="obOptions"></div>
+    <button class="btn-primary w100" id="obNext" onclick="nextQuestion()">
+      Continue
+    </button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 4: ANALYSIS ══ -->
+<div class="screen" id="analysis">
+  <div class="analysis-scroll">
+  <div class="analysis-header">
+    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent)">Preparing Your Path</div>
+  </div>
+
+  <div class="analysis-ring-wrap">
+    <svg class="ring-svg" width="160" height="160" viewBox="0 0 160 160">
+      <circle class="ring-bg" cx="80" cy="80" r="70" stroke-width="2"/>
+      <circle class="ring-fill" cx="80" cy="80" r="70" stroke-width="2" id="ringFill"/>
+    </svg>
+    <div class="ring-inner">
+      <div class="ring-percent" id="ringNum">0%</div>
+      <div class="ring-label">Complete</div>
+    </div>
+  </div>
+
+  <div class="analysis-title">Analysing Your Profile</div>
+  <div class="analysis-sub">Preparing your personalised Shabdapathy practice based on your responses.</div>
+
+  <div class="checklist w100">
+    <div class="check-item" id="ci0">
+      <div class="check-icon-wrap">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M3 9C3 9 5 11 7 13L15 5" stroke="rgba(200,232,245,0.7)" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <span class="check-text">Reviewing your responses</span>
+      <div class="check-status"><div class="check-done" id="cd0"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square" fill="none"/></svg></div></div>
+    </div>
+    <div class="check-item" id="ci1">
+      <div class="check-icon-wrap">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/>
+          <path d="M6 9H12M9 6V12" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <span class="check-text">Matching root word sequences</span>
+      <div class="check-status"><div class="check-done" id="cd1"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square" fill="none"/></svg></div></div>
+    </div>
+    <div class="check-item" id="ci2">
+      <div class="check-icon-wrap">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="2" y="4" width="14" height="10" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/>
+          <path d="M5 8H13M5 11H10" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <span class="check-text">Calibrating pronunciation path</span>
+      <div class="check-status"><div class="check-done" id="cd2"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square" fill="none"/></svg></div></div>
+    </div>
+    <div class="check-item" id="ci3">
+      <div class="check-icon-wrap">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2L11 7H16L12 10.5L13.5 16L9 13L4.5 16L6 10.5L2 7H7Z" stroke="rgba(200,232,245,0.7)" stroke-width="1.2" fill="none"/>
+        </svg>
+      </div>
+      <span class="check-text">Building your healing profile</span>
+      <div class="check-status"><div class="check-done" id="cd3"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square" fill="none"/></svg></div></div>
+    </div>
+    <div class="check-item" id="ci4">
+      <div class="check-icon-wrap">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M5 9 Q9 5 13 9 Q9 13 5 9Z" stroke="rgba(200,232,245,0.7)" stroke-width="1.2" fill="none"/>
+          <circle cx="9" cy="9" r="2" fill="rgba(200,232,245,0.5)"/>
+        </svg>
+      </div>
+      <span class="check-text">Personalising your Shabdapathy plan</span>
+      <div class="check-status"><div class="check-done" id="cd4"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square" fill="none"/></svg></div></div>
+    </div>
+  </div>
+
+  <!-- scroll hint arrow -->
+  <div class="scroll-hint" id="scrollHint">
+    <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
+      <path d="M2 2L10 10L18 2" stroke="rgba(200,232,245,0.7)" stroke-width="1.8" stroke-linecap="square"/>
+    </svg>
+  </div>
+
+  </div><!-- /analysis-scroll -->
+
+  <!-- START YOUR JOURNEY — always visible at bottom of glass panel -->
+  <div class="analysis-cta">
+    <button class="btn-primary w100" id="startJourneyBtn" style="display:none;" onclick="goTo('home')">
+      Start Your Journey
+    </button>
+  </div>
+</div>
+
+<!-- ══ HOME FIXED HEADER (fixed overlay, shown only on home screen) ══ -->
+<div class="home-header w100" id="homeHeader" style="display:none;">
+  <div class="home-logo">
+    <img class="logo-img" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776888809/1000033338_no_bg-1776888417038_hc6hyu.png" alt="NowsBansiu">
+    <span class="brand-name" style="font-size:22px;text-shadow:0 1px 8px rgba(0,0,0,0.5);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
+  </div>
+  <div style="width:36px;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);" onclick="openMenu()">
+    <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+      <line x1="0" y1="2" x2="16" y2="2" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+      <line x1="0" y1="7" x2="16" y2="7" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+      <line x1="0" y1="12" x2="10" y2="12" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ══ SCREEN 5: HOME ══ -->
+<div class="screen" id="home">
+
+  <!-- ══ HERO HEADER ══ -->
+  <div class="hero-section">
+    <div class="hero-bg on" id="hb0"></div>
+    <div class="hero-bg"    id="hb1"></div>
+    <div class="hero-bg"    id="hb2"></div>
+    <div class="hero-bg"    id="hb3"></div>
+    <div class="hero-bg"    id="hb4"></div>
+    <div class="hero-content">
+      <div style="margin-left:18px;">
+        <div>
+          <span class="brand-name" style="font-size:clamp(32px,9vw,52px);"><span class="b">Nowss</span><span class="t">B</span></span>
+        </div>
+        <div style="margin-top:6px;overflow:hidden;">
+          <span id="heroTagline" style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;display:inline-block;animation:taglineReveal 1.4s 0.6s both cubic-bezier(0.16,1,0.3,1);"><span style="font-weight:700;color:#fff;" id="tagWord">VIBRATION</span></span>
+        </div>
+      </div>
+      <div class="hero-bottom">
+        <div style="width:100%;text-align:center;margin-bottom:36px;position:relative;z-index:30;">
+          <div style="text-shadow:0 1px 12px rgba(0,0,0,0.8);"><span class="brand-tag" style="font-size:15px;">Natural Origin of <strong>Word Science</strong></span></div>
+        </div>
+        <div class="hero-glass">
+          <div class="hero-cards">
+            <div class="hero-card active" id="hc0"></div>
+            <div class="hero-card"       id="hc1"></div>
+            <div class="hero-card"       id="hc2"></div>
+            <div class="hero-card"       id="hc3"></div>
+            <div class="hero-card"       id="hc4"></div>
+          </div>
+        </div>
+        <div class="hero-word-wrap">
+          <span class="hero-word" id="hwd">VIBRATION</span>
+        </div>
+        <div class="hero-btns">
+          <button class="hero-btn hero-btn-p">Explore</button>
+          <button class="hero-btn hero-btn-s">Learn More</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-body">
+
+  <div class="home-greeting w100">Begin Your<br>Healing Path</div>
+  <div class="home-tagline w100"><span class="brand-tag" style="font-size:12px;">Natural Origin of <strong>Word Science</strong></span></div>
+
+  <div class="home-card w100" onclick="openSub('practice')">
+    <span class="home-card-label">Today's Practice</span>
+    <div class="home-card-title">Morning Word Ritual</div>
+    <div class="home-card-sub">Start with foundational root syllables to activate clarity and vitality.</div>
+    <div class="home-card-arrow">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(200,232,245,0.6)" stroke-width="1.4" stroke-linecap="square"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="home-grid w100">
+    <div class="home-tile" onclick="openSub('sound-library')">
+      <div class="home-tile-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="8" stroke="rgba(200,232,245,0.6)" stroke-width="1.2"/>
+          <path d="M8 11 Q11 7 14 11 Q11 15 8 11Z" stroke="rgba(200,232,245,0.6)" stroke-width="1.2" fill="none"/>
+        </svg>
+      </div>
+      <div class="home-tile-title">Sound Library</div>
+      <div class="home-tile-sub">Root frequencies</div>
+      <div class="home-tile-arrow"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="rgba(200,232,245,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    </div>
+    <div class="home-tile" onclick="openSub('my-progress')">
+      <div class="home-tile-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 3L13.5 9H19L14.5 12.5L16 18L11 14.5L6 18L7.5 12.5L3 9H8.5Z" stroke="rgba(232,213,163,0.65)" stroke-width="1.2" fill="none"/>
+        </svg>
+      </div>
+      <div class="home-tile-title">My Progress</div>
+      <div class="home-tile-sub">Healing journey</div>
+      <div class="home-tile-arrow"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="rgba(232,213,163,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    </div>
+    <div class="home-tile" onclick="openSub('word-science')">
+      <div class="home-tile-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <rect x="3" y="4" width="16" height="14" stroke="rgba(200,232,245,0.6)" stroke-width="1.2"/>
+          <path d="M7 9H15M7 13H11" stroke="rgba(200,232,245,0.6)" stroke-width="1.2"/>
+        </svg>
+      </div>
+      <div class="home-tile-title">Word Science</div>
+      <div class="home-tile-sub">NOWSBANSIU texts</div>
+      <div class="home-tile-arrow"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="rgba(200,232,245,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    </div>
+    <div class="home-tile" onclick="openSub('profile')">
+      <div class="home-tile-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="9" r="4" stroke="rgba(200,232,245,0.6)" stroke-width="1.2"/>
+          <path d="M5 19 Q11 15 17 19" stroke="rgba(200,232,245,0.6)" stroke-width="1.2" fill="none"/>
+        </svg>
+      </div>
+      <div class="home-tile-title">Profile</div>
+      <div class="home-tile-sub">Your settings</div>
+      <div class="home-tile-arrow"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="rgba(200,232,245,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    </div>
+  </div>
+
+  <div class="home-card w100" onclick="openSub('shabdapathy')">
+    <span class="home-card-label">Featured</span>
+    <div class="home-card-title">Shabdapathy Foundations</div>
+    <div class="home-card-sub">Ancient word science meets modern wellness. Explore the healing power of natural word origins.</div>
+    <div class="home-card-arrow">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(200,232,245,0.6)" stroke-width="1.4" stroke-linecap="square"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- HEADING ONLY -->
+  <div class="real-meaning-section w100">
+    <div class="rm-header">
+      <span class="rm-eyebrow">Word Without Dictionary</span>
+      <div class="rm-title">Do You Really<br>Know?</div>
+      <div class="rm-sub">The real meaning behind the words you use every day — before dictionaries existed.</div>
+    </div>
+  </div>
+
+  <!-- ══ KNOW THE REAL MEANING SECTION ══ -->
+  <div class="krm-section w100">
+    <video class="krm-video" autoplay muted loop playsinline>
+      <source src="https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776940241/InShot_20260423_155207268_zfu45r.mp4" type="video/mp4">
+    </video>
+    <div class="krm-overlay"></div>
+    <div class="krm-content">
+      <div class="krm-eyebrow-wrap">
+        <span class="krm-eyebrow" id="krmEyebrow">WORD WITHOUT DICTIONARY</span>
+      </div>
+      <div class="krm-title">
+        <span class="krm-title-light">Know the</span><br>
+        <span class="krm-title-bold">Real Meaning</span>
+      </div>
+      <div class="krm-question-wrap">
+        <div class="krm-question" id="krmQuestion">Why is <em>Earth</em> called Earth?</div>
+      </div>
+      <div class="krm-search-wrap">
+        <div class="krm-search-box">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;opacity:0.55;">
+            <circle cx="7" cy="7" r="4.5" stroke="rgba(200,232,245,0.9)" stroke-width="1.3"/>
+            <path d="M10.5 10.5L14 14" stroke="rgba(200,232,245,0.9)" stroke-width="1.3" stroke-linecap="square"/>
+          </svg>
+          <input
+            class="krm-input"
+            id="krmInput"
+            type="text"
+            placeholder="Type any word, name or country..."
+            onkeydown="if(event.key==='Enter')krmSearch()"
+          >
+          <button class="krm-btn" onclick="krmSearch()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8H13M9 4L13 8L9 12" stroke="#07101f" stroke-width="1.6" stroke-linecap="square"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="krm-hint">Earth · Water · God · Your Name · Your Country</div>
+    </div>
+  </div>
+
+  <!-- HORIZONTAL SCROLL CARDS -->
+  <div class="real-meaning-section w100" style="margin-top:0;">
+    <div class="rm-cards-row" id="rmCardsRow">
+
+      <div class="rm-card" onclick="openWordOrigin('earth')">
+        <div class="rm-card-img" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030389/grok_image_1777030001969_2_mpmpu2.jpg')"></div>
+        <div class="rm-card-overlay"></div>
+        <div class="rm-card-body">
+          <div class="rm-card-q">Why is</div>
+          <div class="rm-card-word">Earth</div>
+          <div class="rm-card-q">called Earth?</div>
+        </div>
+        <div class="rm-card-glow"></div>
+      </div>
+
+      <div class="rm-card" onclick="openWordOrigin('water')">
+        <div class="rm-card-img" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030372/grok_image_1777029845867_2_abtxad.jpg')"></div>
+        <div class="rm-card-overlay"></div>
+        <div class="rm-card-body">
+          <div class="rm-card-q">Why is</div>
+          <div class="rm-card-word">Water</div>
+          <div class="rm-card-q">called Water?</div>
+        </div>
+        <div class="rm-card-glow"></div>
+      </div>
+
+      <div class="rm-card" onclick="openWordOrigin('god')">
+        <div class="rm-card-img" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030423/grok_image_1777030062742_2_f7k7eo.jpg')"></div>
+        <div class="rm-card-overlay"></div>
+        <div class="rm-card-body">
+          <div class="rm-card-q">Why is</div>
+          <div class="rm-card-word">God</div>
+          <div class="rm-card-q">called God?</div>
+        </div>
+        <div class="rm-card-glow"></div>
+      </div>
+
+      <div class="rm-card" onclick="openWordOrigin('name')">
+        <div class="rm-card-img" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg')"></div>
+        <div class="rm-card-overlay"></div>
+        <div class="rm-card-body">
+          <div class="rm-card-q">Search</div>
+          <div class="rm-card-word">Your Name</div>
+          <div class="rm-card-q">What does it mean?</div>
+        </div>
+        <div class="rm-card-glow"></div>
+      </div>
+
+    </div>
+
+    <div class="rm-cta" onclick="openSub('real-meaning')">
+      <span>Explore All Origins</span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(200,232,245,0.8)" stroke-width="1.4" stroke-linecap="square"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- WORD SEARCH SECTION -->
+  <div class="word-search-section">
+    <video class="word-search-video" autoplay muted loop playsinline>
+      <source src="https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4" type="video/mp4">
+    </video>
+    <div class="word-search-overlay"></div>
+    <div class="word-search-content">
+      <span class="word-search-label">Shabdapathy</span>
+      <div class="word-search-title">Word Search</div>
+      <div class="word-search-sub">Discover the natural origin and healing frequency of any word.</div>
+      <div class="word-search-input-wrap">
+        <input class="word-search-input" id="wordSearchInput" type="text" placeholder="Enter a word..." onkeydown="if(event.key==='Enter')searchWord()">
+        <button class="word-search-btn" onclick="searchWord()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="8" cy="8" r="5.5" stroke="rgba(200,232,245,0.8)" stroke-width="1.4"/>
+            <path d="M12.5 12.5L16 16" stroke="rgba(200,232,245,0.8)" stroke-width="1.4" stroke-linecap="square"/>
+          </svg>
+        </button>
+      </div>
+      <div class="word-search-result" id="wordSearchResult">
+        <div class="wsr-word" id="wsrWord"></div>
+        <div class="wsr-origin" id="wsrOrigin"></div>
+        <div class="wsr-meaning" id="wsrMeaning"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIDEO BANNER — 16:9 — above footer ══ -->
+  <div class="hvb-glass-wrap">
+  <div class="home-video-banner">
+    <video class="hvb-video" autoplay muted loop playsinline>
+      <source src="https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776935142/grok_video_2026-04-23-12-27-29_va2kty.mp4" type="video/mp4">
+    </video>
+    <div class="hvb-fade"></div>
+    <div class="hvb-text">
+      <span class="hvb-eyebrow">Shabdapathy</span>
+      <div class="hvb-big">
+        <span class="hvb-line hvb-line-1" style="font-weight:200;color:rgba(255,255,255,0.92);">Before language</span>
+        <span class="hvb-line hvb-line-2" style="font-weight:800;color:#fff;">was written,</span>
+        <span class="hvb-line hvb-line-3">it was sound.</span>
+      </div>
+      <span class="hvb-meta">Natural Origin of Word Science</span>
+    </div>
+    <span class="hvb-label">Nowsbansiu</span>
+    <img class="hvb-logo-cover"
+      src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776888809/1000033338_no_bg-1776888417038_hc6hyu.png"
+      alt="">
+  </div>
+  </div>
+
+  <!-- ══ FOOTER — 3D STAGE ══ -->
+  <div class="home-footer" id="homeFooter">
+
+    <!-- Dynamic background — updates to match active carousel image -->
+    <div class="footer-bg-img" id="footerBgImg"></div>
+    <div class="footer-bg-overlay"></div>
+
+    <!-- Intro text — above carousel -->
+    <div class="footer-intro">
+      <span class="footer-intro-eyebrow">Across Every Language</span>
+      <div class="footer-intro-title">
+        Every civilization
+        <span class="fi-bold">heard the same</span>
+        <span class="fi-accent">original sound.</span>
+      </div>
+      <div class="footer-intro-sub">Different words. One root. All languages descend from the same vibrational origin.</div>
+    </div>
+
+    <!-- 3D Image Carousel -->
+    <div class="footer-carousel" id="footerCarousel">
+      <div class="footer-carousel-track" id="footerTrack">
+        <div class="fci" data-index="0"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931241446_2_oqn7z0.jpg" alt=""></div>
+        <div class="fci" data-index="1"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931251298_2_nuhjin.jpg" alt=""></div>
+        <div class="fci" data-index="2"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931991083_2_eyvogv.jpg" alt=""></div>
+        <div class="fci" data-index="3"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776932343988_3_bofj1s.jpg" alt=""></div>
+        <div class="fci" data-index="4"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931659181_2_l3dxyi.jpg" alt=""></div>
+        <div class="fci" data-index="5"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931253654_2_hrtsra.jpg" alt=""></div>
+        <div class="fci" data-index="6"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934920/grok_image_1776932830246_2_x0yyb6.jpg" alt=""></div>
+        <div class="fci" data-index="7"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776933033268_2_m3fmo9.jpg" alt=""></div>
+        <div class="fci" data-index="8"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932933365_2_jb1lch.jpg" alt=""></div>
+        <div class="fci" data-index="9"><img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932486772_2_spplq4.jpg" alt=""></div>
+      </div>
+      <div class="footer-carousel-dots" id="footerDots">
+        <div class="fcd active"></div><div class="fcd"></div><div class="fcd"></div><div class="fcd"></div><div class="fcd"></div>
+        <div class="fcd"></div><div class="fcd"></div><div class="fcd"></div><div class="fcd"></div><div class="fcd"></div>
+      </div>
+    </div>
+
+    <!-- Glass/Neumorphic/Skeuomorphic Brand Panel -->
+    <div class="footer-panel">
+      <div class="footer-brand"><span class="b">Nowsb</span><span class="t">ansiu</span></div>
+      <div class="footer-tagline">Natural Origin of <strong style="color:rgba(200,232,245,0.75);">Word Science</strong></div>
+      <div class="footer-divider"></div>
+      <div class="footer-links">
+        <span class="footer-link" onclick="openSub('shabdapathy')">About</span>
+        <span class="footer-link" onclick="openSub('word-science')">Word Science</span>
+        <span class="footer-link" onclick="openSub('sound-library')">Sound Library</span>
+        <span class="footer-link" onclick="openSub('practice')">Practice</span>
+        <span class="footer-link" onclick="openSub('profile')">Profile</span>
+      </div>
+      <div class="footer-copy">© 2026 Adv. Sanjaykumar Gadge · Shabdapathy</div>
+    </div>
+
+  </div>
+
+  </div><!-- /home-body -->
+</div><!-- /home screen -->
+
+<!-- ══ HAMBURGER MENU OVERLAY + DRAWER ══ -->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+<div class="menu-drawer" id="menuDrawer">
+  <!-- BANNER IMAGE -->
+  <div class="menu-banner">
+    <img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776887825/grok_image_1776887705378_2_nsuvle.jpg" alt="">
+    <div class="menu-banner-fade"></div>
+    <div class="menu-banner-brand">
+      <img class="logo-img" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776888809/1000033338_no_bg-1776888417038_hc6hyu.png" alt="NowsBansiu">
+      <span class="brand-name" style="font-size:22px;text-shadow:0 2px 14px rgba(0,0,0,0.9),0 0 30px rgba(200,232,245,0.2);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
+    </div>
+    <div class="menu-banner-tag"><span class="brand-tag" style="font-size:9px;letter-spacing:4px;text-transform:uppercase;text-shadow:0 0 20px rgba(200,232,245,0.8);">Natural Origin of <strong>Word Science</strong></span></div>
+  </div>
+
+  <div class="menu-drawer-head">
+    <div class="menu-drawer-logo">
+      <span class="brand-name" style="font-size:24px;text-shadow:0 2px 20px rgba(0,0,0,0.8);"><span class="b">Nowss</span><span class="t">B</span></span>
+      <span class="drawer-sub">Shabdapathy</span>
+    </div>
+    <div class="menu-close" onclick="closeMenu()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M2 2L12 12M12 2L2 12" stroke="rgba(255,255,255,0.7)" stroke-width="1.4" stroke-linecap="square"/>
+      </svg>
+    </div>
+  </div>
+  <div class="menu-nav-item" onclick="closeMenu()">
+    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6L8 2L14 6V14H10V10H6V14H2V6Z" stroke="rgba(200,232,245,0.7)" stroke-width="1.2" fill="none"/></svg></div>
+    <div><div class="menu-nav-label">Home</div><div class="menu-nav-sub">Dashboard</div></div>
+  </div>
+  <div class="menu-nav-item" onclick="closeMenu();openSub('practice')">
+    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/><path d="M8 5V8L10 10" stroke="rgba(200,232,245,0.7)" stroke-width="1.2" stroke-linecap="square"/></svg></div>
+    <div><div class="menu-nav-label">Daily Practice</div><div class="menu-nav-sub">Morning ritual</div></div>
+  </div>
+  <div class="menu-nav-item" onclick="closeMenu();openSub('sound-library')">
+    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/><path d="M6 8 Q8 5 10 8 Q8 11 6 8Z" stroke="rgba(200,232,245,0.7)" stroke-width="1.2" fill="none"/></svg></div>
+    <div><div class="menu-nav-label">Sound Library</div><div class="menu-nav-sub">Root frequencies</div></div>
+  </div>
+  <div class="menu-nav-item" onclick="closeMenu();openSub('word-science')">
+    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/><path d="M5 7H11M5 10H8" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/></svg></div>
+    <div><div class="menu-nav-label">Word Science</div><div class="menu-nav-sub">NOWSBANSIU system</div></div>
+  </div>
+  <div class="menu-nav-item" onclick="closeMenu();openSub('my-progress')">
+    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L9.8 6.5H14L10.5 9L11.8 13.5L8 11L4.2 13.5L5.5 9L2 6.5H6.2Z" stroke="rgba(232,213,163,0.7)" stroke-width="1.2" fill="none"/></svg></div>
+    <div><div class="menu-nav-label">My Progress</div><div class="menu-nav-sub">Healing journey</div></div>
+  </div>
+  <div class="menu-nav-item" onclick="closeMenu();openSub('shabdapathy')">
+    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2C4.7 2 2 4.7 2 8s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6Z" stroke="rgba(200,232,245,0.7)" stroke-width="1.2" fill="none"/><path d="M8 5V9M8 11V11.5" stroke="rgba(200,232,245,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div><div class="menu-nav-label">Shabdapathy</div><div class="menu-nav-sub">Foundations</div></div>
+  </div>
+  <div class="menu-nav-item" onclick="closeMenu();openSub('profile')">
+    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="rgba(200,232,245,0.7)" stroke-width="1.2"/><path d="M3 14 Q8 11 13 14" stroke="rgba(200,232,245,0.7)" stroke-width="1.2" fill="none"/></svg></div>
+    <div><div class="menu-nav-label">Profile</div><div class="menu-nav-sub">Settings &amp; account</div></div>
+  </div>
+  <div class="menu-footer-note">Shabdapathy · v9.5</div>
+</div>
+
+<!-- ══ SUB-SCREEN: PRACTICE ══ -->
+<div class="sub-screen" id="sub-practice">
+  <div class="sub-header">
+    <div class="sub-back" onclick="closeSub('practice')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div><div class="sub-header-title">Morning Ritual</div><div class="sub-header-tag">Today's Practice</div></div>
+  </div>
+  <div class="sub-body">
+    <span class="sub-section-label">Today's Session</span>
+    <div style="padding:18px;background:rgba(200,232,245,0.06);border:1px solid rgba(200,232,245,0.18);margin-bottom:24px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--text-primary);margin-bottom:4px;">Root Syllable Activation</div>
+      <div style="font-size:11px;font-weight:300;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">Activate the foundational sounds that connect language to bodily resonance.</div>
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);">Duration · 18 min</div>
+    </div>
+    <span class="sub-section-label">Steps</span>
+    <div class="practice-step">
+      <div class="practice-step-num">1</div>
+      <div><div class="practice-step-title">Breath Preparation</div><div class="practice-step-desc">Sit upright, close eyes, take 7 deep abdominal breaths to settle the nervous system.</div><div class="practice-duration">3 min</div></div>
+    </div>
+    <div class="practice-step">
+      <div class="practice-step-num">2</div>
+      <div><div class="practice-step-title">Root Syllable Chant — NA</div><div class="practice-step-desc">Vibrate the sound "NA" slowly, feeling resonance in the lower abdomen. 21 repetitions.</div><div class="practice-duration">5 min</div></div>
+    </div>
+    <div class="practice-step">
+      <div class="practice-step-num">3</div>
+      <div><div class="practice-step-title">Silent Observation</div><div class="practice-step-desc">Rest in silence, observe any sensations or clarity arising from the vibration.</div><div class="practice-duration">4 min</div></div>
+    </div>
+    <div class="practice-step">
+      <div class="practice-step-num">4</div>
+      <div><div class="practice-step-title">Word Intention Setting</div><div class="practice-step-desc">Choose one word that represents your healing intention for the day and repeat it silently 11 times.</div><div class="practice-duration">4 min</div></div>
+    </div>
+    <div class="practice-step" style="border-bottom:none;">
+      <div class="practice-step-num">5</div>
+      <div><div class="practice-step-title">Closing Gratitude</div><div class="practice-step-desc">Speak your word aloud once with full conviction, followed by deep exhale.</div><div class="practice-duration">2 min</div></div>
+    </div>
+    <button class="btn-primary" style="margin-top:28px;">Begin Practice</button>
+  </div>
+</div>
+
+<!-- ══ SUB-SCREEN: SOUND LIBRARY ══ -->
+<div class="sub-screen" id="sub-sound-library">
+  <div class="sub-header">
+    <div class="sub-back" onclick="closeSub('sound-library')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div><div class="sub-header-title">Sound Library</div><div class="sub-header-tag">Root Frequencies</div></div>
+  </div>
+  <div class="sub-body">
+    <span class="sub-section-label">Healing Frequencies</span>
+    <div class="freq-grid">
+      <div class="freq-card"><div class="freq-hz">396 Hz</div><div class="freq-name">Liberation</div><div class="freq-sub">Releases guilt, fear and trauma from root organs.</div></div>
+      <div class="freq-card"><div class="freq-hz">417 Hz</div><div class="freq-name">Transformation</div><div class="freq-sub">Facilitates change, clears traumatic experiences.</div></div>
+      <div class="freq-card"><div class="freq-hz">528 Hz</div><div class="freq-name">Repair</div><div class="freq-sub">DNA repair frequency, clarity and transformation.</div></div>
+      <div class="freq-card"><div class="freq-hz">639 Hz</div><div class="freq-name">Connection</div><div class="freq-sub">Enhances communication, tolerance and love.</div></div>
+      <div class="freq-card"><div class="freq-hz">741 Hz</div><div class="freq-name">Expression</div><div class="freq-sub">Awakens intuition, cleans cells of toxins.</div></div>
+      <div class="freq-card"><div class="freq-hz">852 Hz</div><div class="freq-name">Intuition</div><div class="freq-sub">Returns to spiritual order, third eye activation.</div></div>
+    </div>
+    <span class="sub-section-label">NOWSBANSIU Root Sounds</span>
+    <div class="sub-card"><div class="sub-card-title">NA — नa</div><div class="sub-card-sub">The primordial sound of negation and creation. Resonates with the nasal cavity, activating neural clarity.</div></div>
+    <div class="sub-card"><div class="sub-card-title">OW — ओ</div><div class="sub-card-sub">Circular breath vibration. Opens chest resonance, connects heart and throat chakras.</div></div>
+    <div class="sub-card"><div class="sub-card-title">SA — सa</div><div class="sub-card-sub">Sanskrit root of existence. Sibilant activation of the solar plexus and digestive organs.</div></div>
+  </div>
+</div>
+
+<!-- ══ SUB-SCREEN: MY PROGRESS ══ -->
+<div class="sub-screen" id="sub-my-progress">
+  <div class="sub-header">
+    <div class="sub-back" onclick="closeSub('my-progress')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div><div class="sub-header-title">My Progress</div><div class="sub-header-tag">Healing Journey</div></div>
+  </div>
+  <div class="sub-body">
+    <span class="sub-section-label">Current Streak</span>
+    <div class="streak-row">
+      <div class="streak-num">7</div>
+      <div><div style="font-size:14px;font-weight:400;color:var(--text-primary);margin-bottom:4px;">Days Active</div><div style="font-size:11px;font-weight:300;color:var(--text-secondary);">Keep going — consistency builds frequency.</div></div>
+    </div>
+    <span class="sub-section-label">This Week</span>
+    <div class="week-row">
+      <div class="week-day"><div class="week-day-dot done">M</div><div class="week-day-name">Mon</div></div>
+      <div class="week-day"><div class="week-day-dot done">T</div><div class="week-day-name">Tue</div></div>
+      <div class="week-day"><div class="week-day-dot done">W</div><div class="week-day-name">Wed</div></div>
+      <div class="week-day"><div class="week-day-dot done">T</div><div class="week-day-name">Thu</div></div>
+      <div class="week-day"><div class="week-day-dot today">F</div><div class="week-day-name">Fri</div></div>
+      <div class="week-day"><div class="week-day-dot">S</div><div class="week-day-name">Sat</div></div>
+      <div class="week-day"><div class="week-day-dot">S</div><div class="week-day-name">Sun</div></div>
+    </div>
+    <span class="sub-section-label">Milestones</span>
+    <div class="sub-card"><div class="sub-card-title">First Ritual Complete</div><div class="sub-card-sub">You completed your first morning word ritual. The journey of a thousand words begins with one sound.</div></div>
+    <div class="sub-card"><div class="sub-card-title">7-Day Streak</div><div class="sub-card-sub">Seven consecutive days of practice. Your neural pathways are beginning to rewire.</div></div>
+    <div class="sub-card" style="opacity:0.45;"><div class="sub-card-title">21-Day Transformation</div><div class="sub-card-sub">Complete 21 days of uninterrupted practice to unlock deep cellular resonance.</div></div>
+  </div>
+</div>
+
+<!-- ══ SUB-SCREEN: WORD SCIENCE ══ -->
+<div class="sub-screen" id="sub-word-science">
+  <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png');"></div>
+  <div class="sub-header">
+    <div class="sub-back" onclick="closeSub('word-science')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div><div class="sub-header-title">Word Science</div><div class="sub-header-tag">NOWSBANSIU System</div></div>
+  </div>
+  <div class="sub-body">
+    <span class="sub-section-label">The NOWSBANSIU Acronym</span>
+    <div id="letterDetail" class="letter-detail">
+      <div class="letter-detail-title">Select a Letter</div>
+      <div class="letter-detail-text">Tap any letter below to explore its natural origin, bodily resonance, and healing application within the Shabdapathy system.</div>
+    </div>
+    <div class="letter-row" id="letterRow"></div>
+    <span class="sub-section-label">Core Principle</span>
+    <div class="sub-card"><div class="sub-card-title">Natural Origin</div><div class="sub-card-sub">Every word in every language traces back to sounds made by the natural world — breath, water, fire, earth. NOWSBANSIU decodes these origins.</div></div>
+    <div class="sub-card"><div class="sub-card-title">Word as Medicine</div><div class="sub-card-sub">Specific phonetic combinations activate specific organs and neural pathways. Shabdapathy is the science of applying this knowledge for healing.</div></div>
+    <div class="sub-card"><div class="sub-card-title">Century Living</div><div class="sub-card-sub">The ultimate goal — through correct word practice, the human body can achieve optimal function and longevity beyond ordinary expectations.</div></div>
+  </div>
+</div>
+
+<!-- ══ SUB-SCREEN: PROFILE ══ -->
+<div class="sub-screen" id="sub-profile">
+  <div class="sub-header">
+    <div class="sub-back" onclick="closeSub('profile')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div><div class="sub-header-title">Profile</div><div class="sub-header-tag">Settings &amp; Account</div></div>
+  </div>
+  <div class="sub-body">
+    <div class="profile-avatar">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="7" stroke="rgba(200,232,245,0.6)" stroke-width="1.4"/><path d="M6 32 Q18 25 30 32" stroke="rgba(200,232,245,0.6)" stroke-width="1.4" fill="none"/></svg>
+    </div>
+    <div class="profile-name">Practitioner</div>
+    <div class="profile-email">Shabdapathy Member</div>
+    <span class="sub-section-label">Preferences</span>
+    <div class="profile-row"><div class="profile-row-label">Language</div><div class="profile-row-val">English</div></div>
+    <div class="profile-row"><div class="profile-row-label">Daily Reminder</div><div class="profile-row-val">6:00 AM</div></div>
+    <div class="profile-row"><div class="profile-row-label">Practice Duration</div><div class="profile-row-val">18 min</div></div>
+    <div class="profile-row"><div class="profile-row-label">Sound Feedback</div><div class="profile-row-val">On</div></div>
+    <div class="profile-row" style="border-bottom:none;"><div class="profile-row-label">App Version</div><div class="profile-row-val">v9.5</div></div>
+    <button class="btn-signout" onclick="goTo('login')">Sign Out</button>
+  </div>
+</div>
+
+<!-- ══ SUB-SCREEN: REAL MEANING ══ -->
+<div class="sub-screen" id="sub-real-meaning">
+  <div class="sub-screen-bg" id="rmBg"></div>
+  <div class="sub-header">
+    <div class="sub-back" onclick="closeSub('real-meaning')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div><div class="sub-header-title">Real Meaning</div><div class="sub-header-tag">Word Without Dictionary</div></div>
+  </div>
+  <div class="sub-body" id="rmSubBody">
+
+    <!-- Search -->
+    <div class="rm-search-wrap">
+      <div class="rm-search-inner">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;opacity:0.5;">
+          <circle cx="7" cy="7" r="4.5" stroke="rgba(200,232,245,0.9)" stroke-width="1.3"/>
+          <path d="M10.5 10.5L14 14" stroke="rgba(200,232,245,0.9)" stroke-width="1.3" stroke-linecap="square"/>
+        </svg>
+        <input class="rm-search-input" id="rmSearchInput" type="text" placeholder="Type any word, name, country..." onkeydown="if(event.key==='Enter')rmSearch()">
+        <button class="rm-search-btn" onclick="rmSearch()">Go</button>
+      </div>
+    </div>
+
+    <!-- Feature word display — image slot empty, you'll provide -->
+    <div class="rm-feature-card" id="rmFeatureCard">
+      <div class="rm-feature-img" id="rmFeatureImg"></div>
+      <div class="rm-feature-overlay"></div>
+      <div class="rm-feature-content">
+        <span class="rm-feature-eyebrow">Natural Origin</span>
+        <div class="rm-feature-word" id="rmFeatureWord">—</div>
+        <div class="rm-feature-root" id="rmFeatureRoot">Search a word above</div>
+      </div>
+    </div>
+
+    <!-- Meaning panel -->
+    <div class="rm-meaning-panel" id="rmMeaningPanel" style="display:none;">
+      <div class="rm-meaning-shimmer"></div>
+      <div class="rm-meaning-label">The Real Meaning</div>
+      <div class="rm-meaning-text" id="rmMeaningText"></div>
+    </div>
+
+    <!-- Sound breakdown -->
+    <div class="rm-sound-panel" id="rmSoundPanel" style="display:none;">
+      <div class="rm-sound-label">Sound Breakdown</div>
+      <div class="rm-sound-chips" id="rmSoundChips"></div>
+    </div>
+
+    <!-- Quick pills -->
+    <span class="sub-section-label">Explore</span>
+    <div class="rm-pills">
+      <div class="rm-pill" onclick="loadWordOrigin('earth')">Earth</div>
+      <div class="rm-pill" onclick="loadWordOrigin('water')">Water</div>
+      <div class="rm-pill" onclick="loadWordOrigin('god')">God</div>
+      <div class="rm-pill" onclick="loadWordOrigin('fire')">Fire</div>
+      <div class="rm-pill" onclick="loadWordOrigin('earth')">Earth</div>
+      <div class="rm-pill" onclick="loadWordOrigin('love')">Love</div>
+      <div class="rm-pill" onclick="loadWordOrigin('mind')">Mind</div>
+      <div class="rm-pill" onclick="loadWordOrigin('soul')">Soul</div>
+      <div class="rm-pill" onclick="loadWordOrigin('sun')">Sun</div>
+      <div class="rm-pill" onclick="loadWordOrigin('moon')">Moon</div>
+      <div class="rm-pill" onclick="loadWordOrigin('mother')">Mother</div>
+      <div class="rm-pill" onclick="loadWordOrigin('father')">Father</div>
+      <div class="rm-pill" onclick="loadWordOrigin('child')">Child</div>
+      <div class="rm-pill" onclick="loadWordOrigin('breath')">Breath</div>
+      <div class="rm-pill" onclick="loadWordOrigin('blood')">Blood</div>
+      <div class="rm-pill" onclick="loadWordOrigin('light')">Light</div>
+      <div class="rm-pill" onclick="loadWordOrigin('dark')">Dark</div>
+      <div class="rm-pill" onclick="loadWordOrigin('truth')">Truth</div>
+      <div class="rm-pill" onclick="loadWordOrigin('time')">Time</div>
+      <div class="rm-pill" onclick="loadWordOrigin('space')">Space</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ SUB-SCREEN: SHABDAPATHY ══ -->
+<div class="sub-screen" id="sub-shabdapathy">
+  <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png');"></div>
+  <div class="sub-header">
+    <div class="sub-back" onclick="closeSub('shabdapathy')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div><div class="sub-header-title">Shabdapathy</div><div class="sub-header-tag">Foundations</div></div>
+  </div>
+  <div class="sub-body">
+    <div style="padding:22px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);margin-bottom:24px;backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);box-shadow:0 4px 24px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.14);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.32),transparent);"></div>
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">By Adv. Sanjaykumar Gadge</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--text-primary);margin-bottom:8px;line-height:1.3;">The Natural Origin Word Science</div>
+      <div style="font-size:12px;font-weight:300;color:var(--text-secondary);line-height:1.7;">Shabdapathy is the ancient science of healing through the natural origin of words. Every sound in every language carries a vibrational signature that corresponds to specific organs, emotions, and states of consciousness.</div>
+    </div>
+    <span class="sub-section-label">Chapters</span>
+    <div class="sub-card"><div class="sub-card-title">I. The Origin of Sound</div><div class="sub-card-sub">How primordial sounds became the building blocks of all human language across every civilization.</div></div>
+    <div class="sub-card"><div class="sub-card-title">II. Body as Instrument</div><div class="sub-card-sub">The human body produces and receives specific frequencies. Each organ has a corresponding sound signature.</div></div>
+    <div class="sub-card"><div class="sub-card-title">III. The NOWSBANSIU Key</div><div class="sub-card-sub">Decoding the nine-letter framework that maps natural sounds to their origin words and healing applications.</div></div>
+    <div class="sub-card"><div class="sub-card-title">IV. Practice &amp; Application</div><div class="sub-card-sub">Structured daily practice protocols for activating word-body resonance and achieving century living.</div></div>
+    <div class="sub-card"><div class="sub-card-title">V. Scientific Evidence</div><div class="sub-card-sub">Modern neuroscience and cymatics research supporting the ancient Shabdapathy tradition.</div></div>
+    <button class="btn-primary" style="margin-top:16px;">Download eBook</button>
+  </div>
+</div>
+
+<!-- ══ DOWNLOAD FAB (visible only on home) ══ -->
+<div class="dl-fab" id="dlFab" onclick="openDlPopup()">
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+    <path d="M11 3V15M11 15L7 11M11 15L15 11" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square"/>
+    <path d="M4 18H18" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square"/>
+  </svg>
+</div>
+
+<!-- ══ INSTALL POPUP OVERLAY ══ -->
+<div class="dl-overlay" id="dlOverlay" onclick="closeDlPopup(event)">
+  <div class="dl-sheet" id="dlSheet">
+    <div class="dl-handle"></div>
+
+    <!-- ANDROID / DESKTOP: native install prompt -->
+    <div id="dlViewInstall">
+      <div class="dl-icon-wrap" style="background:none;border:none;">
+        <img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg" style="width:64px;height:64px;object-fit:cover;clip-path:circle(50% at 50% 50%);-webkit-clip-path:circle(50% at 50% 50%);">
+      </div>
+      <div class="dl-title">Install the App</div>
+      <div class="dl-sub">Add NOWSBANSIU to your home screen for a full native app experience — works offline, no browser bar.</div>
+      <button class="dl-btn" id="dlInstallBtn" onclick="triggerInstall()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.5" stroke-linecap="square"/>
+          <path d="M2 14H14" stroke="#07101f" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
+        Add to Home Screen
+      </button>
+      <button class="dl-cancel" onclick="closeDlSheet()">Maybe Later</button>
+    </div>
+
+    <!-- iOS: step-by-step instructions -->
+    <div id="dlViewIOS" style="display:none;">
+      <div class="dl-icon-wrap" style="background:none;border:none;">
+        <img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776888809/1000033338_no_bg-1776888417038_hc6hyu.png" style="width:64px;height:64px;object-fit:contain;">
+      </div>
+      <div class="dl-title">Add to Home Screen</div>
+      <div class="dl-sub">Install NOWSBANSIU as an app in 2 taps:</div>
+      <div style="width:100%;margin-bottom:18px;">
+        <div class="dl-ios-step">
+          <div class="dl-step-num">1</div>
+          <div class="dl-step-text">
+            Tap the <strong style="color:var(--accent)">Share</strong> button
+            <svg style="display:inline;vertical-align:middle;margin-left:4px;" width="16" height="18" viewBox="0 0 16 18" fill="none">
+              <path d="M8 1V12M8 1L4 5M8 1L12 5" stroke="rgba(200,232,245,0.85)" stroke-width="1.4" stroke-linecap="square"/>
+              <path d="M2 9V16H14V9" stroke="rgba(200,232,245,0.85)" stroke-width="1.4" stroke-linecap="square"/>
+            </svg>
+            at the bottom of Safari
+          </div>
+        </div>
+        <div class="dl-ios-step">
+          <div class="dl-step-num">2</div>
+          <div class="dl-step-text">Tap <strong style="color:var(--accent)">"Add to Home Screen"</strong> then tap <strong style="color:var(--accent)">"Add"</strong></div>
+        </div>
+      </div>
+      <button class="dl-cancel" onclick="closeDlSheet()">Got It</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── BACKGROUND IMAGES — 1 per screen, never repeated ──
+const bgImages = {
+  splash:     null, // splash uses its own inline bg
+  login:      'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776789081/grok_image_1776752739810_uuqwjo.jpg',
+  onboarding: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850589/1000033069-ezremove_hz5p0s.png',
+  analysis:   'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850607/1000033084-ezremove_ybzuzs.png',
+  home:       'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png'
+};
+
+const appBg = document.getElementById('appBg');
+
+function setBg(screenId) {
+  const url = bgImages[screenId];
+  if (url) {
+    appBg.style.backgroundImage = `url('${url}')`;
+    appBg.style.opacity = '1';
+  } else {
+    // splash — hide global bg, splash has its own
+    appBg.style.opacity = '0';
+  }
+}
+
+// Init
+setBg('splash');
+
+// ── PARTICLES ──
+(function createParticles() {
+  const cont = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      width:${Math.random()*2+1}px;
+      height:${Math.random()*2+1}px;
+      animation-duration:${9+Math.random()*13}s;
+      animation-delay:${-Math.random()*22}s;
+      opacity:${0.25+Math.random()*0.65};
+    `;
+    cont.appendChild(p);
+  }
+})();
+
+// ── SCREEN NAVIGATION ──
+let currentScreen = 'splash';
+function goTo(id) {
+  const cur = document.getElementById(currentScreen);
+  const next = document.getElementById(id);
+  const homeHdr = document.getElementById('homeHeader');
+  cur.classList.add('exit');
+  setBg(id);
+  setTimeout(() => {
+    cur.classList.remove('active','exit');
+    next.classList.add('active');
+    next.scrollTop = 0;
+    currentScreen = id;
+    // Show fixed header only on home screen
+    homeHdr.style.display = (id === 'home') ? 'flex' : 'none';
+    // Show download FAB only on home screen
+    const fab = document.getElementById('dlFab');
+    const alreadyInstalled = isInStandaloneMode() || (!isIOS() && !deferredInstallPrompt);
+    fab.style.display = (id === 'home' && !alreadyInstalled) ? 'flex' : 'none';
+    if (id === 'analysis') startAnalysis();
+    if (id === 'onboarding') renderQuestion();
+    if (id === 'home') initHomeScrollBg();
+    else resetHomeBgLayer();
+  }, 320);
+}
+
+// ── SPLASH AUTO-ADVANCE ──
+setTimeout(() => goTo('login'), 4200);
+
+// ── HOME SCROLL BG CROSSFADE ──
+// When the Word Search section scrolls into view on the home screen,
+// the background cross-fades to the left footer image (primal/nature figure).
+// Scrolling back restores the original home background.
+const HOME_BG_SCROLL = 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png';
+const appBgLayer2 = document.getElementById('appBgLayer2');
+// Pre-load the image so the transition is instant
+(new Image()).src = HOME_BG_SCROLL;
+appBgLayer2.style.backgroundImage = `url('${HOME_BG_SCROLL}')`;
+
+let homeBgObserver = null;
+function initHomeScrollBg() {
+  if (homeBgObserver) return; // only set up once
+  const homeScreen = document.getElementById('home');
+  const trigger = homeScreen.querySelector('.word-search-section');
+  if (!trigger) return;
+
+  homeBgObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (currentScreen !== 'home') return;
+      if (entry.isIntersecting) {
+        appBgLayer2.style.opacity = '1';
+      } else {
+        appBgLayer2.style.opacity = '0';
+      }
+    });
+  }, { root: homeScreen, threshold: 0.12 });
+
+  homeBgObserver.observe(trigger);
+}
+
+function resetHomeBgLayer() {
+  appBgLayer2.style.opacity = '0';
+}
+
+// ── PASSWORD TOGGLE ──
+function togglePw() {
+  const inp = document.getElementById('pwInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── ONBOARDING DATA ──
+const questions = [
+  {
+    label:'Personalise Your Journey',
+    q:'What brings you to Shabdapathy?',
+    opts:['Healing through sound & pronunciation','Exploring natural word science','Improving health & longevity','Spiritual & cultural connection']
+  },
+  {
+    label:'Your Current Practice',
+    q:'How do you currently work with words?',
+    opts:['Daily reading & chanting','Occasional meditation','I am completely new to this','Academic / research interest']
+  },
+  {
+    label:'Your Primary Goal',
+    q:'What is your primary healing goal?',
+    opts:['Physical organ wellness','Mental clarity & focus','Longevity — century living','Understanding root word science']
+  }
+];
+
+let currentQ = 0;
+let selectedOpts = [null, null, null];
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('stepText').textContent = `Step ${currentQ+1} of ${questions.length}`;
+  document.getElementById('obQText').textContent = q.q;
+  document.querySelector('.ob-q-label').textContent = q.label;
+  document.getElementById('obProgress').style.width = `${((currentQ+1)/questions.length)*100}%`;
+
+  for (let i=0; i<3; i++) {
+    document.getElementById(`tick${i}`).className = 'ob-tick' + (i <= currentQ ? ' done' : '');
+  }
+
+  const cont = document.getElementById('obOptions');
+  cont.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'ob-option' + (selectedOpts[currentQ] === i ? ' selected' : '');
+    div.innerHTML = `
+      <span class="ob-option-text">${opt}</span>
+      <div class="ob-option-check">
+        ${selectedOpts[currentQ] === i ? `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#07101f" stroke-width="1.8" stroke-linecap="square" fill="none"/></svg>` : ''}
+      </div>`;
+    div.onclick = () => selectOption(i);
+    cont.appendChild(div);
+  });
+}
+
+function selectOption(i) {
+  selectedOpts[currentQ] = i;
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (currentQ < questions.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    goTo('analysis');
+  }
+}
+
+function skipOnboarding() { goTo('home'); }
+
+// ── HERO HEADER ──
+const HERO_IMGS = [
+  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800798/grok_image_1776753853585_luk2yh.jpg',
+  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800798/grok_image_1776754047350_m02pef.jpg',
+  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800794/1000033116-ezremove_o2eo65.png',
+  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800798/grok_image_1776754188034_snzcgu.jpg',
+  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800794/1000033117-ezremove_dhil4m.png'
+];
+const HERO_WORDS = ['VIBRATION','FREQUENCIES','MIND','NEURONS','RESONANCE'];
+
+const heroBgs   = [0,1,2,3,4].map(i => document.getElementById('hb'+i));
+const heroCards = [0,1,2,3,4].map(i => document.getElementById('hc'+i));
+const heroWEl   = document.getElementById('hwd');
+
+heroBgs.forEach((el,i) => {
+  el.style.backgroundImage = `url('${HERO_IMGS[i]}')`;
+});
+heroCards.forEach((c,i) => {
+  c.style.backgroundImage = `url('${HERO_IMGS[i]}')`;
+});
+
+let heroCur = 0;
+function heroActive(n) { heroCards.forEach((c,i) => c.classList.toggle('active', i===n)); }
+heroActive(0);
+
+function heroGo(n) {
+  if (n === heroCur) return;
+  heroBgs[heroCur].classList.remove('on');
+  heroCur = n;
+  heroBgs[heroCur].classList.add('on');
+  heroActive(heroCur);
+  heroWEl.classList.add('hw-out');
+  setTimeout(() => {
+    heroWEl.textContent = HERO_WORDS[heroCur];
+    heroWEl.classList.remove('hw-out');
+    heroWEl.classList.add('hw-in');
+    setTimeout(() => heroWEl.classList.remove('hw-in'), 360);
+  }, 270);
+}
+setInterval(() => heroGo((heroCur + 1) % 5), 4000);
+
+// ── TAGLINE WORD CYCLER ──
+const TAG_WORDS = ['VIBRATION','FREQUENCY','RESONANCE','AWAKENING','SOUND BIRTH'];
+const tagEl = document.getElementById('tagWord');
+let tagIdx = 0;
+setInterval(() => {
+  tagIdx = (tagIdx + 1) % TAG_WORDS.length;
+  tagEl.style.opacity = '0';
+  tagEl.style.transform = 'translateY(8px)';
+  tagEl.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+  setTimeout(() => {
+    tagEl.textContent = TAG_WORDS[tagIdx];
+    tagEl.style.opacity = '1';
+    tagEl.style.transform = 'translateY(0)';
+  }, 260);
+}, 2500);
+
+// ── ANALYSIS ANIMATION ──
+function startAnalysis() {
+  const delays =     [300, 700, 1100, 1500, 1900];
+  const doneDelays = [950, 1350, 1750, 2150, 2500];
+
+  delays.forEach((d, i) => {
+    setTimeout(() => {
+      document.getElementById(`ci${i}`).classList.add('visible');
+    }, d);
+  });
+  doneDelays.forEach((d, i) => {
+    setTimeout(() => {
+      document.getElementById(`cd${i}`).classList.add('show');
+    }, d);
+  });
+
+  const numEl = document.getElementById('ringNum');
+  let count = 0;
+  const interval = setInterval(() => {
+    count += 2;
+    if (count >= 100) {
+      count = 100; clearInterval(interval);
+      setTimeout(() => {
+        const btn = document.getElementById('startJourneyBtn');
+        if (btn) btn.style.display = 'block';
+        const hint = document.getElementById('scrollHint');
+        if (hint) hint.style.display = 'none';
+      }, 500);
+    }
+    numEl.textContent = count + '%';
+  }, 56);
+}
+
+// ── PWA SERVICE WORKER (enables offline + installability) ──
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'nowsbansiu-v1';
+    self.addEventListener('install', e => {
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(clients.claim());
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        fetch(e.request).catch(() => caches.match(e.request))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// ── PWA INSTALL PROMPT capture ──
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+
+// ── DETECT iOS SAFARI ──
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+function isInStandaloneMode() {
+  return (('standalone' in window.navigator) && window.navigator.standalone) ||
+         window.matchMedia('(display-mode: standalone)').matches ||
+         window.matchMedia('(display-mode: fullscreen)').matches;
+}
+
+// ── DOWNLOAD POPUP ──
+function openDlPopup() {
+  const overlay  = document.getElementById('dlOverlay');
+  const viewInstall = document.getElementById('dlViewInstall');
+  const viewIOS  = document.getElementById('dlViewIOS');
+
+  if (isIOS() && !isInStandaloneMode()) {
+    viewInstall.style.display = 'none';
+    viewIOS.style.display     = 'block';
+  } else {
+    viewInstall.style.display = 'block';
+    viewIOS.style.display     = 'none';
+    // If no native prompt available, change button label
+    if (!deferredInstallPrompt) {
+      const btn = document.getElementById('dlInstallBtn');
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.5" stroke-linecap="square"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.5" stroke-linecap="square"/></svg> Save to Home Screen`;
+    }
+  }
+
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('open')));
+}
+
+async function triggerInstall() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    const { outcome } = await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    if (outcome === 'accepted') closeDlSheet();
+  } else {
+    // Fallback: open in browser so user can use browser's Add to Home Screen
+    alert('To install: tap your browser menu (⋮ or Share) → "Add to Home Screen"');
+  }
+}
+
+function closeDlSheet() {
+  const overlay = document.getElementById('dlOverlay');
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity 0.22s ease';
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.style.opacity = '';
+    overlay.style.transition = '';
+    overlay.classList.remove('open');
+  }, 230);
+}
+
+function closeDlPopup(e) {
+  if (e && e.target !== document.getElementById('dlOverlay')) return;
+  closeDlSheet();
+}
+// ── HAMBURGER MENU ──
+function openMenu() {
+  document.getElementById('menuOverlay').classList.add('open');
+  document.getElementById('menuDrawer').classList.add('open');
+}
+function closeMenu() {
+  document.getElementById('menuOverlay').classList.remove('open');
+  document.getElementById('menuDrawer').classList.remove('open');
+}
+
+// ── SUB-SCREENS ──
+function openSub(id) {
+  document.getElementById('sub-' + id).classList.add('open');
+  if (id === 'word-science') initLetterChips();
+  if (id === 'real-meaning') setTimeout(() => loadWordOrigin('earth'), 80);
+}
+function closeSub(id) {
+  document.getElementById('sub-' + id).classList.remove('open');
+}
+
+// ── WORD SCIENCE LETTER CHIPS ──
+const LETTERS = [
+  { l:'N', m:'Nature',   d:'N represents the natural breath — the first sound expelled at birth. It activates the nasal resonance chamber and connects to the nervous system and neurological clarity.' },
+  { l:'O', m:'Origin',   d:'O is the circular, open vowel of creation. Found in every language as a sound of recognition and wholeness. Resonates with the heart and thoracic cavity.' },
+  { l:'W', m:'Water',    d:'W mirrors the waveform of water in motion. Its labial formation activates salivary glands, digestive initiation, and cellular hydration at a vibrational level.' },
+  { l:'S', m:'Sound',    d:'S is the sibilant of the sun and wind — universal across civilizations. It stimulates the solar plexus, activates adrenal clarity and metabolic function.' },
+  { l:'B', m:'Body',     d:'B is the plosive of birth — the closing of lips and sudden release mirrors the moment of first breath. Activates the lungs and bronchial pathways.' },
+  { l:'A', m:'Air',      d:'A is the open throat — the most universally shared vowel. It activates the vocal cords, thyroid gland, and upper respiratory resonance.' },
+  { l:'N', m:'Neural',   d:'Second N deepens the neural activation pattern, creating a looping resonance between the initial sound and the brain\'s language centers.' },
+  { l:'S', m:'Silence',  d:'Second S completes the vibrational arc — the settling of sound into silence, where healing integration takes place at the cellular level.' },
+  { l:'I', m:'Intention', d:'I is the forward, pointed vowel of intention and will. It activates the prefrontal cortex and pineal gland — the seat of conscious direction.' },
+  { l:'U', m:'Universe', d:'U is the deep, resonant vowel of the universe itself — found in sacred syllables across Sanskrit, Sumerian and indigenous traditions worldwide.' }
+];
+let initedLetters = false;
+function initLetterChips() {
+  if (initedLetters) return;
+  initedLetters = true;
+  const row = document.getElementById('letterRow');
+  LETTERS.forEach((item, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'letter-chip';
+    chip.innerHTML = `<span class="letter-chip-letter">${item.l}</span><span class="letter-chip-meaning">${item.m}</span>`;
+    chip.onclick = () => {
+      document.querySelectorAll('.letter-chip').forEach(c => c.classList.remove('active-chip'));
+      chip.classList.add('active-chip');
+      document.getElementById('letterDetail').innerHTML = `<div class="letter-detail-title">${item.l} — ${item.m}</div><div class="letter-detail-text">${item.d}</div>`;
+    };
+    row.appendChild(chip);
+  });
+}
+
+// ── KNOW THE REAL MEANING — cycling questions ──
+const KRM_QUESTIONS = [
+  'Why is <em>Earth</em> called Earth?',
+  'Why is <em>Water</em> called Water?',
+  'Why is <em>God</em> called God?',
+  'Why is <em>Fire</em> called Fire?',
+  'What does your <em>Name</em> really mean?',
+  'Why is <em>Mother</em> called Mother?',
+  'Why is <em>Sun</em> called Sun?',
+  'What is <em>Love</em> at its root?',
+  'Why is your <em>Country</em> named that?',
+  'What does <em>Soul</em> really mean?',
+];
+let krmQIdx = 0;
+const krmQEl = document.getElementById('krmQuestion');
+if (krmQEl) {
+  setInterval(() => {
+    krmQIdx = (krmQIdx + 1) % KRM_QUESTIONS.length;
+    krmQEl.classList.add('krm-q-out');
+    setTimeout(() => {
+      krmQEl.innerHTML = KRM_QUESTIONS[krmQIdx];
+      krmQEl.classList.remove('krm-q-out');
+      krmQEl.classList.add('krm-q-in');
+      setTimeout(() => krmQEl.classList.remove('krm-q-in'), 360);
+    }, 250);
+  }, 3200);
+}
+
+// ── FOOTER 3D CAROUSEL ──
+(function() {
+  var active = 0, autoT = null, items, dots, N;
+  var bgEl = null; // footer bg image element
+
+  // Image URLs in same order as .fci cards
+  var IMGS = [
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931241446_2_oqn7z0.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931251298_2_nuhjin.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931991083_2_eyvogv.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776932343988_3_bofj1s.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931659181_2_l3dxyi.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931253654_2_hrtsra.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934920/grok_image_1776932830246_2_x0yyb6.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776933033268_2_m3fmo9.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932933365_2_jb1lch.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932486772_2_spplq4.jpg'
+  ];
+
+  function updateBg(idx) {
+    if (!bgEl) return;
+    bgEl.style.backgroundImage = 'url("' + IMGS[idx] + '")';
+  }
+
+  function cfg(s) {
+    var a = Math.abs(s), d = s < 0 ? -1 : 1;
+    if (a===0) return {tx:0,      tz:200,  ry:0,     sc:1.00, op:1.00, zi:20};
+    if (a===1) return {tx:d*172,  tz:-10,  ry:d*-28, sc:0.78, op:0.68, zi:15};
+    if (a===2) return {tx:d*292,  tz:-155, ry:d*-50, sc:0.55, op:0.36, zi:10};
+    if (a===3) return {tx:d*362,  tz:-285, ry:d*-65, sc:0.34, op:0.12, zi:5};
+    return           {tx:0,      tz:-600, ry:0,     sc:0.10, op:0.00, zi:0};
+  }
+
+  function paint() {
+    items.forEach(function(el, i) {
+      var off = ((i - active) % N + N) % N;
+      var s = off > Math.floor(N/2) ? off - N : off;
+      var c = cfg(s);
+      el.style.transform     = 'translateX('+c.tx+'px) translateZ('+c.tz+'px) rotateY('+c.ry+'deg) scale('+c.sc+')';
+      el.style.opacity       = c.op;
+      el.style.zIndex        = c.zi;
+      el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
+    });
+    dots.forEach(function(d,i){ d.classList.toggle('active', i===active); });
+    updateBg(active);
+  }
+
+  function go(n) { active=((n%N)+N)%N; paint(); }
+  function startAuto() { clearInterval(autoT); autoT=setInterval(function(){go(active+1);},2800); }
+
+  function init() {
+    var carousel = document.getElementById('footerCarousel');
+    if (!carousel) return;
+    bgEl = document.getElementById('footerBgImg');
+    items = Array.from(carousel.querySelectorAll('.fci'));
+    dots  = Array.from(carousel.querySelectorAll('.fcd'));
+    N = items.length;
+    if (!N) return;
+
+    // Set initial bg
+    updateBg(0);
+
+    items.forEach(function(el) {
+      el.style.transition = 'none';
+      el.style.transform  = 'translateX(0px) translateZ(-600px) rotateY(0deg) scale(0.1)';
+      el.style.opacity    = '0';
+    });
+
+    void carousel.offsetHeight;
+
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        var T = 'transform 0.78s cubic-bezier(0.34,1.08,0.64,1),opacity 0.78s ease,box-shadow 0.78s ease';
+        items.forEach(function(el){ el.style.transition = T; });
+        paint();
+        startAuto();
+      });
+    });
+
+    items.forEach(function(el,i){
+      el.addEventListener('click', function(e){
+        if (i!==active){ e.stopPropagation(); go(i); startAuto(); }
+      });
+    });
+
+    var tx0=0;
+    carousel.addEventListener('touchstart',function(e){tx0=e.touches[0].clientX;},{passive:true});
+    carousel.addEventListener('touchend',function(e){
+      var dx=e.changedTouches[0].clientX-tx0;
+      if(Math.abs(dx)>44){go(active+(dx<0?1:-1));startAuto();}
+    },{passive:true});
+  }
+
+  setTimeout(init, 5200);
+})();
+
+function krmSearch() {
+  const val = document.getElementById('krmInput').value.trim().toLowerCase();
+  if (!val) return;
+  openSub('real-meaning');
+  setTimeout(() => {
+    document.getElementById('rmSearchInput').value = val;
+    loadWordOrigin(val);
+  }, 120);
+}
+
+// ── REAL MEANING DATA ──
+const RM_DATA = {
+  name: {
+    word: 'Name', root: 'Natural Origin · Being Decoded',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg',
+    meaning: `The word <em>Name</em> carries a vibrational signature that predates all dictionaries. Every syllable was chosen — consciously or unconsciously — based on sounds your ancestors made when they wanted to call that energy into existence. In Shabdapathy, we decode the phonetic blueprint of <em>Name</em> by tracing its root sounds back to the natural world — breath, water, fire, earth. The <em>N</em> is the nasal breath of identity, <em>A</em> opens the self to the world, <em>M</em> is the internal hum of being, and <em>E</em> is the energy that radiates outward. Your name is not a label — it is a frequency.`,
+    sounds: [['N','Neural'],['A','Awaken'],['M','Hum'],['E','Energy']]
+  },
+  india: {
+    word: 'India', root: 'Sanskrit · Sindhu',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850589/1000033069-ezremove_hz5p0s.png',
+    meaning: `India comes from the Sanskrit word <em>Sindhu</em> — meaning river, the mighty Indus. Persians called it <em>Hindu</em>, Greeks turned it into <em>Indos</em>, Romans wrote <em>India</em>. This is not a name given by kings — it is the sound of flowing water, the original breath of the land. In Shabdapathy, <em>IN</em> carries the vibration of inward consciousness, and <em>DIA</em> resonates with divine light. India means: the land where the river of consciousness flows inward toward the divine.`,
+    sounds: [['I','Inward'],['N','Neural'],['D','Divine'],['I','Intent'],['A','Awakened']]
+  },
+  water: {
+    word: 'Water', root: 'Proto-Indo-European · wed',
+    imgPos: 'center center',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030372/grok_image_1777029845867_2_abtxad.jpg',
+    meaning: `Water comes from PIE <em>wódr</em> — the primordial liquid. Before any dictionary, early humans named it by the sound of their lips when they drank: the <em>W</em> movement, the open mouth <em>AH</em>, the teeth on tongue <em>T</em>, and the resonant close <em>ER</em>. Your body drinking water makes the exact sounds of the word itself. In Shabdapathy, <em>W</em> activates cellular hydration, <em>A</em> opens the throat, <em>T</em> directs energy, and <em>ER</em> grounds the vibration in the body.`,
+    sounds: [['W','Wave'],['A','Open'],['T','Direct'],['E','Energy'],['R','Root']]
+  },
+  god: {
+    word: 'God', root: 'Proto-Germanic · gudan',
+    imgPos: 'center center',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030423/grok_image_1777030062742_2_f7k7eo.jpg',
+    meaning: `The word <em>God</em> comes from Proto-Germanic <em>gudan</em> — meaning that which is invoked or called upon. Not a person. Not a king. A vibration that answers when called. The G opens the throat from deep within. O expands the chest cavity to its maximum resonance. D seals the sound with intention. In Shabdapathy, chanting <em>GOD</em> activates the vagus nerve, opens cardiac resonance, and aligns the prefrontal cortex. You are not calling a name — you are making the sound that calls consciousness itself.`,
+    sounds: [['G','Ground'],['O','Open'],['D','Direct']]
+  },
+  fire: {
+    word: 'Fire', root: 'Proto-Indo-European · pṓr',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png',
+    meaning: `Fire comes from PIE <em>pṓr</em> — ancient humans named it by the sound of fire crackling. The <em>F</em> mimics breath being blown onto embers. <em>I</em> is the sharp rising flame. <em>R</em> is the roaring, rolling sound of flames spreading. Every language names fire with breath-sounds because fire begins with breath. In Shabdapathy, <em>FIRE</em> activates the solar plexus, stimulates metabolic fire, and awakens the will.`,
+    sounds: [['F','Force'],['I','Ignite'],['R','Roar'],['E','Energy']]
+  },
+  earth: {
+    word: 'Earth', root: 'Proto-Germanic · erþō',
+    imgPos: 'center center',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030389/grok_image_1777030001969_2_mpmpu2.jpg',
+    meaning: `Earth comes from Proto-Germanic <em>erþō</em> — the ground beneath. The <em>ER</em> sound is the universal human sound of grounding — babies make it, animals make it, it is the sound the body makes when it feels safe and held. <em>TH</em> is the dental sound of physical touch. In Shabdapathy, saying <em>EARTH</em> slowly grounds the nervous system, activates the root resonance of the lower body, and connects the speaker to planetary frequency.`,
+    sounds: [['E','Elemental'],['A','Ancient'],['R','Root'],['T','Touch'],['H','Hold']]
+  },
+  love: {
+    word: 'Love', root: 'Proto-Indo-European · lewbh',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850589/1000033069-ezremove_hz5p0s.png',
+    meaning: `Love comes from PIE <em>lewbh</em> — to care, to desire, to value. The <em>L</em> is the most liquid of consonants — the tongue curves gently, water-like. The <em>O</em> opens the heart cavity. <em>V</em> creates a vibration between the teeth and lip — the very act of saying love makes the body produce the physical sensations of warmth. In Shabdapathy, <em>LOVE</em> said slowly three times activates cardiac coherence, the vagus nerve, and oxytocin pathways.`,
+    sounds: [['L','Liquid'],['O','Open'],['V','Vibrate'],['E','Expand']]
+  },
+  mind: {
+    word: 'Mind', root: 'Proto-Indo-European · men',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850607/1000033084-ezremove_ybzuzs.png',
+    meaning: `Mind comes from PIE <em>men</em> — to think, to remember. The <em>M</em> is the first sound all humans make — it is the humming of the internal instrument. Every language has a word for mother starting with M because M is the sound of the internal voice before words form. <em>IND</em> directs that vibration inward. In Shabdapathy, humming <em>MMMM</em> before speaking any intention activates the default mode network — the brain's consciousness centre.`,
+    sounds: [['M','Hum'],['I','Inward'],['N','Neural'],['D','Direct']]
+  },
+  soul: {
+    word: 'Soul', root: 'Proto-Germanic · saiwalō',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png',
+    meaning: `Soul comes from Proto-Germanic <em>saiwalō</em> — the animating force that moves. Ancient people believed the soul was breath itself — the <em>S</em> is the hiss of breath leaving the body. <em>OUL</em> is the circular resonance of something that has no edges. In Shabdapathy, <em>SOUL</em> activates the upper respiratory cavity, creates a loop of internal resonance, and when chanted creates a standing wave inside the chest that can be physically felt.`,
+    sounds: [['S','Sound'],['O','Open'],['U','Universe'],['L','Loop']]
+  },
+  sun: {
+    word: 'Sun', root: 'Proto-Indo-European · sóh₂wl',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png',
+    meaning: `Sun comes from PIE <em>sóh₂wl</em> — the shining one. In Sanskrit it is <em>Surya</em>, in Latin <em>Sol</em>, in Arabic <em>Shams</em> — every language begins the sun's name with an S or SH sound. Because S is the sound of light moving through air. In Shabdapathy, <em>S</em> activates the solar plexus — literally the sun-centre of the body. Saying <em>SUN</em> while facing natural light synchronises your body's solar plexus frequency with the external light source.`,
+    sounds: [['S','Solar'],['U','Universal'],['N','Nature']]
+  },
+  moon: {
+    word: 'Moon', root: 'Proto-Indo-European · mḗh₁n̥s',
+    img: 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png',
+    meaning: `Moon comes from PIE <em>mḗh₁n̥s</em> — the measurer of time. Ancient humans measured months by the moon — and the words <em>moon</em>, <em>month</em>, and <em>measure</em> all share the same root. The <em>M</em> is the internal hum, <em>OO</em> is the circular fullness of the complete disc, and <em>N</em> is the nasal resonance of the night. In Shabdapathy, chanting <em>MOON</em> at night activates the pineal gland — the body's internal lunar clock — and regulates melatonin and sleep cycles.`,
+    sounds: [['M','Measure'],['OO','Full'],['N','Night']]
+  }
+};
+
+function loadWordOrigin(key) {
+  const d = RM_DATA[key] || null;
+  if (!d) { rmSearchFallback(key); return; }
+  document.getElementById('rmFeatureWord').textContent = d.word;
+  document.getElementById('rmFeatureRoot').textContent = d.root;
+  document.getElementById('rmFeatureImg').style.backgroundImage = d.img ? `url('${d.img}')` : '';
+  document.getElementById('rmFeatureImg').style.backgroundPosition = d.imgPos || 'top center';
+  const rmBg = document.getElementById('rmBg');
+  if (rmBg) rmBg.style.backgroundImage = d.img ? `url('${d.img}')` : '';
+  document.getElementById('rmMeaningText').innerHTML = d.meaning;
+  document.getElementById('rmMeaningPanel').style.display = 'block';
+  document.getElementById('rmSoundPanel').style.display = 'block';
+  const chips = document.getElementById('rmSoundChips');
+  chips.innerHTML = '';
+  d.sounds.forEach(([l, m]) => {
+    chips.innerHTML += `<div class="rm-sound-chip"><span class="rm-chip-letter">${l}</span><span class="rm-chip-meaning">${m}</span></div>`;
+  });
+  document.getElementById('rmSubBody').scrollTop = 0;
+}
+
+function openWordOrigin(key) {
+  openSub('real-meaning');
+  setTimeout(() => loadWordOrigin(key), 80);
+}
+
+function rmSearch() {
+  const val = document.getElementById('rmSearchInput').value.trim().toLowerCase();
+  if (!val) return;
+  if (RM_DATA[val]) { loadWordOrigin(val); return; }
+  rmSearchFallback(val);
+}
+
+function rmSearchFallback(val) {
+  const word = val.charAt(0).toUpperCase() + val.slice(1);
+  document.getElementById('rmFeatureWord').textContent = word;
+  document.getElementById('rmFeatureRoot').textContent = 'Natural Origin · Being Decoded';
+  document.getElementById('rmFeatureImg').style.backgroundImage = '';
+  const rmBg = document.getElementById('rmBg');
+  if (rmBg) rmBg.style.backgroundImage = '';
+  document.getElementById('rmMeaningText').innerHTML = `The word <em>${word}</em> carries a vibrational signature that predates all dictionaries. Every syllable was chosen — consciously or unconsciously — based on sounds your ancestors made when they wanted to call that energy into existence. In Shabdapathy, we decode the phonetic blueprint of <em>${word}</em> by tracing its root sounds back to the natural world — breath, water, fire, earth. This word is currently being catalogued in the NOWSBANSIU system.`;
+  document.getElementById('rmMeaningPanel').style.display = 'block';
+  document.getElementById('rmSoundPanel').style.display = 'block';
+  const chips = document.getElementById('rmSoundChips');
+  chips.innerHTML = '';
+  [...word.toUpperCase()].forEach(l => {
+    chips.innerHTML += `<div class="rm-sound-chip"><span class="rm-chip-letter">${l}</span><span class="rm-chip-meaning">Origin</span></div>`;
+  });
+  document.getElementById('rmSubBody').scrollTop = 0;
+}
+
+// ── WORD SEARCH ──
+const WORD_DB = {
+  'water':   { origin:'Proto-Indo-European · wed-', meaning:'From PIE *wódr — the primordial liquid. In Shabdapathy, W activates cellular hydration resonance and O opens the thoracic cavity. Water words in all languages begin with labial-vowel combinations mimicking drinking motion.' },
+  'nature':  { origin:'Latin · natura', meaning:'From Latin nasci — to be born. The N root (nasal breath of birth) combined with the T of touch and R of rhythm. In NOWSBANSIU, this word activates the birth-breath resonance of the nervous system.' },
+  'heal':    { origin:'Proto-Germanic · hailaz', meaning:'From PIE *kailo — whole, uninjured. H is the breath of life across cultures. In Shabdapathy, the H-EAL combination opens the throat chakra and activates thyroid-assisted immune function.' },
+  'sound':   { origin:'Latin · sonus', meaning:'From PIE *swon-o — to make noise. S activates solar plexus, OU is the circular resonance of the chest, N returns to nasal grounding. The complete phonetic journey from stimulus to vibration to stillness.' },
+  'mind':    { origin:'Proto-Indo-European · men-', meaning:'From PIE *men — to think. M is the labial hum of internal vibration. In Shabdapathy, M resonates with the brain\'s default mode network and activates contemplative neural pathways.' },
+  'word':    { origin:'Proto-Indo-European · werdh-', meaning:'From PIE *werdh — word, speech. In NOWSBANSIU, W-O-R-D encodes the complete cycle: W (water/creation), O (openness), R (rhythm), D (direction). The word \'word\' contains its own instruction.' },
+  'body':    { origin:'Old English · bodig', meaning:'From Proto-Germanic *budagaz. B is the plosive of birth, O opens resonance, D is direction of flow, Y is the connector to higher self. In Shabdapathy, chanting \'BODY\' activates awareness of the physical instrument.' },
+};
+function searchWord() {
+  const input = document.getElementById('wordSearchInput');
+  const val = input.value.trim().toLowerCase();
+  const result = document.getElementById('wordSearchResult');
+  if (!val) return;
+  const data = WORD_DB[val] || {
+    origin: 'Etymology · In Research',
+    meaning: `The word "${val}" carries unique vibrational signatures being catalogued in the Shabdapathy system. Every word traces back to natural sounds — water, wind, breath, fire. This word's root frequencies are actively being decoded.`
+  };
+  document.getElementById('wsrWord').textContent = val.charAt(0).toUpperCase() + val.slice(1);
+  document.getElementById('wsrOrigin').textContent = data.origin;
+  document.getElementById('wsrMeaning').textContent = data.meaning;
+  result.classList.add('show');
+}
+</script>
+
+<!-- ── GSAP ── -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+// ── GSAP SCROLL REVEALS ──
+// Runs after home screen is active
+function initGSAP() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  const homeEl = document.getElementById('home');
+
+  // Hero brand name drops in
+  gsap.from('.brand-name', {
+    y: -40, opacity: 0, duration: 1.1,
+    ease: 'power4.out', delay: 0.2
+  });
+
+  // Home cards stagger up on scroll
+  gsap.utils.toArray('.home-card, .home-tile').forEach((el, i) => {
+    gsap.from(el, {
+      scrollTrigger: {
+        trigger: el,
+        scroller: homeEl,
+        start: 'top 92%',
+        toggleActions: 'play none none none'
+      },
+      y: 48, opacity: 0, duration: 0.75,
+      delay: i * 0.08,
+      ease: 'power3.out'
+    });
+  });
+
+  // Section labels slide in from left
+  gsap.utils.toArray('.home-greeting, .home-tagline').forEach(el => {
+    gsap.from(el, {
+      scrollTrigger: {
+        trigger: el,
+        scroller: homeEl,
+        start: 'top 95%',
+        toggleActions: 'play none none none'
+      },
+      x: -32, opacity: 0, duration: 0.8,
+      ease: 'power3.out'
+    });
+  });
+}
+
+// ── HERO PARALLAX on touch/mouse ──
+const heroSection = document.querySelector('.hero-section');
+let tiltActive = false;
+
+function applyTilt(x, y) {
+  const rect = heroSection.getBoundingClientRect();
+  const cx = rect.width / 2;
+  const cy = rect.height / 2;
+  const dx = (x - rect.left - cx) / cx;
+  const dy = (y - rect.top  - cy) / cy;
+  const rotY =  dx * 6;
+  const rotX = -dy * 4;
+  heroSection.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.015)`;
+  heroSection.style.transition = 'transform 0.12s ease-out';
+}
+
+function resetTilt() {
+  heroSection.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)';
+  heroSection.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)';
+}
+
+// Touch
+heroSection.addEventListener('touchmove', e => {
+  applyTilt(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+heroSection.addEventListener('touchend', resetTilt);
+
+// Mouse (desktop)
+heroSection.addEventListener('mousemove', e => applyTilt(e.clientX, e.clientY));
+heroSection.addEventListener('mouseleave', resetTilt);
+
+// ── HERO BG PARALLAX on scroll ──
+const homeScreen = document.getElementById('home');
+homeScreen.addEventListener('scroll', () => {
+  const sy = homeScreen.scrollTop;
+  document.querySelectorAll('.hero-bg').forEach(bg => {
+    bg.style.transform = `translateY(${sy * 0.38}px)`;
+  });
+}, { passive: true });
+
+// ── CARD MAGNETIC HOVER (home tiles) ──
+document.querySelectorAll('.home-tile, .home-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width  - 0.5) * 12;
+    const y = ((e.clientY - r.top)  / r.height - 0.5) * 12;
+    card.style.transform = `perspective(600px) rotateX(${-y}deg) rotateY(${x}deg) translateZ(6px)`;
+    card.style.transition = 'transform 0.1s ease';
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(600px) rotateX(0) rotateY(0) translateZ(0)';
+    card.style.transition = 'transform 0.4s ease';
+  });
+});
+
+// ── GLASS PANEL SHIMMER on touch ──
+document.querySelectorAll('.glass-panel, .sub-card, .home-card').forEach(el => {
+  el.addEventListener('touchstart', e => {
+    const r = el.getBoundingClientRect();
+    const x = ((e.touches[0].clientX - r.left) / r.width * 100).toFixed(1);
+    const y = ((e.touches[0].clientY - r.top)  / r.height * 100).toFixed(1);
+    el.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.07) 60%)`;
+  }, { passive: true });
+  el.addEventListener('touchend', () => {
+    el.style.background = '';
+  });
+});
+
+// Init GSAP after a tick so home screen elements exist
+setTimeout(initGSAP, 400);
+</script>
+</script>
+</body>
+</html>
