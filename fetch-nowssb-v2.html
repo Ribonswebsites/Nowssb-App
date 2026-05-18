@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NowssB Image Fetcher</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; color: #fff; font-family: sans-serif; padding: 20px; }
+  h2 { color: #a78bfa; margin-bottom: 20px; font-size: 22px; }
+  label { font-size: 12px; color: #9ca3af; display: block; margin-bottom: 4px; }
+  input { width: 100%; padding: 10px 12px; background: #1a1a1a; border: 1px solid #333;
+    border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 12px; }
+  button { width: 100%; padding: 14px; border: none; border-radius: 8px;
+    color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+  #fetchBtn { background: #7c3aed; }
+  #fetchBtn:disabled { background: #4c1d95; cursor: wait; }
+  #copyBtn { background: #047857; display: none; }
+  #status { color: #fbbf24; font-size: 14px; margin-bottom: 12px; min-height: 20px; }
+  #urlBox { background: #111; border-radius: 8px; padding: 16px; font-size: 11px;
+    color: #86efac; word-break: break-all; line-height: 2; max-height: 300px;
+    overflow-y: auto; display: none; }
+  #urlCount { color: #fbbf24; font-weight: bold; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<h2>📦 NowssB Image Fetcher</h2>
+
+<label>Cloud Name</label>
+<input id="cloud" value="dmewlquma">
+
+<label>API Key</label>
+<input id="apikey" value="569815392387381">
+
+<label>API Secret</label>
+<input id="secret" value="6IJKGx0D_JJhpaOJkF-HvHhk5zM">
+
+<label>Folder Prefix</label>
+<input id="folder" value="NowssB">
+
+<button id="fetchBtn" onclick="fetchAll()">🚀 Fetch All URLs</button>
+<button id="copyBtn" onclick="copyAll()">📋 Copy All URLs</button>
+
+<div id="status"></div>
+<div id="urlBox"><div id="urlCount"></div><div id="urlList"></div></div>
+
+<script>
+let allUrls = [];
+
+async function fetchAll() {
+  const cloud = document.getElementById('cloud').value.trim();
+  const key = document.getElementById('apikey').value.trim();
+  const secret = document.getElementById('secret').value.trim();
+  const folder = document.getElementById('folder').value.trim();
+  const btn = document.getElementById('fetchBtn');
+  const status = document.getElementById('status');
+
+  btn.disabled = true;
+  allUrls = [];
+  status.textContent = '⏳ Fetching...';
+  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('urlBox').style.display = 'none';
+
+  let nextCursor = null;
+  const creds = btoa(key + ':' + secret);
+
+  try {
+    do {
+      let url = `https://api.cloudinary.com/v1_1/${cloud}/resources/image?prefix=${folder}&max_results=100&type=upload`;
+      if (nextCursor) url += `&next_cursor=${encodeURIComponent(nextCursor)}`;
+
+      const res = await fetch(url, { headers: { 'Authorization': 'Basic ' + creds } });
+      const data = await res.json();
+
+      if (data.error) { status.textContent = '❌ Error: ' + data.error.message; btn.disabled = false; return; }
+
+      data.resources.forEach(r => {
+        allUrls.push(`https://res.cloudinary.com/${cloud}/image/upload/${r.public_id}.${r.format || 'jpg'}`);
+      });
+
+      status.textContent = `⏳ Loaded ${allUrls.length} so far...`;
+      nextCursor = data.next_cursor;
+    } while (nextCursor);
+
+    status.textContent = `✅ Found ${allUrls.length} images!`;
+    document.getElementById('urlCount').textContent = allUrls.length + ' URLs:';
+    document.getElementById('urlList').innerHTML = allUrls.map(u => `<div>${u}</div>`).join('');
+    document.getElementById('urlBox').style.display = 'block';
+    document.getElementById('copyBtn').style.display = 'block';
+  } catch(e) {
+    status.textContent = '❌ Error: ' + e.message;
+  }
+  btn.disabled = false;
+}
+
+function copyAll() {
+  navigator.clipboard.writeText(allUrls.join('\n')).then(() => {
+    document.getElementById('copyBtn').textContent = '✅ Copied! Paste to Claude';
+    setTimeout(() => document.getElementById('copyBtn').textContent = '📋 Copy All URLs', 3000);
+  });
+}
+</script>
+</body>
+</html>
