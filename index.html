@@ -5373,10 +5373,12 @@ window._fbServerTimestamp = () => serverTimestamp();
   /* Full cube image — fills wrapper via absolute positioning */
   .home-cw-cube-img {
     position: absolute;
-    top: -30%;
-    left: -15%;
-    width: 130%;
-    height: auto;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
@@ -5384,10 +5386,11 @@ window._fbServerTimestamp = () => serverTimestamp();
   /* Logo — absolute overlay centred over the NowssB 3D text area */
   .home-cw-logo-overlay {
     position: absolute;
-    top: 10%;
+    top: 8%;
     left: 50%;
     transform: translate(-50%, 0);
     z-index: 3;
+    width: auto;
   }
   .home-cw-logo-box {
     width: 80px; height: 80px;
@@ -5406,14 +5409,14 @@ window._fbServerTimestamp = () => serverTimestamp();
   /* 2×2 grid of buttons — fully inside the glass interior */
   .home-cw-grid {
     position: absolute;
-    top: 28%;
-    bottom: 8%;
-    left: 8%;
-    right: 8%;
+    top: 26%;
+    bottom: 6%;
+    left: 7%;
+    right: 7%;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
     z-index: 2;
   }
   .home-cw-row {
@@ -25619,6 +25622,50 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 .ig-nav-btn.dim { color:#fff; }
 .ig-nav-avatar { width:25px; height:25px; border-radius:50%; object-fit:cover; border:1.5px solid #fff; }
 .ig-nav-btn.active .ig-nav-avatar { border-color:#fff; }
+
+/* ─── RESPONSIVE — identical on all phones ─── */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Small phones (< 360px) */
+@media (max-width: 359px) {
+  .home-card-title { font-size: 16px !important; }
+  .home-cw-btn-label { font-size: 9px !important; letter-spacing: 1.2px !important; }
+  .home-cw-btn-icon { width: 28px !important; height: 28px !important; }
+  .home-cw-btn { padding: 8px 8px 6px !important; }
+  .home-cw-logo-box { width: 64px !important; height: 64px !important; }
+  .sp-word-title { font-size: 28px !important; }
+  .ss-plan-card { min-width: 240px !important; }
+}
+
+/* Standard phones (360px – 430px) — no overrides needed, base styles target this */
+
+/* Large phones (> 430px — iPhone Plus, Samsung Ultra) */
+@media (min-width: 431px) {
+  .home-cw-grid { left: 10% !important; right: 10% !important; }
+  .app-content { max-width: 480px; margin: 0 auto; }
+}
+
+/* Tablets / iPad (> 600px) */
+@media (min-width: 600px) {
+  body { display: flex; justify-content: center; }
+  #app { max-width: 480px; width: 100%; margin: 0 auto; }
+  .sub-screen { max-width: 480px; margin: 0 auto; }
+  .home-cw-cube-wrap { max-width: 480px; }
+}
+
+/* Very tall phones — ensure content doesn't stretch awkwardly */
+@media (min-height: 900px) {
+  .home-cw-cube-wrap { padding-bottom: 80% !important; }
+}
+
+/* Fix safe areas for notch/dynamic island phones */
+.splash-screen, #login, #signup1, #signup2 {
+  padding-top: calc(20px + var(--safe-top));
+  padding-bottom: calc(20px + var(--safe-bottom));
+}
 </style>
 
 <!-- ── EXPLORE / SEARCH SUB-SCREEN ── -->
