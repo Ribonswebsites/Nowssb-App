@@ -26137,31 +26137,31 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 /* ── Store sub-tab strip (shown above nav when Store is active) ── */
 #ig-store-subtabs {
   position: fixed; left: 0; right: 0;
-  bottom: calc(58px + env(safe-area-inset-bottom, 0px));
-  z-index: 999; display: none;
+  bottom: 0;
+  z-index: 1000; display: none;
   background: rgba(6,12,24,0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255,255,255,.07);
-  flex-direction: row; align-items: center;
-  justify-content: space-around; height: 44px;
-  padding: 0 12px;
+  flex-direction: row; align-items: stretch;
+  justify-content: space-around;
+  height: calc(58px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 #ig-store-subtabs.show { display: flex; }
 .store-sub-btn {
-  display: flex; align-items: center; gap: 5px;
-  padding: 6px 14px; border-radius: 20px;
-  background: transparent; border: 1px solid rgba(255,255,255,.1);
-  color: rgba(255,255,255,.6); font-size: 12px; font-weight: 600;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  flex: 1; padding: 0; border-radius: 0;
+  background: transparent; border: none;
+  color: rgba(255,255,255,.5); font-size: 11px; font-weight: 600;
   font-family: 'DM Sans', sans-serif; cursor: pointer;
-  transition: all .15s;
+  transition: color .15s;
   -webkit-tap-highlight-color: transparent;
+  min-height: 58px;
 }
-.store-sub-btn:active, .store-sub-btn.active {
-  background: rgba(232,213,163,.12);
-  border-color: rgba(232,213,163,.35);
-  color: #e8d5a3;
-}
+.store-sub-btn img { opacity: 0.55; transition: opacity .15s; }
+.store-sub-btn:active, .store-sub-btn.active { color: #e8d5a3; }
+.store-sub-btn:active img, .store-sub-btn.active img { opacity: 1; }
 </style>
 
 <!-- ── EXPLORE / SEARCH SUB-SCREEN ── -->
@@ -26435,12 +26435,13 @@ document.getElementById('sub-social').addEventListener('transitionend', function
       var el=document.getElementById('ignav-'+k);
       if(el) el.classList.toggle('active', k===which);
     });
-    // Show store subtabs only when store is active
+    // Swap navs: store section → store sub-nav only; everything else → main nav only
     var subtabs = document.getElementById('ig-store-subtabs');
-    if(subtabs) subtabs.classList.toggle('show', which==='store');
-    // Adjust content bottom padding based on whether subtabs are showing
-    var extraPad = which==='store' ? '102px' : '58px';
-    document.documentElement.style.setProperty('--nav-height', extraPad);
+    var mainnav = document.getElementById('ig-bottomnav');
+    var isStore = which === 'store';
+    if(subtabs) subtabs.classList.toggle('show', isStore);
+    if(mainnav) mainnav.classList.toggle('show', !isStore);
+    document.documentElement.style.setProperty('--nav-height', '58px');
   }
   function closeNavScreens(){
     Object.keys(NAV_MAP).forEach(function(id){
@@ -26449,7 +26450,15 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   }
   function showNav(show){
     var n=document.getElementById('ig-bottomnav');
-    if(n) n.classList.toggle('show', !!show);
+    var s=document.getElementById('ig-store-subtabs');
+    var storeActive = s && s.classList.contains('show');
+    if(show){
+      // Only show main nav if store sub-nav isn't active
+      if(n) n.classList.toggle('show', !storeActive);
+    } else {
+      if(n) n.classList.remove('show');
+      if(s) s.classList.remove('show');
+    }
   }
 
   // ── public API ──
