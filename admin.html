@@ -2,101 +2,229 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NowssB Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NowssB — CEO Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #060c18; color: #fff; font-family: 'DM Sans', sans-serif; padding: 20px; min-height: 100vh; }
-h1 { color: #e8d5a3; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.subtitle { color: rgba(255,255,255,0.4); font-size: 12px; letter-spacing: 0.5px; margin-bottom: 28px; }
+:root {
+  --bg: #060c18; --gold: #e8d5a3; --blue: #c8e8f5;
+  --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.09);
+  --red: rgba(220,80,80,0.9); --green: rgba(16,185,129,0.9);
+}
+body { background: var(--bg); color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+/* ── AUTH ── */
+#authWrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.auth-card { width: 100%; max-width: 380px; background: rgba(255,255,255,0.03); border: 1px solid rgba(232,213,163,0.15); border-radius: 24px; padding: 36px 28px; }
+.auth-logo { font-size: 28px; font-weight: 800; color: var(--gold); letter-spacing: -0.5px; margin-bottom: 4px; }
+.auth-sub { font-size: 12px; letter-spacing: 1px; color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 32px; }
+.auth-label { font-size: 10px; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 7px; display: block; }
+.auth-input { width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; margin-bottom: 16px; }
+.auth-input:focus { border-color: rgba(232,213,163,0.4); }
+.auth-btn { width: 100%; padding: 14px; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.3); border-radius: 12px; color: var(--gold); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.auth-btn:hover { background: rgba(232,213,163,0.18); }
+.auth-error { font-size: 12px; color: rgba(220,80,80,0.8); margin-top: 10px; text-align: center; min-height: 18px; }
+
+/* ── MAIN LAYOUT ── */
+#mainWrap { display: none; max-width: 560px; margin: 0 auto; padding: 0 0 80px; }
+
+/* ── TOP BAR ── */
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 0; margin-bottom: 24px; }
+.topbar-brand { font-size: 16px; font-weight: 700; color: var(--gold); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.notif-btn { position: relative; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.notif-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; background: var(--red); border-radius: 9px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 4px; display: none; }
+.notif-badge.show { display: flex; }
+.logout-btn { font-size: 12px; color: rgba(255,255,255,0.35); cursor: pointer; padding: 8px; }
+
+/* ── GREETING ── */
+.greeting-wrap { padding: 0 20px 24px; }
+.greeting-time { font-size: 11px; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 6px; }
+.greeting-name { font-size: 26px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 4px; }
+.greeting-name span { color: var(--gold); }
+.greeting-title { font-size: 13px; color: rgba(255,255,255,0.45); }
+.greeting-stats { display: flex; gap: 10px; margin-top: 16px; }
+.stat-chip { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; }
+.stat-num { font-size: 22px; font-weight: 700; color: var(--gold); }
+.stat-lbl { font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 0.5px; margin-top: 2px; }
+
+/* ── SECTION LABELS ── */
+.sec-label { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.25); text-transform: uppercase; padding: 0 20px; margin: 24px 0 12px; }
+.sec-label:first-of-type { margin-top: 0; }
+
+/* ── FORM ── */
+.form-wrap { padding: 0 16px; }
 .field { margin-bottom: 14px; }
-label { display: block; font-size: 10px; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 6px; }
-input, select, textarea { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
-input:focus, select:focus, textarea:focus { border-color: rgba(232,213,163,0.4); background: rgba(255,255,255,0.07); }
-textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
-select option { background: #0a1628; }
-.btn { width: 100%; padding: 14px; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.3); border-radius: 12px; color: #e8d5a3; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 6px; }
-.btn:hover { background: rgba(232,213,163,0.18); border-color: rgba(232,213,163,0.5); }
-.btn-danger { background: rgba(220,80,80,0.08); border-color: rgba(220,80,80,0.2); color: rgba(220,80,80,0.8); }
-.btn-danger:hover { background: rgba(220,80,80,0.18); }
-.section-label { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.25); text-transform: uppercase; margin: 28px 0 14px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
-.word-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 16px; margin-bottom: 10px; position: relative; }
-.word-name { font-size: 17px; font-weight: 700; color: #e8d5a3; letter-spacing: 2px; margin-bottom: 4px; }
-.word-phonetic { font-size: 12px; color: rgba(200,232,245,0.7); margin-bottom: 6px; letter-spacing: 0.5px; }
-.word-meta { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
-.word-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); font-size: 10px; color: rgba(255,255,255,0.5); margin: 2px 2px 0 0; }
-.del-btn { position: absolute; top: 12px; right: 12px; background: rgba(220,80,80,0.08); border: 1px solid rgba(220,80,80,0.15); border-radius: 8px; padding: 5px 10px; font-size: 11px; color: rgba(220,80,80,0.7); cursor: pointer; font-family: 'DM Sans', sans-serif; }
-.del-btn:hover { background: rgba(220,80,80,0.2); }
-#authWrap { max-width: 380px; margin: 0 auto; padding-top: 80px; }
-#mainWrap { max-width: 520px; margin: 0 auto; display: none; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.count-badge { display: inline-block; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.2); border-radius: 8px; padding: 3px 10px; font-size: 12px; color: #e8d5a3; font-weight: 600; margin-left: 8px; }
-.export-area { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; font-size: 11px; color: rgba(255,255,255,0.5); font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; margin-top: 10px; }
-.success-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(16,185,129,0.9); color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 999; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
-.success-toast.show { opacity: 1; }
+.field label { display: block; font-size: 10px; letter-spacing: 1.5px; color: rgba(255,255,255,0.38); text-transform: uppercase; margin-bottom: 7px; }
+.field input, .field select, .field textarea { width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(232,213,163,0.35); background: rgba(255,255,255,0.06); }
+.field textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+.field select option { background: #0a1628; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; margin-bottom: 14px; }
+
+/* ── RECORD BUTTON ── */
+.record-wrap { padding: 0 16px; margin-bottom: 14px; }
+.record-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+.record-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.rec-btn { width: 56px; height: 56px; border-radius: 50%; background: rgba(220,80,80,0.1); border: 2px solid rgba(220,80,80,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+.rec-btn.recording { background: rgba(220,80,80,0.25); border-color: rgba(220,80,80,0.8); animation: rec-pulse 1s ease-in-out infinite; }
+@keyframes rec-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(220,80,80,0.3)} 50%{box-shadow:0 0 0 8px rgba(220,80,80,0)} }
+.rec-info { flex: 1; }
+.rec-status { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.rec-sub { font-size: 12px; color: rgba(255,255,255,0.35); }
+.waveform-bars { display: flex; align-items: center; gap: 3px; height: 32px; }
+.wb { width: 3px; border-radius: 2px; background: rgba(232,213,163,0.2); transition: height 0.1s; }
+.wb.active { background: rgba(232,213,163,0.7); }
+.rec-actions { display: flex; gap: 8px; }
+.rec-action-btn { flex: 1; padding: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; transition: all 0.2s; }
+.rec-action-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.rec-action-btn.primary { background: rgba(232,213,163,0.08); border-color: rgba(232,213,163,0.25); color: var(--gold); }
+
+/* ── PRONUNCIATION PREVIEW ── */
+.pronun-card { background: rgba(232,213,163,0.04); border: 1px solid rgba(232,213,163,0.12); border-radius: 16px; padding: 20px; margin-bottom: 14px; }
+.pronun-title { font-size: 10px; letter-spacing: 2px; color: rgba(232,213,163,0.5); text-transform: uppercase; margin-bottom: 12px; }
+.pronun-notation { font-size: 18px; font-weight: 600; color: var(--gold); letter-spacing: 1px; line-height: 1.5; word-break: break-all; margin-bottom: 14px; font-style: italic; min-height: 28px; }
+.breath-guide { display: flex; flex-direction: column; gap: 6px; }
+.breath-step { display: flex; align-items: flex-start; gap: 10px; }
+.breath-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.breath-text { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+.breath-text strong { color: rgba(255,255,255,0.85); }
+
+/* ── BUTTONS ── */
+.btn-primary { width: 100%; padding: 15px; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.3); border-radius: 14px; color: var(--gold); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.btn-primary:hover { background: rgba(232,213,163,0.18); }
+.btn-wrap { padding: 0 16px; margin-top: 8px; }
+
+/* ── WORD LIST ── */
+.word-list-wrap { padding: 0 16px; }
+.wl-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 10px; }
+.wl-status { display: inline-block; padding: 3px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; float: right; }
+.wl-status.pending { background: rgba(232,213,163,0.1); color: var(--gold); border: 1px solid rgba(232,213,163,0.2); }
+.wl-status.approved { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+.wl-status.rejected { background: rgba(220,80,80,0.1); color: rgba(220,80,80,0.8); border: 1px solid rgba(220,80,80,0.2); }
+.wl-name { font-size: 17px; font-weight: 700; color: var(--gold); letter-spacing: 2px; margin-bottom: 4px; }
+.wl-phonetic { font-size: 12px; color: rgba(200,232,245,0.7); margin-bottom: 4px; }
+.wl-meta { font-size: 11px; color: rgba(255,255,255,0.35); }
+.wl-note { margin-top: 8px; padding: 8px 12px; background: rgba(220,80,80,0.06); border: 1px solid rgba(220,80,80,0.15); border-radius: 8px; font-size: 12px; color: rgba(220,80,80,0.8); }
+
+/* ── NOTIF PANEL ── */
+#notifPanel { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.7); }
+.notif-sheet { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 560px; background: #060c18; border-top: 1px solid rgba(232,213,163,0.15); border-radius: 20px 20px 0 0; padding: 24px 20px 40px; max-height: 80vh; overflow-y: auto; }
+.notif-sheet-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+.notif-item { padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; }
+.notif-item-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.notif-item-sub { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(16,185,129,0.92); color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+.toast.show { opacity: 1; }
+.toast.error { background: rgba(220,80,80,0.92); }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
+<!-- ══ AUTH SCREEN ══ -->
 <div id="authWrap">
-  <h1 style="margin-bottom:8px;">NowssB Admin</h1>
-  <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-bottom:28px;">Word Management · Content Panel</p>
-  <div class="field">
-    <label>Admin Password</label>
-    <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')authCheck()">
+  <div class="auth-card">
+    <div class="auth-logo">NowssB</div>
+    <div class="auth-sub">CEO Content Studio</div>
+    <label class="auth-label">Password</label>
+    <input type="password" class="auth-input" id="pwInput" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="auth-btn" onclick="doLogin()">Enter Studio</button>
+    <div class="auth-error" id="authErr"></div>
   </div>
-  <button class="btn" onclick="authCheck()">Enter Panel</button>
 </div>
 
-<!-- MAIN PANEL -->
+<!-- ══ MAIN PANEL ══ -->
 <div id="mainWrap">
-  <h1>NowssB Admin</h1>
-  <p class="subtitle">Word Management Panel · All changes save locally and sync on deploy</p>
 
-  <!-- ADD WORD FORM -->
-  <div class="section-label">Add New Word</div>
-
-  <div class="field">
-    <label>Word Name *</label>
-    <input id="fWord" placeholder="e.g. AASHIRVAAD" oninput="this.value=this.value.toUpperCase()">
-  </div>
-  <div class="field">
-    <label>Phonetic Breakdown *</label>
-    <input id="fPhonetic" placeholder="e.g. aa-shii-r-vaad">
-  </div>
-  <div class="field">
-    <label>Organ / Body System *</label>
-    <input id="fOrgan" placeholder="e.g. Heart, Lungs, Immune System">
-  </div>
-  <div class="field">
-    <label>Healing Benefit</label>
-    <input id="fBenefit" placeholder="e.g. Strengthens respiratory system and clears airways">
-  </div>
-  <div class="field">
-    <label>Meaning &amp; Natural Origin Story</label>
-    <textarea id="fMeaning" placeholder="Full meaning and natural origin story of this word..."></textarea>
-  </div>
-
-  <div class="grid-2">
-    <div class="field">
-      <label>Mouth Position</label>
-      <input id="fMouth" placeholder="e.g. Lips slightly open...">
-    </div>
-    <div class="field">
-      <label>Resonance Point</label>
-      <input id="fResonance" placeholder="e.g. Chest cavity vibrates...">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-brand">NowssB Studio</div>
+    <div class="topbar-right">
+      <div class="notif-btn" onclick="openNotifPanel()">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 015 5v2.5l1.5 2H2.5L4 9.5V7a5 5 0 015-5z" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/><path d="M7 14.5a2 2 0 004 0" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/></svg>
+        <div class="notif-badge" id="notifBadge"></div>
+      </div>
+      <div class="logout-btn" onclick="doLogout()">Sign out</div>
     </div>
   </div>
-  <div class="grid-2">
+
+  <!-- GREETING -->
+  <div class="greeting-wrap">
+    <div class="greeting-time" id="greetTime">Good morning</div>
+    <div class="greeting-name">Welcome back, <span>Sanjay Kumar Gadge</span></div>
+    <div class="greeting-title">CEO &amp; Owner · NowssB — Natural Origin Word Sound Science</div>
+    <div class="greeting-stats">
+      <div class="stat-chip"><div class="stat-num" id="statTotal">0</div><div class="stat-lbl">Words Added</div></div>
+      <div class="stat-chip"><div class="stat-num" id="statPending">0</div><div class="stat-lbl">Pending Review</div></div>
+      <div class="stat-chip"><div class="stat-num" id="statApproved">0</div><div class="stat-lbl">Approved</div></div>
+    </div>
+  </div>
+
+  <!-- RECORD WORD -->
+  <div class="sec-label">Step 1 — Record the Word</div>
+  <div class="record-wrap">
+    <div class="record-card">
+      <div class="record-row">
+        <div class="rec-btn" id="recBtn" onclick="toggleRecording()">
+          <svg id="recIcon" width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="7" y="2" width="8" height="12" rx="4" stroke="rgba(220,80,80,0.9)" stroke-width="1.5"/><path d="M3 11a8 8 0 0016 0" stroke="rgba(220,80,80,0.9)" stroke-width="1.5" stroke-linecap="round"/><path d="M11 19v3" stroke="rgba(220,80,80,0.9)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <svg id="stopIcon" width="20" height="20" viewBox="0 0 20 20" fill="none" style="display:none"><rect x="4" y="4" width="12" height="12" rx="2" fill="rgba(220,80,80,0.9)"/></svg>
+        </div>
+        <div class="rec-info">
+          <div class="rec-status" id="recStatus">Tap mic to start recording</div>
+          <div class="rec-sub" id="recTimer">Speak the word clearly — multiple times if needed</div>
+        </div>
+      </div>
+      <div class="waveform-bars" id="waveformBars"></div>
+      <div class="rec-actions" id="recActions" style="margin-top:14px; display:none;">
+        <div class="rec-action-btn" onclick="playRecording()">▶ Play back</div>
+        <div class="rec-action-btn" onclick="clearRecording()">✕ Re-record</div>
+        <div class="rec-action-btn primary" onclick="useRecording()">✓ Use this</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORD DETAILS -->
+  <div class="sec-label">Step 2 — Word Details</div>
+  <div class="form-wrap">
     <div class="field">
-      <label>Common Mistake</label>
-      <input id="fMistake" placeholder="e.g. Rushing the second syllable...">
+      <label>Word Name *</label>
+      <input id="fWord" placeholder="e.g. AAROGYA" oninput="this.value=this.value.toUpperCase(); autoGeneratePronun()">
     </div>
     <div class="field">
-      <label>Practice Tip</label>
-      <input id="fTip" placeholder="e.g. Breathe out slowly...">
+      <label>Phonetic Breakdown * (use hyphens between syllables)</label>
+      <input id="fPhonetic" placeholder="e.g. aa-ro-gyaa" oninput="autoGeneratePronun()">
+    </div>
+  </div>
+
+  <!-- PRONUNCIATION PREVIEW -->
+  <div style="padding:0 16px; margin-bottom:14px;">
+    <div class="pronun-card" id="pronunCard" style="display:none;">
+      <div class="pronun-title">ElevenLabs Pronunciation Notation</div>
+      <div class="pronun-notation" id="pronunNotation"></div>
+      <div class="pronun-title" style="margin-bottom:10px;">Breath &amp; Hold Guide</div>
+      <div class="breath-guide" id="breathGuide"></div>
+    </div>
+  </div>
+
+  <div class="form-wrap">
+    <div class="field">
+      <label>Organ / Body System *</label>
+      <input id="fOrgan" placeholder="e.g. Immune system, Heart, Lungs, Gut">
+    </div>
+    <div class="field">
+      <label>Healing Benefit for the Practitioner</label>
+      <input id="fBenefit" placeholder="e.g. Strengthens immunity, clears respiratory pathways">
+    </div>
+    <div class="field">
+      <label>Meaning &amp; Natural Origin Story</label>
+      <textarea id="fMeaning" placeholder="Describe the full meaning of this word and where it comes from naturally — not Sanskrit, not ancient scripture, but the natural origin..."></textarea>
+    </div>
+    <div class="field">
+      <label>How Long to Hold Each Part (in seconds)</label>
+      <input id="fHoldTime" placeholder="e.g. AA=3s · RO=1.5s · GYAA=3s" oninput="autoGeneratePronun()">
     </div>
   </div>
 
@@ -115,15 +243,13 @@ select option { background: #0a1628; }
         <option value="Hormones">Hormones</option>
         <option value="Sleep &amp; Recovery">Sleep &amp; Recovery</option>
         <option value="Hair Health">Hair Health</option>
-        <option value="Kidney &amp; Bladder">Kidney &amp; Bladder</option>
-        <option value="Bone &amp; Joint">Bone &amp; Joint</option>
         <option value="Energy &amp; Vitality">Energy &amp; Vitality</option>
         <option value="Confidence">Confidence</option>
-        <option value="Relationships">Relationships</option>
+        <option value="Kidney &amp; Bladder">Kidney &amp; Bladder</option>
       </select>
     </div>
     <div class="field">
-      <label>Gender Tag</label>
+      <label>Gender</label>
       <select id="fGender">
         <option value="both">Both</option>
         <option value="male">Male</option>
@@ -132,90 +258,331 @@ select option { background: #0a1628; }
     </div>
   </div>
 
-  <div class="field">
-    <label>Time Tag</label>
-    <select id="fTime">
-      <option value="any">Any Time</option>
-      <option value="morning">Morning</option>
-      <option value="evening">Evening</option>
-      <option value="night">Night</option>
-    </select>
+  <div class="grid-2">
+    <div class="field">
+      <label>Best Time</label>
+      <select id="fTime">
+        <option value="any">Any Time</option>
+        <option value="morning">Morning</option>
+        <option value="evening">Evening</option>
+        <option value="night">Night</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Price (₹)</label>
+      <input id="fPrice" type="number" placeholder="e.g. 200" value="200">
+    </div>
   </div>
 
-  <div class="field">
-    <label>Audio URL — Male Voice (Cloudflare R2)</label>
-    <input id="fAudioM" placeholder="https://pub-xxxx.r2.dev/words/word-male.mp3">
+  <div class="form-wrap">
+    <div class="field">
+      <label>Mouth Position</label>
+      <input id="fMouth" placeholder="e.g. Lips slightly parted, tongue rests low, throat open">
+    </div>
+    <div class="field">
+      <label>Resonance Point</label>
+      <input id="fResonance" placeholder="e.g. Feel the vibration in the chest / throat / nasal cavity">
+    </div>
+    <div class="field">
+      <label>Common Mistake</label>
+      <input id="fMistake" placeholder="e.g. Cutting the first vowel short instead of extending it">
+    </div>
+    <div class="field">
+      <label>Practice Tip</label>
+      <input id="fTip" placeholder="e.g. Close your eyes, breathe in slowly, then begin the sound">
+    </div>
+    <div class="field">
+      <label>Audio URL — Male Voice (Cloudflare R2 · paste after uploading)</label>
+      <input id="fAudioM" placeholder="https://pub-xxxx.r2.dev/words/word-male.mp3">
+    </div>
+    <div class="field">
+      <label>Audio URL — Female Voice (Cloudflare R2)</label>
+      <input id="fAudioF" placeholder="https://pub-xxxx.r2.dev/words/word-female.mp3">
+    </div>
+    <div class="field">
+      <label>Additional Notes for Ribon (developer)</label>
+      <textarea id="fNotes" placeholder="Any special instructions for the developer — timing, UI treatment, special animations..."></textarea>
+    </div>
   </div>
-  <div class="field">
-    <label>Audio URL — Female Voice (Cloudflare R2)</label>
-    <input id="fAudioF" placeholder="https://pub-xxxx.r2.dev/words/word-female.mp3">
+
+  <div class="btn-wrap" style="margin-bottom:8px;">
+    <button class="btn-primary" onclick="submitWord()">Submit Word for Review</button>
+  </div>
+  <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.25);padding-bottom:8px;">Ribon will review and fine-tune before publishing</div>
+
+  <!-- MY SUBMITTED WORDS -->
+  <div class="sec-label" style="margin-top:32px;">My Submitted Words</div>
+  <div class="word-list-wrap" id="wordListWrap">
+    <div style="color:rgba(255,255,255,0.25);font-size:13px;text-align:center;padding:28px 0;">No words submitted yet.</div>
   </div>
 
-  <button class="btn" onclick="addWord()">Add Word to Library</button>
+</div><!-- /mainWrap -->
 
-  <!-- WORD LIST -->
-  <div class="section-label">
-    Current Word Library
-    <span class="count-badge" id="wordCount">0</span>
+<!-- NOTIF PANEL -->
+<div id="notifPanel" onclick="if(event.target===this)closeNotifPanel()">
+  <div class="notif-sheet">
+    <div class="notif-sheet-title">Notifications</div>
+    <div id="notifList"><div style="color:rgba(255,255,255,0.3);font-size:13px;">No notifications yet.</div></div>
+    <div style="margin-top:16px;"><button style="width:100%;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="clearNotifs()">Clear All</button></div>
   </div>
-  <div id="wordListContainer"></div>
-
-  <!-- EXPORT -->
-  <div class="section-label">Export as JSON</div>
-  <button class="btn" onclick="exportWords()" style="margin-bottom:10px;">Copy JSON Export</button>
-  <div id="exportArea" class="export-area" style="display:none;"></div>
-
-  <!-- DANGER ZONE -->
-  <div class="section-label" style="color:rgba(220,80,80,0.5);">Danger Zone</div>
-  <button class="btn btn-danger" onclick="clearAll()">Clear All Words</button>
-
 </div>
 
-<div class="success-toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-var ADMIN_PW = 'nowssb_admin_2026';
+// ── PASSWORDS ──
+var CEO_PW = 'sanjay_nowssb_2026';
 
-function authCheck() {
+// ── AUTH ──
+function doLogin() {
   var pw = document.getElementById('pwInput').value;
-  if (pw === ADMIN_PW) {
+  if (pw === CEO_PW) {
     document.getElementById('authWrap').style.display = 'none';
     document.getElementById('mainWrap').style.display = 'block';
-    renderWordList();
+    initPanel();
   } else {
+    document.getElementById('authErr').textContent = 'Incorrect password. Please try again.';
     document.getElementById('pwInput').style.borderColor = 'rgba(220,80,80,0.5)';
-    setTimeout(function(){ document.getElementById('pwInput').style.borderColor = ''; }, 1500);
+    setTimeout(function(){ document.getElementById('pwInput').style.borderColor = ''; document.getElementById('authErr').textContent = ''; }, 2000);
   }
 }
 
-function toast(msg) {
-  var el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 2500);
+function doLogout() {
+  document.getElementById('authWrap').style.display = 'flex';
+  document.getElementById('mainWrap').style.display = 'none';
+  document.getElementById('pwInput').value = '';
 }
 
-function getWords() {
-  try { return JSON.parse(localStorage.getItem('nwsb_admin_words') || '[]'); } catch(e) { return []; }
+// ── GREETING TIME ──
+function setGreeting() {
+  var h = new Date().getHours();
+  var g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greetTime').textContent = g;
 }
 
-function saveWords(words) {
-  localStorage.setItem('nwsb_admin_words', JSON.stringify(words));
-  document.getElementById('wordCount').textContent = words.length;
+// ── INIT ──
+function initPanel() {
+  setGreeting();
+  renderWordList();
+  updateStats();
+  checkNotifs();
 }
 
-function addWord() {
-  var word = document.getElementById('fWord').value.trim().toUpperCase();
-  if (!word) { document.getElementById('fWord').focus(); return; }
+// ── RECORDING ──
+var _mediaRecorder = null, _audioChunks = [], _audioBlob = null;
+var _recActive = false, _recTimer = null, _recSeconds = 0;
+var _animFrame = null;
+
+// Build waveform bars
+(function(){
+  var c = document.getElementById('waveformBars');
+  for (var i = 0; i < 28; i++) {
+    var b = document.createElement('div');
+    b.className = 'wb';
+    b.style.height = '4px';
+    c.appendChild(b);
+  }
+})();
+
+function toggleRecording() {
+  _recActive ? stopRecording() : startRecording();
+}
+
+function startRecording() {
+  if (!navigator.mediaDevices) { showToast('Microphone not available in this browser', true); return; }
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+    _audioChunks = [];
+    _mediaRecorder = new MediaRecorder(stream);
+    _mediaRecorder.ondataavailable = function(e) { _audioChunks.push(e.data); };
+    _mediaRecorder.onstop = function() {
+      _audioBlob = new Blob(_audioChunks, { type: 'audio/webm' });
+      stream.getTracks().forEach(function(t) { t.stop(); });
+      document.getElementById('recStatus').textContent = 'Recording saved — play it back';
+      document.getElementById('recTimer').textContent = _recSeconds + 's recorded';
+      document.getElementById('recActions').style.display = 'flex';
+      animateWaveformIdle();
+    };
+    _mediaRecorder.start();
+    _recActive = true;
+    _recSeconds = 0;
+    document.getElementById('recBtn').classList.add('recording');
+    document.getElementById('recIcon').style.display = 'none';
+    document.getElementById('stopIcon').style.display = 'block';
+    document.getElementById('recStatus').textContent = 'Recording… speak the word clearly';
+    document.getElementById('recTimer').textContent = '0s';
+    document.getElementById('recActions').style.display = 'none';
+    _recTimer = setInterval(function() {
+      _recSeconds++;
+      document.getElementById('recTimer').textContent = _recSeconds + 's';
+    }, 1000);
+    animateWaveformLive(stream);
+  }).catch(function() {
+    showToast('Microphone access denied', true);
+  });
+}
+
+function stopRecording() {
+  if (_mediaRecorder && _recActive) {
+    _mediaRecorder.stop();
+    _recActive = false;
+    clearInterval(_recTimer);
+    document.getElementById('recBtn').classList.remove('recording');
+    document.getElementById('recIcon').style.display = 'block';
+    document.getElementById('stopIcon').style.display = 'none';
+    cancelAnimationFrame(_animFrame);
+  }
+}
+
+function animateWaveformLive(stream) {
+  var ctx = new (window.AudioContext || window.webkitAudioContext)();
+  var src = ctx.createMediaStreamSource(stream);
+  var analyser = ctx.createAnalyser();
+  analyser.fftSize = 64;
+  src.connect(analyser);
+  var data = new Uint8Array(analyser.frequencyBinCount);
+  var bars = document.querySelectorAll('.wb');
+  function draw() {
+    analyser.getByteFrequencyData(data);
+    bars.forEach(function(b, i) {
+      var val = data[i % data.length] || 0;
+      var h = Math.max(4, (val / 255) * 32);
+      b.style.height = h + 'px';
+      b.classList.toggle('active', val > 20);
+    });
+    _animFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function animateWaveformIdle() {
+  var bars = document.querySelectorAll('.wb');
+  bars.forEach(function(b) { b.style.height = '4px'; b.classList.remove('active'); });
+}
+
+function playRecording() {
+  if (!_audioBlob) return;
+  var url = URL.createObjectURL(_audioBlob);
+  var audio = new Audio(url);
+  audio.play();
+}
+
+function clearRecording() {
+  _audioBlob = null;
+  _audioChunks = [];
+  document.getElementById('recStatus').textContent = 'Tap mic to start recording';
+  document.getElementById('recTimer').textContent = 'Speak the word clearly — multiple times if needed';
+  document.getElementById('recActions').style.display = 'none';
+  animateWaveformIdle();
+}
+
+function useRecording() {
+  showToast('Recording attached to word');
+  document.getElementById('recActions').style.display = 'none';
+  document.getElementById('recStatus').textContent = 'Recording attached ✓';
+}
+
+// ── AUTO-GENERATE PRONUNCIATION ──
+function autoGeneratePronun() {
   var phonetic = document.getElementById('fPhonetic').value.trim();
-  if (!phonetic) { document.getElementById('fPhonetic').focus(); return; }
+  var holdInput = document.getElementById('fHoldTime').value.trim();
+  if (!phonetic) { document.getElementById('pronunCard').style.display = 'none'; return; }
 
-  var newWord = {
+  // Parse hold times from input like "AA=3s · RO=1.5s"
+  var holdMap = {};
+  if (holdInput) {
+    holdInput.split(/[·,;]/).forEach(function(part) {
+      var m = part.match(/([a-zA-Z]+)\s*=\s*([\d.]+)/);
+      if (m) holdMap[m[1].toUpperCase()] = parseFloat(m[2]);
+    });
+  }
+
+  var parts = phonetic.toLowerCase().split('-');
+
+  // Generate ElevenLabs notation
+  var notation = parts.map(function(part, i) {
+    var syllableKey = part.replace(/[^a-z]/g, '').toUpperCase();
+    var holdSecs = holdMap[syllableKey] || (countVowels(part) * 1.5) || 1;
+    // Extend vowels based on hold time
+    var extended = part.replace(/([aeiou])/g, function(v) {
+      var reps = Math.max(1, Math.round(holdSecs * 2.5));
+      return v.repeat(reps);
+    });
+    // Add pause dashes between syllables (longer for longer holds)
+    var dashes = holdSecs >= 2 ? '---' : holdSecs >= 1 ? '--' : '-';
+    return extended + (i < parts.length - 1 ? dashes : '');
+  }).join('');
+
+  document.getElementById('pronunNotation').textContent = '"' + notation + '"';
+
+  // Generate breath guide
+  var breathHtml = '';
+
+  // Inhale step
+  breathHtml += breathStep('inhale', '<strong>Deep inhale</strong> through nose — fill the belly, not the chest. Hold for 1 second before you begin.');
+
+  // Each syllable
+  var totalHold = 0;
+  parts.forEach(function(part, i) {
+    var syllableKey = part.replace(/[^a-z]/g, '').toUpperCase();
+    var holdSecs = holdMap[syllableKey] || (countVowels(part) * 1.5) || 1;
+    totalHold += holdSecs;
+    var isLast = i === parts.length - 1;
+    var partDisplay = part.toUpperCase();
+    var note = holdSecs >= 3 ? ' — sustain this, let it vibrate in the ' + getResonanceHint(part) :
+               holdSecs >= 2 ? ' — hold steady, feel the resonance' :
+               ' — short and precise';
+    breathHtml += breathStep('syllable', '<strong>"' + partDisplay + '"</strong> — hold for <strong>' + holdSecs + ' second' + (holdSecs !== 1 ? 's' : '') + '</strong>' + note + (isLast ? '. Then release.' : ', then move to next syllable.'));
+  });
+
+  // Exhale step
+  breathHtml += breathStep('exhale', '<strong>Slow exhale</strong> — release all remaining breath through the nose. Pause 2 seconds before repeating.');
+
+  // Total time
+  breathHtml += '<div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.3px;">Total practice time per repetition: ~' + (totalHold + 3).toFixed(1) + ' seconds</div>';
+
+  document.getElementById('breathGuide').innerHTML = breathHtml;
+  document.getElementById('pronunCard').style.display = 'block';
+}
+
+function breathStep(type, text) {
+  var icons = {
+    inhale: { bg: 'rgba(200,232,245,0.1)', svg: '<path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(200,232,245,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' },
+    syllable: { bg: 'rgba(232,213,163,0.1)', svg: '<circle cx="12" cy="12" r="3" fill="rgba(232,213,163,0.7)"/>' },
+    exhale: { bg: 'rgba(200,232,245,0.06)', svg: '<path d="M12 5v14M5 12l7 7 7-7" stroke="rgba(200,232,245,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' }
+  };
+  var ic = icons[type] || icons.syllable;
+  return '<div class="breath-step"><div class="breath-icon" style="background:' + ic.bg + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none">' + ic.svg + '</svg></div><div class="breath-text">' + text + '</div></div>';
+}
+
+function countVowels(str) {
+  return (str.match(/[aeiou]/g) || []).length;
+}
+
+function getResonanceHint(syllable) {
+  var s = syllable.toLowerCase();
+  if (s.match(/[aeiou]{2,}/)) return 'throat and chest';
+  if (s.match(/m|n/)) return 'nasal cavity';
+  if (s.match(/r/)) return 'back of throat';
+  return 'chest';
+}
+
+// ── SUBMIT WORD ──
+function submitWord() {
+  var word = document.getElementById('fWord').value.trim().toUpperCase();
+  var phonetic = document.getElementById('fPhonetic').value.trim();
+  if (!word) { document.getElementById('fWord').focus(); showToast('Please enter the word name', true); return; }
+  if (!phonetic) { document.getElementById('fPhonetic').focus(); showToast('Please enter the phonetic breakdown', true); return; }
+
+  var notation = document.getElementById('pronunNotation').textContent.replace(/^"|"$/g,'') || phonetic;
+  var wordObj = {
+    id: Date.now(),
     word: word,
     phonetic: phonetic,
+    elevenlabsNotation: notation,
     organ: document.getElementById('fOrgan').value.trim(),
     benefit: document.getElementById('fBenefit').value.trim(),
     meaning: document.getElementById('fMeaning').value.trim(),
+    holdTime: document.getElementById('fHoldTime').value.trim(),
     mouth: document.getElementById('fMouth').value.trim(),
     resonance: document.getElementById('fResonance').value.trim(),
     mistake: document.getElementById('fMistake').value.trim(),
@@ -223,76 +590,99 @@ function addWord() {
     category: document.getElementById('fCategory').value,
     gender: document.getElementById('fGender').value,
     time: document.getElementById('fTime').value,
+    price: document.getElementById('fPrice').value || '200',
     audioMale: document.getElementById('fAudioM').value.trim(),
     audioFemale: document.getElementById('fAudioF').value.trim(),
-    addedAt: new Date().toISOString()
+    notes: document.getElementById('fNotes').value.trim(),
+    hasRecording: !!_audioBlob,
+    submittedAt: new Date().toISOString(),
+    status: 'pending',
+    submittedBy: 'Sanjay Kumar Gadge'
   };
 
-  var words = getWords();
-  words.unshift(newWord);
-  saveWords(words);
+  var words = getSubmissions();
+  words.unshift(wordObj);
+  saveSubmissions(words);
 
-  // Clear form fields
-  ['fWord','fPhonetic','fOrgan','fBenefit','fMeaning','fMouth','fResonance','fMistake','fTip','fAudioM','fAudioF'].forEach(function(id) {
-    document.getElementById(id).value = '';
-  });
+  // Notify developer
+  addDevNotif('New word submitted: ' + word, 'Sanjay Kumar Gadge submitted "' + word + '" for review.');
+
+  // Clear form
+  ['fWord','fPhonetic','fOrgan','fBenefit','fMeaning','fHoldTime','fMouth','fResonance','fMistake','fTip','fAudioM','fAudioF','fNotes'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('pronunCard').style.display = 'none';
+  clearRecording();
 
   renderWordList();
-  toast('"' + word + '" added successfully');
+  updateStats();
+  showToast('"' + word + '" submitted for review');
 }
 
-function deleteWord(idx) {
-  if (!confirm('Delete this word? This cannot be undone.')) return;
-  var words = getWords();
-  words.splice(idx, 1);
-  saveWords(words);
-  renderWordList();
-  toast('Word deleted');
+// ── DATA ──
+function getSubmissions() { try { return JSON.parse(localStorage.getItem('nwsb_submissions') || '[]'); } catch(e) { return []; } }
+function saveSubmissions(arr) { localStorage.setItem('nwsb_submissions', JSON.stringify(arr)); }
+
+function updateStats() {
+  var words = getSubmissions();
+  document.getElementById('statTotal').textContent = words.length;
+  document.getElementById('statPending').textContent = words.filter(function(w){ return w.status === 'pending'; }).length;
+  document.getElementById('statApproved').textContent = words.filter(function(w){ return w.status === 'approved'; }).length;
 }
 
 function renderWordList() {
-  var words = getWords();
-  document.getElementById('wordCount').textContent = words.length;
-  var container = document.getElementById('wordListContainer');
-  if (!words.length) {
-    container.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:13px;text-align:center;padding:28px 0;">No words added yet. Add the first word above.</div>';
-    return;
-  }
-  container.innerHTML = words.map(function(w, i) {
-    return '<div class="word-card">' +
-      '<button class="del-btn" onclick="deleteWord(' + i + ')">Delete</button>' +
-      '<div class="word-name">' + w.word + '</div>' +
-      '<div class="word-phonetic">' + (w.phonetic || '—') + '</div>' +
-      '<div class="word-meta">' +
-        (w.organ ? '<span class="word-tag">' + w.organ + '</span>' : '') +
-        (w.category ? '<span class="word-tag">' + w.category + '</span>' : '') +
-        (w.gender ? '<span class="word-tag">' + w.gender + '</span>' : '') +
-        (w.time && w.time !== 'any' ? '<span class="word-tag">' + w.time + '</span>' : '') +
-      '</div>' +
-      (w.benefit ? '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:8px;">' + w.benefit + '</div>' : '') +
-      '</div>';
+  var words = getSubmissions();
+  var el = document.getElementById('wordListWrap');
+  if (!words.length) { el.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:13px;text-align:center;padding:28px 0;">No words submitted yet.</div>'; return; }
+  el.innerHTML = words.map(function(w) {
+    var statusClass = w.status === 'approved' ? 'approved' : w.status === 'rejected' ? 'rejected' : 'pending';
+    var statusLabel = w.status === 'approved' ? 'Approved' : w.status === 'rejected' ? 'Needs Edit' : 'Pending Review';
+    var noteHtml = w.devNote ? '<div class="wl-note">Developer note: ' + w.devNote + '</div>' : '';
+    return '<div class="wl-card"><span class="wl-status ' + statusClass + '">' + statusLabel + '</span><div class="wl-name">' + w.word + '</div><div class="wl-phonetic">' + w.phonetic + '</div><div class="wl-meta">' + (w.category||'') + ' · ' + (w.organ||'') + '</div>' + noteHtml + '</div>';
   }).join('');
 }
 
-function exportWords() {
-  var words = getWords();
-  var json = JSON.stringify(words, null, 2);
-  var area = document.getElementById('exportArea');
-  area.style.display = 'block';
-  area.textContent = json;
-  navigator.clipboard.writeText(json).then(function(){
-    toast('JSON copied to clipboard');
-  }).catch(function(){
-    toast('Select and copy the JSON above');
-  });
+// ── NOTIFICATIONS ──
+function addDevNotif(title, body) {
+  var notifs = getDevNotifs();
+  notifs.unshift({ title: title, body: body, time: new Date().toLocaleString(), read: false });
+  localStorage.setItem('nwsb_dev_notifs', JSON.stringify(notifs));
+}
+function getDevNotifs() { try { return JSON.parse(localStorage.getItem('nwsb_dev_notifs') || '[]'); } catch(e){ return []; } }
+function getCeoNotifs() { try { return JSON.parse(localStorage.getItem('nwsb_ceo_notifs') || '[]'); } catch(e){ return []; } }
+function checkNotifs() {
+  var notifs = getCeoNotifs().filter(function(n){ return !n.read; });
+  var badge = document.getElementById('notifBadge');
+  badge.textContent = notifs.length;
+  badge.classList.toggle('show', notifs.length > 0);
+}
+function openNotifPanel() {
+  var notifs = getCeoNotifs();
+  var el = document.getElementById('notifList');
+  el.innerHTML = notifs.length ? notifs.map(function(n){ return '<div class="notif-item"><div class="notif-item-title">' + n.title + '</div><div class="notif-item-sub">' + (n.body||'') + ' · ' + (n.time||'') + '</div></div>'; }).join('') : '<div style="color:rgba(255,255,255,0.3);font-size:13px;">No notifications yet.</div>';
+  document.getElementById('notifPanel').style.display = 'block';
+  // Mark as read
+  notifs.forEach(function(n){ n.read = true; });
+  localStorage.setItem('nwsb_ceo_notifs', JSON.stringify(notifs));
+  checkNotifs();
+}
+function closeNotifPanel() { document.getElementById('notifPanel').style.display = 'none'; }
+function clearNotifs() { localStorage.removeItem('nwsb_ceo_notifs'); document.getElementById('notifList').innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;">No notifications.</div>'; closeNotifPanel(); }
+
+// ── TOAST ──
+function showToast(msg, isError) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (isError ? ' error' : '') + ' show';
+  setTimeout(function(){ el.className = 'toast'; }, 2800);
 }
 
-function clearAll() {
-  if (!confirm('Clear ALL words? This cannot be undone.')) return;
-  localStorage.removeItem('nwsb_admin_words');
-  renderWordList();
-  toast('All words cleared');
-}
+// ── CHECK LOGIN ON LOAD ──
+window.addEventListener('DOMContentLoaded', function(){
+  if (localStorage.getItem('nwsb_ceo_loggedin') === '1') {
+    document.getElementById('authWrap').style.display = 'none';
+    document.getElementById('mainWrap').style.display = 'block';
+    initPanel();
+  }
+});
 </script>
 </body>
 </html>
