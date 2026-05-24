@@ -1787,14 +1787,14 @@ window._fbServerTimestamp = () => serverTimestamp();
   }
 
   .menu-nav-item {
-    display: flex; align-items: center; gap: 14px; padding: 13px 0;
+    display: flex; align-items: center; gap: 16px; padding: 14px 0;
     border-bottom: 1px solid rgba(255,255,255,0.08); cursor: pointer;
     transition: background 0.2s;
   }
   .menu-nav-item:active { background: rgba(255,255,255,0.04); }
 
   .menu-nav-icon {
-    width: 36px; height: 36px; border-radius: 10px;
+    width: 52px; height: 52px; border-radius: 14px;
     background: rgba(232,213,163,0.08); border: 1px solid rgba(255,255,255,0.08);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; color: #e8d5a3;
@@ -5534,33 +5534,37 @@ window._fbServerTimestamp = () => serverTimestamp();
       </div>
 
 
-      <!-- Row 3: Sound Bath -->
+      <!-- Row 2: Cart + Wishlist -->
       <div class="home-cw-row">
-        <div class="home-cw-btn" onclick="openSub('sound-bath')"
-          style="border-color:rgba(180,160,255,0.25);flex:1;">
-          <div class="home-cw-btn-bg" style="background:linear-gradient(135deg,rgba(100,80,200,.18),rgba(60,40,140,.12));"></div>
+        <div class="home-cw-btn home-cw-cart" onclick="openSub('cart')">
+          <div class="home-cw-btn-bg"></div>
           <div class="home-cw-btn-vignette"></div>
-          <div class="home-cw-btn-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/1e3514c0-5788-11f1-9331-1302872077be_dft895.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt="Sound Bath"></div>
-          <div class="home-cw-btn-label" style="color:rgba(200,185,255,.95);">Sound Bath</div>
-          <div class="home-cw-btn-sub" style="color:rgba(180,160,255,.65);">Sleep · Focus · Healing</div>
+          <div class="home-cw-btn-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M3 3h2l2.8 11.2a2 2 0 0 0 2 1.8h7.4a2 2 0 0 0 2-1.6L20 8H6" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/>
+              <circle cx="9" cy="19" r="1.2" fill="rgba(232,213,163,0.85)"/>
+              <circle cx="17" cy="19" r="1.2" fill="rgba(232,213,163,0.85)"/>
+            </svg>
+            <div class="home-cw-btn-badge" id="homeCwCartBadge"></div>
+          </div>
+          <div class="home-cw-btn-label">Cart</div>
+          <div class="home-cw-btn-sub" id="homeCwCartSub">0 items</div>
         </div>
-        <div class="home-cw-btn" onclick="IG.nav('discover')"
-          style="border-color:rgba(200,232,245,0.2);flex:1;">
-          <div class="home-cw-btn-bg" style="background:linear-gradient(135deg,rgba(40,120,200,.14),rgba(20,80,160,.10));"></div>
+        <div class="home-cw-btn home-cw-wish" onclick="openSub('wishlist')">
+          <div class="home-cw-btn-bg"></div>
           <div class="home-cw-btn-vignette"></div>
-          <div class="home-cw-btn-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt=""></div>
-          <div class="home-cw-btn-label" style="color:rgba(200,232,245,.9);">Discover</div>
-          <div class="home-cw-btn-sub" style="color:rgba(200,232,245,.5);">Find healers</div>
+          <div class="home-cw-btn-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 18.5S3 13 3 7.5A4.5 4.5 0 0 1 11 5.9 4.5 4.5 0 0 1 19 7.5C19 13 11 18.5 11 18.5Z" stroke="rgba(220,80,80,0.85)" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <div class="home-cw-btn-badge" id="homeCwWishBadge"></div>
+          </div>
+          <div class="home-cw-btn-label">Wishlist</div>
+          <div class="home-cw-btn-sub" id="homeCwWishSub">0 saved</div>
         </div>
       </div>
 
     </div><!-- /home-cw-grid -->
-
-    <div style="position:absolute; bottom:4%; left:0; right:0; text-align:center; z-index:2; pointer-events:none;">
-      <div style="font-size:10px; letter-spacing:0.18em; color:rgba(255,255,255,0.35); font-weight:500; text-transform:uppercase; line-height:1.8;">
-        Your Collection &nbsp;·&nbsp; Track Orders &nbsp;·&nbsp; Manage Wishlist
-      </div>
-    </div>
 
     <div style="position:absolute; bottom:4%; left:0; right:0; text-align:center; z-index:2; pointer-events:none;">
       <div style="font-size:10px; letter-spacing:0.18em; color:rgba(255,255,255,0.35); font-weight:500; text-transform:uppercase; line-height:1.8;">
@@ -5968,47 +5972,51 @@ window._fbServerTimestamp = () => serverTimestamp();
   
   <div style="padding: 0 20px 40px;">
   <div class="menu-nav-item" onclick="closeMenu()">
-    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png" style="width:16px;height:16px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Home</div><div class="menu-nav-sub">Dashboard</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openPracticeIntro()">
-    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png" style="width:16px;height:16px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Daily Practice</div><div class="menu-nav-sub">Morning ritual</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('routines')">
-    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/112b2180-56d8-11f1-8fad-095787cce754_c3lk6m.png" style="width:16px;height:16px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/112b2180-56d8-11f1-8fad-095787cce754_c3lk6m.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">My Routines</div><div class="menu-nav-sub">5 routine slots</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('sound-library')">
-    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" style="width:16px;height:16px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Sound Library</div><div class="menu-nav-sub">Root frequencies</div></div>
   </div>
+  <div class="menu-nav-item" onclick="closeMenu();openSub('sound-bath')">
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/1e3514c0-5788-11f1-9331-1302872077be_dft895.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
+    <div><div class="menu-nav-label">Sound Bath</div><div class="menu-nav-sub">Sleep · Focus · Healing</div></div>
+  </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('word-science')">
-    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" stroke="currentColor" stroke-width="1.5"/><path d="M5 7H11M5 10H8" stroke="currentColor" stroke-width="1.5"/></svg></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/a7b04840-5789-11f1-9331-1302872077be_bqobig.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Word Science</div><div class="menu-nav-sub">NOWSBANSIU system</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('my-progress')">
-    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L9.8 6.5H14L10.5 9L11.8 13.5L8 11L4.2 13.5L5.5 9L2 6.5H6.2Z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">My Progress</div><div class="menu-nav-sub">Healing journey</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('shabdapathy')">
-    <div class="menu-nav-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2C4.7 2 2 4.7 2 8s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6Z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 5V9M8 11V11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/49a3a200-578a-11f1-9331-1302872077be_jgmnss.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Shabdapathy</div><div class="menu-nav-sub">Foundations</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('nowssb-store')">
-    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" style="width:16px;height:16px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">NowssB Store</div><div class="menu-nav-sub">Word &amp; Meaning Libraries</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('meaning-store')">
-    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558988/cb456de0-56cf-11f1-8fad-095787cce754_zplzrc.png" style="width:16px;height:16px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558988/cb456de0-56cf-11f1-8fad-095787cce754_zplzrc.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Meaning Store</div><div class="menu-nav-sub">True hidden meanings</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('profile')">
-    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" style="width:16px;height:16px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Profile</div><div class="menu-nav-sub">Settings &amp; account</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('social')">
-    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:16px;height:16px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Settings</div><div class="menu-nav-sub">Discover &amp; preferences</div></div>
   </div>
     <div class="menu-footer-note" style="padding-top: 40px;">Shabdapathy · v9.5</div>
