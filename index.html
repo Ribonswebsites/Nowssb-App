@@ -1183,7 +1183,7 @@ window._fbServerTimestamp = () => serverTimestamp();
   .home-body {
     width: 100%;
     padding: 0;
-    padding-bottom: calc(var(--nav-height, 49px) + 16px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--nav-height, 58px) + 16px + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15628,6 +15628,7 @@ setTimeout(() => {
   overflow-y: auto; -webkit-overflow-scrolling: touch;
   background: #060c18;
   display: none; flex-direction: column;
+  padding-bottom: calc(var(--nav-height, 102px) + 8px + env(safe-area-inset-bottom, 0px));
 }
 .nss-body.visible { display: flex; }
 
@@ -16194,7 +16195,7 @@ function nssShowToast(msg) {
   if (!t) {
     t = document.createElement('div');
     t.id = 'nssToast';
-    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);' +
+    t.style.cssText = 'position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);' +
       'background:rgba(11,17,32,0.95);border:1px solid rgba(255,255,255,0.1);' +
       'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);' +
       'color:rgba(255,255,255,0.9);font-size:12px;font-weight:600;letter-spacing:0.3px;' +
@@ -18463,7 +18464,7 @@ console.log('%cNowssB Groq Engine ready ✓', 'color:#e8d5a3;font-weight:800;fon
 
 /* Sub-screen tip */
 #nwSub {
-  position:fixed;bottom:88px;left:50%;
+  position:fixed;bottom:96px;left:50%;
   transform:translateX(-50%) translateY(20px);
   width:calc(100vw - 36px);max-width:340px;
   background:rgba(5,9,20,.97);
@@ -24586,7 +24587,7 @@ function msBuyThisWord() {
     color: rgba(255,255,255,0.3);
   }
   #sub-social .ss-tab.active { color: #e8d5a3; border-bottom-color: #e8d5a3; font-weight: 700; }
-  #sub-social .ss-tab-content { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--nav-height, 49px) + 20px); }
+  #sub-social .ss-tab-content { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--nav-height, 58px) + 20px); }
   #sub-social .ss-tab-content.active { display: block; }
   /* Glass card */
   #sub-social .sg { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
@@ -25853,7 +25854,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 
 /* sub-screens for IG run on the existing .sub-screen system (z 600) */
 #sub-people, #sub-ig-profile { background:#000; }
-.ig-scroll { position:absolute; inset:0; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; padding-bottom:calc(var(--nav-height, 49px) + 16px + env(safe-area-inset-bottom,0px)); }
+.ig-scroll { position:absolute; inset:0; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; padding-bottom:calc(var(--nav-height, 58px) + 16px + env(safe-area-inset-bottom,0px)); }
 .ig-scroll::-webkit-scrollbar { display:none; }
 
 /* ── Top bar ── */
@@ -25960,14 +25961,15 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 
 /* ── Bottom nav ── */
 /* ── Neumorphic 4-tab bottom bar ── */
-/* ── Instagram-style flat bottom nav ── */
+/* ── Bottom navigation bar ── */
 #ig-bottomnav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000; display: none;
-  height: calc(49px + env(safe-area-inset-bottom, 0px));
+  height: calc(58px + env(safe-area-inset-bottom, 0px));
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: #000;
-  border-top: 1px solid rgba(255,255,255,.12);
-  border-radius: 0 !important;
+  background: rgba(6,12,24,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,.1);
   align-items: stretch; justify-content: space-around;
 }
 #ig-bottomnav.show { display: flex; }
@@ -25975,54 +25977,64 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 .ig-nav-btn {
   background: transparent; border: none; cursor: pointer; padding: 0;
   display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 4px;
-  flex: 1; outline: none; min-height: 49px;
+  justify-content: center; gap: 3px;
+  flex: 1; outline: none; min-height: 58px;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 .ig-nav-puck {
-  width: 28px; height: 28px;
+  width: 26px; height: 26px;
   display: flex; align-items: center; justify-content: center;
-  background: transparent; border-radius: 0 !important;
-  box-shadow: none;
-  color: rgba(255,255,255,.7);
-  transition: opacity .15s ease, transform .12s ease;
-  opacity: 0.6;
-  filter: brightness(0.8);
+  color: rgba(255,255,255,.45);
+  transition: color .2s ease, transform .12s ease;
 }
-.ig-nav-btn:active .ig-nav-puck { transform: scale(.88); }
-.ig-nav-puck svg { display: block; }
+.ig-nav-puck svg { display: block; width: 22px; height: 22px; }
+.ig-nav-btn:active .ig-nav-puck { transform: scale(.85); }
 .ig-nav-label {
-  font-size: 10px; font-weight: 400; color: rgba(255,255,255,.7);
-  font-family: -apple-system, 'DM Sans', sans-serif;
-  letter-spacing: 0; transition: color .15s ease;
+  font-size: 10px; font-weight: 500; color: rgba(255,255,255,.45);
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.2px; transition: color .2s ease;
 }
-/* active state — white icon + white label (Instagram style) */
-.ig-nav-btn.active .ig-nav-puck { opacity: 1; color: #fff; filter: brightness(1.15); }
-.ig-nav-btn.active .ig-nav-label { color: #fff; font-weight: 600; }
-.ig-nav-avatar { width: 24px; height: 24px; border-radius: 50% !important; object-fit: cover; }
+/* active state — gold icon + gold label + top indicator dot */
+.ig-nav-btn.active .ig-nav-puck { color: #e8d5a3; }
+.ig-nav-btn.active .ig-nav-label { color: #e8d5a3; font-weight: 700; }
+.ig-nav-btn.active::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 2px;
+  background: #e8d5a3;
+  border-radius: 0 0 3px 3px;
+}
+.ig-nav-avatar { width: 22px; height: 22px; border-radius: 50% !important; object-fit: cover; }
 
 /* ── Store sub-tab strip (shown above nav when Store is active) ── */
 #ig-store-subtabs {
   position: fixed; left: 0; right: 0;
-  bottom: calc(49px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(58px + env(safe-area-inset-bottom, 0px));
   z-index: 999; display: none;
-  background: #0a0a0a;
-  border-top: 1px solid rgba(255,255,255,.08);
+  background: rgba(6,12,24,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,.07);
   flex-direction: row; align-items: center;
-  justify-content: space-around; height: 42px;
-  padding: 0 8px;
+  justify-content: space-around; height: 44px;
+  padding: 0 12px;
 }
 #ig-store-subtabs.show { display: flex; }
 .store-sub-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 7px 16px; border-radius: 20px;
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: 20px;
   background: transparent; border: 1px solid rgba(255,255,255,.1);
-  color: rgba(255,255,255,.65); font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,.6); font-size: 12px; font-weight: 600;
   font-family: 'DM Sans', sans-serif; cursor: pointer;
   transition: all .15s;
   -webkit-tap-highlight-color: transparent;
 }
-.store-sub-btn:active { background: rgba(255,255,255,.08); }
+.store-sub-btn:active, .store-sub-btn.active {
+  background: rgba(232,213,163,.12);
+  border-color: rgba(232,213,163,.35);
+  color: #e8d5a3;
+}
 </style>
 
 <!-- ── EXPLORE / SEARCH SUB-SCREEN ── -->
@@ -26110,21 +26122,46 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 
 <!-- ── FLAT INSTAGRAM-STYLE 4-TAB BOTTOM NAV ── -->
 <div id="ig-bottomnav">
+  <!-- Store -->
   <button class="ig-nav-btn" id="ignav-store" onclick="IG.nav('store')">
-    <span class="ig-nav-puck"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt=""></span>
+    <span class="ig-nav-puck">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+    </span>
     <span class="ig-nav-label">Store</span>
   </button>
+  <!-- NowssB (Home) -->
   <button class="ig-nav-btn" id="ignav-nowssb" onclick="IG.nav('nowssb')">
-    <span class="ig-nav-puck"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt=""></span>
+    <span class="ig-nav-puck">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </span>
     <span class="ig-nav-label">NowssB</span>
   </button>
+  <!-- Discover -->
   <button class="ig-nav-btn" id="ignav-discover" onclick="IG.nav('discover')">
-    <span class="ig-nav-puck"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt=""></span>
+    <span class="ig-nav-puck">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </span>
     <span class="ig-nav-label">Discover</span>
   </button>
+  <!-- Profile / Settings -->
   <button class="ig-nav-btn" id="ignav-settings" onclick="IG.nav('settings')">
-    <span class="ig-nav-puck"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt=""></span>
-    <span class="ig-nav-label">Settings</span>
+    <span class="ig-nav-puck">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </span>
+    <span class="ig-nav-label">Profile</span>
   </button>
 </div>
 
@@ -26288,7 +26325,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     var subtabs = document.getElementById('ig-store-subtabs');
     if(subtabs) subtabs.classList.toggle('show', which==='store');
     // Adjust content bottom padding based on whether subtabs are showing
-    var extraPad = which==='store' ? '91px' : '49px';
+    var extraPad = which==='store' ? '102px' : '58px';
     document.documentElement.style.setProperty('--nav-height', extraPad);
   }
   function closeNavScreens(){
@@ -26306,7 +26343,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     _currentProfile:null,
     nav:function(which){
       if(which==='store'){ closeNavScreens(); if(typeof openSub==='function') openSub('nowssb-store'); setActiveNav('store'); showNav(true); }
-      else if(which==='nowssb'){ closeNavScreens(); if(typeof currentScreen==='undefined' || currentScreen!=='home'){ if(typeof showScreen==='function') showScreen('home'); } setActiveNav('nowssb'); showNav(true); }
+      else if(which==='nowssb'){ closeNavScreens(); if(typeof goTo==='function' && (typeof currentScreen==='undefined' || currentScreen!=='home')){ goTo('home'); } setActiveNav('nowssb'); showNav(true); }
       else if(which==='discover'){ closeNavScreens(); this.openExplore(); }
       else if(which==='settings'){ closeNavScreens(); if(typeof openSub==='function') openSub('social'); setActiveNav('settings'); showNav(true); }
       setTimeout(syncNav,60);
@@ -26412,7 +26449,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     if(typeof orig!=='function') return;
     window[name] = function(){ var r=orig.apply(this,arguments); setTimeout(syncNav,30); return r; };
   }
-  ['showScreen','openSub','closeSub','openMenu','closeMenu'].forEach(wrap);
+  ['goTo','showScreen','openSub','closeSub','openMenu','closeMenu'].forEach(wrap);
 
   // init avatar + first sync once DOM ready
   function boot(){
