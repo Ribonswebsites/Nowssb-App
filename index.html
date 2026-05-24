@@ -5348,24 +5348,18 @@ window._fbServerTimestamp = () => serverTimestamp();
   <!-- ══ STORE QUICK-ACCESS: LOGO + 2×2 GRID ══ -->
   <style>
   /* ── Cube outer wrapper ── */
-  /* ── Cube outer wrapper — fixed aspect ratio so layout is consistent on all screens ── */
   .home-cw-cube-wrap {
     position: relative;
     margin: 0;
     overflow: hidden;
-    /* 100:95 ratio keeps the cube image proportional across all screen widths */
-    padding-bottom: 95%;
-    height: 0;
   }
-  /* Full cube image — fills wrapper via absolute positioning */
+  /* Full cube image — zoomed so glass interior fills the frame */
   .home-cw-cube-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
+    display: block;
+    width: 145%;
+    height: auto;
+    margin-left: -22%;
+    margin-top: -48%;
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
@@ -5375,11 +5369,11 @@ window._fbServerTimestamp = () => serverTimestamp();
     position: absolute;
     top: 10%;
     left: 50%;
-    transform: translate(-50%, 0);
+    transform: translate(-50%, -50%);
     z-index: 3;
   }
   .home-cw-logo-box {
-    width: 80px; height: 80px;
+    width: 90px; height: 90px;
     background: rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.22);
     backdrop-filter: blur(14px);
@@ -5395,10 +5389,10 @@ window._fbServerTimestamp = () => serverTimestamp();
   /* 2×2 grid of buttons — fully inside the glass interior */
   .home-cw-grid {
     position: absolute;
-    top: 28%;
-    bottom: 8%;
-    left: 8%;
-    right: 8%;
+    top: 23%;
+    bottom: 10%;
+    left: 10%;
+    right: 10%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -5408,8 +5402,7 @@ window._fbServerTimestamp = () => serverTimestamp();
   .home-cw-row {
     display: flex;
     gap: 6px;
-    flex: 1;
-    min-height: 0;
+    height: 100px;
   }
   .home-cw-btn {
     flex: 1; position: relative; overflow: hidden;
@@ -5421,7 +5414,6 @@ window._fbServerTimestamp = () => serverTimestamp();
     box-shadow: 0 6px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
     cursor: pointer; -webkit-tap-highlight-color: transparent;
     transition: transform 0.15s, opacity 0.15s;
-    min-height: 0;
   }
   .home-cw-btn:active { transform: scale(0.97); opacity: 0.85; }
   .home-cw-btn-bg {
@@ -5520,19 +5512,28 @@ window._fbServerTimestamp = () => serverTimestamp();
         <div class="home-cw-btn home-cw-orders" onclick="openSub('orders')">
           <div class="home-cw-btn-bg"></div>
           <div class="home-cw-btn-vignette"></div>
-          <div class="home-cw-btn-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/c8ede950-56cf-11f1-8fad-095787cce754_lhp24x.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt=""></div>
+          <div class="home-cw-btn-icon">
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+              <rect x="3" y="2" width="10" height="12" stroke="rgba(200,232,245,0.85)" stroke-width="1.2"/>
+              <path d="M5 6h6M5 9h4" stroke="rgba(200,232,245,0.85)" stroke-width="1.2" stroke-linecap="square"/>
+            </svg>
+          </div>
           <div class="home-cw-btn-label">Order</div>
           <div class="home-cw-btn-sub" id="homeCwOrdersSub">Purchases</div>
         </div>
         <div class="home-cw-btn home-cw-history" onclick="openSub('order-history')">
           <div class="home-cw-btn-bg"></div>
           <div class="home-cw-btn-vignette"></div>
-          <div class="home-cw-btn-icon"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/112b2180-56d8-11f1-8fad-095787cce754_c3lk6m.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt=""></div>
+          <div class="home-cw-btn-icon">
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="6" stroke="rgba(232,213,163,0.85)" stroke-width="1.2"/>
+              <path d="M8 5v3.5l2.5 1.5" stroke="rgba(232,213,163,0.85)" stroke-width="1.2" stroke-linecap="square"/>
+            </svg>
+          </div>
           <div class="home-cw-btn-label">History</div>
           <div class="home-cw-btn-sub">All time</div>
         </div>
       </div>
-
 
       <!-- Row 2: Cart + Wishlist -->
       <div class="home-cw-row">
@@ -5540,12 +5541,12 @@ window._fbServerTimestamp = () => serverTimestamp();
           <div class="home-cw-btn-bg"></div>
           <div class="home-cw-btn-vignette"></div>
           <div class="home-cw-btn-icon">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M3 3h2l2.8 11.2a2 2 0 0 0 2 1.8h7.4a2 2 0 0 0 2-1.6L20 8H6" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/>
-              <circle cx="9" cy="19" r="1.2" fill="rgba(232,213,163,0.85)"/>
-              <circle cx="17" cy="19" r="1.2" fill="rgba(232,213,163,0.85)"/>
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+              <path d="M2 2h1.5l1.8 7.2a1 1 0 0 0 1 .8h5.4a1 1 0 0 0 .97-.75L14 5H4.5" stroke="rgba(232,213,163,0.9)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="6.5" cy="13" r="1" fill="rgba(232,213,163,0.9)"/>
+              <circle cx="11.5" cy="13" r="1" fill="rgba(232,213,163,0.9)"/>
             </svg>
-            <div class="home-cw-btn-badge" id="homeCwCartBadge"></div>
+            <div class="home-cw-btn-badge" id="homeCwCartBadge">0</div>
           </div>
           <div class="home-cw-btn-label">Cart</div>
           <div class="home-cw-btn-sub" id="homeCwCartSub">0 items</div>
@@ -5554,10 +5555,10 @@ window._fbServerTimestamp = () => serverTimestamp();
           <div class="home-cw-btn-bg"></div>
           <div class="home-cw-btn-vignette"></div>
           <div class="home-cw-btn-icon">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M11 18.5S3 13 3 7.5A4.5 4.5 0 0 1 11 5.9 4.5 4.5 0 0 1 19 7.5C19 13 11 18.5 11 18.5Z" stroke="rgba(220,80,80,0.85)" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+              <path d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(220,80,80,0.9)" stroke-width="1.3" stroke-linejoin="round" fill="rgba(220,80,80,0.15)"/>
             </svg>
-            <div class="home-cw-btn-badge" id="homeCwWishBadge"></div>
+            <div class="home-cw-btn-badge" id="homeCwWishBadge">0</div>
           </div>
           <div class="home-cw-btn-label">Wishlist</div>
           <div class="home-cw-btn-sub" id="homeCwWishSub">0 saved</div>
