@@ -26617,21 +26617,21 @@ document.getElementById('sub-social').addEventListener('transitionend', function
         if(btn) btn.classList.toggle('active', t===tab);
       });
       if(tab==='profile'){
-        if(typeof closeSub==='function') closeSub('social');
+        if(typeof closeSub==='function') { closeSub('social'); closeSub('profile'); }
         document.getElementById('sub-people').classList.remove('open');
         IG.openMyProfile();
       } else if(tab==='nowssb'){
-        if(typeof closeSub==='function') closeSub('social');
         document.getElementById('sub-ig-profile').classList.remove('open');
         document.getElementById('sub-people').classList.remove('open');
-        if(typeof openSub==='function') openSub('social');
-        setTimeout(function(){ if(typeof ssOpenPanel==='function') ssOpenPanel('profile-edit'); }, 150);
+        if(typeof closeSub==='function') closeSub('social');
+        if(typeof openSub==='function') openSub('profile');
       } else if(tab==='settings'){
         document.getElementById('sub-ig-profile').classList.remove('open');
         document.getElementById('sub-people').classList.remove('open');
+        if(typeof closeSub==='function') closeSub('profile');
         if(typeof openSub==='function') openSub('social');
       } else if(tab==='explore'){
-        if(typeof closeSub==='function') closeSub('social');
+        if(typeof closeSub==='function') { closeSub('social'); closeSub('profile'); }
         document.getElementById('sub-ig-profile').classList.remove('open');
         IG.openExplore();
       }
