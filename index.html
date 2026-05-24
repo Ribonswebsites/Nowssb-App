@@ -7328,7 +7328,9 @@ function renderPracticeIntro() {
             '<svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/></svg>' +
           '</div>' +
           '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
-          '<div style="width:38px;"></div>' +
+          '<button onclick="openIntroSetting()" style="width:38px;height:38px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);border-radius:50% !important;display:flex;align-items:center;justify-content:center;cursor:pointer;">' +
+            '<svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>' +
+          '</button>' +
         '</div>' +
 
         '<div style="flex:1;min-height:20px;"></div>' +
@@ -8826,6 +8828,9 @@ if (typeof window._currentUid === 'undefined') window._currentUid = null;
         </svg>
       </div>
       <div class="sl-intro-tag">Personal Collection</div>
+      <button onclick="openIntroSetting()" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50% !important;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+        <svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>
+      </button>
     </div>
     <!-- Bottom content -->
     <div class="sl-intro-bottom">
@@ -10846,6 +10851,9 @@ function wsShowTab(idx) {
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
       </div>
       <div class="sl-intro-tag">Account &amp; Settings</div>
+      <button onclick="openIntroSetting()" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50% !important;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+        <svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>
+      </button>
     </div>
 
     <!-- Bottom content -->
@@ -11129,10 +11137,18 @@ async function _profileDb() {
     if (id === 'profile') {
       const introPage   = document.getElementById('profileIntroPage');
       const mainContent = document.getElementById('profileMainContent');
-      if (introPage)   { introPage.classList.remove('sl-intro-hidden'); introPage.style.display = ''; }
-      if (mainContent) mainContent.style.display = 'none';
-      profileLoadAll();
-      if (typeof nssUpdateProfileCounts === 'function') nssUpdateProfileCounts();
+      if (typeof shouldShowIntro === 'function' && !shouldShowIntro('profile')) {
+        if (introPage)   { introPage.classList.add('sl-intro-hidden'); }
+        if (mainContent) mainContent.style.display = '';
+        profileLoadAll();
+        if (typeof nssUpdateProfileCounts === 'function') nssUpdateProfileCounts();
+        setTimeout(function() { if (typeof window.profileEnterFromIntro === 'function') window.profileEnterFromIntro(); }, 100);
+      } else {
+        if (introPage)   { introPage.classList.remove('sl-intro-hidden'); introPage.style.display = ''; }
+        if (mainContent) mainContent.style.display = 'none';
+        profileLoadAll();
+        if (typeof nssUpdateProfileCounts === 'function') nssUpdateProfileCounts();
+      }
     }
   };
 })();
@@ -11668,6 +11684,9 @@ async function _profileSavePhotoURL(url) {
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
       </div>
       <div class="sl-intro-tag">Shabdapathy · Word Science</div>
+      <button onclick="openIntroSetting()" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50% !important;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+        <svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>
+      </button>
     </div>
 
     <div class="sl-intro-bottom">
@@ -12085,6 +12104,9 @@ async function _profileSavePhotoURL(url) {
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
         </div>
         <div class="sl-intro-tag">Shabdapathy · True Origin</div>
+        <button onclick="openIntroSetting()" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50% !important;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+          <svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>
+        </button>
       </div>
       <div class="sl-intro-top-text">
         <span class="sl-intro-eyebrow">Hidden · Meaning · Store</span>
@@ -13595,8 +13617,21 @@ function openSub(id) {
     }
   }
   if (id === 'word-science') initLetterChips();
-  if (id === 'real-meaning') { /* intro page handles first load */ }
+  if (id === 'real-meaning') {
+    if (typeof shouldShowIntro === 'function' && !shouldShowIntro('word-store')) {
+      setTimeout(function() {
+        var intro = document.getElementById('rmIntroPage');
+        if (intro) intro.classList.add('rm-intro-hidden');
+        if (typeof window.rmEnterFromIntro === 'function') window.rmEnterFromIntro();
+      }, 100);
+    }
+  }
   if (id === 'meaning-store') {
+    if (typeof shouldShowIntro === 'function' && !shouldShowIntro('meaning-store')) {
+      setTimeout(function() {
+        if (typeof window.msEnterFromIntro === 'function') window.msEnterFromIntro();
+      }, 100);
+    }
     setTimeout(msRenderStore, 80);
     setTimeout(msInitParallax, 200);
     // Kick video playback on mobile (autoplay blocked until user gesture)
@@ -13614,10 +13649,11 @@ function openSub(id) {
     _pwIdx = 0; _pwRepCount = 0; _pwRepTarget = 7;
     _pwSteps = new Set(); _pwPlaying = false; _pwDone = false; _pwMode = 'listen';
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    if (window._pwShowIntro) {
+    if (window._pwShowIntro && (typeof shouldShowIntro !== 'function' || shouldShowIntro('practice'))) {
       window._pwShowIntro = false;
       setTimeout(renderPracticeIntro, 80);
     } else {
+      window._pwShowIntro = false;
       setTimeout(renderPractice, 80);
     }
   }
@@ -14334,11 +14370,13 @@ function openHealthGender(gender) {
       <div class="hcpi-organ-tag" id="hcpiOrganTag"></div>
       <div class="hcpi-title" id="hcpiTitle"></div>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;">
-      <div style="width:4px;height:4px;background:rgba(255,255,255,0.55);border-radius:50% !important;"></div>
-      <div style="width:4px;height:4px;background:rgba(255,255,255,0.55);border-radius:50% !important;"></div>
-      <div style="width:4px;height:4px;background:rgba(255,255,255,0.55);border-radius:50% !important;"></div>
-    </div>
+    <button onclick="openIntroSetting()" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50% !important;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+      <svg width="4" height="16" viewBox="0 0 4 18" fill="none">
+        <circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/>
+        <circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/>
+        <circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/>
+      </svg>
+    </button>
   </div>
 
   <!-- Description just below the top bar -->
@@ -14472,8 +14510,12 @@ function openCategoryPage(category, gender) {
   var enterCard = document.getElementById('hcpiEnterCard');
   if (enterCard) enterCard.onclick = function() { _openActualCategoryPage(); };
 
-  // Open the intro sub-screen
-  openSub('hcp-intro');
+  // Open the intro sub-screen (or skip directly to category if intros disabled)
+  if (typeof shouldShowIntro === 'function' && !shouldShowIntro('health-category')) {
+    _openActualCategoryPage();
+  } else {
+    openSub('hcp-intro');
+  }
 }
 
 function _openActualCategoryPage() {
@@ -16419,7 +16461,11 @@ function openDailyPracticeIntro() {
   _rtIntroFromHome = true;
   // Open the routines sub-screen, then render the intro into it
   _origOpenSub('routines');
-  setTimeout(renderRoutineIntro, 60);
+  if (typeof shouldShowIntro === 'function' && !shouldShowIntro('routine')) {
+    setTimeout(renderRoutineDetail_inline, 60);
+  } else {
+    setTimeout(renderRoutineIntro, 60);
+  }
 }
 
 // ── RENDER ROUTINES LIST ──
@@ -16552,7 +16598,9 @@ function renderRoutineIntro() {
           '</svg>' +
         '</div>' +
         '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
-        '<div style="width:38px;"></div>' +
+        '<button onclick="openIntroSetting()" style="width:38px;height:38px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);border-radius:50% !important;display:flex;align-items:center;justify-content:center;cursor:pointer;">' +
+          '<svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>' +
+        '</button>' +
       '</div>' +
 
       // SPACER
@@ -17016,22 +17064,28 @@ window.openSub = function(id) {
     _origOpenSub(id);
   } else if (id === 'sound-library') {
     _origOpenSub(id);
-    // Always show intro first when opening Sound Library
     var introPage = document.getElementById('slIntroPage');
     if (introPage) {
-      introPage.classList.remove('sl-intro-hidden');
-      // Update intro stats
-      try {
-        var _s = JSON.parse(localStorage.getItem('nwsb_sentences') || '[]');
-        var _p = JSON.parse(localStorage.getItem('nwsb_purchased') || '[]');
-        var _all = typeof PRACTICE_WORDS !== 'undefined' ? PRACTICE_WORDS : [];
-        var isStat = document.getElementById('slIntroStatSentences');
-        var iwStat = document.getElementById('slIntroStatWords');
-        var ipStat = document.getElementById('slIntroStatPurchased');
-        if (isStat) isStat.textContent = _s.length;
-        if (iwStat) iwStat.textContent = _all.length;
-        if (ipStat) ipStat.textContent = _p.length;
-      } catch(e) {}
+      if (typeof shouldShowIntro === 'function' && !shouldShowIntro('sound-library')) {
+        introPage.classList.add('sl-intro-hidden');
+        setTimeout(function() {
+          if (typeof window.slEnterLibrary === 'function') window.slEnterLibrary();
+          else if (typeof slRender === 'function') slRender();
+        }, 80);
+      } else {
+        introPage.classList.remove('sl-intro-hidden');
+        try {
+          var _s = JSON.parse(localStorage.getItem('nwsb_sentences') || '[]');
+          var _p = JSON.parse(localStorage.getItem('nwsb_purchased') || '[]');
+          var _all = typeof PRACTICE_WORDS !== 'undefined' ? PRACTICE_WORDS : [];
+          var isStat = document.getElementById('slIntroStatSentences');
+          var iwStat = document.getElementById('slIntroStatWords');
+          var ipStat = document.getElementById('slIntroStatPurchased');
+          if (isStat) isStat.textContent = _s.length;
+          if (iwStat) iwStat.textContent = _all.length;
+          if (ipStat) ipStat.textContent = _p.length;
+        } catch(e) {}
+      }
     }
   } else {
     _origOpenSub(id);
@@ -20994,6 +21048,9 @@ window.msInitParallax = function() {
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
       </div>
       <div class="sl-intro-tag">NowssB · Store</div>
+      <button onclick="openIntroSetting()" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50% !important;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+        <svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>
+      </button>
     </div>
 
     <div class="sl-intro-bottom">
@@ -22528,11 +22585,16 @@ var _cwpPrevOpen = window.openSub;
 window.openSub = function(id) {
   if (id === 'cart') {
     if (typeof _cwpPrevOpen === 'function') _cwpPrevOpen(id);
-    // Show intro page; main content stays hidden until user taps "View My Cart"
-    var intro = document.getElementById('cartIntroPage');
-    var main  = document.getElementById('cartMainContent');
-    if (intro) { intro.classList.remove('cart-intro-hidden'); intro.style.opacity = ''; intro.style.pointerEvents = ''; }
-    if (main)  { main.style.display = 'none'; }
+    if (typeof shouldShowIntro === 'function' && !shouldShowIntro('cart')) {
+      setTimeout(function() {
+        if (typeof window.cartEnterFromIntro === 'function') window.cartEnterFromIntro();
+      }, 80);
+    } else {
+      var intro = document.getElementById('cartIntroPage');
+      var main  = document.getElementById('cartMainContent');
+      if (intro) { intro.classList.remove('cart-intro-hidden'); intro.style.opacity = ''; intro.style.pointerEvents = ''; }
+      if (main)  { main.style.display = 'none'; }
+    }
     return;
   }
   if (id === 'wishlist') {
@@ -24786,6 +24848,16 @@ function msBuyThisWord() {
             <div class="sr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
             <div class="sr-body"><div class="sr-label">Playback Speed</div><div class="sr-sub" id="ss-speed-sub">1.0× Normal</div></div>
             <span id="ss-speed-pill" style="font-size:12px;font-weight:700;color:#c8e8f5;background:rgba(200,232,245,.12);padding:4px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;">1.0×</span>
+          </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="slbl">EXPERIENCE</div>
+        <div class="sg" style="padding:0 18px;margin-bottom:24px;">
+          <div class="sr last" id="intro-setting-row" onclick="event.stopPropagation();ssToggleIntros(document.getElementById('tgl-intros'))">
+            <div class="sr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+            <div class="sr-body"><div class="sr-label">Screen Meditation Intros</div><div class="sr-sub">Cinematic intros prime your mind before each section</div></div>
+            <div class="stgl" id="tgl-intros" style="background:#e8d5a3;"><div class="stgl-knob" style="left:24px;background:#060c18;"></div></div>
           </div>
         </div>
 
@@ -30750,6 +30822,106 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
         Sign Out
       </button>
     </div>`;
+  });
+})();
+</script>
+
+<!-- ── Screen Meditation Intros — JS + Modal ── -->
+<div id="intro-warn-modal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(6,12,24,0.88);align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#060c18;border:1px solid rgba(232,213,163,0.35);border-radius:20px;max-width:380px;width:100%;padding:32px 28px 28px;">
+    <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;color:#e8d5a3;margin-bottom:16px;">Are You Sure?</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.65;color:rgba(255,255,255,0.78);margin-bottom:28px;">
+      These intro screens are not decorative — they are precision-designed micro-meditations rooted in NOWSSB Word Science research.<br><br>
+      Each 10-second cinematic intro activates your brain's predictive processing system, shifting you from a reactive state into a receptive, healing state before you begin practice. This neurological priming is what makes your word sessions fundamentally different from passive listening.<br><br>
+      Removing this preparation layer reduces the depth of every session that follows. The intro is not a gate — it is the first word of every practice.
+    </div>
+    <button onclick="_introWarnCancel()" style="font-family:'DM Sans',sans-serif;width:100%;padding:15px;background:#e8d5a3;color:#060c18;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;">Keep Intros On</button>
+    <div style="text-align:center;">
+      <button onclick="_introWarnConfirm()" style="font-family:'DM Sans',sans-serif;background:none;border:none;color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;padding:8px;">Turn Off Anyway</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  function shouldShowIntro(key) {
+    var mode = localStorage.getItem('nwsb_intros') || 'always';
+    if (mode === 'always') return true;
+    if (!window._introSeen) window._introSeen = {};
+    if (window._introSeen[key]) return false;
+    window._introSeen[key] = true;
+    return true;
+  }
+  window.shouldShowIntro = shouldShowIntro;
+
+  window.openIntroSetting = function() {
+    if (typeof openSub === 'function') openSub('social');
+    setTimeout(function() {
+      var row = document.getElementById('intro-setting-row');
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.style.transition = 'background 0.3s';
+        row.style.background = 'rgba(232,213,163,0.12)';
+        setTimeout(function() { row.style.background = ''; }, 1400);
+      }
+    }, 420);
+  };
+
+  window.ssToggleIntros = function(el) {
+    var knob = el ? el.querySelector('.stgl-knob') : null;
+    if (!knob) return;
+    var isOn = parseInt(knob.style.left) > 10;
+    if (isOn) {
+      document.getElementById('intro-warn-modal').style.display = 'flex';
+    } else {
+      localStorage.setItem('nwsb_intros', 'always');
+      window._introSeen = {};
+      knob.style.left = '24px';
+      el.style.background = '#e8d5a3';
+    }
+  };
+
+  window._introWarnConfirm = function() {
+    localStorage.setItem('nwsb_intros', 'once');
+    var el = document.getElementById('tgl-intros');
+    if (el) {
+      var knob = el.querySelector('.stgl-knob');
+      if (knob) knob.style.left = '4px';
+      el.style.background = 'rgba(255,255,255,0.1)';
+    }
+    document.getElementById('intro-warn-modal').style.display = 'none';
+  };
+
+  window._introWarnCancel = function() {
+    document.getElementById('intro-warn-modal').style.display = 'none';
+  };
+
+  // Sync toggle visual state from localStorage when settings opens
+  function _syncIntroToggle() {
+    var el = document.getElementById('tgl-intros');
+    if (!el) return;
+    var mode = localStorage.getItem('nwsb_intros') || 'always';
+    var knob = el.querySelector('.stgl-knob');
+    if (!knob) return;
+    if (mode === 'always') {
+      knob.style.left = '24px';
+      el.style.background = '#e8d5a3';
+    } else {
+      knob.style.left = '4px';
+      el.style.background = 'rgba(255,255,255,0.1)';
+    }
+  }
+  // Sync on any openSub('social') call — patch after DOM ready
+  document.addEventListener('DOMContentLoaded', function() {
+    var _prevOpenSub = window.openSub;
+    if (typeof _prevOpenSub === 'function') {
+      window.openSub = function(id) {
+        var result = _prevOpenSub.apply(this, arguments);
+        if (id === 'social') setTimeout(_syncIntroToggle, 50);
+        return result;
+      };
+    }
+    _syncIntroToggle();
   });
 })();
 </script>
