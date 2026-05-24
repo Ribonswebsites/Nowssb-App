@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NowssB Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #060c18; color: #fff; font-family: 'DM Sans', sans-serif; padding: 20px; min-height: 100vh; }
+h1 { color: #e8d5a3; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { color: rgba(255,255,255,0.4); font-size: 12px; letter-spacing: 0.5px; margin-bottom: 28px; }
+.field { margin-bottom: 14px; }
+label { display: block; font-size: 10px; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 6px; }
+input, select, textarea { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+input:focus, select:focus, textarea:focus { border-color: rgba(232,213,163,0.4); background: rgba(255,255,255,0.07); }
+textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+select option { background: #0a1628; }
+.btn { width: 100%; padding: 14px; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.3); border-radius: 12px; color: #e8d5a3; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 6px; }
+.btn:hover { background: rgba(232,213,163,0.18); border-color: rgba(232,213,163,0.5); }
+.btn-danger { background: rgba(220,80,80,0.08); border-color: rgba(220,80,80,0.2); color: rgba(220,80,80,0.8); }
+.btn-danger:hover { background: rgba(220,80,80,0.18); }
+.section-label { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.25); text-transform: uppercase; margin: 28px 0 14px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.word-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 16px; margin-bottom: 10px; position: relative; }
+.word-name { font-size: 17px; font-weight: 700; color: #e8d5a3; letter-spacing: 2px; margin-bottom: 4px; }
+.word-phonetic { font-size: 12px; color: rgba(200,232,245,0.7); margin-bottom: 6px; letter-spacing: 0.5px; }
+.word-meta { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+.word-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); font-size: 10px; color: rgba(255,255,255,0.5); margin: 2px 2px 0 0; }
+.del-btn { position: absolute; top: 12px; right: 12px; background: rgba(220,80,80,0.08); border: 1px solid rgba(220,80,80,0.15); border-radius: 8px; padding: 5px 10px; font-size: 11px; color: rgba(220,80,80,0.7); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.del-btn:hover { background: rgba(220,80,80,0.2); }
+#authWrap { max-width: 380px; margin: 0 auto; padding-top: 80px; }
+#mainWrap { max-width: 520px; margin: 0 auto; display: none; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.count-badge { display: inline-block; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.2); border-radius: 8px; padding: 3px 10px; font-size: 12px; color: #e8d5a3; font-weight: 600; margin-left: 8px; }
+.export-area { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; font-size: 11px; color: rgba(255,255,255,0.5); font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; margin-top: 10px; }
+.success-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(16,185,129,0.9); color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 999; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+.success-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="authWrap">
+  <h1 style="margin-bottom:8px;">NowssB Admin</h1>
+  <p style="color:rgba(255,255,255,0.4);font-size:13px;margin-bottom:28px;">Word Management · Content Panel</p>
+  <div class="field">
+    <label>Admin Password</label>
+    <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')authCheck()">
+  </div>
+  <button class="btn" onclick="authCheck()">Enter Panel</button>
+</div>
+
+<!-- MAIN PANEL -->
+<div id="mainWrap">
+  <h1>NowssB Admin</h1>
+  <p class="subtitle">Word Management Panel · All changes save locally and sync on deploy</p>
+
+  <!-- ADD WORD FORM -->
+  <div class="section-label">Add New Word</div>
+
+  <div class="field">
+    <label>Word Name *</label>
+    <input id="fWord" placeholder="e.g. AASHIRVAAD" oninput="this.value=this.value.toUpperCase()">
+  </div>
+  <div class="field">
+    <label>Phonetic Breakdown *</label>
+    <input id="fPhonetic" placeholder="e.g. aa-shii-r-vaad">
+  </div>
+  <div class="field">
+    <label>Organ / Body System *</label>
+    <input id="fOrgan" placeholder="e.g. Heart, Lungs, Immune System">
+  </div>
+  <div class="field">
+    <label>Healing Benefit</label>
+    <input id="fBenefit" placeholder="e.g. Strengthens respiratory system and clears airways">
+  </div>
+  <div class="field">
+    <label>Meaning &amp; Natural Origin Story</label>
+    <textarea id="fMeaning" placeholder="Full meaning and natural origin story of this word..."></textarea>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Mouth Position</label>
+      <input id="fMouth" placeholder="e.g. Lips slightly open...">
+    </div>
+    <div class="field">
+      <label>Resonance Point</label>
+      <input id="fResonance" placeholder="e.g. Chest cavity vibrates...">
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="field">
+      <label>Common Mistake</label>
+      <input id="fMistake" placeholder="e.g. Rushing the second syllable...">
+    </div>
+    <div class="field">
+      <label>Practice Tip</label>
+      <input id="fTip" placeholder="e.g. Breathe out slowly...">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label>Category</label>
+      <select id="fCategory">
+        <option value="Mental Clarity">Mental Clarity</option>
+        <option value="Heart Health">Heart Health</option>
+        <option value="Immunity Boost">Immunity Boost</option>
+        <option value="Skin &amp; Glow">Skin &amp; Glow</option>
+        <option value="Gut Health">Gut Health</option>
+        <option value="Fitness &amp; Muscle">Fitness &amp; Muscle</option>
+        <option value="Liver Detox">Liver Detox</option>
+        <option value="Lung &amp; Breath">Lung &amp; Breath</option>
+        <option value="Hormones">Hormones</option>
+        <option value="Sleep &amp; Recovery">Sleep &amp; Recovery</option>
+        <option value="Hair Health">Hair Health</option>
+        <option value="Kidney &amp; Bladder">Kidney &amp; Bladder</option>
+        <option value="Bone &amp; Joint">Bone &amp; Joint</option>
+        <option value="Energy &amp; Vitality">Energy &amp; Vitality</option>
+        <option value="Confidence">Confidence</option>
+        <option value="Relationships">Relationships</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Gender Tag</label>
+      <select id="fGender">
+        <option value="both">Both</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Time Tag</label>
+    <select id="fTime">
+      <option value="any">Any Time</option>
+      <option value="morning">Morning</option>
+      <option value="evening">Evening</option>
+      <option value="night">Night</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Audio URL — Male Voice (Cloudflare R2)</label>
+    <input id="fAudioM" placeholder="https://pub-xxxx.r2.dev/words/word-male.mp3">
+  </div>
+  <div class="field">
+    <label>Audio URL — Female Voice (Cloudflare R2)</label>
+    <input id="fAudioF" placeholder="https://pub-xxxx.r2.dev/words/word-female.mp3">
+  </div>
+
+  <button class="btn" onclick="addWord()">Add Word to Library</button>
+
+  <!-- WORD LIST -->
+  <div class="section-label">
+    Current Word Library
+    <span class="count-badge" id="wordCount">0</span>
+  </div>
+  <div id="wordListContainer"></div>
+
+  <!-- EXPORT -->
+  <div class="section-label">Export as JSON</div>
+  <button class="btn" onclick="exportWords()" style="margin-bottom:10px;">Copy JSON Export</button>
+  <div id="exportArea" class="export-area" style="display:none;"></div>
+
+  <!-- DANGER ZONE -->
+  <div class="section-label" style="color:rgba(220,80,80,0.5);">Danger Zone</div>
+  <button class="btn btn-danger" onclick="clearAll()">Clear All Words</button>
+
+</div>
+
+<div class="success-toast" id="toast"></div>
+
+<script>
+var ADMIN_PW = 'nowssb_admin_2026';
+
+function authCheck() {
+  var pw = document.getElementById('pwInput').value;
+  if (pw === ADMIN_PW) {
+    document.getElementById('authWrap').style.display = 'none';
+    document.getElementById('mainWrap').style.display = 'block';
+    renderWordList();
+  } else {
+    document.getElementById('pwInput').style.borderColor = 'rgba(220,80,80,0.5)';
+    setTimeout(function(){ document.getElementById('pwInput').style.borderColor = ''; }, 1500);
+  }
+}
+
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2500);
+}
+
+function getWords() {
+  try { return JSON.parse(localStorage.getItem('nwsb_admin_words') || '[]'); } catch(e) { return []; }
+}
+
+function saveWords(words) {
+  localStorage.setItem('nwsb_admin_words', JSON.stringify(words));
+  document.getElementById('wordCount').textContent = words.length;
+}
+
+function addWord() {
+  var word = document.getElementById('fWord').value.trim().toUpperCase();
+  if (!word) { document.getElementById('fWord').focus(); return; }
+  var phonetic = document.getElementById('fPhonetic').value.trim();
+  if (!phonetic) { document.getElementById('fPhonetic').focus(); return; }
+
+  var newWord = {
+    word: word,
+    phonetic: phonetic,
+    organ: document.getElementById('fOrgan').value.trim(),
+    benefit: document.getElementById('fBenefit').value.trim(),
+    meaning: document.getElementById('fMeaning').value.trim(),
+    mouth: document.getElementById('fMouth').value.trim(),
+    resonance: document.getElementById('fResonance').value.trim(),
+    mistake: document.getElementById('fMistake').value.trim(),
+    tip: document.getElementById('fTip').value.trim(),
+    category: document.getElementById('fCategory').value,
+    gender: document.getElementById('fGender').value,
+    time: document.getElementById('fTime').value,
+    audioMale: document.getElementById('fAudioM').value.trim(),
+    audioFemale: document.getElementById('fAudioF').value.trim(),
+    addedAt: new Date().toISOString()
+  };
+
+  var words = getWords();
+  words.unshift(newWord);
+  saveWords(words);
+
+  // Clear form fields
+  ['fWord','fPhonetic','fOrgan','fBenefit','fMeaning','fMouth','fResonance','fMistake','fTip','fAudioM','fAudioF'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
+
+  renderWordList();
+  toast('"' + word + '" added successfully');
+}
+
+function deleteWord(idx) {
+  if (!confirm('Delete this word? This cannot be undone.')) return;
+  var words = getWords();
+  words.splice(idx, 1);
+  saveWords(words);
+  renderWordList();
+  toast('Word deleted');
+}
+
+function renderWordList() {
+  var words = getWords();
+  document.getElementById('wordCount').textContent = words.length;
+  var container = document.getElementById('wordListContainer');
+  if (!words.length) {
+    container.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:13px;text-align:center;padding:28px 0;">No words added yet. Add the first word above.</div>';
+    return;
+  }
+  container.innerHTML = words.map(function(w, i) {
+    return '<div class="word-card">' +
+      '<button class="del-btn" onclick="deleteWord(' + i + ')">Delete</button>' +
+      '<div class="word-name">' + w.word + '</div>' +
+      '<div class="word-phonetic">' + (w.phonetic || '—') + '</div>' +
+      '<div class="word-meta">' +
+        (w.organ ? '<span class="word-tag">' + w.organ + '</span>' : '') +
+        (w.category ? '<span class="word-tag">' + w.category + '</span>' : '') +
+        (w.gender ? '<span class="word-tag">' + w.gender + '</span>' : '') +
+        (w.time && w.time !== 'any' ? '<span class="word-tag">' + w.time + '</span>' : '') +
+      '</div>' +
+      (w.benefit ? '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:8px;">' + w.benefit + '</div>' : '') +
+      '</div>';
+  }).join('');
+}
+
+function exportWords() {
+  var words = getWords();
+  var json = JSON.stringify(words, null, 2);
+  var area = document.getElementById('exportArea');
+  area.style.display = 'block';
+  area.textContent = json;
+  navigator.clipboard.writeText(json).then(function(){
+    toast('JSON copied to clipboard');
+  }).catch(function(){
+    toast('Select and copy the JSON above');
+  });
+}
+
+function clearAll() {
+  if (!confirm('Clear ALL words? This cannot be undone.')) return;
+  localStorage.removeItem('nwsb_admin_words');
+  renderWordList();
+  toast('All words cleared');
+}
+</script>
+</body>
+</html>
