@@ -25983,20 +25983,29 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   position: relative;
 }
 .ig-nav-puck {
-  width: 26px; height: 26px;
+  width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,.45);
-  transition: color .2s ease, transform .12s ease;
+  transition: transform .12s ease;
 }
-.ig-nav-puck svg { display: block; width: 22px; height: 22px; }
 .ig-nav-btn:active .ig-nav-puck { transform: scale(.85); }
+/* image icons — dim when inactive, full brightness when active */
+.ig-nav-img {
+  width: 28px; height: 28px;
+  object-fit: contain; display: block;
+  opacity: 0.45;
+  filter: brightness(1) grayscale(0.3);
+  transition: opacity .2s ease, filter .2s ease;
+}
+.ig-nav-btn.active .ig-nav-img {
+  opacity: 1;
+  filter: brightness(1.15) grayscale(0);
+}
 .ig-nav-label {
   font-size: 10px; font-weight: 500; color: rgba(255,255,255,.45);
   font-family: 'DM Sans', sans-serif;
   letter-spacing: 0.2px; transition: color .2s ease;
 }
-/* active state — gold icon + gold label + top indicator dot */
-.ig-nav-btn.active .ig-nav-puck { color: #e8d5a3; }
+/* active state — bright label + gold top bar */
 .ig-nav-btn.active .ig-nav-label { color: #e8d5a3; font-weight: 700; }
 .ig-nav-btn.active::before {
   content: '';
@@ -26005,7 +26014,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   background: #e8d5a3;
   border-radius: 0 0 3px 3px;
 }
-.ig-nav-avatar { width: 22px; height: 22px; border-radius: 50% !important; object-fit: cover; }
+.ig-nav-avatar { width: 24px; height: 24px; border-radius: 50% !important; object-fit: cover; }
 
 /* ── Store sub-tab strip (shown above nav when Store is active) ── */
 #ig-store-subtabs {
@@ -26125,41 +26134,28 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   <!-- Store -->
   <button class="ig-nav-btn" id="ignav-store" onclick="IG.nav('store')">
     <span class="ig-nav-puck">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <path d="M16 10a4 4 0 01-8 0"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" class="ig-nav-img" alt="Store">
     </span>
     <span class="ig-nav-label">Store</span>
   </button>
   <!-- NowssB (Home) -->
   <button class="ig-nav-btn" id="ignav-nowssb" onclick="IG.nav('nowssb')">
     <span class="ig-nav-puck">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png" class="ig-nav-img" alt="NowssB">
     </span>
     <span class="ig-nav-label">NowssB</span>
   </button>
   <!-- Discover -->
   <button class="ig-nav-btn" id="ignav-discover" onclick="IG.nav('discover')">
     <span class="ig-nav-puck">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="ig-nav-img" alt="Discover">
     </span>
     <span class="ig-nav-label">Discover</span>
   </button>
   <!-- Profile / Settings -->
   <button class="ig-nav-btn" id="ignav-settings" onclick="IG.nav('settings')">
     <span class="ig-nav-puck">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" class="ig-nav-img" alt="Profile">
     </span>
     <span class="ig-nav-label">Profile</span>
   </button>
