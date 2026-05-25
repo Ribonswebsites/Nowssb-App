@@ -4851,6 +4851,25 @@ window._fbServerTimestamp = () => serverTimestamp();
     letter-spacing:0.8px; color:rgba(0,0,0,0.45); text-align:center;
     text-transform:uppercase;
   }
+  .ld-toprow {
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%; margin-bottom:8px;
+  }
+  .ld-toprow-brand {
+    display:flex; align-items:center;
+  }
+  .ld-signin-btn {
+    height:36px; padding:0 16px;
+    background:#f0f2f7; border:none; border-radius:10px;
+    font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700;
+    color:#1a1a2e; cursor:pointer; letter-spacing:0.5px;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95);
+    transition:box-shadow 0.12s, transform 0.12s;
+  }
+  .ld-signin-btn:active {
+    box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.9);
+    transform: scale(0.97);
+  }
   .ld-divider {
     width:40px; height:1px; background:rgba(0,0,0,0.1); margin:32px 0;
   }
@@ -5368,15 +5387,21 @@ window._fbServerTimestamp = () => serverTimestamp();
   <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779713364/ee429d10-5835-11f1-9971-736215a430db_lii4mj.png" alt="" loading="eager">
 </div>
 
-<!-- ══ SCREEN: LANDING (New Home) ══ -->
+<!-- ══ SCREEN: LANDING (Primary Home) ══ -->
 <div class="screen" id="landing">
   <div class="ld-wrap">
+
+    <!-- Top row: Sign In button -->
+    <div class="ld-toprow">
+      <div class="ld-toprow-brand">
+        <span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#c8a96e;">Nowsbansiu</span>
+      </div>
+      <button class="ld-signin-btn" onclick="goTo('login')">Sign In</button>
+    </div>
 
     <div class="ld-logo-ring">
       <img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776888809/1000033338_no_bg-1776888417038_hc6hyu.png" alt="NowssB">
     </div>
-
-    <div class="ld-tag">Nowsbansiu</div>
 
     <div class="ld-headline">Healing is the<br>New Fashion.</div>
 
@@ -5406,7 +5431,7 @@ window._fbServerTimestamp = () => serverTimestamp();
       </svg>
       Heal in Fashion
     </button>
-    <div class="ld-cta-sub" id="ld-cta-hint">Subscription required</div>
+    <div class="ld-cta-sub" id="ld-cta-hint">Subscribers only</div>
 
   </div>
 </div>
