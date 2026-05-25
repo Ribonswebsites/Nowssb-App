@@ -6065,11 +6065,11 @@ window._fbServerTimestamp = () => serverTimestamp();
     <div><div class="menu-nav-label">Sound Bath</div><div class="menu-nav-sub">Sleep · Focus · Healing</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('word-science')">
-    <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/a7b04840-5789-11f1-9331-1302872077be_bqobig.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">Word Science</div><div class="menu-nav-sub">NOWSBANSIU system</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('my-progress')">
-    <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
+    <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/a7b04840-5789-11f1-9331-1302872077be_bqobig.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
     <div><div class="menu-nav-label">My Progress</div><div class="menu-nav-sub">Healing journey</div></div>
   </div>
   <div class="menu-nav-item" onclick="closeMenu();openSub('shabdapathy')">
@@ -26865,7 +26865,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   white-space: nowrap;
   min-height: 58px;
 }
-.store-sub-btn img { opacity: 0.55; transition: opacity .15s; }
+.store-sub-btn img { opacity: 0.85; transition: opacity .15s; }
 .store-sub-btn:active, .store-sub-btn.active { color: #e8d5a3; }
 .store-sub-btn:active img, .store-sub-btn.active img { opacity: 1; }
 
@@ -27437,8 +27437,14 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     syncNav();
   }
   if(document.readyState!=='loading') boot(); else document.addEventListener('DOMContentLoaded',boot);
-  // also sync periodically in case other code toggles screens without our wrappers
-  setInterval(syncNav, 3000);
+  // Sync on visibility change (tab switch, lock screen) — not on an interval which causes flicker
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) syncNav(); });
+  // Sync after any openSub/closeSub via MutationObserver on sub-screens instead of polling
+  (function(){
+    var mo = new MutationObserver(function(){ setTimeout(syncNav, 40); });
+    var home = document.getElementById('home');
+    if(home) mo.observe(home.parentNode || document.body, { childList:false, subtree:true, attributes:true, attributeFilter:['class'] });
+  })();
 })();
 </script>
 
