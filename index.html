@@ -27399,51 +27399,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 }
 .ig-nav-avatar { width: 24px; height: 24px; border-radius: 50% !important; object-fit: cover; }
 
-/* ── Store sub-tab strip (shown above nav when Store is active) ── */
-#ig-store-subtabs {
-  position: fixed; left: 0; right: 0;
-  bottom: 0;
-  z-index: 1000; display: none;
-  background: rgba(6,12,24,0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,.07);
-  flex-direction: row; align-items: stretch;
-  justify-content: space-around;
-  height: calc(58px + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-#ig-store-subtabs.show { display: flex; }
-.store-sub-btn {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  flex: 1; padding: 0; border-radius: 0;
-  background: transparent; border: none;
-  color: rgba(255,255,255,.5); font-size: 11px; font-weight: 600;
-  font-family: 'DM Sans', sans-serif; cursor: pointer;
-  transition: color .15s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  white-space: nowrap;
-  min-height: 58px;
-}
-.store-sub-btn img { opacity: 0.85; transition: opacity .15s; }
-.store-sub-btn:active, .store-sub-btn.active { color: #e8d5a3; }
-.store-sub-btn:active img, .store-sub-btn.active img { opacity: 1; }
-
-/* ── Profile / Settings sub-nav ── */
-#profile-subnav {
-  position: fixed; left: 0; right: 0; bottom: 0;
-  z-index: 1000; display: none;
-  background: rgba(6,12,24,0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,.07);
-  flex-direction: row; align-items: stretch;
-  justify-content: space-around;
-  height: calc(58px + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-#profile-subnav.show { display: flex; }
+/* store and profile sub-navs removed — single 5-tab nav only */
 </style>
 
 <!-- ── EXPLORE / SEARCH SUB-SCREEN ── -->
@@ -27517,80 +27473,35 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   </div>
 </div>
 
-<!-- ── Store sub-tab strip ── -->
-<div id="ig-store-subtabs">
-  <!-- First button: go back to NowssB Home (Instagram-style: active tab → home) -->
-  <button class="store-sub-btn" id="store-sub-home" onclick="IG.nav('nowssb')">
-    <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" style="width:22px;height:22px;object-fit:contain;display:block;" alt="">
-    NowssB
-  </button>
-  <button class="store-sub-btn" onclick="openSub('cart')">
-    <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png" style="width:22px;height:22px;object-fit:contain;display:block;" alt="">
-    Cart
-  </button>
-  <button class="store-sub-btn" onclick="openSub('wishlist')"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png" style="width:22px;height:22px;object-fit:contain;display:block;" alt=""> Wishlist</button>
-  <button class="store-sub-btn" onclick="openSub('orders')"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/c8ede950-56cf-11f1-8fad-095787cce754_lhp24x.png" style="width:22px;height:22px;object-fit:contain;display:block;" alt=""> Orders</button>
-</div>
-
-<!-- ── Profile / Settings sub-nav ── -->
-<div id="profile-subnav">
-  <!-- Profile (IG) -->
-  <button class="ig-nav-btn" id="psn-profile" onclick="PSN.go('profile')">
-    <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/1e3514c0-5788-11f1-9331-1302872077be_dft895.png" class="ig-nav-img" alt="Profile">
-    </span>
-    <span class="ig-nav-label">Profile</span>
-  </button>
-  <!-- NowssB Profile -->
-  <button class="ig-nav-btn" id="psn-nowssb" onclick="PSN.go('nowssb')">
-    <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png" class="ig-nav-img" alt="NowssB">
-    </span>
-    <span class="ig-nav-label">NowssB</span>
-  </button>
-  <!-- App Settings -->
-  <button class="ig-nav-btn" id="psn-settings" onclick="PSN.go('settings')">
-    <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" class="ig-nav-img" alt="Settings">
-    </span>
-    <span class="ig-nav-label">Settings</span>
-  </button>
-  <!-- Explore People -->
-  <button class="ig-nav-btn" id="psn-explore" onclick="PSN.go('explore')">
-    <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/67f88680-578a-11f1-9331-1302872077be_r5mntz.png" class="ig-nav-img" alt="Explore">
-    </span>
-    <span class="ig-nav-label">Explore</span>
-  </button>
-</div>
-
-<!-- ── FLAT INSTAGRAM-STYLE 4-TAB BOTTOM NAV ── -->
+<!-- ── 5-TAB BOTTOM NAV ── -->
 <div id="ig-bottomnav">
-  <!-- Store -->
+  <button class="ig-nav-btn" id="ignav-home" onclick="IG.nav('home')">
+    <span class="ig-nav-puck">
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" class="ig-nav-img" alt="Home">
+    </span>
+    <span class="ig-nav-label">Home</span>
+  </button>
+  <button class="ig-nav-btn" id="ignav-practice" onclick="IG.nav('practice')">
+    <span class="ig-nav-puck">
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png" class="ig-nav-img" alt="Practice">
+    </span>
+    <span class="ig-nav-label">Practice</span>
+  </button>
+  <button class="ig-nav-btn" id="ignav-library" onclick="IG.nav('library')">
+    <span class="ig-nav-puck">
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" class="ig-nav-img" alt="Library">
+    </span>
+    <span class="ig-nav-label">Library</span>
+  </button>
   <button class="ig-nav-btn" id="ignav-store" onclick="IG.nav('store')">
     <span class="ig-nav-puck">
       <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" class="ig-nav-img" alt="Store">
     </span>
     <span class="ig-nav-label">Store</span>
   </button>
-  <!-- NowssB (Home) -->
-  <button class="ig-nav-btn" id="ignav-nowssb" onclick="IG.nav('nowssb')">
+  <button class="ig-nav-btn" id="ignav-profile" onclick="IG.nav('profile')">
     <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" class="ig-nav-img" alt="NowssB">
-    </span>
-    <span class="ig-nav-label">NowssB</span>
-  </button>
-  <!-- Discover -->
-  <button class="ig-nav-btn" id="ignav-discover" onclick="IG.nav('discover')">
-    <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="ig-nav-img" alt="Discover">
-    </span>
-    <span class="ig-nav-label">Discover</span>
-  </button>
-  <!-- Profile / Settings -->
-  <button class="ig-nav-btn" id="ignav-settings" onclick="IG.nav('settings')">
-    <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" class="ig-nav-img" alt="Profile">
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" class="ig-nav-img" alt="Profile">
     </span>
     <span class="ig-nav-label">Profile</span>
   </button>
@@ -27788,24 +27699,17 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   // ── NAV management ──
   var NAV_MAP = {
     'sub-nowssb-store':'store', 'sub-meaning-store':'store',
-    'sub-routines':'nowssb', 'sub-routine-detail':'nowssb',
-    'sub-people':'discover', 'sub-ig-profile':'discover',
-    'sub-social':'settings'
+    'sub-cart':'store', 'sub-wishlist':'store', 'sub-orders':'store', 'sub-order-history':'store',
+    'sub-routines':'home', 'sub-routine-detail':'home',
+    'sub-sound-library':'library', 'sub-sound-bath':'library',
+    'sub-people':'profile', 'sub-ig-profile':'profile',
+    'sub-social':'profile', 'sub-profile':'profile'
   };
   function setActiveNav(which){
-    ['store','nowssb','discover','settings'].forEach(function(k){
+    ['home','practice','library','store','profile'].forEach(function(k){
       var el=document.getElementById('ignav-'+k);
       if(el) el.classList.toggle('active', k===which);
     });
-    // Swap navs based on context
-    var storenav   = document.getElementById('ig-store-subtabs');
-    var profilenav = document.getElementById('profile-subnav');
-    var mainnav    = document.getElementById('ig-bottomnav');
-    var isStore   = which === 'store';
-    var isProfile = which === 'settings';
-    if(storenav)   storenav.classList.toggle('show', isStore);
-    if(profilenav) profilenav.classList.toggle('show', isProfile);
-    if(mainnav)    mainnav.classList.toggle('show', !isStore && !isProfile);
     document.documentElement.style.setProperty('--nav-height', '58px');
   }
   function closeNavScreens(){
@@ -27815,18 +27719,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   }
   function showNav(show){
     var n=document.getElementById('ig-bottomnav');
-    var s=document.getElementById('ig-store-subtabs');
-    var p=document.getElementById('profile-subnav');
-    var storeActive   = s && s.classList.contains('show');
-    var profileActive = p && p.classList.contains('show');
-    if(show){
-      if(n) n.classList.toggle('show', !storeActive && !profileActive);
-    } else {
-      if(n) n.classList.remove('show');
-      if(s) s.classList.remove('show');
-      if(p) p.classList.remove('show');
-    }
-    // Keep --nav-height in sync so all content areas clear the bar correctly
+    if(n) n.classList.toggle('show', !!show);
     document.documentElement.style.setProperty('--nav-height', show ? '58px' : '0px');
   }
 
@@ -27834,17 +27727,38 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   window.IG = {
     _currentProfile:null,
     nav:function(which){
-      if(which==='store'){ closeNavScreens(); if(typeof openSub==='function') openSub('nowssb-store'); setActiveNav('store'); showNav(true); }
-      else if(which==='nowssb'){ closeNavScreens(); if(typeof goTo==='function' && (typeof currentScreen==='undefined' || (currentScreen!=='home'&&currentScreen!=='home-nm'))){ var _pm=localStorage.getItem('nwsb_home_mode')||'nm'; goTo(_pm==='classic'?'home':'home-nm'); } setActiveNav('nowssb'); showNav(true); }
-      else if(which==='discover'){ closeNavScreens(); this.openExplore(); }
-      else if(which==='settings'){ closeNavScreens(); setActiveNav('settings'); showNav(true); setTimeout(function(){ PSN.go('profile'); }, 30); }
+      if(which==='home'){
+        closeNavScreens();
+        if(typeof goTo==='function'&&(typeof currentScreen==='undefined'||(currentScreen!=='home'&&currentScreen!=='home-nm'))){
+          var _pm=localStorage.getItem('nwsb_home_mode')||'nm';
+          goTo(_pm==='classic'?'home':'home-nm');
+        }
+        setActiveNav('home'); showNav(true);
+      } else if(which==='practice'){
+        closeNavScreens();
+        if(typeof openPracticeIntro==='function') openPracticeIntro();
+        else if(typeof openSub==='function') openSub('practice');
+        setActiveNav('practice');
+      } else if(which==='library'){
+        closeNavScreens();
+        if(typeof openSub==='function') openSub('sound-library');
+        setActiveNav('library'); showNav(true);
+      } else if(which==='store'){
+        closeNavScreens();
+        if(typeof openSub==='function') openSub('nowssb-store');
+        setActiveNav('store'); showNav(true);
+      } else if(which==='profile'){
+        closeNavScreens();
+        if(typeof openSub==='function') openSub('profile');
+        setActiveNav('profile'); showNav(true);
+      }
       setTimeout(syncNav,60);
     },
     openExplore:function(){
       document.getElementById('sub-ig-profile').classList.remove('open');
       document.getElementById('sub-people').classList.add('open');
       renderExplore(); this.clearSearch();
-      setActiveNav('discover'); showNav(true);
+      setActiveNav('profile'); showNav(true);
       var sc=document.getElementById('ig-people-scroll'); if(sc) sc.scrollTop=0;
     },
     openMyProfile:function(){
@@ -27860,7 +27774,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
       this._syncExploreAvatar();
       document.getElementById('sub-people').classList.remove('open');
       document.getElementById('sub-ig-profile').classList.add('open');
-      setActiveNav('discover'); showNav(true);
+      setActiveNav('profile'); showNav(true);
       var sc=document.getElementById('ig-prof-scroll'); if(sc) sc.scrollTop=0;
     },
     openProfile:function(id){
@@ -27869,13 +27783,13 @@ document.getElementById('sub-social').addEventListener('transitionend', function
       this._currentProfile=p;
       renderProfile(p);
       document.getElementById('sub-ig-profile').classList.add('open');
-      showNav(true); setActiveNav('discover');
+      showNav(true); setActiveNav('profile');
       var sc=document.getElementById('ig-prof-scroll'); if(sc) sc.scrollTop=0;
     },
     closeProfile:function(){
       document.getElementById('sub-ig-profile').classList.remove('open');
       // if people screen underneath is open keep nav on search else default
-      if(document.getElementById('sub-people').classList.contains('open')) setActiveNav('discover');
+      if(document.getElementById('sub-people').classList.contains('open')) setActiveNav('profile');
     },
     search:function(v){
       document.getElementById('ig-search-clear').style.display = v?'block':'none';
@@ -27908,7 +27822,6 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     openExplorePost:function(){ alert('Post viewer — coming soon'); },
     showFollowers:function(){ alert('Followers list — coming soon'); },
     editProfile:function(){
-      // open existing settings profile-edit if present
       if(typeof openSub==='function'){ openSub('social'); if(typeof ssOpenPanel==='function') setTimeout(function(){ssOpenPanel('profile-edit');},120); }
     },
     shareProfile:function(){ alert('Share profile — coming soon'); },
@@ -27981,7 +27894,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     if(navScreen){ showNav(true); setActiveNav(NAV_MAP[navScreen]); return; }
     var onHome = (typeof currentScreen!=='undefined' && (currentScreen==='home'||currentScreen==='home-nm'));
     showNav(onHome);
-    if(onHome) setActiveNav('nowssb');
+    if(onHome) setActiveNav('home');
   }
 
   // wrap navigation functions to keep nav in sync
