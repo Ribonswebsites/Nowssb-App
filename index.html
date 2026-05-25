@@ -875,11 +875,10 @@ window._fbServerTimestamp = () => serverTimestamp();
     box-shadow: 9px 9px 22px rgba(0,0,0,0.16), -7px -7px 18px rgba(255,255,255,0.97);
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 18px; flex-shrink: 0;
+    overflow: hidden;
   }
   .nm-logo-img {
-    width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
-    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), inset -2px -2px 5px rgba(255,255,255,0.8);
-    display: block; background: transparent;
+    width: 100%; height: 100%; object-fit: cover; display: block;
   }
   .nm-brand {
     font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
@@ -5583,7 +5582,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 .nmh-wrap {
   width:100%; min-height:100%;
   padding: 0 20px 0;
-  display:flex; flex-direction:column; align-items:center; gap:14px;
+  display:flex; flex-direction:column; align-items:stretch; gap:14px;
   box-sizing:border-box;
 }
 /* Top row — sticky neumorphic header */
@@ -5600,10 +5599,11 @@ window._fbServerTimestamp = () => serverTimestamp();
   display:flex; align-items:center; gap:12px;
 }
 .nmh-logo {
-  width:42px; height:42px; border-radius:50%; overflow:hidden; flex-shrink:0;
-  box-shadow:none; background:transparent;
+  width:44px; height:44px; border-radius:50%; overflow:hidden; flex-shrink:0;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.14), -4px -4px 10px rgba(255,255,255,0.95);
+  background:#f0f2f7;
 }
-.nmh-logo img { width:42px; height:42px; object-fit:cover; display:block; }
+.nmh-logo img { width:100%; height:100%; object-fit:cover; display:block; }
 .nmh-brand-text { display:flex; flex-direction:column; }
 .nmh-brand-name {
   font-family:'DM Sans',sans-serif; font-size:15px; font-weight:800;
@@ -5692,6 +5692,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 .nmh-practice-meaning {
   font-family:'DM Sans',sans-serif; font-size:12px; font-weight:400;
   color:rgba(0,0,0,0.45); line-height:1.5;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
 }
 .nmh-practice-footer {
   display:flex; align-items:center; justify-content:space-between; margin-top:4px;
@@ -5785,6 +5786,7 @@ window._fbServerTimestamp = () => serverTimestamp();
   background: #12122a;
   box-shadow: 0 6px 18px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3), 0 -1px 0 rgba(40,40,80,0.3) inset;
 }
+#home-nm.nm-dark .nmh-logo { background:#1e1e38; box-shadow: 5px 5px 12px rgba(0,0,0,0.5), -3px -3px 8px rgba(40,40,80,0.2); }
 #home-nm.nm-dark .nmh-brand-name { color: #fff; }
 #home-nm.nm-dark .nmh-brand-sub  { color: rgba(232,213,163,0.55); }
 #home-nm.nm-dark .nmh-greeting   { color: #fff; }
@@ -5905,7 +5907,7 @@ window._fbServerTimestamp = () => serverTimestamp();
             <rect x="19" y="13" width="5" height="8" rx="2.5" stroke="#c8a96e" stroke-width="1.7"/>
           </svg>
         </div>
-        <div>
+        <div style="min-width:0;flex:1;overflow:hidden;">
           <div class="nmh-practice-word" id="nmhTodayWord">Loading...</div>
           <div class="nmh-practice-meaning" id="nmhTodayMeaning">Your personalized word ritual for right now.</div>
         </div>
@@ -13290,7 +13292,7 @@ async function _profileSavePhotoURL(url) {
     <!-- ANDROID / DESKTOP: native install prompt -->
     <div id="dlViewInstall">
       <div class="dl-icon-wrap">
-        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:56px;height:56px;object-fit:cover;border-radius:50%;" loading="lazy">
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">
       </div>
       <div class="dl-title">Install the App</div>
       <div class="dl-sub">Add NOWSBANSIU to your home screen for a full native app experience — works offline, no browser bar.</div>
@@ -13307,7 +13309,7 @@ async function _profileSavePhotoURL(url) {
     <!-- iOS: step-by-step instructions -->
     <div id="dlViewIOS" style="display:none;">
       <div class="dl-icon-wrap">
-        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:56px;height:56px;object-fit:cover;border-radius:50%;" loading="lazy">
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">
       </div>
       <div class="dl-title">Add to Home Screen</div>
       <div class="dl-sub">Install NOWSBANSIU as an app in 2 taps:</div>
