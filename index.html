@@ -5572,14 +5572,19 @@ window._fbServerTimestamp = () => serverTimestamp();
 }
 .nmh-wrap {
   width:100%; min-height:100%;
-  padding: max(env(safe-area-inset-top,52px),52px) 20px 0;
+  padding: 0 20px 0;
   display:flex; flex-direction:column; align-items:center; gap:14px;
   box-sizing:border-box;
 }
-/* Top row */
+/* Top row — sticky neumorphic header */
 .nmh-toprow {
+  position: sticky; top: 0; z-index: 50;
   display:flex; align-items:center; justify-content:space-between;
-  width:100%; margin-bottom:4px;
+  width: calc(100% + 40px); margin-left: -20px; margin-right: -20px;
+  padding: max(env(safe-area-inset-top,16px),16px) 20px 14px;
+  background: #f0f2f7;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06), 0 -1px 0 rgba(255,255,255,0.9) inset;
+  margin-bottom: 8px;
 }
 .nmh-brand-row {
   display:flex; align-items:center; gap:12px;
@@ -5766,6 +5771,10 @@ window._fbServerTimestamp = () => serverTimestamp();
 /* ── BLACK NEUMORPHIC MODE ── */
 #home-nm.nm-dark { background: #12122a; }
 #home-nm.nm-dark .nmh-wrap { background: #12122a; }
+#home-nm.nm-dark .nmh-toprow {
+  background: #12122a;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3), 0 -1px 0 rgba(40,40,80,0.3) inset;
+}
 #home-nm.nm-dark .nmh-brand-name { color: #fff; }
 #home-nm.nm-dark .nmh-brand-sub  { color: rgba(232,213,163,0.55); }
 #home-nm.nm-dark .nmh-greeting   { color: #fff; }
