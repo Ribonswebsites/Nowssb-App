@@ -107,14 +107,14 @@ async function _resolveUserRoute(user) {
     setTimeout(function(){ if (window._spRefreshPromo) window._spRefreshPromo(); }, 100);
   }
   if (data.gender) window._userGender = data.gender;
-  if (data.onboardingDone) return 'home-nm';
-  // If they finished signup but never completed onboarding (old accounts / skipped) → go home-nm
+  if (data.onboardingDone) return 'home';
+  // If they finished signup but never completed onboarding (old accounts / skipped) → go home
   if (data.profileStepDone) {
     if (window._fbSetDoc && window._currentUid) {
       window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
     }
     if (window._userDataCache) window._userDataCache.onboardingDone = true;
-    return 'home-nm';
+    return 'home';
   }
   if (!window._su2Method) window._su2Method = 'social';
   return 'signup2';
@@ -133,7 +133,7 @@ onAuthStateChanged(auth, async user => {
       try {
         window._splashRoute = await _resolveUserRoute(user);
       } catch(e) {
-        window._splashRoute = 'home-nm';
+        window._splashRoute = 'home';
       }
       if (window._splashDone) _doNavigate(window._splashRoute);
       return;
@@ -167,12 +167,12 @@ onAuthStateChanged(auth, async user => {
     }
 
     // Not logged in on a protected screen — send to login
-    const protectedScreens = ['home','onboarding','analysis'];
+    // home and home-nm both allow guest browsing (skip login sets _guestMode)
+    const protectedScreens = ['onboarding','analysis'];
     if (protectedScreens.includes(currentScreen)) {
       goTo('login');
     }
-    // home-nm allows guest browsing (skip login)
-    if (currentScreen === 'home-nm' && !window._guestMode) {
+    if ((currentScreen === 'home' || currentScreen === 'home-nm') && !window._guestMode) {
       goTo('login');
     }
   }
@@ -199,7 +199,7 @@ window.finishOnboarding = async () => {
     // Ensure onboardingDone is set without overwriting existing answers
     window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
   }
-  goTo('home-nm');
+  goTo('home');
 };
 
 // Save onboarding answers to Firestore
@@ -5119,7 +5119,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 
     </div>
 
-    <button onclick="window._guestMode=true;goTo('home-nm');" style="display:block;width:100%;margin-top:18px;padding:12px;background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:#c8a96e;letter-spacing:0.3px;text-align:center;opacity:0.8;">
+    <button onclick="window._guestMode=true;goTo('home');" style="display:block;width:100%;margin-top:18px;padding:12px;background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:#c8a96e;letter-spacing:0.3px;text-align:center;opacity:0.8;">
       Explore without account →
     </button>
 
@@ -5609,6 +5609,13 @@ window._fbServerTimestamp = () => serverTimestamp();
   box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.9);
   transform:scale(0.95);
 }
+.nmh-mode-dark {
+  background: #1a1a2e;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.5), -2px -2px 6px rgba(60,60,100,0.25);
+}
+.nmh-mode-dark:active {
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.5), inset -2px -2px 5px rgba(60,60,100,0.2);
+}
 /* Greeting */
 .nmh-greeting {
   width:100%; font-family:'DM Sans',sans-serif;
@@ -5768,10 +5775,9 @@ window._fbServerTimestamp = () => serverTimestamp();
           <div class="nmh-brand-sub">Nowsbansiu Edition</div>
         </div>
       </div>
-      <button class="nmh-mode-btn" onclick="nmhSwitchMode()" title="Switch to Classic">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M9 2v1M9 15v1M2 9H1M17 9h-1M4.22 4.22l-.71-.71M14.49 14.49l-.71-.71M4.22 13.78l-.71.71M14.49 3.51l-.71.71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="9" cy="9" r="3" stroke="#1a1a2e" stroke-width="1.5"/>
+      <button class="nmh-mode-btn nmh-mode-dark" onclick="nmhSwitchMode()" title="Switch to Fashion Mode">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1L10 6H15L11 9.5L12.5 15L8 11.5L3.5 15L5 9.5L1 6H6L8 1Z" stroke="rgba(232,213,163,0.9)" stroke-width="1.3" stroke-linejoin="round" fill="rgba(232,213,163,0.15)"/>
         </svg>
       </button>
     </div>
@@ -5881,6 +5887,20 @@ window._fbServerTimestamp = () => serverTimestamp();
       <div class="nmh-quick-btn" onclick="openSub('sound-bath')">
         <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/1e3514c0-5788-11f1-9331-1302872077be_dft895.png" alt="">
         <span>Sound Bath</span>
+      </div>
+    </div>
+
+    <!-- Switch to Fashion Mode section -->
+    <div onclick="nmhSwitchMode()" style="width:100%;margin-top:8px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
+      <div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(232,213,163,0.65);margin-bottom:4px;">Experience</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:600;color:#fff;letter-spacing:0.2px;">Fashion Mode</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.45);margin-top:3px;">Dark · Cinematic · Editorial</div>
+      </div>
+      <div style="width:44px;height:44px;border-radius:50%;background:rgba(232,213,163,0.12);border:1px solid rgba(232,213,163,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
+          <path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
       </div>
     </div>
 
@@ -13661,11 +13681,11 @@ function landingEnter() {
   if (overlay) {
     overlay.classList.add('show');
     setTimeout(function() {
-      goTo('home-nm');
+      goTo('home');
       setTimeout(function() { overlay.classList.remove('show'); }, 300);
     }, 950);
   } else {
-    goTo('home-nm');
+    goTo('home');
   }
 }
 
@@ -21267,8 +21287,8 @@ function nwagOpenSection(id) {
 
   // ensure home screen is visible before opening any sub-panel
   if (typeof goTo === 'function') {
-    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'nm';
-    goTo(_pm2 === 'classic' ? 'home' : 'home-nm');
+    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'classic';
+    goTo(_pm2 === 'nm' ? 'home-nm' : 'home');
   }
 
   setTimeout(function() {
@@ -27970,8 +27990,8 @@ document.getElementById('sub-social').addEventListener('transitionend', function
       if(which==='home'){
         closeNavScreens();
         if(typeof goTo==='function'&&(typeof currentScreen==='undefined'||(currentScreen!=='home'&&currentScreen!=='home-nm'))){
-          var _pm=localStorage.getItem('nwsb_home_mode')||'nm';
-          goTo(_pm==='classic'?'home':'home-nm');
+          var _pm=localStorage.getItem('nwsb_home_mode')||'classic';
+          goTo(_pm==='nm'?'home-nm':'home');
         }
         setActiveNav('home'); showNav(true);
       } else if(which==='practice'){
