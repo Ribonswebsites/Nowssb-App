@@ -167,8 +167,12 @@ onAuthStateChanged(auth, async user => {
     }
 
     // Not logged in on a protected screen — send to login
-    const protectedScreens = ['home','home-nm','onboarding','analysis'];
+    const protectedScreens = ['home','onboarding','analysis'];
     if (protectedScreens.includes(currentScreen)) {
+      goTo('login');
+    }
+    // home-nm allows guest browsing (skip login)
+    if (currentScreen === 'home-nm' && !window._guestMode) {
       goTo('login');
     }
   }
@@ -1925,9 +1929,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 
   .dl-overlay {
     position: fixed; inset: 0; z-index: 300;
-    background: rgba(3,8,20,0.72);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    background: rgba(0,0,0,0.35);
     display: none;
     align-items: flex-end; justify-content: center;
     padding-bottom: max(env(safe-area-inset-bottom, 24px), 24px);
@@ -1942,101 +1944,94 @@ window._fbServerTimestamp = () => serverTimestamp();
   @keyframes dlFadeIn { to { opacity: 1; } }
 
   .dl-sheet {
-    width: calc(100% - 48px);
+    width: calc(100% - 32px);
     max-width: 420px;
-    background: rgba(12,22,42,0.92);
-    border: 1px solid rgba(255,255,255,0.18);
-    box-shadow: 0 -4px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
-    padding: 28px 24px 24px;
+    background: #f0f2f7;
+    border-radius: 28px 28px 20px 20px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.18), 8px 8px 20px rgba(0,0,0,0.1), -6px -6px 16px rgba(255,255,255,0.9);
+    padding: 22px 24px calc(24px + env(safe-area-inset-bottom, 0px));
     position: relative;
     transform: translateY(40px);
     animation: dlSlideUp 0.38s cubic-bezier(0.16,1,0.3,1) forwards;
   }
   @keyframes dlSlideUp { to { transform: translateY(0); } }
 
-  .dl-sheet::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-  }
+  .dl-sheet::before { display: none; }
 
   .dl-handle {
-    width: 36px; height: 3px;
-    background: rgba(255,255,255,0.25);
+    width: 36px; height: 4px;
+    border-radius: 2px;
+    background: rgba(0,0,0,0.15);
     margin: 0 auto 22px;
   }
   .dl-icon-wrap {
-    width: 56px; height: 56px;
-    background: rgba(200,232,245,0.10);
-    border: 1px solid rgba(200,232,245,0.28);
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: #f0f2f7;
+    box-shadow: 5px 5px 12px rgba(0,0,0,0.12), -4px -4px 10px rgba(255,255,255,0.95);
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
+    margin: 0 auto 18px;
+    overflow: hidden;
   }
   .dl-title {
-    font-family:var(--font-primary, 'Quattrocento Sans', 'DM Sans', sans-serif);
-    font-size: 26px; font-weight: 500;
-    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 22px; font-weight: 600;
+    color: #1a1a2e;
     text-align: center; margin-bottom: 8px;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
   }
   .dl-sub {
-    font-size: 12px; font-weight: 300;
-    color: var(--text-secondary);
-    text-align: center; line-height: 1.7;
-    margin-bottom: 24px; letter-spacing: 0.2px;
+    font-size: 13px; font-weight: 400;
+    color: rgba(0,0,0,0.5);
+    text-align: center; line-height: 1.65;
+    margin-bottom: 24px; letter-spacing: 0.1px;
   }
   .dl-btn {
-    width: 100%; height: 54px;
-    background: rgba(255,255,255,0.95);
+    width: 100%; height: 52px;
+    background: #c8a96e;
     border: none; cursor: pointer;
+    border-radius: 14px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 12px; font-weight: 500;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: #07101f;
-    display: flex; align-items: center; justify-content: center; gap: 12px;
-    box-shadow: 0 4px 24px rgba(255,255,255,0.14), 0 2px 8px rgba(0,0,0,0.28);
-    transition: transform 0.15s, background 0.15s;
-    position: relative; overflow: hidden; margin-bottom: 10px;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 4px 4px 12px rgba(200,169,110,0.4), -2px -2px 6px rgba(255,255,255,0.8);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-bottom: 12px;
   }
-  .dl-btn::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(200,232,245,0.18), transparent);
-  }
-  .dl-btn:active { transform: scale(0.985) translateY(1px); background: rgba(225,240,250,0.95); }
+  .dl-btn::before { display: none; }
+  .dl-btn:active { transform: scale(0.975); box-shadow: 2px 2px 6px rgba(200,169,110,0.35), inset 2px 2px 4px rgba(0,0,0,0.12); }
   .dl-cancel {
-    width: 100%; height: 48px;
+    width: 100%; height: 44px;
     background: transparent;
-    border: 1px solid rgba(255,255,255,0.18);
+    border: none;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
-    font-size: 12px; font-weight: 400;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--text-secondary);
-    transition: border-color 0.2s, color 0.2s;
+    font-size: 13px; font-weight: 400;
+    color: rgba(0,0,0,0.4);
+    transition: color 0.2s;
   }
-  .dl-cancel:active { border-color: rgba(255,255,255,0.4); color: var(--text-primary); }
+  .dl-cancel:active { color: rgba(0,0,0,0.65); }
 
   .dl-ios-step {
     display: flex; align-items: flex-start; gap: 14px;
     padding: 13px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(0,0,0,0.07);
   }
   .dl-ios-step:last-child { border-bottom: none; }
   .dl-step-num {
-    width: 26px; height: 26px; flex-shrink: 0;
-    background: rgba(200,232,245,0.14);
-    border: 1px solid rgba(200,232,245,0.32);
+    width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%;
+    background: #f0f2f7;
+    box-shadow: 3px 3px 7px rgba(0,0,0,0.12), -2px -2px 5px rgba(255,255,255,0.95);
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 500;
-    color: var(--accent); letter-spacing: 0;
+    font-size: 12px; font-weight: 600;
+    color: #c8a96e; letter-spacing: 0;
     margin-top: 1px;
   }
   .dl-step-text {
-    font-size: 13px; font-weight: 300;
-    color: var(--text-primary); line-height: 1.6;
+    font-size: 13px; font-weight: 400;
+    color: rgba(0,0,0,0.65); line-height: 1.6;
   }
 
   /* ══ HAMBURGER DRAWER ══ */
@@ -5118,6 +5113,10 @@ window._fbServerTimestamp = () => serverTimestamp();
       </div>
 
     </div>
+
+    <button onclick="window._guestMode=true;goTo('home-nm');" style="display:block;width:100%;margin-top:18px;padding:12px;background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:#c8a96e;letter-spacing:0.3px;text-align:center;opacity:0.8;">
+      Explore without account →
+    </button>
 
   </div>
 </div>
@@ -13142,15 +13141,15 @@ async function _profileSavePhotoURL(url) {
 
     <!-- ANDROID / DESKTOP: native install prompt -->
     <div id="dlViewInstall">
-      <div class="dl-icon-wrap" style="background:none;border:none;">
-        <img src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg" style="width:64px;height:64px;object-fit:cover;clip-path:circle(50% at 50% 50%);-webkit-clip-path:circle(50% at 50% 50%);" loading="lazy">
+      <div class="dl-icon-wrap">
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:56px;height:56px;object-fit:cover;border-radius:50%;" loading="lazy">
       </div>
       <div class="dl-title">Install the App</div>
       <div class="dl-sub">Add NOWSBANSIU to your home screen for a full native app experience — works offline, no browser bar.</div>
       <button class="dl-btn" id="dlInstallBtn" onclick="triggerInstall()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.5" stroke-linecap="square"/>
-          <path d="M2 14H14" stroke="#07101f" stroke-width="1.5" stroke-linecap="square"/>
+          <path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
+          <path d="M2 14H14" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
         </svg>
         Add to Home Screen
       </button>
@@ -13159,8 +13158,8 @@ async function _profileSavePhotoURL(url) {
 
     <!-- iOS: step-by-step instructions -->
     <div id="dlViewIOS" style="display:none;">
-      <div class="dl-icon-wrap" style="background:none;border:none;">
-        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:64px;height:64px;object-fit:contain;" loading="lazy">
+      <div class="dl-icon-wrap">
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:56px;height:56px;object-fit:cover;border-radius:50%;" loading="lazy">
       </div>
       <div class="dl-title">Add to Home Screen</div>
       <div class="dl-sub">Install NOWSBANSIU as an app in 2 taps:</div>
@@ -13168,17 +13167,17 @@ async function _profileSavePhotoURL(url) {
         <div class="dl-ios-step">
           <div class="dl-step-num">1</div>
           <div class="dl-step-text">
-            Tap the <strong style="color:var(--accent)">Share</strong> button
+            Tap the <strong style="color:#c8a96e">Share</strong> button
             <svg style="display:inline;vertical-align:middle;margin-left:4px;" width="16" height="18" viewBox="0 0 16 18" fill="none">
-              <path d="M8 1V12M8 1L4 5M8 1L12 5" stroke="rgba(200,232,245,0.85)" stroke-width="1.4" stroke-linecap="square"/>
-              <path d="M2 9V16H14V9" stroke="rgba(200,232,245,0.85)" stroke-width="1.4" stroke-linecap="square"/>
+              <path d="M8 1V12M8 1L4 5M8 1L12 5" stroke="#c8a96e" stroke-width="1.4" stroke-linecap="square"/>
+              <path d="M2 9V16H14V9" stroke="#c8a96e" stroke-width="1.4" stroke-linecap="square"/>
             </svg>
             at the bottom of Safari
           </div>
         </div>
         <div class="dl-ios-step">
           <div class="dl-step-num">2</div>
-          <div class="dl-step-text">Tap <strong style="color:var(--accent)">"Add to Home Screen"</strong> then tap <strong style="color:var(--accent)">"Add"</strong></div>
+          <div class="dl-step-text">Tap <strong style="color:#c8a96e">"Add to Home Screen"</strong> then tap <strong style="color:#c8a96e">"Add"</strong></div>
         </div>
       </div>
       <button class="dl-cancel" onclick="closeDlSheet()">Got It</button>
