@@ -5647,7 +5647,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 }
 /* Today's Practice */
 .nmh-practice {
-  width:100%; border-radius:22px; cursor:pointer;
+  width:100%; border-radius:22px; cursor:pointer; overflow:hidden;
   background:#f0f2f7;
   box-shadow: 9px 9px 22px rgba(0,0,0,0.15), -6px -6px 18px rgba(255,255,255,0.97);
   padding:20px 20px 18px; display:flex; flex-direction:column; gap:6px;
@@ -5671,7 +5671,8 @@ window._fbServerTimestamp = () => serverTimestamp();
 }
 .nmh-practice-icon img { width:32px; height:32px; object-fit:contain; display:block; }
 .nmh-practice-word {
-  font-family:'DM Sans',sans-serif; font-size:24px; font-weight:800; color:#1a1a2e; line-height:1.1;
+  font-family:'DM Sans',sans-serif; font-size:18px; font-weight:800; color:#1a1a2e; line-height:1.2;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
 }
 .nmh-practice-meaning {
   font-family:'DM Sans',sans-serif; font-size:12px; font-weight:400;
