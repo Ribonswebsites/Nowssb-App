@@ -108,8 +108,15 @@ async function _resolveUserRoute(user) {
   }
   if (data.gender) window._userGender = data.gender;
   if (data.onboardingDone) return 'home';
-  // profileStepDone means they completed or skipped signup2 — go to onboarding intro
-  if (data.profileStepDone) return 'ob-intro';
+  // If they finished signup but never completed onboarding (old accounts / skipped) → go home
+  if (data.profileStepDone) {
+    // Mark onboardingDone so they never loop again
+    if (window._fbSetDoc && window._currentUid) {
+      window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
+    }
+    if (window._userDataCache) window._userDataCache.onboardingDone = true;
+    return 'home';
+  }
   if (!window._su2Method) window._su2Method = 'social';
   return 'signup2';
 }
@@ -12738,6 +12745,14 @@ function goTo(id) {
   const next = document.getElementById(id);
   const homeHdr = document.getElementById('homeHeader');
   if (!cur || !next) { console.warn('goTo: missing element for', currentScreen, '→', id); return; }
+
+  // Force-close all SS panels so they never bleed into other screens
+  document.querySelectorAll('.ss-panel').forEach(function(p) {
+    p.style.transform = 'translateX(100%)';
+    p.style.display = 'none';
+  });
+  if (window._ssOpenPanels) window._ssOpenPanels = [];
+
   cur.classList.add('exit');
   setBg(id);
 
@@ -12770,6 +12785,8 @@ function goTo(id) {
   }
 
   setTimeout(() => {
+    // Remove active from ALL screens (catch any that got stuck)
+    document.querySelectorAll('.screen.active').forEach(function(s) { s.classList.remove('active','exit'); });
     cur.classList.remove('active','exit');
     next.classList.add('active');
     next.scrollTop = 0;
@@ -24862,10 +24879,13 @@ function msBuyThisWord() {
   #sub-social .ss-tab-content { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--nav-height, 58px) + 20px); }
   #sub-social .ss-tab-content.active { display: block; }
   /* Glass card */
-  #sub-social .sg { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  #sub-social .sg { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); overflow: hidden; }
+  /* Settings image icons — never go blank, fall back to grey box */
+  #sub-social .sr-icon img { width:24px;height:24px;object-fit:contain;display:block;min-width:24px;min-height:24px; }
+  #sub-social .sr-icon img[src=""], #sub-social .sr-icon img:not([src]) { display:none; }
   /* Row */
   #sub-social .sr {
-    display: flex; align-items: center; gap: 14px; padding: 13px 0;
+    display: flex; align-items: center; gap: 14px; padding: 15px 0; min-height: 52px;
     border-bottom: 1px solid rgba(255,255,255,0.08); cursor: pointer;
   }
   #sub-social .sr.last { border-bottom: none; }
