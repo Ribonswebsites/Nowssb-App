@@ -5759,6 +5759,70 @@ window._fbServerTimestamp = () => serverTimestamp();
   font-family:'DM Sans',sans-serif; font-size:10px; font-weight:600;
   color:rgba(0,0,0,0.55); letter-spacing:0.3px;
 }
+
+/* ── BLACK NEUMORPHIC MODE ── */
+#home-nm.nm-dark { background: #12122a; }
+#home-nm.nm-dark .nmh-wrap { background: #12122a; }
+#home-nm.nm-dark .nmh-brand-name { color: #fff; }
+#home-nm.nm-dark .nmh-brand-sub  { color: rgba(232,213,163,0.55); }
+#home-nm.nm-dark .nmh-greeting   { color: #fff; }
+#home-nm.nm-dark .nmh-sub-greeting { color: rgba(255,255,255,0.35); }
+#home-nm.nm-dark .nmh-streak-bar {
+  background: #1e1e38;
+  box-shadow: 6px 6px 14px rgba(0,0,0,0.55), -3px -3px 8px rgba(40,40,80,0.2);
+}
+#home-nm.nm-dark .nmh-streak-icon {
+  background: #1e1e38;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.5), -2px -2px 5px rgba(40,40,80,0.2);
+}
+#home-nm.nm-dark .nmh-streak-num   { color: #c8a96e; }
+#home-nm.nm-dark .nmh-streak-label { color: rgba(255,255,255,0.35); }
+#home-nm.nm-dark .nmh-streak-bar > div:last-child { color: rgba(255,255,255,0.25); }
+#home-nm.nm-dark .nmh-practice {
+  background: #1e1e38;
+  box-shadow: 8px 8px 20px rgba(0,0,0,0.55), -4px -4px 12px rgba(40,40,80,0.2);
+}
+#home-nm.nm-dark .nmh-practice:active {
+  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.5), inset -2px -2px 7px rgba(40,40,80,0.2);
+}
+#home-nm.nm-dark .nmh-practice-icon {
+  background: #1e1e38;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.5), -2px -2px 6px rgba(40,40,80,0.18);
+}
+#home-nm.nm-dark .nmh-practice-word    { color: #fff; }
+#home-nm.nm-dark .nmh-practice-meaning { color: rgba(255,255,255,0.4); }
+#home-nm.nm-dark .nmh-practice-cta     { color: #c8a96e; }
+#home-nm.nm-dark .nmh-practice-arrow svg path { stroke: #c8a96e; }
+#home-nm.nm-dark .nmh-tile {
+  background: #1e1e38;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.55), -3px -3px 10px rgba(40,40,80,0.2);
+}
+#home-nm.nm-dark .nmh-tile:active {
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.5), inset -2px -2px 6px rgba(40,40,80,0.18);
+}
+#home-nm.nm-dark .nmh-tile-icon {
+  background: #1e1e38;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.5), -2px -2px 5px rgba(40,40,80,0.18);
+}
+#home-nm.nm-dark .nmh-tile-title { color: #fff; }
+#home-nm.nm-dark .nmh-tile-sub   { color: rgba(255,255,255,0.38); }
+#home-nm.nm-dark .nmh-routine {
+  background: #1e1e38;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.55), -3px -3px 10px rgba(40,40,80,0.2);
+}
+#home-nm.nm-dark .nmh-routine:active {
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.5), inset -2px -2px 6px rgba(40,40,80,0.18);
+}
+#home-nm.nm-dark .nmh-routine-label { color: rgba(232,213,163,0.6); }
+#home-nm.nm-dark .nmh-routine-title { color: #fff; }
+#home-nm.nm-dark .nmh-routine-sub   { color: rgba(255,255,255,0.35); }
+#home-nm.nm-dark .nmh-routine-arrow svg path { stroke: rgba(255,255,255,0.5); }
+#home-nm.nm-dark .nmh-quick-btn {
+  background: #1e1e38;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.5), -2px -2px 6px rgba(40,40,80,0.18);
+}
+#home-nm.nm-dark .nmh-quick-btn span { color: rgba(255,255,255,0.45); }
+#home-nm.nm-dark .nmh-quick-btn img  { filter: brightness(1.1) invert(0); }
 </style>
 
 <div class="screen" id="home-nm">
@@ -5775,9 +5839,15 @@ window._fbServerTimestamp = () => serverTimestamp();
           <div class="nmh-brand-sub">Nowsbansiu Edition</div>
         </div>
       </div>
-      <button class="nmh-mode-btn nmh-mode-dark" onclick="nmhSwitchMode()" title="Switch to Fashion Mode">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 1L10 6H15L11 9.5L12.5 15L8 11.5L3.5 15L5 9.5L1 6H6L8 1Z" stroke="rgba(232,213,163,0.9)" stroke-width="1.3" stroke-linejoin="round" fill="rgba(232,213,163,0.15)"/>
+      <button class="nmh-mode-btn" id="nmhModeBtn" onclick="nmhSwitchMode()" title="Toggle dark neumorphic">
+        <!-- sun icon — shown in light mode -->
+        <svg id="nmhSunIcon" width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2v1M9 15v1M2 9H1M17 9h-1M4.22 4.22l-.71-.71M14.49 14.49l-.71-.71M4.22 13.78l-.71.71M14.49 3.51l-.71.71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="9" cy="9" r="3" stroke="#1a1a2e" stroke-width="1.5"/>
+        </svg>
+        <!-- moon icon — shown in dark mode -->
+        <svg id="nmhMoonIcon" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display:none;">
+          <path d="M13 10.5A6 6 0 015.5 3a6.5 6.5 0 100 10A6 6 0 0113 10.5z" stroke="rgba(232,213,163,0.9)" stroke-width="1.4" fill="rgba(232,213,163,0.1)"/>
         </svg>
       </button>
     </div>
@@ -5891,7 +5961,7 @@ window._fbServerTimestamp = () => serverTimestamp();
     </div>
 
     <!-- Switch to Fashion Mode section -->
-    <div onclick="nmhSwitchMode()" style="width:100%;margin-top:8px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
+    <div onclick="goTo('home')" style="width:100%;margin-top:8px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
       <div>
         <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(232,213,163,0.65);margin-bottom:4px;">Experience</div>
         <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:600;color:#fff;letter-spacing:0.2px;">Fashion Mode</div>
@@ -13700,17 +13770,53 @@ function landingEnter() {
 
 // ── Neumorphic Home helpers ──
 function nmhSwitchMode() {
-  var cur = localStorage.getItem('nwsb_home_mode') || 'nm';
-  if (cur === 'nm') {
-    localStorage.setItem('nwsb_home_mode', 'classic');
-    goTo('home');
+  var home = document.getElementById('home-nm');
+  var isDark = home && home.classList.contains('nm-dark');
+  var nav = document.getElementById('ig-bottomnav');
+  var btn = document.getElementById('nmhModeBtn');
+  var sun = document.getElementById('nmhSunIcon');
+  var moon = document.getElementById('nmhMoonIcon');
+  if (isDark) {
+    // → switch to light neumorphic
+    if (home) home.classList.remove('nm-dark');
+    if (nav)  nav.classList.add('nav-light');
+    if (btn)  { btn.style.background=''; btn.style.boxShadow=''; }
+    if (sun)  sun.style.display = '';
+    if (moon) moon.style.display = 'none';
+    localStorage.setItem('nwsb_nm_color','light');
   } else {
-    localStorage.setItem('nwsb_home_mode', 'nm');
-    goTo('home-nm');
+    // → switch to dark neumorphic
+    if (home) home.classList.add('nm-dark');
+    if (nav)  nav.classList.remove('nav-light');
+    if (btn)  { btn.style.background='#1a1a2e'; btn.style.boxShadow='5px 5px 12px rgba(0,0,0,0.5),-2px -2px 6px rgba(40,40,80,0.25)'; }
+    if (sun)  sun.style.display = 'none';
+    if (moon) moon.style.display = '';
+    localStorage.setItem('nwsb_nm_color','dark');
   }
 }
 
 function nmhRefresh() {
+  // Restore dark/light nm state
+  var home = document.getElementById('home-nm');
+  var nav  = document.getElementById('ig-bottomnav');
+  var btn  = document.getElementById('nmhModeBtn');
+  var sun  = document.getElementById('nmhSunIcon');
+  var moon = document.getElementById('nmhMoonIcon');
+  var savedColor = localStorage.getItem('nwsb_nm_color') || 'light';
+  if (savedColor === 'dark') {
+    if (home) home.classList.add('nm-dark');
+    if (nav)  nav.classList.remove('nav-light');
+    if (btn)  { btn.style.background='#1a1a2e'; btn.style.boxShadow='5px 5px 12px rgba(0,0,0,0.5),-2px -2px 6px rgba(40,40,80,0.25)'; }
+    if (sun)  sun.style.display='none';
+    if (moon) moon.style.display='';
+  } else {
+    if (home) home.classList.remove('nm-dark');
+    if (nav)  nav.classList.add('nav-light');
+    if (btn)  { btn.style.background=''; btn.style.boxShadow=''; }
+    if (sun)  sun.style.display='';
+    if (moon) moon.style.display='none';
+  }
+
   // Sync streak
   var d = window._userDataCache || {};
   var streak = d.currentStreak || d.streakCount || 0;
