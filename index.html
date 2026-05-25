@@ -140,7 +140,7 @@ onAuthStateChanged(auth, async user => {
     }
 
     // ── ALREADY ON A SAFE SCREEN — don't interrupt ──
-    const noRedirect = ['home','home-nm','onboarding','analysis','signup1','signup2','profile-setup','landing'];
+    const noRedirect = ['home','home-nm','onboarding','ob-normal','ob-intro','analysis','signup1','signup2','profile-setup','landing'];
     if (noRedirect.includes(currentScreen)) return;
 
     // ── ON LOGIN SCREEN — navigate to correct destination ──
@@ -1075,6 +1075,109 @@ window._fbServerTimestamp = () => serverTimestamp();
   /* ══════════════════════════════════════
      SCREEN 3 — ONBOARDING
   ══════════════════════════════════════ */
+  /* ── NEUMORPHIC ONBOARDING ── */
+  #ob-normal {
+    background: #f0f2f7; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .obn-wrap {
+    width:100%; min-height:100%;
+    padding: max(env(safe-area-inset-top,52px),52px) 24px max(env(safe-area-inset-bottom,32px),32px);
+    display:flex; flex-direction:column; box-sizing:border-box;
+  }
+  .obn-toprow {
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:28px;
+  }
+  .obn-back {
+    width:40px; height:40px; border:none; cursor:pointer; border-radius:50%;
+    background:#f0f2f7;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95);
+    display:flex; align-items:center; justify-content:center;
+    transition:box-shadow .12s, transform .12s;
+  }
+  .obn-back:active { box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.9); transform:scale(0.95); }
+  .obn-step { font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; color:rgba(0,0,0,0.35); letter-spacing:1.5px; }
+  .obn-skip { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; color:rgba(0,0,0,0.3); background:none; border:none; cursor:pointer; padding:4px 0; }
+  /* Progress */
+  .obn-progress {
+    width:100%; height:5px; border-radius:10px; background:#e0e2e9;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -1px -1px 3px rgba(255,255,255,0.8);
+    margin-bottom:32px; overflow:hidden;
+  }
+  .obn-progress-fill {
+    height:100%; border-radius:10px;
+    background: linear-gradient(90deg, #c8a96e, #e8d5a3);
+    transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+  /* Question */
+  .obn-qlabel { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:#c8a96e; margin-bottom:10px; }
+  .obn-qtext { font-family:'DM Sans',sans-serif; font-size:24px; font-weight:800; color:#1a1a2e; line-height:1.2; margin-bottom:28px; }
+  /* Options */
+  .obn-option {
+    width:100%; border-radius:16px; background:#f0f2f7; border:none; cursor:pointer;
+    padding:16px 18px; margin-bottom:10px; text-align:left;
+    box-shadow: 5px 5px 12px rgba(0,0,0,0.11), -3px -3px 9px rgba(255,255,255,0.95);
+    display:flex; align-items:center; justify-content:space-between;
+    transition:box-shadow .12s, transform .12s;
+    font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:#1a1a2e;
+  }
+  .obn-option:active { transform:scale(0.98); }
+  .obn-option.selected {
+    box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.9);
+    color: #c8a96e; font-weight:700;
+  }
+  .obn-check {
+    width:22px; height:22px; border-radius:50%; flex-shrink:0;
+    background:#f0f2f7;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.12), -1px -1px 4px rgba(255,255,255,0.9);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .obn-option.selected .obn-check {
+    background: linear-gradient(135deg, #e8d5a3, #c8a96e);
+    box-shadow: none;
+  }
+  /* CTA */
+  .obn-cta {
+    width:100%; height:58px; border-radius:18px; border:none; cursor:pointer; margin-top:6px;
+    background: linear-gradient(135deg, #e8d5a3 0%, #c8a96e 100%);
+    font-family:'DM Sans',sans-serif; font-size:15px; font-weight:800;
+    color:#1a1a2e; letter-spacing:1px;
+    box-shadow: 6px 6px 14px rgba(200,169,110,0.35), -4px -4px 10px rgba(255,255,255,0.9);
+    transition:box-shadow .12s, transform .12s;
+  }
+  .obn-cta:active { box-shadow: inset 3px 3px 8px rgba(0,0,0,0.15); transform:scale(0.98); }
+  /* Ob-intro path cards */
+  .ob-path-card {
+    border-radius:20px; padding:20px 18px; cursor:pointer; flex:1;
+    display:flex; flex-direction:column; gap:6px;
+    transition:transform .12s, box-shadow .12s;
+  }
+  .ob-path-card:active { transform:scale(0.97); }
+  .ob-path-dark {
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.18);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  }
+  .ob-path-light {
+    background:#f0f2f7;
+    box-shadow: 6px 6px 16px rgba(0,0,0,0.15), -4px -4px 12px rgba(255,255,255,0.95);
+  }
+  .ob-path-tag {
+    font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700;
+    letter-spacing:2.5px; text-transform:uppercase;
+  }
+  .ob-path-dark .ob-path-tag { color:#e8d5a3; }
+  .ob-path-light .ob-path-tag { color:#c8a96e; }
+  .ob-path-title {
+    font-family:'DM Sans',sans-serif; font-size:18px; font-weight:800; line-height:1.1;
+  }
+  .ob-path-dark .ob-path-title { color:#fff; }
+  .ob-path-light .ob-path-title { color:#1a1a2e; }
+  .ob-path-sub {
+    font-family:'DM Sans',sans-serif; font-size:11px; font-weight:400;
+  }
+  .ob-path-dark .ob-path-sub { color:rgba(255,255,255,0.55); }
+  .ob-path-light .ob-path-sub { color:rgba(0,0,0,0.4); }
+
   #onboarding {
     padding-left: 10%; padding-right: 10%;
     justify-content:flex-start;
@@ -5114,16 +5217,51 @@ window._fbServerTimestamp = () => serverTimestamp();
   </div>
 
   <!-- Content panel pinned to bottom -->
-  <div style="position:absolute;bottom:0;left:0;right:0;padding:28px 9% max(env(safe-area-inset-bottom,24px),24px);z-index:10;">
-    <div style="margin-bottom:10px;">
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:24px 7% max(env(safe-area-inset-bottom,28px),28px);z-index:10;">
+    <div style="margin-bottom:8px;">
       <span style="font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;">Personalise Your Journey</span>
     </div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:600;color:#fff;margin-bottom:10px;line-height:1.2;">Help us understand what you need</div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:28px;">A few questions help us personalise your word prescription, routine suggestions, and healing focus — takes under 60 seconds.</div>
-    <button class="btn-primary" style="width:100%;" onclick="goIntroYes()">Answer a few questions</button>
-    <div style="text-align:center;padding:14px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);cursor:pointer;" onclick="goIntroSkip()">Skip for now</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.2;">Pick your path</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.5;margin-bottom:18px;">5 quick questions to personalise your healing practice.</div>
+    <!-- Two path cards -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <div class="ob-path-card ob-path-dark" onclick="goIntroYes()">
+        <div class="ob-path-tag">The Fashion Way</div>
+        <div class="ob-path-title">Cinematic</div>
+        <div class="ob-path-sub">Immersive · Dark · Editorial</div>
+      </div>
+      <div class="ob-path-card ob-path-light" onclick="goIntroNormal()">
+        <div class="ob-path-tag">The Simple Way</div>
+        <div class="ob-path-title" style="color:#1a1a2e;">Clean</div>
+        <div class="ob-path-sub" style="color:rgba(0,0,0,0.4);">Bright · Clear · Neumorphic</div>
+      </div>
+    </div>
+    <div style="text-align:center;padding:10px 0 0;font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);cursor:pointer;" onclick="goIntroSkip()">Skip for now</div>
   </div>
 
+</div>
+
+<!-- ══ SCREEN: ONBOARDING NORMAL (NEUMORPHIC) ══ -->
+<div class="screen" id="ob-normal">
+  <div class="obn-wrap">
+    <div class="obn-toprow">
+      <button class="obn-back" onclick="obnBack()">
+        <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+          <path d="M7 1L1 7L7 13" stroke="rgba(0,0,0,0.5)" stroke-width="1.5" stroke-linecap="square"/>
+          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/>
+        </svg>
+      </button>
+      <div class="obn-step" id="obnStepText">Step 1 of 5</div>
+      <button class="obn-skip" onclick="obnSkip()">Skip</button>
+    </div>
+    <div class="obn-progress"><div class="obn-progress-fill" id="obnProgressFill" style="width:20%;"></div></div>
+    <div class="obn-qlabel" id="obnLabel">About You</div>
+    <div class="obn-qtext" id="obnQText">What brings you to NowssB?</div>
+    <div id="obnOptions"></div>
+    <div style="flex:1;"></div>
+    <button class="obn-cta" id="obnCta" onclick="obnNext()">Continue</button>
+    <div style="height:12px;"></div>
+  </div>
 </div>
 
 <!-- ══ SCREEN 3: ONBOARDING ══ -->
@@ -13265,6 +13403,7 @@ function goTo(id) {
     if (id === 'analysis') startAnalysis();
     if (id === 'ob-intro') { /* nothing extra needed, the screen just shows */ }
     if (id === 'onboarding') renderQuestion();
+    if (id === 'ob-normal') { if(typeof obnRender==='function') obnRender(); }
     if (id === 'profile-setup') psInit();
     if (id === 'landing') {
       var hint = document.getElementById('ld-cta-hint');
@@ -13875,29 +14014,30 @@ async function sendOtp() {
 }
 
 // ── ONBOARDING DATA ──
+// ── FASHION (DARK CINEMATIC) QUESTIONS ──
 const questions = [
   {
-    label:'Your Goal',
-    q:'What do you want to improve?',
-    opts:['Confidence','Energy & Vitality','Focus & Mental Clarity','Beauty & Skin'],
+    label:'What Calls You',
+    q:'What calls you to heal?',
+    opts:['Voice & Vocal power','Inner calm & peace','Ancient wisdom & knowledge','Physical strength & vitality'],
     bg: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777615781/grok_image_1777614945447_twam5z.jpg'
   },
   {
-    label:'Your Goal',
-    q:'What else do you want to improve?',
-    opts:['Relationships','Health & Healing','Sleep & Recovery','Fitness & Strength'],
+    label:'What Feels Broken',
+    q:'What feels most out of balance?',
+    opts:['My confidence & self-expression','My sleep & recovery','My focus & clarity','My relationships & connection'],
     bg: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777615898/grok_image_1777615621529_xdxfj6.jpg'
   },
   {
-    label:'Your Signature Practice',
-    q:'When do you practice?',
-    opts:['Morning','Evening','Night','All day — flexible'],
+    label:'Your Signature Moment',
+    q:'When do you meet yourself?',
+    opts:['In the quiet of the morning','In the heat of midday','In the stillness of the night','Whenever the feeling comes'],
     bg: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777616006/grok_image_1777615631154_yddgyh.jpg'
   },
   {
-    label:'Your Level',
-    q:'What is your experience level?',
-    opts:['Beginner — completely new','Intermediate — some practice','Advanced — regular practitioner','Expert — deep study'],
+    label:'Your Depth',
+    q:'Where are you in your journey?',
+    opts:['A seeker — just beginning','I have touched this before','I practice regularly','I want to go much deeper'],
     bg: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777748690/grok_image_1777748446479_lotpls.jpg'
   },
   {
@@ -13908,15 +14048,52 @@ const questions = [
   }
 ];
 
-// Questions map to 4 actual answers: [goal1+goal2 merged, routine, level, gender]
-// Internal indices: 0=goal-A, 1=goal-B, 2=routine, 3=level, 4=gender
+// ── SIMPLE (NEUMORPHIC) QUESTIONS ──
+const normalQuestions = [
+  {
+    label:'Your Healing Focus',
+    q:'What do you most want to work on?',
+    opts:['Body & Physical health','Mind & Mental clarity','Emotions & Relationships','Sleep & Deep rest']
+  },
+  {
+    label:'Your Daily Challenge',
+    q:"What's your biggest struggle right now?",
+    opts:['Stress & Anxiety','Low energy & fatigue','Poor focus & distraction','Feeling disconnected']
+  },
+  {
+    label:'Your Practice Time',
+    q:'How much time can you give each day?',
+    opts:['5 minutes — just a quick ritual','10-15 minutes — a proper session','30+ minutes — I go deep','Flexible — it varies']
+  },
+  {
+    label:'Your Style',
+    q:'How do you prefer to learn?',
+    opts:['Listening — I absorb through sound','Reading — I understand through text','Doing — I learn by practising','Feeling — I go by intuition']
+  },
+  {
+    label:'About You',
+    q:'What is your gender?',
+    opts:['Male','Female']
+  }
+];
+
 let currentQ = 0;
 let selectedOpts = [null, null, null, null, null];
+
+// ── Normal onboarding state ──
+let obnQ = 0;
+let obnSelected = [null, null, null, null, null];
 
 // ── OB-INTRO SCREEN HANDLERS ──
 function goIntroYes() {
   renderQuestion();
   goTo('onboarding');
+}
+function goIntroNormal() {
+  obnQ = 0;
+  obnSelected = [null, null, null, null, null];
+  obnRender();
+  goTo('ob-normal');
 }
 function goIntroSkip() {
   window._obSkipped = true;
@@ -14053,6 +14230,78 @@ function skipOnboarding() {
       window.saveOnboardingAnswers([], true);
     }
     goTo('profile-setup'); // → name + avatar step before analysis
+  }
+}
+
+// ── NEUMORPHIC ONBOARDING (ob-normal) ──
+function obnRender() {
+  var q = normalQuestions[obnQ];
+  var total = normalQuestions.length;
+  document.getElementById('obnStepText').textContent = 'Step ' + (obnQ+1) + ' of ' + total;
+  document.getElementById('obnLabel').textContent = q.label;
+  document.getElementById('obnQText').textContent = q.q;
+  document.getElementById('obnProgressFill').style.width = (((obnQ+1)/total)*100) + '%';
+
+  var cont = document.getElementById('obnOptions');
+  cont.innerHTML = '';
+  q.opts.forEach(function(opt, i) {
+    var sel = obnSelected[obnQ] === i;
+    var div = document.createElement('div');
+    div.className = 'obn-option' + (sel ? ' selected' : '');
+    div.innerHTML =
+      '<span>' + opt + '</span>' +
+      '<div class="obn-check">' +
+        (sel ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round"/></svg>' : '') +
+      '</div>';
+    div.onclick = function() {
+      obnSelected[obnQ] = i;
+      obnRender();
+    };
+    cont.appendChild(div);
+  });
+  // Gender question sub-text
+  if (obnQ === total - 1) {
+    var note = document.createElement('div');
+    note.style.cssText = 'text-align:center;margin-top:8px;font-family:\'DM Sans\',sans-serif;font-size:11px;color:rgba(0,0,0,0.35);';
+    note.textContent = 'Helps personalise your word prescription.';
+    cont.appendChild(note);
+  }
+}
+function obnNext() {
+  if (obnQ < normalQuestions.length - 1) {
+    obnQ++;
+    obnRender();
+  } else {
+    // Save answers and proceed
+    var focus  = obnSelected[0] !== null ? normalQuestions[0].opts[obnSelected[0]] : 'Skipped';
+    var challenge = obnSelected[1] !== null ? normalQuestions[1].opts[obnSelected[1]] : null;
+    var time   = obnSelected[2] !== null ? normalQuestions[2].opts[obnSelected[2]] : 'Flexible';
+    var style  = obnSelected[3] !== null ? normalQuestions[3].opts[obnSelected[3]] : 'Skipped';
+    var gender = obnSelected[4] !== null ? normalQuestions[4].opts[obnSelected[4]] : 'Skipped';
+    var goal   = challenge ? focus + ', ' + challenge : focus;
+    window._onboardingAnswers = [goal, time, style, gender];
+    if (window.saveOnboardingAnswers) window.saveOnboardingAnswers([goal, time, style, gender], false);
+    localStorage.removeItem('nwsb_ob_skipped');
+    goTo('profile-setup');
+  }
+}
+function obnBack() {
+  if (obnQ > 0) {
+    obnQ--;
+    obnRender();
+  } else {
+    goTo('ob-intro');
+  }
+}
+function obnSkip() {
+  if (obnQ < normalQuestions.length - 1) {
+    obnQ++;
+    obnRender();
+  } else {
+    window._obSkipped = true;
+    localStorage.setItem('nwsb_ob_skipped', 'true');
+    if (window.saveOnboardingAnswers) window.saveOnboardingAnswers([], true);
+    goTo('profile-setup');
   }
 }
 
