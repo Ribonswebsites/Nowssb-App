@@ -230,9 +230,23 @@ getRedirectResult(auth).then(async result => {
     // Show loader while onAuthStateChanged resolves destination
     const loader = document.getElementById('authLoader');
     if (loader) loader.classList.add('visible');
+    // onAuthStateChanged will fire immediately after and navigate
   }
 }).catch(e => {
-  console.error('Redirect error:', e.message);
+  const code = e.code || '';
+  if (code === 'auth/unauthorized-domain') {
+    console.warn('Firebase: domain not authorised for Google sign-in.');
+    // Show message only if user was actively trying to sign in
+    if (currentScreen === 'login' || currentScreen === 'splash') {
+      setTimeout(() => {
+        if (currentScreen === 'login') {
+          alert('Google sign-in is not available at this URL. Please use Email or Phone login instead.');
+        }
+      }, 3000);
+    }
+  } else {
+    console.error('Redirect error:', e.message);
+  }
   _googleSignInInProgress = false;
 });
 
@@ -252,8 +266,19 @@ window.fbGoogleLogin = async () => {
   } catch(e) {
     _googleSignInInProgress = false;
     if (btn) { btn.style.opacity = ''; btn.disabled = false; }
-    if (e.code === 'auth/popup-blocked') {
-      alert('Please allow popups for this site and try again, or use Email / Phone login instead.');
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') {
+      // Mobile Chrome blocks popups — fall back to full-page redirect
+      try {
+        await signInWithRedirect(auth, provider);
+      } catch(re) {
+        if (re.code === 'auth/unauthorized-domain') {
+          alert('Google sign-in is not available at this URL. Please use Email or Phone login instead.');
+        } else {
+          alert('Sign-in failed: ' + re.message);
+        }
+      }
+    } else if (e.code === 'auth/unauthorized-domain') {
+      alert('Google sign-in is not available at this URL (domain not authorised). Please use Email or Phone login instead.');
     } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
       alert('Google sign-in failed: ' + e.message);
     }
@@ -876,9 +901,11 @@ window._fbServerTimestamp = () => serverTimestamp();
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 18px; flex-shrink: 0;
     overflow: hidden;
+    clip-path: circle(50% at 50% 50%);
   }
   .nm-logo-img {
     width: 100%; height: 100%; object-fit: cover; display: block;
+    clip-path: circle(50% at 50% 50%);
   }
   .nm-brand {
     font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
@@ -1984,6 +2011,7 @@ window._fbServerTimestamp = () => serverTimestamp();
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 18px;
     overflow: hidden;
+    clip-path: circle(50% at 50% 50%);
   }
   .dl-title {
     font-family: 'DM Sans', sans-serif;
@@ -5613,8 +5641,9 @@ window._fbServerTimestamp = () => serverTimestamp();
   width:44px; height:44px; border-radius:50%; overflow:hidden; flex-shrink:0;
   box-shadow: 5px 5px 12px rgba(0,0,0,0.14), -4px -4px 10px rgba(255,255,255,0.95);
   background:#f0f2f7;
+  clip-path: circle(50% at 50% 50%);
 }
-.nmh-logo img { width:100%; height:100%; object-fit:cover; display:block; }
+.nmh-logo img { width:100%; height:100%; object-fit:cover; display:block; clip-path: circle(50% at 50% 50%); }
 .nmh-brand-text { display:flex; flex-direction:column; }
 .nmh-brand-name {
   font-family:'DM Sans',sans-serif; font-size:15px; font-weight:800;
@@ -13576,17 +13605,17 @@ function goTo(id) {
 }
 
 // ── SPLASH AUTO-ADVANCE ──
+// Wait up to 4s so getRedirectResult + onAuthStateChanged can resolve
+// before bailing to login (prevents redirect-loop on mobile Google sign-in)
 setTimeout(() => {
   if (currentScreen !== 'splash') return;
   window._splashDone = true;
   if (window._splashRoute) {
-    // Auth + Firestore already resolved — go straight there, no login flash
     goTo(window._splashRoute);
   } else {
-    // Auth still pending — go to login; onAuthStateChanged will redirect if needed
     goTo('login');
   }
-}, 2500);
+}, 4000);
 
 // ══════════════════════════════════════════════════════════════════
 // PROFILE SETUP SCREEN — name + avatar / photo
