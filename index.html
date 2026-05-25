@@ -847,12 +847,12 @@ window._fbServerTimestamp = () => serverTimestamp();
   }
 
   /* ── WHITE NEUMORPHIC AUTH SCREENS ── */
-  #login, #signup2 { background: #e8eaf0; }
+  #login, #signup2 { background: #e4e6ed; }
   .nm-wrap {
     width: 100%; min-height: 100%;
     display: flex; flex-direction: column; align-items: center;
     padding: max(env(safe-area-inset-top,48px),48px) 26px max(env(safe-area-inset-bottom,28px),28px);
-    box-sizing: border-box; overflow-y: auto; background: #e8eaf0;
+    box-sizing: border-box; overflow-y: auto; background: #e4e6ed;
   }
   .nm-toprow {
     display: flex; align-items: center; justify-content: space-between;
@@ -868,10 +868,18 @@ window._fbServerTimestamp = () => serverTimestamp();
     display: flex; flex-direction: column; align-items: center;
     text-align: center; padding: 20px 0 26px; width: 100%;
   }
+  /* Neumorphic circle that wraps the logo */
+  .nm-logo-ring {
+    width: 100px; height: 100px; border-radius: 50%;
+    background: #e4e6ed;
+    box-shadow: 9px 9px 22px rgba(0,0,0,0.16), -7px -7px 18px rgba(255,255,255,0.97);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px; flex-shrink: 0;
+  }
   .nm-logo-img {
-    width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
-    box-shadow: none; margin-bottom: 14px; background: transparent;
-    display: block; overflow: hidden;
+    width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), inset -2px -2px 5px rgba(255,255,255,0.8);
+    display: block; background: transparent;
   }
   .nm-brand {
     font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
@@ -888,22 +896,22 @@ window._fbServerTimestamp = () => serverTimestamp();
   }
   .nm-btn-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
   .nm-auth-btn {
-    width: 100%; height: 56px;
-    display: flex; align-items: center; gap: 14px; padding: 0 20px;
-    background: #f0f2f7; border: none; border-radius: 16px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    width: 100%; height: 58px;
+    display: flex; align-items: center; gap: 14px; padding: 0 22px;
+    background: #e4e6ed; border: none; border-radius: 18px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
     color: #2d2d3a; cursor: pointer; text-align: left;
-    box-shadow: 6px 6px 14px rgba(0,0,0,0.11), -4px -4px 10px rgba(255,255,255,0.92);
+    box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.95);
     transition: box-shadow 0.15s, transform 0.15s; letter-spacing: 0.2px;
   }
   .nm-auth-btn:active {
-    transform: scale(0.985);
-    box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -3px -3px 7px rgba(255,255,255,0.88);
+    transform: scale(0.983);
+    box-shadow: inset 4px 4px 9px rgba(0,0,0,0.13), inset -4px -4px 9px rgba(255,255,255,0.88);
   }
-  .nm-auth-btn.nm-active { background: #f0f2f7; color: #c8a96e; box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -3px -3px 7px rgba(255,255,255,0.88); }
+  .nm-auth-btn.nm-active { background: #e4e6ed; color: #c8a96e; box-shadow: inset 4px 4px 9px rgba(0,0,0,0.13), inset -4px -4px 9px rgba(255,255,255,0.88); }
   .nm-form-panel {
     display: none; flex-direction: column; gap: 10px; width: 100%;
-    padding: 18px 16px; background: #e0e2e9; border-radius: 16px;
+    padding: 18px 16px; background: #dcdee6; border-radius: 18px;
     box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.85);
     box-sizing: border-box;
   }
@@ -5030,7 +5038,9 @@ window._fbServerTimestamp = () => serverTimestamp();
   <div class="nm-wrap">
 
     <div class="nm-logo-area">
-      <img class="nm-logo-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB">
+      <div class="nm-logo-ring">
+        <img class="nm-logo-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB">
+      </div>
       <div class="nm-brand">Nowsbansiu</div>
       <div class="nm-auth-title">Welcome</div>
       <div class="nm-auth-sub">Sign in or create your account</div>
