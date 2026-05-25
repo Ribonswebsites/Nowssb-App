@@ -5576,23 +5576,27 @@ window._fbServerTimestamp = () => serverTimestamp();
 <!-- ══ NEUMORPHIC HOME SCREEN ══ -->
 <style>
 #home-nm {
+  display:block; /* override .screen flex — lets content scroll naturally */
   background:#f0f2f7; overflow-y:auto; overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
+  padding-top:0 !important; /* sticky header handles its own positioning */
 }
 .nmh-wrap {
   width:100%; min-height:100%;
-  padding: 0 20px 0;
+  padding: 0 20px calc(var(--nav-height, 58px) + 24px);
   display:flex; flex-direction:column; align-items:stretch; gap:14px;
   box-sizing:border-box;
 }
 /* Top row — sticky neumorphic header */
 .nmh-toprow {
-  position: sticky; top: 0; z-index: 50;
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display:flex; align-items:center; justify-content:space-between;
   width: calc(100% + 40px); margin-left: -20px; margin-right: -20px;
-  padding: max(env(safe-area-inset-top,6px),6px) 20px 14px;
+  padding: max(env(safe-area-inset-top, 14px), 14px) 20px 14px;
   background: #f0f2f7;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06), 0 -1px 0 rgba(255,255,255,0.9) inset;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.09), 0 1px 3px rgba(0,0,0,0.05);
   margin-bottom: 8px;
 }
 .nmh-brand-row {
@@ -5614,13 +5618,14 @@ window._fbServerTimestamp = () => serverTimestamp();
   letter-spacing:2px; text-transform:uppercase; color:#c8a96e;
 }
 .nmh-mode-btn {
-  width:42px; height:42px; border:none; cursor:pointer;
-  background:#f0f2f7; border-radius:50%;
-  box-shadow: 5px 5px 12px rgba(0,0,0,0.15), -4px -4px 10px rgba(255,255,255,0.95);
+  width:42px; height:42px; padding:0; border:none; cursor:pointer;
+  background:#e8eaf0; border-radius:50%;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.18), -3px -3px 8px rgba(255,255,255,1);
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
   transition:box-shadow 0.12s, transform 0.12s;
   overflow:hidden;
   -webkit-appearance:none; appearance:none;
+  box-sizing:border-box;
 }
 .nmh-mode-btn:active {
   box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.9);
@@ -5662,11 +5667,12 @@ window._fbServerTimestamp = () => serverTimestamp();
 }
 /* Today's Practice */
 .nmh-practice {
-  width:100%; border-radius:22px; cursor:pointer; overflow:hidden;
+  width:100%; border-radius:22px; cursor:pointer;
   background:#f0f2f7;
   box-shadow: 9px 9px 22px rgba(0,0,0,0.15), -6px -6px 18px rgba(255,255,255,0.97);
   padding:20px 20px 18px; display:flex; flex-direction:column; gap:6px;
   transition:box-shadow 0.12s, transform 0.12s;
+  box-sizing:border-box;
 }
 .nmh-practice:active {
   box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.9);
@@ -5784,7 +5790,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 #home-nm.nm-dark .nmh-wrap { background: #12122a; }
 #home-nm.nm-dark .nmh-toprow {
   background: #12122a;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3), 0 -1px 0 rgba(40,40,80,0.3) inset;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
 }
 #home-nm.nm-dark .nmh-logo { background:#1e1e38; box-shadow: 5px 5px 12px rgba(0,0,0,0.5), -3px -3px 8px rgba(40,40,80,0.2); }
 #home-nm.nm-dark .nmh-brand-name { color: #fff; }
