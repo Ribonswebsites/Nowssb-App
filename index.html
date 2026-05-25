@@ -141,7 +141,7 @@ onAuthStateChanged(auth, async user => {
     }
 
     // ── ALREADY ON A SAFE SCREEN — don't interrupt ──
-    const noRedirect = ['home','onboarding','analysis','signup1','signup2','profile-setup','landing'];
+    const noRedirect = ['home','home-nm','onboarding','analysis','signup1','signup2','profile-setup','landing'];
     if (noRedirect.includes(currentScreen)) return;
 
     // ── ON LOGIN SCREEN — navigate to correct destination ──
@@ -870,7 +870,7 @@ window._fbServerTimestamp = () => serverTimestamp();
     text-align: center; padding: 20px 0 26px; width: 100%;
   }
   .nm-logo-img {
-    width: 72px; height: 72px; border-radius: 20px; object-fit: cover;
+    width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
     box-shadow: 6px 6px 14px rgba(0,0,0,0.14), -4px -4px 10px rgba(255,255,255,0.9);
     margin-bottom: 14px; background: #e8eaf0;
   }
@@ -4816,13 +4816,13 @@ window._fbServerTimestamp = () => serverTimestamp();
     box-sizing:border-box; overflow-y:auto;
   }
   .ld-logo-ring {
-    width:88px; height:88px; border-radius:26px;
+    width:88px; height:88px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     background:#f0f2f7;
     box-shadow: 8px 8px 18px rgba(0,0,0,0.13), -6px -6px 14px rgba(255,255,255,0.95);
-    margin-bottom:20px;
+    margin-bottom:20px; overflow:hidden;
   }
-  .ld-logo-ring img { width:58px; height:58px; object-fit:contain; }
+  .ld-logo-ring img { width:88px; height:88px; object-fit:cover; display:block; }
   .ld-tag {
     font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700;
     letter-spacing:3px; text-transform:uppercase; color:#c8a96e; margin-bottom:16px;
@@ -5433,6 +5433,330 @@ window._fbServerTimestamp = () => serverTimestamp();
     </button>
     <div class="ld-cta-sub" id="ld-cta-hint">Subscribers only</div>
 
+  </div>
+</div>
+
+<!-- ══ NEUMORPHIC HOME SCREEN ══ -->
+<style>
+#home-nm {
+  background:#f0f2f7; overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+.nmh-wrap {
+  width:100%; min-height:100%;
+  padding: max(env(safe-area-inset-top,52px),52px) 20px 0;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+  box-sizing:border-box;
+}
+/* Top row */
+.nmh-toprow {
+  display:flex; align-items:center; justify-content:space-between;
+  width:100%; margin-bottom:4px;
+}
+.nmh-brand-row {
+  display:flex; align-items:center; gap:12px;
+}
+.nmh-logo {
+  width:42px; height:42px; border-radius:50%; overflow:hidden; flex-shrink:0;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95);
+}
+.nmh-logo img { width:42px; height:42px; object-fit:cover; display:block; }
+.nmh-brand-text { display:flex; flex-direction:column; }
+.nmh-brand-name {
+  font-family:'DM Sans',sans-serif; font-size:15px; font-weight:800;
+  color:#1a1a2e; letter-spacing:-0.3px; line-height:1.1;
+}
+.nmh-brand-sub {
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase; color:#c8a96e;
+}
+.nmh-mode-btn {
+  width:38px; height:38px; border:none; cursor:pointer;
+  background:#f0f2f7; border-radius:50%;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:box-shadow 0.12s, transform 0.12s;
+}
+.nmh-mode-btn:active {
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.9);
+  transform:scale(0.95);
+}
+/* Greeting */
+.nmh-greeting {
+  width:100%; font-family:'DM Sans',sans-serif;
+  font-size:26px; font-weight:800; color:#1a1a2e; line-height:1.2;
+}
+.nmh-sub-greeting {
+  width:100%; font-family:'DM Sans',sans-serif;
+  font-size:12px; font-weight:400; color:rgba(0,0,0,0.4);
+  margin-top:-8px;
+}
+/* Streak bar */
+.nmh-streak-bar {
+  width:100%; display:flex; align-items:center; gap:10px;
+  background:#f0f2f7; border-radius:16px; padding:14px 18px;
+  box-shadow: 6px 6px 14px rgba(0,0,0,0.11), -4px -4px 10px rgba(255,255,255,0.95);
+}
+.nmh-streak-icon {
+  width:36px; height:36px; border-radius:50%; background:#f0f2f7; flex-shrink:0;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.1), -2px -2px 6px rgba(255,255,255,0.9);
+  display:flex; align-items:center; justify-content:center;
+}
+.nmh-streak-num {
+  font-family:'DM Sans',sans-serif; font-size:22px; font-weight:800; color:#c8a96e; line-height:1;
+}
+.nmh-streak-label {
+  font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; color:rgba(0,0,0,0.45);
+}
+/* Today's Practice */
+.nmh-practice {
+  width:100%; border-radius:22px; overflow:hidden; cursor:pointer;
+  background:#f0f2f7;
+  box-shadow: 8px 8px 20px rgba(0,0,0,0.13), -6px -6px 16px rgba(255,255,255,0.95);
+  padding:20px 20px 18px; display:flex; flex-direction:column; gap:6px;
+  transition:box-shadow 0.12s, transform 0.12s;
+}
+.nmh-practice:active {
+  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.9);
+  transform:scale(0.99);
+}
+.nmh-practice-label {
+  font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:2.5px; text-transform:uppercase; color:#c8a96e;
+}
+.nmh-practice-row {
+  display:flex; align-items:center; gap:14px;
+}
+.nmh-practice-icon {
+  width:52px; height:52px; border-radius:14px; background:#f0f2f7; flex-shrink:0;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.1), -3px -3px 8px rgba(255,255,255,0.9);
+  display:flex; align-items:center; justify-content:center;
+}
+.nmh-practice-icon img { width:32px; height:32px; object-fit:contain; display:block; }
+.nmh-practice-word {
+  font-family:'DM Sans',sans-serif; font-size:24px; font-weight:800; color:#1a1a2e; line-height:1.1;
+}
+.nmh-practice-meaning {
+  font-family:'DM Sans',sans-serif; font-size:12px; font-weight:400;
+  color:rgba(0,0,0,0.45); line-height:1.5;
+}
+.nmh-practice-footer {
+  display:flex; align-items:center; justify-content:space-between; margin-top:4px;
+}
+.nmh-practice-cta {
+  font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700;
+  color:#1a1a2e; letter-spacing:0.5px;
+}
+.nmh-practice-arrow {
+  width:32px; height:32px; border-radius:50%; background:#f0f2f7;
+  box-shadow: 3px 3px 7px rgba(0,0,0,0.11), -2px -2px 6px rgba(255,255,255,0.9);
+  display:flex; align-items:center; justify-content:center;
+}
+/* 2x2 Grid */
+.nmh-grid {
+  width:100%; display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+.nmh-tile {
+  border-radius:20px; background:#f0f2f7; cursor:pointer; padding:18px 16px 16px;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.12), -4px -4px 12px rgba(255,255,255,0.95);
+  display:flex; flex-direction:column; gap:6px;
+  transition:box-shadow 0.12s, transform 0.12s;
+}
+.nmh-tile:active {
+  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.9);
+  transform:scale(0.97);
+}
+.nmh-tile-icon {
+  width:42px; height:42px; border-radius:13px; background:#f0f2f7; margin-bottom:4px;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.1), -2px -2px 6px rgba(255,255,255,0.9);
+  display:flex; align-items:center; justify-content:center;
+}
+.nmh-tile-icon img { width:24px; height:24px; object-fit:contain; display:block; }
+.nmh-tile-title {
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; color:#1a1a2e;
+}
+.nmh-tile-sub {
+  font-family:'DM Sans',sans-serif; font-size:10px; font-weight:400; color:rgba(0,0,0,0.4);
+}
+/* Routine card */
+.nmh-routine {
+  width:100%; border-radius:20px; background:#f0f2f7; cursor:pointer;
+  padding:18px 20px; display:flex; align-items:center; justify-content:space-between;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.12), -4px -4px 12px rgba(255,255,255,0.95);
+  transition:box-shadow 0.12s, transform 0.12s;
+}
+.nmh-routine:active {
+  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.9);
+  transform:scale(0.99);
+}
+.nmh-routine-label {
+  font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase; color:#c8a96e; margin-bottom:4px;
+}
+.nmh-routine-title {
+  font-family:'DM Sans',sans-serif; font-size:16px; font-weight:800; color:#1a1a2e;
+}
+.nmh-routine-sub {
+  font-family:'DM Sans',sans-serif; font-size:11px; color:rgba(0,0,0,0.4); margin-top:3px;
+}
+.nmh-routine-arrow {
+  width:36px; height:36px; border-radius:50%; background:#f0f2f7; flex-shrink:0;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.11), -2px -2px 6px rgba(255,255,255,0.9);
+  display:flex; align-items:center; justify-content:center;
+}
+/* Quick row */
+.nmh-quick-row {
+  width:100%; display:flex; gap:10px;
+}
+.nmh-quick-btn {
+  flex:1; border-radius:16px; background:#f0f2f7; cursor:pointer;
+  padding:14px 10px 12px;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.11), -3px -3px 9px rgba(255,255,255,0.95);
+  display:flex; flex-direction:column; align-items:center; gap:7px;
+  transition:box-shadow 0.12s, transform 0.12s;
+}
+.nmh-quick-btn:active {
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.9);
+  transform:scale(0.97);
+}
+.nmh-quick-btn img { width:26px; height:26px; object-fit:contain; display:block; }
+.nmh-quick-btn span {
+  font-family:'DM Sans',sans-serif; font-size:10px; font-weight:600;
+  color:rgba(0,0,0,0.55); letter-spacing:0.3px;
+}
+</style>
+
+<div class="screen" id="home-nm">
+  <div class="nmh-wrap">
+
+    <!-- Top row: brand + mode toggle -->
+    <div class="nmh-toprow">
+      <div class="nmh-brand-row">
+        <div class="nmh-logo">
+          <img loading="eager" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779713364/ee429d10-5835-11f1-9971-736215a430db_lii4mj.png" alt="NowssB">
+        </div>
+        <div class="nmh-brand-text">
+          <div class="nmh-brand-name">NowssB</div>
+          <div class="nmh-brand-sub">Nowsbansiu Edition</div>
+        </div>
+      </div>
+      <button class="nmh-mode-btn" onclick="nmhSwitchMode()" title="Switch to Classic">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2v1M9 15v1M2 9H1M17 9h-1M4.22 4.22l-.71-.71M14.49 14.49l-.71-.71M4.22 13.78l-.71.71M14.49 3.51l-.71.71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="9" cy="9" r="3" stroke="#1a1a2e" stroke-width="1.5"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Greeting -->
+    <div class="nmh-greeting" id="nmhGreeting">Begin Your<br>Healing Path</div>
+    <div class="nmh-sub-greeting">Natural Origin of Word Science</div>
+
+    <!-- Streak -->
+    <div class="nmh-streak-bar">
+      <div class="nmh-streak-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#c8a96e" opacity="0.85"/>
+          <path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.7"/>
+        </svg>
+      </div>
+      <div>
+        <div class="nmh-streak-num" id="nmhStreakNum">0</div>
+        <div class="nmh-streak-label">day streak</div>
+      </div>
+      <div style="flex:1;"></div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;color:rgba(0,0,0,0.3);letter-spacing:1px;text-transform:uppercase;">Keep Going</div>
+    </div>
+
+    <!-- Today's Practice -->
+    <div class="nmh-practice" onclick="openPracticeIntro()">
+      <div class="nmh-practice-label">Today's Practice</div>
+      <div class="nmh-practice-row">
+        <div class="nmh-practice-icon">
+          <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/49a3a200-578a-11f1-9331-1302872077be_jgmnss.png" alt="">
+        </div>
+        <div>
+          <div class="nmh-practice-word" id="nmhTodayWord">Loading...</div>
+          <div class="nmh-practice-meaning" id="nmhTodayMeaning">Your personalized word ritual for right now.</div>
+        </div>
+      </div>
+      <div class="nmh-practice-footer">
+        <div class="nmh-practice-cta">Begin Practice</div>
+        <div class="nmh-practice-arrow">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 7H11M7 3L11 7L7 11" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="square"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2x2 Grid -->
+    <div class="nmh-grid">
+      <div class="nmh-tile" onclick="openSub('sound-library')">
+        <div class="nmh-tile-icon">
+          <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" alt="">
+        </div>
+        <div class="nmh-tile-title">Sound Library</div>
+        <div class="nmh-tile-sub">Root frequencies</div>
+      </div>
+      <div class="nmh-tile" onclick="openSub('my-progress')">
+        <div class="nmh-tile-icon">
+          <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png" alt="">
+        </div>
+        <div class="nmh-tile-title">My Progress</div>
+        <div class="nmh-tile-sub">Healing journey</div>
+      </div>
+      <div class="nmh-tile" onclick="openSub('word-science')">
+        <div class="nmh-tile-icon">
+          <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/a7b04840-5789-11f1-9331-1302872077be_bqobig.png" alt="">
+        </div>
+        <div class="nmh-tile-title">Word Science</div>
+        <div class="nmh-tile-sub">NOWSBANSIU texts</div>
+      </div>
+      <div class="nmh-tile" onclick="openSub('profile')">
+        <div class="nmh-tile-icon">
+          <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" alt="">
+        </div>
+        <div class="nmh-tile-title">Profile</div>
+        <div class="nmh-tile-sub">Your settings</div>
+      </div>
+    </div>
+
+    <!-- My Routines -->
+    <div class="nmh-routine" onclick="openDailyPracticeIntro()">
+      <div>
+        <div class="nmh-routine-label">My Routines</div>
+        <div class="nmh-routine-title">Daily Practice System</div>
+        <div class="nmh-routine-sub">Morning · Midday · Evening · Night</div>
+      </div>
+      <div class="nmh-routine-arrow">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M3 7H11M7 3L11 7L7 11" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Quick access row -->
+    <div class="nmh-quick-row">
+      <div class="nmh-quick-btn" onclick="openSub('nowssb-store')">
+        <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">
+        <span>Store</span>
+      </div>
+      <div class="nmh-quick-btn" onclick="openSub('health-journey')">
+        <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/112b2180-56d8-11f1-8fad-095787cce754_c3lk6m.png" alt="">
+        <span>Health</span>
+      </div>
+      <div class="nmh-quick-btn" onclick="openSub('people')">
+        <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" alt="">
+        <span>Community</span>
+      </div>
+      <div class="nmh-quick-btn" onclick="openSub('sound-bath')">
+        <img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/1e3514c0-5788-11f1-9331-1302872077be_dft895.png" alt="">
+        <span>Sound Bath</span>
+      </div>
+    </div>
+
+    <div style="height:calc(var(--nav-height,58px) + 32px);"></div>
   </div>
 </div>
 
@@ -13236,10 +13560,74 @@ function landingEnter() {
   var overlay = document.getElementById('ld-transition');
   overlay.classList.add('show');
   setTimeout(function() {
-    goTo('home');
+    var pref = localStorage.getItem('nwsb_home_mode') || 'nm';
+    goTo(pref === 'classic' ? 'home' : 'home-nm');
     setTimeout(function() { overlay.classList.remove('show'); }, 300);
   }, 950);
 }
+
+// ── Neumorphic Home helpers ──
+function nmhSwitchMode() {
+  var cur = localStorage.getItem('nwsb_home_mode') || 'nm';
+  if (cur === 'nm') {
+    localStorage.setItem('nwsb_home_mode', 'classic');
+    goTo('home');
+  } else {
+    localStorage.setItem('nwsb_home_mode', 'nm');
+    goTo('home-nm');
+  }
+}
+
+function nmhRefresh() {
+  // Sync streak
+  var d = window._userDataCache || {};
+  var streak = d.currentStreak || d.streakCount || 0;
+  var el = document.getElementById('nmhStreakNum');
+  if (el) el.textContent = streak;
+
+  // Sync greeting by time
+  var h = new Date().getHours();
+  var g = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+  var name = (d.displayName || d.name || '').split(' ')[0];
+  var greet = document.getElementById('nmhGreeting');
+  if (greet) greet.innerHTML = g + (name ? ',<br>' + name : ',<br>Healer');
+
+  // Sync today's word from the dark home if available
+  var tw = document.getElementById('todayPracticeTitle');
+  var nmw = document.getElementById('nmhTodayWord');
+  if (tw && nmw) nmw.textContent = tw.textContent || 'Loading...';
+  var ts = document.getElementById('todayPracticeSub');
+  var nms = document.getElementById('nmhTodayMeaning');
+  if (ts && nms) nms.textContent = ts.textContent || 'Your personalized word ritual for right now.';
+}
+
+// Hook into goTo so we refresh whenever home-nm is opened
+(function(){
+  var _origGoTo = window.goTo;
+  if (typeof _origGoTo === 'function') {
+    window.goTo = function(id) {
+      var r = _origGoTo.apply(this, arguments);
+      if (id === 'home-nm') setTimeout(nmhRefresh, 60);
+      return r;
+    };
+  }
+})();
+
+// Also add classic→nm toggle button on dark home header area
+// (We inject a small pill toggle onto home screen after DOM ready)
+document.addEventListener('DOMContentLoaded', function() {
+  var hdr = document.getElementById('homeHeader');
+  if (hdr && !document.getElementById('homeNmToggle')) {
+    var btn = document.createElement('button');
+    btn.id = 'homeNmToggle';
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 0112 0" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="2" fill="#e8d5a3"/><path d="M8 2v1M8 13v1M2 8H1M15 8h-1" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/></svg>';
+    btn.title = 'Light Mode';
+    btn.style.cssText = 'position:absolute;top:16px;right:18px;z-index:30;width:36px;height:36px;border:none;cursor:pointer;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);';
+    btn.onclick = function(){ localStorage.setItem('nwsb_home_mode','nm'); goTo('home-nm'); };
+    hdr.style.position = 'relative';
+    hdr.appendChild(btn);
+  }
+});
 
 function nmToggleAuthForm(id) {
   var target = document.getElementById(id);
@@ -27472,7 +27860,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     _currentProfile:null,
     nav:function(which){
       if(which==='store'){ closeNavScreens(); if(typeof openSub==='function') openSub('nowssb-store'); setActiveNav('store'); showNav(true); }
-      else if(which==='nowssb'){ closeNavScreens(); if(typeof goTo==='function' && (typeof currentScreen==='undefined' || currentScreen!=='home')){ goTo('home'); } setActiveNav('nowssb'); showNav(true); }
+      else if(which==='nowssb'){ closeNavScreens(); if(typeof goTo==='function' && (typeof currentScreen==='undefined' || (currentScreen!=='home'&&currentScreen!=='home-nm'))){ var _pm=localStorage.getItem('nwsb_home_mode')||'nm'; goTo(_pm==='classic'?'home':'home-nm'); } setActiveNav('nowssb'); showNav(true); }
       else if(which==='discover'){ closeNavScreens(); this.openExplore(); }
       else if(which==='settings'){ closeNavScreens(); setActiveNav('settings'); showNav(true); setTimeout(function(){ PSN.go('profile'); }, 30); }
       setTimeout(syncNav,60);
@@ -27616,7 +28004,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     });
     if(focused){ showNav(false); return; }       // player / health / etc. = full focus
     if(navScreen){ showNav(true); setActiveNav(NAV_MAP[navScreen]); return; }
-    var onHome = (typeof currentScreen!=='undefined' && currentScreen==='home');
+    var onHome = (typeof currentScreen!=='undefined' && (currentScreen==='home'||currentScreen==='home-nm'));
     showNav(onHome);
     if(onHome) setActiveNav('nowssb');
   }
