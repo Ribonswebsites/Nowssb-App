@@ -848,96 +848,90 @@ window._fbServerTimestamp = () => serverTimestamp();
     display: flex;
   }
 
-  /* ── NEUMORPHIC AUTH SCREENS ── */
+  /* ── WHITE NEUMORPHIC AUTH SCREENS ── */
+  #login, #signup2 { background: #e8eaf0; }
   .nm-wrap {
-    width: 100%;
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: max(env(safe-area-inset-top,48px),48px) 24px max(env(safe-area-inset-bottom,28px),28px);
-    box-sizing: border-box;
-    overflow-y: auto;
+    width: 100%; min-height: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    padding: max(env(safe-area-inset-top,48px),48px) 26px max(env(safe-area-inset-bottom,28px),28px);
+    box-sizing: border-box; overflow-y: auto; background: #e8eaf0;
   }
   .nm-toprow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; margin-bottom: 4px;
   }
   .nm-back-btn {
-    width: 36px; height: 36px;
+    width: 38px; height: 38px;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px; cursor: pointer;
+    background: #e8eaf0; border: none; border-radius: 11px; cursor: pointer;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.14), -3px -3px 8px rgba(255,255,255,0.9);
   }
   .nm-logo-area {
     display: flex; flex-direction: column; align-items: center;
     text-align: center; padding: 20px 0 26px; width: 100%;
   }
   .nm-logo-img {
-    width: 68px; height: 68px; border-radius: 18px; object-fit: cover;
-    box-shadow: 8px 8px 20px rgba(0,0,0,0.7), -4px -4px 12px rgba(255,255,255,0.04);
-    margin-bottom: 14px;
+    width: 72px; height: 72px; border-radius: 20px; object-fit: cover;
+    box-shadow: 6px 6px 14px rgba(0,0,0,0.14), -4px -4px 10px rgba(255,255,255,0.9);
+    margin-bottom: 14px; background: #e8eaf0;
   }
   .nm-brand {
     font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 2.5px; text-transform: uppercase;
-    color: rgba(232,213,163,0.6); margin-bottom: 10px;
+    color: #c8a96e; margin-bottom: 10px;
   }
   .nm-auth-title {
     font-family: 'DM Sans', sans-serif; font-size: 30px; font-weight: 700;
-    color: #fff; margin-bottom: 6px; line-height: 1.1;
+    color: #1a1a2e; margin-bottom: 6px; line-height: 1.1;
   }
   .nm-auth-sub {
     font-family: 'DM Sans', sans-serif; font-size: 13px;
-    color: rgba(255,255,255,0.38); letter-spacing: 0.3px;
+    color: rgba(0,0,0,0.42); letter-spacing: 0.3px;
   }
-  .nm-btn-list {
-    width: 100%; display: flex; flex-direction: column; gap: 10px;
-  }
+  .nm-btn-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
   .nm-auth-btn {
-    width: 100%; height: 54px;
+    width: 100%; height: 56px;
     display: flex; align-items: center; gap: 14px; padding: 0 20px;
-    background: #0c1628; border: none; border-radius: 16px;
+    background: #e8eaf0; border: none; border-radius: 16px;
     font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
-    color: rgba(255,255,255,0.78); cursor: pointer; text-align: left;
-    box-shadow: 6px 6px 16px rgba(0,0,0,0.65), -3px -3px 8px rgba(255,255,255,0.04);
+    color: #2d2d3a; cursor: pointer; text-align: left;
+    box-shadow: 6px 6px 14px rgba(0,0,0,0.14), -4px -4px 10px rgba(255,255,255,0.9);
     transition: all 0.15s; letter-spacing: 0.2px;
   }
   .nm-auth-btn:active {
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.55), -1px -1px 4px rgba(255,255,255,0.02);
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.12), -1px -1px 4px rgba(255,255,255,0.8);
     transform: scale(0.985);
   }
   .nm-auth-btn.nm-active {
-    border: 1px solid rgba(232,213,163,0.25); color: #e8d5a3;
+    box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.85);
+    color: #c8a96e;
   }
   .nm-form-panel {
     display: none; flex-direction: column; gap: 10px; width: 100%;
-    padding: 18px 16px; background: #0a1422; border-radius: 14px;
-    box-shadow: inset 4px 4px 12px rgba(0,0,0,0.65), inset -2px -2px 6px rgba(255,255,255,0.03);
+    padding: 18px 16px; background: #e0e2e9; border-radius: 16px;
+    box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.85);
     box-sizing: border-box;
   }
   .nm-form-panel.open { display: flex; }
   .nm-field-label {
     font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
     letter-spacing: 1.5px; text-transform: uppercase;
-    color: rgba(255,255,255,0.33); margin-bottom: 4px;
+    color: rgba(0,0,0,0.4); margin-bottom: 4px;
   }
   .nm-input-wrap { position: relative; }
   .nm-input {
-    width: 100%; height: 46px;
-    background: #060c18; border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 12px; padding: 0 14px 0 42px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    color: rgba(255,255,255,0.88);
-    box-shadow: inset 3px 3px 8px rgba(0,0,0,0.7), inset -2px -2px 6px rgba(255,255,255,0.03);
-    box-sizing: border-box; outline: none; transition: border-color 0.2s;
+    width: 100%; height: 48px;
+    background: #e8eaf0; border: none; border-radius: 12px;
+    padding: 0 14px 0 42px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: #1a1a2e;
+    box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -3px -3px 7px rgba(255,255,255,0.9);
+    box-sizing: border-box; outline: none; transition: box-shadow 0.2s;
   }
-  .nm-input:focus { border-color: rgba(232,213,163,0.35); }
-  .nm-input::placeholder { color: rgba(255,255,255,0.22); }
+  .nm-input:focus {
+    box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -3px -3px 7px rgba(255,255,255,0.9),
+                0 0 0 2px rgba(200,169,110,0.35);
+  }
+  .nm-input::placeholder { color: rgba(0,0,0,0.28); }
   .nm-input-no-icon { padding-left: 14px; }
   .nm-input-icon {
     position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
@@ -949,80 +943,69 @@ window._fbServerTimestamp = () => serverTimestamp();
     display: flex; align-items: center;
   }
   .nm-btn-gold {
-    width: 100%; height: 50px;
+    width: 100%; height: 52px;
     background: linear-gradient(135deg, #e8d5a3 0%, #c8a96e 100%);
-    color: #060c18; border: none; border-radius: 14px;
+    color: #1a1a2e; border: none; border-radius: 14px;
     font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
     letter-spacing: 0.5px; cursor: pointer;
-    box-shadow: 4px 4px 12px rgba(200,169,110,0.3), -2px -2px 8px rgba(0,0,0,0.5);
+    box-shadow: 4px 4px 12px rgba(200,169,110,0.4), -2px -2px 8px rgba(255,255,255,0.7);
     transition: all 0.15s;
   }
   .nm-btn-gold:active { transform: scale(0.985); }
   .nm-link-sm {
     background: none; border: none;
     font-family: 'DM Sans', sans-serif; font-size: 11px;
-    color: rgba(255,255,255,0.35); cursor: pointer;
+    color: rgba(0,0,0,0.38); cursor: pointer;
     letter-spacing: 0.5px; text-align: center; padding: 6px; width: 100%;
   }
-  .nm-divider {
-    display: flex; align-items: center; gap: 10px; width: 100%;
-  }
-  .nm-divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+  .nm-divider { display: flex; align-items: center; gap: 10px; width: 100%; }
+  .nm-divider-line { flex: 1; height: 1px; background: rgba(0,0,0,0.1); }
   .nm-divider-text {
     font-family: 'DM Sans', sans-serif; font-size: 10px;
-    color: rgba(255,255,255,0.28); letter-spacing: 2px;
+    color: rgba(0,0,0,0.3); letter-spacing: 2px;
   }
   .nm-footer-row {
     display: flex; align-items: center; justify-content: center;
     gap: 8px; margin-top: 20px; width: 100%;
   }
   .nm-footer-text {
-    font-family: 'DM Sans', sans-serif; font-size: 12px;
-    color: rgba(255,255,255,0.36);
+    font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(0,0,0,0.4);
   }
   .nm-footer-btn {
     font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
-    color: #e8d5a3; background: none; border: none;
+    color: #c8a96e; background: none; border: none;
     cursor: pointer; padding: 4px 8px; letter-spacing: 0.5px;
   }
   .nm-phone-row { display: flex; gap: 8px; }
   .nm-phone-select {
-    height: 46px; background: #060c18;
-    border: 1px solid rgba(255,255,255,0.07); border-radius: 12px;
-    color: rgba(255,255,255,0.72); font-family: 'DM Sans', sans-serif;
-    font-size: 12px; padding: 0 8px;
-    box-shadow: inset 3px 3px 8px rgba(0,0,0,0.7), inset -2px -2px 6px rgba(255,255,255,0.03);
+    height: 48px; background: #e8eaf0; border: none; border-radius: 12px;
+    color: #2d2d3a; font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 0 8px;
+    box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -3px -3px 7px rgba(255,255,255,0.9);
     box-sizing: border-box; min-width: 84px; outline: none; -webkit-appearance: none;
   }
   .nm-stepdots { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
-  .nm-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-  }
+  .nm-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.15); }
   .nm-steptext {
     font-family: 'DM Sans', sans-serif; font-size: 10px;
-    color: rgba(255,255,255,0.32); letter-spacing: 1px; margin-left: 4px;
+    color: rgba(0,0,0,0.35); letter-spacing: 1px; margin-left: 4px;
   }
-  .nm-terms-row {
-    display: flex; align-items: flex-start; gap: 10px; padding: 2px 0 8px;
-  }
+  .nm-terms-row { display: flex; align-items: flex-start; gap: 10px; padding: 2px 0 8px; }
   .nm-terms-cb {
     width: 20px; height: 20px; border-radius: 6px;
-    border: 1.5px solid rgba(255,255,255,0.2); background: #060c18;
-    box-shadow: inset 2px 2px 6px rgba(0,0,0,0.6);
+    background: #e8eaf0; border: none;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.9);
     flex-shrink: 0; display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.15s; margin-top: 1px;
   }
   .nm-terms-cb.checked {
     background: linear-gradient(135deg, #e8d5a3, #c8a96e);
-    border-color: transparent;
-    box-shadow: 0 2px 8px rgba(200,169,110,0.4);
+    box-shadow: 2px 2px 6px rgba(200,169,110,0.4);
   }
   .nm-terms-text {
     font-family: 'DM Sans', sans-serif; font-size: 11px;
-    color: rgba(255,255,255,0.4); line-height: 1.55;
+    color: rgba(0,0,0,0.48); line-height: 1.55;
   }
-  .nm-terms-link { color: rgba(232,213,163,0.65); cursor: pointer; }
+  .nm-terms-link { color: #c8a96e; cursor: pointer; }
 
   /* Phone input group */
   .phone-row {
@@ -4893,16 +4876,16 @@ window._fbServerTimestamp = () => serverTimestamp();
         <div>
           <div class="nm-field-label">Email Address</div>
           <div class="nm-input-wrap">
-            <span class="nm-input-icon"><svg width="15" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="1" width="14" height="10" rx="1.5" stroke="rgba(255,255,255,0.38)" stroke-width="1.2"/><path d="M1 3l7 4 7-4" stroke="rgba(255,255,255,0.38)" stroke-width="1.2"/></svg></span>
+            <span class="nm-input-icon"><svg width="15" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="1" width="14" height="10" rx="1.5" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/><path d="M1 3l7 4 7-4" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/></svg></span>
             <input class="nm-input" type="email" placeholder="your@email.com" id="loginEmail" autocomplete="email">
           </div>
         </div>
         <div>
           <div class="nm-field-label">Password</div>
           <div class="nm-input-wrap">
-            <span class="nm-input-icon"><svg width="13" height="15" viewBox="0 0 14 17" fill="none"><rect x="2" y="7" width="10" height="9" rx="2" stroke="rgba(255,255,255,0.38)" stroke-width="1.2"/><path d="M4 7V5Q4 2 7 2Q10 2 10 5V7" stroke="rgba(255,255,255,0.38)" stroke-width="1.2" fill="none"/></svg></span>
+            <span class="nm-input-icon"><svg width="13" height="15" viewBox="0 0 14 17" fill="none"><rect x="2" y="7" width="10" height="9" rx="2" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/><path d="M4 7V5Q4 2 7 2Q10 2 10 5V7" stroke="rgba(0,0,0,0.35)" stroke-width="1.2" fill="none"/></svg></span>
             <input class="nm-input" type="password" placeholder="Your password" id="pwInput" autocomplete="current-password">
-            <button class="nm-input-icon-r" onclick="togglePw()"><svg width="18" height="12" viewBox="0 0 18 12" fill="none"><path d="M9 1C5.5 1 2.5 3 1 6C2.5 9 5.5 11 9 11C12.5 11 15.5 9 17 6C15.5 3 12.5 1 9 1Z" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/><circle cx="9" cy="6" r="2.5" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/></svg></button>
+            <button class="nm-input-icon-r" onclick="togglePw()"><svg width="18" height="12" viewBox="0 0 18 12" fill="none"><path d="M9 1C5.5 1 2.5 3 1 6C2.5 9 5.5 11 9 11C12.5 11 15.5 9 17 6C15.5 3 12.5 1 9 1Z" stroke="rgba(0,0,0,0.32)" stroke-width="1.2"/><circle cx="9" cy="6" r="2.5" stroke="rgba(0,0,0,0.32)" stroke-width="1.2"/></svg></button>
           </div>
         </div>
         <button class="nm-btn-gold" onclick="fbEmailLogin()">Continue →</button>
@@ -4957,9 +4940,9 @@ window._fbServerTimestamp = () => serverTimestamp();
 
     <div class="nm-toprow">
       <button class="nm-back-btn" onclick="signup2Back()">
-        <svg width="16" height="14" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/></svg>
+        <svg width="16" height="14" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(0,0,0,0.5)" stroke-width="1.5" stroke-linecap="round"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/></svg>
       </button>
-      <span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(232,213,163,0.6);text-transform:uppercase;">Nowsbansiu</span>
+      <span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:#c8a96e;text-transform:uppercase;">Nowsbansiu</span>
       <div style="width:36px;"></div>
     </div>
 
