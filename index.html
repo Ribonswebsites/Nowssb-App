@@ -107,15 +107,14 @@ async function _resolveUserRoute(user) {
     setTimeout(function(){ if (window._spRefreshPromo) window._spRefreshPromo(); }, 100);
   }
   if (data.gender) window._userGender = data.gender;
-  if (data.onboardingDone) return 'landing';
-  // If they finished signup but never completed onboarding (old accounts / skipped) → go landing
+  if (data.onboardingDone) return 'home-nm';
+  // If they finished signup but never completed onboarding (old accounts / skipped) → go home-nm
   if (data.profileStepDone) {
-    // Mark onboardingDone so they never loop again
     if (window._fbSetDoc && window._currentUid) {
       window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
     }
     if (window._userDataCache) window._userDataCache.onboardingDone = true;
-    return 'landing';
+    return 'home-nm';
   }
   if (!window._su2Method) window._su2Method = 'social';
   return 'signup2';
@@ -134,7 +133,7 @@ onAuthStateChanged(auth, async user => {
       try {
         window._splashRoute = await _resolveUserRoute(user);
       } catch(e) {
-        window._splashRoute = 'landing';
+        window._splashRoute = 'home-nm';
       }
       if (window._splashDone) _doNavigate(window._splashRoute);
       return;
@@ -160,15 +159,15 @@ onAuthStateChanged(auth, async user => {
     window._currentUid = null;
     window._userDataCache = null;
 
-    // Landing is public — unauthenticated users always go there first
+    // Unauthenticated → go straight to login
     if (currentScreen === 'splash') {
-      window._splashRoute = 'landing';
-      if (window._splashDone) _doNavigate('landing');
+      window._splashRoute = 'login';
+      if (window._splashDone) _doNavigate('login');
       return;
     }
 
     // Not logged in on a protected screen — send to login
-    const protectedScreens = ['home','onboarding','analysis'];
+    const protectedScreens = ['home','home-nm','onboarding','analysis'];
     if (protectedScreens.includes(currentScreen)) {
       goTo('login');
     }
@@ -196,7 +195,7 @@ window.finishOnboarding = async () => {
     // Ensure onboardingDone is set without overwriting existing answers
     window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
   }
-  goTo('home');
+  goTo('home-nm');
 };
 
 // Save onboarding answers to Firestore
@@ -13268,22 +13267,12 @@ function goTo(id) {
     if (id === 'onboarding') renderQuestion();
     if (id === 'profile-setup') psInit();
     if (id === 'landing') {
-      // Update hint text based on current auth/sub state
       var hint = document.getElementById('ld-cta-hint');
-      if (hint) {
-        if (!window._currentUid) {
-          hint.textContent = 'Sign in to begin';
-        } else {
-          var d2 = window._userDataCache || {};
-          var now2 = new Date();
-          var inTrial2 = d2.trialEndDate && now2 < new Date(d2.trialEndDate);
-          var hasAccess2 = d2.isPro || d2.tier || inTrial2;
-          hint.textContent = hasAccess2 ? 'Enter your practice' : 'Subscription required';
-        }
-      }
+      if (hint) hint.textContent = window._currentUid ? 'Enter your practice' : 'Sign in to begin';
     }
-    if (id === 'home') { initHomeScrollBg(); updateTodayCard(); if(typeof rxInit==='function') setTimeout(rxInit,120); if (typeof nssUpdateHomeBadges === 'function') nssUpdateHomeBadges(); (function(){ var card = document.getElementById('sub-promo-card'); if (!card) return; var hasPlan = window.GATE ? (window.GATE.tier()==='resonance'||window.GATE.tier()==='frequency'||window.GATE.tier()==='frequencyX') : (window._userDataCache && window._userDataCache.isPro); card.style.display = hasPlan ? 'none' : 'block'; })(); } // run immediately, not delayed
-    else resetHomeBgLayer();
+    if (id === 'home') { initHomeScrollBg(); updateTodayCard(); if(typeof rxInit==='function') setTimeout(rxInit,120); if (typeof nssUpdateHomeBadges === 'function') nssUpdateHomeBadges(); (function(){ var card = document.getElementById('sub-promo-card'); if (!card) return; var hasPlan = window.GATE ? (window.GATE.tier()==='resonance'||window.GATE.tier()==='frequency'||window.GATE.tier()==='frequencyX') : (window._userDataCache && window._userDataCache.isPro); card.style.display = hasPlan ? 'none' : 'block'; })(); }
+    if (id === 'home-nm') { if(typeof nmhRefresh==='function') setTimeout(nmhRefresh,80); if(typeof updateTodayCard==='function') setTimeout(updateTodayCard,100); }
+    if (id !== 'home') resetHomeBgLayer();
   }, 320);
 }
 
@@ -13295,8 +13284,8 @@ setTimeout(() => {
     // Auth + Firestore already resolved — go straight there, no login flash
     goTo(window._splashRoute);
   } else {
-    // Auth still pending — go to landing; onAuthStateChanged will redirect if needed
-    goTo('landing');
+    // Auth still pending — go to login; onAuthStateChanged will redirect if needed
+    goTo('login');
   }
 }, 2500);
 
@@ -13537,33 +13526,17 @@ function togglePw() {
 
 // ── NEUMORPHIC AUTH FORM TOGGLE ──
 function landingEnter() {
-  // Not logged in → go to login first
-  if (!window._currentUid) {
-    goTo('login');
-    return;
-  }
-  // Logged in — check subscription / trial
-  var d = window._userDataCache || {};
-  var now = new Date();
-  var inTrial = d.trialEndDate && now < new Date(d.trialEndDate);
-  var hasAccess = d.isPro || d.tier || inTrial;
-  if (!hasAccess) {
-    // No subscription — show subscription panel
-    if (window.SS && typeof SS.open === 'function') {
-      SS.open('subscription');
-    } else {
-      goTo('home'); // fallback if SS not ready
-    }
-    return;
-  }
-  // Subscribed / on trial → play transition and open home
+  if (!window._currentUid) { goTo('login'); return; }
   var overlay = document.getElementById('ld-transition');
-  overlay.classList.add('show');
-  setTimeout(function() {
-    var pref = localStorage.getItem('nwsb_home_mode') || 'nm';
-    goTo(pref === 'classic' ? 'home' : 'home-nm');
-    setTimeout(function() { overlay.classList.remove('show'); }, 300);
-  }, 950);
+  if (overlay) {
+    overlay.classList.add('show');
+    setTimeout(function() {
+      goTo('home-nm');
+      setTimeout(function() { overlay.classList.remove('show'); }, 300);
+    }, 950);
+  } else {
+    goTo('home-nm');
+  }
 }
 
 // ── Neumorphic Home helpers ──
@@ -21052,9 +21025,11 @@ function nwagOpenSection(id) {
     try { localStorage.setItem('nwsb_pg', JSON.stringify(window._pgSeen)); } catch(e) {}
   }
 
-  // CRITICAL FIX: ensure home screen is visible before opening any sub-panel
-  // Without this, the sub opens on top of a blank/wrong screen
-  if (typeof goTo === 'function') goTo('home');
+  // ensure home screen is visible before opening any sub-panel
+  if (typeof goTo === 'function') {
+    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'nm';
+    goTo(_pm2 === 'classic' ? 'home' : 'home-nm');
+  }
 
   setTimeout(function() {
     if (typeof openSub === 'function') openSub(id);
