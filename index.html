@@ -13169,7 +13169,7 @@ function signup2Skip() {
     window._fbSetDoc(window._currentUid, { profileStepDone: true }).catch(() => {});
   }
   currentQ = 0; selectedOpts = [null, null, null, null, null];
-  goTo('onboarding');
+  goTo('ob-intro');
 }
 
 // ── TERMS CHECKBOX ──
@@ -13217,7 +13217,7 @@ async function createAccountFinal() {
       });
       if(btn){btn.textContent='Create Account →';btn.disabled=false;}
       currentQ = 0; selectedOpts = [null, null, null, null, null];
-      goTo('onboarding');
+      goTo('ob-intro');
     } catch(e) {
       if(btn){btn.textContent='Create Account →';btn.disabled=false;}
       alert('Profile save failed: ' + e.message);
@@ -13241,7 +13241,7 @@ async function createAccountFinal() {
       });
       if(btn){btn.textContent='Create Account →';btn.disabled=false;}
       currentQ = 0; selectedOpts = [null, null, null, null, null];
-      goTo('onboarding');
+      goTo('ob-intro');
     } catch(e) {
       if(btn){btn.textContent='Create Account →';btn.disabled=false;}
       if (e.code === 'auth/email-already-in-use') {
@@ -13265,7 +13265,7 @@ async function createAccountFinal() {
       await window._fbSetDoc(user.uid, { uid:user.uid, displayName:name, phone:window._su2Phone||null, dob, signupMethod:'phone', isPro:false, profileStepDone:true, createdAt:window._fbServerTimestamp(), lastLogin:window._fbServerTimestamp() });
       if(btn){btn.textContent='Create Account →';btn.disabled=false;}
       currentQ = 0; selectedOpts = [null, null, null, null, null];
-      goTo('onboarding');
+      goTo('ob-intro');
     } catch(e) {
       if(btn){btn.textContent='Create Account →';btn.disabled=false;}
       alert('Profile save failed: ' + e.message);
