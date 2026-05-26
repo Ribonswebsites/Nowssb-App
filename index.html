@@ -520,10 +520,12 @@ window._fbServerTimestamp = () => serverTimestamp();
     overflow-y:auto;
     overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
+    scrollbar-width: none;
     contain: layout paint;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
+  .screen::-webkit-scrollbar { display: none; }
   .screen.active {
     opacity:1; pointer-events:all; transform:translateY(0);
   }
@@ -911,7 +913,9 @@ window._fbServerTimestamp = () => serverTimestamp();
     display: flex; flex-direction: column; align-items: center;
     padding: max(env(safe-area-inset-top,48px),48px) 26px max(env(safe-area-inset-bottom,28px),28px);
     box-sizing: border-box; overflow-y: auto; background: #e4e6ed;
+    scrollbar-width: none;
   }
+  .nm-wrap::-webkit-scrollbar { display: none; }
   .nm-toprow {
     display: flex; align-items: center; justify-content: space-between;
     width: 100%; margin-bottom: 4px;
