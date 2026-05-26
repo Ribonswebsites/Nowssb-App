@@ -330,8 +330,9 @@ window.fbEmailLogin = async () => {
     if (notFound.some(c => signInErr.code === c || signInErr.message?.includes('no user'))) {
       try {
         if (btn) btn.textContent = 'Creating account…';
-        window._su2Method = 'email';
-        window._su2Email  = email;
+        window._su2Method   = 'email';
+        window._su2Email    = email;
+        window._su2Password = pass;
         await createUserWithEmailAndPassword(auth, email, pass);
         if (loader) loader.classList.add('visible');
       } catch(createErr) {
@@ -14132,92 +14133,49 @@ async function createAccountFinal() {
     cb.style.boxShadow = '0 0 0 3px rgba(255,107,107,0.25)';
     cb.scrollIntoView({ behavior: 'smooth', block: 'center' });
     alert('Please agree to the Terms of Service to continue.');
-    setTimeout(() => {
-      cb.style.border = '';
-      cb.style.boxShadow = '';
-    }, 2500);
+    setTimeout(() => { cb.style.border = ''; cb.style.boxShadow = ''; }, 2500);
     return;
   }
-  const method = window._su2Method || 'email';
-  const name   = window._su2Name  || '';
-  const dob    = document.getElementById('su2Dob').value || null;
-  const phone2 = (method === 'email')
-    ? (document.getElementById('su2Phone').value.trim() || null)
-    : (window._su2Phone || null);
+
+  const name  = window._su2Name || '';
+  const dob   = document.getElementById('su2Dob').value || null;
+  const phone = (document.getElementById('su2Phone') || {}).value?.trim() || window._su2Phone || null;
 
   const btn = document.querySelector('#signup2 .nm-btn-gold');
   if (btn) { btn.textContent = 'Setting up…'; btn.disabled = true; }
 
-  // ── SOCIAL / GOOGLE — user already authenticated, just save extra profile data ──
-  if (method === 'social') {
-    const user = auth.currentUser;
-    if (!user) {
-      if(btn){btn.textContent='Create Account →';btn.disabled=false;}
-      return alert('Session lost. Please sign in again.');
-    }
+  function _reset() { if(btn){ btn.textContent='Create Account →'; btn.disabled=false; } }
+
+  // ── Already authenticated (Google, phone OTP, or email already created) ──
+  // Just save the extra profile fields — never try to re-create the account.
+  const user = auth.currentUser;
+  if (user) {
     try {
-      const phone2Social = document.getElementById('su2Phone') ? document.getElementById('su2Phone').value.trim() || null : null;
       await window._fbSetDoc(user.uid, {
-        phone: phone2Social, dob,
+        uid: user.uid,
+        displayName: name || user.displayName || '',
+        email: user.email || null,
+        phone: phone,
+        dob: dob,
+        signupMethod: window._su2Method || (user.providerData[0] && user.providerData[0].providerId) || 'unknown',
+        isPro: false,
         profileStepDone: true,
         lastLogin: window._fbServerTimestamp()
       });
-      if(btn){btn.textContent='Create Account →';btn.disabled=false;}
+      _reset();
       currentQ = 0; selectedOpts = [null, null, null, null, null];
       goTo('ob-intro');
     } catch(e) {
-      if(btn){btn.textContent='Create Account →';btn.disabled=false;}
-      alert('Profile save failed: ' + e.message);
+      _reset();
+      alert('Could not save your profile: ' + e.message);
     }
     return;
   }
 
-  if (method === 'email') {
-    const email = window._su2Email    || '';
-    const pass  = window._su2Password || '';
-    if (!email) { if(btn){btn.textContent='Create Account →';btn.disabled=false;} return alert('Email missing. Go back.'); }
-    if (!pass)  { if(btn){btn.textContent='Create Account →';btn.disabled=false;} return alert('Password missing. Go back.'); }
-    try {
-      const cred = await window._fbCreateUser(email, pass);
-      await window._fbSetDoc(cred.user.uid, {
-        uid: cred.user.uid, email, displayName: name,
-        phone: phone2, dob, signupMethod: 'email',
-        isPro: false, profileStepDone: true,
-        createdAt: window._fbServerTimestamp(),
-        lastLogin: window._fbServerTimestamp()
-      });
-      if(btn){btn.textContent='Create Account →';btn.disabled=false;}
-      currentQ = 0; selectedOpts = [null, null, null, null, null];
-      goTo('ob-intro');
-    } catch(e) {
-      if(btn){btn.textContent='Create Account →';btn.disabled=false;}
-      if (e.code === 'auth/email-already-in-use') {
-        alert('This email already has an account. Please sign in instead.');
-        // Pre-fill login so they don't retype
-        const loginEmail = document.getElementById('loginEmail');
-        if (loginEmail) loginEmail.value = email;
-        goTo('login');
-      } else {
-        alert('Sign up failed: ' + e.message);
-      }
-    }
-  } else {
-    // Phone OTP — user must have confirmed OTP before reaching here
-    const user = auth.currentUser;
-    if (!user) {
-      if(btn){btn.textContent='Create Account →';btn.disabled=false;}
-      return alert('Your phone number wasn\'t verified yet. Please go back and complete the OTP verification step first.');
-    }
-    try {
-      await window._fbSetDoc(user.uid, { uid:user.uid, displayName:name, phone:window._su2Phone||null, dob, signupMethod:'phone', isPro:false, profileStepDone:true, createdAt:window._fbServerTimestamp(), lastLogin:window._fbServerTimestamp() });
-      if(btn){btn.textContent='Create Account →';btn.disabled=false;}
-      currentQ = 0; selectedOpts = [null, null, null, null, null];
-      goTo('ob-intro');
-    } catch(e) {
-      if(btn){btn.textContent='Create Account →';btn.disabled=false;}
-      alert('Profile save failed: ' + e.message);
-    }
-  }
+  // ── No current user — session expired, send back to login ──
+  _reset();
+  alert('Your session expired. Please sign in again.');
+  goTo('login');
 }
 
 // ── OTP SEND — Login via Phone ──
@@ -14231,9 +14189,15 @@ async function sendOtp() {
   if (_confirmationResult) {
     const code = otpInput.value.trim();
     if (!code) return alert('Enter the OTP you received');
-    try { btn.textContent = 'Verifying…'; btn.disabled = true;
+    try {
+      btn.textContent = 'Verifying…'; btn.disabled = true;
       await _confirmationResult.confirm(code);
-    } catch(e) { btn.textContent = 'Verify OTP'; btn.disabled = false; alert('Invalid OTP. Try again.'); }
+      // OTP verified — onAuthStateChanged will navigate. Reset button as fallback.
+      btn.textContent = 'Verified'; btn.disabled = true;
+    } catch(e) {
+      btn.textContent = 'Verify OTP'; btn.disabled = false;
+      alert('Invalid OTP. Please check the code and try again.');
+    }
     return;
   }
   try {
