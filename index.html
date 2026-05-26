@@ -1034,16 +1034,19 @@ window._fbServerTimestamp = () => serverTimestamp();
   }
   .nm-terms-row { display: flex; align-items: flex-start; gap: 10px; padding: 2px 0 8px; }
   .nm-terms-cb {
-    width: 20px; height: 20px; border-radius: 6px;
-    background: #e8eaf0; border: none;
+    width: 24px !important; height: 24px !important; min-width: 24px; min-height: 24px;
+    border-radius: 7px; background: #e8eaf0; border: 1.5px solid rgba(0,0,0,0.12);
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.9);
     flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.15s; margin-top: 1px;
+    cursor: pointer; transition: all 0.15s; margin-top: 1px; box-sizing: border-box;
   }
+  .nm-terms-cb .nm-cb-check { display: none; }
   .nm-terms-cb.checked {
     background: linear-gradient(135deg, #e8d5a3, #c8a96e);
     box-shadow: 2px 2px 6px rgba(200,169,110,0.4);
+    border-color: transparent;
   }
+  .nm-terms-cb.checked .nm-cb-check { display: block; }
   .nm-terms-text {
     font-family: 'DM Sans', sans-serif; font-size: 11px;
     color: rgba(0,0,0,0.48); line-height: 1.55;
@@ -4027,7 +4030,7 @@ window._fbServerTimestamp = () => serverTimestamp();
      SIGNUP SCREENS (1 & 2)
   ══════════════════════════════════════ */
   #signup1, #signup2 {
-    padding-left: 9%; padding-right: 9%;
+    padding-left: 5%; padding-right: 5%;
     justify-content: flex-end;
     gap: 10px;
     padding-bottom: max(env(safe-area-inset-bottom, 18px), 18px);
@@ -5228,7 +5231,9 @@ window._fbServerTimestamp = () => serverTimestamp();
       </div>
 
       <div class="nm-terms-row">
-        <div class="nm-terms-cb" id="su2TermsCb" onclick="toggleTerms()"></div>
+        <div class="nm-terms-cb" id="su2TermsCb" onclick="toggleTerms()">
+          <svg class="nm-cb-check" width="13" height="10" viewBox="0 0 13 10" fill="none"><path d="M1.5 5L5 8.5L11.5 1.5" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
         <span class="nm-terms-text">I agree to the <span class="nm-terms-link">Terms of Service</span> and <span class="nm-terms-link">Privacy Policy</span> of Nowsbansiu · Shabdapathy</span>
       </div>
 
@@ -14118,13 +14123,14 @@ async function createAccountFinal() {
   const termsChecked = document.getElementById('su2TermsCb').classList.contains('checked');
   if (!termsChecked) {
     const cb = document.getElementById('su2TermsCb');
-    cb.style.borderColor = '#ff6b6b';
-    cb.style.boxShadow = '0 0 0 2px rgba(255,107,107,0.3)';
+    cb.style.border = '2px solid #ff6b6b';
+    cb.style.boxShadow = '0 0 0 3px rgba(255,107,107,0.25)';
     cb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    alert('Please agree to the Terms of Service to continue.');
     setTimeout(() => {
-      cb.style.borderColor = '';
+      cb.style.border = '';
       cb.style.boxShadow = '';
-    }, 2000);
+    }, 2500);
     return;
   }
   const method = window._su2Method || 'email';
@@ -14134,7 +14140,7 @@ async function createAccountFinal() {
     ? (document.getElementById('su2Phone').value.trim() || null)
     : (window._su2Phone || null);
 
-  const btn = document.querySelector('#signup2 .btn-primary');
+  const btn = document.querySelector('#signup2 .nm-btn-gold');
   if (btn) { btn.textContent = 'Setting up…'; btn.disabled = true; }
 
   // ── SOCIAL / GOOGLE — user already authenticated, just save extra profile data ──
