@@ -1527,17 +1527,20 @@ window._fbServerTimestamp = () => serverTimestamp();
      SCREEN 5 — HOME
   ══════════════════════════════════════ */
   #home {
-    justify-content:flex-start;
-    padding-top: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    gap:0;
+    display: block !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 0 !important;
+    gap: 0;
+    scrollbar-width: none;
   }
+  #home::-webkit-scrollbar { display: none; }
   /* Padded wrapper for all home content below the hero */
   .home-body {
     width: 100%;
     padding: 0;
-    padding-bottom: calc(var(--nav-height, 58px) + 16px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--nav-height, 58px) + 32px + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
     align-items: center;
