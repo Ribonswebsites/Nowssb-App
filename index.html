@@ -240,23 +240,21 @@ window.saveOnboardingAnswers = async (answers, skipped) => {
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 getRedirectResult(auth).then(async result => {
   if (result && result.user) {
-    // Redirect completed — set placeholder route NOW so the fallback timer
-    // never navigates to 'login' while we wait for Firestore to resolve
-    if (!window._splashRoute) window._splashRoute = 'home';
-    await saveUser(result.user);
-    const loader = document.getElementById('authLoader');
-    if (loader) loader.classList.add('visible');
-    // onAuthStateChanged fires next and does the final navigation
+    // Coming back from a redirect fallback — skip splash entirely, go home now
+    window._splashRoute = 'home';
+    window._splashDone  = true;
+    saveUser(result.user).catch(() => {});
+    // Give onAuthStateChanged 200ms to fire first; if it hasn't, navigate ourselves
+    setTimeout(function() {
+      if (currentScreen === 'splash' || currentScreen === 'login') {
+        _doNavigate('home');
+      }
+    }, 200);
   }
 }).catch(e => {
   const code = e.code || '';
   if (code === 'auth/unauthorized-domain') {
     console.warn('Firebase: domain not authorised for Google sign-in.');
-    setTimeout(() => {
-      if (currentScreen === 'login') {
-        alert('Google sign-in is not available at this URL. Please use Email or Phone login instead.');
-      }
-    }, 500);
   } else if (code && code !== 'auth/user-cancelled') {
     console.error('Redirect error:', e.message);
   }
@@ -269,51 +267,34 @@ window.fbGoogleLogin = async () => {
   _googleSignInInProgress = true;
   const provider = new GoogleAuthProvider();
   const loader = document.getElementById('authLoader');
-  const isMob = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-  // Mobile: always use redirect — popup is unreliable on mobile Chrome/WebView/PWA
-  if (isMob) {
-    if (loader) loader.classList.add('visible');
-    try {
-      await signInWithRedirect(auth, provider);
-      // Page navigates away — code after this never runs
-    } catch(e) {
-      _googleSignInInProgress = false;
-      if (loader) loader.classList.remove('visible');
-      if (e.code === 'auth/unauthorized-domain') {
-        alert('Google sign-in is not available at this domain. Please use Email or Phone instead.');
-      } else {
-        alert('Sign-in failed: ' + e.message);
-      }
-    }
-    return;
-  }
-
-  // Desktop: use popup with redirect fallback
-  const btn = document.querySelector('#login .nm-auth-btn');
-  if (btn) { btn.style.opacity = '0.6'; btn.disabled = true; }
+  // Always try popup first — on mobile Chrome this shows the native account picker
+  // overlay without leaving the page (same as Manus / Claude). Only fall back to
+  // redirect if the browser explicitly blocks popups (PWA standalone, some WebViews).
+  if (loader) loader.classList.add('visible');
   try {
-    const result = await signInWithPopup(auth, provider);
-    if (result && result.user) {
-      if (loader) loader.classList.add('visible');
-    }
+    await signInWithPopup(auth, provider);
+    // onAuthStateChanged fires and handles navigation — nothing to do here
   } catch(e) {
     _googleSignInInProgress = false;
-    if (btn) { btn.style.opacity = ''; btn.disabled = false; }
+    if (loader) loader.classList.remove('visible');
     if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') {
+      // Browser blocked the popup (PWA mode, WKWebView) — fall back to redirect
+      if (loader) loader.classList.add('visible');
       try {
         await signInWithRedirect(auth, provider);
+        // Page navigates away — code below never runs
       } catch(re) {
-        if (re.code === 'auth/unauthorized-domain') {
-          alert('Google sign-in is not available at this URL. Please use Email or Phone login instead.');
-        } else {
-          alert('Sign-in failed: ' + re.message);
-        }
+        _googleSignInInProgress = false;
+        if (loader) loader.classList.remove('visible');
+        alert(re.code === 'auth/unauthorized-domain'
+          ? 'Google sign-in is not available here. Please use Email or Phone instead.'
+          : 'Sign-in failed: ' + re.message);
       }
     } else if (e.code === 'auth/unauthorized-domain') {
-      alert('Google sign-in is not available at this URL. Please use Email or Phone login instead.');
+      alert('Google sign-in is not available here. Please use Email or Phone instead.');
     } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
-      alert('Google sign-in failed: ' + e.message);
+      alert('Sign-in failed: ' + e.message);
     }
   }
 };
