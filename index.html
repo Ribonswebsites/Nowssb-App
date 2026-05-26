@@ -5699,49 +5699,51 @@ window._fbServerTimestamp = () => serverTimestamp();
 }
 /* Today's Practice */
 .nmh-practice {
-  width:100%; border-radius:22px; cursor:pointer;
+  width:100%; border-radius:26px; cursor:pointer; overflow:hidden;
   background:#f0f2f7;
-  box-shadow: 9px 9px 22px rgba(0,0,0,0.15), -6px -6px 18px rgba(255,255,255,0.97);
-  padding:20px 20px 18px; display:flex; flex-direction:column; gap:6px;
-  transition:box-shadow 0.12s, transform 0.12s;
+  box-shadow: 10px 10px 26px rgba(0,0,0,0.14), -7px -7px 20px rgba(255,255,255,0.98);
+  padding:28px 26px 26px;
+  display:flex; flex-direction:column; gap:0;
+  transition:box-shadow 0.15s, transform 0.15s;
   box-sizing:border-box;
 }
 .nmh-practice:active {
-  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.9);
-  transform:scale(0.99);
+  box-shadow: inset 5px 5px 12px rgba(0,0,0,0.12), inset -4px -4px 10px rgba(255,255,255,0.9);
+  transform:scale(0.985);
 }
 .nmh-practice-label {
   font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700;
-  letter-spacing:2.5px; text-transform:uppercase; color:#c8a96e;
-}
-.nmh-practice-row {
-  display:flex; align-items:center; gap:14px;
+  letter-spacing:3px; text-transform:uppercase; color:#c8a96e;
+  margin-bottom:14px;
 }
 .nmh-practice-icon {
-  width:52px; height:52px; border-radius:14px; background:#f0f2f7; flex-shrink:0;
-  box-shadow: 4px 4px 10px rgba(0,0,0,0.1), -3px -3px 8px rgba(255,255,255,0.9);
+  width:60px; height:60px; border-radius:18px; background:#f0f2f7; flex-shrink:0;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.11), -4px -4px 10px rgba(255,255,255,0.92);
   display:flex; align-items:center; justify-content:center;
+  margin-bottom:18px;
 }
-.nmh-practice-icon img { width:32px; height:32px; object-fit:contain; display:block; }
+.nmh-practice-icon img { width:34px; height:34px; object-fit:contain; display:block; }
 .nmh-practice-word {
-  font-family:'DM Sans',sans-serif; font-size:18px; font-weight:800; color:#1a1a2e; line-height:1.2;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+  font-family:'DM Sans',sans-serif; font-size:26px; font-weight:800; color:#1a1a2e; line-height:1.15;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-bottom:8px;
 }
 .nmh-practice-meaning {
-  font-family:'DM Sans',sans-serif; font-size:12px; font-weight:400;
-  color:rgba(0,0,0,0.45); line-height:1.5;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:400;
+  color:rgba(0,0,0,0.42); line-height:1.55;
+  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  margin-bottom:22px;
 }
 .nmh-practice-footer {
-  display:flex; align-items:center; justify-content:space-between; margin-top:4px;
+  display:flex; align-items:center; justify-content:space-between;
 }
 .nmh-practice-cta {
-  font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700;
-  color:#1a1a2e; letter-spacing:0.5px;
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700;
+  color:#1a1a2e; letter-spacing:0.4px;
 }
 .nmh-practice-arrow {
-  width:32px; height:32px; border-radius:50%; background:#f0f2f7;
-  box-shadow: 3px 3px 7px rgba(0,0,0,0.11), -2px -2px 6px rgba(255,255,255,0.9);
+  width:40px; height:40px; border-radius:50%; background:#f0f2f7;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.92);
   display:flex; align-items:center; justify-content:center;
 }
 /* 2x2 Grid */
@@ -5941,23 +5943,19 @@ window._fbServerTimestamp = () => serverTimestamp();
     <!-- Today's Practice -->
     <div class="nmh-practice" onclick="openPracticeIntro()">
       <div class="nmh-practice-label">Today's Practice</div>
-      <div class="nmh-practice-row">
-        <div class="nmh-practice-icon">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <path d="M7 14a7 7 0 0114 0" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round"/>
-            <rect x="4" y="13" width="5" height="8" rx="2.5" stroke="#c8a96e" stroke-width="1.7"/>
-            <rect x="19" y="13" width="5" height="8" rx="2.5" stroke="#c8a96e" stroke-width="1.7"/>
-          </svg>
-        </div>
-        <div style="min-width:0;flex:1;overflow:hidden;">
-          <div class="nmh-practice-word" id="nmhTodayWord">Loading...</div>
-          <div class="nmh-practice-meaning" id="nmhTodayMeaning">Your personalized word ritual for right now.</div>
-        </div>
+      <div class="nmh-practice-icon">
+        <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
+          <path d="M7 14a7 7 0 0114 0" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round"/>
+          <rect x="4" y="13" width="5" height="8" rx="2.5" stroke="#c8a96e" stroke-width="1.7"/>
+          <rect x="19" y="13" width="5" height="8" rx="2.5" stroke="#c8a96e" stroke-width="1.7"/>
+        </svg>
       </div>
+      <div class="nmh-practice-word" id="nmhTodayWord">Loading...</div>
+      <div class="nmh-practice-meaning" id="nmhTodayMeaning">Your personalized word ritual for right now.</div>
       <div class="nmh-practice-footer">
         <div class="nmh-practice-cta">Begin Practice</div>
         <div class="nmh-practice-arrow">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
             <path d="M3 7H11M7 3L11 7L7 11" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="square"/>
           </svg>
         </div>
