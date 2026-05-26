@@ -895,17 +895,13 @@ window._fbServerTimestamp = () => serverTimestamp();
   }
   /* Neumorphic circle that wraps the logo */
   .nm-logo-ring {
-    width: 100px; height: 100px; border-radius: 50%;
-    background: #e4e6ed;
-    box-shadow: 9px 9px 22px rgba(0,0,0,0.16), -7px -7px 18px rgba(255,255,255,0.97);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 18px; flex-shrink: 0;
-    overflow: hidden;
+    width: 110px; height: 110px; border-radius: 50%;
+    background-image: url('https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png');
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+    box-shadow: 10px 10px 26px rgba(0,0,0,0.17), -8px -8px 20px rgba(255,255,255,0.98);
+    margin-bottom: 20px; flex-shrink: 0;
   }
-  .nm-logo-img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-    clip-path: circle(50% at 50% 50%);
-  }
+  .nm-logo-img { display: none; }
   .nm-brand {
     font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 2.5px; text-transform: uppercase;
@@ -919,19 +915,20 @@ window._fbServerTimestamp = () => serverTimestamp();
     font-family: 'DM Sans', sans-serif; font-size: 13px;
     color: rgba(0,0,0,0.42); letter-spacing: 0.3px;
   }
-  .nm-btn-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .nm-btn-list { width: 100%; display: flex; flex-direction: column; gap: 14px; }
   .nm-auth-btn {
-    width: 100%; height: 58px;
-    display: flex; align-items: center; gap: 14px; padding: 0 22px;
-    background: #e4e6ed; border: none; border-radius: 18px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    color: #2d2d3a; cursor: pointer; text-align: left;
-    box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.95);
+    width: 100%; height: 68px;
+    display: flex; align-items: center; gap: 16px; padding: 0 26px;
+    background: #e8eaf1; border: none; border-radius: 22px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+    color: #1a1a2e; cursor: pointer; text-align: left;
+    box-shadow: 8px 8px 18px rgba(0,0,0,0.15), -6px -6px 14px rgba(255,255,255,0.97);
     transition: box-shadow 0.15s, transform 0.15s; letter-spacing: 0.2px;
+    -webkit-appearance: none;
   }
   .nm-auth-btn:active {
-    transform: scale(0.983);
-    box-shadow: inset 4px 4px 9px rgba(0,0,0,0.13), inset -4px -4px 9px rgba(255,255,255,0.88);
+    transform: scale(0.975);
+    box-shadow: inset 5px 5px 11px rgba(0,0,0,0.13), inset -4px -4px 10px rgba(255,255,255,0.88);
   }
   .nm-auth-btn.nm-active { background: #e4e6ed; color: #c8a96e; box-shadow: inset 4px 4px 9px rgba(0,0,0,0.13), inset -4px -4px 9px rgba(255,255,255,0.88); }
   .nm-form-panel {
@@ -2005,11 +2002,10 @@ window._fbServerTimestamp = () => serverTimestamp();
   .dl-icon-wrap {
     width: 72px; height: 72px;
     border-radius: 50%;
-    background: #f0f2f7;
+    background-image: url('https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png');
+    background-size: cover; background-position: center; background-repeat: no-repeat;
     box-shadow: 5px 5px 12px rgba(0,0,0,0.12), -4px -4px 10px rgba(255,255,255,0.95);
-    display: flex; align-items: center; justify-content: center;
     margin: 0 auto 18px;
-    overflow: hidden;
   }
   .dl-title {
     font-family: 'DM Sans', sans-serif;
@@ -5636,11 +5632,12 @@ window._fbServerTimestamp = () => serverTimestamp();
   display:flex; align-items:center; gap:12px;
 }
 .nmh-logo {
-  width:44px; height:44px; border-radius:50%; overflow:hidden; flex-shrink:0;
-  box-shadow: 5px 5px 12px rgba(0,0,0,0.14), -4px -4px 10px rgba(255,255,255,0.95);
-  background:#f0f2f7;
+  width:46px; height:46px; border-radius:50%; flex-shrink:0;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.15), -4px -4px 10px rgba(255,255,255,0.97);
+  background-image: url('https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png');
+  background-size: cover; background-position: center; background-repeat: no-repeat;
 }
-.nmh-logo img { width:100%; height:100%; object-fit:cover; display:block; clip-path: circle(50% at 50% 50%); }
+.nmh-logo img { display: none; }
 .nmh-brand-text { display:flex; flex-direction:column; }
 .nmh-brand-name {
   font-family:'DM Sans',sans-serif; font-size:15px; font-weight:800;
@@ -13330,9 +13327,7 @@ async function _profileSavePhotoURL(url) {
 
     <!-- ANDROID / DESKTOP: native install prompt -->
     <div id="dlViewInstall">
-      <div class="dl-icon-wrap">
-        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:100%;height:100%;object-fit:cover;display:block;clip-path:circle(50% at 50% 50%);" loading="lazy">
-      </div>
+      <div class="dl-icon-wrap"></div>
       <div class="dl-title">Install the App</div>
       <div class="dl-sub">Add NOWSBANSIU to your home screen for a full native app experience — works offline, no browser bar.</div>
       <button class="dl-btn" id="dlInstallBtn" onclick="triggerInstall()">
@@ -13347,9 +13342,7 @@ async function _profileSavePhotoURL(url) {
 
     <!-- iOS: step-by-step instructions -->
     <div id="dlViewIOS" style="display:none;">
-      <div class="dl-icon-wrap">
-        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" style="width:100%;height:100%;object-fit:cover;display:block;clip-path:circle(50% at 50% 50%);" loading="lazy">
-      </div>
+      <div class="dl-icon-wrap"></div>
       <div class="dl-title">Add to Home Screen</div>
       <div class="dl-sub">Install NOWSBANSIU as an app in 2 taps:</div>
       <div style="width:100%;margin-bottom:18px;">
