@@ -1588,6 +1588,7 @@ window._fbServerTimestamp = () => serverTimestamp();
     -webkit-backdrop-filter:blur(14px);
     margin-bottom:14px; flex-shrink:0;
     position:relative; overflow:hidden;
+    isolation: isolate;
     cursor:pointer; transition:background 0.2s;
   }
   .home-card-top { position:relative; z-index:2; }
@@ -1651,6 +1652,7 @@ window._fbServerTimestamp = () => serverTimestamp();
     backdrop-filter:blur(10px);
     cursor:pointer; transition:background 0.2s, transform 0.18s ease, box-shadow 0.18s ease;
     position:relative; overflow:hidden;
+    isolation: isolate;
     transform-style:preserve-3d;
   }
   .home-tile::before {
@@ -1748,6 +1750,7 @@ window._fbServerTimestamp = () => serverTimestamp();
   .home-card-static {
     contain: layout style;
     will-change: auto;
+    isolation: isolate;
     /* Always visible — never gated behind a scroll trigger */
     opacity: 1 !important;
     transform: none !important;
@@ -1804,6 +1807,7 @@ window._fbServerTimestamp = () => serverTimestamp();
   .hero-bg {
     position: absolute; inset: 0;
     background-size: cover; background-position: center top;
+    background-color: #0a1528;
     opacity: 0;
     transition: opacity 1.3s cubic-bezier(0.4,0,0.2,1);
   }
@@ -6494,8 +6498,8 @@ window._fbServerTimestamp = () => serverTimestamp();
 
   <!-- STANDALONE BANNER ABOVE WORD SEARCH SECTION -->
   <div style="padding: 0 16px 16px; background: transparent;">
-    <div style="position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.18); box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12); background: rgba(0,0,0,0.9);">
-      <video autoplay muted loop playsinline style="width:100%;height:auto;display:block;" poster="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg">
+    <div style="position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.18); box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12); background: linear-gradient(135deg,rgba(6,12,24,0.95) 0%,rgba(12,20,40,0.92) 100%); aspect-ratio:16/9;">
+      <video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" poster="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg">
         <source src="https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.mp4" type="video/mp4">
       </video>
     </div>
@@ -6584,23 +6588,26 @@ window._fbServerTimestamp = () => serverTimestamp();
     width: 100%;
     position: relative;
     overflow: hidden;
-    background: #060c18;
+    background: transparent;
+    aspect-ratio: 16/9;
   }
   .store-banner-track {
     display: flex;
+    height: 100%;
     transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
   }
   .store-banner-slide {
     flex: 0 0 100%;
+    height: 100%;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
   }
   .store-banner-slide img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
-    object-fit: contain;
+    object-fit: cover;
   }
 
   </style>
