@@ -5636,15 +5636,19 @@ window._fbServerTimestamp = () => serverTimestamp();
 <style>
 /* ── #home-nm: full-screen flex column, header pinned, wrap scrolls ── */
 #home-nm {
-  display:flex !important;
-  flex-direction:column !important;
-  overflow:hidden !important;
+  display:block !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
   padding:0 !important;
   background:#f0f2f7;
+  scrollbar-width:none;
 }
-/* Header: pinned, never scrolls */
+#home-nm::-webkit-scrollbar { display:none; }
+/* Header: sticky — stays at top while content scrolls */
 .nmh-toprow {
-  flex-shrink:0;
+  position:sticky;
+  top:0;
   width:100%;
   display:flex; align-items:center; justify-content:space-between;
   padding: max(env(safe-area-inset-top,16px),16px) 20px 14px;
@@ -5653,13 +5657,8 @@ window._fbServerTimestamp = () => serverTimestamp();
   box-sizing:border-box;
   z-index:10;
 }
-/* Scrollable content: takes remaining height */
+/* Content: natural height, scrolls with the page — no clipping */
 .nmh-wrap {
-  flex:1;
-  min-height:0; /* critical — lets flex item shrink and scroll */
-  overflow-y:auto;
-  overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
   width:100%;
   display:flex; flex-direction:column; align-items:stretch; gap:14px;
   padding: 16px 20px calc(var(--nav-height,58px) + 32px);
