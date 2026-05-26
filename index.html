@@ -5572,12 +5572,17 @@ window._fbServerTimestamp = () => serverTimestamp();
     <img class="logo-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowsBansiu" loading="lazy">
     <span class="brand-name" style="font-size:22px;text-shadow:0 1px 8px rgba(0,0,0,0.5);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
   </div>
-  <div style="width:36px;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:none;" onclick="openMenu()">
-    <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
-      <line x1="0" y1="2" x2="16" y2="2" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
-      <line x1="0" y1="7" x2="16" y2="7" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
-      <line x1="0" y1="12" x2="10" y2="12" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
-    </svg>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');goTo('home-nm')" title="Light Mode" style="width:36px;height:36px;border:none;cursor:pointer;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);flex-shrink:0;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 0112 0" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="2" fill="#e8d5a3"/><path d="M8 2v1M8 13v1M2 8H1M15 8h-1" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </button>
+    <div style="width:36px;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);flex-shrink:0;" onclick="openMenu()">
+      <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+        <line x1="0" y1="2" x2="16" y2="2" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+        <line x1="0" y1="7" x2="16" y2="7" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+        <line x1="0" y1="12" x2="10" y2="12" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+      </svg>
+    </div>
   </div>
 </div>
 
@@ -13975,19 +13980,6 @@ function nmhRefresh() {
 
 // Also add classic→nm toggle button on dark home header area
 // (We inject a small pill toggle onto home screen after DOM ready)
-document.addEventListener('DOMContentLoaded', function() {
-  var hdr = document.getElementById('homeHeader');
-  if (hdr && !document.getElementById('homeNmToggle')) {
-    var btn = document.createElement('button');
-    btn.id = 'homeNmToggle';
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 0112 0" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="2" fill="#e8d5a3"/><path d="M8 2v1M8 13v1M2 8H1M15 8h-1" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/></svg>';
-    btn.title = 'Light Mode';
-    btn.style.cssText = 'position:absolute;top:16px;right:18px;z-index:30;width:36px;height:36px;border:none;cursor:pointer;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);';
-    btn.onclick = function(){ localStorage.setItem('nwsb_home_mode','nm'); goTo('home-nm'); };
-    hdr.style.position = 'relative';
-    hdr.appendChild(btn);
-  }
-});
 
 function nmToggleAuthForm(id) {
   var target = document.getElementById(id);
@@ -27861,8 +27853,8 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 }
 #ig-bottomnav.nav-light .ig-nav-label { color: rgba(0,0,0,0.35); }
 #ig-bottomnav.nav-light .ig-nav-btn.active .ig-nav-label { color: #c8a96e; }
-#ig-bottomnav.nav-light .ig-nav-svg { color: rgba(0,0,0,0.28); }
-#ig-bottomnav.nav-light .ig-nav-btn.active .ig-nav-svg { color: #c8a96e; }
+#ig-bottomnav.nav-light .ig-nav-img { filter: brightness(0) opacity(0.35); }
+#ig-bottomnav.nav-light .ig-nav-btn.active .ig-nav-img { filter: brightness(0) saturate(1) sepia(1) hue-rotate(5deg) brightness(0.8) opacity(1); }
 #ig-bottomnav.nav-light .ig-nav-btn.active::before { background: #c8a96e; }
 
 .ig-nav-btn {
@@ -27880,13 +27872,12 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   transition: transform .12s ease;
 }
 .ig-nav-btn:active .ig-nav-puck { transform: scale(.85); }
-/* SVG icons — use currentColor for stroke/fill */
-.ig-nav-svg {
-  color: rgba(255,255,255,0.38);
-  transition: color .2s ease;
-  display: block;
+.ig-nav-img {
+  width: 26px; height: 26px; object-fit: contain; display: block;
+  filter: brightness(1) grayscale(0.3);
+  transition: opacity .2s ease, filter .2s ease;
 }
-.ig-nav-btn.active .ig-nav-svg { color: #e8d5a3; }
+.ig-nav-btn.active .ig-nav-img { filter: brightness(1.15) grayscale(0); }
 .ig-nav-label {
   font-size: 11px; font-weight: 500; color: rgba(255,255,255,.45);
   font-family: 'DM Sans', sans-serif;
@@ -27983,45 +27974,31 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 <div id="ig-bottomnav">
   <button class="ig-nav-btn" id="ignav-home" onclick="IG.nav('home')">
     <span class="ig-nav-puck">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
-        <path d="M3 10.5L11 3.5L19 10.5V19.5H14.5V14.5H7.5V19.5H3V10.5Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" class="ig-nav-img" alt="Home">
     </span>
     <span class="ig-nav-label">Home</span>
   </button>
   <button class="ig-nav-btn" id="ignav-practice" onclick="IG.nav('practice')">
     <span class="ig-nav-puck">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
-        <rect x="8" y="2.5" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.65"/>
-        <path d="M5 12c0 3.3 2.7 6 6 6s6-2.7 6-6" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
-        <path d="M11 18v2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png" class="ig-nav-img" alt="Practice">
     </span>
     <span class="ig-nav-label">Practice</span>
   </button>
   <button class="ig-nav-btn" id="ignav-library" onclick="IG.nav('library')">
     <span class="ig-nav-puck">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
-        <path d="M2 11.5h2.5l3-5.5 4 11 3-6.5 2 1H20" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" class="ig-nav-img" alt="Library">
     </span>
     <span class="ig-nav-label">Library</span>
   </button>
   <button class="ig-nav-btn" id="ignav-store" onclick="IG.nav('store')">
     <span class="ig-nav-puck">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
-        <path d="M7.5 8.5V7a3.5 3.5 0 017 0v1.5" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
-        <rect x="3.5" y="8.5" width="15" height="11" rx="2" stroke="currentColor" stroke-width="1.65"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" class="ig-nav-img" alt="Store">
     </span>
     <span class="ig-nav-label">Store</span>
   </button>
   <button class="ig-nav-btn" id="ignav-profile" onclick="IG.nav('profile')">
     <span class="ig-nav-puck">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
-        <circle cx="11" cy="7.5" r="3.5" stroke="currentColor" stroke-width="1.65"/>
-        <path d="M4 20c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
-      </svg>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" class="ig-nav-img" alt="Profile">
     </span>
     <span class="ig-nav-label">Profile</span>
   </button>
