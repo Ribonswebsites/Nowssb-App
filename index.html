@@ -27954,9 +27954,9 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   </button>
   <button class="ig-nav-btn" id="ignav-profile" onclick="IG.nav('profile')">
     <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" class="ig-nav-img" alt="Profile">
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" class="ig-nav-img" alt="People">
     </span>
-    <span class="ig-nav-label">Profile</span>
+    <span class="ig-nav-label">People</span>
   </button>
 </div>
 
@@ -28201,6 +28201,12 @@ document.getElementById('sub-social').addEventListener('transitionend', function
         if(typeof openSub==='function') openSub('nowssb-store');
         setActiveNav('store'); showNav(true);
       } else if(which==='profile'){
+        closeNavScreens();
+        document.getElementById('sub-people').classList.add('open');
+        renderExplore(); this.clearSearch();
+        setActiveNav('profile'); showNav(true);
+        var _sc=document.getElementById('ig-people-scroll'); if(_sc) _sc.scrollTop=0;
+      } else if(which==='myprofile'){
         closeNavScreens();
         if(typeof openSub==='function') openSub('profile');
         setActiveNav('profile'); showNav(true);
