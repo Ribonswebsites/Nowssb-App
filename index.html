@@ -5259,9 +5259,9 @@ window._fbServerTimestamp = () => serverTimestamp();
 <div class="screen" id="ob-intro" style="justify-content:flex-start;padding:0;">
 
   <!-- Full-bleed background image -->
-  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779803860/99d6b980-5909-11f1-8540-43cf58c6068c_yrroq4.png');background-size:cover;background-position:center;z-index:0;"></div>
-  <!-- Overlay for readability -->
-  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(to bottom,rgba(6,12,24,0.35) 0%,rgba(6,12,24,0.65) 60%,rgba(6,12,24,0.88) 100%);z-index:1;"></div>
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png');background-size:cover;background-position:center top;z-index:0;"></div>
+  <!-- Very light overlay — top only for text readability, transparent at bottom so cube shows -->
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(to bottom,rgba(6,12,24,0.45) 0%,rgba(6,12,24,0.2) 45%,rgba(6,12,24,0.05) 70%,rgba(6,12,24,0.0) 100%);z-index:1;"></div>
 
   <!-- Logo + brand at top -->
   <div style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:9%;right:9%;z-index:10;display:flex;align-items:center;justify-content:center;gap:12px;">
@@ -5269,15 +5269,15 @@ window._fbServerTimestamp = () => serverTimestamp();
     <span class="brand-name" style="font-size:24px;text-shadow:0 2px 12px rgba(0,0,0,0.9);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
   </div>
 
-  <!-- Content panel pinned to bottom -->
-  <div style="position:absolute;bottom:0;left:0;right:0;padding:24px 7% max(env(safe-area-inset-bottom,28px),28px);z-index:10;">
-    <div style="margin-bottom:8px;">
-      <span style="font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;">Personalise Your Journey</span>
+  <!-- Content panel — sits over the glass cube, transparent so cube shows through -->
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:20px 7% max(env(safe-area-inset-bottom,28px),28px);z-index:10;">
+    <div style="margin-bottom:6px;">
+      <span style="font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 8px rgba(0,0,0,0.6);">Personalise Your Journey</span>
     </div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.2;">Pick your path</div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.5;margin-bottom:18px;">5 quick questions to personalise your healing practice.</div>
-    <!-- Two path cards -->
-    <div style="display:flex;gap:10px;margin-bottom:16px;">
+    <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,0.7);">Pick your path</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:16px;text-shadow:0 1px 6px rgba(0,0,0,0.6);">5 quick questions to personalise your healing practice.</div>
+    <!-- Two path cards inside the glass cube -->
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
       <div class="ob-path-card ob-path-dark" onclick="goIntroYes()">
         <div class="ob-path-tag">The Fashion Way</div>
         <div class="ob-path-title">Cinematic</div>
@@ -5289,7 +5289,7 @@ window._fbServerTimestamp = () => serverTimestamp();
         <div class="ob-path-sub" style="color:rgba(0,0,0,0.4);">Bright · Clear · Neumorphic</div>
       </div>
     </div>
-    <div style="text-align:center;padding:10px 0 0;font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);cursor:pointer;" onclick="goIntroSkip()">Skip for now</div>
+    <div style="text-align:center;padding:8px 0 0;font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);cursor:pointer;text-shadow:0 1px 6px rgba(0,0,0,0.5);" onclick="goIntroSkip()">Skip for now</div>
   </div>
 
 </div>
@@ -13416,7 +13416,7 @@ const bgImages = {
   signup1phone: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584978/grok_image_1777580577245_s0oftf.jpg',
   signup2:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777591568/grok_image_1777591433417_rx2whb.jpg',
   'profile-setup': 'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778309102/grok_image_1778309033334_fza02n.jpg',
-  onboarding: 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto,w_900/v1779803860/99d6b980-5909-11f1-8540-43cf58c6068c_yrroq4.png',
+  onboarding: 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto,w_900/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png',
   onboarding2: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777615898/grok_image_1777615621529_xdxfj6.jpg',
   onboarding3: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777616006/grok_image_1777615631154_yddgyh.jpg',
   analysis:   'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850607/1000033084-ezremove_ybzuzs.png',
@@ -14252,7 +14252,7 @@ const questions = [
     label:'What Calls You',
     q:'What calls you to heal?',
     opts:['Voice & Vocal power','Inner calm & peace','Ancient wisdom & knowledge','Physical strength & vitality'],
-    bg: 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779803860/99d6b980-5909-11f1-8540-43cf58c6068c_yrroq4.png'
+    bg: 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png'
   },
   {
     label:'What Feels Broken',
