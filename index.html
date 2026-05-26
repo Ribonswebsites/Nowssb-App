@@ -199,6 +199,11 @@ function _doNavigate(dest) {
   // Hide auth loader if visible
   const loader = document.getElementById('authLoader');
   if (loader) loader.classList.remove('visible');
+  // Respect stored home mode preference — default is neumorphic
+  if (dest === 'home') {
+    var _pref = localStorage.getItem('nwsb_home_mode') || 'nm';
+    dest = (_pref === 'nm') ? 'home-nm' : 'home';
+  }
   if (currentScreen !== dest) goTo(dest);
 }
 
@@ -5928,7 +5933,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 
   <!-- Header — pinned to top, never scrolls -->
   <div class="nmh-toprow">
-    <div class="nmh-brand-row" onclick="goTo('home')" style="cursor:pointer;" title="Switch to Fashion Mode">
+    <div class="nmh-brand-row" style="cursor:default;">
       <div class="nmh-logo">
         <img loading="eager" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB">
       </div>
@@ -5942,8 +5947,8 @@ window._fbServerTimestamp = () => serverTimestamp();
         <path d="M9 2v1M9 15v1M2 9H1M17 9h-1M4.22 4.22l-.71-.71M14.49 14.49l-.71-.71M4.22 13.78l-.71.71M14.49 3.51l-.71.71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
         <circle cx="9" cy="9" r="3" stroke="#1a1a2e" stroke-width="1.5"/>
       </svg>
-      <svg id="nmhMoonIcon" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display:none;">
-        <path d="M13 10.5A6 6 0 015.5 3a6.5 6.5 0 100 10A6 6 0 0113 10.5z" stroke="rgba(232,213,163,0.9)" stroke-width="1.4" fill="rgba(232,213,163,0.1)"/>
+      <svg id="nmhMoonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" style="display:none;">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="rgba(232,213,163,0.9)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="rgba(232,213,163,0.12)"/>
       </svg>
     </button>
   </div>
@@ -21503,7 +21508,7 @@ function nwagOpenSection(id) {
 
   // ensure home screen is visible before opening any sub-panel
   if (typeof goTo === 'function') {
-    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'classic';
+    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'nm';
     goTo(_pm2 === 'nm' ? 'home-nm' : 'home');
   }
 
@@ -28214,7 +28219,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
       if(which==='home'){
         closeNavScreens();
         if(typeof goTo==='function'&&(typeof currentScreen==='undefined'||(currentScreen!=='home'&&currentScreen!=='home-nm'))){
-          var _pm=localStorage.getItem('nwsb_home_mode')||'classic';
+          var _pm=localStorage.getItem('nwsb_home_mode')||'nm';
           goTo(_pm==='nm'?'home-nm':'home');
         }
         setActiveNav('home'); showNav(true);
