@@ -5748,9 +5748,9 @@ window._fbServerTimestamp = () => serverTimestamp();
   width:100%; display:grid; grid-template-columns:1fr 1fr; gap:12px;
 }
 .nmh-tile {
-  border-radius:20px; background:#f0f2f7; cursor:pointer; padding:18px 16px 16px;
+  border-radius:22px; background:#f0f2f7; cursor:pointer; padding:24px 20px 22px;
   box-shadow: 7px 7px 18px rgba(0,0,0,0.14), -5px -5px 14px rgba(255,255,255,0.97);
-  display:flex; flex-direction:column; gap:6px;
+  display:flex; flex-direction:column; gap:0;
   transition:box-shadow 0.12s, transform 0.12s;
 }
 .nmh-tile:active {
@@ -5758,16 +5758,16 @@ window._fbServerTimestamp = () => serverTimestamp();
   transform:scale(0.97);
 }
 .nmh-tile-icon {
-  width:42px; height:42px; border-radius:13px; background:#f0f2f7; margin-bottom:4px;
-  box-shadow: 3px 3px 8px rgba(0,0,0,0.1), -2px -2px 6px rgba(255,255,255,0.9);
-  display:flex; align-items:center; justify-content:center;
+  width:52px; height:52px; border-radius:16px; background:#f0f2f7; margin-bottom:14px;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.11), -3px -3px 8px rgba(255,255,255,0.92);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
 }
-.nmh-tile-icon img { width:24px; height:24px; object-fit:contain; display:block; }
+.nmh-tile-icon img { width:26px; height:26px; object-fit:contain; display:block; }
 .nmh-tile-title {
-  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; color:#1a1a2e;
+  font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; color:#1a1a2e; margin-bottom:5px;
 }
 .nmh-tile-sub {
-  font-family:'DM Sans',sans-serif; font-size:10px; font-weight:400; color:rgba(0,0,0,0.4);
+  font-family:'DM Sans',sans-serif; font-size:11px; font-weight:400; color:rgba(0,0,0,0.4);
 }
 /* Routine card */
 .nmh-routine {
@@ -5867,7 +5867,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 }
 #home-nm.nm-dark .nmh-tile-icon {
   background: #1e1e38;
-  box-shadow: 3px 3px 8px rgba(0,0,0,0.5), -2px -2px 5px rgba(40,40,80,0.18);
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.55), -3px -3px 8px rgba(40,40,80,0.2);
 }
 #home-nm.nm-dark .nmh-tile-title { color: #fff; }
 #home-nm.nm-dark .nmh-tile-sub   { color: rgba(255,255,255,0.38); }
@@ -5881,7 +5881,11 @@ window._fbServerTimestamp = () => serverTimestamp();
 #home-nm.nm-dark .nmh-routine-label { color: rgba(232,213,163,0.6); }
 #home-nm.nm-dark .nmh-routine-title { color: #fff; }
 #home-nm.nm-dark .nmh-routine-sub   { color: rgba(255,255,255,0.35); }
-#home-nm.nm-dark .nmh-routine-arrow svg path { stroke: rgba(255,255,255,0.5); }
+#home-nm.nm-dark .nmh-routine-arrow {
+  background: #1e1e38;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.5), -2px -2px 5px rgba(40,40,80,0.18);
+}
+#home-nm.nm-dark .nmh-routine-arrow svg path { stroke: rgba(255,255,255,0.55); }
 #home-nm.nm-dark .nmh-quick-btn {
   background: #1e1e38;
   box-shadow: 4px 4px 10px rgba(0,0,0,0.5), -2px -2px 6px rgba(40,40,80,0.18);
@@ -27826,8 +27830,8 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 }
 #ig-bottomnav.nav-light .ig-nav-label { color: rgba(0,0,0,0.35); }
 #ig-bottomnav.nav-light .ig-nav-btn.active .ig-nav-label { color: #c8a96e; }
-#ig-bottomnav.nav-light .ig-nav-img { filter: brightness(0) opacity(0.35); }
-#ig-bottomnav.nav-light .ig-nav-btn.active .ig-nav-img { filter: brightness(0) saturate(1) sepia(1) hue-rotate(5deg) brightness(0.8) opacity(1); }
+#ig-bottomnav.nav-light .ig-nav-svg { color: rgba(0,0,0,0.28); }
+#ig-bottomnav.nav-light .ig-nav-btn.active .ig-nav-svg { color: #c8a96e; }
 #ig-bottomnav.nav-light .ig-nav-btn.active::before { background: #c8a96e; }
 
 .ig-nav-btn {
@@ -27845,18 +27849,13 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   transition: transform .12s ease;
 }
 .ig-nav-btn:active .ig-nav-puck { transform: scale(.85); }
-/* image icons — dim when inactive, full brightness when active */
-.ig-nav-img {
-  width: 28px; height: 28px;
-  object-fit: contain; display: block;
-  opacity: 0.45;
-  filter: brightness(1) grayscale(0.3);
-  transition: opacity .2s ease, filter .2s ease;
+/* SVG icons — use currentColor for stroke/fill */
+.ig-nav-svg {
+  color: rgba(255,255,255,0.38);
+  transition: color .2s ease;
+  display: block;
 }
-.ig-nav-btn.active .ig-nav-img {
-  opacity: 1;
-  filter: brightness(1.15) grayscale(0);
-}
+.ig-nav-btn.active .ig-nav-svg { color: #e8d5a3; }
 .ig-nav-label {
   font-size: 11px; font-weight: 500; color: rgba(255,255,255,.45);
   font-family: 'DM Sans', sans-serif;
@@ -27953,31 +27952,45 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 <div id="ig-bottomnav">
   <button class="ig-nav-btn" id="ignav-home" onclick="IG.nav('home')">
     <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" class="ig-nav-img" alt="Home">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
+        <path d="M3 10.5L11 3.5L19 10.5V19.5H14.5V14.5H7.5V19.5H3V10.5Z" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"/>
+      </svg>
     </span>
     <span class="ig-nav-label">Home</span>
   </button>
   <button class="ig-nav-btn" id="ignav-practice" onclick="IG.nav('practice')">
     <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png" class="ig-nav-img" alt="Practice">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
+        <rect x="8" y="2.5" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.65"/>
+        <path d="M5 12c0 3.3 2.7 6 6 6s6-2.7 6-6" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+        <path d="M11 18v2" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+      </svg>
     </span>
     <span class="ig-nav-label">Practice</span>
   </button>
   <button class="ig-nav-btn" id="ignav-library" onclick="IG.nav('library')">
     <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" class="ig-nav-img" alt="Library">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
+        <path d="M2 11.5h2.5l3-5.5 4 11 3-6.5 2 1H20" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </span>
     <span class="ig-nav-label">Library</span>
   </button>
   <button class="ig-nav-btn" id="ignav-store" onclick="IG.nav('store')">
     <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" class="ig-nav-img" alt="Store">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
+        <path d="M7.5 8.5V7a3.5 3.5 0 017 0v1.5" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+        <rect x="3.5" y="8.5" width="15" height="11" rx="2" stroke="currentColor" stroke-width="1.65"/>
+      </svg>
     </span>
     <span class="ig-nav-label">Store</span>
   </button>
   <button class="ig-nav-btn" id="ignav-profile" onclick="IG.nav('profile')">
     <span class="ig-nav-puck">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" class="ig-nav-img" alt="Profile">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" class="ig-nav-svg">
+        <circle cx="11" cy="7.5" r="3.5" stroke="currentColor" stroke-width="1.65"/>
+        <path d="M4 20c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"/>
+      </svg>
     </span>
     <span class="ig-nav-label">Profile</span>
   </button>
