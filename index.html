@@ -28186,7 +28186,11 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     _currentProfile:null,
     nav:function(which){
       if(which==='home'){
-        closeNavScreens();
+        // Close all sub-screens instantly (no slide animation) — prevents cycling flash
+        document.querySelectorAll('.sub-screen.open').forEach(function(el){
+          el.style.transition='none'; el.classList.remove('open');
+          requestAnimationFrame(function(){ el.style.transition=''; });
+        });
         if(typeof goTo==='function'&&(typeof currentScreen==='undefined'||(currentScreen!=='home'&&currentScreen!=='home-nm'))){
           var _pm=localStorage.getItem('nwsb_home_mode')||'nm';
           goTo(_pm==='nm'?'home-nm':'home');
