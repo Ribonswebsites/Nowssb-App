@@ -63,6 +63,7 @@ const app = initializeApp({
 
 const auth = getAuth(app);
 const db   = getFirestore(app);
+window._splashStartTime = Date.now();
 
 async function saveUser(user) {
   const ref  = doc(db, "users", user.uid);
@@ -128,14 +129,27 @@ onAuthStateChanged(auth, async user => {
     // Fire-and-forget lastLogin update — don't block routing on it
     saveUser(user).catch(() => {});
 
-    // ── DURING SPLASH: logged-in users go to landing or onboarding ──
+    // ── DURING SPLASH: logged-in users go to home or onboarding ──
     if (currentScreen === 'splash') {
+      // Set placeholder immediately so the fallback timer never defaults to 'login'
+      window._splashRoute = 'home';
       try {
         window._splashRoute = await _resolveUserRoute(user);
       } catch(e) {
         window._splashRoute = 'home';
       }
-      if (window._splashDone) _doNavigate(window._splashRoute);
+      if (window._splashDone) {
+        _doNavigate(window._splashRoute);
+      } else {
+        // Navigate as soon as 1.5s minimum splash time has elapsed
+        var _elapsed = Date.now() - (window._splashStartTime || Date.now());
+        var _minWait = Math.max(0, 1500 - _elapsed);
+        setTimeout(function() {
+          if (currentScreen !== 'splash') return;
+          window._splashDone = true;
+          _doNavigate(window._splashRoute);
+        }, _minWait);
+      }
       return;
     }
 
@@ -226,25 +240,24 @@ window.saveOnboardingAnswers = async (answers, skipped) => {
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 getRedirectResult(auth).then(async result => {
   if (result && result.user) {
+    // Redirect completed — set placeholder route NOW so the fallback timer
+    // never navigates to 'login' while we wait for Firestore to resolve
+    if (!window._splashRoute) window._splashRoute = 'home';
     await saveUser(result.user);
-    // Show loader while onAuthStateChanged resolves destination
     const loader = document.getElementById('authLoader');
     if (loader) loader.classList.add('visible');
-    // onAuthStateChanged will fire immediately after and navigate
+    // onAuthStateChanged fires next and does the final navigation
   }
 }).catch(e => {
   const code = e.code || '';
   if (code === 'auth/unauthorized-domain') {
     console.warn('Firebase: domain not authorised for Google sign-in.');
-    // Show message only if user was actively trying to sign in
-    if (currentScreen === 'login' || currentScreen === 'splash') {
-      setTimeout(() => {
-        if (currentScreen === 'login') {
-          alert('Google sign-in is not available at this URL. Please use Email or Phone login instead.');
-        }
-      }, 3000);
-    }
-  } else {
+    setTimeout(() => {
+      if (currentScreen === 'login') {
+        alert('Google sign-in is not available at this URL. Please use Email or Phone login instead.');
+      }
+    }, 500);
+  } else if (code && code !== 'auth/user-cancelled') {
     console.error('Redirect error:', e.message);
   }
   _googleSignInInProgress = false;
@@ -255,8 +268,29 @@ window.fbGoogleLogin = async () => {
   if (_googleSignInInProgress) return;
   _googleSignInInProgress = true;
   const provider = new GoogleAuthProvider();
-  const btn = document.querySelector('#login .nm-auth-btn');
   const loader = document.getElementById('authLoader');
+  const isMob = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  // Mobile: always use redirect — popup is unreliable on mobile Chrome/WebView/PWA
+  if (isMob) {
+    if (loader) loader.classList.add('visible');
+    try {
+      await signInWithRedirect(auth, provider);
+      // Page navigates away — code after this never runs
+    } catch(e) {
+      _googleSignInInProgress = false;
+      if (loader) loader.classList.remove('visible');
+      if (e.code === 'auth/unauthorized-domain') {
+        alert('Google sign-in is not available at this domain. Please use Email or Phone instead.');
+      } else {
+        alert('Sign-in failed: ' + e.message);
+      }
+    }
+    return;
+  }
+
+  // Desktop: use popup with redirect fallback
+  const btn = document.querySelector('#login .nm-auth-btn');
   if (btn) { btn.style.opacity = '0.6'; btn.disabled = true; }
   try {
     const result = await signInWithPopup(auth, provider);
@@ -267,7 +301,6 @@ window.fbGoogleLogin = async () => {
     _googleSignInInProgress = false;
     if (btn) { btn.style.opacity = ''; btn.disabled = false; }
     if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') {
-      // Mobile Chrome blocks popups — fall back to full-page redirect
       try {
         await signInWithRedirect(auth, provider);
       } catch(re) {
@@ -278,7 +311,7 @@ window.fbGoogleLogin = async () => {
         }
       }
     } else if (e.code === 'auth/unauthorized-domain') {
-      alert('Google sign-in is not available at this URL (domain not authorised). Please use Email or Phone login instead.');
+      alert('Google sign-in is not available at this URL. Please use Email or Phone login instead.');
     } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
       alert('Google sign-in failed: ' + e.message);
     }
@@ -13596,18 +13629,14 @@ function goTo(id) {
   }, 320);
 }
 
-// ── SPLASH AUTO-ADVANCE ──
-// Wait up to 4s so getRedirectResult + onAuthStateChanged can resolve
-// before bailing to login (prevents redirect-loop on mobile Google sign-in)
+// ── SPLASH FALLBACK TIMER ──
+// Module navigates immediately when auth resolves (after 1.5s minimum).
+// This timer is a safety net for cases where Firebase module is slow or fails.
 setTimeout(() => {
   if (currentScreen !== 'splash') return;
   window._splashDone = true;
-  if (window._splashRoute) {
-    goTo(window._splashRoute);
-  } else {
-    goTo('login');
-  }
-}, 4000);
+  goTo(window._splashRoute || 'login');
+}, 5000);
 
 // ══════════════════════════════════════════════════════════════════
 // PROFILE SETUP SCREEN — name + avatar / photo
