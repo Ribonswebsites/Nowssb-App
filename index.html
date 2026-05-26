@@ -1531,10 +1531,9 @@ window._fbServerTimestamp = () => serverTimestamp();
     width: 100%;
     padding: 0;
     padding-bottom: calc(var(--nav-height, 58px) + 32px + env(safe-area-inset-bottom, 0px));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: block;
   }
+  .home-body > * { flex-shrink: 0 !important; }
   .home-header {
     width:100%; display:flex; align-items:center; justify-content:space-between;
     padding-top:14px; margin-bottom:28px; flex-shrink:0;
@@ -2209,9 +2208,14 @@ window._fbServerTimestamp = () => serverTimestamp();
   }
   /* ══ HEALTH JOURNEY HOME CARD ══ */
   .health-journey-card {
-    position:relative; min-height:240px;
-    margin:0 16px 16px; overflow:hidden; cursor:pointer;
-    border:1px solid rgba(255,255,255,0.15); flex-shrink:0;
+    position:relative;
+    min-height: 360px !important;
+    height: auto;
+    margin: 0 16px 28px;
+    overflow: hidden; cursor: pointer;
+    border:1px solid rgba(255,255,255,0.15);
+    flex-shrink: 0 !important;
+    display: block;
   }
   .hjc-bg {
     position:absolute; inset:0;
@@ -2220,14 +2224,14 @@ window._fbServerTimestamp = () => serverTimestamp();
   }
   .health-journey-card::after {
     content:''; position:absolute; inset:0; z-index:1;
-    background:linear-gradient(160deg,rgba(4,10,24,0.55) 0%,rgba(4,10,24,0.20) 50%,rgba(4,10,24,0.72) 100%);
+    background:linear-gradient(160deg,rgba(4,10,24,0.78) 0%,rgba(4,10,24,0.45) 45%,rgba(4,10,24,0.88) 100%);
   }
   .health-journey-card:active .hjc-bg { transform:scale(1.03); }
-  .hjc-content { position:absolute; top:0; left:0; z-index:2; padding:20px 20px 20px; text-align:left; }
-  .hjc-label { font-size:9px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:8px; }
-  .hjc-title { font-family:'DM Sans',sans-serif; font-size:32px; font-weight:800; line-height:1.05; color:#fff; margin-bottom:8px; text-shadow:0 2px 16px rgba(0,0,0,0.6); }
-  .hjc-sub { font-size:13px; font-weight:300; color:rgba(255,255,255,0.78); line-height:1.5; margin-bottom:18px; max-width:260px; }
-  .hjc-btn { display:inline-block; font-size:11px; font-weight:500; letter-spacing:2px; color:var(--accent); border:1px solid rgba(200,232,245,0.4); padding:7px 16px; }
+  .hjc-content { position:relative; z-index:2; padding:28px 22px 28px; text-align:left; min-height: 360px; display:flex; flex-direction:column; justify-content:space-between; }
+  .hjc-label { font-size:10px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:10px; text-shadow:0 1px 8px rgba(0,0,0,0.7); }
+  .hjc-title { font-family:'DM Sans',sans-serif; font-size:34px; font-weight:800; line-height:1.05; color:#fff; margin-bottom:10px; text-shadow:0 2px 16px rgba(0,0,0,0.7); }
+  .hjc-sub { font-size:13px; font-weight:300; color:rgba(255,255,255,0.85); line-height:1.55; margin-bottom:22px; max-width:280px; text-shadow:0 1px 8px rgba(0,0,0,0.55); }
+  .hjc-btn { display:inline-block; font-size:12px; font-weight:600; letter-spacing:2px; color:#060c18; background:var(--accent); border:none; padding:11px 22px; text-transform:uppercase; align-self:flex-start; box-shadow:0 4px 18px rgba(0,0,0,0.4); }
 
   /* ══ GENDER SELECT ══ */
   .gsel-body { flex:1; display:flex; flex-direction:column; justify-content:flex-start; padding-bottom:max(env(safe-area-inset-bottom,28px),28px); position:relative; z-index:2; }
@@ -6245,15 +6249,16 @@ window._fbServerTimestamp = () => serverTimestamp();
     margin: 0;
     overflow: hidden;
     width: 100%;
-    min-height: 340px;
-    aspect-ratio: 1.1 / 1;
+    min-height: 420px;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
   }
   .home-cw-cube-img {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
     object-fit: cover;
-    object-position: center 30%;
+    object-position: center center;
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
