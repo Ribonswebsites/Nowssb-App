@@ -21624,27 +21624,28 @@ window._dismissHomeIntro = function() {
   setTimeout(function() { el.style.display = 'none'; }, 700);
 };
 (function() {
-  function wrapHomeScreen() {
-    if (typeof window.showScreen !== 'function') { return setTimeout(wrapHomeScreen, 250); }
-    var _orig = window.showScreen;
-    window.showScreen = function(id) {
+  function triggerHomeIntro() {
+    if (window._homeIntroShown) return;
+    window._homeIntroShown = true;
+    var el = document.getElementById('home-intro-overlay');
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.display = 'block';
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { el.style.opacity = '1'; });
+    });
+    setTimeout(function() { window._dismissHomeIntro(); }, 3800);
+  }
+  function wrapGoTo() {
+    if (typeof window.goTo !== 'function') { return setTimeout(wrapGoTo, 150); }
+    var _orig = window.goTo;
+    window.goTo = function(id) {
       var r = _orig.apply(this, arguments);
-      if (id === 'home' && !window._homeIntroShown) {
-        window._homeIntroShown = true;
-        var el = document.getElementById('home-intro-overlay');
-        if (el) {
-          el.style.opacity = '0';
-          el.style.display = 'block';
-          requestAnimationFrame(function() {
-            requestAnimationFrame(function() { el.style.opacity = '1'; });
-          });
-          setTimeout(function() { window._dismissHomeIntro(); }, 3800);
-        }
-      }
+      if (id === 'home') triggerHomeIntro();
       return r;
     };
   }
-  wrapHomeScreen();
+  wrapGoTo();
 })();
 
 // ── Subscription intro: show whenever subscription panel opens ──
