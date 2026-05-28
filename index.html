@@ -21641,62 +21641,43 @@ function _showSubscriptionSuccess(planId) {
 </div>
 
 <style>
-/* ── Universal Back Button ── */
-.nwsb-back {
+/* ── Universal Back Button — pure CSS, no JS ── */
+.menu-close-btn,.sub-back,.sl-intro-back,.sl-back-btn,.ss-back,.ss-panel-back,
+.ssp-back-btn,.nm-back-btn,.obn-back,.btn-back,.hcpi-back-btn,.nss-banner-back,
+.cwp-back,.chk-back,.ms-hero-back,.rmd-back-btn,.rm-catd-back,.wl-close-btn,
+.pap-back-btn,.ms-detail-close,.rt-intro-back {
   width:44px !important; height:44px !important;
   min-width:44px !important; min-height:44px !important;
   background:rgba(6,12,24,0.35) !important;
   border:1px solid rgba(255,255,255,0.25) !important;
   display:flex !important; align-items:center !important; justify-content:center !important;
   cursor:pointer !important; flex-shrink:0 !important;
-  color:rgba(255,255,255,0.85) !important;
-  padding:0 !important; margin:0 !important;
-  text-decoration:none !important; font-size:0 !important;
-  box-shadow:none !important;
+  padding:0 !important; gap:0 !important;
+  font-size:0 !important; color:transparent !important;
+  overflow:hidden !important; box-shadow:none !important;
+  text-decoration:none !important;
 }
-.nwsb-back svg { width:18px !important; height:18px !important; display:block !important; }
+/* Hide any inner elements (existing SVGs, text spans, etc.) */
+.menu-close-btn > *,.sub-back > *,.sl-intro-back > *,.sl-back-btn > *,
+.ss-back > *,.ss-panel-back > *,.ssp-back-btn > *,.nm-back-btn > *,
+.obn-back > *,.btn-back > *,.hcpi-back-btn > *,.nss-banner-back > *,
+.cwp-back > *,.chk-back > *,.ms-hero-back > *,.rmd-back-btn > *,
+.rm-catd-back > *,.wl-close-btn > *,.pap-back-btn > *,.ms-detail-close > *,
+.rt-intro-back > * { display:none !important; }
+/* Show the arrow via ::after — works regardless of button content */
+.menu-close-btn::after,.sub-back::after,.sl-intro-back::after,.sl-back-btn::after,
+.ss-back::after,.ss-panel-back::after,.ssp-back-btn::after,.nm-back-btn::after,
+.obn-back::after,.btn-back::after,.hcpi-back-btn::after,.nss-banner-back::after,
+.cwp-back::after,.chk-back::after,.ms-hero-back::after,.rmd-back-btn::after,
+.rm-catd-back::after,.wl-close-btn::after,.pap-back-btn::after,
+.ms-detail-close::after,.rt-intro-back::after {
+  content:'';
+  display:block;
+  width:18px; height:18px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M12 5l-7 7 7 7'/%3E%3C/svg%3E");
+  background-size:contain; background-repeat:no-repeat; background-position:center;
+  opacity:0.85;
+}
 </style>
-
-<script>
-(function(){
-  var ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>';
-
-  var SELS = [
-    '.sub-back','.sl-intro-back','.sl-back-btn','.ss-back','.ss-panel-back',
-    '.ssp-back-btn','.nm-back-btn','.obn-back','.btn-back','.hcpi-back-btn',
-    '.nss-banner-back','.cwp-back','.chk-back','.ms-hero-back','.rmd-back-btn',
-    '.rm-catd-back','.wl-close-btn','.pap-back-btn','.ms-detail-close',
-    '.rt-intro-back','.menu-close-btn'
-  ].join(',');
-
-  function applyAll() {
-    document.querySelectorAll(SELS).forEach(function(el) {
-      if (el.dataset.backDone) return;
-      el.dataset.backDone = '1';
-      el.classList.add('nwsb-back');
-      el.innerHTML = ARROW;
-    });
-  }
-
-  // Run on load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyAll);
-  } else {
-    applyAll();
-  }
-
-  // Watch for dynamically added buttons (practice intro, routine intro, etc.)
-  var obs = new MutationObserver(function(mutations) {
-    var found = false;
-    mutations.forEach(function(m) {
-      m.addedNodes.forEach(function(n) {
-        if (n.nodeType === 1 && (n.matches && n.matches(SELS) || n.querySelector && n.querySelector(SELS))) found = true;
-      });
-    });
-    if (found) applyAll();
-  });
-  obs.observe(document.body, { childList: true, subtree: true });
-})();
-</script>
 </body>
 </html>
