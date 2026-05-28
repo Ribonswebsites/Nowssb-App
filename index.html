@@ -16208,22 +16208,17 @@ function msBuyThisWord() {
     </div>
     <!-- /subscription intro page -->
 
-    <div style="padding:20px 0 4px;">
-      <button class="ss-back" onclick="ssClosePanel('subscription')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-      </button>
+    <!-- Hero Banner flush to top, back button overlaid -->
+    <div style="position:relative;margin:0 -20px 0;overflow:hidden;">
+      <img decoding="async" loading="eager"
+        src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779959490/f5dbb980-5a74-11f1-b395-7149fc656cdb_wft1nx.webp"
+        alt="Healing is Fashion"
+        style="width:100%;height:220px;object-fit:cover;object-position:center top;display:block;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0) 40%,rgba(6,12,24,0.85) 100%);pointer-events:none;"></div>
+      <button class="ss-back" onclick="ssClosePanel('subscription')" style="position:absolute;top:max(env(safe-area-inset-top,12px),12px);left:12px;"></button>
     </div>
-    <!-- Hero -->
-    <div style="text-align:center;padding:4px 0 32px;">
-      <!-- Hero Banner Image -->
-      <div style="position:relative;margin:0 -20px 24px;overflow:hidden;border-radius:0 0 28px 28px;">
-        <img decoding="async" loading="lazy"
-          src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779901344/1bd75700-59eb-11f1-919c-855cd6228d78_j7fnos.webp"
-          alt="Healing is Fashion"
-          style="width:100%;height:220px;object-fit:cover;object-position:center top;display:block;">
-        <!-- Gradient overlay so text below reads clearly -->
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0) 40%,rgba(6,12,24,0.85) 100%);pointer-events:none;"></div>
-      </div>
+    <!-- Hero text -->
+    <div style="text-align:center;padding:20px 0 32px;">
       <div style="font-size:10px;letter-spacing:3.5px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:10px;">NOWSBANSIU EDITION</div>
       <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;line-height:1.25;margin-bottom:8px;">Healing is Fashion.<br>Choose your frequency.</div>
       <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;">Word without dictionary — your plan, your identity.</div>
