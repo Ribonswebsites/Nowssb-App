@@ -21568,6 +21568,104 @@ function _showSubscriptionSuccess(planId) {
   </div>
 </div>
 
+<!-- ── HOME INTRO OVERLAY (shows once on fresh load) ── -->
+<div id="home-intro-overlay" style="display:none;position:fixed;inset:0;z-index:9998;background:#060c18;overflow:hidden;transition:opacity 0.65s cubic-bezier(0.4,0,0.2,1);cursor:pointer;" onclick="window._dismissHomeIntro()">
+  <div style="position:absolute;inset:0;background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1779713364/ee429d10-5835-11f1-9971-736215a430db_lii4mj.png');background-size:cover;background-position:center top;"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.2) 0%,rgba(6,12,24,0.0) 30%,rgba(6,12,24,0.0) 55%,rgba(6,12,24,0.75) 100%);"></div>
+  <div style="position:absolute;top:max(env(safe-area-inset-top,24px),24px);left:0;right:0;display:flex;justify-content:center;z-index:2;">
+    <img decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB" style="width:44px;height:44px;object-fit:contain;">
+  </div>
+  <div style="position:absolute;bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 16px);left:0;right:0;text-align:center;z-index:2;">
+    <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.45);font-family:'DM Sans',sans-serif;font-weight:600;animation:homeIntroPulse 2s ease-in-out infinite;">TAP TO CONTINUE</div>
+  </div>
+</div>
+<style>
+@keyframes homeIntroPulse {
+  0%,100%{opacity:0.45;} 50%{opacity:0.9;}
+}
+</style>
+
+<!-- ── SUBSCRIPTION INTRO OVERLAY ── -->
+<div id="sub-intro-overlay" style="display:none;position:fixed;inset:0;z-index:490;background:#060c18;overflow:hidden;">
+  <div style="position:absolute;inset:0;background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1779959490/4ddfa1c0-5a6e-11f1-959f-ddbc3010df52_knj06q.webp');background-size:cover;background-position:center top;"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.35) 0%,rgba(6,12,24,0.0) 30%,rgba(6,12,24,0.0) 45%,rgba(6,12,24,0.88) 100%);pointer-events:none;"></div>
+  <!-- Top bar -->
+  <div style="position:relative;z-index:10;padding:max(env(safe-area-inset-top,18px),18px) 20px 0;display:flex;align-items:center;justify-content:space-between;">
+    <button onclick="if(window.SS)window.SS.close('subscription');document.getElementById('sub-intro-overlay').style.display='none';" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,0.8);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <div style="font-size:10px;letter-spacing:3.5px;font-weight:700;color:rgba(232,213,163,0.75);font-family:'DM Sans',sans-serif;">NOWSBANSIU EDITION</div>
+    <div style="width:36px;"></div>
+  </div>
+  <!-- Banner image (centred) -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);width:calc(100% - 48px);max-width:340px;z-index:5;">
+    <img decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779959490/f5dbb980-5a74-11f1-b395-7149fc656cdb_wft1nx.webp" alt="" style="width:100%;display:block;object-fit:cover;border:1px solid rgba(232,213,163,0.25);box-shadow:0 24px 64px rgba(0,0,0,0.65);">
+  </div>
+  <!-- Bottom content -->
+  <div style="position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 24px calc(max(env(safe-area-inset-bottom,20px),20px) + 16px);">
+    <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:8px;">YOUR FREQUENCY AWAITS</div>
+    <div style="font-size:30px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;line-height:1.1;margin-bottom:10px;">Healing is<br>Fashion.</div>
+    <div style="width:36px;height:1px;background:rgba(232,213,163,0.35);margin-bottom:12px;"></div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;margin-bottom:22px;line-height:1.65;">Choose your plan. Begin your healing practice.<br>Cancel anytime.</div>
+    <button onclick="document.getElementById('sub-intro-overlay').style.display='none'" style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 22px;background:rgba(232,213,163,0.07);border:1px solid rgba(232,213,163,0.28);cursor:pointer;font-family:'DM Sans',sans-serif;">
+      <span style="font-size:15px;font-weight:700;color:#e8d5a3;letter-spacing:0.5px;">See Plans</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── Home intro: show once per fresh page load ──
+window._homeIntroShown = false;
+window._dismissHomeIntro = function() {
+  var el = document.getElementById('home-intro-overlay');
+  if (!el || el.style.display === 'none') return;
+  el.style.opacity = '0';
+  setTimeout(function() { el.style.display = 'none'; }, 700);
+};
+(function() {
+  function wrapHomeScreen() {
+    if (typeof window.showScreen !== 'function') { return setTimeout(wrapHomeScreen, 250); }
+    var _orig = window.showScreen;
+    window.showScreen = function(id) {
+      var r = _orig.apply(this, arguments);
+      if (id === 'home' && !window._homeIntroShown) {
+        window._homeIntroShown = true;
+        var el = document.getElementById('home-intro-overlay');
+        if (el) {
+          el.style.opacity = '0';
+          el.style.display = 'block';
+          requestAnimationFrame(function() {
+            requestAnimationFrame(function() { el.style.opacity = '1'; });
+          });
+          setTimeout(function() { window._dismissHomeIntro(); }, 3800);
+        }
+      }
+      return r;
+    };
+  }
+  wrapHomeScreen();
+})();
+
+// ── Subscription intro: show whenever subscription panel opens ──
+(function() {
+  function showSubIntro() {
+    var el = document.getElementById('sub-intro-overlay');
+    if (el) el.style.display = 'block';
+  }
+  function wrapSSOpen() {
+    if (!window.SS || typeof window.SS.open !== 'function') { return setTimeout(wrapSSOpen, 300); }
+    var _orig = window.SS.open.bind(window.SS);
+    window.SS.open = function(id) {
+      var r = _orig(id);
+      if (id === 'subscription') showSubIntro();
+      return r;
+    };
+  }
+  wrapSSOpen();
+})();
+</script>
+
 <!-- ── SUBSCRIPTION SUCCESS OVERLAY ── -->
 <div id="sub-success-overlay" style="display:none;position:fixed;inset:0;z-index:99996;background:rgba(6,12,24,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;">
   <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB" style="width:56px;height:56px;object-fit:contain;margin-bottom:20px;">
