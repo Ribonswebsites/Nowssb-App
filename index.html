@@ -20932,6 +20932,28 @@ window.ONBOARD = (function(){
 </div>
 
 <script>
+/* Move stray ss-panels (located outside #sub-social in source) into #sub-social so the
+   `#sub-social .ss-panel` CSS (positioning, z-index, slide-in transform) applies. */
+(function(){
+  function move(){
+    var social = document.getElementById('sub-social');
+    if(!social){ setTimeout(move, 100); return; }
+    ['ss-panel-voice','ss-panel-speed','ss-panel-reps','ss-panel-sensitivity',
+     'ss-panel-persona','ss-panel-ambient','ss-panel-chatperm',
+     'ss-panel-bgmode','ss-panel-themecolor'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && el.parentNode !== social) social.appendChild(el);
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', move);
+  } else {
+    move();
+  }
+})();
+</script>
+
+<script>
 /* ══ COMPLETELY REBUILD THE SETTINGS TAB HTML ══ */
 (function(){
   function waitFor(id, fn, tries){
