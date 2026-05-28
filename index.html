@@ -21595,7 +21595,7 @@ function _showSubscriptionSuccess(planId) {
 </style>
 
 <!-- ── SUBSCRIPTION INTRO OVERLAY ── -->
-<div id="sub-intro-overlay" style="display:none;position:fixed;inset:0;z-index:490;background:#060c18;overflow:hidden;">
+<div id="sub-intro-overlay" style="display:none;position:fixed;inset:0;z-index:700;background:#060c18;overflow:hidden;">
   <div style="position:absolute;inset:0;background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1779959490/4ddfa1c0-5a6e-11f1-959f-ddbc3010df52_knj06q.webp');background-size:cover;background-position:center top;"></div>
   <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.35) 0%,rgba(6,12,24,0.0) 30%,rgba(6,12,24,0.0) 45%,rgba(6,12,24,0.88) 100%);pointer-events:none;"></div>
   <!-- Top bar -->
@@ -21663,15 +21663,28 @@ window._dismissHomeIntro = function() {
 (function() {
   function showSubIntro() {
     var el = document.getElementById('sub-intro-overlay');
-    if (el) el.style.display = 'block';
+    if (!el) return;
+    // Navigate to #sub-social (settings screen) so the subscription panel
+    // is visible underneath once the intro is dismissed
+    if (typeof openSub === 'function') {
+      openSub('social');
+    }
+    // Small delay so sub-social starts sliding in before overlay appears
+    setTimeout(function() {
+      if (window.SS && typeof window.SS._init === 'function') window.SS._init('subscription');
+      if (typeof ssRenderPlans === 'function') ssRenderPlans();
+      // Make sure the panel itself is shown
+      var panel = document.getElementById('ss-panel-subscription');
+      if (panel) { panel.style.display = 'block'; panel.style.transform = 'translateX(0)'; }
+      el.style.display = 'block';
+    }, 80);
   }
   function wrapSSOpen() {
     if (!window.SS || typeof window.SS.open !== 'function') { return setTimeout(wrapSSOpen, 300); }
     var _orig = window.SS.open.bind(window.SS);
     window.SS.open = function(id) {
-      var r = _orig(id);
-      if (id === 'subscription') showSubIntro();
-      return r;
+      if (id === 'subscription') { showSubIntro(); return; }
+      return _orig(id);
     };
   }
   wrapSSOpen();
