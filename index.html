@@ -18264,11 +18264,11 @@ document.getElementById('sub-social').addEventListener('transitionend', function
       bgs.forEach(function(b){ b.style.display='none'; });
       window._heroLock = -1;
       apApplyBodyBg('#000');
+      apWhiteMode(false);
     } else if (mode === 'white') {
       bgs.forEach(function(b){ b.style.display='none'; });
       window._heroLock = -1;
       apApplyBodyBg('#f0f0f0');
-      // Flip some text for readability
       apWhiteMode(true);
     } else if (mode === 'both') {
       bgs.forEach(function(b){ b.style.display=''; });
@@ -18292,16 +18292,17 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     var t = THEMES[id] || THEMES.cosmic;
     apApplyBodyBg(window._apBg==='black'?'#000': window._apBg==='white'?'#f0f0f0' : t.bg);
 
-    // Update indicator borders on both pickers (appearance panel + profile panel)
+    // Dark themes cancel white mode
+    if (window._apBg !== 'white') apWhiteMode(false);
+
+    // Update indicator borders
     ['cosmic','void','navy'].forEach(function(k){
-      // appearance panel
       var ap = document.getElementById('ap-td-'+k);
       if (ap) {
         var active = k===id;
         ap.style.border = active ? ('2px solid '+(THEMES[k].borderClr)) : '2px solid transparent';
       }
     });
-
 
     // Subtitle update
     var sub = document.getElementById('ss-apptheme-sub');
@@ -18311,7 +18312,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     try { localStorage.setItem('nowssb_theme', id); } catch(e){}
   };
 
-  /* Apply body background */
+  /* Apply background to #home only */
   window.apApplyBodyBg = function(color) {
     var st = document.getElementById('ap-theme-style');
     if (!st) { st = document.createElement('style'); st.id='ap-theme-style'; document.head.appendChild(st); }
@@ -18319,14 +18320,30 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     st.textContent = '#home{background:'+color+' !important;}';
   };
 
-  /* Minimal white mode flip — keep gold accents */
+  /* White mode — flip ALL #home text to dark so it's readable on light background */
   window.apWhiteMode = function(on) {
     var st = document.getElementById('ap-white-style');
     if (!st) { st = document.createElement('style'); st.id='ap-white-style'; document.head.appendChild(st); }
     if (on) {
-      st.textContent = '#home .home-body .sr-label,#home .slbl{color:#111 !important;}'+
-        '#sub-social .sr-label{color:#111 !important;}'+
-        '.home-header,.ig-topbar{background:rgba(240,240,240,.95) !important;}';
+      st.textContent =
+        /* Hero brand text */
+        '#home .brand-name .b{color:#1a1a2e !important;}' +
+        '#home .brand-name .t{color:rgba(26,26,46,0.75) !important;}' +
+        '#home .brand-tag{color:rgba(26,26,46,0.55) !important;}' +
+        '#home .brand-tag strong{color:#1a1a2e !important;}' +
+        '#home #tagWord{color:#1a1a2e !important;}' +
+        '#home #heroTagline{color:rgba(26,26,46,0.6) !important;}' +
+        /* Hero watermark word & buttons */
+        '#home .hero-word{color:rgba(26,26,46,0.08) !important;text-shadow:none !important;}' +
+        '#home .hero-btn{color:#1a1a2e !important;border-color:rgba(26,26,46,0.25) !important;background:rgba(26,26,46,0.06) !important;}' +
+        /* Home body text */
+        '#home .home-greeting{color:#1a1a2e !important;}' +
+        '#home .home-tagline{color:rgba(26,26,46,0.5) !important;}' +
+        '#home .slbl{color:rgba(26,26,46,0.38) !important;}' +
+        /* Fixed home header → light */
+        '#homeHeader{background:rgba(240,240,240,0.97) !important;border-bottom:1px solid rgba(0,0,0,0.08) !important;box-shadow:0 2px 12px rgba(0,0,0,0.07) !important;}' +
+        '#homeHeader .brand-name .b{color:#1a1a2e !important;}' +
+        '#homeHeader .brand-name .t{color:rgba(26,26,46,0.75) !important;}';
     } else {
       st.textContent = '';
     }
