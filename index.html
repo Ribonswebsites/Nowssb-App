@@ -17370,17 +17370,7 @@ window.ssBgMode = function(id) {
 };
 
 window.ssApplyBgMode = function(mode) {
-  var bgs = [].slice.call(document.querySelectorAll('#home .hero-bg'));
-  window._heroLock = null;
-  if (mode === 'none') {
-    bgs.forEach(function(b){ b.style.display = 'none'; });
-    window._heroLock = -1;
-  } else {
-    bgs.forEach(function(b){ b.style.display = ''; });
-    if (mode === 'one') { window._heroLock = 0; if (typeof heroGo === 'function') heroGo(0); }
-    else if (mode === 'two') { window._heroLock = 1; if (typeof heroGo === 'function') heroGo(1); }
-    // 'both' and 'custom' leave the carousel running (lock stays null)
-  }
+  if (typeof apSetBg === 'function') { apSetBg(mode); return; }
   try { localStorage.setItem('nowssb_bgmode', mode); } catch(e) {}
 };
 
@@ -18268,8 +18258,21 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     window._apBg = mode;
     var bgs = document.querySelectorAll('#home .hero-bg');
     window._heroLock = null;
+    apWhiteMode(false);
 
-    if (mode === 'black') {
+    // img0–img4: lock to a specific image
+    var imgMatch = mode && mode.match(/^img(\d)$/);
+    if (imgMatch) {
+      var idx = parseInt(imgMatch[1]);
+      bgs.forEach(function(b){ b.style.display=''; });
+      window._heroLock = idx;
+      if (typeof heroGo === 'function') heroGo(idx);
+      apApplyBodyBg('');
+    } else if (mode === 'none') {
+      bgs.forEach(function(b){ b.style.display='none'; });
+      window._heroLock = -1;
+      apApplyBodyBg('');
+    } else if (mode === 'black') {
       bgs.forEach(function(b){ b.style.display='none'; });
       window._heroLock = -1;
       apApplyBodyBg('#000');
@@ -18277,13 +18280,12 @@ document.getElementById('sub-social').addEventListener('transitionend', function
       bgs.forEach(function(b){ b.style.display='none'; });
       window._heroLock = -1;
       apApplyBodyBg('#f0f0f0');
-      // Flip some text for readability
       apWhiteMode(true);
-    } else if (mode === 'both') {
+    } else {
+      // 'both' and anything else: run carousel
       bgs.forEach(function(b){ b.style.display=''; });
       window._heroLock = null;
       apApplyBodyBg('');
-      apWhiteMode(false);
     }
 
     // Update active puck borders
@@ -20573,6 +20575,7 @@ window.ONBOARD = (function(){
     setBgMode: function(v){
       S.bgMode = v; save('bgmode', v);
       if(typeof apSetBg==='function') apSetBg(v);
+      _renderBgModes(); // refresh thumbnails to show new selection
       this.close('bgmode');
     },
     setTheme: function(v){
@@ -20653,21 +20656,36 @@ window.ONBOARD = (function(){
   /* ── BG mode picker ── */
   function _renderBgModes(){
     var el = document.getElementById('ss-opts-bgmode'); if(!el) return;
-    var opts = [
-      {v:'both',   l:'Both backgrounds cycle',   sub:'Default — hero carousel runs'},
-      {v:'one',    l:'Background 1 only',          sub:'Freeze on first image'},
-      {v:'two',    l:'Background 2 only',          sub:'Freeze on second image'},
-      {v:'black',  l:'Pure Black — no images',     sub:'OLED dark, zero distraction'},
-      {v:'white',  l:'Pure White — no images',     sub:'Light minimal mode'},
+    var imgs = window.HERO_IMGS || [];
+    var cur  = S.bgMode;
+
+    // Top: image thumbnail grid
+    var thumbs = imgs.map(function(url, i){
+      var sel = cur === ('img'+i);
+      return '<div onclick="SS.setBgMode(\'img'+i+'\')" style="position:relative;cursor:pointer;border-radius:12px;overflow:hidden;aspect-ratio:9/16;flex:1;min-width:0;border:2px solid '+(sel?'#e8d5a3':'transparent')+';transition:border-color .2s;">'+
+        '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">'+
+        (sel?'<div style="position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:#e8d5a3;display:flex;align-items:center;justify-content:center;"><svg width="10" height="8" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#060c18" stroke-width="2" stroke-linecap="round"/></svg></div>':'')+
+      '</div>';
+    }).join('');
+
+    // Bottom: mode options
+    var modes = [
+      {v:'both',  l:'Cycle all',      sub:'Auto-rotate every 4s'},
+      {v:'none',  l:'No image',       sub:'Pure dark — OLED friendly'},
     ];
-    el.innerHTML = opts.map(function(o,i){
-      var sel = o.v===S.bgMode;
-      return '<div class="ss-option'+(i===opts.length-1?' last':'')+'" onclick="SS.setBgMode(\''+o.v+'\')">'+
+    var modeHtml = modes.map(function(o,i){
+      var sel = o.v===cur;
+      return '<div class="ss-option'+(i===modes.length-1?' last':'')+'" onclick="SS.setBgMode(\''+o.v+'\')">'+
         '<div><div class="ss-option-label">'+o.l+'</div><div class="ss-option-sub">'+o.sub+'</div></div>'+
         '<div class="ss-check'+(sel?' active':'')+'">'+
           (sel?'<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#060c18" stroke-width="2" stroke-linecap="round"/></svg>':'')+
         '</div></div>';
     }).join('');
+
+    el.innerHTML =
+      '<div style="padding:0 0 16px;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.35);font-weight:700;font-family:\'DM Sans\',sans-serif;">PICK AN IMAGE</div>'+
+      '<div style="display:flex;gap:8px;margin-bottom:20px;">'+thumbs+'</div>'+
+      modeHtml;
   }
 
   /* ── Theme picker ── */
