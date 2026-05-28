@@ -248,7 +248,7 @@ window.finishOnboarding = async () => {
     // Ensure onboardingDone is set without overwriting existing answers
     window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
   }
-  goTo('home');
+  _doNavigate('home');
 };
 
 // Save onboarding answers to Firestore
@@ -6532,11 +6532,11 @@ function landingEnter() {
   if (overlay) {
     overlay.classList.add('show');
     setTimeout(function() {
-      goTo('home');
+      _doNavigate('home');
       setTimeout(function() { overlay.classList.remove('show'); }, 300);
     }, 950);
   } else {
-    goTo('home');
+    _doNavigate('home');
   }
 }
 
@@ -21649,8 +21649,10 @@ window._dismissHomeIntro = function() {
     if (typeof window.goTo !== 'function') { return setTimeout(wrapGoTo, 150); }
     var _orig = window.goTo;
     window.goTo = function(id) {
+      var fromNm = (typeof currentScreen !== 'undefined' && currentScreen === 'home-nm');
       var r = _orig.apply(this, arguments);
-      if (id === 'home') triggerHomeIntro();
+      // Only show fashion intro when coming FROM the neomorphism home (Fashion Mode button tap)
+      if (id === 'home' && fromNm) triggerHomeIntro();
       return r;
     };
   }
