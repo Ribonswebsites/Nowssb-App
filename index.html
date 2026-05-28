@@ -1662,22 +1662,18 @@ window._fbServerTimestamp = () => serverTimestamp();
 <!-- ══ HAMBURGER MENU OVERLAY + DRAWER ══ -->
 <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
 <div class="menu-drawer" id="menuDrawer">
-  <!-- Banner with header overlaid -->
-  <div style="position:relative;overflow:hidden;min-height:180px;background:#0a0e1a;flex-shrink:0;">
-    <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779961020/grok_image_1779909152435_ij2joo.jpg" alt="" loading="eager" decoding="async" style="width:100%;height:180px;display:block;object-fit:cover;object-position:center center;">
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.45) 0%,rgba(6,12,24,0) 35%,rgba(6,12,24,0) 55%,rgba(6,12,24,0.7) 100%);pointer-events:none;"></div>
-    <!-- Back button overlaid top-left -->
-    <button class="menu-close-btn" onclick="closeMenu()" style="position:absolute;top:max(env(safe-area-inset-top,12px),12px);left:12px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      Back
-    </button>
-    <!-- NOWSBANSIU / Menu text overlaid bottom-left -->
-    <div style="position:absolute;bottom:14px;left:20px;">
-      <div class="drawer-top" style="margin-bottom:3px;">NOWSBANSIU</div>
+  <button class="menu-close-btn" onclick="closeMenu()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back
+  </button>
+  
+  <div class="menu-drawer-head">
+    <div class="menu-drawer-logo">
+      <div class="drawer-top">NOWSBANSIU</div>
       <div class="drawer-main">Menu</div>
     </div>
   </div>
-
+  
   <div style="padding: 0 20px 40px;">
   <div class="menu-nav-item" onclick="closeMenu()">
     <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt=""></div>
@@ -16210,20 +16206,22 @@ function msBuyThisWord() {
     </div>
     <!-- /subscription intro page -->
 
-    <!-- Hero Banner flush to top -->
-    <div style="position:relative;margin:0 -20px 0;overflow:hidden;border-radius:0 0 28px 28px;">
-      <img decoding="async" loading="eager"
-        src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779959490/f5dbb980-5a74-11f1-b395-7149fc656cdb_wft1nx.webp"
-        alt="Healing is Fashion"
-        style="width:100%;height:220px;object-fit:cover;object-position:center top;display:block;">
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0) 40%,rgba(6,12,24,0.85) 100%);pointer-events:none;"></div>
-      <!-- Back button overlaid on image -->
-      <button class="ss-back" onclick="ssClosePanel('subscription')" style="position:absolute;top:max(env(safe-area-inset-top,12px),12px);left:12px;background:rgba(6,12,24,0.45);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:6px 14px;">
+    <div style="padding:20px 0 4px;">
+      <button class="ss-back" onclick="ssClosePanel('subscription')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
       </button>
     </div>
-    <!-- Hero text -->
-    <div style="text-align:center;padding:20px 0 32px;">
+    <!-- Hero -->
+    <div style="text-align:center;padding:4px 0 32px;">
+      <!-- Hero Banner Image -->
+      <div style="position:relative;margin:0 -20px 24px;overflow:hidden;border-radius:0 0 28px 28px;">
+        <img decoding="async" loading="lazy"
+          src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779901344/1bd75700-59eb-11f1-919c-855cd6228d78_j7fnos.webp"
+          alt="Healing is Fashion"
+          style="width:100%;height:220px;object-fit:cover;object-position:center top;display:block;">
+        <!-- Gradient overlay so text below reads clearly -->
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0) 40%,rgba(6,12,24,0.85) 100%);pointer-events:none;"></div>
+      </div>
       <div style="font-size:10px;letter-spacing:3.5px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:10px;">NOWSBANSIU EDITION</div>
       <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;line-height:1.25;margin-bottom:8px;">Healing is Fashion.<br>Choose your frequency.</div>
       <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;">Word without dictionary — your plan, your identity.</div>
@@ -20932,28 +20930,6 @@ window.ONBOARD = (function(){
 </div>
 
 <script>
-/* Move stray ss-panels (located outside #sub-social in source) into #sub-social so the
-   `#sub-social .ss-panel` CSS (positioning, z-index, slide-in transform) applies. */
-(function(){
-  function move(){
-    var social = document.getElementById('sub-social');
-    if(!social){ setTimeout(move, 100); return; }
-    ['ss-panel-voice','ss-panel-speed','ss-panel-reps','ss-panel-sensitivity',
-     'ss-panel-persona','ss-panel-ambient','ss-panel-chatperm',
-     'ss-panel-bgmode','ss-panel-themecolor'].forEach(function(id){
-      var el = document.getElementById(id);
-      if(el && el.parentNode !== social) social.appendChild(el);
-    });
-  }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', move);
-  } else {
-    move();
-  }
-})();
-</script>
-
-<script>
 /* ══ COMPLETELY REBUILD THE SETTINGS TAB HTML ══ */
 (function(){
   function waitFor(id, fn, tries){
@@ -20965,16 +20941,6 @@ window.ONBOARD = (function(){
 
   waitFor('ss-content-settings', function(el){
     el.innerHTML = `
-    <!-- Banner -->
-    <div class="menu-banner" style="height:220px;margin-bottom:-60px;">
-      <img decoding="async" loading="eager" src="https://res.cloudinary.com/dcda8ed8e/image/upload/v1779455673/image-2_gv7pht.jpg" alt="Settings Banner" style="width:100%;height:100%;object-fit:cover;display:block;">
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,#060c18 100%);"></div>
-    </div>
-    <!-- Header -->
-    <div style="padding:70px 20px 8px;position:relative;z-index:1;">
-      <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:6px;">NOWSBANSIU</div>
-      <div style="font-size:28px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Settings</div>
-    </div>
     <!-- ── ACCOUNT ── -->
     <div class="ss-section-title">ACCOUNT</div>
     <div class="ss-section">
