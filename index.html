@@ -1023,7 +1023,7 @@ window._fbServerTimestamp = () => serverTimestamp();
         <div class="nmh-brand-sub">Nowsbansiu Edition</div>
       </div>
     </div>
-    <button class="nmh-mode-btn" id="nmhModeBtn" onclick="nmhSwitchMode()" title="Toggle dark neumorphic">
+    <button class="nmh-mode-btn" id="nmhModeBtn" onclick="nmhSwitchMode()" title="Toggle dark neumorphic" style="display:none;">
       <svg id="nmhSunIcon" width="18" height="18" viewBox="0 0 18 18" fill="none">
         <path d="M9 2v1M9 15v1M2 9H1M17 9h-1M4.22 4.22l-.71-.71M14.49 14.49l-.71-.71M4.22 13.78l-.71.71M14.49 3.51l-.71.71" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
         <circle cx="9" cy="9" r="3" stroke="#1a1a2e" stroke-width="1.5"/>
@@ -6534,46 +6534,9 @@ function landingEnter() {
 }
 
 // ── Neumorphic Home helpers ──
-function nmhSwitchMode() {
-  var home = document.getElementById('home-nm');
-  var isDark = home && home.classList.contains('nm-dark');
-  var nav = document.getElementById('ig-bottomnav');
-  var btn = document.getElementById('nmhModeBtn');
-  var sun = document.getElementById('nmhSunIcon');
-  var moon = document.getElementById('nmhMoonIcon');
-  if (isDark) {
-    // → switch to light neumorphic
-    if (home) home.classList.remove('nm-dark');
-    if (sun)  sun.style.display = '';
-    if (moon) moon.style.display = 'none';
-    localStorage.setItem('nwsb_nm_color','light');
-  } else {
-    // → switch to dark neumorphic
-    if (home) home.classList.add('nm-dark');
-    if (sun)  sun.style.display = 'none';
-    if (moon) moon.style.display = '';
-    localStorage.setItem('nwsb_nm_color','dark');
-  }
-}
+function nmhSwitchMode() { /* removed */ }
 
 function nmhRefresh() {
-  // Restore dark/light nm state
-  var home = document.getElementById('home-nm');
-  var nav  = document.getElementById('ig-bottomnav');
-  var btn  = document.getElementById('nmhModeBtn');
-  var sun  = document.getElementById('nmhSunIcon');
-  var moon = document.getElementById('nmhMoonIcon');
-  var savedColor = localStorage.getItem('nwsb_nm_color') || 'light';
-  if (savedColor === 'dark') {
-    if (home) home.classList.add('nm-dark');
-    if (sun)  sun.style.display='none';
-    if (moon) moon.style.display='';
-  } else {
-    if (home) home.classList.remove('nm-dark');
-    if (sun)  sun.style.display='';
-    if (moon) moon.style.display='none';
-  }
-
   // Sync streak
   var d = window._userDataCache || {};
   var streak = d.currentStreak || d.streakCount || 0;
@@ -16528,8 +16491,6 @@ function msBuyThisWord() {
 var _ssToggles = { sound:true, notif:true, newword:true, visible:true, pub:true, age:false, rating:true };
 var _ssBilling = 'monthly';
 var _ssSelectedPlan = 'frequency';
-var _ssCurrentTheme = 'cosmic';
-var _ssBgMode = 'both';
 var _ssDiscoverFilter = 'all';
 var _ssViewUser = null;
 var _ssMyRating = 0;
@@ -16611,19 +16572,6 @@ var SS_PLANS = [
   },
 ];
 
-var SS_THEMES = [
-  { id:'cosmic', label:'Cosmic Dark', hex:'#060c18', note:'Default' },
-  { id:'void',   label:'Void Black',  hex:'#000000', note:'Pure black' },
-  { id:'white',  label:'Pure White',  hex:'#f4f4ef', note:'Light mode' },
-];
-
-var SS_BG_MODES = [
-  { id:'both',   label:'Both images',   sub:'Crossfade cycle · 4s transition' },
-  { id:'one',    label:'Image 1 only',  sub:'First image, static' },
-  { id:'two',    label:'Image 2 only',  sub:'Second image, static' },
-  { id:'none',   label:'No image',      sub:'Pure theme color + animations only' },
-  { id:'custom', label:'Your gallery',  sub:'Upload any image from your device' },
-];
 
 // ── Helpers ────────────────────────────────────────────────
 function badgeClass(tier) {
@@ -16686,7 +16634,6 @@ window.ssOpenPanel = function(id) {
       subIntro.style.pointerEvents = 'all';
     }
   }
-  if (id==='appearance')   ssRenderAppearance();
   if (id==='user-profile' && _ssViewUser) ssRenderUserProfile(_ssViewUser);
 };
 
@@ -17089,119 +17036,6 @@ function ssRenderPlans() {
   if (ctaEl) ctaEl.innerHTML = ctaHtml;
 }
 
-// ══ APPEARANCE ════════════════════════════════════════════
-
-function ssRenderAppearance() {
-  // Theme row
-  var themeRow = document.getElementById('ss-theme-row');
-  if (themeRow) {
-    themeRow.innerHTML = SS_THEMES.map(function(t) {
-      var sel = _ssCurrentTheme === t.id;
-      return '<div onclick="ssSelectTheme(\''+t.id+'\')" style="flex:1;border-radius:14px;border:1.5px solid '+(sel?'#e8d5a3':'rgba(255,255,255,.08)')+';overflow:hidden;cursor:pointer;transition:border-color .2s;">'+
-        '<div style="height:54px;background:'+t.hex+';display:flex;align-items:center;justify-content:center;">'+(sel?'<div style="width:20px;height:20px;border-radius:50%;background:#e8d5a3;display:flex;align-items:center;justify-content:center;">'+checkSvg('#060c18')+'</div>':'')+'</div>'+
-        '<div style="padding:8px 10px;background:rgba(255,255,255,.04);"><div style="font-size:11px;font-weight:600;color:'+(sel?'#e8d5a3':'#fff')+';font-family:\'DM Sans\',sans-serif;">'+t.label+'</div><div style="font-size:10px;color:rgba(255,255,255,.22);font-family:\'DM Sans\',sans-serif;">'+t.note+'</div></div></div>';
-    }).join('');
-  }
-  ssRenderBgModes();
-}
-
-window.ssSelectTheme = function(id) {
-  _ssCurrentTheme = id;
-  ssApplyTheme(id);
-  ssRenderAppearance();
-  // reflect in the settings list subtitle
-  var sub = document.querySelector('#sub-social .sr .sr-sub');
-  var t = SS_THEMES.find(function(x){return x.id===id;});
-  var appThemeSub = document.getElementById('ss-apptheme-sub');
-  if (appThemeSub && t) appThemeSub.textContent = t.label + (id==='cosmic'?' — default':'');
-};
-
-window.ssApplyTheme = function(id) {
-  var map = { cosmic:'#060c18', void:'#000000', white:'#f4f4ef' };
-  var bg = map[id] || '#060c18';
-  var st = document.getElementById('ss-theme-override');
-  if (!st) { st = document.createElement('style'); st.id = 'ss-theme-override'; document.head.appendChild(st); }
-  if (id === 'white') {
-    // Light mode requires a full restyle to stay readable — apply a safe soft tint only
-    st.textContent = '';
-    if (typeof alert === 'function') {} // no-op; keep app stable
-    st.textContent = "body{background:#10131a !important;}";
-  } else {
-    st.textContent = "body,.screen,.sub-screen:not(#sub-people):not(#sub-ig-profile),.menu-drawer{background:"+bg+" !important;}";
-  }
-  try { localStorage.setItem('nowssb_theme', id); } catch(e) {}
-};
-
-function ssRenderBgModes() {
-  var list = document.getElementById('ss-bgmode-list');
-  if (!list) return;
-  list.innerHTML = SS_BG_MODES.map(function(m) {
-    var sel = _ssBgMode === m.id;
-    return '<div onclick="ssBgMode(\''+m.id+'\')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;border:1.5px solid '+(sel?'#e8d5a3':'rgba(255,255,255,.08)')+';background:'+(sel?'rgba(232,213,163,.05)':'rgba(255,255,255,.04)')+';cursor:pointer;transition:all .2s;backdrop-filter:blur(8px);">'+
-      '<div style="width:20px;height:20px;border-radius:50%;flex-shrink:0;border:2px solid '+(sel?'#e8d5a3':'rgba(255,255,255,.22)')+';display:flex;align-items:center;justify-content:center;">'+(sel?'<div style="width:10px;height:10px;border-radius:50%;background:#e8d5a3;"></div>':'')+'</div>'+
-      '<div style="flex:1;"><div style="font-size:14px;font-weight:'+(sel?600:400)+';color:'+(sel?'#e8d5a3':'#fff')+';font-family:\'DM Sans\',sans-serif;">'+m.label+'</div><div style="font-size:11px;color:rgba(255,255,255,.52);font-family:\'DM Sans\',sans-serif;">'+m.sub+'</div></div>'+
-      (m.id==='custom'&&sel?'<button style="font-size:12px;color:#c8e8f5;background:rgba(200,232,245,.10);border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-weight:600;">Choose</button>':'')+
-      '</div>';
-  }).join('');
-  // Current images
-  var ci = document.getElementById('ss-current-images');
-  var gu = document.getElementById('ss-gallery-upload');
-  if (ci) ci.innerHTML = (['both','one','two'].indexOf(_ssBgMode)>=0) ?
-    '<div style="font-size:10px;letter-spacing:2.5px;color:rgba(255,255,255,.22);font-weight:700;font-family:\'DM Sans\',sans-serif;margin-bottom:10px;">CURRENT IMAGES</div>'+
-    '<div style="display:flex;gap:10px;margin-bottom:28px;">'+
-    [1,2].map(function(n){
-      var active = _ssBgMode==='both'||_ssBgMode===(['','one','two'][n]);
-      return '<div style="flex:1;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.08);opacity:'+(active?1:.3)+';">'+
-        '<div style="height:80px;background:linear-gradient(135deg,#0a1628,#1a2a4a);display:flex;align-items:center;justify-content:center;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>'+
-        '<div style="padding:8px 12px;background:rgba(255,255,255,.04);"><div style="font-size:12px;font-weight:600;color:#fff;font-family:\'DM Sans\',sans-serif;">Image '+n+'</div><div style="font-size:10px;color:rgba(255,255,255,.22);font-family:\'DM Sans\',sans-serif;">'+(n===1?'Morning':'Evening')+' bg</div></div></div>';
-    }).join('')+'</div>' : '';
-  if (gu) gu.style.display = (_ssBgMode==='custom') ? 'block' : 'none';
-}
-
-window.ssBgMode = function(id) {
-  _ssBgMode = id;
-  ssApplyBgMode(id);
-  ssRenderBgModes();
-};
-
-window.ssApplyBgMode = function(mode) {
-  var bgs = [].slice.call(document.querySelectorAll('#home .hero-bg'));
-  window._heroLock = null;
-  if (mode === 'none') {
-    bgs.forEach(function(b){ b.style.display = 'none'; });
-    window._heroLock = -1;
-  } else {
-    bgs.forEach(function(b){ b.style.display = ''; });
-    if (mode === 'one') { window._heroLock = 0; if (typeof heroGo === 'function') heroGo(0); }
-    else if (mode === 'two') { window._heroLock = 1; if (typeof heroGo === 'function') heroGo(1); }
-    // 'both' and 'custom' leave the carousel running (lock stays null)
-  }
-  try { localStorage.setItem('nowssb_bgmode', mode); } catch(e) {}
-};
-
-window.ssSaveAppearance = function() {
-  ssApplyTheme(_ssCurrentTheme);
-  ssApplyBgMode(_ssBgMode);
-  try {
-    localStorage.setItem('nowssb_theme', _ssCurrentTheme);
-    localStorage.setItem('nowssb_bgmode', _ssBgMode);
-  } catch(e) {}
-  if (typeof ssClosePanel === 'function') ssClosePanel('appearance');
-};
-
-// Restore saved appearance on load
-(function(){
-  function restore(){
-    try {
-      var th = localStorage.getItem('nowssb_theme');
-      var bm = localStorage.getItem('nowssb_bgmode');
-      if (th) { _ssCurrentTheme = th; if (typeof ssApplyTheme==='function') ssApplyTheme(th); }
-      if (bm) { _ssBgMode = bm; if (typeof ssApplyBgMode==='function') ssApplyBgMode(bm); }
-    } catch(e) {}
-  }
-  if (document.readyState !== 'loading') setTimeout(restore, 400);
-  else document.addEventListener('DOMContentLoaded', function(){ setTimeout(restore, 400); });
-})();
 
 // ══ DISCOVER ══════════════════════════════════════════════
 
@@ -20313,7 +20147,6 @@ window.ONBOARD = (function(){
         'certificates': function(){ if(typeof ssRenderCertificates==='function') ssRenderCertificates(); },
         'privacy': function(){ _renderPrivacy(); },
         'chatsettings': function(){ _renderChatSettings(); },
-        'appearance': function(){ if(typeof ssRenderAppearance==='function') ssRenderAppearance(); },
         'subscription': function(){
           _ssSelectedPlan = 'frequency'; // ensure valid selection
           if(typeof ssBilling==='function') ssBilling(_ssBilling); // sync toggle + render
