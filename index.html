@@ -460,7 +460,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 </div>
 
 <!-- ══ SCREEN 2: LOGIN ══ -->
-<div class="screen" id="login">
+<div class="screen" id="login" style="background:#e4e6ed;">
   <div class="nm-wrap">
 
     <div class="nm-logo-area">
@@ -6056,7 +6056,7 @@ async function _profileSavePhotoURL(url) {
 // ── BACKGROUND IMAGES — 1 per screen, never repeated ──
 const bgImages = {
   splash:     null, // splash uses its own inline bg
-  login:      'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777570716/grok_image_1777570509389_ch0bif.jpg',
+  login:      null,
   signup1:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584943/grok_image_1777580530017_nftrrb.jpg',
   signup1phone: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584978/grok_image_1777580577245_s0oftf.jpg',
   signup2:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777591568/grok_image_1777591433417_rx2whb.jpg',
@@ -6069,9 +6069,7 @@ const bgImages = {
 };
 
 // Per-screen background positions — new image is well-centered, characters top half, panel bottom
-const bgPositions = {
-  login: '50% 40%'
-};
+const bgPositions = {};
 
 const appBg = document.getElementById('appBg');
 
