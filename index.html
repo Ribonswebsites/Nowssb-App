@@ -5145,14 +5145,6 @@ function profileEnterFromIntro() {
     if (main)  main.style.display = 'flex';
   }, 420);
 }
-function ssEnterFromIntro() {
-  var intro = document.getElementById('ss-intro-page');
-  if (intro) {
-    intro.style.transition = 'opacity 0.42s cubic-bezier(0.4,0,0.2,1)';
-    intro.style.opacity = '0';
-    setTimeout(function(){ intro.classList.add('sl-intro-hidden'); intro.style.opacity = ''; intro.style.transition = ''; }, 430);
-  }
-}
 
 // ══════════════════════════════════════════════════════════════════
 // PROFILE PHOTO — select, upload to Cloudinary, save to Firestore
@@ -6274,6 +6266,7 @@ function goTo(id) {
     if (id === 'home') {
       var nav=document.getElementById('ig-bottomnav');
       if(nav){ nav.classList.remove('nav-light'); }
+      showNav(true);
     }
     if (id !== 'home') resetHomeBgLayer();
   }, 320);
@@ -15835,60 +15828,6 @@ function msBuyThisWord() {
 <div class="sub-screen" id="sub-social">
 <style>
 #sub-social{background:#060c18;}
-#ss-intro-page{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;overflow:hidden;background:#060c18;}
-#ss-intro-page.sl-intro-hidden{display:none;}
-#ss-intro-bg{position:absolute;inset:0;background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780058911/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_rhgwnf.png');background-size:cover;background-position:center top;z-index:0;}
-#ss-intro-vignette{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(6,12,24,0.18) 0%,rgba(6,12,24,0.0) 30%,rgba(6,12,24,0.0) 50%,rgba(6,12,24,0.72) 78%,rgba(6,12,24,0.97) 100%);}
-</style>
-
-<!-- Settings Intro Page -->
-<div id="ss-intro-page">
-  <div id="ss-intro-bg"></div>
-  <div id="ss-intro-vignette"></div>
-
-  <!-- Top nav -->
-  <div style="position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top,18px),18px) 18px 0;">
-    <div class="sl-intro-back" onclick="closeSub('social')">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
-    </div>
-    <div class="sl-intro-tag">NOWSBANSIU · Settings</div>
-    <div style="width:40px;"></div>
-  </div>
-
-  <!-- Title -->
-  <div style="position:relative;z-index:10;padding:28px 24px 0;">
-    <span class="sl-intro-eyebrow">Your Practice · Your Rules</span>
-    <div class="sl-intro-title" style="margin-top:8px;">Control<br>Everything.</div>
-  </div>
-
-  <!-- Bottom section -->
-  <div class="sl-intro-bottom">
-
-    <!-- Banner image -->
-    <div style="width:100%;height:160px;border-radius:16px;overflow:hidden;position:relative;margin-bottom:22px;border:1px solid rgba(255,255,255,0.12);">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780058911/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_p6gkoh.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
-      <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(6,12,24,0.55) 0%,transparent 60%);"></div>
-      <div style="position:absolute;bottom:14px;left:16px;">
-        <div style="font-size:10px;letter-spacing:2px;color:rgba(232,213,163,0.8);font-weight:700;font-family:'DM Sans',sans-serif;text-transform:uppercase;">Black Edition</div>
-        <div style="font-size:14px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;margin-top:3px;">3 visual styles</div>
-      </div>
-    </div>
-
-    <div class="sl-intro-divider"></div>
-    <div class="sl-intro-desc">Tune your voice, speed, session depth, and visual style. Every setting shapes your healing practice.</div>
-
-    <div class="sl-intro-enter-btn" onclick="ssEnterFromIntro()" style="margin-top:28px;">
-      <span class="sl-intro-enter-label">Open Settings</span>
-      <span class="sl-intro-enter-icon">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M3 8H13M9 4L13 8L9 12" stroke="rgba(200,232,245,0.8)" stroke-width="1.3" stroke-linecap="square"/>
-        </svg>
-      </span>
-    </div>
-
-  </div>
-</div>
-<!-- /Settings Intro Page -->
 <style>#sub-social .ss-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;position:relative;}#sub-social .ss-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.08);padding:0 20px;background:rgba(6,12,24,0.92);position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex-shrink:0;}#sub-social .ss-tab{padding:15px 18px;border:none;background:none;cursor:pointer;font-size:13px;font-family:'DM Sans', system-ui, sans-serif;margin-bottom:-1px;text-transform:capitalize;border-bottom:2px solid transparent;transition:color .2s, border-color .2s;color:rgba(255,255,255,0.3);}#sub-social .ss-tab.active{color:#e8d5a3;border-bottom-color:#e8d5a3;font-weight:700;}#sub-social .ss-tab-content{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-height, 58px) + 20px);}#sub-social .ss-tab-content.active{display:block;}#sub-social .sg{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);overflow:hidden;}#sub-social .sr-icon img{width:24px;height:24px;object-fit:contain;display:block;min-width:24px;min-height:24px;}#sub-social .sr-icon img[src=""], #sub-social .sr-icon img:not([src]){display:none;}#sub-social .sr{display:flex;align-items:center;gap:14px;padding:15px 0;min-height:52px;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;}#sub-social .sr.last{border-bottom:none;}#sub-social .sr.no-tap{cursor:default;}#sub-social .sr-icon{width:36px;height:36px;border-radius:10px;background:rgba(232,213,163,0.08);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#e8d5a3;}#sub-social .sr-icon.danger{background:rgba(248,113,113,0.1);color:#f87171;}#sub-social .sr-body{flex:1;min-width:0;}#sub-social .sr-label{font-size:15px;font-weight:500;color:#fff;font-family:'DM Sans', sans-serif;}#sub-social .sr-label.danger{color:#f87171;}#sub-social .sr-sub{font-size:12px;color:rgba(255,255,255,0.52);margin-top:1px;font-family:'DM Sans', sans-serif;}#sub-social .sr-chev{color:rgba(255,255,255,0.22);flex-shrink:0;}#sub-social .slbl{font-size:10px;letter-spacing:2.5px;color:rgba(255,255,255,0.22);font-weight:700;font-family:'DM Sans', sans-serif;margin-bottom:10px;}#sub-social .stgl{width:46px;height:26px;border-radius:13px;transition:background .2s;cursor:pointer;position:relative;flex-shrink:0;}#sub-social .stgl-knob{position:absolute;top:4px;width:18px;height:18px;border-radius:50%;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.4);}#sub-social .ss-back{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.52);padding:8px 0;display:flex;align-items:center;gap:6px;font-size:13px;font-family:'DM Sans', sans-serif;}#sub-social .sub-badge{font-size:10px;font-weight:700;letter-spacing:.6px;padding:3px 8px;border-radius:6px;font-family:'DM Sans', sans-serif;}#sub-social .badge-free{color:rgba(255,255,255,0.52);background:rgba(255,255,255,0.06);}#sub-social .badge-pro{color:#c8e8f5;background:rgba(200,232,245,0.10);}#sub-social .badge-elite{color:#f5c842;background:rgba(245,200,66,0.12);}#sub-social .ss-profile-card{padding:16px 18px;margin-bottom:28px;cursor:pointer;}#sub-social .ss-panel{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:#060c18;z-index:10;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);scrollbar-width:none;-ms-overflow-style:none;padding-bottom:calc(var(--nav-height, 58px) + max(env(safe-area-inset-bottom, 24px), 24px)) !important;}#sub-social .ss-panel::-webkit-scrollbar{display:none;}#sub-social .ss-panel.open{display:block;transform:translateX(0);}#sub-social #ss-panel-support{overflow:hidden;padding-bottom:0 !important;}#sub-social #ss-panel-support.open{display:flex;}.sup-msg{display:flex;}.sup-msg.sup-me{justify-content:flex-end;}.sup-msg.sup-them{justify-content:flex-start;}.sup-bubble{max-width:82%;padding:11px 15px;border-radius:16px;font-size:13px;font-family:'DM Sans', sans-serif;line-height:1.6;}.sup-msg.sup-me .sup-bubble{background:rgba(232,213,163,.15);border:1px solid rgba(232,213,163,.22);color:#e8d5a3;border-bottom-right-radius:4px;}.sup-msg.sup-them .sup-bubble{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.88);border-bottom-left-radius:4px;}.sup-typing .sup-bubble{color:rgba(255,255,255,.35);font-style:italic;}#sub-social .plan-card{border:1.5px solid rgba(255,255,255,0.08);border-radius:20px;background:rgba(255,255,255,0.04);backdrop-filter:blur(12px);padding:20px;cursor:pointer;transition:border-color .2s, background .2s;position:relative;overflow:visible;margin-bottom:14px;}#sub-social .du-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:12px;cursor:pointer;position:relative;overflow:hidden;}#sub-social .score-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 8px;text-align:center;}#sub-social .star-btn{background:none;border:none;cursor:pointer;padding:4px;}#sub-social .bill-toggle{display:flex;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:5px;margin-bottom:28px;gap:4px;}#sub-social .bill-btn{flex:1;padding:11px 0;border-radius:10px;border:none;font-size:13px;font-family:'DM Sans', sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}#sub-social .ss-search{width:100%;padding:13px 14px 13px 44px;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#fff;font-size:14px;font-family:'DM Sans', sans-serif;outline:none;box-sizing:border-box;backdrop-filter:blur(8px);}#sub-social .chat-me{background:linear-gradient(135deg, rgba(232,213,163,.8), rgba(196,163,90,.8));color:#060c18;border-radius:14px 14px 4px 14px;}#sub-social .chat-them{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);color:#fff;border-radius:14px 14px 14px 4px;}</style>
 
 <div class="ss-wrap" style="position:relative;">
@@ -16728,9 +16667,6 @@ window.ssToggle = function(key) {
 
 // ── Panel navigation ───────────────────────────────────────
 window.ssOpenPanel = function(id) {
-  // Skip intro when navigating directly to a panel
-  var intro = document.getElementById('ss-intro-page');
-  if (intro) intro.classList.add('sl-intro-hidden');
   var el = document.getElementById('ss-panel-'+id);
   if (!el) return;
   el.style.display = (id === 'chat' || id === 'support') ? 'flex' : 'block';
