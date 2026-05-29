@@ -5509,8 +5509,6 @@ async function _profileSavePhotoURL(url) {
         var container=document.getElementById('rm-word-sections-container');
         var html='';
         CATS.forEach(function(cat){
-          var allWords=cat.words.map(function(w){return"['"+w[0]+"', '"+w[1]+"']";}).join(',');
-          var showAllBtn='<div class="rm-show-more-btn" onclick="openCatDetail(\''+cat.id+'\', \''+cat.label+'\', ['+allWords+'])">Show All →</div>';
           var banners=CAT_BANNERS[cat.id];
           if(banners&&banners.length){
             html+='<div class="rm-cat-banner-wrap" id="rmcb-'+cat.id+'" style="position:relative;width:100%;height:190px;border-radius:14px;overflow:hidden;margin-bottom:12px;">';
@@ -5518,7 +5516,6 @@ async function _profileSavePhotoURL(url) {
               html+='<img decoding="async" src="'+src+'" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.9s ease;opacity:'+(i===0?'1':'0')+';border-radius:14px;">';
             });
             html+='<div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,rgba(6,12,24,0.35) 100%);border-radius:14px;"></div>';
-            html+='<div style="position:absolute;top:10px;right:10px;">'+showAllBtn+'</div>';
             html+='</div>';
           } else {
             var labelStyle=cat.labelColor?'color:'+cat.labelColor+';':'';
@@ -5529,10 +5526,10 @@ async function _profileSavePhotoURL(url) {
               var bStyle=(bColor?'color:'+bColor+';':'')+(bBorder?'border-color:'+bBorder+';':'');
               badgeHtml='<span class="rm-cat-badge"'+(bStyle?' style="'+bStyle+'"':'')+'>'+cat.badge+'</span>';
             }
-            html+='<div class="rm-cat-header" style="display:flex;align-items:flex-start;justify-content:space-between;padding-right:0;">';
+            html+='<div class="rm-cat-header">';
             html+='<div style="flex:1;min-width:0;"><span class="rm-cat-label"'+(labelStyle?' style="'+labelStyle+'"':'')+'>'+cat.label+badgeHtml+'</span>';
             html+='<div class="rm-cat-sub">'+cat.sub+'</div></div>';
-            html+=showAllBtn+'</div>';
+            html+='</div>';
           }
           html+='<div class="rm-word-row">';
           cat.words.slice(0,15).forEach(function(w){
