@@ -6262,6 +6262,7 @@ function goTo(id) {
       if(typeof updateTodayCard==='function') setTimeout(updateTodayCard,100);
       var nav=document.getElementById('ig-bottomnav');
       if(nav){ nav.classList.add('nav-light'); }
+      showNav(true);
     }
     if (id === 'home') {
       var nav=document.getElementById('ig-bottomnav');
