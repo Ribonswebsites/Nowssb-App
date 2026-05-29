@@ -17308,6 +17308,36 @@ document.getElementById('sub-social').addEventListener('transitionend', function
   </button>
 </div>
 
+<!-- ── SOCIAL NAV — shown only when People section is active ── -->
+<div id="ig-social-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:rgba(6,12,24,0.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);height:58px;padding-bottom:env(safe-area-inset-bottom,0px);align-items:center;justify-content:space-around;">
+  <button onclick="IG.socialNav('home')" class="ig-social-btn" id="igsn-home">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Home</span>
+  </button>
+  <button onclick="IG.socialNav('search')" class="ig-social-btn" id="igsn-search">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>Search</span>
+  </button>
+  <button onclick="IG.socialNav('chat')" class="ig-social-btn" id="igsn-chat">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span>Chat</span>
+  </button>
+  <button onclick="IG.socialNav('activity')" class="ig-social-btn" id="igsn-activity">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>Activity</span>
+  </button>
+  <button onclick="IG.socialNav('myprofile')" class="ig-social-btn" id="igsn-myprofile">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Profile</span>
+  </button>
+</div>
+<style>
+.ig-social-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;padding:6px 0;outline:none;-webkit-tap-highlight-color:transparent;}
+.ig-social-btn span{font-family:'DM Sans',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3px;color:rgba(255,255,255,.45);}
+.ig-social-btn.active svg{stroke:#e8d5a3 !important;}
+.ig-social-btn.active span{color:#e8d5a3;}
+</style>
+
 <script>
 /* ══════════════════════════════════════════════════════════
    IG — Instagram-style People / Explore / Profile controller
@@ -17534,9 +17564,13 @@ document.getElementById('sub-social').addEventListener('transitionend', function
           el.style.transition='none'; el.classList.remove('open');
           requestAnimationFrame(function(){ el.style.transition=''; });
         });
+        // Restore main nav, hide social nav
+        var _mainNav = document.getElementById('ig-bottomnav');
+        var _socialNav = document.getElementById('ig-social-nav');
+        if (_socialNav) _socialNav.style.display = 'none';
+        if (_mainNav) _mainNav.style.display = '';
         if(typeof goTo==='function'&&(typeof currentScreen==='undefined'||(currentScreen!=='home'&&currentScreen!=='home-nm'))){
-          var _pm=localStorage.getItem('nwsb_home_mode')||'nm';
-          goTo(_pm==='nm'?'home-nm':'home');
+          goTo('home');
         }
         setActiveNav('home'); showNav(true);
       } else if(which==='practice'){
@@ -17557,6 +17591,12 @@ document.getElementById('sub-social').addEventListener('transitionend', function
         document.getElementById('sub-people').classList.add('open');
         renderExplore(); this.clearSearch();
         setActiveNav('profile'); showNav(true);
+        // Swap to Instagram-style social nav
+        var mainNav = document.getElementById('ig-bottomnav');
+        var socialNav = document.getElementById('ig-social-nav');
+        if (mainNav) mainNav.style.display = 'none';
+        if (socialNav) { socialNav.style.display = 'flex'; }
+        setSocialNavActive('search');
         var _sc=document.getElementById('ig-people-scroll'); if(_sc) _sc.scrollTop=0;
       } else if(which==='myprofile'){
         closeNavScreens();
@@ -17685,7 +17725,41 @@ document.getElementById('sub-social').addEventListener('transitionend', function
         IG.openExplore();
       }
     }
+    socialNav: function(which) {
+      setSocialNavActive(which);
+      if (which === 'home') {
+        // Close social screens, restore main nav, go to fashion home
+        closeNavScreens();
+        var mainNav = document.getElementById('ig-bottomnav');
+        var socialNav = document.getElementById('ig-social-nav');
+        if (socialNav) socialNav.style.display = 'none';
+        if (mainNav) mainNav.style.display = '';
+        setActiveNav('home');
+        if (typeof goTo === 'function') goTo('home');
+      } else if (which === 'search') {
+        document.getElementById('sub-ig-profile').classList.remove('open');
+        document.getElementById('sub-people').classList.add('open');
+        renderExplore(); this.clearSearch();
+        var _sc = document.getElementById('ig-people-scroll'); if (_sc) _sc.scrollTop = 0;
+      } else if (which === 'chat') {
+        if (typeof ssOpenChat === 'function') ssOpenChat();
+        else if (typeof openSub === 'function') { openSub('social'); setTimeout(function(){ if(typeof ssOpenPanel==='function') ssOpenPanel('chat'); }, 120); }
+      } else if (which === 'activity') {
+        // Activity / likes — open explore for now
+        document.getElementById('sub-people').classList.add('open');
+        renderExplore();
+      } else if (which === 'myprofile') {
+        this.openMyProfile();
+      }
+    }
   };
+
+  function setSocialNavActive(which) {
+    ['home','search','chat','activity','myprofile'].forEach(function(k){
+      var el = document.getElementById('igsn-'+k);
+      if (el) el.classList.toggle('active', k === which);
+    });
+  }
 
   function closeAllIG(){
     document.getElementById('sub-people').classList.remove('open');
