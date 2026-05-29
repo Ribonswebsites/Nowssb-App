@@ -20759,6 +20759,63 @@ window.ONBOARD = (function(){
       </div>
     </div>
 
+    <!-- ── BLACK EDITION ── -->
+    <div class="ss-section-title">BLACK EDITION</div>
+    <div class="ss-section" style="padding:14px 16px 18px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.32);font-family:'DM Sans',sans-serif;margin-bottom:14px;line-height:1.5;">Hero header stays exactly the same. Only the two background layers, nav, hamburger, and settings go black.</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+
+        <!-- Default -->
+        <div id="be-card-default" onclick="setBE('')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid #e8d5a3;position:relative;aspect-ratio:0.6;">
+          <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0e1525 0%,#060c18 100%);"></div>
+          <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:rgba(255,255,255,0.09);border-radius:4px;border:1px solid rgba(255,255,255,0.18);"></div>
+          <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.07);border-radius:3px;border:1px solid rgba(255,255,255,0.12);"></div>
+          <div style="position:absolute;top:50px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.05);border-radius:3px;border:1px solid rgba(255,255,255,0.08);"></div>
+          <div style="position:absolute;bottom:8px;left:6px;right:6px;height:8px;background:rgba(6,12,24,0.97);border-radius:3px;border-top:1px solid rgba(255,255,255,0.1);"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:5px;text-align:center;">
+            <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:#e8d5a3;font-family:'DM Sans',sans-serif;text-transform:uppercase;">Default</span>
+          </div>
+        </div>
+
+        <!-- Fashion Black -->
+        <div id="be-card-fashion2" onclick="setBE('fashion')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+          <div style="position:absolute;inset:0;background:#000;"></div>
+          <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:rgba(255,255,255,0.09);border-radius:4px;border:1px solid rgba(255,255,255,0.18);"></div>
+          <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.07);"></div>
+          <div style="position:absolute;top:50px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.02);border-radius:3px;border:1px solid rgba(255,255,255,0.05);"></div>
+          <div style="position:absolute;bottom:8px;left:6px;right:6px;height:8px;background:#000;border-radius:3px;border-top:1px solid rgba(255,255,255,0.06);"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:5px;text-align:center;">
+            <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Fashion</span>
+          </div>
+        </div>
+
+        <!-- Neo Black -->
+        <div id="be-card-neo2" onclick="setBE('neo')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+          <div style="position:absolute;inset:0;background:#0a0a0a;"></div>
+          <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:#181818;border-radius:4px;box-shadow:3px 3px 6px #000,-2px -2px 5px #222;"></div>
+          <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:#141414;border-radius:3px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
+          <div style="position:absolute;top:50px;left:6px;right:6px;height:12px;background:#141414;border-radius:3px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
+          <div style="position:absolute;bottom:8px;left:6px;right:6px;height:8px;background:#111;border-radius:3px;box-shadow:2px 2px 4px #000,-1px -1px 3px #1a1a1a;"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:5px;text-align:center;">
+            <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:rgba(255,255,255,0.4);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Neo</span>
+          </div>
+        </div>
+
+        <!-- Glass Black -->
+        <div id="be-card-glass2" onclick="setBE('glass')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+          <div style="position:absolute;inset:0;background:#000;"></div>
+          <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:rgba(255,255,255,0.07);border-radius:4px;border:1px solid rgba(255,255,255,0.20);backdrop-filter:blur(8px);"></div>
+          <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.14);"></div>
+          <div style="position:absolute;top:50px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.02);border-radius:3px;border:1px solid rgba(255,255,255,0.10);"></div>
+          <div style="position:absolute;bottom:8px;left:6px;right:6px;height:8px;background:rgba(0,0,0,0.9);border-radius:3px;border:1px solid rgba(255,255,255,0.08);"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:5px;text-align:center;">
+            <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:rgba(200,232,245,0.7);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Glass</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- ── PRIVACY ── -->
     <div class="ss-section-title">PRIVACY & SOCIAL</div>
     <div class="ss-section">
