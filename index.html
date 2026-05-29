@@ -17371,21 +17371,17 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Home</span>
   </button>
-  <button onclick="IG.socialNav('search')" class="ig-social-btn" id="igsn-search">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <span>Search</span>
+  <button onclick="IG.socialNav('feed')" class="ig-social-btn" id="igsn-feed">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/></svg>
+    <span>Feed</span>
+  </button>
+  <button onclick="IG.socialNav('discover')" class="ig-social-btn" id="igsn-discover">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+    <span>Discover</span>
   </button>
   <button onclick="IG.socialNav('chat')" class="ig-social-btn" id="igsn-chat">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <span>Chat</span>
-  </button>
-  <button onclick="IG.socialNav('activity')" class="ig-social-btn" id="igsn-activity">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-    <span>Activity</span>
-  </button>
-  <button onclick="IG.socialNav('myprofile')" class="ig-social-btn" id="igsn-myprofile">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>Profile</span>
   </button>
 </div>
 <style>
@@ -17785,7 +17781,6 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     socialNav: function(which) {
       setSocialNavActive(which);
       if (which === 'home') {
-        // Close social screens, restore main nav, go to fashion home
         closeNavScreens();
         var mainNav = document.getElementById('ig-bottomnav');
         var socialNav = document.getElementById('ig-social-nav');
@@ -17793,26 +17788,25 @@ document.getElementById('sub-social').addEventListener('transitionend', function
         if (mainNav) mainNav.style.display = '';
         setActiveNav('home');
         if (typeof goTo === 'function') goTo('home');
-      } else if (which === 'search') {
+      } else if (which === 'feed') {
         document.getElementById('sub-ig-profile').classList.remove('open');
         document.getElementById('sub-people').classList.add('open');
         renderExplore(); this.clearSearch();
         var _sc = document.getElementById('ig-people-scroll'); if (_sc) _sc.scrollTop = 0;
+      } else if (which === 'discover') {
+        document.getElementById('sub-ig-profile').classList.remove('open');
+        document.getElementById('sub-people').classList.add('open');
+        renderExplore(); this.clearSearch();
+        var _sc2 = document.getElementById('ig-people-scroll'); if (_sc2) _sc2.scrollTop = 0;
       } else if (which === 'chat') {
         if (typeof ssOpenChat === 'function') ssOpenChat();
         else if (typeof openSub === 'function') { openSub('social'); setTimeout(function(){ if(typeof ssOpenPanel==='function') ssOpenPanel('chat'); }, 120); }
-      } else if (which === 'activity') {
-        // Activity / likes — open explore for now
-        document.getElementById('sub-people').classList.add('open');
-        renderExplore();
-      } else if (which === 'myprofile') {
-        this.openMyProfile();
       }
     }
   };
 
   function setSocialNavActive(which) {
-    ['home','search','chat','activity','myprofile'].forEach(function(k){
+    ['home','feed','discover','chat'].forEach(function(k){
       var el = document.getElementById('igsn-'+k);
       if (el) el.classList.toggle('active', k === which);
     });
