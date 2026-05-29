@@ -17308,6 +17308,9 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     <button class="ig-iconbtn" id="ig-prof-add" style="display:none;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
     </button>
+    <button class="ig-iconbtn" onclick="if(typeof chatInboxOpen==='function')chatInboxOpen()" style="position:relative;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
     <button class="ig-iconbtn" onclick="IG.menu()">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
@@ -17375,11 +17378,11 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     </span>
     <span class="ig-nav-label">Store</span>
   </button>
-  <button class="ig-nav-btn" id="ignav-chat" onclick="if(typeof chatInboxOpen==='function')chatInboxOpen();if(typeof setActiveNav==='function')setActiveNav('chat');">
+  <button class="ig-nav-btn" id="ignav-profile" onclick="IG.nav('myprofile')">
     <span class="ig-nav-puck">
-      <svg class="ig-nav-chat-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" class="ig-nav-img" alt="Profile">
     </span>
-    <span class="ig-nav-label">Chat</span>
+    <span class="ig-nav-label">Profile</span>
   </button>
 </div>
 
@@ -17610,7 +17613,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     'sub-social':'profile', 'sub-profile':'profile'
   };
   function setActiveNav(which){
-    ['home','practice','library','store','chat'].forEach(function(k){
+    ['home','practice','library','store','profile'].forEach(function(k){
       var el=document.getElementById('ignav-'+k);
       if(el) el.classList.toggle('active', k===which);
     });
@@ -19215,11 +19218,10 @@ window.chatInboxClose = function() {
   if (!overlay) return;
   var bn = document.getElementById('ig-bottomnav');
   var sn = document.getElementById('ig-social-nav');
-  overlay.style.display = 'none';
   if (bn && overlay._prevBn !== null) bn.style.display = overlay._prevBn || '';
   if (sn && overlay._prevSn !== null) sn.style.display = overlay._prevSn || '';
-  // Restore active highlight on main nav
-  if (typeof setActiveNav === 'function') setActiveNav('chat');
+  overlay.style.display = 'none';
+  setSocialNavActive('chat');
 };
 window.chatInboxNew = function() {
   chatInboxClose();
