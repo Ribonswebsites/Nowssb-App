@@ -20761,10 +20761,10 @@ window.ONBOARD = (function(){
   <!-- ══ BLACK EDITION INTRO PAGE ══ -->
   <div id="beIntroPage" style="position:absolute;inset:0;z-index:20;background:#000;display:flex;flex-direction:column;overflow:hidden;transition:opacity 0.48s cubic-bezier(0.4,0,0.2,1);">
 
-    <!-- Rotating banner background (fades between two images) -->
+    <!-- Rotating background (fades between the two intro images) -->
     <div style="position:absolute;inset:0;z-index:0;">
-      <div id="beBg1" style="position:absolute;inset:0;background:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom.png') center/cover no-repeat;opacity:1;transition:opacity 1.4s ease;"></div>
-      <div id="beBg2" style="position:absolute;inset:0;background:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_o2zjbs.png') center/cover no-repeat;opacity:0;transition:opacity 1.4s ease;"></div>
+      <div id="beBg1" style="position:absolute;inset:0;background:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/51d59000-5b5e-11f1-aed0-2ba1e609569d_nwrv0w.png') center/cover no-repeat;opacity:1;transition:opacity 1.4s ease;"></div>
+      <div id="beBg2" style="position:absolute;inset:0;background:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_soknfu.png') center/cover no-repeat;opacity:0;transition:opacity 1.4s ease;"></div>
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.1) 30%,rgba(0,0,0,0.6) 65%,rgba(0,0,0,0.96) 100%);"></div>
     </div>
 
@@ -20777,20 +20777,8 @@ window.ONBOARD = (function(){
       <div style="width:40px;"></div>
     </div>
 
-    <!-- Rotating image cards (centre display) -->
-    <div style="position:relative;z-index:10;flex:1;display:flex;align-items:center;justify-content:center;padding:24px 0 0;perspective:800px;">
-      <!-- Card frame — crossfades between two images (no preserve-3d to avoid overflow:hidden bug) -->
-      <div style="width:160px;height:224px;position:relative;cursor:pointer;flex-shrink:0;" onclick="beFlipNow()">
-        <img id="beCardImg1" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/51d59000-5b5e-11f1-aed0-2ba1e609569d_nwrv0w.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;border:1px solid rgba(255,255,255,0.18);box-shadow:0 32px 80px rgba(0,0,0,0.85),0 8px 20px rgba(0,0,0,0.5);opacity:1;transition:opacity 1.0s ease;" alt="">
-        <img id="beCardImg2" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_soknfu.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;border:1px solid rgba(255,255,255,0.18);box-shadow:0 32px 80px rgba(0,0,0,0.85),0 8px 20px rgba(0,0,0,0.5);opacity:0;transition:opacity 1.0s ease;" alt="">
-        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.07) 0%,transparent 50%);pointer-events:none;"></div>
-      </div>
-      <!-- Subtle dot indicator for which face is showing -->
-      <div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:6px;">
-        <div id="beFlipDot1" style="width:20px;height:3px;background:#e8d5a3;transition:all 0.4s;"></div>
-        <div id="beFlipDot2" style="width:4px;height:3px;background:rgba(255,255,255,0.25);transition:all 0.4s;"></div>
-      </div>
-    </div>
+    <!-- Spacer so bottom content stays at bottom -->
+    <div style="flex:1;"></div>
 
     <!-- Bottom content -->
     <div style="position:relative;z-index:10;padding:0 24px calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,20px),20px) + 8px);flex-shrink:0;animation:slIntroUp 1.1s 0.3s both cubic-bezier(0.16,1,0.3,1);">
@@ -20815,9 +20803,10 @@ window.ONBOARD = (function(){
   <!-- ══ PANEL CONTENT (carousel — shown after intro dismissed) ══ -->
   <div id="beMainContent" style="display:none;flex-direction:column;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#060c18;">
 
-    <!-- Mini banner strip -->
+    <!-- Mini banner strip — crossfades between the two banner images -->
     <div style="position:relative;height:180px;flex-shrink:0;overflow:hidden;">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom.png" decoding="async" loading="eager" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;">
+      <img id="beBanner1" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom.png" decoding="async" loading="eager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;opacity:1;transition:opacity 1.4s ease;">
+      <img id="beBanner2" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_o2zjbs.png" decoding="async" loading="eager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;opacity:0;transition:opacity 1.4s ease;">
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.1) 0%,rgba(6,12,24,0.9) 100%);"></div>
       <button class="ss-panel-back" onclick="SS.close('blackedition')" style="position:absolute;top:16px;left:16px;z-index:10;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
       <div style="position:absolute;bottom:16px;left:20px;right:20px;z-index:2;">
@@ -21942,7 +21931,13 @@ window.beEnterFromIntro = function() {
   var intro = document.getElementById('beIntroPage');
   var main  = document.getElementById('beMainContent');
   if (intro) { intro.style.opacity = '0'; intro.style.pointerEvents = 'none'; setTimeout(function(){ intro.style.display = 'none'; }, 480); }
-  if (main)  { main.style.display = 'flex'; requestAnimationFrame(function(){ if(typeof beCarouselInit==='function') beCarouselInit(); }); }
+  if (main)  {
+    main.style.display = 'flex';
+    requestAnimationFrame(function(){
+      if(typeof beCarouselInit==='function') beCarouselInit();
+      beBannerRotate();
+    });
+  }
 };
 
 /* ── Reset intro each time the panel opens (called from SS._init renderMap) ── */
@@ -21952,10 +21947,9 @@ window.beIntroReset = function(){
   if (intro) { intro.style.display='flex'; intro.style.opacity='1'; intro.style.pointerEvents=''; }
   if (main)  { main.style.display='none'; }
   beBgRotate();
-  beFlipStart();
 };
 
-/* ── Background cross-fade rotation ── */
+/* ── Background cross-fade rotation (intro page — the two intro images) ── */
 var _beBgTimer = null;
 var _beBgFace  = 0;
 function beBgRotate(){
@@ -21963,8 +21957,8 @@ function beBgRotate(){
   _beBgFace = 0;
   var b1 = document.getElementById('beBg1');
   var b2 = document.getElementById('beBg2');
-  if (b1) { b1.style.opacity='1'; }
-  if (b2) { b2.style.opacity='0'; }
+  if (b1) b1.style.opacity='1';
+  if (b2) b2.style.opacity='0';
   _beBgTimer = setInterval(function(){
     _beBgFace = 1 - _beBgFace;
     if (b1) b1.style.opacity = _beBgFace===0 ? '1' : '0';
@@ -21972,27 +21966,26 @@ function beBgRotate(){
   }, 3200);
 }
 
-/* ── Card crossfade (opacity — avoids preserve-3d + overflow:hidden bug) ── */
-var _beFlipTimer = null;
-var _beFlipFace  = 0;
-window.beFlipNow = function(){
-  _beFlipFace = 1 - _beFlipFace;
-  var img1 = document.getElementById('beCardImg1');
-  var img2 = document.getElementById('beCardImg2');
-  var d1   = document.getElementById('beFlipDot1');
-  var d2   = document.getElementById('beFlipDot2');
-  if (img1) img1.style.opacity = _beFlipFace === 0 ? '1' : '0';
-  if (img2) img2.style.opacity = _beFlipFace === 1 ? '1' : '0';
-  if (d1) { d1.style.width = _beFlipFace===0?'20px':'4px'; d1.style.background = _beFlipFace===0?'#e8d5a3':'rgba(255,255,255,0.25)'; }
-  if (d2) { d2.style.width = _beFlipFace===1?'20px':'4px'; d2.style.background = _beFlipFace===1?'#e8d5a3':'rgba(255,255,255,0.25)'; }
-};
+/* ── Banner strip cross-fade (main content — the two banner images) ── */
+var _beBannerTimer = null;
+var _beBannerFace  = 0;
+function beBannerRotate(){
+  clearInterval(_beBannerTimer);
+  _beBannerFace = 0;
+  var b1 = document.getElementById('beBanner1');
+  var b2 = document.getElementById('beBanner2');
+  if (b1) b1.style.opacity='1';
+  if (b2) b2.style.opacity='0';
+  _beBannerTimer = setInterval(function(){
+    _beBannerFace = 1 - _beBannerFace;
+    if (b1) b1.style.opacity = _beBannerFace===0 ? '1' : '0';
+    if (b2) b2.style.opacity = _beBannerFace===1 ? '1' : '0';
+  }, 3200);
+}
+
+/* unused stubs kept so no ReferenceErrors from any lingering calls */
+window.beFlipNow = function(){};
 function beFlipStart(){
-  clearInterval(_beFlipTimer);
-  _beFlipFace = 0;
-  var img1 = document.getElementById('beCardImg1');
-  var img2 = document.getElementById('beCardImg2');
-  if (img1) img1.style.opacity = '1';
-  if (img2) img2.style.opacity = '0';
   var d1=document.getElementById('beFlipDot1'), d2=document.getElementById('beFlipDot2');
   if(d1){d1.style.width='20px';d1.style.background='#e8d5a3';}
   if(d2){d2.style.width='4px';d2.style.background='rgba(255,255,255,0.25)';}
