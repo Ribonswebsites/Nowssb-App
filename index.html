@@ -16221,8 +16221,8 @@ function msBuyThisWord() {
     </div>
     <!-- Billing toggle -->
     <div class="bill-toggle" id="ss-bill-toggle">
-      <button class="bill-btn" id="ss-bill-monthly" onclick="ssBilling('monthly')" style="background:transparent;color:rgba(255,255,255,.52);">Monthly</button>
-      <button class="bill-btn" id="ss-bill-yearly" onclick="ssBilling('yearly')" style="background:rgba(255,255,255,.07);color:#fff;font-weight:600;">
+      <button class="bill-btn" id="ss-bill-monthly" onclick="ssBilling('monthly')" style="background:rgba(255,255,255,.07);color:#fff;font-weight:600;">Monthly</button>
+      <button class="bill-btn" id="ss-bill-yearly" onclick="ssBilling('yearly')" style="background:transparent;color:rgba(255,255,255,.52);">
         Yearly <span style="font-size:10px;background:rgba(110,231,183,.12);color:#6ee7b7;padding:2px 7px;border-radius:5px;font-weight:700;">Save 30%</span>
       </button>
     </div>
@@ -16722,8 +16722,8 @@ function msBuyThisWord() {
 
 // ── State ──────────────────────────────────────────────────
 var _ssToggles = { sound:true, notif:true, newword:true, visible:true, pub:true, age:false, rating:true };
-var _ssBilling = 'yearly';
-var _ssSelectedPlan = 'pro';
+var _ssBilling = 'monthly';
+var _ssSelectedPlan = 'frequency';
 var _ssCurrentTheme = 'cosmic';
 var _ssBgMode = 'both';
 var _ssDiscoverFilter = 'all';
@@ -20472,23 +20472,35 @@ window.ONBOARD = (function(){
 
   /* ── Open / close panel (improved) ── */
   var _stack = [];
+  var _ssReturnScreen = null; // screen to return to when subscription closed externally
   window.SS = {
     open: function(id){
-      // Ensure #sub-social is on-screen before opening any panel inside it
       var social = document.getElementById('sub-social');
-      if (social && !social.classList.contains('open')) {
-        social.classList.add('open');
-        if (typeof ssSyncProfile === 'function') ssSyncProfile();
-      }
+      var wasOpen = social && social.classList.contains('open');
       var el = document.getElementById('ss-panel-'+id);
       if(!el) return;
-      el.style.display = 'block';
-      requestAnimationFrame(function(){
+
+      if (!wasOpen) {
+        // Opening from outside settings — pre-position panel so settings never flashes
+        el.style.transition = 'none';
+        el.style.transform  = 'translateX(0)';
+        el.style.display    = 'block';
+        // Remember where to return when this panel is closed
+        if (id === 'subscription') _ssReturnScreen = window._activeSub || 'home';
+        if (social) {
+          social.classList.add('open');
+          if (typeof ssSyncProfile === 'function') ssSyncProfile();
+        }
+      } else {
+        // Normal slide-in from within settings
+        el.style.display = 'block';
         requestAnimationFrame(function(){
-          el.style.transition = 'transform .3s cubic-bezier(.4,0,.2,1)';
-          el.style.transform  = 'translateX(0)';
+          requestAnimationFrame(function(){
+            el.style.transition = 'transform .3s cubic-bezier(.4,0,.2,1)';
+            el.style.transform  = 'translateX(0)';
+          });
         });
-      });
+      }
       _stack.push(id);
       this._init(id);
     },
@@ -20499,6 +20511,16 @@ window.ONBOARD = (function(){
       el.style.transform  = 'translateX(100%)';
       setTimeout(function(){ el.style.display='none'; }, 310);
       _stack = _stack.filter(function(x){ return x!==id; });
+      // If subscription was opened from outside settings, close settings and go home
+      if (id === 'subscription' && _ssReturnScreen) {
+        var ret = _ssReturnScreen;
+        _ssReturnScreen = null;
+        var social = document.getElementById('sub-social');
+        if (social) social.classList.remove('open');
+        setTimeout(function(){
+          if (typeof _doNavigate === 'function') _doNavigate(ret);
+        }, 320);
+      }
     },
     toggle: function(key, el){
       S[key] = !S[key]; save(key, S[key]);
@@ -20619,7 +20641,10 @@ window.ONBOARD = (function(){
         'privacy': function(){ _renderPrivacy(); },
         'chatsettings': function(){ _renderChatSettings(); },
         'appearance': function(){ if(typeof ssRenderAppearance==='function') ssRenderAppearance(); },
-        'subscription': function(){ if(typeof ssRenderPlans==='function') ssRenderPlans(); },
+        'subscription': function(){
+          _ssSelectedPlan = 'frequency'; // ensure valid selection
+          if(typeof ssBilling==='function') ssBilling(_ssBilling); // sync toggle + render
+        },
         'profile-edit': function(){ _renderProfileEdit(); },
         'voice': function(){ _renderOptions('ss-opts-voice', ['F','M'], S.voice, function(v){SS.setVoice(v);}, ['Female','Male']); },
         'speed': function(){ _renderOptions('ss-opts-speed', ['0.75','1.0','1.25','1.5'], String(S.speed), function(v){SS.setSpeed(parseFloat(v));}, ['0.75× Slow','1.0× Normal','1.25× Fast','1.5× Faster']); },
