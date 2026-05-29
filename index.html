@@ -17334,8 +17334,8 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 <div id="ig-bottomnav">
   <button class="ig-nav-btn" id="ignav-home" onclick="IG.nav('profile')">
     <span class="ig-nav-puck" style="width:32px;height:32px;border-radius:50%;overflow:hidden;border:2px solid rgba(232,213,163,0.5);background:#1a1a2e;display:flex;align-items:center;justify-content:center;">
-      <img decoding="async" loading="lazy" id="ignav-avatar" src="" alt="" class="ig-nav-avatar" style="display:none;">
-      <span id="ignav-avatar-init" style="color:#e8d5a3;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;">?</span>
+      <img decoding="async" loading="lazy" id="ignav-avatar" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780065459/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png" alt="" class="ig-nav-avatar" style="display:block;">
+      <span id="ignav-avatar-init" style="color:#e8d5a3;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;display:none;">?</span>
     </span>
     <span class="ig-nav-label">Profile</span>
   </button>
@@ -17733,17 +17733,12 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     menu:function(){ alert('Menu — coming soon'); },
     refreshNavAvatar:function(){
       var ud = window._userDataCache;
+      var DEFAULT_AVATAR = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780065459/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png';
       var photoURL = (ud && ud.photoURL) || ME.avatar || '';
-      var fullName = (ud && ud.displayName) || ME.fullName || '?';
       var imgEl  = document.getElementById('ignav-avatar');
       var initEl = document.getElementById('ignav-avatar-init');
-      if (photoURL && imgEl) {
-        imgEl.src = photoURL; imgEl.style.display = 'block';
-        if (initEl) initEl.style.display = 'none';
-      } else {
-        if (imgEl) imgEl.style.display = 'none';
-        if (initEl) { initEl.textContent = fullName.trim().charAt(0).toUpperCase(); initEl.style.display = 'block'; }
-      }
+      if (imgEl) { imgEl.src = photoURL || DEFAULT_AVATAR; imgEl.style.display = 'block'; }
+      if (initEl) initEl.style.display = 'none';
       this._syncExploreAvatar();
     },
     _syncExploreAvatar:function(){
