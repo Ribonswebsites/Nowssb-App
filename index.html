@@ -17853,12 +17853,8 @@ document.getElementById('sub-social').addEventListener('transitionend', function
       } else if (which === 'profile') {
         this.openMyProfile();
       } else if (which === 'chat') {
-        // Open people/discover so user can find someone to message
-        document.getElementById('sub-ig-profile').classList.remove('open');
-        document.getElementById('sub-people').classList.add('open');
-        renderExplore(); this.clearSearch();
-        var _sc = document.getElementById('ig-people-scroll'); if (_sc) _sc.scrollTop = 0;
         setSocialNavActive('chat');
+        if (typeof chatInboxOpen === 'function') chatInboxOpen();
       }
   };
 
@@ -19217,6 +19213,114 @@ window.CERT = (function(){
     </div>
   </div>
 </div>
+
+<!-- ══ Chat Inbox Overlay ══ -->
+<div id="chatInboxOverlay" style="display:none;position:fixed;inset:0;z-index:9150;background:#060c18;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,20px),44px) 18px 14px;background:rgba(6,12,24,.96);border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;">
+    <button style="background:none;border:none;color:#fff;cursor:pointer;padding:0;" onclick="chatInboxClose()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <div style="flex:1;font-size:18px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;">Messages</div>
+    <button onclick="chatInboxNew()" style="background:rgba(232,213,163,.1);border:1px solid rgba(232,213,163,.25);border-radius:20px;padding:7px 16px;color:#e8d5a3;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">+ New</button>
+  </div>
+  <div id="chatInboxList" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+</div>
+
+<script>
+window.chatInboxOpen = function() {
+  var overlay = document.getElementById('chatInboxOverlay');
+  if (!overlay) return;
+  var bn = document.getElementById('ig-bottomnav');
+  var sn = document.getElementById('ig-social-nav');
+  overlay._prevBn = bn ? bn.style.display : null;
+  overlay._prevSn = sn ? sn.style.display : null;
+  if (bn) bn.style.display = 'none';
+  if (sn) sn.style.display = 'none';
+  overlay.style.display = 'flex';
+  chatInboxRender();
+};
+window.chatInboxClose = function() {
+  var overlay = document.getElementById('chatInboxOverlay');
+  if (!overlay) return;
+  var bn = document.getElementById('ig-bottomnav');
+  var sn = document.getElementById('ig-social-nav');
+  if (bn && overlay._prevBn !== null) bn.style.display = overlay._prevBn || '';
+  if (sn && overlay._prevSn !== null) sn.style.display = overlay._prevSn || '';
+  overlay.style.display = 'none';
+  setSocialNavActive('chat');
+};
+window.chatInboxNew = function() {
+  chatInboxClose();
+  document.getElementById('sub-ig-profile').classList.remove('open');
+  document.getElementById('sub-people').classList.add('open');
+  if (typeof renderExplore === 'function') renderExplore();
+  var sn = document.getElementById('ig-social-nav');
+  if (sn) sn.style.display = 'flex';
+  setSocialNavActive('chat');
+};
+window.chatInboxRender = function() {
+  var list = document.getElementById('chatInboxList');
+  if (!list) return;
+  var KEY = 'nowssb_chat_v1';
+  var PEOPLE = (window.IG && window.IG._allPeople) ? window.IG._allPeople : [
+    {id:1,username:'kavya.frequency',fullName:'Kavya Singh',avatar:'https://i.pravatar.cc/150?img=5'},
+    {id:2,username:'aryan.sound',fullName:'Aryan Mehta',avatar:'https://i.pravatar.cc/150?img=13'},
+    {id:3,username:'priya.heals',fullName:'Priya Nair',avatar:'https://i.pravatar.cc/150?img=20'},
+    {id:4,username:'rohan.resonance',fullName:'Rohan Desai',avatar:'https://i.pravatar.cc/150?img=33'},
+    {id:5,username:'aisha.vibration',fullName:'Aisha Patel',avatar:'https://i.pravatar.cc/150?img=45'},
+    {id:6,username:'dev.tones',fullName:'Dev Sharma',avatar:'https://i.pravatar.cc/150?img=51'},
+    {id:7,username:'meera.om',fullName:'Meera Iyer',avatar:'https://i.pravatar.cc/150?img=47'},
+    {id:8,username:'kabir.naad',fullName:'Kabir Khan',avatar:'https://i.pravatar.cc/150?img=60'}
+  ];
+  var me = window._currentUid || 'me';
+  var convos = [];
+  PEOPLE.forEach(function(p) {
+    var them = p.id || p.username || 'them';
+    var roomId = [me, them].sort().join('_');
+    var msgs = [];
+    try { msgs = JSON.parse(localStorage.getItem(KEY + '_' + roomId) || '[]'); } catch(e) {}
+    if (msgs.length) {
+      convos.push({ person: p, last: msgs[msgs.length-1], roomId: roomId });
+    }
+  });
+  convos.sort(function(a,b){ return (b.last.ts||0)-(a.last.ts||0); });
+  if (!convos.length) {
+    list.innerHTML = '<div style="padding:48px 24px;text-align:center;">' +
+      '<div style="font-size:44px;margin-bottom:16px;">💬</div>' +
+      '<div style="font-size:16px;font-weight:700;color:#fff;font-family:\'DM Sans\',sans-serif;margin-bottom:8px;">No messages yet</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.4);font-family:\'DM Sans\',sans-serif;margin-bottom:24px;">Find practitioners and start healing conversations</div>' +
+      '<button onclick="chatInboxNew()" style="padding:12px 28px;border-radius:24px;border:none;background:#e8d5a3;color:#060c18;font-size:14px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;">Find People</button>' +
+      '</div>';
+    return;
+  }
+  list.innerHTML = convos.map(function(c) {
+    var p = c.person;
+    var lastText = c.last.text || '';
+    if (lastText.length > 42) lastText = lastText.slice(0,42) + '…';
+    var isMe = c.last.from === me;
+    var timeStr = '';
+    if (c.last.ts) {
+      var d = new Date(c.last.ts);
+      timeStr = (d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
+    }
+    return '<div onclick="chatInboxOpenConvo('+p.id+')" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;-webkit-tap-highlight-color:transparent;">' +
+      '<img src="'+p.avatar+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;" alt="">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:15px;font-weight:600;color:#fff;font-family:\'DM Sans\',sans-serif;">'+(p.fullName||p.username)+'</div>' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.4);font-family:\'DM Sans\',sans-serif;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+(isMe?'You: ':'')+lastText+'</div>' +
+      '</div>' +
+      '<div style="font-size:10px;color:rgba(255,255,255,.3);font-family:\'DM Sans\',sans-serif;flex-shrink:0;">'+timeStr+'</div>' +
+      '</div>';
+  }).join('');
+};
+window.chatInboxOpenConvo = function(id) {
+  var PEOPLE = (window.IG && window.IG._allPeople) ? window.IG._allPeople : [];
+  var user = PEOPLE.find ? PEOPLE.find(function(p){ return p.id===id; }) : null;
+  if (!user) user = { id:id, fullName:'NowssB Practitioner', username:'practitioner', avatar:'https://i.pravatar.cc/150?img='+id, category:'Practitioner' };
+  chatInboxClose();
+  setTimeout(function(){ if (window.CHAT) CHAT.open(user); }, 60);
+};
+</script>
 
 <!-- ══ 8. Rating modal ══ -->
 <div id="ratingModal" style="display:none;" class="rating-modal" onclick="if(event.target===this)RATINGS.close()">
@@ -20778,7 +20882,7 @@ window.ONBOARD = (function(){
         </div>
 
         <!-- Fashion Black -->
-        <div id="be-card-fashion2" onclick="setBE('fashion')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+        <div id="be-card-fashion" onclick="setBE('fashion')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
           <div style="position:absolute;inset:0;background:#000;"></div>
           <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:rgba(255,255,255,0.09);border-radius:4px;border:1px solid rgba(255,255,255,0.18);"></div>
           <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.07);"></div>
@@ -20790,7 +20894,7 @@ window.ONBOARD = (function(){
         </div>
 
         <!-- Neo Black -->
-        <div id="be-card-neo2" onclick="setBE('neo')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+        <div id="be-card-neo" onclick="setBE('neo')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
           <div style="position:absolute;inset:0;background:#0a0a0a;"></div>
           <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:#181818;border-radius:4px;box-shadow:3px 3px 6px #000,-2px -2px 5px #222;"></div>
           <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:#141414;border-radius:3px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
@@ -20802,7 +20906,7 @@ window.ONBOARD = (function(){
         </div>
 
         <!-- Glass Black -->
-        <div id="be-card-glass2" onclick="setBE('glass')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+        <div id="be-card-glass" onclick="setBE('glass')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
           <div style="position:absolute;inset:0;background:#000;"></div>
           <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:rgba(255,255,255,0.07);border-radius:4px;border:1px solid rgba(255,255,255,0.20);backdrop-filter:blur(8px);"></div>
           <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.14);"></div>
