@@ -17333,11 +17333,12 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 
 <!-- ── 5-TAB BOTTOM NAV ── -->
 <div id="ig-bottomnav">
-  <button class="ig-nav-btn" id="ignav-home" onclick="IG.nav('home')">
-    <span class="ig-nav-puck">
-      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" class="ig-nav-img" alt="Home">
+  <button class="ig-nav-btn" id="ignav-home" onclick="IG.nav('profile')">
+    <span class="ig-nav-puck" style="width:32px;height:32px;border-radius:50%;overflow:hidden;border:2px solid rgba(232,213,163,0.5);background:#1a1a2e;display:flex;align-items:center;justify-content:center;">
+      <img decoding="async" loading="lazy" id="ignav-avatar" src="" alt="" class="ig-nav-avatar" style="display:none;">
+      <span id="ignav-avatar-init" style="color:#e8d5a3;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;">?</span>
     </span>
-    <span class="ig-nav-label">Home</span>
+    <span class="ig-nav-label">Profile</span>
   </button>
   <button class="ig-nav-btn" id="ignav-practice" onclick="IG.nav('practice')">
     <span class="ig-nav-puck">
@@ -17732,7 +17733,18 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     shareProfile:function(){ alert('Share profile — coming soon'); },
     menu:function(){ alert('Menu — coming soon'); },
     refreshNavAvatar:function(){
-      var a=document.getElementById('ignav-avatar'); if(a) a.src=ME.avatar||'';
+      var ud = window._userDataCache;
+      var photoURL = (ud && ud.photoURL) || ME.avatar || '';
+      var fullName = (ud && ud.displayName) || ME.fullName || '?';
+      var imgEl  = document.getElementById('ignav-avatar');
+      var initEl = document.getElementById('ignav-avatar-init');
+      if (photoURL && imgEl) {
+        imgEl.src = photoURL; imgEl.style.display = 'block';
+        if (initEl) initEl.style.display = 'none';
+      } else {
+        if (imgEl) imgEl.style.display = 'none';
+        if (initEl) { initEl.textContent = fullName.trim().charAt(0).toUpperCase(); initEl.style.display = 'block'; }
+      }
       this._syncExploreAvatar();
     },
     _syncExploreAvatar:function(){
