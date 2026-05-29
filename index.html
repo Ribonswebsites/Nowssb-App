@@ -15932,25 +15932,6 @@ function msBuyThisWord() {
           </div>
         </div>
 
-        <!-- Appearance -->
-        <div class="slbl" data-ss-section>APPEARANCE</div>
-        <div class="sg" data-ss-group style="padding:0 18px;margin-bottom:24px;">
-          <div class="sr" id="ss-appear-row" onclick="ssOpenPanel('appearance')">
-            <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779660027/cce5d030-57bb-11f1-91df-057b0bbc1a40_iru4a0.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
-            <div class="sr-body"><div class="sr-label">Home Appearance</div><div id="ss-appear-sub" class="sr-sub">Frequency plan exclusive</div></div>
-            <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-          <div class="sr" onclick="ssOpenPanel('profile-edit')">
-            <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657310/688cc250-57ad-11f1-ae7e-3f26811e4481_1_pd59jh.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
-            <div class="sr-body"><div class="sr-label">Profile Customization</div><div class="sr-sub">Banner, avatar, bio</div></div>
-            <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-          <div class="sr last" onclick="ssOpenPanel('appearance')">
-            <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657310/2cf955e0-57ae-11f1-ae7e-3f26811e4481_1_odxgyh.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
-            <div class="sr-body"><div class="sr-label">App Theme</div><div class="sr-sub" id="ss-apptheme-sub">Cosmic Dark — default</div></div>
-            <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>
 
         <!-- Audio -->
         <div class="slbl" data-ss-section>AUDIO &amp; PLAYBACK</div>
@@ -16233,123 +16214,6 @@ function msBuyThisWord() {
     </div>
   </div>
 
-  <!-- ── PANEL: APPEARANCE ── -->
-  <div class="ss-panel" id="ss-panel-appearance" style="padding:0 0 80px;">
-    <!-- Top bar -->
-    <div style="padding:20px 20px 4px;display:flex;align-items:center;gap:12px;">
-      <button class="ss-back" onclick="ssClosePanel('appearance')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-      </button>
-    </div>
-    <div style="padding:8px 20px 28px;">
-      <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:6px;">CUSTOMIZATION</div>
-      <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Home Appearance</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.48);font-family:'DM Sans',sans-serif;margin-top:4px;">All animations &amp; effects are preserved.</div>
-    </div>
-
-    <!-- ── BACKGROUND IMAGES ── -->
-    <div style="padding:0 20px;">
-      <div style="font-size:10px;letter-spacing:2.5px;color:rgba(255,255,255,.3);font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:14px;">HOME BACKGROUND</div>
-
-      <!-- Two big neumorphic remove buttons -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-        <!-- Remove → Black -->
-        <button id="ap-btn-black" onclick="apSetBg('black')"
-          style="padding:0;border:none;cursor:pointer;border-radius:20px;overflow:hidden;background:transparent;outline:none;">
-          <div id="ap-puck-black" style="
-            border-radius:20px; padding:22px 14px;
-            background:linear-gradient(145deg,#0e0e0e,#1a1a1a);
-            box-shadow:6px 6px 14px rgba(0,0,0,.8),-6px -6px 14px rgba(255,255,255,.04);
-            display:flex;flex-direction:column;align-items:center;gap:10px;
-            transition:box-shadow .2s;border:2px solid transparent;">
-            <div style="width:44px;height:44px;background:#000;border-radius:12px;
-              box-shadow:inset 3px 3px 8px rgba(0,0,0,.9),inset -3px -3px 8px rgba(255,255,255,.03);
-              display:flex;align-items:center;justify-content:center;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
-            </div>
-            <div style="font-size:12px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;letter-spacing:.3px;">Pure Black</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.35);font-family:'DM Sans',sans-serif;text-align:center;">Remove images<br>→ OLED dark</div>
-          </div>
-        </button>
-        <!-- Remove → White -->
-        <button id="ap-btn-white" onclick="apSetBg('white')"
-          style="padding:0;border:none;cursor:pointer;border-radius:20px;overflow:hidden;background:transparent;outline:none;">
-          <div id="ap-puck-white" style="
-            border-radius:20px; padding:22px 14px;
-            background:linear-gradient(145deg,#d0d0d8,#e8e8f0);
-            box-shadow:6px 6px 14px rgba(0,0,0,.35),-6px -6px 14px rgba(255,255,255,.9);
-            display:flex;flex-direction:column;align-items:center;gap:10px;
-            transition:box-shadow .2s;border:2px solid transparent;">
-            <div style="width:44px;height:44px;background:#efefef;border-radius:12px;
-              box-shadow:inset 3px 3px 8px rgba(0,0,0,.12),inset -3px -3px 8px rgba(255,255,255,.95);
-              display:flex;align-items:center;justify-content:center;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-            </div>
-            <div style="font-size:12px;font-weight:700;color:#222;font-family:'DM Sans',sans-serif;letter-spacing:.3px;">Pure White</div>
-            <div style="font-size:10px;color:rgba(0,0,0,.45);font-family:'DM Sans',sans-serif;text-align:center;">Remove images<br>→ Light mode</div>
-          </div>
-        </button>
-      </div>
-
-      <!-- Restore images button -->
-      <button onclick="apSetBg('both')" style="width:100%;padding:13px;border-radius:14px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:28px;letter-spacing:.3px;">
-        ↺ Restore Original Backgrounds
-      </button>
-
-      <!-- ── 3-COLOR NEUMORPHIC THEME PICKER ── -->
-      <div style="font-size:10px;letter-spacing:2.5px;color:rgba(255,255,255,.3);font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:14px;">THEME COLOR</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:28px;" id="ap-theme-grid">
-        <!-- Cosmic Dark -->
-        <button onclick="apSetTheme('cosmic')" id="ap-t-cosmic" style="padding:0;border:none;cursor:pointer;background:transparent;outline:none;">
-          <div style="border-radius:18px;padding:18px 10px;
-            background:linear-gradient(145deg,#0c1426,#05090f);
-            box-shadow:5px 5px 12px rgba(0,0,0,.7),-5px -5px 12px rgba(255,255,255,.04);
-            display:flex;flex-direction:column;align-items:center;gap:8px;
-            border:2px solid #e8d5a3;" id="ap-td-cosmic">
-            <div style="width:36px;height:36px;border-radius:10px;background:#060c18;
-              box-shadow:inset 3px 3px 6px rgba(0,0,0,.8),inset -3px -3px 6px rgba(255,255,255,.04);">
-            </div>
-            <div style="font-size:11px;font-weight:700;color:#e8d5a3;font-family:'DM Sans',sans-serif;">Cosmic</div>
-          </div>
-        </button>
-        <!-- Pure Black -->
-        <button onclick="apSetTheme('void')" id="ap-t-void" style="padding:0;border:none;cursor:pointer;background:transparent;outline:none;">
-          <div style="border-radius:18px;padding:18px 10px;
-            background:linear-gradient(145deg,#0e0e0e,#1a1a1a);
-            box-shadow:5px 5px 12px rgba(0,0,0,.8),-5px -5px 12px rgba(255,255,255,.04);
-            display:flex;flex-direction:column;align-items:center;gap:8px;
-            border:2px solid transparent;" id="ap-td-void">
-            <div style="width:36px;height:36px;border-radius:10px;background:#000;
-              box-shadow:inset 3px 3px 6px rgba(0,0,0,.95),inset -3px -3px 6px rgba(255,255,255,.03);">
-            </div>
-            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);font-family:'DM Sans',sans-serif;">Black</div>
-          </div>
-        </button>
-        <!-- Navy Blue -->
-        <button onclick="apSetTheme('navy')" id="ap-t-navy" style="padding:0;border:none;cursor:pointer;background:transparent;outline:none;">
-          <div style="border-radius:18px;padding:18px 10px;
-            background:linear-gradient(145deg,#050d20,#0a1a38);
-            box-shadow:5px 5px 12px rgba(0,0,0,.7),-5px -5px 12px rgba(50,100,200,.06);
-            display:flex;flex-direction:column;align-items:center;gap:8px;
-            border:2px solid transparent;" id="ap-td-navy">
-            <div style="width:36px;height:36px;border-radius:10px;background:#040d1f;
-              box-shadow:inset 3px 3px 6px rgba(0,0,0,.8),inset -3px -3px 6px rgba(50,100,200,.07);">
-            </div>
-            <div style="font-size:11px;font-weight:700;color:rgba(200,220,255,.75);font-family:'DM Sans',sans-serif;">Navy</div>
-          </div>
-        </button>
-      </div>
-
-      <!-- Save -->
-      <button onclick="apSave()" style="width:100%;padding:16px 0;border-radius:16px;border:none;
-        background:linear-gradient(135deg,#e8d5a3,#c4a35a);
-        color:#060c18;font-size:15px;font-weight:800;font-family:'DM Sans',sans-serif;cursor:pointer;
-        box-shadow:0 4px 18px rgba(232,213,163,.28);letter-spacing:.3px;">
-        Apply &amp; Save
-      </button>
-    </div>
-  </div>
-
   <!-- ── PANEL: PROFILE EDIT ── -->
   <div class="ss-panel" id="ss-panel-profile-edit" style="padding:0 20px 60px;">
     <div style="padding:20px 0 4px;">
@@ -16409,65 +16273,7 @@ function msBuyThisWord() {
       </div>
     </div>
 
-    <!-- ── BACKGROUND CUSTOMIZER ── -->
-    <div class="slbl" style="margin-top:4px;">BACKGROUND STYLE</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <button onclick="apSetBg('black')" style="padding:0;border:none;cursor:pointer;background:transparent;outline:none;">
-        <div style="border-radius:16px;padding:16px 12px;
-          background:linear-gradient(145deg,#0e0e0e,#1a1a1a);
-          box-shadow:5px 5px 12px rgba(0,0,0,.8),-5px -5px 12px rgba(255,255,255,.04);
-          display:flex;flex-direction:column;align-items:center;gap:8px;border:2px solid rgba(255,255,255,.06);">
-          <div style="width:36px;height:36px;border-radius:10px;background:#000;
-            box-shadow:inset 3px 3px 6px rgba(0,0,0,.95),inset -3px -3px 6px rgba(255,255,255,.03);"></div>
-          <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);font-family:'DM Sans',sans-serif;">Pure Black</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.35);font-family:'DM Sans',sans-serif;text-align:center;">Remove BGs → OLED</div>
-        </div>
-      </button>
-      <button onclick="apSetBg('white')" style="padding:0;border:none;cursor:pointer;background:transparent;outline:none;">
-        <div style="border-radius:16px;padding:16px 12px;
-          background:linear-gradient(145deg,#d0d0d8,#e8e8f0);
-          box-shadow:5px 5px 12px rgba(0,0,0,.3),-5px -5px 12px rgba(255,255,255,.9);
-          display:flex;flex-direction:column;align-items:center;gap:8px;border:2px solid rgba(255,255,255,.5);">
-          <div style="width:36px;height:36px;border-radius:10px;background:#efefef;
-            box-shadow:inset 3px 3px 6px rgba(0,0,0,.12),inset -3px -3px 6px rgba(255,255,255,.95);"></div>
-          <div style="font-size:11px;font-weight:700;color:#222;font-family:'DM Sans',sans-serif;">Pure White</div>
-          <div style="font-size:9px;color:rgba(0,0,0,.45);font-family:'DM Sans',sans-serif;text-align:center;">Remove BGs → Light</div>
-        </div>
-      </button>
-    </div>
-    <!-- 3 theme colors row -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-      <button onclick="apSetTheme('cosmic')" style="padding:0;border:none;cursor:pointer;background:transparent;outline:none;">
-        <div style="border-radius:14px;padding:14px 8px;
-          background:linear-gradient(145deg,#0c1426,#05090f);
-          box-shadow:4px 4px 10px rgba(0,0,0,.7),-4px -4px 10px rgba(255,255,255,.04);
-          display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid rgba(232,213,163,.4);">
-          <div style="width:28px;height:28px;border-radius:8px;background:#060c18;box-shadow:inset 2px 2px 5px rgba(0,0,0,.8),inset -2px -2px 5px rgba(255,255,255,.04);"></div>
-          <div style="font-size:10px;font-weight:700;color:#e8d5a3;font-family:'DM Sans',sans-serif;">Cosmic</div>
-        </div>
-      </button>
-      <button onclick="apSetTheme('void')" style="padding:0;border:none;cursor:pointer;background:transparent;outline:none;">
-        <div style="border-radius:14px;padding:14px 8px;
-          background:linear-gradient(145deg,#0e0e0e,#1a1a1a);
-          box-shadow:4px 4px 10px rgba(0,0,0,.8),-4px -4px 10px rgba(255,255,255,.04);
-          display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid rgba(255,255,255,.07);">
-          <div style="width:28px;height:28px;border-radius:8px;background:#000;box-shadow:inset 2px 2px 5px rgba(0,0,0,.95),inset -2px -2px 5px rgba(255,255,255,.03);"></div>
-          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.65);font-family:'DM Sans',sans-serif;">Black</div>
-        </div>
-      </button>
-      <button onclick="apSetTheme('navy')" style="padding:0;border:none;cursor:pointer;background:transparent;outline:none;">
-        <div style="border-radius:14px;padding:14px 8px;
-          background:linear-gradient(145deg,#050d20,#0a1a38);
-          box-shadow:4px 4px 10px rgba(0,0,0,.7),-4px -4px 10px rgba(50,100,200,.06);
-          display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid rgba(255,255,255,.07);">
-          <div style="width:28px;height:28px;border-radius:8px;background:#040d1f;box-shadow:inset 2px 2px 5px rgba(0,0,0,.8),inset -2px -2px 5px rgba(50,100,200,.08);"></div>
-          <div style="font-size:10px;font-weight:700;color:rgba(200,220,255,.7);font-family:'DM Sans',sans-serif;">Navy</div>
-        </div>
-      </button>
-    </div>
-    <button onclick="apSetBg('both')" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:24px;">↺ Restore original backgrounds</button>
-
-    <button onclick="apSave();ssClosePanel('profile-edit')" style="width:100%;padding:16px 0;border-radius:14px;border:none;background:linear-gradient(135deg,#e8d5a3,#c4a35a);color:#060c18;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Save Profile</button>
+    <button onclick="ssClosePanel('profile-edit')" style="width:100%;padding:16px 0;border-radius:14px;border:none;background:linear-gradient(135deg,#e8d5a3,#c4a35a);color:#060c18;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Save Profile</button>
   </div>
 
   <!-- ── PANEL: USER PROFILE ── -->
@@ -18238,135 +18044,6 @@ document.getElementById('sub-social').addEventListener('transitionend', function
 })();
 </script>
 
-<script>
-/* ══════════════════════════════════════════════════════════
-   APPEARANCE CONTROLLER — apSetBg / apSetTheme / apSave
-═══════════════════════════════════════════════════════════ */
-(function(){
-  var THEMES = {
-    cosmic: { bg:'#060c18', neumBg:'linear-gradient(145deg,#0c1426,#05090f)', textClr:'#e8d5a3', borderClr:'#e8d5a3' },
-    void:   { bg:'#000000', neumBg:'linear-gradient(145deg,#0e0e0e,#1a1a1a)', textClr:'rgba(255,255,255,.75)', borderClr:'rgba(255,255,255,.12)' },
-    navy:   { bg:'#040d1f', neumBg:'linear-gradient(145deg,#050d20,#0a1a38)', textClr:'rgba(200,220,255,.8)', borderClr:'rgba(100,160,255,.2)' }
-  };
-
-  window._apTheme = 'cosmic';
-  window._apBg    = 'both';
-
-  /* Apply bg mode — live */
-  window.apSetBg = function(mode) {
-    window._apBg = mode;
-    var bgs = document.querySelectorAll('#home .hero-bg');
-    window._heroLock = null;
-
-    if (mode === 'black') {
-      bgs.forEach(function(b){ b.style.display='none'; });
-      window._heroLock = -1;
-      apApplyBodyBg('#000');
-      apWhiteMode(false);
-    } else if (mode === 'white') {
-      bgs.forEach(function(b){ b.style.display='none'; });
-      window._heroLock = -1;
-      apApplyBodyBg('#f0f0f0');
-      apWhiteMode(true);
-    } else if (mode === 'both') {
-      bgs.forEach(function(b){ b.style.display=''; });
-      window._heroLock = null;
-      apApplyBodyBg('');
-      apWhiteMode(false);
-    }
-
-    // Update active puck borders
-    ['black','white'].forEach(function(k){
-      var puck = document.getElementById('ap-puck-'+k);
-      if (puck) puck.style.border = (k===mode) ? '2px solid #e8d5a3' : '2px solid transparent';
-    });
-
-    try { localStorage.setItem('nowssb_bgmode', mode); } catch(e){}
-  };
-
-  /* Apply theme color — live */
-  window.apSetTheme = function(id) {
-    window._apTheme = id;
-    var t = THEMES[id] || THEMES.cosmic;
-    apApplyBodyBg(window._apBg==='black'?'#000': window._apBg==='white'?'#f0f0f0' : t.bg);
-
-    // Dark themes cancel white mode
-    if (window._apBg !== 'white') apWhiteMode(false);
-
-    // Update indicator borders
-    ['cosmic','void','navy'].forEach(function(k){
-      var ap = document.getElementById('ap-td-'+k);
-      if (ap) {
-        var active = k===id;
-        ap.style.border = active ? ('2px solid '+(THEMES[k].borderClr)) : '2px solid transparent';
-      }
-    });
-
-    // Subtitle update
-    var sub = document.getElementById('ss-apptheme-sub');
-    var names = {cosmic:'Cosmic Dark — default', void:'Pure Black', navy:'Navy Blue'};
-    if (sub) sub.textContent = names[id] || '';
-
-    try { localStorage.setItem('nowssb_theme', id); } catch(e){}
-  };
-
-  /* Apply background to #home only */
-  window.apApplyBodyBg = function(color) {
-    var st = document.getElementById('ap-theme-style');
-    if (!st) { st = document.createElement('style'); st.id='ap-theme-style'; document.head.appendChild(st); }
-    if (!color) { st.textContent = ''; return; }
-    st.textContent = '#home{background:'+color+' !important;}';
-  };
-
-  /* White mode — flip ALL #home text to dark so it's readable on light background */
-  window.apWhiteMode = function(on) {
-    var st = document.getElementById('ap-white-style');
-    if (!st) { st = document.createElement('style'); st.id='ap-white-style'; document.head.appendChild(st); }
-    if (on) {
-      st.textContent =
-        /* Hero brand text */
-        '#home .brand-name .b{color:#1a1a2e !important;}' +
-        '#home .brand-name .t{color:rgba(26,26,46,0.75) !important;}' +
-        '#home .brand-tag{color:rgba(26,26,46,0.55) !important;}' +
-        '#home .brand-tag strong{color:#1a1a2e !important;}' +
-        '#home #tagWord{color:#1a1a2e !important;}' +
-        '#home #heroTagline{color:rgba(26,26,46,0.6) !important;}' +
-        /* Hero watermark word & buttons */
-        '#home .hero-word{color:rgba(26,26,46,0.08) !important;text-shadow:none !important;}' +
-        '#home .hero-btn{color:#1a1a2e !important;border-color:rgba(26,26,46,0.25) !important;background:rgba(26,26,46,0.06) !important;}' +
-        /* Home body text */
-        '#home .home-greeting{color:#1a1a2e !important;}' +
-        '#home .home-tagline{color:rgba(26,26,46,0.5) !important;}' +
-        '#home .slbl{color:rgba(26,26,46,0.38) !important;}' +
-        /* Fixed home header → light */
-        '#homeHeader{background:rgba(240,240,240,0.97) !important;border-bottom:1px solid rgba(0,0,0,0.08) !important;box-shadow:0 2px 12px rgba(0,0,0,0.07) !important;}' +
-        '#homeHeader .brand-name .b{color:#1a1a2e !important;}' +
-        '#homeHeader .brand-name .t{color:rgba(26,26,46,0.75) !important;}';
-    } else {
-      st.textContent = '';
-    }
-  };
-
-  /* Save — persist + close */
-  window.apSave = function() {
-    apSetTheme(window._apTheme);
-    apSetBg(window._apBg);
-    if (typeof ssClosePanel === 'function') ssClosePanel('appearance');
-  };
-
-  /* Restore on reload */
-  (function(){
-    function restore(){
-      var th, bm;
-      try { th=localStorage.getItem('nowssb_theme'); bm=localStorage.getItem('nowssb_bgmode'); } catch(e){}
-      if (th) apSetTheme(th);
-      if (bm && bm!=='both') apSetBg(bm);
-    }
-    if (document.readyState!=='loading') setTimeout(restore,500);
-    else document.addEventListener('DOMContentLoaded',function(){ setTimeout(restore,500); });
-  })();
-})();
-</script>
 <!-- ═══════════════════════════════════════════════════════════
      SOUND BATH MODE — sub-screen #23
      3 modes: Sleep · Focus · Healing
@@ -20596,12 +20273,10 @@ window.ONBOARD = (function(){
     },
     setBgMode: function(v){
       S.bgMode = v; save('bgmode', v);
-      if(typeof apSetBg==='function') apSetBg(v);
       this.close('bgmode');
     },
     setTheme: function(v){
       S.theme = v; save('theme', v);
-      if(typeof apSetTheme==='function') apSetTheme(v);
       this.close('themecolor');
     },
     saveBio: function(){
@@ -20938,25 +20613,6 @@ window.ONBOARD = (function(){
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-chatperm"></div></div>
 </div>
 
-<!-- BG MODE picker -->
-<div class="ss-panel" id="ss-panel-bgmode" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('bgmode')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">Home Background</div>
-    <div class="ss-panel-sub">Applied instantly across the app</div>
-  </div>
-  <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-bgmode"></div></div>
-</div>
-
-<!-- THEME COLOR picker -->
-<div class="ss-panel" id="ss-panel-themecolor" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('themecolor')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">App Theme</div>
-    <div class="ss-panel-sub">Changes the base color everywhere</div>
-  </div>
-  <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-themecolor"></div></div>
-</div>
 
 <script>
 /* Move ss-panels that are outside #sub-social into it so the scoped CSS applies */
@@ -20965,7 +20621,7 @@ window.ONBOARD = (function(){
     var social = document.getElementById('sub-social');
     if (!social){ setTimeout(move, 100); return; }
     ['ss-panel-voice','ss-panel-speed','ss-panel-reps','ss-panel-sensitivity',
-     'ss-panel-ambient','ss-panel-chatperm','ss-panel-bgmode','ss-panel-themecolor'
+     'ss-panel-ambient','ss-panel-chatperm'
     ].forEach(function(id){
       var el = document.getElementById(id);
       if (el && el.parentNode !== social) social.appendChild(el);
@@ -21059,20 +20715,6 @@ window.ONBOARD = (function(){
       </div>
     </div>
 
-    <!-- ── APPEARANCE ── -->
-    <div class="ss-section-title">APPEARANCE</div>
-    <div class="ss-section">
-      <div class="sr" onclick="SS.open('bgmode')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779660027/cce5d030-57bb-11f1-91df-057b0bbc1a40_iru4a0.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
-        <div class="sr-body"><div class="sr-label">Home Background</div><div class="sr-sub">Background image control</div></div>
-        <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="sr last" onclick="SS.open('themecolor')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657310/2cf955e0-57ae-11f1-ae7e-3f26811e4481_1_odxgyh.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
-        <div class="sr-body"><div class="sr-label">App Theme</div><div class="sr-sub">Cosmic Dark · Black · Navy</div></div>
-        <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-    </div>
 
     <!-- ── AUDIO ── -->
     <div class="ss-section-title">AUDIO</div>
