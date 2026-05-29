@@ -20022,12 +20022,11 @@ window.ONBOARD = (function(){
       _stack = _stack.filter(function(x){ return x!==id; });
       // If subscription was opened from outside settings, close settings and go home
       if (id === 'subscription' && _ssReturnScreen) {
-        var ret = _ssReturnScreen;
         _ssReturnScreen = null;
         var social = document.getElementById('sub-social');
         if (social) social.classList.remove('open');
         setTimeout(function(){
-          if (typeof _doNavigate === 'function') _doNavigate(ret);
+          if (typeof goTo === 'function') goTo('home');
         }, 320);
       }
     },
