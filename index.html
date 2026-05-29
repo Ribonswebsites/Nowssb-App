@@ -5811,11 +5811,12 @@ async function _profileSavePhotoURL(url) {
 
       <!-- ── CINEMATIC 2:3 HERO BANNER ── -->
       <div class="ms-hero-banner" id="msBanner">
-        <!-- Hero image -->
-        <img class="ms-hero-img" id="msBannerImg" loading="lazy" decoding="async"
-          src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png"
-          alt=""
-          style="object-fit:cover;object-position:center top;width:100%;height:100%;position:absolute;inset:0;background:#060c18;">
+        <!-- Parallax video layer -->
+        <video class="ms-hero-img" id="msBannerImg"
+          src="https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4"
+          autoplay loop muted playsinline
+          preload="none"
+          style="object-fit:cover;width:100%;height:100%;position:absolute;inset:0;background:#060c18;"></video>
         <!-- Gradient fade to page bg -->
         <div class="ms-hero-fade"></div>
         <!-- Floating back btn -->
@@ -13370,7 +13371,8 @@ window.msEnterFromIntro = function() {
   if (!intro || !mc) return;
   intro.classList.add('ms-intro-hidden');
   mc.style.display = 'flex';
-  // banner is now a static image — no play() needed
+  var vid = document.getElementById('msBannerImg');
+  if (vid && vid.tagName === 'VIDEO') { try { vid.play(); } catch(e) {} }
   setTimeout(msRenderStore, 80);
   setTimeout(msInitParallax, 120);
 };
