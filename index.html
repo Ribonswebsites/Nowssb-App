@@ -4544,10 +4544,18 @@ function wsShowTab(idx) {
     <!-- Intro image reused as full-screen background behind body content -->
     <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778246066/grok_image_1778245944595_jbjdb2.jpg'); background-position:center 30%;"></div>
     <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(3,8,20,0.55) 0%,rgba(3,8,20,0.65) 50%,rgba(3,8,20,0.82) 100%);pointer-events:none;"></div>
-    <div class="sub-header" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778246083/grok_image_1777988386974_xbaic7.jpg');">
+    <div class="sub-header" id="profileHeaderBanner" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778246083/grok_image_1777988386974_xbaic7.jpg');">
+      <img decoding="async" loading="lazy" class="profile-hdr-img" id="profileHeaderBannerImg" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778246083/grok_image_1777988386974_xbaic7.jpg" alt="">
+      <div class="profile-hdr-fade"></div>
       <div class="sub-back" onclick="closeSub('profile')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
-      <div><div class="sub-header-title">Profile</div><div class="sub-header-tag">Settings &amp; Account</div></div>
+      <div class="profile-hdr-text"><div class="sub-header-title">Profile</div><div class="sub-header-tag">Settings &amp; Account</div></div>
     </div>
+    <style>
+    #profileHeaderBanner{transform-style:preserve-3d;perspective:900px;}
+    #profileHeaderBanner .profile-hdr-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;z-index:0;transform:scale(1.1);transform-origin:center top;will-change:transform;}
+    #profileHeaderBanner .profile-hdr-fade{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(6,12,24,0.12) 0%,rgba(6,12,24,0) 35%,rgba(6,12,24,0.55) 80%,rgba(6,12,24,0.92) 100%);pointer-events:none;}
+    #profileHeaderBanner .sub-back, #profileHeaderBanner .profile-hdr-text{position:relative;z-index:2;}
+    </style>
     <div class="sub-body">
 
       <!-- ── AVATAR + NAME ── -->
@@ -5145,6 +5153,42 @@ function profileEnterFromIntro() {
     if (main)  main.style.display = 'flex';
   }, 420);
 }
+
+// ── PROFILE BANNER: 3D scroll parallax + touch tilt (same as guide banner) ──
+(function() {
+  function initProfileBanner() {
+    var img  = document.getElementById('profileHeaderBannerImg');
+    var hdr  = document.getElementById('profileHeaderBanner');
+    var body = document.querySelector('#sub-profile .sub-body');
+    if (!img || !hdr || !body) return;
+    // Scroll parallax — image rises slower than content
+    body.addEventListener('scroll', function() {
+      var sy = body.scrollTop; if (sy < 0) sy = 0;
+      img.style.transition = 'none';
+      img.style.transform = 'scale(1.1) translateY(' + (sy * 0.38) + 'px)';
+    }, { passive: true });
+    // 3D perspective tilt on touch/mouse, reset on release
+    function tilt(cx, cy) {
+      var r = hdr.getBoundingClientRect();
+      var dx = (cx - r.left - r.width / 2) / (r.width / 2);
+      var dy = (cy - r.top - r.height / 2) / (r.height / 2);
+      img.style.transition = 'transform 0.12s ease-out';
+      img.style.transform = 'perspective(900px) rotateX(' + (-dy * 3.5) + 'deg) rotateY(' + (dx * 5) + 'deg) scale(1.08)';
+    }
+    function reset() {
+      img.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)';
+      img.style.transform = 'scale(1.1) translateY(' + (body.scrollTop * 0.38) + 'px)';
+    }
+    hdr.addEventListener('touchmove', function(e) {
+      if (body.scrollTop < hdr.offsetHeight) tilt(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    hdr.addEventListener('touchend', reset);
+    hdr.addEventListener('mousemove', function(e) { tilt(e.clientX, e.clientY); });
+    hdr.addEventListener('mouseleave', reset);
+  }
+  if (document.readyState !== 'loading') initProfileBanner();
+  else document.addEventListener('DOMContentLoaded', initProfileBanner);
+})();
 
 // ══════════════════════════════════════════════════════════════════
 // PROFILE PHOTO — select, upload to Cloudinary, save to Firestore
@@ -17361,11 +17405,11 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     </span>
     <span class="ig-nav-label">Store</span>
   </button>
-  <button class="ig-nav-btn" id="ignav-profile" onclick="IG.nav('profile')">
+  <button class="ig-nav-btn" id="ignav-profile" onclick="IG.nav('myprofile')">
     <span class="ig-nav-puck">
-      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" class="ig-nav-img" alt="People">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" class="ig-nav-img" alt="Profile">
     </span>
-    <span class="ig-nav-label">People</span>
+    <span class="ig-nav-label">Profile</span>
   </button>
 </div>
 
