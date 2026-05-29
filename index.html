@@ -15892,47 +15892,6 @@ function msBuyThisWord() {
         </div>
 
 
-        <!-- Black Edition -->
-        <div class="slbl" data-ss-section>BLACK EDITION</div>
-        <div data-ss-group style="margin-bottom:24px;">
-          <div style="font-size:11px;color:rgba(255,255,255,0.32);font-family:'DM Sans',sans-serif;margin-bottom:14px;line-height:1.5;">Choose your black aesthetic. Applies to the Fashion home, nav, and all panels.</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-            <!-- Fashion Black -->
-            <div id="be-card-fashion" onclick="setBlackEdition('fashion')" style="cursor:pointer;border-radius:12px;overflow:hidden;border:2px solid #e8d5a3;position:relative;aspect-ratio:0.65;">
-              <div style="position:absolute;inset:0;background:#000;"></div>
-              <div style="position:absolute;top:10px;left:8px;right:8px;height:28px;background:#111;border-radius:6px;border:1px solid rgba(255,255,255,0.06);"></div>
-              <div style="position:absolute;top:46px;left:8px;right:8px;height:14px;background:rgba(255,255,255,0.05);border-radius:4px;border:1px solid rgba(255,255,255,0.06);"></div>
-              <div style="position:absolute;top:64px;left:8px;right:8px;height:14px;background:rgba(255,255,255,0.03);border-radius:4px;border:1px solid rgba(255,255,255,0.04);"></div>
-              <div style="position:absolute;bottom:10px;left:8px;right:8px;height:10px;background:rgba(255,255,255,0.06);border-radius:4px;"></div>
-              <div style="position:absolute;bottom:0;left:0;right:0;padding:8px;text-align:center;">
-                <span style="font-size:9px;font-weight:700;letter-spacing:1px;color:#e8d5a3;font-family:'DM Sans',sans-serif;text-transform:uppercase;">Fashion</span>
-              </div>
-            </div>
-            <!-- Neo Black -->
-            <div id="be-card-neo" onclick="setBlackEdition('neo')" style="cursor:pointer;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.65;">
-              <div style="position:absolute;inset:0;background:#0d0d0d;"></div>
-              <div style="position:absolute;top:10px;left:8px;right:8px;height:28px;background:#181818;border-radius:6px;box-shadow:3px 3px 6px #000,-2px -2px 5px #222;"></div>
-              <div style="position:absolute;top:46px;left:8px;right:8px;height:14px;background:#141414;border-radius:4px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
-              <div style="position:absolute;top:64px;left:8px;right:8px;height:14px;background:#141414;border-radius:4px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
-              <div style="position:absolute;bottom:10px;left:8px;right:8px;height:10px;background:#181818;border-radius:4px;box-shadow:2px 2px 4px #000,-1px -1px 3px #1e1e1e;"></div>
-              <div style="position:absolute;bottom:0;left:0;right:0;padding:8px;text-align:center;">
-                <span style="font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Neo</span>
-              </div>
-            </div>
-            <!-- Glass Black -->
-            <div id="be-card-glass" onclick="setBlackEdition('glass')" style="cursor:pointer;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.65;">
-              <div style="position:absolute;inset:0;background:#000;"></div>
-              <div style="position:absolute;top:10px;left:8px;right:8px;height:28px;background:rgba(255,255,255,0.07);border-radius:6px;border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);"></div>
-              <div style="position:absolute;top:46px;left:8px;right:8px;height:14px;background:rgba(255,255,255,0.05);border-radius:4px;border:1px solid rgba(255,255,255,0.12);"></div>
-              <div style="position:absolute;top:64px;left:8px;right:8px;height:14px;background:rgba(255,255,255,0.03);border-radius:4px;border:1px solid rgba(255,255,255,0.09);"></div>
-              <div style="position:absolute;bottom:10px;left:8px;right:8px;height:10px;background:rgba(255,255,255,0.06);border-radius:4px;border:1px solid rgba(255,255,255,0.1);"></div>
-              <div style="position:absolute;bottom:0;left:0;right:0;padding:8px;text-align:center;">
-                <span style="font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(200,232,245,0.8);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Glass</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Audio -->
         <div class="slbl" data-ss-section>AUDIO &amp; PLAYBACK</div>
         <div class="sg" data-ss-group style="padding:0 18px;margin-bottom:24px;">
@@ -21326,124 +21285,10 @@ function _showSubscriptionSuccess(planId) {
   filter: brightness(1.15) grayscale(0) !important;
 }
 
-/* ── BLACK EDITION: FASHION ── */
-#home.black-fashion { background:#000 !important; }
-#home.black-fashion .hero-bg { background-color:#000 !important; background-image:none !important; }
-body.black-fashion #appBg,
-body.black-fashion #appBgLayer2 { opacity:0 !important; }
-body.black-fashion #ig-bottomnav {
-  background:#000 !important;
-  border-top:1px solid rgba(255,255,255,0.06) !important;
-}
-body.black-fashion .menu-drawer { background:#000 !important; }
-body.black-fashion #sub-social { background:#000 !important; }
-body.black-fashion #sub-social .ss-panel { background:#000 !important; }
-
-/* ── BLACK EDITION: NEO ── */
-#home.black-neo { background:#0d0d0d !important; }
-#home.black-neo .home-card,
-#home.black-neo .home-tile {
-  background:#161616 !important;
-  border:none !important;
-  box-shadow:5px 5px 12px #000, -3px -3px 9px #222 !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-#home.black-neo .hero-section { background:#0d0d0d; }
-#home.black-neo .hero-glass {
-  background:#161616 !important;
-  border:none !important;
-  box-shadow:4px 4px 10px #000, -2px -2px 7px #1e1e1e !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-body.black-neo #ig-bottomnav {
-  background:#0d0d0d !important;
-  border-top:none !important;
-  box-shadow:0 -3px 12px #000 !important;
-}
-body.black-neo .menu-drawer { background:#0d0d0d !important; }
-body.black-neo #sub-social { background:#0d0d0d !important; }
-body.black-neo #sub-social .sg,
-body.black-neo #sub-social .ss-panel {
-  background:#161616 !important;
-  border:none !important;
-  box-shadow:3px 3px 8px #000, -2px -2px 6px #1e1e1e !important;
-}
-
-/* ── BLACK EDITION: GLASS ── */
-#home.black-glass { background:#000 !important; }
-#home.black-glass .home-card,
-#home.black-glass .home-tile {
-  background:rgba(255,255,255,0.04) !important;
-  border:1px solid rgba(255,255,255,0.14) !important;
-  box-shadow:0 12px 40px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.08) !important;
-  backdrop-filter:blur(22px) saturate(1.8) !important;
-  -webkit-backdrop-filter:blur(22px) saturate(1.8) !important;
-}
-#home.black-glass .hero-glass {
-  background:rgba(255,255,255,0.04) !important;
-  border:1px solid rgba(255,255,255,0.16) !important;
-  box-shadow:0 16px 48px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.10) !important;
-  backdrop-filter:blur(28px) saturate(2) !important;
-  -webkit-backdrop-filter:blur(28px) saturate(2) !important;
-}
-body.black-glass #ig-bottomnav {
-  background:rgba(0,0,0,0.92) !important;
-  border-top:1px solid rgba(255,255,255,0.10) !important;
-  backdrop-filter:blur(28px) !important;
-  -webkit-backdrop-filter:blur(28px) !important;
-}
-body.black-glass .menu-drawer {
-  background:rgba(0,0,0,0.94) !important;
-  backdrop-filter:blur(24px) !important;
-  -webkit-backdrop-filter:blur(24px) !important;
-}
-body.black-glass #sub-social { background:rgba(0,0,0,0.95) !important; }
-body.black-glass #sub-social .sg,
-body.black-glass #sub-social .ss-panel {
-  background:rgba(255,255,255,0.04) !important;
-  border:1px solid rgba(255,255,255,0.12) !important;
-  backdrop-filter:blur(18px) !important;
-  -webkit-backdrop-filter:blur(18px) !important;
-}
 </style>
-
 <script>
-(function(){
-  function setBlackEdition(style) {
-    var home = document.getElementById('home');
-    var body = document.body;
-    home.classList.remove('black-fashion','black-neo','black-glass');
-    body.classList.remove('black-fashion','black-neo','black-glass');
-    if (style === 'fashion') {
-      home.classList.add('black-fashion');
-      body.classList.add('black-fashion');
-    } else if (style === 'neo') {
-      home.classList.add('black-neo');
-      body.classList.add('black-neo');
-    } else if (style === 'glass') {
-      home.classList.add('black-glass');
-      body.classList.add('black-glass');
-    }
-    localStorage.setItem('nwsb_black_edition', style || '');
-    ['fashion','neo','glass'].forEach(function(s){
-      var card = document.getElementById('be-card-'+s);
-      if (card) card.style.borderColor = (s === style) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
-    });
-  }
-  window.setBlackEdition = setBlackEdition;
-  // Restore saved choice on load (default = none = original)
-  var saved = localStorage.getItem('nwsb_black_edition') || '';
-  if (saved) setBlackEdition(saved);
-  document.addEventListener('DOMContentLoaded', function(){
-    var s = localStorage.getItem('nwsb_black_edition') || '';
-    ['fashion','neo','glass'].forEach(function(k){
-      var card = document.getElementById('be-card-'+k);
-      if (card) card.style.borderColor = (k === s) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
-    });
-  });
-})();
+// Clear any stale black edition localStorage key from previous broken deployment
+localStorage.removeItem('nwsb_black_edition');
 </script>
 </body>
 </html>
