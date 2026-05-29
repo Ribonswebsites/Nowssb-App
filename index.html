@@ -6261,13 +6261,13 @@ function goTo(id) {
       if(typeof nmhRefresh==='function') setTimeout(nmhRefresh,80);
       if(typeof updateTodayCard==='function') setTimeout(updateTodayCard,100);
       var nav=document.getElementById('ig-bottomnav');
-      if(nav){ nav.classList.add('nav-light'); }
-      showNav(true);
+      if(nav){ nav.classList.add('nav-light'); nav.classList.add('show'); }
+      document.documentElement.style.setProperty('--nav-height','58px');
     }
     if (id === 'home') {
       var nav=document.getElementById('ig-bottomnav');
-      if(nav){ nav.classList.remove('nav-light'); }
-      showNav(true);
+      if(nav){ nav.classList.remove('nav-light'); nav.classList.add('show'); }
+      document.documentElement.style.setProperty('--nav-height','58px');
     }
     if (id !== 'home') resetHomeBgLayer();
   }, 320);
@@ -17606,6 +17606,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     if(n) n.classList.toggle('show', !!show);
     document.documentElement.style.setProperty('--nav-height', show ? '58px' : '0px');
   }
+  window.showNav = showNav;
 
   // ── public API ──
   window.IG = {
