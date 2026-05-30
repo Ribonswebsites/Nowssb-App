@@ -232,10 +232,6 @@ function _doNavigate(dest) {
   // Hide auth loader if visible
   const loader = document.getElementById('authLoader');
   if (loader) loader.classList.remove('visible');
-  // Always land on neumorphic home; dark mode is toggled in-place via nmhSwitchMode()
-  if (dest === 'home') {
-    dest = document.body.classList.contains('be-fashion') ? 'home' : 'home-nm';
-  }
   if (currentScreen !== dest) goTo(dest);
 }
 
@@ -1669,7 +1665,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 <div class="menu-drawer" id="menuDrawer">
 
   <!-- ── MENU INTRO PAGE ── -->
-  <div id="menuIntroPage" style="position:absolute;inset:0;z-index:50;background:#000;display:flex;flex-direction:column;overflow:hidden;transition:opacity 0.42s ease;pointer-events:all;">
+  <div id="menuIntroPage" style="position:absolute;inset:0;z-index:50;background:#000;display:none;flex-direction:column;overflow:hidden;transition:opacity 0.42s ease;pointer-events:all;">
     <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779961020/grok_image_1779908680335_bed5rb.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="">
     <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0.55) 72%,rgba(0,0,0,0.92) 100%);pointer-events:none;"></div>
     <!-- Back button — universal style -->
@@ -22476,9 +22472,9 @@ body.be-glass .menu-nav-item {
   }
   window.setBE = setBE;
   // On load: restore neo/glass only — clear any stale 'fashion' that may have been saved
-  var stored = localStorage.getItem('nwsb_be') || '';
-  if (stored === 'fashion') { localStorage.setItem('nwsb_be', ''); stored = ''; }
-  setBE(stored);
+  // BE themes are session-only — always start fresh with glassmorphism default
+  localStorage.setItem('nwsb_be', '');
+  setBE('');
 })();
 </script>
 
