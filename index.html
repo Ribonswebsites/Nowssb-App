@@ -22480,17 +22480,11 @@ body.be-glass .menu-nav-item {
     localStorage.setItem('nwsb_be', style || '');
     if (style === 'fashion') {
       if (explicit) {
-        // User tapped Fashion BE — navigate home then show intro
-        window._fashionHomeIntroSeen = true; // block goTo wrapper from double-firing
-        var cur = typeof currentScreen !== 'undefined' ? currentScreen : '';
-        if (cur === 'home-nm') {
-          setTimeout(function(){ if (window.showFashionHomeIntro) window.showFashionHomeIntro(); }, 80);
-        } else {
-          if (typeof goTo === 'function') goTo('home-nm');
-          setTimeout(function(){ if (window.showFashionHomeIntro) window.showFashionHomeIntro(); }, 450);
-        }
+        // Show intro immediately over current screen — Enter button navigates home
+        window._fashionHomeIntroSeen = true;
+        if (window.showFashionHomeIntro) window.showFashionHomeIntro();
       } else {
-        // Page-load restore — block auto-intro, Fashion BE is already persisted
+        // Page-load restore — block auto-intro
         window._fashionHomeIntroSeen = true;
       }
     }
@@ -22695,8 +22689,12 @@ window.fashionHomeIntroEnter = function() {
   if (!el) return;
   el.style.transition = 'opacity 0.38s ease';
   el.style.opacity = '0';
-  // Just hide the overlay — home-nm is already loaded underneath
-  setTimeout(function(){ el.style.display = 'none'; }, 400);
+  setTimeout(function(){
+    el.style.display = 'none';
+    // Navigate to home-nm after intro — ensures correct landing regardless of prior screen
+    if (typeof _doNavigate === 'function') _doNavigate('home');
+    else if (typeof goTo === 'function') goTo('home-nm');
+  }, 400);
 };
 </script>
 </body>
