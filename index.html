@@ -21123,11 +21123,10 @@ window.ONBOARD = (function(){
   <!-- ══ BLACK EDITION INTRO PAGE ══ -->
   <div id="beIntroPage" style="position:absolute;inset:0;z-index:20;background:#000;display:flex;flex-direction:column;overflow:hidden;transition:opacity 0.48s cubic-bezier(0.4,0,0.2,1);">
 
-    <!-- Background — fashion hero image with gradient overlay -->
+    <!-- Rotating background (fades between the two intro images — no vignette, contain so full image shows) -->
     <div style="position:absolute;inset:0;z-index:0;background:#000;">
-      <img id="beBg1" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780142466/e1bce500-5835-11f1-9971-736215a430db_qh1vfh.webp" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:1;transition:opacity 1.4s ease;" alt="">
-      <img id="beBg2" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_soknfu.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:0;transition:opacity 1.4s ease;" alt="">
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0) 35%,rgba(0,0,0,0) 45%,rgba(0,0,0,0.75) 100%);pointer-events:none;"></div>
+      <img id="beBg1" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/51d59000-5b5e-11f1-aed0-2ba1e609569d_nwrv0w.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;opacity:1;transition:opacity 1.4s ease;" alt="">
+      <img id="beBg2" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_soknfu.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;opacity:0;transition:opacity 1.4s ease;" alt="">
     </div>
 
     <!-- Top bar -->
