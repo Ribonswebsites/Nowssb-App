@@ -19936,6 +19936,216 @@ window.FOLLOW = (function(){
 })();
 
 /* ═══════════════════════════════════════════════════════════
+   PARTS 2 & 3: Real Firestore users · Firestore follow/ratings ·
+                Firestore v9 real-time chat
+═══════════════════════════════════════════════════════════ */
+
+// ── Seed IG._allPeople with fallback so chat inbox is never empty ──
+(function() {
+  var SEED = [
+    {id:'1',uid:'1',username:'kavya.frequency',fullName:'Kavya Singh',verified:true,avatar:'https://i.pravatar.cc/150?img=5',bio:'Word without dictionary.\nFrequency is truth.',category:'Sound Healer',link:'nowssb.com/kavya',following_state:false,highlights:[],grid:[]},
+    {id:'2',uid:'2',username:'aryan.sound',fullName:'Aryan Mehta',verified:true,avatar:'https://i.pravatar.cc/150?img=13',bio:'Sound practice every morning.\n47-day streak.',category:'Daily Practitioner',link:'',following_state:false,highlights:[],grid:[]},
+    {id:'3',uid:'3',username:'priya.heals',fullName:'Priya Nair',verified:false,avatar:'https://i.pravatar.cc/150?img=20',bio:'Healing my body one word at a time.',category:'Wellness',link:'',following_state:false,highlights:[],grid:[]},
+    {id:'4',uid:'4',username:'rohan.resonance',fullName:'Rohan Desai',verified:false,avatar:'https://i.pravatar.cc/150?img=33',bio:'Morning practice since Jan 2026. Building the habit.',category:'Health & Frequency',link:'',following_state:false,highlights:[],grid:[]},
+    {id:'5',uid:'5',username:'aisha.vibration',fullName:'Aisha Patel',verified:true,avatar:'https://i.pravatar.cc/150?img=45',bio:'Natural origin sounds healed my anxiety.',category:'Sound Healer',link:'nowssb.com/aisha',following_state:false,highlights:[],grid:[]},
+    {id:'6',uid:'6',username:'dev.tones',fullName:'Dev Sharma',verified:false,avatar:'https://i.pravatar.cc/150?img=51',bio:'New to Shabdapathy. Learning every day.',category:'Beginner',link:'',following_state:false,highlights:[],grid:[]},
+    {id:'7',uid:'7',username:'meera.om',fullName:'Meera Iyer',verified:false,avatar:'https://i.pravatar.cc/150?img=47',bio:'Frequency is medicine.',category:'Practitioner',link:'',following_state:false,highlights:[],grid:[]},
+    {id:'8',uid:'8',username:'kabir.naad',fullName:'Kabir Khan',verified:true,avatar:'https://i.pravatar.cc/150?img=60',bio:'Top 1% · 1000+ sessions.\nYour voice is the instrument.',category:'Frequency Sage',link:'nowssb.com/kabir',following_state:false,highlights:[],grid:[]}
+  ];
+  // Apply saved follow state
+  SEED.forEach(function(p) { p.following_state = window.FOLLOW ? window.FOLLOW.isFollowing(p.id) : false; });
+  if (window.IG) window.IG._allPeople = SEED;
+})();
+
+// ── Fetch real Firestore users → update IG._allPeople ──
+window._igFetchRealUsers = async function() {
+  if (!window._currentUid) return;
+  try {
+    var fs = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
+    var db2 = fs.getFirestore();
+    var snap = await fs.getDocs(fs.query(fs.collection(db2,'users'), fs.limit(40)));
+    var real = [];
+    snap.forEach(function(d) {
+      if (d.id === window._currentUid) return;
+      var u = d.data();
+      if (!u.displayName) return;
+      real.push({
+        id: d.id, uid: d.id,
+        username: u.displayName.toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,''),
+        fullName: u.displayName,
+        verified: !!(u.isPro || u.tier),
+        avatar: u.photoURL || '',
+        bannerURL: u.bannerURL || '',
+        bio: u.bio || '',
+        category: u.healthFocus || 'Practitioner',
+        link: '', posts: 0, followers: '0', following: 0,
+        following_state: window.FOLLOW ? window.FOLLOW.isFollowing(d.id) : false,
+        highlights: [], grid: [], self: false
+      });
+    });
+    if (real.length && window.IG) {
+      window.IG._allPeople = real;
+      // Refresh chat inbox if open
+      var inbox = document.getElementById('chatInboxOverlay');
+      if (inbox && inbox.style.display !== 'none' && typeof chatInboxRender === 'function') chatInboxRender();
+    }
+  } catch(e) { console.warn('_igFetchRealUsers:', e); }
+};
+
+// ── Sync follow state from _userDataCache when auth settles ──
+window._igInitFollowing = function() {
+  var ud = window._userDataCache;
+  if (!ud || !ud.following) return;
+  var KEY = 'nowssb_following_v1';
+  var existing = []; try { existing = JSON.parse(localStorage.getItem(KEY)||'[]'); } catch(e){}
+  Object.keys(ud.following).forEach(function(uid) {
+    if (ud.following[uid] && existing.indexOf(uid)<0) existing.push(uid);
+    else if (!ud.following[uid]) { var i=existing.indexOf(uid); if(i>=0) existing.splice(i,1); }
+  });
+  try { localStorage.setItem(KEY, JSON.stringify(existing)); } catch(e){}
+  if (window.IG && window.IG._allPeople) {
+    window.IG._allPeople.forEach(function(p) {
+      p.following_state = window.FOLLOW ? window.FOLLOW.isFollowing(String(p.id)) : false;
+    });
+  }
+};
+
+// ── Patch IG.toggleFollow / toggleFollowMini → FOLLOW system + _allPeople sync ──
+(function() {
+  window.IG.toggleFollow = function(id) {
+    var now = window.FOLLOW.toggle(String(id));
+    var b = document.getElementById('ig-bigfollow');
+    if (b) { b.classList.toggle('following', now); b.textContent = now ? 'Following' : 'Follow'; }
+    if (this._allPeople) {
+      var p = this._allPeople.find(function(x){ return String(x.id)===String(id)||x.uid===String(id); });
+      if (p) p.following_state = now;
+    }
+  };
+  window.IG.toggleFollowMini = function(id, btn) {
+    var now = window.FOLLOW.toggle(String(id));
+    if (btn) { btn.classList.toggle('following', now); btn.textContent = now ? 'Following' : 'Follow'; }
+    if (this._allPeople) {
+      var p = this._allPeople.find(function(x){ return String(x.id)===String(id)||x.uid===String(id); });
+      if (p) p.following_state = now;
+    }
+  };
+})();
+
+// ── Patch RATINGS → write to Firestore on submit ──
+(function() {
+  var origSetStar = window.RATINGS.setStar;
+  var origSubmit  = window.RATINGS.submit;
+  window._lastRatingValue = 0;
+  window.RATINGS.setStar = function(n) { window._lastRatingValue = n; origSetStar.call(this, n); };
+  window.RATINGS.submit = async function() {
+    var rating = window._lastRatingValue || 0;
+    origSubmit.call(this);
+    if (!rating || !window._currentUid) return;
+    var tu = window._chatCurrentUser;
+    var targetUid = tu ? (tu.uid || String(tu.id)) : null;
+    if (!targetUid || targetUid === window._currentUid) return;
+    try {
+      var fs = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
+      var db2 = fs.getFirestore();
+      await fs.setDoc(fs.doc(db2,'ratings',targetUid,'entries',window._currentUid), {
+        rating: rating, ratedAt: new Date().toISOString(), raterUid: window._currentUid
+      });
+    } catch(e) { console.warn('RATINGS Firestore write:', e); }
+  };
+})();
+
+// ── Hook People screen open → fetch real users once ──
+(function() {
+  var orig = window.IG.openExplore;
+  window.IG.openExplore = function() {
+    orig.call(this);
+    if (!window._igPeopleFetched && window._currentUid) {
+      window._igPeopleFetched = true;
+      window._igFetchRealUsers();
+    }
+  };
+})();
+
+// Sync following state 2s after page load (auth resolves by then)
+setTimeout(window._igInitFollowing, 2000);
+
+/* ─── PART 3: Firestore v9 real-time chat ─────────────────── */
+(function() {
+  var _fsUnsub  = null;
+  var _fsRoomId = null;
+
+  function _roomKey(user) {
+    var me   = window._currentUid || 'me';
+    var them = user.uid || String(user.id) || user.username || 'them';
+    return [me, them].sort().join('_');
+  }
+
+  function _ts(ts) {
+    var d = new Date(ts);
+    return (d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
+  }
+
+  function _renderFsMsgs(msgs) {
+    var box = document.getElementById('chatMessages');
+    if (!box || !msgs.length) return;
+    var me = window._currentUid || 'me';
+    box.innerHTML = msgs.map(function(msg) {
+      var isMe = msg.from === me;
+      return '<div class="chat-bubble-wrap'+(isMe?' me':'')+'">'+
+        '<div class="chat-bubble '+(isMe?'me':'them')+'">'+msg.text+'</div></div>'+
+        (msg.ts ? '<div class="chat-time" style="text-align:'+(isMe?'right':'left')+';">'+_ts(msg.ts)+'</div>' : '');
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  }
+
+  var origOpen  = window.CHAT.open;
+  var origSend  = window.CHAT.send;
+  var origClose = window.CHAT.close;
+
+  window.CHAT.open = async function(user) {
+    // Unsubscribe previous real-time listener
+    if (_fsUnsub) { try { _fsUnsub(); } catch(e) {} _fsUnsub = null; }
+    // Set room ID synchronously so send() can use it immediately
+    _fsRoomId = _roomKey(user);
+    // Call original — loads localStorage msgs, sets header, shows overlay
+    origOpen.call(this, user);
+    if (!window._currentUid) return;
+    try {
+      var fs = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
+      var db2 = fs.getFirestore();
+      var rId = _fsRoomId;
+      var q = fs.query(fs.collection(db2,'chats',rId,'messages'), fs.orderBy('ts'));
+      _fsUnsub = fs.onSnapshot(q, function(snap) {
+        var msgs = snap.docs.map(function(d){ return d.data(); });
+        if (!msgs.length) return;
+        _renderFsMsgs(msgs);
+        try { localStorage.setItem('nowssb_chat_v1_'+rId, JSON.stringify(msgs.slice(-100))); } catch(e){}
+      });
+    } catch(e) { console.warn('CHAT open Firestore:', e); }
+  };
+
+  window.CHAT.send = async function() {
+    // Call original — clears input, updates UI, saves to localStorage
+    origSend.call(this);
+    if (!_fsRoomId || !window._currentUid) return;
+    // Read the message the original just saved to localStorage
+    var msgs = [];
+    try { msgs = JSON.parse(localStorage.getItem('nowssb_chat_v1_'+_fsRoomId)||'[]'); } catch(e){}
+    var msg = msgs.length ? msgs[msgs.length-1] : null;
+    if (!msg || msg.from !== (window._currentUid||'me')) return;
+    try {
+      var fs = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js");
+      await fs.addDoc(fs.collection(fs.getFirestore(),'chats',_fsRoomId,'messages'), msg);
+    } catch(e) { console.warn('CHAT send Firestore:', e); }
+  };
+
+  window.CHAT.close = function() {
+    if (_fsUnsub) { try { _fsUnsub(); } catch(e) {} _fsUnsub = null; }
+    origClose.call(this);
+  };
+})();
+
+/* ═══════════════════════════════════════════════════════════
    11. WORD OF THE DAY
 ═══════════════════════════════════════════════════════════ */
 window.WOTD = (function(){
