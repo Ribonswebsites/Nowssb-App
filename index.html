@@ -12382,14 +12382,19 @@ window.nwSubClose = function() {
 /* ══ Hook goTo → fire tour on home + fashion intro ══ */
 var _origGoTo = window.goTo;
 window.goTo = function(dest) {
-  // Route 'home': Fashion BE → dark home, otherwise → neumorphic home
+  // Navigating away from #home (Fashion dark home) → auto-deactivate Fashion BE
+  // so next goTo('home') lands on home-nm, not #home again
+  if (document.body.classList.contains('be-fashion') &&
+      typeof currentScreen !== 'undefined' &&
+      currentScreen === 'home' &&
+      dest !== 'home') {
+    document.body.classList.remove('be-fashion');
+  }
+  // Route 'home': Fashion BE active → dark #home, else → neumorphic home-nm
   if (dest === 'home') dest = document.body.classList.contains('be-fashion') ? 'home' : 'home-nm';
   if (_origGoTo) _origGoTo.apply(this, [dest]);
   if (dest === 'home-nm') {
-    // Leaving Fashion mode — deactivate BE so home-nm loads clean
-    if (document.body.classList.contains('be-fashion')) {
-      document.body.classList.remove('be-fashion');
-    }
+    document.body.classList.remove('be-fashion');
     setTimeout(function(){
       try { if (!localStorage.getItem('nwsb_done')) start(); }
       catch(e){ start(); }
