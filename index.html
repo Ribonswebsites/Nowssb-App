@@ -946,7 +946,7 @@ window._fbServerTimestamp = () => serverTimestamp();
     <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');goTo('home-nm')" title="Light Mode" style="width:36px;height:36px;border:none;cursor:pointer;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);flex-shrink:0;">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 0112 0" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="2" fill="#e8d5a3"/><path d="M8 2v1M8 13v1M2 8H1M15 8h-1" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/></svg>
     </button>
-    <div style="width:36px;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);flex-shrink:0;" onclick="openMenu()">
+    <div id="homeMenuBtn" style="width:36px;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);flex-shrink:0;" onclick="openMenu()">
       <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
         <line x1="0" y1="2" x2="16" y2="2" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
         <line x1="0" y1="7" x2="16" y2="7" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
@@ -21901,6 +21901,85 @@ body.be-glass #home .hero-glass {
   box-shadow:0 16px 48px rgba(0,0,0,0.98),inset 0 1px 0 rgba(255,255,255,0.12) !important;
   backdrop-filter:blur(30px) saturate(2) !important;
   -webkit-backdrop-filter:blur(30px) saturate(2) !important;
+}
+
+/* ── All BE — Home header base: solid black bar ── */
+body.be-fashion #homeHeader,
+body.be-neo #homeHeader,
+body.be-glass #homeHeader {
+  background:#000 !important;
+  border-bottom:1px solid rgba(255,255,255,0.06) !important;
+}
+/* ── All BE — Menu drawer nav items: subtle separators ── */
+body.be-fashion .menu-nav-item,
+body.be-neo .menu-nav-item,
+body.be-glass .menu-nav-item {
+  border-bottom-color:rgba(255,255,255,0.05) !important;
+}
+
+/* ── NEO BLACK — Home header nav bar ── */
+body.be-neo #homeHeader {
+  background:#0e0e0e !important;
+  border-bottom:none !important;
+  box-shadow:0 4px 14px #000,0 1px 0 #1d1d1d !important;
+}
+/* NM toggle + hamburger button — neumorphic raised circles */
+body.be-neo #homeNmToggle {
+  background:#161616 !important;
+  border:none !important;
+  box-shadow:4px 4px 10px #000,-2px -2px 7px #222 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+body.be-neo #homeMenuBtn {
+  background:#161616 !important;
+  border:none !important;
+  box-shadow:4px 4px 10px #000,-2px -2px 7px #222 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+/* Menu drawer — nav icons neumorphic */
+body.be-neo .menu-nav-icon {
+  background:#181818 !important;
+  border:none !important;
+  box-shadow:4px 4px 10px #000,-2px -2px 7px #232323 !important;
+}
+body.be-neo .menu-nav-item {
+  border-bottom-color:rgba(255,255,255,0.04) !important;
+}
+
+/* ── GLASS BLACK — Home header nav bar ── */
+body.be-glass #homeHeader {
+  background:rgba(255,255,255,0.03) !important;
+  border-bottom:1px solid rgba(255,255,255,0.12) !important;
+  backdrop-filter:blur(24px) saturate(2) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(2) !important;
+}
+/* NM toggle + hamburger — intensified glass on black */
+body.be-glass #homeNmToggle {
+  background:rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.18) !important;
+  box-shadow:0 4px 16px rgba(0,0,0,0.9),inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+}
+body.be-glass #homeMenuBtn {
+  background:rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.18) !important;
+  box-shadow:0 4px 16px rgba(0,0,0,0.9),inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+}
+/* Menu drawer — glass nav icons */
+body.be-glass .menu-nav-icon {
+  background:rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.14) !important;
+  box-shadow:0 4px 16px rgba(0,0,0,0.85),inset 0 1px 0 rgba(255,255,255,0.08) !important;
+  backdrop-filter:blur(8px) !important;
+  -webkit-backdrop-filter:blur(8px) !important;
+}
+body.be-glass .menu-nav-item {
+  border-bottom-color:rgba(255,255,255,0.07) !important;
 }
 </style>
 
