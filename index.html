@@ -4565,6 +4565,7 @@ function wsShowTab(idx) {
       <!-- ── AVATAR + NAME ── -->
       <!-- Hidden file input for photo selection -->
       <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" onchange="profileHandlePhotoFile(this.files[0])">
+      <input type="file" id="profileBannerInput" accept="image/*" style="display:none;" onchange="profileHandleBannerFile(this.files[0])">
 
       <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:28px;">
         <!-- Avatar — border-radius on the IMG itself (Android WebView fix) -->
@@ -5341,6 +5342,63 @@ async function _profileSavePhotoURL(url) {
   const { db, doc, setDoc } = await _profileDb();
   await setDoc(doc(db, 'users', window._currentUid), { photoURL: url }, { merge: true });
   if (window._userDataCache) window._userDataCache.photoURL = url;
+  // Refresh edit panel avatar circle and IG nav avatar
+  var circle = document.getElementById('profile-edit-avatar-circle');
+  if (circle) { circle.style.backgroundImage = 'url('+url+')'; circle.style.backgroundSize = 'cover'; circle.style.backgroundPosition = 'center'; circle.innerHTML = ''; }
+  if (window.IG && typeof IG.refreshNavAvatar === 'function') IG.refreshNavAvatar();
+  // Refresh IG profile banner/avatar if open
+  if (window.IG && document.getElementById('sub-ig-profile') && document.getElementById('sub-ig-profile').classList.contains('open')) IG.openMyProfile();
+}
+
+// ── Save bannerURL to Firestore + update local cache ──
+async function _profileSaveBannerURL(url) {
+  if (!window._currentUid) throw new Error('Not logged in');
+  const { db, doc, setDoc } = await _profileDb();
+  await setDoc(doc(db, 'users', window._currentUid), { bannerURL: url }, { merge: true });
+  if (window._userDataCache) window._userDataCache.bannerURL = url;
+}
+
+// ── Called when user picks a banner image file ──
+async function profileHandleBannerFile(file) {
+  const ALLOWED = ['image/jpeg','image/png','image/webp','image/gif'];
+  if (!file || !ALLOWED.includes(file.type)) { _profileShowToast('Please choose a JPG, PNG, or WebP image'); return; }
+  if (file.size > 10 * 1024 * 1024) { _profileShowToast('Image too large — max 10 MB'); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    var src = e.target.result;
+    var preview = document.getElementById('profile-edit-banner-preview');
+    if (preview) { preview.style.backgroundImage = 'url('+src+')'; preview.style.backgroundSize = 'cover'; preview.style.backgroundPosition = 'center'; }
+    var mainBanner = document.getElementById('ig-prof-banner');
+    if (mainBanner) { mainBanner.style.backgroundImage = 'url('+src+')'; mainBanner.style.backgroundSize = 'cover'; mainBanner.style.backgroundPosition = 'center top'; }
+  };
+  reader.readAsDataURL(file);
+
+  _profileShowToast('Uploading banner…');
+
+  try {
+    var fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', _CLOUDINARY_PRESET);
+    fd.append('folder', 'nowssb_user_banners');
+    fd.append('public_id', 'banner_' + (window._currentUid || Date.now()));
+    var res = await fetch('https://api.cloudinary.com/v1_1/' + _CLOUDINARY_CLOUD + '/image/upload', { method: 'POST', body: fd });
+    if (!res.ok) { var err = await res.json().catch(function(){ return {}; }); throw new Error(err.error && err.error.message ? err.error.message : 'Upload failed'); }
+    var data = await res.json();
+    if (!data.secure_url) throw new Error('No URL returned');
+    var url = data.secure_url.replace('/upload/', '/upload/q_auto/f_auto/');
+    await _profileSaveBannerURL(url);
+    _profileShowToast('Banner saved ✓');
+  } catch(err) {
+    console.warn('Banner upload error:', err);
+    _profileShowToast(err.message || 'Upload failed');
+  }
+}
+
+// ── Trigger banner file picker ──
+function profilePickBanner() {
+  var input = document.getElementById('profileBannerInput');
+  if (input) { input.value = ''; input.click(); }
 }
 </script>
 
@@ -17502,6 +17560,19 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     $('ig-prof-username').textContent = p.username || '';
     $('ig-prof-verified-top').innerHTML = p.verified ? verifiedSvg : '';
 
+    // Banner
+    var bannerEl = $('ig-prof-banner');
+    if (bannerEl) {
+      var bannerURL = p.self ? (window._userDataCache && window._userDataCache.bannerURL) : (p.bannerURL || '');
+      if (bannerURL) {
+        bannerEl.style.backgroundImage = 'url(' + bannerURL + ')';
+        bannerEl.style.backgroundSize = 'cover';
+        bannerEl.style.backgroundPosition = 'center top';
+      } else {
+        bannerEl.style.backgroundImage = '';
+      }
+    }
+
     // Avatar — real photoURL for self, p.avatar for others; no placeholders
     var ring = $('ig-prof-avatar-ring');
     var avatarImg = $('ig-prof-avatar');
@@ -20436,15 +20507,23 @@ window.ONBOARD = (function(){
     saveBio: function(){
       var bio = document.getElementById('ss-bio-edit');
       var name = document.getElementById('ss-name-edit');
-      if(bio && window._fbSetDoc && window._currentUid){
-        window._fbSetDoc(window._currentUid,{bio:bio.value, displayName:name?name.value:''}).catch(function(){});
+      var nameVal = name ? name.value : '';
+      var bioVal  = bio  ? bio.value  : '';
+      if(window._fbSetDoc && window._currentUid){
+        window._fbSetDoc(window._currentUid, {bio: bioVal, displayName: nameVal}).catch(function(){});
       }
+      // Update local cache
+      if(window._userDataCache){ window._userDataCache.displayName = nameVal; window._userDataCache.bio = bioVal; }
       this.close('profile-edit');
-      // Update profile display
+      // Update Settings profile name display
       var pn = document.getElementById('profileDisplayName');
       var pb = document.getElementById('profileBio');
-      if(pn && name) pn.textContent = name.value;
-      if(pb && bio)  pb.textContent = bio.value;
+      if(pn) pn.textContent = nameVal;
+      if(pb) pb.textContent = bioVal;
+      // Refresh IG profile view if open
+      if(window.IG && document.getElementById('sub-ig-profile') && document.getElementById('sub-ig-profile').classList.contains('open')){
+        IG.openMyProfile();
+      }
       _showToast('Profile saved ✓');
     },
     downloadData: function(){
@@ -20548,13 +20627,38 @@ window.ONBOARD = (function(){
   function _renderProfileEdit(){
     var nameEl = document.getElementById('ss-name-edit');
     var bioEl  = document.getElementById('ss-bio-edit');
+    var ud = window._userDataCache || {};
+
     if(nameEl){
-      var n = document.getElementById('profileDisplayName');
-      if(n && n.textContent) nameEl.value = n.textContent;
+      nameEl.value = ud.displayName || (function(){ var n=document.getElementById('profileDisplayName'); return n&&n.textContent||''; })();
     }
     if(bioEl){
-      var b = document.getElementById('profileBio');
-      if(b && b.textContent) bioEl.value = b.textContent;
+      bioEl.value = ud.bio || (function(){ var b=document.getElementById('profileBio'); return b&&b.textContent||''; })();
+    }
+
+    // Populate avatar preview circle in the edit panel
+    var avatarCircle = document.getElementById('profile-edit-avatar-circle');
+    if(avatarCircle){
+      if(ud.photoURL){
+        avatarCircle.style.backgroundImage = 'url('+ud.photoURL+')';
+        avatarCircle.style.backgroundSize = 'cover';
+        avatarCircle.style.backgroundPosition = 'center';
+        avatarCircle.innerHTML = '';
+      } else {
+        avatarCircle.style.backgroundImage = '';
+        var initChar = ((ud.displayName||'P').trim().charAt(0)).toUpperCase();
+        avatarCircle.innerHTML = '<span style="font-size:28px;font-weight:700;color:#e8d5a3;font-family:\'DM Sans\',sans-serif;">'+initChar+'</span>';
+      }
+    }
+
+    // Populate banner preview
+    var bannerPreview = document.getElementById('profile-edit-banner-preview');
+    if(bannerPreview && ud.bannerURL){
+      bannerPreview.style.backgroundImage = 'url('+ud.bannerURL+')';
+      bannerPreview.style.backgroundSize = 'cover';
+      bannerPreview.style.backgroundPosition = 'center';
+    } else if(bannerPreview) {
+      bannerPreview.style.backgroundImage = '';
     }
   }
 
@@ -20651,12 +20755,12 @@ window.ONBOARD = (function(){
 
       <!-- Avatar -->
       <div style="display:flex;align-items:center;gap:16px;">
-        <div style="width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,rgba(232,213,163,.15),rgba(200,232,245,.1));border:2.5px solid rgba(232,213,163,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;" onclick="alert('Gallery upload requires native app build')">
-          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt="">
+        <div id="profile-edit-avatar-circle" onclick="profileEditPhoto()" style="width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,rgba(232,213,163,.12),rgba(200,232,245,.08));border:2.5px solid rgba(232,213,163,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;overflow:hidden;position:relative;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(232,213,163,.5)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
         </div>
         <div>
           <div style="font-size:15px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;margin-bottom:6px;">Profile Photo</div>
-          <button onclick="alert('Gallery upload requires native app build')" style="padding:8px 16px;border-radius:10px;border:1px solid rgba(232,213,163,.4);background:transparent;color:#e8d5a3;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Upload Photo</button>
+          <button onclick="profileEditPhoto()" style="padding:8px 16px;border-radius:10px;border:1px solid rgba(232,213,163,.4);background:transparent;color:#e8d5a3;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Change Photo</button>
         </div>
       </div>
 
@@ -20676,9 +20780,9 @@ window.ONBOARD = (function(){
       <!-- Banner -->
       <div>
         <div class="slbl" style="margin-bottom:10px;">PROFILE BANNER</div>
-        <div style="height:100px;background:linear-gradient(135deg,#0a1628,#1a2a4a);border-radius:14px;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;" onclick="alert('Gallery upload requires native app build')">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <div style="font-size:12px;color:rgba(255,255,255,.3);font-family:'DM Sans',sans-serif;margin-top:8px;position:absolute;bottom:12px;">Tap to change · 1200×400 recommended</div>
+        <div id="profile-edit-banner-preview" onclick="profilePickBanner()" style="height:100px;background:linear-gradient(135deg,#0a1628,#1a2a4a);border-radius:14px;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;gap:8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);font-family:'DM Sans',sans-serif;">Tap to upload · 1200×400 recommended</div>
         </div>
       </div>
 
