@@ -232,9 +232,9 @@ function _doNavigate(dest) {
   // Hide auth loader if visible
   const loader = document.getElementById('authLoader');
   if (loader) loader.classList.remove('visible');
-  // Respect stored home mode preference — default is dark
+  // Respect stored home mode preference — default is nm (neumorphic light)
   if (dest === 'home') {
-    var _pref = localStorage.getItem('nwsb_home_mode') || 'dark';
+    var _pref = localStorage.getItem('nwsb_home_mode') || 'nm';
     dest = (_pref === 'nm') ? 'home-nm' : 'home';
   }
   if (currentScreen !== dest) goTo(dest);
@@ -12999,7 +12999,7 @@ function nwagOpenSection(id) {
 
   // ensure home screen is visible before opening any sub-panel
   if (typeof goTo === 'function') {
-    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'dark';
+    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'nm';
     goTo(_pm2 === 'nm' ? 'home-nm' : 'home');
   }
 
@@ -22067,8 +22067,6 @@ body.nav-solid #ig-bottomnav, body.nav-solid #ig-social-nav {
 </style>
 <script>
 localStorage.removeItem('nwsb_black_edition');
-// Migrate: old default was 'nm' (light), new default is dark — clear it so dark loads
-if (localStorage.getItem('nwsb_home_mode') === 'nm') localStorage.removeItem('nwsb_home_mode');
 </script>
 
 <!-- ── BLACK EDITION CSS ── -->
@@ -22607,7 +22605,7 @@ function beFlipStart(){
 <script>
 window.showFashionHomeIntro = function() {
   var el = document.getElementById('fashionHomeIntro');
-  if (!el) { if (typeof goTo === 'function') goTo('home'); return; }
+  if (!el) return;
   el.style.display = 'block';
   el.style.opacity = '0';
   el.style.transition = 'opacity 0.5s ease';
@@ -22615,13 +22613,11 @@ window.showFashionHomeIntro = function() {
 };
 window.fashionHomeIntroEnter = function() {
   var el = document.getElementById('fashionHomeIntro');
-  if (!el) { if (typeof goTo === 'function') goTo('home'); return; }
+  if (!el) return;
   el.style.transition = 'opacity 0.38s ease';
   el.style.opacity = '0';
-  setTimeout(function(){
-    el.style.display = 'none';
-    if (typeof goTo === 'function') goTo('home');
-  }, 400);
+  // Just hide the overlay — home-nm is already loaded underneath
+  setTimeout(function(){ el.style.display = 'none'; }, 400);
 };
 </script>
 </body>
