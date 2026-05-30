@@ -12375,11 +12375,15 @@ window.nwSubClose = function() {
   };
 })();
 
-/* ══ Hook goTo → fire tour on home ══ */
+/* ══ Hook goTo → manage fashion-home-active + fire tour on home ══ */
 var _origGoTo = window.goTo;
 window.goTo = function(dest) {
+  if (dest !== 'home') {
+    document.body.classList.remove('fashion-home-active');
+  }
   if (_origGoTo) _origGoTo.apply(this, [dest]);
   if (dest === 'home') {
+    document.body.classList.add('fashion-home-active');
     setTimeout(function(){
       try { if (!localStorage.getItem('nwsb_done')) start(); }
       catch(e){ start(); }
@@ -16057,56 +16061,62 @@ function msBuyThisWord() {
         </div>
 
 
-        <!-- Black Edition -->
+        <!-- Black Edition Themes -->
         <div class="slbl" data-ss-section>BLACK EDITION</div>
         <div data-ss-group style="margin-bottom:24px;">
-          <div style="font-size:11px;color:rgba(255,255,255,0.32);font-family:'DM Sans',sans-serif;margin-bottom:14px;line-height:1.5;">Hero header stays exactly the same. Only the two background layers, nav, hamburger, and settings go black.</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.32);font-family:'DM Sans',sans-serif;margin-bottom:14px;line-height:1.5;">Choose your Fashion home theme. Applies to the Fashion screen only — nav, header, settings, and drawer all change.</div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
 
-            <!-- Default -->
-            <div id="be-card-default" onclick="setBE('')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid #e8d5a3;position:relative;aspect-ratio:0.6;">
+            <!-- Default (Glassmorphism) -->
+            <div id="theme-card-default" onclick="setNwsbTheme('default')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid #e8d5a3;position:relative;aspect-ratio:0.6;">
               <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0e1525 0%,#060c18 100%);"></div>
-              <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:rgba(255,255,255,0.09);border-radius:4px;border:1px solid rgba(255,255,255,0.18);"></div>
-              <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.07);border-radius:3px;border:1px solid rgba(255,255,255,0.12);"></div>
-              <div style="position:absolute;top:50px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.05);border-radius:3px;border:1px solid rgba(255,255,255,0.08);"></div>
-              <div style="position:absolute;bottom:8px;left:6px;right:6px;height:8px;background:rgba(6,12,24,0.97);border-radius:3px;border-top:1px solid rgba(255,255,255,0.1);"></div>
-              <div style="position:absolute;bottom:0;left:0;right:0;padding:5px;text-align:center;">
+              <!-- BG image hint -->
+              <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(14,110,180,0.18) 0%,rgba(60,180,120,0.12) 100%);"></div>
+              <!-- Header bar -->
+              <div style="position:absolute;top:8px;left:6px;right:6px;height:18px;background:rgba(255,255,255,0.09);border-radius:4px;border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(6px);"></div>
+              <!-- Content rows -->
+              <div style="position:absolute;top:30px;left:6px;right:6px;height:10px;background:rgba(255,255,255,0.07);border-radius:3px;border:1px solid rgba(255,255,255,0.12);"></div>
+              <div style="position:absolute;top:44px;left:6px;right:6px;height:10px;background:rgba(255,255,255,0.05);border-radius:3px;border:1px solid rgba(255,255,255,0.08);"></div>
+              <!-- Nav bar -->
+              <div style="position:absolute;bottom:14px;left:6px;right:6px;height:8px;background:rgba(6,12,24,0.38);border-radius:3px;border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(6px);"></div>
+              <div style="position:absolute;bottom:0;left:0;right:0;padding:4px;text-align:center;">
                 <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:#e8d5a3;font-family:'DM Sans',sans-serif;text-transform:uppercase;">Default</span>
               </div>
             </div>
 
-            <!-- Fashion Black -->
-            <div id="be-card-fashion" onclick="setBE('fashion',true)" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+            <!-- Black Edition (solid black) -->
+            <div id="theme-card-black" onclick="setNwsbTheme('black')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
               <div style="position:absolute;inset:0;background:#000;"></div>
-              <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:rgba(255,255,255,0.09);border-radius:4px;border:1px solid rgba(255,255,255,0.18);"></div>
-              <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.07);"></div>
-              <div style="position:absolute;top:50px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.02);border-radius:3px;border:1px solid rgba(255,255,255,0.05);"></div>
-              <div style="position:absolute;bottom:8px;left:6px;right:6px;height:8px;background:#000;border-radius:3px;border-top:1px solid rgba(255,255,255,0.06);"></div>
-              <div style="position:absolute;bottom:0;left:0;right:0;padding:5px;text-align:center;">
-                <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Fashion</span>
+              <div style="position:absolute;top:8px;left:6px;right:6px;height:18px;background:#000;border-radius:4px;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
+              <div style="position:absolute;top:30px;left:6px;right:6px;height:10px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.06);"></div>
+              <div style="position:absolute;top:44px;left:6px;right:6px;height:10px;background:rgba(255,255,255,0.02);border-radius:3px;border:1px solid rgba(255,255,255,0.04);"></div>
+              <div style="position:absolute;bottom:14px;left:6px;right:6px;height:8px;background:#000;border-radius:3px;"></div>
+              <div style="position:absolute;bottom:0;left:0;right:0;padding:4px;text-align:center;">
+                <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Black</span>
               </div>
             </div>
 
-            <!-- Neo Black -->
-            <div id="be-card-neo" onclick="setBE('neo')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+            <!-- Neo (neumorphism) -->
+            <div id="theme-card-neo" onclick="setNwsbTheme('neo')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
               <div style="position:absolute;inset:0;background:#0a0a0a;"></div>
-              <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:#181818;border-radius:4px;box-shadow:3px 3px 6px #000,-2px -2px 5px #222;"></div>
-              <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:#141414;border-radius:3px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
-              <div style="position:absolute;top:50px;left:6px;right:6px;height:12px;background:#141414;border-radius:3px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
-              <div style="position:absolute;bottom:8px;left:6px;right:6px;height:8px;background:#111;border-radius:3px;box-shadow:2px 2px 4px #000,-1px -1px 3px #1a1a1a;"></div>
-              <div style="position:absolute;bottom:0;left:0;right:0;padding:5px;text-align:center;">
+              <div style="position:absolute;top:8px;left:6px;right:6px;height:18px;background:#0d0d0d;border-radius:4px;box-shadow:0 4px 10px #000,inset 0 1px 0 rgba(255,255,255,0.03);"></div>
+              <div style="position:absolute;top:30px;left:6px;right:6px;height:10px;background:#141414;border-radius:3px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
+              <div style="position:absolute;top:44px;left:6px;right:6px;height:10px;background:#141414;border-radius:3px;box-shadow:2px 2px 5px #000,-1px -1px 4px #1e1e1e;"></div>
+              <div style="position:absolute;bottom:14px;left:6px;right:6px;height:8px;background:#0d0d0d;border-radius:3px;box-shadow:0 -4px 10px #000,inset 0 -1px 0 rgba(255,255,255,0.03);"></div>
+              <div style="position:absolute;bottom:0;left:0;right:0;padding:4px;text-align:center;">
                 <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:rgba(255,255,255,0.4);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Neo</span>
               </div>
             </div>
 
-            <!-- Glass Black -->
-            <div id="be-card-glass" onclick="setBE('glass')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
-              <div style="position:absolute;inset:0;background:#000;"></div>
-              <div style="position:absolute;top:8px;left:6px;right:6px;height:22px;background:rgba(255,255,255,0.07);border-radius:4px;border:1px solid rgba(255,255,255,0.20);backdrop-filter:blur(8px);"></div>
-              <div style="position:absolute;top:34px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.14);"></div>
-              <div style="position:absolute;top:50px;left:6px;right:6px;height:12px;background:rgba(255,255,255,0.02);border-radius:3px;border:1px solid rgba(255,255,255,0.10);"></div>
-              <div style="position:absolute;bottom:8px;left:6px;right:6px;height:8px;background:rgba(0,0,0,0.9);border-radius:3px;border:1px solid rgba(255,255,255,0.08);"></div>
-              <div style="position:absolute;bottom:0;left:0;right:0;padding:5px;text-align:center;">
+            <!-- Glass Black (dark blur glassmorphism) -->
+            <div id="theme-card-glass-black" onclick="setNwsbTheme('glass-black')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0e1525 0%,#060c18 100%);"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(14,110,180,0.18) 0%,rgba(60,180,120,0.12) 100%);"></div>
+              <div style="position:absolute;top:8px;left:6px;right:6px;height:18px;background:rgba(0,0,0,0.55);border-radius:4px;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(10px);"></div>
+              <div style="position:absolute;top:30px;left:6px;right:6px;height:10px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.10);"></div>
+              <div style="position:absolute;top:44px;left:6px;right:6px;height:10px;background:rgba(255,255,255,0.02);border-radius:3px;border:1px solid rgba(255,255,255,0.07);"></div>
+              <div style="position:absolute;bottom:14px;left:6px;right:6px;height:8px;background:rgba(0,0,0,0.65);border-radius:3px;border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(10px);"></div>
+              <div style="position:absolute;bottom:0;left:0;right:0;padding:4px;text-align:center;">
                 <span style="font-size:8px;font-weight:700;letter-spacing:0.8px;color:rgba(200,232,245,0.7);font-family:'DM Sans',sans-serif;text-transform:uppercase;">Glass</span>
               </div>
             </div>
@@ -22420,31 +22430,194 @@ body.be-glass .menu-nav-item {
 }
 </style>
 
+<!-- ── NOWSSB FASHION HOME THEMES — scoped via body.fashion-home-active ── -->
+<style>
+/* DEFAULT theme: base glassmorphism CSS already covers it — no extra rules needed */
+
+/* ── BLACK EDITION ── */
+body.fashion-home-active.nwsb-theme-black #appBg,
+body.fashion-home-active.nwsb-theme-black #appBgLayer2 {
+  opacity:0 !important;
+  transition:opacity 0.4s ease !important;
+}
+body.fashion-home-active.nwsb-theme-black .home-header {
+  background:#000 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  border-bottom:1px solid rgba(255,255,255,0.06) !important;
+  box-shadow:0 4px 20px rgba(0,0,0,0.95) !important;
+}
+body.fashion-home-active.nwsb-theme-black #ig-bottomnav,
+body.fashion-home-active.nwsb-theme-black #ig-social-nav {
+  background:#000 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  border-top:none !important;
+  box-shadow:0 -6px 24px rgba(0,0,0,0.98) !important;
+}
+body.fashion-home-active.nwsb-theme-black #sub-social {
+  background:#000 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+body.fashion-home-active.nwsb-theme-black .menu-drawer {
+  background:#000 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+body.fashion-home-active.nwsb-theme-black .menu-nav-item {
+  background:#050505 !important;
+  border-bottom-color:rgba(255,255,255,0.05) !important;
+}
+body.fashion-home-active.nwsb-theme-black .menu-nav-icon {
+  background:#0a0a0a !important;
+  border-color:rgba(255,255,255,0.07) !important;
+}
+
+/* ── NEUMORPHISM (NEO) ── */
+body.fashion-home-active.nwsb-theme-neo #appBg,
+body.fashion-home-active.nwsb-theme-neo #appBgLayer2 {
+  opacity:0 !important;
+  transition:opacity 0.4s ease !important;
+}
+body.fashion-home-active.nwsb-theme-neo .home-header {
+  background:#0d0d0d !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  border-bottom:none !important;
+  box-shadow:0 5px 18px #000, inset 0 1px 0 rgba(255,255,255,0.035) !important;
+}
+body.fashion-home-active.nwsb-theme-neo #ig-bottomnav,
+body.fashion-home-active.nwsb-theme-neo #ig-social-nav {
+  background:#0d0d0d !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  border-top:none !important;
+  box-shadow:0 -5px 18px #000, inset 0 -1px 0 rgba(255,255,255,0.03) !important;
+}
+body.fashion-home-active.nwsb-theme-neo #sub-social {
+  background:#0e0e0e !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+body.fashion-home-active.nwsb-theme-neo .menu-drawer {
+  background:#0d0d0d !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  box-shadow:8px 0 28px #000 !important;
+}
+body.fashion-home-active.nwsb-theme-neo .menu-nav-item {
+  background:#0d0d0d !important;
+  border-bottom-color:rgba(255,255,255,0.04) !important;
+}
+body.fashion-home-active.nwsb-theme-neo .menu-nav-icon {
+  background:#181818 !important;
+  border:none !important;
+  box-shadow:4px 4px 10px #000,-2px -2px 6px #232323 !important;
+}
+body.fashion-home-active.nwsb-theme-neo .menu-section-group {
+  background:transparent !important;
+  border:none !important;
+  box-shadow:6px 6px 18px #000,-3px -3px 10px #1e1e1e !important;
+  overflow:hidden !important;
+}
+body.fashion-home-active.nwsb-theme-neo #sub-social .sg,
+body.fashion-home-active.nwsb-theme-neo #sub-social .ss-section {
+  background:#131313 !important;
+  border:none !important;
+  box-shadow:5px 5px 14px #000,-3px -3px 10px #1e1e1e !important;
+}
+body.fashion-home-active.nwsb-theme-neo #sub-social .sr-icon {
+  background:#1a1a1a !important;
+  border:none !important;
+  box-shadow:3px 3px 8px #000,-2px -2px 5px #252525 !important;
+}
+body.fashion-home-active.nwsb-theme-neo #sub-social .sr {
+  border-bottom-color:rgba(255,255,255,0.04) !important;
+}
+
+/* ── GLASS BLACK ── */
+body.fashion-home-active.nwsb-theme-glass-black .home-header {
+  background:rgba(0,0,0,0.6) !important;
+  backdrop-filter:blur(32px) saturate(1.6) !important;
+  -webkit-backdrop-filter:blur(32px) saturate(1.6) !important;
+  border-bottom:1px solid rgba(255,255,255,0.05) !important;
+  box-shadow:0 4px 24px rgba(0,0,0,0.75) !important;
+}
+body.fashion-home-active.nwsb-theme-glass-black #ig-bottomnav,
+body.fashion-home-active.nwsb-theme-glass-black #ig-social-nav {
+  background:rgba(0,0,0,0.65) !important;
+  backdrop-filter:blur(32px) saturate(1.6) !important;
+  -webkit-backdrop-filter:blur(32px) saturate(1.6) !important;
+  border-top:1px solid rgba(255,255,255,0.04) !important;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.7) !important;
+}
+body.fashion-home-active.nwsb-theme-glass-black #sub-social {
+  background:rgba(0,0,0,0.78) !important;
+  backdrop-filter:blur(32px) saturate(1.6) !important;
+  -webkit-backdrop-filter:blur(32px) saturate(1.6) !important;
+}
+body.fashion-home-active.nwsb-theme-glass-black .menu-drawer {
+  background:rgba(0,0,0,0.78) !important;
+  backdrop-filter:blur(32px) saturate(1.6) !important;
+  -webkit-backdrop-filter:blur(32px) saturate(1.6) !important;
+}
+body.fashion-home-active.nwsb-theme-glass-black .menu-nav-icon {
+  background:rgba(255,255,255,0.05) !important;
+  border-color:rgba(255,255,255,0.14) !important;
+  backdrop-filter:blur(10px) !important;
+}
+body.fashion-home-active.nwsb-theme-glass-black .menu-nav-item {
+  border-bottom-color:rgba(255,255,255,0.06) !important;
+}
+body.fashion-home-active.nwsb-theme-glass-black #sub-social .sg,
+body.fashion-home-active.nwsb-theme-glass-black #sub-social .ss-section {
+  background:rgba(255,255,255,0.04) !important;
+  border-color:rgba(255,255,255,0.08) !important;
+  backdrop-filter:blur(12px) !important;
+}
+body.fashion-home-active.nwsb-theme-glass-black #sub-social .sr-icon {
+  background:rgba(255,255,255,0.06) !important;
+  border-color:rgba(255,255,255,0.12) !important;
+}
+</style>
+
 <script>
 (function(){
-  var CLASSES = ['be-fashion','be-neo','be-glass'];
-  function setBE(style, explicit) {
-    CLASSES.forEach(function(c){ document.body.classList.remove(c); });
-    if (style) document.body.classList.add('be-'+style);
-    // Fashion is transient — never persist it; only persist neo/glass choices
-    if (style !== 'fashion') localStorage.setItem('nwsb_be', style || '');
-    if (style === 'fashion' && explicit) {
+  var THEME_CLASSES = ['nwsb-theme-default','nwsb-theme-black','nwsb-theme-neo','nwsb-theme-glass-black'];
+  var OLD_BE_CLASSES = ['be-fashion','be-neo','be-glass'];
+
+  window.setNwsbTheme = function(theme) {
+    theme = theme || 'default';
+    THEME_CLASSES.forEach(function(c){ document.body.classList.remove(c); });
+    OLD_BE_CLASSES.forEach(function(c){ document.body.classList.remove(c); });
+    document.body.classList.add('nwsb-theme-' + theme);
+    localStorage.setItem('nwsb_theme', theme);
+
+    // Fashion intro only for Black theme
+    if (theme === 'black' && !window._fashionHomeIntroSeen) {
       window._fashionHomeIntroSeen = true;
       if (window.showFashionHomeIntro) window.showFashionHomeIntro();
     }
+
     // Update card borders
-    ['default','fashion','neo','glass'].forEach(function(s){
-      var el = document.getElementById('be-card-'+s);
+    ['default','black','neo','glass-black'].forEach(function(s){
+      var el = document.getElementById('theme-card-'+s);
       if (!el) return;
-      var active = (s === style) || (s === 'default' && !style);
-      el.style.borderColor = active ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
+      el.style.borderColor = (s === theme) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
     });
-  }
-  window.setBE = setBE;
-  // On load: restore neo/glass only — clear any stale 'fashion' that may have been saved
-  // BE themes are session-only — always start fresh with glassmorphism default
-  localStorage.setItem('nwsb_be', '');
-  setBE('');
+  };
+
+  // Backward compat alias
+  window.setBE = function(style, explicit) {
+    var map = {'':'default','fashion':'black','neo':'neo','glass':'glass-black'};
+    window.setNwsbTheme(map[style || ''] || 'default');
+  };
+
+  // Init from localStorage
+  var saved = localStorage.getItem('nwsb_theme') || 'default';
+  setNwsbTheme(saved);
+  localStorage.removeItem('nwsb_be');
 })();
 </script>
 
