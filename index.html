@@ -22081,12 +22081,51 @@ body.be-fashion #appBgLayer2, body.be-neo #appBgLayer2, body.be-glass #appBgLaye
 body.be-fashion #home, body.be-neo #home, body.be-glass #home {
   background:#000 !important;
 }
-body.be-fashion #ig-bottomnav, body.be-neo #ig-bottomnav, body.be-glass #ig-bottomnav {
+/* Fashion nav — deep neumorphic black (separate from neo/glass) */
+body.be-fashion #ig-bottomnav, body.be-fashion #ig-social-nav {
+  background:#000 !important;
+  border-top:none !important;
+  box-shadow:0 -10px 36px rgba(0,0,0,0.98), 0 -3px 8px rgba(0,0,0,0.95), inset 0 1px 0 rgba(28,28,48,0.55) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+body.be-neo #ig-bottomnav, body.be-neo #ig-social-nav,
+body.be-glass #ig-bottomnav, body.be-glass #ig-social-nav {
   background:#000 !important;
   border-top:1px solid rgba(255,255,255,0.06) !important;
 }
 body.be-fashion .menu-drawer, body.be-neo .menu-drawer, body.be-glass .menu-drawer {
   background:#000 !important;
+}
+/* Fashion menu — deep neumorphic rows (matching Settings look) */
+body.be-fashion .menu-section-group {
+  background: transparent !important;
+  border:none !important;
+  margin: 0 14px 14px !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.92), -3px -3px 10px rgba(22,22,40,0.22) !important;
+}
+body.be-fashion .menu-nav-item {
+  background: #08080f !important;
+  border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+  padding: 15px 18px !important;
+  transition: box-shadow 0.12s !important;
+}
+body.be-fashion .menu-nav-item:last-child {
+  border-bottom: none !important;
+}
+body.be-fashion .menu-nav-item:active {
+  background: #050508 !important;
+  box-shadow: inset 5px 5px 12px rgba(0,0,0,0.95), inset -2px -2px 6px rgba(20,20,38,0.18) !important;
+}
+body.be-fashion .menu-nav-icon {
+  background: #0e0e1c !important;
+  border: none !important;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.88), -2px -2px 6px rgba(22,22,44,0.2) !important;
+}
+body.be-fashion .menu-section-label {
+  padding-left: 28px !important;
 }
 body.be-fashion #sub-social, body.be-neo #sub-social, body.be-glass #sub-social {
   background:#000 !important;
