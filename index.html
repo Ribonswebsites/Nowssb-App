@@ -234,7 +234,7 @@ function _doNavigate(dest) {
   if (loader) loader.classList.remove('visible');
   // Always land on neumorphic home; dark mode is toggled in-place via nmhSwitchMode()
   if (dest === 'home') {
-    dest = 'home-nm';
+    dest = document.body.classList.contains('be-fashion') ? 'home' : 'home-nm';
   }
   if (currentScreen !== dest) goTo(dest);
 }
@@ -12382,8 +12382,8 @@ window.nwSubClose = function() {
 /* ══ Hook goTo → fire tour on home + fashion intro ══ */
 var _origGoTo = window.goTo;
 window.goTo = function(dest) {
-  // Always route bare 'home' to neumorphic home — dark mode is toggled in-place
-  if (dest === 'home') dest = 'home-nm';
+  // Route 'home': Fashion BE → dark home, otherwise → neumorphic home
+  if (dest === 'home') dest = document.body.classList.contains('be-fashion') ? 'home' : 'home-nm';
   if (_origGoTo) _origGoTo.apply(this, [dest]);
   if (dest === 'home-nm') {
     setTimeout(function(){
@@ -22691,12 +22691,11 @@ window.fashionHomeIntroEnter = function() {
   el.style.opacity = '0';
   setTimeout(function(){
     el.style.display = 'none';
-    // Close any open sub-screens (settings, social, etc.) that overlay home-nm
+    // Close any open sub-screens (settings, social, etc.)
     document.querySelectorAll('.sub-screen.open').forEach(function(s){ s.classList.remove('open'); });
-    // If currentScreen changed during the intro, navigate back to home-nm
-    if (typeof currentScreen !== 'undefined' && currentScreen !== 'home-nm') {
-      if (typeof goTo === 'function') goTo('home-nm');
-    }
+    // Navigate home — wrapper routes to #home for Fashion BE, home-nm otherwise
+    if (typeof currentScreen !== 'undefined') currentScreen = '__transitioning__';
+    if (typeof goTo === 'function') goTo('home');
   }, 400);
 };
 </script>
