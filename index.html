@@ -437,6 +437,14 @@ window._fbServerTimestamp = () => serverTimestamp();
 </head>
 <body>
 <script>(function(){var s=localStorage.getItem('nwsb_nav_style')||'glass';document.body.classList.add('nav-'+s);})();</script>
+<style>
+/* ── Universal search icon ── */
+:root{--nwsb-search-icon:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png');}
+.nwsb-search-icon{width:18px;height:18px;object-fit:contain;display:block;filter:brightness(0) invert(1);flex-shrink:0;pointer-events:none;}
+/* Any search bar wrapper that uses position:relative + padding-left for the icon */
+.nwsb-search-wrap{position:relative;}
+.nwsb-search-wrap .nwsb-search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);}
+</style>
 
 <!-- BACKGROUND — changes per screen -->
 <div class="app-bg" id="appBg"></div>
@@ -1461,10 +1469,7 @@ window._fbServerTimestamp = () => serverTimestamp();
       <div class="word-search-input-wrap" onclick="event.stopPropagation()">
         <input class="word-search-input" id="wordSearchInput" type="text" placeholder="Enter a word..." onkeydown="if(event.key==='Enter'){openSub('word-search');setTimeout(()=>{document.getElementById('wsPageInput').value=this.value;wsPageSearch();},220);}">
         <button class="word-search-btn" onclick="openSub('word-search');setTimeout(()=>{var v=document.getElementById('wordSearchInput').value;if(v){document.getElementById('wsPageInput').value=v;wsPageSearch();}},220);">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <circle cx="8" cy="8" r="5.5" stroke="rgba(200,232,245,0.8)" stroke-width="1.4"/>
-            <path d="M12.5 12.5L16 16" stroke="rgba(200,232,245,0.8)" stroke-width="1.4" stroke-linecap="square"/>
-          </svg>
+          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="opacity:0.85;" alt="">
         </button>
       </div>
     </div>
@@ -1489,10 +1494,7 @@ window._fbServerTimestamp = () => serverTimestamp();
     <div class="krm-content" style="justify-content:flex-end;padding:0 16px 24px;">
       <div class="krm-search-wrap" onclick="event.stopPropagation()">
         <div class="krm-search-box">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;opacity:0.55;">
-            <circle cx="7" cy="7" r="4.5" stroke="rgba(200,232,245,0.9)" stroke-width="1.3"/>
-            <path d="M10.5 10.5L14 14" stroke="rgba(200,232,245,0.9)" stroke-width="1.3" stroke-linecap="square"/>
-          </svg>
+          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:16px;height:16px;opacity:0.55;" alt="">
           <input
             class="krm-input"
             id="krmInput"
@@ -5528,10 +5530,7 @@ function profilePickBanner() {
       <!-- Search bar -->
       <div class="rm-search-wrap">
         <div class="rm-search-inner">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;opacity:0.5;">
-            <circle cx="7" cy="7" r="4.5" stroke="rgba(200,232,245,0.9)" stroke-width="1.3"/>
-            <path d="M10.5 10.5L14 14" stroke="rgba(200,232,245,0.9)" stroke-width="1.3" stroke-linecap="square"/>
-          </svg>
+          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:16px;height:16px;opacity:0.5;" alt="">
           <input class="rm-search-input" id="rmSearchInput" type="text" placeholder="Type any word, name, country…" onkeydown="if(event.key==='Enter')rmSearch()">
           <button class="rm-search-btn" onclick="rmSearch()">Go</button>
         </div>
@@ -5800,7 +5799,10 @@ function profilePickBanner() {
             <div class="rm-catd-banner-sub">The Word Atelier</div>
           </div>
         </div>
-        <input type="text" class="rm-catd-search" id="rmCatDetailSearch" placeholder="Search words..." oninput="filterCatDetail(this.value)">
+        <div class="nwsb-search-wrap" style="margin:10px 12px 6px;">
+          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:14px;height:14px;opacity:0.35;" alt="">
+          <input type="text" class="rm-catd-search" id="rmCatDetailSearch" placeholder="Search words..." oninput="filterCatDetail(this.value)" style="margin:0;padding-left:34px;">
+        </div>
         <div class="rm-catd-grid" id="rmCatDetailGrid"></div>
       </div>
       <script>
@@ -12756,7 +12758,7 @@ window._PG        = PG;
       <div class="nwag-section-label">Real Meaning</div>
       <div class="nwag-card">
         <div class="nwag-card-icon">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5" stroke="#e8d5a3" stroke-width="1.4"/><path d="M12 12l3 3" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="square"/></svg>
+          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:18px;height:18px;filter:brightness(0) saturate(100%) invert(83%) sepia(18%) saturate(560%) hue-rotate(2deg) brightness(95%);" alt="">
         </div>
         <div class="nwag-card-body">
           <div class="nwag-card-title">Word origin search</div>
@@ -12886,7 +12888,7 @@ window._PG        = PG;
 
         <div class="nwag-section-tile" onclick="nwagOpenSection('real-meaning')">
           <div class="nwag-section-tile-icon">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5" stroke="#e8d5a3" stroke-width="1.4"/><path d="M12 12l3 3" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="square"/></svg>
+            <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:18px;height:18px;filter:brightness(0) saturate(100%) invert(83%) sepia(18%) saturate(560%) hue-rotate(2deg) brightness(95%);" alt="">
           </div>
           <div class="nwag-section-tile-name">Word Origins</div>
           <div class="nwag-section-tile-arr">→</div>
@@ -15138,10 +15140,7 @@ window.openSub = function(id) {
       <div class="ws-page-tagline">Word without dictionary</div>
 
       <div class="ws-page-bar">
-        <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
-          <circle cx="7.5" cy="7.5" r="5" stroke="rgba(200,232,245,0.9)" stroke-width="1.4"/>
-          <path d="M11.5 11.5L15 15" stroke="rgba(200,232,245,0.9)" stroke-width="1.4" stroke-linecap="square"/>
-        </svg>
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:17px;height:17px;opacity:0.45;margin-right:12px;" alt="">
         <input
           class="ws-page-input"
           id="wsPageInput"
@@ -15685,10 +15684,7 @@ function wsBuyThisWord() {
       <div class="ms-page-tagline">Sound before definition</div>
 
       <div class="ms-page-bar">
-        <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
-          <circle cx="7.5" cy="7.5" r="5" stroke="rgba(200,232,245,0.9)" stroke-width="1.4"/>
-          <path d="M11.5 11.5L15 15" stroke="rgba(200,232,245,0.9)" stroke-width="1.4" stroke-linecap="square"/>
-        </svg>
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:17px;height:17px;opacity:0.45;margin-right:12px;" alt="">
         <input
           class="ms-page-input"
           id="msPageInput"
@@ -17399,7 +17395,7 @@ document.getElementById('sub-social').addEventListener('transitionend', function
     <!-- search bar -->
     <div class="ig-searchwrap" style="display:flex;align-items:center;gap:10px;">
       <div class="ig-searchbar" style="flex:1;">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:17px;height:17px;opacity:0.55;" alt="">
         <input id="ig-search-input" type="text" placeholder="Search" oninput="IG.search(this.value)" onfocus="IG.searchFocus(true)">
         <svg id="ig-search-clear" onclick="IG.clearSearch()" style="display:none;cursor:pointer" width="18" height="18" viewBox="0 0 24 24" fill="#a8a8a8"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6" stroke="#000" stroke-width="2"/></svg>
       </div>
