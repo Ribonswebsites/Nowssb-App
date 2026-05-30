@@ -22145,14 +22145,7 @@ localStorage.removeItem('nwsb_black_edition');
 <style>
 .becd{width:4px;height:4px;background:rgba(232,213,163,0.3);transition:all 0.4s ease;flex-shrink:0;}
 .becd.active{width:20px;background:rgba(232,213,163,0.9);box-shadow:0 0 8px rgba(232,213,163,0.5);}
-/* Shared: all 3 black editions hide the two bg layers + black home/nav/drawer/settings */
-body.be-fashion #appBg, body.be-neo #appBg, body.be-glass #appBg,
-body.be-fashion #appBgLayer2, body.be-neo #appBgLayer2, body.be-glass #appBgLayer2 {
-  opacity:0 !important; transition:none !important;
-}
-body.be-fashion #home, body.be-neo #home, body.be-glass #home {
-  background:#000 !important;
-}
+/* BE themes: keep default glassmorphism bg images visible on #home — themes only style nav/drawer/settings */
 /* Fashion nav — deep neumorphic black (separate from neo/glass) */
 body.be-fashion #ig-bottomnav, body.be-fashion #ig-social-nav {
   background:#000 !important;
