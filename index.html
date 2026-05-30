@@ -1668,6 +1668,25 @@ window._fbServerTimestamp = () => serverTimestamp();
 <!-- ══ HAMBURGER MENU OVERLAY + DRAWER ══ -->
 <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
 <div class="menu-drawer" id="menuDrawer">
+
+  <!-- ── MENU INTRO PAGE ── -->
+  <div id="menuIntroPage" style="position:absolute;inset:0;z-index:50;background:#000;display:flex;flex-direction:column;overflow:hidden;transition:opacity 0.42s ease;pointer-events:all;">
+    <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779961020/grok_image_1779908680335_bed5rb.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="">
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0.55) 72%,rgba(0,0,0,0.92) 100%);pointer-events:none;"></div>
+    <!-- Back button -->
+    <button onclick="closeMenu()" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:14px;z-index:10;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:rgba(255,255,255,0.85);display:flex;align-items:center;gap:6px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <!-- Bottom content -->
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:0 26px 52px;">
+      <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.75);margin-bottom:10px;">NOWSBANSIU</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:34px;font-weight:800;color:#fff;line-height:1.05;letter-spacing:-0.5px;margin-bottom:8px;">Your<br>Menu</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:rgba(255,255,255,0.55);margin-bottom:28px;">Navigate your healing practice</div>
+      <button onclick="menuIntroEnter()" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#060c18;background:#e8d5a3;border:none;padding:15px 0;width:100%;cursor:pointer;transition:transform .1s;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''">Enter</button>
+    </div>
+  </div>
+
   <!-- Banner with Back button + header overlaid -->
   <div style="position:relative;overflow:hidden;height:180px;background:#0a0e1a;flex-shrink:0;">
     <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779961020/grok_image_1779909152435_ij2joo.jpg" alt="" loading="eager" decoding="async" style="width:100%;height:180px;display:block;object-fit:cover;object-position:center center;">
@@ -7438,6 +7457,16 @@ function closeDlPopup(e) {
 function openMenu() {
   document.getElementById('menuOverlay').classList.add('open');
   document.getElementById('menuDrawer').classList.add('open');
+  // Reset intro so it shows fresh each time menu opens
+  var intro = document.getElementById('menuIntroPage');
+  if (intro) { intro.style.opacity = '1'; intro.style.display = 'flex'; intro.style.pointerEvents = 'all'; }
+}
+function menuIntroEnter() {
+  var intro = document.getElementById('menuIntroPage');
+  if (!intro) return;
+  intro.style.transition = 'opacity 0.35s ease';
+  intro.style.opacity = '0';
+  setTimeout(function() { intro.style.display = 'none'; intro.style.pointerEvents = 'none'; }, 360);
 }
 function closeMenu() {
   document.getElementById('menuOverlay').classList.remove('open');
