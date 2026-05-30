@@ -232,9 +232,9 @@ function _doNavigate(dest) {
   // Hide auth loader if visible
   const loader = document.getElementById('authLoader');
   if (loader) loader.classList.remove('visible');
-  // Respect stored home mode preference — default is neumorphic
+  // Respect stored home mode preference — default is dark
   if (dest === 'home') {
-    var _pref = localStorage.getItem('nwsb_home_mode') || 'nm';
+    var _pref = localStorage.getItem('nwsb_home_mode') || 'dark';
     dest = (_pref === 'nm') ? 'home-nm' : 'home';
   }
   if (currentScreen !== dest) goTo(dest);
@@ -12329,6 +12329,13 @@ window.goTo = function(dest) {
       setTimeout(function(){ if (typeof showFashionHomeIntro === 'function') showFashionHomeIntro(); }, 120);
     }
   }
+  // Also trigger for home-nm (light mode home)
+  if (dest === 'home-nm') {
+    if (document.body.classList.contains('be-fashion') && !window._fashionHomeIntroSeen) {
+      window._fashionHomeIntroSeen = true;
+      setTimeout(function(){ if (typeof showFashionHomeIntro === 'function') showFashionHomeIntro(); }, 120);
+    }
+  }
 };
 
 /* ══ On load fallback ══ */
@@ -12992,7 +12999,7 @@ function nwagOpenSection(id) {
 
   // ensure home screen is visible before opening any sub-panel
   if (typeof goTo === 'function') {
-    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'nm';
+    var _pm2 = localStorage.getItem('nwsb_home_mode') || 'dark';
     goTo(_pm2 === 'nm' ? 'home-nm' : 'home');
   }
 
