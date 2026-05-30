@@ -22411,6 +22411,8 @@ body.be-glass .menu-nav-item {
     CLASSES.forEach(function(c){ document.body.classList.remove(c); });
     if (style) document.body.classList.add('be-'+style);
     localStorage.setItem('nwsb_be', style || '');
+    // Reset fashion home intro so it fires on next home visit when switching to fashion
+    if (style === 'fashion') window._fashionHomeIntroSeen = false;
     // Update card borders
     ['default','fashion','neo','glass'].forEach(function(s){
       var el = document.getElementById('be-card-'+s);
@@ -22420,8 +22422,8 @@ body.be-glass .menu-nav-item {
     });
   }
   window.setBE = setBE;
-  // Restore on load — default is 'fashion' (Fashion Black Edition)
-  setBE(localStorage.getItem('nwsb_be') || 'fashion');
+  // Restore on load — default is '' (no Black Edition)
+  setBE(localStorage.getItem('nwsb_be') || '');
 })();
 </script>
 
