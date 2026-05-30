@@ -20764,11 +20764,10 @@ window.ONBOARD = (function(){
   <!-- ══ BLACK EDITION INTRO PAGE ══ -->
   <div id="beIntroPage" style="position:absolute;inset:0;z-index:20;background:#000;display:flex;flex-direction:column;overflow:hidden;transition:opacity 0.48s cubic-bezier(0.4,0,0.2,1);">
 
-    <!-- Rotating background (fades between the two intro images) -->
-    <div style="position:absolute;inset:0;z-index:0;">
-      <div id="beBg1" style="position:absolute;inset:0;background:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/51d59000-5b5e-11f1-aed0-2ba1e609569d_nwrv0w.png') center/cover no-repeat;opacity:1;transition:opacity 1.4s ease;"></div>
-      <div id="beBg2" style="position:absolute;inset:0;background:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_soknfu.png') center/cover no-repeat;opacity:0;transition:opacity 1.4s ease;"></div>
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.1) 30%,rgba(0,0,0,0.6) 65%,rgba(0,0,0,0.96) 100%);"></div>
+    <!-- Rotating background (fades between the two intro images — no vignette, contain so full image shows) -->
+    <div style="position:absolute;inset:0;z-index:0;background:#000;">
+      <img id="beBg1" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/51d59000-5b5e-11f1-aed0-2ba1e609569d_nwrv0w.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;opacity:1;transition:opacity 1.4s ease;" alt="">
+      <img id="beBg2" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_soknfu.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;opacity:0;transition:opacity 1.4s ease;" alt="">
     </div>
 
     <!-- Top bar -->
@@ -20807,10 +20806,9 @@ window.ONBOARD = (function(){
   <div id="beMainContent" style="display:none;flex-direction:column;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#060c18;">
 
     <!-- Mini banner strip — crossfades between the two banner images -->
-    <div style="position:relative;height:180px;flex-shrink:0;overflow:hidden;">
-      <img id="beBanner1" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom.png" decoding="async" loading="eager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;opacity:1;transition:opacity 1.4s ease;">
-      <img id="beBanner2" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_o2zjbs.png" decoding="async" loading="eager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;opacity:0;transition:opacity 1.4s ease;">
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.1) 0%,rgba(6,12,24,0.9) 100%);"></div>
+    <div style="position:relative;flex-shrink:0;">
+      <img id="beBanner1" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom.png" decoding="async" loading="eager" style="display:block;width:100%;height:auto;opacity:1;transition:opacity 1.4s ease;">
+      <img id="beBanner2" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_o2zjbs.png" decoding="async" loading="eager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity 1.4s ease;">
       <button class="ss-panel-back" onclick="SS.close('blackedition')" style="position:absolute;top:16px;left:16px;z-index:10;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
       <div style="position:absolute;bottom:16px;left:20px;right:20px;z-index:2;">
         <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:4px;">NOWSBANSIU</div>
