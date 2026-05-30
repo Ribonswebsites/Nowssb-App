@@ -12314,7 +12314,7 @@ window.nwSubClose = function() {
   };
 })();
 
-/* ══ Hook goTo → fire tour on home ══ */
+/* ══ Hook goTo → fire tour on home + fashion intro ══ */
 var _origGoTo = window.goTo;
 window.goTo = function(dest) {
   if (_origGoTo) _origGoTo.apply(this, arguments);
@@ -12323,6 +12323,11 @@ window.goTo = function(dest) {
       try { if (!localStorage.getItem('nwsb_done')) start(); }
       catch(e){ start(); }
     }, 1000);
+    // Show Fashion home intro once per session when Black Edition Fashion is active
+    if (document.body.classList.contains('be-fashion') && !window._fashionHomeIntroSeen) {
+      window._fashionHomeIntroSeen = true;
+      setTimeout(function(){ if (typeof showFashionHomeIntro === 'function') showFashionHomeIntro(); }, 120);
+    }
   }
 };
 
@@ -22533,6 +22538,43 @@ function beFlipStart(){
     if (btn) { btn.textContent = 'APPLIED!'; btn.style.background = '#fff'; setTimeout(function(){ btn.textContent = 'APPLY — '+BE_LABELS[beActive].toUpperCase(); btn.style.background = '#e8d5a3'; }, 1400); }
   };
 })();
+</script>
+
+<!-- ══ FASHION HOME INTRO OVERLAY ══ -->
+<div id="fashionHomeIntro" style="display:none;position:fixed;inset:0;z-index:99990;background:#000;overflow:hidden;">
+  <!-- Full-bleed fashion hero image -->
+  <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780142466/e1bce500-5835-11f1-9971-736215a430db_qh1vfh.webp"
+       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;" alt="">
+  <!-- Bottom gradient vignette -->
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0.55) 75%,rgba(6,12,24,0.92) 100%);pointer-events:none;"></div>
+  <!-- Content -->
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:0 28px 52px;text-align:left;">
+    <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.7);margin-bottom:10px;">NowssB — Black Edition</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:32px;font-weight:800;color:#fff;line-height:1.1;letter-spacing:-0.5px;margin-bottom:8px;">Healing<br>is Fashion.</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;color:rgba(255,255,255,0.62);line-height:1.55;margin-bottom:32px;">Where word science meets the language of style.</div>
+    <button onclick="fashionHomeIntroEnter()" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#060c18;background:#e8d5a3;border:none;border-radius:14px;padding:16px 40px;cursor:pointer;display:block;width:100%;transition:transform .1s;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''">Enter</button>
+  </div>
+</div>
+
+<script>
+window.showFashionHomeIntro = function() {
+  var el = document.getElementById('fashionHomeIntro');
+  if (!el) { if (typeof goTo === 'function') goTo('home'); return; }
+  el.style.display = 'block';
+  el.style.opacity = '0';
+  el.style.transition = 'opacity 0.5s ease';
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.style.opacity = '1'; }); });
+};
+window.fashionHomeIntroEnter = function() {
+  var el = document.getElementById('fashionHomeIntro');
+  if (!el) { if (typeof goTo === 'function') goTo('home'); return; }
+  el.style.transition = 'opacity 0.38s ease';
+  el.style.opacity = '0';
+  setTimeout(function(){
+    el.style.display = 'none';
+    if (typeof goTo === 'function') goTo('home');
+  }, 400);
+};
 </script>
 </body>
 </html>
