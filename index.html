@@ -6384,7 +6384,8 @@ function goTo(id) {
 setTimeout(() => {
   if (currentScreen !== 'splash') return;
   window._splashDone = true;
-  goTo(window._splashRoute || 'login');
+  if (typeof _doNavigate === 'function') _doNavigate(window._splashRoute || 'home');
+  else goTo(window._splashRoute || 'login');
 }, 5000);
 
 // ══════════════════════════════════════════════════════════════════
@@ -12318,22 +12319,17 @@ window.nwSubClose = function() {
 var _origGoTo = window.goTo;
 window.goTo = function(dest) {
   if (_origGoTo) _origGoTo.apply(this, arguments);
-  if (dest === 'home') {
+  if (dest === 'home' || dest === 'home-nm') {
     setTimeout(function(){
       try { if (!localStorage.getItem('nwsb_done')) start(); }
       catch(e){ start(); }
     }, 1000);
-    // Show Fashion home intro once per session when Black Edition Fashion is active
+    // Show Fashion home intro once per session when Fashion Black Edition is active
     if (document.body.classList.contains('be-fashion') && !window._fashionHomeIntroSeen) {
       window._fashionHomeIntroSeen = true;
-      setTimeout(function(){ if (typeof showFashionHomeIntro === 'function') showFashionHomeIntro(); }, 120);
-    }
-  }
-  // Also trigger for home-nm (light mode home)
-  if (dest === 'home-nm') {
-    if (document.body.classList.contains('be-fashion') && !window._fashionHomeIntroSeen) {
-      window._fashionHomeIntroSeen = true;
-      setTimeout(function(){ if (typeof showFashionHomeIntro === 'function') showFashionHomeIntro(); }, 120);
+      setTimeout(function(){
+        if (window.showFashionHomeIntro) showFashionHomeIntro();
+      }, 180);
     }
   }
 };
@@ -22424,8 +22420,8 @@ body.be-glass .menu-nav-item {
     });
   }
   window.setBE = setBE;
-  // Restore on load — default is '' (original)
-  setBE(localStorage.getItem('nwsb_be') || '');
+  // Restore on load — default is 'fashion' (Fashion Black Edition)
+  setBE(localStorage.getItem('nwsb_be') || 'fashion');
 })();
 </script>
 
