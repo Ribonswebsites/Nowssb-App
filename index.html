@@ -22691,9 +22691,12 @@ window.fashionHomeIntroEnter = function() {
   el.style.opacity = '0';
   setTimeout(function(){
     el.style.display = 'none';
-    // Navigate to home-nm after intro — ensures correct landing regardless of prior screen
-    if (typeof _doNavigate === 'function') _doNavigate('home');
-    else if (typeof goTo === 'function') goTo('home-nm');
+    // Close any open sub-screens (settings, social, etc.) that overlay home-nm
+    document.querySelectorAll('.sub-screen.open').forEach(function(s){ s.classList.remove('open'); });
+    // If currentScreen changed during the intro, navigate back to home-nm
+    if (typeof currentScreen !== 'undefined' && currentScreen !== 'home-nm') {
+      if (typeof goTo === 'function') goTo('home-nm');
+    }
   }, 400);
 };
 </script>
