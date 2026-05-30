@@ -19304,7 +19304,11 @@ window.chatInboxClose = function() {
   if (bn && overlay._prevBn !== null) bn.style.display = overlay._prevBn || '';
   if (sn && overlay._prevSn !== null) sn.style.display = overlay._prevSn || '';
   overlay.style.display = 'none';
-  setSocialNavActive('chat');
+  // Highlight chat button in social nav (setSocialNavActive is private to IG IIFE)
+  ['home','feed','profile','chat'].forEach(function(k){
+    var el = document.getElementById('igsn-'+k);
+    if (el) el.classList.toggle('active', k === 'chat');
+  });
 };
 window.chatInboxNew = function() {
   chatInboxClose();
@@ -20068,6 +20072,18 @@ window._igInitFollowing = function() {
 
 // Sync following state 2s after page load (auth resolves by then)
 setTimeout(window._igInitFollowing, 2000);
+
+// ── Override editProfile to close IG screens before opening Settings ──
+// sub-ig-profile is later in DOM than sub-social (same z-index 600), so it renders
+// on top — we must remove 'open' from IG screens before showing Settings.
+window.IG.editProfile = function() {
+  document.getElementById('sub-ig-profile').classList.remove('open');
+  document.getElementById('sub-people').classList.remove('open');
+  if (typeof openSub === 'function') {
+    openSub('social');
+    if (typeof ssOpenPanel === 'function') setTimeout(function(){ ssOpenPanel('profile-edit'); }, 150);
+  }
+};
 
 // ── IG profile menu (three-dots button) ──
 window.IG.menu = function() {
