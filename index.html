@@ -12386,6 +12386,10 @@ window.goTo = function(dest) {
   if (dest === 'home') dest = document.body.classList.contains('be-fashion') ? 'home' : 'home-nm';
   if (_origGoTo) _origGoTo.apply(this, [dest]);
   if (dest === 'home-nm') {
+    // Leaving Fashion mode — deactivate BE so home-nm loads clean
+    if (document.body.classList.contains('be-fashion')) {
+      document.body.classList.remove('be-fashion');
+    }
     setTimeout(function(){
       try { if (!localStorage.getItem('nwsb_done')) start(); }
       catch(e){ start(); }
@@ -22477,16 +22481,11 @@ body.be-glass .menu-nav-item {
   function setBE(style, explicit) {
     CLASSES.forEach(function(c){ document.body.classList.remove(c); });
     if (style) document.body.classList.add('be-'+style);
-    localStorage.setItem('nwsb_be', style || '');
-    if (style === 'fashion') {
-      if (explicit) {
-        // Show intro immediately over current screen — Enter button navigates home
-        window._fashionHomeIntroSeen = true;
-        if (window.showFashionHomeIntro) window.showFashionHomeIntro();
-      } else {
-        // Page-load restore — block auto-intro
-        window._fashionHomeIntroSeen = true;
-      }
+    // Fashion is transient — never persist it; only persist neo/glass choices
+    if (style !== 'fashion') localStorage.setItem('nwsb_be', style || '');
+    if (style === 'fashion' && explicit) {
+      window._fashionHomeIntroSeen = true;
+      if (window.showFashionHomeIntro) window.showFashionHomeIntro();
     }
     // Update card borders
     ['default','fashion','neo','glass'].forEach(function(s){
@@ -22497,8 +22496,10 @@ body.be-glass .menu-nav-item {
     });
   }
   window.setBE = setBE;
-  // Restore on load — default is '' (no Black Edition)
-  setBE(localStorage.getItem('nwsb_be') || '');
+  // On load: restore neo/glass only — clear any stale 'fashion' that may have been saved
+  var stored = localStorage.getItem('nwsb_be') || '';
+  if (stored === 'fashion') { localStorage.setItem('nwsb_be', ''); stored = ''; }
+  setBE(stored);
 })();
 </script>
 
