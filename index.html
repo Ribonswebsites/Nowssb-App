@@ -22119,12 +22119,8 @@ function _showSubscriptionSuccess(planId) {
 .cwp-back::after,.chk-back::after,.ms-hero-back::after,.rmd-back-btn::after,
 .rm-catd-back::after,.wl-close-btn::after,.pap-back-btn::after,
 .ms-detail-close::after,.rt-intro-back::after {
-  content:'';
-  display:block;
-  width:18px; height:18px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M12 5l-7 7 7 7'/%3E%3C/svg%3E");
-  background-size:contain; background-repeat:no-repeat; background-position:center;
-  opacity:0.85;
+  display:none !important;
+  content:none !important;
 }
 /* Nav style — controlled by body.nav-glass / nav-neo / nav-solid */
 /* GLASS (default) */
@@ -22458,6 +22454,45 @@ body.be-glass .menu-nav-icon {
 }
 body.be-glass .menu-nav-item {
   border-bottom-color:rgba(255,255,255,0.07) !important;
+}
+</style>
+
+<!-- ── UNIVERSAL BACK BUTTON IMAGE ── -->
+<style>
+/* All back buttons across the entire app use this single image */
+.nm-back-btn,.obn-back,.btn-back,.ssp-back-btn,
+.sl-intro-back,.sl-back-btn,.sub-back,.pap-back-btn,
+.rmd-back-btn,.rm-catd-back,.ms-hero-back,.cwp-back,
+.wish-intro-back,.chk-back,.hcpi-back-btn,.nss-banner-back,
+.rt-intro-back,.sb-intro-back,.ms-detail-close,.wl-close-btn,
+.ss-panel-back {
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:7px !important;
+}
+/* Hide every inline SVG inside any back button */
+.nm-back-btn svg,.obn-back svg,.btn-back svg,.ssp-back-btn svg,
+.sl-intro-back svg,.sl-back-btn svg,.sub-back svg,.pap-back-btn svg,
+.rmd-back-btn svg,.rm-catd-back svg,.ms-hero-back svg,.cwp-back svg,
+.wish-intro-back svg,.chk-back svg,.hcpi-back-btn svg,.nss-banner-back svg,
+.rt-intro-back svg,.sb-intro-back svg,.ms-detail-close svg,.wl-close-btn svg,
+.ss-panel-back svg {
+  display:none !important;
+}
+/* Inject custom back image via ::before on every back button class */
+.nm-back-btn::before,.obn-back::before,.btn-back::before,.ssp-back-btn::before,
+.sl-intro-back::before,.sl-back-btn::before,.sub-back::before,.pap-back-btn::before,
+.rmd-back-btn::before,.rm-catd-back::before,.ms-hero-back::before,.cwp-back::before,
+.wish-intro-back::before,.chk-back::before,.hcpi-back-btn::before,.nss-banner-back::before,
+.rt-intro-back::before,.sb-intro-back::before,.ms-detail-close::before,.wl-close-btn::before,
+.ss-panel-back::before {
+  content:'' !important;
+  display:block !important;
+  width:22px !important;
+  height:22px !important;
+  background:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780207753/02cd3710-5cb7-11f1-a488-eb4ba8668ed2_v4eqem.png') no-repeat center/contain !important;
+  flex-shrink:0 !important;
+  opacity:0.85;
 }
 </style>
 
