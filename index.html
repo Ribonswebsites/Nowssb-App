@@ -21374,7 +21374,7 @@ window.ONBOARD = (function(){
   </div>
 
   <!-- ══ MAIN CONTENT (shown after intro dismissed) ══ -->
-  <div id="ispMainContent" style="display:none;flex-direction:column;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#060c18;">
+  <div id="ispMainContent" style="display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#060c18;">
 
     <!-- Mini banner with title overlay -->
     <div style="position:relative;flex-shrink:0;">
@@ -21420,12 +21420,12 @@ window.ONBOARD = (function(){
           <div style="position:absolute;bottom:0;left:0;right:0;padding:9px;text-align:center;background:rgba(0,0,0,0.6);"><span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#e8d5a3;font-family:'DM Sans',sans-serif;">SOUND BATH</span></div>
         </div>
         <div class="ispci" style="position:absolute;width:150px;height:210px;top:50%;left:50%;margin-left:-75px;margin-top:-105px;overflow:hidden;border:2px solid rgba(255,255,255,0.18);box-shadow:0 24px 60px rgba(0,0,0,0.7);cursor:pointer;will-change:transform,opacity;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:0;">
-          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:9px;text-align:center;background:rgba(0,0,0,0.6);"><span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#e8d5a3;font-family:'DM Sans',sans-serif;">LIBRARY</span></div>
+          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780142466/e1bce500-5835-11f1-9971-736215a430db_qh1vfh.webp" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:9px;text-align:center;background:rgba(0,0,0,0.6);"><span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#e8d5a3;font-family:'DM Sans',sans-serif;">FASHION</span></div>
         </div>
         <div class="ispci" style="position:absolute;width:150px;height:210px;top:50%;left:50%;margin-left:-75px;margin-top:-105px;overflow:hidden;border:2px solid rgba(255,255,255,0.18);box-shadow:0 24px 60px rgba(0,0,0,0.7);cursor:pointer;will-change:transform,opacity;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:0;">
-          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780083906/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_o2zjbs.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:9px;text-align:center;background:rgba(0,0,0,0.6);"><span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#e8d5a3;font-family:'DM Sans',sans-serif;">STORE</span></div>
+          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780213180/60d712a0-5cc0-11f1-b2eb-f765c6244362_1_gqljyn.webp" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:9px;text-align:center;background:rgba(0,0,0,0.6);"><span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#e8d5a3;font-family:'DM Sans',sans-serif;">NEO</span></div>
         </div>
         <div class="ispci" style="position:absolute;width:150px;height:210px;top:50%;left:50%;margin-left:-75px;margin-top:-105px;overflow:hidden;border:2px solid rgba(255,255,255,0.18);box-shadow:0 24px 60px rgba(0,0,0,0.7);cursor:pointer;will-change:transform,opacity;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:0;">
           <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780213180/grok_image_1780213016088_vdd4vv.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
@@ -21901,7 +21901,7 @@ window.ONBOARD = (function(){
 <script>
 (function() {
   // ── Carousel state ──
-  var ispActive = 0, ispItems = null, ispDotEls = null, ISP_N = 10;
+  var ispActive = 0, ispItems = null, ispDotEls = null, ISP_N = 10, _ispTimer = null;
 
   function ispCfg(s) {
     var a = Math.abs(s), d = s < 0 ? -1 : 1;
@@ -21958,6 +21958,10 @@ window.ONBOARD = (function(){
     ispItems.forEach(function(el, i){
       el.addEventListener('click', function(e){ e.stopPropagation(); ispGo(i); });
     });
+
+    // Auto-rotate — fast (1.1 s per card)
+    clearInterval(_ispTimer);
+    _ispTimer = setInterval(function(){ ispGo(ispActive + 1); }, 1100);
   };
 
   // ── Intro page enter / reset ──
@@ -21980,6 +21984,7 @@ window.ONBOARD = (function(){
   };
 
   window.ispIntroReset = function() {
+    clearInterval(_ispTimer); _ispTimer = null;
     var intro = document.getElementById('ispIntroPage');
     var main  = document.getElementById('ispMainContent');
     if (intro) { intro.style.display = 'flex'; intro.style.opacity = '1'; intro.style.pointerEvents = ''; }
@@ -21991,7 +21996,7 @@ window.ONBOARD = (function(){
 
   // Called from settings row onclick — shows intro page fresh each time
   window.ispStart = function() { ispIntroReset(); };
-  window.ispStop  = function() { /* nothing to stop */ };
+  window.ispStop  = function() { clearInterval(_ispTimer); _ispTimer = null; };
 
   window.ispToggleIntros = function() {
     var on = localStorage.getItem('nwsb_intros') !== 'off';
