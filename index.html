@@ -21472,7 +21472,7 @@ window.ONBOARD = (function(){
   </div>
 
   <!-- ══ MAIN CONTENT (shown after intro dismissed) ══ -->
-  <div id="ispMainContent" style="display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#060c18;">
+  <div id="ispMainContent" style="display:none;flex-direction:column;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#060c18;">
 
     <!-- Mini banner with title overlay -->
     <div style="position:relative;flex-shrink:0;">
@@ -21544,8 +21544,8 @@ window.ONBOARD = (function(){
     </div>
 
     <!-- SETTINGS toggle -->
-    <div class="ss-section-title">SETTINGS</div>
-    <div class="sg" style="margin:0 0 16px;">
+    <div class="ss-section-title" style="padding-top:8px;">SETTINGS</div>
+    <div class="ss-section" style="margin:0 16px 20px;">
       <div class="sr last" onclick="ispToggleIntros()">
         <div class="sr-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#e8d5a3;">
