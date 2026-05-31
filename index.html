@@ -22534,19 +22534,33 @@ body.fashion-home-active.nwsb-theme-default #sub-social .sr {
   border-bottom-color: rgba(255,255,255,0.05) !important;
 }
 
-/* ── BLACK EDITION ── */
-body.fashion-home-active.nwsb-theme-black #appBg,
+/* ── BLACK EDITION — Complete Black ── */
+/* Single background image: CSS overrides JS inline style */
+body.fashion-home-active.nwsb-theme-black #appBg {
+  background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780209363/grok_image_1780209143800_i8lcry.jpg') !important;
+  background-size:cover !important;
+  background-position:center !important;
+  opacity:1 !important;
+  transition:none !important;
+}
+/* Hide the second crossfade layer — one image only */
 body.fashion-home-active.nwsb-theme-black #appBgLayer2 {
   opacity:0 !important;
-  transition:opacity 0.4s ease !important;
+  transition:none !important;
 }
+/* Body base */
+body.nwsb-theme-black {
+  background:#000 !important;
+}
+/* Header */
 body.fashion-home-active.nwsb-theme-black .home-header {
   background:#000 !important;
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
-  border-bottom:1px solid rgba(255,255,255,0.06) !important;
+  border-bottom:1px solid rgba(255,255,255,0.05) !important;
   box-shadow:0 4px 20px rgba(0,0,0,0.95) !important;
 }
+/* Bottom nav + social nav */
 body.fashion-home-active.nwsb-theme-black #ig-bottomnav,
 body.fashion-home-active.nwsb-theme-black #ig-social-nav {
   background:#000 !important;
@@ -22555,23 +22569,70 @@ body.fashion-home-active.nwsb-theme-black #ig-social-nav {
   border-top:none !important;
   box-shadow:0 -6px 24px rgba(0,0,0,0.98) !important;
 }
+/* Settings panel */
 body.fashion-home-active.nwsb-theme-black #sub-social {
   background:#000 !important;
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
 }
+/* Settings groups + sections */
+body.fashion-home-active.nwsb-theme-black #sub-social .sg,
+body.fashion-home-active.nwsb-theme-black #sub-social .ss-section {
+  background:#0a0a0a !important;
+  border-color:rgba(255,255,255,0.05) !important;
+  backdrop-filter:none !important;
+}
+/* Settings rows */
+body.fashion-home-active.nwsb-theme-black #sub-social .sr {
+  background:#050505 !important;
+  border-bottom-color:rgba(255,255,255,0.04) !important;
+}
+/* Settings row icons */
+body.fashion-home-active.nwsb-theme-black #sub-social .sr-icon {
+  background:#111 !important;
+  border-color:rgba(255,255,255,0.06) !important;
+}
+/* Settings search input */
+body.fashion-home-active.nwsb-theme-black #sub-social .ss-input,
+body.fashion-home-active.nwsb-theme-black #sub-social input {
+  background:#0a0a0a !important;
+  border-color:rgba(255,255,255,0.07) !important;
+  color:#fff !important;
+}
+/* Settings main view + tab content */
+body.fashion-home-active.nwsb-theme-black #sub-social #ss-main-view,
+body.fashion-home-active.nwsb-theme-black #sub-social .ss-tab-content {
+  background:#000 !important;
+}
+/* Menu drawer */
 body.fashion-home-active.nwsb-theme-black .menu-drawer {
   background:#000 !important;
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
 }
+/* Menu section group headers */
+body.fashion-home-active.nwsb-theme-black .menu-section-group {
+  background:#080808 !important;
+}
+/* Menu nav items */
 body.fashion-home-active.nwsb-theme-black .menu-nav-item {
   background:#050505 !important;
-  border-bottom-color:rgba(255,255,255,0.05) !important;
+  border-bottom-color:rgba(255,255,255,0.04) !important;
 }
+/* Menu nav icons */
 body.fashion-home-active.nwsb-theme-black .menu-nav-icon {
+  background:#0f0f0f !important;
+  border-color:rgba(255,255,255,0.06) !important;
+}
+/* Home cards + tiles */
+body.fashion-home-active.nwsb-theme-black .home-card,
+body.fashion-home-active.nwsb-theme-black .home-grid-tile,
+body.fashion-home-active.nwsb-theme-black .hm-tile,
+body.fashion-home-active.nwsb-theme-black .home-section-card {
   background:#0a0a0a !important;
-  border-color:rgba(255,255,255,0.07) !important;
+  border-color:rgba(255,255,255,0.06) !important;
+  backdrop-filter:none !important;
+  box-shadow:0 4px 16px rgba(0,0,0,0.9) !important;
 }
 
 /* ── NEUMORPHISM (NEO) — Very High Depth ── */
