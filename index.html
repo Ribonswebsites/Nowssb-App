@@ -961,8 +961,8 @@ window._fbServerTimestamp = () => serverTimestamp();
     <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');window._fashionHomeIntroSeen=true;goTo('home-nm')" title="Light Mode" style="width:36px;height:36px;border:none;cursor:pointer;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);flex-shrink:0;">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 0112 0" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="2" fill="#e8d5a3"/><path d="M8 2v1M8 13v1M2 8H1M15 8h-1" stroke="#e8d5a3" stroke-width="1.4" stroke-linecap="round"/></svg>
     </button>
-    <div id="homeMenuBtn" style="width:36px;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);flex-shrink:0;" onclick="openMenu()">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780207753/25935860-5cb7-11f1-a488-eb4ba8668ed2_vhv3rm.png" style="width:20px;height:20px;object-fit:contain;display:block;opacity:0.85;" alt="">
+    <div id="homeMenuBtn" style="width:40px;height:40px;background:none;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;" onclick="openMenu()">
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780207753/25935860-5cb7-11f1-a488-eb4ba8668ed2_vhv3rm.png" style="width:28px;height:28px;object-fit:contain;display:block;opacity:0.9;" alt="">
     </div>
   </div>
 </div>
@@ -16385,9 +16385,7 @@ function msBuyThisWord() {
       <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(6,12,24,0.28) 0%,rgba(6,12,24,0.00) 22%,rgba(6,12,24,0.04) 48%,rgba(6,12,24,0.62) 72%,rgba(6,12,24,0.92) 92%,rgba(6,12,24,0.98) 100%);"></div>
       <!-- Top bar -->
       <div style="position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top,20px),20px) 18px 0;">
-        <button onclick="ssClosePanel('subscription')" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        </button>
+        <button class="ss-back" onclick="ssClosePanel('subscription')"></button>
         <span style="font-size:7px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);background:rgba(6,12,24,0.50);border:1px solid rgba(200,232,245,0.18);padding:5px 12px;backdrop-filter:blur(6px);">NOWSBANSIU EDITION</span>
       </div>
       <!-- Bottom content -->
@@ -22089,16 +22087,16 @@ function _showSubscriptionSuccess(planId) {
 .menu-close-btn,.sub-back,.sl-intro-back,.sl-back-btn,.ss-back,.ss-panel-back,
 .ssp-back-btn,.nm-back-btn,.obn-back,.btn-back,.hcpi-back-btn,.nss-banner-back,
 .cwp-back,.chk-back,.ms-hero-back,.rmd-back-btn,.rm-catd-back,.wl-close-btn,
-.pap-back-btn,.ms-detail-close,.rt-intro-back {
-  width:44px !important; height:44px !important;
-  min-width:44px !important; min-height:44px !important;
-  background:rgba(6,12,24,0.35) !important;
-  border:1px solid rgba(255,255,255,0.25) !important;
+.pap-back-btn,.ms-detail-close,.rt-intro-back,.wish-cat-back,.wish-intro-back,.sb-intro-back {
+  width:40px !important; height:40px !important;
+  min-width:40px !important; min-height:40px !important;
+  background:none !important;
+  border:none !important;
   display:flex !important; align-items:center !important; justify-content:center !important;
   cursor:pointer !important; flex-shrink:0 !important;
   padding:0 !important; gap:0 !important;
   font-size:0 !important; color:transparent !important;
-  overflow:hidden !important; box-shadow:none !important;
+  overflow:visible !important; box-shadow:none !important;
   text-decoration:none !important;
 }
 /* Hide any inner elements (existing SVGs, text spans, etc.) */
@@ -22107,14 +22105,15 @@ function _showSubscriptionSuccess(planId) {
 .obn-back > *,.btn-back > *,.hcpi-back-btn > *,.nss-banner-back > *,
 .cwp-back > *,.chk-back > *,.ms-hero-back > *,.rmd-back-btn > *,
 .rm-catd-back > *,.wl-close-btn > *,.pap-back-btn > *,.ms-detail-close > *,
-.rt-intro-back > * { display:none !important; }
-/* Show the arrow via ::after — works regardless of button content */
+.rt-intro-back > *,.wish-cat-back > *,.wish-intro-back > *,.sb-intro-back > * { display:none !important; }
+/* Suppress ::after on all */
 .menu-close-btn::after,.sub-back::after,.sl-intro-back::after,.sl-back-btn::after,
 .ss-back::after,.ss-panel-back::after,.ssp-back-btn::after,.nm-back-btn::after,
 .obn-back::after,.btn-back::after,.hcpi-back-btn::after,.nss-banner-back::after,
 .cwp-back::after,.chk-back::after,.ms-hero-back::after,.rmd-back-btn::after,
 .rm-catd-back::after,.wl-close-btn::after,.pap-back-btn::after,
-.ms-detail-close::after,.rt-intro-back::after {
+.ms-detail-close::after,.rt-intro-back::after,.wish-cat-back::after,
+.wish-intro-back::after,.sb-intro-back::after {
   display:none !important;
   content:none !important;
 }
@@ -22455,40 +22454,21 @@ body.be-glass .menu-nav-item {
 
 <!-- ── UNIVERSAL BACK BUTTON IMAGE ── -->
 <style>
-/* All back buttons across the entire app use this single image */
-.nm-back-btn,.obn-back,.btn-back,.ssp-back-btn,
-.sl-intro-back,.sl-back-btn,.sub-back,.pap-back-btn,
-.rmd-back-btn,.rm-catd-back,.ms-hero-back,.cwp-back,
-.wish-intro-back,.chk-back,.hcpi-back-btn,.nss-banner-back,
-.rt-intro-back,.sb-intro-back,.ms-detail-close,.wl-close-btn,
-.ss-panel-back {
-  display:inline-flex !important;
-  align-items:center !important;
-  gap:7px !important;
-}
-/* Hide every inline SVG inside any back button */
-.nm-back-btn svg,.obn-back svg,.btn-back svg,.ssp-back-btn svg,
-.sl-intro-back svg,.sl-back-btn svg,.sub-back svg,.pap-back-btn svg,
-.rmd-back-btn svg,.rm-catd-back svg,.ms-hero-back svg,.cwp-back svg,
-.wish-intro-back svg,.chk-back svg,.hcpi-back-btn svg,.nss-banner-back svg,
-.rt-intro-back svg,.sb-intro-back svg,.ms-detail-close svg,.wl-close-btn svg,
-.ss-panel-back svg {
-  display:none !important;
-}
-/* Inject custom back image via ::before on every back button class */
+/* Inject custom back image via ::before — covers every back button in the app */
 .nm-back-btn::before,.obn-back::before,.btn-back::before,.ssp-back-btn::before,
 .sl-intro-back::before,.sl-back-btn::before,.sub-back::before,.pap-back-btn::before,
 .rmd-back-btn::before,.rm-catd-back::before,.ms-hero-back::before,.cwp-back::before,
-.wish-intro-back::before,.chk-back::before,.hcpi-back-btn::before,.nss-banner-back::before,
-.rt-intro-back::before,.sb-intro-back::before,.ms-detail-close::before,.wl-close-btn::before,
-.ss-panel-back::before {
+.wish-intro-back::before,.wish-cat-back::before,.chk-back::before,.hcpi-back-btn::before,
+.nss-banner-back::before,.rt-intro-back::before,.sb-intro-back::before,
+.ms-detail-close::before,.wl-close-btn::before,.ss-panel-back::before,
+.menu-close-btn::before,.ss-back::before {
   content:'' !important;
   display:block !important;
-  width:22px !important;
-  height:22px !important;
+  width:30px !important;
+  height:30px !important;
   background:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780207753/02cd3710-5cb7-11f1-a488-eb4ba8668ed2_v4eqem.png') no-repeat center/contain !important;
   flex-shrink:0 !important;
-  opacity:0.85;
+  opacity:0.9 !important;
 }
 </style>
 
