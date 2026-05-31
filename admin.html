@@ -316,6 +316,91 @@ body { background: var(--bg); color: #fff; font-family: 'DM Sans', sans-serif; m
     <div style="color:rgba(255,255,255,0.25);font-size:13px;text-align:center;padding:28px 0;">No words submitted yet.</div>
   </div>
 
+  <!-- ══ INSTAGRAM ══ -->
+  <div class="sec-label" style="margin-top:40px;">SOCIAL</div>
+  <div style="padding:0 16px;">
+    <a id="igLink" href="https://www.instagram.com/nowssb" target="_blank" style="display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(131,58,180,0.12),rgba(252,175,69,0.10),rgba(255,56,92,0.10));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px 20px;text-decoration:none;">
+      <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="4" stroke="#fff" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1.2" fill="#fff"/></svg>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;">NowssB Instagram</div>
+        <div id="igHandle" style="font-size:12px;color:rgba(255,255,255,0.45);">@nowssb</div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M7 17L17 7M17 7H7M17 7v10" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="field" style="margin-top:10px;">
+      <label>Instagram Handle (tap to update)</label>
+      <input id="igHandleInput" placeholder="@nowssb" style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;" oninput="updateIgLink(this.value)">
+    </div>
+  </div>
+
+  <!-- ══ USER ACCESS CONTROL ══ -->
+  <div class="sec-label" style="margin-top:40px;">USER ACCESS CONTROL</div>
+  <div class="form-wrap">
+    <div class="field">
+      <label>Search User by Email or UID</label>
+      <input id="uSearch" placeholder="user@example.com or Firebase UID" onkeydown="if(event.key==='Enter')searchUser()">
+    </div>
+  </div>
+  <div class="btn-wrap" style="margin-bottom:14px;">
+    <button class="btn-primary" onclick="searchUser()" id="uSearchBtn">Find User</button>
+  </div>
+
+  <!-- User result card -->
+  <div id="userResultCard" style="display:none;padding:0 16px;margin-bottom:24px;">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div id="uAvatar" style="width:44px;height:44px;border-radius:50%;background:rgba(232,213,163,0.15);border:1.5px solid rgba(232,213,163,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--gold);flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+          <div id="uName" style="font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+          <div id="uEmail" style="font-size:12px;color:rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+        </div>
+        <div id="uBlockedBadge" style="display:none;padding:3px 10px;background:rgba(220,80,80,0.12);border:1px solid rgba(220,80,80,0.3);border-radius:8px;font-size:10px;font-weight:700;color:rgba(220,80,80,0.85);letter-spacing:0.5px;flex-shrink:0;">BLOCKED</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <div style="padding:5px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.45);">Tier: <span id="uTier" style="color:#fff;font-weight:600;"></span></div>
+        <div style="padding:5px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.45);">Words: <span id="uWordCount" style="color:#fff;font-weight:600;"></span></div>
+        <div style="padding:5px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.45);">Joined: <span id="uJoined" style="color:#fff;font-weight:600;"></span></div>
+      </div>
+
+      <!-- Grant Access -->
+      <div style="font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:8px;">Grant Free Access</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px;">
+        <button onclick="grantAccess('resonance')" style="padding:10px 6px;background:rgba(200,232,245,0.07);border:1px solid rgba(200,232,245,0.2);border-radius:10px;color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;">Resonance</button>
+        <button onclick="grantAccess('frequency')" style="padding:10px 6px;background:rgba(232,213,163,0.07);border:1px solid rgba(232,213,163,0.25);border-radius:10px;color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;">Frequency</button>
+        <button onclick="grantAccess('frequencyX')" style="padding:10px 6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);border-radius:10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;">Frequency X</button>
+      </div>
+      <button onclick="revokeAccess()" style="width:100%;padding:9px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(255,255,255,0.35);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:12px;">Revoke All Access</button>
+
+      <!-- Block / Unblock -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button id="blockBtn" onclick="blockUser(true)" style="padding:11px;background:rgba(220,80,80,0.08);border:1px solid rgba(220,80,80,0.22);border-radius:10px;color:rgba(220,80,80,0.85);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Block User</button>
+        <button id="unblockBtn" onclick="blockUser(false)" style="padding:11px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);border-radius:10px;color:rgba(16,185,129,0.85);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Unblock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SEND WORD TO USER ══ -->
+  <div class="sec-label" style="margin-top:8px;">SEND WORD TO USER</div>
+  <div class="form-wrap">
+    <div class="field">
+      <label>User Email or UID</label>
+      <input id="swEmail" placeholder="user@example.com or Firebase UID">
+    </div>
+    <div class="field">
+      <label>Word Name (exact, uppercase)</label>
+      <input id="swWord" placeholder="e.g. AAROGYA" oninput="this.value=this.value.toUpperCase()">
+    </div>
+    <div class="field">
+      <label>Note to User (optional)</label>
+      <input id="swNote" placeholder="e.g. A gift from the NowssB team">
+    </div>
+  </div>
+  <div class="btn-wrap" style="margin-bottom:40px;">
+    <button class="btn-primary" onclick="sendWordToUser()">Send Word</button>
+  </div>
+
 </div><!-- /mainWrap -->
 
 <!-- NOTIF PANEL -->
@@ -682,7 +767,188 @@ window.addEventListener('DOMContentLoaded', function(){
     document.getElementById('mainWrap').style.display = 'block';
     initPanel();
   }
+  // Restore saved IG handle
+  var savedHandle = localStorage.getItem('nwsb_ig_handle') || '@nowssb';
+  document.getElementById('igHandleInput').value = savedHandle;
+  updateIgLink(savedHandle);
 });
+</script>
+
+<!-- ── FIREBASE SDK ── -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+const _fbApp = initializeApp({
+  apiKey: "AIzaSyBly5XnqNnpVom11thjlvT5q_BfxNJBfgQ",
+  authDomain: "nowssb-34f1b.firebaseapp.com",
+  projectId: "nowssb-34f1b",
+  storageBucket: "nowssb-34f1b.firebasestorage.app",
+  messagingSenderId: "1024709686012",
+  appId: "1:1024709686012:web:20d425060043141a0b5d79"
+}, 'admin-panel');
+
+const _db = getFirestore(_fbApp);
+var _foundUid = null;
+
+// ── INSTAGRAM LINK ──
+window.updateIgLink = function(val) {
+  val = val || '@nowssb';
+  var handle = val.replace(/^@/, '');
+  var displayHandle = '@' + handle;
+  document.getElementById('igHandle').textContent = displayHandle;
+  document.getElementById('igLink').href = 'https://www.instagram.com/' + handle;
+  localStorage.setItem('nwsb_ig_handle', displayHandle);
+};
+
+// ── SEARCH USER ──
+window.searchUser = async function() {
+  var input = document.getElementById('uSearch').value.trim();
+  if (!input) { showToast('Enter an email or UID', true); return; }
+  var btn = document.getElementById('uSearchBtn');
+  btn.textContent = 'Searching…';
+  btn.disabled = true;
+  _foundUid = null;
+  document.getElementById('userResultCard').style.display = 'none';
+
+  try {
+    var userData = null;
+    // Try as UID first
+    var snap = await getDoc(doc(_db, 'users', input));
+    if (snap.exists()) {
+      _foundUid = input;
+      userData = snap.data();
+    } else {
+      // Try as email
+      var q = query(collection(_db, 'users'), where('email', '==', input));
+      var qs = await getDocs(q);
+      if (!qs.empty) {
+        qs.forEach(function(d){ _foundUid = d.id; userData = d.data(); });
+      }
+    }
+    if (!userData) { showToast('User not found', true); return; }
+    renderUserCard(_foundUid, userData);
+  } catch(e) {
+    showToast('Error: ' + e.message, true);
+  } finally {
+    btn.textContent = 'Find User';
+    btn.disabled = false;
+  }
+};
+
+function renderUserCard(uid, d) {
+  var name = d.displayName || d.name || 'Unknown';
+  var email = d.email || uid;
+  var tier = d.tier || (d.isPro ? 'pro' : 'free');
+  var words = (d.ownedWords || []).length;
+  var joined = d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '—';
+  var blocked = !!d.blocked;
+
+  document.getElementById('uAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('uName').textContent = name;
+  document.getElementById('uEmail').textContent = email;
+  document.getElementById('uTier').textContent = tier;
+  document.getElementById('uWordCount').textContent = words;
+  document.getElementById('uJoined').textContent = joined;
+  document.getElementById('uBlockedBadge').style.display = blocked ? 'block' : 'none';
+  document.getElementById('blockBtn').style.opacity = blocked ? '0.35' : '1';
+  document.getElementById('unblockBtn').style.opacity = blocked ? '1' : '0.35';
+  document.getElementById('userResultCard').style.display = 'block';
+}
+
+// ── GRANT ACCESS ──
+window.grantAccess = async function(tier) {
+  if (!_foundUid) { showToast('Find a user first', true); return; }
+  try {
+    await setDoc(doc(_db, 'users', _foundUid), {
+      isPro: true,
+      tier: tier,
+      subscriptionType: 'admin_grant',
+      subscriptionGrantedAt: new Date().toISOString(),
+      subscriptionGrantedBy: 'CEO Admin'
+    }, { merge: true });
+    document.getElementById('uTier').textContent = tier;
+    showToast('Access granted: ' + tier);
+  } catch(e) {
+    showToast('Failed: ' + e.message, true);
+  }
+};
+
+// ── REVOKE ACCESS ──
+window.revokeAccess = async function() {
+  if (!_foundUid) { showToast('Find a user first', true); return; }
+  try {
+    await setDoc(doc(_db, 'users', _foundUid), {
+      isPro: false,
+      tier: null,
+      subscriptionType: null
+    }, { merge: true });
+    document.getElementById('uTier').textContent = 'free';
+    showToast('Access revoked');
+  } catch(e) {
+    showToast('Failed: ' + e.message, true);
+  }
+};
+
+// ── BLOCK / UNBLOCK ──
+window.blockUser = async function(block) {
+  if (!_foundUid) { showToast('Find a user first', true); return; }
+  try {
+    await setDoc(doc(_db, 'users', _foundUid), {
+      blocked: block,
+      blockedAt: block ? new Date().toISOString() : null,
+      blockedBy: block ? 'CEO Admin' : null
+    }, { merge: true });
+    document.getElementById('uBlockedBadge').style.display = block ? 'block' : 'none';
+    document.getElementById('blockBtn').style.opacity = block ? '0.35' : '1';
+    document.getElementById('unblockBtn').style.opacity = block ? '1' : '0.35';
+    showToast(block ? 'User blocked' : 'User unblocked');
+  } catch(e) {
+    showToast('Failed: ' + e.message, true);
+  }
+};
+
+// ── SEND WORD TO USER ──
+window.sendWordToUser = async function() {
+  var emailOrUid = document.getElementById('swEmail').value.trim();
+  var word = document.getElementById('swWord').value.trim().toUpperCase();
+  var note = document.getElementById('swNote').value.trim();
+  if (!emailOrUid) { showToast('Enter an email or UID', true); return; }
+  if (!word) { showToast('Enter the word name', true); return; }
+
+  var btn = document.querySelector('[onclick="sendWordToUser()"]');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+
+  try {
+    var uid = null, userData = null;
+    var snap = await getDoc(doc(_db, 'users', emailOrUid));
+    if (snap.exists()) {
+      uid = emailOrUid; userData = snap.data();
+    } else {
+      var q = query(collection(_db, 'users'), where('email', '==', emailOrUid));
+      var qs = await getDocs(q);
+      if (!qs.empty) { qs.forEach(function(d){ uid=d.id; userData=d.data(); }); }
+    }
+    if (!uid) { showToast('User not found', true); return; }
+
+    var update = { ownedWords: arrayUnion(word) };
+    if (note) {
+      var gifts = userData.adminGifts || [];
+      gifts.push({ word: word, note: note, sentAt: new Date().toISOString() });
+      update.adminGifts = gifts;
+    }
+    await setDoc(doc(_db, 'users', uid), update, { merge: true });
+
+    document.getElementById('swEmail').value = '';
+    document.getElementById('swWord').value = '';
+    document.getElementById('swNote').value = '';
+    showToast('"' + word + '" sent to user');
+  } catch(e) {
+    showToast('Failed: ' + e.message, true);
+  } finally {
+    btn.textContent = 'Send Word'; btn.disabled = false;
+  }
+};
 </script>
 </body>
 </html>

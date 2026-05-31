@@ -141,6 +141,12 @@ async function _resolveUserRoute(user) {
     setTimeout(function(){ if (window._spRefreshPromo) window._spRefreshPromo(); }, 100);
   }
   if (data.gender) window._userGender = data.gender;
+  // Blocked users are signed out immediately
+  if (data.blocked) {
+    if (typeof signOut === 'function') try { signOut(auth); } catch(e) {}
+    alert('Your account has been suspended. Please contact support.');
+    return 'login';
+  }
   if (data.onboardingDone) return 'home';
   // If they finished signup but never completed onboarding (old accounts / skipped) → go home
   if (data.profileStepDone) {
