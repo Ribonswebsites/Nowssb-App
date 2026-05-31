@@ -1797,20 +1797,13 @@ window._fbServerTimestamp = () => serverTimestamp();
 .sp-lib-sc.selected,.sp-lib-sc.sel{color:#e8d5a3;background:rgba(232,213,163,0.1);border-color:rgba(232,213,163,0.4);}
 .sp-sentence-btn{flex-shrink:0;padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(200,232,245,0.8);background:rgba(200,232,245,0.07);border:1px solid rgba(200,232,245,0.22);cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;transition:all 0.2s;white-space:nowrap;}
 .sp-sentence-btn:disabled{opacity:0.3;pointer-events:none;}
-.sp-bottom-new{display:flex;align-items:center;justify-content:space-between;padding:8px 16px calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,12px),12px) + 4px);position:relative;z-index:10;flex-shrink:0;gap:8px;}
-.sp-ctrl-strip{display:flex;align-items:center;gap:3px;flex-shrink:0;}
-.sp-ctrl-btn{width:38px;height:38px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.11);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:0.3px;color:rgba(255,255,255,0.52);font-family:'DM Sans',sans-serif;transition:background 0.15s,border-color 0.15s,color 0.15s;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
-.sp-ctrl-btn.active{color:#e8d5a3;border-color:rgba(232,213,163,0.42);background:rgba(232,213,163,0.09);}
-.sp-ctrl-btn:active{opacity:0.65;}
-.sp-ctrl-sep{width:1px;height:24px;background:rgba(255,255,255,0.1);flex-shrink:0;margin:0 2px;}
-.sp-nav-compact{display:flex;align-items:center;gap:10px;}
-.sp-complete-btn-sm{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,213,163,0.85);background:rgba(232,213,163,0.07);border:1px solid rgba(232,213,163,0.22);padding:9px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
-.sp-complete-btn-sm:disabled{opacity:0.4;}
-.sp-meaning-card{flex:1;max-width:130px;min-width:90px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:border-color 0.2s;}
-.sp-meaning-card:active{border-color:rgba(232,213,163,0.4);}
-.sp-mc-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,232,245,0.4);margin-bottom:4px;font-family:'DM Sans',sans-serif;}
-.sp-mc-text{font-size:11px;font-weight:600;color:rgba(255,255,255,0.82);line-height:1.4;font-family:'DM Sans',sans-serif;}
-.sp-mc-organ{font-size:9px;color:rgba(232,213,163,0.55);margin-top:3px;font-family:'DM Sans',sans-serif;}
+.sp-cam-bar{display:flex;align-items:stretch;flex-shrink:0;position:relative;z-index:10;background:rgba(6,12,24,0.92);border-top:1px solid rgba(255,255,255,0.07);padding-bottom:calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,6px),6px));}
+.sp-cam-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 2px;background:none;border:none;border-right:1px solid rgba(255,255,255,0.06);cursor:pointer;color:rgba(255,255,255,0.42);font-family:'DM Sans',sans-serif;font-size:6.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:color 0.14s,background 0.14s;-webkit-tap-highlight-color:transparent;min-width:0;}
+.sp-cam-btn:last-child{border-right:none;}
+.sp-cam-btn.active{color:#e8d5a3;background:rgba(232,213,163,0.06);}
+.sp-cam-btn:active{background:rgba(255,255,255,0.06);}
+.sp-cam-btn:disabled,.sp-cam-btn[disabled]{opacity:0.22;pointer-events:none;}
+.sp-cam-icon{display:flex;align-items:center;justify-content:center;width:22px;height:18px;}
 #spScoreWrap{max-height:130px;overflow:hidden;}
 /* Meaning expand sheet */
 #spMeaningSheet{position:fixed;bottom:0;left:0;right:0;z-index:9000;background:#060c18;border-top:1px solid rgba(255,255,255,0.12);padding:20px 20px calc(var(--nav-height,58px) + 24px);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);}
@@ -2539,36 +2532,40 @@ function renderPractice() {
         </div>
       </div>
 
-      <!-- BOTTOM ROW: controls | nav | meaning -->
-      <div class="sp-bottom-new">
-        <!-- Control strip -->
-        <div class="sp-ctrl-strip">
-          <button class="sp-ctrl-btn${_pwVoice==='F'?' active':''}" onclick="pwSetVoice('F')">F</button>
-          <button class="sp-ctrl-btn${_pwVoice==='M'?' active':''}" onclick="pwSetVoice('M')">M</button>
-          <div class="sp-ctrl-sep"></div>
-          <button class="sp-ctrl-btn${_pwLoop?' active':''}" onclick="pwToggleLoop()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
-          </button>
-          <button class="sp-ctrl-btn sp-ri-rep" onclick="pwCycleRepTarget()">${_pwRepTarget}<span style="font-size:8px;opacity:0.7;">×</span></button>
-        </div>
-        <!-- Compact nav -->
-        <div class="sp-nav-compact">
-          <button class="sp-nav-btn" onclick="pwPrevWord()" ${isFirst?'disabled':''}>
-            <svg width="13" height="11" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/></svg>
-          </button>
-          <button class="sp-complete-btn-sm" id="pwCompleteBtn" onclick="pwCompleteSession()" ${_pwDone?'disabled':''}>
-            ${_pwDone?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="rgba(232,213,163,0.9)" stroke-width="1.6" stroke-linecap="square"/></svg>':'Done'}
-          </button>
-          <button class="sp-nav-btn" onclick="pwNextWord()" ${isLast?'disabled':''}>
-            <svg width="13" height="11" viewBox="0 0 16 14" fill="none"><path d="M9 1L15 7L9 13" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="square"/><line x1="15" y1="7" x2="1" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/></svg>
-          </button>
-        </div>
-        <!-- Meaning card -->
-        <div class="sp-meaning-card" onclick="pwExpandMeaning()">
-          <div class="sp-mc-label">Meaning</div>
-          <div class="sp-mc-text">${w.meaning.length > 32 ? w.meaning.slice(0,30)+'…' : w.meaning}</div>
-          <div class="sp-mc-organ">${w.organ}</div>
-        </div>
+      <!-- CAMERA FUNCTION BAR (Sony-style: icon + label, one row) -->
+      <div class="sp-cam-bar">
+        <button class="sp-cam-btn" onclick="pwPrevWord()" ${isFirst?'disabled':''}>
+          <div class="sp-cam-icon"><svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          PREV
+        </button>
+        <button class="sp-cam-btn${_pwVoice==='F'?' active':''}" onclick="pwSetVoice('F')">
+          <div class="sp-cam-icon" style="font-size:13px;font-weight:800;">F</div>
+          FEMALE
+        </button>
+        <button class="sp-cam-btn${_pwVoice==='M'?' active':''}" onclick="pwSetVoice('M')">
+          <div class="sp-cam-icon" style="font-size:13px;font-weight:800;">M</div>
+          MALE
+        </button>
+        <button class="sp-cam-btn${_pwLoop?' active':''}" onclick="pwToggleLoop()">
+          <div class="sp-cam-icon"><svg width="15" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 21 3 17 7 13"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></div>
+          LOOP
+        </button>
+        <button class="sp-cam-btn sp-ri-rep" onclick="pwCycleRepTarget()">
+          <div class="sp-cam-icon" style="font-size:13px;font-weight:800;">${_pwRepTarget}×</div>
+          REPS
+        </button>
+        <button class="sp-cam-btn" onclick="pwExpandMeaning()">
+          <div class="sp-cam-icon"><svg width="14" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="currentColor" stroke-width="1.6"/><line x1="0" y1="7" x2="12" y2="7" stroke="currentColor" stroke-width="1.6"/><line x1="0" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          MEANING
+        </button>
+        <button class="sp-cam-btn${_pwDone?' active':''}" onclick="pwCompleteSession()" ${_pwDone?'disabled':''}>
+          <div class="sp-cam-icon"><svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M1 7L5.5 11.5L15 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg></div>
+          DONE
+        </button>
+        <button class="sp-cam-btn" onclick="pwNextWord()" ${isLast?'disabled':''}>
+          <div class="sp-cam-icon"><svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M9 1L15 7L9 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/><line x1="15" y1="7" x2="1" y2="7" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          NEXT
+        </button>
       </div>
 
       <!-- Meaning expand sheet (fixed bottom overlay) -->
@@ -23382,8 +23379,8 @@ window.pwToggleRadial = function() {
 window.pwCycleRepTarget = function() {
   var t = [3,7,21]; var i = t.indexOf(_pwRepTarget);
   _pwRepTarget = t[(i+1)%t.length];
-  var ri = document.querySelector('.sp-ri-rep');
-  if (ri) ri.innerHTML = _pwRepTarget + '<span style="font-size:8px;opacity:0.7;">×</span>';
+  var ri = document.querySelector('.sp-ri-rep .sp-cam-icon');
+  if (ri) ri.textContent = _pwRepTarget + '×';
 };
 window.pwExpandMeaning = function() {
   var s = document.getElementById('spMeaningSheet');
