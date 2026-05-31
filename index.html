@@ -232,6 +232,11 @@ function _doNavigate(dest) {
   // Hide auth loader if visible
   const loader = document.getElementById('authLoader');
   if (loader) loader.classList.remove('visible');
+  // Route 'home' to the user's preferred home screen (default: home-nm)
+  if (dest === 'home') {
+    var homeMode = localStorage.getItem('nwsb_home_mode') || 'nm';
+    if (homeMode !== 'home') dest = 'home-nm';
+  }
   if (currentScreen !== dest) goTo(dest);
 }
 
@@ -1180,7 +1185,7 @@ window._fbServerTimestamp = () => serverTimestamp();
     </div>
 
     <!-- Switch to Fashion Mode section -->
-    <div onclick="setBE('fashion',true)" style="width:100%;margin-top:8px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
+    <div onclick="localStorage.setItem('nwsb_home_mode','home');setNwsbTheme('black',true);goTo('home')" style="width:100%;margin-top:8px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
       <div>
         <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(232,213,163,0.65);margin-bottom:4px;">Experience</div>
         <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:600;color:#fff;letter-spacing:0.2px;">Fashion Mode</div>
@@ -16085,7 +16090,7 @@ function msBuyThisWord() {
             </div>
 
             <!-- Black Edition (solid black) -->
-            <div id="theme-card-black" onclick="setNwsbTheme('black')" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
+            <div id="theme-card-black" onclick="setNwsbTheme('black',true)" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);position:relative;aspect-ratio:0.6;">
               <div style="position:absolute;inset:0;background:#000;"></div>
               <div style="position:absolute;top:8px;left:6px;right:6px;height:18px;background:#000;border-radius:4px;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
               <div style="position:absolute;top:30px;left:6px;right:6px;height:10px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.06);"></div>
@@ -22587,15 +22592,15 @@ body.fashion-home-active.nwsb-theme-glass-black #sub-social .sr-icon {
   var THEME_CLASSES = ['nwsb-theme-default','nwsb-theme-black','nwsb-theme-neo','nwsb-theme-glass-black'];
   var OLD_BE_CLASSES = ['be-fashion','be-neo','be-glass'];
 
-  window.setNwsbTheme = function(theme) {
+  window.setNwsbTheme = function(theme, explicit) {
     theme = theme || 'default';
     THEME_CLASSES.forEach(function(c){ document.body.classList.remove(c); });
     OLD_BE_CLASSES.forEach(function(c){ document.body.classList.remove(c); });
     document.body.classList.add('nwsb-theme-' + theme);
     localStorage.setItem('nwsb_theme', theme);
 
-    // Fashion intro only for Black theme
-    if (theme === 'black' && !window._fashionHomeIntroSeen) {
+    // Fashion intro only when user explicitly selects Black — never on page-load restore
+    if (theme === 'black' && explicit && !window._fashionHomeIntroSeen) {
       window._fashionHomeIntroSeen = true;
       if (window.showFashionHomeIntro) window.showFashionHomeIntro();
     }
@@ -22810,6 +22815,8 @@ window.fashionHomeIntroEnter = function() {
   el.style.opacity = '0';
   setTimeout(function(){
     el.style.display = 'none';
+    // Persist Fashion home as the preferred home screen
+    localStorage.setItem('nwsb_home_mode', 'home');
     // Close any open sub-screens (settings, social, etc.)
     document.querySelectorAll('.sub-screen.open').forEach(function(s){ s.classList.remove('open'); });
     // Navigate home — wrapper routes to #home for Fashion BE, home-nm otherwise
