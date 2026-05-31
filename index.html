@@ -16209,10 +16209,10 @@ function msBuyThisWord() {
         <!-- Experience -->
         <div class="slbl" data-ss-section>EXPERIENCE</div>
         <div class="sg" data-ss-group style="padding:0 18px;margin-bottom:24px;">
-          <div class="sr" id="intro-setting-row" onclick="event.stopPropagation();ssToggleIntros(document.getElementById('tgl-intros'))">
+          <div class="sr" id="intro-setting-row" onclick="ssOpenPanel('intro-settings');ispStart();">
             <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657311/6d8a1280-57ad-11f1-ae7e-3f26811e4481_tjz4an.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
-            <div class="sr-body"><div class="sr-label">Screen Meditation Intros</div><div class="sr-sub">Cinematic intros prime your mind before each section</div></div>
-            <div class="stgl" id="tgl-intros" style="background:#e8d5a3;"><div class="stgl-knob" style="left:24px;background:#060c18;"></div></div>
+            <div class="sr-body"><div class="sr-label">Screen Meditation Intros</div><div class="sr-sub" id="isp-status-sub">Showing before each section</div></div>
+            <svg class="sr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
           </div>
           <div class="sr" onclick="event.stopPropagation();ssToggle('haptic',document.getElementById('tgl-haptic'))">
             <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657309/3208f590-57ae-11f1-ae7e-3f26811e4481_spytes.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
@@ -21340,6 +21340,81 @@ window.ONBOARD = (function(){
   </div><!-- /beMainContent -->
 </div><!-- /ss-panel-blackedition -->
 
+<!-- ══ INTRO SETTINGS PANEL ══ -->
+<div class="ss-panel" id="ss-panel-intro-settings" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+
+  <!-- ── IMAGE CAROUSEL AREA ── -->
+  <div style="flex:0 0 auto;position:relative;width:100%;height:58%;min-height:300px;background:#000;overflow:hidden;">
+    <!-- Two crossfading images (auto-rotate every 3.5s) -->
+    <img id="ispBg1" src="https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777973723/grok_image_1777967661568_pbau2f.jpg"
+      style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;opacity:1;transition:opacity 1.4s ease;" alt="">
+    <img id="ispBg2" src="https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965419/grok_image_1777891898700_zzskwn.jpg"
+      style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block;opacity:0;transition:opacity 1.4s ease;" alt="">
+
+    <!-- Bottom gradient fade into content -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(to bottom,transparent 0%,rgba(6,12,24,0.7) 60%,#060c18 100%);pointer-events:none;z-index:5;"></div>
+
+    <!-- Top bar: back button + three dots -->
+    <div style="position:absolute;top:0;left:0;right:0;z-index:10;padding:max(env(safe-area-inset-top,18px),18px) 18px 0;display:flex;align-items:center;justify-content:space-between;">
+      <button class="ss-panel-back" onclick="ssClosePanel('intro-settings');ispStop();">Back</button>
+      <!-- Three dots — matches intro page style -->
+      <button onclick="ssClosePanel('intro-settings');ispStop();"
+        style="width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);">
+        <svg width="4" height="18" viewBox="0 0 4 18" fill="none">
+          <circle cx="2" cy="2" r="2" fill="rgba(255,255,255,0.75)"/>
+          <circle cx="2" cy="9" r="2" fill="rgba(255,255,255,0.75)"/>
+          <circle cx="2" cy="16" r="2" fill="rgba(255,255,255,0.75)"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Dot indicators -->
+    <div style="position:absolute;bottom:22px;left:0;right:0;z-index:10;display:flex;justify-content:center;align-items:center;gap:7px;">
+      <div class="isp-dot" style="height:3px;width:18px;background:rgba(255,255,255,0.9);border-radius:2px;transition:all 0.45s ease;"></div>
+      <div class="isp-dot" style="height:3px;width:6px;background:rgba(255,255,255,0.35);border-radius:2px;transition:all 0.45s ease;"></div>
+      <div class="isp-dot" style="height:3px;width:6px;background:rgba(255,255,255,0.35);border-radius:2px;transition:all 0.45s ease;"></div>
+      <div class="isp-dot" style="height:3px;width:6px;background:rgba(255,255,255,0.35);border-radius:2px;transition:all 0.45s ease;"></div>
+      <div class="isp-dot" style="height:3px;width:6px;background:rgba(255,255,255,0.35);border-radius:2px;transition:all 0.45s ease;"></div>
+    </div>
+  </div>
+
+  <!-- ── CONTENT AREA ── -->
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 20px calc(var(--nav-height,58px) + 28px);">
+
+    <!-- Title -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:22px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;letter-spacing:-0.3px;margin-bottom:5px;">Intro Pages</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.42);font-family:'DM Sans',sans-serif;line-height:1.5;">Cinematic micro-meditations before each section of the app</div>
+    </div>
+
+    <div style="width:32px;height:1px;background:linear-gradient(90deg,rgba(232,213,163,0.45),rgba(232,213,163,0.06));margin-bottom:20px;"></div>
+
+    <!-- Research note -->
+    <div style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;margin-bottom:24px;">
+      Each intro is a precision-designed micro-meditation rooted in NOWSBANSIU Word Science research. The brief visual priming activates the brain's predictive processing system, shifting you from a reactive state into a receptive, healing state before practice begins.
+    </div>
+
+    <!-- Toggle row -->
+    <div class="sg" style="padding:0 18px;">
+      <div class="sr last" onclick="ispToggleIntros()">
+        <div class="sr-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:#e8d5a3;">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div class="sr-body">
+          <div class="sr-label">Show Intro Pages</div>
+          <div class="sr-sub">Cinematic screens before each section</div>
+        </div>
+        <div class="stgl" id="isp-toggle" style="background:#e8d5a3;">
+          <div class="stgl-knob" style="left:24px;background:#060c18;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /ss-panel-intro-settings -->
+
 
 <script>
 /* Move ss-panels that are outside #sub-social into it so the scoped CSS applies */
@@ -21348,7 +21423,7 @@ window.ONBOARD = (function(){
     var social = document.getElementById('sub-social');
     if (!social){ setTimeout(move, 100); return; }
     ['ss-panel-voice','ss-panel-speed','ss-panel-reps','ss-panel-sensitivity',
-     'ss-panel-ambient','ss-panel-chatperm','ss-panel-blackedition'
+     'ss-panel-ambient','ss-panel-chatperm','ss-panel-blackedition','ss-panel-intro-settings'
     ].forEach(function(id){
       var el = document.getElementById(id);
       if (el && el.parentNode !== social) social.appendChild(el);
@@ -21549,6 +21624,7 @@ window.ONBOARD = (function(){
 (function() {
   function shouldShowIntro(key) {
     var mode = localStorage.getItem('nwsb_intros') || 'always';
+    if (mode === 'off') return false;
     if (mode === 'always') return true;
     if (!window._introSeen) window._introSeen = {};
     if (window._introSeen[key]) return false;
@@ -21585,13 +21661,11 @@ window.ONBOARD = (function(){
   };
 
   window._introWarnConfirm = function() {
-    localStorage.setItem('nwsb_intros', 'once');
+    localStorage.setItem('nwsb_intros', 'off');
     var el = document.getElementById('tgl-intros');
-    if (el) {
-      var knob = el.querySelector('.stgl-knob');
-      if (knob) knob.style.left = '4px';
-      el.style.background = 'rgba(255,255,255,0.1)';
-    }
+    if (el) { var knob = el.querySelector('.stgl-knob'); if (knob) knob.style.left = '4px'; el.style.background = 'rgba(255,255,255,0.1)'; }
+    var isp = document.getElementById('isp-toggle');
+    if (isp) { var k2 = isp.querySelector('.stgl-knob'); if (k2) { k2.style.left='4px'; k2.style.background='rgba(255,255,255,.52)'; } isp.style.background='rgba(255,255,255,.12)'; }
     document.getElementById('intro-warn-modal').style.display = 'none';
   };
 
@@ -21755,6 +21829,81 @@ window.ONBOARD = (function(){
   })();
 
   });
+})();
+</script>
+
+<!-- ── INTRO SETTINGS PANEL — carousel + toggle logic ── -->
+<script>
+(function() {
+  var ISP_IMAGES = [
+    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777973723/grok_image_1777967661568_pbau2f.jpg',
+    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965419/grok_image_1777891898700_zzskwn.jpg',
+    'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778246066/grok_image_1778245944595_jbjdb2.jpg',
+    'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778761511/906bb480-4f7d-11f1-948a-2573bbbbb305_mxc2tx.webp',
+    'https://res.cloudinary.com/ds6duqabl/image/upload/v1780083905/51d59000-5b5e-11f1-aed0-2ba1e609569d_nwrv0w.png'
+  ];
+  var _idx = 0, _timer = null, _aActive = true;
+
+  function _dots(i) {
+    document.querySelectorAll('.isp-dot').forEach(function(d, j) {
+      d.style.opacity = j === i ? '1' : '0.35';
+      d.style.width   = j === i ? '18px' : '6px';
+    });
+  }
+
+  function _rotate() {
+    var show = document.getElementById(_aActive ? 'ispBg2' : 'ispBg1');
+    var hide = document.getElementById(_aActive ? 'ispBg1' : 'ispBg2');
+    if (!show || !hide) return;
+    _idx = (_idx + 1) % ISP_IMAGES.length;
+    show.src = ISP_IMAGES[_idx];
+    show.style.opacity = '1';
+    hide.style.opacity = '0';
+    _aActive = !_aActive;
+    _dots(_idx);
+  }
+
+  window.ispStart = function() {
+    _idx = 0; _aActive = true;
+    var b1 = document.getElementById('ispBg1');
+    var b2 = document.getElementById('ispBg2');
+    if (b1) { b1.src = ISP_IMAGES[0]; b1.style.opacity = '1'; }
+    if (b2) { b2.style.opacity = '0'; }
+    _dots(0);
+    // Sync toggle to current localStorage state
+    var tgl = document.getElementById('isp-toggle');
+    if (tgl) {
+      var knob = tgl.querySelector('.stgl-knob');
+      var on = localStorage.getItem('nwsb_intros') !== 'off';
+      tgl.style.background = on ? '#e8d5a3' : 'rgba(255,255,255,.12)';
+      if (knob) { knob.style.left = on ? '24px' : '4px'; knob.style.background = on ? '#060c18' : 'rgba(255,255,255,.52)'; }
+    }
+    // Sync status subtitle in settings row
+    var sub = document.getElementById('isp-status-sub');
+    if (sub) sub.textContent = localStorage.getItem('nwsb_intros') === 'off' ? 'Currently off' : 'Showing before each section';
+    clearInterval(_timer);
+    _timer = setInterval(_rotate, 3500);
+  };
+
+  window.ispStop = function() { clearInterval(_timer); };
+
+  window.ispToggleIntros = function() {
+    var on = localStorage.getItem('nwsb_intros') !== 'off';
+    if (on) {
+      document.getElementById('intro-warn-modal').style.display = 'flex';
+    } else {
+      localStorage.setItem('nwsb_intros', 'always');
+      window._introSeen = {};
+      var tgl = document.getElementById('isp-toggle');
+      if (tgl) {
+        var knob = tgl.querySelector('.stgl-knob');
+        tgl.style.background = '#e8d5a3';
+        if (knob) { knob.style.left = '24px'; knob.style.background = '#060c18'; }
+      }
+      var sub = document.getElementById('isp-status-sub');
+      if (sub) sub.textContent = 'Showing before each section';
+    }
+  };
 })();
 </script>
 
