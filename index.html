@@ -22844,49 +22844,96 @@ body.fashion-home-active.nwsb-theme-neo #home .hero-glass {
     inset 0 1px 0 rgba(255,255,255,0.04) !important;
 }
 
-/* ── GLASS BLACK ── */
+/* ── GLASS BLACK — Black-tinted glassmorphism, both background images, full blur ── */
+/* Background images stay (JS controls them) — no override needed */
+/* Header */
 body.fashion-home-active.nwsb-theme-glass-black .home-header {
-  background:rgba(0,0,0,0.6) !important;
-  backdrop-filter:blur(32px) saturate(1.6) !important;
-  -webkit-backdrop-filter:blur(32px) saturate(1.6) !important;
-  border-bottom:1px solid rgba(255,255,255,0.05) !important;
-  box-shadow:0 4px 24px rgba(0,0,0,0.75) !important;
+  background:rgba(0,0,0,0.62) !important;
+  backdrop-filter:blur(32px) saturate(1.8) !important;
+  -webkit-backdrop-filter:blur(32px) saturate(1.8) !important;
+  border-bottom:1px solid rgba(255,255,255,0.06) !important;
+  box-shadow:0 4px 24px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06) !important;
 }
+/* Bottom nav + social nav */
 body.fashion-home-active.nwsb-theme-glass-black #ig-bottomnav,
 body.fashion-home-active.nwsb-theme-glass-black #ig-social-nav {
-  background:rgba(0,0,0,0.65) !important;
-  backdrop-filter:blur(32px) saturate(1.6) !important;
-  -webkit-backdrop-filter:blur(32px) saturate(1.6) !important;
-  border-top:1px solid rgba(255,255,255,0.04) !important;
-  box-shadow:0 -4px 24px rgba(0,0,0,0.7) !important;
+  background:rgba(0,0,0,0.68) !important;
+  backdrop-filter:blur(32px) saturate(1.8) !important;
+  -webkit-backdrop-filter:blur(32px) saturate(1.8) !important;
+  border-top:1px solid rgba(255,255,255,0.05) !important;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.75) !important;
 }
+/* Settings panel */
 body.fashion-home-active.nwsb-theme-glass-black #sub-social {
-  background:rgba(0,0,0,0.78) !important;
-  backdrop-filter:blur(32px) saturate(1.6) !important;
-  -webkit-backdrop-filter:blur(32px) saturate(1.6) !important;
+  background:rgba(0,0,0,0.82) !important;
+  backdrop-filter:blur(40px) saturate(1.6) !important;
+  -webkit-backdrop-filter:blur(40px) saturate(1.6) !important;
 }
-body.fashion-home-active.nwsb-theme-glass-black .menu-drawer {
-  background:rgba(0,0,0,0.78) !important;
-  backdrop-filter:blur(32px) saturate(1.6) !important;
-  -webkit-backdrop-filter:blur(32px) saturate(1.6) !important;
+/* Settings main view + tab content */
+body.fashion-home-active.nwsb-theme-glass-black #sub-social #ss-main-view,
+body.fashion-home-active.nwsb-theme-glass-black #sub-social .ss-tab-content {
+  background:transparent !important;
 }
-body.fashion-home-active.nwsb-theme-glass-black .menu-nav-icon {
-  background:rgba(255,255,255,0.05) !important;
-  border-color:rgba(255,255,255,0.14) !important;
-  backdrop-filter:blur(10px) !important;
-}
-body.fashion-home-active.nwsb-theme-glass-black .menu-nav-item {
-  border-bottom-color:rgba(255,255,255,0.06) !important;
-}
+/* Settings groups + sections */
 body.fashion-home-active.nwsb-theme-glass-black #sub-social .sg,
 body.fashion-home-active.nwsb-theme-glass-black #sub-social .ss-section {
   background:rgba(255,255,255,0.04) !important;
-  border-color:rgba(255,255,255,0.08) !important;
+  border-color:rgba(255,255,255,0.09) !important;
+  backdrop-filter:blur(14px) !important;
+  -webkit-backdrop-filter:blur(14px) !important;
+}
+/* Settings rows */
+body.fashion-home-active.nwsb-theme-glass-black #sub-social .sr {
+  background:rgba(255,255,255,0.03) !important;
+  border-bottom-color:rgba(255,255,255,0.05) !important;
+}
+/* Settings row icons */
+body.fashion-home-active.nwsb-theme-glass-black #sub-social .sr-icon {
+  background:rgba(255,255,255,0.07) !important;
+  border-color:rgba(255,255,255,0.13) !important;
+  backdrop-filter:blur(10px) !important;
+}
+/* Settings search input */
+body.fashion-home-active.nwsb-theme-glass-black #sub-social .ss-input,
+body.fashion-home-active.nwsb-theme-glass-black #sub-social input {
+  background:rgba(0,0,0,0.5) !important;
+  border-color:rgba(255,255,255,0.1) !important;
+  backdrop-filter:blur(10px) !important;
+  color:#fff !important;
+}
+/* Menu drawer */
+body.fashion-home-active.nwsb-theme-glass-black .menu-drawer {
+  background:rgba(0,0,0,0.82) !important;
+  backdrop-filter:blur(40px) saturate(1.6) !important;
+  -webkit-backdrop-filter:blur(40px) saturate(1.6) !important;
+}
+/* Menu section group headers */
+body.fashion-home-active.nwsb-theme-glass-black .menu-section-group {
+  background:rgba(255,255,255,0.03) !important;
   backdrop-filter:blur(12px) !important;
 }
-body.fashion-home-active.nwsb-theme-glass-black #sub-social .sr-icon {
+/* Menu nav items */
+body.fashion-home-active.nwsb-theme-glass-black .menu-nav-item {
+  background:rgba(255,255,255,0.025) !important;
+  border-bottom-color:rgba(255,255,255,0.06) !important;
+}
+/* Menu nav icons */
+body.fashion-home-active.nwsb-theme-glass-black .menu-nav-icon {
   background:rgba(255,255,255,0.06) !important;
-  border-color:rgba(255,255,255,0.12) !important;
+  border-color:rgba(255,255,255,0.14) !important;
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
+}
+/* Home cards + tiles */
+body.fashion-home-active.nwsb-theme-glass-black .home-card,
+body.fashion-home-active.nwsb-theme-glass-black .home-grid-tile,
+body.fashion-home-active.nwsb-theme-glass-black .hm-tile,
+body.fashion-home-active.nwsb-theme-glass-black .home-section-card {
+  background:rgba(0,0,0,0.55) !important;
+  border-color:rgba(255,255,255,0.08) !important;
+  backdrop-filter:blur(20px) saturate(1.4) !important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.4) !important;
+  box-shadow:0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06) !important;
 }
 </style>
 
