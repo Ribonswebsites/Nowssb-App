@@ -22594,66 +22594,213 @@ body.fashion-home-active.nwsb-theme-black .menu-nav-icon {
   border-color:rgba(255,255,255,0.07) !important;
 }
 
-/* ── NEUMORPHISM (NEO) ── */
+/* ── NEUMORPHISM (NEO) — Very High Depth ── */
+/* Base surface: #141414. Light source: top-left.
+   Raised = shadow bottom-right dark + highlight top-left light.
+   Pressed = inset shadow. No blur, no glass. Pure depth. */
+
 body.fashion-home-active.nwsb-theme-neo #appBg,
 body.fashion-home-active.nwsb-theme-neo #appBgLayer2 {
   opacity:0 !important;
   transition:opacity 0.4s ease !important;
 }
+
+/* ── Header bar — flat slab, presses down ── */
 body.fashion-home-active.nwsb-theme-neo .home-header {
-  background:#0d0d0d !important;
+  background:#141414 !important;
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
   border-bottom:none !important;
-  box-shadow:0 5px 18px #000, inset 0 1px 0 rgba(255,255,255,0.035) !important;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.98),
+    0 3px 8px rgba(0,0,0,0.9),
+    inset 0 1px 0 rgba(255,255,255,0.055),
+    inset 0 -2px 6px rgba(0,0,0,0.6) !important;
 }
+
+/* ── Bottom nav + social nav — rises from floor ── */
 body.fashion-home-active.nwsb-theme-neo #ig-bottomnav,
 body.fashion-home-active.nwsb-theme-neo #ig-social-nav {
-  background:#0d0d0d !important;
+  background:#141414 !important;
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
   border-top:none !important;
-  box-shadow:0 -5px 18px #000, inset 0 -1px 0 rgba(255,255,255,0.03) !important;
+  box-shadow:
+    0 -12px 36px rgba(0,0,0,0.98),
+    0 -4px 10px rgba(0,0,0,0.9),
+    inset 0 -1px 0 rgba(255,255,255,0.04),
+    inset 0 2px 8px rgba(0,0,0,0.55) !important;
 }
+
+/* ── Settings / Social full panel ── */
 body.fashion-home-active.nwsb-theme-neo #sub-social {
-  background:#0e0e0e !important;
+  background:#141414 !important;
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
 }
-body.fashion-home-active.nwsb-theme-neo .menu-drawer {
-  background:#0d0d0d !important;
+
+/* ── Settings tab bar ── */
+body.fashion-home-active.nwsb-theme-neo #sub-social .ss-tabs {
+  background:#111 !important;
+  border-bottom:none !important;
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
-  box-shadow:8px 0 28px #000 !important;
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.98),
+    0 2px 5px rgba(0,0,0,0.85),
+    inset 0 -2px 8px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.04) !important;
 }
-body.fashion-home-active.nwsb-theme-neo .menu-nav-item {
-  background:#0d0d0d !important;
-  border-bottom-color:rgba(255,255,255,0.04) !important;
-}
-body.fashion-home-active.nwsb-theme-neo .menu-nav-icon {
-  background:#181818 !important;
-  border:none !important;
-  box-shadow:4px 4px 10px #000,-2px -2px 6px #232323 !important;
-}
-body.fashion-home-active.nwsb-theme-neo .menu-section-group {
+body.fashion-home-active.nwsb-theme-neo #sub-social .ss-tab {
   background:transparent !important;
-  border:none !important;
-  box-shadow:6px 6px 18px #000,-3px -3px 10px #1e1e1e !important;
-  overflow:hidden !important;
+  border-bottom-color:transparent !important;
 }
+body.fashion-home-active.nwsb-theme-neo #sub-social .ss-tab.active {
+  border-bottom-color:transparent !important;
+  text-shadow:0 0 14px rgba(232,213,163,0.55) !important;
+}
+
+/* ── Settings section groups — raised slabs ── */
 body.fashion-home-active.nwsb-theme-neo #sub-social .sg,
 body.fashion-home-active.nwsb-theme-neo #sub-social .ss-section {
-  background:#131313 !important;
+  background:#181818 !important;
   border:none !important;
-  box-shadow:5px 5px 14px #000,-3px -3px 10px #1e1e1e !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  box-shadow:
+    8px 8px 22px rgba(0,0,0,0.98),
+    -4px -4px 12px rgba(30,30,30,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.045),
+    inset 0 -1px 0 rgba(0,0,0,0.5) !important;
 }
+
+/* ── Settings rows ── */
+body.fashion-home-active.nwsb-theme-neo #sub-social .sr {
+  border-bottom:1px solid rgba(0,0,0,0.55) !important;
+  background:transparent !important;
+}
+body.fashion-home-active.nwsb-theme-neo #sub-social .sr:last-child,
+body.fashion-home-active.nwsb-theme-neo #sub-social .sr.last {
+  border-bottom:none !important;
+}
+
+/* ── Settings row icons — raised squares ── */
 body.fashion-home-active.nwsb-theme-neo #sub-social .sr-icon {
+  background:#1e1e1e !important;
+  border:none !important;
+  box-shadow:
+    5px 5px 12px rgba(0,0,0,0.98),
+    -3px -3px 8px rgba(34,34,34,0.75),
+    inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+
+/* ── Settings search input — pressed concave ── */
+body.fashion-home-active.nwsb-theme-neo #sub-social .ss-input {
+  background:#111 !important;
+  border-color:transparent !important;
+  box-shadow:
+    inset 4px 4px 12px rgba(0,0,0,0.98),
+    inset -2px -2px 8px rgba(28,28,28,0.6) !important;
+}
+
+/* ── Settings panel ── */
+body.fashion-home-active.nwsb-theme-neo #sub-social .ss-panel {
+  background:#141414 !important;
+}
+body.fashion-home-active.nwsb-theme-neo #sub-social .ss-panel-header {
+  border-bottom:none !important;
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.98),
+    inset 0 -2px 6px rgba(0,0,0,0.6) !important;
+}
+
+/* ── Toggles — raised pill with pressed knob ── */
+body.fashion-home-active.nwsb-theme-neo #sub-social .stgl {
+  box-shadow:
+    inset 3px 3px 8px rgba(0,0,0,0.98),
+    inset -2px -2px 6px rgba(28,28,28,0.6) !important;
+}
+
+/* ── Section title labels ── */
+body.fashion-home-active.nwsb-theme-neo #sub-social .ss-section-title,
+body.fashion-home-active.nwsb-theme-neo #sub-social .slbl {
+  color:rgba(255,255,255,0.22) !important;
+}
+
+/* ── Hamburger menu drawer — deep raised panel ── */
+body.fashion-home-active.nwsb-theme-neo .menu-drawer {
+  background:#141414 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  box-shadow:
+    -16px 0 50px rgba(0,0,0,0.99),
+    -6px 0 18px rgba(0,0,0,0.9),
+    inset -1px 0 0 rgba(255,255,255,0.04) !important;
+}
+
+/* ── Menu section groups — raised card ── */
+body.fashion-home-active.nwsb-theme-neo .menu-section-group {
+  background:#181818 !important;
+  border:none !important;
+  margin:0 14px 14px !important;
+  overflow:hidden !important;
+  box-shadow:
+    8px 8px 24px rgba(0,0,0,0.98),
+    -4px -4px 14px rgba(30,30,30,0.65),
+    inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+
+/* ── Menu rows — concave pressed ── */
+body.fashion-home-active.nwsb-theme-neo .menu-nav-item {
+  background:#181818 !important;
+  border-bottom:1px solid rgba(0,0,0,0.6) !important;
+}
+body.fashion-home-active.nwsb-theme-neo .menu-nav-item:last-child {
+  border-bottom:none !important;
+}
+body.fashion-home-active.nwsb-theme-neo .menu-nav-item:active {
+  box-shadow:inset 4px 4px 10px rgba(0,0,0,0.98),inset -2px -2px 6px rgba(28,28,28,0.5) !important;
+}
+
+/* ── Menu icons — raised circular buttons ── */
+body.fashion-home-active.nwsb-theme-neo .menu-nav-icon {
+  background:#1e1e1e !important;
+  border:none !important;
+  box-shadow:
+    6px 6px 14px rgba(0,0,0,0.98),
+    -3px -3px 9px rgba(34,34,34,0.75),
+    inset 0 1px 0 rgba(255,255,255,0.06) !important;
+}
+
+/* ── Home cards + tiles — raised surfaces ── */
+body.fashion-home-active.nwsb-theme-neo #home .home-card,
+body.fashion-home-active.nwsb-theme-neo #home .home-tile {
   background:#1a1a1a !important;
   border:none !important;
-  box-shadow:3px 3px 8px #000,-2px -2px 5px #252525 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  box-shadow:
+    7px 7px 18px rgba(0,0,0,0.98),
+    -4px -4px 12px rgba(30,30,30,0.65),
+    inset 0 1px 0 rgba(255,255,255,0.045) !important;
 }
-body.fashion-home-active.nwsb-theme-neo #sub-social .sr {
-  border-bottom-color:rgba(255,255,255,0.04) !important;
+body.fashion-home-active.nwsb-theme-neo #home .home-card:active,
+body.fashion-home-active.nwsb-theme-neo #home .home-tile:active {
+  box-shadow:
+    inset 4px 4px 12px rgba(0,0,0,0.98),
+    inset -2px -2px 8px rgba(28,28,28,0.5) !important;
+}
+
+/* ── Hero glass card ── */
+body.fashion-home-active.nwsb-theme-neo #home .hero-glass {
+  background:#1a1a1a !important;
+  border:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  box-shadow:
+    8px 8px 22px rgba(0,0,0,0.98),
+    -4px -4px 14px rgba(30,30,30,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.04) !important;
 }
 
 /* ── GLASS BLACK ── */
