@@ -1367,7 +1367,7 @@ window._fbServerTimestamp = () => serverTimestamp();
   .home-cw-wish .home-cw-btn-badge{background:rgba(220,80,80,0.9);color:#fff;}
   </style>
 
-  <div style="margin-top:28px;width:100%;">
+  <div style="margin-top:28px;margin-bottom:20px;width:100%;">
   <div class="home-cw-cube-wrap">
 
     <img decoding="async" class="home-cw-cube-img" src="https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778922166/grok_image_1778922009415_qtoteo.jpg" alt="" loading="eager" draggable="false">
@@ -12398,15 +12398,14 @@ var _origGoTo = window.goTo;
 window.goTo = function(dest) {
   if (dest !== 'home') {
     document.body.classList.remove('fashion-home-active');
+  } else {
+    // Add fashion-home-active BEFORE the original goTo runs setBg(), so the
+    // black-edition #appBg image is already in place from the first paint of
+    // the transition. No delayed timeout = no 520ms hard-swap pop.
+    document.body.classList.add('fashion-home-active');
   }
   if (_origGoTo) _origGoTo.apply(this, [dest]);
   if (dest === 'home') {
-    // Delay fashion-home-active until AFTER the 520ms cross-fade completes.
-    // Adding it synchronously causes #appBg to switch to the fashion image
-    // while the screen is still fading in (opacity 0→1), creating a visible flash.
-    setTimeout(function(){
-      document.body.classList.add('fashion-home-active');
-    }, 520);
     setTimeout(function(){
       try { if (!localStorage.getItem('nwsb_done')) start(); }
       catch(e){ start(); }
@@ -22812,6 +22811,9 @@ body.fashion-home-active.nwsb-theme-default #sub-social .sr {
 }
 
 /* ── BLACK EDITION — Complete Black ── */
+/* Splash stays dark for black-edition users so there's no light→black jump
+   (the "flash") when the splash hands off to the black home screen. */
+body.nwsb-theme-black #splash { background:#060c18 !important; }
 /* Single background image: CSS overrides JS inline style */
 body.fashion-home-active.nwsb-theme-black #appBg {
   background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780209363/grok_image_1780209143800_i8lcry.jpg') !important;
@@ -23231,6 +23233,14 @@ body.fashion-home-active.nwsb-theme-glass-black .home-section-card {
     OLD_BE_CLASSES.forEach(function(c){ document.body.classList.remove(c); });
     document.body.classList.add('nwsb-theme-' + theme);
     localStorage.setItem('nwsb_theme', theme);
+
+    // Preload the black-edition background image so it's cached and ready —
+    // prevents a blank/flash frame when fashion-home-active first applies it.
+    if (theme === 'black' && !window._beBgPreloaded) {
+      window._beBgPreloaded = true;
+      var _pre = new Image();
+      _pre.src = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780209363/grok_image_1780209143800_i8lcry.jpg';
+    }
 
     // Fashion intro only when user explicitly selects Black — never on page-load restore
     if (theme === 'black' && explicit && !window._fashionHomeIntroSeen) {
