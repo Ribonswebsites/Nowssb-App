@@ -1,0 +1,25 @@
+{
+  "name": "NOWSBANSIU — Shabdapathy",
+  "short_name": "NowssB",
+  "description": "Natural Origin Word Science",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#060c18",
+  "theme_color": "#060c18",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dkzxw33ln/image/upload/c_fill,g_center,w_192,h_192/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://res.cloudinary.com/dkzxw33ln/image/upload/c_fill,g_center,w_512,h_512/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
