@@ -1339,24 +1339,19 @@ window._fbServerTimestamp = () => serverTimestamp();
 
   <!-- ══ STORE QUICK-ACCESS: LOGO + 2×2 GRID ══ -->
   <style>
-  .home-cw-cube-wrap{position:relative;width:100%;background:#060c18;display:flex;flex-direction:column;}
-  .home-cw-hero{position:relative;width:100%;overflow:hidden;flex-shrink:0;}
+  .home-cw-cube-wrap{position:relative;width:100%;overflow:hidden;background:#060c18;}
   .home-cw-cube-img{width:100%;height:auto;display:block;pointer-events:none;user-select:none;-webkit-user-select:none;}
-  .home-cw-logo-overlay{position:absolute;top:0;left:0;right:0;display:flex;justify-content:center;padding-top:12px;z-index:3;pointer-events:none;}
-  .home-cw-logo-box{width:64px;height:64px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:8px;pointer-events:auto;}
+  .home-cw-logo-overlay{position:absolute;top:0;left:0;right:0;display:flex;justify-content:center;padding-top:4%;z-index:3;pointer-events:none;}
+  .home-cw-logo-box{width:60px;height:60px;background:rgba(0,0,0,0.50);border:1px solid rgba(255,255,255,0.25);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:7px;pointer-events:auto;}
   .home-cw-logo-box img{width:100%;height:100%;object-fit:contain;display:block;}
-  .home-cw-tiles-wrap{position:relative;width:100%;padding:0 10px 14px;}
-  .home-cw-frame{position:absolute;inset:0;pointer-events:none;z-index:1;
-    border:2px solid rgba(160,110,50,0.5);
-    box-shadow:0 0 0 1px rgba(100,65,20,0.35),inset 0 0 0 1px rgba(200,155,80,0.15),inset 0 0 30px rgba(0,0,0,0.5);}
-  .home-cw-grid{position:relative;z-index:2;display:flex;flex-direction:column;gap:6px;padding:10px;}
-  .home-cw-row{display:flex;gap:6px;height:148px;}
-  .home-cw-btn{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;padding:10px 10px 8px;background:rgba(6,12,24,0.30);border:1px solid rgba(255,255,255,0.10);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.15s,opacity 0.15s;}
+  .home-cw-grid{position:absolute;top:57%;left:12%;right:12%;bottom:13%;display:flex;flex-direction:column;gap:6px;z-index:2;}
+  .home-cw-row{display:flex;gap:6px;flex:1;}
+  .home-cw-btn{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;padding:10px 10px 8px;background:rgba(6,12,24,0.28);border:1px solid rgba(255,255,255,0.10);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.15s,opacity 0.15s;}
   .home-cw-btn:active{transform:scale(0.97);opacity:0.85;}
   .home-cw-btn-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center center;}
-  .home-cw-btn-vignette{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(6,12,24,0.18) 0%,rgba(6,12,24,0.52) 100%);}
+  .home-cw-btn-vignette{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(6,12,24,0.15) 0%,rgba(6,12,24,0.50) 100%);}
   .home-cw-btn > *:not(.home-cw-btn-bg):not(.home-cw-btn-vignette){position:relative;z-index:2;}
-  .home-cw-btn-icon{width:32px;height:32px;margin-bottom:auto;display:flex;align-items:center;justify-content:center;position:relative;}
+  .home-cw-btn-icon{width:30px;height:30px;margin-bottom:auto;display:flex;align-items:center;justify-content:center;position:relative;}
   .home-cw-btn-badge{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;background:var(--accent-gold);color:#060c18;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border-radius:8px !important;opacity:0;transition:opacity 0.2s;}
   .home-cw-btn-badge.show{opacity:1;}
   .home-cw-btn-label{font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#fff;margin-bottom:3px;text-shadow:0 1px 8px rgba(0,0,0,0.9);}
@@ -1375,21 +1370,14 @@ window._fbServerTimestamp = () => serverTimestamp();
   <div style="margin-top:28px;width:100%;">
   <div class="home-cw-cube-wrap">
 
-    <!-- Hero: display case background image with logo overlay -->
-    <div class="home-cw-hero">
-      <img decoding="async" class="home-cw-cube-img" src="https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778922166/grok_image_1778922009415_qtoteo.jpg" alt="" loading="eager" draggable="false">
-      <div class="home-cw-logo-overlay">
-        <div class="home-cw-logo-box">
-          <img loading="eager" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt="NowssB Store">
-        </div>
+    <img decoding="async" class="home-cw-cube-img" src="https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778922166/grok_image_1778922009415_qtoteo.jpg" alt="" loading="eager" draggable="false">
+    <div class="home-cw-logo-overlay">
+      <div class="home-cw-logo-box">
+        <img loading="eager" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt="NowssB Store">
       </div>
     </div>
 
-    <!-- Framed tile grid: leather case frame border + 2×2 grid -->
-    <div class="home-cw-tiles-wrap">
-      <!-- CSS leather frame outline -->
-      <div class="home-cw-frame"></div>
-      <div class="home-cw-grid">
+    <div class="home-cw-grid">
 
         <!-- Row 1: Your Orders + Order History -->
         <div class="home-cw-row">
@@ -1437,8 +1425,7 @@ window._fbServerTimestamp = () => serverTimestamp();
           </div>
         </div>
 
-      </div><!-- /home-cw-grid -->
-    </div><!-- /home-cw-tiles-wrap -->
+    </div><!-- /home-cw-grid -->
 
   </div><!-- /home-cw-cube-wrap -->
   </div><!-- /Store Quick-Access -->
