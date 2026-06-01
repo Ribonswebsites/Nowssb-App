@@ -22811,16 +22811,12 @@ body.fashion-home-active.nwsb-theme-default #sub-social .sr {
 }
 
 /* ── BLACK EDITION — Complete Black ── */
-/* Splash stays dark for black-edition users so there's no light→black jump
-   (the "flash") when the splash hands off to the black home screen. */
-body.nwsb-theme-black #splash { background:#060c18 !important; }
-/* Single background image: CSS overrides JS inline style */
+/* Only override the image — let setBg() control opacity so the appBg fades
+   in smoothly over the exiting splash instead of hard-snapping (the flash). */
 body.fashion-home-active.nwsb-theme-black #appBg {
   background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/v1780209363/grok_image_1780209143800_i8lcry.jpg') !important;
   background-size:cover !important;
   background-position:center !important;
-  opacity:1 !important;
-  transition:none !important;
 }
 /* Hide the second crossfade layer — one image only */
 body.fashion-home-active.nwsb-theme-black #appBgLayer2 {
