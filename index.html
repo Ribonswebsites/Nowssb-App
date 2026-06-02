@@ -2485,16 +2485,7 @@ function renderPractice() {
           <svg width="13" height="11" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/></svg>
         </button>
         <div class="sp-topbar-label">${(()=>{const ar=getActiveRoutine();return ar?ar.name:timeLabel})()} Ritual &nbsp;·&nbsp; ${_pwIdx+1} of ${PRACTICE_WORDS.length}</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-        <button onclick="openWalkmanLib()" style="background:rgba(200,232,245,0.08);border:1px solid rgba(200,232,245,0.22);width:44px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:all 0.18s;flex-shrink:0;touch-action:manipulation;" title="Open Library">
-          <svg width="12" height="10" viewBox="0 0 14 12" fill="none"><rect x="0" y="0" width="5.5" height="5.5" stroke="rgba(200,232,245,0.7)" stroke-width="1.1"/><rect x="8.5" y="0" width="5.5" height="5.5" stroke="rgba(200,232,245,0.7)" stroke-width="1.1"/><rect x="0" y="7.5" width="5.5" height="4.5" stroke="rgba(200,232,245,0.7)" stroke-width="1.1"/><rect x="8.5" y="7.5" width="5.5" height="4.5" stroke="rgba(200,232,245,0.7)" stroke-width="1.1"/></svg>
-          <span style="font-size:5.5px;letter-spacing:1px;text-transform:uppercase;color:rgba(200,232,245,0.7);font-family:'DM Sans',sans-serif;font-weight:700;">LIB</span>
-        </button>
-        <div class="sp-voice-toggle">
-          <button class="sp-voice-btn${_pwVoice==='F'?' active':''}" onclick="pwSetVoice('F')">F</button>
-          <button class="sp-voice-btn${_pwVoice==='M'?' active':''}" onclick="pwSetVoice('M')">M</button>
-        </div>
-        </div>
+        <div style="width:36px;flex-shrink:0;"></div>
       </div>
 
       <!-- WORD HERO — compact, centered -->
