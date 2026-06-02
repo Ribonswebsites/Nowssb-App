@@ -136,8 +136,55 @@
     });
   };
 
+  /* ══════════════════════════════════════════════════════════
+     PHASE 3 — GATING + FREE-CLAIM
+  ══════════════════════════════════════════════════════════ */
+
+  /* Numeric tier rank — higher sees more. trial = full access. */
+  function tierRank(t) {
+    switch (t) {
+      case 'trial':      return 99;
+      case 'frequencyX': return 3;
+      case 'frequency':  return 2;
+      case 'resonance':  return 1;
+      default:           return 0; /* expired / free / none */
+    }
+  }
+
+  /* Words the viewer already owns (purchased + claimed + practiced) */
+  function ownedWordSet() {
+    var set = {};
+    try { JSON.parse(localStorage.getItem('nwsb_purchased') || '[]').forEach(function (w) { set[w] = 1; }); } catch (e) {}
+    try { JSON.parse(localStorage.getItem('nwsb_claimed')   || '[]').forEach(function (w) { set[w] = 1; }); } catch (e) {}
+    /* words practiced (session keys: YYYY-MM-DD_WORD) */
+    try {
+      Object.keys(localStorage).forEach(function (k) {
+        var m = /^\d{4}-\d{2}-\d{2}_(.+)$/.exec(k);
+        if (m) set[m[1]] = 1;
+      });
+    } catch (e) {}
+    return set;
+  }
+
+  /* Claim a free word (within the viewer's tier) into the owned set */
+  window.nwsbClaimWord = function (word, btn) {
+    if (!word) return;
+    var claimed = [];
+    try { claimed = JSON.parse(localStorage.getItem('nwsb_claimed') || '[]'); } catch (e) {}
+    if (claimed.indexOf(word) === -1) {
+      claimed.push(word);
+      try { localStorage.setItem('nwsb_claimed', JSON.stringify(claimed)); } catch (e) {}
+    }
+    if (btn) {
+      btn.textContent = '✓ Claimed';
+      btn.disabled = true;
+      btn.classList.add('claimed');
+    }
+  };
+
   /* ── Build one reel card HTML ── */
-  function reelCardHtml(r) {
+  function reelCardHtml(r, ctx) {
+    ctx = ctx || {};
     var initials = (r.name || '?').charAt(0).toUpperCase();
     var avHtml = r.photoURL
       ? '<img src="' + r.photoURL + '" class="nwsb-reel-av" alt="" loading="lazy" decoding="async">'
@@ -149,6 +196,16 @@
 
     var scoreColor = r.score >= 80 ? '#e8d5a3' : r.score >= 55 ? '#c8e8f5' : 'rgba(255,255,255,.5)';
 
+    /* Free-claim button: viewer can access this word's tier, doesn't own it,
+       and it's not their own reel */
+    var claimHtml = '';
+    var isOwn = ctx.uid && r.uid === ctx.uid;
+    if (!isOwn && r.word && ctx.owned && !ctx.owned[r.word] &&
+        tierRank(ctx.viewerTier) >= tierRank(r.wordTier || 'resonance')) {
+      claimHtml = '<button class="nwsb-reel-claim-btn" onclick="nwsbClaimWord(\'' +
+        String(r.word).replace(/'/g, '') + '\', this)">Claim free</button>';
+    }
+
     return '<div class="nwsb-reel-card">' +
       bgHtml +
       '<div class="nwsb-reel-card-body">' +
@@ -159,6 +216,7 @@
             '<span class="nwsb-reel-score-num" style="color:' + scoreColor + ';">' + (r.score || 0) + '</span>' +
             '<span class="nwsb-reel-score-suffix">/100</span>' +
           '</div>' +
+          claimHtml +
         '</div>' +
         '<div class="nwsb-reel-user-row">' +
           avHtml +
@@ -168,15 +226,46 @@
     '</div>';
   }
 
+  /* ── Gate prompt shown when viewer has no active plan ── */
+  function reelsGateHtml() {
+    return '<div class="nwsb-reels-empty">' +
+      '<div class="nwsb-reels-empty-title">Reels are a member feature</div>' +
+      '<div class="nwsb-reels-empty-sub">Start a plan to watch the community\'s pronunciation reels and claim free words.</div>' +
+      '<button class="nwsb-post-reel-btn" style="max-width:220px;margin:18px auto 0;" ' +
+        'onclick="window.SS&&window.SS.open(\'subscription\')">See Plans</button>' +
+    '</div>';
+  }
+
   /* ── Render reels feed into a container element ── */
   window.nwsbRenderReelsFeed = async function (containerId, opts) {
     var box = document.getElementById(containerId);
     if (!box) return;
+
+    /* Gate: only members (or trial) can view the feed */
+    if (window.GATE && !window.GATE.canAccess()) {
+      box.innerHTML = reelsGateHtml();
+      return;
+    }
+
     box.innerHTML = '<div style="padding:30px;text-align:center;color:rgba(255,255,255,.3);font-family:\'DM Sans\',sans-serif;font-size:13px;">Loading reels…</div>';
+
+    var viewerTier = window.GATE ? window.GATE.tier() : 'free';
+    var ctx = {
+      viewerTier: viewerTier,
+      uid:        window._currentUid,
+      owned:      ownedWordSet()
+    };
 
     try {
       if (!window._fbGetReels) throw new Error('Firestore not ready');
       var reels = await window._fbGetReels(opts || {});
+
+      /* Tier visibility — viewer sees reels at or below their tier */
+      if (!(opts && opts.uid)) {
+        reels = reels.filter(function (r) {
+          return tierRank(viewerTier) >= tierRank(r.wordTier || 'resonance');
+        });
+      }
 
       if (!reels.length) {
         box.innerHTML =
@@ -186,7 +275,7 @@
           '</div>';
         return;
       }
-      box.innerHTML = reels.map(reelCardHtml).join('');
+      box.innerHTML = reels.map(function (r) { return reelCardHtml(r, ctx); }).join('');
     } catch (e) {
       box.innerHTML =
         '<div class="nwsb-reels-empty">' +
@@ -232,7 +321,7 @@
     box.innerHTML =
       '<div class="nwsb-hero">' +
         '<div class="nwsb-hero-tag">Healing is Fashion</div>' +
-        '<div class="nwsb-hero-title">Your Practice,<br>Your Frequency.</div>' +
+        '<div class="nwsb-hero-title">Your Stats,<br>Your Frequency.</div>' +
         '<div class="nwsb-hero-sub">NowssB · Word Science</div>' +
         '<div class="nwsb-hero-stats">' +
           '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + words    + '</span><span class="nwsb-hero-stat-lbl">Words</span></div>' +
@@ -272,6 +361,52 @@
   }
 
   window._nwsbRenderSocialHome = renderSocialHome;
+
+  /* ══════════════════════════════════════════════════════════
+     STATS SCREEN — opened from Profile (the old social-home content)
+  ══════════════════════════════════════════════════════════ */
+  window.nwsbOpenStats = function () {
+    var el = document.getElementById('sub-social-home');
+    if (!el) return;
+    el.classList.add('open');
+    renderSocialHome();
+    var sc = document.getElementById('ig-social-home-scroll');
+    if (sc) sc.scrollTop = 0;
+  };
+
+  window.nwsbCloseStats = function () {
+    var el = document.getElementById('sub-social-home');
+    if (el) el.classList.remove('open');
+    /* Profile sits underneath — keep it open */
+  };
+
+  /* ── Inject a "Stats" button into the self profile button row ── */
+  function injectStatsBtn() {
+    var btns = document.getElementById('ig-prof-btns');
+    if (!btns) return;
+    var isSelf = window.IG && window.IG._currentProfile && window.IG._currentProfile.self;
+    if (!isSelf) return;
+    if (btns.querySelector('.nwsb-stats-btn')) return;
+    var b = document.createElement('button');
+    b.className = 'ig-btn gray nwsb-stats-btn';
+    b.textContent = 'Stats';
+    b.onclick = function () { window.nwsbOpenStats(); };
+    btns.appendChild(b);
+  }
+
+  /* Wrap openMyProfile / openProfile to add the Stats button after render */
+  function patchProfileButtons() {
+    if (!window.IG || typeof window.IG.openMyProfile !== 'function') {
+      return setTimeout(patchProfileButtons, 120);
+    }
+    var _origMy = window.IG.openMyProfile.bind(window.IG);
+    window.IG.openMyProfile = function () {
+      var r = _origMy();
+      setTimeout(injectStatsBtn, 30);
+      return r;
+    };
+  }
+  patchProfileButtons();
 
   /* ══════════════════════════════════════════════════════════
      SOCIAL NAV PATCHES
@@ -394,7 +529,8 @@
             grid.innerHTML = '<div class="nwsb-reels-empty"><div class="nwsb-reels-empty-title">No reels yet</div><div class="nwsb-reels-empty-sub">Practice and score a word, then post it as a reel.</div></div>';
             return;
           }
-          grid.innerHTML = reels.map(reelCardHtml).join('');
+          var pctx = { viewerTier: window.GATE ? window.GATE.tier() : 'free', uid: window._currentUid, owned: {} };
+          grid.innerHTML = reels.map(function (r) { return reelCardHtml(r, pctx); }).join('');
         }).catch(function () {
           grid.innerHTML = '<div class="nwsb-reels-empty"><div class="nwsb-reels-empty-title">Could not load</div></div>';
         });

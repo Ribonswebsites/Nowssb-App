@@ -636,3 +636,29 @@
   color: rgba(255,255,255,.3);
   line-height: 1.55;
 }
+
+/* Free-claim button on reel cards */
+.nwsb-reel-claim-btn {
+  margin-left: auto;
+  padding: 6px 16px;
+  border-radius: 20px !important;
+  border: 1px solid rgba(200,232,245,.35);
+  background: rgba(200,232,245,.12);
+  color: #c8e8f5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity .15s;
+}
+.nwsb-reel-claim-btn:active { opacity: .8; }
+.nwsb-reel-claim-btn.claimed {
+  border-color: rgba(232,213,163,.35);
+  background: rgba(232,213,163,.12);
+  color: #e8d5a3;
+}
+
+/* Stats button on profile */
+.nwsb-stats-btn { flex: 0 0 auto !important; padding: 0 16px !important; }
