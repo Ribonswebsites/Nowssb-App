@@ -134,7 +134,20 @@ async function _resolveUserRoute(user) {
   let data = window._userDataCache;
   if (!data) {
     const ref  = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
+    // CRITICAL: getDoc can hang forever on slow/blocked networks (incognito,
+    // restrictive WiFi, VPN). Race it against a 4s timeout so the user is NEVER
+    // stuck on the "Opening…" loader. On timeout, treat as a returning user → home.
+    let snap;
+    try {
+      snap = await Promise.race([
+        getDoc(ref),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('firestore-timeout')), 4000))
+      ]);
+    } catch (e) {
+      // Firestore unreachable / too slow — let the user in rather than hang.
+      // Don't cache the (empty) result so a real read can happen later.
+      return 'home';
+    }
     data = snap.data() || {};
     window._userDataCache = data;
     // Refresh promo bar visibility once data is known
@@ -199,11 +212,22 @@ onAuthStateChanged(auth, async user => {
     // ── ON LOGIN SCREEN — navigate to correct destination ──
     if (window._authNavigating) return;
     window._authNavigating = true;
+    // HARD SAFETY NET: if routing somehow hasn't navigated within 5s, force home.
+    // The user is authenticated — they must never be stuck on the "Opening…" loader.
+    var _authStuckTimer = setTimeout(function() {
+      if (currentScreen === 'login' || currentScreen === 'splash') {
+        _doNavigate('home');
+      }
+      window._authNavigating = false;
+    }, 5000);
     try {
       const dest = await _resolveUserRoute(user);
+      clearTimeout(_authStuckTimer);
       _doNavigate(dest);
     } catch(e) {
       console.warn('Auth routing error:', e.message);
+      clearTimeout(_authStuckTimer);
+      _doNavigate('home');
     } finally {
       window._authNavigating = false;
     }
