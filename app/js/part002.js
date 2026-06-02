@@ -1,0 +1,1 @@
+(function(){var s=localStorage.getItem('nwsb_nav_style')||'glass';document.body.classList.add('nav-'+s);})();

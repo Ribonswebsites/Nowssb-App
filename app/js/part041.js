@@ -1,0 +1,61 @@
+
+(function(){
+  var oldPanel = document.getElementById('ss-panel-profile-edit');
+  if(!oldPanel) return;
+  oldPanel.innerHTML = `
+    <div class="ss-panel-header">
+      <button class="ss-panel-back" onclick="SS.close('profile-edit')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Settings
+      </button>
+      <div class="ss-panel-title">Edit Profile</div>
+      <div class="ss-panel-sub">Your public NowssB identity</div>
+    </div>
+    <div style="padding:24px 20px;display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Avatar -->
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div id="profile-edit-avatar-circle" onclick="profileEditPhoto()" style="width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,rgba(232,213,163,.12),rgba(200,232,245,.08));border:2.5px solid rgba(232,213,163,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;overflow:hidden;position:relative;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(232,213,163,.5)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;margin-bottom:6px;">Profile Photo</div>
+          <button onclick="profileEditPhoto()" style="padding:8px 16px;border-radius:10px;border:1px solid rgba(232,213,163,.4);background:transparent;color:#e8d5a3;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Change Photo</button>
+        </div>
+      </div>
+
+      <!-- Display Name -->
+      <div>
+        <div class="slbl" style="margin-bottom:10px;">DISPLAY NAME</div>
+        <input id="ss-name-edit" class="ss-input" type="text" placeholder="Your name..." maxlength="40">
+      </div>
+
+      <!-- Bio -->
+      <div>
+        <div class="slbl" style="margin-bottom:10px;">BIO</div>
+        <textarea id="ss-bio-edit" class="ss-input" rows="4" maxlength="300" placeholder="Tell your healing story..." style="resize:none;height:100px;"></textarea>
+        <div style="text-align:right;font-size:11px;color:rgba(255,255,255,.3);font-family:'DM Sans',sans-serif;margin-top:4px;">300 chars max</div>
+      </div>
+
+      <!-- Banner -->
+      <div>
+        <div class="slbl" style="margin-bottom:10px;">PROFILE BANNER</div>
+        <div id="profile-edit-banner-preview" onclick="profilePickBanner()" style="height:100px;background:linear-gradient(135deg,#0a1628,#1a2a4a);border-radius:14px;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;gap:8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);font-family:'DM Sans',sans-serif;">Tap to upload · 1200×400 recommended</div>
+        </div>
+      </div>
+
+      <!-- Theme mini -->
+      <div>
+        <div class="slbl" style="margin-bottom:10px;">APP THEME</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <button onclick="SS.setTheme('cosmic')" style="padding:12px 0;border-radius:12px;border:2px solid rgba(232,213,163,.5);background:linear-gradient(135deg,#0c1426,#05090f);color:#e8d5a3;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Cosmic</button>
+          <button onclick="SS.setTheme('void')" style="padding:12px 0;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#000;color:rgba(255,255,255,.7);font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Black</button>
+          <button onclick="SS.setTheme('navy')" style="padding:12px 0;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#040d1f;color:rgba(200,220,255,.7);font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Navy</button>
+        </div>
+      </div>
+
+      <button class="ss-btn-primary" onclick="SS.saveBio()">Save Profile</button>
+    </div>`;
+})();
