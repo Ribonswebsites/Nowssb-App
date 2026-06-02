@@ -143,7 +143,7 @@ async function _resolveUserRoute(user) {
     } catch (e) {
       // Firestore timed out — use Firebase auth metadata to distinguish new vs returning.
       // For a brand-new account, creationTime and lastSignInTime are the same moment.
-      return _isNewUser(user) ? 'signup2' : 'home';
+      return _isNewUser(user) ? 'ob-intro' : 'home';
     }
     data = snap.data() || {};
     window._userDataCache = data;
@@ -163,8 +163,8 @@ async function _resolveUserRoute(user) {
     if (window._userDataCache) window._userDataCache.onboardingDone = true;
     return 'home';
   }
-  if (!window._su2Method) window._su2Method = 'social';
-  return 'signup2';
+  // New user — start the onboarding choose page
+  return 'ob-intro';
 }
 
 // Detect first-ever login using Firebase auth metadata (works offline, no Firestore needed).
@@ -317,7 +317,7 @@ getRedirectResult(auth).then(async result => {
   if (result && result.user) {
     // Coming back from a redirect fallback (incognito / PWA mode).
     // Route new users to signup2, returning users to home.
-    var _rDest = _isNewUser(result.user) ? 'signup2' : 'home';
+    var _rDest = _isNewUser(result.user) ? 'ob-intro' : 'home';
     window._splashRoute = _rDest;
     window._splashDone  = true;
     saveUser(result.user).catch(() => {});
