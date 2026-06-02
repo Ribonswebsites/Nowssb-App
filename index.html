@@ -307,14 +307,6 @@ getRedirectResult(auth).then(async result => {
     console.error('Redirect error:', e.message);
   }
   _googleSignInInProgress = false;
-  // If redirect auth failed AND we're still on splash, navigate to login
-  // so the user is never stuck on the splash screen indefinitely.
-  setTimeout(function() {
-    if (currentScreen === 'splash') {
-      window._splashDone = true;
-      _doNavigate(window._splashRoute || 'login');
-    }
-  }, 300);
 });
 
 let _googleSignInInProgress = false;
@@ -6439,19 +6431,13 @@ function goTo(id) {
   }, 520);
 }
 
-// ── SPLASH FALLBACK TIMERS ──
-// First escape: 3s — catches slow auth resolution
+// ── SPLASH FALLBACK TIMER ──
 setTimeout(() => {
   if (currentScreen !== 'splash') return;
   window._splashDone = true;
-  if (typeof window._doNavigate === 'function') window._doNavigate(window._splashRoute || 'login');
+  if (typeof _doNavigate === 'function') _doNavigate(window._splashRoute || 'home');
   else goTo(window._splashRoute || 'login');
-}, 3000);
-// Second escape: 7s — catches total Firebase failure (module error, network down)
-setTimeout(() => {
-  if (currentScreen !== 'splash') return;
-  goTo('login');
-}, 7000);
+}, 5000);
 
 // ══════════════════════════════════════════════════════════════════
 // PROFILE SETUP SCREEN — name + avatar / photo
@@ -12408,6 +12394,7 @@ window.nwSubClose = function() {
 /* ══ Hook goTo → manage fashion-home-active + fire tour on home ══ */
 var _origGoTo = window.goTo;
 window.goTo = function(dest) {
+  var fromSplash = (currentScreen === 'splash');
   if (dest !== 'home') {
     document.body.classList.remove('fashion-home-active');
   } else {
@@ -12415,6 +12402,20 @@ window.goTo = function(dest) {
     // black-edition #appBg image is already in place from the first paint of
     // the transition. No delayed timeout = no 520ms hard-swap pop.
     document.body.classList.add('fashion-home-active');
+  }
+  // When coming from the splash screen to the fashion home, hold the home
+  // at opacity 0 until the splash finishes fading (500ms). This prevents the
+  // dark hero content from bleeding through the white splash cross-fade.
+  if (fromSplash && dest === 'home') {
+    var _homeEl = document.getElementById('home');
+    if (_homeEl) {
+      _homeEl.style.opacity = '0';
+      _homeEl.style.transition = 'none';
+      setTimeout(function() {
+        _homeEl.style.transition = '';
+        _homeEl.style.opacity = '';
+      }, 520);
+    }
   }
   if (_origGoTo) _origGoTo.apply(this, [dest]);
   if (dest === 'home') {
@@ -23272,6 +23273,9 @@ body.fashion-home-active.nwsb-theme-glass-black .home-section-card {
 
   // Init from localStorage
   var saved = localStorage.getItem('nwsb_theme') || 'default';
+  // If user already chose Black in a prior session, mark intro as seen so it
+  // never fires on page reload — only shows the first time they tap the card.
+  if (saved === 'black') { window._fashionHomeIntroSeen = true; }
   setNwsbTheme(saved);
   localStorage.removeItem('nwsb_be');
 })();
