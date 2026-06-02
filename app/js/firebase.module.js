@@ -6,7 +6,8 @@ import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
   sendSignInLinkToEmail, sendPasswordResetEmail, signOut,
   RecaptchaVerifier, signInWithPhoneNumber }
   from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp,
+  collection, addDoc, getDocs, query, orderBy, limit, where }
   from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
 const app = initializeApp({
@@ -399,3 +400,15 @@ window._fbCreateUser = (email, pass) => createUserWithEmailAndPassword(auth, ema
 window._fbSendEmailLink = (email) => sendSignInLinkToEmail(auth, email, { url: window.location.href, handleCodeInApp: true });
 window._fbSetDoc = (uid, data) => setDoc(doc(db, 'users', uid), data, { merge: true });
 window._fbServerTimestamp = () => serverTimestamp();
+
+/* ── Reels collection helpers ── */
+window._fbAddReelDoc = (reelData) =>
+  addDoc(collection(db, 'reels'), { ...reelData, createdAt: serverTimestamp(), likes: 0 });
+
+window._fbGetReels = async (opts) => {
+  opts = opts || {};
+  var constraints = [orderBy('createdAt', 'desc'), limit(opts.limit || 30)];
+  if (opts.uid) constraints.splice(1, 0, where('uid', '==', opts.uid));
+  var snap = await getDocs(query(collection(db, 'reels'), ...constraints));
+  return snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+};

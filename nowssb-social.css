@@ -429,3 +429,210 @@
   inset: 0;
   background: linear-gradient(to top, rgba(6,12,24,.85) 0%, transparent 55%);
 }
+
+/* ═══════════════════════════════════════════
+   REELS FEED — Phase 2
+═══════════════════════════════════════════ */
+
+/* Reels feed sub-screen */
+#sub-reels-feed {
+  background: #060c18 !important;
+}
+
+.nwsb-reels-feed-scroll {
+  position: absolute;
+  inset: 0;
+  top: 48px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 12px calc(72px + env(safe-area-inset-bottom, 0px));
+}
+.nwsb-reels-feed-scroll::-webkit-scrollbar { display: none; }
+
+/* Vertical reel card */
+.nwsb-reel-card {
+  position: relative;
+  border-radius: 20px !important;
+  overflow: hidden;
+  min-height: 340px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.nwsb-reel-card-bg {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Gradient overlay for readability */
+.nwsb-reel-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(6,12,24,.96) 0%,
+    rgba(6,12,24,.55) 40%,
+    rgba(6,12,24,.1) 70%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+.nwsb-reel-card-body {
+  position: relative;
+  z-index: 2;
+  padding: 18px 18px 18px;
+}
+
+.nwsb-reel-word {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .5px;
+  text-shadow: 0 2px 14px rgba(0,0,0,.5);
+  line-height: 1.05;
+}
+
+.nwsb-reel-syllables {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: rgba(232,213,163,.75);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.nwsb-reel-score-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.nwsb-reel-score-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  background: rgba(232,213,163,.12);
+  border: 1px solid rgba(232,213,163,.28);
+  border-radius: 20px !important;
+  padding: 5px 14px;
+}
+
+.nwsb-reel-score-num {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #e8d5a3;
+  line-height: 1;
+}
+
+.nwsb-reel-score-suffix {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: rgba(232,213,163,.5);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.nwsb-reel-user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.nwsb-reel-av {
+  width: 34px;
+  height: 34px;
+  border-radius: 50% !important;
+  border: 2px solid rgba(232,213,163,.35);
+  object-fit: cover;
+  flex-shrink: 0;
+  background: rgba(255,255,255,.06);
+}
+
+.nwsb-reel-av-init {
+  width: 34px;
+  height: 34px;
+  border-radius: 50% !important;
+  border: 2px solid rgba(232,213,163,.35);
+  background: #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #e8d5a3;
+}
+
+.nwsb-reel-username {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  flex: 1;
+}
+
+/* Post as Reel button — injected into player score wrap */
+.nwsb-post-reel-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 11px 20px;
+  border-radius: 14px !important;
+  border: 1px solid rgba(232,213,163,.28);
+  background: rgba(232,213,163,.1);
+  color: #e8d5a3;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background .15s, opacity .15s;
+}
+
+.nwsb-post-reel-btn:active {
+  opacity: .8;
+}
+
+.nwsb-post-reel-btn:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+/* Empty state in reels feed */
+.nwsb-reels-empty {
+  text-align: center;
+  padding: 60px 30px;
+}
+
+.nwsb-reels-empty-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255,255,255,.65);
+  margin-bottom: 8px;
+}
+
+.nwsb-reels-empty-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,.3);
+  line-height: 1.55;
+}
