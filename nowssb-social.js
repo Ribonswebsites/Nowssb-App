@@ -539,4 +539,169 @@
   }
   patchProfTab();
 
+  /* ══════════════════════════════════════════════════════════
+     PHASE 4 — VERIFICATION BADGES + COUNTS MIGRATION
+  ══════════════════════════════════════════════════════════ */
+
+  /* ── Firestore count sync ── */
+  function syncCountsToFirestore() {
+    if (!window._currentUid || !window._fbSetDoc) return;
+    var sentences = 0;
+    try { sentences = JSON.parse(localStorage.getItem('nwsb_sentences') || '[]').length; } catch (e) {}
+    var purchased = 0;
+    try { purchased = JSON.parse(localStorage.getItem('nwsb_purchased') || '[]').length; } catch (e) {}
+    var practiced = 0;
+    try {
+      var ks = Object.keys(localStorage).filter(function (k) { return /^\d{4}-\d{2}-\d{2}_/.test(k); });
+      practiced = new Set(ks.map(function (k) { return k.split('_').slice(1).join('_'); })).size;
+    } catch (e) {}
+    var claimed = 0;
+    try { claimed = JSON.parse(localStorage.getItem('nwsb_claimed') || '[]').length; } catch (e) {}
+    var wordsOwnedCount = Math.max(purchased + claimed, practiced);
+    var ud = window._userDataCache || {};
+    var verifyLevel = window.VERIFY
+      ? window.VERIFY.level({ wordsOwnedCount: wordsOwnedCount, sentencesCount: sentences, isPro: ud.isPro, tier: ud.tier })
+      : 'none';
+    window._fbSetDoc(window._currentUid, {
+      wordsOwnedCount: wordsOwnedCount,
+      sentencesCount:  sentences,
+      verifyLevel:     verifyLevel
+    }).catch(function () {});
+    /* Update local cache so badges refresh without reload */
+    ud.wordsOwnedCount = wordsOwnedCount;
+    ud.sentencesCount  = sentences;
+    ud.verifyLevel     = verifyLevel;
+  }
+
+  /* ── Remove the 50-sentence cap in slAddSentence ── */
+  function patchSentenceCap() {
+    if (typeof window.slAddSentence !== 'function') { return setTimeout(patchSentenceCap, 200); }
+    window.slAddSentence = function (text, words, routineName) {
+      var arr;
+      try { arr = JSON.parse(localStorage.getItem('nwsb_sentences') || '[]'); } catch (e) { arr = []; }
+      arr.unshift({
+        id: Date.now(),
+        text: text,
+        words: words || [],
+        routineName: routineName || 'Practice',
+        date: Date.now(),
+        playCount: 0
+      });
+      /* unlimited — no 50-item cap */
+      try { localStorage.setItem('nwsb_sentences', JSON.stringify(arr)); } catch (e) {}
+      syncCountsToFirestore();
+    };
+  }
+  patchSentenceCap();
+
+  /* ── Sync counts after each completed practice session ── */
+  function patchCompleteSession() {
+    if (typeof window.pwCompleteSession !== 'function') { return setTimeout(patchCompleteSession, 200); }
+    var _origComplete = window.pwCompleteSession;
+    window.pwCompleteSession = async function () {
+      var result = await _origComplete.apply(this, arguments);
+      setTimeout(syncCountsToFirestore, 500);
+      return result;
+    };
+  }
+  patchCompleteSession();
+
+  /* ── Sync on load (so counts are always current at startup) ── */
+  function initialSync() {
+    if (window._currentUid) {
+      syncCountsToFirestore();
+    } else {
+      /* Wait for auth to complete */
+      var attempts = 0;
+      var iv = setInterval(function () {
+        if (window._currentUid || ++attempts > 20) {
+          clearInterval(iv);
+          if (window._currentUid) syncCountsToFirestore();
+        }
+      }, 500);
+    }
+  }
+  initialSync();
+
+  /* ── Headphone SVG badge for a given userData object ── */
+  function badgeForUser(userData) {
+    if (!userData) return '';
+    return window.VERIFY ? window.VERIFY.badge(userData) : '';
+  }
+
+  /* ── Patch IG.search to swap Instagram blue check → headphone badge ── */
+  function patchSearch() {
+    if (!window.IG || typeof window.IG.search !== 'function') { return setTimeout(patchSearch, 120); }
+    var _origSearch = window.IG.search;
+    window.IG.search = function (v) {
+      _origSearch.call(this, v);
+      /* After DOM update, replace any .ig-verified (Instagram blue check) with headphone badges */
+      requestAnimationFrame(function () {
+        var box = document.getElementById('ig-search-results');
+        if (box) box.querySelectorAll('.ig-verified').forEach(function (el) {
+          el.outerHTML = HP_SVG_TIER;
+        });
+      });
+    };
+  }
+  patchSearch();
+
+  /* ── Patch renderExplore grid to use headphone badges ── */
+  /* renderExplore is private — observe the explore grid for newly inserted user rows */
+  (function observeExplore() {
+    var grid = document.getElementById('ig-search-results');
+    if (!grid) { return setTimeout(observeExplore, 300); }
+    var mo = new MutationObserver(function () {
+      grid.querySelectorAll('.ig-verified').forEach(function (el) { el.outerHTML = HP_SVG_TIER; });
+    });
+    mo.observe(grid, { childList: true, subtree: true });
+  })();
+
+  /* ── Add headphone badge to the self profile top verified area ── */
+  function patchProfileVerifiedBadge() {
+    if (!window.IG || typeof window.IG.openMyProfile !== 'function') {
+      return setTimeout(patchProfileVerifiedBadge, 120);
+    }
+    var _origMy = window.IG.openMyProfile;
+    /* Already patched in Stats section — wrap the already-patched version */
+    window.IG.openMyProfile = function () {
+      var r = _origMy.apply(this, arguments);
+      requestAnimationFrame(function () {
+        /* Replace top-bar verified badge with headphone badge based on real level */
+        var topBadge = document.getElementById('ig-prof-verified-top');
+        if (topBadge) {
+          var ud = window._userDataCache || {};
+          topBadge.innerHTML = badgeForUser(ud);
+        }
+        /* Also fix the ring to NowssB gold→blue gradient for self */
+        var ring = document.getElementById('ig-prof-avatar-ring');
+        if (ring) ring.style.background = 'linear-gradient(135deg,#e8d5a3,#c8e8f5)';
+        /* Stats button injection already handled in patchProfileButtons */
+      });
+      return r;
+    };
+  }
+  patchProfileVerifiedBadge();
+
+  /* ── Patch openProfile (other users) to swap badge ── */
+  function patchOtherProfileBadge() {
+    if (!window.IG || typeof window.IG.openProfile !== 'function') {
+      return setTimeout(patchOtherProfileBadge, 120);
+    }
+    var _origProf = window.IG.openProfile;
+    window.IG.openProfile = function (id) {
+      var r = _origProf.apply(this, arguments);
+      requestAnimationFrame(function () {
+        var topBadge = document.getElementById('ig-prof-verified-top');
+        if (topBadge) {
+          /* For other users use tier badge (stub — real data would come from Firestore) */
+          var current = window.IG && window.IG._currentProfile;
+          if (current && current.verified) topBadge.innerHTML = HP_SVG_TIER;
+        }
+      });
+      return r;
+    };
+  }
+  patchOtherProfileBadge();
+
 })();

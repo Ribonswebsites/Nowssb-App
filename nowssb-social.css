@@ -662,3 +662,50 @@
 
 /* Stats button on profile */
 .nwsb-stats-btn { flex: 0 0 auto !important; padding: 0 16px !important; }
+
+/* ═══════════════════════════════════════════
+   PHASE 4 — VERIFICATION BADGE STYLES
+═══════════════════════════════════════════ */
+
+/* Hide Instagram blue check everywhere in the social section */
+.ig .ig-verified,
+#sub-people .ig-verified,
+#sub-ig-profile .ig-verified {
+  display: none !important;
+}
+
+/* Headphone badge base */
+.nwsb-badge-hp {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-left: 3px;
+}
+
+/* Tier badge — blue (paid subscriber) */
+.nwsb-badge-tier {
+  color: #c8e8f5;
+  stroke: #c8e8f5;
+}
+
+/* Ultimate badge — gold (50+ words & sentences) */
+.nwsb-badge-ult {
+  color: #e8d5a3;
+  stroke: #e8d5a3;
+  filter: drop-shadow(0 0 4px rgba(232,213,163,.5));
+}
+
+/* Massive badge — bright gold + glow (1000+) */
+.nwsb-badge-massive {
+  color: #e8d5a3;
+  stroke: #e8d5a3;
+  filter: drop-shadow(0 0 8px rgba(232,213,163,.9)) drop-shadow(0 0 18px rgba(232,213,163,.4));
+}
+
+/* Profile top-bar verified area */
+#ig-prof-verified-top .nwsb-badge-hp {
+  width: 18px;
+  height: 18px;
+}
