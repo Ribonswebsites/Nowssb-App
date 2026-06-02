@@ -12423,25 +12423,58 @@ window.goTo = function(dest) {
     document.body.classList.remove('fashion-home-active');
   } else {
     // Add fashion-home-active BEFORE the original goTo runs setBg(), so the
-    // black-edition #appBg image is already in place from the first paint of
-    // the transition. No delayed timeout = no 520ms hard-swap pop.
+    // black-edition #appBg image is already in place from the first paint.
     document.body.classList.add('fashion-home-active');
   }
-  // When coming from the splash screen to the fashion home, hold the home
-  // at opacity 0 until the splash finishes fading (500ms). This prevents the
-  // dark hero content from bleeding through the white splash cross-fade.
+
+  // ── SPLASH → FASHION HOME: opaque-cover transition (kills the black flash) ──
+  // The flash happens because the splash cross-fades out while the black-edition
+  // #appBg image fades in behind it — for ~0.5s the user sees the black image
+  // bleeding through the dissolving white splash. Fix: keep the splash fully
+  // OPAQUE and on TOP while the home + black appBg build behind it, then hard-cut
+  // the splash away once everything is settled. No cross-fade = nothing can bleed.
   if (fromSplash && dest === 'home') {
-    var _homeEl = document.getElementById('home');
+    var _splashEl = document.getElementById('splash');
+    var _homeEl   = document.getElementById('home');
+    // Pin splash above everything, solid, no fade
+    if (_splashEl) {
+      _splashEl.style.zIndex = '10000';
+      _splashEl.style.transition = 'none';
+      _splashEl.style.opacity = '1';
+    }
+    // Build home fully (opacity 1, no transition) hidden behind the splash cover
     if (_homeEl) {
-      _homeEl.style.opacity = '0';
       _homeEl.style.transition = 'none';
-      setTimeout(function() {
+      _homeEl.style.opacity = '1';
+    }
+    if (_origGoTo) _origGoTo.apply(this, [dest]);
+    // _origGoTo adds .exit (fade) to the splash — undo it, keep splash solid on top
+    if (_splashEl) {
+      _splashEl.classList.remove('exit');
+      _splashEl.style.opacity = '1';
+    }
+    // Once home + black appBg have painted (700ms), fade the splash cover away to
+    // reveal the already-settled home. Nothing flashes because it's already there.
+    setTimeout(function() {
+      if (_splashEl) {
+        _splashEl.style.transition = 'opacity 0.45s ease';
+        _splashEl.style.opacity = '0';
+        setTimeout(function() {
+          _splashEl.classList.remove('active', 'exit');
+          _splashEl.style.zIndex = '';
+          _splashEl.style.transition = '';
+          _splashEl.style.opacity = '';
+        }, 480);
+      }
+      if (_homeEl) {
         _homeEl.style.transition = '';
         _homeEl.style.opacity = '';
-      }, 520);
-    }
+      }
+    }, 700);
+  } else {
+    if (_origGoTo) _origGoTo.apply(this, [dest]);
   }
-  if (_origGoTo) _origGoTo.apply(this, [dest]);
+
   if (dest === 'home') {
     setTimeout(function(){
       try { if (!localStorage.getItem('nwsb_done')) start(); }
