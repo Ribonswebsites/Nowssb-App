@@ -130,38 +130,32 @@ window._splashDone    = false;
 window._authNavigating = false;
 
 async function _resolveUserRoute(user) {
-  // Returns 'home', 'onboarding', or 'signup2' based on Firestore profile
+  // Returns 'home', 'signup2' based on Firestore profile
   let data = window._userDataCache;
   if (!data) {
     const ref  = doc(db, "users", user.uid);
-    // CRITICAL: getDoc can hang forever on slow/blocked networks (incognito,
-    // restrictive WiFi, VPN). Race it against a 4s timeout so the user is NEVER
-    // stuck on the "Opening…" loader. On timeout, treat as a returning user → home.
     let snap;
     try {
       snap = await Promise.race([
         getDoc(ref),
-        new Promise((_, rej) => setTimeout(() => rej(new Error('firestore-timeout')), 4000))
+        new Promise((_, rej) => setTimeout(() => rej(new Error('firestore-timeout')), 6000))
       ]);
     } catch (e) {
-      // Firestore unreachable / too slow — let the user in rather than hang.
-      // Don't cache the (empty) result so a real read can happen later.
-      return 'home';
+      // Firestore timed out — use Firebase auth metadata to distinguish new vs returning.
+      // For a brand-new account, creationTime and lastSignInTime are the same moment.
+      return _isNewUser(user) ? 'signup2' : 'home';
     }
     data = snap.data() || {};
     window._userDataCache = data;
-    // Refresh promo bar visibility once data is known
     setTimeout(function(){ if (window._spRefreshPromo) window._spRefreshPromo(); }, 100);
   }
   if (data.gender) window._userGender = data.gender;
-  // Blocked users are signed out immediately
   if (data.blocked) {
     if (typeof signOut === 'function') try { signOut(auth); } catch(e) {}
     alert('Your account has been suspended. Please contact support.');
     return 'login';
   }
   if (data.onboardingDone) return 'home';
-  // If they finished signup but never completed onboarding (old accounts / skipped) → go home
   if (data.profileStepDone) {
     if (window._fbSetDoc && window._currentUid) {
       window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
@@ -171,6 +165,16 @@ async function _resolveUserRoute(user) {
   }
   if (!window._su2Method) window._su2Method = 'social';
   return 'signup2';
+}
+
+// Detect first-ever login using Firebase auth metadata (works offline, no Firestore needed).
+// For a brand-new account, creationTime and lastSignInTime are the same moment.
+function _isNewUser(user) {
+  try {
+    var c = new Date(user.metadata.creationTime).getTime();
+    var l = new Date(user.metadata.lastSignInTime).getTime();
+    return Math.abs(c - l) < 90000; // within 90 seconds = first login
+  } catch(e) { return false; }
 }
 
 onAuthStateChanged(auth, async user => {
@@ -212,14 +216,13 @@ onAuthStateChanged(auth, async user => {
     // ── ON LOGIN SCREEN — navigate to correct destination ──
     if (window._authNavigating) return;
     window._authNavigating = true;
-    // HARD SAFETY NET: if routing somehow hasn't navigated within 5s, force home.
-    // The user is authenticated — they must never be stuck on the "Opening…" loader.
+    // Safety net: if routing stalls beyond 8s, force-navigate based on user type
     var _authStuckTimer = setTimeout(function() {
       if (currentScreen === 'login' || currentScreen === 'splash') {
-        _doNavigate('home');
+        _doNavigate(_isNewUser(user) ? 'signup2' : 'home');
       }
       window._authNavigating = false;
-    }, 5000);
+    }, 8000);
     try {
       const dest = await _resolveUserRoute(user);
       clearTimeout(_authStuckTimer);
@@ -227,7 +230,7 @@ onAuthStateChanged(auth, async user => {
     } catch(e) {
       console.warn('Auth routing error:', e.message);
       clearTimeout(_authStuckTimer);
-      _doNavigate('home');
+      _doNavigate(_isNewUser(user) ? 'signup2' : 'home');
     } finally {
       window._authNavigating = false;
     }
@@ -312,16 +315,19 @@ const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     window.addEventListener('touchmove', () => {}, passiveEvents);
 getRedirectResult(auth).then(async result => {
   if (result && result.user) {
-    // Coming back from a redirect fallback — skip splash entirely, go home now
-    window._splashRoute = 'home';
+    // Coming back from a redirect fallback (incognito / PWA mode).
+    // Route new users to signup2, returning users to home.
+    var _rDest = _isNewUser(result.user) ? 'signup2' : 'home';
+    window._splashRoute = _rDest;
     window._splashDone  = true;
     saveUser(result.user).catch(() => {});
-    // Give onAuthStateChanged 200ms to fire first; if it hasn't, navigate ourselves
+    // Let onAuthStateChanged fire first (it will also route correctly);
+    // this setTimeout is only a fallback if it hasn't fired within 300ms.
     setTimeout(function() {
       if (currentScreen === 'splash' || currentScreen === 'login') {
-        _doNavigate('home');
+        _doNavigate(_rDest);
       }
-    }, 200);
+    }, 300);
   }
 }).catch(e => {
   const code = e.code || '';
