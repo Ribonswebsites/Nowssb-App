@@ -7448,6 +7448,12 @@ let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredInstallPrompt = e;
+  // Auto-show install popup only AFTER native prompt is ready, so tapping always triggers direct install
+  if (!isInStandaloneMode() && !localStorage.getItem('pwaPopupDismissed')) {
+    setTimeout(() => {
+      if (!isInStandaloneMode() && deferredInstallPrompt) openDlPopup();
+    }, 2500);
+  }
 });
 
 // ── DETECT iOS SAFARI ──
@@ -7524,19 +7530,12 @@ function closeDlPopup(e) {
   if (e && e.target !== document.getElementById('dlOverlay')) return;
   closeDlSheet();
 }
-// ── AUTO PWA INSTALL POPUP ──
-(function() {
-  if (isInStandaloneMode()) return;
-  if (localStorage.getItem('pwaPopupDismissed')) return;
-  setTimeout(() => {
-    if (isInStandaloneMode()) return;
-    openDlPopup();
-  }, 3000);
-  window.addEventListener('appinstalled', () => {
-    closeDlSheet();
-    localStorage.setItem('pwaPopupDismissed', '1');
-  });
-})();
+// ── PWA installed event ──
+window.addEventListener('appinstalled', () => {
+  closeDlSheet();
+  localStorage.setItem('pwaPopupDismissed', '1');
+  deferredInstallPrompt = null;
+});
 
 // ── HAMBURGER MENU ──
 function openMenu() {
