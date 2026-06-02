@@ -298,18 +298,18 @@
     if (!window.IG || typeof window.IG.socialNav !== 'function') {
       return setTimeout(patchSocialNav, 120);
     }
-    var _orig = window.IG.socialNav.bind(window.IG);
 
     window.IG.socialNav = function (which) {
-      var sn = document.getElementById('ig-social-nav');
-      if (sn) sn.style.display = 'flex';
+      var sn      = document.getElementById('ig-social-nav');
+      var mainNav = document.getElementById('ig-bottomnav');
 
       if (which === 'home') {
+        /* Go back to Fashion/app home — hide social nav, restore main nav */
         hideSocialScreens();
-        var homeEl = document.getElementById('sub-social-home');
-        if (homeEl) homeEl.classList.add('open');
-        setSocialActive('home');
-        renderSocialHome();
+        if (sn)      sn.style.display      = 'none';
+        if (mainNav) mainNav.style.display = '';
+        if (typeof setActiveNav === 'function') setActiveNav('home');
+        if (typeof goTo         === 'function') goTo('home');
 
       } else if (which === 'feed') {
         hideSocialScreens();
@@ -337,43 +337,28 @@
 
       } else if (which === 'chat') {
         setSocialActive('chat');
+        if (sn) sn.style.display = 'flex';
         if (typeof chatInboxOpen === 'function') chatInboxOpen();
-
-      } else {
-        _orig(which);
       }
     };
   }
   patchSocialNav();
 
-  /* Patch IG.nav('profile') to open social home first */
+  /* Patch IG.nav('profile') — close social screens when leaving social section */
   function patchNavProfile() {
     if (!window.IG || typeof window.IG.nav !== 'function') {
       return setTimeout(patchNavProfile, 120);
     }
     var _origNav = window.IG.nav.bind(window.IG);
     window.IG.nav = function (which) {
-      if (which === 'profile') {
-        var mainNav   = document.getElementById('ig-bottomnav');
-        var socialNav = document.getElementById('ig-social-nav');
-        if (mainNav)   mainNav.style.display   = 'none';
-        if (socialNav) socialNav.style.display = 'flex';
-
-        hideSocialScreens();
+      if (which !== 'profile') {
+        /* Leaving social section — close social-only screens */
         var homeEl = document.getElementById('sub-social-home');
-        if (homeEl) homeEl.classList.add('open');
-        setSocialActive('home');
-        renderSocialHome();
-
-        if (typeof setActiveNav === 'function') setActiveNav('profile');
-        if (typeof showNav      === 'function') showNav(true);
-      } else {
-        var homeEl2 = document.getElementById('sub-social-home');
-        if (homeEl2) homeEl2.classList.remove('open');
-        var feedEl2 = document.getElementById('sub-reels-feed');
-        if (feedEl2) feedEl2.classList.remove('open');
-        _origNav(which);
+        var feedEl = document.getElementById('sub-reels-feed');
+        if (homeEl) homeEl.classList.remove('open');
+        if (feedEl) feedEl.classList.remove('open');
       }
+      _origNav(which);
     };
   }
   patchNavProfile();
