@@ -307,6 +307,14 @@ getRedirectResult(auth).then(async result => {
     console.error('Redirect error:', e.message);
   }
   _googleSignInInProgress = false;
+  // If redirect auth failed AND we're still on splash, navigate to login
+  // so the user is never stuck on the splash screen indefinitely.
+  setTimeout(function() {
+    if (currentScreen === 'splash') {
+      window._splashDone = true;
+      _doNavigate(window._splashRoute || 'login');
+    }
+  }, 300);
 });
 
 let _googleSignInInProgress = false;
@@ -6431,15 +6439,19 @@ function goTo(id) {
   }, 520);
 }
 
-// ── SPLASH FALLBACK TIMER ──
-// Module navigates immediately when auth resolves (after 1.5s minimum).
-// This timer is a safety net for cases where Firebase module is slow or fails.
+// ── SPLASH FALLBACK TIMERS ──
+// First escape: 3s — catches slow auth resolution
 setTimeout(() => {
   if (currentScreen !== 'splash') return;
   window._splashDone = true;
-  if (typeof _doNavigate === 'function') _doNavigate(window._splashRoute || 'home');
+  if (typeof window._doNavigate === 'function') window._doNavigate(window._splashRoute || 'login');
   else goTo(window._splashRoute || 'login');
-}, 5000);
+}, 3000);
+// Second escape: 7s — catches total Firebase failure (module error, network down)
+setTimeout(() => {
+  if (currentScreen !== 'splash') return;
+  goTo('login');
+}, 7000);
 
 // ══════════════════════════════════════════════════════════════════
 // PROFILE SETUP SCREEN — name + avatar / photo
