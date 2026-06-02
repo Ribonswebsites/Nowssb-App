@@ -279,7 +279,7 @@ window.finishOnboarding = async () => {
   // Just navigate to home. Only save here if somehow _onboardingAnswers is set
   // (legacy path) or mark as done if not already marked.
   if (window._onboardingAnswers && window._onboardingAnswers.length > 0) {
-    await window.saveOnboardingAnswers(window._onboardingAnswers, false);
+    window.saveOnboardingAnswers(window._onboardingAnswers, false).catch(() => {});
   } else if (window._currentUid && window._fbSetDoc) {
     // Ensure onboardingDone is set without overwriting existing answers
     window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
