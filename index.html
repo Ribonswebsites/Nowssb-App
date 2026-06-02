@@ -23439,6 +23439,10 @@ function beFlipStart(){
 </script>
 
 <!-- ══ FASHION HOME INTRO OVERLAY ══ -->
+<!-- CSS lock: display:none !important unless body.fi-ready is set. This makes it
+     physically impossible for the overlay to appear during splash or any other
+     unintended context — CSS !important overrides any JS style.display='block'. -->
+<style>body:not(.fi-ready) #fashionHomeIntro{display:none!important;visibility:hidden!important;}</style>
 <div id="fashionHomeIntro" style="display:none;position:fixed;inset:0;z-index:99990;background:#000;overflow:hidden;">
   <!-- Full-bleed fashion hero image -->
   <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780142466/e1bce500-5835-11f1-9971-736215a430db_qh1vfh.webp"
@@ -23456,10 +23460,11 @@ function beFlipStart(){
 
 <script>
 window.showFashionHomeIntro = function() {
-  // Never fire during splash — prevents flash on page load when nwsb_theme=black is cached
   if (!window._splashDone) return;
   var el = document.getElementById('fashionHomeIntro');
   if (!el) return;
+  // Unlock the CSS lock — without this body class, !important keeps it hidden
+  document.body.classList.add('fi-ready');
   el.style.display = 'block';
   el.style.opacity = '0';
   el.style.transition = 'opacity 0.5s ease';
@@ -23472,11 +23477,9 @@ window.fashionHomeIntroEnter = function() {
   el.style.opacity = '0';
   setTimeout(function(){
     el.style.display = 'none';
-    // Persist Fashion home as the preferred home screen
+    document.body.classList.remove('fi-ready');
     localStorage.setItem('nwsb_home_mode', 'home');
-    // Close any open sub-screens (settings, social, etc.)
     document.querySelectorAll('.sub-screen.open').forEach(function(s){ s.classList.remove('open'); });
-    // Navigate home — wrapper routes to #home for Fashion BE, home-nm otherwise
     if (typeof goTo === 'function') goTo('home');
   }, 400);
 };
