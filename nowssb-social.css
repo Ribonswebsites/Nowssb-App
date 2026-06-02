@@ -1,0 +1,431 @@
+/* ═══════════════════════════════════════════════════════════════
+   NowssB Social Design System
+   Overrides app/app.css Instagram-style rules.
+   All !important required to beat: global *{border-radius:0!important}
+   and any inline styles set by SS.open().
+   Colors: #060c18 navy · #e8d5a3 gold · #c8e8f5 blue
+═══════════════════════════════════════════════════════════════ */
+
+/* ── BASE backgrounds ── */
+.ig,
+#sub-people,
+#sub-ig-profile,
+#sub-social-home {
+  background: #060c18 !important;
+}
+
+/* Subtle ambient glow over the navy bg */
+#sub-people::before,
+#sub-ig-profile::before,
+#sub-social-home::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 35% at 15% 8%, rgba(232,213,163,.05) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 30% at 85% 88%, rgba(200,232,245,.04) 0%, transparent 55%);
+}
+
+/* ── TOP BAR ── */
+.ig-topbar {
+  background: rgba(6,12,24,.97) !important;
+  border-bottom: 1px solid rgba(232,213,163,.08) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.ig-topbar .ig-username {
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  color: #e8d5a3 !important;
+}
+
+/* ── SEARCH ── */
+.ig-searchwrap {
+  background: #060c18 !important;
+}
+
+.ig-searchbar {
+  background: rgba(255,255,255,.05) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  color: rgba(255,255,255,.55) !important;
+}
+
+.ig-searchbar input::placeholder {
+  color: rgba(255,255,255,.28) !important;
+}
+
+/* ── EXPLORE GRID — rounded tiles, bigger gap ── */
+.ig-tile {
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  background: rgba(255,255,255,.04) !important;
+}
+
+.ig-explore {
+  gap: 5px !important;
+  padding: 5px !important;
+}
+
+/* ── USER ROWS — glass cards ── */
+.ig-userrow {
+  background: rgba(255,255,255,.03) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+  border-radius: 16px !important;
+  margin: 4px 12px !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  padding: 12px 14px !important;
+}
+
+.ig-userrow .ig-u {
+  color: #fff !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.ig-userrow .ig-n {
+  color: rgba(255,255,255,.42) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+/* ── AVATAR RING — gold → blue headphone gradient ── */
+.ig-prof-avatar-ring {
+  background: linear-gradient(135deg, #e8d5a3, #c8e8f5) !important;
+  padding: 3px !important;
+  box-shadow:
+    0 0 18px rgba(232,213,163,.22),
+    0 0 36px rgba(200,232,245,.1) !important;
+}
+
+.ig-prof-avatar-ring img,
+.ig-prof-avatar-ring .ig-av-fallback {
+  border: 3px solid #060c18 !important;
+}
+
+/* ── SMALL AVATARS in user rows ── */
+.ig-userrow .ig-av {
+  border-radius: 50% !important;
+  border: 2px solid rgba(232,213,163,.25) !important;
+}
+
+/* ── FOLLOW BUTTON ── */
+.ig-mini-follow {
+  background: linear-gradient(135deg, #e8d5a3, #c4a35a) !important;
+  color: #060c18 !important;
+  border-radius: 14px !important;
+  font-weight: 700 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  border: none !important;
+}
+
+.ig-mini-follow.following {
+  background: rgba(255,255,255,.07) !important;
+  color: rgba(255,255,255,.65) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+}
+
+/* ── PROFILE ACTION BUTTONS ── */
+.ig-btn {
+  border-radius: 14px !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.ig-btn.primary {
+  background: linear-gradient(135deg, #e8d5a3, #c4a35a) !important;
+  color: #060c18 !important;
+  border: none !important;
+}
+
+.ig-btn.primary.following {
+  background: rgba(255,255,255,.06) !important;
+  color: rgba(255,255,255,.65) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+}
+
+.ig-btn.gray {
+  background: rgba(255,255,255,.06) !important;
+  color: rgba(255,255,255,.85) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+}
+
+.ig-btn.icon {
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+}
+
+/* ── PROFILE PAGE ── */
+.ig-prof-banner {
+  background: linear-gradient(160deg, #0d1a3a 0%, #1a0a2e 55%, #060c18 100%) !important;
+}
+
+.ig-prof-top {
+  background: #060c18 !important;
+}
+
+.ig-prof-name {
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  font-size: 16px !important;
+}
+
+.ig-prof-cat {
+  color: rgba(232,213,163,.65) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+}
+
+.ig-stat .n {
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 800 !important;
+  color: #e8d5a3 !important;
+}
+
+.ig-stat .l {
+  color: rgba(255,255,255,.42) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .3px !important;
+}
+
+/* ── PROFILE TABS ── */
+.ig-tabs {
+  background: #060c18 !important;
+  border-top: 1px solid rgba(255,255,255,.06) !important;
+}
+
+.ig-tab {
+  color: rgba(255,255,255,.3) !important;
+  border-bottom: 2px solid transparent !important;
+}
+
+.ig-tab.active {
+  color: #e8d5a3 !important;
+  border-bottom-color: #e8d5a3 !important;
+}
+
+/* ── PROFILE GRID — rounded tiles ── */
+.ig-grid {
+  gap: 4px !important;
+  padding: 4px !important;
+}
+
+.ig-grid .ig-tile {
+  border-radius: 12px !important;
+}
+
+/* ── HIGHLIGHTS ── */
+.ig-hl-circle {
+  border: 2px solid rgba(232,213,163,.28) !important;
+  background: rgba(255,255,255,.04) !important;
+  border-radius: 50% !important;
+}
+
+.ig-hl-label {
+  font-family: 'DM Sans', sans-serif !important;
+  color: rgba(255,255,255,.55) !important;
+  font-size: 11px !important;
+}
+
+/* ── SOCIAL BOTTOM NAV ── */
+#ig-social-nav {
+  background: rgba(6,12,24,.97) !important;
+  border-top: 1px solid rgba(232,213,163,.08) !important;
+}
+
+.ig-social-btn span {
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: .6px !important;
+  text-transform: uppercase !important;
+}
+
+/* ── VERIFIED BADGE (replaced with headphone SVG in JS) ── */
+.nwsb-badge-hp {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+  vertical-align: middle !important;
+}
+
+.nwsb-badge-tier    { color: #c8e8f5; }
+.nwsb-badge-ult     { color: #e8d5a3; filter: drop-shadow(0 0 4px rgba(232,213,163,.55)); }
+.nwsb-badge-massive { color: #e8d5a3; filter: drop-shadow(0 0 8px rgba(232,213,163,.8)) drop-shadow(0 0 14px rgba(232,213,163,.4)); }
+
+/* ── SOCIAL HOME SCREEN ── */
+#sub-social-home {
+  position: absolute !important;
+  inset: 0 !important;
+}
+
+.nwsb-home-scroll {
+  position: absolute;
+  inset: 0;
+  top: 48px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 16px);
+}
+.nwsb-home-scroll::-webkit-scrollbar { display: none; }
+
+/* Hero glass cube */
+.nwsb-hero {
+  margin: 14px 14px 0;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 20px 20px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.nwsb-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(232,213,163,.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.nwsb-hero-tag {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(232,213,163,.6);
+  margin-bottom: 8px;
+}
+
+.nwsb-hero-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+}
+
+.nwsb-hero-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+.nwsb-hero-stats {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding-top: 14px;
+}
+
+.nwsb-hero-stat {
+  flex: 1;
+  text-align: center;
+  padding: 0 4px;
+  border-right: 1px solid rgba(255,255,255,.07);
+}
+
+.nwsb-hero-stat:last-child {
+  border-right: none;
+}
+
+.nwsb-hero-stat-num {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #e8d5a3;
+  display: block;
+}
+
+.nwsb-hero-stat-lbl {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,.3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  display: block;
+  margin-top: 1px;
+}
+
+/* Section headings */
+.nwsb-section-hd {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.28);
+  padding: 18px 14px 8px;
+}
+
+/* People strip on social home */
+.nwsb-home-people {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 0 8px;
+}
+
+/* Placeholder reels strip */
+.nwsb-reels-strip {
+  display: flex;
+  gap: 10px;
+  padding: 0 14px 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.nwsb-reels-strip::-webkit-scrollbar { display: none; }
+
+.nwsb-reel-thumb {
+  flex-shrink: 0;
+  width: 100px;
+  height: 160px;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.nwsb-reel-thumb-word {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  padding: 8px 8px 10px;
+  text-shadow: 0 1px 6px rgba(0,0,0,.7);
+  position: relative;
+  z-index: 2;
+}
+
+.nwsb-reel-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(6,12,24,.85) 0%, transparent 55%);
+}
