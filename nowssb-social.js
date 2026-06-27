@@ -471,6 +471,9 @@
         if (sn)      sn.style.display      = 'none';
         if (mainNav) mainNav.style.display = '';
         if (typeof setActiveNav === 'function') setActiveNav('home');
+        /* Avoid goTo()'s self-exit bug when we're "already" on home (social is
+           an overlay so currentScreen never changed) — nudge it first. */
+        try { if (typeof currentScreen !== 'undefined' && currentScreen === 'home') currentScreen = 'home-nm'; } catch (e) {}
         if (typeof goTo         === 'function') goTo('home');
 
       } else if (which === 'feed') {

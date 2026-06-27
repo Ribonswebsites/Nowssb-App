@@ -434,18 +434,93 @@
     });
   };
 
+  /* Apply a banner URL/dataURL everywhere + persist (works for guests too) */
+  function nwsbApplyBanner(url) {
+    window._userDataCache = window._userDataCache || {};
+    window._userDataCache.bannerURL = url;
+    try { localStorage.setItem('nwsb_local_banner', url); } catch (e) {}
+    var b = document.getElementById('ig-prof-banner');
+    if (b) { b.style.backgroundImage = 'url(' + url + ')'; b.style.backgroundSize = 'cover'; b.style.backgroundPosition = 'center top'; }
+    var pv = document.getElementById('profile-edit-banner-preview');
+    if (pv) { pv.style.backgroundImage = 'url(' + url + ')'; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.innerHTML = ''; }
+    /* If the IG profile is open, re-render so the banner shows there immediately */
+    var igp = document.getElementById('sub-ig-profile');
+    if (window.IG && igp && igp.classList.contains('open') && typeof IG.openMyProfile === 'function') {
+      try { IG.openMyProfile(); } catch (e) {}
+    }
+    if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { bannerURL: url }).catch(function () {});
+    nwsbToast('Banner updated ✓');
+  }
+  window.nwsbApplyBanner = nwsbApplyBanner;
+
   window.profileHandleBannerFile = function (file) {
-    nwsbResize(file, 1000, function (dataUrl) {
-      window._userDataCache = window._userDataCache || {};
-      window._userDataCache.bannerURL = dataUrl;
-      try { localStorage.setItem('nwsb_local_banner', dataUrl); } catch (e) {}
-      var b = document.getElementById('ig-prof-banner');
-      if (b) { b.style.backgroundImage = 'url(' + dataUrl + ')'; b.style.backgroundSize = 'cover'; b.style.backgroundPosition = 'center top'; }
-      var pv = document.getElementById('profile-edit-banner-preview');
-      if (pv) { pv.style.backgroundImage = 'url(' + dataUrl + ')'; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; }
-      if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { bannerURL: dataUrl }).catch(function () {});
-      nwsbToast('Banner updated ✓');
-    });
+    nwsbResize(file, 1000, function (dataUrl) { nwsbApplyBanner(dataUrl); });
+  };
+
+  /* ── Prebuilt banner library (in-built banners, matched to the avatars) ── */
+  var NWSB_BANNERS = [
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591933705_qq3l9g.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591857840_tbznap.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782592051446_womamz.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591669371_kqnaf9.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591627828_lmde11.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591559591_yxgud5.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591561380_ytpn3b.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592260/grok_image_1782591732123_epmpiu.jpg'
+  ];
+  window.NWSB_BANNERS = NWSB_BANNERS;
+
+  function nwsbCloseBannerUI() {
+    var s = document.getElementById('nwsb-banner-sheet'); if (s) s.remove();
+    var p = document.getElementById('nwsb-banner-picker'); if (p) p.remove();
+  }
+  window.nwsbCloseBannerUI = nwsbCloseBannerUI;
+
+  /* Bottom chooser: Upload your own  /  Pick a prebuilt banner */
+  window.nwsbBannerChooser = function () {
+    nwsbCloseBannerUI();
+    var navH = 'calc(var(--nav-height,58px) + env(safe-area-inset-bottom,0px) + 24px)';
+    var w = document.createElement('div');
+    w.id = 'nwsb-banner-sheet';
+    w.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:flex-end;justify-content:center;';
+    w.innerHTML =
+      '<div onclick="nwsbCloseBannerUI()" style="position:absolute;inset:0;background:rgba(20,22,34,.5);backdrop-filter:blur(3px);"></div>' +
+      '<div style="position:relative;width:100%;max-width:520px;background:#f0f2f7;border-radius:28px 28px 0 0;padding:22px 20px ' + navH + ';box-shadow:0 -10px 40px rgba(0,0,0,.25);">' +
+        '<div style="width:42px;height:5px;border-radius:3px !important;background:rgba(0,0,0,.14);margin:0 auto 18px;"></div>' +
+        '<div style="font-family:DM Sans,sans-serif;font-size:18px;font-weight:800;color:#1a1a2e;margin-bottom:16px;">Change Banner</div>' +
+        '<button onclick="nwsbCloseBannerUI();nwsbPickImage(\'banner\')" class="nwsb-bch-btn" style="width:100%;display:flex;align-items:center;gap:14px;background:#f0f2f7;border:none;cursor:pointer;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:6px 6px 14px rgba(0,0,0,.12),-4px -4px 11px rgba(255,255,255,.95);text-align:left;">' +
+          '<span style="width:46px;height:46px;border-radius:50% !important;background:#f0f2f7;box-shadow:inset 3px 3px 7px rgba(0,0,0,.1),inset -2px -2px 6px rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>' +
+          '<span><span style="display:block;font-family:DM Sans,sans-serif;font-size:15px;font-weight:700;color:#1a1a2e;">Upload Photo</span><span style="display:block;font-family:DM Sans,sans-serif;font-size:12px;color:rgba(0,0,0,.45);">Choose from your phone\'s gallery</span></span>' +
+        '</button>' +
+        '<button onclick="nwsbBannerPicker()" class="nwsb-bch-btn" style="width:100%;display:flex;align-items:center;gap:14px;background:#f0f2f7;border:none;cursor:pointer;border-radius:18px;padding:16px;box-shadow:6px 6px 14px rgba(0,0,0,.12),-4px -4px 11px rgba(255,255,255,.95);text-align:left;">' +
+          '<span style="width:46px;height:46px;border-radius:50% !important;background:#f0f2f7;box-shadow:inset 3px 3px 7px rgba(0,0,0,.1),inset -2px -2px 6px rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg></span>' +
+          '<span><span style="display:block;font-family:DM Sans,sans-serif;font-size:15px;font-weight:700;color:#1a1a2e;">Prebuilt Banner</span><span style="display:block;font-family:DM Sans,sans-serif;font-size:12px;color:rgba(0,0,0,.45);">Pick from ready-made banners</span></span>' +
+        '</button>' +
+      '</div>';
+    document.body.appendChild(w);
+  };
+
+  /* Grid of prebuilt banners */
+  window.nwsbBannerPicker = function () {
+    nwsbCloseBannerUI();
+    var navH = 'calc(var(--nav-height,58px) + env(safe-area-inset-bottom,0px) + 24px)';
+    var cells = NWSB_BANNERS.map(function (u) {
+      return '<div onclick="nwsbApplyBanner(\'' + u + '\');nwsbCloseBannerUI();" style="width:100%;height:84px;border-radius:14px;background:#f0f2f7 url(' + u + ') center/cover no-repeat;cursor:pointer;box-shadow:5px 5px 12px rgba(0,0,0,.13),-3px -3px 9px rgba(255,255,255,.92);"></div>';
+    }).join('');
+    var w = document.createElement('div');
+    w.id = 'nwsb-banner-picker';
+    w.style.cssText = 'position:fixed;inset:0;z-index:10001;display:flex;align-items:flex-end;justify-content:center;';
+    w.innerHTML =
+      '<div onclick="nwsbCloseBannerUI()" style="position:absolute;inset:0;background:rgba(20,22,34,.5);backdrop-filter:blur(3px);"></div>' +
+      '<div style="position:relative;width:100%;max-width:520px;max-height:82vh;display:flex;flex-direction:column;background:#f0f2f7;border-radius:28px 28px 0 0;padding:18px 18px ' + navH + ';box-shadow:0 -10px 40px rgba(0,0,0,.25);">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0;">' +
+          '<button onclick="nwsbBannerChooser()" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;color:#c8a96e;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Back</button>' +
+          '<div style="font-family:DM Sans,sans-serif;font-size:16px;font-weight:800;color:#1a1a2e;">Choose Banner</div>' +
+          '<div style="width:44px;"></div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow-y:auto;-webkit-overflow-scrolling:touch;">' + cells + '</div>' +
+      '</div>';
+    document.body.appendChild(w);
   };
 
   /* ══════════════════════════════════════════════════════════
@@ -556,18 +631,17 @@
         if (mainNav) mainNav.style.display = '';
         window._nwsbEditFromSocial = false;
         if (typeof setActiveNav === 'function') setActiveNav('home');
-        /* Force the target home screen active directly (don't rely on goTo
-           finding a valid "current" — overlays may have desynced it) */
         var target = nwsbHomeScreen();
-        var tgt = document.getElementById(target);
-        if (tgt) {
-          var screens = document.querySelectorAll('.screen.active, .screen.exit');
-          for (var j = 0; j < screens.length; j++) {
-            screens[j].classList.remove('active'); screens[j].classList.remove('exit');
+        /* The social section is an OVERLAY, so `currentScreen` is still the home
+           we came from. Calling goTo(target) when currentScreen === target hits
+           goTo's self-exit bug (it strips .active from the very screen it just
+           activated 500ms later → blank screen). Nudge currentScreen to the
+           OTHER home first so goTo does a clean cross-fade onto `target`. */
+        try {
+          if (typeof currentScreen !== 'undefined' && currentScreen === target) {
+            currentScreen = (target === 'home') ? 'home-nm' : 'home';
           }
-          tgt.classList.add('active');
-          window.currentScreen = target;
-        }
+        } catch (e) {}
         if (typeof goTo === 'function') goTo(target);
         if (typeof nmhRefresh === 'function' && target === 'home-nm') { try { nmhRefresh(); } catch (e) {} }
         syncNmBody();
