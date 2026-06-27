@@ -523,9 +523,73 @@ body.nm-night #sub-social .ss-search {
 }
 body.nm-mode #sub-social .ss-search::placeholder { color: rgba(0,0,0,0.3) !important; }
 
-/* Sliding panels (subscription, profile-edit, certificates, terms, etc.) keep
-   their original dark design — they are full-screen overlays with white text,
-   so recoloring only the background made them unreadable. Left untouched. */
+/* ── Sliding panels → WHITE NEUMORPHISM ──
+   Inline white text is recolored to dark and gold accents to deep-gold via
+   [style*=] attribute selectors; dark-background buttons are re-whitened so
+   they stay readable. */
+body.nm-mode #sub-social .ss-panel { background: #f0f2f7 !important; }
+
+/* Skip the subscription cinematic intro overlay */
+body.nm-mode #sub-social #sub-intro-page { display: none !important; }
+
+/* White inline text → dark */
+body.nm-mode #sub-social .ss-panel [style*="#fff"],
+body.nm-mode #sub-social .ss-panel [style*="255,255,255"],
+body.nm-mode #sub-social .ss-panel [style*="255, 255, 255"] { color: #2a2533 !important; }
+
+/* Gold / accent inline text → deep gold (keeps the accent on cream) */
+body.nm-mode #sub-social .ss-panel [style*="e8d5a3"],
+body.nm-mode #sub-social .ss-panel [style*="accent-gold"],
+body.nm-mode #sub-social .ss-panel [style*="var(--accent"] { color: #a8854a !important; }
+
+/* Re-whiten buttons that have a dark background (so their label stays visible) */
+body.nm-mode #sub-social .ss-panel button[style*="rgba(0,0,0"],
+body.nm-mode #sub-social .ss-panel button[style*="background:#060c18"],
+body.nm-mode #sub-social .ss-panel button[style*="135deg,#e8d5a3"] { color: #060c18 !important; }
+
+/* Panel headings / sub (class-based) */
+body.nm-mode #sub-social .ss-panel-title { color: #1a1a2e !important; }
+body.nm-mode #sub-social .ss-panel-sub { color: rgba(0,0,0,0.5) !important; }
+body.nm-mode #sub-social .ss-panel-header { border-bottom-color: rgba(0,0,0,0.07) !important; }
+
+/* Back button */
+body.nm-mode #sub-social .ss-back, body.nm-mode #sub-social .ss-panel-back { color: #1a1a2e !important; }
+body.nm-mode #sub-social .ss-back svg { stroke: #1a1a2e !important; }
+
+/* Inputs / textareas → neumorphic inset */
+body.nm-mode #sub-social .ss-panel input,
+body.nm-mode #sub-social .ss-panel textarea,
+body.nm-mode #sub-social .ss-input {
+  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important; border-radius: 14px !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.95) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-mode #sub-social .ss-panel input::placeholder,
+body.nm-mode #sub-social .ss-panel textarea::placeholder { color: rgba(0,0,0,0.3) !important; }
+
+/* Billing toggle */
+body.nm-mode #sub-social .bill-toggle {
+  background: #f0f2f7 !important; border: none !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-social .bill-btn { color: rgba(0,0,0,0.5) !important; }
+body.nm-mode #sub-social .bill-btn[style*="background:rgba(255,255,255"] {
+  background: #f0f2f7 !important; color: #1a1a2e !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.13), -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+
+/* Plan cards + option rows + checks */
+body.nm-mode #sub-social .ss-plan-card {
+  background: #f0f2f7 !important; border: none !important; border-radius: 18px !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.12), -5px -5px 14px rgba(255,255,255,0.97) !important;
+}
+body.nm-mode #sub-social .ss-option { border-bottom-color: rgba(0,0,0,0.07) !important; }
+body.nm-mode #sub-social .ss-option-label { color: #1a1a2e !important; }
+body.nm-mode #sub-social .ss-option-sub { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode #sub-social .ss-check { border-color: rgba(0,0,0,0.25) !important; }
+
+/* Gold gradient CTA buttons keep dark text (already dark via re-whiten rule) */
+body.nm-mode #sub-social .ss-btn-primary { color: #060c18 !important; }
 
 /* ═══════════════════════════════════════════════════════════════
    INNER PAGE 2 — NOWSSB STORE  (#sub-nowssb-store)
