@@ -1621,3 +1621,14 @@ body.nm-mode #sub-ig-profile .nwsb-reel-card {
   border: none !important;
   box-shadow: 8px 8px 20px rgba(0,0,0,0.16), -5px -5px 14px rgba(255,255,255,0.9) !important;
 }
+
+/* ── Logo wrappers must be true neumorphic CIRCLES (defeat the global
+   *{border-radius:0!important} reset that was squaring them) ── */
+.nmh-logo{
+  border-radius:50% !important;
+  background-color:#f0f2f7 !important;
+}
+.nm-logo-ring{
+  border-radius:50% !important;
+  background-color:#e4e6ed !important;
+}

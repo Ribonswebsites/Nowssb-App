@@ -546,15 +546,31 @@
     var orig = window.IG.socialNav;
     window.IG.socialNav = function (which) {
       if (which === 'home') {
-        ['sub-social-home', 'sub-reels-feed', 'sub-people', 'sub-ig-profile'].forEach(function (id) {
-          var e = document.getElementById(id); if (e) e.classList.remove('open');
-        });
+        /* Close EVERY open sub-screen overlay (social + anything else lingering)
+           so nothing covers the home screen → no more blank dark screen */
+        var subs = document.querySelectorAll('.sub-screen.open');
+        for (var i = 0; i < subs.length; i++) subs[i].classList.remove('open');
         var sn = document.getElementById('ig-social-nav');
         var mainNav = document.getElementById('ig-bottomnav');
         if (sn) sn.style.display = 'none';
         if (mainNav) mainNav.style.display = '';
+        window._nwsbEditFromSocial = false;
         if (typeof setActiveNav === 'function') setActiveNav('home');
-        if (typeof goTo === 'function') goTo(nwsbHomeScreen());
+        /* Force the target home screen active directly (don't rely on goTo
+           finding a valid "current" — overlays may have desynced it) */
+        var target = nwsbHomeScreen();
+        var tgt = document.getElementById(target);
+        if (tgt) {
+          var screens = document.querySelectorAll('.screen.active, .screen.exit');
+          for (var j = 0; j < screens.length; j++) {
+            screens[j].classList.remove('active'); screens[j].classList.remove('exit');
+          }
+          tgt.classList.add('active');
+          window.currentScreen = target;
+        }
+        if (typeof goTo === 'function') goTo(target);
+        if (typeof nmhRefresh === 'function' && target === 'home-nm') { try { nmhRefresh(); } catch (e) {} }
+        syncNmBody();
         return;
       }
       return orig.apply(this, arguments);
