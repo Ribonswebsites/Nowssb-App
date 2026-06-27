@@ -409,6 +409,74 @@
     });
   };
 
+  /* ══════════════════════════════════════════════════════════
+     SOCIAL PROFILE NAVIGATION FIX
+     normal/fashion home → social profile → (edit) → back → social profile
+                                                    → back → the home you came from
+  ══════════════════════════════════════════════════════════ */
+  function nwsbHomeScreen() {
+    return (localStorage.getItem('nwsb_home_mode') || 'nm') === 'home' ? 'home' : 'home-nm';
+  }
+
+  /* Edit Profile: open the edit panel cleanly, remember we came from social */
+  (function patchEditProfile() {
+    if (!window.IG) return setTimeout(patchEditProfile, 150);
+    window.IG.editProfile = function () {
+      window._nwsbEditFromSocial = true;
+      var igp = document.getElementById('sub-ig-profile');
+      var ppl = document.getElementById('sub-people');
+      if (igp) igp.classList.remove('open');
+      if (ppl) ppl.classList.remove('open');
+      if (typeof openSub === 'function') openSub('social');
+      /* open the panel in the same gesture → no settings flash */
+      if (typeof ssOpenPanel === 'function') ssOpenPanel('profile-edit');
+    };
+  })();
+
+  /* Back / Save from Edit Profile → return to the social profile (re-rendered) */
+  (function patchClosePanel() {
+    if (typeof window.ssClosePanel !== 'function') return setTimeout(patchClosePanel, 150);
+    var orig = window.ssClosePanel;
+    window.ssClosePanel = function (id) {
+      var fromSocial = (id === 'profile-edit' && window._nwsbEditFromSocial);
+      var r = orig.apply(this, arguments);
+      if (fromSocial) {
+        window._nwsbEditFromSocial = false;
+        if (typeof closeSub === 'function') closeSub('social');
+        var mainNav = document.getElementById('ig-bottomnav');
+        var sn      = document.getElementById('ig-social-nav');
+        if (mainNav) mainNav.style.display = 'none';
+        if (sn)      sn.style.display = 'flex';
+        var igp = document.getElementById('sub-ig-profile');
+        if (igp) igp.classList.add('open');
+        if (window.IG && typeof IG.openMyProfile === 'function') { try { IG.openMyProfile(); } catch (e) {} }
+        if (typeof setSocialNavActive === 'function') {} /* noop */
+      }
+      return r;
+    };
+  })();
+
+  /* Social-nav Home → the home you actually came from (normal or fashion) */
+  (function patchSocialHome() {
+    if (!window.IG || typeof window.IG.socialNav !== 'function') return setTimeout(patchSocialHome, 150);
+    var orig = window.IG.socialNav;
+    window.IG.socialNav = function (which) {
+      if (which === 'home') {
+        ['sub-social-home', 'sub-reels-feed', 'sub-people', 'sub-ig-profile'].forEach(function (id) {
+          var e = document.getElementById(id); if (e) e.classList.remove('open');
+        });
+        var sn = document.getElementById('ig-social-nav');
+        var mainNav = document.getElementById('ig-bottomnav');
+        if (sn) sn.style.display = 'none';
+        if (mainNav) mainNav.style.display = '';
+        if (typeof setActiveNav === 'function') setActiveNav('home');
+        if (typeof goTo === 'function') goTo(nwsbHomeScreen());
+        return;
+      }
+      return orig.apply(this, arguments);
+    };
+  })();
+
   /* ── Bulletproof settings view-switch: whenever #sub-social opens in nm-mode,
      hide the old fashion settings list and render the curated neumorphic one,
      no matter which entry point opened it ── */
