@@ -1522,3 +1522,48 @@ body.nm-mode #sub-word-science .ws-page-chip {
 }
 body.nm-mode #sub-word-science .ws-page-tagline { color: rgba(0,0,0,0.5) !important; }
 body.nm-mode #sub-word-science .ws-page-brand { color: #1a1a2e !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   INNER PAGE 10 — PROFILE  (#sub-profile)
+   Neumorphism (light) · intro already skipped via shouldShowIntro
+═══════════════════════════════════════════════════════════════ */
+
+/* Surface */
+body.nm-mode #sub-profile #profileMainContent { background: #f0f2f7 !important; }
+body.nm-mode #sub-profile .menu-banner { display: none !important; }
+body.nm-mode #sub-profile * { text-shadow: none !important; }
+body.nm-mode #sub-profile .sub-back svg path { stroke: #1a1a2e !important; }
+
+/* Identity */
+body.nm-mode #sub-profile .profile-avatar-ring-img {
+  border: 3px solid #f0f2f7 !important;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.16), -4px -4px 12px rgba(255,255,255,0.9) !important;
+}
+body.nm-mode #sub-profile .profile-name { color: #1a1a2e !important; }
+body.nm-mode #sub-profile .profile-email { color: rgba(0,0,0,0.45) !important; }
+
+/* Section labels */
+body.nm-mode #sub-profile .sub-section-label { color: #c8a96e !important; }
+
+/* Cards (progress / body map) → neumorphic */
+body.nm-mode #sub-profile .sub-card {
+  background: #f0f2f7 !important; border: none !important; border-radius: 18px !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.12), -5px -5px 14px rgba(255,255,255,0.97) !important;
+}
+body.nm-mode #sub-profile .sub-card::before { display: none !important; }
+body.nm-mode #sub-profile .sub-card:active { background: #eceef4 !important; }
+body.nm-mode #sub-profile .sub-card-title { color: #1a1a2e !important; }
+body.nm-mode #sub-profile .sub-card-sub { color: rgba(0,0,0,0.55) !important; }
+
+/* Preference / shop rows grouped into a neumorphic card look */
+body.nm-mode #sub-profile .profile-row { border-bottom-color: rgba(0,0,0,0.08) !important; }
+body.nm-mode #sub-profile .profile-row-label { color: #1a1a2e !important; }
+body.nm-mode #sub-profile .profile-row-val { color: rgba(0,0,0,0.5) !important; }
+
+/* Toggles → neumorphic groove */
+body.nm-mode #sub-profile .stgl { box-shadow: inset 2px 2px 5px rgba(0,0,0,0.14), inset -2px -2px 5px rgba(255,255,255,0.92) !important; }
+
+/* Stat numbers / generic gold accents inside profile */
+body.nm-mode #sub-profile .pp-stat-num,
+body.nm-mode #sub-profile .profile-stat-num { color: #c8a96e !important; }
