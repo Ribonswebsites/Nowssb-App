@@ -242,3 +242,167 @@
 #home-nm.nm-dark .nmh-offer-now  { color: #e8d5a3; }
 #home-nm.nm-dark .nmh-offer-was  { color: rgba(255,255,255,0.32); }
 #home-nm.nm-dark .nmh-offer-cta  { color: #e8d5a3; }
+
+/* ═══════════════════════════════════════════════════════════════
+   INNER PAGE 1 — SOUND LIBRARY  (#sub-sound-library)
+   Neumorphism skin · light = day, dark = night (body.nm-night)
+═══════════════════════════════════════════════════════════════ */
+
+/* Hide the cinematic photo layers */
+body.nm-mode #sub-sound-library .sl-bg,
+body.nm-mode #sub-sound-library .sl-bg-overlay,
+body.nm-mode #sub-sound-library .sl-banner-img,
+body.nm-mode #sub-sound-library .sl-banner-fade { display: none !important; }
+
+/* Screen surface */
+body.nm-mode #sub-sound-library .sl-screen { background: #f0f2f7 !important; }
+body.nm-night #sub-sound-library .sl-screen { background: #0c0c20 !important; }
+
+/* Banner header → clean panel */
+body.nm-mode #sub-sound-library .sl-banner { height: 150px !important; background: transparent !important; }
+body.nm-mode #sub-sound-library .sl-back-btn svg path,
+body.nm-mode #sub-sound-library .sl-back-btn svg line { stroke: #1a1a2e !important; }
+body.nm-night #sub-sound-library .sl-back-btn svg path,
+body.nm-night #sub-sound-library .sl-back-btn svg line { stroke: rgba(232,213,163,0.9) !important; }
+
+body.nm-mode #sub-sound-library .sl-eyebrow { color: #c8a96e !important; }
+body.nm-night #sub-sound-library .sl-eyebrow { color: #e8d5a3 !important; }
+body.nm-mode #sub-sound-library .sl-banner-title { color: #1a1a2e !important; text-shadow: none !important; }
+body.nm-night #sub-sound-library .sl-banner-title { color: #fff !important; }
+body.nm-mode #sub-sound-library .sl-stat { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode #sub-sound-library .sl-stat strong { color: #1a1a2e !important; }
+body.nm-mode #sub-sound-library .sl-stat-sep { color: rgba(0,0,0,0.2) !important; }
+body.nm-night #sub-sound-library .sl-stat { color: rgba(255,255,255,0.5) !important; }
+body.nm-night #sub-sound-library .sl-stat strong { color: rgba(255,255,255,0.85) !important; }
+body.nm-night #sub-sound-library .sl-stat-sep { color: rgba(255,255,255,0.2) !important; }
+
+/* Tab bar */
+body.nm-mode #sub-sound-library .sl-tabs {
+  background: #f0f2f7 !important;
+  border-bottom: none !important;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-night #sub-sound-library .sl-tabs {
+  background: #0c0c20 !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
+}
+body.nm-mode #sub-sound-library .sl-tab { color: rgba(0,0,0,0.35) !important; }
+body.nm-mode #sub-sound-library .sl-tab.active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
+body.nm-night #sub-sound-library .sl-tab { color: rgba(255,255,255,0.32) !important; }
+body.nm-night #sub-sound-library .sl-tab.active { color: #e8d5a3 !important; border-bottom-color: #e8d5a3 !important; }
+body.nm-mode #sub-sound-library .sl-tab-badge { background: rgba(0,0,0,0.06) !important; color: rgba(0,0,0,0.4) !important; border-radius: 20px !important; }
+body.nm-mode #sub-sound-library .sl-tab.active .sl-tab-badge { background: rgba(200,169,110,0.18) !important; color: #c8a96e !important; }
+body.nm-night #sub-sound-library .sl-tab-badge { background: rgba(255,255,255,0.08) !important; color: rgba(255,255,255,0.4) !important; }
+body.nm-night #sub-sound-library .sl-tab.active .sl-tab-badge { background: rgba(232,213,163,0.18) !important; color: #e8d5a3 !important; }
+
+/* Content surface */
+body.nm-mode #sub-sound-library .sl-content { background: transparent !important; }
+
+/* Sort row + buttons */
+body.nm-mode #sub-sound-library .sl-sort-label { color: rgba(0,0,0,0.32) !important; }
+body.nm-night #sub-sound-library .sl-sort-label { color: rgba(255,255,255,0.3) !important; }
+body.nm-mode #sub-sound-library .sl-sort-btn {
+  background: #f0f2f7 !important; border: none !important; color: rgba(0,0,0,0.4) !important;
+  border-radius: 12px !important; box-shadow: 3px 3px 7px rgba(0,0,0,0.12),-2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-sound-library .sl-sort-btn.active { color: #c8a96e !important; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12),inset -2px -2px 5px rgba(255,255,255,0.95) !important; }
+body.nm-night #sub-sound-library .sl-sort-btn {
+  background: #16163c !important; border: none !important; color: rgba(255,255,255,0.4) !important;
+  border-radius: 12px !important; box-shadow: 3px 3px 8px rgba(0,0,0,0.85),-2px -2px 6px rgba(50,50,110,0.3) !important;
+}
+body.nm-night #sub-sound-library .sl-sort-btn.active { color: #e8d5a3 !important; box-shadow: inset 2px 2px 6px rgba(0,0,0,0.85),inset -2px -2px 5px rgba(50,50,110,0.3) !important; }
+
+/* Sentence cards → neumorphic raised */
+body.nm-mode #sub-sound-library .sl-sentence-card {
+  background: #f0f2f7 !important; border: none !important; border-radius: 20px !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.13),-5px -5px 14px rgba(255,255,255,0.97) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-mode #sub-sound-library .sl-sentence-card::before { display: none !important; }
+body.nm-night #sub-sound-library .sl-sentence-card {
+  background: #16163c !important; border: none !important; border-radius: 20px !important;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88),-4px -4px 14px rgba(50,50,110,0.32) !important;
+}
+body.nm-mode #sub-sound-library .sl-sentence-eyebrow { color: #c8a96e !important; }
+body.nm-night #sub-sound-library .sl-sentence-eyebrow { color: #e8d5a3 !important; }
+body.nm-mode #sub-sound-library .sl-sentence-date { color: rgba(0,0,0,0.3) !important; }
+body.nm-mode #sub-sound-library .sl-sentence-text { color: rgba(0,0,0,0.78) !important; }
+body.nm-mode #sub-sound-library .sl-sentence-text .sl-word-hl { color: #c8a96e !important; border-bottom-color: rgba(200,169,110,0.35) !important; }
+body.nm-night #sub-sound-library .sl-sentence-text { color: rgba(255,255,255,0.86) !important; }
+body.nm-mode #sub-sound-library .sl-sentence-chip { color: #a8854a !important; border-color: rgba(200,169,110,0.3) !important; background: rgba(200,169,110,0.07) !important; border-radius: 12px !important; }
+body.nm-night #sub-sound-library .sl-sentence-chip { border-radius: 12px !important; }
+body.nm-mode #sub-sound-library .sl-sentence-footer { border-top-color: rgba(0,0,0,0.08) !important; }
+body.nm-mode #sub-sound-library .sl-sentence-meta { color: rgba(0,0,0,0.3) !important; }
+body.nm-mode #sub-sound-library .sl-sentence-play-btn {
+  background: #f0f2f7 !important; border: none !important; border-radius: 12px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.13),-2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-sound-library .sl-sentence-play-btn { border-radius: 12px !important; }
+body.nm-mode #sub-sound-library .sl-sentence-play-btn svg path,
+body.nm-mode #sub-sound-library .sl-sentence-play-btn svg polygon { stroke: #c8a96e !important; fill: #c8a96e !important; }
+body.nm-mode #sub-sound-library .sl-sentence-delete-btn {
+  background: #f0f2f7 !important; border: none !important; border-radius: 12px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.13),-2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-sound-library .sl-sentence-delete-btn { border-radius: 12px !important; }
+
+/* Word cards */
+body.nm-mode #sub-sound-library .sl-word-card { border-bottom-color: rgba(0,0,0,0.07) !important; }
+body.nm-mode #sub-sound-library .sl-word-card:active { background: rgba(0,0,0,0.03) !important; }
+body.nm-mode #sub-sound-library .sl-word-disc {
+  background: #f0f2f7 !important; border: none !important; border-radius: 14px !important;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.13),inset -2px -2px 5px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-sound-library .sl-word-disc { background: #16163c !important; border: none !important; border-radius: 14px !important; box-shadow: inset 2px 2px 6px rgba(0,0,0,0.85),inset -2px -2px 5px rgba(50,50,110,0.3) !important; }
+body.nm-mode #sub-sound-library .sl-word-disc::after { display: none !important; }
+body.nm-mode #sub-sound-library .sl-word-disc-letter { color: rgba(0,0,0,0.4) !important; }
+body.nm-mode #sub-sound-library .sl-word-name { color: #1a1a2e !important; }
+body.nm-mode #sub-sound-library .sl-word-phonetic { color: rgba(0,0,0,0.35) !important; }
+body.nm-night #sub-sound-library .sl-word-name { color: #fff !important; }
+body.nm-night #sub-sound-library .sl-word-phonetic { color: rgba(255,255,255,0.35) !important; }
+body.nm-mode #sub-sound-library .sl-word-organ { color: rgba(0,0,0,0.25) !important; }
+body.nm-mode #sub-sound-library .sl-badge-sub { color: #5a8fa8 !important; border-color: rgba(90,143,168,0.3) !important; background: rgba(90,143,168,0.07) !important; border-radius: 10px !important; }
+body.nm-mode #sub-sound-library .sl-badge-buy { color: #a8854a !important; border-color: rgba(200,169,110,0.3) !important; background: rgba(200,169,110,0.07) !important; border-radius: 10px !important; }
+body.nm-night #sub-sound-library .sl-word-badge { border-radius: 10px !important; }
+body.nm-mode #sub-sound-library .sl-purchased-date { color: rgba(200,169,110,0.55) !important; }
+
+/* Filter chips */
+body.nm-mode #sub-sound-library .sl-filter-chip {
+  background: #f0f2f7 !important; border: none !important; color: rgba(0,0,0,0.4) !important; border-radius: 20px !important;
+  box-shadow: 3px 3px 7px rgba(0,0,0,0.11),-2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-sound-library .sl-filter-chip.active { color: #c8a96e !important; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12),inset -2px -2px 5px rgba(255,255,255,0.95) !important; }
+body.nm-night #sub-sound-library .sl-filter-chip {
+  background: #16163c !important; border: none !important; color: rgba(255,255,255,0.4) !important; border-radius: 20px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.85),-2px -2px 6px rgba(50,50,110,0.3) !important;
+}
+body.nm-night #sub-sound-library .sl-filter-chip.active { color: #e8d5a3 !important; box-shadow: inset 2px 2px 6px rgba(0,0,0,0.85),inset -2px -2px 5px rgba(50,50,110,0.3) !important; }
+body.nm-mode #sub-sound-library .sl-word-count-label { color: rgba(0,0,0,0.3) !important; }
+body.nm-mode #sub-sound-library .sl-word-count-label span { color: rgba(0,0,0,0.55) !important; }
+
+/* Empty state */
+body.nm-mode #sub-sound-library .sl-empty-title { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode #sub-sound-library .sl-empty-text { color: rgba(0,0,0,0.3) !important; }
+body.nm-mode #sub-sound-library .sl-empty-cta {
+  background: #f0f2f7 !important; border: none !important; color: #c8a96e !important; border-radius: 14px !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13),-3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-sound-library .sl-empty-cta { background: #16163c !important; border: none !important; color: #e8d5a3 !important; border-radius: 14px !important; box-shadow: 4px 4px 12px rgba(0,0,0,0.85),-3px -3px 8px rgba(50,50,110,0.3) !important; }
+
+/* Upgrade banner */
+body.nm-mode #sub-sound-library .sl-upgrade-banner {
+  background: #f0f2f7 !important; border: none !important; border-radius: 20px !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.13),-5px -5px 14px rgba(255,255,255,0.97) !important;
+}
+body.nm-mode #sub-sound-library .sl-upgrade-banner::before { display: none !important; }
+body.nm-night #sub-sound-library .sl-upgrade-banner { background: #16163c !important; border: none !important; border-radius: 20px !important; box-shadow: 8px 8px 22px rgba(0,0,0,0.88),-4px -4px 14px rgba(50,50,110,0.32) !important; }
+body.nm-mode #sub-sound-library .sl-upgrade-label { color: #c8a96e !important; }
+body.nm-night #sub-sound-library .sl-upgrade-label { color: #e8d5a3 !important; }
+body.nm-mode #sub-sound-library .sl-upgrade-title { color: #1a1a2e !important; }
+body.nm-mode #sub-sound-library .sl-upgrade-text { color: rgba(0,0,0,0.5) !important; }
+body.nm-mode #sub-sound-library .sl-upgrade-btn {
+  background: #f0f2f7 !important; border: none !important; color: #c8a96e !important; border-radius: 14px !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13),-3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-sound-library .sl-upgrade-btn { background: #16163c !important; border: none !important; color: #e8d5a3 !important; border-radius: 14px !important; box-shadow: 4px 4px 12px rgba(0,0,0,0.85),-3px -3px 8px rgba(50,50,110,0.3) !important; }
