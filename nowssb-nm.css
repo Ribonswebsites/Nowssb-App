@@ -1072,3 +1072,17 @@ body.nm-night #nm-settings-view .nmset-tgl { background: #16163c; box-shadow: in
 body.nm-night #nm-settings-view .nmset-signout { background: #16163c; box-shadow: 6px 6px 16px rgba(0,0,0,0.85), -4px -4px 12px rgba(50,50,110,0.3); }
 .nmset-foot { text-align: center; font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(0,0,0,0.3); padding: 10px 0 4px; }
 body.nm-night #nm-settings-view .nmset-foot { color: rgba(255,255,255,0.25); }
+
+/* Sound Library — fix filter chip / sort button height + centering (nm mode) */
+body.nm-mode #sub-sound-library .sl-filter-row { align-items: center !important; }
+body.nm-mode #sub-sound-library .sl-filter-chip {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  height: 38px !important; min-height: 38px !important; padding: 0 16px !important; box-sizing: border-box !important;
+  white-space: nowrap !important;
+}
+body.nm-mode #sub-sound-library .sl-sort-btn {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  height: 34px !important; min-height: 34px !important; padding: 0 16px !important; box-sizing: border-box !important;
+  white-space: nowrap !important;
+}
+body.nm-mode #sub-sound-library .sl-sort-row { align-items: center !important; }
