@@ -1598,3 +1598,26 @@ body.nm-mode #sub-ig-profile .ig-username {
 /* IG profile tabs: stay attached to the content (don't stick & overlap the
    banner/grid on scroll) */
 body.nm-mode #sub-ig-profile .ig-tabs { position: static !important; top: auto !important; }
+
+/* Reels feed (incl. gated / empty state) → neumorphism */
+body.nm-mode #sub-reels-feed { background: #f0f2f7 !important; }
+body.nm-mode #sub-reels-feed .nwsb-reels-empty-title { color: #1a1a2e !important; }
+body.nm-mode #sub-reels-feed .nwsb-reels-empty-sub { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode #sub-reels-feed .nwsb-post-reel-btn,
+body.nm-mode #sub-social-home .nwsb-post-reel-btn {
+  background: #f0f2f7 !important;
+  border: none !important;
+  color: #c8a96e !important;
+  border-radius: 16px !important;
+  box-shadow: 6px 6px 14px rgba(0,0,0,0.13), -5px -5px 12px rgba(255,255,255,0.96) !important;
+}
+body.nm-mode #sub-reels-feed .nwsb-post-reel-btn:active,
+body.nm-mode #sub-social-home .nwsb-post-reel-btn:active {
+  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.13), inset -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+/* Reel cards → raised neumorphic frame (photo stays) */
+body.nm-mode #sub-reels-feed .nwsb-reel-card,
+body.nm-mode #sub-ig-profile .nwsb-reel-card {
+  border: none !important;
+  box-shadow: 8px 8px 20px rgba(0,0,0,0.16), -5px -5px 14px rgba(255,255,255,0.9) !important;
+}
