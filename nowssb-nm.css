@@ -1714,3 +1714,36 @@ body.nm-mode #sub-ig-profile #ig-tab-reels .ig-tab-img {
   width: 20px !important; height: 20px !important; object-fit: contain !important;
   filter: brightness(0) saturate(100%) invert(72%) sepia(28%) saturate(560%) hue-rotate(2deg) brightness(92%) opacity(0.85) !important;
 }
+
+/* ── Follow buttons → neumorphism (white raised pill, gold text) ── */
+body.nm-mode .ig-mini-follow,
+body.nm-mode #sub-ig-profile .ig-btn.primary {
+  background: #f0f2f7 !important;
+  color: #c8a96e !important;
+  border: none !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode .ig-mini-follow.following,
+body.nm-mode #sub-ig-profile .ig-btn.primary.following {
+  color: rgba(0,0,0,0.5) !important;
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode .ig-mini-follow:active,
+body.nm-mode #sub-ig-profile .ig-btn.primary:active {
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
+}
+
+/* ── Social home (Stats): fix faint loading text + broken dashed slots ── */
+body.nm-mode #sub-social-home #nwsb-home-reels-strip,
+body.nm-mode #sub-social-home #nwsb-home-reels-strip div { color: rgba(0,0,0,0.4) !important; }
+
+/* Image-explainer slots → neumorphic inset drop-zones (look intentional) */
+body.nm-mode #sub-social-home .nwsb-explainer-slot {
+  background: #f0f2f7 !important;
+  border: none !important;
+  box-shadow: inset 4px 4px 9px rgba(0,0,0,0.1), inset -3px -3px 7px rgba(255,255,255,0.9) !important;
+}
+body.nm-mode #sub-social-home .nwsb-explainer-slot span { color: #a8854a !important; }
+
+/* Hero stat-cube text already cream-styled; keep its label readable */
+body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !important; }
