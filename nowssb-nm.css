@@ -1643,106 +1643,132 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-reel-card {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   FASHION-MODE social IG profile — GLASS-NEUMORPHISM hybrid.
-   The normal-home social profile stays neumorphic (body.nm-mode, above).
-   In Fashion mode (no .nm-mode) the same Instagram profile becomes frosted
-   glass that still BULGES with neumorphic depth: translucent blurred
-   surfaces + a dark drop shadow for the raised feel + a top-edge light
-   highlight (inset) for the glassy bevel. Text stays light on the dark
-   fashion backdrop.
+   "NowssB Fashion" THEME — BRIGHT FROSTED GLASS with neumorphic BULGES.
+   Not black glass: a light glassy backdrop with clear, frosted, translucent
+   white panels that bulge out (raised) like neumorphism — soft cool drop
+   shadow + white top-left highlight + an inset bevel for the glass edge.
+   Dark text/icons, gold accents, on the bright glass.
 ═══════════════════════════════════════════════════════════════ */
 
-/* Avatar → glass circle with neumorphic bulge */
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring {
-  background: rgba(255,255,255,0.07) !important;
-  -webkit-backdrop-filter: blur(16px) !important; backdrop-filter: blur(16px) !important;
-  border-radius: 50% !important;
-  padding: 6px !important;
-  box-shadow: 8px 8px 20px rgba(0,0,0,0.55), -5px -5px 14px rgba(150,160,200,0.10),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.28), inset -1px -1px 2px rgba(0,0,0,0.35) !important;
+/* Light glassy backdrop so the frosted panels actually read as glass */
+body.nwsb-soc-glass #sub-ig-profile,
+body.nwsb-soc-glass #sub-ig-profile .ig {
+  background: linear-gradient(165deg, #e9ecf9 0%, #e2e6f4 45%, #efe9f7 100%) !important;
 }
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar,
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring img {
-  border: none !important; border-radius: 50% !important;
+body.nwsb-soc-glass #sub-ig-profile::before { display: none !important; }
+
+/* Top bar → clear frosted glass */
+body.nwsb-soc-glass #sub-ig-profile .ig-topbar {
+  background: rgba(255,255,255,0.5) !important; border-bottom: none !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.6) !important; backdrop-filter: blur(20px) saturate(1.6) !important;
+  box-shadow: 0 5px 16px rgba(80,90,140,0.12) !important;
 }
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-initials {
-  background: rgba(255,255,255,0.06) !important;
-  -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
-  color: #e8d5a3 !important; border: none !important; border-radius: 50% !important;
-  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.5), inset -2px -2px 6px rgba(255,255,255,0.12) !important;
+body.nwsb-soc-glass #sub-ig-profile .ig-username { color: #1a1a2e !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-topbar img { filter: brightness(0) opacity(0.8) !important; }
+
+/* Profile text */
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-name { color: #1a1a2e !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-cat { color: #a8854a !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-bio,
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-biotext { color: rgba(0,0,0,0.7) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-rank { color: rgba(0,0,0,0.5) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-plan-badge {
+  color: #a8854a !important; background: rgba(200,169,110,0.16) !important; border-color: rgba(200,169,110,0.35) !important;
 }
 
-/* Stat numbers → glass circles with depth */
+/* Banner placeholder (no image) → light frosted gradient, not black */
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-banner:not([style*="url"]) {
+  background: linear-gradient(160deg, #dfe4f5 0%, #e9e4f3 100%) !important;
+}
+
+/* Avatar → bright frosted glass circle that bulges out */
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring {
+  background: rgba(255,255,255,0.5) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.5) !important; backdrop-filter: blur(16px) saturate(1.5) !important;
+  border-radius: 50% !important; padding: 6px !important;
+  box-shadow: 7px 7px 17px rgba(80,90,140,0.20), -5px -5px 13px rgba(255,255,255,0.9),
+              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.22) !important;
+}
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar,
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring img { border: none !important; border-radius: 50% !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-initials {
+  background: rgba(255,255,255,0.45) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) !important; backdrop-filter: blur(14px) saturate(1.5) !important;
+  color: #a8854a !important; border: none !important; border-radius: 50% !important;
+  box-shadow: inset 2px 2px 6px rgba(120,130,170,0.28), inset -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+
+/* Stat numbers → bright glass circles, bulged */
 body.nwsb-soc-glass #sub-ig-profile .ig-stats { gap: 6px !important; }
 body.nwsb-soc-glass #sub-ig-profile .ig-stat .n {
   width: 54px; height: 54px; border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.06) !important;
-  -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
-  color: #e8d5a3 !important; font-size: 17px !important; margin: 0 auto 7px !important;
-  box-shadow: 6px 6px 15px rgba(0,0,0,0.5), -4px -4px 11px rgba(150,160,200,0.09),
-              inset 1px 1px 1.5px rgba(255,255,255,0.24), inset -1px -1px 2px rgba(0,0,0,0.32) !important;
+  background: rgba(255,255,255,0.5) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) !important; backdrop-filter: blur(14px) saturate(1.5) !important;
+  color: #a8854a !important; font-size: 17px !important; margin: 0 auto 7px !important;
+  box-shadow: 6px 6px 14px rgba(80,90,140,0.2), -4px -4px 11px rgba(255,255,255,0.9),
+              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.2) !important;
 }
-body.nwsb-soc-glass #sub-ig-profile .ig-stat .l { color: rgba(255,255,255,0.45) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-stat .l { color: rgba(0,0,0,0.42) !important; }
 
-/* Topbar icon buttons → glass raised circles */
+/* Topbar icon buttons → bright glass raised circles */
 body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn {
-  background: rgba(255,255,255,0.07) !important;
-  -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
+  background: rgba(255,255,255,0.5) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) !important; backdrop-filter: blur(14px) saturate(1.5) !important;
   border-radius: 50% !important;
   width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
-  box-shadow: 5px 5px 13px rgba(0,0,0,0.5), -3px -3px 9px rgba(150,160,200,0.10),
-              inset 1px 1px 1.5px rgba(255,255,255,0.26), inset -1px -1px 2px rgba(0,0,0,0.3) !important;
+  box-shadow: 5px 5px 12px rgba(80,90,140,0.2), -3px -3px 9px rgba(255,255,255,0.9),
+              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.2) !important;
 }
-body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn svg { stroke: #e8d5a3 !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn svg { stroke: #1a1a2e !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn img { filter: brightness(0) opacity(0.8) !important; }
 
-/* Action buttons → glass with bulge */
+/* Action buttons → bright glass with bulge */
 body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray,
 body.nwsb-soc-glass #sub-ig-profile .ig-btn.icon {
-  background: rgba(255,255,255,0.07) !important;
-  -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
-  border: none !important; color: #f3eede !important; border-radius: 14px !important;
-  box-shadow: 5px 5px 13px rgba(0,0,0,0.5), -3px -3px 9px rgba(150,160,200,0.09),
-              inset 1px 1px 1.5px rgba(255,255,255,0.22), inset -1px -1px 2px rgba(0,0,0,0.3) !important;
+  background: rgba(255,255,255,0.5) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) !important; backdrop-filter: blur(14px) saturate(1.5) !important;
+  border: none !important; color: #1a1a2e !important; border-radius: 14px !important;
+  box-shadow: 5px 5px 12px rgba(80,90,140,0.18), -3px -3px 9px rgba(255,255,255,0.9),
+              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.2) !important;
 }
-body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray svg { stroke: #e8d5a3 !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray svg { stroke: #1a1a2e !important; }
 
-/* Highlights → glass circles */
+/* Highlights → bright glass circles */
 body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle {
-  background: rgba(255,255,255,0.06) !important;
-  -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
+  background: rgba(255,255,255,0.5) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) !important; backdrop-filter: blur(14px) saturate(1.5) !important;
   border: none !important;
-  box-shadow: 5px 5px 12px rgba(0,0,0,0.5), -3px -3px 9px rgba(150,160,200,0.09),
-              inset 1px 1px 1.5px rgba(255,255,255,0.22) !important;
+  box-shadow: 5px 5px 12px rgba(80,90,140,0.18), -3px -3px 9px rgba(255,255,255,0.9),
+              inset 1.5px 1.5px 2px rgba(255,255,255,0.95) !important;
 }
-body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle svg { stroke: #e8d5a3 !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-hl-label { color: rgba(255,255,255,0.6) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle svg { stroke: #a8854a !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-hl-label { color: rgba(0,0,0,0.5) !important; }
 
-/* Tab icons → glass depth tiles, active = pressed glass */
-body.nwsb-soc-glass #sub-ig-profile .ig-tab { margin: 6px 4px !important; }
+/* Tabs */
+body.nwsb-soc-glass #sub-ig-profile .ig-tabs { background: transparent !important; border-top-color: rgba(0,0,0,0.06) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-tab { margin: 6px 4px !important; color: rgba(0,0,0,0.32) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-tab.active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
 body.nwsb-soc-glass #sub-ig-profile .ig-tab svg,
 body.nwsb-soc-glass #sub-ig-profile .ig-tab .ig-tab-img {
   padding: 8px !important; border-radius: 14px !important; box-sizing: content-box !important;
-  background: rgba(255,255,255,0.06) !important;
-  -webkit-backdrop-filter: blur(12px) !important; backdrop-filter: blur(12px) !important;
-  box-shadow: 4px 4px 11px rgba(0,0,0,0.5), -3px -3px 8px rgba(150,160,200,0.09),
-              inset 1px 1px 1.5px rgba(255,255,255,0.2) !important;
+  background: rgba(255,255,255,0.5) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.5) !important; backdrop-filter: blur(12px) saturate(1.5) !important;
+  box-shadow: 4px 4px 10px rgba(80,90,140,0.18), -3px -3px 8px rgba(255,255,255,0.9),
+              inset 1.5px 1.5px 2px rgba(255,255,255,0.95) !important;
 }
 body.nwsb-soc-glass #sub-ig-profile .ig-tab.active svg,
 body.nwsb-soc-glass #sub-ig-profile .ig-tab.active .ig-tab-img {
-  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.55), inset -2px -2px 5px rgba(255,255,255,0.12) !important;
+  box-shadow: inset 3px 3px 7px rgba(120,130,170,0.28), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
 }
+body.nwsb-soc-glass #sub-ig-profile .ig-tab-img { filter: brightness(0) opacity(0.55) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-tab.active .ig-tab-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
 
-/* Explore tiles inside the profile grid → glass frames */
+/* Explore tiles inside the profile grid → bright glass frames */
 body.nwsb-soc-glass #sub-ig-profile .ig-tile {
-  background: rgba(255,255,255,0.05) !important;
-  -webkit-backdrop-filter: blur(10px) !important; backdrop-filter: blur(10px) !important;
+  background: rgba(255,255,255,0.4) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.4) !important; backdrop-filter: blur(10px) saturate(1.4) !important;
   border-radius: 16px !important; border: none !important;
-  box-shadow: 5px 5px 13px rgba(0,0,0,0.45), -3px -3px 9px rgba(150,160,200,0.08),
-              inset 1px 1px 1.5px rgba(255,255,255,0.16) !important;
-}
-
-/* Banner → soft frosted gradient so the avatar/cards lift off it */
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-banner {
-  -webkit-backdrop-filter: blur(6px) !important; backdrop-filter: blur(6px) !important;
+  box-shadow: 5px 5px 12px rgba(80,90,140,0.16), -3px -3px 9px rgba(255,255,255,0.85),
+              inset 1.5px 1.5px 2px rgba(255,255,255,0.9) !important;
 }
