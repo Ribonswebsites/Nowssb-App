@@ -1644,3 +1644,66 @@ body.nm-mode #sub-profile [style*="var(--text-primary)"],
 body.nm-mode #sub-profile [style*="255,255,255"] { color: rgba(0,0,0,0.55) !important; }
 body.nm-mode #sub-profile [style*="var(--accent)"] { color: #5a8fa8 !important; }
 body.nm-mode #sub-profile [style*="var(--accent-gold)"] { color: #c8a96e !important; }
+
+/* ── Community profile: neumorphic circles (avatar + stats) + icon depth ── */
+
+/* Avatar → raised neumorphic CIRCLE (cream), not the flat gold square */
+body.nm-mode #sub-ig-profile .ig-prof-avatar-ring {
+  background: #f0f2f7 !important;
+  border-radius: 50% !important;
+  padding: 6px !important;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.16), -5px -5px 13px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-ig-profile .ig-prof-avatar,
+body.nm-mode #sub-ig-profile .ig-prof-avatar-ring img {
+  border: none !important;
+  border-radius: 50% !important;
+}
+body.nm-mode #sub-ig-profile .ig-prof-initials {
+  background: #f0f2f7 !important;
+  color: #c8a96e !important;
+  border: none !important;
+  border-radius: 50% !important;
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.9) !important;
+}
+
+/* Stat numbers → neumorphic circles */
+body.nm-mode #sub-ig-profile .ig-stats { gap: 6px !important; }
+body.nm-mode #sub-ig-profile .ig-stat .n {
+  width: 54px; height: 54px;
+  border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+  background: #f0f2f7 !important;
+  color: #c8a96e !important;
+  font-size: 17px !important;
+  margin: 0 auto 7px !important;
+  box-shadow: 6px 6px 13px rgba(0,0,0,0.13), -4px -4px 10px rgba(255,255,255,0.95) !important;
+}
+
+/* Topbar icon buttons (chat / menu) → neumorphic raised circles */
+body.nm-mode #sub-ig-profile .ig-iconbtn {
+  background: #f0f2f7 !important;
+  border-radius: 50% !important;
+  width: 40px !important; height: 40px !important;
+  min-width: 40px !important; min-height: 40px !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-ig-profile .ig-iconbtn svg { stroke: #1a1a2e !important; }
+body.nm-mode #sub-ig-profile .ig-iconbtn img { filter: brightness(0) opacity(0.6) !important; }
+
+/* Profile tab icons → neumorphic depth tiles */
+body.nm-mode #sub-ig-profile .ig-tab {
+  margin: 6px 4px !important;
+}
+body.nm-mode #sub-ig-profile .ig-tab svg,
+body.nm-mode #sub-ig-profile .ig-tab .ig-tab-img {
+  padding: 8px !important;
+  border-radius: 14px !important;
+  box-sizing: content-box !important;
+  background: #f0f2f7 !important;
+  box-shadow: 4px 4px 9px rgba(0,0,0,0.12), -3px -3px 7px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-ig-profile .ig-tab.active svg,
+body.nm-mode #sub-ig-profile .ig-tab.active .ig-tab-img {
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
+}
