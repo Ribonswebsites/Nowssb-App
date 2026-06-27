@@ -837,3 +837,119 @@ body.nm-night #sub-practice .sp-rep-preset {
 body.nm-night #sub-practice .sp-rep-preset.active { color: #e8d5a3 !important; box-shadow: inset 2px 2px 6px rgba(0,0,0,0.85), inset -2px -2px 5px rgba(50,50,110,0.3) !important; }
 body.nm-mode #sub-practice .sp-rep-big { color: #1a1a2e !important; text-shadow: none !important; }
 body.nm-night #sub-practice .sp-rep-big { color: #fff !important; text-shadow: none !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   INNER PAGE 4 — ROUTINES  (#sub-routines + #sub-routine-detail)
+   Neumorphism · light=day, dark=night
+═══════════════════════════════════════════════════════════════ */
+
+/* Surface */
+body.nm-mode #sub-routines .rt-screen,
+body.nm-mode #sub-routine-detail .rt-screen { background: #f0f2f7 !important; }
+body.nm-night #sub-routines .rt-screen,
+body.nm-night #sub-routine-detail .rt-screen { background: #0c0c20 !important; }
+
+/* Hide cinematic image layers */
+body.nm-mode #sub-routines .rt-bg,
+body.nm-mode #sub-routines .rt-bg-overlay,
+body.nm-mode #sub-routines .rt-banner-img,
+body.nm-mode #sub-routines .rt-banner-fade,
+body.nm-mode #sub-routine-detail .rt-bg,
+body.nm-mode #sub-routine-detail .rt-bg-overlay,
+body.nm-mode #sub-routine-detail .rt-banner-img,
+body.nm-mode #sub-routine-detail .rt-banner-fade,
+body.nm-mode #sub-routine-detail .rt-edit-banner-img,
+body.nm-mode #sub-routine-detail .rt-edit-banner-fade { display: none !important; }
+
+/* Banner becomes a clean band */
+body.nm-mode #sub-routines .rt-banner,
+body.nm-mode #sub-routine-detail .rt-banner { height: 120px !important; background: transparent !important; }
+
+/* Header / titles */
+body.nm-mode #sub-routines .rt-banner-title, body.nm-mode #sub-routines .rt-title,
+body.nm-mode #sub-routine-detail .rt-banner-title, body.nm-mode #sub-routine-detail .rt-title { color: rgba(0,0,0,0.45) !important; }
+body.nm-night #sub-routines .rt-banner-title, body.nm-night #sub-routines .rt-title,
+body.nm-night #sub-routine-detail .rt-banner-title, body.nm-night #sub-routine-detail .rt-title { color: rgba(255,255,255,0.45) !important; }
+body.nm-mode #sub-routines .rt-section-label,
+body.nm-mode #sub-routine-detail .rt-section-label { color: #c8a96e !important; }
+body.nm-night #sub-routines .rt-section-label,
+body.nm-night #sub-routine-detail .rt-section-label { color: #e8d5a3 !important; }
+
+/* Routine cards → neumorphic raised */
+body.nm-mode #sub-routines .rt-card,
+body.nm-mode #sub-routine-detail .rt-card {
+  background: #f0f2f7 !important; border: none !important; border-radius: 20px !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.12), -5px -5px 14px rgba(255,255,255,0.97) !important;
+}
+body.nm-mode #sub-routines .rt-card::before,
+body.nm-mode #sub-routine-detail .rt-card::before { display: none !important; }
+body.nm-mode #sub-routines .rt-card:active,
+body.nm-mode #sub-routine-detail .rt-card:active { background: #eceef4 !important; }
+body.nm-night #sub-routines .rt-card,
+body.nm-night #sub-routine-detail .rt-card {
+  background: #16163c !important; border: none !important; border-radius: 20px !important;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32) !important;
+}
+
+body.nm-mode #sub-routines .rt-card-name,
+body.nm-mode #sub-routine-detail .rt-card-name { color: #1a1a2e !important; }
+body.nm-night #sub-routines .rt-card-name,
+body.nm-night #sub-routine-detail .rt-card-name { color: #fff !important; }
+body.nm-mode #sub-routines .rt-card-time,
+body.nm-mode #sub-routine-detail .rt-card-time { color: rgba(0,0,0,0.35) !important; }
+body.nm-mode #sub-routines .rt-card-stat-val,
+body.nm-mode #sub-routine-detail .rt-card-stat-val { color: #1a1a2e !important; }
+body.nm-night #sub-routines .rt-card-stat-val,
+body.nm-night #sub-routine-detail .rt-card-stat-val { color: #fff !important; }
+body.nm-mode #sub-routines .rt-card-stat-label,
+body.nm-mode #sub-routine-detail .rt-card-stat-label { color: rgba(0,0,0,0.3) !important; }
+body.nm-mode #sub-routines .rt-card-footer,
+body.nm-mode #sub-routine-detail .rt-card-footer { border-top-color: rgba(0,0,0,0.08) !important; }
+body.nm-mode #sub-routines .rt-card-last,
+body.nm-mode #sub-routine-detail .rt-card-last { color: rgba(0,0,0,0.3) !important; }
+
+/* Start button → neumorphic */
+body.nm-mode #sub-routines .rt-start-btn,
+body.nm-mode #sub-routine-detail .rt-start-btn {
+  background: #f0f2f7 !important; border: none !important; color: #c8a96e !important; border-radius: 12px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.13), -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-routines .rt-start-btn,
+body.nm-night #sub-routine-detail .rt-start-btn {
+  background: #16163c !important; border: none !important; color: #e8d5a3 !important; border-radius: 12px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.85), -2px -2px 6px rgba(50,50,110,0.3) !important;
+}
+
+/* Word rows in detail */
+body.nm-mode #sub-routine-detail .rd-word-row { border-bottom-color: rgba(0,0,0,0.07) !important; }
+body.nm-night #sub-routine-detail .rd-word-row { border-bottom-color: rgba(255,255,255,0.07) !important; }
+
+/* Edit sheet */
+body.nm-mode #sub-routine-detail .rt-edit-sheet { background: #f0f2f7 !important; border-top: none !important; }
+body.nm-night #sub-routine-detail .rt-edit-sheet { background: #14143a !important; border-top: none !important; }
+body.nm-mode #sub-routine-detail .rt-edit-title { color: #c8a96e !important; }
+body.nm-night #sub-routine-detail .rt-edit-title { color: #e8d5a3 !important; }
+body.nm-mode #sub-routine-detail .rt-edit-label { color: rgba(0,0,0,0.4) !important; }
+body.nm-mode #sub-routine-detail .rt-edit-input {
+  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important; border-radius: 12px !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-routine-detail .rt-edit-input {
+  background: #16163c !important; border: none !important; color: #fff !important; border-radius: 12px !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.85), inset -2px -2px 6px rgba(50,50,110,0.3) !important;
+}
+body.nm-mode #sub-routine-detail .rt-edit-time-chip {
+  background: #f0f2f7 !important; border: none !important; color: rgba(0,0,0,0.4) !important; border-radius: 12px !important;
+  box-shadow: 3px 3px 7px rgba(0,0,0,0.11), -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-routine-detail .rt-edit-time-chip.active { color: #c8a96e !important; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.95) !important; }
+body.nm-night #sub-routine-detail .rt-edit-time-chip {
+  background: #16163c !important; border: none !important; color: rgba(255,255,255,0.4) !important; border-radius: 12px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.85), -2px -2px 6px rgba(50,50,110,0.3) !important;
+}
+body.nm-night #sub-routine-detail .rt-edit-time-chip.active { color: #e8d5a3 !important; box-shadow: inset 2px 2px 6px rgba(0,0,0,0.85), inset -2px -2px 5px rgba(50,50,110,0.3) !important; }
+body.nm-mode #sub-routine-detail .rt-edit-save,
+body.nm-night #sub-routine-detail .rt-edit-save {
+  background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; border: none !important; color: #060c18 !important; border-radius: 12px !important;
+}
