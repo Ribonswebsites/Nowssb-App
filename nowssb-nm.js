@@ -51,6 +51,10 @@
           /* Sound Bath intro isn't wired to shouldShowIntro — enter directly */
           setTimeout(function () { if (typeof sbEnter === 'function') sbEnter(); }, 40);
         }
+        if (document.body.classList.contains('nm-mode') && id === 'my-progress') {
+          /* My Progress always shows its intro — skip it directly */
+          setTimeout(function () { if (typeof mpEnterFromIntro === 'function') mpEnterFromIntro(); }, 60);
+        }
         if (document.body.classList.contains('nm-mode') && id === 'social') {
           setTimeout(function () { if (window.nwsbRenderSettings) window.nwsbRenderSettings(); }, 30);
         }
