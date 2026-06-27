@@ -406,3 +406,142 @@ body.nm-mode #sub-sound-library .sl-upgrade-btn {
   box-shadow: 4px 4px 10px rgba(0,0,0,0.13),-3px -3px 8px rgba(255,255,255,0.95) !important;
 }
 body.nm-night #sub-sound-library .sl-upgrade-btn { background: #16163c !important; border: none !important; color: #e8d5a3 !important; border-radius: 14px !important; box-shadow: 4px 4px 12px rgba(0,0,0,0.85),-3px -3px 8px rgba(50,50,110,0.3) !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS  (#sub-social) — full neumorphism redesign
+   No images · clean sections · light=day, dark=night
+═══════════════════════════════════════════════════════════════ */
+
+/* Screen surface */
+body.nm-mode #sub-social { background: #f0f2f7 !important; }
+body.nm-night #sub-social { background: #0c0c20 !important; }
+body.nm-mode #sub-social .ss-wrap,
+body.nm-mode #sub-social .ss-tab-content { background: transparent !important; }
+
+/* Kill the cinematic banner, setting-row icons + the search glyph image */
+body.nm-mode #sub-social .menu-banner { display: none !important; }
+body.nm-mode #sub-social .sr-icon { display: none !important; }
+body.nm-mode #sub-social .ss-search-ico { display: none !important; }
+
+/* Back button → neumorphic pill */
+body.nm-mode #sub-social .sub-back {
+  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important;
+  border-radius: 20px !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-social .sub-back {
+  background: #16163c !important; color: #e8d5a3 !important;
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.85), -3px -3px 8px rgba(50,50,110,0.3) !important;
+}
+
+/* Header */
+body.nm-mode #sub-social .ss-hd-eyebrow { color: #c8a96e !important; }
+body.nm-night #sub-social .ss-hd-eyebrow { color: #e8d5a3 !important; }
+body.nm-mode #sub-social .ss-hd-title { color: #1a1a2e !important; }
+body.nm-night #sub-social .ss-hd-title { color: #fff !important; }
+
+/* Tab bar (Settings / Discover) */
+body.nm-mode #sub-social .ss-tabs {
+  background: #f0f2f7 !important; border-bottom: none !important;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.07) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-night #sub-social .ss-tabs { background: #0c0c20 !important; box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important; }
+body.nm-mode #sub-social .ss-tab { color: rgba(0,0,0,0.35) !important; }
+body.nm-mode #sub-social .ss-tab.active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
+body.nm-night #sub-social .ss-tab { color: rgba(255,255,255,0.32) !important; }
+body.nm-night #sub-social .ss-tab.active { color: #e8d5a3 !important; border-bottom-color: #e8d5a3 !important; }
+
+/* Section labels */
+body.nm-mode #sub-social .slbl { color: rgba(0,0,0,0.4) !important; }
+body.nm-night #sub-social .slbl { color: rgba(255,255,255,0.32) !important; }
+
+/* Section groups → neumorphic raised cards */
+body.nm-mode #sub-social .sg {
+  background: #f0f2f7 !important; border: none !important; border-radius: 20px !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.12), -5px -5px 14px rgba(255,255,255,0.97) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  padding: 4px 18px !important;
+}
+body.nm-night #sub-social .sg {
+  background: #16163c !important; border: none !important; border-radius: 20px !important;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32) !important;
+  padding: 4px 18px !important;
+}
+
+/* Profile card */
+body.nm-mode #sub-social .ss-profile-card { padding: 16px 18px !important; }
+body.nm-mode #sub-social #ss-prof-name { color: #1a1a2e !important; }
+body.nm-mode #sub-social #ss-prof-email { color: rgba(0,0,0,0.45) !important; }
+body.nm-night #sub-social #ss-prof-name { color: #fff !important; }
+body.nm-night #sub-social #ss-prof-email { color: rgba(255,255,255,0.5) !important; }
+
+/* Rows */
+body.nm-mode #sub-social .sr { border-bottom-color: rgba(0,0,0,0.07) !important; padding-left: 0 !important; padding-right: 0 !important; }
+body.nm-mode #sub-social .sr:active { background: rgba(0,0,0,0.03) !important; }
+body.nm-night #sub-social .sr { border-bottom-color: rgba(255,255,255,0.07) !important; padding-left: 0 !important; padding-right: 0 !important; }
+body.nm-mode #sub-social .sr-label { color: #1a1a2e !important; }
+body.nm-mode #sub-social .sr-sub { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode #sub-social .sr-chev { color: rgba(0,0,0,0.25) !important; }
+body.nm-night #sub-social .sr-label { color: #fff !important; }
+body.nm-night #sub-social .sr-sub { color: rgba(255,255,255,0.45) !important; }
+body.nm-night #sub-social .sr-chev { color: rgba(255,255,255,0.25) !important; }
+body.nm-mode #sub-social .sr-label.danger,
+body.nm-mode #sub-social .sr-label.red { color: #d04545 !important; }
+
+/* Value pills (Voice / Speed / etc.) → neumorphic inset chips */
+body.nm-mode #sub-social [id$="-pill"],
+body.nm-mode #sub-social .sr-val {
+  color: #a8854a !important;
+  background: #f0f2f7 !important;
+  border-radius: 12px !important;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-social [id$="-pill"],
+body.nm-night #sub-social .sr-val {
+  color: #e8d5a3 !important;
+  background: #16163c !important;
+  border-radius: 12px !important;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.85), inset -2px -2px 5px rgba(50,50,110,0.3) !important;
+}
+
+/* Toggle track → neumorphic groove (knob colour still driven by JS) */
+body.nm-mode #sub-social .stgl { box-shadow: inset 2px 2px 5px rgba(0,0,0,0.14), inset -2px -2px 5px rgba(255,255,255,0.92) !important; }
+body.nm-night #sub-social .stgl { box-shadow: inset 2px 2px 6px rgba(0,0,0,0.85), inset -2px -2px 5px rgba(50,50,110,0.3) !important; }
+
+/* Search field → neumorphic inset */
+body.nm-mode #sub-social .ss-search {
+  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important;
+  border-radius: 14px !important; padding-left: 16px !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.95) !important;
+  backdrop-filter: none !important;
+}
+body.nm-night #sub-social .ss-search {
+  background: #16163c !important; border: none !important; color: #fff !important;
+  border-radius: 14px !important; padding-left: 16px !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.85), inset -2px -2px 6px rgba(50,50,110,0.3) !important;
+}
+body.nm-mode #sub-social .ss-search::placeholder { color: rgba(0,0,0,0.3) !important; }
+
+/* Sliding panels (subscription, profile-edit, certificates, etc.) */
+body.nm-mode #sub-social .ss-panel { background: #f0f2f7 !important; }
+body.nm-night #sub-social .ss-panel { background: #0c0c20 !important; }
+body.nm-mode #sub-social .ss-panel-title { color: #1a1a2e !important; }
+body.nm-night #sub-social .ss-panel-title { color: #fff !important; }
+body.nm-mode #sub-social .ss-panel-sub { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode #sub-social .ss-back {
+  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important; border-radius: 50% !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-social .ss-back {
+  background: #16163c !important; color: #e8d5a3 !important;
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.85), -3px -3px 8px rgba(50,50,110,0.3) !important;
+}
+body.nm-mode #sub-social .ss-input {
+  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important; border-radius: 14px !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-social .ss-input {
+  background: #16163c !important; border: none !important; color: #fff !important; border-radius: 14px !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.85), inset -2px -2px 6px rgba(50,50,110,0.3) !important;
+}
