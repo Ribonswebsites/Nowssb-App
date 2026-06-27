@@ -1308,3 +1308,41 @@ body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.4) !importa
 /* Reels feed — keep photo cards; lighten the empty/loading states */
 body.nm-mode #sub-reels-feed .nwsb-reels-empty-title { color: rgba(0,0,0,0.55) !important; }
 body.nm-mode #sub-reels-feed .nwsb-reels-empty-sub { color: rgba(0,0,0,0.35) !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   INNER PAGE 7 — SOUND BATH  (#sub-sound-bath)
+   Neumorphism (light) · intro auto-skipped in nm-mode
+═══════════════════════════════════════════════════════════════ */
+
+/* Player surface (drop the dark radial bg) */
+body.nm-mode #sub-sound-bath .sb-player-bg { background: #f0f2f7 !important; }
+
+/* Top bar */
+body.nm-mode #sub-sound-bath .sb-back-btn {
+  background: #f0f2f7 !important; border: none !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-sound-bath .sb-back-btn svg path,
+body.nm-mode #sub-sound-bath .sb-back-btn svg line { stroke: #1a1a2e !important; }
+body.nm-mode #sub-sound-bath .sb-timer-display { color: rgba(0,0,0,0.5) !important; }
+
+/* Mode buttons → neumorphic */
+body.nm-mode #sub-sound-bath .sb-mode-btn {
+  background: #f0f2f7 !important; border: none !important; border-radius: 16px !important;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.12), -4px -4px 10px rgba(255,255,255,0.96) !important;
+}
+body.nm-mode #sub-sound-bath .sb-mode-btn.active {
+  background: #f0f2f7 !important;
+  box-shadow: inset 4px 4px 9px rgba(0,0,0,0.13), inset -3px -3px 7px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-sound-bath .sb-mode-label { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode #sub-sound-bath .sb-mode-btn.active .sb-mode-label { color: #c8a96e !important; }
+
+/* Center text */
+body.nm-mode #sub-sound-bath .sb-mode-title { color: #1a1a2e !important; }
+body.nm-mode #sub-sound-bath .sb-mode-desc { color: rgba(0,0,0,0.5) !important; }
+
+/* Play button — keep gold accent, add neumorphic lift */
+body.nm-mode #sub-sound-bath .sb-play-btn {
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.18), -4px -4px 12px rgba(255,255,255,0.85) !important;
+}

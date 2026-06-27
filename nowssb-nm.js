@@ -47,6 +47,10 @@
           /* Store intro isn't wired to shouldShowIntro — dismiss it directly */
           setTimeout(function () { if (typeof nssEnterStore === 'function') nssEnterStore(); }, 40);
         }
+        if (document.body.classList.contains('nm-mode') && id === 'sound-bath') {
+          /* Sound Bath intro isn't wired to shouldShowIntro — enter directly */
+          setTimeout(function () { if (typeof sbEnter === 'function') sbEnter(); }, 40);
+        }
         if (document.body.classList.contains('nm-mode') && id === 'social') {
           setTimeout(function () { if (window.nwsbRenderSettings) window.nwsbRenderSettings(); }, 30);
         }
