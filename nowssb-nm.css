@@ -1567,3 +1567,11 @@ body.nm-glass #sub-ig-profile .ig-prof-avatar-ring {
   border: 1px solid rgba(255,255,255,.6) !important;
   box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
 }
+
+/* Photo chooser + avatar picker sheets: lift above the bottom nav and add
+   nav-height clearance so their bottom options aren't cut off */
+#profilePhotoSheet  { z-index: 10000 !important; }
+#profileAvatarPicker { z-index: 10001 !important; }
+.pps-card, .pap-card {
+  padding-bottom: calc(var(--nav-height, 58px) + max(env(safe-area-inset-bottom, 20px), 20px) + 22px) !important;
+}
