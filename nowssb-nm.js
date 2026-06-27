@@ -398,6 +398,16 @@
     window.nwsbPickImage('photo');
   };
 
+  /* "Use This Avatar" (preset avatar) → reliable refresh (works for guests too) */
+  window.profileConfirmAvatar = function () {
+    var url = window._papSelectedUrl;
+    if (!url) { if (window.nwsbToast) nwsbToast('Pick an avatar first'); return; }
+    if (typeof profileCloseAvatarPicker === 'function') profileCloseAvatarPicker();
+    if (typeof profileClosePhotoSheet === 'function') profileClosePhotoSheet();
+    nwsbRefreshAvatars(url);
+    if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { photoURL: url }).catch(function () {});
+  };
+
   window.profileHandlePhotoFile = function (file) {
     nwsbResize(file, 320, function (dataUrl) {
       nwsbRefreshAvatars(dataUrl);
