@@ -392,6 +392,12 @@
     input.click();
   };
 
+  /* Photo chooser's "Pick from library" → reliable on-the-fly picker */
+  window.profilePickFromLibrary = function () {
+    if (typeof profileClosePhotoSheet === 'function') profileClosePhotoSheet();
+    window.nwsbPickImage('photo');
+  };
+
   window.profileHandlePhotoFile = function (file) {
     nwsbResize(file, 320, function (dataUrl) {
       nwsbRefreshAvatars(dataUrl);

@@ -15,12 +15,12 @@
 
       <!-- Avatar -->
       <div style="display:flex;align-items:center;gap:16px;">
-        <div id="profile-edit-avatar-circle" class="nwsb-pe-avatar" onclick="nwsbPickImage('photo')" style="width:88px;height:88px;border-radius:50% !important;background:linear-gradient(135deg,rgba(232,213,163,.12),rgba(200,232,245,.08));display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;overflow:hidden;position:relative;background-size:cover;background-position:center;">
+        <div id="profile-edit-avatar-circle" class="nwsb-pe-avatar" onclick="profileEditPhoto()" style="width:88px;height:88px;border-radius:50% !important;background:linear-gradient(135deg,rgba(232,213,163,.12),rgba(200,232,245,.08));display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;overflow:hidden;position:relative;background-size:cover;background-position:center;">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(232,213,163,.6)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
         </div>
         <div>
           <div class="nwsb-pe-label" style="font-size:15px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;margin-bottom:6px;">Profile Photo</div>
-          <button class="nwsb-pe-btn" onclick="nwsbPickImage('photo')" style="padding:9px 18px;border-radius:12px;border:1px solid rgba(232,213,163,.4);background:transparent;color:#e8d5a3;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Change Photo</button>
+          <button class="nwsb-pe-btn" onclick="profileEditPhoto()" style="padding:9px 18px;border-radius:12px;border:1px solid rgba(232,213,163,.4);background:transparent;color:#e8d5a3;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Change Photo</button>
         </div>
       </div>
 
