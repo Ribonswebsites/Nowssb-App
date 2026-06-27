@@ -314,4 +314,60 @@
       '<div class="nmset-foot">NowssB · Nowsbansiu · Healing through Word Science</div>';
   };
 
+  /* ══════════════════════════════════════════════════════════
+     RELIABLE avatar / banner upload — resize → save to Firestore
+     (works without Cloudinary; overrides the existing handlers)
+  ══════════════════════════════════════════════════════════ */
+  function nwsbResize(file, maxW, cb) {
+    var ALLOWED = ['image/jpeg','image/png','image/webp','image/gif'];
+    if (!file || ALLOWED.indexOf(file.type) === -1) { alert('Please choose a JPG, PNG or WebP image'); return; }
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var img = new Image();
+      img.onload = function () {
+        var scale = Math.min(1, maxW / img.width);
+        var w = Math.max(1, Math.round(img.width * scale));
+        var h = Math.max(1, Math.round(img.height * scale));
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        try { cb(canvas.toDataURL('image/jpeg', 0.85)); }
+        catch (err) { cb(e.target.result); } /* fallback: original data url */
+      };
+      img.onerror = function () { cb(e.target.result); };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function nwsbRefreshAvatars(url) {
+    if (window._userDataCache) window._userDataCache.photoURL = url;
+    var c = document.getElementById('profile-edit-avatar-circle');
+    if (c) { c.style.backgroundImage = 'url(' + url + ')'; c.style.backgroundSize = 'cover'; c.style.backgroundPosition = 'center'; c.innerHTML = ''; }
+    var pa = document.getElementById('ig-prof-avatar');
+    if (pa) { pa.style.display = 'block'; pa.src = url; }
+    var init = document.querySelector('#sub-ig-profile .ig-prof-initials');
+    if (init && init.parentNode) init.parentNode.removeChild(init);
+    if (window.IG && typeof IG.refreshNavAvatar === 'function') IG.refreshNavAvatar();
+    if (typeof profileUpdateAvatarDisplay === 'function') { try { profileUpdateAvatarDisplay(url, null); } catch (e) {} }
+  }
+
+  window.profileHandlePhotoFile = function (file) {
+    nwsbResize(file, 320, function (dataUrl) {
+      nwsbRefreshAvatars(dataUrl);
+      if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { photoURL: dataUrl }).catch(function () {});
+    });
+  };
+
+  window.profileHandleBannerFile = function (file) {
+    nwsbResize(file, 1000, function (dataUrl) {
+      if (window._userDataCache) window._userDataCache.bannerURL = dataUrl;
+      var b = document.getElementById('ig-prof-banner');
+      if (b) { b.style.backgroundImage = 'url(' + dataUrl + ')'; b.style.backgroundSize = 'cover'; b.style.backgroundPosition = 'center top'; }
+      var pv = document.getElementById('profile-edit-banner-preview');
+      if (pv) { pv.style.backgroundImage = 'url(' + dataUrl + ')'; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; }
+      if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { bannerURL: dataUrl }).catch(function () {});
+    });
+  };
+
 })();
