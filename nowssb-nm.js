@@ -342,15 +342,33 @@
 
   function nwsbRefreshAvatars(url) {
     if (window._userDataCache) window._userDataCache.photoURL = url;
+    /* Edit-profile panel avatar (first img in that panel) */
+    var panel = document.getElementById('ss-panel-profile-edit');
+    if (panel) { var pimg = panel.querySelector('img'); if (pimg) pimg.src = url; }
     var c = document.getElementById('profile-edit-avatar-circle');
     if (c) { c.style.backgroundImage = 'url(' + url + ')'; c.style.backgroundSize = 'cover'; c.style.backgroundPosition = 'center'; c.innerHTML = ''; }
+    /* IG profile avatar */
     var pa = document.getElementById('ig-prof-avatar');
     if (pa) { pa.style.display = 'block'; pa.src = url; }
     var init = document.querySelector('#sub-ig-profile .ig-prof-initials');
     if (init && init.parentNode) init.parentNode.removeChild(init);
     if (window.IG && typeof IG.refreshNavAvatar === 'function') IG.refreshNavAvatar();
+    /* Full re-render of the IG profile if it's open (reads updated cache) */
+    var igp = document.getElementById('sub-ig-profile');
+    if (window.IG && igp && igp.classList.contains('open') && typeof IG.openMyProfile === 'function') {
+      try { IG.openMyProfile(); } catch (e) {}
+    }
     if (typeof profileUpdateAvatarDisplay === 'function') { try { profileUpdateAvatarDisplay(url, null); } catch (e) {} }
+    nwsbToast('Photo updated ✓');
   }
+  function nwsbToast(msg) {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1a1a2e;color:#e8d5a3;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;padding:11px 20px;border-radius:24px;z-index:99999;box-shadow:0 6px 20px rgba(0,0,0,.3);';
+    document.body.appendChild(t);
+    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 2200);
+  }
+  window.nwsbToast = nwsbToast;
 
   /* Open a fresh, clickable file input (avoids hidden-input click being
      blocked by some Android browsers) and route to the right handler */
@@ -387,7 +405,27 @@
       var pv = document.getElementById('profile-edit-banner-preview');
       if (pv) { pv.style.backgroundImage = 'url(' + dataUrl + ')'; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; }
       if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { bannerURL: dataUrl }).catch(function () {});
+      nwsbToast('Banner updated ✓');
     });
   };
+
+  /* ── Bulletproof settings view-switch: whenever #sub-social opens in nm-mode,
+     hide the old fashion settings list and render the curated neumorphic one,
+     no matter which entry point opened it ── */
+  (function observeSocialOpen() {
+    var el = document.getElementById('sub-social');
+    if (!el) return setTimeout(observeSocialOpen, 200);
+    function apply() {
+      if (!el.classList.contains('open')) return;
+      if (!document.body.classList.contains('nm-mode')) return;
+      var main = document.getElementById('ss-main-view');
+      var nv   = document.getElementById('nm-settings-view');
+      if (main) main.style.display = 'none';
+      if (nv)   nv.style.display = 'block';
+      if (window.nwsbRenderSettings) window.nwsbRenderSettings();
+    }
+    new MutationObserver(apply).observe(el, { attributes: true, attributeFilter: ['class'] });
+    apply();
+  })();
 
 })();
