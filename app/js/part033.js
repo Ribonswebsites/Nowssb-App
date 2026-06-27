@@ -81,7 +81,7 @@
       if (bannerURL) {
         bannerEl.style.backgroundImage = 'url(' + bannerURL + ')';
         bannerEl.style.backgroundSize = 'cover';
-        bannerEl.style.backgroundPosition = 'center top';
+        bannerEl.style.backgroundPosition = 'center';
       } else {
         bannerEl.style.backgroundImage = '';
       }

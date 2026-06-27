@@ -445,7 +445,7 @@
     window._userDataCache.bannerURL = url;
     try { localStorage.setItem('nwsb_local_banner', url); } catch (e) {}
     var b = document.getElementById('ig-prof-banner');
-    if (b) { b.style.backgroundImage = 'url(' + url + ')'; b.style.backgroundSize = 'cover'; b.style.backgroundPosition = 'center top'; }
+    if (b) { b.style.backgroundImage = 'url(' + url + ')'; b.style.backgroundSize = 'cover'; b.style.backgroundPosition = 'center'; }
     var pv = document.getElementById('profile-edit-banner-preview');
     if (pv) { pv.style.backgroundImage = 'url(' + url + ')'; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.innerHTML = ''; }
     /* If the IG profile is open, re-render so the banner shows there immediately */
