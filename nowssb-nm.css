@@ -1086,3 +1086,121 @@ body.nm-mode #sub-sound-library .sl-sort-btn {
   white-space: nowrap !important;
 }
 body.nm-mode #sub-sound-library .sl-sort-row { align-items: center !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   INNER PAGE 5 — HEALTH  (#sub-health-journey / -male / -female / -category)
+   Neumorphism · light=day, dark=night
+═══════════════════════════════════════════════════════════════ */
+
+/* Hide photographic backgrounds + surface */
+body.nm-mode #sub-health-journey .sub-screen-bg,
+body.nm-mode #sub-health-male .sub-screen-bg,
+body.nm-mode #sub-health-female .sub-screen-bg,
+body.nm-mode #sub-health-category .sub-screen-bg { display: none !important; }
+body.nm-mode #sub-health-journey,
+body.nm-mode #sub-health-male,
+body.nm-mode #sub-health-female,
+body.nm-mode #sub-health-category { background: #f0f2f7 !important; }
+body.nm-night #sub-health-journey,
+body.nm-night #sub-health-male,
+body.nm-night #sub-health-female,
+body.nm-night #sub-health-category { background: #0c0c20 !important; }
+
+/* Shared header */
+body.nm-mode #sub-health-journey .sub-title, body.nm-mode #sub-health-journey .sub-title span,
+body.nm-mode #sub-health-male .sub-title, body.nm-mode #sub-health-male .sub-title span,
+body.nm-mode #sub-health-female .sub-title, body.nm-mode #sub-health-female .sub-title span,
+body.nm-mode #sub-health-category .sub-title, body.nm-mode #sub-health-category .sub-title span { color: #1a1a2e !important; }
+body.nm-night #sub-health-journey .sub-title, body.nm-night #sub-health-journey .sub-title span,
+body.nm-night #sub-health-male .sub-title, body.nm-night #sub-health-male .sub-title span,
+body.nm-night #sub-health-female .sub-title, body.nm-night #sub-health-female .sub-title span,
+body.nm-night #sub-health-category .sub-title, body.nm-night #sub-health-category .sub-title span { color: #fff !important; }
+body.nm-mode #sub-health-journey .sub-back svg path, body.nm-mode #sub-health-journey .sub-back svg line,
+body.nm-mode #sub-health-male .sub-back svg path, body.nm-mode #sub-health-male .sub-back svg line,
+body.nm-mode #sub-health-female .sub-back svg path, body.nm-mode #sub-health-female .sub-back svg line,
+body.nm-mode #sub-health-category .sub-back svg path, body.nm-mode #sub-health-category .sub-back svg line { stroke: #1a1a2e !important; }
+body.nm-night #sub-health-journey .sub-back svg path, body.nm-night #sub-health-journey .sub-back svg line,
+body.nm-night #sub-health-male .sub-back svg path, body.nm-night #sub-health-male .sub-back svg line,
+body.nm-night #sub-health-female .sub-back svg path, body.nm-night #sub-health-female .sub-back svg line,
+body.nm-night #sub-health-category .sub-back svg path, body.nm-night #sub-health-category .sub-back svg line { stroke: #e8d5a3 !important; }
+
+/* Gender select */
+body.nm-mode #sub-health-journey .gsel-eyebrow { color: #c8a96e !important; }
+body.nm-night #sub-health-journey .gsel-eyebrow { color: #e8d5a3 !important; }
+body.nm-mode #sub-health-journey .gsel-title { color: #1a1a2e !important; }
+body.nm-night #sub-health-journey .gsel-title { color: #fff !important; }
+body.nm-mode #sub-health-journey .gsel-sub { color: rgba(0,0,0,0.5) !important; }
+body.nm-night #sub-health-journey .gsel-sub { color: rgba(255,255,255,0.6) !important; }
+body.nm-mode #sub-health-journey .gsel-card {
+  border: none !important; border-radius: 20px !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.16), -5px -5px 14px rgba(255,255,255,0.9) !important;
+}
+body.nm-night #sub-health-journey .gsel-card {
+  border: none !important; border-radius: 20px !important;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32) !important;
+}
+body.nm-mode #sub-health-journey .brand-name { color: #1a1a2e !important; }
+
+/* Category grids — hero band + items */
+body.nm-mode #sub-health-male .hcat-hero-img, body.nm-mode #sub-health-female .hcat-hero-img { display: none !important; }
+body.nm-mode #sub-health-male .hcat-hero, body.nm-mode #sub-health-female .hcat-hero {
+  height: 120px !important; border: none !important; background: transparent !important;
+}
+body.nm-mode #sub-health-male .hcat-hero::after, body.nm-mode #sub-health-female .hcat-hero::after { display: none !important; }
+body.nm-mode #sub-health-male .hcat-hero-label, body.nm-mode #sub-health-female .hcat-hero-label { color: #c8a96e !important; }
+body.nm-night #sub-health-male .hcat-hero-label, body.nm-night #sub-health-female .hcat-hero-label { color: #e8d5a3 !important; }
+body.nm-mode #sub-health-male .hcat-hero-name, body.nm-mode #sub-health-female .hcat-hero-name { color: #1a1a2e !important; }
+body.nm-night #sub-health-male .hcat-hero-name, body.nm-night #sub-health-female .hcat-hero-name { color: #fff !important; }
+body.nm-mode #sub-health-male .hcat-section-label, body.nm-mode #sub-health-female .hcat-section-label { color: rgba(0,0,0,0.4) !important; }
+body.nm-night #sub-health-male .hcat-section-label, body.nm-night #sub-health-female .hcat-section-label { color: rgba(255,255,255,0.4) !important; }
+
+body.nm-mode #sub-health-male .hcat-item, body.nm-mode #sub-health-female .hcat-item {
+  background: #f0f2f7 !important; border: none !important; border-radius: 18px !important;
+  box-shadow: 6px 6px 15px rgba(0,0,0,0.12), -5px -5px 12px rgba(255,255,255,0.96) !important;
+}
+body.nm-mode #sub-health-male .hcat-item:active, body.nm-mode #sub-health-female .hcat-item:active {
+  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #sub-health-male .hcat-item, body.nm-night #sub-health-female .hcat-item {
+  background: #16163c !important; border: none !important; border-radius: 18px !important;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.85), -4px -4px 12px rgba(50,50,110,0.3) !important;
+}
+body.nm-mode #sub-health-male .hcat-item-icon, body.nm-mode #sub-health-female .hcat-item-icon { color: #c8a96e !important; }
+body.nm-night #sub-health-male .hcat-item-icon, body.nm-night #sub-health-female .hcat-item-icon { color: #e8d5a3 !important; }
+body.nm-mode #sub-health-male .hcat-item-title, body.nm-mode #sub-health-female .hcat-item-title { color: #1a1a2e !important; }
+body.nm-night #sub-health-male .hcat-item-title, body.nm-night #sub-health-female .hcat-item-title { color: #fff !important; }
+body.nm-mode #sub-health-male .hcat-item-sub, body.nm-mode #sub-health-female .hcat-item-sub { color: rgba(0,0,0,0.42) !important; }
+body.nm-night #sub-health-male .hcat-item-sub, body.nm-night #sub-health-female .hcat-item-sub { color: rgba(255,255,255,0.42) !important; }
+body.nm-mode #sub-health-male .hcat-item-arr, body.nm-mode #sub-health-female .hcat-item-arr { color: #c8a96e !important; }
+
+/* Category page */
+body.nm-mode #sub-health-category #hcp-banner-img { background-image: none !important; background-color: #f0f2f7 !important; height: 130px !important; }
+body.nm-night #sub-health-category #hcp-banner-img { background-color: #0c0c20 !important; }
+body.nm-mode #sub-health-category #hcp-banner-img > div:first-child { display: none !important; }
+body.nm-mode #sub-health-category #hcp-organ-tag { color: #c8a96e !important; opacity: 1 !important; }
+body.nm-mode #sub-health-category #hcp-desc { color: rgba(0,0,0,0.6) !important; }
+body.nm-night #sub-health-category #hcp-desc { color: rgba(255,255,255,0.7) !important; }
+body.nm-mode #sub-health-category .rtd-tabs {
+  background: #f0f2f7 !important; border-top: none !important; border-bottom: none !important;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.07) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-night #sub-health-category .rtd-tabs { background: #0c0c20 !important; box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important; }
+body.nm-mode #sub-health-category .rtd-tab { color: rgba(0,0,0,0.35) !important; }
+body.nm-mode #sub-health-category .rtd-tab.active { color: #c8a96e !important; }
+body.nm-mode #sub-health-category .rtd-tab.active::after { background: #c8a96e !important; }
+body.nm-night #sub-health-category .rtd-tab { color: rgba(255,255,255,0.32) !important; }
+body.nm-night #sub-health-category .rtd-tab.active { color: #e8d5a3 !important; }
+body.nm-night #sub-health-category .rtd-tab.active::after { background: #e8d5a3 !important; }
+body.nm-mode #sub-health-category .rtd-word-row { border-bottom-color: rgba(0,0,0,0.07) !important; }
+body.nm-night #sub-health-category .rtd-word-row { border-bottom-color: rgba(255,255,255,0.07) !important; }
+body.nm-mode #sub-health-category .rtd-word-name { color: #1a1a2e !important; }
+body.nm-night #sub-health-category .rtd-word-name { color: #fff !important; }
+body.nm-mode #sub-health-category .rtd-bottom {
+  background: #f0f2f7 !important; border-top: none !important;
+  box-shadow: 0 -6px 16px rgba(0,0,0,0.08) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-night #sub-health-category .rtd-bottom { background: #0c0c20 !important; box-shadow: 0 -6px 18px rgba(0,0,0,0.6) !important; }
+body.nm-mode #sub-health-category .rtd-session-btn,
+body.nm-night #sub-health-category .rtd-session-btn {
+  background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; border: none !important; color: #060c18 !important; border-radius: 14px !important;
+}
