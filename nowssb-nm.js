@@ -438,6 +438,35 @@
     };
   })();
 
+  /* Close the Edit Profile panel and return to the social profile (never the
+     blank SS settings screen) */
+  window.nwsbCloseEditProfile = function () {
+    var panel = document.getElementById('ss-panel-profile-edit');
+    if (panel) {
+      panel.style.transition = 'transform .3s cubic-bezier(.4,0,.2,1)';
+      panel.style.transform = 'translateX(100%)';
+      setTimeout(function () { panel.style.display = 'none'; panel.style.transform = ''; panel.style.transition = ''; }, 320);
+    }
+    /* restore the settings views that editProfile hid */
+    var main = document.getElementById('ss-main-view');
+    var nv   = document.getElementById('nm-settings-view');
+    if (main) main.style.display = '';
+    if (nv)   nv.style.display = '';
+    if (window._nwsbEditFromSocial) {
+      window._nwsbEditFromSocial = false;
+      if (typeof closeSub === 'function') closeSub('social');
+      var mainNav = document.getElementById('ig-bottomnav');
+      var sn      = document.getElementById('ig-social-nav');
+      if (mainNav) mainNav.style.display = 'none';
+      if (sn)      sn.style.display = 'flex';
+      var igp = document.getElementById('sub-ig-profile');
+      if (igp) igp.classList.add('open');
+      if (window.IG && typeof IG.openMyProfile === 'function') { try { IG.openMyProfile(); } catch (e) {} }
+    } else {
+      if (window.nwsbSyncNmBody) window.nwsbSyncNmBody();
+    }
+  };
+
   /* Back / Save from Edit Profile → return to the social profile (re-rendered) */
   (function patchClosePanel() {
     if (typeof window.ssClosePanel !== 'function') return setTimeout(patchClosePanel, 150);
