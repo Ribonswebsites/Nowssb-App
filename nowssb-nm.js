@@ -10,12 +10,15 @@
 (function () {
 
   /* ── Body-class sync ── */
+  /* Day/night mode removed — normal home is always light cream */
+  try { localStorage.removeItem('nwsb_nm_dark'); } catch (e) {}
   function syncNmBody() {
     var mode = localStorage.getItem('nwsb_home_mode') || 'nm';
-    var dark = localStorage.getItem('nwsb_nm_dark') === '1';
     var nm   = mode !== 'home';
     document.body.classList.toggle('nm-mode', nm);
-    document.body.classList.toggle('nm-night', nm && dark);
+    document.body.classList.remove('nm-night');           // night mode killed
+    var hm = document.getElementById('home-nm');
+    if (hm) hm.classList.remove('nm-dark');                // force light home
   }
   window.nwsbSyncNmBody = syncNmBody;
   syncNmBody();
@@ -30,8 +33,7 @@
       return r;
     };
   }
-  wrapAfter('goTo',          syncNmBody);
-  wrapAfter('nmhSwitchMode', syncNmBody);
+  wrapAfter('goTo', syncNmBody);
 
   /* openSub: sync body + auto-skip intros that aren't gated by shouldShowIntro */
   (function patchOpenSub() {
