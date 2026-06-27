@@ -1520,6 +1520,7 @@ body.nm-mode #sub-my-progress .mp-loading-text { color: rgba(0,0,0,0.4) !importa
 body.nm-mode #sub-word-science { background: #f0f2f7 !important; }
 body.nm-mode #sub-word-science #wsMainContent .sub-screen-bg { display: none !important; }
 body.nm-mode #sub-word-science #wsMainContent { background: #f0f2f7 !important; }
+body.nm-mode #sub-word-science #wsPanelContainer { background: #f0f2f7 !important; }
 body.nm-mode #sub-word-science * { text-shadow: none !important; }
 
 /* Banner header */
@@ -1631,3 +1632,15 @@ body.nm-mode #sub-profile .stgl { box-shadow: inset 2px 2px 5px rgba(0,0,0,0.14)
 /* Stat numbers / generic gold accents inside profile */
 body.nm-mode #sub-profile .pp-stat-num,
 body.nm-mode #sub-profile .profile-stat-num { color: #c8a96e !important; }
+
+/* Live-stats block: dark cells + grid gaps + var/white text → neumorphic light */
+body.nm-mode #sub-profile [style*="background:#060c18"] {
+  background: #f0f2f7 !important; border-radius: 14px !important;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.1), inset -2px -2px 5px rgba(255,255,255,0.92) !important;
+}
+body.nm-mode #sub-profile #profileStatsBlock > div { background: transparent !important; border: none !important; gap: 10px !important; margin-bottom: 10px !important; }
+body.nm-mode #sub-profile [style*="var(--text-secondary)"],
+body.nm-mode #sub-profile [style*="var(--text-primary)"],
+body.nm-mode #sub-profile [style*="255,255,255"] { color: rgba(0,0,0,0.55) !important; }
+body.nm-mode #sub-profile [style*="var(--accent)"] { color: #5a8fa8 !important; }
+body.nm-mode #sub-profile [style*="var(--accent-gold)"] { color: #c8a96e !important; }
