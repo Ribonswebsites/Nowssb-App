@@ -1822,3 +1822,86 @@ body.nm-mode #ss-panel-profile-edit .nwsb-pe-save {
   box-shadow: 0 10px 28px rgba(232,213,163,.4) !important;
   border-radius: 16px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   APP THEME: GLASSMORPHISM  (body.nm-glass)
+   A second normal-mode theme alongside neumorphism.
+═══════════════════════════════════════════════════════════════ */
+
+/* Theme-option buttons (in Edit Profile) */
+.nwsb-theme-opt {
+  padding: 14px 0; border-radius: 14px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .5px;
+  background: rgba(255,255,255,.4); border: 1px solid rgba(255,255,255,.7); color: #1a1a2e;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+.nwsb-theme-opt.active { border: 2px solid #c8a96e; color: #a8854a; }
+
+/* Shared glass-surface gradient for normal-mode screens */
+body.nm-glass.nm-mode #home-nm,
+body.nm-glass #nm-settings-view,
+body.nm-glass #sub-sound-library .sl-screen,
+body.nm-glass #sub-nowssb-store .nss-body,
+body.nm-glass #sub-practice .sp-player,
+body.nm-glass #sub-routines .rt-screen,
+body.nm-glass #sub-routine-detail .rt-screen,
+body.nm-glass #sub-health-journey, body.nm-glass #sub-health-male,
+body.nm-glass #sub-health-female, body.nm-glass #sub-health-category,
+body.nm-glass #sub-sound-bath .sb-player-bg,
+body.nm-glass #sub-my-progress,
+body.nm-glass #sub-word-science #wsMainContent,
+body.nm-glass #sub-word-science #wsPanelContainer,
+body.nm-glass #sub-profile #profileMainContent,
+body.nm-glass #sub-people, body.nm-glass #sub-ig-profile,
+body.nm-glass #sub-social-home, body.nm-glass #sub-reels-feed,
+body.nm-glass #sub-social #nm-settings-view {
+  background:
+    radial-gradient(circle at 14% 8%, rgba(232,213,163,.22), transparent 40%),
+    radial-gradient(circle at 88% 86%, rgba(200,232,245,.26), transparent 44%),
+    linear-gradient(160deg, #e4ebf6 0%, #eef1f7 50%, #f2ece1 100%) !important;
+}
+
+/* Convert the major neumorphic cards/buttons to frosted glass */
+body.nm-glass .nmh-streak-bar, body.nm-glass .nmh-practice, body.nm-glass .nmh-tile,
+body.nm-glass .nmh-routine, body.nm-glass .nmh-quick-btn, body.nm-glass .nmh-trend-card,
+body.nm-glass .nmh-offer-card, body.nm-glass .nmh-settings-btn, body.nm-glass .nmh-mode-btn,
+body.nm-glass .nmh-logo,
+body.nm-glass .nmset-hero, body.nm-glass .nmset-qtile, body.nm-glass .nmset-card,
+body.nm-glass .nmset-back, body.nm-glass .nmset-signout,
+body.nm-glass #sub-sound-library .sl-sentence-card,
+body.nm-glass #sub-sound-library .sl-upgrade-banner,
+body.nm-glass #sub-nowssb-store .ws-store-section, body.nm-glass #sub-nowssb-store .ms-home-card,
+body.nm-glass #sub-practice .sp-glass-ring, body.nm-glass #sub-practice .sp-info-cell,
+body.nm-glass #sub-practice .sp-listen-tip,
+body.nm-glass #sub-routines .rt-card, body.nm-glass #sub-routine-detail .rt-card,
+body.nm-glass #sub-health-journey .gsel-card,
+body.nm-glass #sub-health-male .hcat-item, body.nm-glass #sub-health-female .hcat-item,
+body.nm-glass #sub-my-progress .mp-greeting, body.nm-glass #sub-my-progress .mp-stat-box,
+body.nm-glass #sub-my-progress .mp-session-row, body.nm-glass #sub-my-progress .mp-milestone,
+body.nm-glass #sub-my-progress .mp-insight-wrap,
+body.nm-glass #sub-word-science .ws-info, body.nm-glass #sub-word-science .ws-organ-card,
+body.nm-glass #sub-word-science .ws-quote, body.nm-glass #sub-word-science .ws-highlight,
+body.nm-glass #sub-word-science .ws-effect-row, body.nm-glass #sub-word-science .ws-action-tile,
+body.nm-glass #sub-profile .sub-card,
+body.nm-glass #sub-people .ig-userrow, body.nm-glass #sub-social-home .ig-userrow,
+body.nm-glass #sub-social-home .nwsb-hero {
+  background: rgba(255,255,255,.42) !important;
+  backdrop-filter: blur(16px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
+  border: 1px solid rgba(255,255,255,.72) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.6) !important;
+}
+
+/* Glass section cards (settings groups) keep inner dividers subtle */
+body.nm-glass .nmset-card .nmset-row { border-bottom-color: rgba(0,0,0,.06) !important; }
+
+/* Glass icon tiles / pills → translucent */
+body.nm-glass .nmset-ico, body.nm-glass .nmset-val,
+body.nm-glass #sub-ig-profile .ig-stat .n,
+body.nm-glass #sub-ig-profile .ig-prof-avatar-ring {
+  background: rgba(255,255,255,.4) !important;
+  backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255,255,255,.6) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
+}

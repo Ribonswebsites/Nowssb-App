@@ -48,6 +48,15 @@
         </div>
       </div>
 
+      <!-- App theme: Neumorphism / Glassmorphism -->
+      <div>
+        <div class="slbl" style="margin-bottom:10px;">APP THEME</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <button class="nwsb-theme-opt" data-nm-theme="neo" onclick="nwsbSetNmTheme('neo')">Neumorphism</button>
+          <button class="nwsb-theme-opt" data-nm-theme="glass" onclick="nwsbSetNmTheme('glass')">Glassmorphism</button>
+        </div>
+      </div>
+
       <button class="ss-btn-primary nwsb-pe-save" onclick="if(window.SS&&SS.saveBio)SS.saveBio();nwsbCloseEditProfile()">Save Profile</button>
     </div>`;
 })();
