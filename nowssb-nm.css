@@ -1707,3 +1707,10 @@ body.nm-mode #sub-ig-profile .ig-tab.active svg,
 body.nm-mode #sub-ig-profile .ig-tab.active .ig-tab-img {
   box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
 }
+
+/* Reels tab icon is a filled raster (becomes a black blob with the dark filter)
+   — shrink it and tint gold so it matches the line-icon tabs */
+body.nm-mode #sub-ig-profile #ig-tab-reels .ig-tab-img {
+  width: 20px !important; height: 20px !important; object-fit: contain !important;
+  filter: brightness(0) saturate(100%) invert(72%) sepia(28%) saturate(560%) hue-rotate(2deg) brightness(92%) opacity(0.85) !important;
+}
