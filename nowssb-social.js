@@ -386,7 +386,13 @@
   window.nwsbOpenStats = function () {
     var el = document.getElementById('sub-social-home');
     if (!el) return;
+    /* close the profile / other social screens so Stats shows directly */
+    ['sub-ig-profile', 'sub-people', 'sub-reels-feed'].forEach(function (id) {
+      var e = document.getElementById(id); if (e) e.classList.remove('open');
+    });
     el.classList.add('open');
+    var sn = document.getElementById('ig-social-nav');
+    if (sn) sn.style.display = 'flex';
     renderSocialHome();
     var sc = document.getElementById('ig-social-home-scroll');
     if (sc) sc.scrollTop = 0;
@@ -395,7 +401,10 @@
   window.nwsbCloseStats = function () {
     var el = document.getElementById('sub-social-home');
     if (el) el.classList.remove('open');
-    /* Profile sits underneath — keep it open */
+    /* back from Stats → the social profile */
+    var igp = document.getElementById('sub-ig-profile');
+    if (igp) igp.classList.add('open');
+    if (window.IG && typeof IG.openMyProfile === 'function') { try { IG.openMyProfile(); } catch (e) {} }
   };
 
   /* ── Inject a "Stats" button into the self profile button row ── */

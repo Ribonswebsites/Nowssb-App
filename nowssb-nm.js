@@ -428,7 +428,12 @@
       if (igp) igp.classList.remove('open');
       if (ppl) ppl.classList.remove('open');
       if (typeof openSub === 'function') openSub('social');
-      /* open the panel in the same gesture → no settings flash */
+      /* Hide ALL settings content so only the Edit Profile panel shows —
+         the social section must never reveal the app settings/site */
+      var main = document.getElementById('ss-main-view');
+      var nv   = document.getElementById('nm-settings-view');
+      if (main) main.style.display = 'none';
+      if (nv)   nv.style.display = 'none';
       if (typeof ssOpenPanel === 'function') ssOpenPanel('profile-edit');
     };
   })();
