@@ -77,7 +77,9 @@
     // Banner
     var bannerEl = $('ig-prof-banner');
     if (bannerEl) {
-      var bannerURL = p.self ? (window._userDataCache && window._userDataCache.bannerURL) : (p.bannerURL || '');
+      var bannerURL = p.self
+        ? ((window._userDataCache && window._userDataCache.bannerURL) || (function(){ try { return localStorage.getItem('nwsb_local_banner') || ''; } catch(e){ return ''; } })())
+        : (p.bannerURL || '');
       if (bannerURL) {
         bannerEl.style.backgroundImage = 'url(' + bannerURL + ')';
         bannerEl.style.backgroundSize = 'cover';

@@ -164,7 +164,9 @@
 }
 
 /* ── PROFILE PAGE ── */
-.ig-prof-banner {
+/* Placeholder gradient ONLY when no banner image is set — the !important here
+   was clobbering the inline background-image (uploaded/prebuilt banner). */
+.ig-prof-banner:not([style*="url"]) {
   background: linear-gradient(160deg, #0d1a3a 0%, #1a0a2e 55%, #060c18 100%) !important;
 }
 
