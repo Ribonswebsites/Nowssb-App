@@ -10,16 +10,15 @@
 (function () {
 
   /* ── Body-class sync ── */
-  /* Day/night mode removed — normal home is always light cream */
-  try { localStorage.removeItem('nwsb_nm_dark'); } catch (e) {}
+  /* Day/night mode + glass theme removed — normal home is always light neumorphism */
+  try { localStorage.removeItem('nwsb_nm_dark'); localStorage.removeItem('nwsb_nm_theme'); } catch (e) {}
+  document.body && document.body.classList.remove('nm-glass');
   function syncNmBody() {
     var mode = localStorage.getItem('nwsb_home_mode') || 'nm';
     var nm   = mode !== 'home';
     document.body.classList.toggle('nm-mode', nm);
     document.body.classList.remove('nm-night');           // night mode killed
-    /* App theme within normal mode: neumorphism (default) or glassmorphism */
-    var glass = (localStorage.getItem('nwsb_nm_theme') || 'neo') === 'glass';
-    document.body.classList.toggle('nm-glass', nm && glass);
+    document.body.classList.remove('nm-glass');           // theme switcher removed — neumorphism only
     var hm = document.getElementById('home-nm');
     if (hm) hm.classList.remove('nm-dark');                // force light home
     /* Settings view-switch — JS-driven so it can't be beaten by CSS/cache */
@@ -449,17 +448,8 @@
     };
   })();
 
-  /* App-theme switch: 'neo' (neumorphism) | 'glass' (glassmorphism) */
-  window.nwsbSetNmTheme = function (theme) {
-    var glass = theme === 'glass';
-    try { localStorage.setItem('nwsb_nm_theme', glass ? 'glass' : 'neo'); } catch (e) {}
-    document.body.classList.toggle('nm-glass', glass && document.body.classList.contains('nm-mode'));
-    /* reflect active state on any theme buttons */
-    document.querySelectorAll('[data-nm-theme]').forEach(function (b) {
-      b.classList.toggle('active', b.getAttribute('data-nm-theme') === (glass ? 'glass' : 'neo'));
-    });
-    if (window.nwsbToast) window.nwsbToast(glass ? 'Glassmorphism theme' : 'Neumorphism theme');
-  };
+  /* Theme switcher removed — neumorphism only. Kept as a no-op for safety. */
+  window.nwsbSetNmTheme = function () {};
 
   /* Close the Edit Profile panel and return to the social profile (never the
      blank SS settings screen) */
