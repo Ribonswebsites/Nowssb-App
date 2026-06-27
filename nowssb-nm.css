@@ -1283,7 +1283,7 @@ body.nm-mode #sub-ig-profile .ig-iconbtn svg { color: #1a1a2e !important; stroke
 /* Topbar/nav icon images are white-filtered → make them dark on cream */
 body.nm-mode #sub-people .ig-topbar img,
 body.nm-mode #sub-ig-profile .ig-topbar img,
-body.nm-mode #sub-social-home .ig-topbar img { filter: brightness(0) opacity(0.6) !important; }
+body.nm-mode #sub-social-home .ig-topbar img { filter: brightness(0) opacity(0.82) !important; }
 
 /* Search */
 body.nm-mode #sub-people .ig-searchwrap { background: #f0f2f7 !important; }
@@ -1294,7 +1294,7 @@ body.nm-mode #sub-people .ig-searchbar {
 }
 body.nm-mode #sub-people .ig-searchbar input { color: #1a1a2e !important; }
 body.nm-mode #sub-people .ig-searchbar input::placeholder { color: rgba(0,0,0,0.3) !important; }
-body.nm-mode #sub-people .nwsb-search-icon { filter: brightness(0) opacity(0.4) !important; }
+body.nm-mode #sub-people .nwsb-search-icon { filter: brightness(0) opacity(0.55) !important; }
 
 /* Explore tiles — neumorphic frame (images kept) */
 body.nm-mode #sub-people .ig-tile,
@@ -1341,7 +1341,7 @@ body.nm-mode #sub-ig-profile .ig-tabs { background: #f0f2f7 !important; border-t
 body.nm-mode #sub-ig-profile .ig-tab { color: rgba(0,0,0,0.3) !important; }
 body.nm-mode #sub-ig-profile .ig-tab.active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
 body.nm-mode #sub-ig-profile .ig-tab svg { stroke: currentColor !important; }
-body.nm-mode #sub-ig-profile .ig-tab-img { filter: brightness(0) opacity(0.35) !important; }
+body.nm-mode #sub-ig-profile .ig-tab-img { filter: brightness(0) opacity(0.7) !important; }
 body.nm-mode #sub-ig-profile .ig-tab.active .ig-tab-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
 
 /* Highlights */
@@ -1355,7 +1355,7 @@ body.nm-mode #ig-social-nav {
   background: #f0f2f7 !important; border-top: none !important;
   box-shadow: 0 -6px 16px rgba(0,0,0,0.08) !important;
 }
-body.nm-mode #ig-social-nav .ig-social-img { filter: brightness(0) opacity(0.45) !important; }
+body.nm-mode #ig-social-nav .ig-social-img { filter: brightness(0) opacity(0.78) !important; }
 body.nm-mode #ig-social-nav .ig-social-btn.active .ig-social-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
 body.nm-mode #ig-social-nav .ig-social-btn span { color: rgba(0,0,0,0.4) !important; }
 body.nm-mode #ig-social-nav .ig-social-btn.active span { color: #c8a96e !important; }
@@ -1689,7 +1689,7 @@ body.nm-mode #sub-ig-profile .ig-iconbtn {
   box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
 }
 body.nm-mode #sub-ig-profile .ig-iconbtn svg { stroke: #1a1a2e !important; }
-body.nm-mode #sub-ig-profile .ig-iconbtn img { filter: brightness(0) opacity(0.6) !important; }
+body.nm-mode #sub-ig-profile .ig-iconbtn img { filter: brightness(0) opacity(0.82) !important; }
 
 /* Profile tab icons → neumorphic depth tiles */
 body.nm-mode #sub-ig-profile .ig-tab {
