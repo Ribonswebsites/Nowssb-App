@@ -55,6 +55,10 @@
           /* My Progress always shows its intro — skip it directly */
           setTimeout(function () { if (typeof mpEnterFromIntro === 'function') mpEnterFromIntro(); }, 60);
         }
+        if (document.body.classList.contains('nm-mode') && id === 'word-science') {
+          /* Word Science intro isn't wired to shouldShowIntro — enter directly */
+          setTimeout(function () { if (typeof wsEnterFromIntro === 'function') wsEnterFromIntro(); }, 60);
+        }
         if (document.body.classList.contains('nm-mode') && id === 'social') {
           setTimeout(function () { if (window.nwsbRenderSettings) window.nwsbRenderSettings(); }, 30);
         }

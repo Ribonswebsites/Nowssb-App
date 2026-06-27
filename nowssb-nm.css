@@ -1446,3 +1446,79 @@ body.nm-mode #sub-my-progress .mp-feedback-saved-sub { color: rgba(0,0,0,0.45) !
 body.nm-mode #sub-my-progress .mp-empty-title { color: rgba(0,0,0,0.5) !important; }
 body.nm-mode #sub-my-progress .mp-empty-text { color: rgba(0,0,0,0.32) !important; }
 body.nm-mode #sub-my-progress .mp-loading-text { color: rgba(0,0,0,0.4) !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   INNER PAGE 9 — WORD SCIENCE  (#sub-word-science)
+   Neumorphism (light) · intro auto-skipped in nm-mode
+═══════════════════════════════════════════════════════════════ */
+
+/* Surface */
+body.nm-mode #sub-word-science { background: #f0f2f7 !important; }
+body.nm-mode #sub-word-science #wsMainContent .sub-screen-bg { display: none !important; }
+body.nm-mode #sub-word-science #wsMainContent { background: #f0f2f7 !important; }
+body.nm-mode #sub-word-science * { text-shadow: none !important; }
+
+/* Banner header */
+body.nm-mode #sub-word-science .sub-header { background-image: none !important; background-color: #f0f2f7 !important; box-shadow: 0 5px 14px rgba(0,0,0,0.07) !important; }
+body.nm-mode #sub-word-science .sub-header-title { color: #1a1a2e !important; }
+body.nm-mode #sub-word-science .sub-header-tag { color: #c8a96e !important; }
+body.nm-mode #sub-word-science .sub-back svg path { stroke: #1a1a2e !important; }
+
+/* Tabs */
+body.nm-mode #sub-word-science #wsTabs {
+  background: #f0f2f7 !important; border-bottom: none !important;
+  box-shadow: 0 5px 13px rgba(0,0,0,0.06) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-mode #sub-word-science .ws-tab { color: rgba(0,0,0,0.4) !important; }
+body.nm-mode #sub-word-science .ws-tab.ws-active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
+
+/* Info / quote / highlight / effect / organ cards → neumorphic raised */
+body.nm-mode #sub-word-science .ws-info,
+body.nm-mode #sub-word-science .ws-organ-card,
+body.nm-mode #sub-word-science .ws-quote,
+body.nm-mode #sub-word-science .ws-highlight,
+body.nm-mode #sub-word-science .ws-effect-row,
+body.nm-mode #sub-word-science .ws-action-tile {
+  background: #f0f2f7 !important; border: none !important; border-radius: 18px !important;
+  box-shadow: 6px 6px 15px rgba(0,0,0,0.11), -5px -5px 12px rgba(255,255,255,0.96) !important;
+}
+body.nm-mode #sub-word-science .ws-info::before,
+body.nm-mode #sub-word-science .ws-organ-card::before { display: none !important; }
+body.nm-mode #sub-word-science .ws-quote { border-left: 3px solid #c8a96e !important; }
+
+body.nm-mode #sub-word-science .ws-info-eyebrow { color: #c8a96e !important; }
+body.nm-mode #sub-word-science .ws-info-title { color: #1a1a2e !important; }
+body.nm-mode #sub-word-science .ws-info-body { color: rgba(0,0,0,0.68) !important; }
+body.nm-mode #sub-word-science .ws-organ-icon { color: #c8a96e !important; }
+body.nm-mode #sub-word-science .ws-organ-name { color: #a8854a !important; }
+body.nm-mode #sub-word-science .ws-organ-desc { color: rgba(0,0,0,0.62) !important; }
+body.nm-mode #sub-word-science .ws-quote { color: rgba(0,0,0,0.8) !important; }
+body.nm-mode #sub-word-science .ws-quote-src { color: #a8854a !important; }
+body.nm-mode #sub-word-science .ws-highlight-num { color: #c8a96e !important; }
+body.nm-mode #sub-word-science .ws-highlight-label { color: #a8854a !important; }
+body.nm-mode #sub-word-science .ws-highlight-sub { color: rgba(0,0,0,0.6) !important; }
+body.nm-mode #sub-word-science .ws-effect-label { color: #a8854a !important; }
+body.nm-mode #sub-word-science .ws-effect-body { color: rgba(0,0,0,0.65) !important; }
+body.nm-mode #sub-word-science .ws-effect-dot { background: #c8a96e !important; }
+
+/* Phoneme chips */
+body.nm-mode #sub-word-science .ws-phoneme {
+  background: #f0f2f7 !important; border: none !important; color: #a8854a !important; border-radius: 12px !important;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.12), -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-word-science .ws-phoneme-label { color: rgba(0,0,0,0.4) !important; }
+
+/* Action tiles */
+body.nm-mode #sub-word-science .ws-action-tile-head { color: #a8854a !important; }
+body.nm-mode #sub-word-science .ws-action-tile-title { color: #1a1a2e !important; }
+body.nm-mode #sub-word-science .ws-action-tile-sub { color: rgba(0,0,0,0.5) !important; }
+
+/* Atelier search page */
+body.nm-mode #sub-word-science .ws-page-input { color: #1a1a2e !important; }
+body.nm-mode #sub-word-science .ws-page-input::placeholder { color: rgba(0,0,0,0.3) !important; }
+body.nm-mode #sub-word-science .ws-page-chip {
+  background: #f0f2f7 !important; border: none !important; color: #a8854a !important;
+  box-shadow: 3px 3px 7px rgba(0,0,0,0.11), -2px -2px 6px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-word-science .ws-page-tagline { color: rgba(0,0,0,0.5) !important; }
+body.nm-mode #sub-word-science .ws-page-brand { color: #1a1a2e !important; }
