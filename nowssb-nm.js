@@ -437,7 +437,15 @@
       var nv   = document.getElementById('nm-settings-view');
       if (main) main.style.display = 'none';
       if (nv)   nv.style.display = 'none';
-      if (typeof ssOpenPanel === 'function') ssOpenPanel('profile-edit');
+      /* populate fields, then show the panel instantly (no slide/flash) */
+      if (typeof ssOpenPanel === 'function') { try { ssOpenPanel('profile-edit'); } catch (e) {} }
+      var panel = document.getElementById('ss-panel-profile-edit');
+      if (panel) {
+        panel.style.transition = 'none';
+        panel.style.transform  = 'translateX(0)';
+        panel.style.display     = 'block';
+        panel.style.visibility  = 'visible';
+      }
     };
   })();
 
@@ -535,6 +543,15 @@
     function apply() {
       if (!el.classList.contains('open')) return;
       if (!document.body.classList.contains('nm-mode')) return;
+      /* Editing from the social profile → show ONLY the Edit Profile panel,
+         never the settings list (that caused the flash + back-to-settings bug) */
+      if (window._nwsbEditFromSocial) {
+        var m2 = document.getElementById('ss-main-view');
+        var n2 = document.getElementById('nm-settings-view');
+        if (m2) m2.style.display = 'none';
+        if (n2) n2.style.display = 'none';
+        return;
+      }
       var main = document.getElementById('ss-main-view');
       var nv   = document.getElementById('nm-settings-view');
       if (main) main.style.display = 'none';
