@@ -19,6 +19,11 @@
     document.body.classList.remove('nm-night');           // night mode killed
     var hm = document.getElementById('home-nm');
     if (hm) hm.classList.remove('nm-dark');                // force light home
+    /* Settings view-switch — JS-driven so it can't be beaten by CSS/cache */
+    var main = document.getElementById('ss-main-view');
+    var nv   = document.getElementById('nm-settings-view');
+    if (nm) { if (main) main.style.display = 'none'; if (nv) nv.style.display = 'block'; }
+    else    { if (main) main.style.display = '';     if (nv) nv.style.display = 'none'; }
   }
   window.nwsbSyncNmBody = syncNmBody;
   syncNmBody();
@@ -237,6 +242,11 @@
     var initial = (name.charAt(0) || 'N').toUpperCase();
     var cacheSub = pv('ss-cache-size') || 'Free up space';
 
+    /* Force the view-switch every render (cache/CSS-proof) */
+    var _main = document.getElementById('ss-main-view');
+    if (_main) _main.style.display = 'none';
+    v.style.display = 'block';
+
     v.innerHTML =
       '<div class="nmset-top">' +
         '<button class="nmset-back" onclick="closeSub(\'social\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>' +
@@ -260,9 +270,6 @@
         '<div class="nmset-qtile" onclick="ssOpenPanel(\'chatsettings\')"><div class="nmset-qtile-ico">' + svg('message') + '</div><div class="nmset-qtile-label">Chat</div></div>' +
       '</div>' +
 
-      sec('Intro Pages',
-        rowNav('eye', 'Screen Meditation Intros', 'Cinematic intros before sections', "ssOpenPanel('intro-settings');ispStart()")) +
-
       sec('Audio &amp; Playback',
         rowVal('mic', 'Voice Preference', 'ElevenLabs voice', 'ss-voice-pill', 'ssCycleVoice') +
         rowTgl('volume', 'UI Sound Feedback', 'Interaction sounds', 'sound') +
@@ -278,8 +285,7 @@
 
       sec('Experience',
         rowTgl('zap', 'Haptic Feedback', 'Vibration on interactions', 'haptic') +
-        rowTgl('play', 'Auto-Play Next Session', 'Continue routines automatically', 'autoplay') +
-        rowVal('layout', 'Nav Bar Style', '', 'ss-navstyle-pill', 'ssCycleNavStyle')) +
+        rowTgl('play', 'Auto-Play Next Session', 'Continue routines automatically', 'autoplay')) +
 
       sec('Accessibility',
         rowVal('type', 'Text Size', '', 'ss-textsize-pill', 'ssCycleTextSize') +
