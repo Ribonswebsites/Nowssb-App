@@ -289,35 +289,63 @@
 /* Hero glass cube */
 .nwsb-hero {
   margin: 14px 14px 0;
-  border-radius: 20px !important;
+  border-radius: 22px !important;
   background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
+  border: 1px solid rgba(232,213,163,.14);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  padding: 20px 20px 18px;
+  padding: 0;
   position: relative;
   overflow: hidden;
+  box-shadow:
+    0 10px 40px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* Evolution / origin imagery banner inside the cube */
+.nwsb-hero-img {
+  position: relative;
+  height: 132px;
+  background:
+    linear-gradient(to bottom, rgba(6,12,24,.15) 0%, rgba(6,12,24,.55) 60%, #060c18 100%),
+    url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778922166/grok_image_1778922009415_qtoteo.jpg') center 60% / 160% auto no-repeat;
+}
+
+.nwsb-hero-body {
+  position: relative;
+  padding: 0 20px 18px;
+  margin-top: -34px;
 }
 
 .nwsb-hero::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(232,213,163,.07) 0%, transparent 65%);
+  background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(232,213,163,.08) 0%, transparent 65%);
   pointer-events: none;
+  z-index: 1;
 }
 
 .nwsb-hero-tag {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
   font-family: 'DM Sans', sans-serif;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(232,213,163,.6);
+  color: #e8d5a3;
   margin-bottom: 8px;
+  padding: 4px 10px;
+  border-radius: 20px !important;
+  background: rgba(6,12,24,.6);
+  border: 1px solid rgba(232,213,163,.25);
 }
 
 .nwsb-hero-title {
+  position: relative;
+  z-index: 2;
   font-family: 'DM Sans', sans-serif;
   font-size: 24px;
   font-weight: 800;
@@ -326,6 +354,8 @@
 }
 
 .nwsb-hero-sub {
+  position: relative;
+  z-index: 2;
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   color: rgba(255,255,255,.4);
@@ -334,6 +364,8 @@
 }
 
 .nwsb-hero-stats {
+  position: relative;
+  z-index: 2;
   display: flex;
   gap: 0;
   border-top: 1px solid rgba(255,255,255,.07);
@@ -708,4 +740,127 @@
 #ig-prof-verified-top .nwsb-badge-hp {
   width: 18px;
   height: 18px;
+}
+
+/* ═══════════════════════════════════════════
+   PHASE 5 — IMAGE-EXPLAINER SLOTS + SOCIAL SETTINGS
+═══════════════════════════════════════════ */
+
+/* Image-explainer placeholder grid (user adds their own imagery later) */
+.nwsb-explainer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.nwsb-explainer-slot {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px !important;
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,.02) 0 12px, rgba(255,255,255,.04) 12px 24px);
+  border: 1px dashed rgba(232,213,163,.2);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.nwsb-explainer-slot span {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(232,213,163,.5);
+  padding: 10px 12px;
+}
+
+/* Social settings sheet (self-contained, separate from app Settings) */
+#nwsb-social-settings {
+  position: fixed;
+  inset: 0;
+  z-index: 9600;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: none;
+  align-items: flex-end;
+}
+#nwsb-social-settings.open { display: flex; }
+
+.nwsb-ss-panel {
+  width: 100%;
+  background: #0a1628;
+  border-radius: 22px 22px 0 0;
+  border-top: 1.5px solid rgba(232,213,163,.22);
+  padding: 0 0 calc(20px + env(safe-area-inset-bottom,0px));
+  font-family: 'DM Sans', sans-serif;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.nwsb-ss-handle {
+  width: 40px; height: 4px;
+  background: rgba(255,255,255,.14);
+  border-radius: 2px;
+  margin: 14px auto 8px;
+}
+
+.nwsb-ss-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #e8d5a3;
+  letter-spacing: .5px;
+  padding: 8px 22px 4px;
+}
+
+.nwsb-ss-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+  padding: 0 22px 16px;
+}
+
+.nwsb-ss-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+
+.nwsb-ss-row-body { flex: 1; min-width: 0; }
+.nwsb-ss-row-label { font-size: 15px; font-weight: 600; color: #fff; }
+.nwsb-ss-row-sub   { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 2px; }
+
+.nwsb-ss-toggle {
+  width: 46px; height: 26px;
+  border-radius: 13px !important;
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: rgba(255,255,255,.1);
+  transition: background .2s;
+}
+.nwsb-ss-toggle.on { background: #e8d5a3; }
+.nwsb-ss-toggle-knob {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.55);
+  transition: left .2s, background .2s;
+}
+.nwsb-ss-toggle.on .nwsb-ss-toggle-knob { left: 23px; background: #060c18; }
+
+.nwsb-ss-close {
+  margin: 8px 22px 0;
+  padding: 14px;
+  text-align: center;
+  border-radius: 14px !important;
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.7);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
 }

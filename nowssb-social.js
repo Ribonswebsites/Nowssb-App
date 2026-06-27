@@ -318,22 +318,40 @@
       '</div>';
     }).join('');
 
+    var verifyBadge = window.VERIFY ? window.VERIFY.badge(ud) : '';
+    var verifyLevel = window.VERIFY ? window.VERIFY.level(ud) : 'none';
+    var levelLabel  = { massive:'Massive', ultimate:'Ultimate', tier:'Verified', none:'Unverified' }[verifyLevel] || '';
+
     box.innerHTML =
       '<div class="nwsb-hero">' +
-        '<div class="nwsb-hero-tag">Healing is Fashion</div>' +
-        '<div class="nwsb-hero-title">Your Stats,<br>Your Frequency.</div>' +
-        '<div class="nwsb-hero-sub">NowssB · Word Science</div>' +
-        '<div class="nwsb-hero-stats">' +
-          '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + words    + '</span><span class="nwsb-hero-stat-lbl">Words</span></div>' +
-          '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + sessions + '</span><span class="nwsb-hero-stat-lbl">Sessions</span></div>' +
-          '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + (score ? score + '%' : '—') + '</span><span class="nwsb-hero-stat-lbl">Score</span></div>' +
-          '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + streak   + '</span><span class="nwsb-hero-stat-lbl">Streak</span></div>' +
+        '<div class="nwsb-hero-img"></div>' +
+        '<div class="nwsb-hero-body">' +
+          '<div class="nwsb-hero-tag">Healing is Fashion</div>' +
+          '<div class="nwsb-hero-title">Your Stats,<br>Your Frequency.</div>' +
+          '<div class="nwsb-hero-sub">NowssB · Word Science' +
+            (verifyBadge ? '  <span style="display:inline-flex;align-items:center;gap:4px;color:#e8d5a3;">' + verifyBadge + levelLabel + '</span>' : '') +
+          '</div>' +
+          '<div class="nwsb-hero-stats">' +
+            '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + words    + '</span><span class="nwsb-hero-stat-lbl">Words</span></div>' +
+            '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + sessions + '</span><span class="nwsb-hero-stat-lbl">Sessions</span></div>' +
+            '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + (score ? score + '%' : '—') + '</span><span class="nwsb-hero-stat-lbl">Score</span></div>' +
+            '<div class="nwsb-hero-stat"><span class="nwsb-hero-stat-num">' + streak   + '</span><span class="nwsb-hero-stat-lbl">Streak</span></div>' +
+          '</div>' +
         '</div>' +
       '</div>' +
 
       '<div class="nwsb-section-hd">Reels · Pronunciation</div>' +
       '<div id="nwsb-home-reels-strip" class="nwsb-reels-strip">' +
         '<div style="padding:20px 0;color:rgba(255,255,255,.25);font-family:\'DM Sans\',sans-serif;font-size:12px;">Loading…</div>' +
+      '</div>' +
+
+      /* Image-explainer slots — placeholders for the user's own evolution/origin imagery */
+      '<div class="nwsb-section-hd">The New Fashion Trend</div>' +
+      '<div class="nwsb-explainer-grid">' +
+        '<div class="nwsb-explainer-slot"><span>Origin</span></div>' +
+        '<div class="nwsb-explainer-slot"><span>Evolution</span></div>' +
+        '<div class="nwsb-explainer-slot"><span>Frequency</span></div>' +
+        '<div class="nwsb-explainer-slot"><span>Healing</span></div>' +
       '</div>' +
 
       (people.length
@@ -703,5 +721,83 @@
     };
   }
   patchOtherProfileBadge();
+
+  /* ══════════════════════════════════════════════════════════
+     PHASE 5 — SELF-CONTAINED SOCIAL SETTINGS
+  ══════════════════════════════════════════════════════════ */
+
+  var SOCIAL_SETTINGS = [
+    { key: 'reels_autoplay', label: 'Reels autoplay',     sub: 'Play reels as you scroll',          def: true },
+    { key: 'allow_claims',   label: 'Allow free claims',   sub: 'Let others claim words from your reels', def: true },
+    { key: 'show_stats',     label: 'Show stats publicly', sub: 'Display your stat cube on your profile', def: true },
+    { key: 'reel_notifs',    label: 'Reel notifications',  sub: 'Notify me when my reels get likes',  def: true },
+    { key: 'verified_only',  label: 'Verified DMs only',   sub: 'Only verified members can message you', def: false }
+  ];
+
+  function getSocialSetting(key, def) {
+    var v = null;
+    try { v = localStorage.getItem('nwsb_social_' + key); } catch (e) {}
+    if (v === null) return def;
+    return v === '1';
+  }
+
+  function setSocialSetting(key, on) {
+    try { localStorage.setItem('nwsb_social_' + key, on ? '1' : '0'); } catch (e) {}
+  }
+
+  window.nwsbToggleSocialSetting = function (key, el) {
+    var on = !el.classList.contains('on');
+    el.classList.toggle('on', on);
+    setSocialSetting(key, on);
+  };
+
+  function renderSocialSettings() {
+    var box = document.getElementById('nwsb-social-settings-rows');
+    if (!box) return;
+    box.innerHTML = SOCIAL_SETTINGS.map(function (s) {
+      var on = getSocialSetting(s.key, s.def);
+      return '<div class="nwsb-ss-row">' +
+        '<div class="nwsb-ss-row-body">' +
+          '<div class="nwsb-ss-row-label">' + s.label + '</div>' +
+          '<div class="nwsb-ss-row-sub">' + s.sub + '</div>' +
+        '</div>' +
+        '<div class="nwsb-ss-toggle' + (on ? ' on' : '') + '" onclick="nwsbToggleSocialSetting(\'' + s.key + '\', this)">' +
+          '<div class="nwsb-ss-toggle-knob"></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  window.nwsbOpenSocialSettings = function () {
+    renderSocialSettings();
+    var el = document.getElementById('nwsb-social-settings');
+    if (el) el.classList.add('open');
+  };
+
+  window.nwsbCloseSocialSettings = function () {
+    var el = document.getElementById('nwsb-social-settings');
+    if (el) el.classList.remove('open');
+  };
+
+  /* Route the IG menu "Settings" entry to the self-contained social settings */
+  function patchMenuSettings() {
+    if (!window.IG || typeof window.IG.menu !== 'function') {
+      return setTimeout(patchMenuSettings, 150);
+    }
+    var _origMenu = window.IG.menu;
+    window.IG.menu = function () {
+      _origMenu.apply(this, arguments);
+      /* After the sheet renders, redirect its Settings button to social settings */
+      var settingsBtn = document.getElementById('ig-ms-settings');
+      if (settingsBtn) {
+        settingsBtn.onclick = function () {
+          var sheet = document.getElementById('ig-menu-sheet');
+          if (sheet) sheet.remove();
+          window.nwsbOpenSocialSettings();
+        };
+      }
+    };
+  }
+  patchMenuSettings();
 
 })();
