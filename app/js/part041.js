@@ -48,6 +48,16 @@
         </div>
       </div>
 
+      <!-- Profile Theme -->
+      <div>
+        <div class="slbl" style="margin-bottom:10px;">PROFILE THEME</div>
+        <div style="display:flex;gap:12px;">
+          <button type="button" id="nwsb-theme-neu" onclick="nwsbSetSocTheme('neu')" style="flex:1;padding:14px 8px;border:none;border-radius:14px;background:#f0f2f7;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#1a1a2e;box-shadow:4px 4px 10px rgba(0,0,0,.12), -3px -3px 8px rgba(255,255,255,.95);">NowssB</button>
+          <button type="button" id="nwsb-theme-glass" onclick="nwsbSetSocTheme('glass')" style="flex:1;padding:14px 8px;border:none;border-radius:14px;background:#f0f2f7;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#1a1a2e;box-shadow:4px 4px 10px rgba(0,0,0,.12), -3px -3px 8px rgba(255,255,255,.95);">NowssB Fashion</button>
+        </div>
+        <div style="font-size:11px;color:rgba(0,0,0,.4);margin-top:8px;font-family:'DM Sans',sans-serif;">Neumorphism or frosted glass — applies to your social profile.</div>
+      </div>
+
       <button class="ss-btn-primary nwsb-pe-save" onclick="if(window.SS&&SS.saveBio)SS.saveBio();nwsbCloseEditProfile()">Save Profile</button>
     </div>`;
 })();

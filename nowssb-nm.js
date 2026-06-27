@@ -36,6 +36,11 @@
     document.body.classList.remove('nm-glass');           // theme switcher removed — neumorphism only
     var hm = document.getElementById('home-nm');
     if (hm) hm.classList.remove('nm-dark');                // force light home
+    /* Social profile THEME — manual switch (NowssB = neumorphism, NowssB Fashion
+       = glass), independent of home mode. Default neumorphism until changed. */
+    var soc = 'neu';
+    try { soc = localStorage.getItem('nwsb_social_theme') || 'neu'; } catch (e) {}
+    document.body.classList.toggle('nwsb-soc-glass', soc === 'glass');
     /* Settings view-switch — JS-driven so it can't be beaten by CSS/cache */
     var main = document.getElementById('ss-main-view');
     var nv   = document.getElementById('nm-settings-view');
@@ -557,11 +562,38 @@
         panel.style.display     = 'block';
         panel.style.visibility  = 'visible';
       }
+      /* reflect the current theme on the switcher buttons */
+      if (typeof nwsbSyncThemeButtons === 'function') { try { nwsbSyncThemeButtons(); } catch (e) {} }
     };
   })();
 
   /* Theme switcher removed — neumorphism only. Kept as a no-op for safety. */
   window.nwsbSetNmTheme = function () {};
+
+  /* ── Manual social-profile theme switch: NowssB (neumorphism) / NowssB Fashion (glass) ── */
+  window.nwsbSetSocTheme = function (theme) {
+    theme = (theme === 'glass') ? 'glass' : 'neu';
+    try { localStorage.setItem('nwsb_social_theme', theme); } catch (e) {}
+    document.body.classList.toggle('nwsb-soc-glass', theme === 'glass');
+    nwsbSyncThemeButtons();
+    /* re-render the IG profile if it's open so inline banner/avatar refresh under the new theme */
+    var igp = document.getElementById('sub-ig-profile');
+    if (window.IG && igp && igp.classList.contains('open') && typeof IG.openMyProfile === 'function') {
+      try { IG.openMyProfile(); } catch (e) {}
+    }
+    if (window.nwsbToast) nwsbToast(theme === 'glass' ? 'NowssB Fashion theme ✓' : 'NowssB theme ✓');
+  };
+  function nwsbSyncThemeButtons() {
+    var theme = 'neu';
+    try { theme = localStorage.getItem('nwsb_social_theme') || 'neu'; } catch (e) {}
+    var raised = '4px 4px 10px rgba(0,0,0,.12), -3px -3px 8px rgba(255,255,255,.95)';
+    var inset  = 'inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.92)';
+    var neu = document.getElementById('nwsb-theme-neu');
+    var gl  = document.getElementById('nwsb-theme-glass');
+    if (neu) { neu.style.boxShadow = (theme === 'neu')  ? inset : raised; neu.style.color = (theme === 'neu')  ? '#a8854a' : '#1a1a2e'; }
+    if (gl)  { gl.style.boxShadow  = (theme === 'glass') ? inset : raised; gl.style.color  = (theme === 'glass') ? '#a8854a' : '#1a1a2e'; }
+  }
+  window.nwsbSyncThemeButtons = nwsbSyncThemeButtons;
 
   /* Close the Edit Profile panel and return to the social profile (never the
      blank SS settings screen) */

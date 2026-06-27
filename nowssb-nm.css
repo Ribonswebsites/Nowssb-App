@@ -966,31 +966,31 @@ body.nm-night #sub-health-category .rtd-session-btn {
 
 /* Screen surfaces + kill the dark ambient glow */
 body.nm-mode #sub-people,
-body.nm-mode #sub-ig-profile,
+body:not(.nwsb-soc-glass) #sub-ig-profile,
 body.nm-mode #sub-social-home,
 body.nm-mode #sub-reels-feed { background: #f0f2f7 !important; }
 body.nm-mode #sub-people::before,
-body.nm-mode #sub-ig-profile::before,
+body:not(.nwsb-soc-glass) #sub-ig-profile::before,
 body.nm-mode #sub-social-home::before { display: none !important; }
 body.nm-mode #sub-people .ig,
-body.nm-mode #sub-ig-profile .ig { background: #f0f2f7 !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig { background: #f0f2f7 !important; }
 
 /* Top bar */
 body.nm-mode #sub-people .ig-topbar,
-body.nm-mode #sub-ig-profile .ig-topbar,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar,
 body.nm-mode #sub-social-home .ig-topbar,
 body.nm-mode #sub-reels-feed .ig-topbar {
   background: #f0f2f7 !important; border-bottom: none !important;
   box-shadow: 0 5px 13px rgba(0,0,0,0.07) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
 }
 body.nm-mode #sub-people .ig-username,
-body.nm-mode #sub-ig-profile .ig-username,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-username,
 body.nm-mode #sub-social-home .ig-username,
 body.nm-mode #sub-reels-feed .ig-username { color: #1a1a2e !important; }
-body.nm-mode #sub-ig-profile .ig-iconbtn svg { color: #1a1a2e !important; stroke: #1a1a2e !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-iconbtn svg { color: #1a1a2e !important; stroke: #1a1a2e !important; }
 /* Topbar/nav icon images are white-filtered → make them dark on cream */
 body.nm-mode #sub-people .ig-topbar img,
-body.nm-mode #sub-ig-profile .ig-topbar img,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar img,
 body.nm-mode #sub-social-home .ig-topbar img { filter: brightness(0) opacity(0.82) !important; }
 
 /* Search */
@@ -1006,7 +1006,7 @@ body.nm-mode #sub-people .nwsb-search-icon { filter: brightness(0) opacity(0.55)
 
 /* Explore tiles — neumorphic frame (images kept) */
 body.nm-mode #sub-people .ig-tile,
-body.nm-mode #sub-ig-profile .ig-tile {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tile {
   background: #f0f2f7 !important; border-radius: 16px !important;
   box-shadow: 5px 5px 12px rgba(0,0,0,0.12), -4px -4px 10px rgba(255,255,255,0.95) !important;
 }
@@ -1024,39 +1024,41 @@ body.nm-mode #sub-people .ig-userrow .ig-n,
 body.nm-mode #sub-social-home .ig-userrow .ig-n { color: rgba(0,0,0,0.45) !important; }
 
 /* Profile page */
-body.nm-mode #sub-ig-profile .ig-prof-banner { background: linear-gradient(160deg, #e8eef7 0%, #dfe6f2 55%, #f0f2f7 100%) !important; }
-body.nm-mode #sub-ig-profile .ig-prof-top { background: #f0f2f7 !important; }
-body.nm-mode #sub-ig-profile .ig-prof-name { color: #1a1a2e !important; }
-body.nm-mode #sub-ig-profile .ig-prof-cat { color: #a8854a !important; }
-body.nm-mode #sub-ig-profile .ig-prof-bio,
-body.nm-mode #sub-ig-profile .ig-prof-biotext { color: rgba(0,0,0,0.7) !important; }
-body.nm-mode #sub-ig-profile .ig-stat .n { color: #a8854a !important; }
-body.nm-mode #sub-ig-profile .ig-stat .l { color: rgba(0,0,0,0.4) !important; }
-body.nm-mode #sub-ig-profile .ig-prof-initials { background: #e6e9f1 !important; color: #c8a96e !important; border: 3px solid #f0f2f7 !important; }
-body.nm-mode #sub-ig-profile .ig-prof-plan-badge { color: #a8854a !important; background: rgba(200,169,110,0.14) !important; border-color: rgba(200,169,110,0.3) !important; }
-body.nm-mode #sub-ig-profile .ig-prof-rank { color: rgba(0,0,0,0.45) !important; }
+/* Placeholder gradient ONLY when no banner image is set — otherwise the
+   !important here would clobber the inline background-image (uploaded/prebuilt banner) */
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-banner:not([style*="url"]) { background: linear-gradient(160deg, #e8eef7 0%, #dfe6f2 55%, #f0f2f7 100%) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-top { background: #f0f2f7 !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-name { color: #1a1a2e !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-cat { color: #a8854a !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-bio,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-biotext { color: rgba(0,0,0,0.7) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-stat .n { color: #a8854a !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-stat .l { color: rgba(0,0,0,0.4) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-initials { background: #e6e9f1 !important; color: #c8a96e !important; border: 3px solid #f0f2f7 !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-plan-badge { color: #a8854a !important; background: rgba(200,169,110,0.14) !important; border-color: rgba(200,169,110,0.3) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-rank { color: rgba(0,0,0,0.45) !important; }
 
 /* Action buttons */
-body.nm-mode #sub-ig-profile .ig-btn.gray,
-body.nm-mode #sub-ig-profile .ig-btn.icon {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.gray,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.icon {
   background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important; border-radius: 14px !important;
   box-shadow: 4px 4px 10px rgba(0,0,0,0.12), -3px -3px 8px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-ig-profile .ig-btn.gray svg { stroke: #1a1a2e !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.gray svg { stroke: #1a1a2e !important; }
 
 /* Tabs */
-body.nm-mode #sub-ig-profile .ig-tabs { background: #f0f2f7 !important; border-top-color: rgba(0,0,0,0.08) !important; }
-body.nm-mode #sub-ig-profile .ig-tab { color: rgba(0,0,0,0.3) !important; }
-body.nm-mode #sub-ig-profile .ig-tab.active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
-body.nm-mode #sub-ig-profile .ig-tab svg { stroke: currentColor !important; }
-body.nm-mode #sub-ig-profile .ig-tab-img { filter: brightness(0) opacity(0.7) !important; }
-body.nm-mode #sub-ig-profile .ig-tab.active .ig-tab-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tabs { background: #f0f2f7 !important; border-top-color: rgba(0,0,0,0.08) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab { color: rgba(0,0,0,0.3) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab.active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab svg { stroke: currentColor !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab-img { filter: brightness(0) opacity(0.7) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab.active .ig-tab-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
 
 /* Highlights */
-body.nm-mode #sub-ig-profile .ig-hl-circle { background: #f0f2f7 !important; border: none !important;
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-hl-circle { background: #f0f2f7 !important; border: none !important;
   box-shadow: 4px 4px 10px rgba(0,0,0,0.12), -3px -3px 8px rgba(255,255,255,0.95) !important; }
-body.nm-mode #sub-ig-profile .ig-hl-circle svg { stroke: #c8a96e !important; }
-body.nm-mode #sub-ig-profile .ig-hl-label { color: rgba(0,0,0,0.5) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-hl-circle svg { stroke: #c8a96e !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-hl-label { color: rgba(0,0,0,0.5) !important; }
 
 /* Social bottom nav */
 body.nm-mode #ig-social-nav {
@@ -1299,18 +1301,18 @@ body.nm-mode #sub-word-science .ws-page-brand { color: #1a1a2e !important; }
 /* ── Community profile: neumorphic circles (avatar + stats) + icon depth ── */
 
 /* Avatar → raised neumorphic CIRCLE (cream), not the flat gold square */
-body.nm-mode #sub-ig-profile .ig-prof-avatar-ring {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-avatar-ring {
   background: #f0f2f7 !important;
   border-radius: 50% !important;
   padding: 6px !important;
   box-shadow: 7px 7px 16px rgba(0,0,0,0.16), -5px -5px 13px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-ig-profile .ig-prof-avatar,
-body.nm-mode #sub-ig-profile .ig-prof-avatar-ring img {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-avatar,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-avatar-ring img {
   border: none !important;
   border-radius: 50% !important;
 }
-body.nm-mode #sub-ig-profile .ig-prof-initials {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-initials {
   background: #f0f2f7 !important;
   color: #c8a96e !important;
   border: none !important;
@@ -1319,8 +1321,8 @@ body.nm-mode #sub-ig-profile .ig-prof-initials {
 }
 
 /* Stat numbers → neumorphic circles */
-body.nm-mode #sub-ig-profile .ig-stats { gap: 6px !important; }
-body.nm-mode #sub-ig-profile .ig-stat .n {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-stats { gap: 6px !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-stat .n {
   width: 54px; height: 54px;
   border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center;
@@ -1332,55 +1334,55 @@ body.nm-mode #sub-ig-profile .ig-stat .n {
 }
 
 /* Topbar icon buttons (chat / menu) → neumorphic raised circles */
-body.nm-mode #sub-ig-profile .ig-iconbtn {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-iconbtn {
   background: #f0f2f7 !important;
   border-radius: 50% !important;
   width: 40px !important; height: 40px !important;
   min-width: 40px !important; min-height: 40px !important;
   box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-ig-profile .ig-iconbtn svg { stroke: #1a1a2e !important; }
-body.nm-mode #sub-ig-profile .ig-iconbtn img { filter: brightness(0) opacity(0.82) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-iconbtn svg { stroke: #1a1a2e !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-iconbtn img { filter: brightness(0) opacity(0.82) !important; }
 
 /* Profile tab icons → neumorphic depth tiles */
-body.nm-mode #sub-ig-profile .ig-tab {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab {
   margin: 6px 4px !important;
 }
-body.nm-mode #sub-ig-profile .ig-tab svg,
-body.nm-mode #sub-ig-profile .ig-tab .ig-tab-img {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab svg,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab .ig-tab-img {
   padding: 8px !important;
   border-radius: 14px !important;
   box-sizing: content-box !important;
   background: #f0f2f7 !important;
   box-shadow: 4px 4px 9px rgba(0,0,0,0.12), -3px -3px 7px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-ig-profile .ig-tab.active svg,
-body.nm-mode #sub-ig-profile .ig-tab.active .ig-tab-img {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab.active svg,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tab.active .ig-tab-img {
   box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
 }
 
 /* Reels tab icon is a filled raster (becomes a black blob with the dark filter)
    — shrink it and tint gold so it matches the line-icon tabs */
-body.nm-mode #sub-ig-profile #ig-tab-reels .ig-tab-img {
+body:not(.nwsb-soc-glass) #sub-ig-profile #ig-tab-reels .ig-tab-img {
   width: 20px !important; height: 20px !important; object-fit: contain !important;
   filter: brightness(0) saturate(100%) invert(72%) sepia(28%) saturate(560%) hue-rotate(2deg) brightness(92%) opacity(0.85) !important;
 }
 
 /* ── Follow buttons → neumorphism (white raised pill, gold text) ── */
 body.nm-mode .ig-mini-follow,
-body.nm-mode #sub-ig-profile .ig-btn.primary {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.primary {
   background: #f0f2f7 !important;
   color: #c8a96e !important;
   border: none !important;
   box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
 }
 body.nm-mode .ig-mini-follow.following,
-body.nm-mode #sub-ig-profile .ig-btn.primary.following {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.primary.following {
   color: rgba(0,0,0,0.5) !important;
   box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
 }
 body.nm-mode .ig-mini-follow:active,
-body.nm-mode #sub-ig-profile .ig-btn.primary:active {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.primary:active {
   box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
 }
 
@@ -1404,33 +1406,33 @@ body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !import
 ═══════════════════════════════════════════════════════════════ */
 
 /* Text colors (both themes) */
-body.nm-mode #ss-panel-profile-edit .ss-panel-title { color: #1a1a2e !important; }
-body.nm-mode #ss-panel-profile-edit .ss-panel-sub { color: rgba(0,0,0,.5) !important; }
-body.nm-mode #ss-panel-profile-edit .ss-panel-back { color: #1a1a2e !important; }
-body.nm-mode #ss-panel-profile-edit .ss-panel-back svg { stroke: #1a1a2e !important; }
-body.nm-mode #ss-panel-profile-edit .slbl { color: rgba(0,0,0,.45) !important; }
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-label { color: #1a1a2e !important; }
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-banner-txt { color: #a8854a !important; }
+#ss-panel-profile-edit .ss-panel-title { color: #1a1a2e !important; }
+#ss-panel-profile-edit .ss-panel-sub { color: rgba(0,0,0,.5) !important; }
+#ss-panel-profile-edit .ss-panel-back { color: #1a1a2e !important; }
+#ss-panel-profile-edit .ss-panel-back svg { stroke: #1a1a2e !important; }
+#ss-panel-profile-edit .slbl { color: rgba(0,0,0,.45) !important; }
+#ss-panel-profile-edit .nwsb-pe-label { color: #1a1a2e !important; }
+#ss-panel-profile-edit .nwsb-pe-banner-txt { color: #a8854a !important; }
 
 /* ── NEUMORPHISM (default) ── */
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-avatar {
+#ss-panel-profile-edit .nwsb-pe-avatar {
   width: 92px !important; height: 92px !important; border-radius: 50% !important;
   background-color: #f0f2f7 !important; border: none !important;
   box-shadow: 8px 8px 18px rgba(0,0,0,.16), -6px -6px 14px rgba(255,255,255,.96) !important;
 }
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-btn {
+#ss-panel-profile-edit .nwsb-pe-btn {
   background: #f0f2f7 !important; border: none !important; color: #a8854a !important; border-radius: 14px !important;
   box-shadow: 4px 4px 10px rgba(0,0,0,.14), -3px -3px 8px rgba(255,255,255,.95) !important;
 }
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-banner {
+#ss-panel-profile-edit .nwsb-pe-banner {
   background-color: #f0f2f7 !important; border: none !important; border-radius: 18px !important;
   box-shadow: inset 5px 5px 12px rgba(0,0,0,.13), inset -4px -4px 9px rgba(255,255,255,.92) !important;
 }
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-banner-ico {
+#ss-panel-profile-edit .nwsb-pe-banner-ico {
   background: #f0f2f7 !important;
   box-shadow: 4px 4px 9px rgba(0,0,0,.14), -3px -3px 7px rgba(255,255,255,.95) !important;
 }
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-save {
+#ss-panel-profile-edit .nwsb-pe-save {
   background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; border: none !important; color: #060c18 !important; border-radius: 16px !important;
   box-shadow: 5px 5px 14px rgba(0,0,0,.16), -4px -4px 10px rgba(255,255,255,.7) !important;
 }
@@ -1579,15 +1581,15 @@ body.nm-glass #sub-ig-profile .ig-prof-avatar-ring {
 /* IG profile topbar: move the (other-user) back button onto the banner top-left
    so it's out of the topbar flow, and let the username shrink so the chat +
    hamburger buttons never get cut off */
-body.nm-mode #sub-ig-profile .ig-topbar { overflow: visible !important; padding-right: 8px !important; }
-body.nm-mode #sub-ig-profile #ig-prof-back {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar { overflow: visible !important; padding-right: 8px !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile #ig-prof-back {
   position: absolute !important;
   top: 56px !important;
   left: 14px !important;
   z-index: 25 !important;
   width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
 }
-body.nm-mode #sub-ig-profile .ig-username {
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-username {
   min-width: 0 !important;
   flex-shrink: 1 !important;
   overflow: hidden !important;
@@ -1597,7 +1599,7 @@ body.nm-mode #sub-ig-profile .ig-username {
 
 /* IG profile tabs: stay attached to the content (don't stick & overlap the
    banner/grid on scroll) */
-body.nm-mode #sub-ig-profile .ig-tabs { position: static !important; top: auto !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tabs { position: static !important; top: auto !important; }
 
 /* Reels feed (incl. gated / empty state) → neumorphism */
 body.nm-mode #sub-reels-feed { background: #f0f2f7 !important; }
@@ -1617,7 +1619,7 @@ body.nm-mode #sub-social-home .nwsb-post-reel-btn:active {
 }
 /* Reel cards → raised neumorphic frame (photo stays) */
 body.nm-mode #sub-reels-feed .nwsb-reel-card,
-body.nm-mode #sub-ig-profile .nwsb-reel-card {
+body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-reel-card {
   border: none !important;
   box-shadow: 8px 8px 20px rgba(0,0,0,0.16), -5px -5px 14px rgba(255,255,255,0.9) !important;
 }
@@ -1629,6 +1631,10 @@ body.nm-mode #sub-ig-profile .nwsb-reel-card {
   height:62px !important;
   border-radius:50% !important;
   background-color:#f0f2f7 !important;
+  /* contain (not cover) so the whole headphones logo shows without being cropped by the circle */
+  background-size:84% !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
   box-shadow:6px 6px 15px rgba(0,0,0,0.16), -5px -5px 13px rgba(255,255,255,0.98) !important;
 }
 .nm-logo-ring{
@@ -1647,7 +1653,7 @@ body.nm-mode #sub-ig-profile .nwsb-reel-card {
 ═══════════════════════════════════════════════════════════════ */
 
 /* Avatar → glass circle with neumorphic bulge */
-body:not(.nm-mode) #sub-ig-profile .ig-prof-avatar-ring {
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring {
   background: rgba(255,255,255,0.07) !important;
   -webkit-backdrop-filter: blur(16px) !important; backdrop-filter: blur(16px) !important;
   border-radius: 50% !important;
@@ -1655,11 +1661,11 @@ body:not(.nm-mode) #sub-ig-profile .ig-prof-avatar-ring {
   box-shadow: 8px 8px 20px rgba(0,0,0,0.55), -5px -5px 14px rgba(150,160,200,0.10),
               inset 1.5px 1.5px 2px rgba(255,255,255,0.28), inset -1px -1px 2px rgba(0,0,0,0.35) !important;
 }
-body:not(.nm-mode) #sub-ig-profile .ig-prof-avatar,
-body:not(.nm-mode) #sub-ig-profile .ig-prof-avatar-ring img {
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar,
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring img {
   border: none !important; border-radius: 50% !important;
 }
-body:not(.nm-mode) #sub-ig-profile .ig-prof-initials {
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-initials {
   background: rgba(255,255,255,0.06) !important;
   -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
   color: #e8d5a3 !important; border: none !important; border-radius: 50% !important;
@@ -1667,8 +1673,8 @@ body:not(.nm-mode) #sub-ig-profile .ig-prof-initials {
 }
 
 /* Stat numbers → glass circles with depth */
-body:not(.nm-mode) #sub-ig-profile .ig-stats { gap: 6px !important; }
-body:not(.nm-mode) #sub-ig-profile .ig-stat .n {
+body.nwsb-soc-glass #sub-ig-profile .ig-stats { gap: 6px !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-stat .n {
   width: 54px; height: 54px; border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.06) !important;
@@ -1677,10 +1683,10 @@ body:not(.nm-mode) #sub-ig-profile .ig-stat .n {
   box-shadow: 6px 6px 15px rgba(0,0,0,0.5), -4px -4px 11px rgba(150,160,200,0.09),
               inset 1px 1px 1.5px rgba(255,255,255,0.24), inset -1px -1px 2px rgba(0,0,0,0.32) !important;
 }
-body:not(.nm-mode) #sub-ig-profile .ig-stat .l { color: rgba(255,255,255,0.45) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-stat .l { color: rgba(255,255,255,0.45) !important; }
 
 /* Topbar icon buttons → glass raised circles */
-body:not(.nm-mode) #sub-ig-profile .ig-iconbtn {
+body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn {
   background: rgba(255,255,255,0.07) !important;
   -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
   border-radius: 50% !important;
@@ -1688,47 +1694,47 @@ body:not(.nm-mode) #sub-ig-profile .ig-iconbtn {
   box-shadow: 5px 5px 13px rgba(0,0,0,0.5), -3px -3px 9px rgba(150,160,200,0.10),
               inset 1px 1px 1.5px rgba(255,255,255,0.26), inset -1px -1px 2px rgba(0,0,0,0.3) !important;
 }
-body:not(.nm-mode) #sub-ig-profile .ig-iconbtn svg { stroke: #e8d5a3 !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn svg { stroke: #e8d5a3 !important; }
 
 /* Action buttons → glass with bulge */
-body:not(.nm-mode) #sub-ig-profile .ig-btn.gray,
-body:not(.nm-mode) #sub-ig-profile .ig-btn.icon {
+body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray,
+body.nwsb-soc-glass #sub-ig-profile .ig-btn.icon {
   background: rgba(255,255,255,0.07) !important;
   -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
   border: none !important; color: #f3eede !important; border-radius: 14px !important;
   box-shadow: 5px 5px 13px rgba(0,0,0,0.5), -3px -3px 9px rgba(150,160,200,0.09),
               inset 1px 1px 1.5px rgba(255,255,255,0.22), inset -1px -1px 2px rgba(0,0,0,0.3) !important;
 }
-body:not(.nm-mode) #sub-ig-profile .ig-btn.gray svg { stroke: #e8d5a3 !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray svg { stroke: #e8d5a3 !important; }
 
 /* Highlights → glass circles */
-body:not(.nm-mode) #sub-ig-profile .ig-hl-circle {
+body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle {
   background: rgba(255,255,255,0.06) !important;
   -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important;
   border: none !important;
   box-shadow: 5px 5px 12px rgba(0,0,0,0.5), -3px -3px 9px rgba(150,160,200,0.09),
               inset 1px 1px 1.5px rgba(255,255,255,0.22) !important;
 }
-body:not(.nm-mode) #sub-ig-profile .ig-hl-circle svg { stroke: #e8d5a3 !important; }
-body:not(.nm-mode) #sub-ig-profile .ig-hl-label { color: rgba(255,255,255,0.6) !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle svg { stroke: #e8d5a3 !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-hl-label { color: rgba(255,255,255,0.6) !important; }
 
 /* Tab icons → glass depth tiles, active = pressed glass */
-body:not(.nm-mode) #sub-ig-profile .ig-tab { margin: 6px 4px !important; }
-body:not(.nm-mode) #sub-ig-profile .ig-tab svg,
-body:not(.nm-mode) #sub-ig-profile .ig-tab .ig-tab-img {
+body.nwsb-soc-glass #sub-ig-profile .ig-tab { margin: 6px 4px !important; }
+body.nwsb-soc-glass #sub-ig-profile .ig-tab svg,
+body.nwsb-soc-glass #sub-ig-profile .ig-tab .ig-tab-img {
   padding: 8px !important; border-radius: 14px !important; box-sizing: content-box !important;
   background: rgba(255,255,255,0.06) !important;
   -webkit-backdrop-filter: blur(12px) !important; backdrop-filter: blur(12px) !important;
   box-shadow: 4px 4px 11px rgba(0,0,0,0.5), -3px -3px 8px rgba(150,160,200,0.09),
               inset 1px 1px 1.5px rgba(255,255,255,0.2) !important;
 }
-body:not(.nm-mode) #sub-ig-profile .ig-tab.active svg,
-body:not(.nm-mode) #sub-ig-profile .ig-tab.active .ig-tab-img {
+body.nwsb-soc-glass #sub-ig-profile .ig-tab.active svg,
+body.nwsb-soc-glass #sub-ig-profile .ig-tab.active .ig-tab-img {
   box-shadow: inset 3px 3px 8px rgba(0,0,0,0.55), inset -2px -2px 5px rgba(255,255,255,0.12) !important;
 }
 
 /* Explore tiles inside the profile grid → glass frames */
-body:not(.nm-mode) #sub-ig-profile .ig-tile {
+body.nwsb-soc-glass #sub-ig-profile .ig-tile {
   background: rgba(255,255,255,0.05) !important;
   -webkit-backdrop-filter: blur(10px) !important; backdrop-filter: blur(10px) !important;
   border-radius: 16px !important; border: none !important;
@@ -1737,6 +1743,6 @@ body:not(.nm-mode) #sub-ig-profile .ig-tile {
 }
 
 /* Banner → soft frosted gradient so the avatar/cards lift off it */
-body:not(.nm-mode) #sub-ig-profile .ig-prof-banner {
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-banner {
   -webkit-backdrop-filter: blur(6px) !important; backdrop-filter: blur(6px) !important;
 }
