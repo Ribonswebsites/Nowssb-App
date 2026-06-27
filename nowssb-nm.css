@@ -1594,3 +1594,7 @@ body.nm-mode #sub-ig-profile .ig-username {
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
+
+/* IG profile tabs: stay attached to the content (don't stick & overlap the
+   banner/grid on scroll) */
+body.nm-mode #sub-ig-profile .ig-tabs { position: static !important; top: auto !important; }
