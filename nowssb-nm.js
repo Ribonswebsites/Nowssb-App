@@ -13,6 +13,21 @@
   /* Day/night mode + glass theme removed — normal home is always light neumorphism */
   try { localStorage.removeItem('nwsb_nm_dark'); localStorage.removeItem('nwsb_nm_theme'); } catch (e) {}
   document.body && document.body.classList.remove('nm-glass');
+
+  /* Restore a locally-saved avatar/banner (guests, and before Firebase loads) */
+  (function restoreLocalMedia() {
+    var photo, banner;
+    try { photo = localStorage.getItem('nwsb_local_photo'); banner = localStorage.getItem('nwsb_local_banner'); } catch (e) {}
+    if (!photo && !banner) return;
+    function apply() {
+      window._userDataCache = window._userDataCache || {};
+      if (photo && !window._userDataCache.photoURL) window._userDataCache.photoURL = photo;
+      if (banner && !window._userDataCache.bannerURL) window._userDataCache.bannerURL = banner;
+      if (window.IG && typeof IG.refreshNavAvatar === 'function') { try { IG.refreshNavAvatar(); } catch (e) {} }
+    }
+    apply();
+    setTimeout(apply, 1500); /* re-apply after auth/data settles */
+  })();
   function syncNmBody() {
     var mode = localStorage.getItem('nwsb_home_mode') || 'nm';
     var nm   = mode !== 'home';
@@ -343,7 +358,11 @@
   }
 
   function nwsbRefreshAvatars(url) {
-    if (window._userDataCache) window._userDataCache.photoURL = url;
+    /* Ensure the cache exists (guests have a null/minimal cache) and persist
+       so the social profile re-render + reloads pick up the new photo */
+    window._userDataCache = window._userDataCache || {};
+    window._userDataCache.photoURL = url;
+    try { localStorage.setItem('nwsb_local_photo', url); } catch (e) {}
     /* Edit-profile panel avatar (first img in that panel) */
     var panel = document.getElementById('ss-panel-profile-edit');
     if (panel) { var pimg = panel.querySelector('img'); if (pimg) pimg.src = url; }
@@ -417,7 +436,9 @@
 
   window.profileHandleBannerFile = function (file) {
     nwsbResize(file, 1000, function (dataUrl) {
-      if (window._userDataCache) window._userDataCache.bannerURL = dataUrl;
+      window._userDataCache = window._userDataCache || {};
+      window._userDataCache.bannerURL = dataUrl;
+      try { localStorage.setItem('nwsb_local_banner', dataUrl); } catch (e) {}
       var b = document.getElementById('ig-prof-banner');
       if (b) { b.style.backgroundImage = 'url(' + dataUrl + ')'; b.style.backgroundSize = 'cover'; b.style.backgroundPosition = 'center top'; }
       var pv = document.getElementById('profile-edit-banner-preview');
