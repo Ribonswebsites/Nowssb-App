@@ -953,3 +953,122 @@ body.nm-mode #sub-routine-detail .rt-edit-save,
 body.nm-night #sub-routine-detail .rt-edit-save {
   background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; border: none !important; color: #060c18 !important; border-radius: 12px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS — purpose-built neumorphic UI (#nm-settings-view)
+   Replaces the reskinned fashion list in normal-home mode.
+═══════════════════════════════════════════════════════════════ */
+
+/* View switch */
+#nm-settings-view { display: none; }
+body.nm-mode #sub-social #ss-main-view { display: none !important; }
+body.nm-mode #sub-social #nm-settings-view {
+  display: block; position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  background: #f0f2f7; padding: 0 18px calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,28px),28px));
+}
+body.nm-night #sub-social #nm-settings-view { background: #0c0c20; }
+#nm-settings-view::-webkit-scrollbar { display: none; }
+
+/* Header */
+.nmset-top { display: flex; align-items: center; gap: 14px; padding: 18px 0 8px; position: sticky; top: 0; z-index: 5;
+  background: #f0f2f7; }
+body.nm-night #nm-settings-view .nmset-top { background: #0c0c20; }
+.nmset-back {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; border: none; cursor: pointer;
+  background: #f0f2f7; display: flex; align-items: center; justify-content: center;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.16), -4px -4px 10px rgba(255,255,255,0.95);
+}
+.nmset-back:active { box-shadow: inset 3px 3px 7px rgba(0,0,0,0.16), inset -2px -2px 6px rgba(255,255,255,0.95); }
+.nmset-back svg { stroke: #1a1a2e; }
+body.nm-night #nm-settings-view .nmset-back { background: #16163c; box-shadow: 5px 5px 13px rgba(0,0,0,0.85), -3px -3px 10px rgba(50,50,110,0.3); }
+body.nm-night #nm-settings-view .nmset-back svg { stroke: #e8d5a3; }
+.nmset-title { font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800; color: #1a1a2e; letter-spacing: -0.5px; }
+body.nm-night #nm-settings-view .nmset-title { color: #fff; }
+
+/* Profile hero card */
+.nmset-hero {
+  display: flex; align-items: center; gap: 16px; margin: 16px 0 8px; padding: 20px; cursor: pointer;
+  border-radius: 24px; background: #f0f2f7;
+  box-shadow: 9px 9px 22px rgba(0,0,0,0.14), -7px -7px 18px rgba(255,255,255,0.97);
+}
+.nmset-hero:active { box-shadow: inset 6px 6px 14px rgba(0,0,0,0.12), inset -5px -5px 12px rgba(255,255,255,0.95); }
+body.nm-night #nm-settings-view .nmset-hero { background: #16163c; box-shadow: 9px 9px 24px rgba(0,0,0,0.88), -5px -5px 16px rgba(50,50,110,0.32); }
+.nmset-hero-av {
+  width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #e8d5a3, #c8e8f5); color: #060c18; font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 800;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.18);
+}
+.nmset-hero-info { flex: 1; min-width: 0; }
+.nmset-hero-name { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #1a1a2e; }
+body.nm-night #nm-settings-view .nmset-hero-name { color: #fff; }
+.nmset-hero-email { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(0,0,0,0.45); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.nm-night #nm-settings-view .nmset-hero-email { color: rgba(255,255,255,0.5); }
+.nmset-hero-badge { display: inline-block; margin-top: 8px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #a8854a; background: rgba(200,169,110,0.14); padding: 4px 11px; border-radius: 20px; }
+body.nm-night #nm-settings-view .nmset-hero-badge { color: #e8d5a3; background: rgba(232,213,163,0.14); }
+.nmset-hero-chev { flex-shrink: 0; }
+.nmset-hero-chev svg { stroke: rgba(0,0,0,0.25); }
+body.nm-night #nm-settings-view .nmset-hero-chev svg { stroke: rgba(255,255,255,0.3); }
+
+/* Quick-action grid (Flipkart-style) */
+.nmset-quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 14px 0 6px; }
+.nmset-qtile { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 6px; cursor: pointer;
+  border-radius: 20px; background: #f0f2f7; box-shadow: 6px 6px 14px rgba(0,0,0,0.12), -5px -5px 12px rgba(255,255,255,0.96); }
+.nmset-qtile:active { box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.95); }
+body.nm-night #nm-settings-view .nmset-qtile { background: #16163c; box-shadow: 6px 6px 16px rgba(0,0,0,0.85), -4px -4px 12px rgba(50,50,110,0.3); }
+.nmset-qtile-ico { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+.nmset-qtile-ico svg { stroke: #c8a96e; }
+body.nm-night #nm-settings-view .nmset-qtile-ico svg { stroke: #e8d5a3; }
+.nmset-qtile-label { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .3px; color: #1a1a2e; text-align: center; }
+body.nm-night #nm-settings-view .nmset-qtile-label { color: rgba(255,255,255,0.85); }
+
+/* Sections */
+.nmset-sec-label { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: rgba(0,0,0,0.38); margin: 24px 6px 12px; }
+body.nm-night #nm-settings-view .nmset-sec-label { color: rgba(255,255,255,0.35); }
+
+/* Section card */
+.nmset-card { border-radius: 22px; background: #f0f2f7; padding: 6px 18px; box-shadow: 8px 8px 20px rgba(0,0,0,0.12), -6px -6px 16px rgba(255,255,255,0.97); }
+body.nm-night #nm-settings-view .nmset-card { background: #16163c; box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32); }
+
+/* Row */
+.nmset-row { display: flex; align-items: center; gap: 14px; padding: 15px 0; cursor: pointer; border-bottom: 1px solid rgba(0,0,0,0.06); }
+body.nm-night #nm-settings-view .nmset-row { border-bottom-color: rgba(255,255,255,0.07); }
+.nmset-row:last-child { border-bottom: none; }
+.nmset-row:active { opacity: 0.7; }
+.nmset-ico { width: 40px; height: 40px; border-radius: 13px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: #f0f2f7; box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 6px rgba(255,255,255,0.95); }
+.nmset-ico svg { stroke: #c8a96e; }
+body.nm-night #nm-settings-view .nmset-ico { background: #16163c; box-shadow: inset 3px 3px 8px rgba(0,0,0,0.85), inset -2px -2px 5px rgba(50,50,110,0.3); }
+body.nm-night #nm-settings-view .nmset-ico svg { stroke: #e8d5a3; }
+.nmset-text { flex: 1; min-width: 0; }
+.nmset-label { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #1a1a2e; }
+body.nm-night #nm-settings-view .nmset-label { color: #fff; }
+.nmset-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(0,0,0,0.45); margin-top: 2px; }
+body.nm-night #nm-settings-view .nmset-sub { color: rgba(255,255,255,0.45); }
+.nmset-val { flex-shrink: 0; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800; color: #a8854a; background: #f0f2f7; padding: 6px 14px; border-radius: 20px;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.95); }
+body.nm-night #nm-settings-view .nmset-val { color: #e8d5a3; background: #16163c; box-shadow: inset 2px 2px 6px rgba(0,0,0,0.85), inset -2px -2px 5px rgba(50,50,110,0.3); }
+.nmset-chev { flex-shrink: 0; }
+.nmset-chev svg { stroke: rgba(0,0,0,0.25); }
+body.nm-night #nm-settings-view .nmset-chev svg { stroke: rgba(255,255,255,0.28); }
+
+/* Toggle */
+.nmset-tgl { width: 50px; height: 28px; border-radius: 14px; flex-shrink: 0; position: relative; cursor: pointer; transition: background .2s;
+  background: #f0f2f7; box-shadow: inset 3px 3px 6px rgba(0,0,0,0.16), inset -2px -2px 5px rgba(255,255,255,0.92); }
+body.nm-night #nm-settings-view .nmset-tgl { background: #16163c; box-shadow: inset 3px 3px 7px rgba(0,0,0,0.85), inset -2px -2px 5px rgba(50,50,110,0.3); }
+.nmset-tgl.on { background: linear-gradient(135deg, #e8d5a3, #c4a35a); box-shadow: inset 2px 2px 5px rgba(140,110,40,0.4); }
+.nmset-knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: left .2s;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+.nmset-tgl.on .nmset-knob { left: 25px; background: #060c18; }
+
+/* Danger */
+.nmset-row.danger .nmset-label { color: #d04545; }
+.nmset-row.danger .nmset-ico svg { stroke: #d04545; }
+
+/* Sign-out button */
+.nmset-signout { width: 100%; margin: 22px 0 8px; padding: 16px; border: none; cursor: pointer; border-radius: 18px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: .5px; color: #d04545;
+  background: #f0f2f7; box-shadow: 6px 6px 14px rgba(0,0,0,0.12), -5px -5px 12px rgba(255,255,255,0.96); }
+.nmset-signout:active { box-shadow: inset 4px 4px 10px rgba(0,0,0,0.12), inset -3px -3px 8px rgba(255,255,255,0.95); }
+body.nm-night #nm-settings-view .nmset-signout { background: #16163c; box-shadow: 6px 6px 16px rgba(0,0,0,0.85), -4px -4px 12px rgba(50,50,110,0.3); }
+.nmset-foot { text-align: center; font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(0,0,0,0.3); padding: 10px 0 4px; }
+body.nm-night #nm-settings-view .nmset-foot { color: rgba(255,255,255,0.25); }
