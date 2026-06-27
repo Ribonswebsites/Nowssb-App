@@ -46,8 +46,8 @@
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js"></script>
 <link rel="stylesheet" href="app/app.css">
-<link rel="stylesheet" href="nowssb-social.css?v=5">
-<link rel="stylesheet" href="nowssb-nm.css?v=5">
+<link rel="stylesheet" href="nowssb-social.css?v=6">
+<link rel="stylesheet" href="nowssb-nm.css?v=6">
 </head>
 <body>
 <script src="app/js/part002.js"></script>
@@ -5738,7 +5738,7 @@
       <div style="height:110px;background:linear-gradient(135deg,#0a1628 0%,#1a2a4a 50%,#0d2040 100%);display:flex;align-items:center;justify-content:center;">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       </div>
-      <button onclick="var i=document.getElementById('profileBannerInput');if(i)i.click();" style="position:absolute;bottom:10px;right:10px;padding:7px 14px;border-radius:8px;border:none;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Change Banner</button>
+      <button onclick="nwsbPickImage('banner')" style="position:absolute;bottom:10px;right:10px;padding:7px 14px;border-radius:8px;border:none;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Change Banner</button>
     </div>
 
     <!-- Avatar -->
@@ -5748,7 +5748,7 @@
         <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt="">
       </div>
       <div>
-        <button onclick="var i=document.getElementById('profilePhotoInput');if(i)i.click();" style="display:block;padding:9px 18px;border-radius:10px;border:1px solid #e8d5a3;background:transparent;color:#e8d5a3;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:8px;">Upload Photo</button>
+        <button onclick="nwsbPickImage('photo')" style="display:block;padding:9px 18px;border-radius:10px;border:1px solid #e8d5a3;background:transparent;color:#e8d5a3;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:8px;">Upload Photo</button>
         <div style="font-size:11px;color:rgba(255,255,255,.22);font-family:'DM Sans',sans-serif;">Square · JPG or PNG · Min 200×200px</div>
       </div>
     </div>
@@ -6961,8 +6961,8 @@
 </div>
 
 <script src="app/js/part049.js"></script>
-<script src="nowssb-social.js?v=5" defer></script>
-<script src="nowssb-nm.js?v=5" defer></script>
+<script src="nowssb-social.js?v=6" defer></script>
+<script src="nowssb-nm.js?v=6" defer></script>
 
 </body>
 </html>

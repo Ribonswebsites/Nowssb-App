@@ -352,6 +352,26 @@
     if (typeof profileUpdateAvatarDisplay === 'function') { try { profileUpdateAvatarDisplay(url, null); } catch (e) {} }
   }
 
+  /* Open a fresh, clickable file input (avoids hidden-input click being
+     blocked by some Android browsers) and route to the right handler */
+  window.nwsbPickImage = function (kind) {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.setAttribute('aria-hidden', 'true');
+    input.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;z-index:-1;';
+    input.addEventListener('change', function () {
+      var f = input.files && input.files[0];
+      if (f) {
+        if (kind === 'banner') window.profileHandleBannerFile(f);
+        else                   window.profileHandlePhotoFile(f);
+      }
+      setTimeout(function () { if (input.parentNode) input.parentNode.removeChild(input); }, 1500);
+    });
+    document.body.appendChild(input);
+    input.click();
+  };
+
   window.profileHandlePhotoFile = function (file) {
     nwsbResize(file, 320, function (dataUrl) {
       nwsbRefreshAvatars(dataUrl);
