@@ -1749,79 +1749,90 @@ body.nm-mode #sub-social-home .nwsb-explainer-slot span { color: #a8854a !import
 body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !important; }
 
 /* ═══════════════════════════════════════════════════════════════
-   EDIT PROFILE (social) → GLASSMORPHISM
+   EDIT PROFILE (social) — follows the App Theme (neo default / glass)
 ═══════════════════════════════════════════════════════════════ */
-body.nm-mode #ss-panel-profile-edit {
-  background:
-    radial-gradient(circle at 16% 10%, rgba(232,213,163,.32), transparent 42%),
-    radial-gradient(circle at 86% 78%, rgba(200,232,245,.34), transparent 46%),
-    linear-gradient(160deg, #e4ebf6 0%, #eef1f7 50%, #f2ece1 100%) !important;
-}
 
-/* Header */
+/* Text colors (both themes) */
 body.nm-mode #ss-panel-profile-edit .ss-panel-title { color: #1a1a2e !important; }
 body.nm-mode #ss-panel-profile-edit .ss-panel-sub { color: rgba(0,0,0,.5) !important; }
 body.nm-mode #ss-panel-profile-edit .ss-panel-back { color: #1a1a2e !important; }
 body.nm-mode #ss-panel-profile-edit .ss-panel-back svg { stroke: #1a1a2e !important; }
 body.nm-mode #ss-panel-profile-edit .slbl { color: rgba(0,0,0,.45) !important; }
 body.nm-mode #ss-panel-profile-edit .nwsb-pe-label { color: #1a1a2e !important; }
-
-/* Avatar → glass circle with depth */
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-avatar {
-  width: 92px !important; height: 92px !important;
-  border-radius: 50% !important;
-  background-color: rgba(255,255,255,.42) !important;
-  backdrop-filter: blur(16px) saturate(1.4) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
-  border: 1.5px solid rgba(255,255,255,.85) !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.8) !important;
-}
-
-/* Change Photo button → glass pill */
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-btn {
-  background: rgba(255,255,255,.4) !important;
-  backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255,255,255,.7) !important;
-  color: #a8854a !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
-  border-radius: 14px !important;
-}
-
-/* Inputs / textarea → frosted glass */
-body.nm-mode #ss-panel-profile-edit .ss-input {
-  background: rgba(255,255,255,.45) !important;
-  backdrop-filter: blur(16px) saturate(1.3) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(1.3) !important;
-  border: 1px solid rgba(255,255,255,.72) !important;
-  border-radius: 16px !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.6) !important;
-  color: #1a1a2e !important;
-}
-body.nm-mode #ss-panel-profile-edit .ss-input::placeholder { color: rgba(0,0,0,.35) !important; }
-
-/* Banner → glass drop-zone with depth */
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-banner {
-  background-color: rgba(255,255,255,.35) !important;
-  backdrop-filter: blur(16px) saturate(1.3) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(1.3) !important;
-  border: 1.5px dashed rgba(200,169,110,.7) !important;
-  border-radius: 18px !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.6) !important;
-}
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-banner-ico {
-  background: rgba(255,255,255,.5) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,.1) !important;
-}
 body.nm-mode #ss-panel-profile-edit .nwsb-pe-banner-txt { color: #a8854a !important; }
 
-/* Save → glass-gold */
-body.nm-mode #ss-panel-profile-edit .nwsb-pe-save {
-  background: linear-gradient(135deg, rgba(232,213,163,.95), rgba(196,163,90,.95)) !important;
-  backdrop-filter: blur(10px) !important;
-  color: #060c18 !important;
-  box-shadow: 0 10px 28px rgba(232,213,163,.4) !important;
-  border-radius: 16px !important;
+/* ── NEUMORPHISM (default) ── */
+body.nm-mode #ss-panel-profile-edit .nwsb-pe-avatar {
+  width: 92px !important; height: 92px !important; border-radius: 50% !important;
+  background-color: #f0f2f7 !important; border: none !important;
+  box-shadow: 8px 8px 18px rgba(0,0,0,.16), -6px -6px 14px rgba(255,255,255,.96) !important;
 }
+body.nm-mode #ss-panel-profile-edit .nwsb-pe-btn {
+  background: #f0f2f7 !important; border: none !important; color: #a8854a !important; border-radius: 14px !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,.14), -3px -3px 8px rgba(255,255,255,.95) !important;
+}
+body.nm-mode #ss-panel-profile-edit .nwsb-pe-banner {
+  background-color: #f0f2f7 !important; border: none !important; border-radius: 18px !important;
+  box-shadow: inset 5px 5px 12px rgba(0,0,0,.13), inset -4px -4px 9px rgba(255,255,255,.92) !important;
+}
+body.nm-mode #ss-panel-profile-edit .nwsb-pe-banner-ico {
+  background: #f0f2f7 !important;
+  box-shadow: 4px 4px 9px rgba(0,0,0,.14), -3px -3px 7px rgba(255,255,255,.95) !important;
+}
+body.nm-mode #ss-panel-profile-edit .nwsb-pe-save {
+  background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; border: none !important; color: #060c18 !important; border-radius: 16px !important;
+  box-shadow: 5px 5px 14px rgba(0,0,0,.16), -4px -4px 10px rgba(255,255,255,.7) !important;
+}
+body.nm-mode .nwsb-theme-opt {
+  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95) !important;
+}
+body.nm-mode .nwsb-theme-opt.active {
+  color: #a8854a !important;
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.95) !important;
+}
+
+/* ── GLASSMORPHISM (glass theme only) ── */
+body.nm-glass #ss-panel-profile-edit {
+  background:
+    radial-gradient(circle at 16% 10%, rgba(232,213,163,.32), transparent 42%),
+    radial-gradient(circle at 86% 78%, rgba(200,232,245,.34), transparent 46%),
+    linear-gradient(160deg, #e4ebf6 0%, #eef1f7 50%, #f2ece1 100%) !important;
+}
+body.nm-glass #ss-panel-profile-edit .nwsb-pe-avatar {
+  background-color: rgba(255,255,255,.42) !important; border: 1.5px solid rgba(255,255,255,.85) !important;
+  backdrop-filter: blur(16px) saturate(1.4) !important; -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.8) !important;
+}
+body.nm-glass #ss-panel-profile-edit .nwsb-pe-btn {
+  background: rgba(255,255,255,.4) !important; border: 1px solid rgba(255,255,255,.7) !important; color: #a8854a !important;
+  backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
+}
+body.nm-glass #ss-panel-profile-edit .ss-input {
+  background: rgba(255,255,255,.45) !important; border: 1px solid rgba(255,255,255,.72) !important; color: #1a1a2e !important;
+  backdrop-filter: blur(16px) saturate(1.3) !important; -webkit-backdrop-filter: blur(16px) saturate(1.3) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.6) !important;
+}
+body.nm-glass #ss-panel-profile-edit .nwsb-pe-banner {
+  background-color: rgba(255,255,255,.35) !important; border: 1.5px dashed rgba(200,169,110,.7) !important;
+  backdrop-filter: blur(16px) saturate(1.3) !important; -webkit-backdrop-filter: blur(16px) saturate(1.3) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.6) !important;
+}
+body.nm-glass #ss-panel-profile-edit .nwsb-pe-banner-ico {
+  background: rgba(255,255,255,.5) !important; box-shadow: 0 4px 12px rgba(0,0,0,.1) !important;
+}
+body.nm-glass #ss-panel-profile-edit .nwsb-pe-save {
+  background: linear-gradient(135deg, rgba(232,213,163,.95), rgba(196,163,90,.95)) !important;
+  backdrop-filter: blur(10px) !important; box-shadow: 0 10px 28px rgba(232,213,163,.4) !important;
+}
+body.nm-glass .nwsb-theme-opt {
+  background: rgba(255,255,255,.4) !important; border: 1px solid rgba(255,255,255,.7) !important;
+  backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
+}
+body.nm-glass .nwsb-theme-opt.active { border: 2px solid #c8a96e !important; color: #a8854a !important; }
 
 /* ═══════════════════════════════════════════════════════════════
    APP THEME: GLASSMORPHISM  (body.nm-glass)
