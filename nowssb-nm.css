@@ -545,3 +545,125 @@ body.nm-night #sub-social .ss-input {
   background: #16163c !important; border: none !important; color: #fff !important; border-radius: 14px !important;
   box-shadow: inset 3px 3px 8px rgba(0,0,0,0.85), inset -2px -2px 6px rgba(50,50,110,0.3) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   INNER PAGE 2 — NOWSSB STORE  (#sub-nowssb-store)
+   Neumorphism · no video/photo · light=day, dark=night
+═══════════════════════════════════════════════════════════════ */
+
+/* Body surface */
+body.nm-mode #sub-nowssb-store .nss-body { background: #f0f2f7 !important; }
+body.nm-night #sub-nowssb-store .nss-body { background: #0c0c20 !important; }
+
+/* Banner header — strip the cinematic slideshow, keep a clean header band */
+body.nm-mode #sub-nowssb-store .nss-banner {
+  aspect-ratio: auto !important; min-height: 0 !important; height: 150px !important;
+  background: transparent !important;
+}
+body.nm-mode #sub-nowssb-store .nss-banner-slides,
+body.nm-mode #sub-nowssb-store .nss-banner-fade { display: none !important; }
+/* Second (image) banner block — direct sibling after .nss-banner */
+body.nm-mode #sub-nowssb-store .nss-banner + div { display: none !important; }
+body.nm-mode #sub-nowssb-store .nss-banner-back svg path,
+body.nm-mode #sub-nowssb-store .nss-banner-back svg line { stroke: #1a1a2e !important; }
+body.nm-night #sub-nowssb-store .nss-banner-back svg path,
+body.nm-night #sub-nowssb-store .nss-banner-back svg line { stroke: rgba(232,213,163,0.9) !important; }
+body.nm-mode #sub-nowssb-store .nss-banner-back {
+  background: #f0f2f7 !important; border: none !important; border-radius: 50% !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-night #sub-nowssb-store .nss-banner-back {
+  background: #16163c !important; box-shadow: 4px 4px 12px rgba(0,0,0,0.85), -3px -3px 8px rgba(50,50,110,0.3) !important;
+}
+body.nm-mode #sub-nowssb-store .nss-banner-eyebrow { color: #c8a96e !important; text-shadow: none !important; }
+body.nm-night #sub-nowssb-store .nss-banner-eyebrow { color: #e8d5a3 !important; }
+body.nm-mode #sub-nowssb-store .nss-banner-title-light,
+body.nm-mode #sub-nowssb-store .nss-banner-title-bold { color: #1a1a2e !important; text-shadow: none !important; }
+body.nm-night #sub-nowssb-store .nss-banner-title-light,
+body.nm-night #sub-nowssb-store .nss-banner-title-bold { color: #fff !important; }
+body.nm-mode #sub-nowssb-store .nss-banner-sub { color: rgba(0,0,0,0.5) !important; }
+body.nm-night #sub-nowssb-store .nss-banner-sub { color: rgba(255,255,255,0.55) !important; }
+
+/* Topbar cart / wishlist icons */
+body.nm-mode #sub-nowssb-store .nss-store-icon-btn {
+  background: #f0f2f7 !important; border: none !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+body.nm-night #sub-nowssb-store .nss-store-icon-btn {
+  background: #16163c !important; box-shadow: 4px 4px 12px rgba(0,0,0,0.85), -3px -3px 8px rgba(50,50,110,0.3) !important;
+}
+body.nm-mode #sub-nowssb-store .nss-store-icon-btn svg path,
+body.nm-mode #sub-nowssb-store .nss-store-icon-btn svg circle { stroke: #1a1a2e !important; }
+body.nm-night #sub-nowssb-store .nss-store-icon-btn svg path,
+body.nm-night #sub-nowssb-store .nss-store-icon-btn svg circle { stroke: rgba(232,213,163,0.9) !important; }
+
+/* Library cards (Word + Meaning) → neumorphic, no video */
+body.nm-mode #sub-nowssb-store .ws-store-section,
+body.nm-mode #sub-nowssb-store .ms-home-card {
+  aspect-ratio: auto !important; background: #f0f2f7 !important; border: none !important;
+  border-radius: 22px !important; margin-bottom: 16px !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.13), -5px -5px 14px rgba(255,255,255,0.97) !important;
+}
+body.nm-night #sub-nowssb-store .ws-store-section,
+body.nm-night #sub-nowssb-store .ms-home-card {
+  aspect-ratio: auto !important; background: #16163c !important; border: none !important;
+  border-radius: 22px !important; margin-bottom: 16px !important;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32) !important;
+}
+body.nm-mode #sub-nowssb-store .ws-store-video,
+body.nm-mode #sub-nowssb-store .ms-home-card-bg,
+body.nm-mode #sub-nowssb-store .ws-store-overlay,
+body.nm-mode #sub-nowssb-store .ms-home-card-overlay { display: none !important; }
+/* Card content becomes flow layout (no longer absolute over video) */
+body.nm-mode #sub-nowssb-store .ws-store-content,
+body.nm-mode #sub-nowssb-store .ms-home-card-content { position: relative !important; inset: auto !important; padding: 22px !important; }
+body.nm-mode #sub-nowssb-store .ws-store-eyebrow-wrap { position: relative !important; top: auto !important; left: auto !important; margin-bottom: 12px !important; }
+body.nm-mode #sub-nowssb-store .ms-home-card-content .ws-store-text-block { padding-top: 0 !important; }
+
+body.nm-mode #sub-nowssb-store .ws-store-eyebrow { color: #c8a96e !important; text-shadow: none !important; }
+body.nm-night #sub-nowssb-store .ws-store-eyebrow { color: #e8d5a3 !important; text-shadow: none !important; }
+body.nm-mode #sub-nowssb-store .ws-store-title-light,
+body.nm-mode #sub-nowssb-store .ws-store-title-bold { color: #1a1a2e !important; text-shadow: none !important; }
+body.nm-night #sub-nowssb-store .ws-store-title-light,
+body.nm-night #sub-nowssb-store .ws-store-title-bold { color: #fff !important; text-shadow: none !important; }
+body.nm-mode #sub-nowssb-store .ws-store-sub { color: rgba(0,0,0,0.5) !important; }
+body.nm-night #sub-nowssb-store .ws-store-sub { color: rgba(255,255,255,0.55) !important; }
+
+/* Category chips inside library cards */
+body.nm-mode #sub-nowssb-store .ws-store-btn-wrap span {
+  color: #a8854a !important; background: rgba(200,169,110,0.08) !important;
+  border: 1px solid rgba(200,169,110,0.3) !important; border-radius: 20px !important;
+}
+body.nm-night #sub-nowssb-store .ws-store-btn-wrap span {
+  color: #e8d5a3 !important; background: rgba(232,213,163,0.1) !important;
+  border: 1px solid rgba(232,213,163,0.25) !important; border-radius: 20px !important;
+}
+
+/* Library card CTA → neumorphic gold button */
+body.nm-mode #sub-nowssb-store .ws-store-btn {
+  background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; color: #060c18 !important;
+  border-radius: 14px !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.18), -3px -3px 8px rgba(255,255,255,0.6) !important;
+}
+body.nm-night #sub-nowssb-store .ws-store-btn {
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.7), -2px -2px 8px rgba(50,50,110,0.3) !important;
+}
+
+/* Cart / wishlist panels */
+body.nm-mode #sub-nowssb-store .nss-panel { background: #f0f2f7 !important; border-top: none !important; border-radius: 22px 22px 0 0 !important; }
+body.nm-night #sub-nowssb-store .nss-panel { background: #14143a !important; border-top: none !important; border-radius: 22px 22px 0 0 !important; }
+body.nm-mode #sub-nowssb-store .nss-panel-head { border-bottom-color: rgba(0,0,0,0.07) !important; }
+body.nm-mode #sub-nowssb-store .nss-panel-title { color: #1a1a2e !important; }
+body.nm-night #sub-nowssb-store .nss-panel-title { color: #fff !important; }
+body.nm-mode #sub-nowssb-store .nss-panel-handle { background: rgba(0,0,0,0.15) !important; }
+body.nm-mode #sub-nowssb-store .nss-panel-close { background: #f0f2f7 !important; box-shadow: 3px 3px 7px rgba(0,0,0,0.13),-2px -2px 6px rgba(255,255,255,0.95) !important; border-radius: 50% !important; }
+body.nm-night #sub-nowssb-store .nss-panel-close { background: #1c1c44 !important; }
+body.nm-mode #sub-nowssb-store .nss-panel-item { border-bottom-color: rgba(0,0,0,0.06) !important; }
+body.nm-mode #sub-nowssb-store .nss-panel-item-name { color: #1a1a2e !important; }
+body.nm-night #sub-nowssb-store .nss-panel-item-name { color: #fff !important; }
+body.nm-mode #sub-nowssb-store .nss-panel-item-price { color: #a8854a !important; }
+body.nm-mode #sub-nowssb-store .nss-panel-empty { color: rgba(0,0,0,0.32) !important; }
+body.nm-mode #sub-nowssb-store .nss-cart-total-amount { color: #a8854a !important; }
+body.nm-mode #sub-nowssb-store .nss-cart-total-label { color: rgba(0,0,0,0.45) !important; }

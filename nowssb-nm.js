@@ -30,9 +30,25 @@
       return r;
     };
   }
-  wrapAfter('goTo',         syncNmBody);
+  wrapAfter('goTo',          syncNmBody);
   wrapAfter('nmhSwitchMode', syncNmBody);
-  wrapAfter('openSub',      syncNmBody);
+
+  /* openSub: sync body + auto-skip intros that aren't gated by shouldShowIntro */
+  (function patchOpenSub() {
+    if (typeof window.openSub !== 'function') { return setTimeout(patchOpenSub, 150); }
+    var orig = window.openSub;
+    window.openSub = function (id) {
+      var r = orig.apply(this, arguments);
+      try {
+        syncNmBody();
+        if (document.body.classList.contains('nm-mode') && id === 'nowssb-store') {
+          /* Store intro isn't wired to shouldShowIntro — dismiss it directly */
+          setTimeout(function () { if (typeof nssEnterStore === 'function') nssEnterStore(); }, 40);
+        }
+      } catch (e) {}
+      return r;
+    };
+  })();
 
   /* ── Suppress cinematic intros while in normal-home mode ── */
   function patchIntros() {
