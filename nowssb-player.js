@@ -50,6 +50,8 @@
     var repTarget = ((typeof _pwRepTarget !== 'undefined') ? _pwRepTarget : 7) || 7;
     var repCount = (typeof _pwRepCount !== 'undefined') ? _pwRepCount : 0;
     var repPct = Math.min(100, Math.round((repCount / repTarget) * 100));
+    var voice = (typeof _pwVoice !== 'undefined') ? _pwVoice : 'F';
+    var loop = (typeof _pwLoop !== 'undefined') ? !!_pwLoop : false;
     var th = LGP_THEMES[Math.abs(idx) % LGP_THEMES.length];
     var hr = new Date().getHours();
     var timeLabel = hr < 10 ? 'Morning' : hr < 13 ? 'Midday' : hr < 17 ? 'Afternoon' : hr < 20 ? 'Evening' : 'Night';
@@ -118,18 +120,25 @@
         '<div style="display:none;"><button id="spRecBtn"></button><div id="spRecLabel"></div><div id="spRecStatus"></div><button id="spRecPlayBtn"></button><button id="spRecTrashBtn"></button><div id="spRecControls"></div><div id="spWaveform"></div><div id="sp3BtnMain"></div><span id="sp3BtnLbl"></span><div id="sp3BtnIco"></div></div>' +
       '</div>';
 
-    /* curved liquid-glass dock — Settings · Replay/Rewind · Library (image icons) */
-    var icoSettings = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/018b2fc0-5dec-11f1-9e1a-9303081e5fda_ccsoef.png';
-    var dock =
-      '<div class="lgp-dock">' +
-        '<button class="lgp-dock-btn" onclick="pwOpenSettings&&pwOpenSettings()" aria-label="Settings"><img src="' + icoSettings + '" alt=""></button>' +
-        '<button class="lgp-dock-btn" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Rewind / replay">' +
-          '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 12a9 9 0 109-9 9 9 0 00-7 3.3M3 4v4h4"/></svg>' +
-        '</button>' +
-        '<button class="lgp-dock-btn" onclick="openWalkmanLib&&openWalkmanLib()" aria-label="Library">' +
-          '<svg width="22" height="20" viewBox="0 0 16 14" fill="none" stroke="#fff" stroke-width="1.5"><rect x="0" y="0" width="6" height="6"/><rect x="10" y="0" width="6" height="6"/><rect x="0" y="9" width="6" height="5"/><rect x="10" y="9" width="6" height="5"/></svg>' +
-          '<span>Library</span>' +
-        '</button>' +
+    /* curved liquid-glass ARC — slides up when you tap Settings (camera-dial style) */
+    var gridSvg = '<svg width="24" height="22" viewBox="0 0 16 14" fill="none" stroke="#fff" stroke-width="1.5"><rect x="0" y="0" width="6" height="6"/><rect x="10" y="0" width="6" height="6"/><rect x="0" y="9" width="6" height="5"/><rect x="10" y="9" width="6" height="5"/></svg>';
+    var replaySvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 12a9 9 0 109-9 9 9 0 00-7 3.3M3 4v4h4"/></svg>';
+    var arc =
+      '<div class="lgp-arc" id="lgpArc">' +
+        '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
+        '<div class="lgp-arc-sheet">' +
+          '<div class="lgp-arc-handle"></div>' +
+          '<div class="lgp-arc-row"><span>Voice</span><div class="lgp-arc-seg">' +
+            '<button class="' + (voice === 'F' ? 'on' : '') + '" onclick="pwSetVoice&&pwSetVoice(\'F\');renderPractice&&renderPractice()">Female</button>' +
+            '<button class="' + (voice === 'M' ? 'on' : '') + '" onclick="pwSetVoice&&pwSetVoice(\'M\');renderPractice&&renderPractice()">Male</button>' +
+          '</div></div>' +
+          '<div class="lgp-arc-row" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()"><span>Loop</span><b>' + (loop ? 'On' : 'Off') + '</b></div>' +
+          '<div class="lgp-arc-row" onclick="pwCycleRepTarget&&pwCycleRepTarget();renderPractice&&renderPractice()"><span>Reps</span><b>' + repTarget + '×</b></div>' +
+          '<div class="lgp-arc-actions">' +
+            '<button onclick="lgpToggleArc();openWalkmanLib&&openWalkmanLib()">' + gridSvg + '<span>Library</span></button>' +
+            '<button onclick="lgpToggleArc();if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()">' + replaySvg + '<span>Replay</span></button>' +
+          '</div>' +
+        '</div>' +
       '</div>';
 
     body.innerHTML =
@@ -139,7 +148,7 @@
           '<button class="lgp-back" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
             '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
           '</button>' +
-          '<button class="lgp-settings" onclick="pwOpenSettings&&pwOpenSettings()" aria-label="Settings">' +
+          '<button class="lgp-settings" onclick="lgpToggleArc()" aria-label="Settings">' +
             '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>' +
           '</button>' +
         '</div>' +
@@ -151,10 +160,14 @@
         '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
         center +
-        dock +
+        arc +
       '</div>';
   }
   window.renderLiquidPlayer = renderLiquidPlayer;
+  window.lgpToggleArc = function () {
+    var a = document.getElementById('lgpArc');
+    if (a) a.classList.toggle('open');
+  };
 
   /* override renderPractice when liquid mode is on */
   (function wrap() {

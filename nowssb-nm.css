@@ -992,6 +992,9 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-iconbtn svg { color: #1a1a2e !impo
 body.nm-mode #sub-people .ig-topbar img,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar img,
 body.nm-mode #sub-social-home .ig-topbar img { filter: brightness(0) opacity(0.82) !important; }
+/* the verified badge must keep its true colours in the header (not be blackened) */
+#sub-ig-profile .ig-topbar .ig-vbadge img,
+body.nwsb-soc-glass #sub-ig-profile .ig-topbar .ig-vbadge img { filter: none !important; opacity: 1 !important; }
 
 /* Search */
 body.nm-mode #sub-people .ig-searchwrap { background: #f0f2f7 !important; }
