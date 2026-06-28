@@ -1428,8 +1428,15 @@ body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !import
 #ss-panel-profile-edit .nwsb-pe-banner-txt { color: #a8854a !important; }
 
 /* Inputs — neumorphic inset, always light */
+#ss-panel-profile-edit input.ss-input,
+#ss-panel-profile-edit textarea.ss-input,
 #ss-panel-profile-edit .ss-input {
-  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important;
+  background-color: #f0f2f7 !important; background-image: none !important;
+  border: none !important; color: #1a1a2e !important;
+  /* base `input` has backdrop-filter:blur which renders as a BLACK box on many
+     Android/Chrome GPUs — kill it so the field is reliably light */
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  filter: none !important;
   box-shadow: inset 4px 4px 10px rgba(0,0,0,.12), inset -3px -3px 8px rgba(255,255,255,.95) !important;
 }
 #ss-panel-profile-edit .ss-input::placeholder { color: rgba(0,0,0,.34) !important; }
