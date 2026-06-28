@@ -26,10 +26,22 @@
     { id:7, username:'meera.om', fullName:'Meera Iyer', verified:false, avatar:av(47), posts:96, followers:'5,612', following:188, category:'Practitioner', bio:'Frequency is medicine.', link:'' },
     { id:8, username:'kabir.naad', fullName:'Kabir Khan', verified:true, avatar:av(60), posts:301, followers:'72.1k', following:142, category:'Frequency Sage', bio:'Top 1% · 1000+ sessions.\nYour voice is the instrument.', link:'nowssb.com/kabir' },
   ];
+  // Banner pool — every placeholder person gets a profile banner
+  var PEOPLE_BANNERS = [
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591933705_qq3l9g.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591857840_tbznap.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782592051446_womamz.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591669371_kqnaf9.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591627828_lmde11.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591559591_yxgud5.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591561380_ytpn3b.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592260/grok_image_1782591732123_epmpiu.jpg'
+  ];
   PEOPLE.forEach(function(p,i){
     p.highlights = [{label:'Practice',img:img('p'+i+'a',150)},{label:'Words',img:img('p'+i+'b',150)},{label:'Journey',img:img('p'+i+'c',150)}];
     p.grid = Array.from({length:12},function(_,j){return img('u'+p.id+'g'+j,500);});
     p.following_state = false;
+    p.bannerURL = PEOPLE_BANNERS[i % PEOPLE_BANNERS.length];
   });
 
   var verifiedSvg = '<svg class="ig-verified" viewBox="0 0 24 24" fill="#0095f6"><path d="M12 2l2.3 1.7 2.8-.3 1 2.6 2.5 1.3-.6 2.8 1.4 2.5-1.9 2.1.2 2.8-2.7.9-1.4 2.5-2.8-.5L12 22l-2.6-1.3-2.8.5-1.4-2.5-2.7-.9.2-2.8L.8 12.9l1.4-2.5-.6-2.8 2.5-1.3 1-2.6 2.8.3z"/><path d="M10.5 14.6l-2.3-2.3-1.2 1.2 3.5 3.5 6-6-1.2-1.2z" fill="#fff"/></svg>';
@@ -349,15 +361,15 @@
     message:function(id){
       // bridge to existing chat if available
       if(typeof ssOpenChat==='function'){ /* could integrate */ }
-      alert('Messaging — coming soon');
+      (window.nwsbToast||window.alert)('Messaging — coming soon');
     },
-    openExplorePost:function(){ alert('Post viewer — coming soon'); },
-    showFollowers:function(){ alert('Followers list — coming soon'); },
+    openExplorePost:function(){ (window.nwsbToast||window.alert)('Post viewer — coming soon'); },
+    showFollowers:function(){ (window.nwsbToast||window.alert)('Followers list — coming soon'); },
     editProfile:function(){
       if(typeof openSub==='function'){ openSub('social'); if(typeof ssOpenPanel==='function') setTimeout(function(){ssOpenPanel('profile-edit');},120); }
     },
-    shareProfile:function(){ alert('Share profile — coming soon'); },
-    menu:function(){ alert('Menu — coming soon'); },
+    shareProfile:function(){ (window.nwsbToast||window.alert)('Share profile — coming soon'); },
+    menu:function(){ (window.nwsbToast||window.alert)('Menu — coming soon'); },
     refreshNavAvatar:function(){
       var ud = window._userDataCache;
       var DEFAULT_AVATAR = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780065459/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png';
