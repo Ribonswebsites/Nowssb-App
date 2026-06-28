@@ -118,6 +118,20 @@
         '<div style="display:none;"><button id="spRecBtn"></button><div id="spRecLabel"></div><div id="spRecStatus"></div><button id="spRecPlayBtn"></button><button id="spRecTrashBtn"></button><div id="spRecControls"></div><div id="spWaveform"></div><div id="sp3BtnMain"></div><span id="sp3BtnLbl"></span><div id="sp3BtnIco"></div></div>' +
       '</div>';
 
+    /* curved liquid-glass dock — Settings · Replay/Rewind · Library (image icons) */
+    var icoSettings = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/018b2fc0-5dec-11f1-9e1a-9303081e5fda_ccsoef.png';
+    var dock =
+      '<div class="lgp-dock">' +
+        '<button class="lgp-dock-btn" onclick="pwOpenSettings&&pwOpenSettings()" aria-label="Settings"><img src="' + icoSettings + '" alt=""></button>' +
+        '<button class="lgp-dock-btn" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Rewind / replay">' +
+          '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 12a9 9 0 109-9 9 9 0 00-7 3.3M3 4v4h4"/></svg>' +
+        '</button>' +
+        '<button class="lgp-dock-btn" onclick="openWalkmanLib&&openWalkmanLib()" aria-label="Library">' +
+          '<svg width="22" height="20" viewBox="0 0 16 14" fill="none" stroke="#fff" stroke-width="1.5"><rect x="0" y="0" width="6" height="6"/><rect x="10" y="0" width="6" height="6"/><rect x="0" y="9" width="6" height="5"/><rect x="10" y="9" width="6" height="5"/></svg>' +
+          '<span>Library</span>' +
+        '</button>' +
+      '</div>';
+
     body.innerHTML =
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
@@ -137,6 +151,7 @@
         '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
         center +
+        dock +
       '</div>';
   }
   window.renderLiquidPlayer = renderLiquidPlayer;
