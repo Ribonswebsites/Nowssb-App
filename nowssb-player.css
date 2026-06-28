@@ -6,11 +6,14 @@
 
 .lgp {
   position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
-  padding: max(env(safe-area-inset-top,18px),18px) 26px calc(env(safe-area-inset-bottom,18px) + 18px);
-  overflow:hidden; box-sizing:border-box; font-family:'DM Sans',sans-serif; color:#fff;
+  padding: max(env(safe-area-inset-top,14px),14px) 24px calc(env(safe-area-inset-bottom,16px) + 18px);
+  overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch;
+  box-sizing:border-box; font-family:'DM Sans',sans-serif; color:#fff;
   background: var(--lg-bg, linear-gradient(160deg,#06323e,#1ba0b5)) center/cover no-repeat;
+  background-attachment:fixed;
   transition: background .9s ease;
 }
+.lgp::-webkit-scrollbar { display:none; }
 .lgp * { box-sizing:border-box; }
 
 /* themes */
@@ -47,7 +50,7 @@
   display:flex; align-items:center; justify-content:center;
 }
 .lgp .lgp-brand {
-  margin-top:10px; font-size:30px; font-weight:800; letter-spacing:-.5px;
+  margin-top:8px; font-size:26px; font-weight:800; letter-spacing:-.5px;
   text-shadow:0 2px 20px rgba(0,0,0,.4), 0 0 26px var(--lg-accent);
 }
 .lgp .lgp-ritual {
@@ -57,7 +60,7 @@
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
-  width:100%; max-width:330px; margin:18px 0 4px; aspect-ratio:1/.82; flex-shrink:0;
+  width:100%; max-width:312px; margin:12px 0 2px; aspect-ratio:1/.62; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
@@ -82,7 +85,7 @@
 
 /* title / syllables / organ */
 .lgp .lgp-title {
-  margin-top:18px; font-size:40px; font-weight:800; letter-spacing:.5px; text-align:center; line-height:1.05;
+  margin-top:12px; font-size:34px; font-weight:800; letter-spacing:.5px; text-align:center; line-height:1.05;
   text-shadow:0 2px 26px rgba(0,0,0,.45), 0 0 32px var(--lg-accent);
 }
 .lgp .lgp-syls { margin-top:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
@@ -101,7 +104,7 @@
 
 /* progress */
 .lgp .lgp-progress {
-  width:100%; max-width:330px; height:5px; margin:20px 0 4px; border-radius:999px !important;
+  width:100%; max-width:312px; height:5px; margin:14px 0 2px; border-radius:999px !important;
   background:rgba(255,255,255,.2); overflow:hidden;
 }
 .lgp .lgp-progress-fill {
@@ -111,7 +114,7 @@
 }
 
 /* phase / controls */
-.lgp .lgp-phase { width:100%; margin-top:auto; display:flex; flex-direction:column; align-items:center; }
+.lgp .lgp-phase { width:100%; margin-top:14px; padding-top:6px; display:flex; flex-direction:column; align-items:center; }
 .lgp .lgp-status { font-size:11px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,.78); }
 .lgp .lgp-status.recording { color:#ff8a8a; }
 .lgp .lgp-controls { display:flex; align-items:center; justify-content:center; gap:26px; margin-top:6px; }
@@ -125,7 +128,7 @@
 .lgp .lgp-ctrl:disabled { opacity:.35; }
 .lgp .lgp-ctrl:active { transform:scale(.92); }
 .lgp .lgp-play {
-  width:84px; height:84px; border:none; border-radius:50% !important; cursor:pointer;
+  width:76px; height:76px; border:none; border-radius:50% !important; cursor:pointer;
   background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.4);
   -webkit-backdrop-filter:blur(22px) saturate(1.5); backdrop-filter:blur(22px) saturate(1.5);
   box-shadow:0 18px 48px rgba(0,0,0,.45), 0 0 60px -6px var(--lg-accent),
