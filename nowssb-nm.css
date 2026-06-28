@@ -1409,6 +1409,14 @@ body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !import
    dark text invisible in Fashion mode). */
 #ss-panel-profile-edit { background: #f0f2f7 !important; }
 #ss-panel-profile-edit .ss-panel-header { border-bottom-color: rgba(0,0,0,.06) !important; }
+/* Banner is full-bleed: cancel the panel's 20px horizontal padding so the
+   cover image runs edge-to-edge while the rest of the content stays inset. */
+#ss-panel-profile-edit .nwsb-pe-cover {
+  width: calc(100% + 40px) !important;
+  margin-left: -20px !important;
+  margin-right: -20px !important;
+  margin-top: 0 !important;
+}
 
 /* Text colors (both themes) */
 #ss-panel-profile-edit .ss-panel-title { color: #1a1a2e !important; }
