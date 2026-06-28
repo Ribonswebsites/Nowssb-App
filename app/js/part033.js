@@ -364,18 +364,67 @@
       (window.nwsbToast||window.alert)('Messaging — coming soon');
     },
     openExplorePost:function(el){
-      // Resolve the image src from the tapped tile (or a raw src string)
-      var src = (el && el.querySelector) ? ((el.querySelector('img')||{}).src || '') : el;
-      if(!src) return;
-      var old = document.getElementById('nwsb-lightbox'); if(old) old.remove();
-      var lb = document.createElement('div');
-      lb.id = 'nwsb-lightbox';
-      lb.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(6,12,24,.95);display:flex;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);';
-      lb.innerHTML =
-        '<img src="'+src+'" alt="" style="max-width:94%;max-height:84%;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);object-fit:contain;">'+
-        '<button aria-label="Close" style="position:absolute;top:max(env(safe-area-inset-top,18px),18px);right:18px;width:42px;height:42px;border:none;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);">&times;</button>';
-      lb.addEventListener('click', function(){ lb.remove(); });
-      document.body.appendChild(lb);
+      // Neumorphic, Instagram-style post viewer — author header above each
+      // image, scrollable feed, opens at the tapped post.
+      var prof = this._currentProfile || (typeof ME!=='undefined'?ME:{}) || {};
+      var imgs = (prof.grid && prof.grid.length) ? prof.grid.slice() : [];
+      var tapped = (el && el.querySelector) ? ((el.querySelector('img')||{}).src || '') : (typeof el==='string'?el:'');
+      var idx = 0;
+      if(el && el.parentNode){ var k = Array.prototype.indexOf.call(el.parentNode.children, el); if(k>=0) idx=k; }
+      if(!imgs.length){ if(tapped) imgs=[tapped]; else return; }
+      if(idx>=imgs.length) idx=0;
+
+      var name = prof.fullName || prof.username || 'Practitioner';
+      var uname = prof.username ? ('@'+prof.username) : '';
+      var av = prof.avatar || '';
+      var avHtml = av
+        ? '<div class="nwsb-pv-av" style="background-image:url('+av+')"></div>'
+        : '<div class="nwsb-pv-av nwsb-pv-av-init">'+(name.charAt(0)||'N').toUpperCase()+'</div>';
+
+      var heart='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>';
+      var comment='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg>';
+      var send='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+
+      var cards = imgs.map(function(src,i){
+        return '<div class="nwsb-pv-card" id="nwsb-pv-card-'+i+'">'+
+            '<div class="nwsb-pv-head">'+avHtml+
+              '<div class="nwsb-pv-meta"><div class="nwsb-pv-name">'+name+'</div>'+(uname?'<div class="nwsb-pv-uname">'+uname+'</div>':'')+'</div>'+
+            '</div>'+
+            '<div class="nwsb-pv-imgwrap"><img class="nwsb-pv-img" src="'+src+'" alt="" loading="lazy"></div>'+
+            '<div class="nwsb-pv-actions"><button class="nwsb-pv-act">'+heart+'</button><button class="nwsb-pv-act">'+comment+'</button><button class="nwsb-pv-act">'+send+'</button></div>'+
+          '</div>';
+      }).join('');
+
+      var css = '#nwsb-postviewer{position:fixed;inset:0;z-index:100000;background:#eef0f5;display:flex;flex-direction:column;}'+
+        '#nwsb-postviewer *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
+        '.nwsb-pv-top{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top,14px),14px) 18px 14px;background:#eef0f5;box-shadow:0 4px 16px rgba(0,0,0,.07);flex-shrink:0;}'+
+        '.nwsb-pv-title{font-size:17px;font-weight:800;color:#1a1a2e;}'+
+        '.nwsb-pv-close{width:42px;height:42px;border:none;border-radius:50%!important;background:#eef0f5;color:#1a1a2e;font-size:22px;line-height:1;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.13),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
+        '.nwsb-pv-close:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
+        '.nwsb-pv-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(env(safe-area-inset-bottom,20px) + 26px);}'+
+        '.nwsb-pv-card{background:#eef0f5;border-radius:22px!important;margin-bottom:18px;padding:14px;box-shadow:7px 7px 18px rgba(0,0,0,.12),-5px -5px 14px rgba(255,255,255,.97);}'+
+        '.nwsb-pv-head{display:flex;align-items:center;gap:12px;margin-bottom:13px;}'+
+        '.nwsb-pv-av{width:46px;height:46px;border-radius:50%!important;background-size:cover;background-position:center;background-repeat:no-repeat;flex-shrink:0;box-shadow:4px 4px 10px rgba(0,0,0,.14),-3px -3px 8px rgba(255,255,255,.95);}'+
+        '.nwsb-pv-av-init{display:flex;align-items:center;justify-content:center;background:#e6e9f1;color:#c8a96e;font-weight:800;font-size:18px;}'+
+        '.nwsb-pv-name{font-size:15px;font-weight:700;color:#1a1a2e;}'+
+        '.nwsb-pv-uname{font-size:12px;color:rgba(0,0,0,.45);margin-top:1px;}'+
+        '.nwsb-pv-imgwrap{border-radius:16px!important;overflow:hidden;}'+
+        '.nwsb-pv-img{width:100%;display:block;border-radius:16px!important;}'+
+        '.nwsb-pv-actions{display:flex;gap:12px;margin-top:14px;}'+
+        '.nwsb-pv-act{width:44px;height:44px;border:none;border-radius:50%!important;background:#eef0f5;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.12),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
+        '.nwsb-pv-act:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}';
+
+      var old=document.getElementById('nwsb-postviewer'); if(old) old.remove();
+      var ov=document.createElement('div');
+      ov.id='nwsb-postviewer';
+      ov.innerHTML='<style>'+css+'</style>'+
+        '<div class="nwsb-pv-top"><div class="nwsb-pv-title">Posts</div><button class="nwsb-pv-close" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-postviewer\');if(p)p.remove();">&times;</button></div>'+
+        '<div class="nwsb-pv-scroll" id="nwsb-pv-scroll">'+cards+'</div>';
+      document.body.appendChild(ov);
+      setTimeout(function(){
+        var t=document.getElementById('nwsb-pv-card-'+idx), sc=document.getElementById('nwsb-pv-scroll');
+        if(t&&sc) sc.scrollTop = t.offsetTop - 6;
+      },40);
     },
     showFollowers:function(){ (window.nwsbToast||window.alert)('Followers list — coming soon'); },
     editProfile:function(){
