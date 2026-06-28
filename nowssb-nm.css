@@ -1063,22 +1063,23 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-hl-circle svg { stroke: #c8a96e !i
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-hl-label { color: rgba(0,0,0,0.5) !important; }
 
 /* Social bottom nav */
-body.nm-mode #ig-social-nav {
-  background: #f0f2f7 !important; border-top: none !important;
-  box-shadow: 0 -6px 16px rgba(0,0,0,0.08) !important;
+#ig-social-nav {
+  background: #f0f2f7 !important; border-top: 1px solid rgba(0,0,0,0.05) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
 }
 /* Solid, clearly-visible dark grey, larger (brightness keeps the icon detail,
    full opacity so they don't fade out) */
-body.nm-mode #ig-social-nav .ig-social-img {
+#ig-social-nav .ig-social-img {
   filter: brightness(0.3) contrast(1.15) !important; opacity: 1 !important;
   width: 28px !important; height: 28px !important;
 }
-body.nm-mode #ig-social-nav .ig-social-btn.active .ig-social-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
+#ig-social-nav .ig-social-btn.active .ig-social-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
 /* Profile-tab avatar — circular, light fallback (was a black square) */
-body.nm-mode #ig-social-nav #igsn-me-av { border-radius: 50% !important; background-color: #dfe3ec !important; width: 28px !important; height: 28px !important; }
-body.nm-mode #ig-social-nav #igsn-me-av svg { stroke: rgba(0,0,0,0.45) !important; }
-body.nm-mode #ig-social-nav .ig-social-btn span { color: rgba(0,0,0,0.4) !important; }
-body.nm-mode #ig-social-nav .ig-social-btn.active span { color: #c8a96e !important; }
+#ig-social-nav #igsn-me-av { border-radius: 50% !important; background-color: #dfe3ec !important; width: 28px !important; height: 28px !important; }
+#ig-social-nav #igsn-me-av svg { stroke: rgba(0,0,0,0.45) !important; }
+#ig-social-nav .ig-social-btn span { color: rgba(0,0,0,0.4) !important; }
+#ig-social-nav .ig-social-btn.active span { color: #c8a96e !important; }
 
 /* Social home hero / stat cube → light neumorphic */
 body.nm-mode #sub-social-home .nwsb-hero { background: #f0f2f7 !important; border: none !important;
@@ -1881,7 +1882,7 @@ body.nm-mode #ig-bottomnav {
 body.nm-mode #ig-bottomnav .ig-nav-label { color: rgba(0,0,0,0.42) !important; }
 body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #c8a96e !important; }
 /* No dark upward shadow on the social nav either */
-body.nm-mode #ig-social-nav { box-shadow: 0 -1px 0 rgba(0,0,0,0.05) !important; }
+#ig-social-nav { box-shadow: 0 -1px 0 rgba(0,0,0,0.05) !important; }
 
 /* Kill the dark app-bg vignette in neumorphism mode (it bled a dark band at
    the bottom of light screens / splash). */
