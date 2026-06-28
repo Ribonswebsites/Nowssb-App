@@ -45,7 +45,7 @@
     var main = document.getElementById('ss-main-view');
     var nv   = document.getElementById('nm-settings-view');
     if (nm) { if (main) main.style.display = 'none'; if (nv) nv.style.display = 'block'; }
-    else    { if (main) main.style.display = '';     if (nv) nv.style.display = 'none'; }
+    else    { if (main) main.style.display = 'flex'; if (nv) nv.style.display = 'none'; }  /* restore flex so Fashion settings scrolls */
   }
   window.nwsbSyncNmBody = syncNmBody;
   syncNmBody();
@@ -97,10 +97,15 @@
   /* ── Suppress cinematic intros while in normal-home mode ── */
   function patchIntros() {
     if (typeof window.shouldShowIntro !== 'function') { return setTimeout(patchIntros, 150); }
-    var orig = window.shouldShowIntro;
     window.shouldShowIntro = function (key) {
       if (document.body.classList.contains('nm-mode')) return false; /* skip straight to content */
-      return orig.apply(this, arguments);
+      var mode; try { mode = localStorage.getItem('nwsb_intros'); } catch (e) {}
+      if (mode === 'off') return false;
+      /* Show each intro ONCE per app session (resets only on full close + reopen) */
+      if (!window._introSeen) window._introSeen = {};
+      if (window._introSeen[key]) return false;
+      window._introSeen[key] = true;
+      return true;
     };
   }
   patchIntros();

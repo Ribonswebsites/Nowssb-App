@@ -1306,9 +1306,17 @@ window.addEventListener('appinstalled', () => {
 function openMenu() {
   document.getElementById('menuOverlay').classList.add('open');
   document.getElementById('menuDrawer').classList.add('open');
-  // Reset intro so it shows fresh each time menu opens
+  // Intro shows ONCE per app session (until fully closed & reopened)
   var intro = document.getElementById('menuIntroPage');
-  if (intro) { intro.style.opacity = '1'; intro.style.display = 'flex'; intro.style.pointerEvents = 'all'; }
+  if (intro) {
+    if (!window._introSeen) window._introSeen = {};
+    if (window._introSeen['menu']) {
+      intro.style.display = 'none'; intro.style.pointerEvents = 'none';
+    } else {
+      window._introSeen['menu'] = true;
+      intro.style.opacity = '1'; intro.style.display = 'flex'; intro.style.pointerEvents = 'all';
+    }
+  }
 }
 function menuIntroEnter() {
   var intro = document.getElementById('menuIntroPage');

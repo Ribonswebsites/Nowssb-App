@@ -73,9 +73,13 @@
       window.openSub = function(id) {
         var result = _prevOpenSub.apply(this, arguments);
         if (id === 'social') {
-          // Show settings intro page every time settings opens
+          // Settings intro shows ONCE per app session
           var intro = document.getElementById('ss-intro-page');
-          if (intro) intro.classList.remove('sl-intro-hidden');
+          if (intro) {
+            if (!window._introSeen) window._introSeen = {};
+            if (window._introSeen['settings']) { intro.classList.add('sl-intro-hidden'); }
+            else { window._introSeen['settings'] = true; intro.classList.remove('sl-intro-hidden'); }
+          }
           setTimeout(_syncIntroToggle, 50);
         }
         return result;
