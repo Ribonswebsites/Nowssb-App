@@ -1067,12 +1067,15 @@ body.nm-mode #ig-social-nav {
   background: #f0f2f7 !important; border-top: none !important;
   box-shadow: 0 -6px 16px rgba(0,0,0,0.08) !important;
 }
-/* Solid, clearly-visible dark grey (brightness keeps the icon's detail, full
-   opacity so they don't fade out) */
-body.nm-mode #ig-social-nav .ig-social-img { filter: brightness(0.4) contrast(1.1) !important; opacity: 1 !important; }
+/* Solid, clearly-visible dark grey, larger (brightness keeps the icon detail,
+   full opacity so they don't fade out) */
+body.nm-mode #ig-social-nav .ig-social-img {
+  filter: brightness(0.3) contrast(1.15) !important; opacity: 1 !important;
+  width: 28px !important; height: 28px !important;
+}
 body.nm-mode #ig-social-nav .ig-social-btn.active .ig-social-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
 /* Profile-tab avatar — circular, light fallback (was a black square) */
-body.nm-mode #ig-social-nav #igsn-me-av { border-radius: 50% !important; background-color: #dfe3ec !important; }
+body.nm-mode #ig-social-nav #igsn-me-av { border-radius: 50% !important; background-color: #dfe3ec !important; width: 28px !important; height: 28px !important; }
 body.nm-mode #ig-social-nav #igsn-me-av svg { stroke: rgba(0,0,0,0.45) !important; }
 body.nm-mode #ig-social-nav .ig-social-btn span { color: rgba(0,0,0,0.4) !important; }
 body.nm-mode #ig-social-nav .ig-social-btn.active span { color: #c8a96e !important; }
