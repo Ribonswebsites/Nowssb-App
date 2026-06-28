@@ -176,7 +176,7 @@
     // grid — empty state for self (no fake posts)
     var g = $('ig-prof-grid');
     if(p.self || !p.posts || !(p.grid&&p.grid.length)){
-      g.innerHTML = '<div style="grid-column:1/4;text-align:center;padding:50px 0;color:#737373;"><div style="width:62px;height:62px;border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div><div style="font-size:22px;font-weight:800;color:#fff;">Share Photos</div><div style="font-size:14px;margin-top:8px;">When you share photos, they will appear on your profile.</div></div>';
+      g.innerHTML = '<div class="nwsb-empty-grid" style="grid-column:1/4;text-align:center;padding:50px 0;"><div class="nwsb-empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="nwsb-empty-title">Share Photos</div></div>';
     } else {
       g.innerHTML = p.grid.map(function(src,i){
         return '<div class="ig-tile" onclick="IG.openExplorePost('+i+')"><img decoding="async" loading="lazy" src="'+src+'">'+(i%4===0?multiSvg:'')+'</div>';

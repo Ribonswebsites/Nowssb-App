@@ -1776,3 +1776,28 @@ body.nwsb-soc-glass #sub-ig-profile .ig-tile {
   box-shadow: 5px 5px 12px rgba(80,90,140,0.16), -3px -3px 9px rgba(255,255,255,0.85),
               inset 1.5px 1.5px 2px rgba(255,255,255,0.9) !important;
 }
+
+/* ── Empty grid state ("Share Photos") — neumorphic placeholder ── */
+body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-empty-ico {
+  width: 78px; height: 78px; margin: 0 auto 18px; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+  background: #f0f2f7; color: #c8a96e;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 13px rgba(255,255,255,0.97),
+              inset 1px 1px 2px rgba(255,255,255,0.6);
+}
+body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-empty-title {
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800; color: #1a1a2e;
+}
+
+/* Glass theme variant — frosted bulge */
+body.nwsb-soc-glass #sub-ig-profile .nwsb-empty-ico {
+  width: 78px; height: 78px; margin: 0 auto 18px; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.5); color: #a8854a;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5); backdrop-filter: blur(14px) saturate(1.5);
+  box-shadow: 6px 6px 14px rgba(80,90,140,0.2), -4px -4px 11px rgba(255,255,255,0.9),
+              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.2);
+}
+body.nwsb-soc-glass #sub-ig-profile .nwsb-empty-title {
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800; color: #1a1a2e;
+}
