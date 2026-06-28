@@ -975,6 +975,18 @@ body.nm-mode #sub-social-home::before { display: none !important; }
 body.nm-mode #sub-people .ig,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig { background: #f0f2f7 !important; }
 
+/* ── KILL THE DARK BAND BEHIND THE BOTTOM NAV ──
+   .sub-screen base bg is #060c18 and #sub-ig-profile is #000.  The scroll
+   inside has a tall bottom padding, so that dark colour bleeds through under
+   and just above the bottom nav as a "shadow / vignette".  The social section
+   is always a LIGHT surface (neumorphic or bright glass), so paint every
+   social sub-screen light — no dark band, nav icons fully visible. */
+#sub-ig-profile,
+#sub-ig-feed,
+#sub-people,
+#sub-social-home,
+#sub-reels-feed { background: #eef1f6 !important; }
+
 /* Top bar */
 body.nm-mode #sub-people .ig-topbar,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar,
@@ -992,9 +1004,14 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-iconbtn svg { color: #1a1a2e !impo
 body.nm-mode #sub-people .ig-topbar img,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar img,
 body.nm-mode #sub-social-home .ig-topbar img { filter: brightness(0) opacity(0.82) !important; }
-/* the verified badge must keep its true colours in the header (not be blackened) */
-#sub-ig-profile .ig-topbar .ig-vbadge img,
-body.nwsb-soc-glass #sub-ig-profile .ig-topbar .ig-vbadge img { filter: none !important; opacity: 1 !important; }
+/* the verified badge must keep its true colours in the header (not be blackened).
+   Needs higher specificity than the .ig-topbar img blackening rule above. */
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar .ig-vbadge img,
+body.nwsb-soc-glass #sub-ig-profile .ig-topbar .ig-vbadge img,
+body #sub-people .ig-topbar .ig-vbadge img,
+body #sub-social-home .ig-topbar .ig-vbadge img { filter: none !important; opacity: 1 !important; }
+/* the neumorphic circle wrapper of the header badge */
+#sub-ig-profile .ig-topbar .ig-vbadge { vertical-align: middle !important; }
 
 /* Search */
 body.nm-mode #sub-people .ig-searchwrap { background: #f0f2f7 !important; }

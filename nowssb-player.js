@@ -66,12 +66,23 @@
     var recBars = '';
     for (var r = 0; r < 26; r++) recBars += '<div class="sp-rec-bar" style="height:4px"></div>';
 
+    /* the practice player's own image icons */
+    var ICO_PLAY  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png';
+    var ICO_PREV  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/00f0e8d0-5dec-11f1-9e1a-9303081e5fda_xnc4lk.png';
+    var ICO_NEXT  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/02b2b8b0-5dec-11f1-9e1a-9303081e5fda_qkq4dq.png';
+    var ICO_SET   = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/018b2fc0-5dec-11f1-9e1a-9303081e5fda_ccsoef.png';
     var playIco = playing
-      ? '<svg width="20" height="22" viewBox="0 0 16 18" fill="none"><rect x="2" y="1" width="4" height="16" rx="1.5" fill="#fff"/><rect x="10" y="1" width="4" height="16" rx="1.5" fill="#fff"/></svg>'
-      : '<svg width="22" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';
+      ? '<svg width="22" height="24" viewBox="0 0 16 18" fill="none"><rect x="2" y="1" width="4" height="16" rx="1.5" fill="#fff"/><rect x="10" y="1" width="4" height="16" rx="1.5" fill="#fff"/></svg>'
+      : '<img class="lgp-ico" src="' + ICO_PLAY + '" alt="">';
 
-    var prevSvg = '<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M6 6h2v12H6zM20 6v12L9 12z"/></svg>';
-    var nextSvg = '<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M16 6h2v12h-2zM4 6l11 6L4 18z"/></svg>';
+    var prevSvg = '<img class="lgp-ico" src="' + ICO_PREV + '" alt="" style="transform:scaleX(-1)">';
+    var nextSvg = '<img class="lgp-ico" src="' + ICO_NEXT + '" alt="">';
+
+    /* Library (left) + Replay (right) flank the transport */
+    var libSvg = '<svg width="23" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5v14M9 5v14M14 6l5 13M14 19l-5-14"/></svg>';
+    var replaySvg = '<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>';
+    var libBtn = '<button class="lgp-side" onclick="lgpToggleArc&&document.getElementById(\'lgpArc\')&&document.getElementById(\'lgpArc\').classList.remove(\'open\');openWalkmanLib&&openWalkmanLib()" aria-label="Library">' + libSvg + '<span>Library</span></button>';
+    var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
     /* central waveform = the pair's looping video */
     var visual = th.video
@@ -84,9 +95,13 @@
         '<div id="spPhaseIdlePlay" style="display:' + ((phase === 'idle' || phase === 'playing') ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:10px;width:100%;">' +
           '<div class="lgp-status" id="spAutoStatus">' + (phase === 'playing' ? 'Listening…' : 'Tap ▸ to listen') + '</div>' +
           '<div class="lgp-controls">' +
-            '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-            '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" onclick="pwTogglePlay&&pwTogglePlay()">' + playIco + '</button>' +
-            '<button class="lgp-ctrl" id="lgpNext" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
+            libBtn +
+            '<div class="lgp-transport">' +
+              '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
+              '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" onclick="pwTogglePlay&&pwTogglePlay()">' + playIco + '</button>' +
+              '<button class="lgp-ctrl" id="lgpNext" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
+            '</div>' +
+            replayBtn +
           '</div>' +
           '<button class="lgp-mic" onclick="pwPracticeNow&&pwPracticeNow()">🎙 Practice this word</button>' +
         '</div>' +
@@ -120,14 +135,14 @@
         '<div style="display:none;"><button id="spRecBtn"></button><div id="spRecLabel"></div><div id="spRecStatus"></div><button id="spRecPlayBtn"></button><button id="spRecTrashBtn"></button><div id="spRecControls"></div><div id="spWaveform"></div><div id="sp3BtnMain"></div><span id="sp3BtnLbl"></span><div id="sp3BtnIco"></div></div>' +
       '</div>';
 
-    /* curved liquid-glass ARC — slides up when you tap Settings (camera-dial style) */
-    var gridSvg = '<svg width="24" height="22" viewBox="0 0 16 14" fill="none" stroke="#fff" stroke-width="1.5"><rect x="0" y="0" width="6" height="6"/><rect x="10" y="0" width="6" height="6"/><rect x="0" y="9" width="6" height="5"/><rect x="10" y="9" width="6" height="5"/></svg>';
-    var replaySvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 12a9 9 0 109-9 9 9 0 00-7 3.3M3 4v4h4"/></svg>';
+    /* curved liquid-glass ARC — slides up when you tap Settings (camera-dial style).
+       Library + Replay now live in the transport row, so the arc is settings only. */
     var arc =
       '<div class="lgp-arc" id="lgpArc">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
         '<div class="lgp-arc-sheet">' +
           '<div class="lgp-arc-handle"></div>' +
+          '<div class="lgp-arc-title">Settings</div>' +
           '<div class="lgp-arc-row"><span>Voice</span><div class="lgp-arc-seg">' +
             '<button class="' + (voice === 'F' ? 'on' : '') + '" onclick="pwSetVoice&&pwSetVoice(\'F\');renderPractice&&renderPractice()">Female</button>' +
             '<button class="' + (voice === 'M' ? 'on' : '') + '" onclick="pwSetVoice&&pwSetVoice(\'M\');renderPractice&&renderPractice()">Male</button>' +
@@ -135,7 +150,7 @@
           '<div class="lgp-arc-row" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()"><span>Loop</span><b>' + (loop ? 'On' : 'Off') + '</b></div>' +
           '<div class="lgp-arc-row" onclick="pwCycleRepTarget&&pwCycleRepTarget();renderPractice&&renderPractice()"><span>Reps</span><b>' + repTarget + '×</b></div>' +
           '<div class="lgp-arc-actions">' +
-            '<button onclick="lgpToggleArc();openWalkmanLib&&openWalkmanLib()">' + gridSvg + '<span>Library</span></button>' +
+            '<button onclick="lgpToggleArc();openWalkmanLib&&openWalkmanLib()">' + libSvg + '<span>Library</span></button>' +
             '<button onclick="lgpToggleArc();if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()">' + replaySvg + '<span>Replay</span></button>' +
           '</div>' +
         '</div>' +
