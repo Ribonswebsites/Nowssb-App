@@ -384,43 +384,80 @@
       var heart='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>';
       var comment='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg>';
       var send='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+      var save='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
+      var pin='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="1.9" style="margin-right:4px;vertical-align:-2px;"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+
+      var CAPTIONS=['Every sound is a step closer. 🙏','Word without dictionary. Frequency is truth.','Morning ritual complete. ✨','Healing through natural origin sound.','The vibration before the meaning.','Practice over perfection. 🎧','Tuned in, tuned up.','Sound is medicine.','Found my frequency today.','Breath. Sound. Stillness.'];
+      var LOCS=['Rishikesh, India','Studio · NowssB','Himalayas','','Bali, Indonesia','','Sound Lab','Varanasi, India','',''];
+      function likeCount(i){ return 137 + (i*53)%900 + ((i*7)%9)*11; }
+      function commafy(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
       var cards = imgs.map(function(src,i){
+        var multi = (i % 4 === 0) && imgs.length > 2;
+        var postImgs = multi ? [src, imgs[(i+1)%imgs.length], imgs[(i+2)%imgs.length]] : [src];
+        var slides = postImgs.map(function(s){ return '<div class="nwsb-pv-slide"><img class="nwsb-pv-img" src="'+s+'" alt="" loading="lazy"></div>'; }).join('');
+        var dots = multi ? '<div class="nwsb-pv-dots">'+postImgs.map(function(_,d){return '<span class="nwsb-pv-dot'+(d===0?' on':'')+'"></span>';}).join('')+'</div>' : '';
+        var loc = LOCS[i % LOCS.length];
+        var cap = CAPTIONS[i % CAPTIONS.length];
         return '<div class="nwsb-pv-card" id="nwsb-pv-card-'+i+'">'+
-            '<div class="nwsb-pv-head">'+avHtml+
-              '<div class="nwsb-pv-meta"><div class="nwsb-pv-name">'+name+'</div>'+(uname?'<div class="nwsb-pv-uname">'+uname+'</div>':'')+'</div>'+
-            '</div>'+
-            '<div class="nwsb-pv-imgwrap"><img class="nwsb-pv-img" src="'+src+'" alt="" loading="lazy"></div>'+
-            '<div class="nwsb-pv-actions"><button class="nwsb-pv-act">'+heart+'</button><button class="nwsb-pv-act">'+comment+'</button><button class="nwsb-pv-act">'+send+'</button></div>'+
+            (loc ? '<div class="nwsb-pv-loc">'+pin+loc+'</div>' : '')+
+            '<div class="nwsb-pv-carousel'+(multi?' multi':'')+'">'+slides+'</div>'+
+            dots+
+            '<div class="nwsb-pv-actions"><button class="nwsb-pv-act">'+heart+'</button><button class="nwsb-pv-act">'+comment+'</button><button class="nwsb-pv-act">'+send+'</button><span class="nwsb-pv-spacer"></span><button class="nwsb-pv-act">'+save+'</button></div>'+
+            '<div class="nwsb-pv-likes">'+commafy(likeCount(i))+' likes</div>'+
+            '<div class="nwsb-pv-caption"><b>'+name+'</b> '+cap+'</div>'+
           '</div>';
       }).join('');
 
       var css = '#nwsb-postviewer{position:fixed;inset:0;z-index:100000;background:#eef0f5;display:flex;flex-direction:column;}'+
         '#nwsb-postviewer *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
-        '.nwsb-pv-top{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top,14px),14px) 18px 14px;background:#eef0f5;box-shadow:0 4px 16px rgba(0,0,0,.07);flex-shrink:0;}'+
-        '.nwsb-pv-title{font-size:17px;font-weight:800;color:#1a1a2e;}'+
-        '.nwsb-pv-close{width:42px;height:42px;border:none;border-radius:50%!important;background:#eef0f5;color:#1a1a2e;font-size:22px;line-height:1;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.13),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
+        '.nwsb-pv-top{position:sticky;top:0;display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 16px 14px;background:#eef0f5;box-shadow:0 4px 16px rgba(0,0,0,.07);flex-shrink:0;}'+
+        '.nwsb-pv-topmeta{flex:1;min-width:0;}'+
+        '.nwsb-pv-close{width:42px;height:42px;border:none;border-radius:50%!important;background:#eef0f5;color:#1a1a2e;font-size:22px;line-height:1;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.13),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;flex-shrink:0;}'+
         '.nwsb-pv-close:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
         '.nwsb-pv-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(env(safe-area-inset-bottom,20px) + 26px);}'+
         '.nwsb-pv-card{background:#eef0f5;border-radius:22px!important;margin-bottom:18px;padding:14px;box-shadow:7px 7px 18px rgba(0,0,0,.12),-5px -5px 14px rgba(255,255,255,.97);}'+
-        '.nwsb-pv-head{display:flex;align-items:center;gap:12px;margin-bottom:13px;}'+
         '.nwsb-pv-av{width:46px;height:46px;border-radius:50%!important;background-size:cover;background-position:center;background-repeat:no-repeat;flex-shrink:0;box-shadow:4px 4px 10px rgba(0,0,0,.14),-3px -3px 8px rgba(255,255,255,.95);}'+
         '.nwsb-pv-av-init{display:flex;align-items:center;justify-content:center;background:#e6e9f1;color:#c8a96e;font-weight:800;font-size:18px;}'+
-        '.nwsb-pv-name{font-size:15px;font-weight:700;color:#1a1a2e;}'+
+        '.nwsb-pv-name{font-size:15px;font-weight:700;color:#1a1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}'+
         '.nwsb-pv-uname{font-size:12px;color:rgba(0,0,0,.45);margin-top:1px;}'+
-        '.nwsb-pv-imgwrap{border-radius:16px!important;overflow:hidden;}'+
+        '.nwsb-pv-loc{font-size:12px;color:rgba(0,0,0,.55);font-weight:600;margin-bottom:10px;}'+
+        '.nwsb-pv-carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;border-radius:16px!important;scrollbar-width:none;}'+
+        '.nwsb-pv-carousel::-webkit-scrollbar{display:none;}'+
+        '.nwsb-pv-slide{flex:0 0 100%;scroll-snap-align:center;}'+
         '.nwsb-pv-img{width:100%;display:block;border-radius:16px!important;}'+
-        '.nwsb-pv-actions{display:flex;gap:12px;margin-top:14px;}'+
+        '.nwsb-pv-dots{display:flex;align-items:center;justify-content:center;gap:5px;margin:10px 0 2px;}'+
+        '.nwsb-pv-dot{width:6px;height:6px;border-radius:50%!important;background:rgba(0,0,0,.18);transition:background .2s,transform .2s;}'+
+        '.nwsb-pv-dot.on{background:#c8a96e;transform:scale(1.25);}'+
+        '.nwsb-pv-actions{display:flex;align-items:center;gap:12px;margin-top:14px;}'+
+        '.nwsb-pv-spacer{flex:1;}'+
         '.nwsb-pv-act{width:44px;height:44px;border:none;border-radius:50%!important;background:#eef0f5;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.12),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
-        '.nwsb-pv-act:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}';
+        '.nwsb-pv-act:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
+        '.nwsb-pv-likes{font-size:13px;font-weight:700;color:#1a1a2e;margin-top:13px;}'+
+        '.nwsb-pv-caption{font-size:13px;color:#1a1a2e;line-height:1.45;margin-top:4px;}'+
+        '.nwsb-pv-caption b{font-weight:700;}';
 
       var old=document.getElementById('nwsb-postviewer'); if(old) old.remove();
       var ov=document.createElement('div');
       ov.id='nwsb-postviewer';
       ov.innerHTML='<style>'+css+'</style>'+
-        '<div class="nwsb-pv-top"><div class="nwsb-pv-title">Posts</div><button class="nwsb-pv-close" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-postviewer\');if(p)p.remove();">&times;</button></div>'+
+        '<div class="nwsb-pv-top">'+avHtml+
+          '<div class="nwsb-pv-topmeta"><div class="nwsb-pv-name">'+name+'</div>'+(uname?'<div class="nwsb-pv-uname">'+uname+'</div>':'')+'</div>'+
+          '<button class="nwsb-pv-close" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-postviewer\');if(p)p.remove();">&times;</button>'+
+        '</div>'+
         '<div class="nwsb-pv-scroll" id="nwsb-pv-scroll">'+cards+'</div>';
       document.body.appendChild(ov);
+      // carousel dots follow horizontal scroll
+      Array.prototype.forEach.call(ov.querySelectorAll('.nwsb-pv-carousel.multi'), function(car){
+        car.addEventListener('scroll', function(){
+          var w = car.clientWidth || 1;
+          var cur = Math.round(car.scrollLeft / w);
+          var dotbox = car.nextElementSibling;
+          if(dotbox && dotbox.classList.contains('nwsb-pv-dots')){
+            Array.prototype.forEach.call(dotbox.children, function(d,di){ d.classList.toggle('on', di===cur); });
+          }
+        }, {passive:true});
+      });
       setTimeout(function(){
         var t=document.getElementById('nwsb-pv-card-'+idx), sc=document.getElementById('nwsb-pv-scroll');
         if(t&&sc) sc.scrollTop = t.offsetTop - 6;
