@@ -307,10 +307,10 @@
 /* Evolution / origin imagery banner inside the cube */
 .nwsb-hero-img {
   position: relative;
-  height: 132px;
+  height: 150px;
   background:
-    linear-gradient(to bottom, rgba(6,12,24,.15) 0%, rgba(6,12,24,.55) 60%, #060c18 100%),
-    url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778922166/grok_image_1778922009415_qtoteo.jpg') center 60% / 160% auto no-repeat;
+    linear-gradient(to bottom, rgba(6,12,24,.05) 0%, rgba(6,12,24,.3) 62%, #060c18 100%),
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782596093/a831d350-726f-11f1-a85a-7f29a6214ded_2_odmhwg.png') center / cover no-repeat;
 }
 
 .nwsb-hero-body {
