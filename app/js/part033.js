@@ -54,7 +54,7 @@
     var html='';
     for(var i=0;i<30;i++){
       var tall = (i%7===2); // instagram-like tall tiles
-      html += '<div class="ig-tile'+(tall?' tall':'')+'" onclick="IG.openExplorePost('+i+')">'+
+      html += '<div class="ig-tile'+(tall?' tall':'')+'" onclick="IG.openExplorePost(this)">'+
         '<img decoding="async" loading="lazy" src="'+img('ex'+i, 500, tall?1000:500)+'">'+
         (i%5===0?multiSvg:'')+'</div>';
     }
@@ -191,7 +191,7 @@
       g.innerHTML = '<div class="nwsb-empty-grid" style="grid-column:1/4;text-align:center;padding:50px 0;"><div class="nwsb-empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="nwsb-empty-title">Share Photos</div></div>';
     } else {
       g.innerHTML = p.grid.map(function(src,i){
-        return '<div class="ig-tile" onclick="IG.openExplorePost('+i+')"><img decoding="async" loading="lazy" src="'+src+'">'+(i%4===0?multiSvg:'')+'</div>';
+        return '<div class="ig-tile" onclick="IG.openExplorePost(this)"><img decoding="async" loading="lazy" src="'+src+'">'+(i%4===0?multiSvg:'')+'</div>';
       }).join('');
     }
     profTab('grid');
@@ -210,7 +210,7 @@
     var g=document.getElementById('ig-prof-grid'); if(!g||!p) return;
     if(!p.posts||!(p.grid&&p.grid.length)) return; // empty state already there
     g.innerHTML = p.grid.map(function(src,i){
-      return '<div class="ig-tile" onclick="IG.openExplorePost('+i+')"><img decoding="async" loading="lazy" src="'+src+'">'+(i%4===0?multiSvg:'')+'</div>';
+      return '<div class="ig-tile" onclick="IG.openExplorePost(this)"><img decoding="async" loading="lazy" src="'+src+'">'+(i%4===0?multiSvg:'')+'</div>';
     }).join('');
   }
 
@@ -363,7 +363,20 @@
       if(typeof ssOpenChat==='function'){ /* could integrate */ }
       (window.nwsbToast||window.alert)('Messaging — coming soon');
     },
-    openExplorePost:function(){ (window.nwsbToast||window.alert)('Post viewer — coming soon'); },
+    openExplorePost:function(el){
+      // Resolve the image src from the tapped tile (or a raw src string)
+      var src = (el && el.querySelector) ? ((el.querySelector('img')||{}).src || '') : el;
+      if(!src) return;
+      var old = document.getElementById('nwsb-lightbox'); if(old) old.remove();
+      var lb = document.createElement('div');
+      lb.id = 'nwsb-lightbox';
+      lb.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(6,12,24,.95);display:flex;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);';
+      lb.innerHTML =
+        '<img src="'+src+'" alt="" style="max-width:94%;max-height:84%;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);object-fit:contain;">'+
+        '<button aria-label="Close" style="position:absolute;top:max(env(safe-area-inset-top,18px),18px);right:18px;width:42px;height:42px;border:none;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);">&times;</button>';
+      lb.addEventListener('click', function(){ lb.remove(); });
+      document.body.appendChild(lb);
+    },
     showFollowers:function(){ (window.nwsbToast||window.alert)('Followers list — coming soon'); },
     editProfile:function(){
       if(typeof openSub==='function'){ openSub('social'); if(typeof ssOpenPanel==='function') setTimeout(function(){ssOpenPanel('profile-edit');},120); }
