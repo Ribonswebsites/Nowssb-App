@@ -66,21 +66,21 @@
     var recBars = '';
     for (var r = 0; r < 26; r++) recBars += '<div class="sp-rec-bar" style="height:4px"></div>';
 
-    /* the practice player's own image icons */
-    var ICO_PLAY  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png';
-    var ICO_PREV  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/00f0e8d0-5dec-11f1-9e1a-9303081e5fda_xnc4lk.png';
-    var ICO_NEXT  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/02b2b8b0-5dec-11f1-9e1a-9303081e5fda_qkq4dq.png';
-    var ICO_SET   = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/018b2fc0-5dec-11f1-9e1a-9303081e5fda_ccsoef.png';
+    /* the practice player's own image icon (the headphone play orb) */
+    var ICO_PLAY = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png';
+    /* the Library icon image already used in the app's bottom nav */
+    var ICO_LIB  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png';
     var playIco = playing
       ? '<svg width="22" height="24" viewBox="0 0 16 18" fill="none"><rect x="2" y="1" width="4" height="16" rx="1.5" fill="#fff"/><rect x="10" y="1" width="4" height="16" rx="1.5" fill="#fff"/></svg>'
       : '<img class="lgp-ico" src="' + ICO_PLAY + '" alt="">';
 
-    var prevSvg = '<img class="lgp-ico" src="' + ICO_PREV + '" alt="" style="transform:scaleX(-1)">';
-    var nextSvg = '<img class="lgp-ico" src="' + ICO_NEXT + '" alt="">';
+    /* prev / next — clean skip glyphs (no valid image icon exists for these) */
+    var prevSvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 6h2.2v12H6zM20 6v12L9.5 12z"/></svg>';
+    var nextSvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M15.8 6H18v12h-2.2zM4 6l10.5 6L4 18z"/></svg>';
 
-    /* Library (left) + Replay (right) flank the transport */
-    var libSvg = '<svg width="23" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5v14M9 5v14M14 6l5 13M14 19l-5-14"/></svg>';
-    var replaySvg = '<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>';
+    /* Library (left, image icon) + Replay (right) flank the transport */
+    var replaySvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>';
+    var libSvg = '<img class="lgp-side-ico" src="' + ICO_LIB + '" alt="">';
     var libBtn = '<button class="lgp-side" onclick="lgpToggleArc&&document.getElementById(\'lgpArc\')&&document.getElementById(\'lgpArc\').classList.remove(\'open\');openWalkmanLib&&openWalkmanLib()" aria-label="Library">' + libSvg + '<span>Library</span></button>';
     var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
