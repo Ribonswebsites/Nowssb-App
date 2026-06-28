@@ -1,0 +1,130 @@
+/* ═══════════════════════════════════════════════════════════════
+   NowssB — LIQUID GLASS PLAYER (subscriber skin for the practice player)
+   6 background themes rotate per word; all practice features preserved,
+   re-skinned into a premium liquid-glass UI.
+   Scoped to body.nwsb-lg so the free/normal player is untouched.
+═══════════════════════════════════════════════════════════════ */
+
+/* hide the default video/photo backdrop — themes replace it */
+body.nwsb-lg #sub-practice .sp-bg-img,
+body.nwsb-lg #sub-practice .sp-bg-video,
+body.nwsb-lg #sub-practice .sp-bg-overlay,
+body.nwsb-lg #sub-practice .sp-bg-glow { display: none !important; }
+
+body.nwsb-lg #sub-practice .sp-player {
+  position: relative !important;
+  background: var(--lg-bg, linear-gradient(160deg,#06323e,#1ba0b5)) center/cover no-repeat !important;
+  transition: background-image .9s ease, background .9s ease !important;
+}
+/* readability + glass haze over the theme */
+body.nwsb-lg #sub-practice .sp-player::before {
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,.10), transparent 55%),
+    linear-gradient(180deg, rgba(6,10,25,.30) 0%, rgba(6,10,25,.46) 55%, rgba(6,10,25,.66) 100%);
+}
+
+/* ── the 6 rotating themes ── */
+body.nwsb-lg #sub-practice .sp-player.lg-t1 { --lg-bg:linear-gradient(160deg,#06323e 0%,#0e6f81 50%,#1ba6bb 100%); --lg-accent:#5ff0e0; }
+body.nwsb-lg #sub-practice .sp-player.lg-t2 { --lg-bg:linear-gradient(160deg,#1a0033 0%,#34106a 50%,#5a23a6 100%); --lg-accent:#bd7bff; }
+body.nwsb-lg #sub-practice .sp-player.lg-t3 { --lg-bg:linear-gradient(160deg,#0a1a3a 0%,#244a86 50%,#3f7bd2 100%); --lg-accent:#a6dcff; }
+body.nwsb-lg #sub-practice .sp-player.lg-t4 { --lg-bg:url('assets/player/t-cosmic.jpg');   --lg-accent:#9bb8ff; }
+body.nwsb-lg #sub-practice .sp-player.lg-t5 { --lg-bg:url('assets/player/t-mountain.jpg'); --lg-accent:#cfdcff; }
+body.nwsb-lg #sub-practice .sp-player.lg-t6 { --lg-bg:url('assets/player/t-wave.jpg');     --lg-accent:#7fe9da; }
+
+/* ── top bar / brand ── */
+body.nwsb-lg #sub-practice .sp-topbar { position:relative; z-index:10; }
+body.nwsb-lg #sub-practice .sp-topbar-label {
+  font-weight:700 !important; letter-spacing:.5px !important; color:rgba(255,255,255,.85) !important;
+  text-shadow:0 1px 10px rgba(0,0,0,.5) !important;
+}
+
+/* ── word hero ── */
+body.nwsb-lg #sub-practice .sp-origin-pill {
+  background:rgba(255,255,255,.14) !important; border:1px solid rgba(255,255,255,.32) !important;
+  color:#fff !important; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+  box-shadow:0 4px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.4) !important;
+}
+body.nwsb-lg #sub-practice .sp-word-title {
+  color:#fff !important; text-shadow:0 2px 24px rgba(0,0,0,.45), 0 0 30px var(--lg-accent) !important;
+}
+body.nwsb-lg #sub-practice .sp-syl-chip {
+  background:rgba(255,255,255,.16) !important; border:1px solid rgba(255,255,255,.34) !important;
+  color:#fff !important; -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4);
+  box-shadow:0 6px 20px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.45) !important;
+}
+body.nwsb-lg #sub-practice .sp-syl-chip.active {
+  background:rgba(255,255,255,.4) !important; color:#10202e !important;
+  box-shadow:0 0 24px var(--lg-accent), inset 0 1px 0 rgba(255,255,255,.7) !important;
+}
+body.nwsb-lg #sub-practice .sp-syl-dot { color:rgba(255,255,255,.6) !important; }
+body.nwsb-lg #sub-practice .sp-tag {
+  background:rgba(255,255,255,.12) !important; border:1px solid rgba(255,255,255,.28) !important;
+  color:rgba(255,255,255,.92) !important; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+}
+
+/* ── the disc → liquid-glass orb ── */
+body.nwsb-lg #sub-practice .sp-glass-ring {
+  background:rgba(255,255,255,.10) !important;
+  border:1px solid rgba(255,255,255,.30) !important;
+  -webkit-backdrop-filter:blur(26px) saturate(1.7); backdrop-filter:blur(26px) saturate(1.7);
+  box-shadow:0 24px 70px rgba(0,0,0,.45),
+             0 0 60px -8px var(--lg-accent),
+             inset 0 2px 1px rgba(255,255,255,.5),
+             inset 0 -10px 30px rgba(0,0,0,.25) !important;
+}
+body.nwsb-lg #sub-practice .sp-glass-ring.playing {
+  box-shadow:0 24px 80px rgba(0,0,0,.5),
+             0 0 90px -4px var(--lg-accent),
+             inset 0 2px 1px rgba(255,255,255,.6),
+             inset 0 -10px 30px rgba(0,0,0,.25) !important;
+}
+body.nwsb-lg #sub-practice .sp-wm-ripple,
+body.nwsb-lg #sub-practice .sp-wm-ripple2 { border-color:var(--lg-accent) !important; }
+
+/* ── waveform → liquid chrome ── */
+body.nwsb-lg #sub-practice .sp-rec-bar {
+  background:linear-gradient(to top, var(--lg-accent), #ffffff) !important;
+  box-shadow:0 0 8px var(--lg-accent) !important;
+  border-radius:6px !important;
+}
+body.nwsb-lg #sub-practice .sp-waveform-strip,
+body.nwsb-lg #sub-practice .sp-rec-waveform {
+  filter:drop-shadow(0 0 10px var(--lg-accent)) !important;
+}
+body.nwsb-lg #sub-practice .sp-wm-arc { stroke:var(--lg-accent) !important; }
+body.nwsb-lg #sub-practice .sp-wm-dial { border-color:rgba(255,255,255,.5) !important; }
+body.nwsb-lg #sub-practice .sp-wm-groove { border-color:rgba(255,255,255,.14) !important; }
+
+/* ── play / control / voice buttons → glass ── */
+body.nwsb-lg #sub-practice .sp-play-orb,
+body.nwsb-lg #sub-practice .sp-transport-icon-circle,
+body.nwsb-lg #sub-practice .sp-voice-btn {
+  background:rgba(255,255,255,.14) !important;
+  border:1px solid rgba(255,255,255,.34) !important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
+  box-shadow:0 12px 34px rgba(0,0,0,.4), 0 0 40px -10px var(--lg-accent), inset 0 1px 0 rgba(255,255,255,.5) !important;
+  color:#fff !important;
+}
+body.nwsb-lg #sub-practice .sp-play-orb { box-shadow:0 16px 44px rgba(0,0,0,.45), 0 0 56px -6px var(--lg-accent), inset 0 2px 1px rgba(255,255,255,.6) !important; }
+body.nwsb-lg #sub-practice .sp-play-orb:active,
+body.nwsb-lg #sub-practice .sp-transport-icon-circle:active { transform:scale(.94); }
+body.nwsb-lg #sub-practice .sp-play-orb svg,
+body.nwsb-lg #sub-practice .sp-transport-icon-circle svg,
+body.nwsb-lg #sub-practice .sp-voice-btn svg { stroke:#fff !important; fill:#fff !important; }
+body.nwsb-lg #sub-practice .sp-transport-side-label,
+body.nwsb-lg #sub-practice .sp-auto-status,
+body.nwsb-lg #sub-practice .sp-practice-cta { color:rgba(255,255,255,.9) !important; text-shadow:0 1px 8px rgba(0,0,0,.4) !important; }
+
+/* recording compare hint / waveform strip text */
+body.nwsb-lg #sub-practice .sp-rec-compare-hint { color:rgba(255,255,255,.82) !important; }
+
+/* subtle floating glass orbs for atmosphere */
+body.nwsb-lg #sub-practice .sp-player::after {
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
+  background-image:
+    radial-gradient(circle 5px at 18% 30%, rgba(255,255,255,.6), transparent 60%),
+    radial-gradient(circle 3px at 72% 22%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(circle 4px at 84% 64%, rgba(255,255,255,.45), transparent 60%),
+    radial-gradient(circle 2px at 30% 78%, rgba(255,255,255,.5), transparent 60%);
+}
