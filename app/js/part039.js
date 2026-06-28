@@ -383,6 +383,13 @@ window.CHAT = (function(){
   }
 
   return {
+    openPeerProfile: function(){
+      var u = _currentUser; if(!u) return;
+      this.close();
+      setTimeout(function(){
+        if(window.IG && typeof IG.openProfile==='function') IG.openProfile(u);
+      }, 140);
+    },
     open: function(user){
       _currentUser = user;
       window._chatCurrentUser = user;

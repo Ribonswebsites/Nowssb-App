@@ -46,8 +46,8 @@
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js"></script>
 <link rel="stylesheet" href="app/app.css">
-<link rel="stylesheet" href="nowssb-social.css?v=40">
-<link rel="stylesheet" href="nowssb-nm.css?v=40">
+<link rel="stylesheet" href="nowssb-social.css?v=41">
+<link rel="stylesheet" href="nowssb-nm.css?v=41">
 </head>
 <body>
 <script src="app/js/part002.js"></script>
@@ -6458,8 +6458,8 @@
       <button style="background:none;border:none;color:#fff;cursor:pointer;padding:0;" onclick="CHAT.close()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </button>
-      <img loading="lazy" decoding="async" class="chat-av" id="chatTopAv" src="" alt="">
-      <div style="flex:1;">
+      <img loading="lazy" decoding="async" class="chat-av" id="chatTopAv" src="" alt="" style="cursor:pointer;" onclick="if(window.CHAT)CHAT.openPeerProfile()">
+      <div style="flex:1;cursor:pointer;" onclick="if(window.CHAT)CHAT.openPeerProfile()">
         <div class="chat-user-name" id="chatTopName">—</div>
         <div class="chat-user-rank" id="chatTopRank">Practitioner</div>
       </div>
@@ -6962,8 +6962,8 @@
 </div>
 
 <script src="app/js/part049.js"></script>
-<script src="nowssb-social.js?v=40" defer></script>
-<script src="nowssb-nm.js?v=40" defer></script>
+<script src="nowssb-social.js?v=41" defer></script>
+<script src="nowssb-nm.js?v=41" defer></script>
 
 </body>
 </html>

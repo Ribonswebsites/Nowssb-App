@@ -304,7 +304,13 @@
       var sc=document.getElementById('ig-prof-scroll'); if(sc) sc.scrollTop=0;
     },
     openProfile:function(id){
-      var p=PEOPLE.find(function(x){return x.id===id;});
+      // Accept a numeric/string id OR a full user object (e.g. from chat).
+      var p;
+      if(id && typeof id==='object'){
+        p = PEOPLE.find(function(x){return String(x.id)===String(id.id);}) || id;
+      } else {
+        p = PEOPLE.find(function(x){return String(x.id)===String(id);});
+      }
       if(!p) return;
       this._currentProfile=p;
       renderProfile(p);

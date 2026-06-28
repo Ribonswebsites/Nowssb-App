@@ -1037,6 +1037,8 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-stat .l { color: rgba(0,0,0,0.4) !
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-initials { background: #e6e9f1 !important; color: #c8a96e !important; border: 3px solid #f0f2f7 !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-plan-badge { color: #a8854a !important; background: rgba(200,169,110,0.14) !important; border-color: rgba(200,169,110,0.3) !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-rank { color: rgba(0,0,0,0.45) !important; }
+/* nowssb.com link — was near-white (#e0f1ff), invisible on the light profile */
+#sub-ig-profile .ig-prof-link { color: #3a6ea5 !important; font-weight: 700 !important; }
 
 /* Action buttons */
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.gray,
