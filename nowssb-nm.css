@@ -1469,7 +1469,12 @@ body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !import
 }
 #ss-panel-profile-edit .nwsb-pe-banner {
   background-color: #f0f2f7 !important; border: none !important; border-radius: 18px !important;
-  box-shadow: inset 5px 5px 12px rgba(0,0,0,.13), inset -4px -4px 9px rgba(255,255,255,.92) !important;
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,.08) !important;
+}
+/* Once a banner image is set, drop the inset shadow entirely (the white glow
+   bled onto the dark image) — clean edges. */
+#ss-panel-profile-edit .nwsb-pe-banner[style*="url"] {
+  box-shadow: none !important;
 }
 #ss-panel-profile-edit .nwsb-pe-banner-ico {
   background: #f0f2f7 !important;
@@ -1631,6 +1636,13 @@ body:not(.nwsb-soc-glass) #sub-ig-profile #ig-prof-back {
   left: 14px !important;
   z-index: 25 !important;
   width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
+  /* sits over the dark banner — drop the neumorphic white glow, use a clean dark shadow */
+  background: rgba(255,255,255,0.92) !important;
+  box-shadow: 0 2px 9px rgba(0,0,0,0.32) !important;
+}
+body.nwsb-soc-glass #sub-ig-profile #ig-prof-back {
+  background: rgba(255,255,255,0.92) !important;
+  box-shadow: 0 2px 9px rgba(0,0,0,0.32) !important;
 }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-username {
   min-width: 0 !important;
