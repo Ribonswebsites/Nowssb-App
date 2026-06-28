@@ -324,9 +324,10 @@
 
     box.innerHTML =
       '<div class="nwsb-hero">' +
-        '<div class="nwsb-hero-img"></div>' +
-        '<div class="nwsb-hero-body">' +
+        '<div class="nwsb-hero-img">' +
           '<div class="nwsb-hero-tag">Healing is Fashion</div>' +
+        '</div>' +
+        '<div class="nwsb-hero-body">' +
           '<div class="nwsb-hero-title">Your Stats,<br>Your Frequency.</div>' +
           '<div class="nwsb-hero-sub">NowssB · Word Science' +
             (verifyBadge ? '  <span style="display:inline-flex;align-items:center;gap:4px;color:#e8d5a3;">' + verifyBadge + levelLabel + '</span>' : '') +
