@@ -47,6 +47,30 @@
   var verifiedSvg = '<svg class="ig-verified" viewBox="0 0 24 24" fill="#0095f6"><path d="M12 2l2.3 1.7 2.8-.3 1 2.6 2.5 1.3-.6 2.8 1.4 2.5-1.9 2.1.2 2.8-2.7.9-1.4 2.5-2.8-.5L12 22l-2.6-1.3-2.8.5-1.4-2.5-2.7-.9.2-2.8L.8 12.9l1.4-2.5-.6-2.8 2.5-1.3 1-2.6 2.8.3z"/><path d="M10.5 14.6l-2.3-2.3-1.2 1.2 3.5 3.5 6-6-1.2-1.2z" fill="#fff"/></svg>';
   var multiSvg = '<svg class="ig-multi" width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M16 2H8a2 2 0 00-2 2v0h10a2 2 0 012 2v10a2 2 0 002-2V4a2 2 0 00-2-2z"/><rect x="2" y="6" width="14" height="14" rx="2" fill="none" stroke="#fff" stroke-width="2"/></svg>';
 
+  // ── NowssB Verified — tiers (the headphone check-mark badges) ──
+  var VERIFY_TIERS = [
+    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png', req:['Complete your profile','Reach a 7-day practice streak'], price:'₹199', per:'/mo'},
+    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', req:['30-day practice streak','100 words practiced'], price:'₹499', per:'/mo'},
+    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', req:['365-day streak','1000 words · 50 sessions'], price:'₹999', per:'/mo'},
+    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', req:['Everything in Gold','Invite-only — or buy the Lifetime Pass'], price:'₹4,999', per:' lifetime'}
+  ];
+  var VERIFY_ORDER = ['', 'blue', 'silver', 'gold', 'diamond'];
+  function verifyTierOf(p){
+    if(p && p.self){
+      try { return localStorage.getItem('nwsb_verify_tier') || (window._userDataCache && window._userDataCache.verifyTier) || ''; } catch(e){ return (window._userDataCache && window._userDataCache.verifyTier) || ''; }
+    }
+    return (p && p.verifyTier) || (p && p.verified ? 'blue' : '');
+  }
+  function verifyBadgeImg(tier, size){
+    for(var i=0;i<VERIFY_TIERS.length;i++){
+      if(VERIFY_TIERS[i].key===tier){
+        size = size || 20;
+        return '<img class="ig-vbadge" src="'+VERIFY_TIERS[i].img+'" alt="'+VERIFY_TIERS[i].name+'" style="width:'+size+'px;height:'+size+'px;border-radius:6px;object-fit:cover;vertical-align:-4px;margin-left:6px;display:inline-block;">';
+      }
+    }
+    return '';
+  }
+
   // ── EXPLORE GRID ──
   function renderExplore(){
     var grid = document.getElementById('ig-explore-grid');
@@ -149,7 +173,11 @@
       var planEl2 = $('ig-prof-plan'); if (planEl2) planEl2.innerHTML = '';
     }
 
-    $('ig-prof-fullname').textContent = p.fullName || '';
+    var fnEl = $('ig-prof-fullname');
+    if(fnEl){
+      var vtier = verifyTierOf(p);
+      fnEl.innerHTML = (p.fullName || '') + (vtier ? '<span style="cursor:pointer" onclick="IG.openVerify()">'+verifyBadgeImg(vtier, 22)+'</span>' : (p.self ? ' <span onclick="IG.openVerify()" style="cursor:pointer;font-size:12px;font-weight:700;color:#a8854a;margin-left:6px;vertical-align:1px;">Get Verified ✓</span>' : ''));
+    }
     $('ig-prof-category').textContent = p.category||'';
     $('ig-prof-biotext').textContent = p.bio||'';
     $('ig-prof-linktext').innerHTML = p.link ? ('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:3px;"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>'+p.link) : '';
@@ -386,6 +414,67 @@
       this._currentProfile=p;
       this.openExplorePost((p.grid&&p.grid[0])||p.avatar);
     },
+    openVerify:function(){
+      var cur='';
+      try{ cur = localStorage.getItem('nwsb_verify_tier') || (window._userDataCache&&window._userDataCache.verifyTier) || ''; }catch(e){}
+      var curName = cur ? (function(){ for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===cur) return VERIFY_TIERS[i].name; } return ''; })() : '';
+      var cards = VERIFY_TIERS.map(function(t){
+        var owned = cur && VERIFY_ORDER.indexOf(cur) >= VERIFY_ORDER.indexOf(t.key);
+        var reqs = t.req.map(function(r){ return '<div class="nwsb-vr-req"><span class="nwsb-vr-tick">✓</span><span>'+r+'</span></div>'; }).join('');
+        return '<div class="nwsb-vr-card'+(t.key==='diamond'?' diamond':'')+'">'+
+            '<div class="nwsb-vr-top"><img class="nwsb-vr-img" src="'+t.img+'" alt=""><div class="nwsb-vr-meta"><div class="nwsb-vr-name">'+t.name+'</div><div class="nwsb-vr-tag">'+t.tag+'</div></div></div>'+
+            '<div class="nwsb-vr-reqs-h">How to get it</div>'+reqs+
+            '<div class="nwsb-vr-buy"><div class="nwsb-vr-price">'+t.price+'<span>'+t.per+'</span></div>'+
+              (owned ? '<button class="nwsb-vr-btn owned" disabled>Owned ✓</button>' : '<button class="nwsb-vr-btn" onclick="IG.buyVerify(\''+t.key+'\')">Get '+t.name+'</button>')+
+            '</div>'+
+          '</div>';
+      }).join('');
+      var css='#nwsb-verify{position:fixed;inset:0;z-index:100001;background:#eef0f5;display:flex;flex-direction:column;}'+
+        '#nwsb-verify *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
+        '#nwsb-verify .nwsb-vr-bar{position:sticky;top:0;display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 16px 14px;background:#eef0f5;box-shadow:0 4px 14px rgba(0,0,0,.07);}'+
+        '#nwsb-verify .nwsb-vr-h{flex:1;font-size:18px;font-weight:800;color:#1a1a2e;}'+
+        '#nwsb-verify .nwsb-vr-x{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;color:#1a1a2e;font-size:22px;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.13),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
+        '#nwsb-verify .nwsb-vr-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(env(safe-area-inset-bottom,20px) + 26px);}'+
+        '#nwsb-verify .nwsb-vr-intro{font-size:13px;color:rgba(0,0,0,.55);line-height:1.5;margin-bottom:6px;}'+
+        '#nwsb-verify .nwsb-vr-cur{font-size:12px;font-weight:700;color:#a8854a;margin-bottom:18px;}'+
+        '#nwsb-verify .nwsb-vr-card{background:#eef0f5;border-radius:22px !important;padding:18px;margin-bottom:16px;box-shadow:7px 7px 18px rgba(0,0,0,.12),-5px -5px 14px rgba(255,255,255,.97);}'+
+        '#nwsb-verify .nwsb-vr-card.diamond{box-shadow:7px 7px 18px rgba(0,0,0,.13),-5px -5px 14px rgba(255,255,255,.97),inset 0 0 0 2px rgba(120,200,232,.45);}'+
+        '#nwsb-verify .nwsb-vr-top{display:flex;align-items:center;gap:14px;margin-bottom:14px;}'+
+        '#nwsb-verify .nwsb-vr-img{width:66px;height:66px;border-radius:16px !important;object-fit:cover;flex-shrink:0;box-shadow:4px 4px 11px rgba(0,0,0,.16),-3px -3px 8px rgba(255,255,255,.9);}'+
+        '#nwsb-verify .nwsb-vr-name{font-size:18px;font-weight:800;color:#1a1a2e;}'+
+        '#nwsb-verify .nwsb-vr-tag{font-size:12px;font-weight:700;color:#a8854a;margin-top:2px;}'+
+        '#nwsb-verify .nwsb-vr-reqs-h{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(0,0,0,.38);margin-bottom:9px;}'+
+        '#nwsb-verify .nwsb-vr-req{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1a1a2e;margin-bottom:6px;line-height:1.4;}'+
+        '#nwsb-verify .nwsb-vr-tick{color:#1aa76a;font-weight:800;flex-shrink:0;}'+
+        '#nwsb-verify .nwsb-vr-buy{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;}'+
+        '#nwsb-verify .nwsb-vr-price{font-size:19px;font-weight:800;color:#1a1a2e;white-space:nowrap;}'+
+        '#nwsb-verify .nwsb-vr-price span{font-size:12px;font-weight:500;color:rgba(0,0,0,.45);}'+
+        '#nwsb-verify .nwsb-vr-btn{border:none;border-radius:14px !important;background:#eef0f5;padding:12px 20px;font-size:14px;font-weight:700;color:#a8854a;cursor:pointer;white-space:nowrap;box-shadow:5px 5px 12px rgba(0,0,0,.13),-3px -3px 9px rgba(255,255,255,.95);}'+
+        '#nwsb-verify .nwsb-vr-btn:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
+        '#nwsb-verify .nwsb-vr-btn.owned{color:#1aa76a;}';
+      var old=document.getElementById('nwsb-verify'); if(old) old.remove();
+      var ov=document.createElement('div');
+      ov.id='nwsb-verify';
+      ov.innerHTML='<style>'+css+'</style>'+
+        '<div class="nwsb-vr-bar"><span class="nwsb-vr-h">NowssB Verified</span><button class="nwsb-vr-x" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-verify\');if(p)p.remove();">&times;</button></div>'+
+        '<div class="nwsb-vr-scroll">'+
+          '<div class="nwsb-vr-intro">Wear the headphone check-mark. Show the world you\'re a real NowssB practitioner — and climb from Blue all the way to Diamond.</div>'+
+          (curName ? '<div class="nwsb-vr-cur">Your badge: '+curName+'</div>' : '<div class="nwsb-vr-cur">You\'re not verified yet</div>')+
+          cards+
+        '</div>';
+      document.body.appendChild(ov);
+    },
+    buyVerify:function(tier){
+      try{ localStorage.setItem('nwsb_verify_tier', tier); }catch(e){}
+      window._userDataCache = window._userDataCache || {};
+      window._userDataCache.verifyTier = tier;
+      if(window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, {verifyTier:tier}).catch(function(){});
+      var nm=''; for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===tier) nm=VERIFY_TIERS[i].name; }
+      if(window.nwsbToast) nwsbToast("You're now "+nm+" verified ✓");
+      var igp=document.getElementById('sub-ig-profile');
+      if(igp && igp.classList.contains('open') && this._currentProfile && this._currentProfile.self) this.openMyProfile();
+      this.openVerify();
+    },
     openMyProfile:function(){
       // sync real user data
       var ud = window._userDataCache;
@@ -555,7 +644,7 @@
       if(typeof openSub==='function'){ openSub('social'); if(typeof ssOpenPanel==='function') setTimeout(function(){ssOpenPanel('profile-edit');},120); }
     },
     shareProfile:function(){ (window.nwsbToast||window.alert)('Share profile — coming soon'); },
-    menu:function(){ (window.nwsbToast||window.alert)('Menu — coming soon'); },
+    menu:function(){ this.openVerify(); },
     refreshNavAvatar:function(){
       var ud = window._userDataCache;
       var DEFAULT_AVATAR = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780065459/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png';
