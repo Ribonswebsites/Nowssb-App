@@ -349,10 +349,10 @@
       /* Image-explainer slots — placeholders for the user's own evolution/origin imagery */
       '<div class="nwsb-section-hd">The New Fashion Trend</div>' +
       '<div class="nwsb-explainer-grid">' +
-        '<div class="nwsb-explainer-slot"><span>Origin</span></div>' +
-        '<div class="nwsb-explainer-slot"><span>Evolution</span></div>' +
-        '<div class="nwsb-explainer-slot"><span>Frequency</span></div>' +
-        '<div class="nwsb-explainer-slot"><span>Healing</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/stats/origin.jpg)"><span>Origin</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/stats/evolution.jpg)"><span>Evolution</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/stats/frequency.jpg)"><span>Frequency</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/stats/healing.jpg)"><span>Healing</span></div>' +
       '</div>' +
 
       (people.length
