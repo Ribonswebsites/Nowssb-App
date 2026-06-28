@@ -1405,6 +1405,11 @@ body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !import
    EDIT PROFILE (social) — follows the App Theme (neo default / glass)
 ═══════════════════════════════════════════════════════════════ */
 
+/* Panel surface — ALWAYS light neumorphism (was dark #060c18, making the
+   dark text invisible in Fashion mode). */
+#ss-panel-profile-edit { background: #f0f2f7 !important; }
+#ss-panel-profile-edit .ss-panel-header { border-bottom-color: rgba(0,0,0,.06) !important; }
+
 /* Text colors (both themes) */
 #ss-panel-profile-edit .ss-panel-title { color: #1a1a2e !important; }
 #ss-panel-profile-edit .ss-panel-sub { color: rgba(0,0,0,.5) !important; }
@@ -1413,6 +1418,13 @@ body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !import
 #ss-panel-profile-edit .slbl { color: rgba(0,0,0,.45) !important; }
 #ss-panel-profile-edit .nwsb-pe-label { color: #1a1a2e !important; }
 #ss-panel-profile-edit .nwsb-pe-banner-txt { color: #a8854a !important; }
+
+/* Inputs — neumorphic inset, always light */
+#ss-panel-profile-edit .ss-input {
+  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important;
+  box-shadow: inset 4px 4px 10px rgba(0,0,0,.12), inset -3px -3px 8px rgba(255,255,255,.95) !important;
+}
+#ss-panel-profile-edit .ss-input::placeholder { color: rgba(0,0,0,.34) !important; }
 
 /* ── NEUMORPHISM (default) ── */
 #ss-panel-profile-edit .nwsb-pe-avatar {

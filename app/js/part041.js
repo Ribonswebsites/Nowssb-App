@@ -36,7 +36,7 @@
       <div>
         <div class="slbl" style="margin-bottom:10px;">BIO</div>
         <textarea id="ss-bio-edit" class="ss-input" rows="4" maxlength="300" placeholder="Tell your healing story..." style="resize:none;height:100px;"></textarea>
-        <div style="text-align:right;font-size:11px;color:rgba(255,255,255,.3);font-family:'DM Sans',sans-serif;margin-top:4px;">300 chars max</div>
+        <div style="text-align:right;font-size:11px;color:rgba(0,0,0,.35);font-family:'DM Sans',sans-serif;margin-top:4px;">300 chars max</div>
       </div>
 
       <!-- Banner -->
