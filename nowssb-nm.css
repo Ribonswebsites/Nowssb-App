@@ -1656,6 +1656,10 @@ body.nwsb-soc-glass #sub-ig-profile .ig {
   background: linear-gradient(165deg, #e9ecf9 0%, #e2e6f4 45%, #efe9f7 100%) !important;
 }
 body.nwsb-soc-glass #sub-ig-profile::before { display: none !important; }
+/* The profile body section (behind avatar/stats/buttons) is #060c18 dark by
+   default — make it transparent so the light glassy backdrop shows through and
+   the frosted panels read as bright glass top-to-bottom, not gray blobs. */
+body.nwsb-soc-glass #sub-ig-profile .ig-prof-top { background: transparent !important; }
 
 /* Top bar → clear frosted glass */
 body.nwsb-soc-glass #sub-ig-profile .ig-topbar {
