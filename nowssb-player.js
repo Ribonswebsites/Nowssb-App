@@ -9,6 +9,20 @@
 (function () {
   var ONLY_SUBSCRIBERS = false; // flip true to gate behind a paid/trial plan
 
+  /* ── Style pairs (image background + waveform video). One per word, rotating.
+     Add each pair as you send it; the player cycles through them by word index. ── */
+  var LGP_THEMES = [
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656918/grok_image_1782656676834_rzp2cz.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656947/grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
+      accent:'#7fe9da' },
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656710977_nj5r6x.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656870/grok_video_2026-06-28-19-55-09_otgbxd.mp4',
+      accent:'#9bb8ff' },
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656704854_cfsah3.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656923/grok_video_2026-06-28-19-55-02_of5fwh.mp4',
+      accent:'#bd7bff' }
+  ];
+
   function isSubscribed() {
     try {
       if (window.GATE && typeof window.GATE.tier === 'function') {
@@ -36,7 +50,7 @@
     var repTarget = ((typeof _pwRepTarget !== 'undefined') ? _pwRepTarget : 7) || 7;
     var repCount = (typeof _pwRepCount !== 'undefined') ? _pwRepCount : 0;
     var repPct = Math.min(100, Math.round((repCount / repTarget) * 100));
-    var theme = (Math.abs(idx) % 6) + 1;
+    var th = LGP_THEMES[Math.abs(idx) % LGP_THEMES.length];
     var hr = new Date().getHours();
     var timeLabel = hr < 10 ? 'Morning' : hr < 13 ? 'Midday' : hr < 17 ? 'Afternoon' : hr < 20 ? 'Evening' : 'Night';
     var ar = (typeof getActiveRoutine === 'function') ? getActiveRoutine() : null;
@@ -57,16 +71,10 @@
     var prevSvg = '<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M6 6h2v12H6zM20 6v12L9 12z"/></svg>';
     var nextSvg = '<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M16 6h2v12h-2zM4 6l11 6L4 18z"/></svg>';
 
-    /* central animated liquid waveform (SVG) — the "live" half of the hybrid */
-    var wave =
-      '<svg class="lgp-wave-svg" viewBox="0 0 240 120" preserveAspectRatio="none">' +
-        '<defs><linearGradient id="lgpGrad" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="var(--lg-accent,#7fe9da)"/>' +
-        '</linearGradient></defs>' +
-        '<path class="lgp-wp lgp-wp1" d="M0,60 Q30,20 60,60 T120,60 T180,60 T240,60 V120 H0 Z"/>' +
-        '<path class="lgp-wp lgp-wp2" d="M0,60 Q30,95 60,60 T120,60 T180,60 T240,60 V120 H0 Z"/>' +
-        '<path class="lgp-wp lgp-wp3" d="M0,62 Q40,30 80,62 T160,62 T240,62"/>' +
-      '</svg>';
+    /* central waveform = the pair's looping video */
+    var visual = th.video
+      ? '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + th.video + '"></video>'
+      : '<div class="lgp-video-fallback"></div>';
 
     /* phase-aware center block — preserves the original IDs so play/record/score work */
     var center =
@@ -111,7 +119,7 @@
       '</div>';
 
     body.innerHTML =
-      '<div class="lgp lg-t' + theme + (playing ? ' playing' : '') + '">' +
+      '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
           '<button class="lgp-back" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
@@ -123,7 +131,7 @@
         '</div>' +
         '<div class="lgp-brand">NowssB</div>' +
         '<div class="lgp-ritual">' + ritual + ' Ritual · ' + (idx + 1) + ' of ' + total + '</div>' +
-        '<div class="lgp-visual">' + wave + '</div>' +
+        '<div class="lgp-visual">' + visual + '</div>' +
         '<div class="lgp-title">' + (w.word || '') + '</div>' +
         '<div class="lgp-syls">' + syl + '</div>' +
         '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
