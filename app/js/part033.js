@@ -282,9 +282,9 @@
         var socialNav = document.getElementById('ig-social-nav');
         if (mainNav) mainNav.style.display = 'none';
         if (socialNav) { socialNav.style.display = 'flex'; }
-        // Open the user's own NowssB profile (Instagram-style)
-        this.openMyProfile();
-        setSocialNavActive('profile');
+        // Land on the Instagram-style Home feed
+        this.openFeed();
+        setSocialNavActive('home');
       } else if(which==='myprofile'){
         closeNavScreens();
         if(typeof openSub==='function') openSub('profile');
@@ -298,6 +298,93 @@
       renderExplore(); this.clearSearch();
       setActiveNav('profile'); showNav(true);
       var sc=document.getElementById('ig-people-scroll'); if(sc) sc.scrollTop=0;
+    },
+    openFeed:function(){
+      var screen=document.getElementById('sub-ig-feed');
+      if(!screen) return;
+      var ud=window._userDataCache||{};
+      var myAv=ud.photoURL||'';
+      var myStory = myAv
+        ? '<div class="nwsbf-story-av" style="background-image:url('+myAv+')"></div>'
+        : '<div class="nwsbf-story-av nwsbf-story-init">+</div>';
+      var stories='<div class="nwsbf-story" onclick="IG.socialNav(\'me\')"><div class="nwsbf-story-ring nwsbf-you">'+myStory+'</div><span>Your Story</span></div>'+
+        PEOPLE.map(function(p){
+          return '<div class="nwsbf-story" onclick="IG.openProfile('+p.id+')"><div class="nwsbf-story-ring"><div class="nwsbf-story-av" style="background-image:url('+p.avatar+')"></div></div><span>'+(p.username||p.fullName)+'</span></div>';
+        }).join('');
+
+      var heart='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>';
+      var comment='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg>';
+      var send='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+      var save='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
+      var chat='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg>';
+      var exitc='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>';
+      var CAPS=['Every sound is a step closer. 🙏','Frequency is truth.','Morning ritual done. ✨','Sound is medicine.','Tuned in, tuned up.','Found my frequency today.','Breath. Sound. Stillness.','Practice over perfection. 🎧'];
+      var LOCS=['Rishikesh, India','Bali','Himalayas','','Varanasi','','Sound Lab',''];
+      function lc(i){ return 137+(i*53)%900; }
+      function cf(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+
+      var posts=PEOPLE.map(function(p,i){
+        var loc=LOCS[i%LOCS.length], cap=CAPS[i%CAPS.length];
+        var src=(p.grid&&p.grid[0])||p.avatar;
+        return '<div class="nwsbf-post">'+
+            '<div class="nwsbf-post-head" onclick="IG.openProfile('+p.id+')">'+
+              '<div class="nwsbf-post-av" style="background-image:url('+p.avatar+')"></div>'+
+              '<div class="nwsbf-post-meta"><div class="nwsbf-post-name">'+(p.username||p.fullName)+'</div>'+(loc?'<div class="nwsbf-post-loc">'+loc+'</div>':'')+'</div>'+
+            '</div>'+
+            '<div class="nwsbf-post-imgwrap" onclick="IG.feedOpenPost('+p.id+')"><img class="nwsbf-post-img" src="'+src+'" alt="" loading="lazy"></div>'+
+            '<div class="nwsbf-post-actions"><button class="nwsbf-act">'+heart+'</button><button class="nwsbf-act">'+comment+'</button><button class="nwsbf-act">'+send+'</button><span class="nwsbf-sp"></span><button class="nwsbf-act">'+save+'</button></div>'+
+            '<div class="nwsbf-post-likes">'+cf(lc(i))+' likes</div>'+
+            '<div class="nwsbf-post-cap"><b>'+(p.username||p.fullName)+'</b> '+cap+'</div>'+
+          '</div>';
+      }).join('');
+
+      var css='#sub-ig-feed{background:#eef0f5 !important;}'+
+        '#sub-ig-feed *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
+        '#sub-ig-feed .nwsbf-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(58px + env(safe-area-inset-bottom,0px) + 22px);}'+
+        '#sub-ig-feed .nwsbf-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:max(env(safe-area-inset-top,12px),12px) 16px 12px;background:#eef0f5;box-shadow:0 4px 14px rgba(0,0,0,.06);}'+
+        '#sub-ig-feed .nwsbf-brandlogo{width:34px;height:34px;border-radius:50% !important;object-fit:cover;background:#eef0f5;box-shadow:4px 4px 9px rgba(0,0,0,.14),-3px -3px 7px rgba(255,255,255,.96);flex-shrink:0;}'+
+        '#sub-ig-feed .nwsbf-logo{font-size:20px;font-weight:800;color:#1a1a2e;letter-spacing:-.3px;flex:1;}'+
+        '#sub-ig-feed .nwsbf-icon{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.12),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
+        '#sub-ig-feed .nwsbf-icon:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
+        '#sub-ig-feed .nwsbf-stories{display:flex;gap:15px;overflow-x:auto;padding:14px 16px 16px;scrollbar-width:none;}'+
+        '#sub-ig-feed .nwsbf-stories::-webkit-scrollbar{display:none;}'+
+        '#sub-ig-feed .nwsbf-story{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;width:66px;}'+
+        '#sub-ig-feed .nwsbf-story-ring{width:64px;height:64px;border-radius:50% !important;padding:4px;background:#eef0f5;box-shadow:5px 5px 12px rgba(0,0,0,.13),-4px -4px 10px rgba(255,255,255,.95);}'+
+        '#sub-ig-feed .nwsbf-story-av{width:100%;height:100%;border-radius:50% !important;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#e6e9f1;}'+
+        '#sub-ig-feed .nwsbf-story-init{display:flex;align-items:center;justify-content:center;color:#c8a96e;font-size:24px;font-weight:700;}'+
+        '#sub-ig-feed .nwsbf-story span{font-size:11px;color:rgba(0,0,0,.6);max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}'+
+        '#sub-ig-feed .nwsbf-post{background:#eef0f5;border-radius:22px !important;margin:0 14px 18px;padding:14px;box-shadow:7px 7px 18px rgba(0,0,0,.12),-5px -5px 14px rgba(255,255,255,.97);}'+
+        '#sub-ig-feed .nwsbf-post-head{display:flex;align-items:center;gap:11px;margin-bottom:12px;cursor:pointer;}'+
+        '#sub-ig-feed .nwsbf-post-av{width:42px;height:42px;border-radius:50% !important;background-size:cover;background-position:center;flex-shrink:0;box-shadow:3px 3px 8px rgba(0,0,0,.14),-2px -2px 6px rgba(255,255,255,.95);}'+
+        '#sub-ig-feed .nwsbf-post-name{font-size:14px;font-weight:700;color:#1a1a2e;}'+
+        '#sub-ig-feed .nwsbf-post-loc{font-size:11px;color:rgba(0,0,0,.5);}'+
+        '#sub-ig-feed .nwsbf-post-imgwrap{border-radius:16px !important;overflow:hidden;cursor:pointer;}'+
+        '#sub-ig-feed .nwsbf-post-img{width:100%;display:block;border-radius:16px !important;}'+
+        '#sub-ig-feed .nwsbf-post-actions{display:flex;align-items:center;gap:12px;margin-top:13px;}'+
+        '#sub-ig-feed .nwsbf-sp{flex:1;}'+
+        '#sub-ig-feed .nwsbf-act{width:44px;height:44px;border:none;border-radius:50% !important;background:#eef0f5;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.12),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
+        '#sub-ig-feed .nwsbf-act:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
+        '#sub-ig-feed .nwsbf-post-likes{font-size:13px;font-weight:700;color:#1a1a2e;margin-top:12px;}'+
+        '#sub-ig-feed .nwsbf-post-cap{font-size:13px;color:#1a1a2e;margin-top:4px;line-height:1.45;}';
+
+      screen.innerHTML='<style>'+css+'</style>'+
+        '<div class="nwsbf-scroll">'+
+          '<div class="nwsbf-top"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""><span class="nwsbf-logo">NowssB</span>'+
+            '<button class="nwsbf-icon" aria-label="Messages" onclick="if(typeof chatInboxOpen===\'function\')chatInboxOpen()">'+chat+'</button>'+
+            '<button class="nwsbf-icon" aria-label="Home" onclick="IG.socialNav(\'home\')">'+exitc+'</button>'+
+          '</div>'+
+          '<div class="nwsbf-stories">'+stories+'</div>'+
+          posts+
+        '</div>';
+
+      ['sub-social-home','sub-reels-feed','sub-people','sub-ig-profile'].forEach(function(id){ var e=document.getElementById(id); if(e) e.classList.remove('open'); });
+      screen.classList.add('open');
+      if(typeof showNav==='function') showNav(true);
+    },
+    feedOpenPost:function(id){
+      var p=PEOPLE.find(function(x){return String(x.id)===String(id);}); if(!p) return;
+      this._currentProfile=p;
+      this.openExplorePost((p.grid&&p.grid[0])||p.avatar);
     },
     openMyProfile:function(){
       // sync real user data
@@ -549,10 +636,14 @@
   };
 
   function setSocialNavActive(which) {
-    ['home','feed','profile','chat'].forEach(function(k){
+    ['home','feed','profile','me'].forEach(function(k){
       var el = document.getElementById('igsn-'+k);
       if (el) el.classList.toggle('active', k === which);
     });
+    // keep the Profile-tab avatar in sync
+    var meav = document.getElementById('igsn-me-av');
+    var ud = window._userDataCache;
+    if (meav && ud && ud.photoURL) meav.style.backgroundImage = 'url(' + ud.photoURL + ')';
   }
 
   function closeAllIG(){

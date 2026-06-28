@@ -442,7 +442,7 @@
 
   /* Helper — hide all social sub-screens */
   function hideSocialScreens() {
-    ['sub-social-home', 'sub-reels-feed', 'sub-people', 'sub-ig-profile'].forEach(function (id) {
+    ['sub-social-home', 'sub-reels-feed', 'sub-people', 'sub-ig-profile', 'sub-ig-feed'].forEach(function (id) {
       var el = document.getElementById(id);
       if (el) el.classList.remove('open');
     });
@@ -450,7 +450,7 @@
 
   /* Helper — set social nav active button */
   function setSocialActive(which) {
-    ['home', 'feed', 'profile', 'chat'].forEach(function (k) {
+    ['home', 'feed', 'profile', 'me'].forEach(function (k) {
       var el = document.getElementById('igsn-' + k);
       if (el) el.classList.toggle('active', k === which);
     });
@@ -500,6 +500,16 @@
           if (typeof renderExplore === 'function') renderExplore();
           window.IG.clearSearch && window.IG.clearSearch();
         }
+
+      } else if (which === 'feedhome') {
+        hideSocialScreens();
+        setSocialActive('home');
+        if (window.IG && typeof window.IG.openFeed === 'function') window.IG.openFeed();
+
+      } else if (which === 'me') {
+        hideSocialScreens();
+        setSocialActive('me');
+        if (window.IG && typeof window.IG.openMyProfile === 'function') window.IG.openMyProfile();
 
       } else if (which === 'chat') {
         setSocialActive('chat');
