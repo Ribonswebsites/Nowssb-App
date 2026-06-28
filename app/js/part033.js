@@ -370,8 +370,9 @@
         '#sub-ig-feed *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
         '#sub-ig-feed .nwsbf-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(58px + env(safe-area-inset-bottom,0px) + 22px);}'+
         '#sub-ig-feed .nwsbf-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:max(env(safe-area-inset-top,12px),12px) 16px 12px;background:#eef0f5;box-shadow:0 4px 14px rgba(0,0,0,.06);}'+
+        '#sub-ig-feed .nwsbf-brand{display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;}'+
         '#sub-ig-feed .nwsbf-brandlogo{width:34px;height:34px;border-radius:50% !important;object-fit:cover;background:#eef0f5;box-shadow:4px 4px 9px rgba(0,0,0,.14),-3px -3px 7px rgba(255,255,255,.96);flex-shrink:0;}'+
-        '#sub-ig-feed .nwsbf-logo{font-size:20px;font-weight:800;color:#1a1a2e;letter-spacing:-.3px;flex:1;}'+
+        '#sub-ig-feed .nwsbf-logo{font-size:20px;font-weight:800;color:#1a1a2e;letter-spacing:-.3px;}'+
         '#sub-ig-feed .nwsbf-icon{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.12),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
         '#sub-ig-feed .nwsbf-icon:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
         '#sub-ig-feed .nwsbf-stories{display:flex;gap:15px;overflow-x:auto;padding:14px 16px 16px;scrollbar-width:none;}'+
@@ -397,9 +398,8 @@
 
       screen.innerHTML='<style>'+css+'</style>'+
         '<div class="nwsbf-scroll">'+
-          '<div class="nwsbf-top"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""><span class="nwsbf-logo">NowssB</span>'+
+          '<div class="nwsbf-top"><div class="nwsbf-brand" onclick="IG.socialNav(\'home\')" title="Back to NowssB"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""><span class="nwsbf-logo">NowssB</span></div>'+
             '<button class="nwsbf-icon" aria-label="Messages" onclick="if(typeof chatInboxOpen===\'function\')chatInboxOpen()">'+chat+'</button>'+
-            '<button class="nwsbf-icon" aria-label="Home" onclick="IG.socialNav(\'home\')">'+exitc+'</button>'+
           '</div>'+
           '<div class="nwsbf-stories">'+stories+'</div>'+
           posts+
@@ -732,7 +732,10 @@
     // keep the Profile-tab avatar in sync
     var meav = document.getElementById('igsn-me-av');
     var ud = window._userDataCache;
-    if (meav && ud && ud.photoURL) meav.style.backgroundImage = 'url(' + ud.photoURL + ')';
+    if (meav && ud && ud.photoURL) {
+      meav.style.backgroundImage = 'url(' + ud.photoURL + ')';
+      var svg = meav.querySelector('svg'); if (svg) svg.style.display = 'none';
+    }
   }
 
   function closeAllIG(){
