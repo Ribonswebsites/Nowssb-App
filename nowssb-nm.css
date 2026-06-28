@@ -1390,13 +1390,27 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.primary:active {
 body.nm-mode #sub-social-home #nwsb-home-reels-strip,
 body.nm-mode #sub-social-home #nwsb-home-reels-strip div { color: rgba(0,0,0,0.4) !important; }
 
-/* Image-explainer slots → neumorphic inset drop-zones (look intentional) */
-body.nm-mode #sub-social-home .nwsb-explainer-slot {
+/* Image-explainer slots → neumorphic inset drop-zones, ONLY when empty.
+   Slots with a real image (.has-img) must keep their inline background-image. */
+body.nm-mode #sub-social-home .nwsb-explainer-slot:not(.has-img) {
   background: #f0f2f7 !important;
   border: none !important;
   box-shadow: inset 4px 4px 9px rgba(0,0,0,0.1), inset -3px -3px 7px rgba(255,255,255,0.9) !important;
 }
-body.nm-mode #sub-social-home .nwsb-explainer-slot span { color: #a8854a !important; }
+body.nm-mode #sub-social-home .nwsb-explainer-slot:not(.has-img) span { color: #a8854a !important; }
+
+/* STATS topbar icon buttons (back / chat) → neumorphic raised circles */
+body.nm-mode #sub-social-home .ig-iconbtn {
+  background: #f0f2f7 !important;
+  border-radius: 50% !important;
+  width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body.nm-mode #sub-social-home .ig-iconbtn:active {
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.92) !important;
+}
+body.nm-mode #sub-social-home .ig-iconbtn svg { stroke: #1a1a2e !important; }
+body.nm-mode #sub-social-home .ig-iconbtn img { filter: brightness(0) opacity(0.8) !important; }
 
 /* Hero stat-cube text already cream-styled; keep its label readable */
 body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !important; }
