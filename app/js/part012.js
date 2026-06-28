@@ -801,7 +801,7 @@ const questions = [
     label:'What Calls You',
     q:'What calls you to heal?',
     opts:['Voice & Vocal power','Inner calm & peace','Ancient wisdom & knowledge','Physical strength & vitality'],
-    bg: 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png'
+    bg: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782622024/grok_image_1782621969038_uvugj1.jpg'
   },
   {
     label:'What Feels Broken',
