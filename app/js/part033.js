@@ -358,7 +358,7 @@
         return '<div class="nwsbf-post">'+
             '<div class="nwsbf-post-head" onclick="IG.openProfile('+p.id+')">'+
               '<div class="nwsbf-post-av" style="background-image:url('+p.avatar+')"></div>'+
-              '<div class="nwsbf-post-meta"><div class="nwsbf-post-name">'+(p.username||p.fullName)+'</div>'+(loc?'<div class="nwsbf-post-loc">'+loc+'</div>':'')+'</div>'+
+              '<div class="nwsbf-post-meta"><div class="nwsbf-post-name">'+(p.username||p.fullName)+(verifyTierOf(p)?verifyBadgeImg(verifyTierOf(p),16):'')+'</div>'+(loc?'<div class="nwsbf-post-loc">'+loc+'</div>':'')+'</div>'+
             '</div>'+
             '<div class="nwsbf-post-imgwrap" onclick="IG.feedOpenPost('+p.id+')"><img class="nwsbf-post-img" src="'+src+'" alt="" loading="lazy"></div>'+
             '<div class="nwsbf-post-actions"><button class="nwsbf-act">'+heart+'</button><button class="nwsbf-act">'+comment+'</button><button class="nwsbf-act">'+send+'</button><span class="nwsbf-sp"></span><button class="nwsbf-act">'+save+'</button></div>'+
@@ -400,7 +400,7 @@
 
       screen.innerHTML='<style>'+css+'</style>'+
         '<div class="nwsbf-scroll">'+
-          '<div class="nwsbf-top"><div class="nwsbf-brand"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""><span class="nwsbf-logo">NowssB</span></div>'+
+          '<div class="nwsbf-top"><div class="nwsbf-brand"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""><span class="nwsbf-logo">NowssB Connect</span></div>'+
             '<button class="nwsbf-icon" aria-label="Messages" onclick="if(typeof chatInboxOpen===\'function\')chatInboxOpen()"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png" alt="Chat"></button>'+
             '<button class="nwsbf-icon" aria-label="Home" onclick="IG.socialNav(\'home\')"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" alt="Home"></button>'+
           '</div>'+
