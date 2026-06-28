@@ -1865,3 +1865,20 @@ body.nwsb-soc-glass #sub-ig-profile .nwsb-empty-ico {
 body.nwsb-soc-glass #sub-ig-profile .nwsb-empty-title {
   font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800; color: #1a1a2e;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Kill the dark bar / shadow at the very bottom in NEUMORPHISM mode.
+   The main bottom nav (#ig-bottomnav) is dark navy by default and the
+   dark body shows through at the safe-area — both read as a "black shadow".
+═══════════════════════════════════════════════════════════════ */
+body.nm-mode { background: #f0f2f7 !important; }
+body.nm-mode #ig-bottomnav {
+  background: #f0f2f7 !important;
+  border-top: 1px solid rgba(0,0,0,0.05) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+body.nm-mode #ig-bottomnav .ig-nav-label { color: rgba(0,0,0,0.42) !important; }
+body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #c8a96e !important; }
+/* No dark upward shadow on the social nav either */
+body.nm-mode #ig-social-nav { box-shadow: 0 -1px 0 rgba(0,0,0,0.05) !important; }
