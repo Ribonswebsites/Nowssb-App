@@ -1882,3 +1882,8 @@ body.nm-mode #ig-bottomnav .ig-nav-label { color: rgba(0,0,0,0.42) !important; }
 body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #c8a96e !important; }
 /* No dark upward shadow on the social nav either */
 body.nm-mode #ig-social-nav { box-shadow: 0 -1px 0 rgba(0,0,0,0.05) !important; }
+
+/* Kill the dark app-bg vignette in neumorphism mode (it bled a dark band at
+   the bottom of light screens / splash). */
+body.nm-mode .app-bg::after { display:none !important; }
+body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
