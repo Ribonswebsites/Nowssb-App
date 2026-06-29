@@ -98,14 +98,17 @@
       '<div class="lgp-phase">' +
         '<div id="spPhaseIdlePlay" style="display:' + ((phase === 'idle' || phase === 'playing') ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:10px;width:100%;">' +
           '<div class="lgp-status" id="spAutoStatus">' + (phase === 'playing' ? 'Listening…' : 'Tap ▸ to listen') + '</div>' +
-          '<div class="lgp-controls">' +
-            libBtn +
-            '<div class="lgp-transport">' +
-              '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-              '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" onclick="pwTogglePlay&&pwTogglePlay()">' + playIco + '</button>' +
-              '<button class="lgp-ctrl" id="lgpNext" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
+          '<div class="lgp-tube">' +
+            '<span class="lgp-tube-label">NowssB Player</span>' +
+            '<div class="lgp-controls">' +
+              libBtn +
+              '<div class="lgp-transport">' +
+                '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
+                '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" onclick="pwTogglePlay&&pwTogglePlay()">' + playIco + '</button>' +
+                '<button class="lgp-ctrl" id="lgpNext" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
+              '</div>' +
+              replayBtn +
             '</div>' +
-            replayBtn +
           '</div>' +
           '<div class="lgp-practice-row">' +
             '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
