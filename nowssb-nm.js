@@ -78,14 +78,8 @@
           /* Sound Bath intro isn't wired to shouldShowIntro — enter directly */
           setTimeout(function () { if (typeof sbEnter === 'function') sbEnter(); }, 40);
         }
-        if (document.body.classList.contains('nm-mode') && id === 'my-progress') {
-          /* My Progress always shows its intro — skip it directly */
-          setTimeout(function () { if (typeof mpEnterFromIntro === 'function') mpEnterFromIntro(); }, 60);
-        }
-        if (document.body.classList.contains('nm-mode') && id === 'word-science') {
-          /* Word Science intro isn't wired to shouldShowIntro — enter directly */
-          setTimeout(function () { if (typeof wsEnterFromIntro === 'function') wsEnterFromIntro(); }, 60);
-        }
+        /* My Progress + Word Science now behave exactly like the Fashion page
+           (glass styling, intro shown normally) — no nm-mode special-casing. */
         if (document.body.classList.contains('nm-mode') && id === 'social') {
           setTimeout(function () { if (window.nwsbRenderSettings) window.nwsbRenderSettings(); }, 30);
         }

@@ -1158,99 +1158,99 @@ body.nm-mode #sub-sound-bath .sb-play-btn {
 ═══════════════════════════════════════════════════════════════ */
 
 /* Surface + drop photo bg + kill legibility text-shadows */
-body.nm-mode #sub-my-progress { background: #f0f2f7 !important; }
-body.nm-mode #sub-my-progress #mpBg,
-body.nm-mode #sub-my-progress .sub-screen-bg { display: none !important; }
-body.nm-mode #sub-my-progress * { text-shadow: none !important; }
+body.nm-DISABLED #sub-my-progress { background: #f0f2f7 !important; }
+body.nm-DISABLED #sub-my-progress #mpBg,
+body.nm-DISABLED #sub-my-progress .sub-screen-bg { display: none !important; }
+body.nm-DISABLED #sub-my-progress * { text-shadow: none !important; }
 
 /* Header */
-body.nm-mode #sub-my-progress .sub-title, body.nm-mode #sub-my-progress .sub-title span { color: #1a1a2e !important; }
-body.nm-mode #sub-my-progress .sub-back svg path, body.nm-mode #sub-my-progress .sub-back svg line { stroke: #1a1a2e !important; }
+body.nm-DISABLED #sub-my-progress .sub-title, body.nm-DISABLED #sub-my-progress .sub-title span { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-my-progress .sub-back svg path, body.nm-DISABLED #sub-my-progress .sub-back svg line { stroke: #1a1a2e !important; }
 
 /* Greeting card */
-body.nm-mode #sub-my-progress .mp-greeting {
+body.nm-DISABLED #sub-my-progress .mp-greeting {
   background: #f0f2f7 !important; border: none !important; border-radius: 20px !important;
   box-shadow: 7px 7px 18px rgba(0,0,0,0.12), -5px -5px 14px rgba(255,255,255,0.97) !important;
 }
-body.nm-mode #sub-my-progress .mp-greeting::before { display: none !important; }
-body.nm-mode #sub-my-progress .mp-greeting-name { color: #c8a96e !important; }
-body.nm-mode #sub-my-progress .mp-greeting-msg { color: #1a1a2e !important; }
-body.nm-mode #sub-my-progress .mp-greeting-sub { color: rgba(0,0,0,0.5) !important; }
-body.nm-mode #sub-my-progress .mp-last-practiced { color: rgba(0,0,0,0.45) !important; }
+body.nm-DISABLED #sub-my-progress .mp-greeting::before { display: none !important; }
+body.nm-DISABLED #sub-my-progress .mp-greeting-name { color: #c8a96e !important; }
+body.nm-DISABLED #sub-my-progress .mp-greeting-msg { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-my-progress .mp-greeting-sub { color: rgba(0,0,0,0.5) !important; }
+body.nm-DISABLED #sub-my-progress .mp-last-practiced { color: rgba(0,0,0,0.45) !important; }
 
 /* Stat boxes */
-body.nm-mode #sub-my-progress .mp-stat-box {
+body.nm-DISABLED #sub-my-progress .mp-stat-box {
   background: #f0f2f7 !important; border: none !important; border-radius: 16px !important;
   box-shadow: 6px 6px 14px rgba(0,0,0,0.11), -4px -4px 10px rgba(255,255,255,0.96) !important;
 }
-body.nm-mode #sub-my-progress .mp-stat-box::after { display: none !important; }
-body.nm-mode #sub-my-progress .mp-stat-num { color: #c8a96e !important; }
-body.nm-mode #sub-my-progress .mp-stat-label { color: rgba(0,0,0,0.45) !important; }
-body.nm-mode #sub-my-progress .mp-stat-sub { color: rgba(0,0,0,0.32) !important; }
+body.nm-DISABLED #sub-my-progress .mp-stat-box::after { display: none !important; }
+body.nm-DISABLED #sub-my-progress .mp-stat-num { color: #c8a96e !important; }
+body.nm-DISABLED #sub-my-progress .mp-stat-label { color: rgba(0,0,0,0.45) !important; }
+body.nm-DISABLED #sub-my-progress .mp-stat-sub { color: rgba(0,0,0,0.32) !important; }
 
 /* Week grid */
-body.nm-mode #sub-my-progress .mp-week-dot {
+body.nm-DISABLED #sub-my-progress .mp-week-dot {
   background: #f0f2f7 !important; border: none !important; color: rgba(0,0,0,0.3) !important; border-radius: 12px !important;
   box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-my-progress .mp-week-dot.done { color: #5a8fa8 !important; box-shadow: 3px 3px 7px rgba(0,0,0,0.12), -2px -2px 6px rgba(255,255,255,0.95) !important; }
-body.nm-mode #sub-my-progress .mp-week-dot.done::after { background: #5a8fa8 !important; }
-body.nm-mode #sub-my-progress .mp-week-dot.today { color: #c8a96e !important; box-shadow: 3px 3px 7px rgba(0,0,0,0.13), -2px -2px 6px rgba(255,255,255,0.95) !important; }
-body.nm-mode #sub-my-progress .mp-week-name { color: rgba(0,0,0,0.35) !important; }
+body.nm-DISABLED #sub-my-progress .mp-week-dot.done { color: #5a8fa8 !important; box-shadow: 3px 3px 7px rgba(0,0,0,0.12), -2px -2px 6px rgba(255,255,255,0.95) !important; }
+body.nm-DISABLED #sub-my-progress .mp-week-dot.done::after { background: #5a8fa8 !important; }
+body.nm-DISABLED #sub-my-progress .mp-week-dot.today { color: #c8a96e !important; box-shadow: 3px 3px 7px rgba(0,0,0,0.13), -2px -2px 6px rgba(255,255,255,0.95) !important; }
+body.nm-DISABLED #sub-my-progress .mp-week-name { color: rgba(0,0,0,0.35) !important; }
 
 /* Session rows */
-body.nm-mode #sub-my-progress .mp-session-row {
+body.nm-DISABLED #sub-my-progress .mp-session-row {
   background: #f0f2f7 !important; border: none !important; border-radius: 14px !important; margin-bottom: 8px !important;
   box-shadow: 5px 5px 12px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-my-progress .mp-session-disc {
+body.nm-DISABLED #sub-my-progress .mp-session-disc {
   background: #f0f2f7 !important; border: none !important; color: #c8a96e !important;
   box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-my-progress .mp-session-word { color: #1a1a2e !important; }
-body.nm-mode #sub-my-progress .mp-session-reps { color: #c8a96e !important; }
-body.nm-mode #sub-my-progress .mp-session-reps-label { color: rgba(0,0,0,0.35) !important; }
-body.nm-mode #sub-my-progress .mp-session-detail { color: rgba(0,0,0,0.45) !important; }
+body.nm-DISABLED #sub-my-progress .mp-session-word { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-my-progress .mp-session-reps { color: #c8a96e !important; }
+body.nm-DISABLED #sub-my-progress .mp-session-reps-label { color: rgba(0,0,0,0.35) !important; }
+body.nm-DISABLED #sub-my-progress .mp-session-detail { color: rgba(0,0,0,0.45) !important; }
 
 /* Milestones */
-body.nm-mode #sub-my-progress .mp-milestone {
+body.nm-DISABLED #sub-my-progress .mp-milestone {
   background: #f0f2f7 !important; border: none !important; border-radius: 16px !important;
   box-shadow: 6px 6px 14px rgba(0,0,0,0.11), -4px -4px 10px rgba(255,255,255,0.96) !important;
 }
-body.nm-mode #sub-my-progress .mp-milestone-name { color: #1a1a2e !important; }
-body.nm-mode #sub-my-progress .mp-milestone-cond { color: rgba(0,0,0,0.45) !important; }
-body.nm-mode #sub-my-progress .mp-milestone-icon { color: #c8a96e !important; }
+body.nm-DISABLED #sub-my-progress .mp-milestone-name { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-my-progress .mp-milestone-cond { color: rgba(0,0,0,0.45) !important; }
+body.nm-DISABLED #sub-my-progress .mp-milestone-icon { color: #c8a96e !important; }
 
 /* Insight */
-body.nm-mode #sub-my-progress .mp-insight-wrap {
+body.nm-DISABLED #sub-my-progress .mp-insight-wrap {
   background: #f0f2f7 !important; border: none !important; border-radius: 16px !important;
   box-shadow: 6px 6px 14px rgba(0,0,0,0.11), -4px -4px 10px rgba(255,255,255,0.96) !important;
 }
-body.nm-mode #sub-my-progress .mp-insight-eyebrow { color: #c8a96e !important; }
-body.nm-mode #sub-my-progress .mp-insight-text { color: rgba(0,0,0,0.7) !important; }
+body.nm-DISABLED #sub-my-progress .mp-insight-eyebrow { color: #c8a96e !important; }
+body.nm-DISABLED #sub-my-progress .mp-insight-text { color: rgba(0,0,0,0.7) !important; }
 
 /* Feedback */
-body.nm-mode #sub-my-progress .mp-feedback-question { color: #1a1a2e !important; }
-body.nm-mode #sub-my-progress .mp-chip {
+body.nm-DISABLED #sub-my-progress .mp-feedback-question { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-my-progress .mp-chip {
   background: #f0f2f7 !important; border: none !important; color: rgba(0,0,0,0.5) !important; border-radius: 20px !important;
   box-shadow: 3px 3px 7px rgba(0,0,0,0.11), -2px -2px 6px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-my-progress .mp-chip.selected,
-body.nm-mode #sub-my-progress .mp-chip.selected-gold { color: #c8a96e !important; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.95) !important; }
-body.nm-mode #sub-my-progress .mp-feedback-textarea {
+body.nm-DISABLED #sub-my-progress .mp-chip.selected,
+body.nm-DISABLED #sub-my-progress .mp-chip.selected-gold { color: #c8a96e !important; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.95) !important; }
+body.nm-DISABLED #sub-my-progress .mp-feedback-textarea {
   background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important; border-radius: 14px !important;
   box-shadow: inset 3px 3px 8px rgba(0,0,0,0.12), inset -2px -2px 6px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-my-progress .mp-submit-btn {
+body.nm-DISABLED #sub-my-progress .mp-submit-btn {
   background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; border: none !important; color: #060c18 !important; border-radius: 14px !important;
 }
-body.nm-mode #sub-my-progress .mp-feedback-saved-title { color: #1a1a2e !important; }
-body.nm-mode #sub-my-progress .mp-feedback-saved-sub { color: rgba(0,0,0,0.45) !important; }
+body.nm-DISABLED #sub-my-progress .mp-feedback-saved-title { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-my-progress .mp-feedback-saved-sub { color: rgba(0,0,0,0.45) !important; }
 
 /* Empty + loading */
-body.nm-mode #sub-my-progress .mp-empty-title { color: rgba(0,0,0,0.5) !important; }
-body.nm-mode #sub-my-progress .mp-empty-text { color: rgba(0,0,0,0.32) !important; }
-body.nm-mode #sub-my-progress .mp-loading-text { color: rgba(0,0,0,0.4) !important; }
+body.nm-DISABLED #sub-my-progress .mp-empty-title { color: rgba(0,0,0,0.5) !important; }
+body.nm-DISABLED #sub-my-progress .mp-empty-text { color: rgba(0,0,0,0.32) !important; }
+body.nm-DISABLED #sub-my-progress .mp-loading-text { color: rgba(0,0,0,0.4) !important; }
 
 /* ═══════════════════════════════════════════════════════════════
    INNER PAGE 9 — WORD SCIENCE  (#sub-word-science)
@@ -1258,76 +1258,76 @@ body.nm-mode #sub-my-progress .mp-loading-text { color: rgba(0,0,0,0.4) !importa
 ═══════════════════════════════════════════════════════════════ */
 
 /* Surface */
-body.nm-mode #sub-word-science { background: #f0f2f7 !important; }
-body.nm-mode #sub-word-science #wsMainContent .sub-screen-bg { display: none !important; }
-body.nm-mode #sub-word-science #wsMainContent { background: #f0f2f7 !important; }
-body.nm-mode #sub-word-science #wsPanelContainer { background: #f0f2f7 !important; }
-body.nm-mode #sub-word-science * { text-shadow: none !important; }
+body.nm-DISABLED #sub-word-science { background: #f0f2f7 !important; }
+body.nm-DISABLED #sub-word-science #wsMainContent .sub-screen-bg { display: none !important; }
+body.nm-DISABLED #sub-word-science #wsMainContent { background: #f0f2f7 !important; }
+body.nm-DISABLED #sub-word-science #wsPanelContainer { background: #f0f2f7 !important; }
+body.nm-DISABLED #sub-word-science * { text-shadow: none !important; }
 
 /* Banner header */
-body.nm-mode #sub-word-science .sub-header { background-image: none !important; background-color: #f0f2f7 !important; box-shadow: 0 5px 14px rgba(0,0,0,0.07) !important; }
-body.nm-mode #sub-word-science .sub-header-title { color: #1a1a2e !important; }
-body.nm-mode #sub-word-science .sub-header-tag { color: #c8a96e !important; }
-body.nm-mode #sub-word-science .sub-back svg path { stroke: #1a1a2e !important; }
+body.nm-DISABLED #sub-word-science .sub-header { background-image: none !important; background-color: #f0f2f7 !important; box-shadow: 0 5px 14px rgba(0,0,0,0.07) !important; }
+body.nm-DISABLED #sub-word-science .sub-header-title { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-word-science .sub-header-tag { color: #c8a96e !important; }
+body.nm-DISABLED #sub-word-science .sub-back svg path { stroke: #1a1a2e !important; }
 
 /* Tabs */
-body.nm-mode #sub-word-science #wsTabs {
+body.nm-DISABLED #sub-word-science #wsTabs {
   background: #f0f2f7 !important; border-bottom: none !important;
   box-shadow: 0 5px 13px rgba(0,0,0,0.06) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
 }
-body.nm-mode #sub-word-science .ws-tab { color: rgba(0,0,0,0.4) !important; }
-body.nm-mode #sub-word-science .ws-tab.ws-active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
+body.nm-DISABLED #sub-word-science .ws-tab { color: rgba(0,0,0,0.4) !important; }
+body.nm-DISABLED #sub-word-science .ws-tab.ws-active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
 
 /* Info / quote / highlight / effect / organ cards → neumorphic raised */
-body.nm-mode #sub-word-science .ws-info,
-body.nm-mode #sub-word-science .ws-organ-card,
-body.nm-mode #sub-word-science .ws-quote,
-body.nm-mode #sub-word-science .ws-highlight,
-body.nm-mode #sub-word-science .ws-effect-row,
-body.nm-mode #sub-word-science .ws-action-tile {
+body.nm-DISABLED #sub-word-science .ws-info,
+body.nm-DISABLED #sub-word-science .ws-organ-card,
+body.nm-DISABLED #sub-word-science .ws-quote,
+body.nm-DISABLED #sub-word-science .ws-highlight,
+body.nm-DISABLED #sub-word-science .ws-effect-row,
+body.nm-DISABLED #sub-word-science .ws-action-tile {
   background: #f0f2f7 !important; border: none !important; border-radius: 18px !important;
   box-shadow: 6px 6px 15px rgba(0,0,0,0.11), -5px -5px 12px rgba(255,255,255,0.96) !important;
 }
-body.nm-mode #sub-word-science .ws-info::before,
-body.nm-mode #sub-word-science .ws-organ-card::before { display: none !important; }
-body.nm-mode #sub-word-science .ws-quote { border-left: 3px solid #c8a96e !important; }
+body.nm-DISABLED #sub-word-science .ws-info::before,
+body.nm-DISABLED #sub-word-science .ws-organ-card::before { display: none !important; }
+body.nm-DISABLED #sub-word-science .ws-quote { border-left: 3px solid #c8a96e !important; }
 
-body.nm-mode #sub-word-science .ws-info-eyebrow { color: #c8a96e !important; }
-body.nm-mode #sub-word-science .ws-info-title { color: #1a1a2e !important; }
-body.nm-mode #sub-word-science .ws-info-body { color: rgba(0,0,0,0.68) !important; }
-body.nm-mode #sub-word-science .ws-organ-icon { color: #c8a96e !important; }
-body.nm-mode #sub-word-science .ws-organ-name { color: #a8854a !important; }
-body.nm-mode #sub-word-science .ws-organ-desc { color: rgba(0,0,0,0.62) !important; }
-body.nm-mode #sub-word-science .ws-quote { color: rgba(0,0,0,0.8) !important; }
-body.nm-mode #sub-word-science .ws-quote-src { color: #a8854a !important; }
-body.nm-mode #sub-word-science .ws-highlight-num { color: #c8a96e !important; }
-body.nm-mode #sub-word-science .ws-highlight-label { color: #a8854a !important; }
-body.nm-mode #sub-word-science .ws-highlight-sub { color: rgba(0,0,0,0.6) !important; }
-body.nm-mode #sub-word-science .ws-effect-label { color: #a8854a !important; }
-body.nm-mode #sub-word-science .ws-effect-body { color: rgba(0,0,0,0.65) !important; }
-body.nm-mode #sub-word-science .ws-effect-dot { background: #c8a96e !important; }
+body.nm-DISABLED #sub-word-science .ws-info-eyebrow { color: #c8a96e !important; }
+body.nm-DISABLED #sub-word-science .ws-info-title { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-word-science .ws-info-body { color: rgba(0,0,0,0.68) !important; }
+body.nm-DISABLED #sub-word-science .ws-organ-icon { color: #c8a96e !important; }
+body.nm-DISABLED #sub-word-science .ws-organ-name { color: #a8854a !important; }
+body.nm-DISABLED #sub-word-science .ws-organ-desc { color: rgba(0,0,0,0.62) !important; }
+body.nm-DISABLED #sub-word-science .ws-quote { color: rgba(0,0,0,0.8) !important; }
+body.nm-DISABLED #sub-word-science .ws-quote-src { color: #a8854a !important; }
+body.nm-DISABLED #sub-word-science .ws-highlight-num { color: #c8a96e !important; }
+body.nm-DISABLED #sub-word-science .ws-highlight-label { color: #a8854a !important; }
+body.nm-DISABLED #sub-word-science .ws-highlight-sub { color: rgba(0,0,0,0.6) !important; }
+body.nm-DISABLED #sub-word-science .ws-effect-label { color: #a8854a !important; }
+body.nm-DISABLED #sub-word-science .ws-effect-body { color: rgba(0,0,0,0.65) !important; }
+body.nm-DISABLED #sub-word-science .ws-effect-dot { background: #c8a96e !important; }
 
 /* Phoneme chips */
-body.nm-mode #sub-word-science .ws-phoneme {
+body.nm-DISABLED #sub-word-science .ws-phoneme {
   background: #f0f2f7 !important; border: none !important; color: #a8854a !important; border-radius: 12px !important;
   box-shadow: 3px 3px 8px rgba(0,0,0,0.12), -2px -2px 6px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-word-science .ws-phoneme-label { color: rgba(0,0,0,0.4) !important; }
+body.nm-DISABLED #sub-word-science .ws-phoneme-label { color: rgba(0,0,0,0.4) !important; }
 
 /* Action tiles */
-body.nm-mode #sub-word-science .ws-action-tile-head { color: #a8854a !important; }
-body.nm-mode #sub-word-science .ws-action-tile-title { color: #1a1a2e !important; }
-body.nm-mode #sub-word-science .ws-action-tile-sub { color: rgba(0,0,0,0.5) !important; }
+body.nm-DISABLED #sub-word-science .ws-action-tile-head { color: #a8854a !important; }
+body.nm-DISABLED #sub-word-science .ws-action-tile-title { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-word-science .ws-action-tile-sub { color: rgba(0,0,0,0.5) !important; }
 
 /* Atelier search page */
-body.nm-mode #sub-word-science .ws-page-input { color: #1a1a2e !important; }
-body.nm-mode #sub-word-science .ws-page-input::placeholder { color: rgba(0,0,0,0.3) !important; }
-body.nm-mode #sub-word-science .ws-page-chip {
+body.nm-DISABLED #sub-word-science .ws-page-input { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-word-science .ws-page-input::placeholder { color: rgba(0,0,0,0.3) !important; }
+body.nm-DISABLED #sub-word-science .ws-page-chip {
   background: #f0f2f7 !important; border: none !important; color: #a8854a !important;
   box-shadow: 3px 3px 7px rgba(0,0,0,0.11), -2px -2px 6px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-word-science .ws-page-tagline { color: rgba(0,0,0,0.5) !important; }
-body.nm-mode #sub-word-science .ws-page-brand { color: #1a1a2e !important; }
+body.nm-DISABLED #sub-word-science .ws-page-tagline { color: rgba(0,0,0,0.5) !important; }
+body.nm-DISABLED #sub-word-science .ws-page-brand { color: #1a1a2e !important; }
 
 /* ── Community profile: neumorphic circles (avatar + stats) + icon depth ── */
 
@@ -1948,4 +1948,13 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
 #ss-plan-cards .plan-card {
   flex: 0 0 87% !important; max-width: 340px; margin-bottom: 0 !important;
   scroll-snap-align: center; box-sizing: border-box; align-self: flex-start;
+}
+
+/* ── Hide scrollbars app-wide (scrolling still works via touch) ── */
+*::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
+* { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+/* ── Profile avatar edit pencil — always a perfect circle ── */
+#profilePhotoPencil, .ps-avatar-pencil {
+  width: 30px !important; height: 30px !important; border-radius: 50% !important;
+  top: auto !important; flex-shrink: 0 !important;
 }
