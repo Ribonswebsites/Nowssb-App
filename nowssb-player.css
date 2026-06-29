@@ -168,17 +168,25 @@
   position:relative; width:100%; max-width:352px; margin-top:8px;
   padding:11px 26px; min-height:86px; display:flex; align-items:center;
   background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center/100% 100% no-repeat;
-  animation:lgpTubeGlow 4s linear infinite;
+  filter:drop-shadow(0 13px 26px rgba(0,0,0,.5));
 }
-/* a soft accent glow that travels AROUND the glass capsule (no scaling) */
-@keyframes lgpTubeGlow {
-  0%   { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow( 15px   0  15px var(--lg-accent)); }
-  25%  { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow(  0   13px 15px var(--lg-accent)); }
-  50%  { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow(-15px   0  15px var(--lg-accent)); }
-  75%  { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow(  0  -13px 15px var(--lg-accent)); }
-  100% { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow( 15px   0  15px var(--lg-accent)); }
+/* ── a bright light that TRAVELS AROUND THE OUTSIDE of the glass capsule ──
+   a conic gradient (bright spot) masked to a thin ring just outside the tube;
+   animating its angle sweeps the spot around the perimeter. */
+@property --lgtravel { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp .lgp-tube::before {
+  content:''; position:absolute; inset:-5px; border-radius:60px; padding:4px; pointer-events:none; z-index:1;
+  background:conic-gradient(from var(--lgtravel),
+            transparent 0deg, transparent 250deg,
+            var(--lg-accent) 300deg, #ffffff 332deg, var(--lg-accent) 352deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  filter:blur(.6px) drop-shadow(0 0 6px var(--lg-accent));
+  animation:lgpTubeTravel 3.2s linear infinite;
 }
-.lgp.playing .lgp-tube { animation-duration:2.2s; }
+@keyframes lgpTubeTravel { to { --lgtravel:360deg; } }
+.lgp.playing .lgp-tube::before { animation-duration:1.8s; }
 .lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
 /* ── Inside the capsule: flatten to 5 evenly-spaced icons, all centred in the
    clear interior (library + replay no longer jammed onto the rounded ends) ── */
@@ -222,6 +230,13 @@
   width:48px; height:48px; background:none !important; border:none !important; box-shadow:none !important;
   -webkit-backdrop-filter:none !important; backdrop-filter:none !important; padding:0;
 }
+/* gear / back use a background-image span (NOT an <img>) so the browser can't
+   open/zoom them as an image — taps always trigger the button action */
+.lgp .lgp-imgbtn .lgp-bgico {
+  width:100%; height:100%; display:block; pointer-events:none;
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));
+}
 .lgp .lgp-mic, .lgp .lgp-cta {
   margin-top:14px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-weight:700;
   display:flex; align-items:center; justify-content:center; gap:8px;
@@ -245,18 +260,11 @@
 }
 .lgp .lgp-store:active { transform:translateY(-50%) scale(.92); }
 .lgp .lgp-store-orb {
-  width:54px; height:54px; border-radius:50% !important; box-sizing:border-box;
-  display:flex; align-items:center; justify-content:center;
-  background:radial-gradient(circle at 36% 28%, #2b2b34 0%, #131318 55%, #050507 100%);
-  border:1px solid rgba(255,255,255,.16);
-  box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.22);
-  animation:lgpStorePulse 2.8s ease-in-out infinite;
+  width:60px; height:60px; border-radius:50% !important; box-sizing:border-box; overflow:hidden;
+  display:flex; align-items:center; justify-content:center; background:#000;
+  box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.16);
 }
-@keyframes lgpStorePulse {
-  0%,100% { box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.22), 0 0 0 0 rgba(255,255,255,0); }
-  50%     { box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.22), 0 0 18px 2px var(--lg-accent); }
-}
-.lgp .lgp-store-ico { width:27px; height:27px; object-fit:contain; display:block; filter:brightness(0) invert(1) drop-shadow(0 1px 3px rgba(0,0,0,.4)); }
+.lgp .lgp-store-ico { width:100%; height:100%; object-fit:cover; display:block; }
 .lgp .lgp-store-lbl { text-shadow:0 1px 8px rgba(0,0,0,.4); }
 
 /* Build-your-sentence button — sphere icon, left of the Practice mic */

@@ -119,7 +119,7 @@
               '<span class="lgp-practice-lbl">Practice</span>' +
             '</button>' +
             '<button class="lgp-store" onclick="openSub&&openSub(\'nowssb-store\')" aria-label="Store">' +
-              '<span class="lgp-store-orb"><img class="lgp-store-ico" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt=""></span>' +
+              '<span class="lgp-store-orb"><img class="lgp-store-ico" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png" alt=""></span>' +
               '<span class="lgp-store-lbl">Store</span>' +
             '</button>' +
           '</div>' +
@@ -180,11 +180,11 @@
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
           '<button class="lgp-back lgp-imgbtn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
-            '<img class="lgp-img" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png" alt="">' +
+            '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
           '</button>' +
           '<div class="lgp-brand">NowssB</div>' +
           '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
-            '<img class="lgp-img" src="' + IC.settings + '" alt="">' +
+            '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
           '</button>' +
         '</div>' +
         '<div class="lgp-tagline">' + ['The','new','fashion','trend','of','meditation'].map(function (wd, i) { return '<span style="animation-delay:' + (0.25 + i * 0.18).toFixed(2) + 's">' + wd + '</span>'; }).join(' ') + '</div>' +
