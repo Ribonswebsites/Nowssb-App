@@ -373,7 +373,7 @@
 
 /* RADIAL menu — settings icon centred, options in a glass circle around it */
 .lgp-arc-radial {
-  position:absolute; left:50%; top:50%; width:300px; height:300px;
+  position:absolute; left:50%; top:39%; width:300px; height:300px;
   transform:translate(-50%,-50%) scale(.55); opacity:0;
   transition:transform .36s cubic-bezier(.2,1.1,.3,1), opacity .28s;
 }
@@ -384,12 +384,26 @@
 .lgp-arc.open { visibility:visible; }
 /* glass disc the options sit on — the "circle" */
 .lgp-arc-ring {
-  position:absolute; left:50%; top:50%; width:248px; height:248px; margin:-124px 0 0 -124px;
-  border-radius:50% !important; border:1.5px solid rgba(255,255,255,.3);
+  position:absolute; left:50%; top:50%; width:250px; height:250px; margin:-125px 0 0 -125px;
+  border-radius:50% !important; border:2px solid rgba(255,255,255,.32);
   background:rgba(255,255,255,.05);
   -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
   box-shadow:0 0 50px -6px var(--lg-accent,#8fd), inset 0 0 44px rgba(255,255,255,.1), inset 0 2px 1px rgba(255,255,255,.3);
 }
+/* a bright light that TRAVELS AROUND the ring (smooth — it's a true circle) */
+@property --lgarc { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp-arc-ring::after {
+  content:''; position:absolute; inset:-3px; border-radius:50% !important; padding:3px; pointer-events:none;
+  background:conic-gradient(from var(--lgarc),
+            transparent 0deg, transparent 215deg, rgba(255,255,255,.05) 250deg,
+            var(--lg-accent,#8fd) 300deg, #ffffff 330deg, var(--lg-accent,#8fd) 350deg, rgba(255,255,255,.05) 358deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  will-change:--lgarc;
+  animation:lgpArcTravel 3.4s linear infinite;
+}
+@keyframes lgpArcTravel { to { --lgarc:360deg; } }
 /* back button (top-left) — arc lives in <body>, so style it UNSCOPED */
 .lgp-arc-close {
   position:absolute; top:max(env(safe-area-inset-top,16px),16px); left:16px;
