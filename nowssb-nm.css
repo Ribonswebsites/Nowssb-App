@@ -2005,3 +2005,14 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 
 /* store-header cart/wishlist image icons (replaced the SVGs) */
 .nss-store-icon-img { width: 18px !important; height: 18px !important; object-fit: contain; display: block; }
+
+/* ── Profile avatar edit pencil — force a perfect circle (was rendering as a tall oval) ── */
+#profilePhotoPencil {
+  width: 30px !important; height: 30px !important;
+  min-width: 30px !important; min-height: 30px !important;
+  aspect-ratio: 1 / 1 !important; border-radius: 50% !important;
+  box-sizing: border-box !important;
+  top: auto !important; left: auto !important; bottom: 4px !important; right: 4px !important;
+  flex-shrink: 0 !important;
+}
+#profilePhotoPencil svg { width: 13px !important; height: 13px !important; }
