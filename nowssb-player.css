@@ -175,18 +175,20 @@
    animating its angle sweeps the spot around the perimeter. */
 @property --lgtravel { syntax:'<angle>'; inherits:false; initial-value:0deg; }
 .lgp .lgp-tube::before {
-  content:''; position:absolute; inset:-5px; border-radius:60px; padding:4px; pointer-events:none; z-index:1;
+  content:''; position:absolute; inset:-4px; border-radius:60px; padding:4px; pointer-events:none; z-index:1;
+  /* a soft, wide glowing arc baked into the gradient (no per-frame filter) */
   background:conic-gradient(from var(--lgtravel),
-            transparent 0deg, transparent 250deg,
-            var(--lg-accent) 300deg, #ffffff 332deg, var(--lg-accent) 352deg, transparent 360deg);
+            transparent 0deg, transparent 215deg,
+            rgba(255,255,255,.05) 250deg, var(--lg-accent) 300deg,
+            #ffffff 330deg, var(--lg-accent) 350deg, rgba(255,255,255,.05) 358deg, transparent 360deg);
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
-  filter:blur(.6px) drop-shadow(0 0 6px var(--lg-accent));
-  animation:lgpTubeTravel 3.2s linear infinite;
+  will-change:--lgtravel; transform:translateZ(0);
+  animation:lgpTubeTravel 4s linear infinite;
 }
 @keyframes lgpTubeTravel { to { --lgtravel:360deg; } }
-.lgp.playing .lgp-tube::before { animation-duration:1.8s; }
+.lgp.playing .lgp-tube::before { animation-duration:2.4s; }
 .lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
 /* ── Inside the capsule: flatten to 5 evenly-spaced icons, all centred in the
    clear interior (library + replay no longer jammed onto the rounded ends) ── */
@@ -199,7 +201,13 @@
 .lgp .lgp-tube .lgp-play { width:66px; height:66px; }
 .lgp .lgp-transport { display:flex; align-items:center; justify-content:center; gap:8px; }
 /* glass-sphere icon = the button itself (no glass-circle background, full colour) */
-.lgp .lgp-img { width:100%; height:100%; object-fit:contain; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
+.lgp .lgp-img { width:100%; height:100%; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
+/* every sphere icon is now a background-image span (not an <img>) */
+.lgp .lgp-img, .lgp .lgp-side-ico, .lgp .lgp-mic-ico,
+.lgp .lgp-sentence-ico, .lgp .lgp-practice-ico, .lgp .lgp-bgico {
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+.lgp .lgp-store-ico { background-size:cover; background-position:center; background-repeat:no-repeat; }
 /* Library (left) + Replay (right) side buttons */
 .lgp .lgp-side {
   width:52px; border:none; cursor:pointer; background:none; color:#fff;

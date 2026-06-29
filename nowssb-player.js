@@ -78,13 +78,16 @@
       library:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
       settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png'
     };
-    var playIco = '<img class="lgp-img" src="' + (playing ? IC.pause : IC.play) + '" alt="">';
-    var prevSvg = '<img class="lgp-img" src="' + IC.prev + '" alt="">';
-    var nextSvg = '<img class="lgp-img" src="' + IC.next + '" alt="">';
+    /* render every icon as a background-image SPAN (never an <img>) so the
+       browser can't open/zoom it on tap and taps always hit the button */
+    function bgi(cls, url) { return '<span class="' + cls + '" style="background-image:url(\'' + url + '\')"></span>'; }
+    var playIco = bgi('lgp-img', playing ? IC.pause : IC.play);
+    var prevSvg = bgi('lgp-img', IC.prev);
+    var nextSvg = bgi('lgp-img', IC.next);
 
     /* Library (left, image icon) + Replay (right) flank the transport */
-    var replaySvg = '<img class="lgp-side-ico" src="' + IC.replay + '" alt="">';
-    var libSvg = '<img class="lgp-side-ico" src="' + IC.library + '" alt="">';
+    var replaySvg = bgi('lgp-side-ico', IC.replay);
+    var libSvg = bgi('lgp-side-ico', IC.library);
     var libBtn = '<button class="lgp-side" onclick="lgpToggleArc&&document.getElementById(\'lgpArc\')&&document.getElementById(\'lgpArc\').classList.remove(\'open\');openWalkmanLib&&openWalkmanLib()" aria-label="Library">' + libSvg + '<span>Library</span></button>';
     var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
@@ -111,25 +114,25 @@
           '</div>' +
           '<div class="lgp-practice-row">' +
             '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
-              '<span class="lgp-sentence-orb"><img class="lgp-sentence-ico" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png" alt=""></span>' +
+              '<span class="lgp-sentence-orb"><span class="lgp-sentence-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png\')"></span></span>' +
               '<span class="lgp-sentence-lbl">Sentence</span>' +
             '</button>' +
             '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
-              '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><img class="lgp-practice-ico" src="' + IC.mic + '" alt=""></span>' +
+              '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><span class="lgp-practice-ico" style="background-image:url(\'' + IC.mic + '\')"></span></span>' +
               '<span class="lgp-practice-lbl">Practice</span>' +
             '</button>' +
             '<button class="lgp-store" onclick="openSub&&openSub(\'nowssb-store\')" aria-label="Store">' +
-              '<span class="lgp-store-orb"><img class="lgp-store-ico" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png" alt=""></span>' +
+              '<span class="lgp-store-orb"><span class="lgp-store-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png\')"></span></span>' +
               '<span class="lgp-store-lbl">Store</span>' +
             '</button>' +
           '</div>' +
         '</div>' +
         '<div id="spPhasePost" style="display:' + (phase === 'post-play' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:12px;width:100%;">' +
           '<div class="lgp-status">Word played · your turn</div>' +
-          '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()"><img class="lgp-mic-ico" src="' + IC.mic + '" alt="">Practice Now</button>' +
+          '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()"><span class="lgp-mic-ico" style="background-image:url(\'' + IC.mic + '\')"></span>Practice Now</button>' +
           '<div class="lgp-controls" style="margin-top:4px;">' +
             '<button class="lgp-ctrl" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><img class="lgp-img" src="' + IC.play + '" alt=""></button>' +
+            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><span class="lgp-img" style="background-image:url(\'' + IC.play + '\')"></span></button>' +
             '<button class="lgp-ctrl" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
           '</div>' +
         '</div>' +
@@ -147,7 +150,7 @@
           '</div>' +
           '<div class="lgp-controls" style="margin-top:10px;">' +
             '<button class="lgp-ctrl" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><img class="lgp-img" src="' + IC.play + '" alt=""></button>' +
+            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><span class="lgp-img" style="background-image:url(\'' + IC.play + '\')"></span></button>' +
             '<button class="lgp-ctrl" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
           '</div>' +
         '</div>' +
