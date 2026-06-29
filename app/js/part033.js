@@ -621,7 +621,7 @@
       ov.id='nwsb-postviewer';
       ov.innerHTML='<style>'+css+'</style>'+
         '<div class="nwsb-pv-top">'+avHtml+
-          '<div class="nwsb-pv-topmeta"><div class="nwsb-pv-name">'+name+'</div>'+(uname?'<div class="nwsb-pv-uname">'+uname+'</div>':'')+'</div>'+
+          '<div class="nwsb-pv-topmeta"><div class="nwsb-pv-name">'+name+(verifyTierOf(prof)?verifyBadgeImg(verifyTierOf(prof),15):'')+'</div>'+(uname?'<div class="nwsb-pv-uname">'+uname+'</div>':'')+'</div>'+
           '<button class="nwsb-pv-close" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-postviewer\');if(p)p.remove();">&times;</button>'+
         '</div>'+
         '<div class="nwsb-pv-scroll" id="nwsb-pv-scroll">'+cards+'</div>';

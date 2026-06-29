@@ -5,11 +5,23 @@
 ═══════════════════════════════════════════════════════════════ */
 (function () {
 
-  /* ── Headphone SVG (replaces Instagram blue verified check) ── */
-  var HP_SVG_TIER = '<svg class="nwsb-badge-hp nwsb-badge-tier" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';
-  var HP_SVG_ULT  = '<svg class="nwsb-badge-hp nwsb-badge-ult" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';
-  var HP_SVG_MASS = '<svg class="nwsb-badge-hp nwsb-badge-massive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';
-  var HP_ICON_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';
+  /* ── NowssB Verified IMAGE badge (the headphone check-mark seal images),
+     shown as a neumorphic circle — replaces the old teal headphone SVG ── */
+  var VB_IMG = {
+    blue:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png',
+    silver:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png',
+    gold:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png',
+    diamond: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png'
+  };
+  function imgBadge(tier, size) {
+    size = size || 18;
+    var img = VB_IMG[tier] || VB_IMG.blue;
+    return '<span class="ig-vbadge" style="display:inline-flex;align-items:center;justify-content:center;width:' + size + 'px;height:' + size + 'px;border-radius:50% !important;margin-left:5px;vertical-align:-' + Math.round(size * 0.22) + 'px;overflow:hidden;background:#eef1f6;box-shadow:2px 2px 5px rgba(0,0,0,.2),-1.5px -1.5px 4px rgba(255,255,255,.96);"><img src="' + img + '" alt="Verified" style="width:100%;height:100%;object-fit:cover;border-radius:50% !important;display:block;"></span>';
+  }
+  var HP_SVG_TIER = imgBadge('blue', 18);
+  var HP_SVG_ULT  = imgBadge('gold', 18);
+  var HP_SVG_MASS = imgBadge('diamond', 18);
+  var HP_ICON_SVG = imgBadge('blue', 16);
 
   /* ══════════════════════════════════════════════════════════
      VERIFY — badge level system
