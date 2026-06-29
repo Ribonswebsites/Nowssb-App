@@ -182,14 +182,26 @@
         '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
         center +
-        arc +
       '</div>';
+
+    /* The settings arc must NOT live inside .sub-screen — that screen creates its
+       own stacking context (z-index:600 + transform/contain), which traps and
+       clips the arc no matter how high its z-index. Render it as a direct child
+       of <body> so it's a real top-level overlay above everything. */
+    var arcWasOpen = (function () { var a = document.getElementById('lgpArc'); return !!(a && a.classList.contains('open')); })();
+    var oldArc = document.getElementById('lgpArc');
+    if (oldArc) oldArc.remove();
+    var tmp = document.createElement('div');
+    tmp.innerHTML = arc;
+    var arcEl = tmp.firstChild;
+    document.body.appendChild(arcEl);
+    if (arcWasOpen) { window.lgpToggleArc(true); }
   }
   window.renderLiquidPlayer = renderLiquidPlayer;
-  window.lgpToggleArc = function () {
+  window.lgpToggleArc = function (forceOpen) {
     var a = document.getElementById('lgpArc');
     if (!a) return;
-    var willOpen = !a.classList.contains('open');
+    var willOpen = (forceOpen === true) ? true : !a.classList.contains('open');
     a.classList.toggle('open', willOpen);
     /* Inline styles so the arc opens even if a stale cached player CSS is still
        in effect (immune to the old narrow-column bug). */
@@ -223,6 +235,19 @@
       if (active() && !window._sspActive) {
         try { renderLiquidPlayer(); return; } catch (e) { /* fall back to original */ }
       }
+      /* not using the liquid player → make sure no stray body-level arc lingers */
+      var stray = document.getElementById('lgpArc');
+      if (stray) stray.remove();
+      return orig.apply(this, arguments);
+    };
+  })();
+
+  /* Close (and detach) the arc whenever the practice screen is closed */
+  (function patchCloseSub() {
+    if (typeof window.closeSub !== 'function') { return setTimeout(patchCloseSub, 200); }
+    var orig = window.closeSub;
+    window.closeSub = function (id) {
+      if (id === 'practice') { var a = document.getElementById('lgpArc'); if (a) a.remove(); }
       return orig.apply(this, arguments);
     };
   })();
