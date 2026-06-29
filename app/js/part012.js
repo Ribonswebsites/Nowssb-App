@@ -534,6 +534,18 @@ function nmhRefresh() {
   var greet = document.getElementById('nmhGreeting');
   if (greet) greet.innerHTML = g + (name ? ',<br>' + name : ',<br>Healer');
 
+  // Sync time-of-day greeting image
+  var GREET_IMGS = {
+    morning:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749762/grok_image_1782749533198_o0bzf9.jpg',
+    noon:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749763/grok_image_1782749585407_marxv4.jpg',
+    afternoon:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749763/grok_image_1782749569619_zzlmxg.jpg',
+    evening:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749763/grok_image_1782749538239_vaz21h.jpg',
+    night:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749762/grok_image_1782749559712_azpsuj.jpg'
+  };
+  var slot = h < 5 ? 'night' : h < 11 ? 'morning' : h < 14 ? 'noon' : h < 17 ? 'afternoon' : h < 20 ? 'evening' : 'night';
+  var gimg = document.getElementById('nmhGreetImg');
+  if (gimg) gimg.style.backgroundImage = "url('" + GREET_IMGS[slot] + "')";
+
   // Sync today's word from the dark home if available
   var tw = document.getElementById('todayPracticeTitle');
   var nmw = document.getElementById('nmhTodayWord');

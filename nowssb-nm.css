@@ -2022,3 +2022,16 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   flex-shrink: 0 !important;
 }
 #profilePhotoPencil svg { width: 13px !important; height: 13px !important; }
+
+/* ===== HOME PAGE — TIME-OF-DAY GREETING IMAGE ===== */
+.nmh-greet-img{
+  width:100% !important;
+  aspect-ratio:16/9 !important;
+  border-radius:22px !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  background-color:#e9e2d4 !important;
+  box-shadow:0 10px 28px rgba(40,30,15,.18) !important;
+  margin-bottom:2px !important;
+}
