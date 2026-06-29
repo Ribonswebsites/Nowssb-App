@@ -228,11 +228,15 @@
      Open the store ON TOP of the player (higher z-index), skip its intro, then
      quietly close the player behind it. */
   window.lgpOpenStore = function () {
-    try { if (typeof openSub === 'function') openSub('nowssb-store'); } catch (e) {}
-    var s = document.getElementById('sub-nowssb-store');
-    if (s) s.style.zIndex = '800';            /* above the practice screen (z 600) */
-    try { if (typeof nssEnterStore === 'function') nssEnterStore(); } catch (e) {} /* skip the intro page */
-    setTimeout(function () { try { if (typeof closeSub === 'function') closeSub('practice'); } catch (e) {} }, 30);
+    try {
+      if (typeof openSub === 'function') openSub('nowssb-store');   /* nssOpen — slides the store in */
+      var s = document.getElementById('sub-nowssb-store');
+      if (s) s.style.zIndex = '900';                               /* sit ON TOP of the player (no need to close it → no home flash) */
+      if (typeof nssEnterStore === 'function') nssEnterStore();     /* render the store body + media */
+      /* kill the intro page INSTANTLY (no fade) so we land straight on the store */
+      var intro = document.getElementById('nssIntroPage');
+      if (intro) { intro.style.display = 'none'; intro.style.opacity = '0'; intro.style.pointerEvents = 'none'; }
+    } catch (e) {}
   };
 
   window.lgpToggleArc = function (forceOpen) {
