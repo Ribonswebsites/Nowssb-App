@@ -41,7 +41,7 @@
 .lgp > *:not(.lgp-bg):not(.lgp-scrim):not(.lgp-orbs) { position:relative; z-index:2; }
 
 /* top bar */
-.lgp .lgp-top { width:100%; display:flex; align-items:center; justify-content:space-between; }
+.lgp .lgp-top { position:relative; width:100%; display:flex; align-items:center; justify-content:space-between; }
 .lgp .lgp-back, .lgp .lgp-settings {
   width:42px; height:42px; border:none; border-radius:50% !important; cursor:pointer;
   background:rgba(255,255,255,.14); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
@@ -50,7 +50,8 @@
   display:flex; align-items:center; justify-content:center;
 }
 .lgp .lgp-brand {
-  margin-top:2px; font-size:22px; font-weight:800; letter-spacing:-.5px;
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  font-size:23px; font-weight:800; letter-spacing:-.5px; white-space:nowrap;
   text-shadow:0 2px 20px rgba(0,0,0,.4), 0 0 26px var(--lg-accent);
 }
 .lgp .lgp-ritual {
@@ -89,7 +90,7 @@
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
-  width:100%; max-width:312px; margin:6px 0 0; aspect-ratio:1/.6; flex-shrink:0;
+  width:100%; max-width:330px; margin:8px 0 0; aspect-ratio:1/.8; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
@@ -115,10 +116,16 @@
 @keyframes lgpWaveB { 0%,100%{ transform:scaleY(.7) } 50%{ transform:scaleY(1.05) } }
 @keyframes lgpWaveC { 0%,100%{ transform:translateY(0) scaleY(1) } 50%{ transform:translateY(-6px) scaleY(1.3) } }
 
+/* word + syllables + organ overlaid INSIDE the video panel */
+.lgp .lgp-visual-overlay {
+  position:absolute; left:0; right:0; bottom:0; z-index:3;
+  padding:16px 12px 13px; display:flex; flex-direction:column; align-items:center;
+  background:linear-gradient(180deg, rgba(6,10,22,0) 0%, rgba(6,10,22,.5) 42%, rgba(6,10,22,.85) 100%);
+}
 /* title / syllables / organ */
 .lgp .lgp-title {
-  margin-top:6px; font-size:28px; font-weight:800; letter-spacing:.5px; text-align:center; line-height:1.05;
-  text-shadow:0 2px 26px rgba(0,0,0,.45), 0 0 32px var(--lg-accent);
+  margin-top:0; font-size:30px; font-weight:800; letter-spacing:.5px; text-align:center; line-height:1.05;
+  text-shadow:0 2px 26px rgba(0,0,0,.6), 0 0 32px var(--lg-accent);
 }
 .lgp .lgp-syls { margin-top:7px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
 .lgp .lgp-syl {

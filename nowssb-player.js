@@ -182,17 +182,20 @@
           '<button class="lgp-back" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
             '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
           '</button>' +
+          '<div class="lgp-brand">NowssB</div>' +
           '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
             '<img class="lgp-img" src="' + IC.settings + '" alt="">' +
           '</button>' +
         '</div>' +
-        '<div class="lgp-brand">NowssB</div>' +
         '<div class="lgp-tagline">' + ['The','new','fashion','trend','of','meditation'].map(function (wd, i) { return '<span style="animation-delay:' + (0.25 + i * 0.18).toFixed(2) + 's">' + wd + '</span>'; }).join(' ') + '</div>' +
         '<div class="lgp-ritual">' + ritual + ' Ritual · ' + (idx + 1) + ' of ' + total + '</div>' +
-        '<div class="lgp-visual">' + visual + '</div>' +
-        '<div class="lgp-title">' + (w.word || '') + '</div>' +
-        '<div class="lgp-syls">' + syl + '</div>' +
-        '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
+        '<div class="lgp-visual">' + visual +
+          '<div class="lgp-visual-overlay">' +
+            '<div class="lgp-title">' + (w.word || '') + '</div>' +
+            '<div class="lgp-syls">' + syl + '</div>' +
+            '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
+          '</div>' +
+        '</div>' +
         '<div class="lgp-ticker"><span>Listen</span><span>Learn</span><span>Practice</span><span>Heal</span></div>' +
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
         center +
