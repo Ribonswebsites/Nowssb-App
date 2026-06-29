@@ -1958,3 +1958,25 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
   width: 30px !important; height: 30px !important; border-radius: 50% !important;
   top: auto !important; flex-shrink: 0 !important;
 }
+
+/* ════════ HEALING BODY MAP — glass image + glowing organ points ════════ */
+.hbm-figure {
+  position: relative; width: 100%; max-width: 300px; margin: 0 auto;
+  aspect-ratio: 788 / 1182;
+  background-size: contain; background-position: center; background-repeat: no-repeat;
+}
+.hbm-figure.mini { max-width: 118px; }
+.hbm-point {
+  position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1 / 1;
+  border-radius: 50% !important; cursor: pointer;
+  background: radial-gradient(circle, var(--organ-color) 0%, var(--organ-color) 12%, transparent 66%);
+  opacity: 0; transition: opacity .5s ease; filter: blur(2px); pointer-events: auto;
+}
+.hbm-figure.mini .hbm-point { pointer-events: none; filter: blur(1px); }
+.hbm-point.active { opacity: .9; animation: hbmPointPulse 2.6s ease-in-out infinite; }
+@keyframes hbmPointPulse {
+  0%, 100% { opacity: .42; transform: translate(-50%, -50%) scale(.82); }
+  50%      { opacity: .95; transform: translate(-50%, -50%) scale(1.14); }
+}
+/* give the glass body image more room than the old 180px SVG */
+.hbm-svg-wrap { width: 264px !important; margin: 0 auto 16px !important; }
