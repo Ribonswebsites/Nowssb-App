@@ -152,12 +152,16 @@
 /* glass-capsule image wrapped around the transport controls (e_trim crops the
    whitespace so the capsule fills the bar) */
 .lgp .lgp-tube {
-  position:relative; width:100%; max-width:348px; margin-top:8px;
-  padding:12px 24px; min-height:84px; display:flex; align-items:center;
-  background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim/v1782725628/file_000000003f10720aaeedcf935d7efc22_htjokn.png') center/100% 100% no-repeat;
+  position:relative; width:100%; max-width:352px; margin-top:8px;
+  padding:10px 30px; min-height:74px; display:flex; align-items:center;
+  background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center/100% 100% no-repeat;
   filter:drop-shadow(0 16px 34px rgba(0,0,0,.5));
 }
 .lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
+/* inside the capsule the side buttons are icon-only (labels would overflow) */
+.lgp .lgp-tube .lgp-side { width:auto; }
+.lgp .lgp-tube .lgp-side span { display:none; }
+.lgp .lgp-tube .lgp-side .lgp-side-ico { width:46px; height:46px; }
 .lgp .lgp-transport { display:flex; align-items:center; justify-content:center; gap:8px; }
 /* glass-sphere icon = the button itself (no glass-circle background, full colour) */
 .lgp .lgp-img { width:100%; height:100%; object-fit:contain; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
