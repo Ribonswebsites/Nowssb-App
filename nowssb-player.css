@@ -245,13 +245,18 @@
 }
 .lgp .lgp-store:active { transform:translateY(-50%) scale(.92); }
 .lgp .lgp-store-orb {
-  width:50px; height:50px; border-radius:50% !important; box-sizing:border-box;
+  width:54px; height:54px; border-radius:50% !important; box-sizing:border-box;
   display:flex; align-items:center; justify-content:center;
-  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.3);
-  -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
-  box-shadow:0 8px 22px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+  background:radial-gradient(circle at 36% 28%, #2b2b34 0%, #131318 55%, #050507 100%);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.22);
+  animation:lgpStorePulse 2.8s ease-in-out infinite;
 }
-.lgp .lgp-store-ico { width:26px; height:26px; object-fit:contain; display:block; filter:brightness(0) invert(1) drop-shadow(0 1px 3px rgba(0,0,0,.4)); }
+@keyframes lgpStorePulse {
+  0%,100% { box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.22), 0 0 0 0 rgba(255,255,255,0); }
+  50%     { box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.22), 0 0 18px 2px var(--lg-accent); }
+}
+.lgp .lgp-store-ico { width:27px; height:27px; object-fit:contain; display:block; filter:brightness(0) invert(1) drop-shadow(0 1px 3px rgba(0,0,0,.4)); }
 .lgp .lgp-store-lbl { text-shadow:0 1px 8px rgba(0,0,0,.4); }
 
 /* Build-your-sentence button — sphere icon, left of the Practice mic */
