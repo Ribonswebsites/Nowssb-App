@@ -185,11 +185,13 @@
           '</button>' +
         '</div>' +
         '<div class="lgp-brand">NowssB</div>' +
+        '<div class="lgp-tagline">The new fashion trend of meditation</div>' +
         '<div class="lgp-ritual">' + ritual + ' Ritual · ' + (idx + 1) + ' of ' + total + '</div>' +
         '<div class="lgp-visual">' + visual + '</div>' +
         '<div class="lgp-title">' + (w.word || '') + '</div>' +
         '<div class="lgp-syls">' + syl + '</div>' +
         '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
+        '<div class="lgp-ticker"><span>Listen</span><span>Learn</span><span>Practice</span><span>Heal</span></div>' +
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
         center +
       '</div>';
