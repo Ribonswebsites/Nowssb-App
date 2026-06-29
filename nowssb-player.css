@@ -57,15 +57,16 @@
   margin-top:4px; font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
   color:rgba(255,255,255,.7);
 }
-/* animated shimmer tagline */
+/* tagline — words fade in one by one */
 .lgp .lgp-tagline {
   margin-top:5px; font-size:10.5px; font-weight:600; letter-spacing:1px; text-align:center;
-  background:linear-gradient(90deg, rgba(255,255,255,.42) 0%, #fff 50%, rgba(255,255,255,.42) 100%);
-  background-size:200% auto; -webkit-background-clip:text; background-clip:text;
-  -webkit-text-fill-color:transparent; color:transparent;
-  animation:lgpShine 4.5s linear infinite;
+  color:rgba(255,255,255,.9);
 }
-@keyframes lgpShine { 0% { background-position:200% center; } 100% { background-position:0% center; } }
+.lgp .lgp-tagline span {
+  display:inline-block; opacity:0;
+  animation:lgpWordIn .5s ease forwards;
+}
+@keyframes lgpWordIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 /* rotating word ticker — Listen · Learn · Practice · Heal */
 .lgp .lgp-ticker { position:relative; height:22px; width:200px; margin-top:8px; }
 .lgp .lgp-ticker span {

@@ -185,7 +185,7 @@
           '</button>' +
         '</div>' +
         '<div class="lgp-brand">NowssB</div>' +
-        '<div class="lgp-tagline">The new fashion trend of meditation</div>' +
+        '<div class="lgp-tagline">' + ['The','new','fashion','trend','of','meditation'].map(function (wd, i) { return '<span style="animation-delay:' + (0.25 + i * 0.18).toFixed(2) + 's">' + wd + '</span>'; }).join(' ') + '</div>' +
         '<div class="lgp-ritual">' + ritual + ' Ritual · ' + (idx + 1) + ' of ' + total + '</div>' +
         '<div class="lgp-visual">' + visual + '</div>' +
         '<div class="lgp-title">' + (w.word || '') + '</div>' +

@@ -25,6 +25,28 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- ONE-TIME SERVICE-WORKER KILL-SWITCH: breaks a stuck old SW that keeps
+     serving stale CSS/JS. Runs once per device (guarded by localStorage),
+     unregisters every SW, clears every cache, then reloads clean. -->
+<script>
+(function () {
+  try {
+    var KEY = 'nwsb_sw_reset_v4';
+    if (localStorage.getItem(KEY)) return;
+    localStorage.setItem(KEY, '1');
+    if (!('serviceWorker' in navigator)) return;
+    var jobs = [
+      navigator.serviceWorker.getRegistrations().then(function (rs) {
+        return Promise.all(rs.map(function (r) { return r.unregister(); }));
+      }).catch(function(){}),
+      (window.caches ? caches.keys().then(function (ks) {
+        return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+      }).catch(function(){}) : Promise.resolve())
+    ];
+    Promise.all(jobs).then(function () { location.reload(); });
+  } catch (e) {}
+})();
+</script>
 <title>NowssB — Join the New Fashion Trend of Meditation</title>
 <meta name="description" content="Meditation is the new fashion trend — and NowssB is how you join it. Make mindful meditation your daily ritual, build your streak, and wear your calm. Start free.">
 <meta name="keywords" content="meditation, meditation app, fashion trend, mindfulness, daily meditation, meditation ritual, NowssB, calm, wellness trend">
@@ -75,9 +97,9 @@
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js"></script>
 <link rel="stylesheet" href="app/app.css">
-<link rel="stylesheet" href="nowssb-social.css?v=77">
-<link rel="stylesheet" href="nowssb-nm.css?v=77">
-<link rel="stylesheet" href="nowssb-player.css?v=77">
+<link rel="stylesheet" href="nowssb-social.css?v=78">
+<link rel="stylesheet" href="nowssb-nm.css?v=78">
+<link rel="stylesheet" href="nowssb-player.css?v=78">
 </head>
 <body>
 <script src="app/js/part002.js"></script>
@@ -6997,9 +7019,9 @@
 </div>
 
 <script src="app/js/part049.js"></script>
-<script src="nowssb-social.js?v=77" defer></script>
-<script src="nowssb-nm.js?v=77" defer></script>
-<script src="nowssb-player.js?v=77" defer></script>
+<script src="nowssb-social.js?v=78" defer></script>
+<script src="nowssb-nm.js?v=78" defer></script>
+<script src="nowssb-player.js?v=78" defer></script>
 
 </body>
 </html>
