@@ -1979,3 +1979,15 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
 }
 /* give the glass body image more room than the old 180px SVG */
 .hbm-svg-wrap { width: 264px !important; margin: 0 auto 16px !important; }
+
+/* ── Store/archive back buttons: use the glass back-sphere image (not SVG) ── */
+.cwp-back, .oh-cat-back, .wish-cat-back, .cart-intro-back {
+  background-image: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') !important;
+  background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
+  border: none !important;
+}
+.cwp-back svg, .oh-cat-back svg, .wish-cat-back svg, .cart-intro-back svg { display: none !important; }
+
+/* ── Shabdapathy video banner: give the tall text room so the eyebrow isn't clipped ── */
+.home-video-banner { padding-bottom: 64% !important; }
+.hvb-text { top: 50% !important; }
