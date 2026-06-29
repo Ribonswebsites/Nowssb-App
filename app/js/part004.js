@@ -124,9 +124,7 @@ function renderPracticeIntro() {
       '<div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:max(env(safe-area-inset-top,18px),18px) 28px calc(var(--nav-height,0px) + max(env(safe-area-inset-bottom,20px),20px));">' +
 
         '<div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:4px;">' +
-          '<div onclick="closeSub(\'practice\')" style="width:40px;height:40px;cursor:pointer;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
-            '<svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/></svg>' +
-          '</div>' +
+          '<div onclick="closeSub(\'practice\')" style="width:46px;height:46px;cursor:pointer;flex-shrink:0;background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/contain no-repeat;"></div>' +
           '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
           '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;">' +
             '<svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>' +
@@ -142,8 +140,8 @@ function renderPracticeIntro() {
 
           '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(10,18,38,0.75);border-radius:14px !important;padding:14px 20px;margin-bottom:22px;">' +
             '<span style="font-size:14px;font-weight:700;color:#fff;">Voice Guidance</span>' +
-            '<div id="piToggle" onclick="pwIntroToggle(this)" data-on="true" style="width:48px;height:26px;border-radius:13px !important;background:#e8b100;position:relative;flex-shrink:0;cursor:pointer;box-shadow:0 2px 14px rgba(232,177,0,0.5);transition:background 0.25s,box-shadow 0.25s;">' +
-              '<div style="width:20px;height:20px;border-radius:50% !important;background:#fff;position:absolute;top:3px;right:3px;display:flex;align-items:center;justify-content:center;transition:right 0.25s;">' +
+            '<div id="piToggle" onclick="pwIntroToggle(this)" data-on="true" style="width:44px;height:22px;border-radius:11px !important;background:#e8b100;position:relative;flex-shrink:0;cursor:pointer;box-shadow:0 2px 14px rgba(232,177,0,0.5);transition:background 0.25s,box-shadow 0.25s;">' +
+              '<div style="width:16px;height:16px;border-radius:50% !important;background:#fff;position:absolute;top:3px;right:3px;display:flex;align-items:center;justify-content:center;transition:right 0.25s;">' +
                 '<svg width="11" height="9" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#e8b100" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
               '</div>' +
             '</div>' +
@@ -171,7 +169,7 @@ function pwIntroToggle(el) {
     el.style.background = 'rgba(255,255,255,0.12)';
     el.style.boxShadow = 'none';
     el.setAttribute('data-on', 'false');
-    if (thumb) { thumb.style.right = 'calc(100% - 23px)'; thumb.innerHTML = ''; }
+    if (thumb) { thumb.style.right = 'calc(100% - 19px)'; thumb.innerHTML = ''; }
   } else {
     // Turn ON — word pronounces itself automatically when player opens
     _pwAutoPlay = true;

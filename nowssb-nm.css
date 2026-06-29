@@ -1960,11 +1960,17 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
 
 /* ════════ HEALING BODY MAP — glass image + glowing organ points ════════ */
 .hbm-figure {
-  position: relative; width: 100%; max-width: 300px; margin: 0 auto;
+  position: relative; width: 100%; max-width: 340px; margin: 0 auto;
   aspect-ratio: 788 / 1182;
   background-size: contain; background-position: center; background-repeat: no-repeat;
 }
+/* dark backdrop so the glass organs pop now that the image has no background */
+.hbm-figure::before {
+  content: ''; position: absolute; inset: -8% -4%; z-index: -1; border-radius: 28px !important;
+  background: radial-gradient(ellipse at 50% 46%, rgba(12,20,38,0.92) 22%, rgba(8,14,28,0.55) 58%, transparent 100%);
+}
 .hbm-figure.mini { max-width: 118px; }
+.hbm-figure.mini::before { display: none; }
 .hbm-point {
   position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1 / 1;
   border-radius: 50% !important; cursor: pointer;
@@ -1978,7 +1984,7 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
   50%      { opacity: .95; transform: translate(-50%, -50%) scale(1.14); }
 }
 /* give the glass body image more room than the old 180px SVG */
-.hbm-svg-wrap { width: 300px !important; margin: 0 auto 16px !important; }
+.hbm-svg-wrap { width: min(90vw, 340px) !important; margin: 0 auto 16px !important; }
 
 /* ── Store/archive back buttons: use the glass back-sphere image (not SVG) ── */
 .cwp-back, .oh-cat-back, .wish-cat-back, .cart-intro-back {
