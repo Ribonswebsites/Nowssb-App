@@ -107,7 +107,10 @@
             '</div>' +
             replayBtn +
           '</div>' +
-          '<button class="lgp-mic" onclick="pwPracticeNow&&pwPracticeNow()"><img class="lgp-mic-ico" src="' + IC.mic + '" alt="">Practice this word</button>' +
+          '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
+            '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><img class="lgp-practice-ico" src="' + IC.mic + '" alt=""></span>' +
+            '<span class="lgp-practice-lbl">Practice</span>' +
+          '</button>' +
         '</div>' +
         '<div id="spPhasePost" style="display:' + (phase === 'post-play' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:12px;width:100%;">' +
           '<div class="lgp-status">Word played · your turn</div>' +
