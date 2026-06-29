@@ -800,7 +800,7 @@
     var pill = document.getElementById('ss-voice-pill');
     var sub  = document.getElementById('ss-voice-sub');
     if (pill) pill.textContent = next === 'F' ? 'Female' : 'Male';
-    if (sub)  sub.textContent  = (next === 'F' ? 'Female' : 'Male') + ' voice (ElevenLabs)';
+    if (sub)  sub.textContent  = (next === 'F' ? 'Female' : 'Male') + ' voice';
   };
 
   // ── Playback Speed (cycles 0.75 / 1.0 / 1.25 / 1.5) ──

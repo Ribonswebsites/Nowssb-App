@@ -1908,3 +1908,44 @@ body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #c8a96e !im
    the bottom of light screens / splash). */
 body.nm-mode .app-bg::after { display:none !important; }
 body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
+
+/* ── Fashion-home tile icons: glass wrapper in the top-left corner ── */
+.home-tile { position: relative; }
+.home-tile-icon {
+  position: absolute !important; top: 12px !important; left: 12px !important;
+  width: 44px !important; height: 44px !important; margin: 0 !important;
+  padding: 8px !important; border-radius: 13px !important; opacity: 1 !important; z-index: 3 !important;
+  background: rgba(255,255,255,0.13) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3);
+  border: 1px solid rgba(255,255,255,0.26) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.32) !important;
+  display: flex; align-items: center; justify-content: center;
+}
+.home-tile-icon img { width: 100% !important; height: 100% !important; object-fit: contain !important; }
+
+/* ════════ STORE / ARCHIVE pages: stop the bottom nav (58px) from overlapping
+   CTAs, and fix the cart action buttons that stretched tall ════════ */
+/* Cart ♡ / ✕ buttons — force square (flex was stretching them tall) */
+.cwp-item-btn {
+  width: 38px !important; height: 38px !important; border-radius: 10px !important;
+  align-self: center !important; flex-shrink: 0 !important; padding: 0 !important;
+}
+/* Lift the cart checkout bar above the bottom nav */
+.cwp-checkout-bar { bottom: calc(58px + env(safe-area-inset-bottom, 0px)) !important; }
+/* Archive / wishlist / order-history intro CTAs — clear the nav */
+.oh-cat-bottom, .wish-cat-bottom, .cart-intro-bottom {
+  padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 28px) !important;
+}
+
+/* ── Subscription plans: horizontal swipe carousel (one plan per panel) ── */
+#ss-plan-cards {
+  display: flex !important; flex-direction: row !important; gap: 14px !important;
+  overflow-x: auto !important; overflow-y: visible;
+  -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;
+  padding: 6px 2px 16px !important; scrollbar-width: none;
+}
+#ss-plan-cards::-webkit-scrollbar { display: none; }
+#ss-plan-cards .plan-card {
+  flex: 0 0 87% !important; max-width: 340px; margin-bottom: 0 !important;
+  scroll-snap-align: center; box-sizing: border-box; align-self: flex-start;
+}

@@ -33,7 +33,7 @@ var SS_PLANS = [
     features:[
       [true, 'Unlimited words per day'],
       [true, 'All 5 player modes (Listen, Repeat, Speak, Library, AI)'],
-      [true, 'AI pronunciation scoring — Groq Whisper'],
+      [true, 'AI pronunciation scoring'],
       [true, 'Session sentence builder from owned words'],
       [true, 'All 20 health categories'],
       [true, 'AI persona feedback after each session'],
@@ -45,7 +45,7 @@ var SS_PLANS = [
       [true, 'Enhanced profile (bio, banner)'],
       [false,'Voice Resonance Score overlay'],
       [false,'Sentence Alchemy (personalised AI)'],
-      [false,'Premium cert designs + export (PNG)'],
+      [false,'Premium certificate designs + export'],
       [false,'Custom word requests'],
     ]
   },
@@ -56,12 +56,12 @@ var SS_PLANS = [
     price:{ monthly:699, yearly:5999 },
     features:[
       [true, 'Everything in Resonance'],
-      [true, 'Voice Resonance Score (waveform comparison)'],
+      [true, 'Voice Resonance Score'],
       [true, 'Sentence Alchemy — personalised AI sentences'],
       [true, 'All AI personas + exclusive ones'],
       [true, 'Sound Bath + custom ambient layer mixing'],
       [true, 'Full AI Conversation with session memory'],
-      [true, 'Premium cert designs + export (canvas PNG)'],
+      [true, 'Premium certificate designs + export'],
       [true, 'Featured in community search'],
       [true, 'Priority chat + exclusive community access'],
       [true, 'Custom word requests — 2 per month'],
@@ -79,7 +79,7 @@ var SS_PLANS = [
       [true, 'Everything in Frequency'],
       [true, 'Custom words — 5 requests/month (team-crafted)'],
       [true, 'Word Drop — 48h early access before anyone'],
-      [true, 'ElevenLabs premium voice — studio-quality audio'],
+      [true, 'Premium studio-quality voice'],
       [true, 'Physical certificate printing (posted to you)'],
       [true, '1:1 monthly Shabdapathy session (video call)'],
       [true, 'Exclusive Frequency X community (private)'],
@@ -170,7 +170,7 @@ var _supHistory = []; // conversation history for context
 
 var SUP_SYSTEM = `You are the NowssB support assistant — friendly, concise, and knowledgeable about the app.
 
-NowssB is a healing word-science app based on Shabdapathy — the study of natural-origin phonetic vibrations and their effect on organs and wellbeing. Users practice Sanskrit and natural-origin words by listening and repeating them. Groq Whisper scores their pronunciation.
+NowssB is a healing word-science app based on Shabdapathy — the study of natural-origin phonetic vibrations and their effect on organs and wellbeing. Users practice Sanskrit and natural-origin words by listening and repeating them. The app's AI scores their pronunciation.
 
 Key facts to know:
 - Plans: Free Trial (7 days full access) → Resonance (₹299/mo · ₹2499/yr) → Frequency (₹699/mo · ₹5999/yr) → Frequency X (₹1499/mo · ₹11999/yr)
