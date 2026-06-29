@@ -159,10 +159,17 @@
 
     /* RADIAL liquid-glass settings menu — opens centred, blurs everything behind,
        settings icon in the middle with the options in a glass circle around it. */
+    var wInfo =
+      '<div class="lgp-arc-info">' +
+        '<div class="lgp-arc-info-word">' + (w.word || '') + (w.phonetic ? ' <span>' + w.phonetic + '</span>' : '') + '</div>' +
+        (w.meaning ? '<div class="lgp-arc-info-row"><span class="k">Meaning</span><span class="v">' + w.meaning + '</span></div>' : '') +
+        (w.benefit ? '<div class="lgp-arc-info-row"><span class="k">Heals</span><span class="v">' + w.benefit + '</span></div>' : '') +
+        ((w.categories && w.categories.length) ? '<div class="lgp-arc-info-row"><span class="k">Category</span><span class="v">' + w.categories.join(' · ') + '</span></div>' : (w.organ ? '<div class="lgp-arc-info-row"><span class="k">Category</span><span class="v">' + w.organ + '</span></div>' : '')) +
+      '</div>';
     var arc =
-      '<div class="lgp-arc" id="lgpArc">' +
+      '<div class="lgp-arc" id="lgpArc" style="--lg-accent:' + th.accent + '">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
-        '<button class="lgp-arc-close lgp-imgbtn" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
+        '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
         '<div class="lgp-arc-radial">' +
           '<div class="lgp-arc-ring"></div>' +
           '<button class="lgp-arc-opt o1" onclick="pwSetVoice&&pwSetVoice(\'' + (voice === 'F' ? 'M' : 'F') + '\');renderPractice&&renderPractice()"><span class="lbl">Voice</span><span class="val">' + (voice === 'F' ? 'Female' : 'Male') + '</span></button>' +
@@ -172,6 +179,7 @@
           '<button class="lgp-arc-opt o5" onclick="lgpToggleArc();if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()"><span class="ico" style="background-image:url(\'' + IC.replay + '\')"></span><span class="lbl">Replay</span></button>' +
           '<div class="lgp-arc-center"><span class="lgp-arc-center-ico" style="background-image:url(\'' + IC.settings + '\')"></span><span class="lgp-arc-center-lbl">Settings</span></div>' +
         '</div>' +
+        wInfo +
       '</div>';
 
     body.innerHTML =
@@ -194,11 +202,6 @@
             '<div class="lgp-syls">' + syl + '</div>' +
             '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
           '</div>' +
-        '</div>' +
-        '<div class="lgp-info">' +
-          (w.meaning ? '<div class="lgp-info-row"><span class="k">Meaning</span><span class="v">' + w.meaning + '</span></div>' : '') +
-          (w.benefit ? '<div class="lgp-info-row"><span class="k">Heals</span><span class="v">' + w.benefit + '</span></div>' : '') +
-          ((w.categories && w.categories.length) ? '<div class="lgp-info-row"><span class="k">Category</span><span class="v">' + w.categories.join(' · ') + '</span></div>' : (w.organ ? '<div class="lgp-info-row"><span class="k">Category</span><span class="v">' + w.organ + '</span></div>' : '')) +
         '</div>' +
         '<div class="lgp-ticker"><span>Listen</span><span>Learn</span><span>Practice</span><span>Heal</span></div>' +
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
