@@ -121,7 +121,7 @@
               '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><span class="lgp-practice-ico" style="background-image:url(\'' + IC.mic + '\')"></span></span>' +
               '<span class="lgp-practice-lbl">Practice</span>' +
             '</button>' +
-            '<button class="lgp-store" onclick="openSub&&openSub(\'nowssb-store\')" aria-label="Store">' +
+            '<button class="lgp-store" onclick="closeSub&&closeSub(\'practice\');setTimeout(function(){openSub&&openSub(\'nowssb-store\')},30)" aria-label="Store">' +
               '<span class="lgp-store-orb"><span class="lgp-store-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png\')"></span></span>' +
               '<span class="lgp-store-lbl">Store</span>' +
             '</button>' +
@@ -157,24 +157,18 @@
         '<div style="display:none;"><button id="spRecBtn"></button><div id="spRecLabel"></div><div id="spRecStatus"></div><button id="spRecPlayBtn"></button><button id="spRecTrashBtn"></button><div id="spRecControls"></div><div id="spWaveform"></div><div id="sp3BtnMain"></div><span id="sp3BtnLbl"></span><div id="sp3BtnIco"></div></div>' +
       '</div>';
 
-    /* curved liquid-glass ARC — slides up when you tap Settings (camera-dial style).
-       Library + Replay now live in the transport row, so the arc is settings only. */
+    /* RADIAL liquid-glass settings menu — opens centred, blurs everything behind,
+       settings icon in the middle with the options in a glass circle around it. */
     var arc =
       '<div class="lgp-arc" id="lgpArc">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
-        '<div class="lgp-arc-sheet">' +
-          '<div class="lgp-arc-handle"></div>' +
-          '<div class="lgp-arc-title">Settings</div>' +
-          '<div class="lgp-arc-row"><span>Voice</span><div class="lgp-arc-seg">' +
-            '<button class="' + (voice === 'F' ? 'on' : '') + '" onclick="pwSetVoice&&pwSetVoice(\'F\');renderPractice&&renderPractice()">Female</button>' +
-            '<button class="' + (voice === 'M' ? 'on' : '') + '" onclick="pwSetVoice&&pwSetVoice(\'M\');renderPractice&&renderPractice()">Male</button>' +
-          '</div></div>' +
-          '<div class="lgp-arc-row" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()"><span>Loop</span><b>' + (loop ? 'On' : 'Off') + '</b></div>' +
-          '<div class="lgp-arc-row" onclick="pwCycleRepTarget&&pwCycleRepTarget();renderPractice&&renderPractice()"><span>Reps</span><b>' + repTarget + '×</b></div>' +
-          '<div class="lgp-arc-actions">' +
-            '<button onclick="lgpToggleArc();openWalkmanLib&&openWalkmanLib()">' + libSvg + '<span>Library</span></button>' +
-            '<button onclick="lgpToggleArc();if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()">' + replaySvg + '<span>Replay</span></button>' +
-          '</div>' +
+        '<div class="lgp-arc-radial">' +
+          '<button class="lgp-arc-opt o1" onclick="pwSetVoice&&pwSetVoice(\'' + (voice === 'F' ? 'M' : 'F') + '\');renderPractice&&renderPractice()"><span class="lbl">Voice</span><span class="val">' + (voice === 'F' ? 'Female' : 'Male') + '</span></button>' +
+          '<button class="lgp-arc-opt o2" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()"><span class="lbl">Loop</span><span class="val">' + (loop ? 'On' : 'Off') + '</span></button>' +
+          '<button class="lgp-arc-opt o3" onclick="pwCycleRepTarget&&pwCycleRepTarget();renderPractice&&renderPractice()"><span class="lbl">Reps</span><span class="val">' + repTarget + '×</span></button>' +
+          '<button class="lgp-arc-opt o4" onclick="lgpToggleArc();openWalkmanLib&&openWalkmanLib()"><span class="ico" style="background-image:url(\'' + IC.library + '\')"></span><span class="lbl">Library</span></button>' +
+          '<button class="lgp-arc-opt o5" onclick="lgpToggleArc();if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()"><span class="ico" style="background-image:url(\'' + IC.replay + '\')"></span><span class="lbl">Replay</span></button>' +
+          '<div class="lgp-arc-center"><span class="lgp-arc-center-ico" style="background-image:url(\'' + IC.settings + '\')"></span><span class="lgp-arc-center-lbl">Settings</span></div>' +
         '</div>' +
       '</div>';
 
@@ -228,22 +222,25 @@
        in effect (immune to the old narrow-column bug). */
     a.style.position = 'fixed';
     a.style.left = a.style.top = a.style.right = a.style.bottom = '0';
-    a.style.zIndex = '99999';
+    a.style.zIndex = '2147483000';
     a.style.pointerEvents = willOpen ? 'auto' : 'none';
     var back = a.querySelector('.lgp-arc-back');
     if (back) {
       back.style.position = 'absolute';
       back.style.left = back.style.top = back.style.right = back.style.bottom = '0';
-      back.style.background = 'rgba(6,10,25,.5)';
+      back.style.background = 'rgba(6,10,25,.32)';
       back.style.transition = 'opacity .3s';
       back.style.opacity = willOpen ? '1' : '0';
+      /* blur EVERYTHING behind the menu (only while open) */
+      var blur = willOpen ? 'blur(16px) saturate(1.2)' : 'none';
+      back.style.webkitBackdropFilter = blur;
+      back.style.backdropFilter = blur;
     }
-    var sheet = a.querySelector('.lgp-arc-sheet');
-    if (sheet) {
-      sheet.style.position = 'absolute';
-      sheet.style.left = sheet.style.right = sheet.style.bottom = '0';
-      sheet.style.transition = 'transform .38s cubic-bezier(.16,1,.3,1)';
-      sheet.style.transform = willOpen ? 'translateY(0)' : 'translateY(105%)';
+    var rad = a.querySelector('.lgp-arc-radial');
+    if (rad) {
+      rad.style.transition = 'transform .36s cubic-bezier(.2,1.1,.3,1), opacity .28s';
+      rad.style.opacity = willOpen ? '1' : '0';
+      rad.style.transform = 'translate(-50%,-50%) scale(' + (willOpen ? '1' : '.55') + ')';
     }
   };
 
