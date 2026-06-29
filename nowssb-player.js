@@ -66,13 +66,11 @@
     var recBars = '';
     for (var r = 0; r < 26; r++) recBars += '<div class="sp-rec-bar" style="height:4px"></div>';
 
-    /* the practice player's own image icon (the headphone play orb) */
-    var ICO_PLAY = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png';
     /* the Library icon image already used in the app's bottom nav */
     var ICO_LIB  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png';
     var playIco = playing
-      ? '<svg width="22" height="24" viewBox="0 0 16 18" fill="none"><rect x="2" y="1" width="4" height="16" rx="1.5" fill="#fff"/><rect x="10" y="1" width="4" height="16" rx="1.5" fill="#fff"/></svg>'
-      : '<img class="lgp-ico" src="' + ICO_PLAY + '" alt="">';
+      ? '<svg width="26" height="28" viewBox="0 0 16 18" fill="none"><rect x="2" y="1" width="4" height="16" rx="1.5" fill="#fff"/><rect x="10" y="1" width="4" height="16" rx="1.5" fill="#fff"/></svg>'
+      : '<svg width="30" height="32" viewBox="0 0 24 24" fill="#fff" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg>';
 
     /* prev / next — clean skip glyphs (no valid image icon exists for these) */
     var prevSvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 6h2.2v12H6zM20 6v12L9.5 12z"/></svg>';
