@@ -108,6 +108,10 @@
             replayBtn +
           '</div>' +
           '<div class="lgp-practice-row">' +
+            '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
+              '<span class="lgp-sentence-orb"><img class="lgp-sentence-ico" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png" alt=""></span>' +
+              '<span class="lgp-sentence-lbl">Sentence</span>' +
+            '</button>' +
             '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
               '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><img class="lgp-practice-ico" src="' + IC.mic + '" alt=""></span>' +
               '<span class="lgp-practice-lbl">Practice</span>' +

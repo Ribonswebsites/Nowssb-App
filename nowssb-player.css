@@ -186,6 +186,18 @@
 .lgp .lgp-store-ico { width:26px; height:26px; object-fit:contain; display:block; filter:brightness(0) invert(1) drop-shadow(0 1px 3px rgba(0,0,0,.4)); }
 .lgp .lgp-store-lbl { text-shadow:0 1px 8px rgba(0,0,0,.4); }
 
+/* Build-your-sentence button — sphere icon, left of the Practice mic */
+.lgp .lgp-sentence {
+  position:absolute; left:4px; top:50%; transform:translateY(-50%);
+  border:none; background:none; cursor:pointer; padding:0;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#fff; opacity:.96;
+}
+.lgp .lgp-sentence:active { transform:translateY(-50%) scale(.92); }
+.lgp .lgp-sentence-orb { width:56px; height:56px; display:flex; align-items:center; justify-content:center; }
+.lgp .lgp-sentence-ico { width:56px; height:56px; object-fit:contain; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
+.lgp .lgp-sentence-lbl { text-shadow:0 1px 8px rgba(0,0,0,.4); }
+
 /* standalone Practice mic — sphere icon with a pulsing ring animation, label below */
 .lgp .lgp-practice {
   border:none; background:none; cursor:pointer; padding:0;
