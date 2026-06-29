@@ -80,7 +80,7 @@ function renderCartPage() {
           '<div class="cwp-item-price">$' + (item.price/100).toFixed(2) + '</div>' +
           '<div class="cwp-item-actions">' +
             '<div class="cwp-item-btn gold" title="Save to wishlist" onclick="cwpCartToWish(\'' + safeId + '\',\'' + safeName + '\',' + item.price + ',\'' + (item.img||'').replace(/'/g,"\\'") + '\',\'' + (item.type||'Word') + '\')">' +
-              '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 13S2 9 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9 8 13 8 13Z" stroke="rgba(232,213,163,0.75)" stroke-width="1.3" stroke-linejoin="round"/></svg>' +
+              '<img class="cw-svg-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png" alt="Wishlist" style="width:20px;height:20px;object-fit:contain;display:block;">' +
             '</div>' +
             '<div class="cwp-item-btn red" title="Remove" onclick="cwpRemoveFromCart(\'' + safeId + '\')">' +
               '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="rgba(255,80,80,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg>' +
@@ -143,7 +143,7 @@ function renderWishPage(filter) {
           '<div class="cwp-item-price">$' + (item.price/100).toFixed(2) + '</div>' +
           '<div class="cwp-item-actions">' +
             '<div class="cwp-item-btn gold" title="Move to cart" onclick="cwpWishToCart(\'' + safeId + '\')">' +
-              '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="rgba(232,213,163,0.8)" stroke-width="1.3" stroke-linecap="square"/></svg>' +
+              '<img class="cw-svg-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png" alt="Move to cart" style="width:20px;height:20px;object-fit:contain;display:block;">' +
             '</div>' +
             '<div class="cwp-item-btn red" title="Remove" onclick="cwpRemoveFromWish(\'' + safeId + '\',\'' + safeName + '\',' + item.price + ',\'' + (item.img||'').replace(/'/g,"\\'") + '\',\'' + (item.type||'Word') + '\')">' +
               '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="rgba(255,80,80,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg>' +

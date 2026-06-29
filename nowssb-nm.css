@@ -2002,3 +2002,6 @@ body:has(#sub-real-meaning.open) #ig-bottomnav,
 body:has(#sub-meaning-store.open) #ig-bottomnav {
   display: none !important;
 }
+
+/* store-header cart/wishlist image icons (replaced the SVGs) */
+.nss-store-icon-img { width: 18px !important; height: 18px !important; object-fit: contain; display: block; }

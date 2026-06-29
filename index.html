@@ -97,9 +97,9 @@
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js"></script>
 <link rel="stylesheet" href="app/app.css">
-<link rel="stylesheet" href="nowssb-social.css?v=101">
-<link rel="stylesheet" href="nowssb-nm.css?v=101">
-<link rel="stylesheet" href="nowssb-player.css?v=101">
+<link rel="stylesheet" href="nowssb-social.css?v=102">
+<link rel="stylesheet" href="nowssb-nm.css?v=102">
+<link rel="stylesheet" href="nowssb-player.css?v=102">
 </head>
 <body>
 <script src="app/js/part002.js"></script>
@@ -2498,11 +2498,7 @@
       <div class="profile-row" id="profileCartRow" onclick="openSub('cart')" style="cursor:pointer;">
         <div style="display:flex;align-items:center;gap:11px;">
           <div style="width:32px;height:32px;background:rgba(232,213,163,0.08);border:1px solid rgba(232,213,163,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-              <path d="M2 2h1.5l2 8h7l1.5-5.5H4.5" stroke="rgba(232,213,163,0.8)" stroke-width="1.3" stroke-linecap="square"/>
-              <circle cx="7" cy="12.5" r="1" fill="rgba(232,213,163,0.7)"/>
-              <circle cx="11" cy="12.5" r="1" fill="rgba(232,213,163,0.7)"/>
-            </svg>
+            <img class="cw-svg-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png" alt="Cart" style="width:16px;height:16px;object-fit:contain;display:block;">
           </div>
           <div class="profile-row-label">My Cart</div>
         </div>
@@ -2516,9 +2512,7 @@
       <div class="profile-row" id="profileWishRow" onclick="openSub('wishlist')" style="cursor:pointer;">
         <div style="display:flex;align-items:center;gap:11px;">
           <div style="width:32px;height:32px;background:rgba(220,80,80,0.07);border:1px solid rgba(220,80,80,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-              <path d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(220,80,80,0.85)" stroke-width="1.3" stroke-linejoin="round" fill="none"/>
-            </svg>
+            <img class="cw-svg-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png" alt="Wishlist" style="width:16px;height:16px;object-fit:contain;display:block;">
           </div>
           <div class="profile-row-label">Wishlist</div>
         </div>
@@ -2673,11 +2667,11 @@
         <!-- ACTION BUTTONS -->
         <div class="rmd-actions-row">
           <button class="rmd-act-wish" id="rmdWishBtn" onclick="rmdToggleWish()">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path id="rmdWishHeart" d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.3"/></svg>
+            <img class="cw-svg-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png" alt="Wishlist" style="width:16px;height:16px;object-fit:contain;display:block;">
             Wishlist
           </button>
           <button class="rmd-act-cart" id="rmdCartBtn" onclick="rmdAddCart()">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 2h1.5l2 8h7l1.5-5.5H4.5" stroke="rgba(232,213,163,0.9)" stroke-width="1.3" stroke-linecap="square"/><circle cx="7" cy="12.5" r="1" fill="rgba(232,213,163,0.8)"/><circle cx="11" cy="12.5" r="1" fill="rgba(232,213,163,0.8)"/></svg>
+            <img class="cw-svg-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png" alt="Cart" style="width:16px;height:16px;object-fit:contain;display:block;">
             Add to Cart
           </button>
         </div>
@@ -3525,17 +3519,11 @@
   <!-- ── CART & WISHLIST ICON BUTTONS (visible in main content) ── -->
   <div class="nss-store-topbar" id="nssStoreTopbar" style="display:none;">
     <div class="nss-store-icon-btn" onclick="nssOpenWishlist()" title="Wishlist">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linejoin="round" fill="none" id="nssWishHeartIcon"/>
-      </svg>
+      <img class="nss-store-icon-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png" alt="Wishlist">
       <div class="nss-icon-badge" id="nssWishBadge">0</div>
     </div>
     <div class="nss-store-icon-btn" onclick="nssOpenCart()" title="Cart">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M2 2h1.5l2 8h7l1.5-5.5H4.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linecap="square"/>
-        <circle cx="7" cy="12.5" r="1" fill="rgba(255,255,255,0.6)"/>
-        <circle cx="11" cy="12.5" r="1" fill="rgba(255,255,255,0.6)"/>
-      </svg>
+      <img class="nss-store-icon-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png" alt="Cart">
       <div class="nss-icon-badge" id="nssCartBadge">0</div>
     </div>
   </div>
@@ -7019,9 +7007,9 @@
 </div>
 
 <script src="app/js/part049.js"></script>
-<script src="nowssb-social.js?v=101" defer></script>
-<script src="nowssb-nm.js?v=101" defer></script>
-<script src="nowssb-player.js?v=101" defer></script>
+<script src="nowssb-social.js?v=102" defer></script>
+<script src="nowssb-nm.js?v=102" defer></script>
+<script src="nowssb-player.js?v=102" defer></script>
 
 </body>
 </html>
