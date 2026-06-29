@@ -239,10 +239,10 @@ function renderRoutineIntro() {
           'background:rgba(10,18,38,0.75);border-radius:14px !important;' +
           'padding:14px 20px;margin-bottom:22px;">' +
           '<span style="font-size:14px;font-weight:700;color:#fff;">Activate Sound</span>' +
-          '<div id="rtIntroToggle" class="rt-intro-toggle" style="width:56px;height:32px;border-radius:11px !important;' +
+          '<div id="rtIntroToggle" class="rt-intro-toggle" style="width:48px;height:26px;border-radius:13px !important;' +
             'background:#e8b100;position:relative;cursor:pointer;transition:background 0.25s;' +
             'flex-shrink:0;box-shadow:0 2px 14px rgba(232,177,0,0.5);">' +
-            '<div style="width:26px;height:26px;border-radius:7px !important;background:#fff;position:absolute;' +
+            '<div style="width:20px;height:20px;border-radius:50% !important;background:#fff;position:absolute;' +
               'top:3px;right:3px;transition:right 0.25s;' +
               'display:flex;align-items:center;justify-content:center;">' +
               '<svg width="11" height="9" viewBox="0 0 10 8" fill="none">' +
@@ -430,7 +430,7 @@ function rtToggleActivate(el) {
     el.style.background = 'rgba(255,255,255,0.12)';
     el.style.boxShadow = 'none';
     el.setAttribute('data-on','false');
-    if (thumb) { thumb.style.right = 'calc(100% - 27px)'; thumb.innerHTML = ''; }
+    if (thumb) { thumb.style.right = 'calc(100% - 23px)'; thumb.innerHTML = ''; }
   } else {
     // Turn ON — word pronounces itself automatically when session starts
     _pwAutoPlay = true;

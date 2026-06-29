@@ -19,7 +19,7 @@ window.HBM = (function(){
     { key:'vitality', labels:['Vitality','Testosterone & Hormones','Reproductive'], color:'#f0a0ff', name:'Vitality & Hormones',pos:{x:50, y:87, w:24} },
     { key:'joints',   labels:['Joints'],                                            color:'#a8c8ff', name:'Joints & Mobility',  pos:{x:50, y:46, w:48} },
   ];
-  var HBM_IMG = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782744689/image_fddllc.jpg';
+  var HBM_IMG = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782747508/file_0000000046b07246a11b7146b9ae4c88_oj8ke2.png';
 
   // Match an organ string from PRACTICE_WORDS to an ORGANS key
   function matchOrgan(organStr){

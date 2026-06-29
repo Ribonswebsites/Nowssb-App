@@ -142,8 +142,8 @@ function renderPracticeIntro() {
 
           '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(10,18,38,0.75);border-radius:14px !important;padding:14px 20px;margin-bottom:22px;">' +
             '<span style="font-size:14px;font-weight:700;color:#fff;">Voice Guidance</span>' +
-            '<div id="piToggle" onclick="pwIntroToggle(this)" data-on="true" style="width:56px;height:32px;border-radius:11px !important;background:#e8b100;position:relative;flex-shrink:0;cursor:pointer;box-shadow:0 2px 14px rgba(232,177,0,0.5);transition:background 0.25s,box-shadow 0.25s;">' +
-              '<div style="width:26px;height:26px;border-radius:7px !important;background:#fff;position:absolute;top:3px;right:3px;display:flex;align-items:center;justify-content:center;transition:right 0.25s;">' +
+            '<div id="piToggle" onclick="pwIntroToggle(this)" data-on="true" style="width:48px;height:26px;border-radius:13px !important;background:#e8b100;position:relative;flex-shrink:0;cursor:pointer;box-shadow:0 2px 14px rgba(232,177,0,0.5);transition:background 0.25s,box-shadow 0.25s;">' +
+              '<div style="width:20px;height:20px;border-radius:50% !important;background:#fff;position:absolute;top:3px;right:3px;display:flex;align-items:center;justify-content:center;transition:right 0.25s;">' +
                 '<svg width="11" height="9" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#e8b100" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
               '</div>' +
             '</div>' +
@@ -171,7 +171,7 @@ function pwIntroToggle(el) {
     el.style.background = 'rgba(255,255,255,0.12)';
     el.style.boxShadow = 'none';
     el.setAttribute('data-on', 'false');
-    if (thumb) { thumb.style.right = 'calc(100% - 29px)'; thumb.innerHTML = ''; }
+    if (thumb) { thumb.style.right = 'calc(100% - 23px)'; thumb.innerHTML = ''; }
   } else {
     // Turn ON — word pronounces itself automatically when player opens
     _pwAutoPlay = true;
