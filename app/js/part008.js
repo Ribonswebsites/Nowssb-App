@@ -238,7 +238,7 @@ function profileApplyPrefsUI() {
     if (p.soundFeedback) {
       toggle.style.background = 'rgba(200,232,245,0.22)';
       toggle.style.borderColor = 'rgba(200,232,245,0.38)';
-      knob.style.transform = 'translateX(18px)';
+      knob.style.transform = 'translateX(24px)';
       knob.style.background = 'var(--accent)';
       label.textContent = 'On';
     } else {

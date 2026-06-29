@@ -529,9 +529,11 @@ function nmhRefresh() {
   var el = document.getElementById('nmhStreakNum');
   if (el) el.textContent = streak;
 
-  // Sync greeting by time
+  // Sync greeting + image by time-of-day (same slot logic for both)
   var h = new Date().getHours();
-  var g = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+  var slot = h < 5 ? 'night' : h < 11 ? 'morning' : h < 14 ? 'noon' : h < 17 ? 'afternoon' : h < 20 ? 'evening' : 'night';
+  var GREET_TXT = { morning:'Good Morning', noon:'Good Afternoon', afternoon:'Good Afternoon', evening:'Good Evening', night:'Good Night' };
+  var g = GREET_TXT[slot];
   var name = (d.displayName || d.name || '').split(' ')[0];
   var greet = document.getElementById('nmhGreeting');
   if (greet) greet.innerHTML = g + (name ? ',<br>' + name : ',<br>Healer');
@@ -544,7 +546,6 @@ function nmhRefresh() {
     evening:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749763/grok_image_1782749538239_vaz21h.jpg',
     night:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749762/grok_image_1782749559712_azpsuj.jpg'
   };
-  var slot = h < 5 ? 'night' : h < 11 ? 'morning' : h < 14 ? 'noon' : h < 17 ? 'afternoon' : h < 20 ? 'evening' : 'night';
   var gimg = document.getElementById('nmhGreetImg');
   if (gimg && gimg.getAttribute('src') !== GREET_IMGS[slot]) gimg.src = GREET_IMGS[slot];
 

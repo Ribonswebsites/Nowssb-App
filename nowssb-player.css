@@ -93,7 +93,7 @@
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
-  width:100%; max-width:340px; margin:7px 0 0; aspect-ratio:1/.92; flex-shrink:0;
+  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/1.12; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);

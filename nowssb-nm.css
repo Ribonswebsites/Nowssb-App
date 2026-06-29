@@ -804,14 +804,14 @@ body.nm-night #nm-settings-view .nmset-val { color: #e8d5a3; background: #16163c
 .nmset-chev svg { stroke: rgba(0,0,0,0.25); }
 body.nm-night #nm-settings-view .nmset-chev svg { stroke: rgba(255,255,255,0.28); }
 
-/* Toggle */
-.nmset-tgl { width: 50px; height: 28px; border-radius: 14px; flex-shrink: 0; position: relative; cursor: pointer; transition: background .2s;
-  background: #f0f2f7; box-shadow: inset 3px 3px 6px rgba(0,0,0,0.16), inset -2px -2px 5px rgba(255,255,255,0.92); }
-body.nm-night #nm-settings-view .nmset-tgl { background: #16163c; box-shadow: inset 3px 3px 7px rgba(0,0,0,0.85), inset -2px -2px 5px rgba(50,50,110,0.3); }
-.nmset-tgl.on { background: linear-gradient(135deg, #e8d5a3, #c4a35a); box-shadow: inset 2px 2px 5px rgba(140,110,40,0.4); }
-.nmset-knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: left .2s;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-.nmset-tgl.on .nmset-knob { left: 25px; background: #060c18; }
+/* Toggle — thin pill */
+.nmset-tgl { width: 42px; height: 18px; border-radius: 9px !important; flex-shrink: 0; position: relative; cursor: pointer; transition: background .2s;
+  background: #e6e9f0; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.18), inset -1px -1px 2px rgba(255,255,255,0.92); }
+body.nm-night #nm-settings-view .nmset-tgl { background: #16163c; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.85), inset -1px -1px 2px rgba(50,50,110,0.3); }
+.nmset-tgl.on { background: linear-gradient(135deg, #e8d5a3, #c4a35a); box-shadow: inset 1px 1px 3px rgba(140,110,40,0.4); }
+.nmset-knob { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50% !important; background: #fff; transition: left .2s;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+.nmset-tgl.on .nmset-knob { left: 26px; background: #060c18; }
 
 /* Danger */
 .nmset-row.danger .nmset-label { color: #d04545; }
@@ -1960,7 +1960,7 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
 
 /* ════════ HEALING BODY MAP — glass image + glowing organ points ════════ */
 .hbm-figure {
-  position: relative; width: 100%; max-width: 340px; margin: 0 auto;
+  position: relative; width: 100%; max-width: 460px !important; margin: 0 auto;
   aspect-ratio: 788 / 1182;
   background-size: contain; background-position: center; background-repeat: no-repeat;
 }
@@ -1984,7 +1984,7 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
   50%      { opacity: .95; transform: translate(-50%, -50%) scale(1.14); }
 }
 /* give the glass body image more room than the old 180px SVG */
-.hbm-svg-wrap { width: min(90vw, 340px) !important; margin: 0 auto 16px !important; }
+.hbm-svg-wrap { width: min(98vw, 460px) !important; margin: 0 auto 16px !important; }
 
 /* ── Store/archive back buttons: use the glass back-sphere image (not SVG) ── */
 .cwp-back, .oh-cat-back, .wish-cat-back, .cart-intro-back {
@@ -2005,6 +2005,8 @@ body:has(.cwp-screen.open) #ig-social-nav,
 body:has(#sub-nowssb-store.open) #ig-bottomnav,
 body:has(#sub-nowssb-store.open) #ig-social-nav,
 body:has(#sub-real-meaning.open) #ig-bottomnav,
+body:has(#sub-practice.open) #ig-bottomnav,
+body:has(#sub-practice.open) #ig-social-nav,
 body:has(#sub-meaning-store.open) #ig-bottomnav {
   display: none !important;
 }
