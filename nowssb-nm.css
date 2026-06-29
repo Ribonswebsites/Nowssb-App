@@ -1991,3 +1991,14 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
 /* ── Shabdapathy video banner: give the tall text room so the eyebrow isn't clipped ── */
 .home-video-banner { padding-bottom: 64% !important; }
 .hvb-text { top: 50% !important; }
+
+/* ── Hide the bottom nav while inside the full-screen store/archive flows
+   (they have their own back button) so nothing gets cut off at the bottom ── */
+body:has(.cwp-screen.open) #ig-bottomnav,
+body:has(.cwp-screen.open) #ig-social-nav,
+body:has(#sub-nowssb-store.open) #ig-bottomnav,
+body:has(#sub-nowssb-store.open) #ig-social-nav,
+body:has(#sub-real-meaning.open) #ig-bottomnav,
+body:has(#sub-meaning-store.open) #ig-bottomnav {
+  display: none !important;
+}
