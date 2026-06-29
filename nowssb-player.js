@@ -179,7 +179,30 @@
   window.renderLiquidPlayer = renderLiquidPlayer;
   window.lgpToggleArc = function () {
     var a = document.getElementById('lgpArc');
-    if (a) a.classList.toggle('open');
+    if (!a) return;
+    var willOpen = !a.classList.contains('open');
+    a.classList.toggle('open', willOpen);
+    /* Inline styles so the arc opens even if a stale cached player CSS is still
+       in effect (immune to the old narrow-column bug). */
+    a.style.position = 'fixed';
+    a.style.left = a.style.top = a.style.right = a.style.bottom = '0';
+    a.style.zIndex = '99999';
+    a.style.pointerEvents = willOpen ? 'auto' : 'none';
+    var back = a.querySelector('.lgp-arc-back');
+    if (back) {
+      back.style.position = 'absolute';
+      back.style.left = back.style.top = back.style.right = back.style.bottom = '0';
+      back.style.background = 'rgba(6,10,25,.5)';
+      back.style.transition = 'opacity .3s';
+      back.style.opacity = willOpen ? '1' : '0';
+    }
+    var sheet = a.querySelector('.lgp-arc-sheet');
+    if (sheet) {
+      sheet.style.position = 'absolute';
+      sheet.style.left = sheet.style.right = sheet.style.bottom = '0';
+      sheet.style.transition = 'transform .38s cubic-bezier(.16,1,.3,1)';
+      sheet.style.transform = willOpen ? 'translateY(0)' : 'translateY(105%)';
+    }
   };
 
   /* override renderPractice when liquid mode is on */

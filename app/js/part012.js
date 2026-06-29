@@ -1200,7 +1200,21 @@ function startAnalysis() {
 
 // ── PWA SERVICE WORKER (enables offline + installability) ──
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(err => {
+  // updateViaCache:'none' → the SW script is ALWAYS re-fetched from the network,
+  // never the 24h HTTP cache. This breaks the "stale service worker" trap where
+  // an old cache-first SW keeps serving outdated CSS/JS no matter how many times
+  // we ship a fix.
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+    try { reg.update(); } catch (e) {}
+    // When a freshly-installed SW takes control, reload once so the page is
+    // running the new HTML/CSS/JS instead of whatever the old SW had cached.
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (refreshing) return;
+      refreshing = true;
+      location.reload();
+    });
+  }).catch(err => {
     console.info('PWA service worker not registered:', err.message);
   });
 }
