@@ -15,6 +15,9 @@
 }
 .lgp::-webkit-scrollbar { display:none; }
 .lgp * { box-sizing:border-box; }
+/* Images must never be tap targets or trigger the browser's image
+   zoom/long-press preview — taps pass straight through to the button. */
+.lgp img { pointer-events:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
 
 /* themes */
 .lgp.lg-t1 { --lg-bg:linear-gradient(160deg,#06323e 0%,#0e6f81 50%,#1ba6bb 100%); --lg-accent:#5ff0e0; }
@@ -90,7 +93,7 @@
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
-  width:100%; max-width:330px; margin:8px 0 0; aspect-ratio:1/.8; flex-shrink:0;
+  width:100%; max-width:330px; margin:8px 0 0; aspect-ratio:1/.9; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
@@ -153,22 +156,29 @@
 }
 
 /* phase / controls */
-.lgp .lgp-phase { width:100%; margin-top:6px; padding-top:0; display:flex; flex-direction:column; align-items:center; }
+.lgp .lgp-phase { width:100%; flex:1 1 auto; margin-top:6px; padding-top:0; display:flex; flex-direction:column; align-items:center; }
+/* let the idle phase fill the leftover height so the Sentence/Practice/Store
+   row can sit at the bottom of the screen */
+.lgp #spPhaseIdlePlay { flex:1 1 auto; }
 .lgp .lgp-status { font-size:11px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,.78); }
 .lgp .lgp-status.recording { color:#ff8a8a; }
 /* glass-capsule image wrapped around the transport controls (e_trim crops the
    whitespace so the capsule fills the bar) */
 .lgp .lgp-tube {
   position:relative; width:100%; max-width:352px; margin-top:8px;
-  padding:10px 26px; min-height:78px; display:flex; align-items:center;
+  padding:11px 26px; min-height:86px; display:flex; align-items:center;
   background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center/100% 100% no-repeat;
-  animation:lgpTubeBreathe 4.5s ease-in-out infinite;
+  animation:lgpTubeGlow 4s linear infinite;
 }
-@keyframes lgpTubeBreathe {
-  0%,100% { transform:translateY(0) scale(1);        filter:drop-shadow(0 15px 30px rgba(0,0,0,.5)); }
-  50%     { transform:translateY(-3px) scale(1.012); filter:drop-shadow(0 20px 40px rgba(0,0,0,.55)) drop-shadow(0 0 22px var(--lg-accent)); }
+/* a soft accent glow that travels AROUND the glass capsule (no scaling) */
+@keyframes lgpTubeGlow {
+  0%   { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow( 15px   0  15px var(--lg-accent)); }
+  25%  { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow(  0   13px 15px var(--lg-accent)); }
+  50%  { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow(-15px   0  15px var(--lg-accent)); }
+  75%  { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow(  0  -13px 15px var(--lg-accent)); }
+  100% { filter:drop-shadow(0 13px 26px rgba(0,0,0,.5)) drop-shadow( 15px   0  15px var(--lg-accent)); }
 }
-.lgp.playing .lgp-tube { animation-duration:2.4s; }
+.lgp.playing .lgp-tube { animation-duration:2.2s; }
 .lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
 /* ── Inside the capsule: flatten to 5 evenly-spaced icons, all centred in the
    clear interior (library + replay no longer jammed onto the rounded ends) ── */
@@ -176,9 +186,9 @@
 .lgp .lgp-tube .lgp-controls { justify-content:space-evenly; gap:0; }
 .lgp .lgp-tube .lgp-side { width:auto; padding:0; }
 .lgp .lgp-tube .lgp-side span { display:none; }
-.lgp .lgp-tube .lgp-side .lgp-side-ico { width:46px; height:46px; }
-.lgp .lgp-tube .lgp-ctrl { width:46px; height:46px; }
-.lgp .lgp-tube .lgp-play { width:64px; height:64px; }
+.lgp .lgp-tube .lgp-side .lgp-side-ico { width:48px; height:48px; }
+.lgp .lgp-tube .lgp-ctrl { width:48px; height:48px; }
+.lgp .lgp-tube .lgp-play { width:66px; height:66px; }
 .lgp .lgp-transport { display:flex; align-items:center; justify-content:center; gap:8px; }
 /* glass-sphere icon = the button itself (no glass-circle background, full colour) */
 .lgp .lgp-img { width:100%; height:100%; object-fit:contain; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
@@ -208,8 +218,8 @@
 .lgp .lgp-play .lgp-img { filter:drop-shadow(0 10px 26px rgba(0,0,0,.5)) drop-shadow(0 0 34px var(--lg-accent)); }
 .lgp .lgp-play:active { transform:scale(.95); }
 /* settings gear sphere in the top bar — bare image, no glass circle */
-.lgp .lgp-settings.lgp-imgbtn {
-  width:46px; height:46px; background:none !important; border:none !important; box-shadow:none !important;
+.lgp .lgp-imgbtn {
+  width:48px; height:48px; background:none !important; border:none !important; box-shadow:none !important;
   -webkit-backdrop-filter:none !important; backdrop-filter:none !important; padding:0;
 }
 .lgp .lgp-mic, .lgp .lgp-cta {
@@ -224,7 +234,7 @@
 
 /* Practice (centred) with the Store button on its right */
 .lgp .lgp-practice-row {
-  position:relative; width:100%; max-width:312px; margin-top:8px;
+  position:relative; width:100%; max-width:312px; margin-top:auto;
   display:flex; align-items:center; justify-content:center;
 }
 .lgp .lgp-store {

@@ -179,8 +179,8 @@
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
-          '<button class="lgp-back" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
-            '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
+          '<button class="lgp-back lgp-imgbtn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
+            '<img class="lgp-img" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png" alt="">' +
           '</button>' +
           '<div class="lgp-brand">NowssB</div>' +
           '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
