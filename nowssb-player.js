@@ -107,10 +107,16 @@
             '</div>' +
             replayBtn +
           '</div>' +
-          '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
-            '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><img class="lgp-practice-ico" src="' + IC.mic + '" alt=""></span>' +
-            '<span class="lgp-practice-lbl">Practice</span>' +
-          '</button>' +
+          '<div class="lgp-practice-row">' +
+            '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
+              '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><img class="lgp-practice-ico" src="' + IC.mic + '" alt=""></span>' +
+              '<span class="lgp-practice-lbl">Practice</span>' +
+            '</button>' +
+            '<button class="lgp-store" onclick="openSub&&openSub(\'nowssb-store\')" aria-label="Store">' +
+              '<span class="lgp-store-orb"><img class="lgp-store-ico" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt=""></span>' +
+              '<span class="lgp-store-lbl">Store</span>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
         '<div id="spPhasePost" style="display:' + (phase === 'post-play' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:12px;width:100%;">' +
           '<div class="lgp-status">Word played · your turn</div>' +
