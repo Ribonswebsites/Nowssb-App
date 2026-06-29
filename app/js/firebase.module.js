@@ -63,6 +63,10 @@ window._authNavigating = false;
 
 async function _resolveUserRoute(user) {
   // Returns 'home', 'signup2' based on Firestore profile
+  // Device-level fast path: once this device has finished onboarding (questions +
+  // profile picker), never show those screens again — go straight home, even if
+  // the Firestore read is slow or offline.
+  try { if (localStorage.getItem('nwsb_onboarding_done') === '1') return 'home'; } catch(e){}
   let data = window._userDataCache;
   if (!data) {
     const ref  = doc(db, "users", user.uid);
@@ -87,12 +91,16 @@ async function _resolveUserRoute(user) {
     alert('Your account has been suspended. Please contact support.');
     return 'login';
   }
-  if (data.onboardingDone) return 'home';
+  if (data.onboardingDone) {
+    try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
+    return 'home';
+  }
   if (data.profileStepDone) {
     if (window._fbSetDoc && window._currentUid) {
       window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
     }
     if (window._userDataCache) window._userDataCache.onboardingDone = true;
+    try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
     return 'home';
   }
   // New user — start the onboarding choose page
@@ -216,6 +224,7 @@ window.finishOnboarding = async () => {
     // Ensure onboardingDone is set without overwriting existing answers
     window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
   }
+  try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
   goTo('home');
 };
 
@@ -237,6 +246,7 @@ window.saveOnboardingAnswers = async (answers, skipped) => {
     // Save gender at top level too — used by health section + word sets
     gender: skipped ? null : (answers[3] || null)
   }, { merge: true });
+  try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
   if (!skipped && answers[3]) window._userGender = answers[3];
 };
 

@@ -401,6 +401,7 @@ async function psContinue() {
   }
 
   if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
+  try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
   // If user skipped all onboarding, skip the fake analysis screen — go straight home
   if (window._obSkipped) {
     window._obSkipped = false;
@@ -415,6 +416,7 @@ function psSkip() {
   if (window._currentUid && window._fbSetDoc) {
     window._fbSetDoc(window._currentUid, { profileStepDone: true }).catch(() => {});
   }
+  try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
   // If user skipped all onboarding, skip the fake analysis screen — go straight home
   if (window._obSkipped) {
     window._obSkipped = false;
@@ -544,7 +546,7 @@ function nmhRefresh() {
   };
   var slot = h < 5 ? 'night' : h < 11 ? 'morning' : h < 14 ? 'noon' : h < 17 ? 'afternoon' : h < 20 ? 'evening' : 'night';
   var gimg = document.getElementById('nmhGreetImg');
-  if (gimg) gimg.style.backgroundImage = "url('" + GREET_IMGS[slot] + "')";
+  if (gimg && gimg.getAttribute('src') !== GREET_IMGS[slot]) gimg.src = GREET_IMGS[slot];
 
   // Sync today's word from the dark home if available
   var tw = document.getElementById('todayPracticeTitle');
