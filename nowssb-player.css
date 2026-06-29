@@ -5,8 +5,8 @@
 ═══════════════════════════════════════════════════════════════ */
 
 .lgp {
-  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
-  padding: max(env(safe-area-inset-top,14px),14px) 24px calc(env(safe-area-inset-bottom,16px) + 18px);
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  padding: max(env(safe-area-inset-top,8px),8px) 24px calc(env(safe-area-inset-bottom,8px) + 8px);
   overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch;
   box-sizing:border-box; font-family:'DM Sans',sans-serif; color:#fff;
   background: var(--lg-bg, linear-gradient(160deg,#06323e,#1ba0b5)) center/cover no-repeat;
@@ -50,16 +50,16 @@
   display:flex; align-items:center; justify-content:center;
 }
 .lgp .lgp-brand {
-  margin-top:8px; font-size:26px; font-weight:800; letter-spacing:-.5px;
+  margin-top:2px; font-size:22px; font-weight:800; letter-spacing:-.5px;
   text-shadow:0 2px 20px rgba(0,0,0,.4), 0 0 26px var(--lg-accent);
 }
 .lgp .lgp-ritual {
-  margin-top:4px; font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  margin-top:2px; font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
   color:rgba(255,255,255,.7);
 }
 /* tagline — words fade in one by one */
 .lgp .lgp-tagline {
-  margin-top:5px; font-size:10.5px; font-weight:600; letter-spacing:1px; text-align:center;
+  margin-top:2px; font-size:10.5px; font-weight:600; letter-spacing:1px; text-align:center;
   color:rgba(255,255,255,.9);
 }
 .lgp .lgp-tagline span {
@@ -68,7 +68,7 @@
 }
 @keyframes lgpWordIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 /* rotating word ticker — Listen · Learn · Practice · Heal */
-.lgp .lgp-ticker { position:relative; height:22px; width:200px; margin-top:8px; }
+.lgp .lgp-ticker { position:relative; height:18px; width:200px; margin-top:4px; }
 .lgp .lgp-ticker span {
   position:absolute; left:0; right:0; top:0; text-align:center;
   font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase;
@@ -89,7 +89,7 @@
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
-  width:100%; max-width:312px; margin:12px 0 2px; aspect-ratio:1/.62; flex-shrink:0;
+  width:100%; max-width:280px; margin:6px 0 0; aspect-ratio:1/.5; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
@@ -117,10 +117,10 @@
 
 /* title / syllables / organ */
 .lgp .lgp-title {
-  margin-top:12px; font-size:34px; font-weight:800; letter-spacing:.5px; text-align:center; line-height:1.05;
+  margin-top:6px; font-size:28px; font-weight:800; letter-spacing:.5px; text-align:center; line-height:1.05;
   text-shadow:0 2px 26px rgba(0,0,0,.45), 0 0 32px var(--lg-accent);
 }
-.lgp .lgp-syls { margin-top:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
+.lgp .lgp-syls { margin-top:7px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
 .lgp .lgp-syl {
   padding:6px 13px; border-radius:12px !important; font-size:14px; font-weight:600;
   background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.34);
@@ -130,13 +130,13 @@
 .lgp .lgp-syl.active { background:rgba(255,255,255,.5); color:#10202e; box-shadow:0 0 22px var(--lg-accent); }
 .lgp .lgp-syl-dot { opacity:.55; }
 .lgp .lgp-organ {
-  margin-top:10px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  margin-top:5px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
   color:rgba(255,255,255,.72);
 }
 
 /* progress */
 .lgp .lgp-progress {
-  width:100%; max-width:312px; height:5px; margin:14px 0 2px; border-radius:999px !important;
+  width:100%; max-width:280px; height:5px; margin:7px 0 0; border-radius:999px !important;
   background:rgba(255,255,255,.2); overflow:hidden;
 }
 .lgp .lgp-progress-fill {
@@ -146,10 +146,10 @@
 }
 
 /* phase / controls */
-.lgp .lgp-phase { width:100%; margin-top:14px; padding-top:6px; display:flex; flex-direction:column; align-items:center; }
+.lgp .lgp-phase { width:100%; margin-top:6px; padding-top:0; display:flex; flex-direction:column; align-items:center; }
 .lgp .lgp-status { font-size:11px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,.78); }
 .lgp .lgp-status.recording { color:#ff8a8a; }
-.lgp .lgp-controls { width:100%; max-width:312px; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:6px; }
+.lgp .lgp-controls { width:100%; max-width:312px; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:4px; }
 .lgp .lgp-transport { display:flex; align-items:center; justify-content:center; gap:8px; }
 /* glass-sphere icon = the button itself (no glass-circle background, full colour) */
 .lgp .lgp-img { width:100%; height:100%; object-fit:contain; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
@@ -173,7 +173,7 @@
 .lgp .lgp-ctrl:active { transform:scale(.92); }
 /* play / pause sphere button — bigger, bare image */
 .lgp .lgp-play {
-  width:80px; height:80px; border:none; background:none; cursor:pointer; padding:0;
+  width:72px; height:72px; border:none; background:none; cursor:pointer; padding:0;
   display:flex; align-items:center; justify-content:center;
 }
 .lgp .lgp-play .lgp-img { filter:drop-shadow(0 10px 26px rgba(0,0,0,.5)) drop-shadow(0 0 34px var(--lg-accent)); }
@@ -195,7 +195,7 @@
 
 /* Practice (centred) with the Store button on its right */
 .lgp .lgp-practice-row {
-  position:relative; width:100%; max-width:312px; margin-top:16px;
+  position:relative; width:100%; max-width:312px; margin-top:8px;
   display:flex; align-items:center; justify-content:center;
 }
 .lgp .lgp-store {
@@ -234,10 +234,10 @@
 }
 .lgp .lgp-practice:active { transform:scale(.95); }
 .lgp .lgp-practice-orb {
-  position:relative; width:80px; height:80px; display:flex; align-items:center; justify-content:center;
+  position:relative; width:66px; height:66px; display:flex; align-items:center; justify-content:center;
 }
 .lgp .lgp-practice-ico {
-  width:78px; height:78px; object-fit:contain; display:block; position:relative; z-index:1;
+  width:64px; height:64px; object-fit:contain; display:block; position:relative; z-index:1;
   filter:drop-shadow(0 8px 20px rgba(0,0,0,.5)) drop-shadow(0 0 22px var(--lg-accent));
 }
 .lgp .lgp-practice-ring {
