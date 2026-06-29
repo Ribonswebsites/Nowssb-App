@@ -99,7 +99,6 @@
         '<div id="spPhaseIdlePlay" style="display:' + ((phase === 'idle' || phase === 'playing') ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:10px;width:100%;">' +
           '<div class="lgp-status" id="spAutoStatus">' + (phase === 'playing' ? 'Listening…' : 'Tap ▸ to listen') + '</div>' +
           '<div class="lgp-tube">' +
-            '<span class="lgp-tube-label">NowssB Player</span>' +
             '<div class="lgp-controls">' +
               libBtn +
               '<div class="lgp-transport">' +
@@ -183,7 +182,7 @@
           '<button class="lgp-back" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
             '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
           '</button>' +
-          '<button class="lgp-settings lgp-imgbtn" onclick="lgpToggleArc()" aria-label="Settings">' +
+          '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
             '<img class="lgp-img" src="' + IC.settings + '" alt="">' +
           '</button>' +
         '</div>' +
@@ -203,14 +202,15 @@
        own stacking context (z-index:600 + transform/contain), which traps and
        clips the arc no matter how high its z-index. Render it as a direct child
        of <body> so it's a real top-level overlay above everything. */
-    var arcWasOpen = (function () { var a = document.getElementById('lgpArc'); return !!(a && a.classList.contains('open')); })();
-    var oldArc = document.getElementById('lgpArc');
-    if (oldArc) oldArc.remove();
-    var tmp = document.createElement('div');
-    tmp.innerHTML = arc;
-    var arcEl = tmp.firstChild;
-    document.body.appendChild(arcEl);
-    if (arcWasOpen) { window.lgpToggleArc(true); }
+    var existingArc = document.getElementById('lgpArc');
+    /* If the arc is already OPEN, leave it alone — re-renders during playback
+       would otherwise yank it shut / flicker. Only (re)build when it's closed. */
+    if (!(existingArc && existingArc.classList.contains('open'))) {
+      if (existingArc) existingArc.remove();
+      var tmp = document.createElement('div');
+      tmp.innerHTML = arc;
+      document.body.appendChild(tmp.firstChild);
+    }
   }
   window.renderLiquidPlayer = renderLiquidPlayer;
   window.lgpToggleArc = function (forceOpen) {
@@ -240,6 +240,17 @@
       sheet.style.transform = willOpen ? 'translateY(0)' : 'translateY(105%)';
     }
   };
+
+  /* Bulletproof, capture-phase delegated handler for the gear — fires even if the
+     inline onclick is ever stripped/blocked. Bound once on document. */
+  if (!window._lgpSettingsBound) {
+    window._lgpSettingsBound = true;
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      var hit = t && (t.closest ? t.closest('.lgp-settings') : null);
+      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpToggleArc(); }
+    }, true);
+  }
 
   /* override renderPractice when liquid mode is on */
   (function wrap() {

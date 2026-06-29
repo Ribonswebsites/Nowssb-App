@@ -89,7 +89,7 @@
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
-  width:100%; max-width:280px; margin:6px 0 0; aspect-ratio:1/.5; flex-shrink:0;
+  width:100%; max-width:312px; margin:6px 0 0; aspect-ratio:1/.6; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
@@ -149,20 +149,13 @@
 .lgp .lgp-phase { width:100%; margin-top:6px; padding-top:0; display:flex; flex-direction:column; align-items:center; }
 .lgp .lgp-status { font-size:11px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,.78); }
 .lgp .lgp-status.recording { color:#ff8a8a; }
-/* dark liquid-glass tube wrapped around the transport controls */
+/* glass-capsule image wrapped around the transport controls (e_trim crops the
+   whitespace so the capsule fills the bar) */
 .lgp .lgp-tube {
-  position:relative; width:100%; max-width:330px; margin-top:8px;
-  padding:16px 14px 13px; border-radius:46px !important;
-  background:linear-gradient(160deg, rgba(26,30,46,.5) 0%, rgba(8,11,22,.62) 100%);
-  -webkit-backdrop-filter:blur(24px) saturate(1.4); backdrop-filter:blur(24px) saturate(1.4);
-  border:1px solid rgba(255,255,255,.16);
-  box-shadow:0 20px 50px rgba(0,0,0,.5), 0 0 40px -18px var(--lg-accent),
-             inset 0 1px 0 rgba(255,255,255,.28), inset 0 -12px 28px rgba(0,0,0,.42);
-}
-.lgp .lgp-tube-label {
-  position:absolute; top:7px; right:18px;
-  font-family:'DM Sans',sans-serif; font-size:8px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase;
-  color:rgba(255,255,255,.5); text-shadow:0 1px 4px rgba(0,0,0,.5);
+  position:relative; width:100%; max-width:348px; margin-top:8px;
+  padding:12px 24px; min-height:84px; display:flex; align-items:center;
+  background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim/v1782725628/file_000000003f10720aaeedcf935d7efc22_htjokn.png') center/100% 100% no-repeat;
+  filter:drop-shadow(0 16px 34px rgba(0,0,0,.5));
 }
 .lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
 .lgp .lgp-transport { display:flex; align-items:center; justify-content:center; gap:8px; }
@@ -256,19 +249,20 @@
   filter:drop-shadow(0 8px 20px rgba(0,0,0,.5)) drop-shadow(0 0 22px var(--lg-accent));
 }
 .lgp .lgp-practice-ring {
-  position:absolute; left:50%; top:50%; width:74px; height:74px; margin:-37px 0 0 -37px;
+  position:absolute; left:50%; top:50%; width:62px; height:62px; margin:-31px 0 0 -31px;
   border-radius:50% !important; border:2px solid var(--lg-accent);
-  box-shadow:0 0 16px var(--lg-accent); opacity:0;
-  animation:lgpPulse 2.4s ease-out infinite;
+  box-shadow:0 0 14px var(--lg-accent); opacity:0;
+  animation:lgpPulse 2.6s ease-out infinite;
 }
-.lgp .lgp-practice-ring:nth-child(2) { animation-delay:1.2s; }
+.lgp .lgp-practice-ring:nth-child(2) { animation-delay:1.3s; }
 .lgp .lgp-practice-lbl {
   font-size:8.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.92);
   text-shadow:0 1px 8px rgba(0,0,0,.4);
 }
 @keyframes lgpPulse {
-  0%   { transform:scale(.8);  opacity:.75; }
-  100% { transform:scale(1.7); opacity:0; }
+  0%   { transform:scale(.85); opacity:.7; }
+  70%  { opacity:.22; }
+  100% { transform:scale(1.32); opacity:0; }
 }
 .lgp .lgp-cta { background:linear-gradient(135deg, var(--lg-accent), #fff); color:#10202e; }
 
