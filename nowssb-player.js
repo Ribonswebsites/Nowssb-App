@@ -66,19 +66,25 @@
     var recBars = '';
     for (var r = 0; r < 26; r++) recBars += '<div class="sp-rec-bar" style="height:4px"></div>';
 
-    /* the Library icon image already used in the app's bottom nav */
-    var ICO_LIB  = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png';
-    var playIco = playing
-      ? '<svg width="26" height="28" viewBox="0 0 16 18" fill="none"><rect x="2" y="1" width="4" height="16" rx="1.5" fill="#fff"/><rect x="10" y="1" width="4" height="16" rx="1.5" fill="#fff"/></svg>'
-      : '<svg width="30" height="32" viewBox="0 0 24 24" fill="#fff" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg>';
-
-    /* prev / next — clean skip glyphs (no valid image icon exists for these) */
-    var prevSvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 6h2.2v12H6zM20 6v12L9.5 12z"/></svg>';
-    var nextSvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M15.8 6H18v12h-2.2zM4 6l10.5 6L4 18z"/></svg>';
+    /* ── Custom glass-sphere icons (background-removed PNGs). Each sphere IS the
+       button — the round glass button background is dropped in CSS. ── */
+    var IC = {
+      play:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718777/e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png',
+      pause:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718776/e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png',
+      prev:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718778/ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png',
+      next:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718778/c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png',
+      replay:   'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/file_00000000a484720aa71b5f34f8539f05_amesbb.png',
+      mic:      'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png',
+      library:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
+      settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png'
+    };
+    var playIco = '<img class="lgp-img" src="' + (playing ? IC.pause : IC.play) + '" alt="">';
+    var prevSvg = '<img class="lgp-img" src="' + IC.prev + '" alt="">';
+    var nextSvg = '<img class="lgp-img" src="' + IC.next + '" alt="">';
 
     /* Library (left, image icon) + Replay (right) flank the transport */
-    var replaySvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>';
-    var libSvg = '<img class="lgp-side-ico" src="' + ICO_LIB + '" alt="">';
+    var replaySvg = '<img class="lgp-side-ico" src="' + IC.replay + '" alt="">';
+    var libSvg = '<img class="lgp-side-ico" src="' + IC.library + '" alt="">';
     var libBtn = '<button class="lgp-side" onclick="lgpToggleArc&&document.getElementById(\'lgpArc\')&&document.getElementById(\'lgpArc\').classList.remove(\'open\');openWalkmanLib&&openWalkmanLib()" aria-label="Library">' + libSvg + '<span>Library</span></button>';
     var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
@@ -101,14 +107,14 @@
             '</div>' +
             replayBtn +
           '</div>' +
-          '<button class="lgp-mic" onclick="pwPracticeNow&&pwPracticeNow()">🎙 Practice this word</button>' +
+          '<button class="lgp-mic" onclick="pwPracticeNow&&pwPracticeNow()"><img class="lgp-mic-ico" src="' + IC.mic + '" alt="">Practice this word</button>' +
         '</div>' +
         '<div id="spPhasePost" style="display:' + (phase === 'post-play' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:12px;width:100%;">' +
           '<div class="lgp-status">Word played · your turn</div>' +
-          '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()">🎙 Practice Now</button>' +
+          '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()"><img class="lgp-mic-ico" src="' + IC.mic + '" alt="">Practice Now</button>' +
           '<div class="lgp-controls" style="margin-top:4px;">' +
             '<button class="lgp-ctrl" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()">' + '<svg width="22" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>' + '</button>' +
+            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><img class="lgp-img" src="' + IC.play + '" alt=""></button>' +
             '<button class="lgp-ctrl" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
           '</div>' +
         '</div>' +
@@ -126,7 +132,7 @@
           '</div>' +
           '<div class="lgp-controls" style="margin-top:10px;">' +
             '<button class="lgp-ctrl" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><svg width="22" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button>' +
+            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><img class="lgp-img" src="' + IC.play + '" alt=""></button>' +
             '<button class="lgp-ctrl" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
           '</div>' +
         '</div>' +
@@ -161,8 +167,8 @@
           '<button class="lgp-back" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
             '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
           '</button>' +
-          '<button class="lgp-settings" onclick="lgpToggleArc()" aria-label="Settings">' +
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>' +
+          '<button class="lgp-settings lgp-imgbtn" onclick="lgpToggleArc()" aria-label="Settings">' +
+            '<img class="lgp-img" src="' + IC.settings + '" alt="">' +
           '</button>' +
         '</div>' +
         '<div class="lgp-brand">NowssB</div>' +
