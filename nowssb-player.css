@@ -158,10 +158,15 @@
   filter:drop-shadow(0 16px 34px rgba(0,0,0,.5));
 }
 .lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
-/* inside the capsule the side buttons are icon-only (labels would overflow) */
+/* ── Inside the capsule: flatten to 5 evenly-spaced icons, all centred in the
+   clear interior (library + replay no longer jammed onto the rounded ends) ── */
+.lgp .lgp-tube .lgp-transport { display:contents; }
+.lgp .lgp-tube .lgp-controls { justify-content:space-evenly; gap:0; }
 .lgp .lgp-tube .lgp-side { width:auto; }
 .lgp .lgp-tube .lgp-side span { display:none; }
-.lgp .lgp-tube .lgp-side .lgp-side-ico { width:46px; height:46px; }
+.lgp .lgp-tube .lgp-side .lgp-side-ico { width:40px; height:40px; }
+.lgp .lgp-tube .lgp-ctrl { width:42px; height:42px; }
+.lgp .lgp-tube .lgp-play { width:58px; height:58px; }
 .lgp .lgp-transport { display:flex; align-items:center; justify-content:center; gap:8px; }
 /* glass-sphere icon = the button itself (no glass-circle background, full colour) */
 .lgp .lgp-img { width:100%; height:100%; object-fit:contain; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
