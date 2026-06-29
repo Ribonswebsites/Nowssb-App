@@ -1909,19 +1909,18 @@ body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #c8a96e !im
 body.nm-mode .app-bg::after { display:none !important; }
 body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
 
-/* ── Fashion-home tile icons: glass wrapper in the top-left corner ── */
-.home-tile { position: relative; }
+/* ── Fashion-home tile icons: glass wrapper, IN-FLOW (no overlap), original icon size ── */
 .home-tile-icon {
-  position: absolute !important; top: 12px !important; left: 12px !important;
-  width: 44px !important; height: 44px !important; margin: 0 !important;
-  padding: 8px !important; border-radius: 13px !important; opacity: 1 !important; z-index: 3 !important;
+  position: relative !important; z-index: 3 !important;
+  width: 52px !important; height: 52px !important; margin: 0 0 10px 0 !important;
+  padding: 8px !important; box-sizing: border-box !important; border-radius: 14px !important; opacity: 1 !important;
   background: rgba(255,255,255,0.13) !important;
   -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3);
   border: 1px solid rgba(255,255,255,0.26) !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.32) !important;
-  display: flex; align-items: center; justify-content: center;
+  display: inline-flex !important; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.home-tile-icon img { width: 100% !important; height: 100% !important; object-fit: contain !important; }
+.home-tile-icon img { width: 36px !important; height: 36px !important; object-fit: contain !important; }
 
 /* ════════ STORE / ARCHIVE pages: stop the bottom nav (58px) from overlapping
    CTAs, and fix the cart action buttons that stretched tall ════════ */
