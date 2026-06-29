@@ -121,7 +121,7 @@
               '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><span class="lgp-practice-ico" style="background-image:url(\'' + IC.mic + '\')"></span></span>' +
               '<span class="lgp-practice-lbl">Practice</span>' +
             '</button>' +
-            '<button class="lgp-store" onclick="closeSub&&closeSub(\'practice\');setTimeout(function(){openSub&&openSub(\'nowssb-store\')},30)" aria-label="Store">' +
+            '<button class="lgp-store" onclick="lgpOpenStore&&lgpOpenStore()" aria-label="Store">' +
               '<span class="lgp-store-orb"><span class="lgp-store-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png\')"></span></span>' +
               '<span class="lgp-store-lbl">Store</span>' +
             '</button>' +
@@ -162,7 +162,9 @@
     var arc =
       '<div class="lgp-arc" id="lgpArc">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
+        '<button class="lgp-arc-close lgp-imgbtn" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
         '<div class="lgp-arc-radial">' +
+          '<div class="lgp-arc-ring"></div>' +
           '<button class="lgp-arc-opt o1" onclick="pwSetVoice&&pwSetVoice(\'' + (voice === 'F' ? 'M' : 'F') + '\');renderPractice&&renderPractice()"><span class="lbl">Voice</span><span class="val">' + (voice === 'F' ? 'Female' : 'Male') + '</span></button>' +
           '<button class="lgp-arc-opt o2" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()"><span class="lbl">Loop</span><span class="val">' + (loop ? 'On' : 'Off') + '</span></button>' +
           '<button class="lgp-arc-opt o3" onclick="pwCycleRepTarget&&pwCycleRepTarget();renderPractice&&renderPractice()"><span class="lbl">Reps</span><span class="val">' + repTarget + '×</span></button>' +
@@ -193,6 +195,11 @@
             '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
           '</div>' +
         '</div>' +
+        '<div class="lgp-info">' +
+          (w.meaning ? '<div class="lgp-info-row"><span class="k">Meaning</span><span class="v">' + w.meaning + '</span></div>' : '') +
+          (w.benefit ? '<div class="lgp-info-row"><span class="k">Heals</span><span class="v">' + w.benefit + '</span></div>' : '') +
+          ((w.categories && w.categories.length) ? '<div class="lgp-info-row"><span class="k">Category</span><span class="v">' + w.categories.join(' · ') + '</span></div>' : (w.organ ? '<div class="lgp-info-row"><span class="k">Category</span><span class="v">' + w.organ + '</span></div>' : '')) +
+        '</div>' +
         '<div class="lgp-ticker"><span>Listen</span><span>Learn</span><span>Practice</span><span>Heal</span></div>' +
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
         center +
@@ -213,6 +220,18 @@
     }
   }
   window.renderLiquidPlayer = renderLiquidPlayer;
+
+  /* Open the Store DIRECTLY from the player — no home flash, no intro flash.
+     Open the store ON TOP of the player (higher z-index), skip its intro, then
+     quietly close the player behind it. */
+  window.lgpOpenStore = function () {
+    try { if (typeof openSub === 'function') openSub('nowssb-store'); } catch (e) {}
+    var s = document.getElementById('sub-nowssb-store');
+    if (s) s.style.zIndex = '800';            /* above the practice screen (z 600) */
+    try { if (typeof nssEnterStore === 'function') nssEnterStore(); } catch (e) {} /* skip the intro page */
+    setTimeout(function () { try { if (typeof closeSub === 'function') closeSub('practice'); } catch (e) {} }, 30);
+  };
+
   window.lgpToggleArc = function (forceOpen) {
     var a = document.getElementById('lgpArc');
     if (!a) return;
