@@ -140,9 +140,9 @@ function renderPracticeIntro() {
 
           '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(10,18,38,0.75);border-radius:14px !important;padding:14px 20px;margin-bottom:22px;">' +
             '<span style="font-size:14px;font-weight:700;color:#fff;">Voice Guidance</span>' +
-            '<div id="piToggle" onclick="pwIntroToggle(this)" data-on="true" style="width:44px;height:22px;border-radius:11px !important;background:#e8b100;position:relative;flex-shrink:0;cursor:pointer;box-shadow:0 2px 14px rgba(232,177,0,0.5);transition:background 0.25s,box-shadow 0.25s;">' +
-              '<div style="width:16px;height:16px;border-radius:50% !important;background:#fff;position:absolute;top:3px;right:3px;display:flex;align-items:center;justify-content:center;transition:right 0.25s;">' +
-                '<svg width="11" height="9" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#e8b100" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '<div id="piToggle" onclick="pwIntroToggle(this)" data-on="true" style="width:40px;height:16px;border-radius:8px !important;background:#e8b100;position:relative;flex-shrink:0;cursor:pointer;box-shadow:0 1px 8px rgba(232,177,0,0.45);transition:background 0.25s,box-shadow 0.25s;">' +
+              '<div style="width:12px;height:12px;border-radius:50% !important;background:#fff;position:absolute;top:2px;right:2px;display:flex;align-items:center;justify-content:center;transition:right 0.25s;">' +
+                '<svg width="8" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#e8b100" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -169,14 +169,14 @@ function pwIntroToggle(el) {
     el.style.background = 'rgba(255,255,255,0.12)';
     el.style.boxShadow = 'none';
     el.setAttribute('data-on', 'false');
-    if (thumb) { thumb.style.right = 'calc(100% - 19px)'; thumb.innerHTML = ''; }
+    if (thumb) { thumb.style.right = 'calc(100% - 14px)'; thumb.innerHTML = ''; }
   } else {
     // Turn ON — word pronounces itself automatically when player opens
     _pwAutoPlay = true;
     el.style.background = '#e8b100';
-    el.style.boxShadow = '0 2px 14px rgba(232,177,0,0.5)';
+    el.style.boxShadow = '0 1px 8px rgba(232,177,0,0.45)';
     el.setAttribute('data-on', 'true');
-    if (thumb) { thumb.style.right = '3px'; thumb.innerHTML = '<svg width="11" height="9" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#e8b100" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
+    if (thumb) { thumb.style.right = '2px'; thumb.innerHTML = '<svg width="8" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#e8b100" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
   }
 }
 
