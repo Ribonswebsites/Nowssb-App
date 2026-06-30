@@ -23,7 +23,10 @@
       accent:'#bd7bff' },
     { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782657140/grok_image_1782656684101_o9vc93.jpg',
       video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656932/grok_video_2026-06-28-19-54-43_it2bur.mp4',
-      accent:'#a6dcff' }
+      accent:'#a6dcff' },
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782795978/grok_image_1782795582310_llvpix.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782795956/grok_video_2026-06-30-10-29-43_hzxyun.mp4',
+      accent:'#b9a6ff' }
   ];
 
   function isSubscribed() {
