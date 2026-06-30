@@ -333,40 +333,62 @@ function profileOpenOrders() { if (typeof openSub === 'function') openSub('order
 function nssOpenOrders()     { if (typeof openSub === 'function') openSub('orders'); }
 function nssCloseOrders()    { if (typeof closeSub === 'function') closeSub('orders'); }
 
-// ── NSS BANNER: 3D SCROLL PARALLAX + TOUCH TILT (same as guide page) ──
+// ── NSS BANNER: 3D SCROLL PARALLAX + TOUCH TILT ──
 function nssInitBanner3D() {
   var slides = document.getElementById('nssBannerSlides');
   var banner = document.getElementById('nssBanner');
   var body   = document.getElementById('nssBody');
   if (!slides || !banner || !body) return;
+  if (banner._b3d) return;          // guard: only wire once
+  banner._b3d = true;
 
-  // Scroll parallax — slides rise as user scrolls
+  // give the banner real depth so transforms read as true 3D
+  banner.style.perspective = '1000px';
+  banner.style.perspectiveOrigin = '50% 0%';
+  slides.style.transformOrigin = '50% 0%';
+  slides.style.transformStyle = 'preserve-3d';
+
+  var tilting = false;
+
+  // 3D scroll: as the page scrolls up, the banner tilts back into the screen,
+  // sinks away (translateZ) and rises with parallax — a real 3D scroll.
   body.addEventListener('scroll', function() {
+    if (tilting) return;
+    var h = banner.offsetHeight || 1;
     var sy = body.scrollTop;
-    slides.style.transform = 'scale(1.08) translateY(' + (sy * 0.38) + 'px)';
+    var p = Math.min(sy / h, 1);                 // 0 → 1 across the banner height
+    var rotX = p * 14;                           // tilt back up to 14°
+    var ty   = sy * 0.42;                        // parallax rise
+    var tz   = -p * 140;                         // sink into the screen
+    var sc   = 1.12 - p * 0.06;
     slides.style.transition = 'none';
+    slides.style.transform = 'translate3d(0,' + ty + 'px,' + tz + 'px) rotateX(' + rotX + 'deg) scale(' + sc + ')';
+    slides.style.opacity = String(Math.max(1 - p * 0.85, 0.15));
   }, { passive: true });
 
-  // Touch tilt — 3D perspective on drag
+  // Touch / pointer tilt — parallax follows the finger for a hand-held 3D feel
   function applyTilt(clientX, clientY) {
+    tilting = true;
     var rect = banner.getBoundingClientRect();
     var cx = rect.width / 2, cy = rect.height / 2;
-    var dx = (clientX - cx) / cx;
-    var dy = (clientY - cy) / cy;
-    var rotY =  dx * 5;
-    var rotX = -dy * 3.5;
-    slides.style.transform = 'perspective(900px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(1.06)';
+    var dx = (clientX - rect.left - cx) / cx;
+    var dy = (clientY - rect.top - cy) / cy;
+    var rotY =  dx * 8;
+    var rotX = -dy * 6;
     slides.style.transition = 'transform 0.12s ease-out';
+    slides.style.transform = 'translate3d(0,0,40px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(1.1)';
   }
   function resetTilt() {
-    slides.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.08)';
+    tilting = false;
     slides.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)';
+    slides.style.transform = 'translate3d(0,0,0) rotateX(0deg) rotateY(0deg) scale(1.12)';
+    slides.style.opacity = '1';
   }
   banner.addEventListener('touchmove', function(e) {
-    if (body.scrollTop < banner.offsetHeight) applyTilt(e.touches[0].clientX, e.touches[0].clientY);
+    if (body.scrollTop < 12) applyTilt(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
   banner.addEventListener('touchend', resetTilt);
-  banner.addEventListener('mousemove', function(e) { applyTilt(e.clientX, e.clientY); });
+  banner.addEventListener('mousemove', function(e) { if (body.scrollTop < 12) applyTilt(e.clientX, e.clientY); });
   banner.addEventListener('mouseleave', resetTilt);
 }
 
