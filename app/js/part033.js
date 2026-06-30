@@ -49,10 +49,10 @@
 
   // ── NowssB Verified — tiers (the headphone check-mark badges) ──
   var VERIFY_TIERS = [
-    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png', req:['Complete your profile','Reach a 7-day practice streak'], price:'₹199', per:'/mo'},
-    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', req:['30-day practice streak','100 words practiced'], price:'₹499', per:'/mo'},
-    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', req:['365-day streak','1000 words · 50 sessions'], price:'₹999', per:'/mo'},
-    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', req:['Everything in Gold','Invite-only — or buy the Lifetime Pass'], price:'₹4,999', per:' lifetime'}
+    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792072386_d8fifm.jpg', req:['Complete your profile','Reach a 7-day practice streak','Practice 25 words'], price:'₹199', per:'/mo'},
+    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792074543_iasker.jpg', req:['30-day practice streak','100 words practiced','20 sessions completed'], price:'₹499', per:'/mo'},
+    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792076655_amox3t.jpg', req:['365-day streak','1000 words practiced','50 sessions completed'], price:'₹999', per:'/mo'},
+    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['Everything in Gold','Top 1% of all practitioners','Invite-only — or buy the Lifetime Pass'], price:'₹4,999', per:' lifetime'}
   ];
   var VERIFY_ORDER = ['', 'blue', 'silver', 'gold', 'diamond'];
   function verifyTierOf(p){
@@ -425,10 +425,14 @@
         var owned = cur && VERIFY_ORDER.indexOf(cur) >= VERIFY_ORDER.indexOf(t.key);
         var reqs = t.req.map(function(r){ return '<div class="nwsb-vr-req"><span class="nwsb-vr-tick">✓</span><span>'+r+'</span></div>'; }).join('');
         return '<div class="nwsb-vr-card'+(t.key==='diamond'?' diamond':'')+'">'+
+            '<div class="nwsb-vr-banner"><img class="nwsb-vr-banner-img" src="'+(t.promo||t.img)+'" alt="">'+
+              (owned ? '<span class="nwsb-vr-owned-flag">Owned ✓</span>' : '')+
+            '</div>'+
             '<div class="nwsb-vr-top"><img class="nwsb-vr-img" src="'+t.img+'" alt=""><div class="nwsb-vr-meta"><div class="nwsb-vr-name">'+t.name+'</div><div class="nwsb-vr-tag">'+t.tag+'</div></div></div>'+
-            '<div class="nwsb-vr-reqs-h">How to get it</div>'+reqs+
+            '<div class="nwsb-vr-reqs-h">Earn it the organic way</div>'+reqs+
+            '<div class="nwsb-vr-or"><span>or skip the grind — buy it</span></div>'+
             '<div class="nwsb-vr-buy"><div class="nwsb-vr-price">'+t.price+'<span>'+t.per+'</span></div>'+
-              (owned ? '<button class="nwsb-vr-btn owned" disabled>Owned ✓</button>' : '<button class="nwsb-vr-btn" onclick="IG.buyVerify(\''+t.key+'\')">Get '+t.name+'</button>')+
+              (owned ? '<button class="nwsb-vr-btn owned" disabled>Owned ✓</button>' : '<button class="nwsb-vr-btn" onclick="IG.buyVerify(\''+t.key+'\')">Buy '+t.name+'</button>')+
             '</div>'+
           '</div>';
       }).join('');
@@ -440,8 +444,11 @@
         '#nwsb-verify .nwsb-vr-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(env(safe-area-inset-bottom,20px) + 26px);}'+
         '#nwsb-verify .nwsb-vr-intro{font-size:13px;color:rgba(0,0,0,.55);line-height:1.5;margin-bottom:6px;}'+
         '#nwsb-verify .nwsb-vr-cur{font-size:12px;font-weight:700;color:#a8854a;margin-bottom:18px;}'+
-        '#nwsb-verify .nwsb-vr-card{background:#eef0f5;border-radius:22px !important;padding:18px;margin-bottom:16px;box-shadow:7px 7px 18px rgba(0,0,0,.12),-5px -5px 14px rgba(255,255,255,.97);}'+
+        '#nwsb-verify .nwsb-vr-card{background:#eef0f5;border-radius:22px !important;padding:18px;margin-bottom:16px;box-shadow:7px 7px 18px rgba(0,0,0,.12),-5px -5px 14px rgba(255,255,255,.97);overflow:hidden;}'+
         '#nwsb-verify .nwsb-vr-card.diamond{box-shadow:7px 7px 18px rgba(0,0,0,.13),-5px -5px 14px rgba(255,255,255,.97),inset 0 0 0 2px rgba(120,200,232,.45);}'+
+        '#nwsb-verify .nwsb-vr-banner{position:relative;width:calc(100% + 36px);margin:-18px -18px 16px;height:230px;background:#0a0a12;overflow:hidden;}'+
+        '#nwsb-verify .nwsb-vr-banner-img{width:100%;height:100%;object-fit:cover;object-position:center 46%;display:block;}'+
+        '#nwsb-verify .nwsb-vr-owned-flag{position:absolute;top:12px;right:12px;background:rgba(26,167,106,.95);color:#fff;font-size:11px;font-weight:800;letter-spacing:.5px;padding:5px 11px;border-radius:20px !important;box-shadow:0 4px 12px rgba(0,0,0,.3);}'+
         '#nwsb-verify .nwsb-vr-top{display:flex;align-items:center;gap:14px;margin-bottom:14px;}'+
         '#nwsb-verify .nwsb-vr-img{width:66px;height:66px;border-radius:16px !important;object-fit:cover;flex-shrink:0;box-shadow:4px 4px 11px rgba(0,0,0,.16),-3px -3px 8px rgba(255,255,255,.9);}'+
         '#nwsb-verify .nwsb-vr-name{font-size:18px;font-weight:800;color:#1a1a2e;}'+
@@ -449,7 +456,9 @@
         '#nwsb-verify .nwsb-vr-reqs-h{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(0,0,0,.38);margin-bottom:9px;}'+
         '#nwsb-verify .nwsb-vr-req{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1a1a2e;margin-bottom:6px;line-height:1.4;}'+
         '#nwsb-verify .nwsb-vr-tick{color:#1aa76a;font-weight:800;flex-shrink:0;}'+
-        '#nwsb-verify .nwsb-vr-buy{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;}'+
+        '#nwsb-verify .nwsb-vr-or{display:flex;align-items:center;gap:10px;margin:15px 0 4px;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,.34);}'+
+        '#nwsb-verify .nwsb-vr-or:before,#nwsb-verify .nwsb-vr-or:after{content:"";flex:1;height:1px;background:rgba(0,0,0,.1);}'+
+        '#nwsb-verify .nwsb-vr-buy{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;}'+
         '#nwsb-verify .nwsb-vr-price{font-size:19px;font-weight:800;color:#1a1a2e;white-space:nowrap;}'+
         '#nwsb-verify .nwsb-vr-price span{font-size:12px;font-weight:500;color:rgba(0,0,0,.45);}'+
         '#nwsb-verify .nwsb-vr-btn{border:none;border-radius:14px !important;background:#eef0f5;padding:12px 20px;font-size:14px;font-weight:700;color:#a8854a;cursor:pointer;white-space:nowrap;box-shadow:5px 5px 12px rgba(0,0,0,.13),-3px -3px 9px rgba(255,255,255,.95);}'+
