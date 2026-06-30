@@ -49,10 +49,10 @@
 
   // ── NowssB Verified — tiers (the headphone check-mark badges) ──
   var VERIFY_TIERS = [
-    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792072386_d8fifm.jpg', req:['Complete your profile','Reach a 7-day practice streak','Practice 25 words'], price:'₹199', per:'/mo'},
-    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792074543_iasker.jpg', req:['30-day practice streak','100 words practiced','20 sessions completed'], price:'₹499', per:'/mo'},
-    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792076655_amox3t.jpg', req:['365-day streak','1000 words practiced','50 sessions completed'], price:'₹999', per:'/mo'},
-    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['Everything in Gold','Top 1% of all practitioners','Invite-only — or buy the Lifetime Pass'], price:'₹4,999', per:' lifetime'}
+    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792072386_d8fifm.jpg', req:['Complete your profile','Reach a 7-day practice streak','Practice 25 words'], price:'$1.99', priceN:199, per:'/mo'},
+    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792074543_iasker.jpg', req:['30-day practice streak','100 words practiced','20 sessions completed'], price:'$4.99', priceN:499, per:'/mo'},
+    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792076655_amox3t.jpg', req:['365-day streak','1000 words practiced','50 sessions completed'], price:'$9.99', priceN:999, per:'/mo'},
+    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['Everything in Gold','Top 1% of all practitioners','Invite-only — or buy the Lifetime Pass'], price:'$49.99', priceN:4999, per:' lifetime'}
   ];
   var VERIFY_ORDER = ['', 'blue', 'silver', 'gold', 'diamond'];
   function verifyTierOf(p){
@@ -477,15 +477,24 @@
       document.body.appendChild(ov);
     },
     buyVerify:function(tier){
-      try{ localStorage.setItem('nwsb_verify_tier', tier); }catch(e){}
-      window._userDataCache = window._userDataCache || {};
-      window._userDataCache.verifyTier = tier;
-      if(window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, {verifyTier:tier}).catch(function(){});
-      var nm=''; for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===tier) nm=VERIFY_TIERS[i].name; }
-      if(window.nwsbToast) nwsbToast("You're now "+nm+" verified ✓");
-      var igp=document.getElementById('sub-ig-profile');
-      if(igp && igp.classList.contains('open') && this._currentProfile && this._currentProfile.self) this.openMyProfile();
-      this.openVerify();
+      // Put the badge in the shopping bag and send the user through the real
+      // checkout — the badge is granted by chkHandleSuccess after payment.
+      var t=null; for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===tier){ t=VERIFY_TIERS[i]; break; } }
+      if(!t) return;
+      window.nssCart = window.nssCart || [];
+      var id='badge-'+tier;
+      if(!window.nssCart.some(function(c){ return c.id===id; })){
+        // a badge replaces any lower badge already in the bag
+        window.nssCart = window.nssCart.filter(function(c){ return String(c.id).indexOf('badge-')!==0; });
+        window.nssCart.push({ id:id, name:t.name+' Verified Badge', type:'Badge', tier:tier, price:t.priceN, img:t.img });
+        if(typeof nssSaveCart==='function') nssSaveCart();
+        if(typeof nssUpdateBadges==='function') nssUpdateBadges();
+      }
+      var ov=document.getElementById('nwsb-verify'); if(ov) ov.remove();
+      if(window.nwsbToast) nwsbToast('Badge added to bag — checkout to verify ✓');
+      if(typeof openSub==='function') openSub('cart');
+      // land straight on the bag contents, not the cart intro
+      setTimeout(function(){ if(typeof window.cartEnterFromIntro==='function') window.cartEnterFromIntro(); }, 120);
     },
     openMyProfile:function(){
       // sync real user data

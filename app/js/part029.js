@@ -173,7 +173,14 @@ function chkHandleSuccess(response, cart) {
   try { wordPurchased    = JSON.parse(localStorage.getItem('nwsb_purchased')           || '[]'); } catch(e) {}
   try { meaningPurchased = JSON.parse(localStorage.getItem('nwsb_meaning_purchased')   || '[]'); } catch(e) {}
 
+  var badgeOrder = ['blue','silver','gold','diamond'];
+  var grantBadge = '';
   cart.forEach(function(item) {
+    // Verified badge purchase — grant the tier, don't treat it as a word/meaning
+    if (item.type === 'Badge' && item.tier) {
+      if (badgeOrder.indexOf(item.tier) > badgeOrder.indexOf(grantBadge)) grantBadge = item.tier;
+      return;
+    }
     var entry = { word: item.name, purchasedAt: Date.now(), img: item.img || '', price: item.price };
     if (item.type === 'Meaning') {
       if (!meaningPurchased.some(function(p){ return p.word.toLowerCase() === item.name.toLowerCase(); })) {
@@ -189,6 +196,14 @@ function chkHandleSuccess(response, cart) {
   try { localStorage.setItem('nwsb_purchased',          JSON.stringify(wordPurchased));    } catch(e) {}
   try { localStorage.setItem('nwsb_meaning_purchased',  JSON.stringify(meaningPurchased)); } catch(e) {}
 
+  // Grant the verified badge tier that was bought
+  if (grantBadge) {
+    try { localStorage.setItem('nwsb_verify_tier', grantBadge); } catch(e) {}
+    window._userDataCache = window._userDataCache || {};
+    window._userDataCache.verifyTier = grantBadge;
+    if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { verifyTier: grantBadge }).catch(function(){});
+  }
+
   // Clear cart
   if (window.nssCart) window.nssCart = [];
   if (typeof nssUpdateBadges       === 'function') nssUpdateBadges();
@@ -199,7 +214,9 @@ function chkHandleSuccess(response, cart) {
   closeSub('checkout');
   setTimeout(function() {
     if (typeof openSub === 'function') openSub('orders');
-    if (typeof nssShowToast === 'function') nssShowToast('Purchase complete — words unlocked');
+    if (typeof nssShowToast === 'function') {
+      nssShowToast(grantBadge ? "You're now "+grantBadge.charAt(0).toUpperCase()+grantBadge.slice(1)+" verified ✓" : 'Purchase complete — words unlocked');
+    }
   }, 120);
 }
 
