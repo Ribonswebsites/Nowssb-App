@@ -1968,18 +1968,10 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
           drop-shadow(0 0 1px rgba(190,225,255,.95))
           drop-shadow(0 0 16px rgba(120,180,255,.55));
 }
-/* soft glow behind the glass body so it stays visible — NO box, NO border edge */
-.hbm-figure::before {
-  content: ''; position: absolute; inset: -16% -22%; z-index: -1; border-radius: 0 !important;
-  background: radial-gradient(ellipse 58% 54% at 50% 44%, rgba(34,52,96,0.85) 0%, rgba(16,26,50,0.42) 46%, transparent 72%);
-  filter: blur(10px);
-}
+/* no backdrop glow behind the body — the glass image reads fine on the dark bg */
+.hbm-figure::before { display: none !important; }
 .hbm-figure.mini { max-width: 118px; }
-.hbm-figure.mini::before {
-  display: block; inset: -14% -20%; border-radius: 0 !important;
-  background: radial-gradient(ellipse 60% 55% at 50% 46%, rgba(34,52,96,0.8), transparent 70%);
-  filter: blur(7px);
-}
+.hbm-figure.mini::before { display: none !important; }
 .hbm-point {
   position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1 / 1;
   border-radius: 50% !important; cursor: pointer;
