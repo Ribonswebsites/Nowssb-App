@@ -107,6 +107,26 @@ function pgShow(key) {
   document.getElementById('pggRows').innerHTML = html;
 
   document.getElementById('pgGuide').classList.add('open');
+
+  /* Bulletproof height cap — set inline so no cached/looser CSS can make the
+     card grow taller than the screen and cut off the "Got it" button. */
+  var _inner = document.getElementById('pgGuide-inner');
+  if (_inner) {
+    _inner.style.maxHeight = '84vh';
+    _inner.style.overflow = 'hidden';
+    _inner.style.display = 'flex';
+    _inner.style.flexDirection = 'column';
+  }
+  var _bimg = document.getElementById('pggBannerImg');
+  if (_bimg) {
+    _bimg.style.height = '118px';
+    _bimg.style.width = '100%';
+    _bimg.style.objectFit = 'cover';
+    var _bn = _bimg.parentNode;
+    if (_bn) { _bn.style.height = '118px'; _bn.style.flex = '0 0 118px'; _bn.style.overflow = 'hidden'; }
+  }
+  var _rows = document.getElementById('pggRows');
+  if (_rows) { _rows.style.overflowY = 'auto'; _rows.style.flex = '1 1 auto'; _rows.style.minHeight = '0'; }
 }
 
 function pgClose(permanent) {
