@@ -548,19 +548,28 @@ function nmhRefresh() {
   var gimg = document.getElementById('nmhGreetImg');
   if (gimg) {
     if (!gimg.getAttribute('src')) { window._nmhGreetIdx = 0; gimg.src = GREET_SEQ[0]; }
-    // preload the rest so the rotation is seamless
-    GREET_SEQ.forEach(function(u){ var im = new Image(); im.src = u; });
+    // preload all so the rotation is seamless (once)
+    if (!window._nmhGreetPreloaded) {
+      window._nmhGreetPreloaded = GREET_SEQ.map(function(u){ var im = new Image(); im.src = u; return im; });
+    }
     if (window._nmhGreetTimer) clearInterval(window._nmhGreetTimer);
     window._nmhGreetTimer = setInterval(function(){
       var el = document.getElementById('nmhGreetImg');
       var host = document.getElementById('home-nm');
       if (!el) { clearInterval(window._nmhGreetTimer); window._nmhGreetTimer = null; return; }
       if (!host || !host.classList.contains('active')) return;   // only rotate while home is visible
-      window._nmhGreetIdx = ((window._nmhGreetIdx || 0) + 1) % GREET_SEQ.length;
-      el.style.opacity = '0';
-      var nextSrc = GREET_SEQ[window._nmhGreetIdx];
-      setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; }, 280);
-    }, 3200);
+      var nextIdx = ((window._nmhGreetIdx || 0) + 1) % GREET_SEQ.length;
+      var nextSrc = GREET_SEQ[nextIdx];
+      // Only swap once the next image is fully decoded — no broken flash / double-load
+      var pre = new Image();
+      pre.onload = function(){
+        if (!host.classList.contains('active')) return;
+        el.style.opacity = '0';
+        setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; }, 320);
+        window._nmhGreetIdx = nextIdx;
+      };
+      pre.src = nextSrc;
+    }, 4000);
   }
 
   // Sync today's word from the dark home if available
