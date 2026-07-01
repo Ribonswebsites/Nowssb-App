@@ -2093,3 +2093,15 @@ body.nm-night #sub-health-male .hcat-item-title, body.nm-night #sub-health-femal
 body.nm-mode #sub-health-male .hcat-item-sub, body.nm-mode #sub-health-female .hcat-item-sub,
 body.nm-night #sub-health-male .hcat-item-sub, body.nm-night #sub-health-female .hcat-item-sub { color:rgba(255,255,255,0.42) !important; }
 body.nm-mode #sub-health-male .hcat-item-icon, body.nm-mode #sub-health-female .hcat-item-icon { color:#e8d5a3 !important; }
+
+/* ===== Remove the big hero banner on My Progress + Word Science — collapse the
+   header to a compact bar (back button + title) so the content gets the space ===== */
+#sub-my-progress .sub-header, #sub-word-science .sub-header {
+  height:auto !important; min-height:0 !important;
+  background-image:none !important; background:#060c18 !important;
+  padding:14px 18px 12px !important; box-shadow:none !important;
+  border-bottom:1px solid rgba(255,255,255,0.06) !important;
+}
+#sub-my-progress .sub-header::after, #sub-word-science .sub-header::after,
+#sub-my-progress .sub-header::before, #sub-word-science .sub-header::before { display:none !important; }
+#sub-my-progress .sub-header-title, #sub-word-science .sub-header-title { font-size:22px !important; }
