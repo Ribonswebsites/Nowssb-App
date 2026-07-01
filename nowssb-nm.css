@@ -2105,3 +2105,20 @@ body.nm-mode #sub-health-male .hcat-item-icon, body.nm-mode #sub-health-female .
 #sub-my-progress .sub-header::after, #sub-word-science .sub-header::after,
 #sub-my-progress .sub-header::before, #sub-word-science .sub-header::before { display:none !important; }
 #sub-my-progress .sub-header-title, #sub-word-science .sub-header-title { font-size:22px !important; }
+
+/* ===== EXPLORE/SEARCH (#sub-people) — circle avatar + back button ===== */
+#ig-explore-myavatar, #ig-explore-myavatar > img { border-radius:50% !important; }
+body.nm-glass #ig-explore-myavatar {
+  border:none !important; background:#eef0f5 !important;
+  box-shadow:4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95) !important;
+}
+.ig-people-back {
+  width:34px; height:34px; border-radius:50% !important; flex-shrink:0; cursor:pointer;
+  border:none; background:#1c1c1e; display:flex; align-items:center; justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+}
+body.nm-glass .ig-people-back {
+  background:#eef0f5 !important;
+  box-shadow:4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95) !important;
+}
+body.nm-glass .ig-people-back svg path { stroke:#1a1a2e !important; }
