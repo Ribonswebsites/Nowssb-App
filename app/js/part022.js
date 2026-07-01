@@ -108,25 +108,51 @@ function pgShow(key) {
 
   document.getElementById('pgGuide').classList.add('open');
 
-  /* Bulletproof height cap — set inline so no cached/looser CSS can make the
-     card grow taller than the screen and cut off the "Got it" button. */
+  /* Bulletproof layout — set inline so no cached/looser CSS interferes.
+     Tips are laid out as a HORIZONTAL swipeable row (not a tall stack) so the
+     whole card stays short and the banner can be tall enough to show the full
+     image (no cut-off heads). */
   var _inner = document.getElementById('pgGuide-inner');
   if (_inner) {
-    _inner.style.maxHeight = '84vh';
+    _inner.style.maxHeight = '82vh';
     _inner.style.overflow = 'hidden';
     _inner.style.display = 'flex';
     _inner.style.flexDirection = 'column';
   }
   var _bimg = document.getElementById('pggBannerImg');
   if (_bimg) {
-    _bimg.style.height = '118px';
+    _bimg.style.height = '200px';
     _bimg.style.width = '100%';
     _bimg.style.objectFit = 'cover';
+    _bimg.style.objectPosition = 'center 22%';   // bias toward the top so the head shows
     var _bn = _bimg.parentNode;
-    if (_bn) { _bn.style.height = '118px'; _bn.style.flex = '0 0 118px'; _bn.style.overflow = 'hidden'; }
+    if (_bn) { _bn.style.height = '200px'; _bn.style.flex = '0 0 200px'; _bn.style.overflow = 'hidden'; }
   }
   var _rows = document.getElementById('pggRows');
-  if (_rows) { _rows.style.overflowY = 'auto'; _rows.style.flex = '1 1 auto'; _rows.style.minHeight = '0'; }
+  if (_rows) {
+    _rows.style.display = 'flex';
+    _rows.style.flexDirection = 'row';
+    _rows.style.overflowX = 'auto';
+    _rows.style.overflowY = 'hidden';
+    _rows.style.gap = '12px';
+    _rows.style.flex = '0 0 auto';
+    _rows.style.scrollSnapType = 'x mandatory';
+    _rows.style.webkitOverflowScrolling = 'touch';
+    _rows.style.paddingBottom = '10px';
+    _rows.style.marginBottom = '6px';
+    var _cards = _rows.querySelectorAll('.pgg-row');
+    for (var _i = 0; _i < _cards.length; _i++) {
+      var _c = _cards[_i];
+      _c.style.minWidth = '80%';
+      _c.style.flex = '0 0 80%';
+      _c.style.scrollSnapAlign = 'start';
+      _c.style.borderBottom = 'none';
+      _c.style.background = 'rgba(255,255,255,.05)';
+      _c.style.setProperty('border-radius', '14px', 'important');
+      _c.style.padding = '14px';
+      _c.style.alignItems = 'flex-start';
+    }
+  }
 }
 
 function pgClose(permanent) {

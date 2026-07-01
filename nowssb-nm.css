@@ -2050,11 +2050,13 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 .nwsb-pill-toggle{ border-radius:999px !important; }
 .nwsb-pill-toggle .nwsb-pill-knob{ border-radius:50% !important; }
 
-/* ===== PAGE GUIDE (#pgGuide) — cap height so it never overflows / gets cut ===== */
-#pgGuide-inner{ max-height:86vh !important; overflow:hidden !important; display:flex !important; flex-direction:column !important; }
-#pgGuide .pgg-banner{ height:130px !important; flex-shrink:0 !important; }
-#pgGuide .pgg-drag, #pgGuide .pgg-eyebrow, #pgGuide .pgg-title, #pgGuide .pgg-body, #pgGuide .pgg-foot{ flex-shrink:0 !important; }
-#pgGuide .pgg-rows{ overflow-y:auto !important; flex:1 1 auto !important; min-height:0 !important; -webkit-overflow-scrolling:touch !important; }
+/* ===== PAGE GUIDE (#pgGuide) — short card, tall banner, horizontal tips.
+   Heights/scroll are also set inline in pgShow() (JS) — these just keep the
+   pieces from stretching. Banner height is left to JS so it isn't forced. ===== */
+#pgGuide-inner{ max-height:82vh !important; overflow:hidden !important; display:flex !important; flex-direction:column !important; }
+#pgGuide .pgg-banner{ flex-shrink:0 !important; }
+#pgGuide .pgg-drag, #pgGuide .pgg-eyebrow, #pgGuide .pgg-title, #pgGuide .pgg-body, #pgGuide .pgg-foot, #pgGuide .pgg-rows{ flex-shrink:0 !important; }
+#pgGuide .pgg-rows::-webkit-scrollbar{ display:none !important; }
 
 /* ===== TOGGLE FIX — the global [onclick]{min-height:44px} was forcing every
    toggle to 44px tall, turning the thin pills into squares. Undo it. ===== */
