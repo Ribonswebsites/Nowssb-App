@@ -2065,3 +2065,31 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 
 /* ===== HEALING BODY MAP — remove the wrapper boxes around the figure ===== */
 #hbm-profile-mini{ background:transparent !important; border:none !important; padding:0 !important; }
+
+/* ===== HEALTH MALE/FEMALE CATEGORY LISTS — force the dark "Fashion" style
+   (image shown, dark glass cards) instead of the nm white-neumorphism look.
+   Scoped to male/female only — Choose Your Path (#sub-health-journey) unchanged. ===== */
+body.nm-mode #sub-health-male, body.nm-mode #sub-health-female,
+body.nm-night #sub-health-male, body.nm-night #sub-health-female,
+body.nm-glass #sub-health-male, body.nm-glass #sub-health-female { background:#060c18 !important; }
+body.nm-mode #sub-health-male .sub-screen-bg, body.nm-mode #sub-health-female .sub-screen-bg,
+body.nm-night #sub-health-male .sub-screen-bg, body.nm-night #sub-health-female .sub-screen-bg { display:block !important; }
+body.nm-mode #sub-health-male .hcat-hero-img, body.nm-mode #sub-health-female .hcat-hero-img,
+body.nm-night #sub-health-male .hcat-hero-img, body.nm-night #sub-health-female .hcat-hero-img { display:block !important; }
+body.nm-mode #sub-health-male .hcat-hero, body.nm-mode #sub-health-female .hcat-hero { background:transparent !important; }
+body.nm-mode #sub-health-male .hcat-hero-name, body.nm-mode #sub-health-female .hcat-hero-name,
+body.nm-night #sub-health-male .hcat-hero-name, body.nm-night #sub-health-female .hcat-hero-name { color:#fff !important; }
+body.nm-mode #sub-health-male .hcat-hero-label, body.nm-mode #sub-health-female .hcat-hero-label { color:#e8d5a3 !important; }
+body.nm-mode #sub-health-male .hcat-section-label, body.nm-mode #sub-health-female .hcat-section-label { color:rgba(255,255,255,0.4) !important; }
+body.nm-mode #sub-health-male .hcat-item, body.nm-mode #sub-health-female .hcat-item,
+body.nm-night #sub-health-male .hcat-item, body.nm-night #sub-health-female .hcat-item,
+body.nm-glass #sub-health-male .hcat-item, body.nm-glass #sub-health-female .hcat-item {
+  background:rgba(255,255,255,0.05) !important;
+  border:1px solid rgba(255,255,255,0.1) !important;
+  box-shadow:0 6px 18px rgba(0,0,0,0.3) !important;
+}
+body.nm-mode #sub-health-male .hcat-item-title, body.nm-mode #sub-health-female .hcat-item-title,
+body.nm-night #sub-health-male .hcat-item-title, body.nm-night #sub-health-female .hcat-item-title { color:#fff !important; }
+body.nm-mode #sub-health-male .hcat-item-sub, body.nm-mode #sub-health-female .hcat-item-sub,
+body.nm-night #sub-health-male .hcat-item-sub, body.nm-night #sub-health-female .hcat-item-sub { color:rgba(255,255,255,0.42) !important; }
+body.nm-mode #sub-health-male .hcat-item-icon, body.nm-mode #sub-health-female .hcat-item-icon { color:#e8d5a3 !important; }
