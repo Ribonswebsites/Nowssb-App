@@ -1960,7 +1960,7 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
 
 /* ════════ HEALING BODY MAP — glass image + glowing organ points ════════ */
 .hbm-figure {
-  position: relative; width: 100%; max-width: 460px !important; margin: 0 auto;
+  position: relative; width: 100%; max-width: 280px !important; margin: 0 auto;
   aspect-ratio: 788 / 1182;
   background-size: contain; background-position: center; background-repeat: no-repeat;
   /* the body PNG is transparent glass — give it a bright outline + glow so it is clearly visible */
@@ -1968,17 +1968,17 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
           drop-shadow(0 0 1px rgba(190,225,255,.95))
           drop-shadow(0 0 16px rgba(120,180,255,.55));
 }
-/* dark backdrop so the glass body pops now that the image has no background */
+/* soft glow behind the glass body so it stays visible — NO box, NO border edge */
 .hbm-figure::before {
-  content: ''; position: absolute; inset: -8% -4%; z-index: -1; border-radius: 28px !important;
-  background:
-    radial-gradient(ellipse at 50% 42%, rgba(30,46,86,0.95) 18%, rgba(12,20,40,0.78) 52%, rgba(8,14,28,0.4) 78%, transparent 100%),
-    linear-gradient(180deg, #0a1226 0%, #0d1730 100%);
+  content: ''; position: absolute; inset: -16% -22%; z-index: -1; border-radius: 0 !important;
+  background: radial-gradient(ellipse 58% 54% at 50% 44%, rgba(34,52,96,0.85) 0%, rgba(16,26,50,0.42) 46%, transparent 72%);
+  filter: blur(10px);
 }
 .hbm-figure.mini { max-width: 118px; }
 .hbm-figure.mini::before {
-  display: block; inset: -6% -10%; border-radius: 18px !important;
-  background: radial-gradient(ellipse at 50% 44%, rgba(30,46,86,0.9), rgba(10,18,36,0.5) 70%, transparent);
+  display: block; inset: -14% -20%; border-radius: 0 !important;
+  background: radial-gradient(ellipse 60% 55% at 50% 46%, rgba(34,52,96,0.8), transparent 70%);
+  filter: blur(7px);
 }
 .hbm-point {
   position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1 / 1;
@@ -1993,7 +1993,7 @@ body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
   50%      { opacity: .95; transform: translate(-50%, -50%) scale(1.14); }
 }
 /* give the glass body image more room than the old 180px SVG */
-.hbm-svg-wrap { width: min(98vw, 460px) !important; margin: 0 auto 16px !important; }
+.hbm-svg-wrap { width: min(76vw, 280px) !important; margin: 0 auto 16px !important; }
 
 /* ── Store/archive back buttons: use the glass back-sphere image (not SVG) ── */
 .cwp-back, .oh-cat-back, .wish-cat-back, .cart-intro-back {
@@ -2058,14 +2058,16 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 .nwsb-pill-toggle{ border-radius:999px !important; }
 .nwsb-pill-toggle .nwsb-pill-knob{ border-radius:50% !important; }
 
-/* ===== MY PROGRESS — 3D SCROLL HERO BANNER ===== */
-#sub-my-progress #mpMainContent{ position:relative !important; perspective:1200px; perspective-origin:50% 0%; }
-#sub-my-progress #mpMainContent > .sub-header{
-  position:absolute !important; top:0; left:0; right:0; height:300px !important;
-  z-index:1 !important; transform-origin:50% 0%; will-change:transform,opacity;
-  backface-visibility:hidden; -webkit-backface-visibility:hidden;
-}
-#sub-my-progress #mpBody{
-  position:relative !important; z-index:2 !important;
-  padding-top:296px !important; background:transparent !important;
-}
+/* ===== PAGE GUIDE (#pgGuide) — cap height so it never overflows / gets cut ===== */
+#pgGuide-inner{ max-height:86vh !important; overflow:hidden !important; display:flex !important; flex-direction:column !important; }
+#pgGuide .pgg-banner{ height:130px !important; flex-shrink:0 !important; }
+#pgGuide .pgg-drag, #pgGuide .pgg-eyebrow, #pgGuide .pgg-title, #pgGuide .pgg-body, #pgGuide .pgg-foot{ flex-shrink:0 !important; }
+#pgGuide .pgg-rows{ overflow-y:auto !important; flex:1 1 auto !important; min-height:0 !important; -webkit-overflow-scrolling:touch !important; }
+
+/* ===== TOGGLE FIX — the global [onclick]{min-height:44px} was forcing every
+   toggle to 44px tall, turning the thin pills into squares. Undo it. ===== */
+.nwsb-pill-toggle, #pref-sound-toggle, #piToggle, .rt-intro-toggle, .nmset-tgl,
+#pref-sound-toggle[onclick], .nwsb-pill-toggle[onclick] { min-height:0 !important; }
+
+/* ===== HEALING BODY MAP — remove the wrapper boxes around the figure ===== */
+#hbm-profile-mini{ background:transparent !important; border:none !important; padding:0 !important; }

@@ -436,9 +436,12 @@ function done() {
 function subShow(key) {
   var d = SUB[key];
   if (!d || _subSeen[key]) return;
-  // Don't show nwSub bottom sheet if this screen already has a pgGuide bottom bar
+  // Don't show nwSub bottom sheet if this screen already has a pgGuide (in any part).
+  // A pgGuide exists for a screen when window._PG[key] is defined (part022 + part025),
+  // or the screen is in the pg-active list — either way, never double-up.
   var pgScreens = window._pgActiveScreens || ['practice','routines','routine-detail','health-journey','health-male','health-female','health-category','sound-library','my-progress'];
   if (pgScreens.indexOf(key) !== -1) return;
+  if (window._PG && window._PG[key]) return;
   subEye.textContent = d.eye;
   subH.textContent   = d.h;
   subB.textContent   = d.b;
