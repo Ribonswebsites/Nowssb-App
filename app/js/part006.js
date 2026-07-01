@@ -85,8 +85,30 @@ function mpEnterFromIntro() {
   } else {
     mpLoad();
   }
+  mpInitHero3D();
 }
 window.mpEnterFromIntro = mpEnterFromIntro;
+
+// ── 3D SCROLL HERO — the banner tilts back, sinks and fades as you scroll ──
+function mpInitHero3D() {
+  var body = document.getElementById('mpBody');
+  var hdr  = document.querySelector('#sub-my-progress #mpMainContent > .sub-header');
+  if (!body || !hdr) return;
+  if (body._hero3d) return;      // wire once
+  body._hero3d = true;
+  var H = 300;
+  body.addEventListener('scroll', function() {
+    var sy = body.scrollTop;
+    var p  = Math.min(sy / H, 1);
+    var ty = -sy * 0.5;           // parallax — rises slower than the content
+    var tz = -p * 170;            // sinks into the screen
+    var rx = p * 16;              // tilts back
+    var sc = 1 - p * 0.05;
+    hdr.style.transform = 'translateY(' + ty + 'px) translateZ(' + tz + 'px) rotateX(' + rx + 'deg) scale(' + sc + ')';
+    hdr.style.opacity   = String(Math.max(1 - p * 1.05, 0));
+  }, { passive: true });
+}
+window.mpInitHero3D = mpInitHero3D;
 
 // ── LOAD (full) ──
 async function mpLoad() {

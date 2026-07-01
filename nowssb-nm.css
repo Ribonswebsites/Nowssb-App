@@ -2057,3 +2057,15 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 /* ===== PILL TOGGLES — force true pill/tube shape (beats *{border-radius:0!important}) ===== */
 .nwsb-pill-toggle{ border-radius:999px !important; }
 .nwsb-pill-toggle .nwsb-pill-knob{ border-radius:50% !important; }
+
+/* ===== MY PROGRESS — 3D SCROLL HERO BANNER ===== */
+#sub-my-progress #mpMainContent{ position:relative !important; perspective:1200px; perspective-origin:50% 0%; }
+#sub-my-progress #mpMainContent > .sub-header{
+  position:absolute !important; top:0; left:0; right:0; height:300px !important;
+  z-index:1 !important; transform-origin:50% 0%; will-change:transform,opacity;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+}
+#sub-my-progress #mpBody{
+  position:relative !important; z-index:2 !important;
+  padding-top:296px !important; background:transparent !important;
+}
