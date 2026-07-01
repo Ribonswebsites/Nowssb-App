@@ -2050,6 +2050,7 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   -webkit-user-select:none !important;
   user-select:none !important;
   -webkit-touch-callout:none !important;
+  transition:opacity .3s ease !important;
 }
 .nmh-greet-img:not([src]){ display:none !important; }
 

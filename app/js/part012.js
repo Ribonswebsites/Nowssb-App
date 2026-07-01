@@ -538,16 +538,30 @@ function nmhRefresh() {
   var greet = document.getElementById('nmhGreeting');
   if (greet) greet.innerHTML = g + (name ? ',<br>' + name : ',<br>Healer');
 
-  // Sync time-of-day greeting image
-  var GREET_IMGS = {
-    morning:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749762/grok_image_1782749533198_o0bzf9.jpg',
-    noon:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749763/grok_image_1782749585407_marxv4.jpg',
-    afternoon:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749763/grok_image_1782749569619_zzlmxg.jpg',
-    evening:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749763/grok_image_1782749538239_vaz21h.jpg',
-    night:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782749762/grok_image_1782749559712_azpsuj.jpg'
-  };
+  // Auto-rotating hero sequence: Natural · Origin · Word · Science
+  var GREET_SEQ = [
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782945762/grok_image_1782945639246_pyi7nw.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782945777/grok_image_1782945661636_poon1b.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782945762/grok_image_1782945632664_xqng3z.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782945762/grok_image_1782945664229_jmbcnz.jpg'
+  ];
   var gimg = document.getElementById('nmhGreetImg');
-  if (gimg && gimg.getAttribute('src') !== GREET_IMGS[slot]) gimg.src = GREET_IMGS[slot];
+  if (gimg) {
+    if (!gimg.getAttribute('src')) { window._nmhGreetIdx = 0; gimg.src = GREET_SEQ[0]; }
+    // preload the rest so the rotation is seamless
+    GREET_SEQ.forEach(function(u){ var im = new Image(); im.src = u; });
+    if (window._nmhGreetTimer) clearInterval(window._nmhGreetTimer);
+    window._nmhGreetTimer = setInterval(function(){
+      var el = document.getElementById('nmhGreetImg');
+      var host = document.getElementById('home-nm');
+      if (!el) { clearInterval(window._nmhGreetTimer); window._nmhGreetTimer = null; return; }
+      if (!host || !host.classList.contains('active')) return;   // only rotate while home is visible
+      window._nmhGreetIdx = ((window._nmhGreetIdx || 0) + 1) % GREET_SEQ.length;
+      el.style.opacity = '0';
+      var nextSrc = GREET_SEQ[window._nmhGreetIdx];
+      setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; }, 280);
+    }, 3200);
+  }
 
   // Sync today's word from the dark home if available
   var tw = document.getElementById('todayPracticeTitle');

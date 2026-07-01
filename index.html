@@ -97,9 +97,9 @@
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js"></script>
 <link rel="stylesheet" href="app/app.css">
-<link rel="stylesheet" href="nowssb-social.css?v=116">
-<link rel="stylesheet" href="nowssb-nm.css?v=116">
-<link rel="stylesheet" href="nowssb-player.css?v=116">
+<link rel="stylesheet" href="nowssb-social.css?v=117">
+<link rel="stylesheet" href="nowssb-nm.css?v=117">
+<link rel="stylesheet" href="nowssb-player.css?v=117">
 </head>
 <body>
 <script src="app/js/part002.js"></script>
@@ -6943,6 +6943,9 @@
 
 <!-- ── TRIAL EXPIRED OVERLAY ── -->
 <div id="trial-expired-overlay" style="display:none;position:fixed;inset:0;z-index:99998;background:#060c18;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:48px 24px 80px;">
+  <button onclick="document.getElementById('trial-expired-overlay').style.display='none';if(typeof goTo==='function')goTo('home');" aria-label="Back" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:16px;width:42px;height:42px;border-radius:50% !important;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;-webkit-tap-highlight-color:transparent;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
   <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB" style="width:64px;height:64px;object-fit:contain;margin-bottom:24px;opacity:.85;">
   <div style="font-size:10px;letter-spacing:3px;color:rgba(232,213,163,.55);font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:10px;text-align:center;">NOWSBANSIU EDITION</div>
   <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;text-align:center;line-height:1.3;margin-bottom:10px;">Your free trial has ended.</div>
@@ -7010,9 +7013,9 @@
 </div>
 
 <script src="app/js/part049.js"></script>
-<script src="nowssb-social.js?v=116" defer></script>
-<script src="nowssb-nm.js?v=116" defer></script>
-<script src="nowssb-player.js?v=116" defer></script>
+<script src="nowssb-social.js?v=117" defer></script>
+<script src="nowssb-nm.js?v=117" defer></script>
+<script src="nowssb-player.js?v=117" defer></script>
 
 </body>
 </html>
