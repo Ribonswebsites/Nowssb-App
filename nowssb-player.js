@@ -26,7 +26,22 @@
       accent:'#a6dcff' },
     { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782795978/grok_image_1782795582310_llvpix.jpg',
       video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782795956/grok_video_2026-06-30-10-29-43_hzxyun.mp4',
-      accent:'#b9a6ff' }
+      accent:'#b9a6ff' },
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796537731_vzyhwn.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796761/grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
+      accent:'#a6c8ff' },
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796725/grok_image_1782796641824_izkh09.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796770/grok_video_2026-06-30-10-47-20_rljghs.mp4',
+      accent:'#b9a6ff' },
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796519587_thrrws.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796770/grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
+      accent:'#e8d5a3' },
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796924745_nmksmi.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782797027/grok_video_2026-06-30-10-52-07_gvffol.mp4',
+      accent:'#f0d9a8' },
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796933792_qwzfgx.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796996/grok_video_2026-06-30-10-52-20_zk87yh.mp4',
+      accent:'#8fe6ff' }
   ];
 
   function isSubscribed() {
@@ -188,6 +203,12 @@
         wInfo +
       '</div>';
 
+    /* preserve the currently-playing background video across re-renders so it
+       doesn't restart (or get stuck paused) every time the phase changes */
+    var _prevVid = body.querySelector('.lgp-video');
+    var _prevVidSrc = _prevVid ? (_prevVid.getAttribute('src') || '') : '';
+    var _prevVidTime = (_prevVid && !isNaN(_prevVid.currentTime)) ? _prevVid.currentTime : 0;
+
     body.innerHTML =
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
@@ -213,6 +234,29 @@
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
         center +
       '</div>';
+
+    /* Keep the background video actually playing. A <video> inserted via
+       innerHTML often does NOT honour its autoplay attribute (so it sits paused
+       after ~2-3s when the phase re-renders). Force play, restore its position
+       if it's the same clip, and auto-resume if anything pauses it while the
+       practice screen is open. */
+    (function () {
+      var v = body.querySelector('.lgp-video');
+      if (!v) return;
+      v.muted = true;
+      v.setAttribute('muted', '');
+      v.playsInline = true;
+      var sameClip = _prevVidSrc && (v.getAttribute('src') === _prevVidSrc);
+      if (sameClip && _prevVidTime > 0.1) { try { v.currentTime = _prevVidTime; } catch (e) {} }
+      function tryPlay() { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+      function stillOpen() { var s = document.getElementById('sub-practice'); return s && s.classList.contains('open'); }
+      tryPlay();
+      v.addEventListener('loadeddata', tryPlay);
+      v.addEventListener('canplay', tryPlay);
+      v.addEventListener('pause', function () { if (stillOpen()) setTimeout(tryPlay, 30); });
+      v.addEventListener('stalled', tryPlay);
+      v.addEventListener('ended', function () { try { v.currentTime = 0; } catch (e) {} tryPlay(); });
+    })();
 
     /* The settings arc must NOT live inside .sub-screen — that screen creates its
        own stacking context (z-index:600 + transform/contain), which traps and
