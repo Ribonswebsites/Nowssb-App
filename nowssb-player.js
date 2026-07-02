@@ -26,8 +26,12 @@
      small, fast, hardware-friendly clip instead of the multi-MB source. */
   function cldVid(url, w) {
     if (!url || url.indexOf('/video/upload/') < 0) return url;
-    if (/\/video\/upload\/(q_auto|f_auto|w_|vc_)/.test(url)) return url; // already transformed
-    return url.replace('/video/upload/', '/video/upload/q_auto,f_auto,vc_auto' + (w ? ',w_' + w : '') + '/');
+    if (/\/video\/upload\/(q_auto|f_auto|w_|vc_|ac_)/.test(url)) return url; // already transformed
+    /* Force baseline H.264 (universally hardware-decoded — VP9/AV1 stutter on
+       many phones), eco quality, width cap, strip audio (videos are muted),
+       and cap fps so the decoder isn't hammered. */
+    var t = 'vc_h264,q_auto:eco,ac_none,fps_24' + (w ? ',w_' + w : '');
+    return url.replace('/video/upload/', '/video/upload/' + t + '/');
   }
 
   /* Match a word's organ/category/benefit text to one of the ORGAN_VIDEOS keys.
@@ -147,9 +151,23 @@
     var libBtn = '<button class="lgp-side" onclick="lgpToggleArc&&document.getElementById(\'lgpArc\')&&document.getElementById(\'lgpArc\').classList.remove(\'open\');openWalkmanLib&&openWalkmanLib()" aria-label="Library">' + libSvg + '<span>Library</span></button>';
     var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
-    /* central waveform = the pair's looping video (compressed via Cloudinary) */
+    /* central waveform = the pair's looping video (compressed via Cloudinary).
+       We REUSE the existing <video> element across re-renders (detach before
+       innerHTML, re-insert after) so it never reloads/seeks — recreating it on
+       every phase/rep change was the real cause of the constant stutter. */
+    var _newVidSrc = th.video ? cldVid(th.video, 640) : '';
+    var _keepVid = null;
+    (function () {
+      var ex = document.getElementById('practiceBody');
+      var cur = ex ? ex.querySelector('.lgp-video') : null;
+      if (cur && cur.getAttribute('src') === _newVidSrc) {
+        _keepVid = cur;
+        if (cur.parentNode) cur.parentNode.removeChild(cur); // survive the innerHTML wipe
+      }
+    })();
     var visual = th.video
-      ? '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + cldVid(th.video, 640) + '"></video>'
+      ? (_keepVid ? '<span class="lgp-video-slot"></span>'
+                  : '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + _newVidSrc + '"></video>')
       : '<div class="lgp-video-fallback"></div>';
 
     /* phase-aware center block — preserves the original IDs so play/record/score work */
@@ -295,12 +313,6 @@
         '</div>' +
       '</div>';
 
-    /* preserve the currently-playing background video across re-renders so it
-       doesn't restart (or get stuck paused) every time the phase changes */
-    var _prevVid = body.querySelector('.lgp-video');
-    var _prevVidSrc = _prevVid ? (_prevVid.getAttribute('src') || '') : '';
-    var _prevVidTime = (_prevVid && !isNaN(_prevVid.currentTime)) ? _prevVid.currentTime : 0;
-
     body.innerHTML =
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
@@ -333,27 +345,30 @@
         center +
       '</div>';
 
-    /* Keep the background video actually playing. A <video> inserted via
-       innerHTML often does NOT honour its autoplay attribute (so it sits paused
-       after ~2-3s when the phase re-renders). Force play, restore its position
-       if it's the same clip, and auto-resume if anything pauses it while the
-       practice screen is open. */
+    /* Re-insert the preserved video element (kept playing, no reload/seek). */
+    if (_keepVid) {
+      var _slot = body.querySelector('.lgp-video-slot');
+      if (_slot && _slot.parentNode) _slot.parentNode.replaceChild(_keepVid, _slot);
+      else { var _vw = body.querySelector('.lgp-visual'); if (_vw) _vw.insertBefore(_keepVid, _vw.firstChild); }
+    }
+
+    /* Keep the background video playing. Bind the resume listeners ONCE per
+       element (not every render — that leaked handlers and caused jank). */
     (function () {
       var v = body.querySelector('.lgp-video');
       if (!v) return;
-      v.muted = true;
-      v.setAttribute('muted', '');
-      v.playsInline = true;
-      var sameClip = _prevVidSrc && (v.getAttribute('src') === _prevVidSrc);
-      if (sameClip && _prevVidTime > 0.1) { try { v.currentTime = _prevVidTime; } catch (e) {} }
+      v.muted = true; v.setAttribute('muted', ''); v.playsInline = true;
       function tryPlay() { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
-      function stillOpen() { var s = document.getElementById('sub-practice'); return s && s.classList.contains('open'); }
-      tryPlay();
-      v.addEventListener('loadeddata', tryPlay);
-      v.addEventListener('canplay', tryPlay);
-      v.addEventListener('pause', function () { if (stillOpen()) setTimeout(tryPlay, 30); });
-      v.addEventListener('stalled', tryPlay);
-      v.addEventListener('ended', function () { try { v.currentTime = 0; } catch (e) {} tryPlay(); });
+      if (!v._lgpBound) {
+        v._lgpBound = true;
+        function stillOpen() { var s = document.getElementById('sub-practice'); return s && s.classList.contains('open'); }
+        v.addEventListener('loadeddata', tryPlay);
+        v.addEventListener('canplay', tryPlay);
+        v.addEventListener('pause', function () { if (stillOpen()) setTimeout(tryPlay, 30); });
+        v.addEventListener('stalled', tryPlay);
+        v.addEventListener('ended', function () { try { v.currentTime = 0; } catch (e) {} tryPlay(); });
+      }
+      if (v.paused) tryPlay();
     })();
 
     /* The settings arc must NOT live inside .sub-screen — that screen creates its
