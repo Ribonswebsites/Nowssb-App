@@ -112,7 +112,11 @@
     var repPct = Math.min(100, Math.round((repCount / repTarget) * 100));
     var voice = (typeof _pwVoice !== 'undefined') ? _pwVoice : 'F';
     var loop = (typeof _pwLoop !== 'undefined') ? !!_pwLoop : false;
-    var th = LGP_THEMES[Math.abs(idx) % LGP_THEMES.length];
+    /* ONE theme (= one video) for the whole session, chosen when the player
+       opened — so navigating words never reloads the video (that reload was
+       the transition stutter). Falls back to per-word if not set. */
+    var _thIdx = (typeof window._lgpSessionThemeIdx === 'number') ? window._lgpSessionThemeIdx : Math.abs(idx);
+    var th = LGP_THEMES[_thIdx % LGP_THEMES.length];
     var hr = new Date().getHours();
     var timeLabel = hr < 10 ? 'Morning' : hr < 13 ? 'Midday' : hr < 17 ? 'Afternoon' : hr < 20 ? 'Evening' : 'Night';
     var ar = (typeof getActiveRoutine === 'function') ? getActiveRoutine() : null;
@@ -563,7 +567,21 @@
     if (typeof window.openSub !== 'function') { return setTimeout(patchOpenSubHint, 200); }
     var orig = window.openSub;
     window.openSub = function (id) {
-      if (id === 'practice') { window._lgpHintPending = true; window._lgpHintScheduled = false; }
+      if (id === 'practice') {
+        window._lgpHintPending = true; window._lgpHintScheduled = false;
+        /* pick ONE theme for this whole session (rotate through all 10 across
+           sessions for variety, but keep it fixed within a session so the
+           video never reloads on word navigation). */
+        try {
+          var n = (parseInt(localStorage.getItem('nwsb_lgp_theme') || '-1', 10) + 1);
+          if (isNaN(n) || n < 0) n = 0;
+          n = n % LGP_THEMES.length;
+          localStorage.setItem('nwsb_lgp_theme', String(n));
+          window._lgpSessionThemeIdx = n;
+          /* warm the chosen video into cache right away */
+          if (LGP_THEMES[n] && LGP_THEMES[n].video) { var pv = new Image(); /* hint */ }
+        } catch (e) { window._lgpSessionThemeIdx = 0; }
+      }
       return orig.apply(this, arguments);
     };
   })();
