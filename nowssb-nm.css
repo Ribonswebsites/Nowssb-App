@@ -2269,3 +2269,26 @@ body.nm-glass #sub-health-journey .gsel-card {
   display:flex; align-items:center; justify-content:center; z-index:2;
 }
 .dl-page-back:active { box-shadow:inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.92); }
+
+/* ===== FASHION SECTIONS EMBEDDED IN THE NORMAL HOME ===== */
+/* full-width within nmh-wrap + rounded to match the neumorphic cards */
+#home-nm .word-search-section, #home-nm .krm-section, #home-nm .nss-store-trigger {
+  width:100% !important; margin-left:0 !important; margin-right:0 !important; margin-bottom:0 !important;
+  border-radius:24px !important;
+}
+#home-nm .nss-store-trigger { aspect-ratio:3 / 4 !important; }   /* less extreme than the 9:16 on Fashion */
+
+/* Subscription card (normal home) */
+.nmh-fsec {
+  position:relative; width:100%; border-radius:24px !important; overflow:hidden;
+  aspect-ratio:16/14; min-height:360px; background:#0a1020;
+  box-shadow:0 10px 30px rgba(0,0,0,.28); cursor:pointer;
+}
+.nmh-fsec-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
+.nmh-fsec-fade { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(6,12,24,0) 26%, rgba(6,12,24,.5) 60%, rgba(6,12,24,.96) 100%); }
+.nmh-fsec-inner { position:absolute; left:0; right:0; bottom:0; padding:24px 22px; z-index:1; }
+.nmh-fsec-eyebrow { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#e8d5a3; }
+.nmh-fsec-title { font-family:'DM Sans',sans-serif; font-size:24px; font-weight:800; color:#fff; line-height:1.15; margin:8px 0; }
+.nmh-fsec-sub { font-family:'DM Sans',sans-serif; font-size:12px; color:rgba(255,255,255,.72); line-height:1.6; margin-bottom:16px; max-width:300px; }
+.nmh-fsec-btn { border:none; background:#e8d5a3; color:#060c18; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; padding:13px 22px; border-radius:12px !important; cursor:pointer; }
+.nmh-fsec-btn:active { transform:scale(.97); }
