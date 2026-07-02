@@ -97,7 +97,8 @@
       replay:   'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/file_00000000a484720aa71b5f34f8539f05_amesbb.png',
       mic:      'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png',
       library:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
-      settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png'
+      settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png',
+      info:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782986898/file_000000002038722fac63c79466d73f0f_jnhjvg.png'
     };
     /* render every icon as a background-image SPAN (never an <img>) so the
        browser can't open/zoom it on tap and taps always hit the button */
@@ -277,7 +278,7 @@
         '<div class="lgp-ritual">' + ritual + ' Ritual · ' + (idx + 1) + ' of ' + total + '</div>' +
         '<div class="lgp-visual">' + visual +
           '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
-            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.51v.01"/></svg>' +
+            '<span class="lgp-bgico" style="background-image:url(\'' + IC.info + '\')"></span>' +
           '</button>' +
           '<div class="lgp-visual-overlay">' +
             '<div class="lgp-title">' + (w.word || '') + '</div>' +
@@ -410,9 +411,15 @@
     }
     var sheet = p.querySelector('.lgp-info-sheet');
     if (sheet) {
+      /* the sheet is centered via left:50% + translateX(-50%) — that half MUST
+         be preserved every time, or it renders anchored to screen-center-right
+         and runs off the edge (this exact bug shipped once already). */
+      sheet.style.left = '50%';
       sheet.style.transition = 'transform .38s cubic-bezier(.2,1.1,.3,1), opacity .28s';
       sheet.style.opacity = willOpen ? '1' : '0';
-      sheet.style.transform = willOpen ? 'translateY(0) scale(1)' : 'translateY(24px) scale(.96)';
+      sheet.style.transform = willOpen
+        ? 'translateX(-50%) translateY(0) scale(1)'
+        : 'translateX(-50%) translateY(24px) scale(.96)';
       if (willOpen) sheet.scrollTop = 0;
     }
     // play/pause the organ video with the panel so it doesn't run in the background
