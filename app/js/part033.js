@@ -573,13 +573,9 @@
         '#nwsb-vkyc .vk-input::placeholder{color:rgba(0,0,0,.32);}'+
         '#nwsb-vkyc .vk-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23a8854a\' stroke-width=\'2.4\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 18px center;padding-right:44px;}'+
         '#nwsb-vkyc .vk-prefill{font-size:11px;color:#1aa76a;font-weight:700;margin:-12px 4px 18px;}'+
-        /* intro / requirements */
-        '#nwsb-vkyc .vk-hero{width:calc(100% + 44px);margin:-22px -22px 20px;height:200px;background:#0a0a12;overflow:hidden;position:relative;}'+
-        '#nwsb-vkyc .vk-hero img{width:100%;height:100%;object-fit:cover;object-position:center 42%;display:block;}'+
-        '#nwsb-vkyc .vk-hero-badge{position:absolute;left:18px;bottom:14px;display:flex;align-items:center;gap:10px;}'+
-        '#nwsb-vkyc .vk-hero-badge img{width:44px;height:44px;border-radius:12px !important;box-shadow:0 6px 16px rgba(0,0,0,.4);}'+
-        '#nwsb-vkyc .vk-hero-badge b{color:#fff;font-size:15px;text-shadow:0 2px 8px rgba(0,0,0,.6);}'+
-        '#nwsb-vkyc .vk-hero-badge span{display:block;color:rgba(255,255,255,.85);font-size:12px;text-shadow:0 2px 8px rgba(0,0,0,.6);}'+
+        /* intro / requirements — COMPLETE 9:16 banner, never cropped */
+        '#nwsb-vkyc .vk-hero{width:calc(100% + 44px);margin:-22px -22px 20px;aspect-ratio:9/16;background:#07070d;overflow:hidden;position:relative;}'+
+        '#nwsb-vkyc .vk-hero img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;}'+
         '#nwsb-vkyc .vk-req{display:flex;align-items:flex-start;gap:13px;background:#eef0f5;border-radius:16px !important;padding:15px 16px;margin-bottom:12px;box-shadow:5px 5px 12px rgba(0,0,0,.09),-4px -4px 10px rgba(255,255,255,.95);}'+
         '#nwsb-vkyc .vk-req-ic{width:38px;height:38px;flex-shrink:0;border-radius:10px !important;background:#eef0f5;display:flex;align-items:center;justify-content:center;box-shadow:inset 2px 2px 5px rgba(0,0,0,.1),inset -2px -2px 5px rgba(255,255,255,.9);}'+
         '#nwsb-vkyc .vk-req-t{font-size:14px;font-weight:700;color:#1a1a2e;}'+
@@ -637,13 +633,13 @@
       var dobText = vkycDobToText(st.dob);
 
       var html='<style>'+css+'</style>'+
-        '<div class="vk-bar"><button class="vk-back" id="vk-back" aria-label="Back">&#8249;</button><span class="vk-steplbl" id="vk-steplbl">Step 1 of '+STEPS+'</span></div>'+
-        '<div class="vk-prog"><div class="vk-prog-fill" id="vk-progfill" style="width:'+(100/STEPS)+'%"></div></div>'+
+        '<div class="vk-bar"><button class="vk-back" id="vk-back" aria-label="Back">&#8249;</button><span class="vk-steplbl" id="vk-steplbl"></span></div>'+
+        '<div class="vk-prog" style="visibility:hidden"><div class="vk-prog-fill" id="vk-progfill" style="width:0%"></div></div>'+
         '<div class="vk-scroll">'+
           '<div class="vk-badge-mini"><img src="'+t.img+'" alt=""><div><b>'+st.tierLabel+'</b><br><span id="vk-price-mini">'+t.price+t.per+' · identity check</span></div></div>'+
           /* Step 1 — intro / requirements */
           '<div class="vk-step on" data-step="0">'+
-            '<div class="vk-hero"><img src="'+(t.promo||t.img)+'" alt=""><div class="vk-hero-badge"><img src="'+t.img+'" alt=""><div><b>'+st.tierLabel+'</b><span>'+t.tag+'</span></div></div></div>'+
+            '<div class="vk-hero"><img src="'+(t.promo||t.img)+'" alt=""></div>'+
             '<div class="vk-title">Before you start</div>'+
             '<div class="vk-sub">Getting verified takes about 2 minutes. Here\'s what you\'ll need — have it ready:</div>'+
             '<div class="vk-req"><div class="vk-req-ic">'+idIco+'</div><div><div class="vk-req-t">A government photo ID</div><div class="vk-req-s">Passport, driver\'s licence or national ID — clear and readable.</div></div></div>'+
@@ -715,11 +711,22 @@
     vkycRender:function(){
       var st=window._vkyc; if(!st) return;
       var STEPS=st.steps||6;
+      var FS=STEPS-1; // numbered field steps (intro is a pre-step, not counted)
       document.querySelectorAll('#nwsb-vkyc .vk-step').forEach(function(el){
         el.classList.toggle('on', parseInt(el.getAttribute('data-step'),10)===st.step);
       });
-      var lbl=document.getElementById('vk-steplbl'); if(lbl) lbl.textContent='Step '+(st.step+1)+' of '+STEPS;
-      var pf=document.getElementById('vk-progfill'); if(pf) pf.style.width=(((st.step+1)/STEPS)*100)+'%';
+      var lbl=document.getElementById('vk-steplbl');
+      var pf=document.getElementById('vk-progfill');
+      var prog=document.querySelector('#nwsb-vkyc .vk-prog');
+      if(st.step===0){ // intro cover — NOT a numbered step
+        if(lbl) lbl.textContent='';
+        if(pf) pf.style.width='0%';
+        if(prog) prog.style.visibility='hidden';
+      } else {
+        if(lbl) lbl.textContent='Step '+st.step+' of '+FS;
+        if(pf) pf.style.width=((st.step/FS)*100)+'%';
+        if(prog) prog.style.visibility='visible';
+      }
       var priceLocal = vkycFmt(st.priceUSDNum, st.currency);
       var nb=document.getElementById('vk-next'); if(nb) nb.textContent = (st.step===STEPS-1) ? 'Pay '+priceLocal+' & verify' : 'Continue';
       if(st.step===STEPS-1){
