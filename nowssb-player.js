@@ -9,6 +9,31 @@
 (function () {
   var ONLY_SUBSCRIBERS = false; // flip true to gate behind a paid/trial plan
 
+  /* ═══════════════════════════════════════════════════════════════
+     ORGAN VISUALIZATION VIDEOS (1:1) — shown in the INFO panel (NOT the
+     player). Mapped by ORGAN/CATEGORY, so every word in that category
+     automatically shows its organ video. Drop each Cloudinary URL in as
+     you send it (lungs first). Leave '' to keep the "coming soon"
+     placeholder for organs not wired yet. ═══════════════════════════ */
+  var ORGAN_VIDEOS = {
+    lungs:  '',   // ← lungs / breath / respiratory   (you'll send this first)
+    heart:  '',   // ← heart / cardiac / circulation
+    kidney: '',   // ← kidney / renal / bladder
+    liver:  ''    // ← liver / hepatic / detox
+  };
+  /* Match a word's organ/category/benefit text to one of the ORGAN_VIDEOS keys.
+     Robust to wording like "Lungs · Joints", "Lung & Breath", "Immune", etc. */
+  function organVideoFor(w) {
+    if (!w) return '';
+    if (w.organVideo) return w.organVideo;               // explicit per-word override still wins
+    var hay = ((w.organ || '') + ' ' + ((w.categories || []).join(' ')) + ' ' + (w.benefit || '')).toLowerCase();
+    if (/\blung|breath|respirat|pulmon/.test(hay))         return ORGAN_VIDEOS.lungs  || '';
+    if (/\bheart|cardiac|cardio|circulat/.test(hay))       return ORGAN_VIDEOS.heart  || '';
+    if (/\bkidney|renal|bladder|urinary/.test(hay))        return ORGAN_VIDEOS.kidney || '';
+    if (/\bliver|hepat|detox|gall/.test(hay))              return ORGAN_VIDEOS.liver  || '';
+    return '';
+  }
+
   /* ── Style pairs (image background + waveform video). One per word, rotating.
      Add each pair as you send it; the player cycles through them by word index. ── */
   var LGP_THEMES = [
@@ -210,8 +235,9 @@
        happening in the body, the word's meaning, and the practitioner's
        results for this word. Icons are plain inline SVG for now — real
        image icons come later, same as the rest of the player. ── */
-    var infoVideo = w.organVideo
-      ? '<video class="lgp-info-video" autoplay loop muted playsinline preload="auto" src="' + w.organVideo + '"></video>'
+    var _organVid = organVideoFor(w);
+    var infoVideo = _organVid
+      ? '<video class="lgp-info-video" autoplay loop muted playsinline preload="auto" src="' + _organVid + '"></video>'
       : '<div class="lgp-info-video-placeholder">' +
           '<span class="lgp-info-video-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8.5v7l6-3.5-6-3.5z" fill="#fff" stroke="none"/></svg></span>' +
           '<span class="lgp-info-video-lbl">Organ visualization coming soon</span>' +
