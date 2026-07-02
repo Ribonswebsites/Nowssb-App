@@ -15,13 +15,21 @@ window._mpData = null;
   window.openSub = function(id) {
     _origOpen(id);
     if (id === 'my-progress') {
-      // Always show intro first — reset state
       const introPage   = document.getElementById('mpIntroPage');
       const mainContent = document.getElementById('mpMainContent');
-      if (introPage)   { introPage.classList.remove('sl-intro-hidden'); introPage.style.display = ''; }
-      if (mainContent) mainContent.style.display = 'none';
-      // Load data in background to populate intro stats
-      mpLoadForIntro();
+      var _mpIntroSeen = false;
+      try { _mpIntroSeen = localStorage.getItem('nwsb_mp_intro_seen') === '1'; } catch(e){}
+      if (_mpIntroSeen) {
+        // Intro already shown once — go straight to the content, never again
+        if (introPage)   { introPage.classList.add('sl-intro-hidden'); introPage.style.display = 'none'; }
+        if (mainContent) mainContent.style.display = 'flex';
+        if (window._mpData != null) { mpRender(window._mpData); } else { mpLoad(); }
+      } else {
+        // First time — show the cinematic intro
+        if (introPage)   { introPage.classList.remove('sl-intro-hidden'); introPage.style.display = ''; }
+        if (mainContent) mainContent.style.display = 'none';
+        mpLoadForIntro();
+      }
     }
   };
 })();
@@ -70,6 +78,7 @@ async function mpLoadForIntro() {
 
 // ── ENTER — dismiss intro, show main content ──
 function mpEnterFromIntro() {
+  try { localStorage.setItem('nwsb_mp_intro_seen', '1'); } catch(e){}
   const introPage   = document.getElementById('mpIntroPage');
   const mainContent = document.getElementById('mpMainContent');
   if (introPage) {
