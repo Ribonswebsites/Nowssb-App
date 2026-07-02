@@ -2195,3 +2195,10 @@ body.nm-glass #sub-health-journey .gsel-card {
 .wish-intro-vignette {
   display:none !important; background:none !important;
 }
+
+/* ===== DOWNLOAD/INSTALL POPUP — must sit ABOVE the settings sub-screen.
+   .dl-overlay was z-index:300 in app.css but .sub-screen (Settings) is
+   z-index:600, so tapping "Download App" opened the popup invisibly BEHIND
+   the settings page. Force it to the very top. ===== */
+.dl-overlay { z-index: 2147483000 !important; }
+.dl-sheet   { z-index: 2147483001 !important; position: relative; }
