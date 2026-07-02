@@ -236,8 +236,8 @@
         '<div class="lgp-info-back" onclick="lgpToggleInfo()"></div>' +
         '<div class="lgp-info-sheet">' +
           '<div class="lgp-info-sheet-top">' +
-            '<button class="lgp-info-close" onclick="lgpToggleInfo()" aria-label="Close">' +
-              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
+            '<button class="lgp-info-close lgp-imgbtn" onclick="lgpToggleInfo()" aria-label="Back">' +
+              '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
             '</button>' +
             '<div class="lgp-info-sheet-title">' + (w.word || '') + '</div>' +
           '</div>' +
@@ -358,7 +358,15 @@
         void cluster.offsetWidth;              // restart the animation cleanly
         cluster.classList.add('hint-run');
         setTimeout(function () { var t = document.getElementById('lgpInfoPillTxt'); if (t) t.textContent = 'Learn your score'; }, 2100);
-        setTimeout(function () { var c = document.getElementById('lgpInfoCluster'); if (c) c.classList.remove('hint-run'); }, 4600);
+        setTimeout(function () {
+          var c = document.getElementById('lgpInfoCluster'); if (c) c.classList.remove('hint-run');
+          /* once the pill has retracted, the icon itself gets a light tracing round it */
+          var b = c && c.querySelector('.lgp-info-btn');
+          if (b) {
+            b.classList.remove('trace-run'); void b.offsetWidth; b.classList.add('trace-run');
+            setTimeout(function () { if (b) b.classList.remove('trace-run'); }, 2700);
+          }
+        }, 4600);
       }, 900);
     }
   }
@@ -435,15 +443,12 @@
     }
     var sheet = p.querySelector('.lgp-info-sheet');
     if (sheet) {
-      /* the sheet is centered via left:50% + translateX(-50%) — that half MUST
-         be preserved every time, or it renders anchored to screen-center-right
-         and runs off the edge (this exact bug shipped once already). */
-      sheet.style.left = '50%';
-      sheet.style.transition = 'transform .38s cubic-bezier(.2,1.1,.3,1), opacity .28s';
+      /* full-page now (inset:0), so it centers by filling the screen — no
+         translateX needed. Slide up + fade on open. */
+      sheet.style.left = '0';
+      sheet.style.transition = 'transform .4s cubic-bezier(.2,1,.3,1), opacity .3s';
       sheet.style.opacity = willOpen ? '1' : '0';
-      sheet.style.transform = willOpen
-        ? 'translateX(-50%) translateY(0) scale(1)'
-        : 'translateX(-50%) translateY(24px) scale(.96)';
+      sheet.style.transform = willOpen ? 'translateY(0)' : 'translateY(100%)';
       if (willOpen) sheet.scrollTop = 0;
     }
     // play/pause the organ video with the panel so it doesn't run in the background

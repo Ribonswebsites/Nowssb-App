@@ -471,7 +471,7 @@
 }
 /* bare glass-sphere image button (bigger now) — the icon PNG IS the button */
 .lgp .lgp-info-btn {
-  position:static; width:48px; height:48px; flex-shrink:0;
+  position:relative; width:48px; height:48px; flex-shrink:0;
   border:none !important; background:none !important; box-shadow:none !important;
   -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
   cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center;
@@ -482,6 +482,24 @@
   filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
 }
 .lgp .lgp-info-btn:active { transform:scale(.92); }
+/* travelling light that traces round the info icon — fires AFTER the pill hint */
+@property --lgib { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp .lgp-info-btn::after {
+  content:''; position:absolute; inset:-3px; border-radius:50% !important; padding:2.5px; pointer-events:none;
+  background:conic-gradient(from var(--lgib),
+    transparent 0deg, transparent 250deg, var(--lg-accent,#8fe6ff) 305deg, #ffffff 335deg, var(--lg-accent,#8fe6ff) 350deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; will-change:--lgib;
+}
+.lgp .lgp-info-btn.trace-run::after { animation:lgpInfoBtnTrace 2.6s linear forwards; }
+@keyframes lgpInfoBtnTrace {
+  0%,6% { opacity:0; --lgib:0deg; }
+  12%   { opacity:1; }
+  85%   { opacity:1; --lgib:720deg; }
+  100%  { opacity:0; --lgib:720deg; }
+}
 
 /* ── the hint pill (grows out to the LEFT of the icon, one-shot) ── */
 .lgp .lgp-info-pill {
@@ -546,27 +564,35 @@
 }
 .lgp-info-panel.open .lgp-info-back { opacity:1; }
 
+/* full PAGE — fills the whole screen (not a bottom sheet) */
 .lgp-info-sheet {
-  position:absolute; left:50%; bottom:0; transform:translateX(-50%) translateY(24px) scale(.96); opacity:0;
-  width:100%; max-width:440px; max-height:88vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:16px 18px calc(env(safe-area-inset-bottom,18px) + 18px);
-  border-radius:26px 26px 0 0 !important; color:#fff;
-  background:rgba(20,26,46,.62);
-  -webkit-backdrop-filter:blur(30px) saturate(1.5); backdrop-filter:blur(30px) saturate(1.5);
-  border:1px solid rgba(255,255,255,.18); border-bottom:none;
-  box-shadow:0 -20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.25);
-  transition:transform .38s cubic-bezier(.2,1.1,.3,1), opacity .28s;
+  position:absolute; left:0; top:0; right:0; bottom:0; transform:translateY(100%); opacity:0;
+  width:100%; max-width:none; height:100%; max-height:none; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:max(env(safe-area-inset-top,16px),16px) 20px calc(env(safe-area-inset-bottom,24px) + 24px); color:#fff;
+  border-radius:0 !important;
+  background:rgba(14,20,38,.86);
+  -webkit-backdrop-filter:blur(34px) saturate(1.5); backdrop-filter:blur(34px) saturate(1.5);
+  border:none;
+  transition:transform .4s cubic-bezier(.2,1,.3,1), opacity .3s;
 }
-.lgp-info-panel.open .lgp-info-sheet { transform:translateX(-50%) translateY(0) scale(1); opacity:1; }
+.lgp-info-panel.open .lgp-info-sheet { transform:translateY(0); opacity:1; }
 .lgp-info-sheet::-webkit-scrollbar { display:none; }
 
-.lgp-info-sheet-top { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.lgp-info-sheet-top { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+/* back button uses the glass back-sphere image (bare, like other player buttons) */
 .lgp-info-close {
-  width:34px; height:34px; flex-shrink:0; border:none; border-radius:50% !important; cursor:pointer;
-  background:rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center;
+  width:46px; height:46px; flex-shrink:0; padding:0; cursor:pointer;
+  border:none !important; background:none !important; box-shadow:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp-info-close .lgp-bgico {
+  width:100% !important; height:100% !important; display:block !important; pointer-events:none;
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
 }
 .lgp-info-close:active { transform:scale(.9); }
-.lgp-info-sheet-title { font-size:20px; font-weight:800; letter-spacing:.3px; }
+.lgp-info-sheet-title { font-size:24px; font-weight:800; letter-spacing:.3px; }
 
 .lgp-info-video-wrap {
   width:100%; aspect-ratio:16/10; border-radius:18px !important; overflow:hidden; margin-bottom:18px;
