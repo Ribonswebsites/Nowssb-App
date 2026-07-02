@@ -351,6 +351,14 @@
   will-change:--lgcta; animation:lgpCtaTrace 2.2s linear infinite;
 }
 @keyframes lgpCtaTrace { to { --lgcta:360deg; } }
+/* Replay pill sits to the LEFT of Practice Now — same travelling light */
+.lgp .lgp-cta-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px; width:100%; }
+.lgp .lgp-cta-row .lgp-cta { margin-top:0; }
+.lgp .lgp-cta-replay {
+  background:rgba(255,255,255,.14) !important; color:#fff !important;
+  padding:10px 20px 10px 12px !important;
+}
+.lgp .lgp-cta-replay .lgp-cta-lbl { color:#fff; }
 
 /* recording waveform bars */
 .lgp .sp-rec-waveform { display:flex; align-items:center; gap:3px; height:46px; }
