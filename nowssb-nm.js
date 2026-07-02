@@ -326,7 +326,6 @@
         rowNav('download', 'Download App', 'Install NowssB on your device', 'openDlPopup()')) +
 
       sec('Storage &amp; Data',
-        rowNav('download', 'Download My Data', 'Export sessions & progress as JSON', 'ssDownloadData()') +
         rowNav('database', 'Cached Data', cacheSub, 'ssClearCache()') +
         rowNav('trash', 'Clear Practice History', 'Remove session logs — cannot be undone', 'ssConfirmClearHistory()', true)) +
 

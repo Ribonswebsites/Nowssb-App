@@ -2202,3 +2202,38 @@ body.nm-glass #sub-health-journey .gsel-card {
    the settings page. Force it to the very top. ===== */
 .dl-overlay { z-index: 2147483000 !important; }
 .dl-sheet   { z-index: 2147483001 !important; position: relative; }
+
+/* ===== DOWNLOAD APP — full PAGE, not a bottom-sheet popup ===== */
+.dl-overlay {
+  align-items:stretch !important; justify-content:stretch !important;
+  padding:0 !important; background:#f0f2f7 !important;
+}
+.dl-sheet {
+  width:100% !important; max-width:none !important; min-height:100% !important; flex:1 !important;
+  border-radius:0 !important; box-shadow:none !important; background:#f0f2f7 !important;
+  transform:none !important; animation:none !important;
+  display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important;
+  padding:48px 30px calc(env(safe-area-inset-bottom,28px) + 48px) !important;
+}
+.dl-handle { display:none !important; }
+.dl-icon-wrap {
+  width:118px !important; height:118px !important; border-radius:28px !important;
+  background-image:none !important; box-shadow:0 16px 44px rgba(0,0,0,.18) !important;
+  margin:0 auto 20px !important; overflow:hidden !important;
+}
+.dl-app-logo { width:100% !important; height:100% !important; object-fit:cover !important; display:block !important; }
+.dl-eyebrow { font-size:10px !important; letter-spacing:3px !important; color:#c8a96e !important; font-weight:700 !important; text-align:center !important; margin-bottom:8px !important; font-family:'DM Sans',sans-serif !important; }
+.dl-title { font-size:26px !important; margin-bottom:8px !important; }
+.dl-sub { font-size:13px !important; max-width:320px !important; margin:0 auto 22px !important; }
+#dlViewInstall, #dlViewIOS { width:100% !important; max-width:380px !important; display:flex; flex-direction:column; align-items:center; }
+.dl-btn { height:52px !important; margin-top:8px !important; }
+.dl-cancel { height:44px !important; margin-top:6px !important; }
+
+/* back button on the full-page Download App screen */
+.dl-page-back {
+  position:absolute !important; top:max(env(safe-area-inset-top,16px),16px) !important; left:16px !important;
+  width:42px; height:42px; border:none; border-radius:50% !important; cursor:pointer;
+  background:#f0f2f7; box-shadow:4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95);
+  display:flex; align-items:center; justify-content:center; z-index:2;
+}
+.dl-page-back:active { box-shadow:inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.92); }
