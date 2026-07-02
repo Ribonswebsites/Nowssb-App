@@ -2153,3 +2153,6 @@ body.nm-glass #sub-health-journey .gsel-card {
   background:linear-gradient(to bottom,
     rgba(6,12,24,0.30) 0%, rgba(6,12,24,0.02) 18%, rgba(6,12,24,0) 36%) !important;
 }
+
+/* Remove the intro-page shadow overlay COMPLETELY */
+.sl-intro-vignette{ display:none !important; background:none !important; }
