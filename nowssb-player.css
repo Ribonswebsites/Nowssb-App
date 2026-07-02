@@ -95,8 +95,10 @@
 .lgp .lgp-visual {
   width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/1.12; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
-  background:rgba(255,255,255,.10);
-  -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
+  background:rgba(10,16,30,.35);
+  /* NO backdrop-filter here — the video fills this panel opaquely, so the
+     blur was invisible but still forced expensive real-time GPU compositing
+     over the playing video every frame (a big cause of the stutter). */
   border:1px solid rgba(255,255,255,.3);
   box-shadow:0 26px 70px rgba(0,0,0,.45), 0 0 70px -12px var(--lg-accent),
              inset 0 2px 1px rgba(255,255,255,.5), inset 0 -14px 36px rgba(0,0,0,.22);

@@ -27,10 +27,11 @@
   function cldVid(url, w) {
     if (!url || url.indexOf('/video/upload/') < 0) return url;
     if (/\/video\/upload\/(q_auto|f_auto|w_|vc_|ac_)/.test(url)) return url; // already transformed
-    /* Force baseline H.264 (universally hardware-decoded — VP9/AV1 stutter on
-       many phones), eco quality, width cap, strip audio (videos are muted),
-       and cap fps so the decoder isn't hammered. */
-    var t = 'vc_h264,q_auto:eco,ac_none,fps_24' + (w ? ',w_' + w : '');
+    /* H.264 = hardware-decoded on every phone (VP9/AV1 stutter on many).
+       q_auto (normal, NOT eco — eco looked garbage and didn't help the lag,
+       which proved size wasn't the bottleneck). Strip audio (muted anyway).
+       No fps cap — capping fps made motion judder, which read as "lag". */
+    var t = 'vc_h264,q_auto,ac_none' + (w ? ',w_' + w : '');
     return url.replace('/video/upload/', '/video/upload/' + t + '/');
   }
 
@@ -155,7 +156,7 @@
        We REUSE the existing <video> element across re-renders (detach before
        innerHTML, re-insert after) so it never reloads/seeks — recreating it on
        every phase/rep change was the real cause of the constant stutter. */
-    var _newVidSrc = th.video ? cldVid(th.video, 640) : '';
+    var _newVidSrc = th.video ? cldVid(th.video, 720) : '';
     var _keepVid = null;
     (function () {
       var ex = document.getElementById('practiceBody');
@@ -268,7 +269,7 @@
        lgpToggleInfo, paused/reset on close. Also compressed via Cloudinary. */
     var _organVid = organVideoFor(w);
     var infoVideo = _organVid
-      ? '<video class="lgp-info-video" loop muted playsinline preload="none" src="' + cldVid(_organVid, 560) + '"></video>'
+      ? '<video class="lgp-info-video" loop muted playsinline preload="none" src="' + cldVid(_organVid, 640) + '"></video>'
       : '<div class="lgp-info-video-placeholder">' +
           '<span class="lgp-info-video-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8.5v7l6-3.5-6-3.5z" fill="#fff" stroke="none"/></svg></span>' +
           '<span class="lgp-info-video-lbl">Organ visualization coming soon</span>' +
@@ -565,5 +566,21 @@
       if (id === 'practice') { window._lgpHintPending = true; window._lgpHintScheduled = false; }
       return orig.apply(this, arguments);
     };
+  })();
+
+  /* ── Warm the cache: preload all player theme IMAGES in the background once
+     the app is idle, so the player opens instantly. Images only — preloading
+     every video would be 100+MB and still wouldn't stop decode-time stutter,
+     so that's deliberately NOT done here. Runs once. ── */
+  (function preloadPlayerImages() {
+    if (window._lgpImgsPreloaded) return;
+    window._lgpImgsPreloaded = true;
+    function run() {
+      for (var i = 0; i < LGP_THEMES.length; i++) {
+        if (LGP_THEMES[i].img) { var im = new Image(); im.src = LGP_THEMES[i].img; }
+      }
+    }
+    if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 4000 });
+    else setTimeout(run, 2500);
   })();
 })();
