@@ -1299,28 +1299,42 @@ function openDlPopup() {
   requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('open')));
 }
 
+function showManualInstallInstructions() {
+  // No native prompt (or it failed) — show platform-specific manual instructions
+  // instead of leaving the button doing nothing.
+  const viewInstall = document.getElementById('dlViewInstall');
+  const viewIOS = document.getElementById('dlViewIOS');
+  if (viewInstall) viewInstall.style.display = 'none';
+  if (viewIOS) {
+    if (!isIOS()) {
+      // Android Chrome: update step text to match Chrome menu
+      const steps = viewIOS.querySelectorAll('.dl-step-text');
+      if (steps[0]) steps[0].innerHTML = 'Tap the <strong style="color:#c8a96e">⋮ menu</strong> in the top-right of Chrome';
+      if (steps[1]) steps[1].innerHTML = 'Tap <strong style="color:#c8a96e">"Add to Home screen"</strong> then tap <strong style="color:#c8a96e">"Add"</strong>';
+      const title = viewIOS.querySelector('.dl-title');
+      if (title) title.textContent = 'Add to Home Screen';
+    }
+    viewIOS.style.display = 'block';
+  }
+}
+
 async function triggerInstall() {
   if (deferredInstallPrompt) {
-    deferredInstallPrompt.prompt();
-    const { outcome } = await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    if (outcome === 'accepted') closeDlSheet();
-  } else {
-    // No native prompt — show platform-specific manual instructions
-    const viewInstall = document.getElementById('dlViewInstall');
-    const viewIOS = document.getElementById('dlViewIOS');
-    if (viewInstall) viewInstall.style.display = 'none';
-    if (viewIOS) {
-      if (!isIOS()) {
-        // Android Chrome: update step text to match Chrome menu
-        const steps = viewIOS.querySelectorAll('.dl-step-text');
-        if (steps[0]) steps[0].innerHTML = 'Tap the <strong style="color:#c8a96e">⋮ menu</strong> in the top-right of Chrome';
-        if (steps[1]) steps[1].innerHTML = 'Tap <strong style="color:#c8a96e">"Add to Home screen"</strong> then tap <strong style="color:#c8a96e">"Add"</strong>';
-        const title = viewIOS.querySelector('.dl-title');
-        if (title) title.textContent = 'Add to Home Screen';
-      }
-      viewIOS.style.display = 'block';
+    try {
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      if (outcome === 'accepted') closeDlSheet();
+      // outcome === 'dismissed' — the native dialog worked and the user said no;
+      // that's a real answer, not a bug, so just leave the sheet as-is.
+    } catch (e) {
+      // Some in-app browsers/WebViews fire beforeinstallprompt but .prompt()
+      // silently fails — never leave the button doing nothing.
+      deferredInstallPrompt = null;
+      showManualInstallInstructions();
     }
+  } else {
+    showManualInstallInstructions();
   }
 }
 
