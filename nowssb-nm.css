@@ -2226,9 +2226,8 @@ body.nm-glass #sub-health-journey .gsel-card {
   display:flex; align-items:center; justify-content:center;
 }
 .dl-app-logo {
-  width:100% !important; height:100% !important; object-fit:cover !important; display:block !important;
-  border-radius:22px !important;
-  box-shadow:inset 2px 2px 6px rgba(0,0,0,.28) !important;
+  width:100% !important; height:100% !important; object-fit:contain !important; display:block !important;
+  border-radius:0 !important; box-shadow:none !important;
 }
 .dl-eyebrow { font-size:10px !important; letter-spacing:3px !important; color:#a8854a !important; font-weight:700 !important; text-align:center !important; margin-bottom:6px !important; font-family:'DM Sans',sans-serif !important; }
 .dl-title { font-size:30px !important; font-weight:800 !important; color:#1a1a2e !important; margin-bottom:6px !important; }

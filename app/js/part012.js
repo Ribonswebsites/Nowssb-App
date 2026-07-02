@@ -1258,13 +1258,17 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── PWA INSTALL PROMPT capture ──
-// No auto popup — the native browser prompt is captured silently and only
-// triggered when the user taps "Download App" in Settings.
-let deferredInstallPrompt = null;
+// No auto popup — the native browser prompt is captured (also pre-captured by
+// the early <head> listener into window._bipEvent) and only fired when the
+// user taps "Download App".
+let deferredInstallPrompt = window._bipEvent || null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredInstallPrompt = e;
+  window._bipEvent = e;
 });
+// helper: the freshest available prompt (head listener may have caught it first)
+function _getInstallPrompt() { return deferredInstallPrompt || window._bipEvent || null; }
 
 // ── DETECT iOS SAFARI ──
 function isIOS() {
@@ -1289,7 +1293,7 @@ function openDlPopup() {
     viewInstall.style.display = 'block';
     viewIOS.style.display     = 'none';
     // Keep the label as "Download App" regardless of native-prompt availability
-    if (!deferredInstallPrompt) {
+    if (!_getInstallPrompt()) {
       const btn = document.getElementById('dlInstallBtn');
       btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.6" stroke-linecap="round"/></svg> Download App`;
     }
@@ -1319,18 +1323,19 @@ function showManualInstallInstructions() {
 }
 
 async function triggerInstall() {
-  if (deferredInstallPrompt) {
+  const prompt = _getInstallPrompt();
+  if (prompt) {
     try {
-      deferredInstallPrompt.prompt();
-      const { outcome } = await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
+      prompt.prompt();                                   // ← fires the native install dialog directly
+      const { outcome } = await prompt.userChoice;
+      deferredInstallPrompt = null; window._bipEvent = null;
       if (outcome === 'accepted') closeDlSheet();
       // outcome === 'dismissed' — the native dialog worked and the user said no;
       // that's a real answer, not a bug, so just leave the sheet as-is.
     } catch (e) {
       // Some in-app browsers/WebViews fire beforeinstallprompt but .prompt()
       // silently fails — never leave the button doing nothing.
-      deferredInstallPrompt = null;
+      deferredInstallPrompt = null; window._bipEvent = null;
       showManualInstallInstructions();
     }
   } else {
