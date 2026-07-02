@@ -2154,5 +2154,11 @@ body.nm-glass #sub-health-journey .gsel-card {
     rgba(6,12,24,0.30) 0%, rgba(6,12,24,0.02) 18%, rgba(6,12,24,0) 36%) !important;
 }
 
-/* Remove the intro-page shadow overlay COMPLETELY */
-.sl-intro-vignette{ display:none !important; background:none !important; }
+/* Remove the intro-page shadow overlay COMPLETELY — every intro page across
+   the app uses its own *-intro-vignette class (store, cart, wishlist, orders,
+   sound bath, word origins, etc). Kill them ALL, not just sl-intro-vignette. */
+.sl-intro-vignette, .cart-intro-vignette, .ms-intro-vignette, .nss-intro-vignette,
+.oh-intro-vignette, .orders-intro-vignette, .rm-intro-vignette, .sb-intro-vignette,
+.wish-intro-vignette {
+  display:none !important; background:none !important;
+}
