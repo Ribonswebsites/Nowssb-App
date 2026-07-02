@@ -107,7 +107,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <link rel="stylesheet" href="app/app.css?v=163">
 <link rel="stylesheet" href="nowssb-social.css?v=163">
 <link rel="stylesheet" href="nowssb-nm.css?v=163">
-<link rel="stylesheet" href="nowssb-player.css?v=163">
+<link rel="stylesheet" href="nowssb-player.css?v=164">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -6223,8 +6223,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <div class="ig-scroll" id="ig-people-scroll">
-    <!-- explore grid -->
-    <div class="ig-explore" id="ig-explore-grid"></div>
+    <!-- explore grid (static empty state so it always shows, cache-proof; renderExplore rewrites the same markup) -->
+    <div class="ig-explore" id="ig-explore-grid">
+      <div class="ig-explore-empty">
+        <div class="ig-explore-empty-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        </div>
+        <div class="ig-explore-empty-title">No posts to explore yet</div>
+        <div class="ig-explore-empty-sub">New posts from the NowssB community will appear here.</div>
+      </div>
+    </div>
     <!-- search results -->
     <div id="ig-search-results" style="display:none;"></div>
   </div>
@@ -6354,7 +6362,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 
-<script src="app/js/part033.js?v=163"></script>
+<script src="app/js/part033.js?v=164"></script>
 
 
 
@@ -7118,7 +7126,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part049.js?v=163"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>
-<script src="nowssb-player.js?v=163" defer></script>
+<script src="nowssb-player.js?v=164" defer></script>
 
 </body>
 </html>

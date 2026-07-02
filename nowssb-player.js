@@ -212,10 +212,14 @@
             '<button class="lgp-replay-orb" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay"><span class="lgp-bgico" style="background-image:url(\'' + IC.replay + '\')"></span></button>' +
             '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()"><span class="lgp-mic-ico" style="background-image:url(\'' + IC.mic + '\')"></span><span class="lgp-cta-lbl">Practice Now</span></button>' +
           '</div>' +
-          '<div class="lgp-controls" style="margin-top:4px;">' +
-            '<button class="lgp-ctrl" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-            '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><span class="lgp-img" style="background-image:url(\'' + IC.play + '\')"></span></button>' +
-            '<button class="lgp-ctrl" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
+          '<div class="lgp-tube" style="margin-top:4px;">' +
+            '<div class="lgp-controls">' +
+              '<div class="lgp-transport">' +
+                '<button class="lgp-ctrl" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
+                '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><span class="lgp-img" style="background-image:url(\'' + IC.play + '\')"></span></button>' +
+                '<button class="lgp-ctrl" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
+              '</div>' +
+            '</div>' +
           '</div>' +
         '</div>' +
         '<div id="spPhaseRec" style="display:' + (phase === 'recording' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:10px;width:100%;">' +
