@@ -1288,10 +1288,10 @@ function openDlPopup() {
   } else {
     viewInstall.style.display = 'block';
     viewIOS.style.display     = 'none';
-    // If no native prompt available, change button label
+    // Keep the label as "Download App" regardless of native-prompt availability
     if (!deferredInstallPrompt) {
       const btn = document.getElementById('dlInstallBtn');
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.5" stroke-linecap="square"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.5" stroke-linecap="square"/></svg> Save to Home Screen`;
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.6" stroke-linecap="round"/></svg> Download App`;
     }
   }
 

@@ -2203,37 +2203,70 @@ body.nm-glass #sub-health-journey .gsel-card {
 .dl-overlay { z-index: 2147483000 !important; }
 .dl-sheet   { z-index: 2147483001 !important; position: relative; }
 
-/* ===== DOWNLOAD APP — full PAGE, not a bottom-sheet popup ===== */
+/* ===== DOWNLOAD APP — full neumorphic PAGE (play-store style) ===== */
 .dl-overlay {
   align-items:stretch !important; justify-content:stretch !important;
-  padding:0 !important; background:#f0f2f7 !important;
+  padding:0 !important; background:#e6eaf1 !important;
 }
 .dl-sheet {
   width:100% !important; max-width:none !important; min-height:100% !important; flex:1 !important;
-  border-radius:0 !important; box-shadow:none !important; background:#f0f2f7 !important;
+  border-radius:0 !important; box-shadow:none !important; background:#e6eaf1 !important;
   transform:none !important; animation:none !important;
   display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important;
-  padding:48px 30px calc(env(safe-area-inset-bottom,28px) + 48px) !important;
+  padding:48px 30px calc(env(safe-area-inset-bottom,28px) + 44px) !important;
 }
 .dl-handle { display:none !important; }
+
+/* App logo in a raised neumorphic rounded-square wrapper */
 .dl-icon-wrap {
-  width:118px !important; height:118px !important; border-radius:28px !important;
-  background-image:none !important; box-shadow:0 16px 44px rgba(0,0,0,.18) !important;
-  margin:0 auto 20px !important; overflow:hidden !important;
+  width:124px !important; height:124px !important; border-radius:32px !important;
+  background:#e6eaf1 !important; background-image:none !important; padding:12px !important;
+  box-shadow:14px 14px 30px rgba(0,0,0,.16), -12px -12px 26px rgba(255,255,255,.95) !important;
+  margin:0 auto 22px !important; overflow:visible !important;
+  display:flex; align-items:center; justify-content:center;
 }
-.dl-app-logo { width:100% !important; height:100% !important; object-fit:cover !important; display:block !important; }
-.dl-eyebrow { font-size:10px !important; letter-spacing:3px !important; color:#c8a96e !important; font-weight:700 !important; text-align:center !important; margin-bottom:8px !important; font-family:'DM Sans',sans-serif !important; }
-.dl-title { font-size:26px !important; margin-bottom:8px !important; }
-.dl-sub { font-size:13px !important; max-width:320px !important; margin:0 auto 22px !important; }
+.dl-app-logo {
+  width:100% !important; height:100% !important; object-fit:cover !important; display:block !important;
+  border-radius:22px !important;
+  box-shadow:inset 2px 2px 6px rgba(0,0,0,.28) !important;
+}
+.dl-eyebrow { font-size:10px !important; letter-spacing:3px !important; color:#a8854a !important; font-weight:700 !important; text-align:center !important; margin-bottom:6px !important; font-family:'DM Sans',sans-serif !important; }
+.dl-title { font-size:30px !important; font-weight:800 !important; color:#1a1a2e !important; margin-bottom:6px !important; }
+.dl-sub { font-size:12.5px !important; color:rgba(0,0,0,.5) !important; max-width:320px !important; margin:0 auto 20px !important; }
+
+/* play-store style feature row — neumorphic chips */
+.dl-features { display:flex; gap:12px; justify-content:center; margin:0 auto 26px; width:100%; max-width:360px; }
+.dl-feat { flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 6px; border-radius:18px !important;
+  background:#e6eaf1; box-shadow:6px 6px 14px rgba(0,0,0,.13), -5px -5px 12px rgba(255,255,255,.95); }
+.dl-feat-ico { width:40px; height:40px; border-radius:50% !important; display:flex; align-items:center; justify-content:center;
+  background:#e6eaf1; box-shadow:inset 3px 3px 7px rgba(0,0,0,.12), inset -2px -2px 5px rgba(255,255,255,.92); }
+.dl-feat-lbl { font-size:10px; font-weight:700; letter-spacing:.4px; color:rgba(0,0,0,.55); font-family:'DM Sans',sans-serif; text-transform:uppercase; }
+
 #dlViewInstall, #dlViewIOS { width:100% !important; max-width:380px !important; display:flex; flex-direction:column; align-items:center; }
-.dl-btn { height:52px !important; margin-top:8px !important; }
-.dl-cancel { height:44px !important; margin-top:6px !important; }
+
+/* big neumorphic gold "Download App" button */
+.dl-btn {
+  width:100% !important; height:56px !important; margin:0 0 4px !important;
+  border-radius:18px !important; border:none !important; cursor:pointer;
+  background:linear-gradient(135deg,#e0c085,#c8a96e) !important; color:#07101f !important;
+  font-family:'DM Sans',sans-serif !important; font-size:13px !important; font-weight:800 !important;
+  letter-spacing:1.5px !important; text-transform:uppercase !important;
+  display:flex !important; align-items:center; justify-content:center; gap:9px;
+  box-shadow:8px 8px 18px rgba(160,133,74,.35), -6px -6px 14px rgba(255,255,255,.9) !important;
+}
+.dl-btn:active { box-shadow:inset 4px 4px 9px rgba(120,98,52,.4), inset -3px -3px 7px rgba(255,255,255,.35) !important; }
+.dl-cancel { height:44px !important; margin-top:8px !important; color:rgba(0,0,0,.42) !important; font-weight:600 !important; letter-spacing:.5px; }
+
+/* iOS step cards → neumorphic */
+.dl-ios-step { border-bottom:none !important; }
+.dl-step-num { background:#e6eaf1 !important; box-shadow:4px 4px 9px rgba(0,0,0,.13), -3px -3px 7px rgba(255,255,255,.95) !important; color:#a8854a !important; }
+.dl-step-text { color:rgba(0,0,0,.66) !important; }
 
 /* back button on the full-page Download App screen */
 .dl-page-back {
   position:absolute !important; top:max(env(safe-area-inset-top,16px),16px) !important; left:16px !important;
-  width:42px; height:42px; border:none; border-radius:50% !important; cursor:pointer;
-  background:#f0f2f7; box-shadow:4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95);
+  width:44px; height:44px; border:none; border-radius:50% !important; cursor:pointer;
+  background:#e6eaf1; box-shadow:5px 5px 12px rgba(0,0,0,.14), -4px -4px 9px rgba(255,255,255,.95);
   display:flex; align-items:center; justify-content:center; z-index:2;
 }
 .dl-page-back:active { box-shadow:inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.92); }
