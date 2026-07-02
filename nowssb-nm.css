@@ -2129,3 +2129,20 @@ body.nm-glass .ig-people-back {
   box-shadow:4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95) !important;
 }
 body.nm-glass .ig-people-back svg path { stroke:#1a1a2e !important; }
+
+/* ===== Choose Your Path (#sub-health-journey) — dark "Fashion" style, not white
+   neumorphism. Matches the male/female lists. ===== */
+body.nm-mode #sub-health-journey, body.nm-night #sub-health-journey,
+body.nm-glass #sub-health-journey { background:#060c18 !important; }
+body.nm-mode #sub-health-journey .sub-screen-bg, body.nm-night #sub-health-journey .sub-screen-bg { display:block !important; }
+body.nm-mode #sub-health-journey .gsel-title, body.nm-mode #sub-health-journey .sub-title,
+body.nm-mode #sub-health-journey .sub-title span { color:#fff !important; }
+body.nm-mode #sub-health-journey .gsel-sub { color:rgba(255,255,255,0.6) !important; }
+body.nm-mode #sub-health-journey .gsel-eyebrow { color:#e8d5a3 !important; }
+body.nm-mode #sub-health-journey .brand-name, body.nm-mode #sub-health-journey .brand-name .b,
+body.nm-mode #sub-health-journey .brand-name .t { color:#fff !important; }
+body.nm-mode #sub-health-journey .gsel-card, body.nm-night #sub-health-journey .gsel-card,
+body.nm-glass #sub-health-journey .gsel-card {
+  background:transparent !important; border:none !important;
+  box-shadow:0 10px 30px rgba(0,0,0,0.45) !important;
+}
