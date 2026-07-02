@@ -332,20 +332,25 @@
   70%  { opacity:.22; }
   100% { transform:scale(1.32); opacity:0; }
 }
-/* Practice Now = the glass-capsule + headphone image; text sits in the tube */
+/* Practice Now — glass pill (mic + text) with a light travelling round its edge */
 .lgp .lgp-cta {
-  background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782994951/file_00000000d5887207a0271d9ac3709133_arufyn.png') center/100% 100% no-repeat !important;
-  border:none !important; box-shadow:none !important;
-  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
-  padding:0 22px 0 78px !important; margin-top:14px;
-  min-width:270px; height:76px; border-radius:999px !important;
-  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, var(--lg-accent), #fff); color:#10202e;
+  position:relative; overflow:hidden;
 }
-.lgp .lgp-cta .lgp-cta-lbl {
-  color:#1a2230; font-family:'DM Sans',sans-serif; font-weight:800; font-size:15px; letter-spacing:.5px;
-  text-shadow:0 1px 2px rgba(255,255,255,.5);
-}
+.lgp .lgp-cta .lgp-mic-ico, .lgp .lgp-cta .lgp-cta-lbl { position:relative; z-index:2; }
 .lgp .lgp-cta:active { transform:scale(.96); }
+@property --lgcta { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp .lgp-cta::before {
+  content:''; position:absolute; inset:0; border-radius:16px !important; padding:2.5px; z-index:1; pointer-events:none;
+  background:conic-gradient(from var(--lgcta),
+    transparent 0deg, transparent 210deg,
+    rgba(255,255,255,.2) 250deg, #ffffff 300deg, var(--lg-accent,#8fe6ff) 325deg, #ffffff 350deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  will-change:--lgcta; animation:lgpCtaTrace 2.2s linear infinite;
+}
+@keyframes lgpCtaTrace { to { --lgcta:360deg; } }
 
 /* recording waveform bars */
 .lgp .sp-rec-waveform { display:flex; align-items:center; gap:3px; height:46px; }

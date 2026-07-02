@@ -208,7 +208,7 @@
         '</div>' +
         '<div id="spPhasePost" style="display:' + (phase === 'post-play' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:12px;width:100%;">' +
           '<div class="lgp-status">Word played · your turn</div>' +
-          '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()"><span class="lgp-cta-lbl">Practice Now</span></button>' +
+          '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()"><span class="lgp-mic-ico" style="background-image:url(\'' + IC.mic + '\')"></span><span class="lgp-cta-lbl">Practice Now</span></button>' +
           '<div class="lgp-controls" style="margin-top:4px;">' +
             '<button class="lgp-ctrl" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
             '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><span class="lgp-img" style="background-image:url(\'' + IC.play + '\')"></span></button>' +
