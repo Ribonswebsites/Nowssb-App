@@ -2292,3 +2292,24 @@ body.nm-glass #sub-health-journey .gsel-card {
 .nmh-fsec-sub { font-family:'DM Sans',sans-serif; font-size:12px; color:rgba(255,255,255,.72); line-height:1.6; margin-bottom:16px; max-width:300px; }
 .nmh-fsec-btn { border:none; background:#e8d5a3; color:#060c18; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; padding:13px 22px; border-radius:12px !important; cursor:pointer; }
 .nmh-fsec-btn:active { transform:scale(.97); }
+
+/* ===== EXPLORE (#sub-people) — header + search below + centered empty ===== */
+/* the scroll area flows BELOW the header/search now (was absolute-filling) */
+#sub-people .ig-scroll {
+  position:relative !important; inset:auto !important; top:auto !important; left:auto !important; right:auto !important; bottom:auto !important;
+  flex:1 1 auto !important; min-height:0 !important; padding-top:6px !important;
+}
+.ig-people-header {
+  display:flex; align-items:center; gap:12px; flex-shrink:0;
+  padding:max(env(safe-area-inset-top,12px),12px) 16px 8px; background:#eef1f6;
+}
+.ig-people-htitle { flex:1; font-family:'DM Sans',sans-serif; font-size:20px; font-weight:800; color:#1a1a2e; letter-spacing:.2px; }
+.ig-people-htitle span { color:#c8a96e; }
+.ig-people-back { color:#1a1a2e; }
+.ig-people-searchrow { flex-shrink:0; padding:2px 16px 12px; background:#eef1f6; }
+.ig-people-searchrow .ig-searchbar { width:100% !important; flex:1 1 auto !important; height:40px !important; }
+/* header avatar keeps its neumorphic circle */
+#sub-people .ig-people-header #ig-explore-myavatar { width:38px !important; height:38px !important; }
+
+/* empty state vertically centered in the remaining space */
+#sub-people .ig-explore-empty { min-height:calc(100vh - 240px) !important; justify-content:center !important; }
