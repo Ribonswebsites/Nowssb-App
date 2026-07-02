@@ -57,6 +57,40 @@
   var VERIFY_ORDER = ['', 'blue', 'silver', 'gold', 'diamond'];
   // Universal country list (ISO short names) — the app is global, not region-locked.
   var COUNTRIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua & Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia & Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cambodia','Cameroon','Canada','Cape Verde','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Congo (DRC)','Costa Rica','Côte d’Ivoire','Croatia','Cuba','Cyprus','Czechia','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hong Kong','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Macau','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts & Nevis','Saint Lucia','Saint Vincent & Grenadines','Samoa','San Marino','São Tomé & Príncipe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad & Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'];
+  // Country → local currency [code, symbol, approx units per 1 USD]. Everything
+  // else falls back to USD. Lets the verify flow show prices in the user's money.
+  var _EU = ['Austria','Belgium','Croatia','Cyprus','Estonia','Finland','France','Germany','Greece','Ireland','Italy','Latvia','Lithuania','Luxembourg','Malta','Netherlands','Portugal','Slovakia','Slovenia','Spain','Andorra','Monaco','Montenegro','Kosovo','San Marino','Vatican City'];
+  var CURRENCY_MAP = {
+    'United Kingdom':['GBP','£',0.79],'India':['INR','₹',83],'Canada':['CAD','C$',1.36],'Australia':['AUD','A$',1.52],'New Zealand':['NZD','NZ$',1.63],'Japan':['JPY','¥',157],'China':['CNY','¥',7.2],'Switzerland':['CHF','Fr',0.88],'Sweden':['SEK','kr',10.5],'Norway':['NOK','kr',10.7],'Denmark':['DKK','kr',6.9],'Singapore':['SGD','S$',1.35],'Hong Kong':['HKD','HK$',7.8],'United Arab Emirates':['AED','د.إ',3.67],'Saudi Arabia':['SAR','﷼',3.75],'Qatar':['QAR','﷼',3.64],'Kuwait':['KWD','د.ك',0.31],'Brazil':['BRL','R$',5.0],'Mexico':['MXN','MX$',17],'South Africa':['ZAR','R',18.5],'Russia':['RUB','₽',90],'Turkey':['TRY','₺',32],'South Korea':['KRW','₩',1350],'Indonesia':['IDR','Rp',15800],'Malaysia':['MYR','RM',4.7],'Thailand':['THB','฿',36],'Philippines':['PHP','₱',57],'Vietnam':['VND','₫',25000],'Pakistan':['PKR','₨',278],'Bangladesh':['BDT','৳',110],'Sri Lanka':['LKR','Rs',300],'Nepal':['NPR','₨',133],'Nigeria':['NGN','₦',1500],'Kenya':['KES','KSh',130],'Egypt':['EGP','E£',48],'Ghana':['GHS','₵',15],'Israel':['ILS','₪',3.7],'Poland':['PLN','zł',4.0],'Czechia':['CZK','Kč',23],'Hungary':['HUF','Ft',360],'Romania':['RON','lei',4.6],'Ukraine':['UAH','₴',41],'Argentina':['ARS','$',900],'Chile':['CLP','$',950],'Colombia':['COP','$',3900],'Peru':['PEN','S/',3.8]
+  };
+  _EU.forEach(function(c){ CURRENCY_MAP[c] = ['EUR','€',0.92]; });
+  var _NO_DEC = {JPY:1,KRW:1,VND:1,IDR:1,HUF:1,CLP:1,COP:1,ISK:1,PKR:1,NGN:1,INR:1};
+  function currencyForCountry(name){
+    var c = CURRENCY_MAP[name];
+    if(!c) return {code:'USD',symbol:'$',rate:1,dec:2};
+    return {code:c[0],symbol:c[1],rate:c[2],dec:_NO_DEC[c[0]]?0:2};
+  }
+  function vkycFmt(usd, cur){
+    cur = cur || {code:'USD',symbol:'$',rate:1,dec:2};
+    var v = (usd||0) * cur.rate;
+    var s = (cur.dec===0) ? String(Math.round(v)) : v.toFixed(2);
+    s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return cur.symbol + s;
+  }
+  function vkycParseDob(str){
+    var d = String(str||'').replace(/\D/g,'');
+    if(d.length!==8) return null;
+    var day=+d.slice(0,2), mon=+d.slice(2,4), yr=+d.slice(4,8);
+    if(mon<1||mon>12||day<1||day>31||yr<1900||yr>2025) return null;
+    var dt=new Date(yr,mon-1,day);
+    if(dt.getFullYear()!==yr||dt.getMonth()!==mon-1||dt.getDate()!==day) return null;
+    var age=(Date.now()-dt.getTime())/31557600000;
+    return {iso: yr+'-'+('0'+mon).slice(-2)+'-'+('0'+day).slice(-2), age:age};
+  }
+  function vkycDobToText(iso){
+    if(iso && /^\d{4}-\d{2}-\d{2}$/.test(iso)){ var p=iso.split('-'); return p[2]+' / '+p[1]+' / '+p[0]; }
+    return '';
+  }
   function verifyTierOf(p){
     if(p && p.self){
       try { return localStorage.getItem('nwsb_verify_tier') || (window._userDataCache && window._userDataCache.verifyTier) || ''; } catch(e){ return (window._userDataCache && window._userDataCache.verifyTier) || ''; }
@@ -502,16 +536,19 @@
       // users don't re-type. DOB / residence come from the profile if present.
       var st = {
         tier: tier, tierName: t.name, price: t.price, per: t.per,
+        priceUSDNum: (t.priceN||0)/100,
         name:    ud.kycName    || ud.displayName || ((this._currentProfile&&this._currentProfile.fullName)||'') || '',
         dob:     ud.kycDob     || ud.dob || ud.dateOfBirth || ud.birthday || '',
         country: ud.kycCountry || ud.residence || ud.country || '',
         city:    ud.kycCity    || ud.city || '',
         address: ud.kycAddress || ud.address || '',
-        docFront: '', docBack: '', selfie: '', step: 0
+        docFront: '', docBack: '', selfie: '', step: 0,
+        currency: {code:'USD',symbol:'$',rate:1,dec:2}
       };
       st.tierLabel = (t.name==='Verified') ? 'NowssB Verified' : (t.name+' Verified');
       window._vkyc = st;
-      var STEPS = 5; // name, dob, residence, documents, review
+      var STEPS = 6; // intro, name, dob, residence, documents, review
+      st.steps = STEPS;
 
       var css='#nwsb-vkyc{position:fixed;inset:0;z-index:100002;background:#eef0f5;display:flex;flex-direction:column;}'+
         '#nwsb-vkyc *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
@@ -536,6 +573,32 @@
         '#nwsb-vkyc .vk-input::placeholder{color:rgba(0,0,0,.32);}'+
         '#nwsb-vkyc .vk-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23a8854a\' stroke-width=\'2.4\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 18px center;padding-right:44px;}'+
         '#nwsb-vkyc .vk-prefill{font-size:11px;color:#1aa76a;font-weight:700;margin:-12px 4px 18px;}'+
+        /* intro / requirements */
+        '#nwsb-vkyc .vk-hero{width:calc(100% + 44px);margin:-22px -22px 20px;height:200px;background:#0a0a12;overflow:hidden;position:relative;}'+
+        '#nwsb-vkyc .vk-hero img{width:100%;height:100%;object-fit:cover;object-position:center 42%;display:block;}'+
+        '#nwsb-vkyc .vk-hero-badge{position:absolute;left:18px;bottom:14px;display:flex;align-items:center;gap:10px;}'+
+        '#nwsb-vkyc .vk-hero-badge img{width:44px;height:44px;border-radius:12px !important;box-shadow:0 6px 16px rgba(0,0,0,.4);}'+
+        '#nwsb-vkyc .vk-hero-badge b{color:#fff;font-size:15px;text-shadow:0 2px 8px rgba(0,0,0,.6);}'+
+        '#nwsb-vkyc .vk-hero-badge span{display:block;color:rgba(255,255,255,.85);font-size:12px;text-shadow:0 2px 8px rgba(0,0,0,.6);}'+
+        '#nwsb-vkyc .vk-req{display:flex;align-items:flex-start;gap:13px;background:#eef0f5;border-radius:16px !important;padding:15px 16px;margin-bottom:12px;box-shadow:5px 5px 12px rgba(0,0,0,.09),-4px -4px 10px rgba(255,255,255,.95);}'+
+        '#nwsb-vkyc .vk-req-ic{width:38px;height:38px;flex-shrink:0;border-radius:10px !important;background:#eef0f5;display:flex;align-items:center;justify-content:center;box-shadow:inset 2px 2px 5px rgba(0,0,0,.1),inset -2px -2px 5px rgba(255,255,255,.9);}'+
+        '#nwsb-vkyc .vk-req-t{font-size:14px;font-weight:700;color:#1a1a2e;}'+
+        '#nwsb-vkyc .vk-req-s{font-size:12px;color:rgba(0,0,0,.5);margin-top:2px;line-height:1.45;}'+
+        /* DOB row: text field + calendar button */
+        '#nwsb-vkyc .vk-dobrow{position:relative;margin-bottom:18px;}'+
+        '#nwsb-vkyc .vk-dobrow .vk-input{margin-bottom:0;padding-right:56px;letter-spacing:1px;}'+
+        '#nwsb-vkyc .vk-cal{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:none;border-radius:12px !important;background:#eef0f5;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:3px 3px 7px rgba(0,0,0,.13),-2px -2px 6px rgba(255,255,255,.92);}'+
+        '#nwsb-vkyc .vk-cal:active{box-shadow:inset 2px 2px 5px rgba(0,0,0,.13),inset -1px -1px 4px rgba(255,255,255,.9);}'+
+        '#nwsb-vkyc .vk-dob-native{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:40px;height:40px;opacity:0;pointer-events:none;}'+
+        /* country autocomplete */
+        '#nwsb-vkyc .vk-field{position:relative;margin-bottom:18px;}'+
+        '#nwsb-vkyc .vk-field .vk-input{margin-bottom:0;}'+
+        '#nwsb-vkyc .vk-sugg{position:absolute;left:0;right:0;top:calc(100% + 5px);background:#eef0f5;border-radius:14px !important;box-shadow:7px 7px 18px rgba(0,0,0,.16),-4px -4px 10px rgba(255,255,255,.92);max-height:238px;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:20;display:none;}'+
+        '#nwsb-vkyc .vk-sugg.on{display:block;}'+
+        '#nwsb-vkyc .vk-sugg-item{padding:13px 16px;font-size:14px;color:#1a1a2e;cursor:pointer;border-bottom:1px solid rgba(0,0,0,.05);}'+
+        '#nwsb-vkyc .vk-sugg-item:last-child{border-bottom:none;}'+
+        '#nwsb-vkyc .vk-sugg-item:active{background:rgba(168,133,74,.14);}'+
+        '#nwsb-vkyc .vk-cur-note{font-size:12px;color:#a8854a;font-weight:700;margin:8px 4px 4px;display:none;}'+
         '#nwsb-vkyc .vk-docgrid{display:flex;flex-direction:column;gap:14px;}'+
         '#nwsb-vkyc .vk-doc{position:relative;border-radius:18px !important;background:#eef0f5;box-shadow:5px 5px 13px rgba(0,0,0,.11),-4px -4px 10px rgba(255,255,255,.95);padding:18px;cursor:pointer;overflow:hidden;}'+
         '#nwsb-vkyc .vk-doc:active{box-shadow:inset 3px 3px 8px rgba(0,0,0,.12),inset -2px -2px 6px rgba(255,255,255,.92);}'+
@@ -566,56 +629,77 @@
       var docIco = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M15 9h3M15 13h3M6 16h12"/></svg>';
       var selfieIco='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
 
+      var idIco = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="8" cy="11" r="2"/><path d="M14 10h4M14 14h4M5 15c.7-1.4 4.3-1.4 5 0"/></svg>';
+      var faceIco = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14c1 1.3 5.5 1.3 7 0M9 10h.01M15 10h.01"/></svg>';
+      var docsIco = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>';
+      var ageIco = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+      var calIco = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
+      var dobText = vkycDobToText(st.dob);
+
       var html='<style>'+css+'</style>'+
         '<div class="vk-bar"><button class="vk-back" id="vk-back" aria-label="Back">&#8249;</button><span class="vk-steplbl" id="vk-steplbl">Step 1 of '+STEPS+'</span></div>'+
-        '<div class="vk-prog"><div class="vk-prog-fill" id="vk-progfill" style="width:20%"></div></div>'+
+        '<div class="vk-prog"><div class="vk-prog-fill" id="vk-progfill" style="width:'+(100/STEPS)+'%"></div></div>'+
         '<div class="vk-scroll">'+
-          '<div class="vk-badge-mini"><img src="'+t.img+'" alt=""><div><b>'+st.tierLabel+'</b><br><span>'+t.price+t.per+' · identity check</span></div></div>'+
-          /* Step 1 — real name */
+          '<div class="vk-badge-mini"><img src="'+t.img+'" alt=""><div><b>'+st.tierLabel+'</b><br><span id="vk-price-mini">'+t.price+t.per+' · identity check</span></div></div>'+
+          /* Step 1 — intro / requirements */
           '<div class="vk-step on" data-step="0">'+
+            '<div class="vk-hero"><img src="'+(t.promo||t.img)+'" alt=""><div class="vk-hero-badge"><img src="'+t.img+'" alt=""><div><b>'+st.tierLabel+'</b><span>'+t.tag+'</span></div></div></div>'+
+            '<div class="vk-title">Before you start</div>'+
+            '<div class="vk-sub">Getting verified takes about 2 minutes. Here\'s what you\'ll need — have it ready:</div>'+
+            '<div class="vk-req"><div class="vk-req-ic">'+idIco+'</div><div><div class="vk-req-t">A government photo ID</div><div class="vk-req-s">Passport, driver\'s licence or national ID — clear and readable.</div></div></div>'+
+            '<div class="vk-req"><div class="vk-req-ic">'+faceIco+'</div><div><div class="vk-req-t">A selfie that matches your ID</div><div class="vk-req-s">Your face in the selfie must match the photo on your ID.</div></div></div>'+
+            '<div class="vk-req"><div class="vk-req-ic">'+docsIco+'</div><div><div class="vk-req-t">Your legal name, birth date &amp; country</div><div class="vk-req-s">These are checked against your ID and kept private.</div></div></div>'+
+            '<div class="vk-req"><div class="vk-req-ic">'+ageIco+'</div><div><div class="vk-req-t">You must be 18 or older</div><div class="vk-req-s">Verification is only available to adults.</div></div></div>'+
+          '</div>'+
+          /* Step 2 — real name */
+          '<div class="vk-step" data-step="1">'+
             '<div class="vk-title">What\'s your real name?</div>'+
             '<div class="vk-sub">This is the legal name that will be checked against your ID. It stays private and is never shown on your profile.</div>'+
             '<div class="vk-flabel">Full legal name</div>'+
             '<input class="vk-input" id="vk-name" type="text" autocomplete="name" placeholder="Your full legal name" value="'+esc(st.name)+'">'+
             (prefilledName ? '<div class="vk-prefill">✓ Suggested from your profile — edit if needed</div>' : '')+
           '</div>'+
-          /* Step 2 — date of birth */
-          '<div class="vk-step" data-step="1">'+
+          /* Step 3 — date of birth (type it OR use the calendar) */
+          '<div class="vk-step" data-step="2">'+
             '<div class="vk-title">Your date of birth</div>'+
-            '<div class="vk-sub">You must be 18 or older to be verified. We only use this to confirm your age.</div>'+
+            '<div class="vk-sub">Type it in, or tap the calendar — whichever is quicker. You must be 18 or older.</div>'+
             '<div class="vk-flabel">Date of birth</div>'+
-            '<input class="vk-input" id="vk-dob" type="date" max="2012-12-31" value="'+esc(st.dob)+'">'+
+            '<div class="vk-dobrow">'+
+              '<input class="vk-input" id="vk-dob-text" type="text" inputmode="numeric" autocomplete="bday" placeholder="DD / MM / YYYY" maxlength="14" oninput="IG.vkycDobInput(this)" value="'+esc(dobText)+'">'+
+              '<button type="button" class="vk-cal" aria-label="Open calendar" onclick="IG.vkycDobCalendar()">'+calIco+'</button>'+
+              '<input type="date" class="vk-dob-native" id="vk-dob-native" max="2012-12-31" onchange="IG.vkycDobNative(this)">'+
+            '</div>'+
             (prefilledDob ? '<div class="vk-prefill">✓ From your profile</div>' : '')+
           '</div>'+
-          /* Step 3 — place of residence */
-          '<div class="vk-step" data-step="2">'+
+          /* Step 4 — place of residence (type-ahead country + local currency) */
+          '<div class="vk-step" data-step="3">'+
             '<div class="vk-title">Where do you live?</div>'+
-            '<div class="vk-sub">Your place of residence helps us apply the right verification rules for your region.</div>'+
+            '<div class="vk-sub">Start typing your country and pick it from the list. Prices will show in your local currency.</div>'+
             '<div class="vk-flabel">Country of residence</div>'+
-            '<select class="vk-input vk-select" id="vk-country">'+
-              '<option value="" '+(st.country?'':'selected')+' disabled>Select your country</option>'+
-              COUNTRIES.map(function(c){ return '<option value="'+esc(c)+'"'+(st.country===c?' selected':'')+'>'+esc(c)+'</option>'; }).join('')+
-            '</select>'+
-            (prefilledCountry ? '<div class="vk-prefill">✓ From your profile</div>' : '')+
-            '<div class="vk-flabel">City</div>'+
+            '<div class="vk-field">'+
+              '<input class="vk-input" id="vk-country" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Start typing your country…" oninput="IG.vkycCountryInput(this)" onfocus="IG.vkycCountryInput(this)" value="'+esc(st.country)+'">'+
+              '<div class="vk-sugg" id="vk-country-sugg"></div>'+
+            '</div>'+
+            '<div class="vk-cur-note" id="vk-cur-note"></div>'+
+            '<div class="vk-flabel" style="margin-top:6px;">City</div>'+
             '<input class="vk-input" id="vk-city" type="text" autocomplete="address-level2" placeholder="Your city" value="'+esc(st.city)+'">'+
           '</div>'+
-          /* Step 4 — documents */
-          '<div class="vk-step" data-step="3">'+
+          /* Step 5 — documents */
+          '<div class="vk-step" data-step="4">'+
             '<div class="vk-title">Verify your identity</div>'+
-            '<div class="vk-sub">Upload a clear photo of a government-issued ID. Add a selfie so we can match it to you.</div>'+
+            '<div class="vk-sub">Upload a clear photo of your government ID, then a selfie. Your selfie must match the face on your ID.</div>'+
             '<div class="vk-docgrid">'+
               '<label class="vk-doc" id="vk-doc-front"><div class="vk-doc-row"><div class="vk-doc-ic">'+docIco+'</div><div><div class="vk-doc-t">ID — front</div><div class="vk-doc-s">Passport, driver\'s licence or national ID</div></div></div><input type="file" accept="image/*" onchange="IG.vkycFile(\'docFront\',this)"><img class="vk-doc-thumb" id="vk-th-docFront" style="display:none"></label>'+
               '<label class="vk-doc" id="vk-doc-back"><div class="vk-doc-row"><div class="vk-doc-ic">'+docIco+'</div><div><div class="vk-doc-t">ID — back <span style="font-weight:400;color:rgba(0,0,0,.35)">(optional)</span></div><div class="vk-doc-s">Back side, if your ID has one</div></div></div><input type="file" accept="image/*" onchange="IG.vkycFile(\'docBack\',this)"><img class="vk-doc-thumb" id="vk-th-docBack" style="display:none"></label>'+
-              '<label class="vk-doc" id="vk-doc-selfie"><div class="vk-doc-row"><div class="vk-doc-ic">'+selfieIco+'</div><div><div class="vk-doc-t">Selfie</div><div class="vk-doc-s">A clear photo of your face</div></div></div><input type="file" accept="image/*" capture="user" onchange="IG.vkycFile(\'selfie\',this)"><img class="vk-doc-thumb" id="vk-th-selfie" style="display:none"></label>'+
+              '<label class="vk-doc" id="vk-doc-selfie"><div class="vk-doc-row"><div class="vk-doc-ic">'+selfieIco+'</div><div><div class="vk-doc-t">Selfie</div><div class="vk-doc-s">A clear photo of your face — must match your ID</div></div></div><input type="file" accept="image/*" capture="user" onchange="IG.vkycFile(\'selfie\',this)"><img class="vk-doc-thumb" id="vk-th-selfie" style="display:none"></label>'+
             '</div>'+
           '</div>'+
-          /* Step 5 — review + pay */
-          '<div class="vk-step" data-step="4">'+
+          /* Step 6 — review + pay */
+          '<div class="vk-step" data-step="5">'+
             '<div class="vk-title">Review &amp; pay</div>'+
             '<div class="vk-sub">Confirm your details. Next you\'ll complete a secure payment to finish verification.</div>'+
             '<div class="vk-rev" id="vk-review"></div>'+
-            '<div class="vk-legal">By continuing you confirm the information is accurate and agree to NowssB\'s verification terms. Your documents are used only to confirm your identity.</div>'+
+            '<div class="vk-legal" id="vk-legal">By continuing you confirm the information is accurate and agree to NowssB\'s verification terms. Your documents are used only to confirm your identity.</div>'+
           '</div>'+
         '</div>'+
         '<div class="vk-foot"><button class="vk-next" id="vk-next">Continue</button></div>';
@@ -626,28 +710,34 @@
       document.getElementById('vk-back').onclick=function(){ IG.vkycNav(-1); };
       document.getElementById('vk-next').onclick=function(){ IG.vkycNav(1); };
       this.vkycRender();
+      if(st.country) this.vkycSetCountry(st.country); // prefill currency note from profile
     },
     vkycRender:function(){
       var st=window._vkyc; if(!st) return;
-      var STEPS=5;
+      var STEPS=st.steps||6;
       document.querySelectorAll('#nwsb-vkyc .vk-step').forEach(function(el){
         el.classList.toggle('on', parseInt(el.getAttribute('data-step'),10)===st.step);
       });
       var lbl=document.getElementById('vk-steplbl'); if(lbl) lbl.textContent='Step '+(st.step+1)+' of '+STEPS;
       var pf=document.getElementById('vk-progfill'); if(pf) pf.style.width=(((st.step+1)/STEPS)*100)+'%';
-      var nb=document.getElementById('vk-next'); if(nb) nb.textContent = (st.step===STEPS-1) ? 'Pay '+st.price+' & verify' : 'Continue';
+      var priceLocal = vkycFmt(st.priceUSDNum, st.currency);
+      var nb=document.getElementById('vk-next'); if(nb) nb.textContent = (st.step===STEPS-1) ? 'Pay '+priceLocal+' & verify' : 'Continue';
       if(st.step===STEPS-1){
         var box=document.getElementById('vk-review');
         function row(k,v,ok){ return '<div class="vk-rev-row"><span class="vk-rev-k">'+k+'</span><span class="vk-rev-v'+(ok?' ok':'')+'">'+(v||'—')+'</span></div>'; }
         var docs=[]; if(st.docFront)docs.push('ID front'); if(st.docBack)docs.push('ID back'); if(st.selfie)docs.push('Selfie');
         var esc=function(s){return String(s||'').replace(/[<>&]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;'}[c];});};
+        var nonUsd = st.currency && st.currency.code!=='USD';
         if(box) box.innerHTML=
           row('Badge', st.tierLabel||(st.tierName+' Verified'), false)+
           row('Legal name', esc(st.name), false)+
-          row('Date of birth', esc(st.dob), false)+
+          row('Date of birth', esc(vkycDobToText(st.dob)||st.dob), false)+
           row('Residence', esc([st.city,st.country].filter(Boolean).join(', ')), false)+
           row('Documents', docs.length? docs.join(' · '):'—', docs.length>0)+
-          row('Total', st.price+st.per, false);
+          row('Total', priceLocal+st.per, false);
+        var legal=document.getElementById('vk-legal');
+        if(legal) legal.innerHTML = (nonUsd ? 'Shown in '+st.currency.code+'; billed as '+st.price+' USD ('+st.price+st.per+') at checkout. ' : '')+
+          'By continuing you confirm the information is accurate and agree to NowssB’s verification terms. Your documents are used only to confirm your identity.';
       }
     },
     vkycFile:function(which, input){
@@ -664,7 +754,7 @@
     },
     vkycNav:function(dir){
       var st=window._vkyc; if(!st) return;
-      var STEPS=5;
+      var STEPS=st.steps||6;
       if(dir<0){
         if(st.step===0){ var p=document.getElementById('nwsb-vkyc'); if(p)p.remove(); if(this.openVerify) this.openVerify(); return; }
         st.step--; this.vkycRender();
@@ -672,14 +762,71 @@
       }
       // forward — validate & capture current step
       function shake(id){ var el=document.getElementById(id); if(el){ el.style.boxShadow='inset 0 0 0 2px rgba(220,80,80,.7)'; el.focus(); setTimeout(function(){ el.style.boxShadow=''; },1600);} }
-      if(st.step===0){ var n=(document.getElementById('vk-name')||{}).value||''; if(n.trim().length<2){ shake('vk-name'); return; } st.name=n.trim(); }
-      else if(st.step===1){ var d=(document.getElementById('vk-dob')||{}).value||''; if(!d){ shake('vk-dob'); return; }
-        var age=(new Date()-new Date(d))/31557600000; if(age<18){ if(window.nwsbToast)nwsbToast('You must be 18+ to verify'); shake('vk-dob'); return; } st.dob=d; }
-      else if(st.step===2){ var c=(document.getElementById('vk-country')||{}).value||''; if(c.trim().length<2){ shake('vk-country'); return; } st.country=c.trim(); st.city=((document.getElementById('vk-city')||{}).value||'').trim(); }
-      else if(st.step===3){ if(!st.docFront||!st.selfie){ if(window.nwsbToast)nwsbToast('Upload your ID front and a selfie'); return; } }
+      if(st.step===0){ /* intro — nothing to validate */ }
+      else if(st.step===1){ var n=(document.getElementById('vk-name')||{}).value||''; if(n.trim().length<2){ shake('vk-name'); return; } st.name=n.trim(); }
+      else if(st.step===2){ var raw=(document.getElementById('vk-dob-text')||{}).value||''; var pd=vkycParseDob(raw);
+        if(!pd){ if(window.nwsbToast)nwsbToast('Enter your date as DD / MM / YYYY'); shake('vk-dob-text'); return; }
+        if(pd.age<18){ if(window.nwsbToast)nwsbToast('You must be 18+ to verify'); shake('vk-dob-text'); return; } st.dob=pd.iso; }
+      else if(st.step===3){ var typed=((document.getElementById('vk-country')||{}).value||'').trim();
+        var match=COUNTRIES.filter(function(c){return c.toLowerCase()===typed.toLowerCase();})[0];
+        if(!match){ if(window.nwsbToast)nwsbToast('Pick your country from the suggestions'); shake('vk-country'); return; }
+        this.vkycSetCountry(match); st.city=((document.getElementById('vk-city')||{}).value||'').trim(); }
+      else if(st.step===4){ if(!st.docFront||!st.selfie){ if(window.nwsbToast)nwsbToast('Upload your ID front and a selfie'); return; } }
       if(st.step>=STEPS-1){ this.vkycFinish(); return; }
       st.step++; this.vkycRender();
       var sc2=document.querySelector('#nwsb-vkyc .vk-scroll'); if(sc2) sc2.scrollTop=0;
+    },
+    /* Date of birth — auto-format as they type (DD / MM / YYYY) */
+    vkycDobInput:function(el){
+      var v=(el.value||'').replace(/\D/g,'').slice(0,8);
+      var out=v;
+      if(v.length>4) out=v.slice(0,2)+' / '+v.slice(2,4)+' / '+v.slice(4);
+      else if(v.length>2) out=v.slice(0,2)+' / '+v.slice(2);
+      el.value=out;
+    },
+    vkycDobCalendar:function(){
+      var n=document.getElementById('vk-dob-native'); if(!n) return;
+      n.style.pointerEvents='auto';
+      try{ if(n.showPicker) n.showPicker(); else n.click(); }catch(e){ try{ n.click(); }catch(e2){} }
+    },
+    vkycDobNative:function(n){
+      if(!n||!n.value) return;
+      var t=document.getElementById('vk-dob-text'); if(t){ t.value=vkycDobToText(n.value); }
+    },
+    /* Country — type-ahead suggestions + local currency */
+    vkycCountryInput:function(el){
+      var st=window._vkyc; var q=((el&&el.value)||'').trim().toLowerCase();
+      var sugg=document.getElementById('vk-country-sugg');
+      if(!q){ if(sugg){ sugg.classList.remove('on'); sugg.innerHTML=''; } this.vkycSetCountry(''); return; }
+      var starts=[], incl=[];
+      for(var i=0;i<COUNTRIES.length;i++){ var c=COUNTRIES[i], lc=c.toLowerCase();
+        if(lc.indexOf(q)===0) starts.push(c); else if(lc.indexOf(q)>=0) incl.push(c); }
+      var list=starts.concat(incl).slice(0,8);
+      if(sugg){
+        sugg.innerHTML=list.map(function(c){ var safe=c.replace(/'/g,"\\'"); return '<div class="vk-sugg-item" onmousedown="event.preventDefault();IG.vkycPickCountry(\''+safe+'\')">'+c+'</div>'; }).join('');
+        sugg.classList.toggle('on', list.length>0);
+      }
+      var exact=COUNTRIES.filter(function(c){return c.toLowerCase()===q;})[0];
+      this.vkycSetCountry(exact||'');
+    },
+    vkycPickCountry:function(name){
+      var el=document.getElementById('vk-country'); if(el) el.value=name;
+      var sugg=document.getElementById('vk-country-sugg'); if(sugg){ sugg.classList.remove('on'); sugg.innerHTML=''; }
+      this.vkycSetCountry(name);
+    },
+    vkycSetCountry:function(name){
+      var st=window._vkyc; if(!st) return;
+      st.country=name||'';
+      st.currency = name ? currencyForCountry(name) : {code:'USD',symbol:'$',rate:1,dec:2};
+      var note=document.getElementById('vk-cur-note');
+      if(note){ if(name){ note.style.display='block'; note.textContent='✓ '+name+' · prices shown in '+st.currency.code+' ('+st.currency.symbol+')'; } else { note.style.display='none'; note.textContent=''; } }
+      this.vkycUpdatePrices();
+    },
+    vkycUpdatePrices:function(){
+      var st=window._vkyc; if(!st) return;
+      var local=vkycFmt(st.priceUSDNum, st.currency);
+      var pm=document.getElementById('vk-price-mini'); if(pm) pm.textContent=local+st.per+' · identity check';
+      var nb=document.getElementById('vk-next'); if(nb && st.step===(st.steps-1)) nb.textContent='Pay '+local+' & verify';
     },
     vkycFinish:function(){
       var st=window._vkyc; if(!st) return;
