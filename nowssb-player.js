@@ -21,6 +21,15 @@
     kidney: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991521/grok_video_2026-07-02-16-52-19_mlfgei.mp4',   // ← kidney / renal / bladder
     liver:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991522/grok_video_2026-07-02-16-51-43_gilelq.mp4'    // ← liver / hepatic / detox
   };
+  /* Cloudinary on-the-fly compression — the raw grok mp4s are huge and lag /
+     take forever. Inject q_auto,f_auto (+ a width cap) so Cloudinary serves a
+     small, fast, hardware-friendly clip instead of the multi-MB source. */
+  function cldVid(url, w) {
+    if (!url || url.indexOf('/video/upload/') < 0) return url;
+    if (/\/video\/upload\/(q_auto|f_auto|w_|vc_)/.test(url)) return url; // already transformed
+    return url.replace('/video/upload/', '/video/upload/q_auto,f_auto,vc_auto' + (w ? ',w_' + w : '') + '/');
+  }
+
   /* Match a word's organ/category/benefit text to one of the ORGAN_VIDEOS keys.
      Robust to wording like "Lungs · Joints", "Lung & Breath", "Immune", etc. */
   function organVideoFor(w) {
@@ -138,9 +147,9 @@
     var libBtn = '<button class="lgp-side" onclick="lgpToggleArc&&document.getElementById(\'lgpArc\')&&document.getElementById(\'lgpArc\').classList.remove(\'open\');openWalkmanLib&&openWalkmanLib()" aria-label="Library">' + libSvg + '<span>Library</span></button>';
     var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
-    /* central waveform = the pair's looping video */
+    /* central waveform = the pair's looping video (compressed via Cloudinary) */
     var visual = th.video
-      ? '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + th.video + '"></video>'
+      ? '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + cldVid(th.video, 640) + '"></video>'
       : '<div class="lgp-video-fallback"></div>';
 
     /* phase-aware center block — preserves the original IDs so play/record/score work */
@@ -235,9 +244,13 @@
        happening in the body, the word's meaning, and the practitioner's
        results for this word. Icons are plain inline SVG for now — real
        image icons come later, same as the rest of the player. ── */
+    /* NOTE: no autoplay + preload="none" — the info video must NOT load or play
+       while the panel is closed (it was loading hidden on every render and
+       fighting the main player video for bandwidth). It's started on open by
+       lgpToggleInfo, paused/reset on close. Also compressed via Cloudinary. */
     var _organVid = organVideoFor(w);
     var infoVideo = _organVid
-      ? '<video class="lgp-info-video" autoplay loop muted playsinline preload="auto" src="' + _organVid + '"></video>'
+      ? '<video class="lgp-info-video" loop muted playsinline preload="none" src="' + cldVid(_organVid, 560) + '"></video>'
       : '<div class="lgp-info-video-placeholder">' +
           '<span class="lgp-info-video-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8.5v7l6-3.5-6-3.5z" fill="#fff" stroke="none"/></svg></span>' +
           '<span class="lgp-info-video-lbl">Organ visualization coming soon</span>' +
@@ -477,9 +490,14 @@
       sheet.style.transform = willOpen ? 'translateY(0)' : 'translateY(100%)';
       if (willOpen) sheet.scrollTop = 0;
     }
-    // play/pause the organ video with the panel so it doesn't run in the background
+    // load+play the organ video ONLY while the panel is open; stop it on close
     var vid = p.querySelector('.lgp-info-video');
-    if (vid) { try { if (willOpen) vid.play().catch(function(){}); else vid.pause(); } catch (e) {} }
+    if (vid) {
+      try {
+        if (willOpen) { var pp = vid.play(); if (pp && pp.catch) pp.catch(function(){}); }
+        else { vid.pause(); try { vid.currentTime = 0; } catch (e) {} }
+      } catch (e) {}
+    }
   };
 
   /* Bulletproof, capture-phase delegated handler for the gear — fires even if the
