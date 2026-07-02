@@ -73,27 +73,36 @@
 
   // ── EXPLORE GRID ──
   function renderExplore(){
-    var grid = document.getElementById('ig-explore-grid');
+    var grid  = document.getElementById('ig-explore-grid');
+    var empty = document.getElementById('ig-explore-empty');
     if(!grid) return;
-    // No real explore posts yet (this used an external placeholder image
-    // service that failed to load, leaving a blank page) — show a clean
-    // centered empty state instead of 30 broken tiles.
-    grid.innerHTML =
-      '<div class="ig-explore-empty">' +
-        '<div class="ig-explore-empty-circle">' +
-          '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' +
-        '</div>' +
-        '<div class="ig-explore-empty-title">No posts to explore yet</div>' +
-        '<div class="ig-explore-empty-sub">New posts from the NowssB community will appear here.</div>' +
-      '</div>';
+    // Real community explore posts (none yet). When posts exist, fill the grid
+    // with tiles and hide the empty state; otherwise clear the grid and show
+    // the "No posts to explore yet" block (a SIBLING of the grid, so the
+    // grid's grid-auto-rows can't shove it off-screen).
+    var posts = (window.IG && Array.isArray(window.IG._explorePosts)) ? window.IG._explorePosts : [];
+    if(posts.length){
+      grid.style.display = 'grid';
+      if(empty) empty.style.display = 'none';
+      grid.innerHTML = posts.map(function(p){
+        var img = (p && (p.img||p.image||p.thumb)) || '';
+        return '<div class="ig-explore-tile" onclick="IG.openExplorePost&&IG.openExplorePost(\''+img+'\')">'+
+               '<img loading="lazy" decoding="async" src="'+img+'" alt=""></div>';
+      }).join('');
+    } else {
+      grid.innerHTML = '';
+      grid.style.display = 'none';        // no phantom grid rows when empty
+      if(empty) empty.style.display = 'flex';
+    }
   }
 
   // ── SEARCH ──
   function renderSearchResults(q){
     var box = document.getElementById('ig-search-results');
     var grid = document.getElementById('ig-explore-grid');
-    if(!q){ box.style.display='none'; grid.style.display='grid'; return; }
-    grid.style.display='none'; box.style.display='block';
+    var empty = document.getElementById('ig-explore-empty');
+    if(!q){ box.style.display='none'; renderExplore(); return; }
+    grid.style.display='none'; if(empty) empty.style.display='none'; box.style.display='block';
     var ql = q.toLowerCase();
     var matches = PEOPLE.filter(function(p){ return p.username.toLowerCase().indexOf(ql)>=0 || p.fullName.toLowerCase().indexOf(ql)>=0; });
     if(!matches.length){ box.innerHTML='<div style="text-align:center;color:#737373;padding:40px 0;font-size:14px;">No results found</div>'; return; }
