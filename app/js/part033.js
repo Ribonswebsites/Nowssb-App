@@ -75,14 +75,17 @@
   function renderExplore(){
     var grid = document.getElementById('ig-explore-grid');
     if(!grid) return;
-    var html='';
-    for(var i=0;i<30;i++){
-      var tall = (i%7===2); // instagram-like tall tiles
-      html += '<div class="ig-tile'+(tall?' tall':'')+'" onclick="IG.openExplorePost(this)">'+
-        '<img decoding="async" loading="lazy" src="'+img('ex'+i, 500, tall?1000:500)+'">'+
-        (i%5===0?multiSvg:'')+'</div>';
-    }
-    grid.innerHTML = html;
+    // No real explore posts yet (this used an external placeholder image
+    // service that failed to load, leaving a blank page) — show a clean
+    // centered empty state instead of 30 broken tiles.
+    grid.innerHTML =
+      '<div class="ig-explore-empty">' +
+        '<div class="ig-explore-empty-circle">' +
+          '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' +
+        '</div>' +
+        '<div class="ig-explore-empty-title">No posts to explore yet</div>' +
+        '<div class="ig-explore-empty-sub">New posts from the NowssB community will appear here.</div>' +
+      '</div>';
   }
 
   // ── SEARCH ──

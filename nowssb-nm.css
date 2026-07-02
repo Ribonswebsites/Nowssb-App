@@ -2113,22 +2113,45 @@ body.nm-mode #sub-health-male .hcat-item-icon, body.nm-mode #sub-health-female .
 }
 #sub-my-progress .sub-header-title, #sub-word-science .sub-header-title { font-size:22px !important; }
 
-/* ===== EXPLORE/SEARCH (#sub-people) — circle avatar + back button ===== */
+/* ===== EXPLORE/SEARCH (#sub-people) — white neumorphic circle avatar + back
+   button. The page background here is always light (#eef1f6), so these must
+   be styled light unconditionally — not gated behind nm-glass (that class
+   wasn't the one active; nm-mode was), which is why they rendered as plain
+   black circles/ovals before. ===== */
+#sub-people .ig-searchwrap { padding:12px 12px 4px !important; gap:8px !important; }
+#sub-people .ig-searchbar { flex:1 1 auto !important; max-width:none !important; height:38px !important; }
 #ig-explore-myavatar, #ig-explore-myavatar > img { border-radius:50% !important; }
-body.nm-glass #ig-explore-myavatar {
-  border:none !important; background:#eef0f5 !important;
+#ig-explore-myavatar {
+  width:34px !important; height:34px !important; min-height:0 !important;
+  border:none !important; background:#f0f2f7 !important;
   box-shadow:4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95) !important;
 }
+#ig-explore-myavatar-init { color:#a8854a !important; }
 .ig-people-back {
-  width:34px; height:34px; border-radius:50% !important; flex-shrink:0; cursor:pointer;
-  border:none; background:#1c1c1e; display:flex; align-items:center; justify-content:center;
-  -webkit-tap-highlight-color:transparent;
-}
-body.nm-glass .ig-people-back {
-  background:#eef0f5 !important;
+  width:34px !important; height:34px !important; min-height:0 !important;
+  border-radius:50% !important; flex-shrink:0; cursor:pointer;
+  border:none !important; background:#f0f2f7 !important;
   box-shadow:4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95) !important;
+  display:flex; align-items:center; justify-content:center;
+  -webkit-tap-highlight-color:transparent; padding:0 !important;
 }
-body.nm-glass .ig-people-back svg path { stroke:#1a1a2e !important; }
+.ig-people-back svg path { stroke:#1a1a2e !important; }
+.ig-people-back:active {
+  box-shadow:inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.92) !important;
+}
+
+/* Explore grid empty state — centered neumorphic circle, nothing weird below */
+.ig-explore-empty {
+  grid-column:1 / -1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; text-align:center; padding:70px 30px 40px; gap:14px;
+}
+.ig-explore-empty-circle {
+  width:64px; height:64px; border-radius:50% !important; background:#f0f2f7;
+  color:rgba(0,0,0,.32); display:flex; align-items:center; justify-content:center;
+  box-shadow:6px 6px 14px rgba(0,0,0,.12), -5px -5px 12px rgba(255,255,255,.95);
+}
+.ig-explore-empty-title { font-size:14px; font-weight:700; color:#1a1a2e; font-family:'DM Sans',sans-serif; }
+.ig-explore-empty-sub { font-size:12px; color:rgba(0,0,0,.42); font-family:'DM Sans',sans-serif; max-width:220px; line-height:1.5; }
 
 /* ===== Choose Your Path (#sub-health-journey) — dark "Fashion" style, not white
    neumorphism. Matches the male/female lists. ===== */
