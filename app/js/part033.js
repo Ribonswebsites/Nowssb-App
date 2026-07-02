@@ -445,7 +445,7 @@
             '<div class="nwsb-vr-reqs-h">Earn it the organic way</div>'+reqs+
             '<div class="nwsb-vr-or"><span>or skip the grind — buy it</span></div>'+
             '<div class="nwsb-vr-buy"><div class="nwsb-vr-price">'+t.price+'<span>'+t.per+'</span></div>'+
-              (owned ? '<button class="nwsb-vr-btn owned" disabled>Owned ✓</button>' : '<button class="nwsb-vr-btn" onclick="IG.buyVerify(\''+t.key+'\')">Buy '+t.name+'</button>')+
+              (owned ? '<button class="nwsb-vr-btn owned" disabled>Owned ✓</button>' : '<button class="nwsb-vr-btn" onclick="IG.verifyKyc(\''+t.key+'\')">Buy '+t.name+'</button>')+
             '</div>'+
           '</div>';
       }).join('');
@@ -488,6 +488,209 @@
           cards+
         '</div>';
       document.body.appendChild(ov);
+    },
+    /* ── Verification KYC wizard — real name → DOB → residence → documents →
+       review, then hands off to the real payment gateway (buyVerify → cart →
+       Razorpay checkout). Pre-fills from the user's profile where available. ── */
+    verifyKyc:function(tier){
+      var t=null; for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===tier){ t=VERIFY_TIERS[i]; break; } }
+      if(!t) return;
+      var ud = window._userDataCache || {};
+      // pull any previously-entered KYC first, then profile fields, so returning
+      // users don't re-type. DOB / residence come from the profile if present.
+      var st = {
+        tier: tier, tierName: t.name, price: t.price, per: t.per,
+        name:    ud.kycName    || ud.displayName || ((this._currentProfile&&this._currentProfile.fullName)||'') || '',
+        dob:     ud.kycDob     || ud.dob || ud.dateOfBirth || ud.birthday || '',
+        country: ud.kycCountry || ud.residence || ud.country || '',
+        city:    ud.kycCity    || ud.city || '',
+        address: ud.kycAddress || ud.address || '',
+        docFront: '', docBack: '', selfie: '', step: 0
+      };
+      st.tierLabel = (t.name==='Verified') ? 'NowssB Verified' : (t.name+' Verified');
+      window._vkyc = st;
+      var STEPS = 5; // name, dob, residence, documents, review
+
+      var css='#nwsb-vkyc{position:fixed;inset:0;z-index:100002;background:#eef0f5;display:flex;flex-direction:column;}'+
+        '#nwsb-vkyc *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
+        '#nwsb-vkyc .vk-bar{display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 16px 12px;background:#eef0f5;}'+
+        '#nwsb-vkyc .vk-back{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;color:#1a1a2e;font-size:20px;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.13),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;flex-shrink:0;}'+
+        '#nwsb-vkyc .vk-back:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
+        '#nwsb-vkyc .vk-steplbl{flex:1;font-size:12px;font-weight:700;color:#a8854a;letter-spacing:.5px;}'+
+        '#nwsb-vkyc .vk-prog{height:5px;border-radius:3px !important;background:rgba(0,0,0,.08);margin:0 16px 4px;overflow:hidden;box-shadow:inset 2px 2px 5px rgba(0,0,0,.1),inset -1px -1px 3px rgba(255,255,255,.9);}'+
+        '#nwsb-vkyc .vk-prog-fill{height:100%;border-radius:3px !important;background:linear-gradient(90deg,#c8a96e,#e8d5a3);transition:width .3s cubic-bezier(.4,0,.2,1);}'+
+        '#nwsb-vkyc .vk-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:22px 22px calc(env(safe-area-inset-bottom,20px) + 120px);}'+
+        '#nwsb-vkyc .vk-step{display:none;}'+
+        '#nwsb-vkyc .vk-step.on{display:block;animation:vkin .28s ease;}'+
+        '@keyframes vkin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}'+
+        '#nwsb-vkyc .vk-badge-mini{display:flex;align-items:center;gap:10px;margin-bottom:22px;}'+
+        '#nwsb-vkyc .vk-badge-mini img{width:38px;height:38px;border-radius:11px !important;object-fit:cover;box-shadow:3px 3px 8px rgba(0,0,0,.15),-2px -2px 6px rgba(255,255,255,.9);}'+
+        '#nwsb-vkyc .vk-badge-mini b{font-size:13px;color:#1a1a2e;}'+
+        '#nwsb-vkyc .vk-badge-mini span{font-size:12px;color:rgba(0,0,0,.45);}'+
+        '#nwsb-vkyc .vk-title{font-size:23px;font-weight:800;color:#1a1a2e;line-height:1.2;margin-bottom:7px;}'+
+        '#nwsb-vkyc .vk-sub{font-size:13px;color:rgba(0,0,0,.5);line-height:1.5;margin-bottom:24px;}'+
+        '#nwsb-vkyc .vk-flabel{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,.4);margin:0 4px 8px;}'+
+        '#nwsb-vkyc .vk-input{width:100%;border:none;border-radius:16px !important;background:#eef0f5;padding:16px 18px;font-size:15px;color:#1a1a2e;box-shadow:inset 4px 4px 9px rgba(0,0,0,.11),inset -3px -3px 7px rgba(255,255,255,.94);outline:none;margin-bottom:18px;}'+
+        '#nwsb-vkyc .vk-input::placeholder{color:rgba(0,0,0,.32);}'+
+        '#nwsb-vkyc .vk-prefill{font-size:11px;color:#1aa76a;font-weight:700;margin:-12px 4px 18px;}'+
+        '#nwsb-vkyc .vk-docgrid{display:flex;flex-direction:column;gap:14px;}'+
+        '#nwsb-vkyc .vk-doc{position:relative;border-radius:18px !important;background:#eef0f5;box-shadow:5px 5px 13px rgba(0,0,0,.11),-4px -4px 10px rgba(255,255,255,.95);padding:18px;cursor:pointer;overflow:hidden;}'+
+        '#nwsb-vkyc .vk-doc:active{box-shadow:inset 3px 3px 8px rgba(0,0,0,.12),inset -2px -2px 6px rgba(255,255,255,.92);}'+
+        '#nwsb-vkyc .vk-doc-row{display:flex;align-items:center;gap:14px;}'+
+        '#nwsb-vkyc .vk-doc-ic{width:46px;height:46px;border-radius:12px !important;background:#eef0f5;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:3px 3px 8px rgba(0,0,0,.13),-2px -2px 6px rgba(255,255,255,.92);}'+
+        '#nwsb-vkyc .vk-doc-t{font-size:14px;font-weight:700;color:#1a1a2e;}'+
+        '#nwsb-vkyc .vk-doc-s{font-size:12px;color:rgba(0,0,0,.45);margin-top:2px;}'+
+        '#nwsb-vkyc .vk-doc.done .vk-doc-s{color:#1aa76a;font-weight:700;}'+
+        '#nwsb-vkyc .vk-doc-thumb{width:100%;height:150px;object-fit:cover;border-radius:12px !important;margin-top:14px;display:block;}'+
+        '#nwsb-vkyc .vk-doc input{display:none;}'+
+        '#nwsb-vkyc .vk-rev{border-radius:18px !important;background:#eef0f5;box-shadow:inset 3px 3px 8px rgba(0,0,0,.09),inset -2px -2px 6px rgba(255,255,255,.92);padding:8px 18px;margin-bottom:20px;}'+
+        '#nwsb-vkyc .vk-rev-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid rgba(0,0,0,.06);}'+
+        '#nwsb-vkyc .vk-rev-row:last-child{border-bottom:none;}'+
+        '#nwsb-vkyc .vk-rev-k{font-size:12px;color:rgba(0,0,0,.45);font-weight:600;}'+
+        '#nwsb-vkyc .vk-rev-v{font-size:13px;color:#1a1a2e;font-weight:700;text-align:right;max-width:60%;word-break:break-word;}'+
+        '#nwsb-vkyc .vk-rev-v.ok{color:#1aa76a;}'+
+        '#nwsb-vkyc .vk-legal{font-size:11px;color:rgba(0,0,0,.4);line-height:1.6;margin-bottom:6px;}'+
+        '#nwsb-vkyc .vk-foot{position:absolute;left:0;right:0;bottom:0;padding:14px 22px calc(env(safe-area-inset-bottom,16px) + 16px);background:linear-gradient(to top,#eef0f5 62%,rgba(238,240,245,0));}'+
+        '#nwsb-vkyc .vk-next{width:100%;border:none;border-radius:16px !important;background:linear-gradient(135deg,#c8a96e,#e8d5a3);color:#1a1a2e;font-size:15px;font-weight:800;letter-spacing:.3px;padding:17px;cursor:pointer;box-shadow:5px 5px 14px rgba(168,133,74,.32);display:flex;align-items:center;justify-content:center;gap:8px;}'+
+        '#nwsb-vkyc .vk-next:active{transform:scale(.985);}'+
+        '#nwsb-vkyc .vk-next[disabled]{opacity:.5;}';
+
+      function esc(s){ return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+      var prefilledName    = !!st.name;
+      var prefilledDob     = !!st.dob;
+      var prefilledCountry = !!st.country;
+
+      var docIco = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M15 9h3M15 13h3M6 16h12"/></svg>';
+      var selfieIco='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a8854a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+
+      var html='<style>'+css+'</style>'+
+        '<div class="vk-bar"><button class="vk-back" id="vk-back" aria-label="Back">&#8249;</button><span class="vk-steplbl" id="vk-steplbl">Step 1 of '+STEPS+'</span></div>'+
+        '<div class="vk-prog"><div class="vk-prog-fill" id="vk-progfill" style="width:20%"></div></div>'+
+        '<div class="vk-scroll">'+
+          '<div class="vk-badge-mini"><img src="'+t.img+'" alt=""><div><b>'+st.tierLabel+'</b><br><span>'+t.price+t.per+' · identity check</span></div></div>'+
+          /* Step 1 — real name */
+          '<div class="vk-step on" data-step="0">'+
+            '<div class="vk-title">What\'s your real name?</div>'+
+            '<div class="vk-sub">This is the legal name that will be checked against your ID. It stays private and is never shown on your profile.</div>'+
+            '<div class="vk-flabel">Full legal name</div>'+
+            '<input class="vk-input" id="vk-name" type="text" autocomplete="name" placeholder="e.g. Priya Nair" value="'+esc(st.name)+'">'+
+            (prefilledName ? '<div class="vk-prefill">✓ Suggested from your profile — edit if needed</div>' : '')+
+          '</div>'+
+          /* Step 2 — date of birth */
+          '<div class="vk-step" data-step="1">'+
+            '<div class="vk-title">Your date of birth</div>'+
+            '<div class="vk-sub">You must be 18 or older to be verified. We only use this to confirm your age.</div>'+
+            '<div class="vk-flabel">Date of birth</div>'+
+            '<input class="vk-input" id="vk-dob" type="date" max="2012-12-31" value="'+esc(st.dob)+'">'+
+            (prefilledDob ? '<div class="vk-prefill">✓ From your profile</div>' : '')+
+          '</div>'+
+          /* Step 3 — place of residence */
+          '<div class="vk-step" data-step="2">'+
+            '<div class="vk-title">Where do you live?</div>'+
+            '<div class="vk-sub">Your place of residence helps us apply the right verification rules for your region.</div>'+
+            '<div class="vk-flabel">Country of residence</div>'+
+            '<input class="vk-input" id="vk-country" type="text" autocomplete="country-name" placeholder="e.g. India" value="'+esc(st.country)+'">'+
+            (prefilledCountry ? '<div class="vk-prefill">✓ From your profile</div>' : '')+
+            '<div class="vk-flabel">City</div>'+
+            '<input class="vk-input" id="vk-city" type="text" autocomplete="address-level2" placeholder="e.g. Rishikesh" value="'+esc(st.city)+'">'+
+          '</div>'+
+          /* Step 4 — documents */
+          '<div class="vk-step" data-step="3">'+
+            '<div class="vk-title">Verify your identity</div>'+
+            '<div class="vk-sub">Upload a clear photo of a government-issued ID. Add a selfie so we can match it to you.</div>'+
+            '<div class="vk-docgrid">'+
+              '<label class="vk-doc" id="vk-doc-front"><div class="vk-doc-row"><div class="vk-doc-ic">'+docIco+'</div><div><div class="vk-doc-t">ID — front</div><div class="vk-doc-s">Passport, driver\'s licence or national ID</div></div></div><input type="file" accept="image/*" onchange="IG.vkycFile(\'docFront\',this)"><img class="vk-doc-thumb" id="vk-th-docFront" style="display:none"></label>'+
+              '<label class="vk-doc" id="vk-doc-back"><div class="vk-doc-row"><div class="vk-doc-ic">'+docIco+'</div><div><div class="vk-doc-t">ID — back <span style="font-weight:400;color:rgba(0,0,0,.35)">(optional)</span></div><div class="vk-doc-s">Back side, if your ID has one</div></div></div><input type="file" accept="image/*" onchange="IG.vkycFile(\'docBack\',this)"><img class="vk-doc-thumb" id="vk-th-docBack" style="display:none"></label>'+
+              '<label class="vk-doc" id="vk-doc-selfie"><div class="vk-doc-row"><div class="vk-doc-ic">'+selfieIco+'</div><div><div class="vk-doc-t">Selfie</div><div class="vk-doc-s">A clear photo of your face</div></div></div><input type="file" accept="image/*" capture="user" onchange="IG.vkycFile(\'selfie\',this)"><img class="vk-doc-thumb" id="vk-th-selfie" style="display:none"></label>'+
+            '</div>'+
+          '</div>'+
+          /* Step 5 — review + pay */
+          '<div class="vk-step" data-step="4">'+
+            '<div class="vk-title">Review &amp; pay</div>'+
+            '<div class="vk-sub">Confirm your details. Next you\'ll complete a secure payment to finish verification.</div>'+
+            '<div class="vk-rev" id="vk-review"></div>'+
+            '<div class="vk-legal">By continuing you confirm the information is accurate and agree to NowssB\'s verification terms. Your documents are used only to confirm your identity.</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="vk-foot"><button class="vk-next" id="vk-next">Continue</button></div>';
+
+      var old=document.getElementById('nwsb-vkyc'); if(old) old.remove();
+      var ov=document.createElement('div'); ov.id='nwsb-vkyc'; ov.innerHTML=html;
+      document.body.appendChild(ov);
+      document.getElementById('vk-back').onclick=function(){ IG.vkycNav(-1); };
+      document.getElementById('vk-next').onclick=function(){ IG.vkycNav(1); };
+      this.vkycRender();
+    },
+    vkycRender:function(){
+      var st=window._vkyc; if(!st) return;
+      var STEPS=5;
+      document.querySelectorAll('#nwsb-vkyc .vk-step').forEach(function(el){
+        el.classList.toggle('on', parseInt(el.getAttribute('data-step'),10)===st.step);
+      });
+      var lbl=document.getElementById('vk-steplbl'); if(lbl) lbl.textContent='Step '+(st.step+1)+' of '+STEPS;
+      var pf=document.getElementById('vk-progfill'); if(pf) pf.style.width=(((st.step+1)/STEPS)*100)+'%';
+      var nb=document.getElementById('vk-next'); if(nb) nb.textContent = (st.step===STEPS-1) ? 'Pay '+st.price+' & verify' : 'Continue';
+      if(st.step===STEPS-1){
+        var box=document.getElementById('vk-review');
+        function row(k,v,ok){ return '<div class="vk-rev-row"><span class="vk-rev-k">'+k+'</span><span class="vk-rev-v'+(ok?' ok':'')+'">'+(v||'—')+'</span></div>'; }
+        var docs=[]; if(st.docFront)docs.push('ID front'); if(st.docBack)docs.push('ID back'); if(st.selfie)docs.push('Selfie');
+        var esc=function(s){return String(s||'').replace(/[<>&]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;'}[c];});};
+        if(box) box.innerHTML=
+          row('Badge', st.tierLabel||(st.tierName+' Verified'), false)+
+          row('Legal name', esc(st.name), false)+
+          row('Date of birth', esc(st.dob), false)+
+          row('Residence', esc([st.city,st.country].filter(Boolean).join(', ')), false)+
+          row('Documents', docs.length? docs.join(' · '):'—', docs.length>0)+
+          row('Total', st.price+st.per, false);
+      }
+    },
+    vkycFile:function(which, input){
+      var st=window._vkyc; if(!st||!input.files||!input.files[0]) return;
+      var f=input.files[0];
+      var rd=new FileReader();
+      rd.onload=function(e){
+        st[which]=e.target.result;
+        var th=document.getElementById('vk-th-'+which);
+        if(th){ th.src=e.target.result; th.style.display='block'; }
+        var lab=input.closest('.vk-doc'); if(lab){ lab.classList.add('done'); var s=lab.querySelector('.vk-doc-s'); if(s) s.textContent='✓ '+(f.name.length>26?f.name.slice(0,24)+'…':f.name); }
+      };
+      rd.readAsDataURL(f);
+    },
+    vkycNav:function(dir){
+      var st=window._vkyc; if(!st) return;
+      var STEPS=5;
+      if(dir<0){
+        if(st.step===0){ var p=document.getElementById('nwsb-vkyc'); if(p)p.remove(); if(this.openVerify) this.openVerify(); return; }
+        st.step--; this.vkycRender();
+        var sc=document.querySelector('#nwsb-vkyc .vk-scroll'); if(sc) sc.scrollTop=0; return;
+      }
+      // forward — validate & capture current step
+      function shake(id){ var el=document.getElementById(id); if(el){ el.style.boxShadow='inset 0 0 0 2px rgba(220,80,80,.7)'; el.focus(); setTimeout(function(){ el.style.boxShadow=''; },1600);} }
+      if(st.step===0){ var n=(document.getElementById('vk-name')||{}).value||''; if(n.trim().length<2){ shake('vk-name'); return; } st.name=n.trim(); }
+      else if(st.step===1){ var d=(document.getElementById('vk-dob')||{}).value||''; if(!d){ shake('vk-dob'); return; }
+        var age=(new Date()-new Date(d))/31557600000; if(age<18){ if(window.nwsbToast)nwsbToast('You must be 18+ to verify'); shake('vk-dob'); return; } st.dob=d; }
+      else if(st.step===2){ var c=(document.getElementById('vk-country')||{}).value||''; if(c.trim().length<2){ shake('vk-country'); return; } st.country=c.trim(); st.city=((document.getElementById('vk-city')||{}).value||'').trim(); }
+      else if(st.step===3){ if(!st.docFront||!st.selfie){ if(window.nwsbToast)nwsbToast('Upload your ID front and a selfie'); return; } }
+      if(st.step>=STEPS-1){ this.vkycFinish(); return; }
+      st.step++; this.vkycRender();
+      var sc2=document.querySelector('#nwsb-vkyc .vk-scroll'); if(sc2) sc2.scrollTop=0;
+    },
+    vkycFinish:function(){
+      var st=window._vkyc; if(!st) return;
+      // Persist KYC to the user record (metadata only — the images stay on the
+      // device for this session; a backend bucket would store them for review).
+      window._userDataCache = window._userDataCache || {};
+      var ud=window._userDataCache;
+      ud.kycName=st.name; ud.kycDob=st.dob; ud.kycCountry=st.country; ud.kycCity=st.city; ud.kycSubmitted=true;
+      // also fill the generic profile fields if they were empty
+      if(!ud.dob) ud.dob=st.dob; if(!ud.residence) ud.residence=st.country; if(!ud.city) ud.city=st.city;
+      try{ localStorage.setItem('nwsb_kyc', JSON.stringify({name:st.name,dob:st.dob,country:st.country,city:st.city,submitted:true,tier:st.tier})); }catch(e){}
+      if(window._fbSetDoc && window._currentUid){
+        window._fbSetDoc(window._currentUid, {kycName:st.name,kycDob:st.dob,kycCountry:st.country,kycCity:st.city,kycSubmitted:true}).catch(function(){});
+      }
+      var p=document.getElementById('nwsb-vkyc'); if(p) p.remove();
+      // Hand off to the REAL payment gateway (adds badge to bag → checkout → Razorpay)
+      this.buyVerify(st.tier);
     },
     buyVerify:function(tier){
       // Put the badge in the shopping bag and send the user through the real
