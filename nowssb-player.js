@@ -277,9 +277,12 @@
         '<div class="lgp-tagline">' + ['The','new','fashion','trend','of','meditation'].map(function (wd, i) { return '<span style="animation-delay:' + (0.25 + i * 0.18).toFixed(2) + 's">' + wd + '</span>'; }).join(' ') + '</div>' +
         '<div class="lgp-ritual">' + ritual + ' Ritual · ' + (idx + 1) + ' of ' + total + '</div>' +
         '<div class="lgp-visual">' + visual +
-          '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
-            '<span class="lgp-bgico" style="background-image:url(\'' + IC.info + '\')"></span>' +
-          '</button>' +
+          '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
+            '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
+            '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
+              '<span class="lgp-bgico" style="background-image:url(\'' + IC.info + '\')"></span>' +
+            '</button>' +
+          '</div>' +
           '<div class="lgp-visual-overlay">' +
             '<div class="lgp-title">' + (w.word || '') + '</div>' +
             '<div class="lgp-syls">' + syl + '</div>' +
@@ -336,6 +339,27 @@
       var tmp2 = document.createElement('div');
       tmp2.innerHTML = infoPanel;
       document.body.appendChild(tmp2.firstChild);
+    }
+
+    /* ── ONE-SHOT info-icon hint: ~0.9s after the player opens, the icon
+       pulses and a pill grows out to its left — "Learn more" then
+       "Learn your score" with a light tracing round it — then it retracts.
+       Plays once per player open (not on every re-render, not looping). ── */
+    if (window._lgpHintPending && !window._lgpHintScheduled) {
+      window._lgpHintScheduled = true;
+      setTimeout(function () {
+        window._lgpHintPending = false;
+        window._lgpHintScheduled = false;
+        var cluster = document.getElementById('lgpInfoCluster');
+        var txt = document.getElementById('lgpInfoPillTxt');
+        if (!cluster) return;
+        if (txt) txt.textContent = 'Learn more';
+        cluster.classList.remove('hint-run');
+        void cluster.offsetWidth;              // restart the animation cleanly
+        cluster.classList.add('hint-run');
+        setTimeout(function () { var t = document.getElementById('lgpInfoPillTxt'); if (t) t.textContent = 'Learn your score'; }, 2100);
+        setTimeout(function () { var c = document.getElementById('lgpInfoCluster'); if (c) c.classList.remove('hint-run'); }, 4600);
+      }, 900);
     }
   }
   window.renderLiquidPlayer = renderLiquidPlayer;
@@ -465,6 +489,16 @@
         var a = document.getElementById('lgpArc'); if (a) a.remove();
         var p = document.getElementById('lgpInfoPanel'); if (p) p.remove();
       }
+      return orig.apply(this, arguments);
+    };
+  })();
+
+  /* Arm the one-shot info hint each time the practice screen is opened */
+  (function patchOpenSubHint() {
+    if (typeof window.openSub !== 'function') { return setTimeout(patchOpenSubHint, 200); }
+    var orig = window.openSub;
+    window.openSub = function (id) {
+      if (id === 'practice') { window._lgpHintPending = true; window._lgpHintScheduled = false; }
       return orig.apply(this, arguments);
     };
   })();
