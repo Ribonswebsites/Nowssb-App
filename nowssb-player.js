@@ -17,8 +17,8 @@
      placeholder for organs not wired yet. ═══════════════════════════ */
   var ORGAN_VIDEOS = {
     lungs:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991520/grok_video_2026-07-02-16-52-38_pehfcr.mp4',   // ← lungs / breath / respiratory
-    heart:  '',   // ← heart / cardiac / circulation
-    kidney: '',   // ← kidney / renal / bladder
+    heart:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991522/grok_video_2026-07-02-16-51-54_zpffyf.mp4',   // ← heart / cardiac / circulation
+    kidney: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991521/grok_video_2026-07-02-16-52-19_mlfgei.mp4',   // ← kidney / renal / bladder
     liver:  ''    // ← liver / hepatic / detox
   };
   /* Match a word's organ/category/benefit text to one of the ORGAN_VIDEOS keys.
