@@ -278,6 +278,7 @@
   // ── public API ──
   window.IG = {
     _currentProfile:null,
+    renderExplore:renderExplore,
     nav:function(which){
       if(which==='home'){
         // Close all sub-screens instantly (no slide animation) — prevents cycling flash

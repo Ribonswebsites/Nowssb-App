@@ -29,7 +29,7 @@ window.chatInboxNew = function() {
   chatInboxClose();
   document.getElementById('sub-ig-profile').classList.remove('open');
   document.getElementById('sub-people').classList.add('open');
-  if (typeof renderExplore === 'function') renderExplore();
+  if (window.IG && typeof window.IG.renderExplore === 'function') window.IG.renderExplore();
   var sn = document.getElementById('ig-social-nav');
   if (sn) sn.style.display = 'flex';
   setSocialNavActive('chat');

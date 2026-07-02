@@ -508,8 +508,10 @@
           if (grid) grid.classList.remove('open');
           var sc = document.getElementById('ig-people-scroll');
           if (sc) sc.scrollTop = 0;
-          /* renderExplore is a private fn inside IG closure — trigger via openExplore */
-          if (typeof renderExplore === 'function') renderExplore();
+          /* renderExplore is a private fn inside IG's closure, not global — this bare
+             call always silently no-op'd (typeof renderExplore === 'undefined' here),
+             leaving the grid blank. Call it through window.IG.renderExplore instead. */
+          if (window.IG && typeof window.IG.renderExplore === 'function') window.IG.renderExplore();
           window.IG.clearSearch && window.IG.clearSearch();
         }
 
