@@ -1258,20 +1258,13 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── PWA INSTALL PROMPT capture ──
+// No auto popup — the native browser prompt is captured silently and only
+// triggered when the user taps "Download App" in Settings.
 let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredInstallPrompt = e;
 });
-// ── AUTO PWA INSTALL POPUP ──
-(function() {
-  if (isInStandaloneMode()) return;
-  if (localStorage.getItem('pwaPopupDismissed')) return;
-  setTimeout(() => {
-    if (isInStandaloneMode()) return;
-    openDlPopup();
-  }, 4000);
-})();
 
 // ── DETECT iOS SAFARI ──
 function isIOS() {

@@ -322,6 +322,9 @@
         rowNav('lock', 'Privacy Settings', 'Who can see your stats', "ssOpenPanel('privacy')") +
         rowNav('message', 'Chat Settings', 'Who can message you', "ssOpenPanel('chatsettings')")) +
 
+      sec('App',
+        rowNav('download', 'Download App', 'Install NowssB on your device', 'openDlPopup()')) +
+
       sec('Storage &amp; Data',
         rowNav('download', 'Download My Data', 'Export sessions & progress as JSON', 'ssDownloadData()') +
         rowNav('database', 'Cached Data', cacheSub, 'ssClearCache()') +
