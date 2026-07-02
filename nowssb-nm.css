@@ -1010,6 +1010,10 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar .ig-vbadge img,
 body.nwsb-soc-glass #sub-ig-profile .ig-topbar .ig-vbadge img,
 body #sub-people .ig-topbar .ig-vbadge img,
 body #sub-social-home .ig-topbar .ig-vbadge img { filter: none !important; opacity: 1 !important; }
+/* Shop-Verified header button — keep the true-colour badge in every mode */
+body #sub-ig-profile .ig-topbar .ig-vshop img,
+body.nwsb-soc-glass #sub-ig-profile .ig-topbar .ig-vshop img,
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar .ig-vshop img { filter: none !important; opacity: 1 !important; }
 /* the neumorphic circle wrapper of the header badge */
 #sub-ig-profile .ig-topbar .ig-vbadge { vertical-align: middle !important; }
 
