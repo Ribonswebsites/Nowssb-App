@@ -209,7 +209,7 @@
         '<div id="spPhasePost" style="display:' + (phase === 'post-play' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:12px;width:100%;">' +
           '<div class="lgp-status">Word played · your turn</div>' +
           '<div class="lgp-cta-row">' +
-            '<button class="lgp-cta lgp-cta-replay" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay"><span class="lgp-mic-ico" style="background-image:url(\'' + IC.replay + '\')"></span><span class="lgp-cta-lbl">Replay</span></button>' +
+            '<button class="lgp-replay-orb" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay"><span class="lgp-bgico" style="background-image:url(\'' + IC.replay + '\')"></span></button>' +
             '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()"><span class="lgp-mic-ico" style="background-image:url(\'' + IC.mic + '\')"></span><span class="lgp-cta-lbl">Practice Now</span></button>' +
           '</div>' +
           '<div class="lgp-controls" style="margin-top:4px;">' +

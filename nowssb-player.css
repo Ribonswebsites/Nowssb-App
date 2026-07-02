@@ -351,14 +351,29 @@
   will-change:--lgcta; animation:lgpCtaTrace 2.2s linear infinite;
 }
 @keyframes lgpCtaTrace { to { --lgcta:360deg; } }
-/* Replay pill sits to the LEFT of Practice Now — same travelling light */
-.lgp .lgp-cta-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px; width:100%; }
+/* Replay = bare glass-sphere icon (NO pill) to the LEFT of Practice Now, with
+   the travelling light running around the ICON itself. */
+.lgp .lgp-cta-row { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; width:100%; }
 .lgp .lgp-cta-row .lgp-cta { margin-top:0; }
-.lgp .lgp-cta-replay {
-  background:rgba(255,255,255,.14) !important; color:#fff !important;
-  padding:10px 20px 10px 12px !important;
+.lgp .lgp-replay-orb {
+  position:relative; width:52px; height:52px; flex-shrink:0; border:none; background:none; cursor:pointer; padding:0;
+  display:flex; align-items:center; justify-content:center;
 }
-.lgp .lgp-cta-replay .lgp-cta-lbl { color:#fff; }
+.lgp .lgp-replay-orb .lgp-bgico {
+  width:100%; height:100%; display:block; pointer-events:none;
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
+}
+.lgp .lgp-replay-orb:active { transform:scale(.92); }
+.lgp .lgp-replay-orb::after {
+  content:''; position:absolute; inset:-3px; border-radius:50% !important; padding:2.5px; pointer-events:none;
+  background:conic-gradient(from var(--lgcta),
+    transparent 0deg, transparent 210deg, rgba(255,255,255,.2) 250deg, #ffffff 300deg, var(--lg-accent,#8fe6ff) 325deg, #ffffff 350deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  will-change:--lgcta; animation:lgpCtaTrace 2.2s linear infinite;
+}
 
 /* recording waveform bars */
 .lgp .sp-rec-waveform { display:flex; align-items:center; gap:3px; height:46px; }

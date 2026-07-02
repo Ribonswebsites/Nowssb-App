@@ -1322,23 +1322,46 @@ function showManualInstallInstructions() {
   }
 }
 
+// Wait up to `ms` for the native install prompt to arrive (it often fires a
+// beat AFTER page load, so a tap right away would otherwise see nothing).
+function _waitForInstallPrompt(ms) {
+  return new Promise(resolve => {
+    const now = _getInstallPrompt();
+    if (now) return resolve(now);
+    let done = false;
+    const onBip = e => { if (done) return; done = true; window._bipEvent = e; deferredInstallPrompt = e; cleanup(); resolve(e); };
+    const cleanup = () => window.removeEventListener('beforeinstallprompt', onBip);
+    window.addEventListener('beforeinstallprompt', onBip);
+    setTimeout(() => { if (done) return; done = true; cleanup(); resolve(_getInstallPrompt()); }, ms);
+  });
+}
+
 async function triggerInstall() {
-  const prompt = _getInstallPrompt();
+  // Already installed → nothing to download.
+  if (isInStandaloneMode()) { showManualInstallInstructions(); return; }
+  let prompt = _getInstallPrompt();
+  if (!prompt && !isIOS()) {
+    // give the browser a moment to hand us the prompt before falling back
+    const btn = document.getElementById('dlInstallBtn');
+    const prev = btn ? btn.innerHTML : '';
+    if (btn) { btn.innerHTML = 'Preparing…'; btn.disabled = true; }
+    prompt = await _waitForInstallPrompt(2500);
+    if (btn) { btn.innerHTML = prev; btn.disabled = false; }
+  }
   if (prompt) {
     try {
       prompt.prompt();                                   // ← fires the native install dialog directly
       const { outcome } = await prompt.userChoice;
       deferredInstallPrompt = null; window._bipEvent = null;
       if (outcome === 'accepted') closeDlSheet();
-      // outcome === 'dismissed' — the native dialog worked and the user said no;
-      // that's a real answer, not a bug, so just leave the sheet as-is.
+      // outcome === 'dismissed' — the native dialog worked; user said no. Fine.
     } catch (e) {
-      // Some in-app browsers/WebViews fire beforeinstallprompt but .prompt()
-      // silently fails — never leave the button doing nothing.
       deferredInstallPrompt = null; window._bipEvent = null;
       showManualInstallInstructions();
     }
   } else {
+    // Browser genuinely isn't offering the one-tap install (already dismissed,
+    // engagement heuristics, or an in-app browser) — manual is the only path.
     showManualInstallInstructions();
   }
 }
