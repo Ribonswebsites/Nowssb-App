@@ -203,6 +203,58 @@
         wInfo +
       '</div>';
 
+    /* ── INFO PANEL — full-screen liquid-glass overlay opened from the ⓘ icon
+       on the video. Shows an organ-specific video (wired later per word via
+       w.organVideo — falls back to a placeholder for now), then what's
+       happening in the body, the word's meaning, and the practitioner's
+       results for this word. Icons are plain inline SVG for now — real
+       image icons come later, same as the rest of the player. ── */
+    var infoVideo = w.organVideo
+      ? '<video class="lgp-info-video" autoplay loop muted playsinline preload="auto" src="' + w.organVideo + '"></video>'
+      : '<div class="lgp-info-video-placeholder">' +
+          '<span class="lgp-info-video-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8.5v7l6-3.5-6-3.5z" fill="#fff" stroke="none"/></svg></span>' +
+          '<span class="lgp-info-video-lbl">Organ visualization coming soon</span>' +
+        '</div>';
+
+    var bodyRows = '' +
+      (w.organ    ? '<div class="lgp-info-row"><span class="k">Target Organ</span><span class="v">' + w.organ + '</span></div>' : '') +
+      (w.benefit  ? '<div class="lgp-info-row"><span class="k">Effect</span><span class="v">' + w.benefit + '</span></div>' : '') +
+      (w.resonance? '<div class="lgp-info-row"><span class="k">Resonance Point</span><span class="v">' + w.resonance + '</span></div>' : '') +
+      (w.mouthPos ? '<div class="lgp-info-row"><span class="k">Mouth Position</span><span class="v">' + w.mouthPos + '</span></div>' : '');
+
+    var meaningRows = '' +
+      (w.meaning ? '<div class="lgp-info-row"><span class="k">Meaning</span><span class="v">' + w.meaning + '</span></div>' : '') +
+      (w.origin  ? '<div class="lgp-info-row"><span class="k">Origin</span><span class="v">' + w.origin + '</span></div>' : '');
+
+    /* best-effort real numbers where the data already exists in this session;
+       everything else shows a clean placeholder until scoring/history is wired */
+    var infoRepPct = repPct;
+
+    var infoPanel =
+      '<div class="lgp-info-panel" id="lgpInfoPanel">' +
+        '<div class="lgp-info-back" onclick="lgpToggleInfo()"></div>' +
+        '<div class="lgp-info-sheet">' +
+          '<div class="lgp-info-sheet-top">' +
+            '<button class="lgp-info-close" onclick="lgpToggleInfo()" aria-label="Close">' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
+            '</button>' +
+            '<div class="lgp-info-sheet-title">' + (w.word || '') + '</div>' +
+          '</div>' +
+          '<div class="lgp-info-video-wrap">' + infoVideo + '</div>' +
+          (bodyRows ? '<div class="lgp-info-sec"><div class="lgp-info-sec-h">What\'s Happening</div><div class="lgp-info-card">' + bodyRows + '</div></div>' : '') +
+          (meaningRows ? '<div class="lgp-info-sec"><div class="lgp-info-sec-h">Meaning</div><div class="lgp-info-card">' + meaningRows + '</div></div>' : '') +
+          '<div class="lgp-info-sec">' +
+            '<div class="lgp-info-sec-h">Your Results</div>' +
+            '<div class="lgp-info-results">' +
+              '<div class="lgp-info-result-tile"><div class="lgp-info-result-num">' + repCount + '<span>/' + repTarget + '</span></div><div class="lgp-info-result-lbl">Reps This Session</div></div>' +
+              '<div class="lgp-info-result-tile"><div class="lgp-info-result-num">' + infoRepPct + '<span>%</span></div><div class="lgp-info-result-lbl">Session Progress</div></div>' +
+              '<div class="lgp-info-result-tile"><div class="lgp-info-result-num">—</div><div class="lgp-info-result-lbl">Pronunciation Score</div></div>' +
+            '</div>' +
+            '<div class="lgp-info-improve">Practice this word in Record mode to build your score history and track improvement over time.</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
     /* preserve the currently-playing background video across re-renders so it
        doesn't restart (or get stuck paused) every time the phase changes */
     var _prevVid = body.querySelector('.lgp-video');
@@ -224,6 +276,9 @@
         '<div class="lgp-tagline">' + ['The','new','fashion','trend','of','meditation'].map(function (wd, i) { return '<span style="animation-delay:' + (0.25 + i * 0.18).toFixed(2) + 's">' + wd + '</span>'; }).join(' ') + '</div>' +
         '<div class="lgp-ritual">' + ritual + ' Ritual · ' + (idx + 1) + ' of ' + total + '</div>' +
         '<div class="lgp-visual">' + visual +
+          '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.51v.01"/></svg>' +
+          '</button>' +
           '<div class="lgp-visual-overlay">' +
             '<div class="lgp-title">' + (w.word || '') + '</div>' +
             '<div class="lgp-syls">' + syl + '</div>' +
@@ -270,6 +325,16 @@
       var tmp = document.createElement('div');
       tmp.innerHTML = arc;
       document.body.appendChild(tmp.firstChild);
+    }
+
+    /* Same reasoning as the arc — the info panel must live outside .sub-screen's
+       stacking context, and must not be yanked shut mid-view by a re-render. */
+    var existingInfo = document.getElementById('lgpInfoPanel');
+    if (!(existingInfo && existingInfo.classList.contains('open'))) {
+      if (existingInfo) existingInfo.remove();
+      var tmp2 = document.createElement('div');
+      tmp2.innerHTML = infoPanel;
+      document.body.appendChild(tmp2.firstChild);
     }
   }
   window.renderLiquidPlayer = renderLiquidPlayer;
@@ -320,6 +385,41 @@
     }
   };
 
+  window.lgpToggleInfo = function (forceOpen) {
+    var p = document.getElementById('lgpInfoPanel');
+    if (!p) return;
+    var willOpen = (forceOpen === true) ? true : !p.classList.contains('open');
+    p.classList.toggle('open', willOpen);
+    /* Inline styles so it opens even if a stale cached player CSS is still in
+       effect — same bulletproofing as the settings arc. */
+    p.style.position = 'fixed';
+    p.style.left = p.style.top = p.style.right = p.style.bottom = '0';
+    p.style.zIndex = '2147483000';
+    p.style.pointerEvents = willOpen ? 'auto' : 'none';
+    var back = p.querySelector('.lgp-info-back');
+    if (back) {
+      back.style.position = 'absolute';
+      back.style.left = back.style.top = back.style.right = back.style.bottom = '0';
+      back.style.background = 'rgba(6,10,25,.4)';
+      back.style.transition = 'opacity .3s';
+      back.style.opacity = willOpen ? '1' : '0';
+      /* completely blur the player behind it, liquid-glass style */
+      var blur = willOpen ? 'blur(22px) saturate(1.3)' : 'none';
+      back.style.webkitBackdropFilter = blur;
+      back.style.backdropFilter = blur;
+    }
+    var sheet = p.querySelector('.lgp-info-sheet');
+    if (sheet) {
+      sheet.style.transition = 'transform .38s cubic-bezier(.2,1.1,.3,1), opacity .28s';
+      sheet.style.opacity = willOpen ? '1' : '0';
+      sheet.style.transform = willOpen ? 'translateY(0) scale(1)' : 'translateY(24px) scale(.96)';
+      if (willOpen) sheet.scrollTop = 0;
+    }
+    // play/pause the organ video with the panel so it doesn't run in the background
+    var vid = p.querySelector('.lgp-info-video');
+    if (vid) { try { if (willOpen) vid.play().catch(function(){}); else vid.pause(); } catch (e) {} }
+  };
+
   /* Bulletproof, capture-phase delegated handler for the gear — fires even if the
      inline onclick is ever stripped/blocked. Bound once on document. */
   if (!window._lgpSettingsBound) {
@@ -340,19 +440,24 @@
       if (active() && !window._sspActive) {
         try { renderLiquidPlayer(); return; } catch (e) { /* fall back to original */ }
       }
-      /* not using the liquid player → make sure no stray body-level arc lingers */
+      /* not using the liquid player → make sure no stray body-level arc/info panel lingers */
       var stray = document.getElementById('lgpArc');
       if (stray) stray.remove();
+      var strayInfo = document.getElementById('lgpInfoPanel');
+      if (strayInfo) strayInfo.remove();
       return orig.apply(this, arguments);
     };
   })();
 
-  /* Close (and detach) the arc whenever the practice screen is closed */
+  /* Close (and detach) the arc + info panel whenever the practice screen is closed */
   (function patchCloseSub() {
     if (typeof window.closeSub !== 'function') { return setTimeout(patchCloseSub, 200); }
     var orig = window.closeSub;
     window.closeSub = function (id) {
-      if (id === 'practice') { var a = document.getElementById('lgpArc'); if (a) a.remove(); }
+      if (id === 'practice') {
+        var a = document.getElementById('lgpArc'); if (a) a.remove();
+        var p = document.getElementById('lgpInfoPanel'); if (p) p.remove();
+      }
       return orig.apply(this, arguments);
     };
   })();
