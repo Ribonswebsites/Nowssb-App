@@ -1901,8 +1901,18 @@ body.nm-mode #ig-bottomnav {
 }
 body.nm-mode #ig-bottomnav .ig-nav-label { color: rgba(0,0,0,0.42) !important; }
 body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #c8a96e !important; }
-/* No dark upward shadow on the social nav either */
-#ig-social-nav { box-shadow: 0 -1px 0 rgba(0,0,0,0.05) !important; }
+
+/* Unconditional, theme-independent: the frosted-glass blur behind a
+   semi-transparent dark nav is what reads as a smudged "shadow" sitting on
+   top of the page content. Kill the blur + any shadow on BOTH bottom nav
+   bars in every mode/theme, not just nm-mode, so this can't resurface. */
+#ig-bottomnav, #ig-social-nav {
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+body:not(.nm-mode) #ig-bottomnav, body:not(.nm-mode) #ig-social-nav {
+  background: #060c18 !important;
+}
 
 /* Kill the dark app-bg vignette in neumorphism mode (it bled a dark band at
    the bottom of light screens / splash). */
