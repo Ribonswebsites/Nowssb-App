@@ -2146,3 +2146,10 @@ body.nm-glass #sub-health-journey .gsel-card {
   background:transparent !important; border:none !important;
   box-shadow:0 10px 30px rgba(0,0,0,0.45) !important;
 }
+
+/* ===== INTRO PAGES — remove the black bottom shadow (it blacked out the
+   bottom nav and its icons). Keep only a faint top scrim. ===== */
+.sl-intro-vignette{
+  background:linear-gradient(to bottom,
+    rgba(6,12,24,0.30) 0%, rgba(6,12,24,0.02) 18%, rgba(6,12,24,0) 36%) !important;
+}
