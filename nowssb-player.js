@@ -435,8 +435,66 @@
         }, 4600);
       }, 900);
     }
+
+    /* (re)start the one-at-a-time animation sequence after every render */
+    lgpKickAnimSeq();
   }
   window.renderLiquidPlayer = renderLiquidPlayer;
+
+  /* ── One-at-a-time animation sequencer ───────────────────────────────────
+     Previously every traveling-light border (tube, Practice Now, Replay, info
+     icon) looped `infinite` at the same time — 3-4 conic-gradient repaints per
+     frame competing with the video decode → GPU bottleneck / video stutter.
+     Now a single light animates at a time: it plays ONE sweep, then the next
+     element does, cycling round. While the word is PLAYING the whole sequence
+     stops (CSS also freezes every other animation) so the video gets the GPU. */
+  var _LGP_SEQ_ORDER = ['.lgp-tube', '.lgp-replay-orb', '.lgp-cta', '.lgp-info-btn'];
+  var _LGP_SEQ_DUR = 2200, _LGP_SEQ_GAP = 260;
+  function lgpSeqClear() {
+    var root = document.querySelector('.lgp'); if (!root) return;
+    var on = root.querySelectorAll('.lgp-anim');
+    for (var i = 0; i < on.length; i++) on[i].classList.remove('lgp-anim');
+  }
+  function lgpSeqTargets() {
+    var root = document.querySelector('.lgp'); if (!root) return [];
+    var out = [];
+    for (var i = 0; i < _LGP_SEQ_ORDER.length; i++) {
+      var els = root.querySelectorAll(_LGP_SEQ_ORDER[i]);
+      for (var j = 0; j < els.length; j++) {
+        var e = els[j];
+        if (e.offsetWidth > 0 && e.offsetHeight > 0) out.push(e); // visible only
+      }
+    }
+    return out;
+  }
+  function lgpSeqLoop() {
+    if (!window._lgpSeqRun) return;              // single-owner guard (no double loops)
+    var root = document.querySelector('.lgp');
+    if (!root) { window._lgpSeqRun = false; return; }   // player closed — stop; render re-kicks
+    if (root.classList.contains('playing')) {    // word playing → no animations, video only
+      lgpSeqClear();
+      window._lgpSeqTimer = setTimeout(lgpSeqLoop, 500);
+      return;
+    }
+    var els = lgpSeqTargets();
+    if (!els.length) { window._lgpSeqTimer = setTimeout(lgpSeqLoop, 600); return; }
+    lgpSeqClear();
+    var idx = (window._lgpSeqIdx || 0) % els.length;
+    var el = els[idx];
+    window._lgpSeqIdx = (idx + 1) % els.length;
+    el.classList.add('lgp-anim');
+    window._lgpSeqTimer = setTimeout(function () {
+      el.classList.remove('lgp-anim');
+      window._lgpSeqTimer = setTimeout(lgpSeqLoop, _LGP_SEQ_GAP); // one at a time, small gap
+    }, _LGP_SEQ_DUR + 60);
+  }
+  function lgpKickAnimSeq() {
+    if (window._lgpSeqRun) return;               // exactly one loop, ever
+    window._lgpSeqRun = true;
+    window._lgpSeqIdx = 0;
+    window._lgpSeqTimer = setTimeout(lgpSeqLoop, 400);
+  }
+  window.lgpKickAnimSeq = lgpKickAnimSeq;
 
   /* Open the Store DIRECTLY from the player — no home flash, no intro flash.
      Open the store ON TOP of the player (higher z-index), skip its intro, then

@@ -77,7 +77,7 @@
   position:absolute; left:0; right:0; top:0; text-align:center;
   font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase;
   color:var(--lg-accent); text-shadow:0 0 16px var(--lg-accent);
-  opacity:0; animation:lgpTick 8s infinite;
+  opacity:0; animation:lgpTick 8s 1;   /* play through the 4 words ONCE, then the text is gone */
 }
 .lgp .lgp-ticker span:nth-child(1) { animation-delay:0s; }
 .lgp .lgp-ticker span:nth-child(2) { animation-delay:2s; }
@@ -200,11 +200,12 @@
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
-  will-change:--lgtravel; transform:translateZ(0);
-  animation:lgpTubeTravel 4s linear infinite;
+  will-change:--lgtravel; transform:translateZ(0); opacity:.5;
 }
 @keyframes lgpTubeTravel { to { --lgtravel:360deg; } }
-.lgp.playing .lgp-tube::before { animation-duration:2.4s; }
+/* Only ONE traveling light runs at a time — a JS sequencer adds .lgp-anim to
+   one element, it plays a single sweep, then the next. Keeps GPU free for video. */
+.lgp .lgp-tube.lgp-anim::before { opacity:1; animation:lgpTubeTravel 2.2s linear 1; }
 .lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
 /* ── Inside the capsule: flatten to 5 evenly-spaced icons, all centred in the
    clear interior (library + replay no longer jammed onto the rounded ends) ── */
@@ -348,9 +349,12 @@
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
-  will-change:--lgcta; animation:lgpCtaTrace 2.2s linear infinite;
+  will-change:--lgcta; opacity:.5;
 }
 @keyframes lgpCtaTrace { to { --lgcta:360deg; } }
+/* sequenced one-shot sweeps (see .lgp-tube.lgp-anim above) */
+.lgp .lgp-cta.lgp-anim::before { opacity:1; animation:lgpCtaTrace 2.2s linear 1; }
+.lgp .lgp-replay-orb.lgp-anim::after { opacity:1; animation:lgpCtaTrace 2.2s linear 1; }
 /* Replay = bare glass-sphere icon (NO pill) to the LEFT of Practice Now, with
    the travelling light running around the ICON itself. */
 .lgp .lgp-cta-row { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; width:100%; }
@@ -372,7 +376,7 @@
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
-  will-change:--lgcta; animation:lgpCtaTrace 2.2s linear infinite;
+  will-change:--lgcta; opacity:.5;
 }
 
 /* recording waveform bars */
@@ -537,6 +541,16 @@
   opacity:0; will-change:--lgib;
 }
 .lgp .lgp-info-btn.trace-run::after { animation:lgpInfoBtnTrace 2.6s linear forwards; }
+/* info icon also joins the one-at-a-time sequence */
+.lgp .lgp-info-btn.lgp-anim::after { animation:lgpInfoBtnTrace 2.2s linear 1; }
+/* When the word is PLAYING, every CSS animation freezes — only the video runs.
+   `*` covers elements; the traveling lights live on pseudo-elements so pause
+   those explicitly too. */
+.lgp.playing * { animation-play-state:paused !important; }
+.lgp.playing .lgp-tube::before,
+.lgp.playing .lgp-cta::before,
+.lgp.playing .lgp-replay-orb::after,
+.lgp.playing .lgp-info-btn::after { animation:none !important; }
 @keyframes lgpInfoBtnTrace {
   0%,6% { opacity:0; --lgib:0deg; }
   12%   { opacity:1; }
