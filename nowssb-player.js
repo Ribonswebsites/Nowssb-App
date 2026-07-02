@@ -16,7 +16,7 @@
      you send it (lungs first). Leave '' to keep the "coming soon"
      placeholder for organs not wired yet. ═══════════════════════════ */
   var ORGAN_VIDEOS = {
-    lungs:  '',   // ← lungs / breath / respiratory   (you'll send this first)
+    lungs:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991520/grok_video_2026-07-02-16-52-38_pehfcr.mp4',   // ← lungs / breath / respiratory
     heart:  '',   // ← heart / cardiac / circulation
     kidney: '',   // ← kidney / renal / bladder
     liver:  ''    // ← liver / hepatic / detox
