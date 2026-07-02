@@ -71,7 +71,7 @@ window.chkProceedToRazorpay = function() {
   var email  = (document.getElementById('chkEmail') || {}).value || '';
   var phone  = (document.getElementById('chkPhone') || {}).value || '';
   var total  = cart.reduce(function(s,c){ return s + (c.price||0); }, 0);
-  var totalPaise = total * 100; // Razorpay uses paise
+  var amountMinor = total; // prices are already stored in USD cents (the minor unit)
 
   // Validate email
   if (!email || !/\S+@\S+\.\S+/.test(email)) {
@@ -101,8 +101,8 @@ window.chkProceedToRazorpay = function() {
   function openRazorpay(orderId) {
     var options = {
       key:         RAZORPAY_KEY_ID,
-      amount:      totalPaise,
-      currency:    'INR',
+      amount:      amountMinor,
+      currency:    'USD',
       name:        'NowssB',
       description: description,
       order_id:    orderId,
@@ -119,8 +119,8 @@ window.chkProceedToRazorpay = function() {
     };
     if (typeof Razorpay !== 'undefined') {
       try { new Razorpay(options).open(); }
-      catch(e) { chkFallbackConfirm(totalPaise / 100, cart); resetBtn(); }
-    } else { chkFallbackConfirm(totalPaise / 100, cart); resetBtn(); }
+      catch(e) { chkFallbackConfirm(total, cart); resetBtn(); }
+    } else { chkFallbackConfirm(total, cart); resetBtn(); }
   }
 
   function resetBtn() {
@@ -135,7 +135,7 @@ window.chkProceedToRazorpay = function() {
     fetch(apiBase + '/api/razorpay/order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: totalPaise, currency: 'INR',
+      body: JSON.stringify({ amount: amountMinor, currency: 'USD',
         notes: { email: email, items: itemNames.slice(0, 100) } })
     })
     .then(function(r){ return r.json(); })

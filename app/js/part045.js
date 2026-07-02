@@ -143,7 +143,7 @@ window.ssStartSubscription = function(planId, billing) {
   var plan = SS_PLANS.find(function(p){ return p.id === planId; });
   if (!plan) return;
   var amount = billing === 'yearly' ? plan.price.yearly : plan.price.monthly;
-  var amountPaise = amount * 100;
+  var amountMinor = Math.round(amount * 100); // USD dollars → cents (the minor unit)
   var user = window._currentUser;
   var email = (user && user.email) || '';
   var RAZORPAY_KEY_ID = 'rzp_live_REPLACE_WITH_YOUR_KEY';
@@ -152,8 +152,8 @@ window.ssStartSubscription = function(planId, billing) {
   function _openPayment(orderId) {
     var options = {
       key: RAZORPAY_KEY_ID,
-      amount: amountPaise,
-      currency: 'INR',
+      amount: amountMinor,
+      currency: 'USD',
       name: 'NowssB',
       description: plan.name + ' — ' + (billing === 'yearly' ? 'Yearly' : 'Monthly'),
       order_id: orderId || undefined,
@@ -176,7 +176,7 @@ window.ssStartSubscription = function(planId, billing) {
     fetch(apiBase + '/api/razorpay/order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: amountPaise, currency: 'INR', notes: { tier: planId, billing: billing, email: email } })
+      body: JSON.stringify({ amount: amountMinor, currency: 'USD', notes: { tier: planId, billing: billing, email: email } })
     })
     .then(function(r){ return r.json(); })
     .then(function(ord){ _openPayment(ord.id); })
@@ -240,7 +240,7 @@ function _renderExpiredPlanCards() {
     return '<div style="padding:20px;border-radius:16px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);">'+
       '<div style="font-size:17px;font-weight:700;color:'+p.color+';font-family:\'DM Sans\',sans-serif;margin-bottom:4px;">'+p.name+'</div>'+
       '<div style="font-size:11px;color:rgba(255,255,255,.45);font-family:\'DM Sans\',sans-serif;margin-bottom:14px;">'+p.tagline+'</div>'+
-      '<div style="font-size:22px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;margin-bottom:16px;">₹'+p.price.monthly+'<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,.45);">/mo</span></div>'+
+      '<div style="font-size:22px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;margin-bottom:16px;">$'+p.price.monthly+'<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,.45);">/mo</span></div>'+
       '<button onclick="ssStartSubscription(\''+p.id+'\',\'monthly\');document.getElementById(\'trial-expired-overlay\').style.display=\'none\'" style="width:100%;padding:13px 0;border-radius:12px;border:none;background:'+(bg[p.id]||bg.frequency)+';color:#060c18;font-size:14px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;">Continue with '+p.name+'</button>'+
       '</div>';
   }).join('');

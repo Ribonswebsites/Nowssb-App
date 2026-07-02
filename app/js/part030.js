@@ -312,7 +312,7 @@ async function wsPageSearch() {
 function wsRequestThisWord() {
   if (!_wsCurrentWord) return;
   var word = _wsCurrentWord.charAt(0).toUpperCase() + _wsCurrentWord.slice(1);
-  // TODO: open Razorpay ₹200 — wire up when payment is ready
+  // TODO: open payment $2.99 — wire up when payment is ready
   // For now show confirmation sheet
   _wsShowRequestSheet(word);
 }
@@ -327,7 +327,7 @@ function _wsShowRequestSheet(word) {
     '<div style="font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.6);margin-bottom:12px;">Own Your Word</div>' +
     '<div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">' + word + '</div>' +
     '<div style="font-size:14px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:24px;">Your word will be personally crafted with phonetic breakdown, natural origin, organ activation, and healing intention — delivered to your library within 48 hours. Yours alone. Nobody else gets this word.</div>' +
-    '<button onclick="wsConfirmRequest(\'' + word + '\')" style="width:100%;background:#e8d5a3;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:700;color:#060c18;padding:16px 20px;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">Request · ₹200 <span style="opacity:0.5;font-weight:400;">48 hrs delivery</span></button>' +
+    '<button onclick="wsConfirmRequest(\'' + word + '\')" style="width:100%;background:#e8d5a3;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:700;color:#060c18;padding:16px 20px;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">Request · $2.99 <span style="opacity:0.5;font-weight:400;">48 hrs delivery</span></button>' +
     '<button onclick="document.getElementById(\'wsRequestSheet\').remove()" style="width:100%;background:none;border:1px solid rgba(255,255,255,0.12);cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:400;color:rgba(255,255,255,0.45);padding:14px 20px;">Cancel</button>' +
     '</div>';
   sheet.onclick = function(e){ if(e.target===sheet) sheet.remove(); };
@@ -337,7 +337,7 @@ function _wsShowRequestSheet(word) {
 function wsConfirmRequest(word) {
   var sheet = document.getElementById('wsRequestSheet');
   if (sheet) sheet.remove();
-  // TODO: integrate Razorpay ₹200 here
+  // TODO: integrate payment $2.99 here
   // Show waiting state
   var waiting = document.createElement('div');
   waiting.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.95);font-family:\'DM Sans\',sans-serif;flex-direction:column;gap:16px;';

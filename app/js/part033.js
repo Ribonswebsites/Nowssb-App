@@ -55,6 +55,8 @@
     {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['Everything in Gold','Top 1% of all practitioners','Invite-only — or buy the Lifetime Pass'], price:'$49.99', priceN:4999, per:' lifetime'}
   ];
   var VERIFY_ORDER = ['', 'blue', 'silver', 'gold', 'diamond'];
+  // Universal country list (ISO short names) — the app is global, not region-locked.
+  var COUNTRIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua & Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia & Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cambodia','Cameroon','Canada','Cape Verde','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Congo (DRC)','Costa Rica','Côte d’Ivoire','Croatia','Cuba','Cyprus','Czechia','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hong Kong','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Macau','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts & Nevis','Saint Lucia','Saint Vincent & Grenadines','Samoa','San Marino','São Tomé & Príncipe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad & Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'];
   function verifyTierOf(p){
     if(p && p.self){
       try { return localStorage.getItem('nwsb_verify_tier') || (window._userDataCache && window._userDataCache.verifyTier) || ''; } catch(e){ return (window._userDataCache && window._userDataCache.verifyTier) || ''; }
@@ -532,6 +534,7 @@
         '#nwsb-vkyc .vk-flabel{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,.4);margin:0 4px 8px;}'+
         '#nwsb-vkyc .vk-input{width:100%;border:none;border-radius:16px !important;background:#eef0f5;padding:16px 18px;font-size:15px;color:#1a1a2e;box-shadow:inset 4px 4px 9px rgba(0,0,0,.11),inset -3px -3px 7px rgba(255,255,255,.94);outline:none;margin-bottom:18px;}'+
         '#nwsb-vkyc .vk-input::placeholder{color:rgba(0,0,0,.32);}'+
+        '#nwsb-vkyc .vk-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23a8854a\' stroke-width=\'2.4\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 18px center;padding-right:44px;}'+
         '#nwsb-vkyc .vk-prefill{font-size:11px;color:#1aa76a;font-weight:700;margin:-12px 4px 18px;}'+
         '#nwsb-vkyc .vk-docgrid{display:flex;flex-direction:column;gap:14px;}'+
         '#nwsb-vkyc .vk-doc{position:relative;border-radius:18px !important;background:#eef0f5;box-shadow:5px 5px 13px rgba(0,0,0,.11),-4px -4px 10px rgba(255,255,255,.95);padding:18px;cursor:pointer;overflow:hidden;}'+
@@ -573,7 +576,7 @@
             '<div class="vk-title">What\'s your real name?</div>'+
             '<div class="vk-sub">This is the legal name that will be checked against your ID. It stays private and is never shown on your profile.</div>'+
             '<div class="vk-flabel">Full legal name</div>'+
-            '<input class="vk-input" id="vk-name" type="text" autocomplete="name" placeholder="e.g. Priya Nair" value="'+esc(st.name)+'">'+
+            '<input class="vk-input" id="vk-name" type="text" autocomplete="name" placeholder="Your full legal name" value="'+esc(st.name)+'">'+
             (prefilledName ? '<div class="vk-prefill">✓ Suggested from your profile — edit if needed</div>' : '')+
           '</div>'+
           /* Step 2 — date of birth */
@@ -589,10 +592,13 @@
             '<div class="vk-title">Where do you live?</div>'+
             '<div class="vk-sub">Your place of residence helps us apply the right verification rules for your region.</div>'+
             '<div class="vk-flabel">Country of residence</div>'+
-            '<input class="vk-input" id="vk-country" type="text" autocomplete="country-name" placeholder="e.g. India" value="'+esc(st.country)+'">'+
+            '<select class="vk-input vk-select" id="vk-country">'+
+              '<option value="" '+(st.country?'':'selected')+' disabled>Select your country</option>'+
+              COUNTRIES.map(function(c){ return '<option value="'+esc(c)+'"'+(st.country===c?' selected':'')+'>'+esc(c)+'</option>'; }).join('')+
+            '</select>'+
             (prefilledCountry ? '<div class="vk-prefill">✓ From your profile</div>' : '')+
             '<div class="vk-flabel">City</div>'+
-            '<input class="vk-input" id="vk-city" type="text" autocomplete="address-level2" placeholder="e.g. Rishikesh" value="'+esc(st.city)+'">'+
+            '<input class="vk-input" id="vk-city" type="text" autocomplete="address-level2" placeholder="Your city" value="'+esc(st.city)+'">'+
           '</div>'+
           /* Step 4 — documents */
           '<div class="vk-step" data-step="3">'+

@@ -29,7 +29,7 @@ var SS_PLANS = [
     id:'resonance', name:'Resonance',
     tagline:'The full frequency. The complete practice.',
     color:'#c8e8f5', badge:'',
-    price:{ monthly:299, yearly:2499 },
+    price:{ monthly:4.99, yearly:49.99 },
     features:[
       [true, 'Unlimited words per day'],
       [true, 'All 5 player modes (Listen, Repeat, Speak, Library, AI)'],
@@ -53,7 +53,7 @@ var SS_PLANS = [
     id:'frequency', name:'Frequency',
     tagline:'Healing is your identity. This is the full edition.',
     color:'#e8d5a3', badge:'Most Popular',
-    price:{ monthly:699, yearly:5999 },
+    price:{ monthly:9.99, yearly:99.99 },
     features:[
       [true, 'Everything in Resonance'],
       [true, 'Voice Resonance Score'],
@@ -74,7 +74,7 @@ var SS_PLANS = [
     id:'frequencyX', name:'Frequency X',
     tagline:'Beyond practice. This is mastery.',
     color:'#f0f0f0', badge:'Mastery',
-    price:{ monthly:1499, yearly:11999 },
+    price:{ monthly:19.99, yearly:199.99 },
     features:[
       [true, 'Everything in Frequency'],
       [true, 'Custom words — 5 requests/month (team-crafted)'],
@@ -173,7 +173,7 @@ var SUP_SYSTEM = `You are the NowssB support assistant — friendly, concise, an
 NowssB is a healing word-science app based on Shabdapathy — the study of natural-origin phonetic vibrations and their effect on organs and wellbeing. Users practice Sanskrit and natural-origin words by listening and repeating them. The app's AI scores their pronunciation.
 
 Key facts to know:
-- Plans: Free Trial (7 days full access) → Resonance (₹299/mo · ₹2499/yr) → Frequency (₹699/mo · ₹5999/yr) → Frequency X (₹1499/mo · ₹11999/yr)
+- Plans: Free Trial (7 days full access) → Resonance ($4.99/mo · $49.99/yr) → Frequency ($9.99/mo · $99.99/yr) → Frequency X ($19.99/mo · $199.99/yr)
 - Payments via Razorpay. Cancel anytime from Settings → Your Plan.
 - Pronunciation is scored 0-100 based on phonetic match. 90%+ three times = Word Mastery.
 - Word Atelier: browse and acquire words. Resonance: 10/month, Frequency+: unlimited.
@@ -516,7 +516,7 @@ function ssRenderPlans() {
   SS_PLANS.forEach(function(p) {
     var isSel = _ssSelectedPlan === p.id;
     var isCur = tier === p.id;
-    var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? Math.round(p.price.yearly/12) : p.price.monthly;
+    var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? (p.price.yearly/12).toFixed(2) : p.price.monthly;
     var borderColor = isSel ? p.color : 'rgba(255,255,255,.08)';
     var bg = isSel ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)';
     html += '<div class="plan-card" onclick="ssSelectPlan(\''+p.id+'\')" style="border-color:'+borderColor+';background:'+bg+';">';
@@ -535,8 +535,8 @@ function ssRenderPlans() {
     if (p.price.monthly===0) {
       html += '<div style="font-size:22px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;">Free</div>';
     } else {
-      html += '<div style="font-size:22px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">₹'+monthlyEquiv+'<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,.52);">/mo</span></div>';
-      if (_ssBilling==='yearly') html += '<div style="font-size:10px;color:rgba(255,255,255,.52);font-family:\'DM Sans\',sans-serif;">₹'+p.price.yearly+'/year</div>';
+      html += '<div style="font-size:22px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,.52);">/mo</span></div>';
+      if (_ssBilling==='yearly') html += '<div style="font-size:10px;color:rgba(255,255,255,.52);font-family:\'DM Sans\',sans-serif;">$'+p.price.yearly+'/year</div>';
     }
     html += '</div></div>';
     // Features
@@ -564,8 +564,8 @@ function ssRenderPlans() {
   var bgMap = { resonance:'linear-gradient(135deg,#a8d4e8,#7ab8d4)', frequency:'linear-gradient(135deg,#e8d5a3,#c8a96e)', frequencyX:'linear-gradient(135deg,#f0f0f0,#c8c8c8)' };
   var planBg = bgMap[plan.id] || 'linear-gradient(135deg,#e8d5a3,#c8a96e)';
   var trialLabel = (curTier === 'trial' || curTier === 'expired')
-    ? 'Start 7-Day Free Trial — then ₹' + ((_ssBilling==='yearly') ? plan.price.yearly + '/year' : plan.price.monthly + '/mo')
-    : ((_ssBilling==='yearly') ? 'Subscribe — ₹' + plan.price.yearly + '/year' : 'Subscribe — ₹' + plan.price.monthly + '/mo');
+    ? 'Start 7-Day Free Trial — then $' + ((_ssBilling==='yearly') ? plan.price.yearly + '/year' : plan.price.monthly + '/mo')
+    : ((_ssBilling==='yearly') ? 'Subscribe — $' + plan.price.yearly + '/year' : 'Subscribe — $' + plan.price.monthly + '/mo');
   if (!isCurrentPlan || curTier === 'trial' || curTier === 'expired') {
     ctaHtml = '<button onclick="ssStartSubscription(\''+plan.id+'\',\''+(_ssBilling||'monthly')+'\')" style="width:100%;padding:17px 0;border-radius:16px;border:none;background:'+planBg+';color:#060c18;font-size:15px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;margin-bottom:12px;letter-spacing:.2px;">'+trialLabel+'</button>';
     if (curTier === 'trial') {

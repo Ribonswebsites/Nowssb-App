@@ -44,7 +44,7 @@
             + '<div class="rm-catd-card-body">'
             + '<div class="rm-catd-card-name" style="font-size:18px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;letter-spacing:.5px;">'+cap+'</div>'
             + '<div class="rm-catd-card-root" style="font-size:10px;color:rgba(255,255,255,.45);font-family:\'DM Sans\',sans-serif;letter-spacing:1px;text-transform:uppercase;margin-top:3px;">'+root+'</div>'
-            + '<div style="margin-top:10px;font-size:11px;font-weight:700;color:rgba(232,213,163,.8);font-family:\'DM Sans\',sans-serif;">₹'+price+'</div>'
+            + '<div style="margin-top:10px;font-size:11px;font-weight:700;color:rgba(232,213,163,.8);font-family:\'DM Sans\',sans-serif;">$'+(price/100).toFixed(2)+'</div>'
             + '</div>'
             + '</div>';
         }).join('');

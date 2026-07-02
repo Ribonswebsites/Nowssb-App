@@ -21,12 +21,12 @@
  *   GET  /api/health                — health check
  *
  * Razorpay subscription plan IDs (set as env vars):
- *   RAZORPAY_PLAN_RESONANCE_MONTHLY   — plan_id for Resonance monthly ₹299
- *   RAZORPAY_PLAN_RESONANCE_YEARLY    — plan_id for Resonance yearly ₹2499
- *   RAZORPAY_PLAN_FREQUENCY_MONTHLY   — plan_id for Frequency monthly ₹699
- *   RAZORPAY_PLAN_FREQUENCY_YEARLY    — plan_id for Frequency yearly ₹5999
- *   RAZORPAY_PLAN_FREQUENCYX_MONTHLY  — plan_id for Frequency X monthly ₹1499
- *   RAZORPAY_PLAN_FREQUENCYX_YEARLY   — plan_id for Frequency X yearly ₹11999
+ *   RAZORPAY_PLAN_RESONANCE_MONTHLY   — plan_id for Resonance monthly $4.99
+ *   RAZORPAY_PLAN_RESONANCE_YEARLY    — plan_id for Resonance yearly $49.99
+ *   RAZORPAY_PLAN_FREQUENCY_MONTHLY   — plan_id for Frequency monthly $9.99
+ *   RAZORPAY_PLAN_FREQUENCY_YEARLY    — plan_id for Frequency yearly $99.99
+ *   RAZORPAY_PLAN_FREQUENCYX_MONTHLY  — plan_id for Frequency X monthly $19.99
+ *   RAZORPAY_PLAN_FREQUENCYX_YEARLY   — plan_id for Frequency X yearly $199.99
  */
 
 const ALLOWED_ORIGINS = [
@@ -175,12 +175,12 @@ export default {
     if (path === '/api/razorpay/order') {
       /*
        * Expects { amount, currency?, notes? }
-       * amount in paise (₹1 = 100 paise)
+       * amount in the currency's minor unit ($1 = 100 cents). App is universal → USD.
        * Returns { id, amount, currency } — pass id to Razorpay checkout in frontend
        */
-      const { amount, currency = 'INR', notes = {} } = body;
-      if (!amount || isNaN(amount) || amount < 100) {
-        return err('amount (in paise) required, min 100', 400, origin);
+      const { amount, currency = 'USD', notes = {} } = body;
+      if (!amount || isNaN(amount) || amount < 50) {
+        return err('amount (in minor units) required, min 50', 400, origin);
       }
 
       const credentials = btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`);
