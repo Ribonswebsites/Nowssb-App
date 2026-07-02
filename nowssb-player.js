@@ -449,7 +449,9 @@
      element does, cycling round. While the word is PLAYING the whole sequence
      stops (CSS also freezes every other animation) so the video gets the GPU. */
   var _LGP_SEQ_ORDER = ['.lgp-tube', '.lgp-replay-orb', '.lgp-cta', '.lgp-info-btn'];
-  var _LGP_SEQ_DUR = 2200, _LGP_SEQ_GAP = 260;
+  /* One sweep, then a full 1s pause where NOTHING animates — the video gets the
+     GPU to itself between lights, so playback stays smooth and glitch-free. */
+  var _LGP_SEQ_DUR = 2000, _LGP_SEQ_GAP = 1000;
   function lgpSeqClear() {
     var root = document.querySelector('.lgp'); if (!root) return;
     var on = root.querySelectorAll('.lgp-anim');

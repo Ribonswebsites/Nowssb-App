@@ -106,6 +106,9 @@
 }
 .lgp .lgp-video {
   width:100%; height:100%; object-fit:cover; display:block; border-radius:30px !important;
+  /* keep the video on its own compositor layer — it renders independently of the
+     traveling-light repaints, so it's the priority and plays smoothly. */
+  transform:translateZ(0); will-change:transform; backface-visibility:hidden;
 }
 .lgp .lgp-wave-svg { width:88%; height:62%; overflow:visible; }
 .lgp .lgp-wp { fill:url(#lgpGrad); opacity:.92; filter:drop-shadow(0 0 14px var(--lg-accent)); }
@@ -205,7 +208,7 @@
 @keyframes lgpTubeTravel { to { --lgtravel:360deg; } }
 /* Only ONE traveling light runs at a time — a JS sequencer adds .lgp-anim to
    one element, it plays a single sweep, then the next. Keeps GPU free for video. */
-.lgp .lgp-tube.lgp-anim::before { opacity:1; animation:lgpTubeTravel 2.2s linear 1; }
+.lgp .lgp-tube.lgp-anim::before { opacity:1; animation:lgpTubeTravel 2s linear 1; }
 .lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
 /* ── Inside the capsule: flatten to 5 evenly-spaced icons, all centred in the
    clear interior (library + replay no longer jammed onto the rounded ends) ── */
@@ -352,9 +355,11 @@
   will-change:--lgcta; opacity:.5;
 }
 @keyframes lgpCtaTrace { to { --lgcta:360deg; } }
-/* sequenced one-shot sweeps (see .lgp-tube.lgp-anim above) */
-.lgp .lgp-cta.lgp-anim::before { opacity:1; animation:lgpCtaTrace 2.2s linear 1; }
-.lgp .lgp-replay-orb.lgp-anim::after { opacity:1; animation:lgpCtaTrace 2.2s linear 1; }
+/* sequenced one-shot sweeps (see .lgp-tube.lgp-anim above). Each animated light
+   sits on its own compositor layer (translateZ) so its repaint never invalidates
+   the video's layer — the video stays the render priority. */
+.lgp .lgp-cta.lgp-anim::before { opacity:1; transform:translateZ(0); animation:lgpCtaTrace 2s linear 1; }
+.lgp .lgp-replay-orb.lgp-anim::after { opacity:1; transform:translateZ(0); animation:lgpCtaTrace 2s linear 1; }
 /* Replay = bare glass-sphere icon (NO pill) to the LEFT of Practice Now, with
    the travelling light running around the ICON itself. */
 .lgp .lgp-cta-row { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; width:100%; }
@@ -542,7 +547,7 @@
 }
 .lgp .lgp-info-btn.trace-run::after { animation:lgpInfoBtnTrace 2.6s linear forwards; }
 /* info icon also joins the one-at-a-time sequence */
-.lgp .lgp-info-btn.lgp-anim::after { animation:lgpInfoBtnTrace 2.2s linear 1; }
+.lgp .lgp-info-btn.lgp-anim::after { transform:translateZ(0); animation:lgpInfoBtnTrace 2s linear 1; }
 /* When the word is PLAYING, every CSS animation freezes — only the video runs.
    `*` covers elements; the traveling lights live on pseudo-elements so pause
    those explicitly too. */
