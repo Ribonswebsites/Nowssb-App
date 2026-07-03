@@ -2307,6 +2307,18 @@ body.nm-glass #sub-health-journey .gsel-card {
 }
 .dl-page-back:active { box-shadow:inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.92); }
 
+/* Fashion / Trend rotating banner on the normal home (above the Fashion button) */
+.nmh-fashbanner {
+  position:relative; width:100%; margin-top:16px; aspect-ratio:16/9;
+  border-radius:22px !important; overflow:hidden; background:#0a0a12; cursor:pointer;
+  box-shadow:6px 6px 16px rgba(0,0,0,.22), -3px -3px 8px rgba(255,255,255,.7);
+}
+.nmh-fashbanner-img {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
+  opacity:1; transition:opacity .34s ease;
+}
+.nmh-fashbanner:active { transform:scale(.99); }
+
 /* ===== FASHION SECTIONS EMBEDDED IN THE NORMAL HOME ===== */
 /* full-width within nmh-wrap + rounded to match the neumorphic cards */
 #home-nm .word-search-section, #home-nm .krm-section, #home-nm .nss-store-trigger {

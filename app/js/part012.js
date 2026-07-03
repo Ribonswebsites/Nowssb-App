@@ -580,6 +580,39 @@ function nmhRefresh() {
     }, 4000);
   }
 
+  // ── Fashion / Trend rotating banner (above the Fashion button) ──
+  var FASH_SEQ = [
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082389/file_000000007d4871fbaca8e355961125c7_yobwv4.png',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082439/grok_image_1782948633889_qkam54.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/grok_image_1782948636806_oe97xg.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082390/file_000000008e0871f886e73306cdc00cca_pjjdjf.png',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/image-22_ns2jhx.jpg'
+  ];
+  var fimg = document.getElementById('nmhFashImg');
+  if (fimg) {
+    if (!fimg.getAttribute('src')) { window._nmhFashIdx = 0; fimg.src = FASH_SEQ[0]; }
+    if (!window._nmhFashPreloaded) {
+      window._nmhFashPreloaded = FASH_SEQ.map(function(u){ var im = new Image(); im.src = u; return im; });
+    }
+    if (window._nmhFashTimer) clearInterval(window._nmhFashTimer);
+    window._nmhFashTimer = setInterval(function(){
+      var el = document.getElementById('nmhFashImg');
+      var host = document.getElementById('home-nm');
+      if (!el) { clearInterval(window._nmhFashTimer); window._nmhFashTimer = null; return; }
+      if (!host || !host.classList.contains('active')) return;  // rotate only while home is visible
+      var nextIdx = ((window._nmhFashIdx || 0) + 1) % FASH_SEQ.length;
+      var nextSrc = FASH_SEQ[nextIdx];
+      var pre = new Image();
+      pre.onload = function(){
+        if (!host.classList.contains('active')) return;
+        el.style.opacity = '0';
+        setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; }, 340);
+        window._nmhFashIdx = nextIdx;
+      };
+      pre.src = nextSrc;
+    }, 4000);
+  }
+
   // Sync today's word from the dark home if available
   var tw = document.getElementById('todayPracticeTitle');
   var nmw = document.getElementById('nmhTodayWord');
