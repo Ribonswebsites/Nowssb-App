@@ -552,20 +552,22 @@
 
       var css='#nwsb-vkyc{position:fixed;inset:0;z-index:100002;background:#eef0f5;display:flex;flex-direction:column;}'+
         '#nwsb-vkyc *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
-        '#nwsb-vkyc .vk-bar{display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 16px 12px;background:#eef0f5;}'+
+        /* proper fixed header: back · badge · NowssB Verified / price · step */
+        '#nwsb-vkyc .vk-bar{display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,12px),12px) 16px 12px;background:#eef0f5;flex-shrink:0;box-shadow:0 3px 14px rgba(0,0,0,.06);z-index:5;}'+
         '#nwsb-vkyc .vk-back{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;color:#1a1a2e;font-size:20px;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.13),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;flex-shrink:0;}'+
         '#nwsb-vkyc .vk-back:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
-        '#nwsb-vkyc .vk-steplbl{flex:1;font-size:12px;font-weight:700;color:#a8854a;letter-spacing:.5px;}'+
-        '#nwsb-vkyc .vk-prog{height:5px;border-radius:3px !important;background:rgba(0,0,0,.08);margin:0 16px 4px;overflow:hidden;box-shadow:inset 2px 2px 5px rgba(0,0,0,.1),inset -1px -1px 3px rgba(255,255,255,.9);}'+
-        '#nwsb-vkyc .vk-prog-fill{height:100%;border-radius:3px !important;background:linear-gradient(90deg,#c8a96e,#e8d5a3);transition:width .3s cubic-bezier(.4,0,.2,1);}'+
-        '#nwsb-vkyc .vk-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:22px 22px calc(env(safe-area-inset-bottom,20px) + 120px);}'+
+        '#nwsb-vkyc .vk-bar-badge{width:40px;height:40px;border-radius:12px !important;object-fit:cover;flex-shrink:0;box-shadow:3px 3px 8px rgba(0,0,0,.14),-2px -2px 6px rgba(255,255,255,.9);}'+
+        '#nwsb-vkyc .vk-bar-titles{flex:1;min-width:0;}'+
+        '#nwsb-vkyc .vk-bar-t{font-size:15px;font-weight:800;color:#1a1a2e;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'+
+        '#nwsb-vkyc .vk-bar-s{font-size:12px;color:rgba(0,0,0,.5);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'+
+        '#nwsb-vkyc .vk-steplbl{flex-shrink:0;font-size:12px;font-weight:700;color:#a8854a;letter-spacing:.3px;}'+
+        '#nwsb-vkyc .vk-prog{height:5px;border-radius:3px !important;background:rgba(0,0,0,.08);margin:0;flex-shrink:0;overflow:hidden;}'+
+        '#nwsb-vkyc .vk-prog-fill{height:100%;border-radius:0 3px 3px 0 !important;background:linear-gradient(90deg,#c8a96e,#e8d5a3);transition:width .3s cubic-bezier(.4,0,.2,1);}'+
+        '#nwsb-vkyc .vk-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;padding:22px 22px calc(env(safe-area-inset-bottom,16px) + 8px);}'+
         '#nwsb-vkyc .vk-step{display:none;}'+
         '#nwsb-vkyc .vk-step.on{display:block;animation:vkin .28s ease;}'+
         '@keyframes vkin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}'+
-        '#nwsb-vkyc .vk-badge-mini{display:flex;align-items:center;gap:10px;margin-bottom:22px;}'+
-        '#nwsb-vkyc .vk-badge-mini img{width:38px;height:38px;border-radius:11px !important;object-fit:cover;box-shadow:3px 3px 8px rgba(0,0,0,.15),-2px -2px 6px rgba(255,255,255,.9);}'+
-        '#nwsb-vkyc .vk-badge-mini b{font-size:13px;color:#1a1a2e;}'+
-        '#nwsb-vkyc .vk-badge-mini span{font-size:12px;color:rgba(0,0,0,.45);}'+
+        '#nwsb-vkyc .vk-spacer{flex:1 1 auto;min-height:22px;}'+
         '#nwsb-vkyc .vk-title{font-size:23px;font-weight:800;color:#1a1a2e;line-height:1.2;margin-bottom:7px;}'+
         '#nwsb-vkyc .vk-sub{font-size:13px;color:rgba(0,0,0,.5);line-height:1.5;margin-bottom:24px;}'+
         '#nwsb-vkyc .vk-flabel{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,.4);margin:0 4px 8px;}'+
@@ -573,9 +575,10 @@
         '#nwsb-vkyc .vk-input::placeholder{color:rgba(0,0,0,.32);}'+
         '#nwsb-vkyc .vk-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23a8854a\' stroke-width=\'2.4\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 18px center;padding-right:44px;}'+
         '#nwsb-vkyc .vk-prefill{font-size:11px;color:#1aa76a;font-weight:700;margin:-12px 4px 18px;}'+
-        /* intro / requirements — COMPLETE 9:16 banner, never cropped */
-        '#nwsb-vkyc .vk-hero{width:calc(100% + 44px);margin:-22px -22px 20px;aspect-ratio:9/16;background:#07070d;overflow:hidden;position:relative;}'+
-        '#nwsb-vkyc .vk-hero img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;}'+
+        /* intro / requirements — COMPLETE banner, full width, natural height:
+           the whole image shows, never cropped and with no black bars. */
+        '#nwsb-vkyc .vk-hero{width:calc(100% + 44px);margin:-22px -22px 20px;background:#07070d;overflow:hidden;position:relative;font-size:0;}'+
+        '#nwsb-vkyc .vk-hero img{width:100%;height:auto;display:block;}'+
         '#nwsb-vkyc .vk-req{display:flex;align-items:flex-start;gap:13px;background:#eef0f5;border-radius:16px !important;padding:15px 16px;margin-bottom:12px;box-shadow:5px 5px 12px rgba(0,0,0,.09),-4px -4px 10px rgba(255,255,255,.95);}'+
         '#nwsb-vkyc .vk-req-ic{width:38px;height:38px;flex-shrink:0;border-radius:10px !important;background:#eef0f5;display:flex;align-items:center;justify-content:center;box-shadow:inset 2px 2px 5px rgba(0,0,0,.1),inset -2px -2px 5px rgba(255,255,255,.9);}'+
         '#nwsb-vkyc .vk-req-t{font-size:14px;font-weight:700;color:#1a1a2e;}'+
@@ -612,7 +615,7 @@
         '#nwsb-vkyc .vk-rev-v{font-size:13px;color:#1a1a2e;font-weight:700;text-align:right;max-width:60%;word-break:break-word;}'+
         '#nwsb-vkyc .vk-rev-v.ok{color:#1aa76a;}'+
         '#nwsb-vkyc .vk-legal{font-size:11px;color:rgba(0,0,0,.4);line-height:1.6;margin-bottom:6px;}'+
-        '#nwsb-vkyc .vk-foot{position:absolute;left:0;right:0;bottom:0;padding:14px 22px calc(env(safe-area-inset-bottom,16px) + 16px);background:linear-gradient(to top,#eef0f5 62%,rgba(238,240,245,0));}'+
+        '#nwsb-vkyc .vk-foot{flex-shrink:0;padding:6px 0 4px;}'+
         '#nwsb-vkyc .vk-next{width:100%;border:none;border-radius:16px !important;background:linear-gradient(135deg,#c8a96e,#e8d5a3);color:#1a1a2e;font-size:15px;font-weight:800;letter-spacing:.3px;padding:17px;cursor:pointer;box-shadow:5px 5px 14px rgba(168,133,74,.32);display:flex;align-items:center;justify-content:center;gap:8px;}'+
         '#nwsb-vkyc .vk-next:active{transform:scale(.985);}'+
         '#nwsb-vkyc .vk-next[disabled]{opacity:.5;}';
@@ -633,10 +636,14 @@
       var dobText = vkycDobToText(st.dob);
 
       var html='<style>'+css+'</style>'+
-        '<div class="vk-bar"><button class="vk-back" id="vk-back" aria-label="Back">&#8249;</button><span class="vk-steplbl" id="vk-steplbl"></span></div>'+
+        '<div class="vk-bar">'+
+          '<button class="vk-back" id="vk-back" aria-label="Back">&#8249;</button>'+
+          '<img class="vk-bar-badge" src="'+t.img+'" alt="">'+
+          '<div class="vk-bar-titles"><div class="vk-bar-t">'+st.tierLabel+'</div><div class="vk-bar-s" id="vk-price-mini">'+t.price+t.per+' · identity check</div></div>'+
+          '<span class="vk-steplbl" id="vk-steplbl"></span>'+
+        '</div>'+
         '<div class="vk-prog" style="visibility:hidden"><div class="vk-prog-fill" id="vk-progfill" style="width:0%"></div></div>'+
         '<div class="vk-scroll">'+
-          '<div class="vk-badge-mini"><img src="'+t.img+'" alt=""><div><b>'+st.tierLabel+'</b><br><span id="vk-price-mini">'+t.price+t.per+' · identity check</span></div></div>'+
           /* Step 1 — intro / requirements */
           '<div class="vk-step on" data-step="0">'+
             '<div class="vk-hero"><img src="'+(t.promo||t.img)+'" alt=""></div>'+
@@ -697,8 +704,9 @@
             '<div class="vk-rev" id="vk-review"></div>'+
             '<div class="vk-legal" id="vk-legal">By continuing you confirm the information is accurate and agree to NowssB\'s verification terms. Your documents are used only to confirm your identity.</div>'+
           '</div>'+
-        '</div>'+
-        '<div class="vk-foot"><button class="vk-next" id="vk-next">Continue</button></div>';
+          '<div class="vk-spacer"></div>'+
+          '<div class="vk-foot"><button class="vk-next" id="vk-next">Continue</button></div>'+
+        '</div>';
 
       var old=document.getElementById('nwsb-vkyc'); if(old) old.remove();
       var ov=document.createElement('div'); ov.id='nwsb-vkyc'; ov.innerHTML=html;
