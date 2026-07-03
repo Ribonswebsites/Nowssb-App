@@ -1930,15 +1930,31 @@ body:not(.nm-mode) #ig-social-nav #igsn-me-av svg { stroke: rgba(255,255,255,0.7
    the bottom of light screens / splash). */
 body.nm-mode .app-bg::after { display:none !important; }
 body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
-/* The auth / onboarding screens are ALWAYS light and show BEFORE nm-mode is set,
-   so the dark app-bg vignette bled a black band at the bottom there too. Kill it
-   whenever one of those screens is active. */
-body:has(#login.active) .app-bg::after, body:has(#signup1.active) .app-bg::after,
-body:has(#signup2.active) .app-bg::after, body:has(#onboarding.active) .app-bg::after,
-body:has(#ob-intro.active) .app-bg::after { display:none !important; }
-body:has(#login.active) .app-bg, body:has(#signup1.active) .app-bg,
-body:has(#signup2.active) .app-bg, body:has(#onboarding.active) .app-bg,
-body:has(#ob-intro.active) .app-bg { background:#e4e6ed !important; }
+/* ── The black band at the bottom of LIGHT screens ──────────────────────────
+   The root html/body bg is dark (#060c18) and the app-bg has a dark vignette,
+   needed for the Fashion (dark) screens. On light screens (login, signup,
+   onboarding, neumorphism home) the screen is capped at --full-height, and the
+   bottom gap showed that dark bg as a black band. `:has()` isn't supported on
+   older Android WebViews, so a plain body class (toggled in goTo) drives it: on
+   any light screen the whole fallback stack — html, body, app-bg — goes light
+   and the dark vignette is killed, so no gap can ever read as a black band. */
+html.nwsb-lightbg, body.nwsb-lightbg { background:#e4e6ed !important; }
+body.nwsb-lightbg .app-bg::after,
+body.nwsb-lightbg .app-bg::before { display:none !important; }
+body.nwsb-lightbg .app-bg { background:#e4e6ed !important; opacity:1 !important; background-image:none !important; }
+body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !important; background-image:none !important; }
+
+/* ── THE actual "black band at the bottom, everywhere" ─────────────────────
+   The guide bottom-sheets (#pgGuide, .wl-overlay) live at body level and sit
+   slid off-screen at the bottom when closed (transform:translateY(100%)). Their
+   dark panels carry a big UPWARD box-shadow (0 -12px 48px rgba(0,0,0,.75)) that
+   still cast a dark band up into the viewport on EVERY screen. Hide the closed
+   sheet entirely (kills its shadow); delay the visibility flip on close so the
+   slide-out still animates. */
+#pgGuide { visibility:hidden; transition:transform .38s cubic-bezier(0.32,0.72,0,1), visibility 0s .38s; }
+#pgGuide.open { visibility:visible; transition:transform .38s cubic-bezier(0.32,0.72,0,1), visibility 0s 0s; }
+.wl-overlay { visibility:hidden; transition:background .38s cubic-bezier(0.4,0,0.2,1), visibility 0s .38s; }
+.wl-overlay.open { visibility:visible; transition:background .38s cubic-bezier(0.4,0,0.2,1), visibility 0s 0s; }
 
 /* ── Fashion-home tile icons: glass wrapper, IN-FLOW (no overlap), original icon size ── */
 .home-tile-icon {

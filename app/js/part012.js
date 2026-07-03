@@ -186,6 +186,14 @@ function goTo(id) {
   currentScreen = id;
   if (homeHdr) homeHdr.style.display = (id === 'home') ? 'flex' : 'none';
 
+  /* Light screens must not show the dark app background in any bottom gap.
+     Toggle a plain body/html class (works where :has() doesn't) that lightens
+     the whole fallback stack + kills the dark vignette → no black band. */
+  var _LIGHT_SCREENS = { login:1, signup1:1, signup2:1, onboarding:1, 'ob-normal':1, 'profile-setup':1, 'home-nm':1 };
+  var _isLight = !!_LIGHT_SCREENS[id];
+  document.body.classList.toggle('nwsb-lightbg', _isLight);
+  document.documentElement.classList.toggle('nwsb-lightbg', _isLight);
+
   setTimeout(() => {
     // Clean up exiting screen after CSS transition (0.5s) completes
     cur.classList.remove('active','exit');
