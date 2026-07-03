@@ -2450,3 +2450,15 @@ body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
   -webkit-backdrop-filter: none !important;
           backdrop-filter: none !important;
 }
+/* Static glass background for the settings screen — a single paint, so it gives
+   the frosted-glass look with ZERO per-frame GPU cost (unlike backdrop blur).
+   #sub-social is position:fixed, so the image stays put while the list scrolls
+   over it (no scroll repaint). A dark scrim keeps the white text readable. */
+#sub-social {
+  background:
+    linear-gradient(rgba(6,10,20,0.52), rgba(6,10,20,0.64)),
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783102858/grok_image_1783102581357_gsslw8.jpg') center center / cover no-repeat !important;
+}
+#sub-social #ss-main-view, #sub-social .ss-tab-content, #sub-social #ss-content-settings {
+  background: transparent !important;
+}
