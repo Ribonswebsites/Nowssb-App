@@ -1,4 +1,4 @@
-const CACHE = 'nowsbansiu-v200';
+const CACHE = 'nowsbansiu-v201';
 
 self.addEventListener('install', () => {
   self.skipWaiting();

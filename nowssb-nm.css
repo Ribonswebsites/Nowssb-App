@@ -2470,6 +2470,18 @@ body:not(.nm-mode) #menuDrawer.menu-drawer {
     linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
     url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg') center center / cover no-repeat !important;
 }
+/* Inset the menu rows so they sit INSIDE the glass panel (L/R padding).
+   Fashion (dark) menu only — the glass block image is centered, the rows must
+   not spill past its edges. Rounds each section group into a floating pill. */
+body:not(.nm-mode) #menuDrawer .menu-section-group {
+  margin-left: 24px !important; margin-right: 24px !important;
+  border-radius: 20px !important; overflow: hidden !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+}
+body:not(.nm-mode) #menuDrawer .menu-section-label { padding-left: 32px !important; }
+body:not(.nm-mode) #menuDrawer .menu-footer-note {
+  padding-left: 24px !important; padding-right: 24px !important;
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    WORD / MEANING SEARCH — glassmorphism reskin matching the reference EXACTLY:
