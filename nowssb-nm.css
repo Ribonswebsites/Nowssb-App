@@ -2429,24 +2429,24 @@ body.nm-glass #sub-health-journey .gsel-card {
    These are small, always-fixed areas, so the blur cost is negligible.
    Appended at end-of-file so it beats the earlier `backdrop-filter:none` rules. */
 .home-header {
-  -webkit-backdrop-filter: blur(18px) saturate(1.3) !important;
-          backdrop-filter: blur(18px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.3) !important;
+          backdrop-filter: blur(14px) saturate(1.3) !important;
 }
 /* Fashion (dark) nav — translucent so the glass reads */
 body:not(.nm-mode) #ig-bottomnav, body:not(.nm-mode) #ig-social-nav {
   background: rgba(8,12,22,0.64) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(1.2) !important;
-          backdrop-filter: blur(22px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
+          backdrop-filter: blur(14px) saturate(1.2) !important;
 }
 /* Neumorphism (light) nav — translucent light glass */
 body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
   background: rgba(240,242,247,0.70) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(1.2) !important;
-          backdrop-filter: blur(22px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
+          backdrop-filter: blur(14px) saturate(1.2) !important;
 }
 
-/* ══ Low glass blur in SETTINGS (kept small so it's easy on the GPU) ═════════ */
+/* Settings: NO blur (a glass background image is used there instead) */
 #sub-social .sg, .ss-section {
-  -webkit-backdrop-filter: blur(6px) saturate(1.1) !important;
-          backdrop-filter: blur(6px) saturate(1.1) !important;
+  -webkit-backdrop-filter: none !important;
+          backdrop-filter: none !important;
 }
