@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js"></script>
 <link rel="stylesheet" href="app/app.css?v=177">
 <link rel="stylesheet" href="nowssb-social.css?v=163">
-<link rel="stylesheet" href="nowssb-nm.css?v=183">
+<link rel="stylesheet" href="nowssb-nm.css?v=184">
 <link rel="stylesheet" href="nowssb-player.css?v=172">
 </head>
 <body>
@@ -958,6 +958,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Fashion / Trend rotating banner (opens Fashion Mode) -->
     <div class="nmh-fashbanner" onclick="localStorage.setItem('nwsb_home_mode','home');goTo('home')">
       <img id="nmhFashImg" class="nmh-fashbanner-img" decoding="async" alt="NowssB Fashion">
+      <div class="fb-scrim"></div>
+      <div class="fb-ov in" id="nmhFashOv">
+        <div class="fb-eyebrow">NOWSSB · EDITION</div>
+        <div class="fb-title" id="nmhFashCap">The new trend of meditation</div>
+      </div>
     </div>
 
     <!-- Switch to Fashion Mode section -->
@@ -1045,6 +1050,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Rotating Fashion/Trend banner (below AI Prescription, above the tiles) -->
   <div class="home-fashbanner">
     <img id="homeFashImg" class="home-fashbanner-img" decoding="async" alt="NowssB">
+    <div class="fb-scrim"></div>
+    <div class="fb-ov in" id="homeFashOv">
+      <div class="fb-eyebrow">NOWSSB · EDITION</div>
+      <div class="fb-title" id="homeFashCap">The new trend of meditation</div>
+    </div>
   </div>
 
   <div class="home-grid w100">
@@ -3246,7 +3256,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=182"></script>
+<script src="app/js/part012.js?v=184"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">

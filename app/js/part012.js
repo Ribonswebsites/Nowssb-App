@@ -522,11 +522,25 @@ window._FASH_SEQ = window._FASH_SEQ || [
   'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082390/file_000000008e0871f886e73306cdc00cca_pjjdjf.png',
   'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/image-22_ns2jhx.jpg'
 ];
+/* one animated caption per image (same order as _FASH_SEQ) */
+window._FASH_CAPS = window._FASH_CAPS || [
+  'The new trend of meditation',
+  'Fashion meets frequency',
+  'Wear your healing',
+  'Sound is the new style',
+  'NowssB · Editorial'
+];
 window._nwsbRotateFashBanner = function(imgId, hostId) {
   var img = document.getElementById(imgId); if (!img) return;
-  var seq = window._FASH_SEQ;
+  var seq = window._FASH_SEQ, caps = window._FASH_CAPS;
   var idxKey = imgId + 'Idx', timerKey = imgId + 'Timer';
-  if (!img.getAttribute('src')) { window[idxKey] = 0; img.src = seq[0]; }
+  var capEl = document.getElementById(imgId.replace('Img', 'Cap'));
+  var ovEl  = document.getElementById(imgId.replace('Img', 'Ov'));
+  function showCap(i){
+    if (capEl) capEl.textContent = caps[i % caps.length];
+    if (ovEl){ ovEl.classList.remove('in'); void ovEl.offsetWidth; ovEl.classList.add('in'); } // re-trigger entrance
+  }
+  if (!img.getAttribute('src')) { window[idxKey] = 0; img.src = seq[0]; showCap(0); }
   if (!window._fashPreloaded) { window._fashPreloaded = seq.map(function(u){ var im = new Image(); im.src = u; return im; }); }
   if (window[timerKey]) clearInterval(window[timerKey]);
   window[timerKey] = setInterval(function(){
@@ -540,7 +554,7 @@ window._nwsbRotateFashBanner = function(imgId, hostId) {
     pre.onload = function(){
       if (!host.classList.contains('active')) return;
       el.style.opacity = '0';
-      setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; }, 340);
+      setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; showCap(nextIdx); }, 340);
       window[idxKey] = nextIdx;
     };
     pre.src = nextSrc;

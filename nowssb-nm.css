@@ -2331,6 +2331,36 @@ body.nm-glass #sub-health-journey .gsel-card {
   opacity:1; transition:opacity .34s ease; border-radius:0 !important;
 }
 
+/* ── Animated text overlay shared by both banners ── */
+.fb-scrim {
+  position:absolute; inset:0; pointer-events:none; z-index:1;
+  background:linear-gradient(to top, rgba(6,10,20,.82) 0%, rgba(6,10,20,.34) 30%, rgba(6,10,20,0) 58%);
+}
+.fb-ov {
+  position:absolute; left:18px; right:18px; bottom:16px; z-index:2; pointer-events:none;
+}
+.fb-eyebrow {
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:3px;
+  color:#e8d5a3; margin-bottom:5px; opacity:1; text-shadow:0 2px 8px rgba(0,0,0,.6);
+}
+.fb-title {
+  font-family:'DM Sans',sans-serif; font-size:20px; font-weight:800; line-height:1.15;
+  color:#ffffff; letter-spacing:.2px; opacity:1;
+  text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 6px rgba(232,213,163,.25);
+  animation:fbGlow 3.4s ease-in-out infinite;
+}
+/* soft gold glow that breathes */
+@keyframes fbGlow {
+  0%,100% { text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 5px rgba(232,213,163,.20); }
+  50%     { text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 22px rgba(232,213,163,.65); }
+}
+/* entrance — re-triggered on every image change by toggling .in. NO fill-mode:
+   text stays at its base opacity:1 when the entrance isn't actively playing, so
+   it can never get stuck invisible. */
+@keyframes fbTextIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+.fb-ov.in .fb-eyebrow { animation:fbTextIn .55s cubic-bezier(.16,1,.3,1); }
+.fb-ov.in .fb-title   { animation:fbTextIn .6s .06s cubic-bezier(.16,1,.3,1), fbGlow 3.4s ease-in-out .66s infinite; }
+
 /* ===== FASHION SECTIONS EMBEDDED IN THE NORMAL HOME ===== */
 /* full-width within nmh-wrap + rounded to match the neumorphic cards */
 #home-nm .word-search-section, #home-nm .krm-section, #home-nm .nss-store-trigger {
