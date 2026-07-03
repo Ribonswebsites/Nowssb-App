@@ -2481,16 +2481,23 @@ body:not(.nm-mode) #menuDrawer.menu-drawer {
 #sub-word-search .sub-header {
   background: transparent !important; border-bottom: none !important;
 }
-/* the frosted glass card floating over the crystals */
+/* the frosted GLASS PANEL card floating over the crystals (2nd reference image) */
 .wsg-card {
   position: relative; margin: 14px 16px 10px; border-radius: 28px !important;
   padding: 32px 18px 24px; overflow: hidden;
   background:
-    linear-gradient(160deg, rgba(12,16,28,0.38), rgba(12,16,28,0.52) 55%, rgba(12,16,28,0.44)),
-    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_800/v1783104352/file_00000000bd2071fa895664b37ba90c38_fv8syd.png') center center / cover no-repeat;
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_800/v1783104241/grok_image_1783103929971_kyitm1.jpg') center center / cover no-repeat;
   border: 1px solid rgba(255,255,255,0.22);
   box-shadow: 0 24px 64px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 0 60px rgba(255,255,255,0.05);
 }
+/* elongated diamond gem accent inside the card (like the reference's detail card) */
+.wsg-gem {
+  position: absolute; top: 50%; left: 22px; transform: translateY(-50%);
+  width: 46px; height: 78px; pointer-events: none; z-index: 0; opacity: 0.9;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_200/v1783104352/file_00000000bd2071fa895664b37ba90c38_fv8syd.png') center center / contain no-repeat;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5));
+}
+.wsg-card > *:not(.wsg-gem) { position: relative; z-index: 1; }
 /* logo -> frosted glass circle (was a rainbow ring) */
 #sub-word-search .ws-page-logo-ring {
   background: rgba(255,255,255,0.10) !important;
