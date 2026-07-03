@@ -2496,21 +2496,27 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   background: transparent !important; border-bottom: none !important;
 }
 
-/* the transparent frosted GLASS PANEL (be9hpf.png — no baked background) */
+/* the transparent frosted GLASS PANEL (be9hpf.png — no baked background).
+   Bigger card (small margins), strongly rounded corners + overflow:hidden so
+   the glass fills edge-to-edge as a CURVED panel; the block image is zoomed
+   (background-size >100%) so it reaches the rounded corners instead of sitting
+   small in the middle. A faint frost overlay keeps it uniform. */
 .wsg-card {
-  position: relative; margin: 18px 16px 14px; border-radius: 34px !important;
-  padding: 30px 26px 30px; overflow: hidden;
-  display: flex; flex-direction: column; gap: 20px;
+  position: relative; margin: 12px 12px 18px; border-radius: 40px !important;
+  padding: 34px 24px 34px; overflow: hidden;
+  display: flex; flex-direction: column; gap: 22px;
   background:
-    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_820/v1783105775/file_00000000092071fa987c573af7825e6d_be9hpf.png') center center / cover no-repeat;
-  border: 1px solid rgba(255,255,255,0.20);
-  box-shadow: 0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 0 70px rgba(255,255,255,0.04);
+    linear-gradient(155deg, rgba(240,246,252,0.10), rgba(210,224,240,0.03) 55%, rgba(240,246,252,0.08)),
+    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783105775/file_00000000092071fa987c573af7825e6d_be9hpf.png') center center / 165% no-repeat;
+  background-color: rgba(226,234,246,0.05);
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 34px 80px rgba(0,0,0,0.62), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 0 80px rgba(255,255,255,0.05);
 }
 
 /* top row: circular glass logo + NowssB title / by Nowsbansiu, subtitle */
 .wsg-top { display: flex; align-items: center; gap: 16px; }
 .wsg-logo {
-  width: 78px; height: 78px; flex-shrink: 0; border-radius: 50%;
+  width: 78px; height: 78px; flex-shrink: 0; border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.09);
   border: 1px solid rgba(255,255,255,0.28);
@@ -2531,16 +2537,17 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 /* thin divider line under the header row */
 .wsg-divider { height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.28), rgba(255,255,255,0.02)); }
 
-/* search pill: dot icon + "Enter something…" + chevron */
+/* search pill: dot icon + "Enter something…" + chevron.
+   Smoky-glass fill so the pill reads clearly on the bright glass panel. */
 .wsg-search {
   display: flex; align-items: center; gap: 12px; padding: 0 8px 0 20px;
-  height: 60px; border-radius: 30px;
-  background: rgba(255,255,255,0.09);
-  border: 1px solid rgba(255,255,255,0.24);
+  height: 62px; border-radius: 31px !important;
+  background: rgba(18,24,34,0.30);
+  border: 1px solid rgba(255,255,255,0.26);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 6px 20px rgba(0,0,0,0.3);
 }
 .wsg-search-dot {
-  width: 16px; height: 16px; flex-shrink: 0; border-radius: 50%;
+  width: 16px; height: 16px; flex-shrink: 0; border-radius: 50% !important;
   border: 4px solid rgba(255,255,255,0.55); box-sizing: border-box;
 }
 .wsg-search input {
@@ -2549,7 +2556,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 }
 .wsg-search input::placeholder { color: rgba(255,255,255,0.5); }
 .wsg-search-go {
-  width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%;
+  width: 44px; height: 44px; flex-shrink: 0; border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
   background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.22);
 }
@@ -2557,16 +2564,19 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 
 /* "Focus on details" card: elongated diamond gem + text */
 .wsg-detail {
-  display: flex; align-items: center; gap: 18px; padding: 20px 22px;
-  border-radius: 26px;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.20);
+  display: flex; align-items: center; gap: 18px; padding: 22px 22px;
+  border-radius: 28px !important;
+  background: rgba(18,24,34,0.30);
+  border: 1px solid rgba(255,255,255,0.22);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.24), 0 6px 20px rgba(0,0,0,0.28);
 }
+/* diamond gem — the source PNG has a BLACK background; mix-blend-mode:screen
+   knocks the black out so only the bright crystal shows (matches reference,
+   no black box). border-radius rounds the corners as a fallback. */
 .wsg-gem {
-  width: 64px; height: 92px; flex-shrink: 0;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_220/v1783104352/file_00000000bd2071fa895664b37ba90c38_fv8syd.png') center center / contain no-repeat;
-  filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5));
+  width: 72px; height: 104px; flex-shrink: 0; border-radius: 18px !important;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783104352/file_00000000bd2071fa895664b37ba90c38_fv8syd.png') center center / contain no-repeat;
+  mix-blend-mode: screen;
 }
 .wsg-detail-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 20px; color: #f2f6fa; }
 .wsg-detail-sub { font-family: 'DM Sans', sans-serif; font-weight: 400; font-size: 16px; line-height: 1.35; color: rgba(255,255,255,0.6); margin-top: 4px; }
@@ -2574,10 +2584,10 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 /* Explore button */
 .wsg-explore {
   display: flex; align-items: center; justify-content: center; gap: 14px;
-  width: 100%; height: 62px; border-radius: 31px; cursor: pointer;
+  width: 100%; height: 64px; border-radius: 32px !important; cursor: pointer;
   font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 20px; color: #f4f7fb;
-  background: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.26);
+  background: rgba(18,24,34,0.30);
+  border: 1px solid rgba(255,255,255,0.28);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 8px 24px rgba(0,0,0,0.32);
 }
 .wsg-explore:active { background: rgba(255,255,255,0.2); }
