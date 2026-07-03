@@ -52,7 +52,7 @@
     {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792072386_d8fifm.jpg', req:['1,000 followers','20 words purchased','100-day practice streak'], price:'$1.99', priceN:199, per:'/mo'},
     {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792074543_iasker.jpg', req:['2,000 followers','40 words purchased','200-day practice streak'], price:'$4.99', priceN:499, per:'/mo'},
     {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792076655_amox3t.jpg', req:['4,000 followers','80 words purchased','400-day practice streak'], price:'$9.99', priceN:999, per:'/mo'},
-    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['8,000 followers','160 words purchased','800-day practice streak'], price:'$49.99', priceN:4999, per:' lifetime'}
+    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['10,000 followers','2,000 words purchased','800-day practice streak'], price:'$49.99', priceN:4999, per:'/mo', yearly:'$200', yearlyN:20000, yearlyPer:'/yr'}
   ];
   var VERIFY_ORDER = ['', 'blue', 'silver', 'gold', 'diamond'];
   // Universal country list (ISO short names) — the app is global, not region-locked.
@@ -481,8 +481,9 @@
             '<div class="nwsb-vr-reqs-h">Earn it the organic way</div>'+reqs+
             '<div class="nwsb-vr-or"><span>or skip the grind — buy it</span></div>'+
             '<div class="nwsb-vr-buy"><div class="nwsb-vr-price">'+t.price+'<span>'+t.per+'</span></div>'+
-              (owned ? '<button class="nwsb-vr-btn owned" disabled>Owned ✓</button>' : '<button class="nwsb-vr-btn" onclick="IG.verifyKyc(\''+t.key+'\')">Buy '+t.name+'</button>')+
+              (owned ? '<button class="nwsb-vr-btn owned" disabled>Owned ✓</button>' : '<button class="nwsb-vr-btn" onclick="IG.verifyKyc(\''+t.key+'\',\'monthly\')">Buy '+t.name+'</button>')+
             '</div>'+
+            ((t.yearly && !owned) ? '<button class="nwsb-vr-year" onclick="IG.verifyKyc(\''+t.key+'\',\'yearly\')"><span class="nwsb-vr-year-l">or '+t.yearly+t.yearlyPer+' <b>· save '+Math.round((1-(t.yearlyN/(t.priceN*12)))*100)+'%</b></span><span class="nwsb-vr-year-go">Buy yearly ›</span></button>' : '')+
           '</div>';
       }).join('');
       var css='#nwsb-verify{position:fixed;inset:0;z-index:100001;background:#eef0f5;display:flex;flex-direction:column;}'+
@@ -512,6 +513,11 @@
         '#nwsb-verify .nwsb-vr-price span{font-size:12px;font-weight:500;color:rgba(0,0,0,.45);}'+
         '#nwsb-verify .nwsb-vr-btn{border:none;border-radius:14px !important;background:#eef0f5;padding:12px 20px;font-size:14px;font-weight:700;color:#a8854a;cursor:pointer;white-space:nowrap;box-shadow:5px 5px 12px rgba(0,0,0,.13),-3px -3px 9px rgba(255,255,255,.95);}'+
         '#nwsb-verify .nwsb-vr-btn:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
+        '#nwsb-verify .nwsb-vr-year{width:100%;margin-top:12px;border:none;border-radius:14px !important;background:#eef0f5;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;box-shadow:inset 3px 3px 7px rgba(0,0,0,.1),inset -2px -2px 5px rgba(255,255,255,.9);}'+
+        '#nwsb-verify .nwsb-vr-year:active{box-shadow:inset 4px 4px 9px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.85);}'+
+        '#nwsb-verify .nwsb-vr-year-l{font-size:12px;font-weight:600;color:rgba(0,0,0,.55);}'+
+        '#nwsb-verify .nwsb-vr-year-l b{color:#1aa76a;font-weight:800;}'+
+        '#nwsb-verify .nwsb-vr-year-go{font-size:13px;font-weight:800;color:#a8854a;white-space:nowrap;}'+
         '#nwsb-verify .nwsb-vr-btn.owned{color:#1aa76a;}';
       var old=document.getElementById('nwsb-verify'); if(old) old.remove();
       var ov=document.createElement('div');
@@ -528,15 +534,17 @@
     /* ── Verification KYC wizard — real name → DOB → residence → documents →
        review, then hands off to the real payment gateway (buyVerify → cart →
        Razorpay checkout). Pre-fills from the user's profile where available. ── */
-    verifyKyc:function(tier){
+    verifyKyc:function(tier, billing){
       var t=null; for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===tier){ t=VERIFY_TIERS[i]; break; } }
       if(!t) return;
+      var isYear = (billing==='yearly' && t.yearly);   // yearly option (Diamond)
       var ud = window._userDataCache || {};
       // pull any previously-entered KYC first, then profile fields, so returning
       // users don't re-type. DOB / residence come from the profile if present.
       var st = {
-        tier: tier, tierName: t.name, price: t.price, per: t.per,
-        priceUSDNum: (t.priceN||0)/100,
+        tier: tier, billing: isYear?'yearly':'monthly', tierName: t.name,
+        price: isYear ? t.yearly : t.price, per: isYear ? t.yearlyPer : t.per,
+        priceUSDNum: ((isYear ? t.yearlyN : t.priceN)||0)/100,
         name:    ud.kycName    || ud.displayName || ((this._currentProfile&&this._currentProfile.fullName)||'') || '',
         dob:     ud.kycDob     || ud.dob || ud.dateOfBirth || ud.birthday || '',
         country: ud.kycCountry || ud.residence || ud.country || '',
@@ -858,22 +866,24 @@
       }
       var p=document.getElementById('nwsb-vkyc'); if(p) p.remove();
       // Hand off to the REAL payment gateway (adds badge to bag → checkout → Razorpay)
-      this.buyVerify(st.tier);
+      this.buyVerify(st.tier, st.billing);
     },
-    buyVerify:function(tier){
+    buyVerify:function(tier, billing){
       // Put the badge in the shopping bag and send the user through the real
       // checkout — the badge is granted by chkHandleSuccess after payment.
       var t=null; for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===tier){ t=VERIFY_TIERS[i]; break; } }
       if(!t) return;
+      var isYear = (billing==='yearly' && t.yearly);
+      var priceN = isYear ? t.yearlyN : t.priceN;
+      var label  = t.name+' Verified Badge'+(isYear?' · Yearly':(t.per==='/mo'?' · Monthly':''));
       window.nssCart = window.nssCart || [];
       var id='badge-'+tier;
-      if(!window.nssCart.some(function(c){ return c.id===id; })){
-        // a badge replaces any lower badge already in the bag
-        window.nssCart = window.nssCart.filter(function(c){ return String(c.id).indexOf('badge-')!==0; });
-        window.nssCart.push({ id:id, name:t.name+' Verified Badge', type:'Badge', tier:tier, price:t.priceN, img:t.img });
-        if(typeof nssSaveCart==='function') nssSaveCart();
-        if(typeof nssUpdateBadges==='function') nssUpdateBadges();
-      }
+      // a badge replaces any lower/other badge already in the bag (incl. the
+      // other billing period of the same tier)
+      window.nssCart = window.nssCart.filter(function(c){ return String(c.id).indexOf('badge-')!==0; });
+      window.nssCart.push({ id:id, name:label, type:'Badge', tier:tier, billing:(isYear?'yearly':'monthly'), price:priceN, img:t.img });
+      if(typeof nssSaveCart==='function') nssSaveCart();
+      if(typeof nssUpdateBadges==='function') nssUpdateBadges();
       var ov=document.getElementById('nwsb-verify'); if(ov) ov.remove();
       if(window.nwsbToast) nwsbToast('Badge added to bag — checkout to verify ✓');
       if(typeof openSub==='function') openSub('cart');
