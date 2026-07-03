@@ -93,7 +93,7 @@ function renderRoutines() {
         <div class="rt-banner-img" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777982340/grok_image_1777982257091_q5lkbb.jpg');"></div>
         <div class="rt-banner-fade"></div>
         <div class="rt-banner-header">
-          <button onclick="closeSub('routines')" style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);cursor:pointer;padding:8px;display:flex;align-items:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+          <button onclick="closeSub('routines')" style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);cursor:pointer;padding:8px;display:flex;align-items:center;backdrop-filter:none;-webkit-backdrop-filter:none;">
             <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/></svg>
           </button>
           <div class="rt-banner-title">My Routines</div>
@@ -199,12 +199,12 @@ function renderRoutineIntro() {
       // TOP ROW
       '<div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:4px;">' +
         '<div id="rtIntroBackBtn" style="width:40px;height:40px;cursor:pointer;' +
-          'background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
+          'background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;' +
           'display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
           '<svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/></svg>' +
         '</div>' +
         '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
-        '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;">' +
+        '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;">' +
           '<svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>' +
         '</button>' +
       '</div>' +

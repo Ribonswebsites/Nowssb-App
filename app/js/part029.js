@@ -227,7 +227,7 @@ function chkFallbackConfirm(total, cart) {
   var names = cart.map(function(c){ return c.name; }).join(', ');
   var sheet = document.createElement('div');
   sheet.id = 'chkFallbackSheet';
-  sheet.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+  sheet.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);backdrop-filter:none;-webkit-backdrop-filter:none;';
   sheet.innerHTML =
     '<div style="width:100%;max-width:480px;margin:0 auto;background:#0e1624;border-radius:20px 20px 0 0;border-top:1px solid rgba(232,213,163,0.18);padding:28px 24px 40px;">' +
       '<div style="width:40px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 24px;"></div>' +

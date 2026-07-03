@@ -104,10 +104,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js"></script>
-<link rel="stylesheet" href="app/app.css?v=190">
-<link rel="stylesheet" href="nowssb-social.css?v=163">
-<link rel="stylesheet" href="nowssb-nm.css?v=190">
-<link rel="stylesheet" href="nowssb-player.css?v=172">
+<link rel="stylesheet" href="app/app.css?v=191">
+<link rel="stylesheet" href="nowssb-social.css?v=191">
+<link rel="stylesheet" href="nowssb-nm.css?v=191">
+<link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -619,10 +619,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <span class="brand-name" style="font-size:22px;text-shadow:0 1px 8px rgba(0,0,0,0.5);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');window._fashionHomeIntroSeen=true;goTo('home-nm')" title="Light Mode" style="width:40px;height:40px;min-width:40px;min-height:40px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);flex-shrink:0;padding:0;box-sizing:border-box;">
+    <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');window._fashionHomeIntroSeen=true;goTo('home-nm')" title="Light Mode" style="width:40px;height:40px;min-width:40px;min-height:40px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;backdrop-filter:none;-webkit-backdrop-filter:none;flex-shrink:0;padding:0;box-sizing:border-box;">
       <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780398892/11eba830-5e74-11f1-850d-112dd967e66d_uy7e7p.png" style="width:36px;height:36px;object-fit:contain;display:block;" alt="">
     </button>
-    <div id="homeMenuBtn" style="width:40px;height:40px;min-width:40px;min-height:40px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;padding:0;box-sizing:border-box;" onclick="openMenu()">
+    <div id="homeMenuBtn" style="width:40px;height:40px;min-width:40px;min-height:40px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;padding:0;box-sizing:border-box;" onclick="openMenu()">
       <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780207753/25935860-5cb7-11f1-a488-eb4ba8668ed2_vhv3rm.png" style="width:38px;height:38px;object-fit:contain;display:block;opacity:0.9;" alt="">
     </div>
   </div>
@@ -1448,7 +1448,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779961020/grok_image_1779908680335_bed5rb.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="">
     <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0.55) 72%,rgba(0,0,0,0.92) 100%);pointer-events:none;"></div>
     <!-- Back button — universal style -->
-    <button onclick="closeMenu()" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:14px;z-index:10;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;flex-shrink:0;">
+    <button onclick="closeMenu()" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:14px;z-index:10;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.12);backdrop-filter:none;-webkit-backdrop-filter:none;cursor:pointer;flex-shrink:0;">
       <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/></svg>
     </button>
     <!-- Bottom content -->
@@ -1464,7 +1464,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div style="position:relative;overflow:hidden;height:180px;background:#0a0e1a;flex-shrink:0;">
     <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779961020/grok_image_1779909152435_ij2joo.jpg" alt="" loading="eager" decoding="async" style="width:100%;height:180px;display:block;object-fit:cover;object-position:center center;">
     <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.45) 0%,rgba(6,12,24,0) 35%,rgba(6,12,24,0) 55%,rgba(6,12,24,0.7) 100%);pointer-events:none;"></div>
-    <button class="menu-close-btn" onclick="closeMenu()" style="position:absolute;top:max(env(safe-area-inset-top,12px),12px);left:12px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);">
+    <button class="menu-close-btn" onclick="closeMenu()" style="position:absolute;top:max(env(safe-area-inset-top,12px),12px);left:12px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.15);backdrop-filter:none;-webkit-backdrop-filter:none;">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       Back
     </button>
@@ -1569,7 +1569,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div id="practiceBody" style="display:flex;flex-direction:column;height:100%;overflow:hidden;"></div>
 </div>
 
-<script src="app/js/part004.js?v=163"></script>
+<script src="app/js/part004.js?v=191"></script>
 
 <!-- ══ SUB-SCREEN: SOUND LIBRARY ══ -->
 <!-- ══ SOUND LIBRARY — STYLES ══ -->
@@ -1808,7 +1808,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- ── TAB BAR ── -->
-    <div id="wsTabs" style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(6,12,24,0.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-x:auto;flex-shrink:0;scrollbar-width:none;position:relative;z-index:3;">
+    <div id="wsTabs" style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(6,12,24,0.72);backdrop-filter:none;-webkit-backdrop-filter:none;overflow-x:auto;flex-shrink:0;scrollbar-width:none;position:relative;z-index:3;">
       
 
       <div class="ws-tab ws-active" onclick="wsShowTab(0)">What</div>
@@ -2477,7 +2477,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
              src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778246083/grok_image_1777988386974_xbaic7.jpg"
              alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
         <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.18) 0%,transparent 38%,#060c18 100%);"></div>
-        <div class="sub-back" onclick="closeSub('profile')" style="top:16px;left:20px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.85)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+        <div class="sub-back" onclick="closeSub('profile')" style="top:16px;left:20px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.85)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
       </div>
 
       <!-- ── HEADER TITLE ── -->
@@ -3130,7 +3130,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div><div class="sub-header-title">Shabdapathy</div><div class="sub-header-tag">Foundations</div></div>
     </div>
     <div class="sub-body">
-      <div style="padding:22px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);margin-bottom:24px;backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 4px 24px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.14);position:relative;overflow:hidden;">
+      <div style="padding:22px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);margin-bottom:24px;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 4px 24px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.14);position:relative;overflow:hidden;">
         <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.32),transparent);"></div>
         <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">By Adv. Sanjaykumar Gadge</div>
         <div style="font-family:'Quattrocento Sans','DM Sans',sans-serif;font-size:20px;font-weight:500;color:var(--text-primary);margin-bottom:8px;line-height:1.3;">The Natural Origin Word Science</div>
@@ -3187,7 +3187,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
       <!-- CHAPTER READER OVERLAY -->
       <div id="scReaderOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:#060c18;overflow-y:auto;-webkit-overflow-scrolling:touch;">
-        <div style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px;padding:max(env(safe-area-inset-top,16px),16px) 20px 14px;background:rgba(6,12,24,0.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px;padding:max(env(safe-area-inset-top,16px),16px) 20px 14px;background:rgba(6,12,24,0.97);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid rgba(255,255,255,0.08);">
           <button onclick="scCloseChapter()" style="width:36px;height:36px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
             <svg width="16" height="14" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg>
           </button>
@@ -3832,11 +3832,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 </div><!-- /sub-nowssb-store -->
 
-<script src="app/js/part017.js?v=163"></script>
+<script src="app/js/part017.js?v=191"></script>
 
 <!-- intro rendered inline -->
 
-<script src="app/js/part018.js?v=163"></script>
+<script src="app/js/part018.js?v=191"></script>
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -4085,7 +4085,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part021.js?v=163"></script>
+<script src="app/js/part021.js?v=191"></script>
 
 <!-- ══════════════════════════════════════════
      PAGE FIRST-ENTRY GUIDES — Part 1
@@ -5122,7 +5122,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ══ CHECKOUT PAGE JS ══ -->
-<script src="app/js/part029.js?v=168"></script>
+<script src="app/js/part029.js?v=191"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -5131,7 +5131,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 
 <div class="sub-screen" id="sub-word-search">
-  <div class="sub-header nav-bar" style="background:rgba(6,12,24,0.92);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">
+  <div class="sub-header nav-bar" style="background:rgba(6,12,24,0.92);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:none;-webkit-backdrop-filter:none;">
     <button onclick="closeSub('word-search')" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;width:36px;flex-shrink:0;">
       <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M14 4L7 11L14 18" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/></svg>
     </button>
@@ -5292,7 +5292,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div><!-- /ws-page-body -->
 </div><!-- /sub-word-search -->
 
-<script src="app/js/part030.js?v=168"></script>
+<script src="app/js/part030.js?v=191"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -5301,7 +5301,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 
 <div class="sub-screen" id="sub-meaning-search">
-  <div class="sub-header nav-bar" style="background:rgba(6,12,24,0.92);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">
+  <div class="sub-header nav-bar" style="background:rgba(6,12,24,0.92);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:none;-webkit-backdrop-filter:none;">
     <button onclick="closeSub('meaning-search')" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;width:36px;flex-shrink:0;">
       <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M14 4L7 11L14 18" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/></svg>
     </button>
@@ -5849,7 +5849,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <!-- Top bar -->
       <div style="position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:max(env(safe-area-inset-top,20px),20px) 18px 0;">
         <button class="ss-back" onclick="ssClosePanel('subscription')"></button>
-        <span style="font-size:7px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);background:rgba(6,12,24,0.50);border:1px solid rgba(200,232,245,0.18);padding:5px 12px;backdrop-filter:blur(6px);">NOWSBANSIU EDITION</span>
+        <span style="font-size:7px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);background:rgba(6,12,24,0.50);border:1px solid rgba(200,232,245,0.18);padding:5px 12px;backdrop-filter:none;">NOWSBANSIU EDITION</span>
       </div>
       <!-- Bottom content -->
       <div style="position:relative;z-index:10;margin-top:auto;padding:0 24px calc(env(safe-area-inset-bottom,24px) + 40px);animation:slIntroUp 1.1s 0.3s both cubic-bezier(0.16,1,0.3,1);">
@@ -5913,7 +5913,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="height:110px;background:linear-gradient(135deg,#0a1628 0%,#1a2a4a 50%,#0d2040 100%);display:flex;align-items:center;justify-content:center;">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       </div>
-      <button onclick="nwsbPickImage('banner')" style="position:absolute;bottom:10px;right:10px;padding:7px 14px;border-radius:8px;border:none;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Change Banner</button>
+      <button onclick="nwsbPickImage('banner')" style="position:absolute;bottom:10px;right:10px;padding:7px 14px;border-radius:8px;border:none;background:rgba(0,0,0,.6);backdrop-filter:none;color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Change Banner</button>
     </div>
 
     <!-- Avatar -->
@@ -5932,7 +5932,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="slbl">BIO</div>
     <div style="position:relative;margin-bottom:24px;">
       <textarea id="ss-bio-input" maxlength="150" oninput="document.getElementById('ss-bio-count').textContent=this.value.length+'/150'"
-        style="width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;resize:none;height:90px;outline:none;box-sizing:border-box;backdrop-filter:blur(8px);line-height:1.6;"
+        style="width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;resize:none;height:90px;outline:none;box-sizing:border-box;backdrop-filter:none;line-height:1.6;"
         placeholder="Tell your healing story...">Practicing sound and frequency daily. Word without dictionary.</textarea>
       <span id="ss-bio-count" style="position:absolute;bottom:10px;right:12px;font-size:11px;color:rgba(255,255,255,.22);font-family:'DM Sans',sans-serif;">51/150</span>
     </div>
@@ -5970,7 +5970,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </button>
       </div>
       <div style="position:absolute;bottom:12px;right:16px;display:flex;gap:8px;">
-        <button onclick="ssOpenChat()" style="padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.5);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <button onclick="ssOpenChat()" style="padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.5);backdrop-filter:none;color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Chat
         </button>
       </div>
@@ -6361,7 +6361,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ── SOCIAL NAV — shown only when People section is active ── -->
-<div id="ig-social-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:rgba(6,12,24,0.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);height:58px;padding-bottom:env(safe-area-inset-bottom,0px);align-items:center;justify-content:space-around;">
+<div id="ig-social-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:rgba(6,12,24,0.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:none;-webkit-backdrop-filter:none;height:58px;padding-bottom:env(safe-area-inset-bottom,0px);align-items:center;justify-content:space-around;">
   <button onclick="IG.socialNav('feedhome')" class="ig-social-btn" id="igsn-home">
     <img decoding="async" loading="lazy" class="ig-social-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" alt="Home" style="width:22px;height:22px;object-fit:contain;">
     <span>Home</span>
@@ -6716,7 +6716,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Injected dynamically into sub-social via JS -->
 
-<script src="app/js/part039.js?v=163"></script>
+<script src="app/js/part039.js?v=191"></script>
 
 
 
@@ -6811,10 +6811,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Top bar -->
     <div style="position:relative;z-index:10;padding:max(env(safe-area-inset-top,18px),18px) 20px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div onclick="SS.close('blackedition')" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.42);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;">
+      <div onclick="SS.close('blackedition')" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.42);border:1px solid rgba(255,255,255,0.12);backdrop-filter:none;-webkit-backdrop-filter:none;cursor:pointer;">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
       </div>
-      <div style="font-size:7px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;background:rgba(0,0,0,0.50);border:1px solid rgba(232,213,163,0.22);padding:5px 12px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);">Appearance</div>
+      <div style="font-size:7px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;background:rgba(0,0,0,0.50);border:1px solid rgba(232,213,163,0.22);padding:5px 12px;backdrop-filter:none;-webkit-backdrop-filter:none;">Appearance</div>
       <div style="width:40px;"></div>
     </div>
 
@@ -6848,7 +6848,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div style="position:relative;flex-shrink:0;">
       <img id="beBanner1" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780083905/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom.png" decoding="async" loading="eager" style="display:block;width:100%;height:auto;opacity:1;transition:opacity 1.4s ease;">
       <img id="beBanner2" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780083906/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_o2zjbs.png" decoding="async" loading="eager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity 1.4s ease;">
-      <button class="ss-panel-back" onclick="SS.close('blackedition')" style="position:absolute;top:16px;left:16px;z-index:10;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
+      <button class="ss-panel-back" onclick="SS.close('blackedition')" style="position:absolute;top:16px;left:16px;z-index:10;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
       <div style="position:absolute;bottom:16px;left:20px;right:20px;z-index:2;">
         <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:4px;">NOWSBANSIU</div>
         <div style="font-size:24px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;line-height:1.1;">Black Edition</div>
@@ -6899,10 +6899,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <!-- Glass -->
       <div class="beci" data-be="glass" style="position:absolute;width:150px;height:210px;top:50%;left:50%;margin-left:-75px;margin-top:-105px;overflow:hidden;border:2px solid rgba(255,255,255,0.2);box-shadow:0 24px 60px rgba(0,0,0,0.98);cursor:pointer;will-change:transform,opacity;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:0;">
         <div style="position:absolute;inset:0;background:#000;"></div>
-        <div style="position:absolute;top:10px;left:8px;right:8px;height:26px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"></div>
+        <div style="position:absolute;top:10px;left:8px;right:8px;height:26px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.22);backdrop-filter:none;-webkit-backdrop-filter:none;"></div>
         <div style="position:absolute;top:42px;left:8px;right:8px;height:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.16);"></div>
         <div style="position:absolute;top:62px;left:8px;right:8px;height:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);"></div>
-        <div style="position:absolute;top:82px;left:8px;right:8px;height:62px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.14);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"></div>
+        <div style="position:absolute;top:82px;left:8px;right:8px;height:62px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.14);backdrop-filter:none;-webkit-backdrop-filter:none;"></div>
         <div style="position:absolute;top:152px;left:8px;right:8px;height:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.14);"></div>
         <div style="position:absolute;bottom:0;left:0;right:0;padding:9px;text-align:center;background:rgba(0,0,0,0.8);border-top:1px solid rgba(255,255,255,0.1);"><span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(200,232,245,0.8);font-family:'DM Sans',sans-serif;">GLASS</span></div>
       </div>
@@ -6934,10 +6934,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780309836/933d3dc0-5da4-11f1-bb6a-cbf2afce6c90_xl2pmx.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="">
     </div>
     <div style="position:relative;z-index:10;padding:max(env(safe-area-inset-top,18px),18px) 20px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div onclick="ssClosePanel('intro-settings');ispStop();" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.42);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;">
+      <div onclick="ssClosePanel('intro-settings');ispStop();" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.42);border:1px solid rgba(255,255,255,0.12);backdrop-filter:none;-webkit-backdrop-filter:none;cursor:pointer;">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
       </div>
-      <div style="font-size:7px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;background:rgba(0,0,0,0.50);border:1px solid rgba(232,213,163,0.22);padding:5px 12px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);">Experience</div>
+      <div style="font-size:7px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;background:rgba(0,0,0,0.50);border:1px solid rgba(232,213,163,0.22);padding:5px 12px;backdrop-filter:none;-webkit-backdrop-filter:none;">Experience</div>
       <div style="width:40px;"></div>
     </div>
     <div style="flex:1;"></div>
@@ -6959,7 +6959,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Mini banner with title overlay -->
     <div style="position:relative;flex-shrink:0;">
       <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780213180/grok_image_1780213016088_vdd4vv.jpg" decoding="async" loading="eager" style="display:block;width:100%;height:auto;">
-      <button class="ss-panel-back" onclick="ssClosePanel('intro-settings');ispStop();" style="position:absolute;top:16px;left:16px;z-index:10;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">
+      <button class="ss-panel-back" onclick="ssClosePanel('intro-settings');ispStop();" style="position:absolute;top:16px;left:16px;z-index:10;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
       </button>
       <div style="position:absolute;bottom:16px;left:20px;right:20px;z-index:2;">
@@ -7079,7 +7079,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part045.js?v=168"></script>
 
 <!-- ── TRIAL BANNER ── -->
-<div id="trial-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(232,213,163,0.08);border-bottom:1px solid rgba(232,213,163,0.18);padding:9px 18px;align-items:center;justify-content:space-between;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">
+<div id="trial-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(232,213,163,0.08);border-bottom:1px solid rgba(232,213,163,0.18);padding:9px 18px;align-items:center;justify-content:space-between;backdrop-filter:none;-webkit-backdrop-filter:none;">
   <span style="font-size:11px;color:rgba(232,213,163,0.8);font-family:'DM Sans',sans-serif;"><strong id="trial-days-left">7</strong> days left in your free trial</span>
   <button onclick="if(window.SS)window.SS.open('subscription')" style="font-size:10px;font-weight:700;letter-spacing:1px;background:#e8d5a3;color:#060c18;border:none;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;">Upgrade</button>
 </div>
@@ -7098,7 +7098,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ── GATE UPGRADE MODAL ── -->
-<div id="gate-upgrade-modal" style="display:none;position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px;">
+<div id="gate-upgrade-modal" style="display:none;position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,0.72);backdrop-filter:none;-webkit-backdrop-filter:none;align-items:center;justify-content:center;padding:24px;">
   <div style="width:100%;max-width:360px;background:#0a1020;border:1.5px solid rgba(232,213,163,.25);border-radius:20px;padding:28px 24px;">
     <div style="font-size:11px;letter-spacing:2.5px;color:rgba(232,213,163,.55);font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:10px;">UPGRADE REQUIRED</div>
     <div style="font-size:19px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;margin-bottom:8px;">Feature locked</div>
@@ -7109,7 +7109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ── SUBSCRIPTION SUCCESS OVERLAY ── -->
-<div id="sub-success-overlay" style="display:none;position:fixed;inset:0;z-index:99996;background:rgba(6,12,24,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;">
+<div id="sub-success-overlay" style="display:none;position:fixed;inset:0;z-index:99996;background:rgba(6,12,24,0.96);backdrop-filter:none;-webkit-backdrop-filter:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;">
   <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB" style="width:56px;height:56px;object-fit:contain;margin-bottom:20px;">
   <div style="font-size:10px;letter-spacing:3px;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:8px;" id="sub-success-plan-name">Frequency</div>
   <div style="font-size:24px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;text-align:center;margin-bottom:6px;" id="sub-success-title">You are the frequency.</div>

@@ -260,7 +260,7 @@ function nssShowToast(msg) {
     t.id = 'nssToast';
     t.style.cssText = 'position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);' +
       'background:rgba(11,17,32,0.95);border:1px solid rgba(255,255,255,0.1);' +
-      'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);' +
+      'backdrop-filter:none;-webkit-backdrop-filter:none;' +
       'color:rgba(255,255,255,0.9);font-size:12px;font-weight:600;letter-spacing:0.3px;' +
       'padding:10px 18px;border-radius:20px;z-index:9999;' +
       'opacity:0;transition:opacity 0.2s ease,transform 0.2s ease;white-space:nowrap;';

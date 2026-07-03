@@ -126,7 +126,7 @@ function renderPracticeIntro() {
         '<div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:4px;">' +
           '<div onclick="closeSub(\'practice\')" style="width:46px;height:46px;cursor:pointer;flex-shrink:0;background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/contain no-repeat;"></div>' +
           '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
-          '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;">' +
+          '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;">' +
             '<svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>' +
           '</button>' +
         '</div>' +

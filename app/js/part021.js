@@ -147,8 +147,8 @@ function spotOn(el) {
     'border-radius:'+br+';'+
     'border:2px solid rgba(232,213,163,0.62);'+
     'background:rgba(232,213,163,0.05);'+
-    'backdrop-filter:blur(2px) saturate(1.3);'+
-    '-webkit-backdrop-filter:blur(2px) saturate(1.3);'+
+    'backdrop-filter:none;'+
+    '-webkit-backdrop-filter:none;'+
     'box-shadow:0 0 0 1px rgba(232,213,163,.1),0 0 30px 8px rgba(232,213,163,.24),'+
     'inset 0 1px 0 rgba(255,255,255,.14);';
 

@@ -32,8 +32,8 @@
 .ig-topbar {
   background: rgba(6,12,24,.97) !important;
   border-bottom: 1px solid rgba(232,213,163,.08) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
 }
 
 .ig-topbar .ig-username {
@@ -54,8 +54,8 @@
   background: rgba(255,255,255,.05) !important;
   border: 1px solid rgba(255,255,255,.08) !important;
   border-radius: 20px !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
   color: rgba(255,255,255,.55) !important;
 }
 
@@ -81,8 +81,8 @@
   border: 1px solid rgba(255,255,255,.07) !important;
   border-radius: 16px !important;
   margin: 4px 12px !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
   padding: 12px 14px !important;
 }
 
@@ -294,8 +294,8 @@
   border-radius: 22px !important;
   background: rgba(255,255,255,.04);
   border: 1px solid rgba(232,213,163,.14);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
   padding: 0;
   position: relative;
   overflow: hidden;
@@ -344,8 +344,8 @@
   padding: 5px 11px;
   border-radius: 20px !important;
   background: rgba(6,12,24,.55);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
   border: 1px solid rgba(232,213,163,.3);
 }
 
@@ -806,8 +806,8 @@
   inset: 0;
   z-index: 9600;
   background: rgba(0,0,0,.65);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
   display: none;
   align-items: flex-end;
 }

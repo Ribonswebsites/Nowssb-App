@@ -640,7 +640,7 @@ window.IG.menu = function() {
   var old = document.getElementById('ig-menu-sheet'); if (old) old.remove();
   var sheet = document.createElement('div');
   sheet.id = 'ig-menu-sheet';
-  sheet.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:flex-end;';
+  sheet.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:flex-end;';
   sheet.onclick = function(e){ if (e.target === sheet) sheet.remove(); };
   sheet.innerHTML =
     '<div style="width:100%;background:#0a1628;border-radius:20px 20px 0 0;border-top:1.5px solid rgba(232,213,163,.25);padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));font-family:\'DM Sans\',sans-serif;">'+

@@ -322,7 +322,7 @@ function _wsShowRequestSheet(word) {
   if (existing) existing.remove();
   var sheet = document.createElement('div');
   sheet.id = 'wsRequestSheet';
-  sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+  sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);backdrop-filter:none;-webkit-backdrop-filter:none;';
   sheet.innerHTML = '<div style="width:100%;background:#0e1828;border-top:1px solid rgba(200,232,245,0.14);padding:32px 24px max(env(safe-area-inset-bottom,28px),28px);font-family:\'DM Sans\',sans-serif;">' +
     '<div style="font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.6);margin-bottom:12px;">Own Your Word</div>' +
     '<div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">' + word + '</div>' +
@@ -352,7 +352,7 @@ function wsConfirmRequest(word) {
 
 function _wsShowSuccessSheet(word) {
   var sheet = document.createElement('div');
-  sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+  sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);backdrop-filter:none;-webkit-backdrop-filter:none;';
   sheet.innerHTML = '<div style="width:100%;background:#0e1828;border-top:1px solid rgba(232,213,163,0.2);padding:32px 24px max(env(safe-area-inset-bottom,28px),28px);font-family:\'DM Sans\',sans-serif;">' +
     '<div style="width:40px;height:40px;border-radius:50%;background:rgba(232,213,163,0.12);border:1px solid rgba(232,213,163,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">' +
     '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9l4 4 6-7" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="square"/></svg></div>' +
