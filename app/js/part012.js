@@ -214,7 +214,7 @@ function goTo(id) {
       var hint = document.getElementById('ld-cta-hint');
       if (hint) hint.textContent = window._currentUid ? 'Enter your practice' : 'Sign in to begin';
     }
-    if (id === 'home') { initHomeScrollBg(); updateTodayCard(); if(typeof rxInit==='function') setTimeout(rxInit,120); if (typeof nssUpdateHomeBadges === 'function') nssUpdateHomeBadges(); (function(){ var card = document.getElementById('sub-promo-card'); if (!card) return; var hasPlan = window.GATE ? (window.GATE.tier()==='resonance'||window.GATE.tier()==='frequency'||window.GATE.tier()==='frequencyX') : (window._userDataCache && window._userDataCache.isPro); card.style.display = hasPlan ? 'none' : 'block'; })(); }
+    if (id === 'home') { initHomeScrollBg(); updateTodayCard(); if(typeof rxInit==='function') setTimeout(rxInit,120); if (typeof nssUpdateHomeBadges === 'function') nssUpdateHomeBadges(); if(typeof _nwsbRotateFashBanner==='function') _nwsbRotateFashBanner('homeFashImg','home'); (function(){ var card = document.getElementById('sub-promo-card'); if (!card) return; var hasPlan = window.GATE ? (window.GATE.tier()==='resonance'||window.GATE.tier()==='frequency'||window.GATE.tier()==='frequencyX') : (window._userDataCache && window._userDataCache.isPro); card.style.display = hasPlan ? 'none' : 'block'; })(); }
     if (id === 'home-nm') {
       if(typeof nmhRefresh==='function') setTimeout(nmhRefresh,80);
       if(typeof updateTodayCard==='function') setTimeout(updateTodayCard,100);
@@ -512,6 +512,41 @@ function nmhSwitchMode() {
   }
 }
 
+/* Shared rotating Fashion/Trend banner — used on both the neumorphism home
+   (#home-nm, img #nmhFashImg) and the Fashion home (#home, img #homeFashImg).
+   Preloads once, seamless crossfade, rotates only while its host is visible. */
+window._FASH_SEQ = window._FASH_SEQ || [
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082389/file_000000007d4871fbaca8e355961125c7_yobwv4.png',
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082439/grok_image_1782948633889_qkam54.jpg',
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/grok_image_1782948636806_oe97xg.jpg',
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082390/file_000000008e0871f886e73306cdc00cca_pjjdjf.png',
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/image-22_ns2jhx.jpg'
+];
+window._nwsbRotateFashBanner = function(imgId, hostId) {
+  var img = document.getElementById(imgId); if (!img) return;
+  var seq = window._FASH_SEQ;
+  var idxKey = imgId + 'Idx', timerKey = imgId + 'Timer';
+  if (!img.getAttribute('src')) { window[idxKey] = 0; img.src = seq[0]; }
+  if (!window._fashPreloaded) { window._fashPreloaded = seq.map(function(u){ var im = new Image(); im.src = u; return im; }); }
+  if (window[timerKey]) clearInterval(window[timerKey]);
+  window[timerKey] = setInterval(function(){
+    var el = document.getElementById(imgId);
+    var host = document.getElementById(hostId);
+    if (!el) { clearInterval(window[timerKey]); window[timerKey] = null; return; }
+    if (!host || !host.classList.contains('active')) return;   // rotate only while visible
+    var nextIdx = ((window[idxKey] || 0) + 1) % seq.length;
+    var nextSrc = seq[nextIdx];
+    var pre = new Image();
+    pre.onload = function(){
+      if (!host.classList.contains('active')) return;
+      el.style.opacity = '0';
+      setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; }, 340);
+      window[idxKey] = nextIdx;
+    };
+    pre.src = nextSrc;
+  }, 4000);
+};
+
 function nmhRefresh() {
   // Restore dark mode state from storage
   var _nmDark = localStorage.getItem('nwsb_nm_dark') === '1';
@@ -580,38 +615,8 @@ function nmhRefresh() {
     }, 4000);
   }
 
-  // ── Fashion / Trend rotating banner (above the Fashion button) ──
-  var FASH_SEQ = [
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082389/file_000000007d4871fbaca8e355961125c7_yobwv4.png',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082439/grok_image_1782948633889_qkam54.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/grok_image_1782948636806_oe97xg.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082390/file_000000008e0871f886e73306cdc00cca_pjjdjf.png',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/image-22_ns2jhx.jpg'
-  ];
-  var fimg = document.getElementById('nmhFashImg');
-  if (fimg) {
-    if (!fimg.getAttribute('src')) { window._nmhFashIdx = 0; fimg.src = FASH_SEQ[0]; }
-    if (!window._nmhFashPreloaded) {
-      window._nmhFashPreloaded = FASH_SEQ.map(function(u){ var im = new Image(); im.src = u; return im; });
-    }
-    if (window._nmhFashTimer) clearInterval(window._nmhFashTimer);
-    window._nmhFashTimer = setInterval(function(){
-      var el = document.getElementById('nmhFashImg');
-      var host = document.getElementById('home-nm');
-      if (!el) { clearInterval(window._nmhFashTimer); window._nmhFashTimer = null; return; }
-      if (!host || !host.classList.contains('active')) return;  // rotate only while home is visible
-      var nextIdx = ((window._nmhFashIdx || 0) + 1) % FASH_SEQ.length;
-      var nextSrc = FASH_SEQ[nextIdx];
-      var pre = new Image();
-      pre.onload = function(){
-        if (!host.classList.contains('active')) return;
-        el.style.opacity = '0';
-        setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; }, 340);
-        window._nmhFashIdx = nextIdx;
-      };
-      pre.src = nextSrc;
-    }, 4000);
-  }
+  // ── Fashion / Trend rotating banner (normal home, above the Fashion button) ──
+  if (typeof _nwsbRotateFashBanner === 'function') _nwsbRotateFashBanner('nmhFashImg', 'home-nm');
 
   // Sync today's word from the dark home if available
   var tw = document.getElementById('todayPracticeTitle');
