@@ -252,14 +252,14 @@ let _psGridBuilt = false;
 
 // ── REAL AVATAR IMAGES — your 8 Cloudinary characters ──
 const _AVATAR_URLS = [
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778418246/image-131_jyrnhx.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778418246/image-135_hziacn.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778418246/image-92_rfnjut.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778418246/image-190_jqulqk.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778418246/image-240_wxgthb.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778418327/image-156_awwho5.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778418357/image-162_vl3unq.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778418383/image-167_qbyiji.jpg',
+  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-131_jyrnhx.jpg',
+  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-135_hziacn.jpg',
+  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-92_rfnjut.jpg',
+  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-190_jqulqk.jpg',
+  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-240_wxgthb.jpg',
+  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418327/image-156_awwho5.jpg',
+  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418357/image-162_vl3unq.jpg',
+  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418383/image-167_qbyiji.jpg',
 ];
 function _genAvatarURI(idx) {
   return _AVATAR_URLS[idx % _AVATAR_URLS.length];
@@ -516,11 +516,11 @@ function nmhSwitchMode() {
    (#home-nm, img #nmhFashImg) and the Fashion home (#home, img #homeFashImg).
    Preloads once, seamless crossfade, rotates only while its host is visible. */
 window._FASH_SEQ = window._FASH_SEQ || [
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082389/file_000000007d4871fbaca8e355961125c7_yobwv4.png',
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082439/grok_image_1782948633889_qkam54.jpg',
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/grok_image_1782948636806_oe97xg.jpg',
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082390/file_000000008e0871f886e73306cdc00cca_pjjdjf.png',
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1783082388/image-22_ns2jhx.jpg'
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783082389/file_000000007d4871fbaca8e355961125c7_yobwv4.png',
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783082439/grok_image_1782948633889_qkam54.jpg',
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783082388/grok_image_1782948636806_oe97xg.jpg',
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783082390/file_000000008e0871f886e73306cdc00cca_pjjdjf.png',
+  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783082388/image-22_ns2jhx.jpg'
 ];
 /* one animated caption per image (same order as _FASH_SEQ) */
 window._FASH_CAPS = window._FASH_CAPS || [
@@ -621,10 +621,10 @@ function nmhRefresh() {
 
   // Auto-rotating hero sequence: Natural · Origin · Word · Science
   var GREET_SEQ = [
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782945762/grok_image_1782945639246_pyi7nw.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782945777/grok_image_1782945661636_poon1b.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782945762/grok_image_1782945632664_xqng3z.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782945762/grok_image_1782945664229_jmbcnz.jpg'
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782945762/grok_image_1782945639246_pyi7nw.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782945777/grok_image_1782945661636_poon1b.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782945762/grok_image_1782945632664_xqng3z.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782945762/grok_image_1782945664229_jmbcnz.jpg'
   ];
   var gimg = document.getElementById('nmhGreetImg');
   if (gimg) {
@@ -923,7 +923,7 @@ const questions = [
     label:'What Calls You',
     q:'What calls you to heal?',
     opts:['Voice & Vocal power','Inner calm & peace','Ancient wisdom & knowledge','Physical strength & vitality'],
-    bg: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782622024/grok_image_1782621969038_uvugj1.jpg'
+    bg: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782622024/grok_image_1782621969038_uvugj1.jpg'
   },
   {
     label:'What Feels Broken',
@@ -1812,38 +1812,38 @@ const RM_TIERS = {
   basic_a: {
     price: '$0.80', priceVal: 80, origPrice: null, discount: null,
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778971604/ffec7380-516c-11f1-9b86-d16f5852128e_1_xdqlio.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778971603/ffc4a030-516c-11f1-9b86-d16f5852128e_oahwvn.png'
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971604/ffec7380-516c-11f1-9b86-d16f5852128e_1_xdqlio.png',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971603/ffc4a030-516c-11f1-9b86-d16f5852128e_oahwvn.png'
     ]
   },
   basic_b: {
     price: '$0.80', priceVal: 80, origPrice: null, discount: null,
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778971513/7bb6c750-516c-11f1-9b86-d16f5852128e_appn0v.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778971513/7bb519a0-516c-11f1-9b86-d16f5852128e_1_lnqxkr.png'
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb6c750-516c-11f1-9b86-d16f5852128e_appn0v.png',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb519a0-516c-11f1-9b86-d16f5852128e_1_lnqxkr.png'
     ]
   },
   discount_40: {
     price: '$0.40', priceVal: 40, origPrice: '$0.80', discount: '50% off',
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778971512/ffbb0340-516c-11f1-9b86-d16f5852128e_ekdtma.png'
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971512/ffbb0340-516c-11f1-9b86-d16f5852128e_ekdtma.png'
     ]
   },
   standard_50: {
     price: '$0.50', priceVal: 50, origPrice: '$1.00', discount: '50% off',
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778971513/7bb17020-516c-11f1-9b86-d16f5852128e_1_bbzls6.png'
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb17020-516c-11f1-9b86-d16f5852128e_1_bbzls6.png'
     ]
   },
   premium_140: {
     price: '$1.40', priceVal: 140, origPrice: '$2.00', discount: '30% off',
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778972614/a3447b70-516f-11f1-9b86-d16f5852128e_q0eye7.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778972781/a345db00-516f-11f1-9b86-d16f5852128e_s3mxiu.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778973115/5c8e9a00-517c-11f1-a3dd-d923e87f1895_qggn8o.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778972614/fd7c24e0-516e-11f1-9b86-d16f5852128e_bticry.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778972614/c36f0950-517a-11f1-9d12-25df0fdf84f2_jwiys1.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778972614/a7215cf0-516e-11f1-9b86-d16f5852128e_edvhiv.png'
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/a3447b70-516f-11f1-9b86-d16f5852128e_q0eye7.png',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972781/a345db00-516f-11f1-9b86-d16f5852128e_s3mxiu.png',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778973115/5c8e9a00-517c-11f1-a3dd-d923e87f1895_qggn8o.png',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/fd7c24e0-516e-11f1-9b86-d16f5852128e_bticry.png',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/c36f0950-517a-11f1-9d12-25df0fdf84f2_jwiys1.png',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/a7215cf0-516e-11f1-9b86-d16f5852128e_edvhiv.png'
     ]
   },
   // ── ELITE TIERS — $1.00 each, unique banner per word ──

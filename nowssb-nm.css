@@ -2036,7 +2036,7 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 
 /* ── Store/archive back buttons: use the glass back-sphere image (not SVG) ── */
 .cwp-back, .oh-cat-back, .wish-cat-back, .cart-intro-back {
-  background-image: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') !important;
+  background-image: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') !important;
   background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
   border: none !important;
 }

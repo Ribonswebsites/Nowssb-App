@@ -28,14 +28,14 @@
   ];
   // Banner pool — every placeholder person gets a profile banner
   var PEOPLE_BANNERS = [
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591933705_qq3l9g.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591857840_tbznap.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782592051446_womamz.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591669371_kqnaf9.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591627828_lmde11.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591559591_yxgud5.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591561380_ytpn3b.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592260/grok_image_1782591732123_epmpiu.jpg'
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591933705_qq3l9g.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591857840_tbznap.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782592051446_womamz.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591669371_kqnaf9.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591627828_lmde11.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591559591_yxgud5.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591561380_ytpn3b.jpg',
+    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592260/grok_image_1782591732123_epmpiu.jpg'
   ];
   PEOPLE.forEach(function(p,i){
     p.highlights = [{label:'Practice',img:img('p'+i+'a',150)},{label:'Words',img:img('p'+i+'b',150)},{label:'Journey',img:img('p'+i+'c',150)}];
@@ -49,10 +49,10 @@
 
   // ── NowssB Verified — tiers (the headphone check-mark badges) ──
   var VERIFY_TIERS = [
-    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792072386_d8fifm.jpg', req:['1,000 followers','20 words purchased','100-day practice streak'], price:'$1.99', priceN:199, per:'/mo'},
-    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792074543_iasker.jpg', req:['2,000 followers','40 words purchased','200-day practice streak'], price:'$4.99', priceN:499, per:'/mo'},
-    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792076655_amox3t.jpg', req:['4,000 followers','80 words purchased','400-day practice streak'], price:'$9.99', priceN:999, per:'/mo'},
-    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['10,000 followers','200 words purchased','800-day practice streak'], price:'$49.99', priceN:4999, per:'/mo', yearly:'$200', yearlyN:20000, yearlyPer:'/yr'}
+    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792072386_d8fifm.jpg', req:['1,000 followers','20 words purchased','100-day practice streak'], price:'$1.99', priceN:199, per:'/mo'},
+    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792074543_iasker.jpg', req:['2,000 followers','40 words purchased','200-day practice streak'], price:'$4.99', priceN:499, per:'/mo'},
+    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792076655_amox3t.jpg', req:['4,000 followers','80 words purchased','400-day practice streak'], price:'$9.99', priceN:999, per:'/mo'},
+    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['10,000 followers','200 words purchased','800-day practice streak'], price:'$49.99', priceN:4999, per:'/mo', yearly:'$200', yearlyN:20000, yearlyPer:'/yr'}
   ];
   var VERIFY_ORDER = ['', 'blue', 'silver', 'gold', 'diamond'];
   // Universal country list (ISO short names) — the app is global, not region-locked.
@@ -449,8 +449,8 @@
 
       screen.innerHTML='<style>'+css+'</style>'+
         '<div class="nwsbf-scroll">'+
-          '<div class="nwsbf-top"><div class="nwsbf-brand"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""><span class="nwsbf-logo">NowssB <span style="color:#c8a96e;">Connect</span></span></div>'+
-            '<button class="nwsbf-icon" aria-label="Messages" onclick="if(typeof chatInboxOpen===\'function\')chatInboxOpen()"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png" alt="Chat"></button>'+
+          '<div class="nwsbf-top"><div class="nwsbf-brand"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""><span class="nwsbf-logo">NowssB <span style="color:#c8a96e;">Connect</span></span></div>'+
+            '<button class="nwsbf-icon" aria-label="Messages" onclick="if(typeof chatInboxOpen===\'function\')chatInboxOpen()"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png" alt="Chat"></button>'+
             '<button class="nwsbf-icon" aria-label="Home" onclick="IG.socialNav(\'home\')"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" alt="Home"></button>'+
           '</div>'+
           '<div class="nwsbf-stories">'+stories+'</div>'+
@@ -1062,7 +1062,7 @@
     menu:function(){ this.openVerify(); },
     refreshNavAvatar:function(){
       var ud = window._userDataCache;
-      var DEFAULT_AVATAR = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780065459/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png';
+      var DEFAULT_AVATAR = 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780065459/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png';
       var photoURL = (ud && ud.photoURL) || ME.avatar || '';
       var imgEl  = document.getElementById('ignav-avatar');
       var initEl = document.getElementById('ignav-avatar-init');
