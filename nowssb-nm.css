@@ -2444,3 +2444,9 @@ body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
   -webkit-backdrop-filter: blur(22px) saturate(1.2) !important;
           backdrop-filter: blur(22px) saturate(1.2) !important;
 }
+
+/* ══ Low glass blur in SETTINGS (kept small so it's easy on the GPU) ═════════ */
+#sub-social .sg, .ss-section {
+  -webkit-backdrop-filter: blur(6px) saturate(1.1) !important;
+          backdrop-filter: blur(6px) saturate(1.1) !important;
+}
