@@ -2311,7 +2311,7 @@ body.nm-glass #sub-health-journey .gsel-card {
    Reference style: faint eyebrow, bold dark line, gold accent word. One line at
    a time — the JS fades it out and swaps in the next phrase. */
 .cwc {
-  position:absolute; bottom:49.5%; left:9%; right:9%; z-index:2; text-align:center; pointer-events:none;
+  position:absolute; bottom:51.5%; left:9%; right:9%; z-index:2; text-align:center; pointer-events:none;
 }
 .cwc-eyebrow {
   font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:3px;
