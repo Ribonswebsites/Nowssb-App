@@ -2307,6 +2307,24 @@ body.nm-glass #sub-health-journey .gsel-card {
 }
 .dl-page-back:active { box-shadow:inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.92); }
 
+/* Cycling caption inside the white store-case interior (above the 4 buttons).
+   Reference style: faint eyebrow, bold dark line, gold accent word. One line at
+   a time — the JS fades it out and swaps in the next phrase. */
+.cwc {
+  position:absolute; bottom:49.5%; left:9%; right:9%; z-index:2; text-align:center; pointer-events:none;
+}
+.cwc-eyebrow {
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:3px;
+  text-transform:uppercase; color:rgba(20,20,32,.38); margin-bottom:4px;
+}
+.cwc-line {
+  font-family:'DM Sans',sans-serif; font-size:19px; font-weight:800; line-height:1.15;
+  opacity:1; transform:translateY(0); transition:opacity .4s ease, transform .4s ease;
+}
+.cwc-line.out { opacity:0; transform:translateY(-8px); }
+.cwc-b { color:#15151f; }                                     /* bold dark */
+.cwc-g { color:#bf8a2c; text-shadow:0 1px 6px rgba(191,138,44,.28); }  /* gold accent */
+
 /* Fashion / Trend rotating banner on the normal home (above the Fashion button) */
 .nmh-fashbanner {
   position:relative; width:100%; margin-top:16px; aspect-ratio:16/9;

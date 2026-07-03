@@ -214,7 +214,7 @@ function goTo(id) {
       var hint = document.getElementById('ld-cta-hint');
       if (hint) hint.textContent = window._currentUid ? 'Enter your practice' : 'Sign in to begin';
     }
-    if (id === 'home') { initHomeScrollBg(); updateTodayCard(); if(typeof rxInit==='function') setTimeout(rxInit,120); if (typeof nssUpdateHomeBadges === 'function') nssUpdateHomeBadges(); if(typeof _nwsbRotateFashBanner==='function') _nwsbRotateFashBanner('homeFashImg','home'); (function(){ var card = document.getElementById('sub-promo-card'); if (!card) return; var hasPlan = window.GATE ? (window.GATE.tier()==='resonance'||window.GATE.tier()==='frequency'||window.GATE.tier()==='frequencyX') : (window._userDataCache && window._userDataCache.isPro); card.style.display = hasPlan ? 'none' : 'block'; })(); }
+    if (id === 'home') { initHomeScrollBg(); updateTodayCard(); if(typeof rxInit==='function') setTimeout(rxInit,120); if (typeof nssUpdateHomeBadges === 'function') nssUpdateHomeBadges(); if(typeof _nwsbRotateFashBanner==='function') _nwsbRotateFashBanner('homeFashImg','home'); if(typeof _nwsbCwcCycle==='function') _nwsbCwcCycle(); (function(){ var card = document.getElementById('sub-promo-card'); if (!card) return; var hasPlan = window.GATE ? (window.GATE.tier()==='resonance'||window.GATE.tier()==='frequency'||window.GATE.tier()==='frequencyX') : (window._userDataCache && window._userDataCache.isPro); card.style.display = hasPlan ? 'none' : 'block'; })(); }
     if (id === 'home-nm') {
       if(typeof nmhRefresh==='function') setTimeout(nmhRefresh,80);
       if(typeof updateTodayCard==='function') setTimeout(updateTodayCard,100);
@@ -559,6 +559,30 @@ window._nwsbRotateFashBanner = function(imgId, hostId) {
     };
     pre.src = nextSrc;
   }, 4000);
+};
+
+/* Store-case cycling caption — shows one phrase at a time (fade out → swap →
+   fade in), only while the Fashion home is visible. Bold dark + gold accent. */
+window._CWC_PHRASES = window._CWC_PHRASES || [
+  ['Your fashion', 'drops'],
+  ['The style', 'archive'],
+  ['In your', 'fashion bag'],
+  ['Saved fashion', 'looks'],
+  ['Your', 'healing ritual']
+];
+window._nwsbCwcCycle = function() {
+  var line = document.getElementById('cwcLine'); if (!line) return;
+  var P = window._CWC_PHRASES;
+  function render(k){ var ph = P[k % P.length]; line.innerHTML = '<span class="cwc-b">'+ph[0]+'</span> <span class="cwc-g">'+ph[1]+'</span>'; }
+  var i = window._cwcIdx || 0; render(i);
+  if (window._cwcTimer) clearInterval(window._cwcTimer);
+  window._cwcTimer = setInterval(function(){
+    var l = document.getElementById('cwcLine'); var host = document.getElementById('home');
+    if (!l) { clearInterval(window._cwcTimer); window._cwcTimer = null; return; }
+    if (!host || !host.classList.contains('active')) return;   // cycle only while visible
+    l.classList.add('out');
+    setTimeout(function(){ i = (i + 1) % P.length; window._cwcIdx = i; render(i); l.classList.remove('out'); }, 420);
+  }, 3200);
 };
 
 function nmhRefresh() {
