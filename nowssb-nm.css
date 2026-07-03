@@ -2457,10 +2457,17 @@ body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
 #sub-social {
   background:
     linear-gradient(rgba(6,10,20,0.52), rgba(6,10,20,0.64)),
-    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783102858/grok_image_1783102581357_gsslw8.jpg') center center / cover no-repeat !important;
+    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg') center center / cover no-repeat !important;
 }
 #sub-social #ss-main-view, #sub-social .ss-tab-content, #sub-social #ss-content-settings {
   background: transparent !important;
+}
+/* Same glass image behind the hamburger menu (menu-drawer is position:fixed →
+   static, no scroll repaint, no GPU cost). Dark scrim keeps items readable. */
+#menuDrawer.menu-drawer {
+  background:
+    linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
+    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg') center center / cover no-repeat !important;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
