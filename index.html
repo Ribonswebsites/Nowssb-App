@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js"></script>
 <link rel="stylesheet" href="app/app.css?v=191">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=195">
+<link rel="stylesheet" href="nowssb-nm.css?v=196">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -5140,6 +5140,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <div class="ws-page-body" id="wsPageBody">
 
+    <!-- Glassmorphism card (crystal background behind it) -->
+    <div class="wsg-card">
     <!-- Hero: logo + search bar -->
     <div class="ws-page-hero">
       <div class="ws-page-logo-ring">
@@ -5192,6 +5194,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <button class="ws-page-chip" onclick="wsPageSearchWord('heart')">Heart</button>
       </div>
     </div>
+    </div><!-- /wsg-card -->
 
     <!-- Result card -->
     <div class="ws-page-result" id="wsPageResult">
@@ -5310,6 +5313,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <div class="ms-page-body" id="msPageBody">
 
+    <!-- Glassmorphism card (crystal background behind it) -->
+    <div class="wsg-card">
     <!-- Hero: logo + search bar -->
     <div class="ms-page-hero">
       <div class="ms-page-logo-ring">
@@ -5362,6 +5367,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <button class="ms-page-chip" onclick="msPageSearchWord('dream')">Dream</button>
       </div>
     </div>
+    </div><!-- /wsg-card -->
 
     <!-- Hint -->
     <div class="ms-page-hint">
