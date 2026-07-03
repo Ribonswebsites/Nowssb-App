@@ -233,9 +233,16 @@ window.supSendQuick = function(btn) {
 
 // ── Sign out ───────────────────────────────────────────────
 window.ssSignOut = function() {
-  if (typeof handleSignOut === 'function') { handleSignOut(); }
-  else if (typeof signOut !== 'undefined' && window._auth) { signOut(window._auth).catch(function(){}); }
-  closeSub('social');
+  // Close every open overlay/sub-screen first so nothing covers the login page.
+  try { document.querySelectorAll('.sub-screen.open').forEach(function(el){ el.classList.remove('open'); }); } catch(e) {}
+  ['nwsb-social-settings','ig-social-nav'].forEach(function(id){ var e=document.getElementById(id); if(e){ e.classList.remove('open'); if(id==='ig-social-nav') e.style.display='none'; } });
+  try { if (typeof closeSub === 'function') closeSub('social'); } catch(e) {}
+  // Real sign-out: clears the session, signs out of Firebase and redirects to
+  // the LOGIN screen (fbSignOut does goTo('login')). ssSignOut previously called
+  // an undefined handleSignOut / a module-scoped signOut, so it never signed out
+  // and just fell back to the home page.
+  if (typeof window.fbSignOut === 'function') { window.fbSignOut(); return; }
+  try { if (typeof goTo === 'function') goTo('login'); } catch(e) {}
 };
 
   // ── Words per Session ──────────────────────────────────────────
