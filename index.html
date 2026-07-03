@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js"></script>
 <link rel="stylesheet" href="app/app.css?v=191">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=199">
+<link rel="stylesheet" href="nowssb-nm.css?v=200">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -5140,61 +5140,40 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <div class="ws-page-body" id="wsPageBody">
 
-    <!-- Glassmorphism card (crystal background behind it) -->
+    <!-- Glassmorphism panel (crystal background behind it) -->
     <div class="wsg-card">
-    <div class="wsg-gem" aria-hidden="true"></div>
-    <!-- Hero: logo + search bar -->
-    <div class="ws-page-hero">
-      <div class="ws-page-logo-ring">
-        <div class="ws-page-logo-inner">
+      <div class="wsg-top">
+        <div class="wsg-logo">
           <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB">
         </div>
+        <div class="wsg-brandcol">
+          <div class="wsg-title">NowssB</div>
+          <div class="wsg-sub">by Nowsbansiu,</div>
+        </div>
       </div>
-      <div class="ws-page-brand"><span class="b">Nowss</span><span class="t">B</span></div>
-      <div class="ws-page-tagline">Word without dictionary</div>
 
-      <div class="ws-page-bar">
-        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:17px;height:17px;opacity:0.45;margin-right:12px;" alt="">
-        <input
-          class="ws-page-input"
-          id="wsPageInput"
-          type="text"
-          autocomplete="off"
-          placeholder="Enter any word…"
-          onkeydown="if(event.key==='Enter')wsPageSearch()"
-        >
-        <button class="ws-page-go" onclick="wsPageSearch()">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8H13M9 4L13 8L9 12" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square"/>
-          </svg>
+      <div class="wsg-divider"></div>
+
+      <div class="wsg-search">
+        <span class="wsg-search-dot"></span>
+        <input id="wsPageInput" type="text" autocomplete="off" placeholder="Enter something…" onkeydown="if(event.key==='Enter')wsPageSearch()">
+        <button class="wsg-search-go" onclick="wsPageSearch()" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
-    </div>
 
-    <!-- Quick chips -->
-    <div class="ws-page-chips-wrap">
-      <div class="ws-page-chips-label">Popular</div>
-      <div class="ws-page-chips">
-        <button class="ws-page-chip" onclick="wsPageSearchWord('earth')">Earth</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('water')">Water</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('fire')">Fire</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('god')">God</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('soul')">Soul</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('love')">Love</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('mind')">Mind</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('breath')">Breath</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('light')">Light</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('truth')">Truth</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('time')">Time</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('blood')">Blood</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('star')">Star</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('dream')">Dream</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('moon')">Moon</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('sun')">Sun</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('india')">India</button>
-        <button class="ws-page-chip" onclick="wsPageSearchWord('heart')">Heart</button>
+      <div class="wsg-detail">
+        <div class="wsg-gem" aria-hidden="true"></div>
+        <div class="wsg-detail-text">
+          <div class="wsg-detail-title">Focus on details</div>
+          <div class="wsg-detail-sub">Every reflection tells a story.</div>
+        </div>
       </div>
-    </div>
+
+      <button class="wsg-explore" onclick="wsPageSearch()">
+        Explore
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12H20M14 6L20 12L14 18" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div><!-- /wsg-card -->
 
     <!-- Result card -->
@@ -5314,61 +5293,40 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <div class="ms-page-body" id="msPageBody">
 
-    <!-- Glassmorphism card (crystal background behind it) -->
+    <!-- Glassmorphism panel (crystal background behind it) -->
     <div class="wsg-card">
-    <div class="wsg-gem" aria-hidden="true"></div>
-    <!-- Hero: logo + search bar -->
-    <div class="ms-page-hero">
-      <div class="ms-page-logo-ring">
-        <div class="ms-page-logo-inner">
+      <div class="wsg-top">
+        <div class="wsg-logo">
           <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB">
         </div>
+        <div class="wsg-brandcol">
+          <div class="wsg-title">NowssB</div>
+          <div class="wsg-sub">by Nowsbansiu,</div>
+        </div>
       </div>
-      <div class="ms-page-brand"><span class="b">Nowss</span><span class="t">B</span></div>
-      <div class="ms-page-tagline">Sound before definition</div>
 
-      <div class="ms-page-bar">
-        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:17px;height:17px;opacity:0.45;margin-right:12px;" alt="">
-        <input
-          class="ms-page-input"
-          id="msPageInput"
-          type="text"
-          autocomplete="off"
-          placeholder="Type any word, name, country…"
-          onkeydown="if(event.key==='Enter')msPageSearch()"
-        >
-        <button class="ms-page-go" onclick="msPageSearch()">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8H13M9 4L13 8L9 12" stroke="rgba(200,232,245,0.9)" stroke-width="1.5" stroke-linecap="square"/>
-          </svg>
+      <div class="wsg-divider"></div>
+
+      <div class="wsg-search">
+        <span class="wsg-search-dot"></span>
+        <input id="msPageInput" type="text" autocomplete="off" placeholder="Enter something…" onkeydown="if(event.key==='Enter')msPageSearch()">
+        <button class="wsg-search-go" onclick="msPageSearch()" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
-    </div>
 
-    <!-- Quick chips -->
-    <div class="ms-page-chips-wrap">
-      <div class="ms-page-chips-label">Explore</div>
-      <div class="ms-page-chips">
-        <button class="ms-page-chip" onclick="msPageSearchWord('earth')">Earth</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('water')">Water</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('fire')">Fire</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('god')">God</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('soul')">Soul</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('love')">Love</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('truth')">Truth</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('mind')">Mind</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('light')">Light</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('breath')">Breath</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('blood')">Blood</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('sun')">Sun</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('moon')">Moon</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('star')">Star</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('india')">India</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('heart')">Heart</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('time')">Time</button>
-        <button class="ms-page-chip" onclick="msPageSearchWord('dream')">Dream</button>
+      <div class="wsg-detail">
+        <div class="wsg-gem" aria-hidden="true"></div>
+        <div class="wsg-detail-text">
+          <div class="wsg-detail-title">Focus on details</div>
+          <div class="wsg-detail-sub">Every reflection tells a story.</div>
+        </div>
       </div>
-    </div>
+
+      <button class="wsg-explore" onclick="msPageSearch()">
+        Explore
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12H20M14 6L20 12L14 18" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div><!-- /wsg-card -->
 
     <!-- Hint -->
