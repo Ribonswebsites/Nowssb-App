@@ -2462,9 +2462,10 @@ body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
 #sub-social #ss-main-view, #sub-social .ss-tab-content, #sub-social #ss-content-settings {
   background: transparent !important;
 }
-/* Same glass image behind the hamburger menu (menu-drawer is position:fixed →
-   static, no scroll repaint, no GPU cost). Dark scrim keeps items readable. */
-#menuDrawer.menu-drawer {
+/* Same glass image behind the hamburger menu — FASHION (dark) home only.
+   menu-drawer is position:fixed → static, no scroll repaint, no GPU cost.
+   Neumorphism (light) home keeps its default menu background. */
+body:not(.nm-mode) #menuDrawer.menu-drawer {
   background:
     linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
     url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg') center center / cover no-repeat !important;
