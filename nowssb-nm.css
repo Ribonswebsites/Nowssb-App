@@ -2323,7 +2323,7 @@ body.nm-glass #sub-health-journey .gsel-card {
 }
 .cwc-line.out { opacity:0; transform:translateY(-8px); }
 .cwc-b { color:#15151f; }                                     /* bold dark */
-.cwc-g { color:#bf8a2c; text-shadow:0 1px 6px rgba(191,138,44,.28); }  /* gold accent */
+.cwc-g { color:#ffffff; text-shadow:0 1px 4px rgba(0,0,0,.45); }  /* white accent */
 
 /* Fashion / Trend rotating banner on the normal home (above the Fashion button) */
 .nmh-fashbanner {
