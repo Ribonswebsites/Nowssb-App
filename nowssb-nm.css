@@ -1930,6 +1930,15 @@ body:not(.nm-mode) #ig-social-nav #igsn-me-av svg { stroke: rgba(255,255,255,0.7
    the bottom of light screens / splash). */
 body.nm-mode .app-bg::after { display:none !important; }
 body.nm-mode .app-bg { background-color:#f0f2f7 !important; }
+/* The auth / onboarding screens are ALWAYS light and show BEFORE nm-mode is set,
+   so the dark app-bg vignette bled a black band at the bottom there too. Kill it
+   whenever one of those screens is active. */
+body:has(#login.active) .app-bg::after, body:has(#signup1.active) .app-bg::after,
+body:has(#signup2.active) .app-bg::after, body:has(#onboarding.active) .app-bg::after,
+body:has(#ob-intro.active) .app-bg::after { display:none !important; }
+body:has(#login.active) .app-bg, body:has(#signup1.active) .app-bg,
+body:has(#signup2.active) .app-bg, body:has(#onboarding.active) .app-bg,
+body:has(#ob-intro.active) .app-bg { background:#e4e6ed !important; }
 
 /* ── Fashion-home tile icons: glass wrapper, IN-FLOW (no overlap), original icon size ── */
 .home-tile-icon {
