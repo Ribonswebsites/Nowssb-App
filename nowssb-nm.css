@@ -1917,6 +1917,14 @@ body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #c8a96e !im
 body:not(.nm-mode) #ig-bottomnav, body:not(.nm-mode) #ig-social-nav {
   background: #060c18 !important;
 }
+/* Fashion (dark) mode: the social nav is dark navy, so its LABELS and ICONS
+   must be light — the global light-nav styling (black text, dark icons) was
+   invisible on the dark bar. */
+body:not(.nm-mode) #ig-social-nav .ig-social-btn span { color: rgba(255,255,255,0.72) !important; }
+body:not(.nm-mode) #ig-social-nav .ig-social-btn.active span { color: #e8d5a3 !important; }
+body:not(.nm-mode) #ig-social-nav .ig-social-img { filter: brightness(0) invert(1) !important; opacity: 0.72 !important; }
+body:not(.nm-mode) #ig-social-nav .ig-social-btn.active .ig-social-img { filter: brightness(0) saturate(100%) invert(78%) sepia(35%) saturate(520%) hue-rotate(2deg) brightness(95%) !important; opacity: 1 !important; }
+body:not(.nm-mode) #ig-social-nav #igsn-me-av svg { stroke: rgba(255,255,255,0.72) !important; }
 
 /* Kill the dark app-bg vignette in neumorphism mode (it bled a dark band at
    the bottom of light screens / splash). */
