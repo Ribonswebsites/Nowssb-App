@@ -2366,20 +2366,15 @@ body.nm-glass #sub-health-journey .gsel-card {
 .fb-title {
   font-family:'DM Sans',sans-serif; font-size:14px; font-weight:800; line-height:1.2;
   color:#ffffff; letter-spacing:.2px; opacity:1; max-width:70%;
-  text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 6px rgba(232,213,163,.25);
-  animation:fbGlow 3.4s ease-in-out infinite;
-}
-/* soft gold glow that breathes */
-@keyframes fbGlow {
-  0%,100% { text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 5px rgba(232,213,163,.20); }
-  50%     { text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 22px rgba(232,213,163,.65); }
+  /* static gold glow — was an infinite text-shadow animation (repaint every frame) */
+  text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 12px rgba(232,213,163,.42);
 }
 /* entrance — re-triggered on every image change by toggling .in. NO fill-mode:
    text stays at its base opacity:1 when the entrance isn't actively playing, so
    it can never get stuck invisible. */
 @keyframes fbTextIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
 .fb-ov.in .fb-eyebrow { animation:fbTextIn .55s cubic-bezier(.16,1,.3,1); }
-.fb-ov.in .fb-title   { animation:fbTextIn .6s .06s cubic-bezier(.16,1,.3,1), fbGlow 3.4s ease-in-out .66s infinite; }
+.fb-ov.in .fb-title   { animation:fbTextIn .6s .06s cubic-bezier(.16,1,.3,1); }
 
 /* ===== FASHION SECTIONS EMBEDDED IN THE NORMAL HOME ===== */
 /* full-width within nmh-wrap + rounded to match the neumorphic cards */

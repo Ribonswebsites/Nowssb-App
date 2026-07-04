@@ -551,6 +551,7 @@ window._nwsbRotateFashBanner = function(imgId, hostId) {
     var el = document.getElementById(imgId);
     var host = document.getElementById(hostId);
     if (!el) { clearInterval(window[timerKey]); window[timerKey] = null; return; }
+    if (document.hidden) return;                                // skip crossfade while backgrounded
     if (!host || !host.classList.contains('active')) return;   // rotate only while visible
     var nextIdx = ((window[idxKey] || 0) + 1) % seq.length;
     var nextSrc = seq[nextIdx];
@@ -583,6 +584,7 @@ window._nwsbCwcCycle = function() {
   window._cwcTimer = setInterval(function(){
     var l = document.getElementById('cwcLine'); var host = document.getElementById('home');
     if (!l) { clearInterval(window._cwcTimer); window._cwcTimer = null; return; }
+    if (document.hidden) return;
     if (!host || !host.classList.contains('active')) return;   // cycle only while visible
     l.classList.add('out');
     setTimeout(function(){ i = (i + 1) % P.length; window._cwcIdx = i; render(i); l.classList.remove('out'); }, 420);
@@ -1264,6 +1266,7 @@ function heroGo(n) {
   }
 }
 window._heroInterval = setInterval(() => {
+  if (document.hidden) return; // don't composite full-screen crossfades while backgrounded
   if (window._heroLock !== null && window._heroLock !== undefined) return; // bg-mode one/two/none locks the carousel
   if (document.getElementById('home').classList.contains('active')) {
     heroGo((heroCur + 1) % 5);
@@ -1275,6 +1278,7 @@ const TAG_WORDS = ['VIBRATION','FREQUENCY','RESONANCE','AWAKENING','SOUND BIRTH'
 const tagEl = document.getElementById('tagWord');
 let tagIdx = 0;
 window._tagInterval = setInterval(() => {
+  if (document.hidden) return;
   if (!document.getElementById('home').classList.contains('active')) return;
   tagIdx = (tagIdx + 1) % TAG_WORDS.length;
   tagEl.style.opacity = '0';

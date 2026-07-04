@@ -61,6 +61,7 @@ function applyTilt(x, y) {
   const dy = (y - rect.top  - cy) / cy;
   const rotY =  dx * 6;
   const rotX = -dy * 4;
+  heroSection.style.willChange = 'transform';   // promote to a GPU layer only during the tilt
   heroSection.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.015)`;
   heroSection.style.transition = 'transform 0.12s ease-out';
 }
@@ -68,6 +69,9 @@ function applyTilt(x, y) {
 function resetTilt() {
   heroSection.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)';
   heroSection.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)';
+  // drop the GPU layer once the settle animation finishes (idle = no wasted VRAM)
+  clearTimeout(heroSection._wcTimer);
+  heroSection._wcTimer = setTimeout(() => { heroSection.style.willChange = 'auto'; }, 620);
 }
 
 // ── All home interaction listeners are registered once ──
