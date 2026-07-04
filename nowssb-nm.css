@@ -2572,11 +2572,23 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
 .wsg-head { display: flex; flex-direction: column; gap: 12px; }
 .wsg-tagline {
-  font-size: 11px !important; font-weight: 400 !important; letter-spacing: 1px !important;
-  color: rgba(200,169,110,0.9) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  text-align: center;
+  font-size: 13.5px !important; font-weight: 600 !important; letter-spacing: 0.8px !important;
+  color: #f0dcae !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-align: center; text-shadow: 0 1px 5px rgba(0,0,0,0.65);
 }
-.wsg-tagline strong { color: #e8d5a3 !important; font-weight: 700; }
+.wsg-tagline strong { color: #ffe9b8 !important; font-weight: 800; }
+/* small caption below the Explore button + one-line page hint */
+.wsg-below {
+  text-align: center; margin-top: 14px; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;
+  color: rgba(255,255,255,0.55); text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.ws-page-hint, .ms-page-hint {
+  text-align: center; margin: 16px 24px 0 !important; font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px !important; line-height: 1.4 !important; color: rgba(255,255,255,0.5) !important;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ws-page-hint strong, .ms-page-hint strong { color: rgba(255,255,255,0.8) !important; font-weight: 700; }
 .wsg-title {
   font-family: 'DM Sans', sans-serif; font-weight: 800; letter-spacing: -0.5px;
   font-size: 40px; line-height: 1; color: #f4f7fb;
