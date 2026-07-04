@@ -2625,10 +2625,9 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
    knocks the black out so only the bright crystal shows (matches reference,
    no black box). border-radius rounds the corners as a fallback. */
 .wsg-gem {
-  width: 92px; height: 120px; flex-shrink: 0; border-radius: 22px !important;
+  width: 112px; height: 118px; flex-shrink: 0; border-radius: 22px !important;
   overflow: hidden;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783104352/file_00000000bd2071fa895664b37ba90c38_fv8syd.png') center center / 116% no-repeat;
-  mix-blend-mode: screen;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783162753/file_000000004f5471fa92179aacccd3cea8_nfw8gm.png') center center / cover no-repeat;
 }
 /* themed SVG icon (used on every slide except the first "Focus"/diamond one) */
 .wsg-ico {
