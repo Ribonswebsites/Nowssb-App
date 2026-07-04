@@ -2981,16 +2981,17 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 
 /* ══ FASHION HOME — streak: three glass boxes (label · number · keep) ══ */
 #home .fash-streak {
-  position: relative; display: block; box-sizing: border-box;
+  position: relative; display: block; box-sizing: border-box; overflow: hidden;
   width: calc(100% - 32px) !important; margin: 16px 16px 20px; padding: 0; border: none; cursor: pointer;
-  aspect-ratio: 1536 / 1024;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png') center center / 100% 100% no-repeat;
+  /* show only the middle band with the glass boxes — crop the metallic top/bottom */
+  aspect-ratio: 1536 / 450;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png') center center / 100% auto no-repeat;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.38));
 }
 #home .fash-streak:active { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)) brightness(1.06); }
 /* each label/number/cta centered over its glass box */
 #home .fash-streak-box {
-  position: absolute; top: 48%; transform: translate(-50%,-50%);
+  position: absolute; top: 46%; transform: translate(-50%,-50%);
   display: flex; align-items: center; justify-content: center; text-align: center;
   width: 26%;
 }
