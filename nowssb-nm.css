@@ -2708,8 +2708,8 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 
 #sub-features {
   background:
-    linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
-    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783160845/grok_image_1783160701247_ervstf.jpg') center center / cover no-repeat #060c18 !important;
+    linear-gradient(rgba(6,10,20,0.55), rgba(6,10,20,0.68)),
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1200/v1783161316/grok_image_1783161280041_l9yxo1.jpg') center center / cover no-repeat #060c18 !important;
 }
 #sub-features .feat-scroll {
   position: relative; z-index: 1; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -2747,15 +2747,34 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 }
 #sub-features .feat-card:active { background: rgba(255,255,255,0.06) !important; border-radius: 16px !important; }
 #sub-features .feat-ico {
+  position: relative;
   grid-row: 1 / 3; grid-column: 1; align-self: center;
   width: 68px; height: 68px; border-radius: 18px !important; margin: 0;
   display: flex; align-items: center; justify-content: center;
   background: rgba(232,213,163,0.10); border: 1px solid rgba(255,255,255,0.14);
 }
 #sub-features .feat-ico svg { width: 34px; height: 34px; }
+/* traveling light ring around an icon — border-mask trick; hidden until a JS
+   sequencer adds .feat-anim, then it plays ONE sweep. Only one icon lit at a
+   time, cycling icon-to-icon (see part049.js). */
+@property --featang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+#sub-features .feat-ico::after {
+  content: ''; position: absolute; inset: -2px; border-radius: 20px; padding: 2px;
+  pointer-events: none; z-index: 3; opacity: 0;
+  background: conic-gradient(from var(--featang),
+    transparent 0deg, transparent 210deg,
+    rgba(255,255,255,0.06) 250deg, #e8d5a3 300deg, #ffffff 332deg,
+    #e8d5a3 352deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  will-change: --featang;
+}
+#sub-features .feat-ico.feat-anim::after { opacity: 1; animation: featTravel 1.5s linear 1; }
+@keyframes featTravel { to { --featang: 360deg; } }
 #sub-features .feat-name { grid-column: 2; grid-row: 1; align-self: end; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 18px; color: #f2f6fa; }
 #sub-features .feat-sub { grid-column: 2; grid-row: 2; align-self: start; font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.48); margin-top: 2px; }
 
 /* feature icon that uses a full image (e.g. NowssB Connect logo) — fill the box */
-#sub-features .feat-ico-img { background: transparent; border: none; padding: 0; overflow: hidden; }
+#sub-features .feat-ico-img { background: transparent; border: none; padding: 0; overflow: visible; }
 #sub-features .feat-ico-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 18px !important; display: block; }

@@ -199,3 +199,21 @@ window.pwCloseMeaning = function() {
   window.wsExplore = openExploreChoice;
   window.msExplore = openExploreChoice;
 })();
+
+/* Features menu — traveling light that moves from one icon to the next, ONE at
+   a time. A single interval lights the next .feat-ico (plays one CSS sweep),
+   only while the menu is open, so it never burns cycles in the background. */
+(function () {
+  var idx = 0;
+  setInterval(function () {
+    var scr = document.getElementById('sub-features');
+    if (!scr || !scr.classList.contains('open')) return;
+    var icons = scr.querySelectorAll('.feat-ico');
+    if (!icons.length) return;
+    for (var k = 0; k < icons.length; k++) icons[k].classList.remove('feat-anim');
+    var ic = icons[idx % icons.length];
+    void ic.offsetWidth;            // restart the animation
+    ic.classList.add('feat-anim');
+    idx++;
+  }, 1600);
+})();
