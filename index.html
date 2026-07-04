@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=205"></script>
 <link rel="stylesheet" href="app/app.css?v=191">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=212">
+<link rel="stylesheet" href="nowssb-nm.css?v=214">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -619,6 +619,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <span class="brand-name" style="font-size:22px;text-shadow:0 1px 8px rgba(0,0,0,0.5);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
+    <button class="hero-feat-btn" onclick="openSub('features')" aria-label="All features">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_130/v1783142109/file_000000000bc0720685024714955c2ead_iurobd.png" alt="">
+    </button>
     <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');window._fashionHomeIntroSeen=true;goTo('home-nm')" title="Light Mode" style="width:40px;height:40px;min-width:40px;min-height:40px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;backdrop-filter:none;-webkit-backdrop-filter:none;flex-shrink:0;padding:0;box-sizing:border-box;">
       <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780398892/11eba830-5e74-11f1-850d-112dd967e66d_uy7e7p.png" style="width:36px;height:36px;object-fit:contain;display:block;" alt="">
     </button>
@@ -983,9 +986,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="hero-bg"    id="hb2"></div>
     <div class="hero-bg"    id="hb3"></div>
     <div class="hero-bg"    id="hb4"></div>
-    <button class="hero-feat-btn" onclick="openSub('features')" aria-label="All features">
-      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_130/v1783142109/file_000000000bc0720685024714955c2ead_iurobd.png" alt="">
-    </button>
     <div class="hero-content">
       <div style="margin-left:18px;margin-right:18px;">
         <div>
