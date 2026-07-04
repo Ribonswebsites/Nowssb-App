@@ -2982,11 +2982,11 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 /* ══ FASHION HOME — streak bar below the hero ══ */
 #home .fash-streak {
   display: flex; align-items: center; gap: 14px; box-sizing: border-box;
-  margin: 4px 0 22px; padding: 15px 18px; border-radius: 20px !important; cursor: pointer;
-  background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.10);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.32);
+  margin: 4px 0 20px; padding: 20px 26px; border: none; cursor: pointer;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim,f_auto,q_auto,w_820/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center center / 100% 100% no-repeat;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.38));
 }
-#home .fash-streak:active { background: rgba(255,255,255,0.1); }
+#home .fash-streak:active { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)) brightness(1.08); }
 #home .fash-streak-icon {
   width: 46px; height: 46px; flex-shrink: 0; border-radius: 14px !important;
   display: flex; align-items: center; justify-content: center;
