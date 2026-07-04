@@ -2716,24 +2716,29 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   box-sizing: border-box;
   padding: calc(env(safe-area-inset-top,20px) + 16px) 18px calc(var(--nav-height,58px) + 44px);
 }
-#sub-features .feat-header { display: flex; align-items: flex-start; gap: 14px; margin: 2px 2px 26px; }
+#sub-features .feat-topbar { margin: 2px 0 12px; }
 #sub-features .feat-back {
-  width: 42px; height: 42px; flex-shrink: 0; border: none; cursor: pointer; padding: 0; margin-top: 4px;
+  width: 42px; height: 42px; flex-shrink: 0; border: none; cursor: pointer; padding: 0;
   background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;
 }
+/* header text sits INSIDE the player's glass tube/capsule image (stretched) */
+#sub-features .feat-tube {
+  position: relative; margin: 0 0 24px; padding: 26px 30px 30px;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim,f_auto,q_auto,w_800/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center/100% 100% no-repeat;
+  filter: drop-shadow(0 14px 30px rgba(0,0,0,0.5));
+}
 #sub-features .feat-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #c8a96e; margin-bottom: 8px; }
-#sub-features .feat-title { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 32px; line-height: 1.05; color: #f4f7fb; }
-#sub-features .feat-hsub { font-family: 'DM Sans', sans-serif; font-size: 14px; color: rgba(255,255,255,0.55); margin-top: 8px; }
-/* vertical LIST: each row = big icon on the left, text on the right, stacked */
-#sub-features .feat-grid { display: flex; flex-direction: column; gap: 12px; }
+#sub-features .feat-title { font-family: 'DM Sans', sans-serif; font-weight: 200; font-size: 34px; line-height: 1.05; color: rgba(255,255,255,0.9); }
+#sub-features .feat-title .brand-name { font-size: 34px !important; text-shadow: none !important; }
+#sub-features .feat-hsub { font-size: 13px; margin-top: 10px; }
+/* vertical LIST: each row = big icon on the left, text on the right, NO pill */
+#sub-features .feat-grid { display: flex; flex-direction: column; gap: 6px; }
 #sub-features .feat-card {
   display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto;
   align-items: center; column-gap: 16px; text-align: left; cursor: pointer;
-  padding: 14px 18px; border-radius: 22px !important;
-  background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.13);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 8px 22px rgba(0,0,0,0.32);
+  padding: 10px 4px; border: none !important; background: transparent !important; box-shadow: none !important;
 }
-#sub-features .feat-card:active { background: rgba(255,255,255,0.11); }
+#sub-features .feat-card:active { background: rgba(255,255,255,0.06) !important; border-radius: 16px !important; }
 #sub-features .feat-ico {
   grid-row: 1 / 3; grid-column: 1; align-self: center;
   width: 68px; height: 68px; border-radius: 18px !important; margin: 0;

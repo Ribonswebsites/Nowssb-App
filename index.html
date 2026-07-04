@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=205"></script>
 <link rel="stylesheet" href="app/app.css?v=191">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=218">
+<link rel="stylesheet" href="nowssb-nm.css?v=219">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -5122,13 +5122,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ ALL FEATURES MENU (Fashion hero icon) ══ -->
 <div class="sub-screen" id="sub-features">
   <div class="feat-scroll">
-    <div class="feat-header">
+    <div class="feat-topbar">
       <button class="feat-back" onclick="closeSub('features')" aria-label="Back"></button>
-      <div class="feat-htext">
-        <div class="feat-eyebrow">Nowsbansiu</div>
-        <div class="feat-title">Everything<br>NowssB</div>
-        <div class="feat-hsub">Every feature, one tap away.</div>
-      </div>
+    </div>
+    <div class="feat-tube">
+      <div class="feat-eyebrow">Nowsbansiu</div>
+      <div class="feat-title">Everything <span class="brand-name"><span class="b">Nowss</span><span class="t">B</span></span></div>
+      <div class="feat-hsub brand-tag">Every feature, <strong>one tap away.</strong></div>
     </div>
     <div class="feat-grid">
       <button class="feat-card" onclick="closeSub('features');setTimeout(function(){window.IG&&IG.nav('library');},260);">
@@ -5140,7 +5140,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="feat-name">NowssB Connect</div><div class="feat-sub">Community</div>
       </button>
       <button class="feat-card" onclick="closeSub('features');setTimeout(function(){window.IG&&IG.nav('store');},260);">
-        <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M5 8h14l-1 12H6L5 8z" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_120/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt=""></div>
         <div class="feat-name">NowssB Store</div><div class="feat-sub">Words & meanings</div>
       </button>
       <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('search-choice');},260);">
