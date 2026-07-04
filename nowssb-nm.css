@@ -2684,25 +2684,24 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
    FASHION HERO — "all features" icon button (right of the NowssB title) with a
    traveling light ring, and the features menu it opens (#sub-features). */
 .hero-feat-btn {
-  position: relative; width: 54px; height: 54px; flex-shrink: 0;
-  border-radius: 50% !important; border: none; padding: 0; cursor: pointer;
-  background: transparent; overflow: hidden;
+  position: relative; width: 56px; height: 56px; flex-shrink: 0;
+  border: none; padding: 0; cursor: pointer; background: transparent;
   display: flex; align-items: center; justify-content: center;
 }
-.hero-feat-btn::before {   /* spinning conic light behind the icon */
-  content: ''; position: absolute; z-index: 0; top: 50%; left: 50%;
-  width: 200%; height: 200%; transform: translate(-50%, -50%);
+/* traveling light RING only (masked to an annulus) — no disc behind the icon,
+   so the transparent logo shows with just a moving light halo around it. */
+.hero-feat-btn::before {
+  content: ''; position: absolute; inset: -3px; border-radius: 50%; z-index: 0; pointer-events: none;
   background: conic-gradient(from 0deg,
     rgba(232,213,163,0) 0deg, rgba(232,213,163,0) 250deg,
     rgba(232,213,163,0.6) 312deg, rgba(255,255,255,1) 345deg,
     rgba(232,213,163,0.6) 354deg, rgba(232,213,163,0) 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+          mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
   animation: wsgSpinBtn 3.4s linear infinite; will-change: transform;
 }
-.hero-feat-btn::after {    /* dark inner disc — leaves a 2.5px ring of moving light */
-  content: ''; position: absolute; z-index: 1; inset: 2.5px; border-radius: 50%; background: #070b14;
-}
-.hero-feat-btn img { position: relative; z-index: 2; width: 49px; height: 49px; border-radius: 50% !important; object-fit: cover; display: block; }
-@keyframes wsgSpinBtn { to { transform: translate(-50%, -50%) rotate(360deg); } }
+.hero-feat-btn img { position: relative; z-index: 1; width: 54px; height: 54px; object-fit: contain; display: block; }
+@keyframes wsgSpinBtn { to { transform: rotate(360deg); } }
 
 #sub-features {
   background:
