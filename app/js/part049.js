@@ -192,14 +192,10 @@ window.pwCloseMeaning = function() {
   if (document.readyState !== 'loading') ready();
   else document.addEventListener('DOMContentLoaded', ready);
 
-  function explore(inputId, carId, searchFn, searchWordFn) {
-    var inp = document.getElementById(inputId);
-    var v = inp ? inp.value.trim() : '';
-    if (v) { if (typeof window[searchFn] === 'function') window[searchFn](); return; }
-    var car = document.getElementById(carId);
-    var w = (car && car._currentWord) ? car._currentWord() : '';
-    if (w && typeof window[searchWordFn] === 'function') window[searchWordFn](w);
+  // Explore opens the chooser page (Words store vs Meaning store), NOT a search.
+  function openExploreChoice() {
+    if (typeof openSub === 'function') openSub('explore-choice');
   }
-  window.wsExplore = function () { explore('wsPageInput', 'wsCarousel', 'wsPageSearch', 'wsPageSearchWord'); };
-  window.msExplore = function () { explore('msPageInput', 'msCarousel', 'msPageSearch', 'msPageSearchWord'); };
+  window.wsExplore = openExploreChoice;
+  window.msExplore = openExploreChoice;
 })();
