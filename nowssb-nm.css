@@ -2683,8 +2683,11 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 /* ══════════════════════════════════════════════════════════════════════════
    FASHION HERO — "all features" icon button (right of the NowssB title) with a
    traveling light ring, and the features menu it opens (#sub-features). */
+.hero-section { position: relative; }
 .hero-feat-btn {
-  position: relative; width: 56px; height: 56px; flex-shrink: 0;
+  position: absolute; z-index: 40;
+  top: calc(env(safe-area-inset-top, 0px) + 14px); right: 16px;
+  width: 56px; height: 56px; flex-shrink: 0;
   border: none; padding: 0; cursor: pointer; background: transparent;
   display: flex; align-items: center; justify-content: center;
 }
