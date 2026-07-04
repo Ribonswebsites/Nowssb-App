@@ -475,6 +475,13 @@ window.nwSubClose = function() {
 /* ══ Hook goTo → manage fashion-home-active + fire tour on home ══ */
 var _origGoTo = window.goTo;
 window.goTo = function(dest) {
+  // The Fashion home only loads when explicitly chosen — a Fashion button sets
+  // nwsb_home_mode='home' immediately before calling goTo('home'). Every other
+  // route to 'home' (post-start landing, finish-onboarding, landing enter,
+  // "go home" actions) resolves to the normal neumorphism home.
+  if (dest === 'home' && (localStorage.getItem('nwsb_home_mode') || 'nm') !== 'home') {
+    dest = 'home-nm';
+  }
   var fromSplash = (currentScreen === 'splash');
   if (dest !== 'home') {
     document.body.classList.remove('fashion-home-active');

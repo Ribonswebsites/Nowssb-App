@@ -61,6 +61,13 @@ window._userDataCache = null;
 window._splashRoute   = null;
 // _splashDone: true once the 2.5s splash timer has fired
 window._splashDone    = false;
+// Cold start — the branded start animation is running right now. Always land on
+// the normal home after it, never the Fashion home, regardless of the page the
+// user was last on. (This module only re-runs on a true reload, not on a
+// background→foreground resume, so a resumed session stays where it was.)
+// Fashion is opt-in per session: its buttons set nwsb_home_mode='home' just
+// before navigating.
+try { localStorage.setItem('nwsb_home_mode', 'nm'); } catch(e){}
 // _authNavigating: lock to prevent double-navigation (e.g. Google popup + onAuthStateChanged)
 window._authNavigating = false;
 
