@@ -214,7 +214,7 @@ function goTo(id) {
       var hint = document.getElementById('ld-cta-hint');
       if (hint) hint.textContent = window._currentUid ? 'Enter your practice' : 'Sign in to begin';
     }
-    if (id === 'home') { initHomeScrollBg(); updateTodayCard(); if(typeof rxInit==='function') setTimeout(rxInit,120); if (typeof nssUpdateHomeBadges === 'function') nssUpdateHomeBadges(); if(typeof _nwsbRotateFashBanner==='function') _nwsbRotateFashBanner('homeFashImg','home'); if(typeof _nwsbCwcCycle==='function') _nwsbCwcCycle(); (function(){ var card = document.getElementById('sub-promo-card'); if (!card) return; var hasPlan = window.GATE ? (window.GATE.tier()==='resonance'||window.GATE.tier()==='frequency'||window.GATE.tier()==='frequencyX') : (window._userDataCache && window._userDataCache.isPro); card.style.display = hasPlan ? 'none' : 'block'; })(); }
+    if (id === 'home') { initHomeScrollBg(); updateTodayCard(); if(typeof rxInit==='function') setTimeout(rxInit,120); if (typeof nssUpdateHomeBadges === 'function') nssUpdateHomeBadges(); if(typeof _nwsbRotateFashBanner==='function') _nwsbRotateFashBanner('homeFashImg','home'); if(typeof _nwsbCwcCycle==='function') _nwsbCwcCycle(); (function(){ var d=window._userDataCache||{}; var s=d.currentStreak||d.streakCount||0; var e=document.getElementById('fashStreakNum'); if(e) e.textContent=s; })(); (function(){ var card = document.getElementById('sub-promo-card'); if (!card) return; var hasPlan = window.GATE ? (window.GATE.tier()==='resonance'||window.GATE.tier()==='frequency'||window.GATE.tier()==='frequencyX') : (window._userDataCache && window._userDataCache.isPro); card.style.display = hasPlan ? 'none' : 'block'; })(); }
     if (id === 'home-nm') {
       if(typeof nmhRefresh==='function') setTimeout(nmhRefresh,80);
       if(typeof updateTodayCard==='function') setTimeout(updateTodayCard,100);
@@ -604,11 +604,13 @@ function nmhRefresh() {
     if (_nmMoon) _nmMoon.style.display = 'none';
   }
 
-  // Sync streak
+  // Sync streak (both homes)
   var d = window._userDataCache || {};
   var streak = d.currentStreak || d.streakCount || 0;
   var el = document.getElementById('nmhStreakNum');
   if (el) el.textContent = streak;
+  var elF = document.getElementById('fashStreakNum');
+  if (elF) elF.textContent = streak;
 
   // Sync greeting + image by time-of-day (same slot logic for both)
   var h = new Date().getHours();

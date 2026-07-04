@@ -2978,3 +2978,20 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .nwsb-pv-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 18px; scrollbar-width: none; }
 .nwsb-pv-carousel::-webkit-scrollbar { display: none; }
 .nwsb-pv-carousel .nwsb-pv-media { flex: 0 0 100%; scroll-snap-align: center; }
+
+/* ══ FASHION HOME — streak bar below the hero ══ */
+#home .fash-streak {
+  display: flex; align-items: center; gap: 14px; box-sizing: border-box;
+  margin: 4px 0 22px; padding: 15px 18px; border-radius: 20px !important; cursor: pointer;
+  background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.32);
+}
+#home .fash-streak:active { background: rgba(255,255,255,0.1); }
+#home .fash-streak-icon {
+  width: 46px; height: 46px; flex-shrink: 0; border-radius: 14px !important;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.12); border: 1px solid rgba(255,255,255,0.12);
+}
+#home .fash-streak-num { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 26px; color: #fff; line-height: 1; }
+#home .fash-streak-label { font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 4px; }
+#home .fash-streak-cta { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #c8a96e; }
