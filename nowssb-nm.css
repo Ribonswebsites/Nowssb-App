@@ -2511,13 +2511,36 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   padding: 44px 24px 44px; overflow: hidden;
   min-height: calc(var(--full-height, 100vh) - 118px);
   display: flex; flex-direction: column; justify-content: center; gap: 30px;
+  background: transparent;
+  box-shadow: 0 40px 90px rgba(0,0,0,0.7);
+}
+/* traveling light — a conic-gradient arc spinning behind the panel. The card
+   clips it (overflow:hidden + rounded), and ::after re-draws the glass inset by
+   2px, so only a thin ring of moving light shows around the panel edge. Uses
+   transform:rotate only (works in every WebView; no @property / mask needed). */
+.wsg-card::before {
+  content: ''; position: absolute; z-index: 0; pointer-events: none;
+  top: 50%; left: 50%; width: 240%; height: 240%; transform: translate(-50%, -50%);
+  background: conic-gradient(from 0deg,
+    rgba(255,255,255,0) 0deg,
+    rgba(255,255,255,0) 250deg,
+    rgba(150,210,255,0.55) 315deg,
+    rgba(255,255,255,0.98) 348deg,
+    rgba(150,210,255,0.55) 356deg,
+    rgba(255,255,255,0) 360deg);
+  animation: wsgTravel 4.5s linear infinite;
+  will-change: transform;
+}
+.wsg-card::after {
+  content: ''; position: absolute; z-index: 1; inset: 2px; border-radius: 40px; pointer-events: none;
   background:
     linear-gradient(155deg, rgba(244,248,253,0.16), rgba(214,228,244,0.06) 55%, rgba(244,248,253,0.13)),
     url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783105775/file_00000000092071fa987c573af7825e6d_be9hpf.png') center center / 165% no-repeat;
   background-color: rgba(230,238,248,0.09);
-  border: 1px solid rgba(255,255,255,0.34);
-  box-shadow: 0 40px 90px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 0 90px rgba(255,255,255,0.07);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), inset 0 0 90px rgba(255,255,255,0.07);
 }
+.wsg-card > * { position: relative; z-index: 2; }
+@keyframes wsgTravel { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
 /* top row: circular glass logo + NowssB title / by Nowsbansiu, subtitle */
 .wsg-top { display: flex; align-items: center; gap: 16px; }
