@@ -84,19 +84,60 @@
     if (!f) return;
     var rd = new FileReader();
     rd.onload = function () {
-      var data = rd.result;
-      var key = KEYS[_mode] || KEYS.post;
-      var arr = load(key);
-      arr.unshift({ img: data, caption: '', ts: Date.now(), video: /^data:video/.test(String(data)) });
-      // keep localStorage from overflowing — cap stored items
-      if (arr.length > (_mode === 'post' ? 60 : 30)) arr = arr.slice(0, _mode === 'post' ? 60 : 30);
-      save(key, arr);
       nwsbCloseCreate();
-      var label = _mode.charAt(0).toUpperCase() + _mode.slice(1);
-      toast(label + ' added ✓');
-      refreshProfile();
+      openCompose(_mode, rd.result, /^data:video/.test(String(rd.result)));
     };
     rd.readAsDataURL(f);
+  }
+
+  // ── Instagram-style compose editor (caption, location, share) ──────────────
+  function openCompose(mode, data, isVideo) {
+    var old = document.getElementById('nwsbCompose'); if (old) old.remove();
+    var label = mode.charAt(0).toUpperCase() + mode.slice(1);
+    var media = isVideo
+      ? '<video src="' + data + '" class="nwsb-cp-media" muted autoplay loop playsinline></video>'
+      : '<div class="nwsb-cp-media" style="background-image:url(' + data + ')"></div>';
+    var ov = document.createElement('div');
+    ov.id = 'nwsbCompose'; ov.className = 'nwsb-cp-wrap';
+    ov.innerHTML =
+      '<div class="nwsb-cp-head">' +
+        '<button class="nwsb-cp-x" aria-label="Back">&#10005;</button>' +
+        '<div class="nwsb-cp-title">New ' + label + '</div>' +
+        '<button class="nwsb-cp-share">Share</button>' +
+      '</div>' +
+      '<div class="nwsb-cp-body">' +
+        '<div class="nwsb-cp-preview">' + media + '</div>' +
+        '<textarea class="nwsb-cp-caption" maxlength="2200" placeholder="Write a caption…"></textarea>' +
+        '<div class="nwsb-cp-field"><span class="nwsb-cp-ic">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>' +
+          '</span><input class="nwsb-cp-loc" type="text" placeholder="Add location"></div>' +
+        '<div class="nwsb-cp-field nwsb-cp-toggle"><span class="nwsb-cp-ic">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h16v13H5.2L4 18z"/></svg>' +
+          '</span><span class="nwsb-cp-toggle-tx">Also share to your Story</span><span class="nwsb-cp-sw" data-on="0"></span></div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function () { ov.classList.add('open'); });
+
+    ov.querySelector('.nwsb-cp-x').onclick = function () { ov.classList.remove('open'); setTimeout(function () { ov.remove(); }, 300); };
+    var sw = ov.querySelector('.nwsb-cp-sw');
+    sw.onclick = function () { sw.setAttribute('data-on', sw.getAttribute('data-on') === '1' ? '0' : '1'); };
+    ov.querySelector('.nwsb-cp-share').onclick = function () {
+      var cap = ov.querySelector('.nwsb-cp-caption').value.trim();
+      var loc = ov.querySelector('.nwsb-cp-loc').value.trim();
+      var item = { img: data, caption: cap, location: loc, ts: Date.now(), video: !!isVideo };
+      var key = KEYS[mode] || KEYS.post;
+      var arr = load(key); arr.unshift(item);
+      var cap2 = (mode === 'post' ? 60 : 30); if (arr.length > cap2) arr = arr.slice(0, cap2);
+      save(key, arr);
+      // "also share to story"
+      if (sw.getAttribute('data-on') === '1' && mode !== 'story') {
+        var st = load(KEYS.story); st.unshift({ img: data, caption: cap, ts: Date.now(), video: !!isVideo });
+        save(KEYS.story, st.slice(0, 30));
+      }
+      ov.classList.remove('open'); setTimeout(function () { ov.remove(); }, 300);
+      toast(label + ' shared ✓');
+      refreshProfile();
+    };
   }
 
   // ── render created posts into the profile grid + wire create triggers ──
@@ -141,11 +182,15 @@
   window.nwsbViewMyPost = function (i) {
     var posts = load(KEYS.post); var p = posts[i]; if (!p) return;
     var ov = document.createElement('div'); ov.className = 'nwsb-pv-wrap';
+    var meta = '';
+    if (p.location) meta += '<div class="nwsb-pv-loc">📍 ' + p.location + '</div>';
+    if (p.caption) meta += '<div class="nwsb-pv-cap">' + p.caption + '</div>';
     ov.innerHTML =
       '<div class="nwsb-pv-scrim" onclick="this.parentNode.remove()"></div>' +
       '<div class="nwsb-pv-card">' +
         (p.video ? '<video src="' + p.img + '" controls autoplay loop playsinline class="nwsb-pv-media"></video>'
                  : '<img src="' + p.img + '" class="nwsb-pv-media">') +
+        (meta ? '<div class="nwsb-pv-meta">' + meta + '</div>' : '') +
         '<div class="nwsb-pv-row">' +
           '<button class="nwsb-pv-del" data-i="' + i + '">Delete</button>' +
           '<button class="nwsb-pv-close" onclick="this.closest(\'.nwsb-pv-wrap\').remove()">Close</button>' +

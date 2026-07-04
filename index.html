@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=205"></script>
 <link rel="stylesheet" href="app/app.css?v=191">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=234">
+<link rel="stylesheet" href="nowssb-nm.css?v=235">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -5285,6 +5285,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         Explore
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12H20M14 6L20 12L14 18" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+
+      <div class="wsg-swipe" onclick="closeSub('word-search');setTimeout(function(){openSub('meaning-search');},60);">
+        <span class="wsg-swipe-dot on"></span><span class="wsg-swipe-dot"></span>
+        <span>Swipe for Meaning</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="rgba(255,255,255,0.6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
     </div><!-- /wsg-card -->
 
     <!-- Result card -->
@@ -5446,6 +5452,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         Explore
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12H20M14 6L20 12L14 18" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+
+      <div class="wsg-swipe" onclick="closeSub('meaning-search');setTimeout(function(){openSub('word-search');},60);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="transform:scaleX(-1)"><path d="M5 12h14M13 6l6 6-6 6" stroke="rgba(255,255,255,0.6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Swipe for Words</span>
+        <span class="wsg-swipe-dot"></span><span class="wsg-swipe-dot on"></span>
+      </div>
     </div><!-- /wsg-card -->
 
     <!-- Hint -->
@@ -7098,7 +7110,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <script src="app/js/part049.js?v=231"></script>
-<script src="app/js/part050.js?v=233"></script>
+<script src="app/js/part050.js?v=235"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>
 <script src="nowssb-player.js?v=172" defer></script>

@@ -2444,10 +2444,14 @@ body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
   -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
           backdrop-filter: blur(14px) saturate(1.2) !important;
 }
-/* Light nav → show the ORIGINAL icon images with NO tint/effect at all, active
-   or not. (Active is indicated by the gold LABEL text only, not a gold icon.) */
-body.nm-mode #ig-social-nav .ig-social-img,
-body.nm-mode #ig-bottomnav .ig-nav-img,
+/* Nav icons: show the ORIGINAL images with NO tint/effect in BOTH themes
+   (Fashion + neumorphism) so Connect looks identical from either home. Active
+   is indicated by the gold LABEL text only, not a gold icon. */
+#ig-social-nav .ig-social-img, #ig-bottomnav .ig-nav-img,
+body:not(.nm-mode) #ig-social-nav .ig-social-img, body:not(.nm-mode) #ig-bottomnav .ig-nav-img,
+body.nm-mode #ig-social-nav .ig-social-img, body.nm-mode #ig-bottomnav .ig-nav-img,
+body:not(.nm-mode) #ig-social-nav .ig-social-btn.active .ig-social-img,
+body:not(.nm-mode) #ig-bottomnav .ig-nav-btn.active .ig-nav-img,
 body.nm-mode #ig-social-nav .ig-social-btn.active .ig-social-img,
 body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-img {
   filter: none !important;
@@ -2884,3 +2888,44 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .nwsbf-you.nwsb-has-story .nwsbf-story-ring, .nwsbf-story-ring.nwsbf-you.nwsb-has-story {
   background: linear-gradient(45deg,#c8a96e,#e8d5a3,#c8a96e) !important;
 }
+
+/* ══ INSTAGRAM-STYLE COMPOSE EDITOR (caption + location + share) ══ */
+.nwsb-cp-wrap { position: fixed; inset: 0; z-index: 100003; background: #f6f7fa;
+  transform: translateY(100%); transition: transform .32s cubic-bezier(.16,1,.3,1);
+  display: flex; flex-direction: column; }
+.nwsb-cp-wrap.open { transform: translateY(0); }
+.nwsb-cp-head { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  padding: calc(env(safe-area-inset-top,16px) + 12px) 18px 12px; border-bottom: 1px solid rgba(0,0,0,0.08); background: #fff; }
+.nwsb-cp-x { background: none; border: none; font-size: 19px; color: #1a1f2b; cursor: pointer; line-height: 1; padding: 4px; }
+.nwsb-cp-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 16px; color: #1a1f2b; }
+.nwsb-cp-share { background: none; border: none; color: #c8a96e; font-weight: 800; font-size: 15px; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 4px 2px; }
+.nwsb-cp-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 18px calc(env(safe-area-inset-bottom,16px) + 24px); }
+.nwsb-cp-preview { width: 100%; border-radius: 16px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+.nwsb-cp-media { width: 100%; height: 340px; object-fit: cover; background-size: cover; background-position: center; display: block; background-color: #000; }
+.nwsb-cp-caption { width: 100%; box-sizing: border-box; min-height: 84px; border: none; resize: none; outline: none;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; color: #1a1f2b; background: transparent; padding: 2px 0 14px; border-bottom: 1px solid rgba(0,0,0,0.09); }
+.nwsb-cp-caption::placeholder { color: rgba(0,0,0,0.35); }
+.nwsb-cp-field { display: flex; align-items: center; gap: 12px; padding: 15px 2px; border-bottom: 1px solid rgba(0,0,0,0.08); }
+.nwsb-cp-ic { color: #737a86; display: flex; flex-shrink: 0; }
+.nwsb-cp-loc { flex: 1; border: none; outline: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 15px; color: #1a1f2b; }
+.nwsb-cp-loc::placeholder { color: rgba(0,0,0,0.4); }
+.nwsb-cp-toggle-tx { flex: 1; font-family: 'DM Sans', sans-serif; font-size: 15px; color: #1a1f2b; }
+.nwsb-cp-sw { width: 44px; height: 26px; border-radius: 13px; background: #d3d8e2; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+.nwsb-cp-sw::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+.nwsb-cp-sw[data-on="1"] { background: #c8a96e; }
+.nwsb-cp-sw[data-on="1"]::after { left: 21px; }
+
+/* ══ WORD/MEANING SWIPE INDICATOR ══ */
+.wsg-swipe {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 14px auto 4px; padding: 8px 16px; width: fit-content;
+  border-radius: 20px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.6);
+}
+.wsg-swipe .wsg-swipe-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+.wsg-swipe .wsg-swipe-dot.on { background: #c8a96e; width: 18px; border-radius: 3px; }
+.wsg-swipe svg { opacity: 0.7; animation: wsgSwipeNudge 1.6s ease-in-out infinite; }
+@keyframes wsgSwipeNudge { 0%,100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+.nwsb-pv-meta { margin-top: 12px; font-family: 'DM Sans', sans-serif; }
+.nwsb-pv-loc { font-size: 13px; color: #e8d5a3; margin-bottom: 6px; }
+.nwsb-pv-cap { font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.5; }
