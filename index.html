@@ -1085,7 +1085,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="home-tile-arrow" style="z-index:2;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="rgba(232,213,163,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
     </div>
     <div class="home-tile" onclick="openSub('word-science')" style="background-color:#060c18; backdrop-filter:none; -webkit-backdrop-filter:none;">
-      <div class="tile-img-bg" style="background-image:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_700/v1783178179/grok_image_1783177867840_nupzo9.jpg');"></div>
+      <div class="tile-img-bg" style="background-image:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_700/v1783178179/grok_image_1783177867840_nupzo9.jpg'); background-position:left center;"></div>
       <div class="tile-overlay"></div>
       <div class="home-tile-icon" style="position:relative;z-index:2;"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/a7b04840-5789-11f1-9331-1302872077be_bqobig.png" style="width:36px;height:36px;object-fit:contain;display:block;" alt="Word Science"></div>
       <div class="home-tile-title" style="position:relative;z-index:2;">Word Science</div>
@@ -5311,7 +5311,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Hint -->
     <div class="ws-page-hint">Search any word from <strong>any language</strong>, any civilization, any era.</div>
 
-    <!-- Result card -->
+    <!-- Result — opens as a separate full-screen page -->
+    <div class="ws-result-page" id="wsResultPage">
+      <div class="ws-result-topbar"><button class="ws-result-back" onclick="wsCloseResult()" aria-label="Back"><svg width="20" height="18" viewBox="0 0 20 18" fill="none"><path d="M9 1L1 9L9 17" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="9" x2="19" y2="9" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></button><span class="ws-result-toptitle">Result</span></div>
+      <div class="ws-result-scroll">
     <div class="ws-page-result" id="wsPageResult">
       <div class="ws-result-eyebrow" id="wsPageEyebrow">Shabdapathy</div>
       <div class="ws-result-word" id="wsPageWord"></div>
@@ -5406,11 +5409,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <span id="wsOwnWordPrice">$2.99</span>
       </button>
     </div>
+      </div><!-- /ws-result-scroll -->
+    </div><!-- /ws-result-page -->
 
   </div><!-- /ws-page-body -->
 </div><!-- /sub-word-search -->
 
-<script src="app/js/part030.js?v=191"></script>
+<script src="app/js/part030.js?v=248"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -5480,7 +5485,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Hint -->
     <div class="ms-page-hint">Search any word from <strong>any language</strong>, any civilization, any era.</div>
 
-    <!-- Result card (same pattern as word search) -->
+    <!-- Result — opens as a separate full-screen page -->
+    <div class="ws-result-page" id="msResultPage">
+      <div class="ws-result-topbar"><button class="ws-result-back" onclick="msCloseResult()" aria-label="Back"><svg width="20" height="18" viewBox="0 0 20 18" fill="none"><path d="M9 1L1 9L9 17" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="9" x2="19" y2="9" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></button><span class="ws-result-toptitle">Result</span></div>
+      <div class="ws-result-scroll">
     <div class="ws-page-result" id="msPageResult" style="margin:28px 20px 0;">
       <div class="ws-result-eyebrow" id="msPageEyebrow">Shabdapathy</div>
       <div class="ws-result-word" id="msPageWord"></div>
@@ -5553,11 +5561,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <span id="msOwnWordPrice">$2.99</span>
       </button>
     </div>
+      </div><!-- /ws-result-scroll -->
+    </div><!-- /ms-result-page -->
 
   </div><!-- /ms-page-body -->
 </div><!-- /sub-meaning-search -->
 
-<script src="app/js/part031.js?v=163"></script>
+<script src="app/js/part031.js?v=248"></script>
 
 <!-- ══════════════════════════════════════════════════════════
      SUB-SOCIAL — Settings + Discover Sub-Screen
@@ -7123,7 +7133,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=245"></script>
+<script src="app/js/part049.js?v=248"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>

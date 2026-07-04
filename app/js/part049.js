@@ -290,6 +290,9 @@ window.pwCloseMeaning = function() {
    when nothing is open does back fall through (exit from home). */
 (function () {
   function closeTop() {
+    // search result page (full-screen overlay)
+    var resPage = document.querySelector('.ws-result-page.show');
+    if (resPage) { resPage.classList.remove('show'); return true; }
     // compose / post viewer / create sheet (most-recent overlays first)
     var compose = document.getElementById('nwsbCompose');
     if (compose) { compose.classList.remove('open'); setTimeout(function () { compose.remove(); }, 300); return true; }
@@ -322,3 +325,20 @@ window.pwCloseMeaning = function() {
     // else: nothing open (on home) → let the back proceed (allow exit)
   });
 })();
+
+/* Word/Meaning search RESULT opens as a separate full-screen page. The pages
+   live inside the search sub-screens, but position:fixed misbehaves inside a
+   transformed/contained ancestor — so move them to <body> at load. Their inner
+   elements are populated by global id, so relocating them changes nothing. */
+(function () {
+  function relocate() {
+    ['wsResultPage', 'msResultPage'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.parentNode !== document.body) document.body.appendChild(el);
+    });
+  }
+  if (document.readyState !== 'loading') relocate();
+  else document.addEventListener('DOMContentLoaded', relocate);
+})();
+window.wsCloseResult = function () { var p = document.getElementById('wsResultPage'); if (p) p.classList.remove('show'); };
+window.msCloseResult = function () { var p = document.getElementById('msResultPage'); if (p) p.classList.remove('show'); };

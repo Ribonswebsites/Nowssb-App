@@ -255,15 +255,13 @@ async function wsPageSearch() {
   if (requestWd) requestWd.textContent = word;
   if (ownTitle)  ownTitle.textContent  = word;
 
-  // Show result card immediately
+  // Show result card immediately + open the separate full-screen result page
   if (result)   result.classList.add('show');
+  var _rp = document.getElementById('wsResultPage'); if (_rp) { _rp.classList.add('show'); _rp.scrollTop = 0; }
   // Hide extras until content loads
   if (imgBlock) imgBlock.classList.remove('show');
   if (actionRow)actionRow.classList.remove('show');
   if (ownWord)  ownWord.classList.remove('show');
-
-  // Scroll result into view
-  setTimeout(function(){ if (result) result.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
 
   // Set images now (empty = hidden automatically by _wsSetImg)
   _wsSetImg('wsResultImgEl', WS_IMG_RESULT);

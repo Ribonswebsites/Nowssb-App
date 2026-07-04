@@ -46,12 +46,10 @@ async function msPageSearch() {
   if (ownTitle)  ownTitle.textContent  = word;
 
   if (result)    result.classList.add('show');
+  var _mrp = document.getElementById('msResultPage'); if (_mrp) { _mrp.classList.add('show'); _mrp.scrollTop = 0; }
   if (imgBlock)  imgBlock.classList.remove('show');
   if (actionRow) actionRow.classList.remove('show');
   if (ownWord)   ownWord.classList.remove('show');
-
-  // Scroll to result
-  setTimeout(function(){ if (result) result.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 80);
 
   // Set images
   function _msSetImg(elId, url) {
