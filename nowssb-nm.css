@@ -2022,10 +2022,12 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 .hbm-point {
   position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1 / 1;
   border-radius: 50% !important; cursor: pointer;
-  background: radial-gradient(circle, var(--organ-color) 0%, var(--organ-color) 12%, transparent 66%);
-  opacity: 0; transition: opacity .5s ease; filter: blur(2px); pointer-events: auto;
+  /* soft glow via the radial gradient itself — NO filter:blur (it re-blurred
+     every frame while pulsing, hammering the GPU over the organ video). */
+  background: radial-gradient(circle, var(--organ-color) 0%, var(--organ-color) 10%, rgba(0,0,0,0) 62%);
+  opacity: 0; transition: opacity .5s ease; pointer-events: auto;
 }
-.hbm-figure.mini .hbm-point { pointer-events: none; filter: blur(1px); }
+.hbm-figure.mini .hbm-point { pointer-events: none; }
 .hbm-point.active { opacity: .9; animation: hbmPointPulse 2.6s ease-in-out infinite; }
 @keyframes hbmPointPulse {
   0%, 100% { opacity: .42; transform: translate(-50%, -50%) scale(.82); }
