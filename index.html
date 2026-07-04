@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=205"></script>
 <link rel="stylesheet" href="app/app.css?v=191">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=214">
+<link rel="stylesheet" href="nowssb-nm.css?v=216">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -5143,20 +5143,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M5 8h14l-1 12H6L5 8z" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
         <div class="feat-name">NowssB Store</div><div class="feat-sub">Words & meanings</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('word-search');},260);">
-        <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="rgba(255,255,255,0.9)" stroke-width="1.3"/><path d="M16 16l5 5" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-        <div class="feat-name">Word Search</div><div class="feat-sub">Origin of words</div>
-      </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('meaning-search');},260);">
-        <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="rgba(255,255,255,0.9)" stroke-width="1.3"/></svg></div>
-        <div class="feat-name">Meaning Search</div><div class="feat-sub">Hidden meanings</div>
+      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('search-choice');},260);">
+        <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png" alt=""></div>
+        <div class="feat-name">Search</div><div class="feat-sub">Words &amp; meanings</div>
       </button>
       <button class="feat-card" onclick="closeSub('features');setTimeout(function(){window.IG&&IG.nav('practice');},260);">
-        <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+        <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1783157829/file_0000000050d472089de0ad57116dba0f_tht26i.png" alt=""></div>
         <div class="feat-name">Daily Practice</div><div class="feat-sub">Morning ritual</div>
       </button>
       <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('word-science');},260);">
-        <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M9 3h6M10 3v6l-5 8a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 17l-5-8V3" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+        <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png" alt=""></div>
         <div class="feat-name">Word Science</div><div class="feat-sub">Nowsbansiu system</div>
       </button>
       <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('my-progress');},260);">
@@ -5196,6 +5192,35 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </button>
         <button class="exc-opt" onclick="closeSub('explore-choice');setTimeout(function(){openSub('meaning-store');},240);">
           <div class="exc-opt-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l9 5-9 5-9-5 9-5z" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/><path d="M3 13l9 5 9-5" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+          <div class="exc-opt-txt"><div class="exc-opt-title">Meaning</div><div class="exc-opt-sub">The true hidden meaning</div></div>
+          <svg class="exc-opt-chev" width="9" height="16" viewBox="0 0 9 16" fill="none"><path d="M1 1l6 7-6 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEARCH CHOOSER — Word Search vs Meaning Search ══ -->
+<div class="sub-screen" id="sub-search-choice">
+  <div style="display:flex;flex-direction:column;height:100%;position:relative;z-index:1;">
+    <div class="sub-header nav-bar" style="background:transparent;border-bottom:none;backdrop-filter:none;-webkit-backdrop-filter:none;flex-shrink:0;">
+      <button onclick="closeSub('search-choice')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;border:none;cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
+      <span style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:rgba(255,255,255,0.7);flex:1;text-align:center;margin-right:42px;">Search</span>
+    </div>
+    <div class="exc-body">
+      <div class="exc-hero">
+        <div class="exc-eyebrow">Nowsbansiu</div>
+        <div class="exc-title">What are you<br>searching for?</div>
+        <div class="exc-sub">Search any word's origin, or the true hidden meaning behind it.</div>
+      </div>
+      <div class="exc-options">
+        <button class="exc-opt" onclick="closeSub('search-choice');setTimeout(function(){openSub('word-search');},240);">
+          <div class="exc-opt-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="rgba(255,255,255,0.9)" stroke-width="1.3"/><path d="M16 16l5 5" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <div class="exc-opt-txt"><div class="exc-opt-title">Words</div><div class="exc-opt-sub">Origin of any word</div></div>
+          <svg class="exc-opt-chev" width="9" height="16" viewBox="0 0 9 16" fill="none"><path d="M1 1l6 7-6 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="exc-opt" onclick="closeSub('search-choice');setTimeout(function(){openSub('meaning-search');},240);">
+          <div class="exc-opt-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="rgba(255,255,255,0.9)" stroke-width="1.3"/></svg></div>
           <div class="exc-opt-txt"><div class="exc-opt-title">Meaning</div><div class="exc-opt-sub">The true hidden meaning</div></div>
           <svg class="exc-opt-chev" width="9" height="16" viewBox="0 0 9 16" fill="none"><path d="M1 1l6 7-6 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>

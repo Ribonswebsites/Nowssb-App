@@ -2491,7 +2491,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
    black + floating-crystal page bg, one transparent frosted glass panel with
    logo+title top row, divider, search pill, "Focus on details" gem card and an
    Explore button. No backdrop blur (static images only) = no GPU cost. */
-#sub-word-search, #sub-meaning-search, #sub-explore-choice {
+#sub-word-search, #sub-meaning-search, #sub-explore-choice, #sub-search-choice {
   background:
     linear-gradient(rgba(0,0,0,0.66), rgba(0,0,0,0.66)),
     url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783104242/grok_image_1783103445469_fdv2uu.jpg') center center / cover no-repeat #000 !important;
@@ -2632,41 +2632,41 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .wsg-detail-sub { font-family: 'DM Sans', sans-serif; font-weight: 400; font-size: 16px; line-height: 1.35; color: rgba(255,255,255,0.6); margin-top: 4px; }
 
 /* ══ EXPLORE CHOOSER PAGE (#sub-explore-choice) — Words vs Meaning ══ */
-#sub-explore-choice .exc-body {
+#sub-explore-choice .exc-body, #sub-search-choice .exc-body {
   position: relative; z-index: 1; display: flex; flex-direction: column;
   flex: 1 1 auto; min-height: 0; box-sizing: border-box;
   padding: 12px 22px calc(env(safe-area-inset-bottom,24px) + 34px);
 }
-#sub-explore-choice .exc-hero { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-#sub-explore-choice .exc-eyebrow {
+#sub-explore-choice .exc-hero, #sub-search-choice .exc-hero { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+#sub-explore-choice .exc-eyebrow, #sub-search-choice .exc-eyebrow {
   font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
   color: rgba(255,255,255,0.5); margin-bottom: 12px;
 }
-#sub-explore-choice .exc-title {
+#sub-explore-choice .exc-title, #sub-search-choice .exc-title {
   font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 40px; line-height: 1.05;
   letter-spacing: -0.5px; color: #f4f7fb; text-shadow: 0 2px 16px rgba(0,0,0,0.5);
 }
-#sub-explore-choice .exc-sub {
+#sub-explore-choice .exc-sub, #sub-search-choice .exc-sub {
   font-family: 'DM Sans', sans-serif; font-size: 16px; color: rgba(255,255,255,0.6); margin-top: 12px; max-width: 300px;
 }
-#sub-explore-choice .exc-options { display: flex; flex-direction: column; gap: 16px; }
-#sub-explore-choice .exc-opt {
+#sub-explore-choice .exc-options, #sub-search-choice .exc-options { display: flex; flex-direction: column; gap: 16px; }
+#sub-explore-choice .exc-opt, #sub-search-choice .exc-opt {
   display: flex; align-items: center; gap: 18px; width: 100%; text-align: left; cursor: pointer;
   padding: 22px 22px; border-radius: 28px !important;
   background: rgba(5,7,12,0.55); border: 1px solid rgba(255,255,255,0.24);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.26), 0 10px 30px rgba(0,0,0,0.4);
 }
-#sub-explore-choice .exc-opt:active { background: rgba(20,26,36,0.7); }
-#sub-explore-choice .exc-opt-ico {
+#sub-explore-choice .exc-opt:active, #sub-search-choice .exc-opt:active { background: rgba(20,26,36,0.7); }
+#sub-explore-choice .exc-opt-ico, #sub-search-choice .exc-opt-ico {
   width: 58px; height: 58px; flex-shrink: 0; border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.22);
 }
-#sub-explore-choice .exc-opt-ico svg { width: 30px; height: 30px; }
-#sub-explore-choice .exc-opt-txt { flex: 1; min-width: 0; }
-#sub-explore-choice .exc-opt-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 21px; color: #f2f6fa; }
-#sub-explore-choice .exc-opt-sub { font-family: 'DM Sans', sans-serif; font-size: 14px; color: rgba(255,255,255,0.55); margin-top: 3px; }
-#sub-explore-choice .exc-opt-chev { flex-shrink: 0; color: rgba(255,255,255,0.4); }
+#sub-explore-choice .exc-opt-ico svg, #sub-search-choice .exc-opt-ico svg { width: 30px; height: 30px; }
+#sub-explore-choice .exc-opt-txt, #sub-search-choice .exc-opt-txt { flex: 1; min-width: 0; }
+#sub-explore-choice .exc-opt-title, #sub-search-choice .exc-opt-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 21px; color: #f2f6fa; }
+#sub-explore-choice .exc-opt-sub, #sub-search-choice .exc-opt-sub { font-family: 'DM Sans', sans-serif; font-size: 14px; color: rgba(255,255,255,0.55); margin-top: 3px; }
+#sub-explore-choice .exc-opt-chev, #sub-search-choice .exc-opt-chev { flex-shrink: 0; color: rgba(255,255,255,0.4); }
 
 /* Explore button */
 .wsg-explore {
