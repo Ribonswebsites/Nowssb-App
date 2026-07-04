@@ -140,3 +140,66 @@ window.pwCloseMeaning = function() {
     };
   }
 })();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   WORD / MEANING SEARCH — suggestion carousel + working Explore button.
+   The "Focus on details" card is now a horizontal, auto-rotating strip of word
+   suggestions (one word + a line of text per slide). It advances itself every
+   ~3.8s and the user can also swipe through it. Explore searches whatever the
+   user typed; if the input is empty it searches the suggestion on screen. */
+(function () {
+  function initCarousel(carId, screenId) {
+    var car = document.getElementById(carId);
+    if (!car || car._wsgInit) return;
+    car._wsgInit = true;
+    var slides = car.querySelectorAll('.wsg-slide');
+    var n = slides.length; if (!n) return;
+    var idx = 0, paused = false, programmatic = false, resumeT = null, progT = null;
+
+    function slideW() { return slides[0] ? slides[0].getBoundingClientRect().width : car.clientWidth; }
+    function go(i, smooth) {
+      idx = (i % n + n) % n;
+      var w = slideW(); if (!w) return;
+      programmatic = true;
+      car.scrollTo({ left: idx * w, behavior: smooth ? 'smooth' : 'auto' });
+      clearTimeout(progT);
+      progT = setTimeout(function () { programmatic = false; }, 700);
+    }
+
+    car.addEventListener('scroll', function () {
+      var w = slideW(); if (w) idx = Math.round(car.scrollLeft / w);
+      if (programmatic) return;               // ignore our own auto-advance scrolling
+      paused = true;                          // a real user swipe pauses auto-rotate
+      clearTimeout(resumeT);
+      resumeT = setTimeout(function () { paused = false; }, 2600);
+    }, { passive: true });
+
+    car._currentWord = function () { var s = slides[idx]; return s ? s.getAttribute('data-word') : ''; };
+
+    setInterval(function () {
+      if (paused) return;
+      var scr = document.getElementById(screenId);
+      if (!scr || !scr.classList.contains('open')) return;  // only rotate when visible
+      if (!slideW()) return;
+      go(idx + 1, true);
+    }, 3800);
+  }
+
+  function ready() {
+    initCarousel('wsCarousel', 'sub-word-search');
+    initCarousel('msCarousel', 'sub-meaning-search');
+  }
+  if (document.readyState !== 'loading') ready();
+  else document.addEventListener('DOMContentLoaded', ready);
+
+  function explore(inputId, carId, searchFn, searchWordFn) {
+    var inp = document.getElementById(inputId);
+    var v = inp ? inp.value.trim() : '';
+    if (v) { if (typeof window[searchFn] === 'function') window[searchFn](); return; }
+    var car = document.getElementById(carId);
+    var w = (car && car._currentWord) ? car._currentWord() : '';
+    if (w && typeof window[searchWordFn] === 'function') window[searchWordFn](w);
+  }
+  window.wsExplore = function () { explore('wsPageInput', 'wsCarousel', 'wsPageSearch', 'wsPageSearchWord'); };
+  window.msExplore = function () { explore('msPageInput', 'msCarousel', 'msPageSearch', 'msPageSearchWord'); };
+})();

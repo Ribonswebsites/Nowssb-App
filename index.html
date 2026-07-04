@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=205"></script>
 <link rel="stylesheet" href="app/app.css?v=191">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=204">
+<link rel="stylesheet" href="nowssb-nm.css?v=206">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -5161,14 +5161,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
 
       <div class="wsg-detail">
-        <div class="wsg-gem" aria-hidden="true"></div>
-        <div class="wsg-detail-text">
-          <div class="wsg-detail-title">Focus on details</div>
-          <div class="wsg-detail-sub">Every reflection tells a story.</div>
+        <div class="wsg-carousel" id="wsCarousel">
+          <div class="wsg-slide" data-word="earth" onclick="wsPageSearchWord('earth')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Earth</div><div class="wsg-detail-sub">The ground of all being.</div></div></div>
+          <div class="wsg-slide" data-word="water" onclick="wsPageSearchWord('water')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Water</div><div class="wsg-detail-sub">The flow that shapes stone.</div></div></div>
+          <div class="wsg-slide" data-word="fire" onclick="wsPageSearchWord('fire')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Fire</div><div class="wsg-detail-sub">The spark of change.</div></div></div>
+          <div class="wsg-slide" data-word="soul" onclick="wsPageSearchWord('soul')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Soul</div><div class="wsg-detail-sub">The breath behind the name.</div></div></div>
+          <div class="wsg-slide" data-word="light" onclick="wsPageSearchWord('light')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Light</div><div class="wsg-detail-sub">Where shadow learns to speak.</div></div></div>
+          <div class="wsg-slide" data-word="love" onclick="wsPageSearchWord('love')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Love</div><div class="wsg-detail-sub">The force that binds all.</div></div></div>
+          <div class="wsg-slide" data-word="truth" onclick="wsPageSearchWord('truth')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Truth</div><div class="wsg-detail-sub">What remains when noise fades.</div></div></div>
+          <div class="wsg-slide" data-word="dream" onclick="wsPageSearchWord('dream')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Dream</div><div class="wsg-detail-sub">The mind's quiet rehearsal.</div></div></div>
         </div>
       </div>
 
-      <button class="wsg-explore" onclick="wsPageSearch()">
+      <button class="wsg-explore" onclick="wsExplore()">
         Explore
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12H20M14 6L20 12L14 18" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -5312,14 +5317,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
 
       <div class="wsg-detail">
-        <div class="wsg-gem" aria-hidden="true"></div>
-        <div class="wsg-detail-text">
-          <div class="wsg-detail-title">Focus on details</div>
-          <div class="wsg-detail-sub">Every reflection tells a story.</div>
+        <div class="wsg-carousel" id="msCarousel">
+          <div class="wsg-slide" data-word="earth" onclick="msPageSearchWord('earth')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Earth</div><div class="wsg-detail-sub">The ground of all being.</div></div></div>
+          <div class="wsg-slide" data-word="water" onclick="msPageSearchWord('water')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Water</div><div class="wsg-detail-sub">The flow that shapes stone.</div></div></div>
+          <div class="wsg-slide" data-word="fire" onclick="msPageSearchWord('fire')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Fire</div><div class="wsg-detail-sub">The spark of change.</div></div></div>
+          <div class="wsg-slide" data-word="soul" onclick="msPageSearchWord('soul')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Soul</div><div class="wsg-detail-sub">The breath behind the name.</div></div></div>
+          <div class="wsg-slide" data-word="light" onclick="msPageSearchWord('light')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Light</div><div class="wsg-detail-sub">Where shadow learns to speak.</div></div></div>
+          <div class="wsg-slide" data-word="love" onclick="msPageSearchWord('love')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Love</div><div class="wsg-detail-sub">The force that binds all.</div></div></div>
+          <div class="wsg-slide" data-word="truth" onclick="msPageSearchWord('truth')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Truth</div><div class="wsg-detail-sub">What remains when noise fades.</div></div></div>
+          <div class="wsg-slide" data-word="dream" onclick="msPageSearchWord('dream')"><div class="wsg-gem" aria-hidden="true"></div><div class="wsg-detail-text"><div class="wsg-detail-title">Dream</div><div class="wsg-detail-sub">The mind's quiet rehearsal.</div></div></div>
         </div>
       </div>
 
-      <button class="wsg-explore" onclick="msPageSearch()">
+      <button class="wsg-explore" onclick="msExplore()">
         Explore
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12H20M14 6L20 12L14 18" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -7117,7 +7127,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=205"></script>
+<script src="app/js/part049.js?v=206"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>
 <script src="nowssb-player.js?v=172" defer></script>

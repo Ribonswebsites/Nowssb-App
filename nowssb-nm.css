@@ -2507,8 +2507,8 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
    (background-size >100%) so it reaches the rounded corners instead of sitting
    small in the middle. A faint frost overlay keeps it uniform. */
 .wsg-card {
-  position: relative; margin: 6px 6px 12px; border-radius: 42px !important;
-  padding: 44px 26px 44px; overflow: hidden;
+  position: relative; margin: 6px 16px 12px; border-radius: 42px !important;
+  padding: 44px 24px 44px; overflow: hidden;
   min-height: calc(var(--full-height, 100vh) - 118px);
   display: flex; flex-direction: column; justify-content: center; gap: 30px;
   background:
@@ -2528,7 +2528,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   border: 1px solid rgba(255,255,255,0.28);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 6px 18px rgba(0,0,0,0.3);
 }
-.wsg-logo img { width: 90px; height: 90px; object-fit: contain; opacity: 0.95; }
+.wsg-logo img { width: 80px; height: 80px; object-fit: contain; opacity: 0.95; }
 .wsg-brandcol { display: flex; flex-direction: column; justify-content: center; }
 .wsg-title {
   font-family: 'DM Sans', sans-serif; font-weight: 800; letter-spacing: -0.5px;
@@ -2568,21 +2568,32 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 }
 .wsg-search-go:active { background: rgba(255,255,255,0.22); }
 
-/* "Focus on details" card: elongated diamond gem + text */
+/* suggestion card — now a horizontal, auto-rotating, user-scrollable carousel:
+   the card is the fixed frame; slides scroll inside it, one word at a time. */
 .wsg-detail {
-  display: flex; align-items: center; gap: 18px; padding: 22px 22px;
+  padding: 0 !important; overflow: hidden;
   border-radius: 28px !important;
   background: rgba(5,7,12,0.62);
   border: 1px solid rgba(255,255,255,0.22);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.24), 0 6px 20px rgba(0,0,0,0.28);
 }
+.wsg-carousel {
+  display: flex; width: 100%; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.wsg-carousel::-webkit-scrollbar { display: none; height: 0; }
+.wsg-slide {
+  flex: 0 0 100%; box-sizing: border-box; scroll-snap-align: center;
+  display: flex; align-items: center; gap: 18px; padding: 22px 22px; cursor: pointer;
+}
 /* diamond gem — the source PNG has a BLACK background; mix-blend-mode:screen
    knocks the black out so only the bright crystal shows (matches reference,
    no black box). border-radius rounds the corners as a fallback. */
 .wsg-gem {
-  width: 104px; height: 132px; flex-shrink: 0; border-radius: 22px !important;
+  width: 92px; height: 120px; flex-shrink: 0; border-radius: 22px !important;
   overflow: hidden;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783104352/file_00000000bd2071fa895664b37ba90c38_fv8syd.png') center center / 132% no-repeat;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783104352/file_00000000bd2071fa895664b37ba90c38_fv8syd.png') center center / 116% no-repeat;
   mix-blend-mode: screen;
 }
 .wsg-detail-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 20px; color: #f2f6fa; }
