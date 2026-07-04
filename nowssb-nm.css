@@ -2979,22 +2979,35 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .nwsb-pv-carousel::-webkit-scrollbar { display: none; }
 .nwsb-pv-carousel .nwsb-pv-media { flex: 0 0 100%; scroll-snap-align: center; }
 
-/* ══ FASHION HOME — streak bar below the hero ══ */
+/* ══ FASHION HOME — streak: three glass boxes (label · number · keep) ══ */
 #home .fash-streak {
-  display: flex; align-items: center; gap: 14px; box-sizing: border-box;
-  width: calc(100% - 32px) !important; margin: 16px 16px 20px; padding: 20px 30px; border: none; cursor: pointer;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim,f_auto,q_auto,w_820/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center center / 100% 100% no-repeat;
+  position: relative; display: block; box-sizing: border-box;
+  width: calc(100% - 32px) !important; margin: 16px 16px 20px; padding: 0; border: none; cursor: pointer;
+  aspect-ratio: 1536 / 1024;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png') center center / 100% 100% no-repeat;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.38));
 }
-#home .fash-streak:active { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)) brightness(1.08); }
-#home .fash-streak-icon {
-  width: 46px; height: 46px; flex-shrink: 0; border-radius: 14px !important;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(232,213,163,0.12); border: 1px solid rgba(255,255,255,0.12);
+#home .fash-streak:active { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)) brightness(1.06); }
+/* each label/number/cta centered over its glass box */
+#home .fash-streak-box {
+  position: absolute; top: 48%; transform: translate(-50%,-50%);
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  width: 26%;
 }
-#home .fash-streak-num { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 26px; color: #fff; line-height: 1; }
-#home .fash-streak-label { font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 4px; }
-#home .fash-streak-cta { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #c8a96e; }
+#home .fash-streak-box1 { left: 17%; }
+#home .fash-streak-box2 { left: 50%; }
+#home .fash-streak-box3 { left: 83%; }
+#home .fash-streak-num {
+  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 40px; line-height: 1;
+  color: #1a2230; text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+}
+#home .fash-streak-label,
+#home .fash-streak-cta {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800; line-height: 1.15;
+  letter-spacing: 1.5px; text-transform: uppercase; text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+}
+#home .fash-streak-label { color: #2a3140; }
+#home .fash-streak-cta { color: #9c7b3a; }
 
 /* ══ SEARCH RESULT — separate full-screen page (was dumped below the card) ══ */
 .ws-result-page {

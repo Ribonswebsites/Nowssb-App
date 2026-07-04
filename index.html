@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=205"></script>
 <link rel="stylesheet" href="app/app.css?v=191">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=252">
+<link rel="stylesheet" href="nowssb-nm.css?v=253">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -1037,20 +1037,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <!-- Streak (below Today's Practice) -->
+  <!-- Streak (below Today's Practice) — three glass boxes: label · number · keep -->
   <div class="fash-streak w100" onclick="openPracticeIntro()">
-    <div class="fash-streak-icon">
-      <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
-        <path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/>
-        <path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.75"/>
-      </svg>
+    <div class="fash-streak-box fash-streak-box1">
+      <div class="fash-streak-label">Day<br>Streak</div>
     </div>
-    <div class="fash-streak-txt">
+    <div class="fash-streak-box fash-streak-box2">
       <div class="fash-streak-num" id="fashStreakNum">0</div>
-      <div class="fash-streak-label">day streak</div>
     </div>
-    <div style="flex:1;"></div>
-    <div class="fash-streak-cta">Keep Going</div>
+    <div class="fash-streak-box fash-streak-box3">
+      <div class="fash-streak-cta">Keep<br>Going</div>
+    </div>
   </div>
 
   <!-- AI Prescription Card -->
