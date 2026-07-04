@@ -2354,10 +2354,10 @@ body.nm-glass #sub-health-journey .gsel-card {
 /* ── Animated text overlay shared by both banners ── */
 .fb-scrim {
   position:absolute; inset:0; pointer-events:none; z-index:1;
-  background:linear-gradient(to top, rgba(6,10,20,.82) 0%, rgba(6,10,20,.34) 30%, rgba(6,10,20,0) 58%);
+  background:linear-gradient(to bottom, rgba(6,10,20,.80) 0%, rgba(6,10,20,.32) 32%, rgba(6,10,20,0) 60%);
 }
 .fb-ov {
-  position:absolute; left:18px; right:18px; bottom:16px; z-index:2; pointer-events:none;
+  position:absolute; left:18px; right:18px; top:16px; z-index:2; pointer-events:none; text-align:left;
 }
 .fb-eyebrow {
   font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:3px;
