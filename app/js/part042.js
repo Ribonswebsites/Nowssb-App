@@ -105,7 +105,7 @@
     <div class="ss-section">
       <div class="sr" onclick="SS.open('ambient')">
         <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
-        <div class="sr-body"><div class="sr-label">Ambient Sound</div><div class="sr-sub">Sound Bath background</div></div>
+        <div class="sr-body"><div class="sr-label">Ambient Sound</div><div class="sr-sub">Practice background audio</div></div>
         <span class="sr-val" id="ss-ambient-val">None</span>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>

@@ -296,7 +296,7 @@
     'sub-nowssb-store':'store', 'sub-meaning-store':'store',
     'sub-cart':'store', 'sub-wishlist':'store', 'sub-orders':'store', 'sub-order-history':'store',
     'sub-routines':'home', 'sub-routine-detail':'home',
-    'sub-sound-library':'library', 'sub-sound-bath':'library',
+    'sub-sound-library':'library',
     'sub-people':'profile', 'sub-ig-profile':'profile',
     'sub-social':'profile', 'sub-profile':'profile'
   };

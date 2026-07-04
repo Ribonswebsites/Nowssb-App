@@ -843,15 +843,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </svg>
         <span>Community</span>
       </div>
-      <div class="nmh-quick-btn" onclick="openSub('sound-bath')">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <path d="M4 11c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#c8a96e" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M7 11c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-          <circle cx="11" cy="11" r="1.8" fill="#c8a96e" opacity="0.35"/>
-          <path d="M11 12.8v5" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        <span>Sound Bath</span>
-      </div>
     </div>
 
     <!-- Today Trending -->
@@ -1505,11 +1496,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="menu-nav-body"><div class="menu-nav-label">Sound Library</div><div class="menu-nav-sub">Root frequencies</div></div>
         <svg class="menu-nav-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <div class="menu-nav-item" onclick="closeMenu();openSub('sound-bath')">
-        <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/1e3514c0-5788-11f1-9331-1302872077be_dft895.png" style="width:22px;height:22px;object-fit:contain;display:block;" alt=""></div>
-        <div class="menu-nav-body"><div class="menu-nav-label">Sound Bath</div><div class="menu-nav-sub">Sleep · Focus · Healing</div></div>
-        <svg class="menu-nav-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
       <div class="menu-nav-item" onclick="closeMenu();openSub('word-science')">
         <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png" style="width:22px;height:22px;object-fit:contain;display:block;" alt=""></div>
         <div class="menu-nav-body"><div class="menu-nav-label">Word Science</div><div class="menu-nav-sub">NOWSBANSIU system</div></div>
@@ -1749,7 +1735,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 </div>
 
-<script src="app/js/part006.js?v=163"></script>
+<script src="app/js/part006.js?v=213"></script>
 
 <!-- ══ SUB-SCREEN: WORD SCIENCE ══ -->
 <div class="sub-screen" id="sub-word-science">
@@ -5169,10 +5155,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
         <div class="feat-name">Daily Practice</div><div class="feat-sub">Morning ritual</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('sound-bath');},260);">
-        <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 16 0M7 12a5 5 0 0 1 10 0M10 12a2 2 0 0 1 4 0" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-        <div class="feat-name">Sound Bath</div><div class="feat-sub">Sleep · Focus · Heal</div>
-      </button>
       <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('word-science');},260);">
         <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M9 3h6M10 3v6l-5 8a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 17l-5-8V3" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
         <div class="feat-name">Word Science</div><div class="feat-sub">Nowsbansiu system</div>
@@ -6259,7 +6241,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-wrap -->
 </div><!-- /sub-social -->
 
-<script src="app/js/part032.js?v=176"></script>
+<script src="app/js/part032.js?v=213"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      NOWSSB SOCIAL — People / Explore / Search / Profile / Social Home
@@ -6460,153 +6442,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 
-<script src="app/js/part033.js?v=190"></script>
+<script src="app/js/part033.js?v=213"></script>
 
 
 
-<!-- ═══════════════════════════════════════════════════════════
-     SOUND BATH MODE — sub-screen #23
-     3 modes: Sleep · Focus · Healing
-     Ambient audio looping · animated waveform visualizer
-     Cinematic intro → player
-═══════════════════════════════════════════════════════════ -->
-
-
-<!-- ── SOUND BATH SUB-SCREEN ── -->
-<div class="sub-screen" id="sub-sound-bath">
-
-  <!-- INTRO PAGE -->
-  <div class="sb-intro" id="sbIntro">
-    <div class="sb-intro-bg"></div>
-    <div class="sb-intro-vignette"></div>
-    <div class="sb-intro-top">
-      <div class="sb-intro-back" onclick="closeSub('sound-bath')">
-        <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-          <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,.75)" stroke-width="1.5" stroke-linecap="square"/>
-          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,.75)" stroke-width="1.5"/>
-        </svg>
-      </div>
-      <span class="sb-intro-tag">Shabdapathy · Ambient</span>
-    </div>
-    <div class="sb-intro-bottom">
-      <span class="sb-intro-eyebrow">NowssB · Elite Feature</span>
-      <div class="sb-intro-title">Sound<br>Bath.</div>
-      <div class="sb-intro-desc">Words loop softly with healing ambient underneath. No interaction needed. Pure passive frequency.</div>
-      <div class="sb-enter-btn" onclick="sbEnter()">
-        <span class="sb-enter-label">Begin Session</span>
-        <svg width="16" height="14" viewBox="0 0 18 14" fill="none">
-          <path d="M11 1L17 7L11 13" stroke="rgba(232,213,163,.8)" stroke-width="1.5" stroke-linecap="square"/>
-          <line x1="1" y1="7" x2="17" y2="7" stroke="rgba(232,213,163,.8)" stroke-width="1.5"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- PLAYER -->
-  <div class="sb-player" id="sbPlayer">
-    <div class="sb-player-bg" id="sbPlayerBg"></div>
-
-    <!-- Top bar -->
-    <div class="sb-topbar">
-      <div class="sb-back-btn" onclick="sbClose()">
-        <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-          <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="square"/>
-          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/>
-        </svg>
-      </div>
-      <div class="sb-timer-display" id="sbTimerDisplay">∞</div>
-    </div>
-
-    <!-- Mode tabs -->
-    <div class="sb-modes">
-      <div class="sb-mode-btn active" id="sbMode-sleep" onclick="sbSetMode('sleep')">
-        <span class="sb-mode-icon">🌙</span>
-        <span class="sb-mode-label">Sleep</span>
-      </div>
-      <div class="sb-mode-btn" id="sbMode-focus" onclick="sbSetMode('focus')">
-        <span class="sb-mode-icon">🎯</span>
-        <span class="sb-mode-label">Focus</span>
-      </div>
-      <div class="sb-mode-btn" id="sbMode-healing" onclick="sbSetMode('healing')">
-        <span class="sb-mode-icon">✦</span>
-        <span class="sb-mode-label">Healing</span>
-      </div>
-    </div>
-
-    <!-- Center -->
-    <div class="sb-center">
-      <!-- Rings -->
-      <div class="sb-rings">
-        <div class="sb-ring"></div>
-        <div class="sb-ring"></div>
-        <div class="sb-ring"></div>
-        <div class="sb-ring"></div>
-        <div class="sb-disc" id="sbDisc">
-          <svg id="sbDiscIcon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:#e8d5a3;">
-            <path d="M12 3a9 9 0 100 18A9 9 0 0012 3z"/>
-            <path d="M12 8v8M8 10l4-2 4 2"/>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Waveform -->
-      <div class="sb-wave paused" id="sbWave">
-        <div class="sb-bar"></div><div class="sb-bar"></div><div class="sb-bar"></div>
-        <div class="sb-bar"></div><div class="sb-bar"></div><div class="sb-bar"></div>
-        <div class="sb-bar"></div><div class="sb-bar"></div><div class="sb-bar"></div>
-        <div class="sb-bar"></div><div class="sb-bar"></div><div class="sb-bar"></div>
-        <div class="sb-bar"></div><div class="sb-bar"></div><div class="sb-bar"></div>
-        <div class="sb-bar"></div><div class="sb-bar"></div><div class="sb-bar"></div>
-      </div>
-
-      <div class="sb-mode-title" id="sbModeTitle">Sleep Mode</div>
-      <div class="sb-mode-desc" id="sbModeDesc">Words soften the nervous system. Let your body absorb the frequency without effort.</div>
-    </div>
-
-    <!-- Controls -->
-    <div class="sb-controls">
-      <!-- Ambient sound row -->
-      <div class="sb-ambient-row" id="sbAmbientRow">
-        <div class="sb-ambient-btn active" onclick="sbSetAmbient('none',this)">⬤ None</div>
-        <div class="sb-ambient-btn" onclick="sbSetAmbient('rain',this)">🌧 Rain</div>
-        <div class="sb-ambient-btn" onclick="sbSetAmbient('ocean',this)">🌊 Ocean</div>
-        <div class="sb-ambient-btn" onclick="sbSetAmbient('forest',this)">🌿 Forest</div>
-        <div class="sb-ambient-btn" onclick="sbSetAmbient('bowls',this)">◎ Bowls</div>
-      </div>
-
-      <!-- Timer row -->
-      <div class="sb-timer-row">
-        <div class="sb-timer-btn" onclick="sbSetTimer(15,this)">15 min</div>
-        <div class="sb-timer-btn" onclick="sbSetTimer(30,this)">30 min</div>
-        <div class="sb-timer-btn" onclick="sbSetTimer(60,this)">1 hr</div>
-        <div class="sb-timer-btn active" onclick="sbSetTimer(0,this)">∞</div>
-      </div>
-
-      <!-- Transport -->
-      <div class="sb-transport">
-        <div class="sb-vol-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-          </svg>
-          <input class="sb-vol-slider" id="sbVolSlider" type="range" min="0" max="100" value="70" oninput="sbSetVolume(this.value)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-            <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
-          </svg>
-        </div>
-        <button class="sb-play-btn" id="sbPlayBtn" onclick="sbTogglePlay()">
-          <svg id="sbPlayIcon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-        </button>
-        <!-- spacer -->
-        <div style="flex:1;"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script src="app/js/part034.js?v=163"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      HEALING BODY MAP — SVG organ tracker
@@ -6848,7 +6687,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="ss-panel-header">
     <button class="ss-panel-back" onclick="SS.close('ambient')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
     <div class="ss-panel-title">Ambient Sound</div>
-    <div class="ss-panel-sub">Background audio in Sound Bath mode</div>
+    <div class="ss-panel-sub">Background ambient audio during practice</div>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-ambient"></div></div>
 </div>
@@ -7055,7 +6894,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
         <div class="ispci" style="position:absolute;width:150px;height:210px;top:50%;left:50%;margin-left:-75px;margin-top:-105px;overflow:hidden;border:2px solid rgba(255,255,255,0.18);box-shadow:0 24px 60px rgba(0,0,0,0.7);cursor:pointer;will-change:transform,opacity;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:0;">
           <img src="https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778059670/grok_image_1778059394370_l8tun2.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:9px;text-align:center;background:rgba(0,0,0,0.6);"><span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#e8d5a3;font-family:'DM Sans',sans-serif;">SOUND BATH</span></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:9px;text-align:center;background:rgba(0,0,0,0.6);"><span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#e8d5a3;font-family:'DM Sans',sans-serif;">CONNECT</span></div>
         </div>
         <div class="ispci" style="position:absolute;width:150px;height:210px;top:50%;left:50%;margin-left:-75px;margin-top:-105px;overflow:hidden;border:2px solid rgba(255,255,255,0.18);box-shadow:0 24px 60px rgba(0,0,0,0.7);cursor:pointer;will-change:transform,opacity;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:0;">
           <img src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778246066/grok_image_1778245944595_jbjdb2.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
@@ -7115,7 +6954,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=163"></script>
+<script src="app/js/part042.js?v=213"></script>
 
 
 
@@ -7142,7 +6981,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ── Global subscription promo bars for free users ── -->
 
-<script src="app/js/part045.js?v=168"></script>
+<script src="app/js/part045.js?v=213"></script>
 
 <!-- ── TRIAL BANNER ── -->
 <div id="trial-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(232,213,163,0.08);border-bottom:1px solid rgba(232,213,163,0.18);padding:9px 18px;align-items:center;justify-content:space-between;backdrop-filter:none;-webkit-backdrop-filter:none;">

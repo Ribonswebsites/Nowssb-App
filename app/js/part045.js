@@ -258,7 +258,7 @@ function _showSubscriptionSuccess(planId) {
   var names  = { resonance:'Resonance', frequency:'Frequency', frequencyX:'Frequency X' };
   var titles = { resonance:'Your practice begins now.', frequency:'You are the frequency.', frequencyX:'Mastery unlocked.' };
   var unlocks = {
-    resonance: ['All 20 health categories', 'AI pronunciation scoring', 'Sound Bath Mode', 'AI daily word prescription'],
+    resonance: ['All 20 health categories', 'AI pronunciation scoring', 'AI daily word prescription'],
     frequency: ['Voice Resonance Score overlay', 'Sentence Alchemy personalised', 'Unlimited Word Atelier', 'Premium certificates + export'],
     frequencyX:['5 custom word requests/month', 'Word Drop 48h early access', 'ElevenLabs studio voice', 'Exclusive Frequency X community']
   };

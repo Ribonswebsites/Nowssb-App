@@ -382,7 +382,7 @@ function mpRenderFeedbackForm() {
 
     <div class="mp-feedback-question">What do you want more of?</div>
     <div class="mp-feedback-chips" id="mpChipsWants">
-      ${['More words','Body map','Sound Bath mode','AI feedback','Progress charts','Sentence builder','Weekly report','More voices'].map(t => `<div class="mp-chip" onclick="mpToggleChip(this,'wants','${t}')">${t}</div>`).join('')}
+      ${['More words','Body map','AI feedback','Progress charts','Sentence builder','Weekly report','More voices'].map(t => `<div class="mp-chip" onclick="mpToggleChip(this,'wants','${t}')">${t}</div>`).join('')}
     </div>
 
     <div class="mp-feedback-question" style="margin-top:4px;">Anything else you want to tell us?</div>

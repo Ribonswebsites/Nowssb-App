@@ -38,7 +38,6 @@ var SS_PLANS = [
       [true, 'All 20 health categories'],
       [true, 'AI persona feedback after each session'],
       [true, 'AI daily word prescription'],
-      [true, 'Sound Bath Mode (Sleep / Focus / Healing)'],
       [true, 'Chat with community members — all 5 routine slots'],
       [true, 'Word Mastery Certificates (standard)'],
       [true, 'The Word Atelier — acquire up to 10 words/month'],
@@ -59,7 +58,6 @@ var SS_PLANS = [
       [true, 'Voice Resonance Score'],
       [true, 'Sentence Alchemy — personalised AI sentences'],
       [true, 'All AI personas + exclusive ones'],
-      [true, 'Sound Bath + custom ambient layer mixing'],
       [true, 'Full AI Conversation with session memory'],
       [true, 'Premium certificate designs + export'],
       [true, 'Featured in community search'],
@@ -178,7 +176,7 @@ Key facts to know:
 - Pronunciation is scored 0-100 based on phonetic match. 90%+ three times = Word Mastery.
 - Word Atelier: browse and acquire words. Resonance: 10/month, Frequency+: unlimited.
 - Sentence Alchemy: AI builds a healing sentence from your practiced words after each session.
-- Sound Bath, AI conversation, Voice Resonance Score — Frequency tier and above.
+- AI conversation, Voice Resonance Score — Frequency tier and above.
 - Custom word requests: Frequency (2/mo), Frequency X (5/mo personally crafted by the NowssB team).
 - Support email: nowssbonline@gmail.com
 
