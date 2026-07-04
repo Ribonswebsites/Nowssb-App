@@ -1023,7 +1023,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="home-greeting w100">Begin Your<br>Healing Path</div>
   <div class="home-tagline w100"><span class="brand-tag" style="font-size:12px;">Natural Origin of <strong>Word Science</strong></span></div>
 
-  <!-- Streak (above Today's Practice) -->
+  <div class="home-card w100" id="todayPracticeCard" onclick="openPracticeIntro()" style="background-color:#060c18; backdrop-filter:none; -webkit-backdrop-filter:none;">
+    <div class="tile-img-bg" id="todayPracticeBg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg');"></div>
+    <div class="tile-overlay"></div>
+    <div class="home-card-top">
+      <span class="home-card-label" id="todayPracticeLabel">Today's Practice</span>
+      <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/49a3a200-578a-11f1-9331-1302872077be_jgmnss.png" style="width:40px;height:40px;object-fit:contain;display:block;margin:4px 0 6px;" alt="Word of the Day">
+      <div class="home-card-title" id="todayPracticeTitle">Loading...</div>
+    </div>
+    <div class="home-card-bottom">
+      <div class="home-card-sub" id="todayPracticeSub">Your personalized word ritual for right now.</div>
+      <div class="home-card-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(200,232,245,0.6)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    </div>
+  </div>
+
+  <!-- Streak (below Today's Practice) -->
   <div class="fash-streak w100" onclick="openPracticeIntro()">
     <div class="fash-streak-icon">
       <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
@@ -1037,20 +1051,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <div style="flex:1;"></div>
     <div class="fash-streak-cta">Keep Going</div>
-  </div>
-
-  <div class="home-card w100" id="todayPracticeCard" onclick="openPracticeIntro()" style="background-color:#060c18; backdrop-filter:none; -webkit-backdrop-filter:none;">
-    <div class="tile-img-bg" id="todayPracticeBg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg');"></div>
-    <div class="tile-overlay"></div>
-    <div class="home-card-top">
-      <span class="home-card-label" id="todayPracticeLabel">Today's Practice</span>
-      <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/49a3a200-578a-11f1-9331-1302872077be_jgmnss.png" style="width:40px;height:40px;object-fit:contain;display:block;margin:4px 0 6px;" alt="Word of the Day">
-      <div class="home-card-title" id="todayPracticeTitle">Loading...</div>
-    </div>
-    <div class="home-card-bottom">
-      <div class="home-card-sub" id="todayPracticeSub">Your personalized word ritual for right now.</div>
-      <div class="home-card-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(200,232,245,0.6)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
-    </div>
   </div>
 
   <!-- AI Prescription Card -->
