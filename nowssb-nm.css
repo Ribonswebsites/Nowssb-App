@@ -2826,8 +2826,8 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 }
 .nwsb-cr-fab:active { box-shadow: inset 4px 4px 10px #cdd2de, inset -4px -4px 10px #ffffff; }
 
-.nwsb-cr-wrap { position: fixed; inset: 0; z-index: 100000; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-.nwsb-cr-wrap.open { opacity: 1; pointer-events: auto; }
+.nwsb-cr-wrap { position: fixed; inset: 0; z-index: 100000; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s ease, visibility 0s .25s; }
+.nwsb-cr-wrap.open { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .25s ease; }
 .nwsb-cr-scrim { position: absolute; inset: 0; background: rgba(6,10,20,0.5); }
 .nwsb-cr-sheet {
   position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box;
