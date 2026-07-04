@@ -2708,8 +2708,8 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 
 #sub-features {
   background:
-    linear-gradient(rgba(6,10,20,0.72), rgba(6,10,20,0.82)),
-    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg') center center / cover no-repeat #060c18 !important;
+    linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783160845/grok_image_1783160701247_ervstf.jpg') center center / cover no-repeat #060c18 !important;
 }
 #sub-features .feat-scroll {
   position: relative; z-index: 1; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
