@@ -2444,17 +2444,21 @@ body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
   -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
           backdrop-filter: blur(14px) saturate(1.2) !important;
 }
-/* Light nav → DARK icons so each one is clearly visible (the default filter
-   turns them white, which vanishes on the light bar). Active stays gold. */
+/* Light nav → show the ORIGINAL icon images (no tint filter), fully visible and
+   detailed, instead of a white/black silhouette. Active tab tinted gold. */
 body.nm-mode #ig-social-nav .ig-social-img,
 body.nm-mode #ig-bottomnav .ig-nav-img {
-  filter: brightness(0) opacity(0.82) !important;
+  filter: none !important;
+  opacity: 1 !important;
 }
 body.nm-mode #ig-social-nav .ig-social-btn.active .ig-social-img,
 body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-img {
   filter: brightness(0) saturate(100%) invert(64%) sepia(38%) saturate(600%) hue-rotate(2deg) brightness(92%) !important;
   opacity: 1 !important;
 }
+/* profile avatar in the social nav — bigger so it's clearly visible */
+body.nm-mode #ig-social-nav #igsn-me-av,
+#ig-social-nav #igsn-me-av { width: 32px !important; height: 32px !important; border: 1.5px solid rgba(0,0,0,0.18) !important; }
 
 /* Settings: NO blur (a glass background image is used there instead) */
 #sub-social .sg, .ss-section {
