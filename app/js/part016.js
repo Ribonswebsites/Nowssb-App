@@ -49,49 +49,31 @@ function initGSAP() {
   });
 }
 
-// ── HERO PARALLAX on touch/mouse ──
+// ── HERO 3D SCROLL (replaces the old touch/mouse tilt) ──
+// The interactive tilt was removed by request. Instead the hero gently scales
+// down + fades as it scrolls out of view — a clean 3D depth feel WITHOUT the
+// image "coming down". No permanent GPU layer: it only transforms while the
+// hero is actually on screen, throttled to one write per animation frame.
 const heroSection = document.querySelector('.hero-section');
-let tiltActive = false;
-
-function applyTilt(x, y) {
-  const rect = heroSection.getBoundingClientRect();
-  const cx = rect.width / 2;
-  const cy = rect.height / 2;
-  const dx = (x - rect.left - cx) / cx;
-  const dy = (y - rect.top  - cy) / cy;
-  const rotY =  dx * 6;
-  const rotX = -dy * 4;
-  heroSection.style.willChange = 'transform';   // promote to a GPU layer only during the tilt
-  heroSection.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.015)`;
-  heroSection.style.transition = 'transform 0.12s ease-out';
-}
-
-function resetTilt() {
-  heroSection.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)';
-  heroSection.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)';
-  // drop the GPU layer once the settle animation finishes (idle = no wasted VRAM)
-  clearTimeout(heroSection._wcTimer);
-  heroSection._wcTimer = setTimeout(() => { heroSection.style.willChange = 'auto'; }, 620);
-}
+heroSection.style.transformOrigin = 'top center';
 
 // ── All home interaction listeners are registered once ──
 if (!window._homeListenersInit) {
   window._homeListenersInit = true;
 
-// Touch
-heroSection.addEventListener('touchmove', e => {
-  applyTilt(e.touches[0].clientX, e.touches[0].clientY);
+const homeScreen = document.getElementById('home');
+let _heroTick = false;
+homeScreen.addEventListener('scroll', () => {
+  if (_heroTick) return;
+  _heroTick = true;
+  requestAnimationFrame(() => {
+    _heroTick = false;
+    const h = heroSection.offsetHeight || 1;
+    const p = Math.min(homeScreen.scrollTop / h, 1);   // 0 at top → 1 after one hero height
+    heroSection.style.transform = p > 0.001 ? `scale(${(1 - p * 0.06).toFixed(4)})` : '';
+    heroSection.style.opacity   = p > 0.001 ? (1 - p * 0.5).toFixed(3) : '';
+  });
 }, { passive: true });
-heroSection.addEventListener('touchend', resetTilt);
-
-// Mouse (desktop)
-heroSection.addEventListener('mousemove', e => applyTilt(e.clientX, e.clientY));
-heroSection.addEventListener('mouseleave', resetTilt);
-
-// ── HERO BG SCROLL PARALLAX — REMOVED ──
-// This made the hero image slide down as you scrolled (translateY on scroll)
-// and forced a transform/composite on 5 full-screen layers every scroll frame.
-// The 3D touch/mouse tilt above is kept — only the "comes down" scroll motion is gone.
 
 // ── CARD MAGNETIC HOVER (home tiles) ──
 document.querySelectorAll('.home-tile, .home-card').forEach(card => {

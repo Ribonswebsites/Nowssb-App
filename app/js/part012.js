@@ -2104,6 +2104,17 @@ function rmdBuyNow() {
   if (typeof openSub === 'function') openSub('checkout');
 }
 
+// Header back is context-aware: from a word detail it returns to the word list;
+// from the list it closes the store. (Replaces the old duplicate back button.)
+function rmHeaderBack() {
+  var det = document.getElementById('rmDetailView');
+  if (det && getComputedStyle(det).display !== 'none') {
+    rmdBackToLibrary();          // in a word detail → return to the word list
+  } else {
+    closeSub('real-meaning');    // already in the list → close the store
+  }
+}
+
 function rmdBackToLibrary() {
   clearInterval(_rmdSlideTimer);
   _rmdCurrentKey = null;
