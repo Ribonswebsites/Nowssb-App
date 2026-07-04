@@ -237,6 +237,26 @@ window.pwCloseMeaning = function() {
     }, 440);
   };
 
+  // Open a STORE from the Explore chooser and land inside it (no intro). The
+  // store screens sit EARLIER in the DOM than the search screens, so without a
+  // raised z-index the still-open search page paints over them (looked like it
+  // "went back to search"). Raise the store, open it, skip its intro, then drop
+  // the search + chooser screens behind it.
+  window.wsgToStore = function (storeId, enterFn) {
+    var store = document.getElementById('sub-' + storeId);
+    if (!store) return;
+    store.style.zIndex = '820';
+    if (typeof closeSub === 'function') closeSub('explore-choice');
+    if (typeof openSub === 'function') openSub(storeId); else store.classList.add('open');
+    setTimeout(function () { if (typeof window[enterFn] === 'function') window[enterFn](); }, 340);
+    setTimeout(function () {
+      ['sub-word-search', 'sub-meaning-search', 'sub-explore-choice'].forEach(function (id) {
+        var e = document.getElementById(id); if (e) e.classList.remove('open');
+      });
+      store.style.zIndex = '';
+    }, 520);
+  };
+
   function addSwipe(bodyId, fromId, toId, dir) {
     var el = document.getElementById(bodyId);
     if (!el) return;

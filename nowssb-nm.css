@@ -2525,7 +2525,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .wsg-card {
   position: relative; margin: 6px 16px 12px; border-radius: 42px !important;
   padding: 44px 24px 44px; overflow: hidden;
-  min-height: calc(var(--full-height, 100vh) - 118px);
+  min-height: calc(var(--full-height, 100vh) - 190px);
   display: flex; flex-direction: column; justify-content: center; gap: 30px;
   background: transparent;
   box-shadow: 0 40px 90px rgba(0,0,0,0.7);
@@ -2571,6 +2571,13 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .wsg-brandcol { display: flex; flex-direction: column; justify-content: center; }
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
 .wsg-head { display: flex; flex-direction: column; gap: 12px; }
+/* glass tube/capsule wrapping the logo + NowssB + by Nowsbansiu (player's tube) */
+.wsg-tube {
+  position: relative;
+  padding: 20px 24px;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim,f_auto,q_auto,w_820/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center center / 100% 100% no-repeat;
+  filter: drop-shadow(0 10px 24px rgba(0,0,0,0.4));
+}
 .wsg-tagline {
   font-size: 13.5px !important; font-weight: 600 !important; letter-spacing: 0.8px !important;
   color: #f0dcae !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -2582,8 +2589,8 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .wsg-below {
   position: absolute; left: 0; right: 0; bottom: 16px; z-index: 3; margin: 0;
   text-align: center; font-family: 'DM Sans', sans-serif;
-  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;
-  color: rgba(255,255,255,0.5); text-shadow: 0 1px 4px rgba(0,0,0,0.5); pointer-events: none;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase; font-weight: 800;
+  color: rgba(255,255,255,0.92); text-shadow: 0 1px 8px rgba(0,0,0,0.85); pointer-events: none;
 }
 .ws-page-hint, .ms-page-hint {
   text-align: center; margin: 16px 24px 0 !important; font-family: 'DM Sans', sans-serif;
