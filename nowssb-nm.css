@@ -2716,7 +2716,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   box-sizing: border-box;
   padding: calc(env(safe-area-inset-top,20px) + 16px) 18px calc(var(--nav-height,58px) + 44px);
 }
-#sub-features .feat-topbar { margin: 2px 0 12px; }
+#sub-features .feat-topbar { display: flex; align-items: center; gap: 14px; margin: 2px 0 16px; }
 #sub-features .feat-back {
   width: 42px; height: 42px; flex-shrink: 0; border: none; cursor: pointer; padding: 0;
   background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;
@@ -2727,7 +2727,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim,f_auto,q_auto,w_800/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center/100% 100% no-repeat;
   filter: drop-shadow(0 14px 30px rgba(0,0,0,0.5));
 }
-#sub-features .feat-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #c8a96e; margin-bottom: 8px; }
+#sub-features .feat-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #c8a96e; margin: 0; }
 #sub-features .feat-title { font-family: 'DM Sans', sans-serif; font-weight: 200; font-size: 27px; line-height: 1.05; color: rgba(255,255,255,0.9); white-space: nowrap; }
 #sub-features .feat-title .brand-name { font-size: 27px !important; text-shadow: none !important; }
 #sub-features .feat-hsub { font-size: 13px; margin-top: 10px; }
