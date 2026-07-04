@@ -296,7 +296,8 @@ async function wsPageSearch() {
   // If it's in store it could be bought — for now default = not available in store
   var isInStore = false; // future: check Firestore word store
 
-  if (imgBlock) imgBlock.classList.add('show');
+  // Only reveal the image block if a real result image is set (no empty placeholder)
+  if (imgBlock) { if (WS_IMG_RESULT) imgBlock.classList.add('show'); else imgBlock.classList.remove('show'); }
   setTimeout(function() {
     if (actionRow) actionRow.classList.add('show');
     if (isInStore && ownWord) ownWord.classList.add('show');

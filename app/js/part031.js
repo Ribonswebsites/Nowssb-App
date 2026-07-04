@@ -88,8 +88,8 @@ async function msPageSearch() {
     }
   }
 
-  // Show image + tiles
-  if (imgBlock) imgBlock.classList.add('show');
+  // Show image + tiles — only reveal the image block if a real image is set
+  if (imgBlock) { if (msImgResult) imgBlock.classList.add('show'); else imgBlock.classList.remove('show'); }
   setTimeout(function() {
     if (actionRow) actionRow.classList.add('show');
   }, 120);

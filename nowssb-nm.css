@@ -2364,8 +2364,8 @@ body.nm-glass #sub-health-journey .gsel-card {
   color:#e8d5a3; margin-bottom:5px; opacity:1; text-shadow:0 2px 8px rgba(0,0,0,.6);
 }
 .fb-title {
-  font-family:'DM Sans',sans-serif; font-size:20px; font-weight:800; line-height:1.15;
-  color:#ffffff; letter-spacing:.2px; opacity:1;
+  font-family:'DM Sans',sans-serif; font-size:14px; font-weight:800; line-height:1.2;
+  color:#ffffff; letter-spacing:.2px; opacity:1; max-width:70%;
   text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 6px rgba(232,213,163,.25);
   animation:fbGlow 3.4s ease-in-out infinite;
 }
@@ -3022,3 +3022,15 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 }
 /* the inner result cards no longer need their own show-animation margins */
 .ws-result-page .ws-page-result { margin: 8px 20px 0 !important; }
+
+/* Request disclaimer — subtle line under the action tiles */
+.ws-result-disclaimer {
+  margin: 14px 20px 0; font-family: 'DM Sans', sans-serif; font-size: 11px;
+  font-weight: 300; line-height: 1.55; color: rgba(255,255,255,0.5);
+  letter-spacing: .2px; display: flex; align-items: center; flex-wrap: wrap; gap: 7px;
+}
+.ws-result-disclaimer-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  color: #e8d5a3; padding: 3px 8px; border: 1px solid rgba(232,213,163,0.35);
+  border-radius: 20px !important; background: rgba(232,213,163,0.08); flex-shrink: 0;
+}
