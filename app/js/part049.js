@@ -222,7 +222,22 @@ window.pwCloseMeaning = function() {
    go to Meaning Search, swipe right on Meaning Search to go back. Ignores
    swipes that start on the carousel / inputs so those keep working. */
 (function () {
-  function addSwipe(bodyId, openId, closeId, dir) {
+  // Switch DIRECTLY between the two search screens with no home flash: slide the
+  // target in ON TOP (raised z-index) while the current one stays behind, then
+  // drop the old one once the slide finishes.
+  window.wsgSwitch = function (fromId, toId) {
+    var from = document.getElementById('sub-' + fromId);
+    var to = document.getElementById('sub-' + toId);
+    if (!from || !to || to.classList.contains('open')) return;
+    to.style.zIndex = '650';
+    if (typeof openSub === 'function') openSub(toId); else to.classList.add('open');
+    setTimeout(function () {
+      from.classList.remove('open');
+      to.style.zIndex = '';
+    }, 440);
+  };
+
+  function addSwipe(bodyId, fromId, toId, dir) {
     var el = document.getElementById(bodyId);
     if (!el) return;
     var x0 = null, y0 = null, skip = false;
@@ -235,16 +250,13 @@ window.pwCloseMeaning = function() {
       var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
       x0 = null;
       if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.6) {
-        if ((dir === 'left' && dx < 0) || (dir === 'right' && dx > 0)) {
-          if (typeof closeSub === 'function') closeSub(closeId);
-          setTimeout(function () { if (typeof openSub === 'function') openSub(openId); }, 60);
-        }
+        if ((dir === 'left' && dx < 0) || (dir === 'right' && dx > 0)) window.wsgSwitch(fromId, toId);
       }
     }, { passive: true });
   }
   function init() {
-    addSwipe('wsPageBody', 'meaning-search', 'word-search', 'left');
-    addSwipe('msPageBody', 'word-search', 'meaning-search', 'right');
+    addSwipe('wsPageBody', 'word-search', 'meaning-search', 'left');
+    addSwipe('msPageBody', 'meaning-search', 'word-search', 'right');
   }
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);
