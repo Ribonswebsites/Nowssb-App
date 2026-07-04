@@ -137,9 +137,13 @@ onAuthStateChanged(auth, async user => {
       if (window._splashDone) {
         _doNavigate(window._splashRoute);
       } else {
-        // Navigate as soon as 1.5s minimum splash time has elapsed
+        // Navigate as soon as the minimum splash time has elapsed. On a fresh
+        // session-resume (user switched apps and came back), skip the branded
+        // splash delay so it feels like returning to a native app, not a reload.
         var _elapsed = Date.now() - (window._splashStartTime || Date.now());
-        var _minWait = Math.max(0, 1500 - _elapsed);
+        var _resumeFresh = false;
+        try { _resumeFresh = (typeof window._nwsbHasFreshResume === 'function') && window._nwsbHasFreshResume(); } catch (e) {}
+        var _minWait = Math.max(0, (_resumeFresh ? 150 : 1500) - _elapsed);
         setTimeout(function() {
           if (currentScreen !== 'splash') return;
           window._splashDone = true;
