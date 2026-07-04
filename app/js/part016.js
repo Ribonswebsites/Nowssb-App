@@ -84,14 +84,10 @@ heroSection.addEventListener('touchend', resetTilt);
 heroSection.addEventListener('mousemove', e => applyTilt(e.clientX, e.clientY));
 heroSection.addEventListener('mouseleave', resetTilt);
 
-// ── HERO BG PARALLAX on scroll ──
-const homeScreen = document.getElementById('home');
-homeScreen.addEventListener('scroll', () => {
-  const sy = homeScreen.scrollTop;
-  document.querySelectorAll('.hero-bg').forEach(bg => {
-    bg.style.transform = `translateY(${sy * 0.38}px)`;
-  });
-}, { passive: true });
+// ── HERO BG SCROLL PARALLAX — REMOVED ──
+// This made the hero image slide down as you scrolled (translateY on scroll)
+// and forced a transform/composite on 5 full-screen layers every scroll frame.
+// The 3D touch/mouse tilt above is kept — only the "comes down" scroll motion is gone.
 
 // ── CARD MAGNETIC HOVER (home tiles) ──
 document.querySelectorAll('.home-tile, .home-card').forEach(card => {
