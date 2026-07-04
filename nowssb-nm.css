@@ -2444,16 +2444,13 @@ body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
   -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
           backdrop-filter: blur(14px) saturate(1.2) !important;
 }
-/* Light nav → show the ORIGINAL icon images (no tint filter), fully visible and
-   detailed, instead of a white/black silhouette. Active tab tinted gold. */
+/* Light nav → show the ORIGINAL icon images with NO tint/effect at all, active
+   or not. (Active is indicated by the gold LABEL text only, not a gold icon.) */
 body.nm-mode #ig-social-nav .ig-social-img,
-body.nm-mode #ig-bottomnav .ig-nav-img {
-  filter: none !important;
-  opacity: 1 !important;
-}
+body.nm-mode #ig-bottomnav .ig-nav-img,
 body.nm-mode #ig-social-nav .ig-social-btn.active .ig-social-img,
 body.nm-mode #ig-bottomnav .ig-nav-btn.active .ig-nav-img {
-  filter: brightness(0) saturate(100%) invert(64%) sepia(38%) saturate(600%) hue-rotate(2deg) brightness(92%) !important;
+  filter: none !important;
   opacity: 1 !important;
 }
 /* profile avatar in the social nav — bigger so it's clearly visible */
