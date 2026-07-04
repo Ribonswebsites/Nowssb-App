@@ -1,4 +1,4 @@
-const CACHE = 'nowsbansiu-v256';
+const CACHE = 'nowsbansiu-v257';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -17,6 +17,9 @@ self.addEventListener('fetch', e => {
   const url = e.request.url;
   // Skip videos and large media — browser handles range requests natively
   if (url.includes('.mp4') || url.includes('/video/upload/') || url.includes('video/mp4')) return;
+  // Never touch the Firebase Auth handler/helpers — let them pass straight to the
+  // network (reverse-proxied by functions/_middleware.js) so Google sign-in works.
+  if (url.includes('/__/')) return;
   // Never serve HTML from cache — always go to network so updates land immediately
   if (e.request.mode === 'navigate' || (e.request.destination === 'document')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));

@@ -12,7 +12,10 @@ import { getFirestore, doc, setDoc, getDoc, serverTimestamp,
 
 const app = initializeApp({
   apiKey: "AIzaSyBly5XnqNnpVom11thjlvT5q_BfxNJBfgQ",
-  authDomain: "nowssb-34f1b.firebaseapp.com",
+  // Custom auth domain: the OAuth handler at /__/auth/* is reverse-proxied to
+  // nowssb-34f1b.firebaseapp.com by functions/_middleware.js (Cloudflare Pages),
+  // so Google's consent screen shows "continue to nowssb.com".
+  authDomain: "nowssb.com",
   projectId: "nowssb-34f1b",
   storageBucket: "nowssb-34f1b.firebasestorage.app",
   messagingSenderId: "1024709686012",
