@@ -281,3 +281,44 @@ window.pwCloseMeaning = function() {
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);
 })();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ANDROID BACK GESTURE / BUTTON — close the top overlay instead of exiting.
+   The app navigates with .open overlays that push no history, so a back gesture
+   popped the lone history entry and killed the app. We keep a "trap" history
+   entry on top; on back we close the topmost overlay and re-arm the trap. Only
+   when nothing is open does back fall through (exit from home). */
+(function () {
+  function closeTop() {
+    // compose / post viewer / create sheet (most-recent overlays first)
+    var compose = document.getElementById('nwsbCompose');
+    if (compose) { compose.classList.remove('open'); setTimeout(function () { compose.remove(); }, 300); return true; }
+    var pv = document.querySelector('.nwsb-pv-wrap');
+    if (pv) { pv.remove(); return true; }
+    var sheet = document.getElementById('nwsbCreateSheet');
+    if (sheet && sheet.classList.contains('open')) { if (typeof nwsbCloseCreate === 'function') nwsbCloseCreate(); else sheet.classList.remove('open'); return true; }
+    // choosers before generic sub-screens
+    var chooser = document.querySelector('#sub-explore-choice.open, #sub-search-choice.open');
+    if (chooser) { var cid = chooser.id.replace(/^sub-/, ''); if (typeof closeSub === 'function') closeSub(cid); else chooser.classList.remove('open'); return true; }
+    // hamburger menu
+    var menu = document.getElementById('menuDrawer');
+    if (menu && menu.classList.contains('open')) { if (typeof closeMenu === 'function') closeMenu(); else menu.classList.remove('open'); return true; }
+    // any open sub-screen (topmost in DOM)
+    var subs = document.querySelectorAll('.sub-screen.open');
+    if (subs.length) {
+      var top = subs[subs.length - 1];
+      var id = (top.id || '').replace(/^sub-/, '');
+      if (typeof closeSub === 'function') closeSub(id); else top.classList.remove('open');
+      return true;
+    }
+    return false;
+  }
+  function arm() { try { history.pushState({ nwsbTrap: 1 }, ''); } catch (e) {} }
+  // seed the trap once the app is ready
+  if (document.readyState !== 'loading') arm();
+  else document.addEventListener('DOMContentLoaded', arm);
+  window.addEventListener('popstate', function () {
+    if (closeTop()) arm();   // closed an overlay → re-arm so we stay in the app
+    // else: nothing open (on home) → let the back proceed (allow exit)
+  });
+})();
