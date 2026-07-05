@@ -2523,7 +2523,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   position: relative; margin: 6px 16px 12px; border-radius: 0 !important;
   padding: 44px 24px 44px; overflow: hidden;
   min-height: calc(var(--full-height, 100vh) - 190px);
-  display: flex; flex-direction: column; justify-content: center; gap: 30px;
+  display: flex; flex-direction: column; justify-content: safe center; gap: 30px;
   background: transparent;
   box-shadow: 0 40px 90px rgba(0,0,0,0.7);
 }
@@ -2547,7 +2547,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .wsg-card::after {
   content: ''; position: absolute; z-index: 1; inset: 2px; border-radius: 0; pointer-events: none;
   background:
-    linear-gradient(rgba(6,11,22,0.40), rgba(6,11,22,0.40)),
+    linear-gradient(rgba(4,8,16,0.60), rgba(4,8,16,0.60)),
     linear-gradient(155deg, rgba(244,248,253,0.16), rgba(214,228,244,0.06) 55%, rgba(244,248,253,0.13)),
     url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783105775/file_00000000092071fa987c573af7825e6d_be9hpf.png') center center / 165% no-repeat;
   background-color: rgba(230,238,248,0.09);
@@ -2584,9 +2584,9 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   color: rgba(255,255,255,0.92); text-shadow: 0 1px 8px rgba(0,0,0,0.85); pointer-events: none;
 }
 .ws-page-hint, .ms-page-hint {
-  text-align: center; margin: 16px 24px 0 !important; font-family: 'DM Sans', sans-serif;
-  font-size: 12.5px !important; line-height: 1.4 !important; color: rgba(255,255,255,0.5) !important;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-align: center; margin: 16px 24px calc(env(safe-area-inset-bottom,20px) + 24px) !important; font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px !important; line-height: 1.45 !important; color: rgba(255,255,255,0.5) !important;
+  white-space: normal; overflow: visible; text-overflow: clip;
 }
 .ws-page-hint strong, .ms-page-hint strong { color: rgba(255,255,255,0.8) !important; font-weight: 700; }
 .wsg-title {
@@ -2604,6 +2604,10 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   text-align: center;
 }
 .wsg-instr strong { color: #ffffff !important; font-weight: 700; }
+/* consolidated tagline stack — the fashion trend + "without a dictionary" +
+   "enter a word" lines all sit here, one after another, below the brand. */
+.wsg-lines { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-top: 2px; }
+.wsg-lines .wsg-instr { margin-top: 7px; }   /* "enter a word" a little below the two taglines */
 /* header Words|Meaning switch — compact segmented toggle, white active segment */
 .wsg-switch {
   display: flex; gap: 3px; margin: 0 auto; padding: 3px;
@@ -2647,6 +2651,39 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.22);
 }
 .wsg-search-go:active { background: rgba(255,255,255,0.22); }
+
+/* ── Traveling light that tracks around the search bar + the round go button ──
+   A masked conic-gradient border ring whose start angle sweeps 0→360°, so a
+   bright arc travels continuously around the rounded-rect / circle edge. Same
+   @property + mask-composite trick the features menu uses (WebView-safe). */
+@property --wsgang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes wsgAngTravel { to { --wsgang: 360deg; } }
+.wsg-search { position: relative; }
+.wsg-search > * { position: relative; z-index: 2; }
+.wsg-search::before {
+  content: ''; position: absolute; inset: 0; border-radius: 31px; padding: 1.6px;
+  pointer-events: none; z-index: 1;
+  background: conic-gradient(from var(--wsgang),
+    transparent 0deg, transparent 248deg,
+    rgba(150,210,255,0.5) 312deg, #ffffff 344deg, rgba(150,210,255,0.5) 352deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: wsgAngTravel 4s linear infinite; will-change: --wsgang;
+}
+.wsg-search-go { position: relative; }
+.wsg-search-go img { position: relative; z-index: 2; }
+.wsg-search-go::before {
+  content: ''; position: absolute; inset: -1px; border-radius: 50%; padding: 1.6px;
+  pointer-events: none; z-index: 1;
+  background: conic-gradient(from var(--wsgang),
+    transparent 0deg, transparent 230deg,
+    rgba(150,210,255,0.55) 300deg, #ffffff 340deg, rgba(150,210,255,0.55) 352deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: wsgAngTravel 2.8s linear infinite; will-change: --wsgang;
+}
 
 /* suggestion card — now a horizontal, auto-rotating, user-scrollable carousel:
    the card is the fixed frame; slides scroll inside it, one word at a time. */
