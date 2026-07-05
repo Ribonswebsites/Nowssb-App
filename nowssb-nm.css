@@ -2523,7 +2523,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   position: relative; margin: 6px 16px 12px; border-radius: 0 !important;
   padding: 44px 24px 44px; overflow: hidden;
   min-height: calc(var(--full-height, 100vh) - 190px);
-  display: flex; flex-direction: column; justify-content: safe center; gap: 30px;
+  display: flex; flex-direction: column; justify-content: center; gap: 30px;
   background: transparent;
   box-shadow: 0 40px 90px rgba(0,0,0,0.7);
 }
@@ -2559,19 +2559,21 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 /* top row: circular glass logo + NowssB title / by Nowsbansiu, subtitle */
 .wsg-top { display: flex; align-items: center; gap: 16px; }
 .wsg-logo {
-  width: 86px; height: 86px; flex-shrink: 0; border-radius: 50% !important;
+  width: 78px; height: 78px; flex-shrink: 0; border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center; overflow: hidden;
-  /* glass sphere (left shape of the provided asset) framing the logo */
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_west,ar_1,w_0.42/f_auto,q_auto,w_220/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / cover no-repeat;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  /* glass sphere framing the logo — darkened so it reads on the dark panel */
+  background:
+    linear-gradient(rgba(2,5,12,0.52), rgba(2,5,12,0.52)),
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_west,ar_1,w_0.42/f_auto,q_auto,w_220/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / cover no-repeat;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
-.wsg-logo img { width: 50px; height: 50px; object-fit: contain; opacity: 0.98; }
+.wsg-logo img { width: 56px; height: 56px; object-fit: contain; opacity: 1; }
 .wsg-brandcol {
   display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-  padding: 16px 30px; border-radius: 16px !important;
-  /* glass rectangle (right shape of the provided asset) framing the NowssB text */
+  padding: 12px 26px; border-radius: 16px !important;
+  /* glass rectangle framing the NowssB text — darkened a lot for contrast */
   background:
-    linear-gradient(rgba(4,8,16,0.26), rgba(4,8,16,0.26)),
+    linear-gradient(rgba(2,5,12,0.55), rgba(2,5,12,0.55)),
     url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_east,w_0.54,h_0.52/f_auto,q_auto,w_460/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / 100% 100% no-repeat;
 }
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
