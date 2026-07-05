@@ -2520,7 +2520,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
    (background-size >100%) so it reaches the rounded corners instead of sitting
    small in the middle. A faint frost overlay keeps it uniform. */
 .wsg-card {
-  position: relative; margin: 6px 16px 12px; border-radius: 42px !important;
+  position: relative; margin: 6px 16px 12px; border-radius: 0 !important;
   padding: 44px 24px 44px; overflow: hidden;
   min-height: calc(var(--full-height, 100vh) - 190px);
   display: flex; flex-direction: column; justify-content: center; gap: 30px;
@@ -2545,8 +2545,9 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   will-change: transform;
 }
 .wsg-card::after {
-  content: ''; position: absolute; z-index: 1; inset: 2px; border-radius: 40px; pointer-events: none;
+  content: ''; position: absolute; z-index: 1; inset: 2px; border-radius: 0; pointer-events: none;
   background:
+    linear-gradient(rgba(6,11,22,0.40), rgba(6,11,22,0.40)),
     linear-gradient(155deg, rgba(244,248,253,0.16), rgba(214,228,244,0.06) 55%, rgba(244,248,253,0.13)),
     url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783105775/file_00000000092071fa987c573af7825e6d_be9hpf.png') center center / 165% no-repeat;
   background-color: rgba(230,238,248,0.09);
