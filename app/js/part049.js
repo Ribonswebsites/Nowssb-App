@@ -24,6 +24,27 @@ window.fashionHomeIntroEnter = function() {
   }, 400);
 };
 
+/* ── Word/Meaning search: cycle the tagline through phrases one after another
+   (fade out → swap → fade in). One line at a time so the layout never grows. */
+(function () {
+  var WS = ['New fashion trends of <strong>meditation</strong>', 'Words without a <strong>dictionary</strong>'];
+  var MS = ['New fashion trends of <strong>meditation</strong>', 'Meaning without a <strong>dictionary</strong>'];
+  var i = 1;
+  function isOpen(id) { var s = document.getElementById(id); return s && s.classList.contains('open'); }
+  function swap(elId, arr) {
+    var el = document.getElementById(elId); if (!el) return;
+    el.style.opacity = '0';
+    setTimeout(function () { el.innerHTML = arr[i % arr.length]; el.style.opacity = '1'; }, 400);
+  }
+  setInterval(function () {
+    if (document.hidden) return;
+    if (!isOpen('sub-word-search') && !isOpen('sub-meaning-search')) return;
+    swap('wsCycleTag', WS);
+    swap('msCycleTag', MS);
+    i++;
+  }, 3200);
+})();
+
 ;
 
 /* ── Radial / Meaning helpers added for redesigned player ── */

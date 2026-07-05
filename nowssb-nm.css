@@ -2559,14 +2559,21 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 /* top row: circular glass logo + NowssB title / by Nowsbansiu, subtitle */
 .wsg-top { display: flex; align-items: center; gap: 16px; }
 .wsg-logo {
-  width: 72px; height: 72px; flex-shrink: 0; border-radius: 50% !important;
+  width: 86px; height: 86px; flex-shrink: 0; border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center; overflow: hidden;
-  background: rgba(255,255,255,0.09);
-  border: 1px solid rgba(255,255,255,0.28);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 6px 18px rgba(0,0,0,0.3);
+  /* glass sphere (left shape of the provided asset) framing the logo */
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_west,ar_1,w_0.42/f_auto,q_auto,w_220/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / cover no-repeat;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
 }
-.wsg-logo img { width: 62px; height: 62px; object-fit: contain; opacity: 0.95; }
-.wsg-brandcol { display: flex; flex-direction: column; justify-content: center; }
+.wsg-logo img { width: 50px; height: 50px; object-fit: contain; opacity: 0.98; }
+.wsg-brandcol {
+  display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+  padding: 16px 30px; border-radius: 16px !important;
+  /* glass rectangle (right shape of the provided asset) framing the NowssB text */
+  background:
+    linear-gradient(rgba(4,8,16,0.26), rgba(4,8,16,0.26)),
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_east,w_0.54,h_0.52/f_auto,q_auto,w_460/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / 100% 100% no-repeat;
+}
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
 .wsg-head { display: flex; flex-direction: column; gap: 12px; }
 .wsg-tagline {
@@ -2607,7 +2614,10 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 /* consolidated tagline stack — the fashion trend + "without a dictionary" +
    "enter a word" lines all sit here, one after another, below the brand. */
 .wsg-lines { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-top: 2px; }
-.wsg-lines .wsg-instr { margin-top: 7px; }   /* "enter a word" a little below the two taglines */
+.wsg-lines .wsg-instr { margin-top: 7px; }   /* "enter a word" a little below the cycling tagline */
+/* the tagline is a single line that CYCLES through phrases one after another
+   (fade out → swap → fade in), so it never adds height / shifts the pills */
+.wsg-cycle { transition: opacity 0.4s ease; }
 /* header Words|Meaning switch — compact segmented toggle, white active segment */
 .wsg-switch {
   display: flex; gap: 3px; margin: 0 auto; padding: 3px;
@@ -2652,12 +2662,26 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 }
 .wsg-search-go:active { background: rgba(255,255,255,0.22); }
 
-/* ── Traveling light that tracks around the search bar + the round go button ──
-   A masked conic-gradient border ring whose start angle sweeps 0→360°, so a
-   bright arc travels continuously around the rounded-rect / circle edge. Same
-   @property + mask-composite trick the features menu uses (WebView-safe). */
+/* ── Traveling light — SEQUENTIAL: the arc sweeps all the way around the search
+   bar, and only once it finishes does the round button's arc sweep, then back to
+   the bar (they never run together). Warm-white light. Masked conic-gradient
+   border ring + @property angle sweep (WebView-safe, same trick as the menu). */
 @property --wsgang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-@keyframes wsgAngTravel { to { --wsgang: 360deg; } }
+/* bar lit during the first half of the 5s cycle, hidden during the second half */
+@keyframes wsgBarSeq {
+  0%   { --wsgang: 0deg;   opacity: 1; }
+  46%  { --wsgang: 360deg; opacity: 1; }
+  50%  { --wsgang: 360deg; opacity: 0; }
+  100% { --wsgang: 360deg; opacity: 0; }
+}
+/* button lit during the second half, hidden during the first */
+@keyframes wsgGoSeq {
+  0%   { --wsgang: 0deg;   opacity: 0; }
+  50%  { --wsgang: 0deg;   opacity: 0; }
+  54%  { --wsgang: 0deg;   opacity: 1; }
+  96%  { --wsgang: 360deg; opacity: 1; }
+  100% { --wsgang: 360deg; opacity: 0; }
+}
 .wsg-search { position: relative; }
 .wsg-search > * { position: relative; z-index: 2; }
 .wsg-search::before {
@@ -2665,11 +2689,11 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   pointer-events: none; z-index: 1;
   background: conic-gradient(from var(--wsgang),
     transparent 0deg, transparent 248deg,
-    rgba(150,210,255,0.5) 312deg, #ffffff 344deg, rgba(150,210,255,0.5) 352deg, transparent 360deg);
+    rgba(255,214,150,0.5) 312deg, #fff4e2 344deg, rgba(255,214,150,0.5) 352deg, transparent 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: wsgAngTravel 4s linear infinite; will-change: --wsgang;
+  animation: wsgBarSeq 5s linear infinite; will-change: --wsgang, opacity;
 }
 .wsg-search-go { position: relative; }
 .wsg-search-go img { position: relative; z-index: 2; }
@@ -2678,11 +2702,11 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   pointer-events: none; z-index: 1;
   background: conic-gradient(from var(--wsgang),
     transparent 0deg, transparent 230deg,
-    rgba(150,210,255,0.55) 300deg, #ffffff 340deg, rgba(150,210,255,0.55) 352deg, transparent 360deg);
+    rgba(255,214,150,0.55) 300deg, #fff4e2 340deg, rgba(255,214,150,0.55) 352deg, transparent 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: wsgAngTravel 2.8s linear infinite; will-change: --wsgang;
+  animation: wsgGoSeq 5s linear infinite; will-change: --wsgang, opacity;
 }
 
 /* suggestion card — now a horizontal, auto-rotating, user-scrollable carousel:
