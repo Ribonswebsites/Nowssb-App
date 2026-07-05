@@ -2525,15 +2525,9 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   min-height: calc(var(--full-height, 100vh) - 190px);
   display: flex; flex-direction: column; justify-content: center; gap: 30px;
   background: transparent;
-  /* ambient light behind the panel — a soft cool halo that breathes so the whole
-     glass panel reads as if it is floating */
-  box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 90px 6px rgba(120,170,255,0.4);
-  animation: wsgPanelFloat 6s ease-in-out infinite;
-}
-/* clearly-visible cool ambient light bleeding out from behind the panel */
-@keyframes wsgPanelFloat {
-  0%,100% { box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 80px 4px rgba(120,170,255,0.34); }
-  50%     { box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 150px 12px rgba(150,195,255,0.62); }
+  /* just a dark float shadow — the AMBIENT light is the traveling arc below,
+     not a pulsating halo */
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
 }
 /* traveling light — a conic-gradient arc spinning behind the panel. The card
    clips it (overflow:hidden + rounded), and ::after re-draws the glass inset by
@@ -2543,13 +2537,14 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   content: ''; position: absolute; z-index: 0; pointer-events: none;
   top: 50%; left: 50%; width: 240%; height: 240%; transform: translate(-50%, -50%);
   background: conic-gradient(from 0deg,
-    rgba(255,255,255,0) 0deg,
-    rgba(255,255,255,0) 250deg,
-    rgba(150,210,255,0.55) 315deg,
-    rgba(255,255,255,0.98) 348deg,
-    rgba(150,210,255,0.55) 356deg,
-    rgba(255,255,255,0) 360deg);
-  animation: wsgTravel 4.5s linear infinite;
+    rgba(140,190,255,0) 0deg,
+    rgba(140,190,255,0) 205deg,
+    rgba(140,190,255,0.35) 270deg,
+    rgba(185,220,255,0.8) 320deg,
+    rgba(255,255,255,1) 345deg,
+    rgba(185,220,255,0.8) 359deg,
+    rgba(140,190,255,0) 360deg);
+  animation: wsgTravel 5s linear infinite;
   will-change: transform;
 }
 .wsg-card::after {
@@ -2572,29 +2567,14 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   display: flex; align-items: center; justify-content: center; overflow: hidden;
   /* dark glass crystal ball (provided asset) — zoomed in (135%) so it fills the ring */
   background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783232336/file_000000005418720b94ddb92836d002b1_gyw6qo.png') center center / 135% no-repeat;
-  /* icy aura pulsing around the ball */
-  animation: wsgIceGlow 3.8s ease-in-out infinite;
+  /* record-button pulse from the player — an expanding sonar ring */
+  animation: wsgLogoPulse 2s ease-in-out infinite;
 }
 .wsg-logo img { position: relative; z-index: 2; width: 62px; height: 62px; object-fit: contain; opacity: 1; }
-/* LIQUID-GLASS ICE — soft cold light blobs that slowly flow + morph across the
-   crystal ball like liquid glass. Sits behind the logo. */
-.wsg-logo::after {
-  content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; z-index: 1;
-  background:
-    radial-gradient(55% 45% at 32% 30%, rgba(205,240,255,0.30), transparent 62%),
-    radial-gradient(50% 55% at 70% 68%, rgba(175,222,255,0.24), transparent 62%),
-    radial-gradient(42% 42% at 60% 24%, rgba(232,249,255,0.20), transparent 60%);
-  background-size: 200% 200%, 190% 190%, 170% 170%;
-  animation: wsgLiquidIce 9s ease-in-out infinite alternate;
-}
-@keyframes wsgIceGlow {
-  0%,100% { box-shadow: 0 6px 18px rgba(0,0,0,0.42), 0 0 12px rgba(175,225,255,0.22); }
-  50%     { box-shadow: 0 6px 18px rgba(0,0,0,0.42), 0 0 30px rgba(195,236,255,0.60); }
-}
-@keyframes wsgLiquidIce {
-  0%   { background-position: 10% 20%, 90% 80%, 40% 10%; }
-  50%  { background-position: 55% 45%, 40% 55%, 65% 50%; }
-  100% { background-position: 90% 75%, 15% 25%, 30% 80%; }
+/* same pulse as the player's record/play orb — a ring that expands out + fades */
+@keyframes wsgLogoPulse {
+  0%,100% { box-shadow: 0 6px 18px rgba(0,0,0,0.45), 0 0 0 5px rgba(200,232,245,0.18); }
+  50%     { box-shadow: 0 6px 18px rgba(0,0,0,0.45), 0 0 0 15px rgba(200,232,245,0.04); }
 }
 .wsg-brandcol {
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left;
