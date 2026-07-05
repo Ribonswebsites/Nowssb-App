@@ -2520,7 +2520,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
    (background-size >100%) so it reaches the rounded corners instead of sitting
    small in the middle. A faint frost overlay keeps it uniform. */
 .wsg-card {
-  position: relative; margin: 6px 16px 12px; border-radius: 0 !important;
+  position: relative; margin: 6px 16px 12px; border-radius: 26px !important;
   padding: 44px 24px 44px; overflow: hidden;
   min-height: calc(var(--full-height, 100vh) - 190px);
   display: flex; flex-direction: column; justify-content: center; gap: 30px;
@@ -2545,7 +2545,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   will-change: transform;
 }
 .wsg-card::after {
-  content: ''; position: absolute; z-index: 1; inset: 2px; border-radius: 0; pointer-events: none;
+  content: ''; position: absolute; z-index: 1; inset: 2px; border-radius: 24px; pointer-events: none;
   background:
     linear-gradient(rgba(4,8,16,0.60), rgba(4,8,16,0.60)),
     linear-gradient(155deg, rgba(244,248,253,0.16), rgba(214,228,244,0.06) 55%, rgba(244,248,253,0.13)),
@@ -2553,7 +2553,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   background-color: rgba(230,238,248,0.09);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), inset 0 0 90px rgba(255,255,255,0.07);
 }
-.wsg-card > * { position: relative; z-index: 2; }
+.wsg-card > * { position: relative; z-index: 2; flex-shrink: 0; }   /* pills keep their height — never squished/cropped */
 @keyframes wsgTravel { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
 /* top row: circular glass logo + NowssB title / by Nowsbansiu, subtitle */
@@ -2561,20 +2561,18 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .wsg-logo {
   width: 78px; height: 78px; flex-shrink: 0; border-radius: 50% !important;
   display: flex; align-items: center; justify-content: center; overflow: hidden;
-  /* glass sphere framing the logo — darkened so it reads on the dark panel */
-  background:
-    linear-gradient(rgba(2,5,12,0.52), rgba(2,5,12,0.52)),
-    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_west,ar_1,w_0.42/f_auto,q_auto,w_220/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / cover no-repeat;
+  /* glass sphere framing the logo — darkened via the image itself (e_brightness),
+     NO flat black overlay box. */
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_west,ar_1,w_0.42/e_brightness:-42/f_auto,q_auto,w_220/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / cover no-repeat;
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
-.wsg-logo img { width: 56px; height: 56px; object-fit: contain; opacity: 1; }
+/* nudge the logo slightly up + right so it sits centered inside the glass ball */
+.wsg-logo img { width: 54px; height: 54px; object-fit: contain; opacity: 1; transform: translate(3px, -4px); }
 .wsg-brandcol {
-  display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-  padding: 12px 26px; border-radius: 16px !important;
-  /* glass rectangle framing the NowssB text — darkened a lot for contrast */
-  background:
-    linear-gradient(rgba(2,5,12,0.55), rgba(2,5,12,0.55)),
-    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_east,w_0.54,h_0.52/f_auto,q_auto,w_460/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / 100% 100% no-repeat;
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left;
+  padding: 12px 22px; border-radius: 16px !important;
+  /* glass rectangle framing the NowssB text — darkened via the image (no black box) */
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/c_crop,g_east,w_0.5,h_0.5/e_brightness:-48/f_auto,q_auto,w_460/v1783225198/file_0000000076fc72079db0b161e5490c47_u72er7.png') center center / 100% 100% no-repeat;
 }
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
 .wsg-head { display: flex; flex-direction: column; gap: 12px; }

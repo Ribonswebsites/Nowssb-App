@@ -27,8 +27,8 @@ window.fashionHomeIntroEnter = function() {
 /* ── Word/Meaning search: cycle the tagline through phrases one after another
    (fade out → swap → fade in). One line at a time so the layout never grows. */
 (function () {
-  var WS = ['New fashion trends of <strong>meditation</strong>', 'Words without a <strong>dictionary</strong>'];
-  var MS = ['New fashion trends of <strong>meditation</strong>', 'Meaning without a <strong>dictionary</strong>'];
+  var WS = ['New fashion trends of <strong>meditation</strong>', 'Words without a <strong>dictionary</strong>', 'Enter a word — <strong>get it</strong>, or request it.'];
+  var MS = ['New fashion trends of <strong>meditation</strong>', 'Meaning without a <strong>dictionary</strong>', 'Enter a word — <strong>get its meaning</strong>, or request it.'];
   var i = 1;
   function isOpen(id) { var s = document.getElementById(id); return s && s.classList.contains('open'); }
   function swap(elId, arr) {
