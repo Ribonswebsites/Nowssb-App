@@ -2424,12 +2424,17 @@ body.nm-glass #sub-health-journey .gsel-card {
 #home-nm .word-search-section, #home-nm .krm-section, #home-nm .nss-store-trigger,
 #home-nm .nmh-fsec, #home-nm .nmh-greet-img {
   width:100% !important; margin-left:0 !important; margin-right:0 !important; margin-bottom:0 !important;
-  border-radius:24px !important;
+  /* every section sits INSIDE a raised neumorphic plate: a surface-colored
+     frame + rounded corners + the dual shadow, so the plate is the extruded
+     element and the dark content is inset in it */
+  border:12px solid #f0f2f7 !important;
+  border-radius:28px !important;
   box-shadow:12px 12px 28px rgba(163,177,198,0.7), -9px -9px 22px #ffffff !important;
 }
-/* dark mode: mirror the practice card's dark neumorphic shadows */
+/* dark mode: dark surface frame + the practice card's dark neumorphic shadows */
 #home-nm.nm-dark .word-search-section, #home-nm.nm-dark .krm-section,
 #home-nm.nm-dark .nss-store-trigger, #home-nm.nm-dark .nmh-fsec, #home-nm.nm-dark .nmh-greet-img {
+  border-color:#0c0c20 !important;
   box-shadow:10px 10px 28px rgba(0,0,0,0.88), -5px -5px 18px rgba(50,50,110,0.32) !important;
 }
 /* the coupon banner sits INSIDE a raised neumorphic plate — a surface-colored
