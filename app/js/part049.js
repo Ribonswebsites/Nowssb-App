@@ -24,6 +24,30 @@ window.fashionHomeIntroEnter = function() {
   }, 400);
 };
 
+/* ── Fashion home: rotate the store-coupon banner (same 3 offers as the normal
+   home), one by one, only while the Fashion home is visible. Tap opens store. */
+(function () {
+  var SEQ = [
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
+  ];
+  var idx = 0, preloaded = false;
+  var el = document.getElementById('fashCouponImg');
+  if (el && !el.getAttribute('src')) el.src = SEQ[0];
+  setInterval(function () {
+    if (document.hidden) return;
+    var img = document.getElementById('fashCouponImg');
+    var host = document.getElementById('home');
+    if (!img || !host || !host.classList.contains('active')) return;
+    if (!preloaded) { preloaded = true; SEQ.forEach(function (u) { var im = new Image(); im.src = u; }); }
+    idx = (idx + 1) % SEQ.length;
+    var next = SEQ[idx];
+    img.style.opacity = '0';
+    setTimeout(function () { img.src = next; img.style.opacity = '1'; }, 300);
+  }, 4000);
+})();
+
 /* ── Word/Meaning search: cycle the tagline through phrases one after another
    (fade out → swap → fade in). One line at a time so the layout never grows. */
 (function () {

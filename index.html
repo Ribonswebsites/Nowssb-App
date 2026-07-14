@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=274">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=274">
+<link rel="stylesheet" href="nowssb-nm.css?v=275">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -1125,8 +1125,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
+  <!-- Store COUPON banner — rotates the three coupon offers, tap opens the store -->
+  <img class="fash-coupon-img" id="fashCouponImg" alt="NowssB Store coupons" draggable="false"
+       onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
+
   <!-- ══ STORE QUICK-ACCESS: LOGO + 2×2 GRID ══ -->
-  
+
 
   <div style="margin-top:28px;margin-bottom:20px;width:100%;">
   <div class="home-cw-cube-wrap">
@@ -7136,7 +7140,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=268"></script>
+<script src="app/js/part049.js?v=275"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>
