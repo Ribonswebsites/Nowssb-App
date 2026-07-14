@@ -30,6 +30,35 @@ const MASTER_WORD_LIBRARY = [
 // Active session words — set by routine launch or direct open
 let PRACTICE_WORDS = [...MASTER_WORD_LIBRARY];
 
+// ── PER-WORD PLAYER THEME ──
+// Every word gets its own background video + UI accent color, picked
+// deterministically from these pools (same word → same look, different words
+// → different looks). Add more video URLs here as Ribon shares them.
+const PW_VIDEO_POOL = [
+  'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4',
+  'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/v1778061531/grok_video_2026-05-06-15-27-23_zhylbe.mp4',
+  'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/f_auto/v1778511160/grok_video_2026-05-11-19-06-52_e67kc6.mp4',
+  'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4',
+  'https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4'
+];
+const PW_ACCENT_POOL = [
+  '200,232,245',  // glacial blue
+  '232,213,163',  // gold
+  '214,190,255',  // violet
+  '170,240,210',  // mint
+  '255,196,186',  // coral
+  '255,224,170'   // amber
+];
+function pwTheme(word) {
+  var w = (word || '') + '';
+  var h = 0;
+  for (var i = 0; i < w.length; i++) h = (h * 31 + w.charCodeAt(i)) >>> 0;
+  return {
+    video:  PW_VIDEO_POOL[h % PW_VIDEO_POOL.length],
+    accent: PW_ACCENT_POOL[h % PW_ACCENT_POOL.length]
+  };
+}
+
 // Get words for a specific health category
 function getWordsForCategory(category) {
   return MASTER_WORD_LIBRARY.filter(w => w.categories && w.categories.includes(category));
@@ -311,13 +340,14 @@ function renderSentencePlayer() {
     >${token}</span>`;
   }).join('');
 
+  const _sspTheme = pwTheme((_sspData && (_sspData.title || _sspData.sentence)) || _sspWords.join(''));
   body.innerHTML = `
-    <div class="sp-sentence-player">
+    <div class="sp-sentence-player" style="--accent:rgb(${_sspTheme.accent});">
       <!-- Bg -->
       <div class="sp-bg-img" id="spBgImg"></div>
       <video id="spBgVideo"
         class="sp-bg-video${_sspPlaying?' playing':''}"
-        src="https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4"
+        src="${_sspTheme.video}"
         loop muted playsinline preload="none">
       </video>
       <div class="sp-bg-overlay"></div>
@@ -577,12 +607,13 @@ function renderPractice() {
     : 'Tap ▶ to listen · practice follows';
 
 
+  const _pwTheme = pwTheme((PRACTICE_WORDS[_pwIdx] || {}).word || '');
   body.innerHTML = `
-    <div class="sp-player">
+    <div class="sp-player" style="--accent:rgb(${_pwTheme.accent});">
       <div class="sp-bg-img${_pwPlaying?' hidden':''}" id="pwBgImg"></div>
       <video id="pwBgVideo"
         class="sp-bg-video${_pwPlaying?' playing':''}"
-        src="https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4"
+        src="${_pwTheme.video}"
         loop muted playsinline preload="none">
       </video>
       <div class="sp-bg-overlay"></div>

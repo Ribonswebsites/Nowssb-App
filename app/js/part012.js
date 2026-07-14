@@ -618,21 +618,11 @@ function nmhRefresh() {
   var elF = document.getElementById('fashStreakNum');
   if (elF) elF.textContent = streak;
 
-  // Sync greeting + image by time-of-day (same slot logic for both)
-  var h = new Date().getHours();
-  var slot = h < 5 ? 'night' : h < 11 ? 'morning' : h < 14 ? 'noon' : h < 17 ? 'afternoon' : h < 20 ? 'evening' : 'night';
-  var GREET_TXT = { morning:'Good Morning', noon:'Good Afternoon', afternoon:'Good Afternoon', evening:'Good Evening', night:'Good Night' };
-  var g = GREET_TXT[slot];
-  var name = (d.displayName || d.name || '').split(' ')[0];
-  var greet = document.getElementById('nmhGreeting');
-  if (greet) greet.innerHTML = g + (name ? ',<br>' + name : ',<br>Healer');
-
-  // Auto-rotating hero sequence: Natural · Origin · Word · Science
+  // Store COUPON banners — rotate one by one (greeting was removed by request).
   var GREET_SEQ = [
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782945762/grok_image_1782945639246_pyi7nw.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782945777/grok_image_1782945661636_poon1b.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782945762/grok_image_1782945632664_xqng3z.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782945762/grok_image_1782945664229_jmbcnz.jpg'
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
   ];
   var gimg = document.getElementById('nmhGreetImg');
   if (gimg) {

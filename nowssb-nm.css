@@ -2087,13 +2087,25 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   background-color:#e9e2d4 !important;
   box-shadow:0 10px 28px rgba(40,30,15,.18) !important;
   margin-bottom:2px !important;
-  pointer-events:none !important;
+  pointer-events:auto !important;   /* coupon banner is tappable — opens the store */
+  cursor:pointer;
   -webkit-user-select:none !important;
   user-select:none !important;
   -webkit-touch-callout:none !important;
   transition:opacity .3s ease !important;
 }
 .nmh-greet-img:not([src]){ display:none !important; }
+
+/* ── Checkout coupon field ── */
+.chk-coupon-row { display: flex; gap: 10px; align-items: stretch; }
+.chk-coupon-row .chk-field-input { flex: 1; min-width: 0; text-transform: uppercase; }
+.chk-coupon-apply {
+  flex-shrink: 0; padding: 0 22px; min-height: 0 !important; border: 1px solid rgba(232,213,163,0.4);
+  background: rgba(232,213,163,0.1); color: #e8d5a3; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.chk-coupon-apply:active { background: rgba(232,213,163,0.22); }
+.chk-coupon-msg { font-family: 'DM Sans', sans-serif; font-size: 12px; margin-top: 8px; min-height: 14px; }
 
 /* ===== PILL TOGGLES — force true pill/tube shape (beats *{border-radius:0!important}) ===== */
 .nwsb-pill-toggle{ border-radius:999px !important; }

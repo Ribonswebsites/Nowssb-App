@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
-<link rel="stylesheet" href="app/app.css?v=273">
+<link rel="stylesheet" href="app/app.css?v=274">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=273">
+<link rel="stylesheet" href="nowssb-nm.css?v=274">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -717,12 +717,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Scrollable content area -->
   <div class="nmh-wrap">
 
-    <!-- Greeting -->
-    <div class="nmh-greeting" id="nmhGreeting">Begin Your<br>Healing Path</div>
-    <div class="nmh-sub-greeting">Natural Origin of Word Science</div>
-
-    <!-- Rotating hero image — below the greeting, above the streak -->
-    <img class="nmh-greet-img" id="nmhGreetImg" alt="" draggable="false" />
+    <!-- Rotating STORE COUPON banners (replaces the old greeting) — tap opens the store -->
+    <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
+         onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
 
     <!-- Streak -->
     <div class="nmh-streak-bar">
@@ -1566,7 +1563,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div id="practiceBody" style="display:flex;flex-direction:column;height:100%;overflow:hidden;"></div>
 </div>
 
-<script src="app/js/part004.js?v=191"></script>
+<script src="app/js/part004.js?v=274"></script>
 
 <!-- ══ SUB-SCREEN: SOUND LIBRARY ══ -->
 <!-- ══ SOUND LIBRARY — STYLES ══ -->
@@ -3256,7 +3253,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=258"></script>
+<script src="app/js/part012.js?v=274"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -5022,6 +5019,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <!-- rendered by JS -->
     </div>
 
+    <!-- ── COUPON ── -->
+    <span class="chk-label" style="margin-top:0;">Coupon</span>
+    <div class="chk-field-block">
+      <div class="chk-coupon-row">
+        <input class="chk-field-input" id="chkCouponInput" type="text" placeholder="Enter coupon code" autocapitalize="characters" autocomplete="off" onkeydown="if(event.key==='Enter')chkApplyCoupon()">
+        <button class="chk-coupon-apply" id="chkCouponBtn" onclick="chkApplyCoupon()">Apply</button>
+      </div>
+      <div class="chk-coupon-msg" id="chkCouponMsg"></div>
+    </div>
+
     <!-- ── CONTACT DETAILS ── -->
     <span class="chk-label" style="margin-top:0;">Contact for Receipt</span>
     <div class="chk-field-block">
@@ -5115,7 +5122,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ══ CHECKOUT PAGE JS ══ -->
-<script src="app/js/part029.js?v=191"></script>
+<script src="app/js/part029.js?v=274"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════

@@ -13,6 +13,49 @@ window.chkSelectPay = function(method) {
   });
 };
 
+/* ── COUPONS (match the home-page banner offers) ──
+   NOWSSB10 — flat 10% off, any order (your first word)
+   NOWSSB30 — flat 30% off when the cart has 5+ items
+   NOWSSB50 — flat 50% off when the cart has 10+ items */
+var NSS_COUPONS = {
+  NOWSSB10: { pct: 10, min: 1,  label: 'Flat 10% off' },
+  NOWSSB30: { pct: 30, min: 5,  label: 'Flat 30% off · 5+ words' },
+  NOWSSB50: { pct: 50, min: 10, label: 'Flat 50% off · 10+ words' }
+};
+window._nssCoupon = window._nssCoupon || null;
+
+/* discount for the current cart (coupon drops silently if the cart shrinks
+   below the coupon's minimum) */
+function chkCouponFor(cart) {
+  var c = NSS_COUPONS[window._nssCoupon];
+  if (!c || cart.length < c.min) return null;
+  return c;
+}
+
+window.chkApplyCoupon = function() {
+  var inp  = document.getElementById('chkCouponInput');
+  var msg  = document.getElementById('chkCouponMsg');
+  var cart = window.nssCart || [];
+  var code = ((inp && inp.value) || '').trim().toUpperCase();
+  if (!msg) return;
+  if (!code) { window._nssCoupon = null; msg.textContent = ''; chkRenderSummary(); return; }
+  var c = NSS_COUPONS[code];
+  if (!c) {
+    window._nssCoupon = null;
+    msg.style.color = 'rgba(255,120,120,0.85)';
+    msg.textContent = 'Invalid coupon code.';
+  } else if (cart.length < c.min) {
+    window._nssCoupon = null;
+    msg.style.color = 'rgba(255,120,120,0.85)';
+    msg.textContent = 'This coupon needs at least ' + c.min + ' items in your cart (you have ' + cart.length + ').';
+  } else {
+    window._nssCoupon = code;
+    msg.style.color = 'rgba(140,230,170,0.9)';
+    msg.textContent = c.label + ' applied ✓';
+  }
+  chkRenderSummary();
+};
+
 /* ── Render order summary inside checkout ── */
 function chkRenderSummary() {
   var cart = window.nssCart || [];
@@ -22,7 +65,9 @@ function chkRenderSummary() {
   if (!box) return;
 
   var total = cart.reduce(function(s,c){ return s + (c.price||0); }, 0);
-  if (barTotal) barTotal.textContent = '$' + (total/100).toFixed(2);
+  var coup  = chkCouponFor(cart);
+  var discount = coup ? Math.round(total * coup.pct / 100) : 0;
+  if (barTotal) barTotal.textContent = '$' + ((total - discount)/100).toFixed(2);
   if (btn) btn.disabled = (cart.length === 0);
 
   if (cart.length === 0) {
@@ -46,10 +91,18 @@ function chkRenderSummary() {
     '</div>';
   });
 
+  // Discount row (when a coupon is applied)
+  if (discount > 0) {
+    html += '<div class="chk-total-row" style="border-bottom:none;padding-bottom:0;">' +
+      '<span class="chk-total-label" style="color:rgba(140,230,170,0.85);">Coupon ' + window._nssCoupon + ' · −' + coup.pct + '%</span>' +
+      '<span class="chk-total-val" style="color:rgba(140,230,170,0.9);">−$' + (discount/100).toFixed(2) + '</span>' +
+    '</div>';
+  }
+
   // Total row
   html += '<div class="chk-total-row">' +
     '<span class="chk-total-label">' + cart.length + ' item' + (cart.length !== 1 ? 's' : '') + '</span>' +
-    '<span class="chk-total-val">$' + (total/100).toFixed(2) + '</span>' +
+    '<span class="chk-total-val">$' + ((total - discount)/100).toFixed(2) + '</span>' +
   '</div>';
 
   box.innerHTML = html;
@@ -71,6 +124,9 @@ window.chkProceedToRazorpay = function() {
   var email  = (document.getElementById('chkEmail') || {}).value || '';
   var phone  = (document.getElementById('chkPhone') || {}).value || '';
   var total  = cart.reduce(function(s,c){ return s + (c.price||0); }, 0);
+  // Apply the active coupon (validated against cart size) to the charged amount
+  var _coup = chkCouponFor(cart);
+  if (_coup) total -= Math.round(total * _coup.pct / 100);
   var amountMinor = total; // prices are already stored in USD cents (the minor unit)
 
   // Validate email
@@ -93,7 +149,7 @@ window.chkProceedToRazorpay = function() {
   if (arrow)   arrow.style.display   = 'none';
 
   var itemNames = cart.map(function(c){ return c.name; }).join(', ');
-  var description = 'NowssB · ' + itemNames;
+  var description = 'NowssB · ' + itemNames + (_coup ? ' · coupon ' + window._nssCoupon : '');
 
   // ── Create order_id via Cloudflare Worker (server-side, secure) ──
   var RAZORPAY_KEY_ID = 'rzp_live_REPLACE_WITH_YOUR_KEY'; // Only the public key goes here
