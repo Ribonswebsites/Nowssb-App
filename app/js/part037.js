@@ -33,9 +33,16 @@
   // Smart static fallback when Groq key not set
   function staticPrescription(){
     var slot = getTimeSlot();
-    var lib = window.MASTER_WORD_LIBRARY || [];
+    // MASTER_WORD_LIBRARY is a script-level const (NOT on window) — reach it via
+    // typeof so this never sees an empty library and crashes the rx card.
+    var lib = (typeof MASTER_WORD_LIBRARY !== 'undefined' && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     var timeWords = lib.filter(function(w){ return w.time === slot || w.time === 'any'; });
     if (timeWords.length < 3) timeWords = lib;
+    if (!timeWords.length) timeWords = [
+      { word:'AAROGYA', organ:'Immune System', phonetic:'aa · ro · gyaa' },
+      { word:'PRANA',   organ:'Lungs · Heart', phonetic:'praa · naa' },
+      { word:'SHAKTI',  organ:'Solar Plexus',  phonetic:'shak · ti' }
+    ];
     // Pick 3 deterministically by day-of-year
     var doy = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
     var picks = [];
@@ -57,7 +64,7 @@
     if (!GROQ_KEY || GROQ_KEY === 'PASTE_YOUR_GROQ_KEY_HERE') return null;
 
     var slot = getTimeSlot();
-    var lib  = window.MASTER_WORD_LIBRARY || [];
+    var lib  = (typeof MASTER_WORD_LIBRARY !== "undefined" && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     var wordList = lib.map(function(w){ return w.word + '(' + w.organ + ')'; }).join(', ');
 
     // Build user context
@@ -149,7 +156,7 @@
 
   // Start a single word — load it into player
   window.rxStartWord = function(wordName){
-    var lib = window.MASTER_WORD_LIBRARY || [];
+    var lib = (typeof MASTER_WORD_LIBRARY !== "undefined" && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     var w = lib.find(function(x){ return x.word === wordName; });
     if (!w) return;
     if (typeof setPracticeWords === 'function') setPracticeWords([w]);
@@ -159,7 +166,7 @@
 
   // Start all 3 as a mini-routine
   window.rxStartAll = function(words){
-    var lib = window.MASTER_WORD_LIBRARY || [];
+    var lib = (typeof MASTER_WORD_LIBRARY !== "undefined" && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     var wordObjs = words.map(function(pw){
       return lib.find(function(lw){ return lw.word === pw.word; }) || { word:pw.word, phonetic:pw.word.toLowerCase(), syllables:[pw.word.toLowerCase()], organ:pw.organ||'', origin:'', benefit:'', meaning:'', mouthPos:'', resonance:'', mistake:'', tip:'' };
     }).filter(Boolean);

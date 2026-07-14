@@ -24,6 +24,106 @@ window.fashionHomeIntroEnter = function() {
   }, 400);
 };
 
+/* ── Fashion home: animated promo cards (Connect + Store). Icon + text travel
+   right together, a color flash covers the swap, then both re-enter from the
+   left; between swaps the lines cycle in place. Paused while the Fashion home
+   is not visible or the app is backgrounded. ── */
+(function () {
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function visible() {
+    var h = document.getElementById('home');
+    return !document.hidden && h && h.classList.contains('active');
+  }
+  function waitVisible() {
+    return new Promise(function (r) {
+      (function chk() { if (visible()) r(); else setTimeout(chk, 900); })();
+    });
+  }
+
+  function runCard(ids, sequence) {
+    var stage = document.getElementById(ids.stage);
+    var img   = document.getElementById(ids.img);
+    var flash = document.getElementById(ids.flash);
+    var line  = document.getElementById(ids.line);
+    if (!stage || !img || !flash || !line) return;
+
+    function enterLine(text) {
+      line.textContent = text;
+      line.classList.remove('npc-exit', 'npc-exit-big');
+      line.style.transform = ''; line.style.opacity = '';
+      void line.offsetWidth;
+      line.classList.add('npc-enter');
+    }
+    function exitLineSmall() {
+      return new Promise(function (resolve) {
+        line.classList.remove('npc-enter');
+        line.classList.add('npc-exit');
+        setTimeout(resolve, 280);
+      });
+    }
+    async function performSwitch(next) {
+      stage.classList.remove('npc-enter-left');
+      stage.classList.add('npc-exit-right');
+      line.classList.remove('npc-enter');
+      line.classList.add('npc-exit-big');
+      flash.classList.remove('npc-pulse');
+      void flash.offsetWidth;
+      flash.classList.add('npc-pulse');
+      await wait(300);
+      img.src = next.img;
+      line.textContent = next.lines[0];
+      stage.classList.remove('npc-exit-right');
+      stage.style.transform = 'translateX(-90px)'; stage.style.opacity = '0';
+      line.classList.remove('npc-exit-big', 'npc-exit');
+      line.style.transform = 'translateX(-26px)'; line.style.opacity = '0';
+      void stage.offsetWidth; void line.offsetWidth;
+      stage.classList.add('npc-enter-left');
+      line.classList.add('npc-enter');
+      await wait(500);
+      stage.classList.remove('npc-enter-left');
+      stage.style.transform = 'translateX(0)'; stage.style.opacity = '1';
+    }
+    (async function run() {
+      var firstPass = true;
+      while (true) {
+        for (var i = 0; i < sequence.length; i++) {
+          await waitVisible();
+          var lines = sequence[i].lines;
+          if (firstPass && i === 0) enterLine(lines[0]);
+          else await performSwitch(sequence[i]);
+          await wait(1900);
+          for (var j = 1; j < lines.length; j++) {
+            await waitVisible();
+            await exitLineSmall();
+            enterLine(lines[j]);
+            await wait(1900);
+          }
+        }
+        firstPass = false;
+      }
+    })();
+  }
+
+  // Card 1 — NowssB Connect (blue)
+  runCard({ stage: 'npcBlueStage', img: 'npcBlueImg', flash: 'npcBlueFlash', line: 'npcBlueLine' }, [
+    { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160850/file_00000000d62c7208b5d5d5447d6a1a0e_wsecyk.png',
+      lines: ['Your circle just got bigger.', 'Connect with learners like you.'] },
+    { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png',
+      lines: ['Stand out with a badge.', 'Blue, Silver, Gold or Diamond — your pick.'] },
+    { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png',
+      lines: ['New voices, new stories.', 'Discover creators worth following.'] }
+  ]);
+
+  // Card 2 — NowssB Store (purple): the store logo + cart images from the
+  // fashion home's NowssB store button
+  runCard({ stage: 'npcStoreStage', img: 'npcStoreImg', flash: 'npcStoreFlash', line: 'npcStoreLine' }, [
+    { img: 'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png',
+      lines: ['Enter the NowssB Store.', 'Own words that heal — yours alone.'] },
+    { img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_240/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png',
+      lines: ['Your cart is waiting.', 'Coupons up to 50% off today.'] }
+  ]);
+})();
+
 /* ── Fashion home: rotate the store-coupon banner (same 3 offers as the normal
    home), one by one, only while the Fashion home is visible. Tap opens store. */
 (function () {
