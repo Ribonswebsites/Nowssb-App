@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=274">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=294">
+<link rel="stylesheet" href="nowssb-nm.css?v=296">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -718,8 +718,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="nmh-wrap">
 
     <!-- Rotating STORE COUPON banners (replaces the old greeting) — tap opens the store -->
-    <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
-         onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
+    <div class="nmh-banner-wrap">
+      <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
+           onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
+      <button class="nmh-banner-cta nmh-banner-cta-tl" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now</button>
+    </div>
 
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <filter id="npcRippleBlue" x="-20%" y="-20%" width="140%" height="140%">
@@ -784,8 +787,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Video banner — same height as the animated promo cards above -->
-    <div class="nmh-video-banner">
+    <div class="nmh-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
       <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
+      <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now</button>
     </div>
 
     <!-- 2x2 Grid -->
@@ -906,8 +910,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- ══ FASHION SECTIONS ON NORMAL HOME (Word Search · Meaning · Store · Subscription) ══ -->
 
     <!-- Video banner — above the subscription section -->
-    <div class="nmh-video-banner">
+    <div class="nmh-video-banner" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
       <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102734/grok_video_2026-07-15-13-34-04_htvekp.mp4"></video>
+      <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')">Subscribe Today</button>
     </div>
 
     <!-- Subscription -->
@@ -1103,8 +1108,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- Video banner — below Today's Practice / streak -->
-  <div class="fash-video-banner">
+  <div class="fash-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
     <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
+    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now</button>
   </div>
 
   <!-- AI Prescription Card -->
@@ -1146,8 +1152,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- Video banner — above the subscription promo -->
-  <div class="fash-video-banner">
+  <div class="fash-video-banner" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
     <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102734/grok_video_2026-07-15-13-34-04_htvekp.mp4"></video>
+    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')">Subscribe Today</button>
   </div>
 
   <!-- Subscription promo — shown to free users only -->
@@ -1185,8 +1192,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- Store COUPON banner — rotates the three coupon offers, tap opens the store -->
-  <img class="fash-coupon-img" id="fashCouponImg" alt="NowssB Store coupons" draggable="false"
-       onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
+  <div class="fash-banner-wrap">
+    <img class="fash-coupon-img" id="fashCouponImg" alt="NowssB Store coupons" draggable="false"
+         onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
+    <button class="fash-banner-cta fash-banner-cta-tl" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now</button>
+  </div>
 
   <!-- ══ STORE QUICK-ACCESS: LOGO + 2×2 GRID ══ -->
 

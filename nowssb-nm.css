@@ -2154,6 +2154,23 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 }
 .fash-video-banner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .fash-video-banner-search { cursor: pointer; }
+
+/* ── Shop Now / Subscribe Today CTA buttons overlaid on the coupon + video
+   banners. The coupon banner is a plain <img>, so it needs a position:relative
+   wrapper for the button to sit inside; the video banners are already
+   position:relative. ── */
+.nmh-banner-wrap, .fash-banner-wrap { position: relative; }
+.nmh-banner-cta, .fash-banner-cta {
+  position: absolute; z-index: 3; border: none; cursor: pointer;
+  padding: 9px 18px; min-height: 0 !important; border-radius: 999px !important;
+  background: #e8d5a3; color: #060c18; font-family: 'DM Sans', sans-serif;
+  font-size: 11.5px; font-weight: 800; letter-spacing: 0.4px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
+.nmh-banner-cta:active, .fash-banner-cta:active { transform: scale(0.96); }
+.nmh-banner-cta-tl, .fash-banner-cta-tl { top: 12px; left: 12px; }
+.nmh-banner-cta-r, .fash-banner-cta-r { top: 50%; right: 12px; transform: translateY(-50%); }
+.nmh-banner-cta-r:active, .fash-banner-cta-r:active { transform: translateY(-50%) scale(0.96); }
 .npc-fabric { position: absolute; inset: -10%; }
 .npc-blue   .npc-fabric { background: linear-gradient(100deg,#041022 0%,#082a52 26%,#0d4b8f 50%,#1673c9 72%,#4aa3ec 100%); filter: url(#npcRippleBlue); }
 .npc-purple .npc-fabric { background: linear-gradient(100deg,#150f3a 0%,#2c1a5c 28%,#5a3184 52%,#7d4a9e 72%,#9e6fae 100%); filter: url(#npcRipplePurple); }
