@@ -2142,6 +2142,18 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   border: none; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
 .nmh-vbs-btn img { width: 14px; height: 14px; object-fit: contain; opacity: 0.9; }
+
+/* ── Fashion (dark) home — same video banners, styled to match the page's
+   sharp-corner dark cards (.home-fashbanner) instead of the light neumorphic
+   frame used on the normal home. ── */
+.fash-video-banner {
+  position: relative; width: calc(100% - 32px); margin: 16px 16px 6px;
+  aspect-ratio: 1080 / 411; overflow: hidden; background: #0a0a12;
+  border-radius: 0 !important; box-shadow: 0 14px 36px rgba(0,0,0,.42);
+  border: 1px solid rgba(255,255,255,.08);
+}
+.fash-video-banner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.fash-video-banner-search { cursor: pointer; }
 .npc-fabric { position: absolute; inset: -10%; }
 .npc-blue   .npc-fabric { background: linear-gradient(100deg,#041022 0%,#082a52 26%,#0d4b8f 50%,#1673c9 72%,#4aa3ec 100%); filter: url(#npcRippleBlue); }
 .npc-purple .npc-fabric { background: linear-gradient(100deg,#150f3a 0%,#2c1a5c 28%,#5a3184 52%,#7d4a9e 72%,#9e6fae 100%); filter: url(#npcRipplePurple); }

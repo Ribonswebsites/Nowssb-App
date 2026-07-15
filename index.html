@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=274">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=293">
+<link rel="stylesheet" href="nowssb-nm.css?v=294">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -1111,6 +1111,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
+  <!-- Video banner — below Today's Practice / streak -->
+  <div class="fash-video-banner">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
+  </div>
+
   <!-- AI Prescription Card -->
   <div id="rxCardWrap" style="width:100%;"></div>
 
@@ -1156,6 +1161,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="home-tile-sub" style="position:relative;z-index:2;">Your settings</div>
       <div class="home-tile-arrow" style="z-index:2;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="rgba(200,232,245,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
     </div>
+  </div>
+
+  <!-- Video banner — above the subscription promo -->
+  <div class="fash-video-banner">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102734/grok_video_2026-07-15-13-34-04_htvekp.mp4"></video>
   </div>
 
   <!-- Subscription promo — shown to free users only -->
@@ -1298,6 +1308,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="hjc-sub">Choose your path — body, organ & mind wellness decoded through word science.</div>
         <div class="hjc-btn">Explore →</div>
       </div>
+    </div>
+  </div>
+
+  <!-- Video banner — small word-search bar on the right, above word search -->
+  <div class="fash-video-banner fash-video-banner-search">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784103663/grok_video_2026-07-15-13-50-19_krfkue.mp4"></video>
+    <div class="nmh-vbs-search" onclick="event.stopPropagation()">
+      <input class="nmh-vbs-input" id="fashVbsSearchInput" type="text" placeholder="Search a word…" onkeydown="if(event.key==='Enter'){openSub('word-search');setTimeout(()=>{document.getElementById('wsPageInput').value=this.value;wsPageSearch();},220);}">
+      <button class="nmh-vbs-btn" onclick="openSub('word-search');setTimeout(()=>{var v=document.getElementById('fashVbsSearchInput').value;if(v){document.getElementById('wsPageInput').value=v;wsPageSearch();}},220);">
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" alt="">
+      </button>
     </div>
   </div>
 
