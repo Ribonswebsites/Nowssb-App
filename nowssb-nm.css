@@ -2641,13 +2641,22 @@ body.nm-mode #ig-social-nav #igsn-me-av,
 /* Fashion settings: hide the opaque photo banner so the glass image shows from
    the top of the screen (nm-mode already hides it). */
 body:not(.nm-mode):not(.nm-night) #sub-social .menu-banner { display: none !important; }
-/* Same glass image behind the hamburger menu — FASHION (dark) home only.
+/* Custom background behind the hamburger menu — FASHION (dark) home only.
    menu-drawer is position:fixed → static, no scroll repaint, no GPU cost.
    Neumorphism (light) home keeps its default menu background. */
 body:not(.nm-mode) #menuDrawer.menu-drawer {
   background:
     linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
-    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg') center center / cover no-repeat !important;
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094183/grok_image_1784093977513_alcdo3.jpg') center center / cover no-repeat !important;
+}
+/* Custom background behind the Settings screen — FASHION (dark) home only.
+   #sub-social's default background is a 72%-opacity black (glass overlay),
+   which let the Fashion home hero bleed through underneath it; this replaces
+   that with an opaque image + legibility gradient. */
+body:not(.nm-mode):not(.nm-night) #sub-social {
+  background:
+    linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094627/grok_image_1784094543609_husz87.jpg') center center / cover no-repeat !important;
 }
 /* Inset the menu rows so they sit INSIDE the glass panel (L/R padding).
    Fashion (dark) menu only — the glass block image is centered, the rows must
@@ -2753,7 +2762,7 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   padding: 0; background: none; border: none;
 }
 /* stylized NowssB wordmark image — replaces the plain text + glass box frame */
-.wsg-logo-img { height: 34px; width: auto; object-fit: contain; display: block; }
+.wsg-logo-img { height: 58px; width: auto; object-fit: contain; display: block; }
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
 .wsg-head { display: flex; flex-direction: column; gap: 12px; }
 .wsg-tagline {
