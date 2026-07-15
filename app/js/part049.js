@@ -145,8 +145,9 @@ window.fashionHomeIntroEnter = function() {
     if (!preloaded) { preloaded = true; SEQ.forEach(function (u) { var im = new Image(); im.src = u; }); }
     idx = (idx + 1) % SEQ.length;
     var next = SEQ[idx];
-    img.style.opacity = '0';
-    setTimeout(function () { img.src = next; img.style.opacity = '1'; }, 300);
+    // dash in from the right with a tiny wiggle (no fade)
+    img.src = next;
+    img.classList.remove('coupon-dash'); void img.offsetWidth; img.classList.add('coupon-dash');
   }, 4000);
 })();
 

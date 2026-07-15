@@ -643,8 +643,9 @@ function nmhRefresh() {
       var pre = new Image();
       pre.onload = function(){
         if (!host.classList.contains('active')) return;
-        el.style.opacity = '0';
-        setTimeout(function(){ el.src = nextSrc; el.style.opacity = '1'; }, 320);
+        // dash in from the right with a tiny wiggle (no fade)
+        el.src = nextSrc;
+        el.classList.remove('coupon-dash'); void el.offsetWidth; el.classList.add('coupon-dash');
         window._nmhGreetIdx = nextIdx;
       };
       pre.src = nextSrc;

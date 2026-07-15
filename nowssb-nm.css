@@ -2184,6 +2184,15 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 @keyframes npcSlideOut   { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(18px); } }
 @keyframes npcSlideOutBig{ from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(90px); } }
 
+/* ── Coupon banner swap: dash in from the right with a very slight wiggle ── */
+@keyframes couponDash {
+  0%   { transform: translateX(72px);  opacity: 0; }
+  55%  { transform: translateX(-6px);  opacity: 1; }
+  76%  { transform: translateX(2.5px); }
+  100% { transform: translateX(0); }
+}
+.coupon-dash { animation: couponDash 0.6s cubic-bezier(.2,.7,.3,1); }
+
 /* ── Fashion home: rotating store-coupon banner ── */
 #home .fash-coupon-img {
   display:block; width:calc(100% - 32px); margin:24px 16px 0; aspect-ratio:16/9;
