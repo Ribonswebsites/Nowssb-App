@@ -31,8 +31,10 @@ window.fashionHomeIntroEnter = function() {
 (function () {
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function visible() {
-    var h = document.getElementById('home');
-    return !document.hidden && h && h.classList.contains('active');
+    if (document.hidden) return false;
+    var nm = document.getElementById('home-nm');
+    var f  = document.getElementById('home');
+    return (nm && nm.classList.contains('active')) || (f && f.classList.contains('active'));
   }
   function waitVisible() {
     return new Promise(function (r) {

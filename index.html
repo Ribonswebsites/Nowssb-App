@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=274">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=279">
+<link rel="stylesheet" href="nowssb-nm.css?v=280">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -721,6 +721,34 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
          onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
 
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <filter id="npcRippleBlue" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="2" seed="11" result="turb">
+          <animate attributeName="baseFrequency" dur="7s" values="0.006 0.018;0.010 0.026;0.006 0.018" repeatCount="indefinite"/>
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="turb" scale="26" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="npcRipplePurple" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="2" seed="7" result="turb">
+          <animate attributeName="baseFrequency" dur="7s" values="0.006 0.018;0.010 0.026;0.006 0.018" repeatCount="indefinite"/>
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="turb" scale="26" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </svg>
+
+    <!-- NowssB Store promo card (purple) — below today's offer, tap opens the store -->
+    <div class="npc-card npc-purple" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
+      <div class="npc-fabric"></div>
+      <div class="npc-ambient"></div>
+      <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
+      <div class="npc-stage" id="npcStoreStage">
+        <div class="npc-ring"></div>
+        <div class="npc-disc"><img id="npcStoreImg" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt=""></div>
+        <div class="npc-flash" id="npcStoreFlash"></div>
+      </div>
+      <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
+    </div>
+
     <!-- Streak -->
     <div class="nmh-streak-bar">
       <div class="nmh-streak-icon">
@@ -810,6 +838,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <path d="M3 7H11M7 3L11 7L7 11" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="square"/>
         </svg>
       </div>
+    </div>
+
+    <!-- NowssB Connect promo card (blue) — below the daily practice, tap opens Connect -->
+    <div class="npc-card npc-blue" onclick="window.IG&&IG.nav('profile')">
+      <div class="npc-fabric"></div>
+      <div class="npc-ambient"></div>
+      <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
+      <div class="npc-stage" id="npcBlueStage">
+        <div class="npc-ring"></div>
+        <div class="npc-disc"><img id="npcBlueImg" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160850/file_00000000d62c7208b5d5d5447d6a1a0e_wsecyk.png" alt=""></div>
+        <div class="npc-flash" id="npcBlueFlash"></div>
+      </div>
+      <div class="npc-text"><span class="npc-line" id="npcBlueLine"></span></div>
     </div>
 
     <!-- Quick access row -->
@@ -1042,48 +1083,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="fash-streak-box fash-streak-box3">
       <div class="fash-streak-cta">Keep<br>Going</div>
     </div>
-  </div>
-
-  <!-- ══ ANIMATED PROMO CARDS: Connect (blue) + Store (purple) ══ -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <filter id="npcRippleBlue" x="-20%" y="-20%" width="140%" height="140%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="2" seed="11" result="turb">
-        <animate attributeName="baseFrequency" dur="7s" values="0.006 0.018;0.010 0.026;0.006 0.018" repeatCount="indefinite"/>
-      </feTurbulence>
-      <feDisplacementMap in="SourceGraphic" in2="turb" scale="26" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-    <filter id="npcRipplePurple" x="-20%" y="-20%" width="140%" height="140%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="2" seed="7" result="turb">
-        <animate attributeName="baseFrequency" dur="7s" values="0.006 0.018;0.010 0.026;0.006 0.018" repeatCount="indefinite"/>
-      </feTurbulence>
-      <feDisplacementMap in="SourceGraphic" in2="turb" scale="26" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-  </svg>
-
-  <!-- Card 1 — NowssB Connect (blue) -->
-  <div class="npc-card npc-blue" onclick="window.IG&&IG.nav('profile')">
-    <div class="npc-fabric"></div>
-    <div class="npc-ambient"></div>
-    <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
-    <div class="npc-stage" id="npcBlueStage">
-      <div class="npc-ring"></div>
-      <div class="npc-disc"><img id="npcBlueImg" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160850/file_00000000d62c7208b5d5d5447d6a1a0e_wsecyk.png" alt=""></div>
-      <div class="npc-flash" id="npcBlueFlash"></div>
-    </div>
-    <div class="npc-text"><span class="npc-line" id="npcBlueLine"></span></div>
-  </div>
-
-  <!-- Card 2 — NowssB Store (purple, store logo + cart images) -->
-  <div class="npc-card npc-purple" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
-    <div class="npc-fabric"></div>
-    <div class="npc-ambient"></div>
-    <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
-    <div class="npc-stage" id="npcStoreStage">
-      <div class="npc-ring"></div>
-      <div class="npc-disc"><img id="npcStoreImg" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt=""></div>
-      <div class="npc-flash" id="npcStoreFlash"></div>
-    </div>
-    <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
   </div>
 
   <!-- AI Prescription Card -->
@@ -7182,7 +7181,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=279"></script>
+<script src="app/js/part049.js?v=280"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>
