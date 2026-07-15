@@ -2584,6 +2584,14 @@ body.nm-glass #sub-health-journey .gsel-card {
    shadows so the soft-extruded depth is unmistakable. */
 .nmh-practice { border-radius:26px !important; }
 .nmh-tile { border-radius:22px !important; }
+/* Artwork tiles — the 16:9 transparent PNGs (title text baked into the art).
+   e_trim removes the blank transparent area; the 16:9 contain box guarantees
+   the art is fully visible with no crop or distortion. */
+.nmh-tile.nmh-tile-art { padding: 14px 10px; align-items: center; justify-content: center; }
+.nmh-tile-img {
+  width: 100%; aspect-ratio: 16/9; object-fit: contain; display: block;
+  pointer-events: none; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));
+}
 .nmh-streak-bar { border-radius:16px !important; }
 .nmh-routine { border-radius:20px !important; }
 .nmh-quick-btn { border-radius:16px !important; }
