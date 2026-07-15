@@ -2762,8 +2762,9 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   padding: 0; background: none; border: none;
 }
 /* stylized NowssB wordmark image — replaces the plain text + glass box frame.
-   Much taller now — small was the actual complaint, so go big. */
-.wsg-logo-img { height: 96px; width: auto; max-width: 220px; object-fit: contain; display: block; }
+   Big + sharp: fetched at h_600/q_auto:best (see index.html) so it stays
+   crisp at this display size instead of upscaling a small source. */
+.wsg-logo-img { height: 148px; width: auto; max-width: 260px; object-fit: contain; display: block; }
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
 .wsg-head { display: flex; flex-direction: column; gap: 12px; }
 .wsg-tagline {
