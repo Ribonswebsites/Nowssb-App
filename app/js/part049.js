@@ -108,7 +108,7 @@ window.fashionHomeIntroEnter = function() {
 
   // Card 1 — NowssB Connect (blue)
   runCard({ stage: 'npcBlueStage', img: 'npcBlueImg', flash: 'npcBlueFlash', line: 'npcBlueLine' }, [
-    { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160850/file_00000000d62c7208b5d5d5447d6a1a0e_wsecyk.png',
+    { img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784144640/file_00000000b7f471f4b4ae546a84234072_kyfjjk.png',
       lines: ['Your circle just got bigger.', 'Connect with learners like you.'] },
     { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png',
       lines: ['Stand out with a badge.', 'Blue, Silver, Gold or Diamond — your pick.'] },
