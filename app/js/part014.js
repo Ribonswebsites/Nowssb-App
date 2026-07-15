@@ -68,8 +68,10 @@ function openCategoryPage(category, gender) {
   var enterCard = document.getElementById('hcpiEnterCard');
   if (enterCard) enterCard.onclick = function() { _openActualCategoryPage(); };
 
-  // Open the intro sub-screen (or skip directly to category if intros disabled)
-  if (typeof shouldShowIntro === 'function' && !shouldShowIntro('health-category')) {
+  // Open the intro sub-screen (or skip directly to category if intros disabled).
+  // Use a PER-CATEGORY key so the intro shows the first time each category is
+  // opened (not just the very first category) in "once" mode.
+  if (typeof shouldShowIntro === 'function' && !shouldShowIntro('health-category:' + category)) {
     _openActualCategoryPage();
   } else {
     openSub('hcp-intro');
@@ -81,11 +83,10 @@ function _openActualCategoryPage() {
   var category = _hcpCategory;
   var gender   = _hcpGender;
 
-  // Set back button — goes back to intro
+  // Set back button — goes straight back to the gender grid (NOT the intro)
   document.getElementById('hcp-back-btn').onclick = function() {
     closeSub('health-category');
-    // Re-open intro so user can go back
-    openSub('hcp-intro');
+    openSub(gender === 'M' ? 'health-male' : 'health-female');
   };
 
   // Title

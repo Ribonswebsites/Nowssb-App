@@ -3106,9 +3106,26 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   padding: calc(env(safe-area-inset-top,20px) + 16px) 18px calc(var(--nav-height,58px) + 44px);
 }
 #sub-features .feat-topbar { display: flex; align-items: center; gap: 14px; margin: 2px 0 16px; }
+/* ── Canonical back button: player icon inside a glass circle ── */
+.nwsb-back {
+  width: 42px; height: 42px; min-width: 42px; min-height: 42px; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.28); border-radius: 50% !important;
+  background: rgba(255,255,255,0.14);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0; box-sizing: border-box; overflow: hidden;
+}
+.nwsb-back-ico {
+  width: 30px; height: 30px; display: block; pointer-events: none;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,.4));
+}
 #sub-features .feat-back {
-  width: 42px; height: 42px; flex-shrink: 0; border: none; cursor: pointer; padding: 0;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;
+  width: 42px; height: 42px; flex-shrink: 0; cursor: pointer; padding: 0;
+  border: 1px solid rgba(255,255,255,0.28); border-radius: 50% !important;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/28px no-repeat, rgba(255,255,255,0.14);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
 }
 /* header text sits INSIDE the player's glass tube/capsule image (stretched) */
 #sub-features .feat-tube {
@@ -3354,10 +3371,13 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   padding: calc(env(safe-area-inset-top,14px) + 12px) 18px 12px;
 }
 .ws-result-back {
-  width: 42px; height: 42px; flex-shrink: 0; border: none; cursor: pointer; padding: 0;
+  width: 42px; height: 42px; flex-shrink: 0; cursor: pointer; padding: 0;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 50% !important; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 50% !important; border: 1px solid rgba(255,255,255,0.28);
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/28px no-repeat, rgba(255,255,255,0.14);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
 }
+.ws-result-back svg, .ws-result-back > * { display: none !important; }
 .ws-result-toptitle { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.75); }
 .ws-result-scroll {
   flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;

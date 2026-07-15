@@ -153,7 +153,7 @@ function renderPracticeIntro() {
       '<div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:max(env(safe-area-inset-top,18px),18px) 28px calc(var(--nav-height,0px) + max(env(safe-area-inset-bottom,20px),20px));">' +
 
         '<div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:4px;">' +
-          '<div onclick="closeSub(\'practice\')" style="width:46px;height:46px;cursor:pointer;flex-shrink:0;background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/contain no-repeat;"></div>' +
+          '<div onclick="closeSub(\'practice\')" style="width:44px;height:44px;cursor:pointer;flex-shrink:0;border:1px solid rgba(255,255,255,0.28);border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);"></div>' +
           '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
           '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;">' +
             '<svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>' +

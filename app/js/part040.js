@@ -49,7 +49,7 @@
         el.style.transform  = 'translateX(0)';
         el.style.display    = 'block';
         // Remember where to return when this panel is closed
-        if (id === 'subscription') _ssReturnScreen = window._activeSub || 'home';
+        if (id === 'subscription') _ssReturnScreen = (typeof currentScreen !== 'undefined' && currentScreen) ? currentScreen : 'home';
         if (social) {
           social.classList.add('open');
           if (typeof ssSyncProfile === 'function') ssSyncProfile();
@@ -74,13 +74,24 @@
       el.style.transform  = 'translateX(100%)';
       setTimeout(function(){ el.style.display='none'; }, 310);
       _stack = _stack.filter(function(x){ return x!==id; });
-      // If subscription was opened from outside settings, close settings and go home
+      // If subscription was opened from outside settings, close settings and
+      // return to the screen we came from.
       if (id === 'subscription' && _ssReturnScreen) {
+        var ret = _ssReturnScreen;
         _ssReturnScreen = null;
         var social = document.getElementById('sub-social');
         if (social) social.classList.remove('open');
         setTimeout(function(){
-          if (typeof goTo === 'function') goTo('home');
+          // Subscription is an OVERLAY — when opened over home, currentScreen never
+          // changed, so it still holds .active underneath. Calling goTo(home) here
+          // would add+remove .exit/.active on the SAME element and blank it (every
+          // section gone). Only navigate when we're actually on a different screen.
+          if (typeof currentScreen !== 'undefined' && currentScreen === ret) {
+            var scr = document.getElementById(ret);
+            if (scr) { scr.classList.add('active'); scr.classList.remove('exit'); }
+          } else if (typeof goTo === 'function') {
+            goTo(ret);
+          }
         }, 320);
       }
     },
@@ -210,7 +221,16 @@
         'chatsettings': function(){ _renderChatSettings(); },
         'subscription': function(){
           _ssSelectedPlan = 'frequency'; // ensure valid selection
-          if(typeof ssBilling==='function') ssBilling(_ssBilling); // sync toggle + render
+          // _ssBilling lives in part032's IIFE (private) — reading the bare name
+          // here throws ReferenceError and aborts _init. Guard with typeof.
+          if(typeof ssBilling==='function') ssBilling(typeof _ssBilling!=='undefined'?_ssBilling:'monthly'); // sync toggle + render
+          // Reset the intro splash so it shows fresh on every open
+          var subIntro = document.getElementById('sub-intro-page');
+          if (subIntro) {
+            subIntro.style.display = 'flex';
+            subIntro.style.opacity = '1';
+            subIntro.style.pointerEvents = 'all';
+          }
         },
         'profile-edit': function(){ _renderProfileEdit(); },
         'voice': function(){ _renderOptions('ss-opts-voice', ['F','M'], S.voice, function(v){SS.setVoice(v);}, ['Female','Male']); },

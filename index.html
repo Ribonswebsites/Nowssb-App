@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
-<link rel="stylesheet" href="app/app.css?v=274">
+<link rel="stylesheet" href="app/app.css?v=275">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=299">
+<link rel="stylesheet" href="nowssb-nm.css?v=300">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -1582,34 +1582,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
 <div class="menu-drawer" id="menuDrawer">
 
-  <!-- ── MENU INTRO PAGE ── -->
-  <div id="menuIntroPage" style="position:absolute;inset:0;z-index:50;background:#000;display:none;flex-direction:column;overflow:hidden;transition:opacity 0.42s ease;pointer-events:all;">
-    <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779961020/grok_image_1779908680335_bed5rb.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="">
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0.55) 72%,rgba(0,0,0,0.92) 100%);pointer-events:none;"></div>
-    <!-- Back button — universal style -->
-    <button onclick="closeMenu()" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:14px;z-index:10;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.12);backdrop-filter:none;-webkit-backdrop-filter:none;cursor:pointer;flex-shrink:0;">
-      <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/></svg>
-    </button>
-    <!-- Bottom content -->
-    <div style="position:absolute;bottom:0;left:0;right:0;padding:0 26px 52px;">
-      <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.75);margin-bottom:10px;">NOWSBANSIU</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:34px;font-weight:800;color:#fff;line-height:1.05;letter-spacing:-0.5px;margin-bottom:8px;">Your<br>Menu</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:rgba(255,255,255,0.55);margin-bottom:28px;">Navigate your healing practice</div>
-      <button onclick="menuIntroEnter()" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#060c18;background:#e8d5a3;border:none;padding:15px 0;width:100%;cursor:pointer;transition:transform .1s;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''">Enter</button>
-    </div>
-  </div>
-
-  <!-- Banner with Back button + header overlaid -->
-  <div style="position:relative;overflow:hidden;height:180px;background:#0a0e1a;flex-shrink:0;">
-    <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779961020/grok_image_1779909152435_ij2joo.jpg" alt="" loading="eager" decoding="async" style="width:100%;height:180px;display:block;object-fit:cover;object-position:center center;">
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.45) 0%,rgba(6,12,24,0) 35%,rgba(6,12,24,0) 55%,rgba(6,12,24,0.7) 100%);pointer-events:none;"></div>
-    <button class="menu-close-btn" onclick="closeMenu()" style="position:absolute;top:max(env(safe-area-inset-top,12px),12px);left:12px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.15);backdrop-filter:none;-webkit-backdrop-filter:none;">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      Back
-    </button>
-    <div style="position:absolute;bottom:14px;left:20px;">
-      <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;text-transform:uppercase;margin-bottom:4px;text-shadow:0 1px 6px rgba(0,0,0,.7);">NOWSBANSIU</div>
-      <div style="font-size:28px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;line-height:1.1;text-shadow:0 2px 12px rgba(0,0,0,.6);">Your Menu</div>
+  <!-- Banner: rounded card, padded from drawer edges, header row with back button -->
+  <div style="padding:14px 14px 6px;flex-shrink:0;">
+    <div style="position:relative;overflow:hidden;height:236px;border-radius:24px !important;background:#0a0e1a;box-shadow:0 12px 34px rgba(0,0,0,0.42);">
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779961020/grok_image_1779909152435_ij2joo.jpg" alt="" loading="eager" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center center;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.5) 0%,rgba(6,12,24,0) 34%,rgba(6,12,24,0) 52%,rgba(6,12,24,0.78) 100%);pointer-events:none;"></div>
+      <!-- Header row -->
+      <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;padding:max(env(safe-area-inset-top,14px),14px) 14px 0;z-index:3;">
+        <button class="nwsb-back" onclick="closeMenu()" aria-label="Back"><span class="nwsb-back-ico"></span></button>
+      </div>
+      <!-- Bottom title -->
+      <div style="position:absolute;bottom:18px;left:22px;z-index:2;">
+        <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;text-transform:uppercase;margin-bottom:4px;text-shadow:0 1px 6px rgba(0,0,0,.7);">NOWSBANSIU</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;line-height:1.1;text-shadow:0 2px 12px rgba(0,0,0,.6);">Your Menu</div>
+      </div>
     </div>
   </div>
 
@@ -1703,7 +1689,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div id="practiceBody" style="display:flex;flex-direction:column;height:100%;overflow:hidden;"></div>
 </div>
 
-<script src="app/js/part004.js?v=282"></script>
+<script src="app/js/part004.js?v=283"></script>
 
 <!-- ══ SUB-SCREEN: SOUND LIBRARY ══ -->
 <!-- ══ SOUND LIBRARY — STYLES ══ -->
@@ -3393,7 +3379,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=298"></script>
+<script src="app/js/part012.js?v=299"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -3442,7 +3428,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ══ HEALTH MALE ══ -->
 <div class="sub-screen" id="sub-health-male">
-  <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777653492/1000035456-ezremove_ypc5qy.png');background-position:50% 20%;"></div>
+  <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777653492/1000035456-ezremove_ypc5qy.png');background-position:50% 20%;opacity:0.4;"></div>
   <div class="sub-header nav-bar">
     <div class="sub-back" onclick="closeSub('health-male');openSub('health-journey')">
       <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg>
@@ -3479,7 +3465,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ══ HEALTH FEMALE ══ -->
 <div class="sub-screen" id="sub-health-female">
-  <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777653462/1000035458-ezremove_qrzunf.png');background-position:50% 20%;"></div>
+  <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777653462/1000035458-ezremove_qrzunf.png');background-position:50% 20%;opacity:0.4;"></div>
   <div class="sub-header nav-bar">
     <div class="sub-back" onclick="closeSub('health-female');openSub('health-journey')">
       <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg>
@@ -3600,7 +3586,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part014.js?v=163"></script>
+<script src="app/js/part014.js?v=164"></script>
 
 <!-- ══ WALKMAN LIBRARY OVERLAY ══ -->
 <div class="wl-overlay" id="wlOverlay" onclick="wlOverlayClick(event)">
@@ -3966,7 +3952,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- intro rendered inline -->
 
-<script src="app/js/part018.js?v=192"></script>
+<script src="app/js/part018.js?v=193"></script>
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -5330,7 +5316,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="sub-screen" id="sub-explore-choice">
   <div style="display:flex;flex-direction:column;height:100%;position:relative;z-index:1;">
     <div class="sub-header nav-bar" style="background:transparent;border-bottom:none;backdrop-filter:none;-webkit-backdrop-filter:none;flex-shrink:0;">
-      <button onclick="closeSub('explore-choice')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;border:none;cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
+      <button onclick="closeSub('explore-choice')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
       <span style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:rgba(255,255,255,0.7);flex:1;text-align:center;margin-right:42px;">Explore</span>
     </div>
     <div class="exc-body">
@@ -5359,7 +5345,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="sub-screen" id="sub-search-choice">
   <div style="display:flex;flex-direction:column;height:100%;position:relative;z-index:1;">
     <div class="sub-header nav-bar" style="background:transparent;border-bottom:none;backdrop-filter:none;-webkit-backdrop-filter:none;flex-shrink:0;">
-      <button onclick="closeSub('search-choice')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;border:none;cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
+      <button onclick="closeSub('search-choice')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
       <span style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:rgba(255,255,255,0.7);flex:1;text-align:center;margin-right:42px;">Search</span>
     </div>
     <div class="exc-body">
@@ -5386,7 +5372,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <div class="sub-screen" id="sub-word-search">
   <div class="sub-header nav-bar" style="background:rgba(6,12,24,0.92);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:none;-webkit-backdrop-filter:none;">
-    <button onclick="closeSub('word-search')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;border:none;cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
+    <button onclick="closeSub('word-search')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
     <div class="wsg-switch">
       <button class="wsg-switch-btn active">Words</button>
       <button class="wsg-switch-btn" onclick="wsgSwitch('word-search','meaning-search')">Meaning</button>
@@ -5564,7 +5550,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <div class="sub-screen" id="sub-meaning-search">
   <div class="sub-header nav-bar" style="background:rgba(6,12,24,0.92);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:none;-webkit-backdrop-filter:none;">
-    <button onclick="closeSub('meaning-search')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/contain no-repeat;border:none;cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
+    <button onclick="closeSub('meaning-search')" style="background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);cursor:pointer;padding:0;width:42px;height:42px;flex-shrink:0;"></button>
     <div class="wsg-switch">
       <button class="wsg-switch-btn" onclick="wsgSwitch('meaning-search','word-search')">Words</button>
       <button class="wsg-switch-btn active">Meaning</button>
@@ -6841,7 +6827,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 
 
-<script src="app/js/part040.js?v=163"></script>
+<script src="app/js/part040.js?v=164"></script>
 
 <!-- ══ REBUILT SETTINGS PANELS ══ -->
 
@@ -7207,9 +7193,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ── TRIAL EXPIRED OVERLAY ── -->
 <div id="trial-expired-overlay" style="display:none;position:fixed;inset:0;z-index:99998;background:#060c18;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:48px 24px 80px;">
-  <button onclick="document.getElementById('trial-expired-overlay').style.display='none';if(typeof goTo==='function')goTo('home');" aria-label="Back" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:16px;width:42px;height:42px;border-radius:50% !important;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;-webkit-tap-highlight-color:transparent;">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-  </button>
+  <button onclick="document.getElementById('trial-expired-overlay').style.display='none';if(typeof goTo==='function')goTo('home');" aria-label="Back" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:16px;width:42px;height:42px;border-radius:50% !important;border:1px solid rgba(255,255,255,.28);background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png') center/28px no-repeat,rgba(255,255,255,.14);box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;-webkit-tap-highlight-color:transparent;"></button>
   <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB" style="width:64px;height:64px;object-fit:contain;margin-bottom:24px;opacity:.85;">
   <div style="font-size:10px;letter-spacing:3px;color:rgba(232,213,163,.55);font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:10px;text-align:center;">NOWSBANSIU EDITION</div>
   <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;text-align:center;line-height:1.3;margin-bottom:10px;">Your free trial has ended.</div>

@@ -1478,24 +1478,6 @@ window.addEventListener('appinstalled', () => {
 function openMenu() {
   document.getElementById('menuOverlay').classList.add('open');
   document.getElementById('menuDrawer').classList.add('open');
-  // Intro shows ONCE per app session (until fully closed & reopened)
-  var intro = document.getElementById('menuIntroPage');
-  if (intro) {
-    if (!window._introSeen) window._introSeen = {};
-    if (window._introSeen['menu']) {
-      intro.style.display = 'none'; intro.style.pointerEvents = 'none';
-    } else {
-      window._introSeen['menu'] = true;
-      intro.style.opacity = '1'; intro.style.display = 'flex'; intro.style.pointerEvents = 'all';
-    }
-  }
-}
-function menuIntroEnter() {
-  var intro = document.getElementById('menuIntroPage');
-  if (!intro) return;
-  intro.style.transition = 'opacity 0.35s ease';
-  intro.style.opacity = '0';
-  setTimeout(function() { intro.style.display = 'none'; intro.style.pointerEvents = 'none'; }, 360);
 }
 function closeMenu() {
   document.getElementById('menuOverlay').classList.remove('open');
