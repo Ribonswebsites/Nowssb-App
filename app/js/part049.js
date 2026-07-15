@@ -148,6 +148,9 @@ window.fashionHomeIntroEnter = function() {
     // dash in from the right with a tiny wiggle (no fade)
     img.src = next;
     img.classList.remove('coupon-dash'); void img.offsetWidth; img.classList.add('coupon-dash');
+    // Shop Now shows ONLY on the coupon images (2nd + 3rd) — never on the 1st
+    var cta = document.getElementById('fashCouponCta');
+    if (cta) cta.style.display = (idx === 0) ? 'none' : 'flex';
   }, 4000);
 })();
 

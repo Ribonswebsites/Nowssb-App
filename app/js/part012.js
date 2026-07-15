@@ -625,8 +625,14 @@ function nmhRefresh() {
     'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
   ];
   var gimg = document.getElementById('nmhGreetImg');
+  // Shop Now shows ONLY on the coupon images (2nd + 3rd) — never on the 1st
+  function _nmhCtaSync(i) {
+    var cta = document.getElementById('nmhCouponCta');
+    if (cta) cta.style.display = (i === 0) ? 'none' : 'flex';
+  }
   if (gimg) {
     if (!gimg.getAttribute('src')) { window._nmhGreetIdx = 0; gimg.src = GREET_SEQ[0]; }
+    _nmhCtaSync(window._nmhGreetIdx || 0);
     // preload all so the rotation is seamless (once)
     if (!window._nmhGreetPreloaded) {
       window._nmhGreetPreloaded = GREET_SEQ.map(function(u){ var im = new Image(); im.src = u; return im; });
@@ -647,6 +653,7 @@ function nmhRefresh() {
         el.src = nextSrc;
         el.classList.remove('coupon-dash'); void el.offsetWidth; el.classList.add('coupon-dash');
         window._nmhGreetIdx = nextIdx;
+        _nmhCtaSync(nextIdx);
       };
       pre.src = nextSrc;
     }, 4000);

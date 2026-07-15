@@ -2177,7 +2177,9 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 .nmh-banner-cta:active, .fash-banner-cta:active { background: rgba(255,255,255,0.24); transform: scale(0.96); }
 /* left-aligned, sitting directly above "Exclusive Coupon for you!" on the
    coupon banner — NOT centered on the whole banner width. */
-.nmh-banner-cta-tc, .fash-banner-cta-tc { top: 14px; left: 7%; }
+/* Sits directly ABOVE the "Exclusive Coupon for you!" text baked into the
+   coupon images (text top ≈44% down, centered at ≈27% of the width). */
+.nmh-banner-cta-tc, .fash-banner-cta-tc { top: auto; bottom: 57%; left: 27%; transform: translateX(-50%); }
 .nmh-banner-cta-tc:active, .fash-banner-cta-tc:active { background: rgba(255,255,255,0.24); transform: scale(0.96); }
 .nmh-banner-cta-r, .fash-banner-cta-r { top: 50%; right: 12px; transform: translateY(-50%); }
 .nmh-banner-cta-r:active, .fash-banner-cta-r:active { background: rgba(255,255,255,0.24); transform: translateY(-50%) scale(0.96); }
