@@ -598,23 +598,9 @@
     }, true);
   }
 
-  /* override renderPractice when liquid mode is on */
-  (function wrap() {
-    if (typeof window.renderPractice !== 'function') { return setTimeout(wrap, 200); }
-    var orig = window.renderPractice;
-    window.renderPractice = function () {
-      document.body.classList.toggle('nwsb-lg', active());
-      if (active() && !window._sspActive) {
-        try { renderLiquidPlayer(); return; } catch (e) { /* fall back to original */ }
-      }
-      /* not using the liquid player → make sure no stray body-level arc/info panel lingers */
-      var stray = document.getElementById('lgpArc');
-      if (stray) stray.remove();
-      var strayInfo = document.getElementById('lgpInfoPanel');
-      if (strayInfo) strayInfo.remove();
-      return orig.apply(this, arguments);
-    };
-  })();
+  /* renderPractice (part004.js) now calls renderLiquidPlayer() directly and
+     unconditionally — the old player UI has been deleted, so there is nothing
+     left to monkey-patch/select between here. */
 
   /* Close (and detach) the arc + info panel whenever the practice screen is closed */
   (function patchCloseSub() {

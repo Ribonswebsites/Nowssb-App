@@ -581,214 +581,29 @@ function sspCloseMeaning() {
 }
 
 // ── Render ──
+// The old "Sony Walkman" glassmorphism player UI has been removed. This now
+// renders straight into the Liquid Glass Player (nowssb-player.js) — there is
+// no old UI left to ever flash, and no fallback path to accidentally take.
+// nowssb-player.js is a deferred script; if it hasn't finished loading yet
+// (very first tap on a slow connection), retry shortly instead of ever
+// drawing anything else.
 function renderPractice() {
-  if (_sspActive) { renderSentencePlayer(); return; }
+  if (_sspActive) {
+    // clean up any stray liquid-player overlay before switching to the sentence player
+    var _lgpArc = document.getElementById('lgpArc'); if (_lgpArc) _lgpArc.remove();
+    var _lgpInfo = document.getElementById('lgpInfoPanel'); if (_lgpInfo) _lgpInfo.remove();
+    renderSentencePlayer();
+    return;
+  }
   const body = document.getElementById('practiceBody');
   if (!body) return;
   const w = PRACTICE_WORDS[_pwIdx];
   if (!w) return;
-  const pct = Math.min(100, Math.round((_pwRepCount / _pwRepTarget) * 100));
-  const repDone = _pwRepCount >= _pwRepTarget;
-  const isFirst = _pwIdx === 0;
-  const isLast  = _pwIdx === PRACTICE_WORDS.length - 1;
-  const hr = new Date().getHours();
-  const timeLabel = hr < 10 ? 'Morning' : hr < 13 ? 'Midday' : hr < 17 ? 'Afternoon' : hr < 20 ? 'Evening' : 'Night';
-
-  const sylChips = w.syllables.map((s,i) =>
-    `<div class="sp-syl-chip" id="spSyl${i}">${s}</div>${i < w.syllables.length-1 ? '<div class="sp-syl-dot">·</div>' : ''}`
-  ).join('');
-
-  const wvBars = Array.from({length:15},(_,i)=>`<div class="sp-wv" style="animation-delay:${(i*0.07).toFixed(2)}s"></div>`).join('');
-
-  const recBars = Array.from({length:24},()=>`<div class="sp-rec-bar" style="height:4px"></div>`).join('');
-
-  const autoStatusTxt = _pwRecording ? 'Speak now…'
-    : _pwRecordingBlob ? 'Recorded · tap ▶ to replay'
-    : 'Tap ▶ to listen · practice follows';
-
-
-  const _pwTheme = pwTheme((PRACTICE_WORDS[_pwIdx] || {}).word || '');
-  body.innerHTML = `
-    <div class="sp-player" style="--accent:rgb(${_pwTheme.accent});">
-      <div class="sp-bg-img${_pwPlaying?' hidden':''}" id="pwBgImg"></div>
-      <video id="pwBgVideo"
-        class="sp-bg-video${_pwPlaying?' playing':''}"
-        src="${_pwTheme.video}"
-        loop muted playsinline preload="none">
-      </video>
-      <div class="sp-bg-overlay"></div>
-      <div class="sp-bg-glow${_pwPlaying?' playing':''}"></div>
-
-      <!-- TOP BAR -->
-      <div class="sp-topbar">
-        <button onclick="closeSub('practice')" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;width:36px;flex-shrink:0;">
-          <svg width="13" height="11" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/></svg>
-        </button>
-        <div class="sp-topbar-label">${(()=>{const ar=getActiveRoutine();return ar?ar.name:timeLabel})()} Ritual &nbsp;·&nbsp; ${_pwIdx+1} of ${PRACTICE_WORDS.length}</div>
-        <div style="width:36px;flex-shrink:0;"></div>
-      </div>
-
-      <!-- WORD HERO — compact, centered -->
-      <div class="sp-word-hero" style="position:relative;z-index:10;">
-        <div class="sp-origin-pill">${w.origin}</div>
-        <div class="sp-word-title">${w.word}</div>
-        <div class="sp-syl-row">${sylChips}</div>
-        <div class="sp-tags"><span class="sp-tag">${w.organ}</span></div>
-      </div>
-
-      <!-- DISC — Glassmorphism Walkman -->
-      <div class="sp-disc-wrap" style="position:relative;z-index:10;">
-        <div class="sp-glass-ring${_pwPlaying?' playing':''}">
-
-          <!-- Ripple rings (beat pulse, playing only) -->
-          <div class="sp-wm-ripple"></div>
-          <div class="sp-wm-ripple"></div>
-          <div class="sp-wm-ripple"></div>
-
-          <!-- Groove rings (vinyl record lines) -->
-          <div class="sp-wm-grooves">
-            <div class="sp-wm-groove"></div>
-            <div class="sp-wm-groove"></div>
-            <div class="sp-wm-groove"></div>
-            <div class="sp-wm-groove"></div>
-            <div class="sp-wm-groove"></div>
-          </div>
-
-          <!-- Dial tick-mark ring (slow outer rotation) -->
-          <div class="sp-wm-dial"></div>
-
-          <!-- Orbiting glowing arc -->
-          <div class="sp-wm-arc"></div>
-
-          <!-- Main spinning disc -->
-          <div class="sp-disc-outer${_pwPlaying?' playing':''}">
-            <div class="sp-disc${_pwPlaying?' playing':''}">
-              <img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777803046/grok_image_1777802759590_giabgl.jpg" alt="NowssB" loading="eager">
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- WAVEFORM STRIP -->
-      <div class="sp-waveform-strip${_pwPlaying?' active':''}" id="spWaveform" style="position:relative;z-index:10;">
-        ${wvBars}
-      </div>
-
-      <!-- CENTER: phase-aware -->
-      <div class="sp-center-section">
-
-        <!-- Phase: idle / playing -->
-        <div id="spPhaseIdlePlay" style="display:${(_pwPhase==='idle'||_pwPhase==='playing')?'flex':'none'};flex-direction:column;align-items:center;gap:8px;width:100%;">
-          <div class="sp-auto-status" id="spAutoStatus">${_pwPhase==='playing'?'Listening…':'Tap ▶ to listen'}</div>
-          <div class="sp-play-row">
-            <button class="sp-play-orb${_pwPlaying?' playing':''}" id="spPlayBtn" onclick="pwTogglePlay()">
-              ${_pwPlaying
-                ? `<svg width="14" height="16" viewBox="0 0 16 18" fill="none"><rect x="1" y="1" width="5" height="16" rx="1" fill="rgba(200,232,245,0.9)"/><rect x="10" y="1" width="5" height="16" rx="1" fill="rgba(200,232,245,0.9)"/></svg>`
-                : `<img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png" style="width:32px;height:32px;object-fit:contain;display:block;" alt="">`}
-            </button>
-          </div>
-        </div>
-
-        <!-- Phase: post-play — practice CTA -->
-        <div id="spPhasePost" style="display:${_pwPhase==='post-play'?'flex':'none'};flex-direction:column;align-items:center;gap:10px;width:100%;padding:0 20px;">
-          <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.38);font-family:'DM Sans',sans-serif;font-weight:600;">Word played · your turn</div>
-          <button class="sp-practice-cta" onclick="pwPracticeNow()">
-            <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#e8d5a3"/></svg>
-            PRACTICE NOW
-          </button>
-        </div>
-
-        <!-- Phase: recording — waveform -->
-        <div id="spPhaseRec" style="display:${_pwPhase==='recording'?'flex':'none'};flex-direction:column;align-items:center;gap:8px;width:100%;">
-          <div class="sp-auto-status recording">● Recording</div>
-          <div class="sp-rec-waveform" id="spRecWaveform">${recBars}</div>
-          <div class="sp-rec-compare-hint" id="spRecHint">Speak the word clearly</div>
-        </div>
-
-        <!-- Phase: scoring / scored — score display -->
-        <div id="spScoreWrap" style="display:${(_pwPhase==='scoring'||_pwPhase==='scored')?'flex':'none'};flex-direction:column;align-items:center;gap:4px;padding:0 20px;width:100%;">
-          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,232,245,0.38);font-family:'DM Sans',sans-serif;" id="spScoreLabel">${_pwPhase==='scoring'?'Analyzing…':'Your score'}</div>
-          <div id="spScoreNum" style="font-family:'DM Sans',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;color:#e8d5a3;line-height:1;"></div>
-          <div id="spPersonaWrap" style="display:none;margin-top:6px;padding:10px 14px;background:rgba(255,255,255,0.04);text-align:left;width:100%;">
-            <div id="spPersonaName" style="font-size:9px;letter-spacing:2px;color:rgba(232,213,163,0.55);text-transform:uppercase;margin-bottom:5px;"></div>
-            <div id="spPersonaText" style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.6;font-weight:300;"></div>
-          </div>
-        </div>
-
-        <!-- hidden compat for existing JS refs -->
-        <div style="display:none;">
-          <button id="spRecBtn"></button>
-          <div id="spRecLabel"></div>
-          <div id="spRecStatus"></div>
-          <button id="spRecPlayBtn"></button>
-          <button id="spRecTrashBtn"></button>
-          <div id="spRecControls"></div>
-        </div>
-      </div>
-
-      <!-- 3-BUTTON BAR -->
-      <div class="sp-3btn-bar">
-        <button class="sp-3btn" onclick="pwOpenSettings()">
-          <div class="sp-3btn-ico"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/018b2fc0-5dec-11f1-9e1a-9303081e5fda_ccsoef.png" style="width:26px;height:26px;object-fit:contain;display:block;opacity:0.9;" alt=""></div>
-          SETTINGS
-        </button>
-        <button class="sp-3btn sp-3btn-main sp-btn-play" id="sp3BtnMain" onclick="pwMainBtnAction()">
-          <div class="sp-3btn-ico" id="sp3BtnIco"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt=""></div>
-          <span id="sp3BtnLbl">PLAY</span>
-        </button>
-        <button class="sp-3btn" onclick="openWalkmanLib()">
-          <div class="sp-3btn-ico"><svg width="16" height="14" viewBox="0 0 16 14" fill="none"><rect x="0" y="0" width="6" height="6" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="0" width="6" height="6" stroke="currentColor" stroke-width="1.3"/><rect x="0" y="9" width="6" height="5" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="9" width="6" height="5" stroke="currentColor" stroke-width="1.3"/></svg></div>
-          LIBRARY
-        </button>
-      </div>
-
-      <!-- SETTINGS SHEET (slides up) -->
-      <div id="spSettingsSheet" class="sp-settings-sheet">
-        <div class="sp-ss-handle"></div>
-        <div class="sp-ss-row" style="cursor:default;">
-          <span class="sp-ss-lbl">Voice</span>
-          <div class="sp-ss-voice">
-            <button class="sp-ss-vbtn${_pwVoice==='F'?' active':''}" onclick="pwSetVoice('F');pwUpdateSettingsSheet()">Female</button>
-            <button class="sp-ss-vbtn${_pwVoice==='M'?' active':''}" onclick="pwSetVoice('M');pwUpdateSettingsSheet()">Male</button>
-          </div>
-        </div>
-        <div class="sp-ss-row" onclick="pwToggleLoop();pwUpdateSettingsSheet()">
-          <span class="sp-ss-lbl">Loop</span>
-          <span class="sp-ss-val" id="ssLoopVal">${_pwLoop?'On':'Off'}</span>
-        </div>
-        <div class="sp-ss-row" onclick="pwCycleRepTarget();pwUpdateSettingsSheet()">
-          <span class="sp-ss-lbl">Reps</span>
-          <span class="sp-ss-val" id="ssRepsVal">${_pwRepTarget}×</span>
-        </div>
-        <div class="sp-ss-row" onclick="pwExpandMeaning();pwCloseSettings()">
-          <span class="sp-ss-lbl">Meaning</span>
-          <span class="sp-ss-val">→</span>
-        </div>
-        <div class="sp-ss-navrow">
-          <button class="sp-ss-navbtn" onclick="pwPrevWord();pwCloseSettings()" ${isFirst?'disabled':''}>
-            <svg width="10" height="9" viewBox="0 0 12 11" fill="none"><path d="M5 1L1 5.5L5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="5.5" x2="11" y2="5.5" stroke="currentColor" stroke-width="1.5"/></svg>
-            PREV
-          </button>
-          <button class="sp-ss-navbtn" onclick="pwNextWord();pwCloseSettings()" ${isLast?'disabled':''}>
-            NEXT
-            <svg width="10" height="9" viewBox="0 0 12 11" fill="none"><path d="M7 1L11 5.5L7 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/><line x1="11" y1="5.5" x2="1" y2="5.5" stroke="currentColor" stroke-width="1.5"/></svg>
-          </button>
-        </div>
-        <button class="sp-ss-done${_pwDone?' completed':''}" onclick="pwCompleteSession();pwCloseSettings()">${_pwDone?'COMPLETED ✓':'COMPLETE SESSION'}</button>
-        <div style="height:calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,20px),20px) + 8px);"></div>
-      </div>
-
-      <!-- Meaning expand sheet (fixed bottom overlay) -->
-      <div id="spMeaningSheet" style="position:fixed;bottom:0;left:0;right:0;z-index:9000;background:#060c18;border-top:1px solid rgba(255,255,255,0.12);padding:20px 20px calc(var(--nav-height,58px) + 24px);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);"></div>
-
-      <!-- Hidden compat divs for repeat tab JS -->
-      <div style="display:none;">
-        <div id="spRepNum">${_pwRepCount}</div>
-        <div id="spRepBar" style="width:${pct}%"></div>
-      </div>
-
-    </div>`;
+  if (typeof window.renderLiquidPlayer !== 'function') {
+    setTimeout(renderPractice, 60);
+    return;
+  }
+  window.renderLiquidPlayer();
 
   // Restore recorder state visually after re-render
   _pwRestoreRecorderState();
