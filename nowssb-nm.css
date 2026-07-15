@@ -2626,20 +2626,20 @@ body.nm-glass #sub-health-journey .gsel-card {
   100%  { --ctang: 360deg; opacity: 0; }
 }
 .nmh-tile.nmh-tile-art::after {
-  content: ''; position: absolute; inset: 0; border-radius: 22px; padding: 2px;
+  content: ''; position: absolute; inset: 0; border-radius: 22px; padding: 2.5px;
   pointer-events: none; z-index: 4; opacity: 0;
   background: conic-gradient(from var(--ctang),
-    transparent 0deg, transparent 248deg,
-    rgba(200,169,110,0.45) 312deg, #e8d5a3 344deg, rgba(200,169,110,0.45) 352deg, transparent 360deg);
+    transparent 0deg, transparent 232deg,
+    rgba(200,169,110,0.75) 296deg, #f0dca0 332deg, #fff7dd 346deg, #f0dca0 356deg, rgba(200,169,110,0.6) 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: tileSeq 10s linear infinite backwards; will-change: --ctang, opacity;
+  animation: tileSeq 9s linear infinite backwards; will-change: --ctang, opacity;
 }
 .nmh-grid .nmh-tile-art:nth-child(1)::after { animation-delay: 0s; }
-.nmh-grid .nmh-tile-art:nth-child(2)::after { animation-delay: 2.5s; }
-.nmh-grid .nmh-tile-art:nth-child(3)::after { animation-delay: 5s; }
-.nmh-grid .nmh-tile-art:nth-child(4)::after { animation-delay: 7.5s; }
+.nmh-grid .nmh-tile-art:nth-child(2)::after { animation-delay: 2.25s; }
+.nmh-grid .nmh-tile-art:nth-child(3)::after { animation-delay: 4.5s; }
+.nmh-grid .nmh-tile-art:nth-child(4)::after { animation-delay: 6.75s; }
 .nmh-streak-bar { border-radius:16px !important; }
 .nmh-routine { border-radius:20px !important; }
 .nmh-quick-btn { border-radius:16px !important; }
