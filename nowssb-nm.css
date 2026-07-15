@@ -2601,12 +2601,16 @@ body.nm-glass #sub-health-journey .gsel-card {
    specificity beats * among !important rules) and deepen the light-mode dual
    shadows so the soft-extruded depth is unmistakable. */
 .nmh-practice { border-radius:26px !important; position: relative; }
-/* Today's Practice artwork on the RIGHT; text reserves the left space so the
-   title/meaning truncate before the image instead of running under it. */
-.nmh-practice { padding-right: 40% !important; }
+/* Today's Practice artwork sits like a BACKGROUND on the right — BEHIND the text,
+   which keeps its original full-width position and may overlap the art. */
+.nmh-practice > .nmh-practice-label,
+.nmh-practice > .nmh-practice-icon,
+.nmh-practice > .nmh-practice-word,
+.nmh-practice > .nmh-practice-meaning,
+.nmh-practice > .nmh-practice-footer { position: relative; z-index: 2; }
 .nmh-practice-img {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  width: 38%; max-width: 190px; object-fit: contain; display: block;
+  position: absolute; right: 6px; top: 57%; transform: translateY(-50%);
+  width: 31%; max-width: 150px; object-fit: contain; display: block;
   z-index: 1; pointer-events: none;
 }
 .nmh-tile { border-radius:22px !important; }
