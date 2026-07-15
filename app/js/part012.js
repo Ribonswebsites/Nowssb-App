@@ -1686,8 +1686,9 @@ if (krmQEl) {
   }, 3200);
 }
 
-// ── FOOTER 3D CAROUSEL ──
-(function() {
+// ── FOOTER 3D CAROUSEL — factory so both the Fashion and normal home footers
+// (each with their own ids) can run an independent instance. ──
+function _nwsbSetupFooterCarousel(carouselId, bgImgId) {
   var active = 0, autoT = null, items, dots, N;
   var bgEl = null; // footer bg image element
 
@@ -1737,9 +1738,9 @@ if (krmQEl) {
   function startAuto() { clearInterval(autoT); autoT=setInterval(function(){go(active+1);},2800); }
 
   function init() {
-    var carousel = document.getElementById('footerCarousel');
+    var carousel = document.getElementById(carouselId);
     if (!carousel) return;
-    bgEl = document.getElementById('footerBgImg');
+    bgEl = document.getElementById(bgImgId);
     items = Array.from(carousel.querySelectorAll('.fci'));
     dots  = Array.from(carousel.querySelectorAll('.fcd'));
     N = items.length;
@@ -1780,7 +1781,9 @@ if (krmQEl) {
   }
 
   setTimeout(init, 5200);
-})();
+}
+_nwsbSetupFooterCarousel('footerCarousel', 'footerBgImg');
+_nwsbSetupFooterCarousel('footerCarouselNm', 'footerBgImgNm');
 
 function krmSearch() {
   const val = document.getElementById('krmInput').value.trim().toLowerCase();

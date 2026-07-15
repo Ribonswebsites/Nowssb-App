@@ -1026,6 +1026,62 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 
+    <!-- Footer — same footer as the Fashion home, own ids so both carousels run independently -->
+    <div class="home-footer" id="homeFooterNm">
+
+      <!-- Dynamic background — updates to match active carousel image -->
+      <div class="footer-bg-img" id="footerBgImgNm"></div>
+      <div class="footer-bg-overlay"></div>
+
+      <!-- Intro text — above carousel -->
+      <div class="footer-intro">
+        <span class="footer-intro-eyebrow">Across Every Language</span>
+        <div class="footer-intro-title">
+          Every civilization
+          <span class="fi-bold">heard the same</span>
+          <span class="fi-accent">original sound.</span>
+        </div>
+        <div class="footer-intro-sub">Different words. One root. All languages descend from the same vibrational origin.</div>
+      </div>
+
+      <!-- 3D Image Carousel -->
+      <div class="footer-carousel" id="footerCarouselNm">
+        <div class="footer-carousel-track" id="footerTrackNm">
+          <div class="fci" data-index="0"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931241446_2_oqn7z0.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="1"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931251298_2_nuhjin.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="2"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931991083_2_eyvogv.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="3"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776932343988_3_bofj1s.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="4"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931659181_2_l3dxyi.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="5"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931253654_2_hrtsra.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="6"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934920/grok_image_1776932830246_2_x0yyb6.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="7"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776933033268_2_m3fmo9.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="8"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932933365_2_jb1lch.jpg" alt="" loading="lazy"></div>
+          <div class="fci" data-index="9"><img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932486772_2_spplq4.jpg" alt="" loading="lazy"></div>
+        </div>
+        <div class="footer-carousel-dots" id="footerDotsNm">
+          <div class="fcd active"></div><div class="fcd"></div><div class="fcd"></div><div class="fcd"></div><div class="fcd"></div>
+          <div class="fcd"></div><div class="fcd"></div><div class="fcd"></div><div class="fcd"></div><div class="fcd"></div>
+        </div>
+      </div>
+
+      <!-- Glass/Neumorphic/Skeuomorphic Brand Panel -->
+      <div class="footer-panel">
+        <div class="footer-brand"><span class="b">Nowsb</span><span class="t">ansiu</span></div>
+        <div class="footer-tagline">Natural Origin of <strong style="color:rgba(200,232,245,0.75);">Word Science</strong></div>
+        <div class="footer-divider"></div>
+        <div class="footer-links">
+          <span class="footer-link" onclick="openSub('shabdapathy')">About</span>
+          <span class="footer-link" onclick="openSub('word-science')">Word Science</span>
+          <span class="footer-link" onclick="openSub('sound-library')">Sound Library</span>
+          <span class="footer-link" onclick="openSub('meaning-store')">Meaning Store</span>
+          <span class="footer-link" onclick="openPracticeIntro()">Practice</span>
+          <span class="footer-link" onclick="openSub('profile')">Profile</span>
+        </div>
+        <div class="footer-copy">© 2026 Adv. Sanjaykumar Gadge · Shabdapathy</div>
+      </div>
+
+    </div>
+
   </div>
 </div>
 
@@ -3337,7 +3393,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=281"></script>
+<script src="app/js/part012.js?v=298"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
