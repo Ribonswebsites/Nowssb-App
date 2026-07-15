@@ -405,6 +405,29 @@ window.pwCloseMeaning = function() {
     }, 520);
   };
 
+  // Navigate FROM an open sub-screen TO a new destination with NO home-page flash.
+  // The old pattern — closeSub(from); setTimeout(openSub(target), 260) — slid the
+  // source screen OFF FIRST, so for ~260ms home was the only thing painted underneath
+  // (the "flash" the user reported). Instead: run the destination-opening action NOW
+  // while the source still covers home, raise whatever sub-screen just opened so it
+  // paints ON TOP regardless of DOM order, THEN drop the source once its slide is done.
+  // Works for openSub(...) AND IG.nav(...) targets (both add .open synchronously);
+  // full-screen overlays like Verify cover home on their own so they need nothing.
+  window.navFromSub = function (fromId, enterFn) {
+    var before = {};
+    document.querySelectorAll('.sub-screen.open').forEach(function (el) { before[el.id] = 1; });
+    try { if (typeof enterFn === 'function') enterFn(); } catch (e) {}
+    var raised = [];
+    document.querySelectorAll('.sub-screen.open').forEach(function (el) {
+      if (!before[el.id] && el.id !== 'sub-' + fromId) { el.style.zIndex = '660'; raised.push(el); }
+    });
+    setTimeout(function () {
+      var from = document.getElementById('sub-' + fromId);
+      if (from) from.classList.remove('open');
+      raised.forEach(function (el) { el.style.zIndex = ''; });
+    }, 420);
+  };
+
   function addSwipe(bodyId, fromId, toId, dir) {
     var el = document.getElementById(bodyId);
     if (!el) return;

@@ -812,7 +812,7 @@ function slRenderSentences(sentences) {
       '</svg>' +
       '<div class="sl-empty-title">No sentences yet</div>' +
       '<div class="sl-empty-text">Complete a practice session to save your first sentence — or subscribe to unlock words and buy individual tracks for deeper healing.</div>' +
-      '<button class="sl-empty-cta" onclick="closeSub(\'sound-library\');setTimeout(openPracticeIntro,80)">Start a Session</button>' +
+      '<button class="sl-empty-cta" onclick="navFromSub(\'sound-library\',openPracticeIntro)">Start a Session</button>' +
     '</div>';
   }
 
@@ -949,7 +949,7 @@ function slRenderPurchased(purchased, allSubWords) {
     '<span class="sl-upgrade-label">The Word Atelier</span>' +
     '<div class="sl-upgrade-title">Acquire more words.<br>Build deeper sentences.</div>' +
     '<div class="sl-upgrade-text">Each word you acquire unlocks new sentence combinations. The more words you own, the richer and more powerful your healing sentences become.</div>' +
-    '<button class="sl-upgrade-btn" onclick="closeSub(\'sound-library\');setTimeout(function(){ openSub(\'word-store\') || alert(\'Word Atelier coming soon\') }, 80)">' +
+    '<button class="sl-upgrade-btn" onclick="navFromSub(\'sound-library\',function(){ openSub(\'word-store\') || alert(\'Word Atelier coming soon\') })">' +
       '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 2H4L5.5 9.5H10L11.5 5H4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="square"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="9.5" cy="12" r="1" fill="currentColor"/></svg>' +
       'Browse The Word Atelier' +
     '</button>' +

@@ -56,7 +56,7 @@ function renderCartPage() {
         '<div class="cwp-empty-icon"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><path d="M4 4h2.5l3.5 13h12l2.5-9H8" stroke="rgba(232,213,163,0.45)" stroke-width="1.4" stroke-linecap="square"/><circle cx="12" cy="22" r="1.5" fill="rgba(232,213,163,0.45)"/><circle cx="18" cy="22" r="1.5" fill="rgba(232,213,163,0.45)"/></svg></div>' +
         '<div class="cwp-empty-title">Cart is empty</div>' +
         '<div class="cwp-empty-sub">Add words or meanings from the NowssB Store to begin your order.</div>' +
-        '<div class="cwp-empty-cta" onclick="closeSub(\'cart\');setTimeout(function(){openSub(\'nowssb-store\');},200);">Browse Store →</div>' +
+        '<div class="cwp-empty-cta" onclick="navFromSub(\'cart\',function(){openSub(\'nowssb-store\');});">Browse Store →</div>' +
       '</div>';
     if (total) total.textContent = '$0.00';
     if (btn)   btn.disabled = true;
@@ -118,7 +118,7 @@ function renderWishPage(filter) {
         '<div class="cwp-empty-icon"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><path d="M14 23S4 16 4 9.5A5 5 0 0 1 14 7.2 5 5 0 0 1 24 9.5C24 16 14 23 14 23Z" stroke="rgba(220,80,80,0.45)" stroke-width="1.4" stroke-linejoin="round" fill="none"/></svg></div>' +
         '<div class="cwp-empty-title">Nothing saved yet</div>' +
         '<div class="cwp-empty-sub">Tap the heart icon on any word or meaning card to save it here.</div>' +
-        '<div class="cwp-empty-cta" onclick="closeSub(\'wishlist\');setTimeout(function(){openSub(\'nowssb-store\');},200);">Browse Store →</div>' +
+        '<div class="cwp-empty-cta" onclick="navFromSub(\'wishlist\',function(){openSub(\'nowssb-store\');});">Browse Store →</div>' +
       '</div>';
     return;
   }
@@ -174,7 +174,7 @@ function renderOrdersPage() {
         '<div class="cwp-empty-icon"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="18" stroke="rgba(200,232,245,0.4)" stroke-width="1.4"/><path d="M8 12H20M8 17H14" stroke="rgba(200,232,245,0.4)" stroke-width="1.4"/><path d="M8 6V4a6 6 0 0112 0v2" stroke="rgba(200,232,245,0.4)" stroke-width="1.4"/></svg></div>' +
         '<div class="cwp-empty-title">No purchases yet</div>' +
         '<div class="cwp-empty-sub">Words and meanings you unlock from the NowssB Store will appear here permanently.</div>' +
-        '<div class="cwp-empty-cta" onclick="closeSub(\'orders\');setTimeout(function(){openSub(\'nowssb-store\');},200);">Browse Store →</div>' +
+        '<div class="cwp-empty-cta" onclick="navFromSub(\'orders\',function(){openSub(\'nowssb-store\');});">Browse Store →</div>' +
       '</div>';
     return;
   }

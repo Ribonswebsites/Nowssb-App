@@ -189,7 +189,7 @@ function renderOhPage(filter) {
   }
 
   if (filtered.length === 0) {
-    body.innerHTML = '<div class="cwp-empty"><div class="cwp-empty-title">No ' + (filter === 'words' ? 'words' : 'meanings') + ' yet</div><div class="cwp-empty-sub">Your purchase archive will appear here once you start unlocking ' + (filter === 'words' ? 'words' : 'meanings') + '.</div><div class="cwp-empty-cta" onclick="ohCloseFilter();ohCloseCatIntro();closeSub(\'order-history\');setTimeout(function(){openSub(\'nowssb-store\');},200);">Browse Store →</div></div>';
+    body.innerHTML = '<div class="cwp-empty"><div class="cwp-empty-title">No ' + (filter === 'words' ? 'words' : 'meanings') + ' yet</div><div class="cwp-empty-sub">Your purchase archive will appear here once you start unlocking ' + (filter === 'words' ? 'words' : 'meanings') + '.</div><div class="cwp-empty-cta" onclick="ohCloseFilter();ohCloseCatIntro();navFromSub(\'order-history\',function(){openSub(\'nowssb-store\');});">Browse Store →</div></div>';
     return;
   }
 

@@ -3966,7 +3966,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- intro rendered inline -->
 
-<script src="app/js/part018.js?v=191"></script>
+<script src="app/js/part018.js?v=192"></script>
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -5118,10 +5118,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 </div>
 
-<script src="app/js/part027.js?v=163"></script>
+<script src="app/js/part027.js?v=164"></script>
 
 <!-- ══ CART / WISHLIST / ORDERS PAGE JS ══ -->
-<script src="app/js/part028.js?v=163"></script>
+<script src="app/js/part028.js?v=164"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -5137,7 +5137,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="chk-hero-bg" id="chkHeroBg"></div>
     <div class="chk-hero-overlay"></div>
     <div class="chk-hero-top">
-      <div class="chk-back" onclick="closeSub('checkout');setTimeout(function(){openSub('cart');},80);">
+      <div class="chk-back" onclick="navFromSub('checkout',function(){openSub('cart');});">
         <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
           <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/>
           <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
@@ -5282,43 +5282,43 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="feat-hsub brand-tag">Every feature, <strong>one tap away.</strong></div>
     </div>
     <div class="feat-grid">
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){window.IG&&IG.nav('library');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){window.IG&&IG.nav('library');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png" alt=""></div>
         <div class="feat-name">NowssB Player</div><div class="feat-sub">Sound library</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){window.IG&&IG.nav('profile');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){window.IG&&IG.nav('profile');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160850/file_00000000d62c7208b5d5d5447d6a1a0e_wsecyk.png" alt=""></div>
         <div class="feat-name">NowssB Connect</div><div class="feat-sub">Community</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){window.IG&&IG.nav('store');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){window.IG&&IG.nav('store');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160870/file_0000000037547208b91bfd167f401961_eesfpn.png" alt=""></div>
         <div class="feat-name">NowssB Store</div><div class="feat-sub">Words & meanings</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){window.IG&&IG.openVerify&&IG.openVerify();},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){window.IG&&IG.openVerify&&IG.openVerify();});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png" alt=""></div>
         <div class="feat-name">Verification</div><div class="feat-sub">Get verified ✓</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('search-choice');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){openSub('search-choice');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png" alt=""></div>
         <div class="feat-name">Search</div><div class="feat-sub">Words &amp; meanings</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){window.IG&&IG.nav('practice');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){window.IG&&IG.nav('practice');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000050d472089de0ad57116dba0f_tht26i.png" alt=""></div>
         <div class="feat-name">Daily Practice</div><div class="feat-sub">Morning ritual</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('word-science');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){openSub('word-science');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png" alt=""></div>
         <div class="feat-name">Word Science</div><div class="feat-sub">Nowsbansiu system</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('my-progress');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){openSub('my-progress');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png" alt=""></div>
         <div class="feat-name">My Progress</div><div class="feat-sub">Healing journey</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('wishlist');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){openSub('wishlist');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png" alt=""></div>
         <div class="feat-name">Wishlist</div><div class="feat-sub">Saved words</div>
       </button>
-      <button class="feat-card" onclick="closeSub('features');setTimeout(function(){openSub('cart');},260);">
+      <button class="feat-card" onclick="navFromSub('features',function(){openSub('cart');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png" alt=""></div>
         <div class="feat-name">Cart</div><div class="feat-sub">Your bag</div>
       </button>
@@ -5369,12 +5369,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="exc-sub">Search any word's origin, or the true hidden meaning behind it.</div>
       </div>
       <div class="exc-options">
-        <button class="exc-opt" onclick="closeSub('search-choice');setTimeout(function(){openSub('word-search');},240);">
+        <button class="exc-opt" onclick="wsgSwitch('search-choice','word-search');">
           <div class="exc-opt-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="rgba(255,255,255,0.9)" stroke-width="1.3"/><path d="M16 16l5 5" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
           <div class="exc-opt-txt"><div class="exc-opt-title">Words</div><div class="exc-opt-sub">Origin of any word</div></div>
           <svg class="exc-opt-chev" width="9" height="16" viewBox="0 0 9 16" fill="none"><path d="M1 1l6 7-6 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <button class="exc-opt" onclick="closeSub('search-choice');setTimeout(function(){openSub('meaning-search');},240);">
+        <button class="exc-opt" onclick="wsgSwitch('search-choice','meaning-search');">
           <div class="exc-opt-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z" stroke="rgba(255,255,255,0.9)" stroke-width="1.3" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="rgba(255,255,255,0.9)" stroke-width="1.3"/></svg></div>
           <div class="exc-opt-txt"><div class="exc-opt-title">Meaning</div><div class="exc-opt-sub">The true hidden meaning</div></div>
           <svg class="exc-opt-chev" width="9" height="16" viewBox="0 0 9 16" fill="none"><path d="M1 1l6 7-6 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -6373,7 +6373,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="font-size:12px;color:rgba(255,255,255,.3);font-family:'DM Sans',sans-serif;margin-top:8px;">Version 1.0.0 · build 001</div>
     </div>
     <div class="sg" style="padding:0 18px;margin-bottom:24px;">
-      <div class="sr" onclick="closeSub('social');setTimeout(function(){openSub('shabdapathy')},320)">
+      <div class="sr" onclick="navFromSub('social',function(){openSub('shabdapathy');})">
         <div class="sr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
         <div class="sr-body"><div class="sr-label">What Is NowssB?</div><div class="sr-sub">The science of Shabdapathy</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
@@ -7276,7 +7276,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=281"></script>
+<script src="app/js/part049.js?v=282"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>
