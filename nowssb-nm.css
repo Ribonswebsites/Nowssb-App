@@ -2664,6 +2664,41 @@ body.nm-glass #sub-health-journey .gsel-card {
   filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.22));
 }
 .nmh-tile { border-radius:22px !important; }
+/* ── NowssB Connect — horizontal creator cards ── */
+.nmh-connect-sec { width: 100%; }
+.nmh-connect-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 2px; }
+.nmh-connect-title { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800; color: #1a1a2e; letter-spacing: -0.3px; }
+.nmh-connect-title .accent { color: #c8a96e; }
+.nmh-connect-seeall { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(0,0,0,0.4); cursor: pointer; }
+.nmh-connect-row { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.nmh-connect-row::-webkit-scrollbar { display: none; }
+.nmh-connect-card {
+  flex: 0 0 auto; width: 134px; box-sizing: border-box;
+  background: #f0f2f7; border-radius: 20px !important; padding: 16px 12px 14px;
+  display: flex; flex-direction: column; align-items: center; cursor: pointer;
+  box-shadow: 7px 7px 16px rgba(163,177,198,0.55), -5px -5px 12px #ffffff;
+  transition: transform 0.12s;
+}
+.nmh-connect-card:active { transform: scale(0.97); }
+.nmh-connect-av {
+  width: 64px; height: 64px; border-radius: 50% !important; background-size: cover; background-position: center;
+  background-color: #dfe3ea; margin-bottom: 10px;
+  box-shadow: 3px 3px 8px rgba(163,177,198,0.5), -2px -2px 6px #ffffff;
+}
+.nmh-connect-name { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; justify-content: center; gap: 3px; text-align: center; line-height: 1.2; white-space: nowrap; }
+.nmh-connect-name svg { width: 12px; height: 12px; flex-shrink: 0; }
+.nmh-connect-cat { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; color: rgba(0,0,0,0.42); margin: 3px 0 12px; text-align: center; white-space: nowrap; }
+.nmh-connect-follow {
+  border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #c8a96e, #a8854a); padding: 7px 20px; border-radius: 100px !important;
+  min-height: 0 !important; box-shadow: 0 4px 10px rgba(168,133,74,0.35);
+}
+#home-nm.nm-dark .nmh-connect-title { color: #fff; }
+#home-nm.nm-dark .nmh-connect-seeall { color: rgba(255,255,255,0.4); }
+#home-nm.nm-dark .nmh-connect-card { background: #16163c; box-shadow: 7px 7px 18px rgba(0,0,0,0.85), -4px -4px 12px rgba(50,50,110,0.3); }
+#home-nm.nm-dark .nmh-connect-av { background-color: #22224a; box-shadow: 3px 3px 8px rgba(0,0,0,0.8), -2px -2px 6px rgba(50,50,110,0.28); }
+#home-nm.nm-dark .nmh-connect-name { color: #fff; }
+#home-nm.nm-dark .nmh-connect-cat { color: rgba(255,255,255,0.42); }
 /* Artwork tiles — original icon + title + subtitle stay on the LEFT, the 16:9
    artwork sits BIG on the RIGHT (absolutely placed, vertically centered). The
    tile reserves left space and the title shrinks a touch so the art can be large. */

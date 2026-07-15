@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=314">
+<link rel="stylesheet" href="nowssb-nm.css?v=315">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -865,6 +865,52 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="npc-flash" id="npcBlueFlash"></div>
       </div>
       <div class="npc-text"><span class="npc-line" id="npcBlueLine"></span></div>
+    </div>
+
+    <!-- NowssB Connect — creators worth following -->
+    <div class="nmh-connect-sec">
+      <div class="nmh-connect-head">
+        <div class="nmh-connect-title">NowssB <span class="accent">Connect</span></div>
+        <span class="nmh-connect-seeall" onclick="window.IG&&IG.nav('profile')">SEE ALL</span>
+      </div>
+      <div class="nmh-connect-row">
+        <div class="nmh-connect-card" onclick="if(window.IG&&IG.openProfile){IG.openProfile(1)}else{openSub('people')}">
+          <div class="nmh-connect-av" style="background-image:url('https://i.pravatar.cc/150?img=5')"></div>
+          <div class="nmh-connect-name">Kavya Singh<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#c8a96e"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="nmh-connect-cat">Sound Healer</div>
+          <button class="nmh-connect-follow" onclick="event.stopPropagation();if(window.IG&&IG.openProfile){IG.openProfile(1)}else{openSub('people')}">Follow</button>
+        </div>
+        <div class="nmh-connect-card" onclick="if(window.IG&&IG.openProfile){IG.openProfile(2)}else{openSub('people')}">
+          <div class="nmh-connect-av" style="background-image:url('https://i.pravatar.cc/150?img=13')"></div>
+          <div class="nmh-connect-name">Aryan Mehta<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#c8a96e"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="nmh-connect-cat">Daily Practitioner</div>
+          <button class="nmh-connect-follow" onclick="event.stopPropagation();if(window.IG&&IG.openProfile){IG.openProfile(2)}else{openSub('people')}">Follow</button>
+        </div>
+        <div class="nmh-connect-card" onclick="if(window.IG&&IG.openProfile){IG.openProfile(5)}else{openSub('people')}">
+          <div class="nmh-connect-av" style="background-image:url('https://i.pravatar.cc/150?img=45')"></div>
+          <div class="nmh-connect-name">Aisha Patel<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#c8a96e"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="nmh-connect-cat">Sound Healer</div>
+          <button class="nmh-connect-follow" onclick="event.stopPropagation();if(window.IG&&IG.openProfile){IG.openProfile(5)}else{openSub('people')}">Follow</button>
+        </div>
+        <div class="nmh-connect-card" onclick="if(window.IG&&IG.openProfile){IG.openProfile(8)}else{openSub('people')}">
+          <div class="nmh-connect-av" style="background-image:url('https://i.pravatar.cc/150?img=60')"></div>
+          <div class="nmh-connect-name">Kabir Khan<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#c8a96e"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="nmh-connect-cat">Frequency Sage</div>
+          <button class="nmh-connect-follow" onclick="event.stopPropagation();if(window.IG&&IG.openProfile){IG.openProfile(8)}else{openSub('people')}">Follow</button>
+        </div>
+        <div class="nmh-connect-card" onclick="if(window.IG&&IG.openProfile){IG.openProfile(7)}else{openSub('people')}">
+          <div class="nmh-connect-av" style="background-image:url('https://i.pravatar.cc/150?img=47')"></div>
+          <div class="nmh-connect-name">Meera Iyer</div>
+          <div class="nmh-connect-cat">Practitioner</div>
+          <button class="nmh-connect-follow" onclick="event.stopPropagation();if(window.IG&&IG.openProfile){IG.openProfile(7)}else{openSub('people')}">Follow</button>
+        </div>
+        <div class="nmh-connect-card" onclick="if(window.IG&&IG.openProfile){IG.openProfile(3)}else{openSub('people')}">
+          <div class="nmh-connect-av" style="background-image:url('https://i.pravatar.cc/150?img=20')"></div>
+          <div class="nmh-connect-name">Priya Nair</div>
+          <div class="nmh-connect-cat">Wellness</div>
+          <button class="nmh-connect-follow" onclick="event.stopPropagation();if(window.IG&&IG.openProfile){IG.openProfile(3)}else{openSub('people')}">Follow</button>
+        </div>
+      </div>
     </div>
 
     <!-- Quick access row -->
