@@ -2600,7 +2600,15 @@ body.nm-glass #sub-health-journey .gsel-card {
    read completely flat no matter the shadow. Re-force every radius (class
    specificity beats * among !important rules) and deepen the light-mode dual
    shadows so the soft-extruded depth is unmistakable. */
-.nmh-practice { border-radius:26px !important; }
+.nmh-practice { border-radius:26px !important; position: relative; }
+/* Today's Practice artwork on the RIGHT; text reserves the left space so the
+   title/meaning truncate before the image instead of running under it. */
+.nmh-practice { padding-right: 40% !important; }
+.nmh-practice-img {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 38%; max-width: 190px; object-fit: contain; display: block;
+  z-index: 1; pointer-events: none;
+}
 .nmh-tile { border-radius:22px !important; }
 /* Artwork tiles — original icon + title + subtitle stay on the LEFT, the 16:9
    artwork sits BIG on the RIGHT (absolutely placed, vertically centered). The
