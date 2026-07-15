@@ -141,7 +141,7 @@ window.fashionHomeIntroEnter = function() {
     // (pyqsll = the 1st, button-less image), whatever swapped the image.
     el.addEventListener('load', function () {
       var cta = document.getElementById('fashCouponCta');
-      if (cta) cta.style.display = (el.src.indexOf('pyqsll') !== -1) ? 'none' : 'flex';
+      if (cta) cta.classList.toggle('nmh-cta-hidden', el.src.indexOf('pyqsll') !== -1);
     });
     if (!el.getAttribute('src')) el.src = SEQ[0];
   }
@@ -158,7 +158,7 @@ window.fashionHomeIntroEnter = function() {
     img.classList.remove('coupon-dash'); void img.offsetWidth; img.classList.add('coupon-dash');
     // Shop Now shows ONLY on the coupon images (2nd + 3rd) — never on the 1st
     var cta = document.getElementById('fashCouponCta');
-    if (cta) cta.style.display = (idx === 0) ? 'none' : 'flex';
+    if (cta) cta.classList.toggle('nmh-cta-hidden', idx === 0);
   }, 4000);
 })();
 

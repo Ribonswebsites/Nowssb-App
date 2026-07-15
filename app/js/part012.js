@@ -625,10 +625,12 @@ function nmhRefresh() {
     'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
   ];
   var gimg = document.getElementById('nmhGreetImg');
-  // Shop Now shows ONLY on the coupon images (2nd + 3rd) — never on the 1st
+  // Shop Now is VISIBLE by default; hide it ONLY while the 1st image shows.
+  // Toggling a class (not display) means a stale/absent JS can never leave it
+  // permanently hidden — worst case it just shows on all three.
   function _nmhCtaSync(i) {
     var cta = document.getElementById('nmhCouponCta');
-    if (cta) cta.style.display = (i === 0) ? 'none' : 'flex';
+    if (cta) cta.classList.toggle('nmh-cta-hidden', i === 0);
   }
   if (gimg) {
     // Belt & braces: whenever the banner img finishes loading ANY src, sync the

@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=303">
+<link rel="stylesheet" href="nowssb-nm.css?v=304">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -721,7 +721,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-banner-wrap">
       <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
            onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
-      <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" style="display:none;" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
+      <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
     </div>
 
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -795,16 +795,47 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- 2x2 Grid -->
     <div class="nmh-grid">
       <div class="nmh-tile nmh-tile-art" onclick="openSub('sound-library')">
-        <img class="nmh-tile-img" loading="lazy" decoding="async" alt="Sound Library" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_600/v1784123006/file_00000000048471f4ab69afc37df973c0_iab33r.png">
+        <div class="nmh-tile-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M3 11h2l3-6 4 12 3-7 2 1h2" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="nmh-tile-title">Sound Library</div>
+        <div class="nmh-tile-sub">Root frequencies</div>
+        <img class="nmh-tile-img" loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_600/v1784123006/file_00000000048471f4ab69afc37df973c0_iab33r.png">
       </div>
       <div class="nmh-tile nmh-tile-art" onclick="openSub('my-progress')">
-        <img class="nmh-tile-img" loading="lazy" decoding="async" alt="My Progress" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_600/v1784123007/file_000000009f8871f48dbd29b870dbdc9e_z9idoj.png">
+        <div class="nmh-tile-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M3 17l4-5 4 2 5-7 3 3" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 18.5h16" stroke="#c8a96e" stroke-width="1.4" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="nmh-tile-title">My Progress</div>
+        <div class="nmh-tile-sub">Healing journey</div>
+        <img class="nmh-tile-img" loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_600/v1784123007/file_000000009f8871f48dbd29b870dbdc9e_z9idoj.png">
       </div>
       <div class="nmh-tile nmh-tile-art" onclick="openSub('word-science')">
-        <img class="nmh-tile-img" loading="lazy" decoding="async" alt="Word Science" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_600/v1784123007/file_0000000015b071f48397d34be0129b36_bx9cur.png">
+        <div class="nmh-tile-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="3" y="3" width="16" height="16" rx="3" stroke="#c8a96e" stroke-width="1.7"/>
+            <path d="M7 8h8M7 11h6M7 14h4" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="nmh-tile-title">Word Science</div>
+        <div class="nmh-tile-sub">NOWSBANSIU texts</div>
+        <img class="nmh-tile-img" loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_600/v1784123007/file_0000000015b071f48397d34be0129b36_bx9cur.png">
       </div>
       <div class="nmh-tile nmh-tile-art" onclick="openSub('profile')">
-        <img class="nmh-tile-img" loading="lazy" decoding="async" alt="My Profile" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_600/v1784123007/file_00000000536071f4bf5172014811968f_jkt450.png">
+        <div class="nmh-tile-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="8" r="3.5" stroke="#c8a96e" stroke-width="1.7"/>
+            <path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#c8a96e" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="nmh-tile-title">My Profile</div>
+        <div class="nmh-tile-sub">Your settings</div>
+        <img class="nmh-tile-img" loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_600/v1784123007/file_00000000536071f4bf5172014811968f_jkt450.png">
       </div>
     </div>
 
@@ -1224,7 +1255,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="fash-banner-wrap">
     <img class="fash-coupon-img" id="fashCouponImg" alt="NowssB Store coupons" draggable="false"
          onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
-    <button class="fash-banner-cta fash-banner-cta-tc" id="fashCouponCta" style="display:none;" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
+    <button class="fash-banner-cta fash-banner-cta-tc" id="fashCouponCta" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
   </div>
 
   <!-- ══ STORE QUICK-ACCESS: LOGO + 2×2 GRID ══ -->
@@ -3352,7 +3383,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=301"></script>
+<script src="app/js/part012.js?v=302"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -7233,7 +7264,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=284"></script>
+<script src="app/js/part049.js?v=285"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>

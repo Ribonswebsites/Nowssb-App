@@ -2174,6 +2174,9 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.35);
 }
 .nmh-banner-cta-ico { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; display: block; }
+/* Coupon Shop Now is VISIBLE by default (so stale JS can never hide it); JS adds
+   this class only while the 1st, button-less coupon image is showing. */
+.nmh-cta-hidden { display: none !important; }
 /* ── Traveling light on every banner button — same masked conic-gradient ring
    trick as the search bar: a warm-white arc endlessly sweeping the border. */
 @property --ctang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
@@ -2599,13 +2602,17 @@ body.nm-glass #sub-health-journey .gsel-card {
    shadows so the soft-extruded depth is unmistakable. */
 .nmh-practice { border-radius:26px !important; }
 .nmh-tile { border-radius:22px !important; }
-/* Artwork tiles — the 16:9 transparent PNGs (title text baked into the art).
-   e_trim removes the blank transparent area; the 16:9 contain box guarantees
-   the art is fully visible with no crop or distortion. */
-.nmh-tile.nmh-tile-art { padding: 14px 10px; align-items: center; justify-content: center; }
+/* Artwork tiles — original icon + title + subtitle stay on the LEFT, the 16:9
+   artwork sits on the RIGHT (absolutely placed, vertically centered). The tile
+   reserves right padding so the text never runs under the art. */
+.nmh-tile.nmh-tile-art { position: relative; padding: 22px 44% 22px 20px; overflow: hidden; }
+.nmh-tile.nmh-tile-art .nmh-tile-title,
+.nmh-tile.nmh-tile-art .nmh-tile-sub { position: relative; z-index: 2; }
 .nmh-tile-img {
-  width: 100%; aspect-ratio: 16/9; object-fit: contain; display: block;
-  pointer-events: none; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 40%; aspect-ratio: 16/9; object-fit: contain; display: block;
+  pointer-events: none; z-index: 1;
+  filter: drop-shadow(0 5px 12px rgba(0,0,0,0.20));
 }
 .nmh-streak-bar { border-radius:16px !important; }
 .nmh-routine { border-radius:20px !important; }
