@@ -136,7 +136,15 @@ window.fashionHomeIntroEnter = function() {
   ];
   var idx = 0, preloaded = false;
   var el = document.getElementById('fashCouponImg');
-  if (el && !el.getAttribute('src')) el.src = SEQ[0];
+  if (el) {
+    // Belt & braces: sync the Shop Now button off the loaded URL itself
+    // (pyqsll = the 1st, button-less image), whatever swapped the image.
+    el.addEventListener('load', function () {
+      var cta = document.getElementById('fashCouponCta');
+      if (cta) cta.style.display = (el.src.indexOf('pyqsll') !== -1) ? 'none' : 'flex';
+    });
+    if (!el.getAttribute('src')) el.src = SEQ[0];
+  }
   setInterval(function () {
     if (document.hidden) return;
     var img = document.getElementById('fashCouponImg');

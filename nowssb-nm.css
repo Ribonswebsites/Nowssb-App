@@ -2174,6 +2174,21 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.35);
 }
 .nmh-banner-cta-ico { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; display: block; }
+/* ── Traveling light on every banner button — same masked conic-gradient ring
+   trick as the search bar: a warm-white arc endlessly sweeping the border. */
+@property --ctang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes ctaTravel { to { --ctang: 360deg; } }
+.nmh-banner-cta::before, .fash-banner-cta::before {
+  content: ''; position: absolute; inset: 0; border-radius: 999px; padding: 1.6px;
+  pointer-events: none; z-index: 1;
+  background: conic-gradient(from var(--ctang),
+    transparent 0deg, transparent 244deg,
+    rgba(255,214,150,0.55) 310deg, #fff4e2 342deg, rgba(255,214,150,0.55) 352deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: ctaTravel 3s linear infinite; will-change: --ctang;
+}
 .nmh-banner-cta:active, .fash-banner-cta:active { background: rgba(255,255,255,0.24); transform: scale(0.96); }
 /* left-aligned, sitting directly above "Exclusive Coupon for you!" on the
    coupon banner — NOT centered on the whole banner width. */

@@ -631,6 +631,15 @@ function nmhRefresh() {
     if (cta) cta.style.display = (i === 0) ? 'none' : 'flex';
   }
   if (gimg) {
+    // Belt & braces: whenever the banner img finishes loading ANY src, sync the
+    // button off the URL itself (pyqsll = the 1st, button-less image). This works
+    // no matter which code path swapped the image.
+    if (!gimg._nwsbCtaBound) {
+      gimg._nwsbCtaBound = true;
+      gimg.addEventListener('load', function () {
+        _nmhCtaSync(gimg.src.indexOf('pyqsll') !== -1 ? 0 : 1);
+      });
+    }
     if (!gimg.getAttribute('src')) { window._nmhGreetIdx = 0; gimg.src = GREET_SEQ[0]; }
     _nmhCtaSync(window._nmhGreetIdx || 0);
     // preload all so the rotation is seamless (once)
