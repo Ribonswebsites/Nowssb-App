@@ -630,7 +630,11 @@ function nmhRefresh() {
   // permanently hidden — worst case it just shows on all three.
   function _nmhCtaSync(i) {
     var cta = document.getElementById('nmhCouponCta');
-    if (cta) cta.classList.toggle('nmh-cta-hidden', i === 0);
+    if (!cta) return;
+    var show = (i !== 0);
+    cta.classList.toggle('nmh-cta-hidden', !show);
+    // dash the button IN together with the coupon image
+    if (show) { cta.classList.remove('coupon-dash-cta'); void cta.offsetWidth; cta.classList.add('coupon-dash-cta'); }
   }
   if (gimg) {
     // Belt & braces: whenever the banner img finishes loading ANY src, sync the

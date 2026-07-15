@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=313">
+<link rel="stylesheet" href="nowssb-nm.css?v=314">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -721,7 +721,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-banner-wrap">
       <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
            onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
-      <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
+      <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
     </div>
 
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -790,7 +790,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Video banner — same height as the animated promo cards above -->
     <div class="nmh-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
       <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
-      <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
+      <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
     </div>
 
     <!-- 2x2 Grid -->
@@ -917,7 +917,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Video banner — above the subscription section -->
     <div class="nmh-video-banner" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
       <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102734/grok_video_2026-07-15-13-34-04_htvekp.mp4"></video>
-      <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')">Subscribe Today<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
+      <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
     </div>
 
     <!-- Subscription -->
@@ -1171,7 +1171,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Video banner — below Today's Practice / streak -->
   <div class="fash-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
     <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
-    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
+    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
   </div>
 
   <!-- AI Prescription Card -->
@@ -1215,7 +1215,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Video banner — above the subscription promo -->
   <div class="fash-video-banner" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
     <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102734/grok_video_2026-07-15-13-34-04_htvekp.mp4"></video>
-    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')">Subscribe Today<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
+    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
   </div>
 
   <!-- Subscription promo — shown to free users only -->
@@ -1256,7 +1256,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="fash-banner-wrap">
     <img class="fash-coupon-img" id="fashCouponImg" alt="NowssB Store coupons" draggable="false"
          onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
-    <button class="fash-banner-cta fash-banner-cta-tc" id="fashCouponCta" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}">Shop Now<img class="nmh-banner-cta-ico" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_80/v1784108160/file_00000000b0447209b9723db6e666666b_wors0l.png" alt=""></button>
+    <button class="fash-banner-cta fash-banner-cta-tc" id="fashCouponCta" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
   </div>
 
   <!-- ══ STORE QUICK-ACCESS: LOGO + 2×2 GRID ══ -->
@@ -3384,7 +3384,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=302"></script>
+<script src="app/js/part012.js?v=303"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -7265,7 +7265,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=285"></script>
+<script src="app/js/part049.js?v=286"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>

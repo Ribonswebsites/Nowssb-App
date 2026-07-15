@@ -141,7 +141,10 @@ window.fashionHomeIntroEnter = function() {
     // (pyqsll = the 1st, button-less image), whatever swapped the image.
     el.addEventListener('load', function () {
       var cta = document.getElementById('fashCouponCta');
-      if (cta) cta.classList.toggle('nmh-cta-hidden', el.src.indexOf('pyqsll') !== -1);
+      if (!cta) return;
+      var show = el.src.indexOf('pyqsll') === -1;
+      cta.classList.toggle('nmh-cta-hidden', !show);
+      if (show) { cta.classList.remove('coupon-dash-cta'); void cta.offsetWidth; cta.classList.add('coupon-dash-cta'); }
     });
     if (!el.getAttribute('src')) el.src = SEQ[0];
   }
@@ -156,9 +159,14 @@ window.fashionHomeIntroEnter = function() {
     // dash in from the right with a tiny wiggle (no fade)
     img.src = next;
     img.classList.remove('coupon-dash'); void img.offsetWidth; img.classList.add('coupon-dash');
-    // Shop Now shows ONLY on the coupon images (2nd + 3rd) — never on the 1st
+    // Shop Now shows ONLY on the coupon images (2nd + 3rd) — never on the 1st,
+    // and dashes IN together with the image.
     var cta = document.getElementById('fashCouponCta');
-    if (cta) cta.classList.toggle('nmh-cta-hidden', idx === 0);
+    if (cta) {
+      var show = idx !== 0;
+      cta.classList.toggle('nmh-cta-hidden', !show);
+      if (show) { cta.classList.remove('coupon-dash-cta'); void cta.offsetWidth; cta.classList.add('coupon-dash-cta'); }
+    }
   }, 4000);
 })();
 

@@ -2162,45 +2162,81 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
    backdrop-filter (kept off for GPU cost, matches the rest of the app's
    "glass" buttons like .wsg-search-go). ── */
 .nmh-banner-wrap, .fash-banner-wrap { position: relative; }
+/* CTA buttons styled EXACTLY like the search bar: dark glass pill + the same
+   sequential traveling-light border, with a round cart button on the right. */
 .nmh-banner-cta, .fash-banner-cta {
   position: absolute; z-index: 3; cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 16px; min-height: 0 !important; border-radius: 999px !important;
-  background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; gap: 9px;
+  padding: 4px 4px 4px 15px; min-height: 0 !important; border-radius: 999px !important;
+  background: rgba(5,7,12,0.62); border: 1px solid rgba(255,255,255,0.26);
   backdrop-filter: none; -webkit-backdrop-filter: none;
   color: #fff; font-family: 'DM Sans', sans-serif;
-  font-size: 11.5px; font-weight: 800; letter-spacing: 0.4px;
+  font-size: 12.5px; font-weight: 800; letter-spacing: 0.3px;
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 6px 18px rgba(0,0,0,0.35);
 }
-.nmh-banner-cta-ico { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; display: block; }
+.nmh-cta-lbl { position: relative; z-index: 2; white-space: nowrap; }
+.nmh-cta-go {
+  width: 28px; height: 28px; flex-shrink: 0; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center; position: relative; z-index: 2;
+  background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.22);
+}
+.nmh-cta-go svg { width: 16px; height: 16px; display: block; }
 /* Coupon Shop Now is VISIBLE by default (so stale JS can never hide it); JS adds
    this class only while the 1st, button-less coupon image is showing. */
 .nmh-cta-hidden { display: none !important; }
-/* ── Traveling light on every banner button — same masked conic-gradient ring
-   trick as the search bar: a warm-white arc endlessly sweeping the border. */
+/* ── Traveling light — same masked conic-gradient + @property sweep as the search
+   bar: the pill lights during the 1st half of the cycle, the round button during
+   the 2nd (sequential, never together). ── */
 @property --ctang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-@keyframes ctaTravel { to { --ctang: 360deg; } }
 .nmh-banner-cta::before, .fash-banner-cta::before {
   content: ''; position: absolute; inset: 0; border-radius: 999px; padding: 1.6px;
   pointer-events: none; z-index: 1;
   background: conic-gradient(from var(--ctang),
-    transparent 0deg, transparent 244deg,
-    rgba(255,214,150,0.55) 310deg, #fff4e2 342deg, rgba(255,214,150,0.55) 352deg, transparent 360deg);
+    transparent 0deg, transparent 248deg,
+    rgba(255,214,150,0.5) 312deg, #fff4e2 344deg, rgba(255,214,150,0.5) 352deg, transparent 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: ctaTravel 3s linear infinite; will-change: --ctang;
+  animation: ctaBarSeq 5s linear infinite; will-change: --ctang, opacity;
 }
-.nmh-banner-cta:active, .fash-banner-cta:active { background: rgba(255,255,255,0.24); transform: scale(0.96); }
+.nmh-cta-go::before {
+  content: ''; position: absolute; inset: -1px; border-radius: 50%; padding: 1.6px;
+  pointer-events: none; z-index: 1;
+  background: conic-gradient(from var(--ctang),
+    transparent 0deg, transparent 230deg,
+    rgba(255,214,150,0.55) 300deg, #fff4e2 340deg, rgba(255,214,150,0.55) 352deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: ctaGoSeq 5s linear infinite; will-change: --ctang, opacity;
+}
+@keyframes ctaBarSeq {
+  0% { --ctang: 0deg; opacity: 1; } 46% { --ctang: 360deg; opacity: 1; }
+  50% { --ctang: 360deg; opacity: 0; } 100% { --ctang: 360deg; opacity: 0; }
+}
+@keyframes ctaGoSeq {
+  0% { --ctang: 0deg; opacity: 0; } 50% { --ctang: 0deg; opacity: 0; }
+  54% { --ctang: 0deg; opacity: 1; } 96% { --ctang: 360deg; opacity: 1; }
+  100% { --ctang: 360deg; opacity: 0; }
+}
+.nmh-banner-cta-r:active, .fash-banner-cta-r:active { transform: translateY(-50%) scale(0.96); }
 /* left-aligned, sitting directly above "Exclusive Coupon for you!" on the
    coupon banner — NOT centered on the whole banner width. */
 /* Sits directly ABOVE the "Exclusive Coupon for you!" text baked into the
    coupon images (text top ≈44% down, centered at ≈27% of the width). */
-.nmh-banner-cta-tc, .fash-banner-cta-tc { top: auto; bottom: 57%; left: 27%; transform: translateX(-50%); }
-.nmh-banner-cta-tc:active, .fash-banner-cta-tc:active { background: rgba(255,255,255,0.24); transform: scale(0.96); }
+.nmh-banner-cta-tc, .fash-banner-cta-tc { top: auto; bottom: 62%; left: 27%; transform: translateX(-50%); }
+.nmh-banner-cta-tc:active, .fash-banner-cta-tc:active { transform: translateX(-50%) scale(0.96); }
 .nmh-banner-cta-r, .fash-banner-cta-r { top: 50%; right: 12px; transform: translateY(-50%); }
-.nmh-banner-cta-r:active, .fash-banner-cta-r:active { background: rgba(255,255,255,0.24); transform: translateY(-50%) scale(0.96); }
+/* Coupon Shop Now dashes IN together with the coupon image (same easing as the
+   image), preserving the translateX(-50%) horizontal centring. */
+@keyframes couponDashCta {
+  0%   { transform: translateX(calc(-50% + 72px)); opacity: 0; }
+  55%  { transform: translateX(calc(-50% - 6px)); opacity: 1; }
+  76%  { transform: translateX(calc(-50% + 2.5px)); }
+  100% { transform: translateX(-50%); }
+}
+.nmh-banner-cta-tc.coupon-dash-cta, .fash-banner-cta-tc.coupon-dash-cta { animation: couponDashCta 0.6s cubic-bezier(.2,.7,.3,1); }
 
 /* Normal-home footer — edge to edge (cancel .nmh-wrap's 20px side padding)
    and solid black instead of the rotating carousel image bleeding through as
