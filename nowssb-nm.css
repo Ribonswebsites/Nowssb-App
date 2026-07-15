@@ -2123,6 +2123,25 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   box-shadow:10px 10px 28px rgba(0,0,0,0.88), -5px -5px 18px rgba(50,50,110,0.32);
 }
 .nmh-video-banner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* small word-search bar overlaid on the right side of a video banner */
+.nmh-video-banner-search { cursor: pointer; }
+.nmh-vbs-search {
+  position: absolute; top: 50%; right: 5%; transform: translateY(-50%); z-index: 2;
+  display: flex; align-items: center; gap: 6px;
+  width: 46%; max-width: 190px; height: 36px; padding: 0 5px 0 12px;
+  border-radius: 20px !important; background: rgba(6,10,20,0.55);
+  border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
+.nmh-vbs-input {
+  flex: 1; min-width: 0; background: none; border: none; outline: none;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; color: #fff;
+}
+.nmh-vbs-input::placeholder { color: rgba(255,255,255,0.55); }
+.nmh-vbs-btn {
+  width: 28px; height: 28px; min-height: 0 !important; flex-shrink: 0; border-radius: 50% !important;
+  border: none; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.nmh-vbs-btn img { width: 14px; height: 14px; object-fit: contain; opacity: 0.9; }
 .npc-fabric { position: absolute; inset: -10%; }
 .npc-blue   .npc-fabric { background: linear-gradient(100deg,#041022 0%,#082a52 26%,#0d4b8f 50%,#1673c9 72%,#4aa3ec 100%); filter: url(#npcRippleBlue); }
 .npc-purple .npc-fabric { background: linear-gradient(100deg,#150f3a 0%,#2c1a5c 28%,#5a3184 52%,#7d4a9e 72%,#9e6fae 100%); filter: url(#npcRipplePurple); }

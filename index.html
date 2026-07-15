@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=274">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=290">
+<link rel="stylesheet" href="nowssb-nm.css?v=293">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -919,6 +919,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nmh-fsec-title">Unlock your full<br>healing potential</div>
         <div class="nmh-fsec-sub">50+ premium words · AI pronunciation scoring · 5 custom routines · priority word drops</div>
         <button class="nmh-fsec-btn">Upgrade — from $4.99/mo</button>
+      </div>
+    </div>
+
+    <!-- Video banner — small word-search bar on the right -->
+    <div class="nmh-video-banner nmh-video-banner-search">
+      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784103663/grok_video_2026-07-15-13-50-19_krfkue.mp4"></video>
+      <div class="nmh-vbs-search" onclick="event.stopPropagation()">
+        <input class="nmh-vbs-input" id="nmhVbsSearchInput" type="text" placeholder="Search a word…" onkeydown="if(event.key==='Enter'){openSub('word-search');setTimeout(()=>{document.getElementById('wsPageInput').value=this.value;wsPageSearch();},220);}">
+        <button class="nmh-vbs-btn" onclick="openSub('word-search');setTimeout(()=>{var v=document.getElementById('nmhVbsSearchInput').value;if(v){document.getElementById('wsPageInput').value=v;wsPageSearch();}},220);">
+          <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" alt="">
+        </button>
       </div>
     </div>
 
