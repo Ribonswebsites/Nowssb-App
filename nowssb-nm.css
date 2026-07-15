@@ -2609,9 +2609,12 @@ body.nm-glass #sub-health-journey .gsel-card {
 .nmh-practice > .nmh-practice-meaning,
 .nmh-practice > .nmh-practice-footer { position: relative; z-index: 2; }
 .nmh-practice-img {
-  position: absolute; right: 6px; top: 40%; transform: translateY(-50%);
-  width: 31%; max-width: 150px; object-fit: contain; display: block;
+  position: absolute; right: 8px; top: 30%; transform: translateY(-50%);
+  width: 28%; max-width: 138px; object-fit: contain; display: block;
   z-index: 1; pointer-events: none;
+  /* neumorphic depth — soft dual shadow tracing the art's shape so it blends
+     into the light card instead of floating flat */
+  filter: drop-shadow(3px 4px 6px rgba(163,177,198,0.55)) drop-shadow(-2px -3px 5px rgba(255,255,255,0.72));
 }
 .nmh-tile { border-radius:22px !important; }
 /* Artwork tiles — original icon + title + subtitle stay on the LEFT, the 16:9
@@ -2625,6 +2628,11 @@ body.nm-glass #sub-health-journey .gsel-card {
   position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
   width: 68%; aspect-ratio: 16/9; object-fit: contain; display: block;
   pointer-events: none; z-index: 1;
+  /* neumorphic depth so the art blends into the light card */
+  filter: drop-shadow(3px 4px 6px rgba(163,177,198,0.5)) drop-shadow(-2px -2px 4px rgba(255,255,255,0.66));
+}
+#home-nm.nm-dark .nmh-tile-img {
+  filter: drop-shadow(3px 4px 7px rgba(0,0,0,0.6)) drop-shadow(-2px -2px 5px rgba(50,50,110,0.28));
 }
 /* Traveling gold light — SEQUENTIAL relay: only ONE tile's ring sweeps at a
    time; when it finishes, the next tile's ring starts, and so on. Each tile runs
