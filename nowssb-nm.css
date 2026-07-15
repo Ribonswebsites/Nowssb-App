@@ -2750,13 +2750,10 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 }
 .wsg-brandcol {
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left;
-  padding: 4px 12px; background: none;
-  /* glass frame (provided asset) drawn as a 9-slice border so the NowssB text
-     sits INSIDE the frame and the corners never stretch/distort */
-  border-style: solid; border-color: transparent;
-  border-width: 26px 34px;
-  border-image: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_620/v1783232336/file_000000009884720b9ce4ce5d1680c589_er28yl.png') 27% 24% / 26px 34px / 0 stretch;
+  padding: 0; background: none; border: none;
 }
+/* stylized NowssB wordmark image — replaces the plain text + glass box frame */
+.wsg-logo-img { height: 34px; width: auto; object-fit: contain; display: block; }
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
 .wsg-head { display: flex; flex-direction: column; gap: 12px; }
 .wsg-tagline {
