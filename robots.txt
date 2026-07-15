@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin-dev.html
+Disallow: /fetch-nowssb-v2.html
+
+Sitemap: https://nowssb.com/sitemap.xml
