@@ -2613,25 +2613,33 @@ body.nm-glass #sub-health-journey .gsel-card {
   position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
   width: 68%; aspect-ratio: 16/9; object-fit: contain; display: block;
   pointer-events: none; z-index: 1;
-  filter: drop-shadow(0 6px 15px rgba(0,0,0,0.24));
 }
-/* Traveling gold light sweeping each tile's border — same masked conic-gradient
-   trick as the buttons, tinted gold so it reads on the light neumorphic card.
-   Reuses the --ctang @property + ctaTravel keyframes defined above. */
+/* Traveling gold light — SEQUENTIAL relay: only ONE tile's ring sweeps at a
+   time; when it finishes, the next tile's ring starts, and so on. Each tile runs
+   the same 10s cycle but the sweep only happens during its own 1/4 slot (0-25%);
+   the other 75% it's hidden. Staggered by 2.5s so the four take turns. */
+@keyframes tileSeq {
+  0%    { --ctang: 0deg;   opacity: 0; }
+  0.6%  { --ctang: 0deg;   opacity: 1; }
+  25%   { --ctang: 360deg; opacity: 1; }
+  25.6% { --ctang: 360deg; opacity: 0; }
+  100%  { --ctang: 360deg; opacity: 0; }
+}
 .nmh-tile.nmh-tile-art::after {
   content: ''; position: absolute; inset: 0; border-radius: 22px; padding: 2px;
-  pointer-events: none; z-index: 4;
+  pointer-events: none; z-index: 4; opacity: 0;
   background: conic-gradient(from var(--ctang),
     transparent 0deg, transparent 248deg,
     rgba(200,169,110,0.45) 312deg, #e8d5a3 344deg, rgba(200,169,110,0.45) 352deg, transparent 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: ctaTravel 3.4s linear infinite; will-change: --ctang;
+  animation: tileSeq 10s linear infinite backwards; will-change: --ctang, opacity;
 }
-.nmh-grid .nmh-tile-art:nth-child(2)::after { animation-delay: -0.85s; }
-.nmh-grid .nmh-tile-art:nth-child(3)::after { animation-delay: -1.7s; }
-.nmh-grid .nmh-tile-art:nth-child(4)::after { animation-delay: -2.55s; }
+.nmh-grid .nmh-tile-art:nth-child(1)::after { animation-delay: 0s; }
+.nmh-grid .nmh-tile-art:nth-child(2)::after { animation-delay: 2.5s; }
+.nmh-grid .nmh-tile-art:nth-child(3)::after { animation-delay: 5s; }
+.nmh-grid .nmh-tile-art:nth-child(4)::after { animation-delay: 7.5s; }
 .nmh-streak-bar { border-radius:16px !important; }
 .nmh-routine { border-radius:20px !important; }
 .nmh-quick-btn { border-radius:16px !important; }
