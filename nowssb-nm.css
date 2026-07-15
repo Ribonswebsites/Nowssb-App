@@ -2603,16 +2603,17 @@ body.nm-glass #sub-health-journey .gsel-card {
 .nmh-practice { border-radius:26px !important; }
 .nmh-tile { border-radius:22px !important; }
 /* Artwork tiles — original icon + title + subtitle stay on the LEFT, the 16:9
-   artwork sits on the RIGHT (absolutely placed, vertically centered). The tile
-   reserves right padding so the text never runs under the art. */
-.nmh-tile.nmh-tile-art { position: relative; padding: 22px 44% 22px 20px; overflow: hidden; }
+   artwork sits BIG on the RIGHT (absolutely placed, vertically centered). The
+   tile reserves left space and the title shrinks a touch so the art can be large. */
+.nmh-tile.nmh-tile-art { position: relative; padding: 18px 60% 18px 18px; min-height: 124px; overflow: hidden; }
+.nmh-tile.nmh-tile-art .nmh-tile-title { font-size: 13px; }
 .nmh-tile.nmh-tile-art .nmh-tile-title,
 .nmh-tile.nmh-tile-art .nmh-tile-sub { position: relative; z-index: 2; }
 .nmh-tile-img {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  width: 40%; aspect-ratio: 16/9; object-fit: contain; display: block;
+  position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+  width: 64%; aspect-ratio: 16/9; object-fit: contain; display: block;
   pointer-events: none; z-index: 1;
-  filter: drop-shadow(0 5px 12px rgba(0,0,0,0.20));
+  filter: drop-shadow(0 6px 15px rgba(0,0,0,0.24));
 }
 .nmh-streak-bar { border-radius:16px !important; }
 .nmh-routine { border-radius:20px !important; }
