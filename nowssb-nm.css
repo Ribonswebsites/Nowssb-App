@@ -2761,8 +2761,9 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left;
   padding: 0; background: none; border: none;
 }
-/* stylized NowssB wordmark image — replaces the plain text + glass box frame */
-.wsg-logo-img { height: 58px; width: auto; object-fit: contain; display: block; }
+/* stylized NowssB wordmark image — replaces the plain text + glass box frame.
+   Much taller now — small was the actual complaint, so go big. */
+.wsg-logo-img { height: 96px; width: auto; max-width: 220px; object-fit: contain; display: block; }
 /* header block: tagline + logo/brand row + instruction — brand styling, one line */
 .wsg-head { display: flex; flex-direction: column; gap: 12px; }
 .wsg-tagline {
