@@ -967,11 +967,11 @@ body.nm-DIS #sub-health-category .rtd-session-btn {
 /* Screen surfaces + kill the dark ambient glow */
 body.nm-mode #sub-people,
 body:not(.nwsb-soc-glass) #sub-ig-profile,
-body.nm-mode #sub-social-home,
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home,
 body.nm-mode #sub-reels-feed { background: #f0f2f7 !important; }
 body.nm-mode #sub-people::before,
 body:not(.nwsb-soc-glass) #sub-ig-profile::before,
-body.nm-mode #sub-social-home::before { display: none !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home::before { display: none !important; }
 body.nm-mode #sub-people .ig,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig { background: #f0f2f7 !important; }
 
@@ -990,20 +990,20 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig { background: #f0f2f7 !important; 
 /* Top bar */
 body.nm-mode #sub-people .ig-topbar,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar,
-body.nm-mode #sub-social-home .ig-topbar,
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-topbar,
 body.nm-mode #sub-reels-feed .ig-topbar {
   background: #f0f2f7 !important; border-bottom: none !important;
   box-shadow: 0 5px 13px rgba(0,0,0,0.07) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
 }
 body.nm-mode #sub-people .ig-username,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-username,
-body.nm-mode #sub-social-home .ig-username,
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-username,
 body.nm-mode #sub-reels-feed .ig-username { color: #1a1a2e !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-iconbtn svg { color: #1a1a2e !important; stroke: #1a1a2e !important; }
 /* Topbar/nav icon images are white-filtered → make them dark on cream */
 body.nm-mode #sub-people .ig-topbar img,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar img,
-body.nm-mode #sub-social-home .ig-topbar img { filter: brightness(0) opacity(0.82) !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-topbar img { filter: brightness(0) opacity(0.82) !important; }
 /* the verified badge must keep its true colours in the header (not be blackened).
    Needs higher specificity than the .ig-topbar img blackening rule above. */
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-topbar .ig-vbadge img,
@@ -1037,15 +1037,15 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-tile {
 
 /* User rows — raised cards */
 body.nm-mode #sub-people .ig-userrow,
-body.nm-mode #sub-social-home .ig-userrow {
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-userrow {
   background: #f0f2f7 !important; border: none !important; border-radius: 16px !important;
   box-shadow: 6px 6px 14px rgba(0,0,0,0.1), -5px -5px 12px rgba(255,255,255,0.96) !important;
   backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
 }
 body.nm-mode #sub-people .ig-userrow .ig-u,
-body.nm-mode #sub-social-home .ig-userrow .ig-u { color: #1a1a2e !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-userrow .ig-u { color: #1a1a2e !important; }
 body.nm-mode #sub-people .ig-userrow .ig-n,
-body.nm-mode #sub-social-home .ig-userrow .ig-n { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-userrow .ig-n { color: rgba(0,0,0,0.45) !important; }
 
 /* Profile page */
 /* Placeholder gradient ONLY when no banner image is set — otherwise the
@@ -1106,13 +1106,13 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-hl-label { color: rgba(0,0,0,0.5) 
 #ig-social-nav .ig-social-btn.active span { color: #c8a96e !important; }
 
 /* Social home hero / stat cube → light neumorphic */
-body.nm-mode #sub-social-home .nwsb-hero { background: #f0f2f7 !important; border: none !important;
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-hero { background: #f0f2f7 !important; border: none !important;
   box-shadow: 8px 8px 20px rgba(0,0,0,0.12), -6px -6px 16px rgba(255,255,255,0.97) !important; }
-body.nm-mode #sub-social-home .nwsb-hero-title { color: #1a1a2e !important; }
-body.nm-mode #sub-social-home .nwsb-hero-sub { color: rgba(0,0,0,0.45) !important; }
-body.nm-mode #sub-social-home .nwsb-hero-stat-num { color: #a8854a !important; }
-body.nm-mode #sub-social-home .nwsb-hero-stat-lbl { color: rgba(0,0,0,0.4) !important; }
-body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.4) !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-hero-title { color: #1a1a2e !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-hero-sub { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-hero-stat-num { color: #a8854a !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-hero-stat-lbl { color: rgba(0,0,0,0.4) !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.4) !important; }
 
 /* Reels feed — keep photo cards; lighten the empty/loading states */
 body.nm-mode #sub-reels-feed .nwsb-reels-empty-title { color: rgba(0,0,0,0.55) !important; }
@@ -1422,33 +1422,33 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-btn.primary:active {
 }
 
 /* ── Social home (Stats): fix faint loading text + broken dashed slots ── */
-body.nm-mode #sub-social-home #nwsb-home-reels-strip,
-body.nm-mode #sub-social-home #nwsb-home-reels-strip div { color: rgba(0,0,0,0.4) !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home #nwsb-home-reels-strip,
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home #nwsb-home-reels-strip div { color: rgba(0,0,0,0.4) !important; }
 
 /* Image-explainer slots → neumorphic inset drop-zones, ONLY when empty.
    Slots with a real image (.has-img) must keep their inline background-image. */
-body.nm-mode #sub-social-home .nwsb-explainer-slot:not(.has-img) {
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-explainer-slot:not(.has-img) {
   background: #f0f2f7 !important;
   border: none !important;
   box-shadow: inset 4px 4px 9px rgba(0,0,0,0.1), inset -3px -3px 7px rgba(255,255,255,0.9) !important;
 }
-body.nm-mode #sub-social-home .nwsb-explainer-slot:not(.has-img) span { color: #a8854a !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-explainer-slot:not(.has-img) span { color: #a8854a !important; }
 
 /* STATS topbar icon buttons (back / chat) → neumorphic raised circles */
-body.nm-mode #sub-social-home .ig-iconbtn {
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-iconbtn {
   background: #f0f2f7 !important;
   border-radius: 50% !important;
   width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
   box-shadow: 4px 4px 10px rgba(0,0,0,0.13), -3px -3px 8px rgba(255,255,255,0.95) !important;
 }
-body.nm-mode #sub-social-home .ig-iconbtn:active {
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-iconbtn:active {
   box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 5px rgba(255,255,255,0.92) !important;
 }
-body.nm-mode #sub-social-home .ig-iconbtn svg { stroke: #1a1a2e !important; }
-body.nm-mode #sub-social-home .ig-iconbtn img { filter: brightness(0) opacity(0.8) !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-iconbtn svg { stroke: #1a1a2e !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-iconbtn img { filter: brightness(0) opacity(0.8) !important; }
 
 /* Hero stat-cube text already cream-styled; keep its label readable */
-body.nm-mode #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !important; }
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-section-hd { color: rgba(0,0,0,0.42) !important; }
 
 /* ═══════════════════════════════════════════════════════════════
    EDIT PROFILE (social) — follows the App Theme (neo default / glass)
@@ -1695,7 +1695,7 @@ body.nm-mode #sub-reels-feed { background: #f0f2f7 !important; }
 body.nm-mode #sub-reels-feed .nwsb-reels-empty-title { color: #1a1a2e !important; }
 body.nm-mode #sub-reels-feed .nwsb-reels-empty-sub { color: rgba(0,0,0,0.45) !important; }
 body.nm-mode #sub-reels-feed .nwsb-post-reel-btn,
-body.nm-mode #sub-social-home .nwsb-post-reel-btn {
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-post-reel-btn {
   background: #f0f2f7 !important;
   border: none !important;
   color: #c8a96e !important;
@@ -1703,7 +1703,7 @@ body.nm-mode #sub-social-home .nwsb-post-reel-btn {
   box-shadow: 6px 6px 14px rgba(0,0,0,0.13), -5px -5px 12px rgba(255,255,255,0.96) !important;
 }
 body.nm-mode #sub-reels-feed .nwsb-post-reel-btn:active,
-body.nm-mode #sub-social-home .nwsb-post-reel-btn:active {
+body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-post-reel-btn:active {
   box-shadow: inset 4px 4px 10px rgba(0,0,0,0.13), inset -3px -3px 8px rgba(255,255,255,0.95) !important;
 }
 /* Reel cards → raised neumorphic frame (photo stays) */
@@ -3693,7 +3693,11 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat-num { color: #fff !important; }
 html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat-lbl { color: rgba(255,255,255,0.6) !important; }
 html body.nwsb-soc-glass #sub-social-home .nwsb-explainer-slot {
-  background: rgba(255,255,255,0.08) !important;
+  /* longhand only -- each tile has its own inline background-image (Origin/
+     Evolution/Frequency/Healing); the `background` shorthand was resetting
+     that to none, so all four tiles showed the page bg bleeding through
+     instead of their own distinct photo. */
+  background-color: rgba(255,255,255,0.08) !important;
   border: 1px solid rgba(255,255,255,0.2) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 6px 20px rgba(0,0,0,0.28) !important;
 }
