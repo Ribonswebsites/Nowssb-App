@@ -3540,6 +3540,15 @@ html body.nwsb-soc-glass #sub-people .ig-searchbar {
 html body.nwsb-soc-glass #sub-people .ig-searchbar input { color: #fff !important; }
 html body.nwsb-soc-glass #sub-people .ig-searchbar input::placeholder { color: rgba(255,255,255,0.5) !important; }
 html body.nwsb-soc-glass #sub-people .nwsb-search-icon { filter: brightness(0) invert(1) opacity(0.7) !important; }
+/* a bit more breathing room under the header, and a touch taller */
+html body.nwsb-soc-glass #sub-people .ig-people-searchrow { padding: 16px 12px 8px !important; }
+html body.nwsb-soc-glass #sub-people .ig-searchbar { height: 42px !important; }
+/* header profile avatar was an unconditional light neumorphic circle (white
+   highlight shadow) regardless of theme — glass it too */
+html body.nwsb-soc-glass #ig-explore-myavatar {
+  background: rgba(255,255,255,0.12) !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3) !important;
+}
 html body.nwsb-soc-glass #sub-people .ig-tile {
   background: rgba(255,255,255,0.07) !important;
   border: 1px solid rgba(255,255,255,0.22) !important;
@@ -3596,7 +3605,13 @@ html body.nwsb-soc-glass #sub-ig-profile .ig-vshop {
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring {
   background: rgba(255,255,255,0.12) !important;
   border: 1.5px solid rgba(232,213,163,0.55) !important;
+  border-radius: 50% !important;
   box-shadow: 0 6px 20px rgba(0,0,0,0.35) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar,
+html body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring img {
+  border: none !important;
+  border-radius: 50% !important;
 }
 html body.nwsb-soc-glass #sub-ig-profile .ig-stat {
   background: transparent !important;
@@ -3712,7 +3727,7 @@ html body.nwsb-soc-glass #sub-ig-profile .ig-btn.icon svg { stroke: #fff !import
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-bio,
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-biotext { color: rgba(255,255,255,0.82) !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-rank { color: rgba(255,255,255,0.6) !important; }
-html body.nwsb-soc-glass #sub-ig-profile .ig-prof-plan,
+html body.nwsb-soc-glass #sub-ig-profile .ig-prof-plan { background: transparent !important; border: none !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-plan-badge {
   color: #e8d5a3 !important;
   background: rgba(232,213,163,0.16) !important;
@@ -3724,7 +3739,22 @@ html body.nwsb-soc-glass #sub-ig-profile .ig-tab.active svg { stroke: #e8d5a3 !i
 html body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle svg { stroke: #e8d5a3 !important; }
 
 /* "Share Photos" empty state + create tile + create FAB (were all white) */
+/* Default (non-glass) theme sizing for the "Share Photos" placeholder — this
+   was accidentally deleted along with the old light-glass block; restored. */
+body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-empty-ico {
+  width: 78px; height: 78px; margin: 0 auto 18px; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+  background: #f0f2f7; color: #c8a96e;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 13px rgba(255,255,255,0.97),
+              inset 1px 1px 2px rgba(255,255,255,0.6);
+}
+body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-empty-title {
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800; color: #1a1a2e;
+}
 html body.nwsb-soc-glass #sub-ig-profile .nwsb-empty-ico {
+  width: 78px !important; height: 78px !important; margin: 0 auto 18px !important;
+  border-radius: 50% !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
   background: rgba(255,255,255,0.09) !important; color: #e8d5a3 !important;
   border: 1px solid rgba(255,255,255,0.24) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 20px rgba(0,0,0,0.32) !important;

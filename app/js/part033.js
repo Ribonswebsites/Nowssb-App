@@ -101,7 +101,7 @@
     for(var i=0;i<VERIFY_TIERS.length;i++){
       if(VERIFY_TIERS[i].key===tier){
         size = size || 20;
-        return '<span class="ig-vbadge" style="display:inline-flex;align-items:center;justify-content:center;width:'+size+'px;height:'+size+'px;border-radius:50% !important;margin-left:6px;vertical-align:-'+Math.round(size*0.24)+'px;overflow:hidden;background:#eef1f6;box-shadow:2.5px 2.5px 6px rgba(0,0,0,.2), -2px -2px 5px rgba(255,255,255,.96);"><img src="'+VERIFY_TIERS[i].img+'" alt="'+VERIFY_TIERS[i].name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50% !important;display:block;"></span>';
+        return '<span class="ig-vbadge" style="display:inline-flex;align-items:center;justify-content:center;width:'+size+'px;height:'+size+'px;border-radius:50% !important;margin-left:6px;vertical-align:-'+Math.round(size*0.24)+'px;overflow:hidden;background:none;box-shadow:none;"><img src="'+VERIFY_TIERS[i].img+'" alt="'+VERIFY_TIERS[i].name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50% !important;display:block;"></span>';
       }
     }
     return '';

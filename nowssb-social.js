@@ -16,7 +16,7 @@
   function imgBadge(tier, size) {
     size = size || 18;
     var img = VB_IMG[tier] || VB_IMG.blue;
-    return '<span class="ig-vbadge" style="display:inline-flex;align-items:center;justify-content:center;width:' + size + 'px;height:' + size + 'px;border-radius:50% !important;margin-left:5px;vertical-align:-' + Math.round(size * 0.22) + 'px;overflow:hidden;background:#eef1f6;box-shadow:2px 2px 5px rgba(0,0,0,.2),-1.5px -1.5px 4px rgba(255,255,255,.96);"><img src="' + img + '" alt="Verified" style="width:100%;height:100%;object-fit:cover;border-radius:50% !important;display:block;"></span>';
+    return '<span class="ig-vbadge" style="display:inline-flex;align-items:center;justify-content:center;width:' + size + 'px;height:' + size + 'px;border-radius:50% !important;margin-left:5px;vertical-align:-' + Math.round(size * 0.22) + 'px;overflow:hidden;background:none;box-shadow:none;"><img src="' + img + '" alt="Verified" style="width:100%;height:100%;object-fit:cover;border-radius:50% !important;display:block;"></span>';
   }
   var HP_SVG_TIER = imgBadge('blue', 18);
   var HP_SVG_ULT  = imgBadge('gold', 18);
