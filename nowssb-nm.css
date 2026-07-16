@@ -3738,9 +3738,9 @@ html body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring {
   box-shadow: 0 6px 20px rgba(0,0,0,0.35) !important;
 }
 html body.nwsb-soc-glass #sub-ig-profile .ig-stat {
-  background: rgba(255,255,255,0.09) !important;
-  border: 1px solid rgba(255,255,255,0.24) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 20px rgba(0,0,0,0.3) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 html body.nwsb-soc-glass #sub-ig-profile .ig-stat .n { color: #fff !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-stat .l { color: rgba(255,255,255,0.62) !important; }
@@ -3878,4 +3878,23 @@ html body.nwsb-soc-glass #sub-ig-profile .nwsb-cr-fab {
   background: rgba(232,213,163,0.2) !important; color: #e8d5a3 !important;
   border: 1px solid rgba(232,213,163,0.55) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 8px 22px rgba(0,0,0,0.4) !important;
+}
+
+/* ═══ GLASS PATCH 2 — search row white + neumorphic-shadow leakage ═══ */
+/* The search row had a hardcoded white bg; the search bar's glass sat over it. */
+html body.nwsb-soc-glass #sub-people .ig-people-searchrow,
+html body.nwsb-soc-glass #sub-people .ig-searchwrap { background: transparent !important; }
+/* body.nm-mode (from the normal home) is active at the same time as the glass
+   class, so its neumorphic shadows leak onto Connect surfaces — flatten them. */
+html body.nwsb-soc-glass #sub-people .ig-userrow,
+html body.nwsb-soc-glass #sub-social-home .ig-userrow {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.28) !important;
+}
+html body.nwsb-soc-glass .ig-mini-follow {
+  box-shadow: none !important;
+}
+html body.nwsb-soc-glass #sub-social-home .nwsb-explainer-slot,
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero,
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
 }

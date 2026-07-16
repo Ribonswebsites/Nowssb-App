@@ -106,7 +106,7 @@ window.chatInboxRender = function() {
       subColor = 'rgba(255,255,255,.3)';
     }
     return '<div onclick="chatInboxOpenConvo(\''+String(p.id||p.username)+'\')" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;-webkit-tap-highlight-color:transparent;">' +
-      '<img src="'+p.avatar+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;" alt="">' +
+      '<img src="'+p.avatar+'" style="width:48px;height:48px;border-radius:50% !important;object-fit:cover;flex-shrink:0;" alt="">' +
       '<div style="flex:1;min-width:0;">' +
         '<div style="font-size:15px;font-weight:600;color:#fff;font-family:\'DM Sans\',sans-serif;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+(p.fullName||p.username)+'</div>' +
         '<div style="font-size:12px;color:'+subColor+';font-family:\'DM Sans\',sans-serif;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+subText+'</div>' +
