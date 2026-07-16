@@ -784,14 +784,12 @@
 
   window.nwsbToggleSocialSetting = function (key, el) {
     var on = !el.classList.contains('on');
-    el.classList.toggle('on', on);
     setSocialSetting(key, on);
+    renderSocialSettings(); // keeps every mounted copy of the rows in sync
   };
 
-  function renderSocialSettings() {
-    var box = document.getElementById('nwsb-social-settings-rows');
-    if (!box) return;
-    box.innerHTML = SOCIAL_SETTINGS.map(function (s) {
+  function socialSettingsRowsHtml() {
+    return SOCIAL_SETTINGS.map(function (s) {
       var on = getSocialSetting(s.key, s.def);
       return '<div class="nwsb-ss-row">' +
         '<div class="nwsb-ss-row-body">' +
@@ -804,6 +802,18 @@
       '</div>';
     }).join('');
   }
+
+  // Re-render EVERY place these rows are mounted (the legacy sheet + the
+  // NowssB Connect Hub page) so a toggle flipped in one place is reflected
+  // in the other without a reload.
+  function renderSocialSettings() {
+    var html = socialSettingsRowsHtml();
+    ['nwsb-social-settings-rows', 'nch-settings-rows'].forEach(function (id) {
+      var box = document.getElementById(id);
+      if (box) box.innerHTML = html;
+    });
+  }
+  window.nwsbRenderSocialSettingsRows = renderSocialSettings;
 
   window.nwsbOpenSocialSettings = function () {
     renderSocialSettings();

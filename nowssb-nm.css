@@ -3869,3 +3869,13 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
   font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.45);
   margin: 10px 4px 0; line-height: 1.5;
 }
+
+/* Settings rows rendered INLINE on the Hub page (reuses .nwsb-ss-row from the
+   legacy sheet) -- wrap them in one glass card matching the other nch-rows. */
+#sub-connect-hub .nch-settings-block {
+  border-radius: 18px !important; overflow: hidden; margin-bottom: 10px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 6px 20px rgba(0,0,0,0.3);
+}
+#sub-connect-hub .nch-settings-block .nwsb-ss-row { padding: 15px 16px; border-top-color: rgba(255,255,255,0.1); }
+#sub-connect-hub .nch-settings-block .nwsb-ss-row:first-child { border-top: none; }

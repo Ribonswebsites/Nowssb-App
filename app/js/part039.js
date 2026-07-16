@@ -1100,3 +1100,9 @@ window.nchSyncTheme = function () {
   if (neu) neu.classList.toggle('active', theme === 'neu');
   if (gl)  gl.classList.toggle('active', theme === 'glass');
 };
+// Runs every time the Hub page opens: syncs the theme pills AND renders the
+// settings toggle rows inline (so nothing requires a second popup/sheet).
+window.nchOnOpen = function () {
+  nchSyncTheme();
+  if (typeof window.nwsbRenderSocialSettingsRows === 'function') window.nwsbRenderSocialSettingsRows();
+};

@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
 <link rel="stylesheet" href="nowssb-social.css?v=192">
-<link rel="stylesheet" href="nowssb-nm.css?v=330">
+<link rel="stylesheet" href="nowssb-nm.css?v=331">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -1699,7 +1699,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="menu-nav-body"><div class="menu-nav-label">Settings</div><div class="menu-nav-sub">Preferences</div></div>
         <svg class="menu-nav-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <div class="menu-nav-item" onclick="closeMenu();openSub('connect-hub');setTimeout(nchSyncTheme,60);">
+      <div class="menu-nav-item" onclick="closeMenu();openSub('connect-hub');setTimeout(nchOnOpen,60);">
         <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784144640/file_00000000b7f471f4b4ae546a84234072_kyfjjk.png" style="width:22px;height:22px;object-fit:contain;display:block;border-radius:50%;" alt=""></div>
         <div class="menu-nav-body"><div class="menu-nav-label">NowssB Connect</div><div class="menu-nav-sub">Saved, liked, settings &amp; theme</div></div>
         <svg class="menu-nav-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -6581,7 +6581,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <button class="ig-iconbtn" onclick="if(typeof chatInboxOpen==='function')chatInboxOpen()" style="position:relative;">
       <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png" alt="Chat" style="width:24px;height:24px;object-fit:contain;filter:brightness(0) invert(1) opacity(.7);">
     </button>
-    <button class="ig-iconbtn" onclick="IG.menu()">
+    <button class="ig-iconbtn" onclick="openSub('connect-hub');setTimeout(nchOnOpen,60);">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
   </div>
@@ -6636,6 +6636,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <span class="nch-title">NowssB Connect</span>
   </div>
   <div class="nch-scroll">
+    <div class="nch-row" onclick="IG.editProfile()">
+      <span class="nch-row-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></span>
+      <span class="nch-row-body"><span class="nch-row-label">Edit profile</span></span>
+      <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="nch-row" onclick="IG.shareProfile()">
+      <span class="nch-row-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
+      <span class="nch-row-body"><span class="nch-row-label">Share profile</span></span>
+      <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
     <div class="nch-row" onclick="IG.openSaved()">
       <span class="nch-row-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></span>
       <span class="nch-row-body"><span class="nch-row-label">Saved</span><span class="nch-row-sub">Posts you've bookmarked</span></span>
@@ -6646,11 +6656,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <span class="nch-row-body"><span class="nch-row-label">Liked</span><span class="nch-row-sub">Posts you've liked</span></span>
       <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div class="nch-row" onclick="nwsbOpenSocialSettings()">
-      <span class="nch-row-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
-      <span class="nch-row-body"><span class="nch-row-label">Settings</span><span class="nch-row-sub">Reels, claims, notifications &amp; DMs</span></span>
-      <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
+
+    <!-- Settings toggles rendered DIRECTLY here (no extra tap into another
+         sheet) — same rows/state as the legacy Social Settings sheet. -->
+    <div class="nch-sec-label">Settings</div>
+    <div class="nch-settings-block" id="nch-settings-rows"></div>
 
     <div class="nch-sec-label">Connect Theme</div>
     <div class="nch-theme-row">
@@ -6909,7 +6919,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Injected dynamically into sub-social via JS -->
 
-<script src="app/js/part039.js?v=193"></script>
+<script src="app/js/part039.js?v=194"></script>
 
 
 
@@ -7348,7 +7358,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <script src="app/js/part049.js?v=289"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="nowssb-social.js?v=164" defer></script>
+<script src="nowssb-social.js?v=165" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>
 <script src="nowssb-player.js?v=282" defer></script>
 
