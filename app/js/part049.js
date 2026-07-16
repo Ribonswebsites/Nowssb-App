@@ -170,6 +170,28 @@ window.fashionHomeIntroEnter = function() {
   }, 4000);
 })();
 
+/* ── NowssB Connect background video — reliably autoplay on BOTH homes. autoplay
+   alone can be deferred (esp. the fashion home which isn't always reached via
+   goTo), so observe each .nmh-connect-vid and play it whenever it's on screen. */
+(function () {
+  function init() {
+    var vids = document.querySelectorAll('.nmh-connect-vid');
+    if (!vids.length) { return setTimeout(init, 400); }
+    function playAll() { vids.forEach(function (v) { v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); }); }
+    if (!('IntersectionObserver' in window)) { playAll(); document.addEventListener('click', playAll, { once: true }); return; }
+    var io = new IntersectionObserver(function (ents) {
+      ents.forEach(function (e) {
+        var v = e.target;
+        if (e.isIntersecting) { v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      });
+    }, { threshold: 0.1 });
+    vids.forEach(function (v) { io.observe(v); });
+    // first user gesture unlocks any that autoplay policy still blocked
+    document.addEventListener('touchstart', playAll, { once: true, passive: true });
+  }
+  init();
+})();
+
 /* ── Word/Meaning search: cycle the tagline through phrases one after another
    (fade out → swap → fade in). One line at a time so the layout never grows. */
 (function () {
