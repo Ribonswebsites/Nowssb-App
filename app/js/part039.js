@@ -1089,3 +1089,14 @@ window.ONBOARD = (function(){
   }, 1200);
 
 })();
+
+// ── NowssB Connect Hub — theme pill sync (separate ids from the Edit Profile
+// switcher, same nwsb_social_theme storage) ──
+window.nchSyncTheme = function () {
+  var theme = 'neu';
+  try { theme = localStorage.getItem('nwsb_social_theme') || 'neu'; } catch (e) {}
+  var neu = document.getElementById('nch-theme-neu');
+  var gl  = document.getElementById('nch-theme-glass');
+  if (neu) neu.classList.toggle('active', theme === 'neu');
+  if (gl)  gl.classList.toggle('active', theme === 'glass');
+};

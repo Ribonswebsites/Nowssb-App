@@ -414,7 +414,7 @@
             '</div>'+
             '<div class="nwsbf-post-imgwrap" onclick="IG.feedOpenPost('+p.id+')"><img class="nwsbf-post-img" src="'+src+'" alt="" loading="lazy"></div>'+
             '<div class="nwsbf-post-actions">'+
-              '<button class="nwsbf-act nwsbf-like-btn'+(liked?' on':'')+'" onclick="IG.feedLike(this,'+p.id+')">'+heart+'</button>'+
+              '<button class="nwsbf-act nwsbf-like-btn'+(liked?' on':'')+'" onclick="IG.feedLike(this,'+p.id+',\''+src+'\',\''+uname+'\')">'+heart+'</button>'+
               '<button class="nwsbf-act" onclick="IG.feedComment('+p.id+',\''+uname+'\')">'+comment+'</button>'+
               '<button class="nwsbf-act" onclick="IG.feedShare('+p.id+',\''+uname+'\')">'+send+'</button>'+
               '<span class="nwsbf-sp"></span>'+
@@ -485,20 +485,20 @@
     // persisted in localStorage so they survive reloads. ──
     _ls:function(key,fallback){ try{ var v=JSON.parse(localStorage.getItem(key)); return v==null?fallback:v; }catch(e){ return fallback; } },
     _lsSet:function(key,val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} },
-    isPostLiked:function(id){ return this._ls('nwsb_liked_posts',[]).indexOf(String(id))!==-1; },
+    isPostLiked:function(id){ return this._ls('nwsb_liked_posts',[]).some(function(x){return String(x.id)===String(id);}); },
     isPostSaved:function(id){ return this._ls('nwsb_saved_posts',[]).some(function(x){return String(x.id)===String(id);}); },
     commentLineHtml:function(id){
       var c=this._ls('nwsb_post_comments_'+id,[]);
       if(!c.length) return '';
       return '<span onclick="IG.feedComment('+id+')">View '+c.length+(c.length===1?' comment':' comments')+'</span>';
     },
-    feedLike:function(btn,id){
+    feedLike:function(btn,id,img,uname){
       var arr=this._ls('nwsb_liked_posts',[]);
-      var idx=arr.indexOf(String(id));
+      var idx=arr.findIndex?arr.findIndex(function(x){return String(x.id)===String(id);}):-1;
       var likesEl=document.getElementById('nwsbf-likes-'+id);
       var base=likesEl?parseInt(likesEl.getAttribute('data-base')||'0',10):0;
       var nowLiked;
-      if(idx===-1){ arr.push(String(id)); nowLiked=true; } else { arr.splice(idx,1); nowLiked=false; }
+      if(idx===-1){ arr.push({id:String(id),img:img,uname:uname}); nowLiked=true; } else { arr.splice(idx,1); nowLiked=false; }
       this._lsSet('nwsb_liked_posts',arr);
       btn.classList.toggle('on',nowLiked);
       if(likesEl){
@@ -562,29 +562,40 @@
       this.feedComment(id);
     },
     // ── Saved posts — reachable from the profile ⋯ menu ──
-    openSaved:function(){
-      var old=document.getElementById('nwsb-saved-view'); if(old) old.remove();
-      var saved=this._ls('nwsb_saved_posts',[]);
+    // Shared list-viewer for Saved / Liked grids
+    _openPostList:function(storageKey,title,emptySvg,emptyTitle,emptySub){
+      var old=document.getElementById('nwsb-list-view'); if(old) old.remove();
+      var items=this._ls(storageKey,[]);
       var view=document.createElement('div');
-      view.id='nwsb-saved-view';
+      view.id='nwsb-list-view';
       view.style.cssText='position:fixed;inset:0;z-index:9700;background:#0a0e1a;display:flex;flex-direction:column;font-family:\'DM Sans\',sans-serif;';
       view.innerHTML=
         '<div style="display:flex;align-items:center;gap:14px;padding:max(env(safe-area-inset-top,14px),14px) 16px 14px;border-bottom:1px solid rgba(255,255,255,.1);">'+
-          '<button onclick="document.getElementById(\'nwsb-saved-view\').remove()" style="width:36px;height:36px;border-radius:50% !important;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;cursor:pointer;">'+
+          '<button onclick="document.getElementById(\'nwsb-list-view\').remove()" style="width:36px;height:36px;border-radius:50% !important;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;cursor:pointer;">'+
             '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>'+
           '</button>'+
-          '<span style="font-size:17px;font-weight:800;color:#fff;">Saved</span>'+
+          '<span style="font-size:17px;font-weight:800;color:#fff;">'+title+'</span>'+
         '</div>'+
-        (saved.length
+        (items.length
           ? '<div style="flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;">'+
-              saved.map(function(s){ return '<div style="aspect-ratio:1/1;background-image:url(\''+s.img+'\');background-size:cover;background-position:center;cursor:pointer;" onclick="window.open(\''+s.img+'\',\'_blank\')"></div>'; }).join('')+
+              items.map(function(s){ return '<div style="aspect-ratio:1/1;background-image:url(\''+s.img+'\');background-size:cover;background-position:center;cursor:pointer;" onclick="window.open(\''+s.img+'\',\'_blank\')"></div>'; }).join('')+
             '</div>'
           : '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0 40px;text-align:center;">'+
-              '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>'+
-              '<div style="color:#fff;font-weight:700;font-size:16px;">Nothing saved yet</div>'+
-              '<div style="color:rgba(255,255,255,.5);font-size:13px;">Tap the bookmark icon on any post to save it here.</div>'+
+              emptySvg+
+              '<div style="color:#fff;font-weight:700;font-size:16px;">'+emptyTitle+'</div>'+
+              '<div style="color:rgba(255,255,255,.5);font-size:13px;">'+emptySub+'</div>'+
             '</div>');
       document.body.appendChild(view);
+    },
+    openSaved:function(){
+      this._openPostList('nwsb_saved_posts','Saved',
+        '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>',
+        'Nothing saved yet','Tap the bookmark icon on any post to save it here.');
+    },
+    openLiked:function(){
+      this._openPostList('nwsb_liked_posts','Liked',
+        '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>',
+        'Nothing liked yet','Tap the heart icon on any post to like it.');
     },
 
     openVerify:function(){

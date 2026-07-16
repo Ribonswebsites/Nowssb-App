@@ -3789,3 +3789,83 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero,
 html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
   box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
 }
+
+/* Main Settings toggle switches (#sub-social .stgl / .stgl-knob) were losing
+   their pill/circle radius to the global *{border-radius:0!important} reset
+   -- the base rule in app.css never had !important. Same defect class as the
+   Social Settings sheet toggles. */
+#sub-social .stgl { border-radius: 13px !important; }
+#sub-social .stgl-knob { border-radius: 50% !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NOWSSB CONNECT HUB (#sub-connect-hub) — Saved / Liked / Settings / Theme.
+   Reached from the main hamburger. Always dark glass over a Connect photo,
+   independent of the nwsb-soc-glass toggle (which only affects the 5 Connect
+   screens themselves — the switch to control that toggle lives ON this page).
+   ═══════════════════════════════════════════════════════════════════════ */
+/* NOT setting position here -- .sub-screen already provides position:fixed
+   with higher priority needed; an id-selector override here would beat it
+   (id specificity > class) and break full-screen coverage/animation. */
+#sub-connect-hub { background: #0a0e1a; }
+#sub-connect-hub .nch-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177102414_lpzhbd.jpg') center/cover no-repeat;
+}
+#sub-connect-hub .nch-scrim {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(rgba(4,8,18,0.5) 0%, rgba(4,8,18,0.68) 40%, rgba(4,8,18,0.92) 100%);
+}
+#sub-connect-hub .nch-top {
+  position: relative; z-index: 2; flex-shrink: 0;
+  display: flex; align-items: center; gap: 12px;
+  padding: max(env(safe-area-inset-top,16px),16px) 18px 16px;
+}
+#sub-connect-hub .nch-back {
+  width: 38px; height: 38px; min-width: 38px; min-height: 38px; flex-shrink: 0;
+  border-radius: 50% !important; border: 1px solid rgba(255,255,255,0.24);
+  background: rgba(255,255,255,0.1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 14px rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+#sub-connect-hub .nch-logo { width: 34px; height: 34px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0; }
+#sub-connect-hub .nch-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
+#sub-connect-hub .nch-scroll {
+  position: relative; z-index: 2; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 4px 18px calc(var(--nav-height,58px) + 30px);
+}
+#sub-connect-hub .nch-row {
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  padding: 16px; margin-bottom: 10px; border-radius: 18px !important;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 6px 20px rgba(0,0,0,0.3);
+}
+#sub-connect-hub .nch-row-ico {
+  width: 40px; height: 40px; min-width: 40px; flex-shrink: 0; border-radius: 12px !important;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.12); border: 1px solid rgba(232,213,163,0.3);
+}
+#sub-connect-hub .nch-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+#sub-connect-hub .nch-row-label { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; color: #fff; }
+#sub-connect-hub .nch-row-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.55); }
+#sub-connect-hub .nch-row-chev { flex-shrink: 0; }
+#sub-connect-hub .nch-sec-label {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(232,213,163,0.75); margin: 22px 4px 10px;
+}
+#sub-connect-hub .nch-theme-row {
+  display: flex; gap: 8px; padding: 5px; border-radius: 16px !important;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16);
+}
+#sub-connect-hub .nch-theme-btn {
+  flex: 1; padding: 13px 8px; min-height: 0 !important; border: none; border-radius: 12px !important;
+  background: transparent; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.55);
+}
+#sub-connect-hub .nch-theme-btn.active {
+  background: rgba(232,213,163,0.18); color: #e8d5a3;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+#sub-connect-hub .nch-theme-hint {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.45);
+  margin: 10px 4px 0; line-height: 1.5;
+}

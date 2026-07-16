@@ -105,8 +105,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
-<link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=329">
+<link rel="stylesheet" href="nowssb-social.css?v=192">
+<link rel="stylesheet" href="nowssb-nm.css?v=330">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -1697,6 +1697,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="menu-nav-item" onclick="closeMenu();openSub('social')">
         <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:22px;height:22px;object-fit:contain;display:block;" alt=""></div>
         <div class="menu-nav-body"><div class="menu-nav-label">Settings</div><div class="menu-nav-sub">Preferences</div></div>
+        <svg class="menu-nav-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="menu-nav-item" onclick="closeMenu();openSub('connect-hub');setTimeout(nchSyncTheme,60);">
+        <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784144640/file_00000000b7f471f4b4ae546a84234072_kyfjjk.png" style="width:22px;height:22px;object-fit:contain;display:block;border-radius:50%;" alt=""></div>
+        <div class="menu-nav-body"><div class="menu-nav-label">NowssB Connect</div><div class="menu-nav-sub">Saved, liked, settings &amp; theme</div></div>
         <svg class="menu-nav-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div class="menu-nav-item" onclick="closeMenu();openDlPopup()">
@@ -6616,6 +6621,46 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
+<!-- ── NOWSSB CONNECT HUB — Saved / Liked / Settings / Theme, reachable from
+     the main hamburger. Always uses the Connect photo background + glass
+     styling, independent of the neumorphism/glass toggle (that toggle only
+     controls the 5 Connect screens themselves; the switch lives on THIS page). ── -->
+<div class="sub-screen" id="sub-connect-hub">
+  <div class="nch-bg"></div>
+  <div class="nch-scrim"></div>
+  <div class="nch-top">
+    <button class="nch-back" onclick="closeSub('connect-hub')" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <img class="nch-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784144640/file_00000000b7f471f4b4ae546a84234072_kyfjjk.png" alt="">
+    <span class="nch-title">NowssB Connect</span>
+  </div>
+  <div class="nch-scroll">
+    <div class="nch-row" onclick="IG.openSaved()">
+      <span class="nch-row-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></span>
+      <span class="nch-row-body"><span class="nch-row-label">Saved</span><span class="nch-row-sub">Posts you've bookmarked</span></span>
+      <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="nch-row" onclick="IG.openLiked()">
+      <span class="nch-row-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg></span>
+      <span class="nch-row-body"><span class="nch-row-label">Liked</span><span class="nch-row-sub">Posts you've liked</span></span>
+      <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="nch-row" onclick="nwsbOpenSocialSettings()">
+      <span class="nch-row-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
+      <span class="nch-row-body"><span class="nch-row-label">Settings</span><span class="nch-row-sub">Reels, claims, notifications &amp; DMs</span></span>
+      <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="nch-sec-label">Connect Theme</div>
+    <div class="nch-theme-row">
+      <button type="button" id="nch-theme-neu" class="nch-theme-btn" onclick="nwsbSetSocTheme('neu');nchSyncTheme();">NowssB</button>
+      <button type="button" id="nch-theme-glass" class="nch-theme-btn" onclick="nwsbSetSocTheme('glass');nchSyncTheme();">NowssB Fashion</button>
+    </div>
+    <div class="nch-theme-hint">Neumorphism or frosted glass — applies to the Connect feed, reels, discover and profile.</div>
+  </div>
+</div>
+
 <!-- ── 5-TAB BOTTOM NAV ── -->
 <div id="ig-bottomnav">
   <button class="ig-nav-btn" id="ignav-home" onclick="IG.nav('profile')">
@@ -6685,7 +6730,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 
-<script src="app/js/part033.js?v=218"></script>
+<script src="app/js/part033.js?v=219"></script>
 
 
 
@@ -6864,7 +6909,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Injected dynamically into sub-social via JS -->
 
-<script src="app/js/part039.js?v=192"></script>
+<script src="app/js/part039.js?v=193"></script>
 
 
 
