@@ -610,6 +610,9 @@ function nmhRefresh() {
     if (_nmMoon) _nmMoon.style.display = 'none';
   }
 
+  // Kick the Connect background video(s) — autoplay can be deferred, so nudge them
+  document.querySelectorAll('.nmh-connect-vid').forEach(function(v){ v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function(){}); });
+
   // Sync streak (both homes)
   var d = window._userDataCache || {};
   var streak = d.currentStreak || d.streakCount || 0;

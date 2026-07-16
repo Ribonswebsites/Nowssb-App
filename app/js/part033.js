@@ -421,7 +421,7 @@
         '#sub-ig-feed .nwsbf-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(58px + env(safe-area-inset-bottom,0px) + 22px);}'+
         '#sub-ig-feed .nwsbf-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:max(env(safe-area-inset-top,12px),12px) 16px 12px;background:#eef0f5;box-shadow:0 4px 14px rgba(0,0,0,.06);}'+
         '#sub-ig-feed .nwsbf-brand{display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;}'+
-        '#sub-ig-feed .nwsbf-brandlogo{width:34px;height:34px;border-radius:50% !important;object-fit:cover;background:#eef0f5;box-shadow:4px 4px 9px rgba(0,0,0,.14),-3px -3px 7px rgba(255,255,255,.96);flex-shrink:0;}'+
+        '#sub-ig-feed .nwsbf-brandlogo{width:56px;height:56px;border-radius:50% !important;object-fit:cover;background:#eef0f5;box-shadow:4px 4px 10px rgba(0,0,0,.16),-3px -3px 8px rgba(255,255,255,.96);flex-shrink:0;}'+
         '#sub-ig-feed .nwsbf-logo{font-size:20px;font-weight:800;color:#1a1a2e;letter-spacing:-.3px;}'+
         '#sub-ig-feed .nwsbf-icon{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.12),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
         '#sub-ig-feed .nwsbf-icon:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
