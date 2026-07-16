@@ -3831,7 +3831,10 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 #sub-connect-hub .nch-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
 #sub-connect-hub .nch-scroll {
   position: relative; z-index: 2; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding: 4px 18px calc(var(--nav-height,58px) + 30px);
+  /* was missing the safe-area inset the bottom nav itself reserves, so on
+     gesture-nav devices the last row sat partly behind the nav bar and the
+     scroller's max-scroll never revealed the rest of it */
+  padding: 4px 18px calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,20px),20px) + 40px);
 }
 #sub-connect-hub .nch-row {
   display: flex; align-items: center; gap: 14px; cursor: pointer;
