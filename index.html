@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=317">
+<link rel="stylesheet" href="nowssb-nm.css?v=318">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -867,8 +867,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="npc-text"><span class="npc-line" id="npcBlueLine"></span></div>
     </div>
 
-    <!-- NowssB Connect — what it is -->
+    <!-- Connect banner -->
+    <div class="nmh-connect-banner" onclick="window.IG&&IG.nav('profile')">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784171086/grok_image_1784171046763_kfygmv.jpg" alt="NowssB Connect">
+    </div>
+    <!-- NowssB Connect — what it is (video bg) -->
     <div class="nmh-connect-sec" onclick="window.IG&&IG.nav('profile')">
+      <video class="nmh-connect-vid" autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
+      <div class="nmh-connect-scrim"></div>
       <img class="nmh-connect-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784144640/file_00000000b7f471f4b4ae546a84234072_kyfjjk.png" alt="NowssB Connect">
       <div class="nmh-connect-title">NowssB <span class="accent">Connect</span></div>
       <div class="nmh-connect-desc">The social space of NowssB — share your daily practice, post your frequency journey, and connect with a community of sound healers and word-science practitioners. Follow creators, react, and grow together.</div>
@@ -1218,6 +1224,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="home-tile-sub" style="position:relative;z-index:2;">Your settings</div>
       <div class="home-tile-arrow" style="z-index:2;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="rgba(200,232,245,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
     </div>
+  </div>
+
+  <!-- Connect banner (fashion) -->
+  <div class="nmh-connect-banner fash-connect-banner" onclick="openConnectIntro()">
+    <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784171086/grok_image_1784171046763_kfygmv.jpg" alt="NowssB Connect">
+  </div>
+  <!-- NowssB Connect — what it is (fashion, video bg) -->
+  <div class="nmh-connect-sec fash-connect" onclick="openConnectIntro()">
+    <video class="nmh-connect-vid" autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
+    <div class="nmh-connect-scrim"></div>
+    <img class="nmh-connect-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784144640/file_00000000b7f471f4b4ae546a84234072_kyfjjk.png" alt="NowssB Connect">
+    <div class="nmh-connect-title">NowssB <span class="accent">Connect</span></div>
+    <div class="nmh-connect-desc">The social space of NowssB — share your daily practice, post your frequency journey, and connect with a community of sound healers and word-science practitioners. Follow creators, react, and grow together.</div>
+    <button class="nmh-connect-enter" onclick="event.stopPropagation();openConnectIntro()">Enter Connect<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </div>
 
   <!-- Video banner — above the subscription promo -->
@@ -1691,6 +1711,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <div class="menu-footer-note" style="padding-top: 40px;">Shabdapathy · v9.5</div>
+  </div>
+</div>
+
+<!-- ══ NOWSSB CONNECT INTRO (pops once, only from the Fashion home) ══ -->
+<div id="connectIntro" style="position:fixed;inset:0;z-index:99990;display:none;flex-direction:column;background:#060c18;opacity:0;transition:opacity 0.42s ease;pointer-events:none;overflow:hidden;">
+  <img decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784172445/grok_image_1784172374517_d9q0zs.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="">
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.22) 0%,rgba(6,12,24,0) 34%,rgba(6,12,24,0.55) 70%,rgba(6,12,24,0.93) 100%);pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:0 28px 54px;z-index:2;">
+    <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.8);margin-bottom:10px;">NOWSBANSIU</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:38px;font-weight:800;color:#fff;line-height:1.02;letter-spacing:-0.5px;margin-bottom:10px;">NowssB<br>Connect</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:rgba(255,255,255,0.66);line-height:1.6;margin-bottom:26px;max-width:290px;">Share your practice, discover creators worth following, and grow your frequency together.</div>
+    <button onclick="connectIntroEnter()" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#060c18;background:#e8d5a3;border:none;padding:15px 0;width:100%;cursor:pointer;border-radius:0;transition:transform .1s;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''">Enter Connect</button>
   </div>
 </div>
 
@@ -3392,7 +3424,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=303"></script>
+<script src="app/js/part012.js?v=304"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">

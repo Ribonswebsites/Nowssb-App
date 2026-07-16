@@ -1505,6 +1505,24 @@ function closeMenu() {
   document.getElementById('menuOverlay').classList.remove('open');
   document.getElementById('menuDrawer').classList.remove('open');
 }
+// NowssB Connect intro — pops ONCE per session, and only via the Fashion-home
+// Connect section (which is the only caller). Any later tap goes straight in.
+function openConnectIntro() {
+  var ov = document.getElementById('connectIntro');
+  if (!ov || window._connectIntroSeen) { if (window.IG) IG.nav('profile'); return; }
+  window._connectIntroSeen = true;
+  ov.style.display = 'flex';
+  ov.style.pointerEvents = 'all';
+  requestAnimationFrame(function() { requestAnimationFrame(function() { ov.style.opacity = '1'; }); });
+}
+function connectIntroEnter() {
+  var ov = document.getElementById('connectIntro');
+  if (ov) {
+    ov.style.opacity = '0';
+    setTimeout(function() { ov.style.display = 'none'; ov.style.pointerEvents = 'none'; }, 440);
+  }
+  if (window.IG) IG.nav('profile');
+}
 
 // ── SUB-SCREENS ──
 function applyHealthGenderHighlight(gender) {
