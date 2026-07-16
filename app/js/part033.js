@@ -404,15 +404,25 @@
       var posts=PEOPLE.map(function(p,i){
         var loc=LOCS[i%LOCS.length], cap=CAPS[i%CAPS.length];
         var src=(p.grid&&p.grid[0])||p.avatar;
-        return '<div class="nwsbf-post">'+
+        var uname=(p.username||p.fullName).replace(/'/g,"\\'");
+        var liked = IG.isPostLiked(p.id);
+        var saved = IG.isPostSaved(p.id);
+        return '<div class="nwsbf-post" data-pid="'+p.id+'">'+
             '<div class="nwsbf-post-head" onclick="IG.openProfile('+p.id+')">'+
               '<div class="nwsbf-post-av" style="background-image:url('+p.avatar+')"></div>'+
               '<div class="nwsbf-post-meta"><div class="nwsbf-post-name">'+(p.username||p.fullName)+(verifyTierOf(p)?verifyBadgeImg(verifyTierOf(p),16):'')+'</div>'+(loc?'<div class="nwsbf-post-loc">'+loc+'</div>':'')+'</div>'+
             '</div>'+
             '<div class="nwsbf-post-imgwrap" onclick="IG.feedOpenPost('+p.id+')"><img class="nwsbf-post-img" src="'+src+'" alt="" loading="lazy"></div>'+
-            '<div class="nwsbf-post-actions"><button class="nwsbf-act">'+heart+'</button><button class="nwsbf-act">'+comment+'</button><button class="nwsbf-act">'+send+'</button><span class="nwsbf-sp"></span><button class="nwsbf-act">'+save+'</button></div>'+
-            '<div class="nwsbf-post-likes">'+cf(lc(i))+' likes</div>'+
+            '<div class="nwsbf-post-actions">'+
+              '<button class="nwsbf-act nwsbf-like-btn'+(liked?' on':'')+'" onclick="IG.feedLike(this,'+p.id+')">'+heart+'</button>'+
+              '<button class="nwsbf-act" onclick="IG.feedComment('+p.id+',\''+uname+'\')">'+comment+'</button>'+
+              '<button class="nwsbf-act" onclick="IG.feedShare('+p.id+',\''+uname+'\')">'+send+'</button>'+
+              '<span class="nwsbf-sp"></span>'+
+              '<button class="nwsbf-act nwsbf-save-btn'+(saved?' on':'')+'" onclick="IG.feedSave(this,'+p.id+',\''+src+'\',\''+uname+'\')">'+save+'</button>'+
+            '</div>'+
+            '<div class="nwsbf-post-likes" id="nwsbf-likes-'+p.id+'" data-base="'+lc(i)+'">'+cf(lc(i)+(liked?1:0))+' likes</div>'+
             '<div class="nwsbf-post-cap"><b>'+(p.username||p.fullName)+'</b> '+cap+'</div>'+
+            '<div class="nwsbf-post-comments" id="nwsbf-cmtline-'+p.id+'">'+IG.commentLineHtml(p.id)+'</div>'+
           '</div>';
       }).join('');
 
@@ -445,7 +455,11 @@
         '#sub-ig-feed .nwsbf-act{width:44px;height:44px;border:none;border-radius:50% !important;background:#eef0f5;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.12),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
         '#sub-ig-feed .nwsbf-act:active{box-shadow:inset 3px 3px 7px rgba(0,0,0,.13),inset -2px -2px 5px rgba(255,255,255,.92);}'+
         '#sub-ig-feed .nwsbf-post-likes{font-size:13px;font-weight:700;color:#1a1a2e;margin-top:12px;}'+
-        '#sub-ig-feed .nwsbf-post-cap{font-size:13px;color:#1a1a2e;margin-top:4px;line-height:1.45;}';
+        '#sub-ig-feed .nwsbf-post-cap{font-size:13px;color:#1a1a2e;margin-top:4px;line-height:1.45;}'+
+        '#sub-ig-feed .nwsbf-post-comments{margin-top:4px;}'+
+        '#sub-ig-feed .nwsbf-post-comments span{font-size:13px;color:rgba(26,26,46,0.45);cursor:pointer;}'+
+        '#sub-ig-feed .nwsbf-like-btn.on svg path{fill:#ff3040;stroke:#ff3040;}'+
+        '#sub-ig-feed .nwsbf-save-btn.on svg path{fill:#1a1a2e;stroke:#1a1a2e;}';
 
       screen.innerHTML='<style>'+css+'</style>'+
         '<div class="nwsbf-scroll">'+
@@ -466,6 +480,113 @@
       this._currentProfile=p;
       this.openExplorePost((p.grid&&p.grid[0])||p.avatar);
     },
+
+    // ── Feed post interactions: like / comment / share / save — all real,
+    // persisted in localStorage so they survive reloads. ──
+    _ls:function(key,fallback){ try{ var v=JSON.parse(localStorage.getItem(key)); return v==null?fallback:v; }catch(e){ return fallback; } },
+    _lsSet:function(key,val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} },
+    isPostLiked:function(id){ return this._ls('nwsb_liked_posts',[]).indexOf(String(id))!==-1; },
+    isPostSaved:function(id){ return this._ls('nwsb_saved_posts',[]).some(function(x){return String(x.id)===String(id);}); },
+    commentLineHtml:function(id){
+      var c=this._ls('nwsb_post_comments_'+id,[]);
+      if(!c.length) return '';
+      return '<span onclick="IG.feedComment('+id+')">View '+c.length+(c.length===1?' comment':' comments')+'</span>';
+    },
+    feedLike:function(btn,id){
+      var arr=this._ls('nwsb_liked_posts',[]);
+      var idx=arr.indexOf(String(id));
+      var likesEl=document.getElementById('nwsbf-likes-'+id);
+      var base=likesEl?parseInt(likesEl.getAttribute('data-base')||'0',10):0;
+      var nowLiked;
+      if(idx===-1){ arr.push(String(id)); nowLiked=true; } else { arr.splice(idx,1); nowLiked=false; }
+      this._lsSet('nwsb_liked_posts',arr);
+      btn.classList.toggle('on',nowLiked);
+      if(likesEl){
+        var n=base+(nowLiked?1:0);
+        likesEl.textContent=String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',')+' likes';
+      }
+    },
+    feedSave:function(btn,id,img,uname){
+      var arr=this._ls('nwsb_saved_posts',[]);
+      var idx=arr.findIndex?arr.findIndex(function(x){return String(x.id)===String(id);}):-1;
+      var nowSaved;
+      if(idx===-1){ arr.push({id:String(id),img:img,uname:uname}); nowSaved=true; }
+      else { arr.splice(idx,1); nowSaved=false; }
+      this._lsSet('nwsb_saved_posts',arr);
+      btn.classList.toggle('on',nowSaved);
+      if(window.nwsbToast) nwsbToast(nowSaved?'Saved':'Removed from saved');
+    },
+    feedShare:function(id,uname){
+      var url='https://nowssb.com/connect/p/'+id;
+      var text=uname+' on NowssB Connect — '+url;
+      if(navigator.share){ navigator.share({title:'NowssB Connect',text:uname+"'s post",url:url}).catch(function(){}); return; }
+      if(navigator.clipboard){ navigator.clipboard.writeText(text).then(function(){ if(window.nwsbToast) nwsbToast('Link copied'); }).catch(function(){}); }
+      else if(window.nwsbToast) nwsbToast('Link: '+url);
+    },
+    feedComment:function(id,uname){
+      var old=document.getElementById('nwsb-cmt-sheet'); if(old) old.remove();
+      var comments=this._ls('nwsb_post_comments_'+id,[]);
+      var sheet=document.createElement('div');
+      sheet.id='nwsb-cmt-sheet';
+      sheet.style.cssText='position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;';
+      sheet.onclick=function(e){ if(e.target===sheet) sheet.remove(); };
+      var rows=comments.map(function(c){
+        return '<div style="display:flex;gap:10px;padding:10px 20px;">'+
+          '<div style="width:32px;height:32px;border-radius:50% !important;background:#333;flex-shrink:0;"></div>'+
+          '<div style="flex:1;min-width:0;"><span style="font-weight:700;color:#fff;">You</span> <span style="color:rgba(255,255,255,.82);">'+c.text+'</span></div>'+
+        '</div>';
+      }).join('') || '<div style="padding:24px 20px;color:rgba(255,255,255,.5);font-size:13px;text-align:center;">No comments yet. Start the conversation.</div>';
+      sheet.innerHTML=
+        '<div style="width:100%;max-height:70vh;display:flex;flex-direction:column;background:#0a1628;border-radius:20px 20px 0 0;border-top:1.5px solid rgba(232,213,163,.25);font-family:\'DM Sans\',sans-serif;">'+
+          '<div style="width:40px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:14px auto 10px;"></div>'+
+          '<div style="text-align:center;font-weight:700;color:#fff;font-size:15px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);">Comments</div>'+
+          '<div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">'+rows+'</div>'+
+          '<div style="display:flex;gap:10px;align-items:center;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.08);">'+
+            '<input id="nwsb-cmt-input" placeholder="Add a comment…" style="flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:100px !important;padding:10px 16px;color:#fff;font-size:14px;font-family:\'DM Sans\',sans-serif;outline:none;">'+
+            '<button onclick="IG.feedPostComment('+id+')" style="background:none;border:none;color:#e8d5a3;font-weight:700;font-size:14px;cursor:pointer;padding:8px;">Post</button>'+
+          '</div>'+
+        '</div>';
+      document.body.appendChild(sheet);
+      var inp=document.getElementById('nwsb-cmt-input');
+      if(inp) inp.onkeydown=function(e){ if(e.key==='Enter') IG.feedPostComment(id); };
+    },
+    feedPostComment:function(id){
+      var inp=document.getElementById('nwsb-cmt-input'); if(!inp) return;
+      var text=(inp.value||'').trim(); if(!text) return;
+      var arr=this._ls('nwsb_post_comments_'+id,[]);
+      arr.push({text:text,ts:Date.now()});
+      this._lsSet('nwsb_post_comments_'+id,arr);
+      var line=document.getElementById('nwsbf-cmtline-'+id);
+      if(line) line.innerHTML=this.commentLineHtml(id);
+      var sheet=document.getElementById('nwsb-cmt-sheet'); if(sheet) sheet.remove();
+      this.feedComment(id);
+    },
+    // ── Saved posts — reachable from the profile ⋯ menu ──
+    openSaved:function(){
+      var old=document.getElementById('nwsb-saved-view'); if(old) old.remove();
+      var saved=this._ls('nwsb_saved_posts',[]);
+      var view=document.createElement('div');
+      view.id='nwsb-saved-view';
+      view.style.cssText='position:fixed;inset:0;z-index:9700;background:#0a0e1a;display:flex;flex-direction:column;font-family:\'DM Sans\',sans-serif;';
+      view.innerHTML=
+        '<div style="display:flex;align-items:center;gap:14px;padding:max(env(safe-area-inset-top,14px),14px) 16px 14px;border-bottom:1px solid rgba(255,255,255,.1);">'+
+          '<button onclick="document.getElementById(\'nwsb-saved-view\').remove()" style="width:36px;height:36px;border-radius:50% !important;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;cursor:pointer;">'+
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>'+
+          '</button>'+
+          '<span style="font-size:17px;font-weight:800;color:#fff;">Saved</span>'+
+        '</div>'+
+        (saved.length
+          ? '<div style="flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px;">'+
+              saved.map(function(s){ return '<div style="aspect-ratio:1/1;background-image:url(\''+s.img+'\');background-size:cover;background-position:center;cursor:pointer;" onclick="window.open(\''+s.img+'\',\'_blank\')"></div>'; }).join('')+
+            '</div>'
+          : '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0 40px;text-align:center;">'+
+              '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>'+
+              '<div style="color:#fff;font-weight:700;font-size:16px;">Nothing saved yet</div>'+
+              '<div style="color:rgba(255,255,255,.5);font-size:13px;">Tap the bookmark icon on any post to save it here.</div>'+
+            '</div>');
+      document.body.appendChild(view);
+    },
+
     openVerify:function(){
       var cur='';
       try{ cur = localStorage.getItem('nwsb_verify_tier') || (window._userDataCache&&window._userDataCache.verifyTier) || ''; }catch(e){}

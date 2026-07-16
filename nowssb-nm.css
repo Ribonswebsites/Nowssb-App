@@ -3466,7 +3466,10 @@ html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 8px 32px rgba(0,0,0,0.36) !important;
 }
 html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-av {
-  background: rgba(255,255,255,0.12) !important;
+  /* longhand background-color only — the base rule sets the avatar photo via
+     inline background-image; the shorthand `background` property used to
+     reset that to none and blank out every post's profile picture */
+  background-color: rgba(255,255,255,0.12) !important;
   border: 1px solid rgba(255,255,255,0.28) !important;
   box-shadow: none !important;
 }
@@ -3476,6 +3479,12 @@ html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-likes { color: #fff !important
 html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-cap { color: rgba(255,255,255,0.85) !important; }
 html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-cap b,
 html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-cap strong { color: #fff !important; }
+/* like/comment/send/save icons are hardcoded stroke="#1a1a2e" (dark navy) —
+   correct on the default theme's light feed bg, invisible on dark glass. */
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-act svg path { stroke: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-like-btn.on svg path { fill: #ff3040 !important; stroke: #ff3040 !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-save-btn.on svg path { fill: #fff !important; stroke: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-comments span { color: rgba(255,255,255,0.55) !important; cursor: pointer; font-size: 13px; }
 
 /* ═══ 2. REELS (#sub-reels-feed) ═══ */
 html body.nwsb-soc-glass #sub-reels-feed .nwsb-reel-card {
@@ -3571,8 +3580,18 @@ html body.nwsb-soc-glass #sub-ig-profile .ig-prof-top { background: transparent 
 html body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn {
   background: rgba(255,255,255,0.1) !important;
   border: 1px solid rgba(255,255,255,0.24) !important;
+  border-radius: 50% !important;
+  width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
   color: #fff !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 14px rgba(0,0,0,0.28) !important;
+}
+/* Verified badge is already a self-contained colored graphic — no glass frame */
+html body.nwsb-soc-glass #sub-ig-profile .ig-vshop {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: 24px !important; height: 24px !important; min-width: 24px !important; min-height: 24px !important;
 }
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring {
   background: rgba(255,255,255,0.12) !important;
