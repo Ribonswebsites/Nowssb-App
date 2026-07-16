@@ -2644,63 +2644,35 @@ body.nm-glass #sub-health-journey .gsel-card {
 .nmh-practice > .nmh-practice-word,
 .nmh-practice > .nmh-practice-meaning,
 .nmh-practice > .nmh-practice-footer { position: relative; z-index: 2; }
-/* Recessed neumorphic DIMPLE pocket behind the practice artwork */
-.nmh-practice::before {
-  content: ''; position: absolute; z-index: 0;
-  right: 6px; top: 30%; transform: translateY(-50%);
-  width: 31%; max-width: 150px; aspect-ratio: 1 / 1;
-  border-radius: 26px; background: #f0f2f7;
-  box-shadow: inset 5px 5px 11px rgba(163,177,198,0.55), inset -5px -5px 11px rgba(255,255,255,0.9);
-}
-#home-nm.nm-dark .nmh-practice::before {
-  background: #16163c;
-  box-shadow: inset 5px 5px 12px rgba(0,0,0,0.7), inset -4px -4px 10px rgba(50,50,110,0.3);
-}
 .nmh-practice-img {
   position: absolute; right: 8px; top: 30%; transform: translateY(-50%);
-  width: 27%; max-width: 132px; object-fit: contain; display: block;
+  width: 28%; max-width: 138px; object-fit: contain; display: block;
   z-index: 1; pointer-events: none;
-  /* subtle lift so the art sits INSIDE the dimple pocket */
-  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.22));
+  filter: drop-shadow(3px 4px 6px rgba(163,177,198,0.55)) drop-shadow(-2px -3px 5px rgba(255,255,255,0.72));
 }
 .nmh-tile { border-radius:22px !important; }
-/* ── NowssB Connect — hero panel (image bg) with horizontal creator cards ── */
+/* ── NowssB Connect — explainer hero panel (image bg + logo + description) ── */
 .nmh-connect-sec {
-  width: 100%; border-radius: 24px !important; overflow: hidden; position: relative;
-  padding: 18px 0 10px;
-  background-image: linear-gradient(rgba(6,10,22,0.34) 0%, rgba(6,10,22,0.62) 55%, rgba(6,10,22,0.82) 100%),
+  width: 100%; border-radius: 24px !important; overflow: hidden; position: relative; cursor: pointer;
+  padding: 26px 22px 24px;
+  display: flex; flex-direction: column; align-items: flex-start;
+  background-image: linear-gradient(rgba(6,10,22,0.5) 0%, rgba(6,10,22,0.68) 55%, rgba(6,10,22,0.86) 100%),
     url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg');
-  background-size: cover; background-position: center 62%;
+  background-size: cover; background-position: center 34%;
   box-shadow: 9px 9px 22px rgba(163,177,198,0.55), -7px -7px 16px #ffffff;
 }
-.nmh-connect-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding: 0 16px; position: relative; z-index: 2; }
-.nmh-connect-title { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.3px; text-shadow: 0 2px 10px rgba(0,0,0,0.6); }
+.nmh-connect-logo { width: 58px; height: 58px; border-radius: 50% !important; object-fit: cover; margin-bottom: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.45); }
+.nmh-connect-title { font-family: 'DM Sans', sans-serif; font-size: 21px; font-weight: 800; color: #fff; letter-spacing: -0.3px; text-shadow: 0 2px 12px rgba(0,0,0,0.65); margin-bottom: 8px; }
 .nmh-connect-title .accent { color: #e8d5a3; }
-.nmh-connect-seeall { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.78); cursor: pointer; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
-.nmh-connect-row { display: flex; gap: 12px; overflow-x: auto; padding: 4px 16px 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch; position: relative; z-index: 2; }
-.nmh-connect-row::-webkit-scrollbar { display: none; }
-.nmh-connect-card {
-  flex: 0 0 auto; width: 134px; box-sizing: border-box;
-  background: #f0f2f7; border-radius: 20px !important; padding: 16px 12px 14px;
-  display: flex; flex-direction: column; align-items: center; cursor: pointer;
-  box-shadow: 7px 7px 16px rgba(163,177,198,0.55), -5px -5px 12px #ffffff;
-  transition: transform 0.12s;
+.nmh-connect-desc { font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 400; line-height: 1.6; color: rgba(255,255,255,0.82); text-shadow: 0 1px 6px rgba(0,0,0,0.6); margin-bottom: 18px; max-width: 300px; }
+.nmh-connect-enter {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 800; color: #060c18;
+  background: #e8d5a3; padding: 11px 20px; border-radius: 100px !important; min-height: 0 !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
 }
-.nmh-connect-card:active { transform: scale(0.97); }
-.nmh-connect-av {
-  width: 64px; height: 64px; border-radius: 50% !important; background-size: cover; background-position: center;
-  background-color: #dfe3ea; margin-bottom: 10px;
-  box-shadow: 3px 3px 8px rgba(163,177,198,0.5), -2px -2px 6px #ffffff;
-}
-.nmh-connect-name { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; justify-content: center; gap: 3px; text-align: center; line-height: 1.2; white-space: nowrap; }
-.nmh-connect-name svg { width: 12px; height: 12px; flex-shrink: 0; }
-.nmh-connect-cat { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; color: rgba(0,0,0,0.42); margin: 3px 0 12px; text-align: center; white-space: nowrap; }
-.nmh-connect-follow {
-  border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; color: #fff;
-  background: linear-gradient(135deg, #c8a96e, #a8854a); padding: 7px 20px; border-radius: 100px !important;
-  min-height: 0 !important; box-shadow: 0 4px 10px rgba(168,133,74,0.35);
-}
-/* cards stay light in both themes — they sit on the dark image panel */
+.nmh-connect-enter svg { width: 16px; height: 16px; display: block; }
+.nmh-connect-enter:active { transform: scale(0.96); }
 /* Artwork tiles — original icon + title + subtitle stay on the LEFT, the 16:9
    artwork sits BIG on the RIGHT (absolutely placed, vertically centered). The
    tile reserves left space and the title shrinks a touch so the art can be large. */
@@ -2708,24 +2680,14 @@ body.nm-glass #sub-health-journey .gsel-card {
 .nmh-tile.nmh-tile-art .nmh-tile-title { font-size: 13px; }
 .nmh-tile.nmh-tile-art .nmh-tile-title,
 .nmh-tile.nmh-tile-art .nmh-tile-sub { position: relative; z-index: 2; }
-/* Recessed neumorphic DIMPLE pocket behind each tile's artwork */
-.nmh-tile.nmh-tile-art::before {
-  content: ''; position: absolute; z-index: 0;
-  right: 6px; top: 50%; transform: translateY(-50%);
-  width: 60%; aspect-ratio: 16/9;
-  border-radius: 18px; background: #f0f2f7;
-  box-shadow: inset 4px 4px 9px rgba(163,177,198,0.5), inset -4px -4px 9px rgba(255,255,255,0.88);
-}
-#home-nm.nm-dark .nmh-tile.nmh-tile-art::before {
-  background: #16163c;
-  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.7), inset -3px -3px 8px rgba(50,50,110,0.3);
-}
 .nmh-tile-img {
-  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
-  width: 60%; aspect-ratio: 16/9; object-fit: contain; display: block;
+  position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+  width: 68%; aspect-ratio: 16/9; object-fit: contain; display: block;
   pointer-events: none; z-index: 1;
-  /* subtle lift so the art sits INSIDE the dimple pocket */
-  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.2));
+  filter: drop-shadow(3px 4px 6px rgba(163,177,198,0.5)) drop-shadow(-2px -2px 4px rgba(255,255,255,0.66));
+}
+#home-nm.nm-dark .nmh-tile-img {
+  filter: drop-shadow(3px 4px 7px rgba(0,0,0,0.6)) drop-shadow(-2px -2px 5px rgba(50,50,110,0.28));
 }
 /* Traveling gold light — SEQUENTIAL relay: only ONE tile's ring sweeps at a
    time; when it finishes, the next tile's ring starts, and so on. Each tile runs
