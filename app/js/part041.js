@@ -3,7 +3,7 @@
   var oldPanel = document.getElementById('ss-panel-profile-edit');
   if(!oldPanel) return;
   oldPanel.innerHTML = `
-    <div class="nwsb-pe-cover" style="position:relative;width:100%;height:172px;background:#0a0a14 url('https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782596094/f83ab790-726f-11f1-a85a-7f29a6214ded_peshjl.webp') center/cover no-repeat;">
+    <div class="nwsb-pe-cover" style="position:relative;width:100%;height:172px;background:#0a0a14 url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784171086/grok_image_1784171046763_kfygmv.jpg') center/cover no-repeat;">
       <button class="ss-panel-back" onclick="nwsbCloseEditProfile()" style="position:absolute;top:calc(max(env(safe-area-inset-top,12px),12px));left:14px;z-index:2;display:inline-flex;align-items:center;gap:6px;margin:0;padding:9px 14px 9px 11px;border:none;border-radius:50px !important;background:rgba(255,255,255,0.94);color:#1a1a2e;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.4);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         Back
