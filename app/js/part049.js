@@ -192,6 +192,54 @@ window.fashionHomeIntroEnter = function() {
   init();
 })();
 
+/* ── NowssB Connect features carousel — auto-slides through what Connect offers
+   (its OWN features: feed, stories, reels, discover, verified), one at a time. */
+(function () {
+  var ARROW = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var FEATURES = [
+    { name: 'Community Feed', sub: 'Share your daily practice with the world',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#fff" stroke-width="1.5"/><circle cx="8.5" cy="9" r="1.7" stroke="#fff" stroke-width="1.3"/><path d="M4 17l4.5-4 3.5 2.8L16 12l4 4.2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+    { name: 'Stories', sub: 'Drop 24-hour frequency moments',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.5" stroke-dasharray="2.6 2.4"/><circle cx="12" cy="12" r="4.4" stroke="#fff" stroke-width="1.5"/></svg>' },
+    { name: 'Reels', sub: 'Watch & post short healing reels',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="15" rx="3" stroke="#fff" stroke-width="1.5"/><path d="M3 9h18M8 4.5l2 4.5M14 4.5l2 4.5" stroke="#fff" stroke-width="1.3"/><path d="M11 12.2l4 2.1-4 2.1z" fill="#fff"/></svg>' },
+    { name: 'Discover Creators', sub: 'Find people worth following',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.5"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>' },
+    { name: 'Verified', sub: 'Earn your NowssB check-mark',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.6l2.3 1.7 2.9.2 1 2.7 2.2 1.9-1 2.7 1 2.7-2.2 1.9-1 2.7-2.9.2L12 21.4l-2.3-1.7-2.9-.2-1-2.7-2.2-1.9 1-2.7-1-2.7 2.2-1.9 1-2.7 2.9-.2z" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/><path d="M8.6 12l2.2 2.2 4.6-4.7" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' }
+  ];
+  function build(track, dots) {
+    track.innerHTML = FEATURES.map(function (f) {
+      return '<div class="ncb-slide"><span class="ncb-ico">' + f.svg + '</span>' +
+        '<span class="ncb-txt"><span class="ncb-name">' + f.name + '</span><span class="ncb-sub">' + f.sub + '</span></span>' +
+        '<span class="ncb-btn">' + ARROW + '</span></div>';
+    }).join('');
+    dots.innerHTML = FEATURES.map(function (_, i) { return '<span class="ncb-dot' + (i === 0 ? ' on' : '') + '"></span>'; }).join('');
+  }
+  window._ncbInit = function (id, onTap) {
+    var car = document.getElementById(id); if (!car) return;
+    var track = car.querySelector('.ncb-track'); var dots = car.querySelector('.ncb-dots');
+    if (!track || !dots) return;
+    if (!track._ncbBuilt) { build(track, dots); track._ncbBuilt = true; }
+    car.onclick = onTap;
+    var idx = 0;
+    if (car._ncbTimer) clearInterval(car._ncbTimer);
+    car._ncbTimer = setInterval(function () {
+      if (document.hidden) return;
+      idx = (idx + 1) % FEATURES.length;
+      track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      var ds = dots.querySelectorAll('.ncb-dot');
+      for (var i = 0; i < ds.length; i++) ds[i].classList.toggle('on', i === idx);
+    }, 3200);
+  };
+  function initAll() {
+    if (!document.getElementById('ncbCarouselNm') && !document.getElementById('ncbCarouselFash')) { return setTimeout(initAll, 400); }
+    _ncbInit('ncbCarouselNm', function () { if (window.IG) IG.nav('profile'); });
+    _ncbInit('ncbCarouselFash', function () { if (typeof openConnectIntro === 'function') openConnectIntro(); else if (window.IG) IG.nav('profile'); });
+  }
+  initAll();
+})();
+
 /* ── Word/Meaning search: cycle the tagline through phrases one after another
    (fade out → swap → fade in). One line at a time so the layout never grows. */
 (function () {

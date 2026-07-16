@@ -2651,12 +2651,28 @@ body.nm-glass #sub-health-journey .gsel-card {
   filter: drop-shadow(3px 4px 6px rgba(163,177,198,0.55)) drop-shadow(-2px -3px 5px rgba(255,255,255,0.72));
 }
 .nmh-tile { border-radius:22px !important; }
-/* ── NowssB Connect — explainer hero panel (VIDEO bg + logo + description) ── */
-.nmh-connect-banner {
-  width: 100%; border-radius: 22px !important; overflow: hidden; cursor: pointer;
-  box-shadow: 8px 8px 20px rgba(163,177,198,0.5), -6px -6px 14px #ffffff;
+/* ── NowssB Connect features carousel — auto-sliding, one feature at a time ── */
+.ncb-carousel {
+  width: 100%; border-radius: 22px !important; overflow: hidden; cursor: pointer; position: relative;
+  background: #000; box-shadow: 8px 8px 20px rgba(163,177,198,0.5), -6px -6px 14px #ffffff;
 }
-.nmh-connect-banner img { width: 100%; height: 200px; object-fit: cover; display: block; }
+.ncb-track { display: flex; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); will-change: transform; }
+.ncb-slide { flex: 0 0 100%; box-sizing: border-box; display: flex; align-items: center; gap: 14px; padding: 24px 20px 30px; }
+.ncb-ico { width: 54px; height: 54px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  border-radius: 15px !important; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15); }
+.ncb-ico svg { width: 27px; height: 27px; display: block; }
+.ncb-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ncb-name { font-family: 'DM Sans', sans-serif; font-size: 15.5px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+.ncb-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.62); line-height: 1.35; }
+.ncb-btn { width: 38px; height: 38px; flex-shrink: 0; border-radius: 50% !important; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.24); }
+.ncb-btn svg { width: 17px; height: 17px; display: block; }
+.ncb-dots { position: absolute; bottom: 10px; left: 0; right: 0; display: flex; justify-content: center; gap: 5px; z-index: 2; }
+.ncb-dot { width: 5px; height: 5px; border-radius: 50% !important; background: rgba(255,255,255,0.28); transition: all 0.3s; }
+.ncb-dot.on { background: #e8d5a3; width: 15px; border-radius: 3px !important; }
+/* Fashion variant — square corners + fash width/margins + dark shadow */
+.fash-ncb { border-radius: 0 !important; width: calc(100% - 32px) !important; margin: 16px 16px 8px !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.42) !important; border: 1px solid rgba(255,255,255,0.08); }
 .nmh-connect-sec {
   width: 100%; border-radius: 24px !important; overflow: hidden; position: relative; cursor: pointer;
   min-height: 470px; padding: 44px 22px 36px;

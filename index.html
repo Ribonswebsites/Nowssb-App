@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=260"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
 <link rel="stylesheet" href="nowssb-social.css?v=191">
-<link rel="stylesheet" href="nowssb-nm.css?v=320">
+<link rel="stylesheet" href="nowssb-nm.css?v=321">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -867,10 +867,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="npc-text"><span class="npc-line" id="npcBlueLine"></span></div>
     </div>
 
-    <!-- Connect banner -->
-    <div class="nmh-connect-banner" onclick="window.IG&&IG.nav('profile')">
-      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784171086/grok_image_1784171046763_kfygmv.jpg" alt="NowssB Connect">
-    </div>
+    <!-- Connect features carousel — slides through what NowssB Connect offers -->
+    <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
     <!-- NowssB Connect — what it is (video bg) -->
     <div class="nmh-connect-sec" onclick="window.IG&&IG.nav('profile')">
       <video class="nmh-connect-vid" autoplay muted loop playsinline preload="auto" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
@@ -1226,10 +1224,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <!-- Connect banner (fashion) -->
-  <div class="nmh-connect-banner fash-connect-banner" onclick="openConnectIntro()">
-    <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784171086/grok_image_1784171046763_kfygmv.jpg" alt="NowssB Connect">
-  </div>
+  <!-- Connect features carousel (fashion) -->
+  <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
   <!-- NowssB Connect — what it is (fashion, video bg) -->
   <div class="nmh-connect-sec fash-connect" onclick="openConnectIntro()">
     <video class="nmh-connect-vid" autoplay muted loop playsinline preload="auto" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
@@ -7305,7 +7301,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=288"></script>
+<script src="app/js/part049.js?v=289"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="nowssb-social.js?v=163" defer></script>
 <script src="nowssb-nm.js?v=163" defer></script>
