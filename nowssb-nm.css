@@ -3561,88 +3561,268 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   NOWSSB CONNECT — GLASSMORPHISM THEME (the "NowssB Fashion" option).
-   Built ONE PAGE AT A TIME. Page 1: CONNECT HOME (#sub-social-home).
-   True dark glass: the photo background stays clearly visible; every surface
-   is translucent dark glass with a light border + inner highlight; text white.
-   Default neumorphism untouched (all rules gated on body.nwsb-soc-glass).
+   NOWSSB CONNECT — COMPLETE GLASSMORPHISM THEME ("NowssB Fashion" option).
+   ALL five Connect pages. True dark glass: each page's photo background stays
+   clearly visible under a light dark tint; every surface is translucent dark
+   glass (light border + inner highlight); all text white. The `html body.…`
+   + screen-id selectors out-rank every neumorphism rule (nm-mode, the feed's
+   runtime-injected styles, the old light-glass profile) regardless of order.
+   Default neumorphism untouched — everything is gated on .nwsb-soc-glass.
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* page background — image clearly visible under a light dark tint */
-body.nwsb-soc-glass #sub-social-home {
+/* ── PAGE BACKGROUNDS (images clearly visible) ── */
+html body.nwsb-soc-glass #sub-ig-feed {
+  background: linear-gradient(rgba(4,8,18,0.22) 0%, rgba(4,8,18,0.34) 55%, rgba(4,8,18,0.52) 100%),
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177099346_a7zq1m.jpg') center/cover no-repeat !important;
+}
+html body.nwsb-soc-glass #sub-reels-feed {
+  background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177245304_ihjubs.jpg') center/cover no-repeat !important;
+}
+html body.nwsb-soc-glass #sub-people {
+  background: linear-gradient(rgba(4,8,18,0.22) 0%, rgba(4,8,18,0.34) 55%, rgba(4,8,18,0.52) 100%),
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177237514_bbhcec.jpg') center/cover no-repeat !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile,
+html body.nwsb-soc-glass #sub-ig-profile .ig {
+  background: linear-gradient(rgba(4,8,18,0.24) 0%, rgba(4,8,18,0.36) 55%, rgba(4,8,18,0.54) 100%),
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177102414_lpzhbd.jpg') center/cover no-repeat !important;
+}
+html body.nwsb-soc-glass #sub-social-home {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
     url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177200001_clr7h6.jpg') center/cover no-repeat !important;
 }
-body.nwsb-soc-glass #sub-social-home::before { display: none !important; }
+html body.nwsb-soc-glass #sub-people::before,
+html body.nwsb-soc-glass #sub-social-home::before { display: none !important; }
 
-/* top bar — dark glass strip */
-body.nwsb-soc-glass #sub-social-home .ig-topbar {
-  background: rgba(10,14,26,0.38) !important;
+/* ═══ 1. COMMUNITY FEED (#sub-ig-feed) ═══ */
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-top {
+  background: rgba(10,14,26,0.4) !important;
   border-bottom: 1px solid rgba(255,255,255,0.16) !important;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.3) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.32) !important;
 }
-body.nwsb-soc-glass #sub-social-home .ig-username { color: #fff !important; }
-body.nwsb-soc-glass #sub-social-home .ig-iconbtn {
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-logo { color: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-icon,
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-act,
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-brandlogo {
   background: rgba(255,255,255,0.1) !important;
   border: 1px solid rgba(255,255,255,0.24) !important;
-  border-radius: 50% !important; color: #fff !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 14px rgba(0,0,0,0.3) !important;
 }
-
-/* hero card — dark glass panel */
-body.nwsb-soc-glass #sub-social-home .nwsb-hero {
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-iconimg { filter: brightness(0) invert(1) opacity(0.85) !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-story-ring {
+  background: rgba(255,255,255,0.09) !important;
+  border: 1.5px solid rgba(232,213,163,0.55) !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-story-av { background-color: rgba(255,255,255,0.12) !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-story span,
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-story { color: rgba(255,255,255,0.85) !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post {
   background: rgba(255,255,255,0.08) !important;
   border: 1px solid rgba(255,255,255,0.22) !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 8px 32px rgba(0,0,0,0.36) !important;
 }
-body.nwsb-soc-glass #sub-social-home .nwsb-hero-title { color: #fff !important; }
-body.nwsb-soc-glass #sub-social-home .nwsb-hero-sub { color: rgba(255,255,255,0.72) !important; }
-body.nwsb-soc-glass #sub-social-home .nwsb-hero-tag {
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-av {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.28) !important;
+  box-shadow: none !important;
+}
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-name { color: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-loc { color: rgba(255,255,255,0.6) !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-likes { color: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-cap { color: rgba(255,255,255,0.85) !important; }
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-cap b,
+html body.nwsb-soc-glass #sub-ig-feed .nwsbf-post-cap strong { color: #fff !important; }
+
+/* ═══ 2. REELS (#sub-reels-feed) ═══ */
+html body.nwsb-soc-glass #sub-reels-feed .nwsb-reel-card {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 8px 32px rgba(0,0,0,0.38) !important;
+}
+html body.nwsb-soc-glass .nwsb-reel-thumb {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.32) !important;
+}
+html body.nwsb-soc-glass .nwsb-reel-score-pill,
+html body.nwsb-soc-glass .nwsb-reel-claim-btn {
   background: rgba(255,255,255,0.12) !important;
   border: 1px solid rgba(255,255,255,0.3) !important;
   color: #fff !important;
 }
-
-/* stat cubes — dark glass */
-body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
-  background: rgba(255,255,255,0.09) !important;
-  border: 1px solid rgba(255,255,255,0.22) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 20px rgba(0,0,0,0.3) !important;
-}
-body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat-num { color: #fff !important; }
-body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat-lbl { color: rgba(255,255,255,0.6) !important; }
-
-/* explainer slots — dark glass */
-body.nwsb-soc-glass #sub-social-home .nwsb-explainer-slot {
-  background: rgba(255,255,255,0.08) !important;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 6px 20px rgba(0,0,0,0.28) !important;
+html body.nwsb-soc-glass #sub-reels-feed .nwsb-reel-word,
+html body.nwsb-soc-glass #sub-reels-feed .nwsb-reel-username,
+html body.nwsb-soc-glass #sub-reels-feed .nwsb-reel-score-num { color: #fff !important; }
+html body.nwsb-soc-glass #sub-reels-feed .nwsb-reels-empty-title { color: #fff !important; }
+html body.nwsb-soc-glass #sub-reels-feed .nwsb-reels-empty-sub { color: rgba(255,255,255,0.66) !important; }
+html body.nwsb-soc-glass #sub-reels-feed .nwsb-reels-empty .ig-btn,
+html body.nwsb-soc-glass #sub-reels-feed button {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(232,213,163,0.5) !important;
+  color: #e8d5a3 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 6px 18px rgba(0,0,0,0.32) !important;
 }
 
-/* section headers — white on the photo */
-body.nwsb-soc-glass #sub-social-home .nwsb-section-hd {
-  color: #fff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.6) !important;
+/* ═══ 3. DISCOVER (#sub-people) ═══ */
+html body.nwsb-soc-glass #sub-people .ig-people-header {
+  background: rgba(10,14,26,0.4) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.16) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3) !important;
 }
-
-/* reel thumbnails — glass frames */
-body.nwsb-soc-glass #sub-social-home .nwsb-reel-thumb {
+html body.nwsb-soc-glass #sub-people .ig-people-htitle { color: #fff !important; }
+html body.nwsb-soc-glass #sub-people .ig-people-htitle span { color: #e8d5a3 !important; }
+html body.nwsb-soc-glass #sub-people .ig-people-back {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+  box-shadow: none !important;
+}
+html body.nwsb-soc-glass #sub-people .ig-people-back svg path { stroke: #fff !important; }
+html body.nwsb-soc-glass #sub-people .ig-searchwrap { background: transparent !important; }
+html body.nwsb-soc-glass #sub-people .ig-searchbar {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.26) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 14px rgba(0,0,0,0.28) !important;
+  color: #fff !important;
+}
+html body.nwsb-soc-glass #sub-people .ig-searchbar input { color: #fff !important; }
+html body.nwsb-soc-glass #sub-people .ig-searchbar input::placeholder { color: rgba(255,255,255,0.5) !important; }
+html body.nwsb-soc-glass #sub-people .nwsb-search-icon { filter: brightness(0) invert(1) opacity(0.7) !important; }
+html body.nwsb-soc-glass #sub-people .ig-tile {
   background: rgba(255,255,255,0.07) !important;
   border: 1px solid rgba(255,255,255,0.22) !important;
   box-shadow: 0 6px 20px rgba(0,0,0,0.32) !important;
 }
-body.nwsb-soc-glass #sub-social-home .nwsb-reel-thumb-word { color: #fff !important; }
-
-/* suggested-people rows — dark glass cards */
-body.nwsb-soc-glass #sub-social-home .ig-userrow {
+html body.nwsb-soc-glass #sub-people .ig-userrow,
+html body.nwsb-soc-glass #sub-social-home .ig-userrow {
   background: rgba(255,255,255,0.08) !important;
   border: 1px solid rgba(255,255,255,0.22) !important;
   border-radius: 16px !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 6px 20px rgba(0,0,0,0.3) !important;
 }
-body.nwsb-soc-glass #sub-social-home .ig-userrow .ig-u { color: #fff !important; }
-body.nwsb-soc-glass #sub-social-home .ig-userrow .ig-n { color: rgba(255,255,255,0.6) !important; }
-body.nwsb-soc-glass #sub-social-home .ig-mini-follow {
+html body.nwsb-soc-glass #sub-people .ig-userrow .ig-u,
+html body.nwsb-soc-glass #sub-social-home .ig-userrow .ig-u { color: #fff !important; }
+html body.nwsb-soc-glass #sub-people .ig-userrow .ig-n,
+html body.nwsb-soc-glass #sub-social-home .ig-userrow .ig-n { color: rgba(255,255,255,0.6) !important; }
+html body.nwsb-soc-glass .ig-mini-follow {
   background: rgba(232,213,163,0.16) !important;
   border: 1px solid rgba(232,213,163,0.45) !important;
   color: #e8d5a3 !important;
 }
+html body.nwsb-soc-glass #sub-people .ig-explore-empty-title { color: #fff !important; }
+html body.nwsb-soc-glass #sub-people .ig-explore-empty-sub { color: rgba(255,255,255,0.6) !important; }
+html body.nwsb-soc-glass #sub-people .ig-explore-empty-circle {
+  background: rgba(255,255,255,0.09) !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+  box-shadow: none !important;
+}
+
+/* ═══ 4. PROFILE (#sub-ig-profile) — replaces the old light-glass skin ═══ */
+html body.nwsb-soc-glass #sub-ig-profile .ig-topbar {
+  background: rgba(10,14,26,0.4) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.16) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-username { color: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-prof-top { background: transparent !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 14px rgba(0,0,0,0.28) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1.5px solid rgba(232,213,163,0.55) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-stat {
+  background: rgba(255,255,255,0.09) !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 20px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-stat .n { color: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-stat .l { color: rgba(255,255,255,0.62) !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-prof-name { color: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-prof-cat { color: rgba(255,255,255,0.66) !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray,
+html body.nwsb-soc-glass #sub-ig-profile .ig-btn.icon {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.26) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 18px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-btn.primary {
+  background: rgba(232,213,163,0.2) !important;
+  border: 1px solid rgba(232,213,163,0.55) !important;
+  color: #e8d5a3 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 6px 18px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle {
+  background: rgba(255,255,255,0.09) !important;
+  border: 1px solid rgba(255,255,255,0.26) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-hl-label { color: rgba(255,255,255,0.78) !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-tabs {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-tab {
+  background: transparent !important; color: rgba(255,255,255,0.7) !important;
+  box-shadow: none !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-tab.active {
+  background: rgba(255,255,255,0.14) !important; color: #e8d5a3 !important;
+  border-bottom: 2px solid #e8d5a3 !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-tile {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
+}
+
+/* ═══ 5. CONNECT HOME (#sub-social-home) ═══ */
+html body.nwsb-soc-glass #sub-social-home .ig-topbar {
+  background: rgba(10,14,26,0.4) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.16) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-social-home .ig-username { color: #fff !important; }
+html body.nwsb-soc-glass #sub-social-home .ig-iconbtn {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+  border-radius: 50% !important; color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 14px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 32px rgba(0,0,0,0.38) !important;
+}
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero-title { color: #fff !important; }
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero-sub { color: rgba(255,255,255,0.72) !important; }
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero-tag {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+  color: #fff !important;
+}
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
+  background: rgba(255,255,255,0.09) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 6px 20px rgba(0,0,0,0.3) !important;
+}
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat-num { color: #fff !important; }
+html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat-lbl { color: rgba(255,255,255,0.6) !important; }
+html body.nwsb-soc-glass #sub-social-home .nwsb-explainer-slot {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 6px 20px rgba(0,0,0,0.28) !important;
+}
+html body.nwsb-soc-glass #sub-social-home .nwsb-section-hd,
+html body.nwsb-soc-glass #sub-people .nwsb-section-hd {
+  color: #fff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.6) !important;
+}
+html body.nwsb-soc-glass #sub-social-home .nwsb-reel-thumb-word { color: #fff !important; }
