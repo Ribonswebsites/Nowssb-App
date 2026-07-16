@@ -1732,166 +1732,6 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-reel-card {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   "NowssB Fashion" THEME — BRIGHT FROSTED GLASS with neumorphic BULGES.
-   Not black glass: a light glassy backdrop with clear, frosted, translucent
-   white panels that bulge out (raised) like neumorphism — soft cool drop
-   shadow + white top-left highlight + an inset bevel for the glass edge.
-   Dark text/icons, gold accents, on the bright glass.
-═══════════════════════════════════════════════════════════════ */
-
-/* Light glassy backdrop so the frosted panels actually read as glass */
-body.nwsb-soc-glass #sub-ig-profile,
-body.nwsb-soc-glass #sub-ig-profile .ig {
-  background: linear-gradient(165deg, #e9ecf9 0%, #e2e6f4 45%, #efe9f7 100%) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile::before { display: none !important; }
-/* The profile body section (behind avatar/stats/buttons) is #060c18 dark by
-   default — make it transparent so the light glassy backdrop shows through and
-   the frosted panels read as bright glass top-to-bottom, not gray blobs. */
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-top { background: transparent !important; }
-
-/* Top bar → clear frosted glass */
-body.nwsb-soc-glass #sub-ig-profile .ig-topbar {
-  background: rgba(255,255,255,0.5) !important; border-bottom: none !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  box-shadow: 0 5px 16px rgba(80,90,140,0.12) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile .ig-username { color: #1a1a2e !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-topbar img { filter: brightness(0) opacity(0.8) !important; }
-
-/* Profile text */
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-name { color: #1a1a2e !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-cat { color: #a8854a !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-bio,
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-biotext { color: rgba(0,0,0,0.7) !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-rank { color: rgba(0,0,0,0.5) !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-plan-badge {
-  color: #a8854a !important; background: rgba(200,169,110,0.16) !important; border-color: rgba(200,169,110,0.35) !important;
-}
-
-/* Banner placeholder (no image) → light frosted gradient, not black */
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-banner:not([style*="url"]) {
-  background: linear-gradient(160deg, #dfe4f5 0%, #e9e4f3 100%) !important;
-}
-
-/* Avatar → bright frosted glass circle that bulges out */
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring {
-  background: rgba(255,255,255,0.5) !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  border-radius: 50% !important; padding: 6px !important;
-  box-shadow: 7px 7px 17px rgba(80,90,140,0.20), -5px -5px 13px rgba(255,255,255,0.9),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.22) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar,
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-avatar-ring img { border: none !important; border-radius: 50% !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-prof-initials {
-  background: rgba(255,255,255,0.45) !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  color: #a8854a !important; border: none !important; border-radius: 50% !important;
-  box-shadow: inset 2px 2px 6px rgba(120,130,170,0.28), inset -2px -2px 6px rgba(255,255,255,0.95) !important;
-}
-
-/* Stat numbers → bright glass circles, bulged */
-body.nwsb-soc-glass #sub-ig-profile .ig-stats { gap: 6px !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-stat .n {
-  width: 54px; height: 54px; border-radius: 50% !important;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.5) !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  color: #a8854a !important; font-size: 17px !important; margin: 0 auto 7px !important;
-  box-shadow: 6px 6px 14px rgba(80,90,140,0.2), -4px -4px 11px rgba(255,255,255,0.9),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.2) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile .ig-stat .l { color: rgba(0,0,0,0.42) !important; }
-
-/* Topbar icon buttons → bright glass raised circles */
-body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn {
-  background: rgba(255,255,255,0.5) !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  border-radius: 50% !important;
-  width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
-  box-shadow: 5px 5px 12px rgba(80,90,140,0.2), -3px -3px 9px rgba(255,255,255,0.9),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.2) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn svg { stroke: #1a1a2e !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-iconbtn img { filter: brightness(0) opacity(0.8) !important; }
-
-/* Action buttons → bright glass with bulge */
-body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray,
-body.nwsb-soc-glass #sub-ig-profile .ig-btn.icon {
-  background: rgba(255,255,255,0.5) !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  border: none !important; color: #1a1a2e !important; border-radius: 14px !important;
-  box-shadow: 5px 5px 12px rgba(80,90,140,0.18), -3px -3px 9px rgba(255,255,255,0.9),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.2) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray svg { stroke: #1a1a2e !important; }
-
-/* Highlights → bright glass circles */
-body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle {
-  background: rgba(255,255,255,0.5) !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  border: none !important;
-  box-shadow: 5px 5px 12px rgba(80,90,140,0.18), -3px -3px 9px rgba(255,255,255,0.9),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.95) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile .ig-hl-circle svg { stroke: #a8854a !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-hl-label { color: rgba(0,0,0,0.5) !important; }
-
-/* Tabs */
-body.nwsb-soc-glass #sub-ig-profile .ig-tabs { background: transparent !important; border-top-color: rgba(0,0,0,0.06) !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-tab { margin: 6px 4px !important; color: rgba(0,0,0,0.32) !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-tab.active { color: #c8a96e !important; border-bottom-color: #c8a96e !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-tab svg,
-body.nwsb-soc-glass #sub-ig-profile .ig-tab .ig-tab-img {
-  padding: 8px !important; border-radius: 14px !important; box-sizing: content-box !important;
-  background: rgba(255,255,255,0.5) !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  box-shadow: 4px 4px 10px rgba(80,90,140,0.18), -3px -3px 8px rgba(255,255,255,0.9),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.95) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile .ig-tab.active svg,
-body.nwsb-soc-glass #sub-ig-profile .ig-tab.active .ig-tab-img {
-  box-shadow: inset 3px 3px 7px rgba(120,130,170,0.28), inset -2px -2px 5px rgba(255,255,255,0.95) !important;
-}
-body.nwsb-soc-glass #sub-ig-profile .ig-tab-img { filter: brightness(0) opacity(0.55) !important; }
-body.nwsb-soc-glass #sub-ig-profile .ig-tab.active .ig-tab-img { filter: brightness(0) saturate(100%) invert(70%) sepia(30%) saturate(500%) hue-rotate(2deg) brightness(90%) !important; }
-
-/* Explore tiles inside the profile grid → bright glass frames */
-body.nwsb-soc-glass #sub-ig-profile .ig-tile {
-  background: rgba(255,255,255,0.4) !important;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  border-radius: 16px !important; border: none !important;
-  box-shadow: 5px 5px 12px rgba(80,90,140,0.16), -3px -3px 9px rgba(255,255,255,0.85),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.9) !important;
-}
-
-/* ── Empty grid state ("Share Photos") — neumorphic placeholder ── */
-body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-empty-ico {
-  width: 78px; height: 78px; margin: 0 auto 18px; border-radius: 50% !important;
-  display: flex; align-items: center; justify-content: center;
-  background: #f0f2f7; color: #c8a96e;
-  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 13px rgba(255,255,255,0.97),
-              inset 1px 1px 2px rgba(255,255,255,0.6);
-}
-body:not(.nwsb-soc-glass) #sub-ig-profile .nwsb-empty-title {
-  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800; color: #1a1a2e;
-}
-
-/* Glass theme variant — frosted bulge */
-body.nwsb-soc-glass #sub-ig-profile .nwsb-empty-ico {
-  width: 78px; height: 78px; margin: 0 auto 18px; border-radius: 50% !important;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.5); color: #a8854a;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  box-shadow: 6px 6px 14px rgba(80,90,140,0.2), -4px -4px 11px rgba(255,255,255,0.9),
-              inset 1.5px 1.5px 2px rgba(255,255,255,0.95), inset -1.5px -1.5px 3px rgba(120,130,170,0.2);
-}
-body.nwsb-soc-glass #sub-ig-profile .nwsb-empty-title {
-  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800; color: #1a1a2e;
-}
-
-/* ═══════════════════════════════════════════════════════════════
    Kill the dark bar / shadow at the very bottom in NEUMORPHISM mode.
    The main bottom nav (#ig-bottomnav) is dark navy by default and the
    dark body shows through at the safe-area — both read as a "black shadow".
@@ -3583,10 +3423,12 @@ html body.nwsb-soc-glass #sub-people {
   background: linear-gradient(rgba(4,8,18,0.22) 0%, rgba(4,8,18,0.34) 55%, rgba(4,8,18,0.52) 100%),
     url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177237514_bbhcec.jpg') center/cover no-repeat !important;
 }
+/* Profile: NO background photo — plain dark glass only (per request). A photo
+   here was also the cause of the "white glow" around every round button: its
+   bright swirls were bleeding through the translucent circles. */
 html body.nwsb-soc-glass #sub-ig-profile,
 html body.nwsb-soc-glass #sub-ig-profile .ig {
-  background: linear-gradient(rgba(4,8,18,0.24) 0%, rgba(4,8,18,0.36) 55%, rgba(4,8,18,0.54) 100%),
-    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177102414_lpzhbd.jpg') center/cover no-repeat !important;
+  background: linear-gradient(160deg, #14182a 0%, #0d1020 55%, #0a0c18 100%) !important;
 }
 html body.nwsb-soc-glass #sub-social-home {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
