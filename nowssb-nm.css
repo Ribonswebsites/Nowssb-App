@@ -3886,3 +3886,13 @@ html body.nwsb-soc-glass.nwsb-custom-connect-bg #sub-social-home {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
     var(--nwsb-connect-bg-url) center/cover no-repeat !important;
 }
+/* #sub-social-home was repurposed into the Stats screen (see nowssb-social.js,
+   "STATS SCREEN — opened from Profile (the old social-home content)") — the
+   actual live NowssB Connect home feed today is #sub-ig-feed, built fresh by
+   IG.openFeed() every time the Home tab is tapped. innerHTML rebuilds only
+   replace the element's children, never its own attributes, so this rule
+   survives every re-render. */
+html body.nwsb-soc-glass.nwsb-custom-connect-bg #sub-ig-feed {
+  background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
+    var(--nwsb-connect-bg-url) center/cover no-repeat !important;
+}
