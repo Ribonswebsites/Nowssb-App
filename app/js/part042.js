@@ -29,15 +29,9 @@
 
   waitFor('ss-content-settings', function(el){
     el.innerHTML = `
-    <!-- Banner -->
-    <div class="menu-banner" style="height:220px;margin-bottom:-60px;">
-      <img decoding="async" loading="eager" src="https://res.cloudinary.com/dcda8ed8e/image/upload/v1779455673/image-2_gv7pht.jpg" alt="Settings Banner" style="width:100%;height:100%;object-fit:cover;display:block;">
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,#060c18 100%);"></div>
-    </div>
-    <!-- Header -->
-    <div style="padding:70px 20px 8px;position:relative;z-index:1;">
-      <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:6px;">NOWSBANSIU</div>
-      <div style="font-size:28px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Settings</div>
+    <!-- Video banner — below the header -->
+    <div class="fash-video-banner">
+      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
     </div>
     <!-- ── ACCOUNT ── -->
     <div class="ss-section-title">ACCOUNT</div>

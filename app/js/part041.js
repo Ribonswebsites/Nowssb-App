@@ -3,15 +3,16 @@
   var oldPanel = document.getElementById('ss-panel-profile-edit');
   if(!oldPanel) return;
   oldPanel.innerHTML = `
-    <div class="nwsb-pe-cover" style="position:relative;width:100%;height:172px;background:#0a0a14 url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784171086/grok_image_1784171046763_kfygmv.jpg') center/cover no-repeat;">
-      <button class="ss-panel-back" onclick="nwsbCloseEditProfile()" style="position:absolute;top:calc(max(env(safe-area-inset-top,12px),12px));left:14px;z-index:2;display:inline-flex;align-items:center;gap:6px;margin:0;padding:9px 14px 9px 11px;border:none;border-radius:50px !important;background:rgba(255,255,255,0.94);color:#1a1a2e;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.4);">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Back
-      </button>
+    <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;margin:0 -20px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;background:#060c18;border-bottom:1px solid rgba(255,255,255,.06);">
+      <button class="ss-panel-back" onclick="nwsbCloseEditProfile()"></button>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">
+      <div style="min-width:0;">
+        <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Edit Profile</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;">Your public NowssB identity</div>
+      </div>
     </div>
-    <div class="ss-panel-header" style="padding-top:18px;">
-      <div class="ss-panel-title">Edit Profile</div>
-      <div class="ss-panel-sub">Your public NowssB identity</div>
+    <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
     </div>
     <div style="padding:24px 20px;display:flex;flex-direction:column;gap:20px;">
 

@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
-<link rel="stylesheet" href="app/app.css?v=276">
+<link rel="stylesheet" href="app/app.css?v=277">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=337">
+<link rel="stylesheet" href="nowssb-nm.css?v=338">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -1611,21 +1611,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
 <div class="menu-drawer" id="menuDrawer">
 
-  <!-- Banner: rounded card, padded from drawer edges, header row with back button -->
-  <div style="padding:14px 14px 6px;flex-shrink:0;">
-    <div style="position:relative;overflow:hidden;height:236px;border-radius:24px !important;background:#0a0e1a;box-shadow:0 12px 34px rgba(0,0,0,0.42);">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779961020/grok_image_1779909152435_ij2joo.jpg" alt="" loading="eager" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center center;">
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.5) 0%,rgba(6,12,24,0) 34%,rgba(6,12,24,0) 52%,rgba(6,12,24,0.78) 100%);pointer-events:none;"></div>
-      <!-- Header row -->
-      <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;padding:max(env(safe-area-inset-top,14px),14px) 14px 0;z-index:3;">
-        <button class="nwsb-back" onclick="closeMenu()" aria-label="Back"><span class="nwsb-back-ico"></span></button>
-      </div>
-      <!-- Bottom title -->
-      <div style="position:absolute;bottom:18px;left:22px;z-index:2;">
-        <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;text-transform:uppercase;margin-bottom:4px;text-shadow:0 1px 6px rgba(0,0,0,.7);">NOWSBANSIU</div>
-        <div style="font-size:28px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;line-height:1.1;text-shadow:0 2px 12px rgba(0,0,0,.6);">Your Menu</div>
-      </div>
+  <!-- Header row: back button + NOWSBANSIU Your Menu, one line, no banner image, sticky while the menu list scrolls -->
+  <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 16px;flex-shrink:0;background:rgba(6,12,24,0.92);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <button class="nwsb-back" onclick="closeMenu()" aria-label="Back"><span class="nwsb-back-ico"></span></button>
+    <div style="display:flex;align-items:baseline;gap:8px;min-width:0;">
+      <span style="font-size:10px;letter-spacing:2px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;text-transform:uppercase;flex-shrink:0;">NOWSBANSIU</span>
+      <span style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Your Menu</span>
     </div>
+  </div>
+
+  <!-- Video banner — below the header. Flex-column parent (menu-drawer) doesn't
+       resolve aspect-ratio-only sizing on a flex item reliably, so height is
+       pinned explicitly via the padding-top trick instead. -->
+  <div style="position:relative;width:calc(100% - 32px);height:0;padding-top:calc((100% - 32px) * 0.3806);margin:16px 16px 6px;flex-shrink:0;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-41-24_x8z4mj.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
 
   <div style="padding: 0 0 40px;">
@@ -5754,29 +5753,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="ss-wrap" style="position:relative;">
   <!-- Main view (tabs) -->
   <div id="ss-main-view" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
-    <!-- Close button row -->
-    <div style="display:flex;align-items:center;gap:8px;padding:14px 20px 0;flex-shrink:0;">
-      <button class="sub-back" onclick="closeSub('social')" style="background:rgba(6,12,24,0.5); border:1px solid rgba(255,255,255,0.1); border-radius: 20px; cursor:pointer; color:rgba(255,255,255,0.8); display:flex; align-items:center; gap:6px; font-size:13px; font-family:'DM Sans',sans-serif; padding:6px 14px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Back
-      </button>
+    <!-- Header row: back button + NOWSBANSIU Settings, one line, always visible -->
+    <div class="sub-header nav-bar" style="background:rgba(6,12,24,0.92);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:none;-webkit-backdrop-filter:none;flex-shrink:0;">
+      <button class="sub-back" onclick="closeSub('social')"></button>
+      <div class="sub-title" style="display:flex;align-items:baseline;gap:8px;min-width:0;">
+        <span style="font-size:10px;letter-spacing:2px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;text-transform:uppercase;flex-shrink:0;">NOWSBANSIU</span>
+        <span style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Settings</span>
+      </div>
     </div>
 
     <!-- SETTINGS TAB -->
     <div class="ss-tab-content active" id="ss-content-settings">
-      <!-- Banner -->
-      <div class="menu-banner" style="height: 240px; margin-bottom: -60px;">
-        <img decoding="async" src="https://res.cloudinary.com/dcda8ed8e/image/upload/f_auto,q_auto/v1779455673/image-2_gv7pht.jpg" alt="Settings Banner" loading="lazy">
-        <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, #060c18 100%);"></div>
-      </div>
-
-      <div style="padding:0 20px calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,24px),24px)); position: relative; z-index: 1;">
-        <!-- Header -->
-        <div style="padding:28px 0 24px;">
-          <div class="ss-hd-eyebrow" style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:6px;">NOWSBANSIU</div>
-          <div class="ss-hd-title" style="font-size:28px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Settings</div>
-        </div>
-
+      <div style="padding:20px 20px calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,24px),24px)); position: relative; z-index: 1;">
         <!-- Profile card -->
         <div class="sg ss-profile-card" onclick="ssOpenPanel('profile-edit')" style="margin-bottom:28px;">
           <div style="display:flex;align-items:center;gap:14px;">
@@ -6327,28 +6315,33 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ── PANEL: CERTIFICATES ── -->
   <div class="ss-panel" id="ss-panel-certificates" style="padding:0 20px 80px;">
-    <div style="padding:20px 0 4px;">
-      <button class="ss-back" onclick="ssClosePanel('certificates')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-      </button>
+    <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;margin:0 -20px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;background:#060c18;border-bottom:1px solid rgba(255,255,255,.06);">
+      <button class="ss-back" onclick="ssClosePanel('certificates')"></button>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/669d7570-57ad-11f1-ae7e-3f26811e4481_cetrs1.png" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">
+      <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">My Certificates</div>
     </div>
-    <div style="padding:8px 0 22px;">
+    <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    </div>
+    <div style="padding:16px 0 22px;">
       <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:6px;">WORD MASTERY</div>
-      <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">My Certificates</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;margin-top:4px;">Score 90%+ three sessions in a row to earn a certificate.</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;">Score 90%+ three sessions in a row to earn a certificate.</div>
     </div>
     <div id="ss-cert-list"></div>
   </div>
 
   <!-- ── PANEL: PRIVACY ── -->
   <div class="ss-panel" id="ss-panel-privacy" style="padding:0 20px 80px;">
-    <div style="padding:20px 0 4px;">
-      <button class="ss-back" onclick="ssClosePanel('privacy')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-      </button>
+    <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;margin:0 -20px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;background:#060c18;border-bottom:1px solid rgba(255,255,255,.06);">
+      <button class="ss-back" onclick="ssClosePanel('privacy')"></button>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/e_background_removal/v1779657311/25bb3d70-57ae-11f1-ae7e-3f26811e4481_fhfzwy.png" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">
+      <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Privacy Settings</div>
     </div>
-    <div style="padding:8px 0 24px;"><div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Privacy Settings</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;margin-top:4px;">Control who can see your profile and stats.</div>
+    <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    </div>
+    <div style="padding:16px 0 24px;">
+      <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;">Control who can see your profile and stats.</div>
     </div>
     <div class="slbl">VISIBILITY</div>
     <div id="ss-privacy-selects" style="margin-bottom:24px;"></div>
@@ -6362,13 +6355,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ── PANEL: CHAT SETTINGS ── -->
   <div class="ss-panel" id="ss-panel-chatsettings" style="padding:0 20px 80px;">
-    <div style="padding:20px 0 4px;">
-      <button class="ss-back" onclick="ssClosePanel('chatsettings')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-      </button>
+    <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;margin:0 -20px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;background:#060c18;border-bottom:1px solid rgba(255,255,255,.06);">
+      <button class="ss-back" onclick="ssClosePanel('chatsettings')"></button>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi.png" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">
+      <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Chat Settings</div>
     </div>
-    <div style="padding:8px 0 24px;"><div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Chat Settings</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;margin-top:4px;">Manage who can message you.</div>
+    <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    </div>
+    <div style="padding:16px 0 24px;">
+      <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;">Manage who can message you.</div>
     </div>
     <div class="slbl">WHO CAN MESSAGE YOU</div>
     <div id="ss-chatperm-options" style="margin-bottom:24px;"></div>
@@ -6389,10 +6385,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ── PANEL: ABOUT ── -->
   <div class="ss-panel" id="ss-panel-about" style="padding:0 20px 80px;">
-    <div style="padding:20px 0 4px;">
-      <button class="ss-back" onclick="ssClosePanel('about')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-      </button>
+    <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;margin:0 -20px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;background:#060c18;border-bottom:1px solid rgba(255,255,255,.06);">
+      <button class="ss-back" onclick="ssClosePanel('about')"></button>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/fdd80ef0-57ad-11f1-ae7e-3f26811e4481_lfscbr.png" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">
+      <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">About NowssB</div>
+    </div>
+    <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
     </div>
     <div style="text-align:center;padding:24px 0 28px;">
       <div style="width:64px;height:64px;border-radius:50%;background:conic-gradient(from 0deg,#ff0080,#ff8c00,#ffe000,#00ff80,#00cfff,#7b2fff,#ff0080);padding:3px;margin:0 auto 16px;">
@@ -6433,12 +6432,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ── PANEL: TERMS ── -->
   <div class="ss-panel" id="ss-panel-terms" style="padding:0 20px 80px;">
-    <div style="padding:20px 0 4px;">
-      <button class="ss-back" onclick="ssClosePanel('terms')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-      </button>
+    <div style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;margin:0 -20px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;background:#060c18;border-bottom:1px solid rgba(255,255,255,.06);">
+      <button class="ss-back" onclick="ssClosePanel('terms')"></button>
+      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">
+      <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Terms &amp; Privacy</div>
     </div>
-    <div style="padding:8px 0 20px;"><div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Terms &amp; Privacy</div></div>
+    <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    </div>
+    <div style="padding:16px 0 20px;"></div>
     <div style="font-size:13px;color:rgba(255,255,255,.62);font-family:'DM Sans',sans-serif;line-height:1.8;">
       <p style="margin:0 0 16px;"><b style="color:#e8d5a3;">Acceptance.</b> By using NowssB you agree to practice natural-origin word pronunciation for personal wellbeing. NowssB is not a medical service and does not diagnose, treat, or cure any condition.</p>
       <p style="margin:0 0 16px;"><b style="color:#e8d5a3;">Your data.</b> Account info, routines, progress and ratings are stored securely via Firebase. Audio you generate is stored on Cloudflare R2. You may export or delete your data at any time from Privacy Settings.</p>
@@ -6450,14 +6452,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ── PANEL: SUPPORT CHAT ── -->
   <div class="ss-panel" id="ss-panel-support" style="display:flex;flex-direction:column;height:100%;padding:0;">
-    <div style="padding:20px 20px 12px;flex-shrink:0;">
-      <button class="ss-back" onclick="ssClosePanel('support')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back
-      </button>
-    </div>
-    <div style="padding:0 20px 16px;flex-shrink:0;">
-      <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Support</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;margin-top:4px;">Powered by advanced AI</div>
+    <div style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;flex-shrink:0;background:#060c18;border-bottom:1px solid rgba(255,255,255,.06);">
+      <button class="ss-back" onclick="ssClosePanel('support')"></button>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.5" style="flex-shrink:0;"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <div style="min-width:0;">
+        <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Support</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;">Powered by advanced AI</div>
+      </div>
     </div>
     <!-- Quick questions -->
     <div id="sup-quick" style="padding:0 20px 14px;flex-shrink:0;display:flex;flex-wrap:wrap;gap:8px;">
@@ -7138,74 +7139,116 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ REBUILT SETTINGS PANELS ══ -->
 
 <!-- PROFILE EDIT — fully wired -->
-<script src="app/js/part041.js?v=165"></script>
+<script src="app/js/part041.js?v=166"></script>
 
 <!-- VOICE picker panel -->
 <div class="ss-panel" id="ss-panel-voice" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('voice')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">Voice Preference</div>
-    <div class="ss-panel-sub">Applies to all word audio</div>
+  <div class="ss-panel-header" style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;">
+    <button class="ss-panel-back" onclick="SS.close('voice')"></button>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" style="flex-shrink:0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+    <div style="min-width:0;">
+      <div class="ss-panel-title" style="font-size:17px;">Voice Preference</div>
+      <div class="ss-panel-sub" style="margin-top:1px;">Applies to all word audio</div>
+    </div>
+  </div>
+  <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-voice"></div></div>
 </div>
 
 <!-- SPEED picker panel -->
 <div class="ss-panel" id="ss-panel-speed" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('speed')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">Playback Speed</div>
-    <div class="ss-panel-sub">Applied to speech synthesis</div>
+  <div class="ss-panel-header" style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;">
+    <button class="ss-panel-back" onclick="SS.close('speed')"></button>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" style="flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    <div style="min-width:0;">
+      <div class="ss-panel-title" style="font-size:17px;">Playback Speed</div>
+      <div class="ss-panel-sub" style="margin-top:1px;">Applied to speech synthesis</div>
+    </div>
+  </div>
+  <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-speed"></div></div>
 </div>
 
 <!-- REPS picker panel -->
 <div class="ss-panel" id="ss-panel-reps" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('reps')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">Repeat Count</div>
-    <div class="ss-panel-sub">Default reps in Repeat tab</div>
+  <div class="ss-panel-header" style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;">
+    <button class="ss-panel-back" onclick="SS.close('reps')"></button>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" style="flex-shrink:0;"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+    <div style="min-width:0;">
+      <div class="ss-panel-title" style="font-size:17px;">Repeat Count</div>
+      <div class="ss-panel-sub" style="margin-top:1px;">Default reps in Repeat tab</div>
+    </div>
+  </div>
+  <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-reps"></div></div>
 </div>
 
 <!-- SENSITIVITY picker -->
 <div class="ss-panel" id="ss-panel-sensitivity" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('sensitivity')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">Pronunciation Sensitivity</div>
-    <div class="ss-panel-sub">Affects scoring threshold in Record tab</div>
+  <div class="ss-panel-header" style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;">
+    <button class="ss-panel-back" onclick="SS.close('sensitivity')"></button>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" style="flex-shrink:0;"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    <div style="min-width:0;">
+      <div class="ss-panel-title" style="font-size:17px;">Pronunciation Sensitivity</div>
+      <div class="ss-panel-sub" style="margin-top:1px;">Affects scoring threshold in Record tab</div>
+    </div>
+  </div>
+  <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-sensitivity"></div></div>
 </div>
 
 <!-- PERSONA picker -->
 <div class="ss-panel" id="ss-panel-persona" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('persona')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">AI Persona</div>
-    <div class="ss-panel-sub">Choose your feedback guide voice</div>
+  <div class="ss-panel-header" style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;">
+    <button class="ss-panel-back" onclick="SS.close('persona')"></button>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" style="flex-shrink:0;"><circle cx="12" cy="8" r="4"/><path d="M4 20v-1a8 8 0 0116 0v1"/></svg>
+    <div style="min-width:0;">
+      <div class="ss-panel-title" style="font-size:17px;">AI Persona</div>
+      <div class="ss-panel-sub" style="margin-top:1px;">Choose your feedback guide voice</div>
+    </div>
+  </div>
+  <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-persona"></div></div>
 </div>
 
 <!-- AMBIENT picker -->
 <div class="ss-panel" id="ss-panel-ambient" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('ambient')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">Ambient Sound</div>
-    <div class="ss-panel-sub">Background ambient audio during practice</div>
+  <div class="ss-panel-header" style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;">
+    <button class="ss-panel-back" onclick="SS.close('ambient')"></button>
+    <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" alt="">
+    <div style="min-width:0;">
+      <div class="ss-panel-title" style="font-size:17px;">Ambient Sound</div>
+      <div class="ss-panel-sub" style="margin-top:1px;">Background ambient audio during practice</div>
+    </div>
+  </div>
+  <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-ambient"></div></div>
 </div>
 
 <!-- CHAT PERMISSION picker -->
 <div class="ss-panel" id="ss-panel-chatperm" style="padding:0;">
-  <div class="ss-panel-header">
-    <button class="ss-panel-back" onclick="SS.close('chatperm')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
-    <div class="ss-panel-title">Who Can Message You</div>
-    <div class="ss-panel-sub">Chat permission setting</div>
+  <div class="ss-panel-header" style="display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 20px 14px;">
+    <button class="ss-panel-back" onclick="SS.close('chatperm')"></button>
+    <img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657309/7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi.png" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" alt="">
+    <div style="min-width:0;">
+      <div class="ss-panel-title" style="font-size:17px;">Who Can Message You</div>
+      <div class="ss-panel-sub" style="margin-top:1px;">Chat permission setting</div>
+    </div>
+  </div>
+  <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
+    <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-chatperm"></div></div>
 </div>
@@ -7479,7 +7522,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=214"></script>
+<script src="app/js/part042.js?v=215"></script>
 
 
 
