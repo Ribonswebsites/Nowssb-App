@@ -31,7 +31,7 @@
     el.innerHTML = `
     <!-- Video banner — below the header -->
     <div class="fash-video-banner">
-      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
+      <video autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
     </div>
     <!-- ── ACCOUNT ── -->
     <div class="ss-section-title">ACCOUNT</div>
@@ -197,4 +197,32 @@
       </button>
     </div>`;
   });
+})();
+
+/* Video banners live inside panels/screens that start display:none, then get
+   flipped to display:block by JS when opened. Browsers frequently drop the
+   `autoplay` attempt for a video that wasn't visible at insertion time and
+   never retry on their own, leaving a black frozen frame. Kick any visible,
+   still-paused autoplay video whenever the DOM's style/class attributes
+   change (panel opens, tab switches, etc.) instead of hooking every one of
+   the many open()/openSub() wrappers individually. */
+(function(){
+  function kick(){
+    document.querySelectorAll('video[autoplay]').forEach(function(v){
+      if (v.paused && v.offsetParent !== null) v.play().catch(function(){});
+    });
+  }
+  var scheduled = false;
+  function schedule(){
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(function(){ scheduled = false; kick(); });
+  }
+  var mo = new MutationObserver(schedule);
+  function start(){
+    mo.observe(document.body, { attributes: true, attributeFilter: ['style', 'class'], subtree: true });
+    kick();
+  }
+  if (document.body) start();
+  else document.addEventListener('DOMContentLoaded', start);
 })();

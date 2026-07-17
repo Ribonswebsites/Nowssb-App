@@ -2706,7 +2706,7 @@ body:not(.nm-mode) #menuDrawer.menu-drawer {
 body:not(.nm-mode):not(.nm-night) #sub-social {
   background:
     linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
-    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177102414_lpzhbd.jpg') center center / cover no-repeat !important;
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094627/grok_image_1784094543609_husz87.jpg') center center / cover no-repeat !important;
 }
 /* Inset the menu rows so they sit INSIDE the glass panel (L/R padding).
    Fashion (dark) menu only — the glass block image is centered, the rows must
@@ -3780,7 +3780,7 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 #sub-connect-hub { background: #0a0e1a; }
 #sub-connect-hub .nch-bg {
   position: absolute; inset: 0; z-index: 0;
-  background: url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177102414_lpzhbd.jpg') center/cover no-repeat;
+  background: url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094627/grok_image_1784094543609_husz87.jpg') center/cover no-repeat;
 }
 #sub-connect-hub .nch-scrim {
   position: absolute; inset: 0; z-index: 1;
