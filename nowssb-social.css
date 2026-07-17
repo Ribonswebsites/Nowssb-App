@@ -1226,16 +1226,20 @@
   flex: 1; min-width: 0; cursor: pointer;
   border-radius: 18px !important; padding: 8px;
   border: 1.5px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.05);
+  background: transparent;
   margin: 0; font-family: 'DM Sans', sans-serif;
   box-shadow: none;
 }
-.nwsb-theme-opt.active { border-color: #e8d5a3; background: rgba(232,213,163,.08); }
+.nwsb-theme-opt.active { border-color: #e8d5a3; }
 .nwsb-theme-opt-img {
   width: 100%; aspect-ratio: 1 / 1;
   border-radius: 12px !important;
   background-size: contain; background-repeat: no-repeat; background-position: center;
   background-color: transparent;
+  /* The source photos are studio renders on a flat white backdrop, not
+     transparent PNGs — multiply blend drops white toward invisible against
+     the dark page behind it while keeping the darker mockup content. */
+  mix-blend-mode: multiply;
   margin-bottom: 8px; box-shadow: none;
 }
 .nwsb-theme-opt-label { font-size: 12.5px; font-weight: 700; color: #fff; text-align: center; }
