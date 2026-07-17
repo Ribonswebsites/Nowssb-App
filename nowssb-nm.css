@@ -3849,3 +3849,35 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 }
 #sub-connect-hub .nch-settings-block .nwsb-ss-row { padding: 15px 16px; border-top-color: rgba(255,255,255,0.1); }
 #sub-connect-hub .nch-settings-block .nwsb-ss-row:first-child { border-top: none; }
+
+/* ═══════════════════════════════════════════════════════════════
+   FASHION HOME — custom background photo picker (Settings)
+   Layers on top of whichever Black-Edition theme (default/black/neo/
+   glass-black — app.css) is active: same selector shape and specificity
+   (body.fashion-home-active.<class> #appBg) as those theme overrides, and
+   this file loads after app.css, so source order lets a chosen photo win
+   over the current theme's own background without touching app.css. ── */
+.nwsb-fbg-row {
+  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+.nwsb-fbg-card {
+  flex-shrink: 0; width: 92px; cursor: pointer;
+  border-radius: 16px !important; padding: 4px;
+  border: 1.5px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.05);
+}
+.nwsb-fbg-card.active { border-color: #e8d5a3; }
+.nwsb-fbg-img {
+  width: 100%; aspect-ratio: 9 / 16;
+  border-radius: 12px !important;
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  background-color: transparent;
+}
+
+body.fashion-home-active.nwsb-custom-fashion-bg #appBg {
+  background-image: var(--nwsb-custom-bg-url) !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+body.nwsb-custom-fashion-bg #appBgLayer2 { opacity: 0 !important; transition: none !important; }
