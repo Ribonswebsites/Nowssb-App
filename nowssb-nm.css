@@ -1518,16 +1518,6 @@ body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-section-hd { color: rgb
   background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; border: none !important; color: #060c18 !important; border-radius: 16px !important;
   box-shadow: 5px 5px 14px rgba(0,0,0,.16), -4px -4px 10px rgba(255,255,255,.7) !important;
 }
-body.nm-mode .nwsb-theme-opt {
-  background: #f0f2f7 !important; border: none !important; color: #1a1a2e !important;
-  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
-  box-shadow: 4px 4px 10px rgba(0,0,0,.13), -3px -3px 8px rgba(255,255,255,.95) !important;
-}
-body.nm-mode .nwsb-theme-opt.active {
-  color: #a8854a !important;
-  box-shadow: inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.95) !important;
-}
-
 /* ── GLASSMORPHISM (glass theme only) ── */
 body.nm-glass #ss-panel-profile-edit {
   background:
@@ -1562,27 +1552,10 @@ body.nm-glass #ss-panel-profile-edit .nwsb-pe-save {
   background: linear-gradient(135deg, rgba(232,213,163,.95), rgba(196,163,90,.95)) !important;
   backdrop-filter:none; box-shadow: 0 10px 28px rgba(232,213,163,.4) !important;
 }
-body.nm-glass .nwsb-theme-opt {
-  background: rgba(255,255,255,.4) !important; border: 1px solid rgba(255,255,255,.7) !important;
-  backdrop-filter:none; -webkit-backdrop-filter:none;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
-}
-body.nm-glass .nwsb-theme-opt.active { border: 2px solid #c8a96e !important; color: #a8854a !important; }
-
 /* ═══════════════════════════════════════════════════════════════
    APP THEME: GLASSMORPHISM  (body.nm-glass)
    A second normal-mode theme alongside neumorphism.
 ═══════════════════════════════════════════════════════════════ */
-
-/* Theme-option buttons (in Edit Profile) */
-.nwsb-theme-opt {
-  padding: 14px 0; border-radius: 14px; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .5px;
-  background: rgba(255,255,255,.4); border: 1px solid rgba(255,255,255,.7); color: #1a1a2e;
-  backdrop-filter:none; -webkit-backdrop-filter:none;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-}
-.nwsb-theme-opt.active { border: 2px solid #c8a96e; color: #a8854a; }
 
 /* Shared glass-surface gradient for normal-mode screens */
 body.nm-glass.nm-mode #home-nm,

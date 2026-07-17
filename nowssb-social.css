@@ -1218,24 +1218,33 @@
 
 /* ── Shared theme-option image card — Connect setup wizard, Connect Hub
    "Connect Theme" settings, and Edit Profile's "Profile Theme" row all use
-   this same real-screenshot preview instead of a plain text pill. ── */
+   this same real-screenshot preview instead of a plain text pill.
+   Plain glassmorphism frame only — no neumorphic fill/shadow behind the
+   image, and the full 1:1 source image shown uncropped (contain, not
+   cover), never letterboxed against an added background. ── */
 .nwsb-theme-opt {
   flex: 1; min-width: 0; cursor: pointer;
-  border-radius: 16px !important; padding: 3px; border: 2px solid transparent;
-  background: none; margin: 0; font-family: 'DM Sans', sans-serif;
+  border-radius: 18px !important; padding: 8px;
+  border: 1.5px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  margin: 0; font-family: 'DM Sans', sans-serif;
+  box-shadow: none;
 }
-.nwsb-theme-opt.active { border-color: #e8d5a3; }
+.nwsb-theme-opt.active { border-color: #e8d5a3; background: rgba(232,213,163,.08); }
 .nwsb-theme-opt-img {
-  height: 90px; border-radius: 13px !important;
-  background-size: cover; background-position: top center;
-  margin-bottom: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  width: 100%; aspect-ratio: 1 / 1;
+  border-radius: 12px !important;
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  background-color: transparent;
+  margin-bottom: 8px; box-shadow: none;
 }
 .nwsb-theme-opt-label { font-size: 12.5px; font-weight: 700; color: #fff; text-align: center; }
 
-/* Edit Profile's panel is always a light neumorphic surface — flip the label
-   dark there so it doesn't disappear against #f0f2f7. */
+/* Edit Profile's panel is always a light neumorphic surface — flip the
+   glass frame + label to their light equivalents there. */
+#ss-panel-profile-edit .nwsb-theme-opt { border-color: rgba(0,0,0,.1); background: rgba(0,0,0,.03); }
 #ss-panel-profile-edit .nwsb-theme-opt-label { color: #1a1a2e; }
-#ss-panel-profile-edit .nwsb-theme-opt.active { border-color: #c8a96e; }
+#ss-panel-profile-edit .nwsb-theme-opt.active { border-color: #c8a96e; background: rgba(200,169,110,.1); }
 
 /* Stage 3 — welcome / complete */
 .nwsbcs-stage-welcome { align-items: center; justify-content: center; text-align: center; }
