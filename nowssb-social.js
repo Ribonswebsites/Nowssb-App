@@ -1102,4 +1102,157 @@
   nwsbApplyStrippedBg(NWSB_THEME_IMG_NEU,   '#nwsbcsThemeNeu .nwsb-theme-opt-img, #nch-theme-neu .nwsb-theme-opt-img, #nwsb-theme-neu .nwsb-theme-opt-img');
   nwsbApplyStrippedBg(NWSB_THEME_IMG_GLASS, '#nwsbcsThemeGlass .nwsb-theme-opt-img, #nch-theme-glass .nwsb-theme-opt-img, #nwsb-theme-glass .nwsb-theme-opt-img');
 
+  /* ═══════════════════════════════════════════════════════════════
+     NOWSSB CONNECT HOME — custom background photo picker
+     Only ever visible where it matters: applies exclusively under the
+     Connect Fashion (glass) theme, never neumorphism — the neu theme has
+     no photo background at all. Only touches #sub-social-home (the
+     Connect "Stats"/home screen) — feed/reels/discover/profile keep
+     their own fixed photos. Same 3D-carousel interaction as the Fashion
+     Home background picker (reuses its .fbgci card styling), pooling the
+     4 existing Connect glass photos (feed/reels/discover/home) with the
+     9 Fashion Home photos for 13 choices total. ── */
+  var NWSB_CONNECT_BGS = [
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177099346_a7zq1m.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177245304_ihjubs.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177237514_bbhcec.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177200001_clr7h6.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261485118_fnnndw.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263702345_zlt99m.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263836740_qclr5g.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261493254_szhsuw.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263881946_zespcn.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263699783_tyf4l8.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263996/grok_image_1784263979789_doxtcp.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263836740_atjk35.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg'
+  ];
+
+  window.nwsbSetConnectBg = function (url) {
+    document.body.style.setProperty('--nwsb-connect-bg-url', "url('" + url + "')");
+    document.body.classList.add('nwsb-custom-connect-bg');
+    try { localStorage.setItem('nwsb_connect_bg_custom', url); } catch (e) {}
+    if (window._currentUid && window._fbSetDoc) {
+      window._fbSetDoc(window._currentUid, { connectBgCustom: url }).catch(function () {});
+    }
+    if (window.nwsbToast) nwsbToast('Connect background updated ✓');
+  };
+
+  (function initConnectBg() {
+    var saved = null;
+    try { saved = localStorage.getItem('nwsb_connect_bg_custom'); } catch (e) {}
+    if (saved) {
+      document.body.style.setProperty('--nwsb-connect-bg-url', "url('" + saved + "')");
+      document.body.classList.add('nwsb-custom-connect-bg');
+    }
+  })();
+
+  window.nwsbOpenConnectBgPanel = function () {
+    var panel = document.getElementById('nwsbConnectBgPanel');
+    if (!panel) return;
+    panel.style.display = 'block';
+    ncbgCarouselInit();
+  };
+  window.nwsbCloseConnectBgPanel = function () {
+    var panel = document.getElementById('nwsbConnectBgPanel');
+    if (panel) panel.style.display = 'none';
+  };
+
+  var ncbgActive = 0, ncbgItems = null, ncbgDotEls = null;
+  var NCBG_N = NWSB_CONNECT_BGS.length;
+
+  function ncbgCfg(s) {
+    var a = Math.abs(s), d = s < 0 ? -1 : 1;
+    if (a === 0) return {tx: 0,     tz: 200,  ry: 0,     sc: 1.00, op: 1.00, zi: 20};
+    if (a === 1) return {tx: d*172, tz: -10,  ry: d*-28, sc: 0.78, op: 0.68, zi: 15};
+    if (a === 2) return {tx: d*290, tz: -155, ry: d*-50, sc: 0.52, op: 0.22, zi: 10};
+    return             {tx: 0,     tz: -600, ry: 0,     sc: 0.10, op: 0.00, zi: 0};
+  }
+
+  function ncbgPaint() {
+    if (!ncbgItems) return;
+    ncbgItems.forEach(function (el, i) {
+      var off = ((i - ncbgActive) % NCBG_N + NCBG_N) % NCBG_N;
+      var s = off > Math.floor(NCBG_N / 2) ? off - NCBG_N : off;
+      var c = ncbgCfg(s);
+      el.style.transform     = 'translateX('+c.tx+'px) translateZ('+c.tz+'px) rotateY('+c.ry+'deg) scale('+c.sc+')';
+      el.style.opacity       = String(c.op);
+      el.style.zIndex        = String(c.zi);
+      el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
+      el.style.borderColor   = (i === ncbgActive) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
+    });
+    if (ncbgDotEls) ncbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === ncbgActive); });
+    var label = document.getElementById('ncbgSelectedLabel');
+    if (label) label.textContent = 'Photo ' + (ncbgActive + 1) + ' of ' + NCBG_N;
+  }
+
+  function ncbgGo(n) { ncbgActive = ((n % NCBG_N) + NCBG_N) % NCBG_N; ncbgPaint(); }
+
+  window.ncbgCarouselInit = function () {
+    var carousel = document.getElementById('ncbgCarousel');
+    var inner    = document.getElementById('ncbgCarouselInner');
+    var dotsEl   = document.getElementById('ncbgDots');
+    if (!carousel || !inner || !dotsEl) return;
+
+    if (!inner.dataset.built) {
+      inner.dataset.built = '1';
+      inner.innerHTML = NWSB_CONNECT_BGS.map(function (url) {
+        return '<div class="fbgci" style="background-image:url(\'' + url + '\')"></div>';
+      }).join('');
+      dotsEl.innerHTML = NWSB_CONNECT_BGS.map(function () { return '<div class="becd"></div>'; }).join('');
+    }
+
+    ncbgItems  = Array.from(inner.querySelectorAll('.fbgci'));
+    ncbgDotEls = Array.from(dotsEl.querySelectorAll('.becd'));
+    NCBG_N = ncbgItems.length;
+
+    var cur = null;
+    try { cur = localStorage.getItem('nwsb_connect_bg_custom'); } catch (e) {}
+    var idx = NWSB_CONNECT_BGS.indexOf(cur);
+    ncbgActive = idx >= 0 ? idx : 0;
+
+    ncbgItems.forEach(function (el) {
+      el.style.transition = 'none';
+      el.style.transform  = 'translateX(0px) translateZ(-600px) rotateY(0deg) scale(0.1)';
+      el.style.opacity    = '0';
+    });
+    void carousel.offsetHeight;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var T = 'transform 0.78s cubic-bezier(0.34,1.08,0.64,1),opacity 0.78s ease,border-color 0.3s ease,box-shadow 0.3s ease';
+        ncbgItems.forEach(function (el) { el.style.transition = T; });
+        ncbgPaint();
+      });
+    });
+
+    var tx0 = 0;
+    carousel.addEventListener('touchstart', function (e) { tx0 = e.touches[0].clientX; }, {passive: true});
+    carousel.addEventListener('touchend', function (e) {
+      var dx = e.changedTouches[0].clientX - tx0;
+      if (Math.abs(dx) > 40) ncbgGo(ncbgActive + (dx < 0 ? 1 : -1));
+    }, {passive: true});
+
+    ncbgItems.forEach(function (el, i) {
+      el.onclick = function (e) {
+        e.stopPropagation();
+        if (i !== ncbgActive) ncbgGo(i);
+        else ncbgApply();
+      };
+    });
+  };
+
+  window.ncbgApply = function () {
+    var url = NWSB_CONNECT_BGS[ncbgActive];
+    nwsbSetConnectBg(url);
+    var btn = document.getElementById('ncbgApplyBtn');
+    if (btn) {
+      btn.textContent = 'APPLIED!';
+      btn.style.background = '#fff';
+      setTimeout(function () {
+        btn.textContent = 'APPLY THIS BACKGROUND';
+        btn.style.background = '#e8d5a3';
+      }, 1400);
+    }
+  };
+
 })();

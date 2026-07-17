@@ -3882,3 +3882,13 @@ body.fashion-home-active.nwsb-custom-fashion-bg #appBg {
   background-position: center !important;
 }
 body.nwsb-custom-fashion-bg #appBgLayer2 { opacity: 0 !important; transition: none !important; }
+
+/* NowssB Connect Home — custom background. Extra class on top of the
+   existing html body.nwsb-soc-glass #sub-social-home rule (nowssb-nm.css,
+   the glass theme block) gives this strictly higher specificity, so it
+   wins outright — no source-order dependency needed. Never applies under
+   the neu theme (no nwsb-soc-glass class there = selector never matches). */
+html body.nwsb-soc-glass.nwsb-custom-connect-bg #sub-social-home {
+  background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
+    var(--nwsb-connect-bg-url) center/cover no-repeat !important;
+}
