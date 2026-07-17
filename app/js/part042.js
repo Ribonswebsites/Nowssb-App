@@ -31,7 +31,7 @@
     el.innerHTML = `
     <!-- Video banner — below the header -->
     <div class="fash-video-banner">
-      <video autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
+      <video autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
     </div>
     <!-- ── ACCOUNT ── -->
     <div class="ss-section-title">ACCOUNT</div>
@@ -209,7 +209,13 @@
 (function(){
   function kick(){
     document.querySelectorAll('video[autoplay]').forEach(function(v){
-      if (v.paused && v.offsetParent !== null) v.play().catch(function(){});
+      if (!v.paused || v.offsetParent === null) return;
+      /* A video whose ancestor was display:none when the tag was parsed can be
+         left with readyState 0 (HAVE_NOTHING) and no fetch ever started —
+         calling play() alone doesn't always kick off loading in that state,
+         so force it explicitly first. */
+      if (v.readyState === 0) v.load();
+      v.play().catch(function(){});
     });
   }
   var scheduled = false;
