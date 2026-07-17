@@ -317,6 +317,8 @@ window.CHAT = (function(){
   var _currentUser = null;
   var STORE_KEY  = 'nowssb_chat_v1';
   var _unsubscribe = null;
+  var _callConnectTimer = null;
+  var _callTickTimer = null;
 
   function loadLocal(roomId){
     try{ return JSON.parse(localStorage.getItem(STORE_KEY+'_'+roomId)||'[]'); }catch(e){ return []; }
@@ -438,6 +440,41 @@ window.CHAT = (function(){
       if(!text) return;
       inp.value='';
       addMessage(text, true);
+    },
+    // Simulated voice/video call UI — no live telephony backend yet.
+    startCall: function(kind){
+      var u = _currentUser; if(!u) return;
+      var overlay = document.getElementById('chatCallOverlay');
+      if(!overlay) return;
+      var kindEl   = document.getElementById('chatCallKind');
+      var avEl     = document.getElementById('chatCallAv');
+      var bgEl     = document.getElementById('chatCallBg');
+      var nameEl   = document.getElementById('chatCallName');
+      var statusEl = document.getElementById('chatCallStatus');
+      if(kindEl)   kindEl.textContent = kind==='video' ? 'Video Call' : 'Voice Call';
+      if(avEl)     avEl.src = u.avatar || '';
+      if(bgEl)     bgEl.style.backgroundImage = u.avatar ? "url('"+u.avatar+"')" : 'none';
+      if(nameEl)   nameEl.textContent = u.fullName || u.username || '—';
+      if(statusEl) statusEl.textContent = 'Calling…';
+      overlay.style.display = 'block';
+
+      clearTimeout(_callConnectTimer);
+      clearInterval(_callTickTimer);
+      _callConnectTimer = setTimeout(function(){
+        if(overlay.style.display === 'none') return;
+        var start = Date.now();
+        _callTickTimer = setInterval(function(){
+          var sec = Math.floor((Date.now()-start)/1000);
+          var mm = Math.floor(sec/60), ss = sec%60;
+          if(statusEl) statusEl.textContent = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+        }, 1000);
+      }, 1800 + Math.random()*900);
+    },
+    endCall: function(){
+      var overlay = document.getElementById('chatCallOverlay');
+      if(overlay) overlay.style.display = 'none';
+      clearTimeout(_callConnectTimer);
+      clearInterval(_callTickTimer);
     },
     close: function(){
       if(_unsubscribe) try{ _unsubscribe(); }catch(e){}
