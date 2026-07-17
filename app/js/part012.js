@@ -1516,7 +1516,14 @@ window.addEventListener('appinstalled', () => {
 // ── HAMBURGER MENU ──
 function openMenu() {
   document.getElementById('menuOverlay').classList.add('open');
-  document.getElementById('menuDrawer').classList.add('open');
+  var drawer = document.getElementById('menuDrawer');
+  drawer.classList.add('open');
+  // Explicit kick tied directly to the actual open action — same pattern as
+  // meaning-store's banner video. preload="metadata" + autoplay isn't
+  // reliably enough on its own to start playback for a video that's been
+  // sitting off-screen (translateX) since page load; this guarantees it.
+  var vid = drawer.querySelector('video');
+  if (vid) { vid.muted = true; vid.play().catch(function () {}); }
 }
 function closeMenu() {
   document.getElementById('menuOverlay').classList.remove('open');

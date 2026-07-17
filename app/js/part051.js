@@ -31,6 +31,10 @@
       if (src) urls.push(src);
       v.querySelectorAll('source[src]').forEach(function (s) { urls.push(s.getAttribute('src')); });
     });
+    // Practice player builds its <video> elements dynamically per word, so
+    // none of them exist in the DOM yet at this point — nowssb-player.js
+    // exposes the full pre-transformed list separately for exactly this.
+    if (window.NWSB_PLAYER_VIDEO_URLS) urls = urls.concat(window.NWSB_PLAYER_VIDEO_URLS);
     // de-dupe — several screens intentionally reuse the same background video
     return urls.filter(function (u, i) { return u && urls.indexOf(u) === i; });
   }

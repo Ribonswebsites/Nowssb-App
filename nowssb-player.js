@@ -83,6 +83,17 @@
       accent:'#8fe6ff' }
   ];
 
+  /* Exposed so app/js/part051.js's background video pre-warmer (Cache
+     Storage, same mechanism as every other decorative video in the app)
+     can also warm these — the practice screen builds its <video> elements
+     dynamically per word, so none of them exist in the DOM yet at the point
+     the pre-warmer scans for videos to cache. Pre-transformed through
+     cldVid() at the exact same widths the player actually requests
+     (720 for theme videos, 640 for organ videos), so the cached entry's
+     URL is byte-for-byte what the <video src> will ask for. */
+  window.NWSB_PLAYER_VIDEO_URLS = LGP_THEMES.map(function (t) { return cldVid(t.video, 720); })
+    .concat(Object.keys(ORGAN_VIDEOS).map(function (k) { return ORGAN_VIDEOS[k]; }).filter(Boolean).map(function (v) { return cldVid(v, 640); }));
+
   function isSubscribed() {
     try {
       if (window.GATE && typeof window.GATE.tier === 'function') {
