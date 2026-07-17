@@ -1118,12 +1118,6 @@
 #nwsbConnectSetup { font-family: 'DM Sans', sans-serif; }
 .nwsbcs-stage { position: absolute; inset: 0; display: flex; flex-direction: column; }
 
-.nwsbcs-close {
-  position: absolute; top: max(env(safe-area-inset-top,16px),16px); right: 16px; z-index: 5;
-  width: 34px; height: 34px; border-radius: 50% !important;
-  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-}
 .nwsbcs-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 16px; }
 
 /* Stage 1 — intro */
@@ -1166,9 +1160,11 @@
   padding: max(env(safe-area-inset-top,16px),16px) 16px 12px;
 }
 .nwsbcs-back {
-  width: 34px; height: 34px; border-radius: 50% !important;
+  width: 34px !important; height: 34px !important;
+  min-width: 34px !important; min-height: 34px !important;
+  border-radius: 50% !important;
   background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
-  display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; padding: 0 !important;
 }
 .nwsbcs-top-title { flex: 1; text-align: center; font-size: 15px; font-weight: 800; color: #fff; }
 
@@ -1198,27 +1194,48 @@
 
 .nwsbcs-chiprow { display: flex; flex-wrap: wrap; gap: 8px; }
 .nwsbcs-chip {
+  display: inline-flex; align-items: center; justify-content: center;
   padding: 8px 14px; border-radius: 20px !important;
   background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14);
   color: rgba(255,255,255,.7); font-size: 12.5px; font-weight: 600; cursor: pointer;
+  text-align: center; line-height: 1.3;
 }
 .nwsbcs-chip.selected { background: rgba(232,213,163,.16); border-color: rgba(232,213,163,.5); color: #e8d5a3; }
 
-.nwsbcs-themerow { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; }
-.nwsbcs-themecard { flex: 1; min-width: 130px; cursor: pointer; border-radius: 16px !important; padding: 3px; border: 2px solid transparent; }
-.nwsbcs-themecard.selected { border-color: #e8d5a3; }
-.nwsbcs-theme-preview { height: 90px; border-radius: 13px !important; margin-bottom: 8px; position: relative; overflow: hidden; }
-.nwsbcs-theme-preview-neu { background: linear-gradient(160deg,#f4f6fa,#e2e6ee); }
-.nwsbcs-theme-preview-neu::after {
-  content: ''; position: absolute; inset: 14px; border-radius: 10px !important;
-  background: #fff; box-shadow: 3px 3px 8px rgba(0,0,0,.08), -2px -2px 6px rgba(255,255,255,.9);
+.nwsbcs-themerow { display: flex; gap: 12px; }
+
+.nwsbcs-banner {
+  height: 110px; border-radius: 16px !important;
+  background-color: rgba(255,255,255,.06);
+  background-size: cover; background-position: center;
+  border: 1px solid rgba(255,255,255,.12);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; overflow: hidden;
 }
-.nwsbcs-theme-preview-glass { background: linear-gradient(160deg,#0d1a3a,#1a0a2e 55%,#060c18); }
-.nwsbcs-theme-preview-glass::after {
-  content: ''; position: absolute; inset: 14px; border-radius: 10px !important;
-  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+.nwsbcs-banner span {
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); font-family: 'DM Sans', sans-serif;
 }
-.nwsbcs-theme-label { font-size: 12.5px; font-weight: 700; color: #fff; text-align: center; }
+
+/* ── Shared theme-option image card — Connect setup wizard, Connect Hub
+   "Connect Theme" settings, and Edit Profile's "Profile Theme" row all use
+   this same real-screenshot preview instead of a plain text pill. ── */
+.nwsb-theme-opt {
+  flex: 1; min-width: 0; cursor: pointer;
+  border-radius: 16px !important; padding: 3px; border: 2px solid transparent;
+  background: none; margin: 0; font-family: 'DM Sans', sans-serif;
+}
+.nwsb-theme-opt.active { border-color: #e8d5a3; }
+.nwsb-theme-opt-img {
+  height: 90px; border-radius: 13px !important;
+  background-size: cover; background-position: top center;
+  margin-bottom: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+.nwsb-theme-opt-label { font-size: 12.5px; font-weight: 700; color: #fff; text-align: center; }
+
+/* Edit Profile's panel is always a light neumorphic surface — flip the label
+   dark there so it doesn't disappear against #f0f2f7. */
+#ss-panel-profile-edit .nwsb-theme-opt-label { color: #1a1a2e; }
+#ss-panel-profile-edit .nwsb-theme-opt.active { border-color: #c8a96e; }
 
 /* Stage 3 — welcome / complete */
 .nwsbcs-stage-welcome { align-items: center; justify-content: center; text-align: center; }

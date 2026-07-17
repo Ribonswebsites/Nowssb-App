@@ -587,12 +587,10 @@
   function nwsbSyncThemeButtons() {
     var theme = 'neu';
     try { theme = localStorage.getItem('nwsb_social_theme') || 'neu'; } catch (e) {}
-    var raised = '4px 4px 10px rgba(0,0,0,.12), -3px -3px 8px rgba(255,255,255,.95)';
-    var inset  = 'inset 3px 3px 7px rgba(0,0,0,.13), inset -2px -2px 5px rgba(255,255,255,.92)';
     var neu = document.getElementById('nwsb-theme-neu');
     var gl  = document.getElementById('nwsb-theme-glass');
-    if (neu) { neu.style.boxShadow = (theme === 'neu')  ? inset : raised; neu.style.color = (theme === 'neu')  ? '#a8854a' : '#1a1a2e'; }
-    if (gl)  { gl.style.boxShadow  = (theme === 'glass') ? inset : raised; gl.style.color  = (theme === 'glass') ? '#a8854a' : '#1a1a2e'; }
+    if (neu) neu.classList.toggle('active', theme === 'neu');
+    if (gl)  gl.classList.toggle('active', theme === 'glass');
   }
   window.nwsbSyncThemeButtons = nwsbSyncThemeButtons;
 

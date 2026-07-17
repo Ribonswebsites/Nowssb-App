@@ -105,8 +105,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
-<link rel="stylesheet" href="nowssb-social.css?v=198">
-<link rel="stylesheet" href="nowssb-nm.css?v=333">
+<link rel="stylesheet" href="nowssb-social.css?v=199">
+<link rel="stylesheet" href="nowssb-nm.css?v=334">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -6664,8 +6664,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <div class="nch-sec-label">Connect Theme</div>
     <div class="nch-theme-row">
-      <button type="button" id="nch-theme-neu" class="nch-theme-btn" onclick="nwsbSetSocTheme('neu');nchSyncTheme();">NowssB</button>
-      <button type="button" id="nch-theme-glass" class="nch-theme-btn" onclick="nwsbSetSocTheme('glass');nchSyncTheme();">NowssB Fashion</button>
+      <button type="button" id="nch-theme-neu" class="nwsb-theme-opt" onclick="nwsbSetSocTheme('neu');nchSyncTheme();">
+        <div class="nwsb-theme-opt-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png')"></div>
+        <div class="nwsb-theme-opt-label">NowssB</div>
+      </button>
+      <button type="button" id="nch-theme-glass" class="nwsb-theme-opt" onclick="nwsbSetSocTheme('glass');nchSyncTheme();">
+        <div class="nwsb-theme-opt-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png')"></div>
+        <div class="nwsb-theme-opt-label">NowssB Fashion</div>
+      </button>
     </div>
     <div class="nch-theme-hint">Neumorphism or frosted glass — applies to the Connect feed, reels, discover and profile.</div>
   </div>
@@ -6936,9 +6942,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Stage 1 — intro -->
   <div class="nwsbcs-stage" id="nwsbcs-stage-intro">
-    <button class="nwsbcs-close" onclick="nwsbCloseConnectSetup()" aria-label="Close">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
     <div class="nwsbcs-scroll">
       <div class="nwsbcs-hero-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784255344/grok_image_1784255334796_jew1ou.jpg')"></div>
       <div class="nwsbcs-brand-row">
@@ -6972,12 +6975,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </button>
       <span class="nwsbcs-top-title">Set up your profile</span>
-      <button class="nwsbcs-close" style="position:static;" onclick="nwsbCloseConnectSetup()" aria-label="Close">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
+      <div style="width:34px;flex-shrink:0;"></div>
     </div>
     <div class="nwsbcs-scroll">
-      <div class="nwsbcs-avatar-wrap" onclick="nwsbConnectSetupPickAvatar()">
+      <div class="nwsbcs-avatar-wrap" onclick="profileEditPhoto()">
         <div class="nwsbcs-avatar" id="nwsbcsAvatar">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(232,213,163,.6)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
         </div>
@@ -6985,7 +6986,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         </div>
       </div>
-      <input type="file" id="nwsbcsAvatarInput" accept="image/*" style="display:none;" onchange="nwsbConnectSetupAvatarChosen(this)">
 
       <div class="nwsbcs-field">
         <div class="nwsbcs-label">DISPLAY NAME</div>
@@ -7003,15 +7003,23 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
 
       <div class="nwsbcs-field">
+        <div class="nwsbcs-label">PROFILE BANNER <span class="nwsbcs-optional">(optional)</span></div>
+        <div class="nwsbcs-banner" id="nwsbcsBannerPreview" onclick="nwsbBannerChooser()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Tap to add a banner · 1200×400</span>
+        </div>
+      </div>
+
+      <div class="nwsbcs-field">
         <div class="nwsbcs-label">CHOOSE YOUR LOOK</div>
         <div class="nwsbcs-themerow">
-          <div class="nwsbcs-themecard selected" id="nwsbcsThemeNeu" onclick="nwsbConnectSetupTheme('neu')">
-            <div class="nwsbcs-theme-preview nwsbcs-theme-preview-neu"></div>
-            <div class="nwsbcs-theme-label">NowssB</div>
+          <div class="nwsb-theme-opt active" id="nwsbcsThemeNeu" onclick="nwsbConnectSetupTheme('neu')">
+            <div class="nwsb-theme-opt-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png')"></div>
+            <div class="nwsb-theme-opt-label">NowssB</div>
           </div>
-          <div class="nwsbcs-themecard" id="nwsbcsThemeGlass" onclick="nwsbConnectSetupTheme('glass')">
-            <div class="nwsbcs-theme-preview nwsbcs-theme-preview-glass"></div>
-            <div class="nwsbcs-theme-label">NowssB Fashion</div>
+          <div class="nwsb-theme-opt" id="nwsbcsThemeGlass" onclick="nwsbConnectSetupTheme('glass')">
+            <div class="nwsb-theme-opt-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png')"></div>
+            <div class="nwsb-theme-opt-label">NowssB Fashion</div>
           </div>
         </div>
       </div>
@@ -7092,7 +7100,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ REBUILT SETTINGS PANELS ══ -->
 
 <!-- PROFILE EDIT — fully wired -->
-<script src="app/js/part041.js?v=164"></script>
+<script src="app/js/part041.js?v=165"></script>
 
 <!-- VOICE picker panel -->
 <div class="ss-panel" id="ss-panel-voice" style="padding:0;">
@@ -7522,8 +7530,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <script src="app/js/part049.js?v=290"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="nowssb-social.js?v=166" defer></script>
-<script src="nowssb-nm.js?v=163" defer></script>
+<script src="nowssb-social.js?v=167" defer></script>
+<script src="nowssb-nm.js?v=164" defer></script>
 <script src="nowssb-player.js?v=282" defer></script>
 
 </body>

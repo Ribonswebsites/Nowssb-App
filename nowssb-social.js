@@ -856,8 +856,9 @@
   var CS_FOCUS_OPTIONS = ['Sound Healer', 'Daily Practitioner', 'Wellness', 'Beginner', 'Practitioner', 'Frequency Sage'];
   var _csSelectedFocus = '';
   var _csSelectedTheme = 'neu';
-  var _csAvatarDataUrl = '';
   var _csOnComplete = null;
+  var _csAvatarObserver = null;
+  var _csBannerObserver = null;
 
   window.nwsbSocialOnboardingDone = function () {
     try { if (localStorage.getItem('nwsb_social_onboarding_done') === '1') return true; } catch (e) {}
@@ -865,6 +866,43 @@
     if (ud && ud.socialOnboardingDone) return true;
     return false;
   };
+
+  // Avatar/banner pickers are the app's existing shared sheets (profileEditPhoto()
+  // → prebuilt avatar grid or upload; nwsbBannerChooser() → prebuilt banner grid
+  // or upload). Both persist straight to Firestore/localStorage on selection and
+  // update their own known DOM targets (#profile-edit-avatar-circle /
+  // #profile-edit-banner-preview) — mirror those onto this wizard's own preview
+  // elements via MutationObserver instead of duplicating the picker UI.
+  function watchSharedPickers() {
+    var avSrc = document.getElementById('profile-edit-avatar-circle');
+    var avMine = document.getElementById('nwsbcsAvatar');
+    if (_csAvatarObserver) { _csAvatarObserver.disconnect(); _csAvatarObserver = null; }
+    if (avSrc && avMine) {
+      _csAvatarObserver = new MutationObserver(function () {
+        if (avSrc.style.backgroundImage && avSrc.style.backgroundImage !== 'none') {
+          avMine.style.backgroundImage = avSrc.style.backgroundImage;
+          avMine.innerHTML = '';
+        }
+      });
+      _csAvatarObserver.observe(avSrc, { attributes: true, attributeFilter: ['style'] });
+    }
+    var bnSrc = document.getElementById('profile-edit-banner-preview');
+    var bnMine = document.getElementById('nwsbcsBannerPreview');
+    if (_csBannerObserver) { _csBannerObserver.disconnect(); _csBannerObserver = null; }
+    if (bnSrc && bnMine) {
+      _csBannerObserver = new MutationObserver(function () {
+        if (bnSrc.style.backgroundImage && bnSrc.style.backgroundImage !== 'none') {
+          bnMine.style.backgroundImage = bnSrc.style.backgroundImage;
+          bnMine.innerHTML = '';
+        }
+      });
+      _csBannerObserver.observe(bnSrc, { attributes: true, attributeFilter: ['style'] });
+    }
+  }
+  function unwatchSharedPickers() {
+    if (_csAvatarObserver) { _csAvatarObserver.disconnect(); _csAvatarObserver = null; }
+    if (_csBannerObserver) { _csBannerObserver.disconnect(); _csBannerObserver = null; }
+  }
 
   window.nwsbOpenConnectSetup = function (onComplete) {
     _csOnComplete = onComplete || null;
@@ -876,26 +914,28 @@
     if (nameInput) nameInput.value = ud.displayName || (window._currentUser && window._currentUser.displayName) || '';
     var bioInput = document.getElementById('nwsbcsBio');
     if (bioInput) bioInput.value = ud.bio || '';
+
     var av = document.getElementById('nwsbcsAvatar');
     var existingPhoto = ud.photoURL || (window._currentUser && window._currentUser.photoURL) || '';
-    if (av) av.style.backgroundImage = existingPhoto ? "url('" + existingPhoto + "')" : 'none';
-    _csAvatarDataUrl = '';
+    if (av) { av.style.backgroundImage = existingPhoto ? "url('" + existingPhoto + "')" : 'none'; if (existingPhoto) av.innerHTML = ''; }
+
+    var bn = document.getElementById('nwsbcsBannerPreview');
+    if (bn) {
+      if (ud.bannerURL) { bn.style.backgroundImage = "url('" + ud.bannerURL + "')"; bn.innerHTML = ''; }
+      else { bn.style.backgroundImage = 'none'; }
+    }
+
     _csSelectedFocus = ud.healthFocus || '';
     _csSelectedTheme = (function () { try { return localStorage.getItem('nwsb_social_theme') || 'neu'; } catch (e) { return 'neu'; } })();
 
     renderCsFocusChips();
     syncCsTheme();
+    watchSharedPickers();
 
     document.getElementById('nwsbcs-stage-intro').style.display = 'flex';
     document.getElementById('nwsbcs-stage-profile').style.display = 'none';
     document.getElementById('nwsbcs-stage-welcome').style.display = 'none';
     overlay.style.display = 'block';
-  };
-
-  window.nwsbCloseConnectSetup = function () {
-    var overlay = document.getElementById('nwsbConnectSetup');
-    if (overlay) overlay.style.display = 'none';
-    _csOnComplete = null;
   };
 
   window.nwsbConnectSetupBack = function () {
@@ -927,23 +967,6 @@
     }
   };
 
-  window.nwsbConnectSetupPickAvatar = function () {
-    var inp = document.getElementById('nwsbcsAvatarInput');
-    if (inp) inp.click();
-  };
-  window.nwsbConnectSetupAvatarChosen = function (el) {
-    var file = el.files && el.files[0];
-    el.value = '';
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      _csAvatarDataUrl = e.target.result;
-      var av = document.getElementById('nwsbcsAvatar');
-      if (av) av.style.backgroundImage = "url('" + _csAvatarDataUrl + "')";
-    };
-    reader.readAsDataURL(file);
-  };
-
   window.nwsbConnectSetupTheme = function (theme) {
     _csSelectedTheme = theme;
     syncCsTheme();
@@ -951,8 +974,8 @@
   function syncCsTheme() {
     var neu = document.getElementById('nwsbcsThemeNeu');
     var gl = document.getElementById('nwsbcsThemeGlass');
-    if (neu) neu.classList.toggle('selected', _csSelectedTheme === 'neu');
-    if (gl) gl.classList.toggle('selected', _csSelectedTheme === 'glass');
+    if (neu) neu.classList.toggle('active', _csSelectedTheme === 'neu');
+    if (gl) gl.classList.toggle('active', _csSelectedTheme === 'glass');
   }
 
   function renderCsFocusChips() {
@@ -969,30 +992,17 @@
     el.classList.add('selected');
   };
 
-  function uploadCsAvatar(dataUrl) {
-    return fetch(dataUrl).then(function (r) { return r.blob(); }).then(function (blob) {
-      return import("https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js").then(function (st) {
-        var storage = st.getStorage();
-        var path = 'avatars/' + window._currentUid + '_' + Date.now() + '.jpg';
-        var fileRef = st.ref(storage, path);
-        return st.uploadBytes(fileRef, blob, { contentType: blob.type || 'image/jpeg' }).then(function () {
-          return st.getDownloadURL(fileRef);
-        });
-      });
-    });
-  }
-
   function saveCsProfile(name) {
     var bio = (document.getElementById('nwsbcsBio').value || '').trim();
 
     // Apply the chosen theme via the already-wired setter (localStorage + body class).
     if (typeof nwsbSetSocTheme === 'function') nwsbSetSocTheme(_csSelectedTheme);
 
-    // Patch the in-memory profile cache immediately so the feed/profile reflect
-    // the new name/avatar without waiting on a Firestore round-trip.
+    // Avatar/banner were already persisted the moment they were picked (the
+    // shared pickers do that themselves) — only name/focus/bio/completion
+    // are this wizard's own responsibility to save.
     if (window._userDataCache) {
       window._userDataCache.displayName = name;
-      if (_csAvatarDataUrl) window._userDataCache.photoURL = _csAvatarDataUrl;
       if (_csSelectedFocus) window._userDataCache.healthFocus = _csSelectedFocus;
       window._userDataCache.bio = bio;
       window._userDataCache.socialOnboardingDone = true;
@@ -1005,18 +1015,13 @@
       if (_csSelectedFocus) payload.healthFocus = _csSelectedFocus;
       if (bio) payload.bio = bio;
       window._fbSetDoc(window._currentUid, payload).catch(function () {});
-      if (_csAvatarDataUrl) {
-        uploadCsAvatar(_csAvatarDataUrl).then(function (url) {
-          window._fbSetDoc(window._currentUid, { photoURL: url }).catch(function () {});
-          if (window._userDataCache) window._userDataCache.photoURL = url;
-        }).catch(function (e) { console.warn('Connect setup: avatar upload failed:', e); });
-      }
     }
   }
 
   window.nwsbConnectSetupFinish = function () {
     var overlay = document.getElementById('nwsbConnectSetup');
     if (overlay) overlay.style.display = 'none';
+    unwatchSharedPickers();
     var cb = _csOnComplete;
     _csOnComplete = null;
     if (cb) cb();

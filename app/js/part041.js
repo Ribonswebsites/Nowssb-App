@@ -54,8 +54,14 @@
       <div>
         <div class="slbl" style="margin-bottom:10px;">PROFILE THEME</div>
         <div style="display:flex;gap:12px;">
-          <button type="button" id="nwsb-theme-neu" onclick="nwsbSetSocTheme('neu')" style="flex:1;padding:14px 8px;border:none;border-radius:14px;background:#f0f2f7;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#1a1a2e;box-shadow:4px 4px 10px rgba(0,0,0,.12), -3px -3px 8px rgba(255,255,255,.95);">NowssB</button>
-          <button type="button" id="nwsb-theme-glass" onclick="nwsbSetSocTheme('glass')" style="flex:1;padding:14px 8px;border:none;border-radius:14px;background:#f0f2f7;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#1a1a2e;box-shadow:4px 4px 10px rgba(0,0,0,.12), -3px -3px 8px rgba(255,255,255,.95);">NowssB Fashion</button>
+          <button type="button" id="nwsb-theme-neu" class="nwsb-theme-opt" onclick="nwsbSetSocTheme('neu')">
+            <div class="nwsb-theme-opt-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png')"></div>
+            <div class="nwsb-theme-opt-label">NowssB</div>
+          </button>
+          <button type="button" id="nwsb-theme-glass" class="nwsb-theme-opt" onclick="nwsbSetSocTheme('glass')">
+            <div class="nwsb-theme-opt-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png')"></div>
+            <div class="nwsb-theme-opt-label">NowssB Fashion</div>
+          </button>
         </div>
         <div style="font-size:11px;color:rgba(0,0,0,.4);margin-top:8px;font-family:'DM Sans',sans-serif;">Neumorphism or frosted glass — applies to your social profile.</div>
       </div>
