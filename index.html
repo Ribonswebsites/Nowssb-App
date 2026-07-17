@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
-<link rel="stylesheet" href="app/app.css?v=285">
+<link rel="stylesheet" href="app/app.css?v=286">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=343">
+<link rel="stylesheet" href="nowssb-nm.css?v=344">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -2635,7 +2635,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- ══ MAIN PROFILE CONTENT (hidden until intro dismissed) ══ -->
   <div id="profileMainContent" style="display:none; flex-direction:column; height:100%; overflow:hidden; position:relative; background:#060c18;">
     <!-- Same background image as the Fashion home screen (bgImages.home in part012.js) -->
-    <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850550/1000033096-ezremove_eb2gnu.png');"></div>
+    <!-- Only shows a background image when the user has actually picked a
+         custom Fashion background (SS.open('fashionbg')) — that selection
+         already lives in the --nwsb-custom-bg-url variable set on <body> by
+         nwsbSetFashionBg(). Nothing selected yet = plain #060c18 below, no
+         image, exactly like before. -->
+    <div class="sub-screen-bg" id="profileBgLayer"></div>
     <div class="sub-body" id="profileSubBody" style="padding-top:0; position:relative; z-index:1;">
 
       <!-- ── CLEAN BANNER (matches Settings guide page) ── -->
@@ -6773,7 +6778,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nch-theme-hint">Neumorphism or frosted glass — applies to the Connect feed, reels, discover and profile.</div>
 
     <div class="nch-row" onclick="nwsbOpenConnectBgPanel()" style="margin-top:22px;">
-      <span class="nch-row-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+      <span class="nch-row-ico" style="width:19px;height:19px;display:inline-flex;overflow:hidden;flex-shrink:0;"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt=""></span>
       <span class="nch-row-body"><span class="nch-row-label">Connect Home Background</span><span class="nch-row-sub">NowssB Fashion theme only · 14 photos</span></span>
       <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
@@ -7623,7 +7628,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=219"></script>
+<script src="app/js/part042.js?v=220"></script>
 
 
 
@@ -7729,10 +7734,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <script src="app/js/part049.js?v=290"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="app/js/part051.js?v=3" defer></script>
+<script src="app/js/part051.js?v=4" defer></script>
 <script src="nowssb-social.js?v=173" defer></script>
 <script src="nowssb-nm.js?v=166" defer></script>
-<script src="nowssb-player.js?v=282" defer></script>
+<script src="nowssb-player.js?v=283" defer></script>
 
 </body>
 </html>

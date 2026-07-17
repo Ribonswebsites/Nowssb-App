@@ -110,17 +110,37 @@
     return true; // not inside any known screen wrapper — always-visible chrome, leave alone
   }
 
+  function hasStaticSource(v) {
+    // Checks the HTML itself (src attribute or a <source> child), not the
+    // resolved .currentSrc/.src PROPERTY — those stay empty for a
+    // <source>-child video until the browser actually starts loading it,
+    // which made this check wrongly treat several real decorative videos
+    // (the ones built with <source> instead of a plain src attribute) as
+    // WebRTC call streams and skip them entirely, forever. A true call
+    // video (srcObject-driven) has neither a src attribute nor a <source>
+    // child, so this still correctly excludes those.
+    return v.hasAttribute('src') || !!v.querySelector('source[src]');
+  }
+
   function refresh() {
     // video[autoplay] catches ones not seen yet; [MARK] keeps tracking ones
     // whose autoplay attribute we already stripped after pausing them once.
     document.querySelectorAll('video[autoplay], video[' + MARK + ']').forEach(function (v) {
-      if (!v.currentSrc && !v.src) return; // live call stream (srcObject) — never touch
+      if (!hasStaticSource(v)) return; // live call stream (srcObject) — never touch
       v.setAttribute(MARK, '1');
       if (isVisible(v)) {
-        if (autoPaused.has(v)) {
-          autoPaused.delete(v);
-          if (v.paused) v.play().catch(function () {});
-        }
+        autoPaused.delete(v);
+        // Not just "resume if WE paused it" — also actively (re)try any
+        // visible decorative video that's sitting paused for any reason,
+        // including one whose own autoplay attribute never actually
+        // managed to start it in the first place (the real bug this was
+        // fixing: those videos looked permanently blank because nothing
+        // ever asked them to play). Safe here because every video this
+        // reaches is a controls-free decorative loop — never something
+        // with a real pause button a user could have intentionally hit.
+        // The practice-session video is explicitly excluded below since
+        // it DOES have a real pause control.
+        if (v.paused && !v.classList.contains('lgp-video')) v.play().catch(function () {});
       } else if (!v.paused) {
         v.pause();
         v.removeAttribute('autoplay');

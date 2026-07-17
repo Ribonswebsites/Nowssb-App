@@ -3894,6 +3894,14 @@ body.fashion-home-active.nwsb-custom-fashion-bg #appBg {
 }
 body.nwsb-custom-fashion-bg #appBgLayer2 { opacity: 0 !important; transition: none !important; }
 
+/* Profile screen — same custom Fashion background the user picked in
+   Settings > Fashion Background, shown behind the progress/stats content.
+   No selection yet = #profileBgLayer stays without a background-image, so
+   the plain #060c18 on #profileMainContent shows through untouched. */
+body.fashion-home-active.nwsb-custom-fashion-bg #profileBgLayer {
+  background-image: var(--nwsb-custom-bg-url) !important;
+}
+
 /* NowssB Connect Home — custom background. Extra class on top of the
    existing html body.nwsb-soc-glass #sub-social-home rule (nowssb-nm.css,
    the glass theme block) gives this strictly higher specificity, so it
