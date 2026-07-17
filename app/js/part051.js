@@ -68,3 +68,65 @@
   var idle = window.requestIdleCallback || function (cb) { setTimeout(cb, 4000); };
   idle(start, { timeout: 8000 });
 })();
+
+/* ── Pause offscreen videos ────────────────────────────────────────────────
+   Every autoplay/loop video keeps decoding frames even after its screen is
+   closed and covered by whatever opened next — that's a real, continuous
+   CPU/battery cost with nothing on screen to show for it. This periodically
+   checks each video's actual visibility (via the same .open/.active classes
+   the app already uses to show/hide screens, not a guess) and pauses ones
+   that are hidden.
+   Only ever resumes a video THIS script itself paused (tracked in
+   autoPaused) — anything already paused for some other reason (the user
+   tapped pause, a carousel deliberately stopped it, etc.) is never touched,
+   so no existing pause/play behavior anywhere in the app can be overridden.
+   Skips WebRTC call videos entirely (they use srcObject, not src/<source>,
+   so a live call is never paused by this).
+   Important: the plain <video autoplay> HTML attribute is the browser's OWN
+   standing instruction to keep the element playing — calling .pause() via
+   JS does not cancel that instruction, so if the browser's media pipeline
+   ever resets (observed in testing: an internal abort/reload cycle on a
+   stalled load) the autoplay attribute silently resumes playback again a
+   moment later, fighting our own pause. Stripping the attribute the first
+   time we pause a video hands full control to this script from then on —
+   .play()/.pause() calls here still work exactly the same either way. ── */
+(function () {
+  var autoPaused = (typeof WeakSet !== 'undefined') ? new WeakSet() : null;
+  if (!autoPaused) return; // no WeakSet support — skip rather than leak references
+
+  var MARK = 'data-nwsb-vidmanaged';
+
+  function isVisible(el) {
+    while (el && el !== document.documentElement) {
+      if (el.classList) {
+        if (el.classList.contains('sub-screen')) return el.classList.contains('open');
+        if (el.classList.contains('screen')) return el.classList.contains('active');
+      }
+      var cs = window.getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+      el = el.parentElement;
+    }
+    return true; // not inside any known screen wrapper — always-visible chrome, leave alone
+  }
+
+  function refresh() {
+    // video[autoplay] catches ones not seen yet; [MARK] keeps tracking ones
+    // whose autoplay attribute we already stripped after pausing them once.
+    document.querySelectorAll('video[autoplay], video[' + MARK + ']').forEach(function (v) {
+      if (!v.currentSrc && !v.src) return; // live call stream (srcObject) — never touch
+      v.setAttribute(MARK, '1');
+      if (isVisible(v)) {
+        if (autoPaused.has(v)) {
+          autoPaused.delete(v);
+          if (v.paused) v.play().catch(function () {});
+        }
+      } else if (!v.paused) {
+        v.pause();
+        v.removeAttribute('autoplay');
+        autoPaused.add(v);
+      }
+    });
+  }
+
+  setInterval(refresh, 1800);
+})();
