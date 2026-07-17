@@ -546,6 +546,17 @@
       var igp = document.getElementById('sub-ig-profile');
       var ppl = document.getElementById('sub-people');
       var hub = document.getElementById('sub-connect-hub');
+      var social = document.getElementById('sub-social');
+      /* All four of these are .sub-screen overlays sharing the same slide
+         transition. Closing one (igp/ppl/hub) while opening another
+         (sub-social) at the same time — both animating in the same
+         direction — briefly uncovers the app's home screen mid-transition,
+         same root cause as the bottom-nav tab-switch flash. Snap instantly
+         instead: disable the transition for the group, toggle, then restore
+         it a couple of frames later so a genuine slide-in from elsewhere
+         still animates normally. */
+      var group = [igp, ppl, hub, social].filter(Boolean);
+      group.forEach(function (el) { el.style.transition = 'none'; });
       if (igp) igp.classList.remove('open');
       if (ppl) ppl.classList.remove('open');
       /* sub-connect-hub is later in DOM than sub-social too (same z-index),
@@ -554,6 +565,11 @@
          it's explicitly closed here as well. */
       if (hub) hub.classList.remove('open');
       if (typeof openSub === 'function') openSub('social');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          group.forEach(function (el) { el.style.transition = ''; });
+        });
+      });
       /* Hide ALL settings content so only the Edit Profile panel shows —
          the social section must never reveal the app settings/site */
       var main = document.getElementById('ss-main-view');
