@@ -101,6 +101,7 @@
       if (el.classList) {
         if (el.classList.contains('sub-screen')) return el.classList.contains('open');
         if (el.classList.contains('screen')) return el.classList.contains('active');
+        if (el.classList.contains('menu-drawer')) return el.classList.contains('open');
       }
       var cs = window.getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden') return false;

@@ -31,7 +31,7 @@
     el.innerHTML = `
     <!-- Video banner — below the header -->
     <div class="fash-video-banner">
-      <video autoplay muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
+      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
     </div>
     <!-- ── ACCOUNT ── -->
     <div class="ss-section-title">ACCOUNT</div>
