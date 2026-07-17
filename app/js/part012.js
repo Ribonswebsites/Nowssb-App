@@ -2009,6 +2009,45 @@ const RM_ROOTS = {
   karma:'Sanskrit · karman',       energy:'Greek · energeia'
 };
 
+// ── HEALING FOCUS — organ/system each word's frequency is associated with ──
+const RM_ORGAN = {
+  earth:'Grounding · Nervous System', water:'Hydration · Kidneys',
+  fire:'Circulation · Vitality',      sun:'Energy · Metabolism',
+  moon:'Sleep · Hormonal Balance',    god:'Mental Clarity',
+  soul:'Heart · Emotional Balance',   love:'Heart Health',
+  truth:'Throat · Communication',     light:'Eyes · Pineal Gland',
+  name:'Identity · Confidence',       mind:'Mental Clarity',
+  india:'Cultural Roots',             breath:'Lungs · Respiratory',
+  blood:'Circulation · Heart',        time:'Nervous System · Focus',
+  space:'Mental Clarity',             dark:'Sleep · Melatonin',
+  mother:'Heart · Emotional Balance', father:'Grounding · Strength',
+  sky:'Lungs · Breath',               tree:'Grounding · Nervous System',
+  wind:'Lungs · Breath',              sea:'Hydration · Kidneys',
+  river:'Circulation · Flow',         stone:'Bone & Joint Strength',
+  rain:'Skin & Glow',                 child:'Immunity · Vitality',
+  king:'Confidence · Posture',        woman:'Hormonal Balance',
+  man:'Strength · Vitality',          spirit:'Lungs · Breath',
+  life:'Immunity · Vitality',         death:'Nervous System · Release',
+  power:'Strength · Vitality',        star:'Mental Clarity',
+  dream:'Sleep · Hormonal Balance',   voice:'Throat · Communication',
+  heart:'Heart Health',               peace:'Nervous System · Calm',
+  wisdom:'Mental Clarity',            strength:'Strength · Vitality',
+  grace:'Nervous System · Calm',      freedom:'Lungs · Breath',
+  karma:'Mental Clarity',             energy:'Energy · Metabolism',
+  thunder:'Adrenal · Focus',          storm:'Lungs · Breath',
+  prayer:'Mental Clarity',            divine:'Mental Clarity'
+};
+var RM_ORGAN_FALLBACK = ['Heart Health','Mental Clarity','Lungs · Breath','Immunity · Vitality','Gut Health','Skin & Glow'];
+function rmdOrganFor(key) {
+  if (RM_ORGAN[key]) return RM_ORGAN[key];
+  var h = 0;
+  for (var i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return RM_ORGAN_FALLBACK[h % RM_ORGAN_FALLBACK.length];
+}
+function rmdDescriptionFor(word, root) {
+  return 'Every word carries a vibrational signature shaped by centuries of natural speech. "' + word + '" traces back to ' + root + ' — a root whose original pronunciation is believed to resonate with the body\'s own frequency. Practicing it aloud, slowly and deliberately, reconnects your voice to language as it was first spoken, before dictionaries flattened its sound into spelling.';
+}
+
 // ── SLIDER STATE ──
 var _rmdSlideIdx = 0;
 var _rmdSlideTimer = null;
@@ -2073,6 +2112,12 @@ function loadWordOrigin(key) {
   var rEl = document.getElementById('rmdRoot');
   if (wEl) wEl.textContent = word;
   if (rEl) rEl.textContent = root;
+
+  // Healing focus + description
+  var organEl = document.getElementById('rmdOrganText');
+  var descEl  = document.getElementById('rmdDescText');
+  if (organEl) organEl.textContent = rmdOrganFor(key);
+  if (descEl)  descEl.textContent  = rmdDescriptionFor(word, root);
 
   // Price
   var pNow  = document.getElementById('rmdPriceNow');

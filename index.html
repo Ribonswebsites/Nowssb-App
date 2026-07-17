@@ -104,7 +104,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
-<link rel="stylesheet" href="app/app.css?v=280">
+<link rel="stylesheet" href="app/app.css?v=281">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
 <link rel="stylesheet" href="nowssb-nm.css?v=342">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
@@ -2968,6 +2968,40 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
         <button class="rmd-act-buy" id="rmdBuyBtn" onclick="rmdBuyNow()">Buy Now</button>
 
+        <!-- ORGAN / HEALING FOCUS -->
+        <div class="rmd-organ-row" id="rmdOrganRow" style="display:flex;align-items:center;gap:10px;margin-top:22px;padding:14px 16px;background:rgba(232,213,163,0.06);border:1px solid rgba(232,213,163,0.18);border-radius:12px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" style="flex-shrink:0;"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+          <div style="min-width:0;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,213,163,0.75);">Healing Focus</div>
+            <div id="rmdOrganText" style="font-size:13px;font-weight:600;color:#fff;font-family:'DM Sans',sans-serif;margin-top:2px;">—</div>
+          </div>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="rmd-desc-block" style="margin-top:20px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px;">About This Word</div>
+          <div id="rmdDescText" style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.65);font-family:'DM Sans',sans-serif;"></div>
+        </div>
+
+        <!-- WHAT'S INCLUDED -->
+        <div class="rmd-included-block" style="margin-top:22px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px;">What's Included</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+              <span style="font-size:12.5px;color:rgba(255,255,255,0.62);font-family:'DM Sans',sans-serif;">Native pronunciation audio, generated on demand</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+              <span style="font-size:12.5px;color:rgba(255,255,255,0.62);font-family:'DM Sans',sans-serif;">Full phonetic root breakdown and origin story</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+              <span style="font-size:12.5px;color:rgba(255,255,255,0.62);font-family:'DM Sans',sans-serif;">Permanent access — owned words never expire</span>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- ── LIBRARY VIEW: categories + pills ── -->
@@ -3424,7 +3458,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=306"></script>
+<script src="app/js/part012.js?v=307"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
