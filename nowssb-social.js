@@ -1027,4 +1027,75 @@
     if (cb) cb();
   };
 
+  /* ═══════════════════════════════════════════════════════════════
+     THEME PREVIEW IMAGES — real background removal
+     The two theme screenshots are studio-style renders on a flat white
+     backdrop, not transparent PNGs — mix-blend-mode alone isn't reliable
+     enough (depends on the exact page colour behind it). This actually
+     strips the pixels: flood-fill from the four image edges through
+     near-white pixels only, erasing just the connected background region
+     and leaving any white *inside* the phone mockup (bounded by its dark
+     bezel) untouched. Result is cached per URL and reused everywhere the
+     same image appears (setup wizard, Connect Hub, Edit Profile). ── */
+  var _bgStripCache = {};
+  function nwsbStripCornerBg(url) {
+    if (_bgStripCache[url]) return _bgStripCache[url];
+    var p = new Promise(function (resolve) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        try {
+          var w = img.naturalWidth, h = img.naturalHeight;
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          var imgData = ctx.getImageData(0, 0, w, h);
+          var px = imgData.data;
+          var THRESH = 236;
+          function isWhite(p2) {
+            var i = p2 * 4;
+            return px[i] >= THRESH && px[i + 1] >= THRESH && px[i + 2] >= THRESH;
+          }
+          var visited = new Uint8Array(w * h);
+          var stack = [];
+          function seed(p2) { if (!visited[p2] && isWhite(p2)) { visited[p2] = 1; stack.push(p2); } }
+          for (var x = 0; x < w; x++) { seed(x); seed((h - 1) * w + x); }
+          for (var y = 0; y < h; y++) { seed(y * w); seed(y * w + (w - 1)); }
+          while (stack.length) {
+            var p2 = stack.pop();
+            var x2 = p2 % w, y2 = (p2 / w) | 0;
+            px[p2 * 4 + 3] = 0;
+            if (x2 > 0) seed(p2 - 1);
+            if (x2 < w - 1) seed(p2 + 1);
+            if (y2 > 0) seed(p2 - w);
+            if (y2 < h - 1) seed(p2 + w);
+          }
+          ctx.putImageData(imgData, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+        } catch (e) {
+          console.warn('nwsbStripCornerBg: canvas processing failed, using original image:', e);
+          resolve(url);
+        }
+      };
+      img.onerror = function () { resolve(url); };
+      img.src = url;
+    });
+    _bgStripCache[url] = p;
+    return p;
+  }
+  function nwsbApplyStrippedBg(url, selector) {
+    nwsbStripCornerBg(url).then(function (finalUrl) {
+      document.querySelectorAll(selector).forEach(function (el) {
+        el.style.backgroundImage = "url('" + finalUrl + "')";
+      });
+    });
+  }
+  window.nwsbApplyStrippedBg = nwsbApplyStrippedBg;
+
+  var NWSB_THEME_IMG_NEU   = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png';
+  var NWSB_THEME_IMG_GLASS = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png';
+  nwsbApplyStrippedBg(NWSB_THEME_IMG_NEU,   '#nwsbcsThemeNeu .nwsb-theme-opt-img, #nch-theme-neu .nwsb-theme-opt-img, #nwsb-theme-neu .nwsb-theme-opt-img');
+  nwsbApplyStrippedBg(NWSB_THEME_IMG_GLASS, '#nwsbcsThemeGlass .nwsb-theme-opt-img, #nch-theme-glass .nwsb-theme-opt-img, #nwsb-theme-glass .nwsb-theme-opt-img');
+
 })();
