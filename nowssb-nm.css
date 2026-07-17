@@ -1505,8 +1505,9 @@ body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .nwsb-section-hd { color: rgb
   box-shadow: none !important;
 }
 #ss-panel-profile-edit .nwsb-pe-banner-ico {
-  background: #f0f2f7 !important;
-  box-shadow: 4px 4px 9px rgba(0,0,0,.14), -3px -3px 7px rgba(255,255,255,.95) !important;
+  background: rgba(255,255,255,.35) !important;
+  border: 1px solid rgba(255,255,255,.55) !important;
+  box-shadow: none !important;
 }
 #ss-panel-profile-edit .nwsb-pe-save {
   background: linear-gradient(135deg,#e8d5a3,#c4a35a) !important; border: none !important; color: #060c18 !important; border-radius: 16px !important;
@@ -1642,9 +1643,12 @@ body:not(.nwsb-soc-glass) #sub-ig-profile #ig-prof-back {
   box-shadow: 0 2px 9px rgba(0,0,0,0.32) !important;
 }
 body.nwsb-soc-glass #sub-ig-profile #ig-prof-back {
-  background: rgba(255,255,255,0.92) !important;
-  box-shadow: 0 2px 9px rgba(0,0,0,0.32) !important;
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
 }
+body.nwsb-soc-glass #sub-ig-profile #ig-prof-back svg { stroke: #fff !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-username {
   min-width: 0 !important;
   flex-shrink: 1 !important;
@@ -2483,7 +2487,7 @@ body.nm-glass #sub-health-journey .gsel-card {
 .nmh-connect-sec {
   width: 100%; border-radius: 24px !important; overflow: hidden; position: relative; cursor: pointer;
   min-height: 470px; padding: 44px 22px 36px;
-  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
   background: #0a0e1a;
   box-shadow: 9px 9px 22px rgba(163,177,198,0.55), -7px -7px 16px #ffffff;
 }
@@ -3633,6 +3637,15 @@ html body.nwsb-soc-glass #sub-social-home .ig-topbar {
   border-bottom: 1px solid rgba(255,255,255,0.16) !important;
   box-shadow: 0 8px 28px rgba(0,0,0,0.3) !important;
 }
+/* Scoped to this one screen only — the shared .ig-topbar height (48px, no
+   safe-area padding) crowds the back button and the chat icon against the
+   status bar/notch here. Taller + safe-area padding, other .ig-topbar
+   screens (People, Profile, Reels) untouched. */
+#sub-social-home .ig-topbar {
+  height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+  padding-top: env(safe-area-inset-top, 0px) !important;
+  box-sizing: border-box !important;
+}
 html body.nwsb-soc-glass #sub-social-home .ig-username { color: #fff !important; }
 html body.nwsb-soc-glass #sub-social-home .ig-iconbtn {
   background: rgba(255,255,255,0.1) !important;
@@ -3896,3 +3909,45 @@ html body.nwsb-soc-glass.nwsb-custom-connect-bg #sub-ig-feed {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
     var(--nwsb-connect-bg-url) center/cover no-repeat !important;
 }
+
+/* ═══ POST VIEWER (#nwsb-postviewer) — glassmorphism under Fashion/glass theme ═══
+   Built entirely in JS (part033.js openExplorePost) with its own injected
+   <style> tag hardcoded to a light neumorphic look — it never had a dark
+   variant. These rules load after that injected stylesheet and use matching
+   class selectors + !important, so they win regardless of DOM insertion
+   order. Neumorphism (non-glass) is untouched. */
+body.nwsb-soc-glass #nwsb-postviewer {
+  background: linear-gradient(160deg, #10131f 0%, #0a0c16 100%) !important;
+}
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-top {
+  background: rgba(10,14,26,0.7) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-close {
+  background: rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-name { color: #fff !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-uname { color: rgba(255,255,255,0.55) !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-loc { color: rgba(255,255,255,0.65) !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-loc svg { stroke: rgba(255,255,255,0.55) !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-card {
+  background: rgba(255,255,255,0.06) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-av { box-shadow: none !important; border: 1px solid rgba(255,255,255,0.2) !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-av-init { background: rgba(255,255,255,0.1) !important; color: #e8d5a3 !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-act {
+  background: rgba(255,255,255,0.08) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+}
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-act svg { stroke: #fff !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-likes { color: #fff !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-caption { color: rgba(255,255,255,0.85) !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot { background: rgba(255,255,255,0.22) !important; }
+body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !important; }

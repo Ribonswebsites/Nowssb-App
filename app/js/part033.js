@@ -235,6 +235,10 @@
 
     $('ig-prof-back').style.display = p.self ? 'none' : 'flex';
     $('ig-prof-add').style.display = 'none';
+    /* Shop Verified only makes sense on your own profile — its badge icon
+       reads as a second (fake) verification checkmark next to the real one
+       when viewing someone else's page. */
+    if ($('ig-prof-vshop')) $('ig-prof-vshop').style.display = p.self ? 'flex' : 'none';
 
     // buttons
     var btns = $('ig-prof-btns');

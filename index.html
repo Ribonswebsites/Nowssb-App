@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=278">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=341">
+<link rel="stylesheet" href="nowssb-nm.css?v=342">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -867,8 +867,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="npc-text"><span class="npc-line" id="npcBlueLine"></span></div>
     </div>
 
-    <!-- Connect features carousel — slides through what NowssB Connect offers -->
-    <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
     <!-- NowssB Connect — what it is (video bg) -->
     <div class="nmh-connect-sec" onclick="window.IG&&IG.nav('profile')">
       <video class="nmh-connect-vid" autoplay muted loop playsinline preload="auto" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
@@ -878,6 +876,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="nmh-connect-desc">The social space of NowssB — share your daily practice, post your frequency journey, and connect with a community of sound healers and word-science practitioners. Follow creators, react, and grow together.</div>
       <button class="nmh-connect-enter" onclick="event.stopPropagation();window.IG&&IG.nav('profile')">Enter Connect<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
+    <!-- Connect features carousel — slides through what NowssB Connect offers -->
+    <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
 
     <!-- Quick access row -->
     <div class="nmh-quick-row">
@@ -1224,8 +1224,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <!-- Connect features carousel (fashion) -->
-  <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
   <!-- NowssB Connect — what it is (fashion, video bg) -->
   <div class="nmh-connect-sec fash-connect" onclick="openConnectIntro()">
     <video class="nmh-connect-vid" autoplay muted loop playsinline preload="auto" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
@@ -1235,6 +1233,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-connect-desc">The social space of NowssB — share your daily practice, post your frequency journey, and connect with a community of sound healers and word-science practitioners. Follow creators, react, and grow together.</div>
     <button class="nmh-connect-enter" onclick="event.stopPropagation();openConnectIntro()">Enter Connect<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </div>
+  <!-- Connect features carousel (fashion) -->
+  <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
 
   <!-- Video banner — above the subscription promo -->
   <div class="fash-video-banner" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
@@ -6576,7 +6576,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <button class="ig-iconbtn" id="ig-prof-add" style="display:none;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
     </button>
-    <button class="ig-iconbtn ig-vshop" aria-label="Shop Verified" onclick="if(window.IG&&IG.openVerify)IG.openVerify()">
+    <button class="ig-iconbtn ig-vshop" id="ig-prof-vshop" aria-label="Shop Verified" onclick="if(window.IG&&IG.openVerify)IG.openVerify()">
       <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png" alt="Verified" style="width:24px;height:24px;object-fit:contain;">
     </button>
     <button class="ig-iconbtn" onclick="if(typeof chatInboxOpen==='function')chatInboxOpen()" style="position:relative;">
@@ -6679,7 +6679,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <div class="nch-theme-hint">Neumorphism or frosted glass — applies to the Connect feed, reels, discover and profile.</div>
 
-    <div class="nch-row" onclick="nwsbOpenConnectBgPanel()">
+    <div class="nch-row" onclick="nwsbOpenConnectBgPanel()" style="margin-top:22px;">
       <span class="nch-row-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
       <span class="nch-row-body"><span class="nch-row-label">Connect Home Background</span><span class="nch-row-sub">NowssB Fashion theme only · 13 photos</span></span>
       <svg class="nch-row-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -6697,17 +6697,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div style="position:absolute;inset:0;z-index:0;background:linear-gradient(rgba(6,12,24,0.62),rgba(6,12,24,0.88));"></div>
   <div style="position:relative;height:100%;display:flex;flex-direction:column;z-index:1;">
     <div style="padding:max(env(safe-area-inset-top,16px),16px) 20px 16px;flex-shrink:0;">
-      <button onclick="nwsbCloseConnectBgPanel()" aria-label="Back" style="width:34px;height:34px;min-width:34px !important;min-height:34px !important;border-radius:50% !important;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
-      <div style="padding-top:16px;">
-        <div style="font-size:20px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Connect Home Background</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button onclick="nwsbCloseConnectBgPanel()" aria-label="Back" style="width:34px;height:34px;min-width:34px !important;min-height:34px !important;border-radius:50% !important;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <span style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.55);font-family:'DM Sans',sans-serif;font-weight:700;">NowssB Connect Background</span>
+      </div>
+      <div style="padding-top:20px;">
+        <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Background</div>
         <div style="font-size:12px;color:rgba(255,255,255,.4);font-family:'DM Sans',sans-serif;margin-top:4px;line-height:1.4;">Tap a photo to preview, tap again to apply. NowssB Fashion theme only.</div>
       </div>
     </div>
 
     <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
-      <div style="padding:20px 20px 0;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#e8d5a3;font-family:'DM Sans',sans-serif;font-weight:700;">Choose A Photo · 13 Available</div>
+      <div style="padding:20px 20px 0;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#e8d5a3;font-family:'DM Sans',sans-serif;font-weight:700;">Select Background · 13 Available</div>
       <div id="ncbgCarousel" style="position:relative;width:100%;height:360px;perspective:1000px;perspective-origin:50% 50%;overflow:visible;margin:28px 0 54px;">
         <div style="width:100%;height:100%;position:relative;" id="ncbgCarouselInner"></div>
         <div id="ncbgDots" style="position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;gap:6px;z-index:3;max-width:260px;"></div>
@@ -6790,7 +6793,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 
-<script src="app/js/part033.js?v=220"></script>
+<script src="app/js/part033.js?v=221"></script>
 
 
 
