@@ -454,9 +454,22 @@
 
   /* Helper — hide all social sub-screens */
   function hideSocialScreens() {
-    ['sub-social-home', 'sub-reels-feed', 'sub-people', 'sub-ig-profile', 'sub-ig-feed'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.remove('open');
+    var els = ['sub-social-home', 'sub-reels-feed', 'sub-people', 'sub-ig-profile', 'sub-ig-feed']
+      .map(function (id) { return document.getElementById(id); }).filter(Boolean);
+    /* These five screens act as tabs, switching between each other — they all
+       share .sub-screen's slide transition, so animating two at once (one
+       sliding out, one sliding in, both moving the same direction) briefly
+       uncovers whatever sits behind them (the app home screen) while neither
+       fully covers the viewport mid-transform. Disable the transition for the
+       duration of the switch so it snaps instantly instead, then restore it a
+       couple of frames later so a genuine slide-in navigation into one of
+       these screens from elsewhere still animates normally. */
+    els.forEach(function (el) { el.style.transition = 'none'; });
+    els.forEach(function (el) { el.classList.remove('open'); });
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        els.forEach(function (el) { el.style.transition = ''; });
+      });
     });
   }
 
