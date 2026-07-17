@@ -320,6 +320,10 @@ window.CHAT = (function(){
   var _callConnectTimer = null;
   var _callTickTimer = null;
   var _fsMod = null; // cached dynamic import of the v9 modular Firestore SDK
+  var _stMod = null; // cached dynamic import of the v9 modular Storage SDK
+  var _recording = false;
+  var _recorder  = null;
+  var _activeAudio = null; // currently-playing voice-note <audio>, if any
 
   function loadLocal(roomId){
     try{ return JSON.parse(localStorage.getItem(STORE_KEY+'_'+roomId)||'[]'); }catch(e){ return []; }
@@ -350,6 +354,29 @@ window.CHAT = (function(){
     });
   }
 
+  function getStorageMod(){
+    if (_stMod) return Promise.resolve(_stMod);
+    return import("https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js").then(function(m){
+      _stMod = m;
+      return m;
+    });
+  }
+
+  // Upload a real photo/voice-note file to Firebase Storage (default app,
+  // same project as window._db) and resolve with its public download URL —
+  // small enough to store directly in a Firestore chat message afterward.
+  function uploadToStorage(fileOrBlob, contentType, kind){
+    return getStorageMod().then(function(st){
+      var storage = st.getStorage();
+      var rId = roomId(_currentUser);
+      var subtype = ((contentType||'').split('/')[1] || 'bin').split(';')[0];
+      var path = 'chat_uploads/' + rId + '/' + kind + '_' + Date.now() + '_' + Math.random().toString(36).slice(2) + '.' + subtype;
+      var fileRef = st.ref(storage, path);
+      return st.uploadBytes(fileRef, fileOrBlob, contentType ? { contentType: contentType } : undefined)
+        .then(function(){ return st.getDownloadURL(fileRef); });
+    });
+  }
+
   function timeStr(ts){
     if(!ts) return '';
     var d = new Date(ts);
@@ -374,13 +401,23 @@ window.CHAT = (function(){
       return '<img class="chat-bubble-img" src="'+msg.img+'" alt="">';
     }
     if(msg.type === 'voice'){
-      return '<div class="chat-voice-msg">' +
-        '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+      return '<div class="chat-voice-msg" onclick="CHAT.toggleVoicePlay(this)" data-audio-url="'+escapeHtml(msg.audioUrl||'')+'">' +
+        '<span class="chat-voice-play">' +
+          '<svg class="ico-play" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+          '<svg class="ico-pause" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>' +
+        '</span>' +
         '<span class="chat-voice-wave">'+waveformHtml()+'</span>' +
         '<span class="chat-voice-dur">'+msg.duration+'</span>' +
       '</div>';
     }
     return escapeHtml(msg.text);
+  }
+
+  function setPlayIcons(el, playing){
+    var play = el.querySelector('.ico-play');
+    var pause = el.querySelector('.ico-pause');
+    if(play)  play.style.display  = playing ? 'none' : '';
+    if(pause) pause.style.display = playing ? '' : 'none';
   }
 
   function renderMessages(){
@@ -406,11 +443,12 @@ window.CHAT = (function(){
     renderMessages();
     if(_currentUser) saveLocal(roomId(_currentUser), _msgs);
 
-    // Real Firestore sync — text only for now (image/voice are data URLs that
-    // can blow past Firestore's 1MiB doc limit; those need Storage uploads
-    // first, which is a separate step). Only for real accounts, never demo
-    // seed profiles — there's nobody real on the other end of those rooms.
-    if(fromMe && !msg.type && !isMockChat()){
+    // Real Firestore sync. Only for real accounts, never demo seed profiles —
+    // there's nobody real on the other end of those rooms. Image/voice
+    // messages always carry a short Storage download URL by the time they
+    // reach here (uploaded first — see onImageChosen/finishVoiceNote), never
+    // a raw data: URL, so they're safe to store as a Firestore document.
+    if(fromMe && !isMockChat()){
       var rId = roomId(_currentUser);
       getFS().then(function(fs){
         var colRef = fs.collection(window._db, 'chats', rId, 'messages');
@@ -446,11 +484,64 @@ window.CHAT = (function(){
     }
   }
 
-  function addVoiceMessage(duration, fromMe){
-    pushMessage({ type:'voice', duration:duration }, fromMe);
+  function addVoiceMessage(duration, fromMe, audioUrl){
+    pushMessage({ type:'voice', duration:duration, audioUrl:audioUrl||'' }, fromMe);
     if(fromMe && isMockChat()){
       setTimeout(function(){ addMessage('Got your voice note 🎧', false); }, 1300+Math.random()*700);
     }
+  }
+
+  // ── Real microphone recording (MediaRecorder). Mock chats keep a purely
+  //    local blob URL (fine — nobody else needs to hear it); real chats
+  //    upload the recording to Storage first so it survives for the other
+  //    person and across reloads. ──
+  function startRecording(btn){
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+      alert('Voice messages need microphone access, which this browser doesn\'t support here.');
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
+      var mimeType = (window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : '';
+      var rec = mimeType ? new MediaRecorder(stream, { mimeType: mimeType }) : new MediaRecorder(stream);
+      var chunks = [];
+      var startedAt = Date.now();
+      rec.ondataavailable = function(e){ if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onstop = function(){
+        stream.getTracks().forEach(function(t){ t.stop(); });
+        var blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
+        var durationSec = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+        finishVoiceNote(blob, durationSec);
+      };
+      rec.start();
+      _recorder = rec;
+      _recording = true;
+      if (btn) btn.classList.add('recording');
+    }).catch(function(e){
+      console.warn('CHAT: mic access failed:', e);
+      alert('Could not access the microphone. Check your browser/site permissions and try again.');
+    });
+  }
+
+  function stopRecording(){
+    if (_recorder && _recorder.state !== 'inactive') _recorder.stop();
+    _recording = false;
+    var btn = document.getElementById('chatMicBtn');
+    if (btn) btn.classList.remove('recording');
+  }
+
+  function finishVoiceNote(blob, durationSec){
+    var mm = Math.floor(durationSec/60), ss = durationSec%60;
+    var durStr = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+    if (isMockChat()) {
+      addVoiceMessage(durStr, true, URL.createObjectURL(blob));
+      return;
+    }
+    uploadToStorage(blob, blob.type || 'audio/webm', 'voice').then(function(url){
+      addVoiceMessage(durStr, true, url);
+    }).catch(function(e){
+      console.warn('CHAT: voice upload failed:', e);
+      alert('Could not send the voice note — check your connection and try again.');
+    });
   }
 
   return {
@@ -541,23 +632,42 @@ window.CHAT = (function(){
       var file = el.files && el.files[0];
       el.value = '';
       if(!file) return;
-      var reader = new FileReader();
-      reader.onload = function(e){ addImageMessage(e.target.result, true); };
-      reader.readAsDataURL(file);
+      if (isMockChat()) {
+        var reader = new FileReader();
+        reader.onload = function(e){ addImageMessage(e.target.result, true); };
+        reader.readAsDataURL(file);
+        return;
+      }
+      uploadToStorage(file, file.type || 'image/jpeg', 'photo').then(function(url){
+        addImageMessage(url, true);
+      }).catch(function(e){
+        console.warn('CHAT: image upload failed:', e);
+        alert('Could not send the photo — check your connection and try again.');
+      });
     },
-    // Simulated voice note — no live audio recording backend yet.
+    // Tap to start recording, tap again to stop and send. Real microphone
+    // audio (MediaRecorder) — see startRecording/finishVoiceNote above.
     sendVoiceNote: function(btn){
-      if(this._recording) return;
-      this._recording = true;
-      if(btn) btn.classList.add('recording');
-      var dur = 2 + Math.floor(Math.random()*10);
-      var self = this;
-      setTimeout(function(){
-        if(btn) btn.classList.remove('recording');
-        self._recording = false;
-        var mm = Math.floor(dur/60), ss = dur%60;
-        addVoiceMessage((mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss, true);
-      }, 900);
+      if (_recording) stopRecording();
+      else startRecording(btn);
+    },
+    toggleVoicePlay: function(el){
+      var url = el.getAttribute('data-audio-url');
+      if(!url) return;
+      if(_activeAudio && _activeAudio._bubbleEl === el){
+        if(_activeAudio.paused) _activeAudio.play().catch(function(){});
+        else _activeAudio.pause();
+        return;
+      }
+      if(_activeAudio){ _activeAudio.pause(); }
+      var audio = new Audio(url);
+      audio._bubbleEl = el;
+      audio.play().catch(function(e){ console.warn('CHAT: audio play failed:', e); });
+      setPlayIcons(el, true);
+      audio.onpause = function(){ setPlayIcons(el, false); };
+      audio.onplay  = function(){ setPlayIcons(el, true); };
+      audio.onended = function(){ setPlayIcons(el, false); if(_activeAudio===audio) _activeAudio=null; };
+      _activeAudio = audio;
     },
     toggleStickers: function(){
       var tray = document.getElementById('chatStickerTray');
@@ -574,9 +684,12 @@ window.CHAT = (function(){
       var tray = document.getElementById('chatStickerTray');
       if(tray) tray.style.display = 'none';
     },
-    // Simulated voice/video call UI — no live telephony backend yet.
+    // Demo profiles get the simulated call UI (nobody real to ring). Real
+    // accounts get an actual WebRTC call via window.RTC — see below.
     startCall: function(kind){
       var u = _currentUser; if(!u) return;
+      if (!isMockChat()) { if(window.RTC) window.RTC.startCall(u, kind); return; }
+
       var overlay = document.getElementById('chatCallOverlay');
       if(!overlay) return;
       var kindEl   = document.getElementById('chatCallKind');
@@ -604,6 +717,7 @@ window.CHAT = (function(){
       }, 1800 + Math.random()*900);
     },
     endCall: function(){
+      if (window.RTC && window.RTC.isActive()) { window.RTC.hangup(); return; }
       var overlay = document.getElementById('chatCallOverlay');
       if(overlay) overlay.style.display = 'none';
       clearTimeout(_callConnectTimer);
@@ -611,6 +725,8 @@ window.CHAT = (function(){
     },
     close: function(){
       if(_unsubscribe) try{ _unsubscribe(); }catch(e){}
+      if(_recording) stopRecording();
+      if(_activeAudio){ _activeAudio.pause(); _activeAudio = null; }
       var overlay = document.getElementById('chatScreenOverlay');
       if(!overlay) return;
       // Restore whichever nav was showing before chat opened
@@ -622,6 +738,339 @@ window.CHAT = (function(){
     }
   };
 })();
+
+/* ═══════════════════════════════════════════════════════════
+   REAL 1:1 VOICE/VIDEO CALLING (WebRTC + Firestore signaling)
+   Free: WebRTC itself, Google's public STUN servers, and Firestore
+   (existing free project) carrying the offer/answer/ICE handshake — no
+   extra server needed. Known limitation: no TURN relay, so a minority of
+   users behind strict corporate/hotel NATs won't connect. Also: this is a
+   PWA, not a native app, so a call can only reach the other person while
+   their app is open (foreground or background tab) — there's no OS-level
+   wake/ring when the app is fully closed.
+═══════════════════════════════════════════════════════════ */
+window.RTC = (function(){
+  var _pc = null;
+  var _localStream = null;
+  var _callDocRef = null;
+  var _callId = null;
+  var _role = null; // 'caller' | 'callee'
+  var _kind = null; // 'audio' | 'video'
+  var _peerInfo = null; // {uid, name, avatar} of the other side
+  var _candUnsub = null;
+  var _callDocUnsub = null;
+  var _incomingUnsub = null;
+  var _ringingCall = null; // {id, data} of a currently-incoming call, pre-accept
+  var _fsMod = null;
+  var _connectTickTimer = null;
+
+  var ICE_SERVERS = { iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ]};
+
+  function getFS(){
+    if (_fsMod) return Promise.resolve(_fsMod);
+    return import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js").then(function(m){ _fsMod = m; return m; });
+  }
+
+  function overlayEls(){
+    return {
+      overlay: document.getElementById('chatCallOverlay'),
+      kindEl: document.getElementById('chatCallKind'),
+      avEl: document.getElementById('chatCallAv'),
+      bgEl: document.getElementById('chatCallBg'),
+      nameEl: document.getElementById('chatCallName'),
+      statusEl: document.getElementById('chatCallStatus'),
+      outActions: document.getElementById('chatCallOutActions'),
+      inActions: document.getElementById('chatCallInActions'),
+      avWrap: document.getElementById('chatCallAvWrap'),
+      remoteVideo: document.getElementById('chatCallRemoteVideo'),
+      localVideo: document.getElementById('chatCallLocalVideo'),
+      remoteAudio: document.getElementById('chatCallRemoteAudio')
+    };
+  }
+
+  function showOverlay(peer, kind, statusText, mode){
+    var el = overlayEls();
+    if(!el.overlay) return;
+    if(el.kindEl)   el.kindEl.textContent = kind==='video' ? 'Video Call' : 'Voice Call';
+    if(el.avEl)     el.avEl.src = peer.avatar || '';
+    if(el.bgEl)      el.bgEl.style.backgroundImage = peer.avatar ? "url('"+peer.avatar+"')" : 'none';
+    if(el.nameEl)   el.nameEl.textContent = peer.fullName || peer.username || '—';
+    if(el.statusEl) el.statusEl.textContent = statusText;
+    if(el.outActions) el.outActions.style.display = mode === 'incoming' ? 'none' : 'flex';
+    if(el.inActions)   el.inActions.style.display = mode === 'incoming' ? 'flex' : 'none';
+    el.overlay.style.display = 'block';
+  }
+
+  function hideOverlay(){
+    var el = overlayEls();
+    if(el.overlay) el.overlay.style.display = 'none';
+    if(el.remoteVideo){ el.remoteVideo.style.display = 'none'; el.remoteVideo.srcObject = null; }
+    if(el.localVideo){ el.localVideo.style.display = 'none'; el.localVideo.srcObject = null; }
+    if(el.remoteAudio) el.remoteAudio.srcObject = null;
+    if(el.avWrap) el.avWrap.style.display = '';
+    clearInterval(_connectTickTimer);
+  }
+
+  function setStatus(text){
+    var el = document.getElementById('chatCallStatus');
+    if(el) el.textContent = text;
+  }
+
+  function startConnectedTimer(){
+    clearInterval(_connectTickTimer);
+    var start = Date.now();
+    _connectTickTimer = setInterval(function(){
+      var sec = Math.floor((Date.now()-start)/1000);
+      var mm = Math.floor(sec/60), ss = sec%60;
+      setStatus((mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss);
+    }, 1000);
+  }
+
+  function attachLocalPreview(stream){
+    var el = overlayEls();
+    if (_kind === 'video' && el.localVideo){
+      el.localVideo.srcObject = stream;
+      el.localVideo.style.display = 'block';
+    }
+  }
+
+  function attachRemoteStream(stream){
+    var el = overlayEls();
+    if (_kind === 'video' && el.remoteVideo){
+      el.remoteVideo.srcObject = stream;
+      el.remoteVideo.style.display = 'block';
+      if (el.avWrap) el.avWrap.style.display = 'none';
+    } else if (el.remoteAudio){
+      el.remoteAudio.srcObject = stream;
+      el.remoteAudio.play().catch(function(e){ console.warn('RTC: remote audio play blocked:', e); });
+    }
+  }
+
+  function makePeerConnection(fs, candidatesSubcollection){
+    var pc = new RTCPeerConnection(ICE_SERVERS);
+    var remoteStream = new MediaStream();
+    pc.ontrack = function(e){
+      e.streams[0].getTracks().forEach(function(t){ remoteStream.addTrack(t); });
+      attachRemoteStream(remoteStream);
+    };
+    pc.onicecandidate = function(e){
+      if (!e.candidate || !_callDocRef) return;
+      fs.addDoc(fs.collection(_callDocRef, candidatesSubcollection), e.candidate.toJSON()).catch(function(err){
+        console.warn('RTC: failed to write ICE candidate:', err);
+      });
+    };
+    pc.onconnectionstatechange = function(){
+      if (!pc) return;
+      if (pc.connectionState === 'connected') startConnectedTimer();
+      else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected'){
+        setStatus(pc.connectionState === 'failed' ? 'Connection failed' : 'Reconnecting…');
+      }
+    };
+    return pc;
+  }
+
+  function cleanupPeer(){
+    if (_pc) { try { _pc.close(); } catch(e){} _pc = null; }
+    if (_localStream) { _localStream.getTracks().forEach(function(t){ t.stop(); }); _localStream = null; }
+    if (_candUnsub) { try { _candUnsub(); } catch(e){} _candUnsub = null; }
+    if (_callDocUnsub) { try { _callDocUnsub(); } catch(e){} _callDocUnsub = null; }
+    _callDocRef = null;
+    _callId = null;
+    _role = null;
+    _kind = null;
+    _peerInfo = null;
+  }
+
+  return {
+    isActive: function(){ return !!(_pc || _role); },
+
+    // Subscribe once (after login) to calls where I'm the callee and it's
+    // still ringing — this is the "does my phone ring" piece. Only works
+    // while this tab is open; see the module-level note above.
+    init: function(){
+      if (!window._db || !window._currentUid) return;
+      if (_incomingUnsub) return; // already listening
+      var self = this;
+      getFS().then(function(fs){
+        var q = fs.query(
+          fs.collection(window._db, 'calls'),
+          fs.where('calleeUid', '==', window._currentUid),
+          fs.where('status', '==', 'ringing')
+        );
+        _incomingUnsub = fs.onSnapshot(q, function(snap){
+          snap.docChanges().forEach(function(change){
+            if (change.type === 'added' && !self.isActive()){
+              var data = change.doc.data();
+              _ringingCall = { id: change.doc.id, data: data };
+              showOverlay(
+                { fullName: data.callerName, avatar: data.callerAvatar },
+                data.kind,
+                (data.kind === 'video' ? 'Incoming video call…' : 'Incoming call…'),
+                'incoming'
+              );
+            }
+            if (change.type === 'removed' || (change.type === 'modified' && change.doc.data().status !== 'ringing')){
+              if (_ringingCall && _ringingCall.id === change.doc.id && _role !== 'callee'){
+                _ringingCall = null;
+                hideOverlay();
+              }
+            }
+          });
+        }, function(err){ console.warn('RTC: incoming-call listener failed:', err); });
+      }).catch(function(e){ console.warn('RTC: init failed:', e); });
+    },
+
+    // Caller side.
+    startCall: function(peer, kind){
+      if (this.isActive()) return;
+      if (!window._db || !window._currentUid) { alert('Sign in to make a real call.'); return; }
+      _role = 'caller';
+      _kind = kind;
+      _peerInfo = peer;
+      showOverlay(peer, kind, 'Calling…', 'outgoing');
+
+      var calleeUid = peer.uid || String(peer.id);
+      var me = { uid: window._currentUid, name: window._userName || 'NowssB user', avatar: (window._currentUser && window._currentUser.photoURL) || '' };
+
+      navigator.mediaDevices.getUserMedia({ audio: true, video: kind === 'video' }).then(function(stream){
+        _localStream = stream;
+        attachLocalPreview(stream);
+        getFS().then(function(fs){
+          var pc = makePeerConnection(fs, 'callerCandidates');
+          _pc = pc;
+          stream.getTracks().forEach(function(t){ pc.addTrack(t, stream); });
+
+          fs.addDoc(fs.collection(window._db, 'calls'), {
+            callerUid: me.uid, callerName: me.name, callerAvatar: me.avatar,
+            calleeUid: calleeUid, kind: kind, status: 'ringing',
+            createdAt: Date.now()
+          }).then(function(docRef){
+            _callDocRef = docRef;
+            _callId = docRef.id;
+
+            pc.createOffer().then(function(offerDesc){
+              return pc.setLocalDescription(offerDesc).then(function(){ return offerDesc; });
+            }).then(function(offerDesc){
+              return fs.updateDoc(docRef, { offer: { type: offerDesc.type, sdp: offerDesc.sdp } });
+            }).catch(function(e){ console.warn('RTC: offer creation failed:', e); });
+
+            _callDocUnsub = fs.onSnapshot(docRef, function(snap){
+              var data = snap.data();
+              if (!data) return;
+              if (data.answer && pc.currentRemoteDescription === null){
+                setStatus('Connecting…');
+                pc.setRemoteDescription(new RTCSessionDescription(data.answer)).catch(function(e){
+                  console.warn('RTC: setRemoteDescription (answer) failed:', e);
+                });
+              }
+              if (data.status === 'declined'){ setStatus('Declined'); setTimeout(function(){ window.RTC.hangup(); }, 1200); }
+              if (data.status === 'ended'){ setStatus('Call ended'); setTimeout(function(){ window.RTC.hangup(true); }, 900); }
+            });
+
+            _candUnsub = fs.onSnapshot(fs.collection(docRef, 'calleeCandidates'), function(snap){
+              snap.docChanges().forEach(function(change){
+                if (change.type === 'added') pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(function(e){
+                  console.warn('RTC: addIceCandidate (callee->caller) failed:', e);
+                });
+              });
+            });
+          }).catch(function(e){
+            console.warn('RTC: could not create call doc:', e);
+            setStatus('Could not start the call');
+            setTimeout(function(){ window.RTC.hangup(true); }, 1200);
+          });
+        });
+      }).catch(function(e){
+        console.warn('RTC: getUserMedia failed:', e);
+        setStatus('Camera/mic access needed');
+        setTimeout(function(){ window.RTC.hangup(true); }, 1500);
+      });
+    },
+
+    // Callee side — accept the currently-ringing call.
+    accept: function(){
+      if (!_ringingCall) return;
+      var call = _ringingCall;
+      _ringingCall = null;
+      _role = 'callee';
+      _kind = call.data.kind;
+      _peerInfo = { fullName: call.data.callerName, avatar: call.data.callerAvatar };
+      showOverlay(_peerInfo, _kind, 'Connecting…', 'outgoing');
+
+      navigator.mediaDevices.getUserMedia({ audio: true, video: _kind === 'video' }).then(function(stream){
+        _localStream = stream;
+        attachLocalPreview(stream);
+        getFS().then(function(fs){
+          var docRef = fs.doc(window._db, 'calls', call.id);
+          _callDocRef = docRef;
+          _callId = call.id;
+          var pc = makePeerConnection(fs, 'calleeCandidates');
+          _pc = pc;
+          stream.getTracks().forEach(function(t){ pc.addTrack(t, stream); });
+
+          pc.setRemoteDescription(new RTCSessionDescription(call.data.offer)).then(function(){
+            return pc.createAnswer();
+          }).then(function(answerDesc){
+            return pc.setLocalDescription(answerDesc).then(function(){ return answerDesc; });
+          }).then(function(answerDesc){
+            return fs.updateDoc(docRef, { answer: { type: answerDesc.type, sdp: answerDesc.sdp }, status: 'accepted' });
+          }).catch(function(e){
+            console.warn('RTC: answer creation failed:', e);
+            setStatus('Could not connect');
+            setTimeout(function(){ window.RTC.hangup(true); }, 1500);
+          });
+
+          _callDocUnsub = fs.onSnapshot(docRef, function(snap){
+            var data = snap.data();
+            if (data && data.status === 'ended'){ setStatus('Call ended'); setTimeout(function(){ window.RTC.hangup(true); }, 900); }
+          });
+
+          _candUnsub = fs.onSnapshot(fs.collection(docRef, 'callerCandidates'), function(snap){
+            snap.docChanges().forEach(function(change){
+              if (change.type === 'added') pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(function(e){
+                console.warn('RTC: addIceCandidate (caller->callee) failed:', e);
+              });
+            });
+          });
+        });
+      }).catch(function(e){
+        console.warn('RTC: getUserMedia failed:', e);
+        alert('Could not access camera/microphone to answer the call.');
+        window.RTC.decline();
+      });
+    },
+
+    // Callee side — decline without ever opening a peer connection.
+    decline: function(){
+      if (!_ringingCall) { hideOverlay(); return; }
+      var call = _ringingCall;
+      _ringingCall = null;
+      hideOverlay();
+      getFS().then(function(fs){
+        return fs.updateDoc(fs.doc(window._db, 'calls', call.id), { status: 'declined' });
+      }).catch(function(e){ console.warn('RTC: decline write failed:', e); });
+    },
+
+    // Either side — end an active or outgoing call.
+    hangup: function(skipRemoteUpdate){
+      var docRef = _callDocRef;
+      hideOverlay();
+      if (docRef && !skipRemoteUpdate){
+        getFS().then(function(fs){
+          return fs.updateDoc(docRef, { status: 'ended' });
+        }).catch(function(e){ console.warn('RTC: hangup write failed:', e); });
+      }
+      cleanupPeer();
+    }
+  };
+})();
+
+// Start listening for incoming real calls once auth has settled — mirrors
+// the timing already used for _igInitFollowing elsewhere in this file.
+setTimeout(function(){ if (window.RTC) window.RTC.init(); }, 2000);
 
 // Wire IG message button to real chat
 window.IG._origMessage = window.IG.message;
