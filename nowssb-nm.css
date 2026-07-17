@@ -3852,27 +3852,28 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 
 /* ═══════════════════════════════════════════════════════════════
    FASHION HOME — custom background photo picker (Settings)
+   Carousel styled to match the Black Edition picker (part048.js's
+   .beci/.becd pattern) — same 3D perspective transform, tap-to-preview-
+   tap-again-to-apply interaction, dots, Apply button. Square corners on
+   purpose (no border-radius, unlike .beci which is also square).
    Layers on top of whichever Black-Edition theme (default/black/neo/
    glass-black — app.css) is active: same selector shape and specificity
    (body.fashion-home-active.<class> #appBg) as those theme overrides, and
    this file loads after app.css, so source order lets a chosen photo win
    over the current theme's own background without touching app.css. ── */
-.nwsb-fbg-row {
-  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px;
-  -webkit-overflow-scrolling: touch;
-}
-.nwsb-fbg-card {
-  flex-shrink: 0; width: 92px; cursor: pointer;
-  border-radius: 16px !important; padding: 4px;
-  border: 1.5px solid rgba(255,255,255,0.16);
-  background: rgba(255,255,255,0.05);
-}
-.nwsb-fbg-card.active { border-color: #e8d5a3; }
-.nwsb-fbg-img {
-  width: 100%; aspect-ratio: 9 / 16;
-  border-radius: 12px !important;
-  background-size: contain; background-repeat: no-repeat; background-position: center;
-  background-color: transparent;
+.fbgci {
+  position: absolute;
+  width: 170px; height: 302px;
+  top: 50%; left: 50%;
+  margin-left: -85px; margin-top: -151px;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.08);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5);
+  cursor: pointer;
+  will-change: transform, opacity;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  opacity: 0;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
 }
 
 body.fashion-home-active.nwsb-custom-fashion-bg #appBg {

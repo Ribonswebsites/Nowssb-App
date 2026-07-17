@@ -243,7 +243,7 @@
         'bgmode': function(){ _renderBgModes(); },
         'themecolor': function(){ _renderThemes(); },
         'blackedition': function(){ if(typeof beIntroReset==='function') beIntroReset(); },
-        'fashionbg': function(){ if(typeof window.renderFashionBgRow==='function') window.renderFashionBgRow(); },
+        'fashionbg': function(){ if(typeof window.fbgCarouselInit==='function') window.fbgCarouselInit(); },
       };
       if(renderMap[id]) renderMap[id]();
     }

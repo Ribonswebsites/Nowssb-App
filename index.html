@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=275">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=335">
+<link rel="stylesheet" href="nowssb-nm.css?v=336">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -7095,7 +7095,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 
 
-<script src="app/js/part040.js?v=165"></script>
+<script src="app/js/part040.js?v=166"></script>
 
 <!-- ══ REBUILT SETTINGS PANELS ══ -->
 
@@ -7303,13 +7303,22 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ FASHION HOME BACKGROUND PANEL — separate from Black Edition, which
      only controls the app-wide theme skin. This only changes the two
      Fashion-home background photos; the hero header never changes. ══ -->
-<div class="ss-panel" id="ss-panel-fashionbg" style="padding:0;">
+<div class="ss-panel" id="ss-panel-fashionbg" style="padding:0;overflow:hidden;">
   <div class="ss-panel-header">
     <button class="ss-panel-back" onclick="SS.close('fashionbg')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back</button>
     <div class="ss-panel-title">Fashion Background</div>
-    <div class="ss-panel-sub">Pick a backdrop photo for the Fashion home screen. The hero header stays the same.</div>
+    <div class="ss-panel-sub">Tap a photo to preview, tap again to apply. Hero stays the same.</div>
   </div>
-  <div class="nwsb-fbg-row" id="nwsbFbgRow" style="padding:6px 20px 30px;"></div>
+
+  <div id="fbgCarousel" style="position:relative;width:100%;height:360px;perspective:1000px;perspective-origin:50% 50%;overflow:visible;margin:28px 0 54px;">
+    <div style="width:100%;height:100%;position:relative;" id="fbgCarouselInner"></div>
+    <div id="fbgDots" style="position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3;"></div>
+  </div>
+
+  <div style="padding:0 20px 30px;">
+    <div id="fbgSelectedLabel" style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;text-align:center;margin-bottom:16px;">—</div>
+    <button id="fbgApplyBtn" onclick="fbgApply()" style="width:100%;padding:16px;background:#e8d5a3;color:#060c18;font-size:14px;font-weight:700;letter-spacing:1px;font-family:'DM Sans',sans-serif;border:none;cursor:pointer;">APPLY THIS BACKGROUND</button>
+  </div>
 </div>
 
 <!-- ══ INTRO SETTINGS PANEL ══ -->
@@ -7516,7 +7525,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ── NOWSSB FASHION HOME THEMES — scoped via body.fashion-home-active ── -->
 
 
-<script src="app/js/part047.js?v=165"></script>
+<script src="app/js/part047.js?v=166"></script>
 
 <!-- ── BLACK EDITION INTRO + CAROUSEL ── -->
 <script src="app/js/part048.js?v=163"></script>

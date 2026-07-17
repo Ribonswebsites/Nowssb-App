@@ -63,19 +63,6 @@
     'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg'
   ];
 
-  function renderFashionBgRow() {
-    var row = document.getElementById('nwsbFbgRow');
-    if (!row) return;
-    var current = null;
-    try { current = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
-    row.innerHTML = NWSB_FASHION_BGS.map(function (url) {
-      return '<div class="nwsb-fbg-card' + (url === current ? ' active' : '') + '" onclick="nwsbSetFashionBg(\'' + url + '\')">' +
-        '<div class="nwsb-fbg-img" style="background-image:url(\'' + url + '\')"></div>' +
-      '</div>';
-    }).join('');
-  }
-  window.renderFashionBgRow = renderFashionBgRow;
-
   window.nwsbSetFashionBg = function (url) {
     document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + url + "')");
     document.body.classList.add('nwsb-custom-fashion-bg');
@@ -83,7 +70,6 @@
     if (window._currentUid && window._fbSetDoc) {
       window._fbSetDoc(window._currentUid, { fashionBgCustom: url }).catch(function () {});
     }
-    renderFashionBgRow();
     if (window.nwsbToast) nwsbToast('Background updated ✓');
   };
 
@@ -96,7 +82,6 @@
     document.body.classList.remove('nwsb-custom-fashion-bg');
     document.body.style.removeProperty('--nwsb-custom-bg-url');
     try { localStorage.removeItem('nwsb_fashion_bg_custom'); } catch (e) {}
-    renderFashionBgRow();
     return _origSetNwsbTheme(theme, explicit);
   };
 
@@ -107,6 +92,107 @@
       document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + saved2 + "')");
       document.body.classList.add('nwsb-custom-fashion-bg');
     }
-    renderFashionBgRow();
   })();
+
+  /* ── Fashion Background — 3D carousel, same interaction language as the
+     Black Edition carousel above (tap to preview/centre, tap again to
+     apply, swipe to browse, dots + Apply button). Square corners on
+     purpose — no border-radius anywhere in here. ── */
+  var fbgActive = 0, fbgItems = null, fbgDotEls = null;
+  var FBG_N = NWSB_FASHION_BGS.length;
+
+  function fbgCfg(s) {
+    var a = Math.abs(s), d = s < 0 ? -1 : 1;
+    if (a === 0) return {tx: 0,     tz: 200,  ry: 0,     sc: 1.00, op: 1.00, zi: 20};
+    if (a === 1) return {tx: d*172, tz: -10,  ry: d*-28, sc: 0.78, op: 0.68, zi: 15};
+    if (a === 2) return {tx: d*290, tz: -155, ry: d*-50, sc: 0.52, op: 0.22, zi: 10};
+    return             {tx: 0,     tz: -600, ry: 0,     sc: 0.10, op: 0.00, zi: 0};
+  }
+
+  function fbgPaint() {
+    if (!fbgItems) return;
+    fbgItems.forEach(function (el, i) {
+      var off = ((i - fbgActive) % FBG_N + FBG_N) % FBG_N;
+      var s = off > Math.floor(FBG_N / 2) ? off - FBG_N : off;
+      var c = fbgCfg(s);
+      el.style.transform     = 'translateX('+c.tx+'px) translateZ('+c.tz+'px) rotateY('+c.ry+'deg) scale('+c.sc+')';
+      el.style.opacity       = String(c.op);
+      el.style.zIndex        = String(c.zi);
+      el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
+      el.style.borderColor   = (i === fbgActive) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
+    });
+    if (fbgDotEls) fbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === fbgActive); });
+    var label = document.getElementById('fbgSelectedLabel');
+    if (label) label.textContent = 'Photo ' + (fbgActive + 1) + ' of ' + FBG_N;
+  }
+
+  function fbgGo(n) { fbgActive = ((n % FBG_N) + FBG_N) % FBG_N; fbgPaint(); }
+
+  window.fbgCarouselInit = function () {
+    var carousel = document.getElementById('fbgCarousel');
+    var inner    = document.getElementById('fbgCarouselInner');
+    var dotsEl   = document.getElementById('fbgDots');
+    if (!carousel || !inner || !dotsEl) return;
+
+    if (!inner.dataset.built) {
+      inner.dataset.built = '1';
+      inner.innerHTML = NWSB_FASHION_BGS.map(function (url) {
+        return '<div class="fbgci" style="background-image:url(\'' + url + '\')"></div>';
+      }).join('');
+      dotsEl.innerHTML = NWSB_FASHION_BGS.map(function () { return '<div class="becd"></div>'; }).join('');
+    }
+
+    fbgItems  = Array.from(inner.querySelectorAll('.fbgci'));
+    fbgDotEls = Array.from(dotsEl.querySelectorAll('.becd'));
+    FBG_N = fbgItems.length;
+
+    // Start from whichever photo is currently applied, if any
+    var cur = null;
+    try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
+    var idx = NWSB_FASHION_BGS.indexOf(cur);
+    fbgActive = idx >= 0 ? idx : 0;
+
+    fbgItems.forEach(function (el) {
+      el.style.transition = 'none';
+      el.style.transform  = 'translateX(0px) translateZ(-600px) rotateY(0deg) scale(0.1)';
+      el.style.opacity    = '0';
+    });
+    void carousel.offsetHeight;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var T = 'transform 0.78s cubic-bezier(0.34,1.08,0.64,1),opacity 0.78s ease,border-color 0.3s ease,box-shadow 0.3s ease';
+        fbgItems.forEach(function (el) { el.style.transition = T; });
+        fbgPaint();
+      });
+    });
+
+    var tx0 = 0;
+    carousel.addEventListener('touchstart', function (e) { tx0 = e.touches[0].clientX; }, {passive: true});
+    carousel.addEventListener('touchend', function (e) {
+      var dx = e.changedTouches[0].clientX - tx0;
+      if (Math.abs(dx) > 40) fbgGo(fbgActive + (dx < 0 ? 1 : -1));
+    }, {passive: true});
+
+    fbgItems.forEach(function (el, i) {
+      el.onclick = function (e) {
+        e.stopPropagation();
+        if (i !== fbgActive) fbgGo(i);
+        else fbgApply();
+      };
+    });
+  };
+
+  window.fbgApply = function () {
+    var url = NWSB_FASHION_BGS[fbgActive];
+    nwsbSetFashionBg(url);
+    var btn = document.getElementById('fbgApplyBtn');
+    if (btn) {
+      btn.textContent = 'APPLIED!';
+      btn.style.background = '#fff';
+      setTimeout(function () {
+        btn.textContent = 'APPLY THIS BACKGROUND';
+        btn.style.background = '#e8d5a3';
+      }, 1400);
+    }
+  };
 })();
