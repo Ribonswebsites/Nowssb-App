@@ -2139,6 +2139,48 @@ function loadWordOrigin(key) {
 
   // Wish/cart state
   _rmdRefreshActions();
+
+  // Similar words (same healing focus, excluding this one)
+  rmdPopulateSimilar(key);
+
+  // Collapse "View More Details" back down each time a new word loads
+  var detBody = document.getElementById('rmdDetailsBody');
+  var detChev = document.getElementById('rmdDetailsChev');
+  if (detBody) detBody.style.display = 'none';
+  if (detChev) detChev.style.transform = '';
+}
+
+function rmdToggleDetails() {
+  var body = document.getElementById('rmdDetailsBody');
+  var chev = document.getElementById('rmdDetailsChev');
+  if (!body) return;
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function rmdPopulateSimilar(key) {
+  var row = document.getElementById('rmdSimilarRow');
+  if (!row) return;
+  var organ = rmdOrganFor(key);
+  var allWords = Object.keys(RM_WORD_TIER);
+  var matches = allWords.filter(function(k) { return k !== key && rmdOrganFor(k) === organ; });
+  if (matches.length < 4) {
+    allWords.filter(function(k) { return k !== key && matches.indexOf(k) === -1; }).forEach(function(k) {
+      if (matches.length < 4) matches.push(k);
+    });
+  }
+  matches = matches.slice(0, 4);
+  row.innerHTML = matches.map(function(k) {
+    var w = k.charAt(0).toUpperCase() + k.slice(1);
+    var t = RM_TIERS[RM_WORD_TIER[k] || 'basic_a'];
+    var img = (t.banners && t.banners[0]) || '';
+    return '<div onclick="loadWordOrigin(\'' + k + '\')" style="flex-shrink:0;width:96px;cursor:pointer;">' +
+      '<div style="width:96px;height:96px;border-radius:10px;background:#111 url(\'' + img + '\') center/cover;border:1px solid rgba(255,255,255,0.1);"></div>' +
+      '<div style="font-size:11.5px;font-weight:600;color:#fff;font-family:\'DM Sans\',sans-serif;margin-top:6px;">' + w + '</div>' +
+      '<div style="font-size:10.5px;color:rgba(255,255,255,0.4);font-family:\'DM Sans\',sans-serif;">' + t.price + '</div>' +
+    '</div>';
+  }).join('');
 }
 
 function _rmdRefreshActions() {
