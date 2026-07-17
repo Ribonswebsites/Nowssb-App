@@ -1165,7 +1165,22 @@
     var panel = document.getElementById('nwsbConnectBgPanel');
     if (!panel) return;
     panel.style.display = 'block';
-    ncbgCarouselInit();
+    // Always land on the intro first — ncbgCloseConnectBgPanel resets it
+    // back to this state on close, so it shows again every time.
+    var intro = document.getElementById('ncbgIntroPage');
+    var main  = document.getElementById('ncbgMainContent');
+    if (intro) { intro.style.display = 'flex'; intro.classList.remove('sl-intro-hidden'); }
+    if (main)  main.style.display = 'none';
+  };
+  window.ncbgEnterFromIntro = function () {
+    var intro = document.getElementById('ncbgIntroPage');
+    var main  = document.getElementById('ncbgMainContent');
+    if (intro) intro.classList.add('sl-intro-hidden');
+    setTimeout(function () {
+      if (intro) intro.style.display = 'none';
+      if (main)  main.style.display = 'block';
+      ncbgCarouselInit();
+    }, 420);
   };
   window.nwsbCloseConnectBgPanel = function () {
     var panel = document.getElementById('nwsbConnectBgPanel');

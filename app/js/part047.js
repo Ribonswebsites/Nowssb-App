@@ -135,6 +135,25 @@
 
   function fbgGo(n) { fbgActive = ((n % FBG_N) + FBG_N) % FBG_N; fbgPaint(); }
 
+  /* ── Intro: enter picker from intro page (same pattern as Black Edition's
+     beEnterFromIntro/beIntroReset in part048.js) ── */
+  window.fbgEnterFromIntro = function () {
+    var intro = document.getElementById('fbgIntroPage');
+    var main  = document.getElementById('fbgMainContent');
+    if (intro) intro.classList.add('sl-intro-hidden');
+    setTimeout(function () {
+      if (intro) intro.style.display = 'none';
+      if (main)  main.style.display = 'block';
+      fbgCarouselInit();
+    }, 420);
+  };
+  window.fbgIntroReset = function () {
+    var intro = document.getElementById('fbgIntroPage');
+    var main  = document.getElementById('fbgMainContent');
+    if (intro) { intro.style.display = 'flex'; intro.classList.remove('sl-intro-hidden'); }
+    if (main)  main.style.display = 'none';
+  };
+
   window.fbgCarouselInit = function () {
     var carousel = document.getElementById('fbgCarousel');
     var inner    = document.getElementById('fbgCarouselInner');
