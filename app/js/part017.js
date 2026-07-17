@@ -71,7 +71,10 @@ function nssUpdateBadges() {
 // ── ADD TO CART ──
 function nssAddToCart(item) {
   // item = { id, name, type, price, img }
-  if (window.GATE && !window.GATE.check('resonance')) return;
+  /* Cart/Buy Now must never be gated behind an active subscription check —
+     that blocked the exact action a lapsed-trial user needs to become a
+     paying customer again (Buy Now routes through here too). Purchases
+     themselves are billed individually at checkout regardless of tier. */
   var exists = nssCart.find(function(c){ return c.id === item.id; });
   if (exists) { nssShowToast('Already in cart'); return; }
   nssCart.push(item);
