@@ -1,4 +1,10 @@
-const CACHE = 'nowsbansiu-v375';
+const CACHE = 'nowsbansiu-v376';
+// Separate, stable-named bucket for background-prefetched videos (see
+// app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
+// routine JS/CSS deploy never wipes out videos the user already has warmed —
+// it's purged only by its own explicit version number when the prefetch
+// list itself changes.
+const VIDEO_CACHE = 'nowssb-media-precache-v1';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -6,9 +12,12 @@ self.addEventListener('install', () => {
 
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
-    // Purge any old caches so a stale index.html can never be served
+    // Purge stale *versioned* caches so a stale index.html can never be
+    // served — but never touch VIDEO_CACHE here, it's versioned separately.
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)));
+    await Promise.all(
+      keys.filter(k => k !== CACHE && k !== VIDEO_CACHE && k.startsWith('nowsbansiu-')).map(k => caches.delete(k))
+    );
     await clients.claim();
   })());
 });
@@ -16,8 +25,19 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   const url = req.url;
-  // Skip videos and large media — browser handles range requests natively
-  if (url.includes('.mp4') || url.includes('/video/upload/') || url.includes('video/mp4')) return;
+  // Videos: never fetched eagerly by the SW itself (that's the large-download
+  // cost we're avoiding), but if app/js/part051.js already background-warmed
+  // this exact file into VIDEO_CACHE during idle time, serve it from there
+  // instantly instead of hitting the network. Cache Storage natively answers
+  // Range requests against a fully-cached Response, so seeking/looping still
+  // works. Anything not yet warmed just falls through to the network as before.
+  if (url.includes('.mp4') || url.includes('/video/upload/') || url.includes('video/mp4')) {
+    e.respondWith((async () => {
+      const cached = await caches.match(req, { ignoreVary: true });
+      return cached || fetch(req);
+    })());
+    return;
+  }
   // Never touch the Firebase Auth handler/helpers — let them pass straight to the
   // network (reverse-proxied by functions/_middleware.js) so Google sign-in works.
   if (url.includes('/__/')) return;
