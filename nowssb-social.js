@@ -1184,6 +1184,8 @@
     if (ncbgDotEls) ncbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === ncbgActive); });
     var label = document.getElementById('ncbgSelectedLabel');
     if (label) label.textContent = 'Photo ' + (ncbgActive + 1) + ' of ' + NCBG_N;
+    var previewBg = document.getElementById('ncbgPreviewBg');
+    if (previewBg) previewBg.style.backgroundImage = "url('" + NWSB_CONNECT_BGS[ncbgActive] + "')";
   }
 
   function ncbgGo(n) { ncbgActive = ((n % NCBG_N) + NCBG_N) % NCBG_N; ncbgPaint(); }
@@ -1210,6 +1212,8 @@
     try { cur = localStorage.getItem('nwsb_connect_bg_custom'); } catch (e) {}
     var idx = NWSB_CONNECT_BGS.indexOf(cur);
     ncbgActive = idx >= 0 ? idx : 0;
+    var previewBg0 = document.getElementById('ncbgPreviewBg');
+    if (previewBg0) previewBg0.style.backgroundImage = "url('" + NWSB_CONNECT_BGS[ncbgActive] + "')";
 
     ncbgItems.forEach(function (el) {
       el.style.transition = 'none';

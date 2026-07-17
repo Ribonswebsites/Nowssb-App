@@ -128,6 +128,8 @@
     if (fbgDotEls) fbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === fbgActive); });
     var label = document.getElementById('fbgSelectedLabel');
     if (label) label.textContent = 'Photo ' + (fbgActive + 1) + ' of ' + FBG_N;
+    var previewBg = document.getElementById('fbgPreviewBg');
+    if (previewBg) previewBg.style.backgroundImage = "url('" + NWSB_FASHION_BGS[fbgActive] + "')";
   }
 
   function fbgGo(n) { fbgActive = ((n % FBG_N) + FBG_N) % FBG_N; fbgPaint(); }
@@ -155,6 +157,8 @@
     try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
     var idx = NWSB_FASHION_BGS.indexOf(cur);
     fbgActive = idx >= 0 ? idx : 0;
+    var previewBg0 = document.getElementById('fbgPreviewBg');
+    if (previewBg0) previewBg0.style.backgroundImage = "url('" + NWSB_FASHION_BGS[fbgActive] + "')";
 
     fbgItems.forEach(function (el) {
       el.style.transition = 'none';
