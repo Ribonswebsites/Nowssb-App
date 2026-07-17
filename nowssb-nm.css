@@ -2641,22 +2641,26 @@ body.nm-glass #sub-health-journey .gsel-card {
    The blanket blur removal (perf) fixed the Fashion-home stutter, but the user
    wants the frosted glass back on the fixed header and the bottom nav bars.
    These are small, always-fixed areas, so the blur cost is negligible.
-   Appended at end-of-file so it beats the earlier `backdrop-filter:none` rules. */
+   Appended at end-of-file so it beats the earlier `backdrop-filter:none` rules.
+   Blur amount later turned down from 14px to 6px — these bars stay mounted
+   over scrolling content the whole time (Connect feed, Fashion home), so the
+   browser has to recompute the blur against whatever's behind them on every
+   scroll frame; a heavy blur radius there was the main cause of the jank. */
 .home-header {
-  -webkit-backdrop-filter: blur(14px) saturate(1.3) !important;
-          backdrop-filter: blur(14px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(1.3) !important;
+          backdrop-filter: blur(6px) saturate(1.3) !important;
 }
 /* Fashion (dark) nav — translucent so the glass reads */
 body:not(.nm-mode) #ig-bottomnav, body:not(.nm-mode) #ig-social-nav {
   background: rgba(8,12,22,0.64) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
-          backdrop-filter: blur(14px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(1.2) !important;
+          backdrop-filter: blur(6px) saturate(1.2) !important;
 }
 /* Neumorphism (light) nav — translucent light glass */
 body.nm-mode #ig-bottomnav, body.nm-mode #ig-social-nav {
   background: rgba(240,242,247,0.70) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
-          backdrop-filter: blur(14px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(1.2) !important;
+          backdrop-filter: blur(6px) saturate(1.2) !important;
 }
 /* Nav icons: show the ORIGINAL images with NO tint/effect in BOTH themes
    (Fashion + neumorphism) so Connect looks identical from either home. Active
@@ -3410,7 +3414,7 @@ html body.nwsb-soc-glass #sub-social-home::before { display: none !important; }
 
 /* ═══ 1. COMMUNITY FEED (#sub-ig-feed) ═══ */
 html body.nwsb-soc-glass #sub-ig-feed .nwsbf-top {
-  background: rgba(10,14,26,0.4) !important;
+  background: rgba(6,10,20,0.64) !important;
   border-bottom: 1px solid rgba(255,255,255,0.16) !important;
   box-shadow: 0 8px 28px rgba(0,0,0,0.32) !important;
 }
