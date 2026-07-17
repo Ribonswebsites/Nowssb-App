@@ -4,7 +4,9 @@
   var PROMO_SCREENS = [
     /* [container-id, variant-label] */
     ['slContent',        'Unlock 50+ premium words — Sound Library is just the start.'],
-    ['rmSubBody',        'Acquire rare words in The Word Atelier — exclusive collections weekly.'],
+    /* The Word Atelier now has its own full product page (highlights,
+       certificate, buy CTA, etc.) — the generic upgrade bar was redundant
+       there and the user asked for it removed from this page specifically. */
     ['msMeaningBody',    'Upgrade for unlimited Meaning Store access and AI word origin insights.'],
     ['mpBody',           'Pro members unlock deeper progress analytics and healing rank tracking.'],
     ['routinesBody',     'Upgrade for 5 custom routine slots and AI-personalised practice sequences.'],

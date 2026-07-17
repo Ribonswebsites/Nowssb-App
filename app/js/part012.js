@@ -2171,10 +2171,15 @@ function rmdPopulateSimilar(key) {
     });
   }
   matches = matches.slice(0, 4);
+  /* Same generic word-card image used for every word in the actual store
+     grid (part010.js's IMG constant) — tier.banners[0] is shared across
+     many unrelated words (same tier = same banner), which made several
+     "similar words" show the exact same picture. This is the one image
+     that's actually meant to represent "a word" consistently. */
+  var img = 'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778571475/grok_image_1778520937416_jazknf.jpg';
   row.innerHTML = matches.map(function(k) {
     var w = k.charAt(0).toUpperCase() + k.slice(1);
     var t = RM_TIERS[RM_WORD_TIER[k] || 'basic_a'];
-    var img = (t.banners && t.banners[0]) || '';
     return '<div onclick="loadWordOrigin(\'' + k + '\')" style="flex-shrink:0;width:96px;cursor:pointer;">' +
       '<div style="width:96px;height:96px;border-radius:10px;background:#111 url(\'' + img + '\') center/cover;border:1px solid rgba(255,255,255,0.1);"></div>' +
       '<div style="font-size:11.5px;font-weight:600;color:#fff;font-family:\'DM Sans\',sans-serif;margin-top:6px;">' + w + '</div>' +
