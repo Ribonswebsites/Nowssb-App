@@ -1224,21 +1224,23 @@
    cover), never letterboxed against an added background. ── */
 .nwsb-theme-opt {
   flex: 1; min-width: 0; cursor: pointer;
-  border-radius: 18px !important; padding: 8px;
+  border-radius: 18px !important; padding: 14px 10px 10px;
   border: 1.5px solid rgba(255,255,255,.16);
   background: transparent;
   margin: 0; font-family: 'DM Sans', sans-serif;
   box-shadow: none;
+  display: flex; flex-direction: column; align-items: center;
 }
 .nwsb-theme-opt.active { border-color: #e8d5a3; }
 .nwsb-theme-opt-img {
-  width: 100%; aspect-ratio: 1 / 1;
+  width: 78%; aspect-ratio: 1 / 1;
   border-radius: 12px !important;
   background-size: contain; background-repeat: no-repeat; background-position: center;
   background-color: transparent;
-  /* The source photos are studio renders on a flat white backdrop, not
-     transparent PNGs — multiply blend drops white toward invisible against
-     the dark page behind it while keeping the darker mockup content. */
+  /* Extra defence alongside the real background removal in nwsbStripCornerBg
+     (nowssb-social.js): if that ever falls back to the untouched source
+     image, multiply blend still drops white toward invisible against the
+     dark page behind it, while the darker mockup content stays visible. */
   mix-blend-mode: multiply;
   margin-bottom: 8px; box-shadow: none;
 }

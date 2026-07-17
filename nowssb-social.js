@@ -1042,7 +1042,12 @@
     if (_bgStripCache[url]) return _bgStripCache[url];
     var p = new Promise(function (resolve) {
       var img = new Image();
-      img.crossOrigin = 'anonymous';
+      // Load through our own same-origin proxy (functions/_middleware.js)
+      // instead of crossOrigin='anonymous' straight to Cloudinary — canvas
+      // pixel access throws a SecurityError unless the image was served
+      // with CORS headers, which Cloudinary doesn't reliably send. A
+      // same-origin image never has that problem.
+      img.src = '/img-proxy?u=' + encodeURIComponent(url);
       img.onload = function () {
         try {
           var w = img.naturalWidth, h = img.naturalHeight;
@@ -1079,7 +1084,6 @@
         }
       };
       img.onerror = function () { resolve(url); };
-      img.src = url;
     });
     _bgStripCache[url] = p;
     return p;
