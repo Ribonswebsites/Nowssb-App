@@ -319,6 +319,7 @@ window.CHAT = (function(){
   var _unsubscribe = null;
   var _callConnectTimer = null;
   var _callTickTimer = null;
+  var _fsMod = null; // cached dynamic import of the v9 modular Firestore SDK
 
   function loadLocal(roomId){
     try{ return JSON.parse(localStorage.getItem(STORE_KEY+'_'+roomId)||'[]'); }catch(e){ return []; }
@@ -330,6 +331,23 @@ window.CHAT = (function(){
     var me = window._currentUid || 'me';
     var them = user.id || user.username || 'them';
     return [me,them].sort().join('_');
+  }
+
+  // true when the current conversation should stay on the local-only
+  // simulated flow: no logged-in user, no Firestore, or the other side is
+  // one of the demo/seed profiles (nobody real is there to actually reply).
+  function isMockChat(){
+    return !window._db || !window._currentUid || !!(_currentUser && _currentUser.mock);
+  }
+
+  // Lazily import the v9 modular Firestore SDK once and cache it — matches
+  // the pattern already used elsewhere in this file (_igFetchRealUsers, etc).
+  function getFS(){
+    if (_fsMod) return Promise.resolve(_fsMod);
+    return import("https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js").then(function(m){
+      _fsMod = m;
+      return m;
+    });
   }
 
   function timeStr(ts){
@@ -388,13 +406,16 @@ window.CHAT = (function(){
     renderMessages();
     if(_currentUser) saveLocal(roomId(_currentUser), _msgs);
 
-    // If Firestore is available, write to it
-    if(window._db && fromMe && _currentUser){
-      try{
-        var rId = roomId(_currentUser);
-        var colRef = window._db.collection ? window._db.collection('chats/'+rId+'/messages') : null;
-        if(colRef) colRef.add(msg).catch(function(){});
-      }catch(e){}
+    // Real Firestore sync — text only for now (image/voice are data URLs that
+    // can blow past Firestore's 1MiB doc limit; those need Storage uploads
+    // first, which is a separate step). Only for real accounts, never demo
+    // seed profiles — there's nobody real on the other end of those rooms.
+    if(fromMe && !msg.type && !isMockChat()){
+      var rId = roomId(_currentUser);
+      getFS().then(function(fs){
+        var colRef = fs.collection(window._db, 'chats', rId, 'messages');
+        return fs.addDoc(colRef, msg);
+      }).catch(function(e){ console.warn('CHAT: Firestore send failed:', e); });
     }
     return msg;
   }
@@ -402,8 +423,9 @@ window.CHAT = (function(){
   function addMessage(text, fromMe){
     pushMessage({ text:text }, fromMe);
 
-    // Auto-reply simulation (remove when real Firebase connected)
-    if(fromMe && (!window._db || !window._currentUid)){
+    // Auto-reply simulation — only for demo profiles / guests, never for a
+    // real conversation (a real listener will render the real reply instead).
+    if(fromMe && isMockChat()){
       setTimeout(function(){
         var replies = [
           'Frequency received 🙏',
@@ -419,14 +441,14 @@ window.CHAT = (function(){
 
   function addImageMessage(dataUrl, fromMe){
     pushMessage({ type:'image', img:dataUrl }, fromMe);
-    if(fromMe && (!window._db || !window._currentUid)){
+    if(fromMe && isMockChat()){
       setTimeout(function(){ addMessage('Beautiful 🙏', false); }, 1300+Math.random()*700);
     }
   }
 
   function addVoiceMessage(duration, fromMe){
     pushMessage({ type:'voice', duration:duration }, fromMe);
-    if(fromMe && (!window._db || !window._currentUid)){
+    if(fromMe && isMockChat()){
       setTimeout(function(){ addMessage('Got your voice note 🎧', false); }, 1300+Math.random()*700);
     }
   }
@@ -453,7 +475,7 @@ window.CHAT = (function(){
       if(rank) rank.textContent = user.category||'Practitioner';
 
       _msgs = loadLocal(roomId(user));
-      if(!_msgs.length){
+      if(!_msgs.length && isMockChat()){
         _msgs.push({ from:'them', text:'Hey! Great to connect on NowssB 🙏', ts:Date.now()-60000 });
       }
       renderMessages();
@@ -474,15 +496,21 @@ window.CHAT = (function(){
       overlay.style.display = 'block';
       setTimeout(function(){ var i=document.getElementById('chatInput'); if(i) i.focus(); }, 80);
 
-      if(window._db){
-        try{
-          var rId = roomId(user);
-          var q = window._db.collection('chats/'+rId+'/messages').orderBy('ts');
-          _unsubscribe = q.onSnapshot(function(snap){
-            _msgs = snap.docs.map(function(d){ return d.data(); });
+      if(_unsubscribe){ try{ _unsubscribe(); }catch(e){} _unsubscribe = null; }
+      if(!isMockChat()){
+        var rId = roomId(user);
+        getFS().then(function(fs){
+          if(_currentUser !== user) return; // user switched chats before this resolved
+          var colRef = fs.collection(window._db, 'chats', rId, 'messages');
+          var q = fs.query(colRef, fs.orderBy('ts'));
+          _unsubscribe = fs.onSnapshot(q, function(snap){
+            var fsMsgs = [];
+            snap.forEach(function(d){ fsMsgs.push(d.data()); });
+            _msgs = fsMsgs;
             renderMessages();
-          });
-        }catch(e){}
+            saveLocal(rId, _msgs);
+          }, function(err){ console.warn('CHAT: Firestore listen failed:', err); });
+        }).catch(function(e){ console.warn('CHAT: Firestore listen setup failed:', e); });
       }
     },
     send: function(){
@@ -648,8 +676,13 @@ window.FOLLOW = (function(){
     {id:'7',uid:'7',username:'meera.om',fullName:'Meera Iyer',verified:false,avatar:'https://i.pravatar.cc/150?img=47',bio:'Frequency is medicine.',category:'Practitioner',link:'',following_state:false,highlights:[],grid:[]},
     {id:'8',uid:'8',username:'kabir.naad',fullName:'Kabir Khan',verified:true,avatar:'https://i.pravatar.cc/150?img=60',bio:'Top 1% · 1000+ sessions.\nYour voice is the instrument.',category:'Frequency Sage',link:'nowssb.com/kabir',following_state:false,highlights:[],grid:[]}
   ];
-  // Apply saved follow state
-  SEED.forEach(function(p) { p.following_state = window.FOLLOW ? window.FOLLOW.isFollowing(p.id) : false; });
+  // Apply saved follow state. mock:true marks these as demo profiles, not real
+  // accounts — CHAT keeps them on the simulated local-only reply flow even
+  // once real Firestore messaging is live, since nobody real is behind them.
+  SEED.forEach(function(p) {
+    p.following_state = window.FOLLOW ? window.FOLLOW.isFollowing(p.id) : false;
+    p.mock = true;
+  });
   if (window.IG) window.IG._allPeople = SEED;
 })();
 

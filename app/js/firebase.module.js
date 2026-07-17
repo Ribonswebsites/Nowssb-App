@@ -25,6 +25,10 @@ const app = initializeApp({
 
 const auth = getAuth(app);
 const db   = getFirestore(app);
+// Exposed so app/js/part039.js (CHAT) can read/write real messages without
+// its own duplicate Firestore init — everything else in this file already
+// uses the v9 modular SDK, so consumers must too (no v8 .collection() chaining).
+window._db = db;
 window._splashStartTime = Date.now();
     // Optimization: Defer non-critical font loading
     if ('fonts' in document) {
