@@ -847,4 +847,179 @@
   }
   patchMenuSettings();
 
+  /* ═══════════════════════════════════════════════════════════════
+     NOWSSB CONNECT — one-time account setup wizard
+     Gated from app/js/part033.js's IG.nav('profile') — the first time a
+     user ever taps into Connect, this runs instead; once it finishes it
+     calls IG.nav('profile') again to actually land in the real feed.
+  ═══════════════════════════════════════════════════════════════ */
+  var CS_FOCUS_OPTIONS = ['Sound Healer', 'Daily Practitioner', 'Wellness', 'Beginner', 'Practitioner', 'Frequency Sage'];
+  var _csSelectedFocus = '';
+  var _csSelectedTheme = 'neu';
+  var _csAvatarDataUrl = '';
+  var _csOnComplete = null;
+
+  window.nwsbSocialOnboardingDone = function () {
+    try { if (localStorage.getItem('nwsb_social_onboarding_done') === '1') return true; } catch (e) {}
+    var ud = window._userDataCache;
+    if (ud && ud.socialOnboardingDone) return true;
+    return false;
+  };
+
+  window.nwsbOpenConnectSetup = function (onComplete) {
+    _csOnComplete = onComplete || null;
+    var overlay = document.getElementById('nwsbConnectSetup');
+    if (!overlay) { if (onComplete) onComplete(); return; }
+
+    var ud = window._userDataCache || {};
+    var nameInput = document.getElementById('nwsbcsName');
+    if (nameInput) nameInput.value = ud.displayName || (window._currentUser && window._currentUser.displayName) || '';
+    var bioInput = document.getElementById('nwsbcsBio');
+    if (bioInput) bioInput.value = ud.bio || '';
+    var av = document.getElementById('nwsbcsAvatar');
+    var existingPhoto = ud.photoURL || (window._currentUser && window._currentUser.photoURL) || '';
+    if (av) av.style.backgroundImage = existingPhoto ? "url('" + existingPhoto + "')" : 'none';
+    _csAvatarDataUrl = '';
+    _csSelectedFocus = ud.healthFocus || '';
+    _csSelectedTheme = (function () { try { return localStorage.getItem('nwsb_social_theme') || 'neu'; } catch (e) { return 'neu'; } })();
+
+    renderCsFocusChips();
+    syncCsTheme();
+
+    document.getElementById('nwsbcs-stage-intro').style.display = 'flex';
+    document.getElementById('nwsbcs-stage-profile').style.display = 'none';
+    document.getElementById('nwsbcs-stage-welcome').style.display = 'none';
+    overlay.style.display = 'block';
+  };
+
+  window.nwsbCloseConnectSetup = function () {
+    var overlay = document.getElementById('nwsbConnectSetup');
+    if (overlay) overlay.style.display = 'none';
+    _csOnComplete = null;
+  };
+
+  window.nwsbConnectSetupBack = function () {
+    document.getElementById('nwsbcs-stage-profile').style.display = 'none';
+    document.getElementById('nwsbcs-stage-intro').style.display = 'flex';
+  };
+
+  window.nwsbConnectSetupNext = function (stage) {
+    if (stage === 'profile') {
+      document.getElementById('nwsbcs-stage-intro').style.display = 'none';
+      document.getElementById('nwsbcs-stage-profile').style.display = 'flex';
+      return;
+    }
+    if (stage === 'welcome') {
+      var name = (document.getElementById('nwsbcsName').value || '').trim();
+      if (!name) {
+        if (window.nwsbToast) nwsbToast('Enter your name to continue');
+        else alert('Enter your name to continue');
+        return;
+      }
+      saveCsProfile(name);
+      document.getElementById('nwsbcs-stage-profile').style.display = 'none';
+      document.getElementById('nwsbcs-stage-welcome').style.display = 'flex';
+      document.getElementById('nwsbcsWelcomeSub').textContent = 'Welcome to NowssB Connect, ' + name.split(' ')[0] + '.';
+      setTimeout(function () {
+        var w = document.getElementById('nwsbcs-stage-welcome');
+        if (w && w.style.display !== 'none') window.nwsbConnectSetupFinish();
+      }, 2200);
+    }
+  };
+
+  window.nwsbConnectSetupPickAvatar = function () {
+    var inp = document.getElementById('nwsbcsAvatarInput');
+    if (inp) inp.click();
+  };
+  window.nwsbConnectSetupAvatarChosen = function (el) {
+    var file = el.files && el.files[0];
+    el.value = '';
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      _csAvatarDataUrl = e.target.result;
+      var av = document.getElementById('nwsbcsAvatar');
+      if (av) av.style.backgroundImage = "url('" + _csAvatarDataUrl + "')";
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.nwsbConnectSetupTheme = function (theme) {
+    _csSelectedTheme = theme;
+    syncCsTheme();
+  };
+  function syncCsTheme() {
+    var neu = document.getElementById('nwsbcsThemeNeu');
+    var gl = document.getElementById('nwsbcsThemeGlass');
+    if (neu) neu.classList.toggle('selected', _csSelectedTheme === 'neu');
+    if (gl) gl.classList.toggle('selected', _csSelectedTheme === 'glass');
+  }
+
+  function renderCsFocusChips() {
+    var row = document.getElementById('nwsbcsFocusRow');
+    if (!row) return;
+    row.innerHTML = CS_FOCUS_OPTIONS.map(function (f) {
+      return '<div class="nwsbcs-chip' + (f === _csSelectedFocus ? ' selected' : '') + '" onclick="nwsbConnectSetupFocus(this,\'' + f + '\')">' + f + '</div>';
+    }).join('');
+  }
+  window.nwsbConnectSetupFocus = function (el, focus) {
+    _csSelectedFocus = focus;
+    var row = document.getElementById('nwsbcsFocusRow');
+    if (row) Array.prototype.forEach.call(row.children, function (c) { c.classList.remove('selected'); });
+    el.classList.add('selected');
+  };
+
+  function uploadCsAvatar(dataUrl) {
+    return fetch(dataUrl).then(function (r) { return r.blob(); }).then(function (blob) {
+      return import("https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js").then(function (st) {
+        var storage = st.getStorage();
+        var path = 'avatars/' + window._currentUid + '_' + Date.now() + '.jpg';
+        var fileRef = st.ref(storage, path);
+        return st.uploadBytes(fileRef, blob, { contentType: blob.type || 'image/jpeg' }).then(function () {
+          return st.getDownloadURL(fileRef);
+        });
+      });
+    });
+  }
+
+  function saveCsProfile(name) {
+    var bio = (document.getElementById('nwsbcsBio').value || '').trim();
+
+    // Apply the chosen theme via the already-wired setter (localStorage + body class).
+    if (typeof nwsbSetSocTheme === 'function') nwsbSetSocTheme(_csSelectedTheme);
+
+    // Patch the in-memory profile cache immediately so the feed/profile reflect
+    // the new name/avatar without waiting on a Firestore round-trip.
+    if (window._userDataCache) {
+      window._userDataCache.displayName = name;
+      if (_csAvatarDataUrl) window._userDataCache.photoURL = _csAvatarDataUrl;
+      if (_csSelectedFocus) window._userDataCache.healthFocus = _csSelectedFocus;
+      window._userDataCache.bio = bio;
+      window._userDataCache.socialOnboardingDone = true;
+    }
+
+    try { localStorage.setItem('nwsb_social_onboarding_done', '1'); } catch (e) {}
+
+    if (window._currentUid && window._fbSetDoc) {
+      var payload = { displayName: name, socialOnboardingDone: true };
+      if (_csSelectedFocus) payload.healthFocus = _csSelectedFocus;
+      if (bio) payload.bio = bio;
+      window._fbSetDoc(window._currentUid, payload).catch(function () {});
+      if (_csAvatarDataUrl) {
+        uploadCsAvatar(_csAvatarDataUrl).then(function (url) {
+          window._fbSetDoc(window._currentUid, { photoURL: url }).catch(function () {});
+          if (window._userDataCache) window._userDataCache.photoURL = url;
+        }).catch(function (e) { console.warn('Connect setup: avatar upload failed:', e); });
+      }
+    }
+  }
+
+  window.nwsbConnectSetupFinish = function () {
+    var overlay = document.getElementById('nwsbConnectSetup');
+    if (overlay) overlay.style.display = 'none';
+    var cb = _csOnComplete;
+    _csOnComplete = null;
+    if (cb) cb();
+  };
+
 })();
