@@ -13,11 +13,18 @@
 
   function _openUpgrade() { if (window.SS) window.SS.open('subscription'); }
 
-  function _buildBar(text) {
+  function _dismissedKey(containerId) { return 'nwsb_sp_bar_dismissed_' + containerId; }
+  function _isDismissed(containerId) { try { return localStorage.getItem(_dismissedKey(containerId)) === '1'; } catch (e) { return false; } }
+
+  function _buildBar(text, containerId) {
     var bar = document.createElement('div');
     bar.className = 'sp-bar';
+    bar.dataset.containerId = containerId;
     bar.onclick = _openUpgrade;
     bar.innerHTML =
+      '<div class="sp-bar-close" onclick="event.stopPropagation();this.closest(\'.sp-bar\').style.display=\'none\';try{localStorage.setItem(\'nwsb_sp_bar_dismissed_' + containerId + '\',\'1\')}catch(e){}">' +
+        '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="rgba(255,255,255,0.5)" stroke-width="1.4" stroke-linecap="round"/></svg>' +
+      '</div>' +
       '<div class="sp-bar-text"><strong>NowssB Edition</strong> — ' + text + '</div>' +
       '<div class="sp-bar-btn">Upgrade</div>';
     return bar;
@@ -30,7 +37,8 @@
     PROMO_SCREENS.forEach(function(pair) {
       var el = document.getElementById(pair[0]);
       if (!el || el.querySelector('.sp-bar')) return; // already injected
-      var bar = _buildBar(pair[1]);
+      if (_isDismissed(pair[0])) return; // user closed this one — stay gone
+      var bar = _buildBar(pair[1], pair[0]);
       el.appendChild(bar);
     });
     // Make them visible (CSS display:none → flex)
@@ -43,7 +51,9 @@
     var t = window.GATE ? window.GATE.tier() : 'free';
     var hasPlan = (t==='resonance'||t==='frequency'||t==='frequencyX');
     document.querySelectorAll('.sp-bar').forEach(function(b) {
-      b.style.display = hasPlan ? 'none' : 'flex';
+      if (hasPlan) { b.style.display = 'none'; return; }
+      if (_isDismissed(b.dataset.containerId)) return; // stays closed once dismissed
+      b.style.display = 'flex';
     });
     var homeCard = document.getElementById('sub-promo-card');
     if (homeCard) homeCard.style.display = hasPlan ? 'none' : 'block';
