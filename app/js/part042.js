@@ -5,7 +5,8 @@
     var social = document.getElementById('sub-social');
     if (!social){ setTimeout(move, 100); return; }
     ['ss-panel-voice','ss-panel-speed','ss-panel-reps','ss-panel-sensitivity',
-     'ss-panel-ambient','ss-panel-chatperm','ss-panel-blackedition','ss-panel-intro-settings'
+     'ss-panel-ambient','ss-panel-chatperm','ss-panel-blackedition','ss-panel-intro-settings',
+     'ss-panel-fashionbg'
     ].forEach(function(id){
       var el = document.getElementById(id);
       if (el && el.parentNode !== social) social.appendChild(el);
@@ -119,7 +120,7 @@
     <!-- ── BLACK EDITION ── -->
     <div class="ss-section-title">APPEARANCE</div>
     <div class="ss-section">
-      <div class="sr last" onclick="SS.open('blackedition')">
+      <div class="sr" onclick="SS.open('blackedition')">
         <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <rect x="2" y="2" width="20" height="20" rx="5" fill="#000" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
@@ -130,6 +131,13 @@
           </svg>
         </div>
         <div class="sr-body"><div class="sr-label">Black Edition</div><div class="sr-sub">Customise your app appearance</div></div>
+        <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="sr last" onclick="SS.open('fashionbg')">
+        <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);display:flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div class="sr-body"><div class="sr-label">Fashion Background</div><div class="sr-sub">Backdrop photo for the Fashion home</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
     </div>

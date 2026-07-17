@@ -74,6 +74,7 @@
       '</div>';
     }).join('');
   }
+  window.renderFashionBgRow = renderFashionBgRow;
 
   window.nwsbSetFashionBg = function (url) {
     document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + url + "')");
