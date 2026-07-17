@@ -15,8 +15,12 @@ function nssClose() {
   setTimeout(function(){
     var intro = document.getElementById('nssIntroPage');
     var body  = document.getElementById('nssBody');
+    var topbar = document.getElementById('nssStoreTopbar');
     if (intro) { intro.style.display = ''; intro.style.opacity = ''; intro.style.pointerEvents = ''; }
     if (body)  { body.classList.remove('visible'); body.scrollTop = 0; }
+    /* nssEnterStore() sets this to 'flex' and never resets it — left it
+       stuck visible over the intro image next time the store opens. */
+    if (topbar) topbar.style.display = 'none';
   }, 500);
 }
 
@@ -50,7 +54,6 @@ function nssSaveWishlist() { localStorage.setItem('nowssb_wish', JSON.stringify(
 function nssUpdateBadges() {
   var cb = document.getElementById('nssCartBadge');
   var wb = document.getElementById('nssWishBadge');
-  var topbar = document.getElementById('nssStoreTopbar');
   if (cb) {
     cb.textContent = nssCart.length;
     cb.classList.toggle('show', nssCart.length > 0);
@@ -59,7 +62,10 @@ function nssUpdateBadges() {
     wb.textContent = nssWishlist.length;
     wb.classList.toggle('show', nssWishlist.length > 0);
   }
-  if (topbar) topbar.style.display = 'flex';
+  /* Visibility of the topbar itself is owned by nssEnterStore() (show) and
+     nssClose() (hide) — forcing it visible here too meant any badge-count
+     refresh (e.g. adding a word while browsing) could pop the cart/wishlist
+     icons up over the intro page even before the store was entered. */
 }
 
 // ── ADD TO CART ──

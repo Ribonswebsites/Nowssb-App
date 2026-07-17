@@ -104,7 +104,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
-<link rel="stylesheet" href="app/app.css?v=278">
+<link rel="stylesheet" href="app/app.css?v=279">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
 <link rel="stylesheet" href="nowssb-nm.css?v=342">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
@@ -3807,19 +3807,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <!-- ── CART & WISHLIST ICON BUTTONS (visible in main content) ── -->
-  <div class="nss-store-topbar" id="nssStoreTopbar" style="display:none;">
-    <div class="nss-store-icon-btn" onclick="nssOpenWishlist()" title="Wishlist">
-      <img class="nss-store-icon-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png" alt="Wishlist">
-      <div class="nss-icon-badge" id="nssWishBadge">0</div>
-    </div>
-    <div class="nss-store-icon-btn" onclick="nssOpenCart()" title="Cart">
-      <img class="nss-store-icon-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png" alt="Cart">
-      <div class="nss-icon-badge" id="nssCartBadge">0</div>
-    </div>
-  </div>
-
-
   <!-- ── CART PANEL ── -->
   <div class="nss-panel-overlay" id="nssCartOverlay" onclick="nssCartOverlayClick(event)">
     <div class="nss-panel" id="nssCartPanel">
@@ -3885,12 +3872,23 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nss-banner-slide" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581668/grok_image_1778575330887_cjuvgx.jpg');"></div>
       </div>
       <div class="nss-banner-fade"></div>
-      <button class="nss-banner-back" onclick="nssClose()">
-        <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-          <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/>
-          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
-        </svg>
-      </button>
+      <div class="nss-store-header" id="nssStoreTopbar" style="display:none;">
+        <button class="nss-banner-back" onclick="nssClose()">
+          <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
+            <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/>
+            <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
+          </svg>
+        </button>
+        <div style="flex:1;"></div>
+        <div class="nss-store-icon-btn" onclick="nssOpenWishlist()" title="Wishlist">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+          <div class="nss-icon-badge" id="nssWishBadge">0</div>
+        </div>
+        <div class="nss-store-icon-btn" onclick="nssOpenCart()" title="Cart">
+          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#fff" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#fff" stroke="none"/></svg>
+          <div class="nss-icon-badge" id="nssCartBadge">0</div>
+        </div>
+      </div>
       <div class="nss-banner-inner">
         <span class="nss-banner-eyebrow">Shabdapathy · Collections</span>
         <div class="nss-banner-title">
@@ -3993,7 +3991,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 </div><!-- /sub-nowssb-store -->
 
-<script src="app/js/part017.js?v=191"></script>
+<script src="app/js/part017.js?v=192"></script>
 
 <!-- intro rendered inline -->
 
