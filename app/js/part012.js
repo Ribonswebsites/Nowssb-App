@@ -141,6 +141,20 @@ function goTo(id) {
   const homeHdr = document.getElementById('homeHeader');
   if (!cur || !next) { console.warn('goTo: missing element for', currentScreen, '→', id); return; }
 
+  /* Self-exit guard: some callers reach goTo(id) without knowing
+     currentScreen already equals id — e.g. after navigating through an
+     overlay system like the Store, which never updates currentScreen —
+     so cur === next. The 500ms cleanup below would then strip
+     .active/.exit from the very screen it just (re)activated, leaving it
+     with neither class and the screen effectively blank. Several callers
+     already work around this by manually nudging currentScreen first;
+     guard it here too so every caller is protected, not just the ones
+     that remembered to. */
+  if (cur === next) {
+    if (homeHdr) homeHdr.style.display = (id === 'home') ? 'flex' : 'none';
+    return;
+  }
+
   // Force-close all SS panels so they never bleed into other screens
   document.querySelectorAll('.ss-panel').forEach(function(p) {
     p.style.transform = 'translateX(100%)';
