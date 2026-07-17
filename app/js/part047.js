@@ -34,12 +34,16 @@
 
   // Backward compat alias
   window.setBE = function(style, explicit) {
-    var map = {'':'default','fashion':'black','neo':'neo','glass':'glass-black'};
+    var map = {'':'default','fashion':'black','neo':'neo'};
     window.setNwsbTheme(map[style || ''] || 'default');
   };
 
   // Init from localStorage
   var saved = localStorage.getItem('nwsb_theme') || 'default';
+  // Glass Black is removed entirely — anyone who had it saved falls back to
+  // Fashion (the renamed "default") instead of silently staying stuck on a
+  // theme that no longer has a card in the carousel.
+  if (saved === 'glass-black') { saved = 'default'; }
   // If user already chose Black in a prior session, mark intro as seen so it
   // never fires on page reload — only shows the first time they tap the card.
   if (saved === 'black') { window._fashionHomeIntroSeen = true; }

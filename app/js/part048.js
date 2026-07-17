@@ -67,9 +67,9 @@ function beFlipStart(){
 
 (function(){
   var beActive = 0, beItems = null, beDotEls = null;
-  var BE_N = 4;
-  var BE_STYLES = ['', 'fashion', 'neo', 'glass'];
-  var BE_LABELS = ['Default', 'Fashion Black', 'Neo Black', 'Glass Black'];
+  var BE_N = 3;
+  var BE_STYLES = ['', 'fashion', 'neo'];
+  var BE_LABELS = ['Fashion', 'Black Edition', 'Black Neo'];
 
   function beCfg(s) {
     var a = Math.abs(s), d = s < 0 ? -1 : 1;
