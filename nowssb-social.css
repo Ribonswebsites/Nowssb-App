@@ -937,7 +937,13 @@
   cursor: pointer; flex-shrink: 0; padding: 0 !important;
 }
 .chat-icobtn:active { background: rgba(255,255,255,0.18) !important; }
-.chat-topbar-row2 { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+
+/* Glassmorphism divider between the header row and the profile picture row */
+.chat-topbar-row2 {
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.14);
+}
 .chat-topbar-who { flex: 1; min-width: 0; }
 
 .chat-av {
@@ -946,22 +952,87 @@
   border: 1.5px solid rgba(255,255,255,.2);
 }
 
-#chatRateBtn { border-radius: 20px !important; flex-shrink: 0; }
+#chatRateBtn {
+  border-radius: 20px !important;
+  flex-shrink: 0;
+  padding: 6px 14px !important;
+  background: rgba(232,213,163,.14) !important;
+  border: 1px solid rgba(232,213,163,.4) !important;
+  color: #e8d5a3 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  white-space: nowrap;
+  line-height: 1.4;
+  cursor: pointer;
+}
 
 /* Messages */
 .chat-bubble { border-radius: 18px !important; }
 .chat-me  { border-radius: 18px 18px 4px 18px !important; }
 .chat-them { border-radius: 18px 18px 18px 4px !important; }
+.chat-bubble.has-img { background: transparent !important; border: none !important; padding: 3px !important; }
+.chat-bubble-img { display: block; width: 190px; max-width: 60vw; border-radius: 14px !important; object-fit: cover; }
 
-/* Input bar — frosted glass pill */
+.chat-voice-msg { display: flex; align-items: center; gap: 8px; min-width: 140px; color: inherit; }
+.chat-voice-msg svg { flex-shrink: 0; }
+.chat-voice-wave { display: flex; align-items: center; gap: 2px; flex: 1; height: 20px; }
+.chat-voice-wave span { display: block; width: 2.5px; border-radius: 2px !important; background: currentColor; opacity: .55; }
+.chat-voice-dur { font-size: 11px; opacity: .7; flex-shrink: 0; }
+
+/* Input bar — frosted glass pill, matches the reference toolbar:
+   camera · text field · (mic / gallery / stickers / plus) OR send-when-typing */
 .chat-input-bar {
+  gap: 8px !important;
   background: rgba(10,14,26,0.6) !important;
   -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
           backdrop-filter: blur(14px) saturate(1.2) !important;
   border-top: 1px solid rgba(255,255,255,0.12) !important;
 }
-.chat-input { border-radius: 22px !important; background: rgba(255,255,255,0.07) !important; }
-.chat-send-btn { border-radius: 50% !important; }
+.chat-input { border-radius: 22px !important; background: rgba(255,255,255,0.07) !important; min-width: 0; }
+.chat-send-btn { border-radius: 50% !important; flex-shrink: 0; }
+
+.chat-input-tools { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.chat-tool-btn {
+  width: 34px !important; height: 34px !important;
+  min-width: 34px !important; min-height: 34px !important;
+  border-radius: 50% !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.72);
+  cursor: pointer; flex-shrink: 0;
+}
+.chat-tool-btn:active { color: #e8d5a3; }
+#chatMicBtn.recording {
+  color: #e74c3c;
+  animation: chatMicPulse 1s ease-in-out infinite;
+}
+@keyframes chatMicPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+.chat-sticker-tray {
+  flex-shrink: 0;
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 10px 14px;
+  background: rgba(10,14,26,0.6) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
+          backdrop-filter: blur(14px) saturate(1.2) !important;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+.chat-sticker-item {
+  width: 40px !important; height: 40px !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  font-size: 19px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.chat-sticker-item:active { background: rgba(255,255,255,.14) !important; }
 
 /* ── Voice/video call overlay (simulated) ── */
 #chatCallOverlay {

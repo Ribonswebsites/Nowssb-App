@@ -339,6 +339,32 @@ window.CHAT = (function(){
     return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
   }
 
+  function escapeHtml(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function waveformHtml(){
+    var bars = [];
+    for(var i=0;i<14;i++) bars.push('<span style="height:'+(6+Math.round(Math.abs(Math.sin(i*1.3))*14))+'px"></span>');
+    return bars.join('');
+  }
+
+  function bubbleHtml(msg){
+    if(msg.type === 'image'){
+      return '<img class="chat-bubble-img" src="'+msg.img+'" alt="">';
+    }
+    if(msg.type === 'voice'){
+      return '<div class="chat-voice-msg">' +
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+        '<span class="chat-voice-wave">'+waveformHtml()+'</span>' +
+        '<span class="chat-voice-dur">'+msg.duration+'</span>' +
+      '</div>';
+    }
+    return escapeHtml(msg.text);
+  }
+
   function renderMessages(){
     var box = document.getElementById('chatMessages');
     if(!box) return;
@@ -346,16 +372,18 @@ window.CHAT = (function(){
     box.innerHTML = _msgs.map(function(msg){
       var isMe = msg.from === me;
       return '<div class="chat-bubble-wrap'+(isMe?' me':'')+'">'+
-        '<div class="chat-bubble '+(isMe?'me':'them')+'">'+msg.text+'</div>'+
+        '<div class="chat-bubble '+(isMe?'me':'them')+(msg.type==='image'?' has-img':'')+'">'+bubbleHtml(msg)+'</div>'+
         '</div>'+
         '<div class="chat-time" style="text-align:'+(isMe?'right':'left')+';">'+timeStr(msg.ts)+'</div>';
     }).join('');
     box.scrollTop = box.scrollHeight;
   }
 
-  function addMessage(text, fromMe){
+  function pushMessage(fields, fromMe){
     var me = window._currentUid || 'me';
-    var msg = { from: fromMe?me:'them', text:text, ts:Date.now() };
+    var msg = fields;
+    msg.from = fromMe ? me : 'them';
+    msg.ts = Date.now();
     _msgs.push(msg);
     renderMessages();
     if(_currentUser) saveLocal(roomId(_currentUser), _msgs);
@@ -368,6 +396,11 @@ window.CHAT = (function(){
         if(colRef) colRef.add(msg).catch(function(){});
       }catch(e){}
     }
+    return msg;
+  }
+
+  function addMessage(text, fromMe){
+    pushMessage({ text:text }, fromMe);
 
     // Auto-reply simulation (remove when real Firebase connected)
     if(fromMe && (!window._db || !window._currentUid)){
@@ -381,6 +414,20 @@ window.CHAT = (function(){
         ];
         addMessage(replies[Math.floor(Math.random()*replies.length)], false);
       }, 1200+Math.random()*800);
+    }
+  }
+
+  function addImageMessage(dataUrl, fromMe){
+    pushMessage({ type:'image', img:dataUrl }, fromMe);
+    if(fromMe && (!window._db || !window._currentUid)){
+      setTimeout(function(){ addMessage('Beautiful 🙏', false); }, 1300+Math.random()*700);
+    }
+  }
+
+  function addVoiceMessage(duration, fromMe){
+    pushMessage({ type:'voice', duration:duration }, fromMe);
+    if(fromMe && (!window._db || !window._currentUid)){
+      setTimeout(function(){ addMessage('Got your voice note 🎧', false); }, 1300+Math.random()*700);
     }
   }
 
@@ -419,6 +466,11 @@ window.CHAT = (function(){
       if(bn) bn.style.display = 'none';
       if(sn) sn.style.display = 'none';
 
+      var inp = document.getElementById('chatInput'); if(inp) inp.value = '';
+      var tools = document.getElementById('chatInputTools'); if(tools) tools.style.display = 'flex';
+      var sendBtn = document.getElementById('chatSendBtn'); if(sendBtn) sendBtn.style.display = 'none';
+      var tray = document.getElementById('chatStickerTray'); if(tray) tray.style.display = 'none';
+
       overlay.style.display = 'block';
       setTimeout(function(){ var i=document.getElementById('chatInput'); if(i) i.focus(); }, 80);
 
@@ -439,7 +491,60 @@ window.CHAT = (function(){
       var text = inp.value.trim();
       if(!text) return;
       inp.value='';
+      this.onInputChange(inp);
       addMessage(text, true);
+    },
+    onInputChange: function(el){
+      var hasText = !!(el && el.value.trim().length);
+      var tools = document.getElementById('chatInputTools');
+      var sendBtn = document.getElementById('chatSendBtn');
+      if(tools)   tools.style.display = hasText ? 'none' : 'flex';
+      if(sendBtn) sendBtn.style.display = hasText ? 'flex' : 'none';
+    },
+    // Photo attach — camera or gallery source, sent as an image bubble.
+    pickImage: function(source){
+      var inp = document.getElementById('chatImageInput');
+      if(!inp) return;
+      if(source === 'camera') inp.setAttribute('capture', 'environment');
+      else inp.removeAttribute('capture');
+      inp.click();
+    },
+    onImageChosen: function(el){
+      var file = el.files && el.files[0];
+      el.value = '';
+      if(!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e){ addImageMessage(e.target.result, true); };
+      reader.readAsDataURL(file);
+    },
+    // Simulated voice note — no live audio recording backend yet.
+    sendVoiceNote: function(btn){
+      if(this._recording) return;
+      this._recording = true;
+      if(btn) btn.classList.add('recording');
+      var dur = 2 + Math.floor(Math.random()*10);
+      var self = this;
+      setTimeout(function(){
+        if(btn) btn.classList.remove('recording');
+        self._recording = false;
+        var mm = Math.floor(dur/60), ss = dur%60;
+        addVoiceMessage((mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss, true);
+      }, 900);
+    },
+    toggleStickers: function(){
+      var tray = document.getElementById('chatStickerTray');
+      if(!tray) return;
+      if(tray.style.display !== 'none'){ tray.style.display = 'none'; return; }
+      var emojis = ['🙏','😍','🔥','✨','💛','😂','👏','🎶','🧘','🌿','💫','🙌'];
+      tray.innerHTML = emojis.map(function(e){
+        return '<button class="chat-sticker-item" onclick="CHAT.sendSticker(\''+e+'\')">'+e+'</button>';
+      }).join('');
+      tray.style.display = 'flex';
+    },
+    sendSticker: function(emoji){
+      addMessage(emoji, true);
+      var tray = document.getElementById('chatStickerTray');
+      if(tray) tray.style.display = 'none';
     },
     // Simulated voice/video call UI — no live telephony backend yet.
     startCall: function(kind){
