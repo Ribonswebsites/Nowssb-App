@@ -545,8 +545,14 @@
       window._nwsbEditFromSocial = true;
       var igp = document.getElementById('sub-ig-profile');
       var ppl = document.getElementById('sub-people');
+      var hub = document.getElementById('sub-connect-hub');
       if (igp) igp.classList.remove('open');
       if (ppl) ppl.classList.remove('open');
+      /* sub-connect-hub is later in DOM than sub-social too (same z-index),
+         so if Edit Profile is opened FROM the Connect hub, the hub's own
+         header/video banner render on top of the Edit Profile panel unless
+         it's explicitly closed here as well. */
+      if (hub) hub.classList.remove('open');
       if (typeof openSub === 'function') openSub('social');
       /* Hide ALL settings content so only the Edit Profile panel shows —
          the social section must never reveal the app settings/site */
