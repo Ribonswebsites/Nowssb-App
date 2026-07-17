@@ -201,7 +201,7 @@
    bottom of the viewport when their content is short — .sub-body itself
    isn't flex by default (many unrelated screens share that class and expect
    normal block flow), so these are scoped by id, not the shared class. */
-#slContent,#rmSubBody,#msMeaningBody,#mpBody,#routinesBody,#routineDetailBody{display:flex !important;flex-direction:column !important;min-height:100%;}
+#slContent,#msMeaningBody,#mpBody,#routinesBody,#routineDetailBody{display:flex !important;flex-direction:column !important;min-height:100%;}
 
 /* ===== css block 36 ===== */
 
