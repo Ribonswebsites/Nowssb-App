@@ -279,6 +279,7 @@ let _pwPhase    = 'idle'; // 'idle'|'playing'|'post-play'|'recording'|'scoring'|
 let _pwDone      = false;
 let _pwMode      = 'listen';
 let _pwUtt       = null;
+let _pwLastGatedWord = null; // weekly word-limit gate in renderPractice() — last word already checked/spent
 
 // Auto-play: controlled by the Voice Guidance / Activate Sound toggles on both intros.
 // _pwAutoPlay = persistent preference. _pwAutoPlayOnce = one-shot flag consumed by renderPractice.
@@ -599,6 +600,15 @@ function renderPractice() {
   if (!body) return;
   const w = PRACTICE_WORDS[_pwIdx];
   if (!w) return;
+  // Weekly word-limit gate — every path into the player (Begin, Skip, Next/
+  // Prev, routine launch) converges here, so this is the one place to check.
+  // Only fires when the WORD actually changes (mode switches re-render the
+  // same word and must not re-count); re-visiting an already-spent word via
+  // Prev is always free since checkWordLimit() treats it as already counted.
+  if (w.word !== _pwLastGatedWord) {
+    if (window.GATE && !window.GATE.checkWordLimit(w.word)) return;
+    _pwLastGatedWord = w.word;
+  }
   if (typeof window.renderLiquidPlayer !== 'function') {
     setTimeout(renderPractice, 60);
     return;

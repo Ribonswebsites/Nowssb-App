@@ -176,6 +176,13 @@ async function pwScoreRecording() {
 }
 
 async function pwPersonaFeedback(score, word, transcript) {
+  // AI persona feedback is a Resonance-and-up feature — skip quietly (no
+  // modal spam after every word) for anyone below that, but still route
+  // truly expired users through the normal expired-trial overlay.
+  if (window.GATE && !window.GATE.isResonance()) {
+    if (window.GATE.tier() === 'expired') window.GATE.check('resonance');
+    return;
+  }
   const personaKey  = window._userPersona || 'soundHealer';
   const persona     = GROQ_PERSONAS[personaKey] || GROQ_PERSONAS.soundHealer;
   const personaWrap = document.getElementById('spPersonaWrap');

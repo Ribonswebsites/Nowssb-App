@@ -30,8 +30,9 @@ var SS_PLANS = [
     tagline:'The full frequency. The complete practice.',
     color:'#c8e8f5', badge:'',
     price:{ monthly:4.99, yearly:49.99 },
+    wordsPerWeek: 5,
     features:[
-      [true, 'Unlimited words per day'],
+      [true, '5 words per week'],
       [true, 'All 5 player modes (Listen, Repeat, Speak, Library, AI)'],
       [true, 'AI pronunciation scoring'],
       [true, 'All 20 health categories'],
@@ -45,8 +46,10 @@ var SS_PLANS = [
     tagline:'Healing is your identity. This is the full edition.',
     color:'#e8d5a3', badge:'Most Popular',
     price:{ monthly:9.99, yearly:99.99 },
+    wordsPerWeek: 10,
     features:[
       [true, 'Everything in Resonance'],
+      [true, '10 words per week'],
       [true, 'Voice Resonance Score'],
       [true, 'Sentence Alchemy — personalised AI sentences'],
       [true, 'Full AI Conversation with session memory'],
@@ -60,13 +63,16 @@ var SS_PLANS = [
     tagline:'Beyond practice. This is mastery.',
     color:'#f0f0f0', badge:'Mastery',
     price:{ monthly:19.99, yearly:199.99 },
+    wordsPerWeek: 20,
+    grantsVerifyTier: 'blue',
     features:[
       [true, 'Everything in Frequency'],
+      [true, '20 words per week'],
+      [true, 'Free Blue Verification badge'],
       [true, 'Custom words — 5 requests/month (team-crafted)'],
       [true, 'Word Drop — 48h early access before anyone'],
       [true, 'Premium studio-quality voice'],
       [true, '1:1 monthly Shabdapathy session (video call)'],
-      [true, 'Profile badge: Frequency X (gold + verified)'],
       [true, 'Premium support (24h response)'],
     ]
   },
@@ -155,7 +161,7 @@ var SUP_SYSTEM = `You are the NowssB support assistant — friendly, concise, an
 NowssB is a healing word-science app based on Shabdapathy — the study of natural-origin phonetic vibrations and their effect on organs and wellbeing. Users practice Sanskrit and natural-origin words by listening and repeating them. The app's AI scores their pronunciation.
 
 Key facts to know:
-- Plans: Free Trial (7 days full access) → Resonance ($4.99/mo · $49.99/yr) → Frequency ($9.99/mo · $99.99/yr) → Frequency X ($19.99/mo · $199.99/yr)
+- Plans: Free Trial (15 days full access) → Resonance ($4.99/mo · $49.99/yr, 5 words/week) → Frequency ($9.99/mo · $99.99/yr, 10 words/week) → Frequency X ($19.99/mo · $199.99/yr, 20 words/week + free Blue verification)
 - Payments via Razorpay. Cancel anytime from Settings → Your Plan.
 - Pronunciation is scored 0-100 based on phonetic match. 90%+ three times = Word Mastery.
 - Word Atelier: browse and acquire words. Resonance: 10/month, Frequency+: unlimited.
@@ -545,12 +551,12 @@ function ssRenderPlans() {
   var bgMap = { resonance:'linear-gradient(135deg,#a8d4e8,#7ab8d4)', frequency:'linear-gradient(135deg,#e8d5a3,#c8a96e)', frequencyX:'linear-gradient(135deg,#f0f0f0,#c8c8c8)' };
   var planBg = bgMap[plan.id] || 'linear-gradient(135deg,#e8d5a3,#c8a96e)';
   var trialLabel = (curTier === 'trial' || curTier === 'expired')
-    ? 'Start 7-Day Free Trial — then $' + ((_ssBilling==='yearly') ? plan.price.yearly + '/year' : plan.price.monthly + '/mo')
+    ? 'Start 15-Day Free Trial — then $' + ((_ssBilling==='yearly') ? plan.price.yearly + '/year' : plan.price.monthly + '/mo')
     : ((_ssBilling==='yearly') ? 'Subscribe — $' + plan.price.yearly + '/year' : 'Subscribe — $' + plan.price.monthly + '/mo');
   if (!isCurrentPlan || curTier === 'trial' || curTier === 'expired') {
     ctaHtml = '<button onclick="ssStartSubscription(\''+plan.id+'\',\''+(_ssBilling||'monthly')+'\')" style="width:100%;padding:17px 0;border-radius:16px;border:none;background:'+planBg+';color:#060c18;font-size:15px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;margin-bottom:12px;letter-spacing:.2px;">'+trialLabel+'</button>';
     if (curTier === 'trial') {
-      ctaHtml += '<div style="text-align:center;font-size:11px;color:rgba(255,255,255,.38);font-family:\'DM Sans\',sans-serif;margin-bottom:8px;">Card saved now · charged after 7-day trial · cancel anytime before</div>';
+      ctaHtml += '<div style="text-align:center;font-size:11px;color:rgba(255,255,255,.38);font-family:\'DM Sans\',sans-serif;margin-bottom:8px;">Card saved now · charged after 15-day trial · cancel anytime before</div>';
     }
   } else {
     ctaHtml = '<div style="text-align:center;padding:14px 0;font-size:13px;color:rgba(255,255,255,.38);font-family:\'DM Sans\',sans-serif;">This is your current plan</div>';

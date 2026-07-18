@@ -42,7 +42,7 @@ async function saveUser(user) {
   const snap = await getDoc(ref);
   if (!snap.exists()) {
     var _tStart = new Date();
-    var _tEnd   = new Date(_tStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+    var _tEnd   = new Date(_tStart.getTime() + 15 * 24 * 60 * 60 * 1000);
     await setDoc(ref, {
       uid: user.uid, email: user.email,
       displayName: user.displayName || '',

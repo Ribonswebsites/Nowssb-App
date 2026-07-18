@@ -320,21 +320,22 @@ setNwsbTheme('glass-black')   // dark blur glass
 ### Tier Structure
 
 ```
-FREE TRIAL — 7 days, full Frequency access, no card required
+FREE TRIAL — 15 days, full Frequency access, no card required
      ↓ trial expires
-RESONANCE    ₹299/month · ₹2,499/year
-FREQUENCY    ₹699/month · ₹5,999/year
-FREQUENCY X  ₹1,499/month · ₹11,999/year
+RESONANCE    $4.99/month · $49.99/year  — 5 words/week
+FREQUENCY    $9.99/month · $99.99/year  — 10 words/week
+FREQUENCY X  $19.99/month · $199.99/year — 20 words/week + free Blue verification
 ```
 
 No permanent free tier. After trial expires, app is locked until a plan is chosen.
 
-**Note:** Words are purchased individually from the Word Store — they are NOT included in subscription tiers. Subscription unlocks features. Words unlock sentences. Both together = the full experience.
+**Note:** Each tier caps how many *new* words a user can start practicing per week (5/10/20 — see `GATE.wordsPerWeek()` in `app/js/part045.js`), enforced client-side by `nwsb_words_this_week` in localStorage. Subscribing to Frequency X also auto-grants the Blue verification badge (`_onSubscriptionSuccess()` in `app/js/part045.js`), mirroring the same grant path used by a Verification Store purchase.
 
 ### Feature Comparison
 
 | Feature | Resonance | Frequency | Frequency X |
 |---|---|---|---|
+| New words per week | 5 | 10 | 20 |
 | All 5 player modes | ✓ | ✓ | ✓ |
 | AI pronunciation scoring | ✓ | ✓ | ✓ |
 | All health categories | ✓ | ✓ | ✓ |
@@ -352,7 +353,7 @@ No permanent free tier. After trial expires, app is locked until a plan is chose
 | Custom words (5/mo) | ✗ | ✗ | ✓ |
 | Word Drop 48h early | ✗ | ✗ | ✓ |
 | Frequency X community | ✗ | ✗ | ✓ |
-| Gold profile badge | ✗ | ✗ | ✓ |
+| Free Blue verification badge | ✗ | ✗ | ✓ |
 
 ### Payment
 - **Gateway:** Razorpay

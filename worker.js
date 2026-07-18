@@ -216,9 +216,9 @@ export default {
        * billing: 'monthly' | 'yearly'
        * Returns { subscription_id } — pass to Razorpay checkout in frontend
        *
-       * The subscription starts after the 7-day trial period.
+       * The subscription starts after the 15-day trial period.
        * Razorpay collects the mandate/card during checkout but first charge
-       * happens at start_at (7 days from now).
+       * happens at start_at (15 days from now).
        */
       const { tier, billing = 'monthly', email = '', total_count = 12 } = body;
       if (!tier) return err('tier required', 400, origin);
@@ -234,8 +234,8 @@ export default {
       const planId = planMap[`${tier}_${billing}`];
       if (!planId) return err(`No plan configured for ${tier}/${billing}`, 400, origin);
 
-      // Trial ends in 7 days — auto-charge starts then
-      const trialEndUnix = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
+      // Trial ends in 15 days — auto-charge starts then
+      const trialEndUnix = Math.floor(Date.now() / 1000) + 15 * 24 * 60 * 60;
 
       const credentials = btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`);
       const rzpRes = await fetch('https://api.razorpay.com/v1/subscriptions', {

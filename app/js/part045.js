@@ -79,7 +79,21 @@
    GATE — Feature access control system
    ══════════════════════════════════════════════════════════ */
 window.GATE = (function(){
+  /* Full-access allowlist — accounts here always get 'frequencyX' regardless
+     of their actual subscription (the account that should "see and play
+     with everything"). Fill in with the real uid/email once known. */
+  var ADMIN_UIDS   = [];
+  var ADMIN_EMAILS = [];
+  function _isAdminAccount() {
+    var u = window._currentUser, d = window._userDataCache;
+    if (u && u.uid && ADMIN_UIDS.indexOf(u.uid) !== -1) return true;
+    if (u && u.email && ADMIN_EMAILS.indexOf(u.email) !== -1) return true;
+    if (d && d.email && ADMIN_EMAILS.indexOf(d.email) !== -1) return true;
+    return false;
+  }
+
   function _tier() {
+    if (_isAdminAccount()) return 'frequencyX';
     var d = window._userDataCache;
     if (!d) return 'trial'; // before data loads, assume trial (graceful)
     // Active paid subscriptions
@@ -90,6 +104,50 @@ window.GATE = (function(){
     if (d.trialEndDate && new Date() < new Date(d.trialEndDate)) return 'trial';
     return 'expired';
   }
+
+  /* ── Weekly new-word limit — 5 / 10 / 20 by tier, unlimited on trial.
+     Tracks which words have already been "spent" this calendar week
+     (Mon–Sun) in localStorage; re-practicing an already-counted word is
+     always free, only NEW words count against the cap. ── */
+  function _wordsPerWeek() {
+    var t = _tier();
+    if (t === 'frequencyX') return 20;
+    if (t === 'frequency')  return 10;
+    if (t === 'resonance')  return 5;
+    return Infinity; // trial = full access, no weekly cap
+  }
+  function _weekStartISO() {
+    var d = new Date();
+    var day = d.getDay(); // 0=Sun..6=Sat
+    var diffToMonday = (day === 0 ? 6 : day - 1);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - diffToMonday);
+    return d.toISOString().slice(0, 10);
+  }
+  function _wordsThisWeek() {
+    var data = null;
+    try { data = JSON.parse(localStorage.getItem('nwsb_words_this_week') || 'null'); } catch (e) {}
+    var wk = _weekStartISO();
+    if (!data || data.weekStart !== wk) data = { weekStart: wk, words: [] };
+    return data;
+  }
+  function _saveWordsThisWeek(data) {
+    try { localStorage.setItem('nwsb_words_this_week', JSON.stringify(data)); } catch (e) {}
+  }
+  /* Call when a word becomes active in the player. Returns true if allowed
+     (and records it as spent, if new); false if the weekly cap is hit —
+     caller should show the upgrade prompt / block the session. */
+  function _canStartWord(word) {
+    var limit = _wordsPerWeek();
+    if (limit === Infinity || !word) return true;
+    var data = _wordsThisWeek();
+    if (data.words.indexOf(word) !== -1) return true; // already spent this week
+    if (data.words.length >= limit) return false;
+    data.words.push(word);
+    _saveWordsThisWeek(data);
+    return true;
+  }
+  function _wordsUsedThisWeek() { return _wordsThisWeek().words.length; }
 
   function _canAccess() {
     var t = _tier();
@@ -111,12 +169,38 @@ window.GATE = (function(){
     else { if (window.SS) window.SS.open('subscription'); }
   }
 
+  function _showWordLimitModal() {
+    if (window.nwsbToast) {
+      nwsbToast('Weekly word limit reached — upgrade for more');
+    }
+    var m = document.getElementById('gate-upgrade-modal');
+    var n = document.getElementById('gate-modal-tier-name');
+    if (m) {
+      if (n) n.textContent = 'more words this week';
+      m.style.display = 'flex';
+    } else if (window.SS) {
+      window.SS.open('subscription');
+    }
+  }
+
   return {
     tier: _tier,
     canAccess: _canAccess,
     isResonance:  function(){ var t=_tier(); return t==='resonance'||t==='frequency'||t==='frequencyX'||t==='trial'; },
     isFrequency:  function(){ var t=_tier(); return t==='frequency'||t==='frequencyX'||t==='trial'; },
     isFrequencyX: function(){ var t=_tier(); return t==='frequencyX'||t==='trial'; },
+    wordsPerWeek: _wordsPerWeek,
+    wordsUsedThisWeek: _wordsUsedThisWeek,
+    /* Call when a word becomes active in the player. Returns true/allows if
+       under the weekly cap (and records it); shows the upgrade prompt and
+       returns false if the cap is already hit. */
+    checkWordLimit: function(word) {
+      var t = _tier();
+      if (t === 'expired') { _showExpiredOverlay(); return false; }
+      var ok = _canStartWord(word);
+      if (!ok) _showWordLimitModal();
+      return ok;
+    },
     check: function(featureLevel, onDenied) {
       var t = _tier();
       if (t === 'expired') { _showExpiredOverlay(); return false; }
@@ -225,6 +309,21 @@ function _onSubscriptionSuccess(response, planId, billing, amount) {
     window._userDataCache.subscriptionBilling = billing;
     window._userDataCache.subscriptionStartDate = now.toISOString();
     window._userDataCache.subscriptionEndDate = endDate.toISOString();
+  }
+
+  // Some plans include a free verification badge (Frequency X → Blue) — grant
+  // it, but never downgrade a tier the user already has (e.g. already Gold).
+  var subscribedPlan = SS_PLANS.find(function(p){ return p.id === planId; });
+  if (subscribedPlan && subscribedPlan.grantsVerifyTier) {
+    var vtierRank = { blue:1, silver:2, gold:3, diamond:4 };
+    var curVtier = '';
+    try { curVtier = localStorage.getItem('nwsb_verify_tier') || ''; } catch(e) {}
+    if (!curVtier) curVtier = (window._userDataCache && window._userDataCache.verifyTier) || '';
+    if (!curVtier || (vtierRank[subscribedPlan.grantsVerifyTier] || 0) > (vtierRank[curVtier] || 0)) {
+      try { localStorage.setItem('nwsb_verify_tier', subscribedPlan.grantsVerifyTier); } catch(e) {}
+      if (window._userDataCache) window._userDataCache.verifyTier = subscribedPlan.grantsVerifyTier;
+      if (window._fbSetDoc) window._fbSetDoc(user.uid, { verifyTier: subscribedPlan.grantsVerifyTier }).catch(function(){});
+    }
   }
 
   // Hide trial banner and promo bars
