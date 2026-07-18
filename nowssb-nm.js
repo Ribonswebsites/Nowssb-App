@@ -129,16 +129,35 @@
   function getTiers()    { try { return (typeof RM_TIERS         !== 'undefined') ? RM_TIERS         : {}; } catch (e) { return {}; } }
   function getWordTier() { try { return (typeof RM_WORD_TIER     !== 'undefined') ? RM_WORD_TIER     : {}; } catch (e) { return {}; } }
 
+  var STORE_ICON_URL = 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png';
+  var _trendCycleTimer = null;
+
+  /* One trending word at a time, paired with the store icon — cycles
+     through the day's picks on a loop rather than listing them all at once. */
   function renderTrending() {
     var box = document.getElementById('nmh-trending-text');
     var section = document.getElementById('nmh-trending-section');
     if (!box || !section) return;
-    var picks = rotate(getLib(), 3, 0);
+    if (_trendCycleTimer) { clearInterval(_trendCycleTimer); _trendCycleTimer = null; }
+    var picks = rotate(getLib(), 5, 0);
     if (!picks.length) { section.style.display = 'none'; return; }
     section.style.display = '';
-    box.innerHTML = picks.map(function (w) {
-      return '<div class="nmh-trend-banner-word" onclick="event.stopPropagation();nwsbOpenStoreWord(\'' + String(w.word).replace(/'/g, '') + '\')">' + (w.word || '') + '</div>';
-    }).join('');
+    var idx = 0;
+    function paint() {
+      var w = picks[idx % picks.length];
+      idx++;
+      box.innerHTML = '<div class="nmh-trend-banner-item" onclick="event.stopPropagation();nwsbOpenStoreWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
+        '<div class="nmh-trend-banner-word">' + (w.word || '') + '</div>' +
+        '<img class="nmh-trend-banner-icon" decoding="async" loading="lazy" src="' + STORE_ICON_URL + '" alt="">' +
+      '</div>';
+      var item = box.querySelector('.nmh-trend-banner-item');
+      if (item) {
+        item.style.opacity = '0';
+        requestAnimationFrame(function () { item.style.opacity = '1'; });
+      }
+    }
+    paint();
+    _trendCycleTimer = setInterval(paint, 2400);
   }
 
   function renderOffers() {
