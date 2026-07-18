@@ -1486,3 +1486,53 @@
   }
   wrapPanel();
 })();
+
+/* ── My Profile: cycling verification-tier showcase above the Shop Verified
+   pill. Slides each tier in from the right with a small wiggle, holds it,
+   slides it out, moves to the next — Blue → Silver → Gold → Diamond, then
+   loops. The colored ring is a rotating conic-gradient sized per tier
+   (see .ig-tier-ring.tier-* in app.css). Same tier data/prices as the
+   actual verification panel (VERIFY_TIERS). ── */
+(function () {
+  var TIERS = [
+    { key: 'blue',    name: 'Verified', price: '$1.99/mo',  img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png' },
+    { key: 'silver',  name: 'Silver',   price: '$4.99/mo',  img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png' },
+    { key: 'gold',    name: 'Gold',     price: '$9.99/mo',  img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png' },
+    { key: 'diamond', name: 'Diamond',  price: '$49.99/mo', img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png' }
+  ];
+  var idx = 0;
+
+  function paint() {
+    var ring = document.getElementById('ig-tier-ring');
+    var img = document.getElementById('ig-tier-img');
+    var name = document.getElementById('ig-tier-name');
+    var price = document.getElementById('ig-tier-price');
+    if (!ring || !img || !name || !price) return false;
+    var t = TIERS[idx];
+    ring.className = 'ig-tier-ring tier-' + t.key;
+    img.src = t.img;
+    name.textContent = t.name;
+    price.textContent = t.price;
+    return true;
+  }
+
+  function cycle() {
+    var el = document.getElementById('ig-tier-showcase');
+    if (!el || !paint()) { setTimeout(cycle, 1000); return; } // not mounted yet — retry
+    el.classList.remove('exit');
+    void el.offsetWidth; // restart the entrance animation cleanly if it re-mounts
+    el.classList.add('enter');
+    setTimeout(function () {
+      var el2 = document.getElementById('ig-tier-showcase');
+      if (!el2) { setTimeout(cycle, 1000); return; }
+      el2.classList.remove('enter');
+      el2.classList.add('exit');
+      setTimeout(function () {
+        idx = (idx + 1) % TIERS.length;
+        cycle();
+      }, 420);
+    }, 2400);
+  }
+
+  cycle();
+})();
