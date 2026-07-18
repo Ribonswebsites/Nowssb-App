@@ -514,7 +514,9 @@ function ssRenderPlans() {
     var isCur = tier === p.id;
     var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? (p.price.yearly/12).toFixed(2) : p.price.monthly;
     var borderColor = isSel ? p.color : 'rgba(255,255,255,.22)';
-    html += '<div class="plan-card" onclick="ssSelectPlan(\''+p.id+'\')" style="border:1px solid '+borderColor+';background:rgba(255,255,255,0.09);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--glass-shadow);">';
+    // Each tier gets its own tinted glass card (Resonance pale blue, Frequency
+    // gold, Frequency X silver/white) instead of one uniform color for all three.
+    html += '<div class="plan-card" data-plan-id="'+p.id+'" onclick="ssSelectPlan(\''+p.id+'\')" style="border:1px solid '+borderColor+';background:'+p.color+'24;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--glass-shadow);">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
     html += '<span style="font-size:22px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
     if (p.badge) html += '<span style="font-size:9px;font-weight:700;letter-spacing:.7px;color:'+p.color+';background:'+p.color+'18;padding:3px 8px;border-radius:5px;">'+p.badge.toUpperCase()+'</span>';
@@ -564,6 +566,30 @@ function ssRenderPlans() {
   if (ctaEl) ctaEl.innerHTML = ctaHtml;
   ssPlanBannerSync();
   ssSubBgSync();
+  ssPlanScrollSync(container);
+}
+
+// Banner should track whichever card is actually in view while scrolling,
+// not just whichever was last tapped — a plain swipe without tapping a
+// card never used to update it. The observer instance is created once and
+// reused, but re-observing the current cards has to happen after EVERY
+// render since ssSelectPlan() rebuilds the whole card list (fresh DOM
+// elements each time — the old observed nodes are gone).
+function ssPlanScrollSync(container) {
+  if (typeof IntersectionObserver === 'undefined') return;
+  if (!container._ssIO) {
+    container._ssIO = new IntersectionObserver(function (entries) {
+      var best = null;
+      entries.forEach(function (e) {
+        if (e.isIntersecting && (!best || e.intersectionRatio > best.intersectionRatio)) best = e;
+      });
+      if (!best) return;
+      var id = best.target.getAttribute('data-plan-id');
+      if (id && id !== _ssSelectedPlan) ssSelectPlan(id);
+    }, { root: container, threshold: [0.5, 0.6, 0.7, 0.8, 0.9, 1] });
+  }
+  container._ssIO.disconnect();
+  Array.from(container.querySelectorAll('.plan-card')).forEach(function (el) { container._ssIO.observe(el); });
 }
 
 // Plan banner (video, text right-middle) mirrors whichever plan is selected.
