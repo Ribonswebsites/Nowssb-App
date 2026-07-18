@@ -556,68 +556,16 @@ function ssRenderPlans() {
     ctaHtml = '<div style="text-align:center;padding:14px 0;font-size:13px;color:rgba(255,255,255,.38);font-family:\'DM Sans\',sans-serif;">This is your current plan</div>';
   }
   if (ctaEl) ctaEl.innerHTML = ctaHtml;
-  ssPlanCoverflowPaint(container);
+  ssPlanBannerSync();
 }
 
-// ── Subscription plans — same 3D coverflow transform math as the Fashion
-// Background picker's fbgCfg/fbgPaint (part047.js). Re-run after every
-// ssRenderPlans() since the DOM is fully rebuilt each time. ──
-function ssPlanCfg(s) {
-  // Exact same numbers as fbgCfg (part047.js) — card width matched to 170px
-  // to match, so this produces the identical proportions/depth as the
-  // Fashion Background picker instead of an adapted approximation.
-  var a = Math.abs(s), d = s < 0 ? -1 : 1;
-  if (a === 0) return {tx: 0,     tz: 200,  ry: 0,     sc: 1.00, op: 1.00, zi: 20};
-  if (a === 1) return {tx: d*172, tz: -10,  ry: d*-28, sc: 0.78, op: 0.68, zi: 15};
-  return             {tx: d*290, tz: -155, ry: d*-50, sc: 0.52, op: 0.22, zi: 10};
-}
-function ssPlanCoverflowPaint(container) {
-  var cards = Array.from(container.querySelectorAll('.plan-card'));
-  var n = cards.length;
-  if (!n) return;
-  var activeIdx = SS_PLANS.findIndex(function (p) { return p.id === _ssSelectedPlan; });
-  if (activeIdx < 0) activeIdx = 0;
-  cards.forEach(function (el, i) {
-    var off = ((i - activeIdx) % n + n) % n;
-    var s = off > Math.floor(n / 2) ? off - n : off;
-    var c = ssPlanCfg(s);
-    // No CSS transition here — the DOM is fully rebuilt on every selection
-    // change (feature lists expand/collapse), so there's no previous
-    // element to animate from; positioning snaps to the correct 3D spot.
-    el.style.transition     = 'none';
-    el.style.transform      = 'translateX('+c.tx+'px) translateZ('+c.tz+'px) rotateY('+c.ry+'deg) scale('+c.sc+')';
-    el.style.opacity        = String(c.op);
-    el.style.zIndex         = String(c.zi);
-    el.style.pointerEvents  = c.op > 0.05 ? 'auto' : 'none';
-  });
-  var dotsEl = document.getElementById('ss-plan-dots');
-  if (dotsEl) {
-    if (!dotsEl.dataset.built || dotsEl.children.length !== n) {
-      dotsEl.innerHTML = SS_PLANS.map(function () { return '<div class="becd"></div>'; }).join('');
-      dotsEl.dataset.built = '1';
-    }
-    Array.from(dotsEl.children).forEach(function (d, i) { d.classList.toggle('active', i === activeIdx); });
-  }
-  if (!container.dataset.ssSwipeBound) {
-    container.dataset.ssSwipeBound = '1';
-    var tx0 = 0;
-    container.addEventListener('touchstart', function (e) { tx0 = e.touches[0].clientX; }, {passive: true});
-    container.addEventListener('touchend', function (e) {
-      var dx = e.changedTouches[0].clientX - tx0;
-      if (Math.abs(dx) < 40) return;
-      var idx = SS_PLANS.findIndex(function (p) { return p.id === _ssSelectedPlan; });
-      if (idx < 0) idx = 0;
-      var next = ((idx + (dx < 0 ? 1 : -1)) % SS_PLANS.length + SS_PLANS.length) % SS_PLANS.length;
-      ssSelectPlan(SS_PLANS[next].id);
-    }, {passive: true});
-  }
-  // Plan banner (video, text right-middle) — mirrors whichever plan is centered
+// Plan banner (video, text right-middle) mirrors whichever plan is selected.
+function ssPlanBannerSync() {
   var bannerText = document.getElementById('ssPlanBannerText');
-  if (bannerText) {
-    var activePlan = SS_PLANS[activeIdx];
-    var priceStr = (_ssBilling === 'yearly') ? '$' + activePlan.price.yearly + '/year' : '$' + activePlan.price.monthly + '/mo';
-    bannerText.innerHTML = '<div class="ss-plan-banner-name">' + activePlan.name + '</div><div class="ss-plan-banner-price">' + priceStr + '</div>';
-  }
+  if (!bannerText) return;
+  var activePlan = SS_PLANS.find(function (p) { return p.id === _ssSelectedPlan; }) || SS_PLANS[0];
+  var priceStr = (_ssBilling === 'yearly') ? '$' + activePlan.price.yearly + '/year' : '$' + activePlan.price.monthly + '/mo';
+  bannerText.innerHTML = '<div class="ss-plan-banner-name">' + activePlan.name + '</div><div class="ss-plan-banner-price">' + priceStr + '</div>';
 }
 
 
