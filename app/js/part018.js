@@ -68,13 +68,15 @@ function openDailyPracticeIntro() {
   _rtDetailTab = 'words';
   _rtLibFilter = 'All';
   _rtIntroFromHome = true;
-  // Open the routines sub-screen, then render the intro into it
-  _origOpenSub('routines');
+  // Render the intro into #routinesBody BEFORE revealing the sub-screen —
+  // rendering after open() left the previous session's stale content
+  // visible for a frame (the reported "flash").
   if (typeof shouldShowIntro === 'function' && !shouldShowIntro('routine')) {
-    setTimeout(renderRoutineDetail_inline, 60);
+    renderRoutineDetail_inline();
   } else {
-    setTimeout(renderRoutineIntro, 60);
+    renderRoutineIntro();
   }
+  _origOpenSub('routines');
 }
 
 // ── RENDER ROUTINES LIST ──
@@ -93,7 +95,7 @@ function renderRoutines() {
         <div class="rt-banner-img" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777982340/grok_image_1777982257091_q5lkbb.jpg');"></div>
         <div class="rt-banner-fade"></div>
         <div class="rt-banner-header">
-          <button onclick="closeSub('routines')" style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);cursor:pointer;padding:8px;display:flex;align-items:center;backdrop-filter:none;-webkit-backdrop-filter:none;">
+          <button onclick="closeSub('routines')" style="width:38px;height:38px;border-radius:50% !important;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;backdrop-filter:none;-webkit-backdrop-filter:none;">
             <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/></svg>
           </button>
           <div class="rt-banner-title">My Routines</div>
@@ -198,7 +200,7 @@ function renderRoutineIntro() {
 
       // TOP ROW
       '<div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:4px;">' +
-        '<div id="rtIntroBackBtn" style="width:42px;height:42px;cursor:pointer;border-radius:50%;' +
+        '<div id="rtIntroBackBtn" style="width:42px;height:42px;cursor:pointer;border-radius:50% !important;' +
           'background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);backdrop-filter:none;-webkit-backdrop-filter:none;' +
           'display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
         '</div>' +
@@ -289,7 +291,8 @@ function renderRoutineIntro() {
     var rCheck = _routines.find(function(x){ return Number(x.id) === Number(rid); });
     _rtDetailTab = (!rCheck || !rCheck.words || rCheck.words.length === 0) ? 'library' : 'words';
     _rtLibFilter = 'All';
-    _rtIntroFromHome = false;
+    // Keep _rtIntroFromHome as-is — the detail screen's back button needs it
+    // to know whether to return straight home or back to the intro.
     renderRoutineDetail_inline();
   });
   if (skipBtn) skipBtn.addEventListener('click', function() {
@@ -356,7 +359,7 @@ function renderRoutineDetail_inline() {
         '<div class="rt-banner-img" style="background-image:url(\'' + inlineBannerUrl + '\');"></div>' +
         '<div class="rt-banner-fade"></div>' +
         '<div class="rtd-header" style="position:absolute;top:0;left:0;right:0;">' +
-          '<button class="rtd-inline-back" style="width:42px;height:42px;cursor:pointer;padding:0;border-radius:50%;background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+          '<button class="rtd-inline-back" style="width:42px;height:42px;cursor:pointer;padding:0;border-radius:50% !important;background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
           '</button>' +
           '<button class="rtd-myroutines-btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:100px;cursor:pointer;padding:6px 14px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.65);">' +
             '<svg width="12" height="10" viewBox="0 0 14 12" fill="none"><path d="M1 1H13M1 6H10M1 11H7" stroke="rgba(255,255,255,0.65)" stroke-width="1.4" stroke-linecap="square"/></svg>' +
@@ -390,8 +393,17 @@ function renderRoutineDetail_inline() {
       '</div>' +
     '</div>';
 
-  // Wire back button
-  body.querySelector('.rtd-inline-back').addEventListener('click', function() { renderRoutineIntro(); });
+  // Wire back button — if this flow came straight from the Home card, back
+  // skips the intro entirely and goes straight home instead of bouncing
+  // through it again.
+  body.querySelector('.rtd-inline-back').addEventListener('click', function() {
+    if (_rtIntroFromHome) {
+      _rtIntroFromHome = false;
+      closeSub('routines');
+    } else {
+      renderRoutineIntro();
+    }
+  });
   // Wire My Routines button
   var myRoutinesBtn = body.querySelector('.rtd-myroutines-btn');
   if (myRoutinesBtn) myRoutinesBtn.addEventListener('click', function() { renderRoutines(); });
