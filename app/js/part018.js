@@ -99,7 +99,9 @@ function renderRoutines() {
             <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/></svg>
           </button>
           <div class="rt-banner-title">My Routines</div>
-          <div style="width:38px;"></div>
+          <div style="width:38px;height:38px;border-radius:50% !important;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+            <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;">
+          </div>
         </div>
       </div>
       <div class="rt-scroll">
@@ -204,7 +206,10 @@ function renderRoutineIntro() {
           'background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);backdrop-filter:none;-webkit-backdrop-filter:none;' +
           'display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
         '</div>' +
-        '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:18px;height:18px;object-fit:contain;display:block;">' +
+          '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
+        '</div>' +
         '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;">' +
           '<svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>' +
         '</button>' +
@@ -362,7 +367,7 @@ function renderRoutineDetail_inline() {
           '<button class="rtd-inline-back" style="width:42px;height:42px;cursor:pointer;padding:0;border-radius:50% !important;background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
           '</button>' +
           '<button class="rtd-myroutines-btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:100px;cursor:pointer;padding:6px 14px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.65);">' +
-            '<svg width="12" height="10" viewBox="0 0 14 12" fill="none"><path d="M1 1H13M1 6H10M1 11H7" stroke="rgba(255,255,255,0.65)" stroke-width="1.4" stroke-linecap="square"/></svg>' +
+            '<img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:13px;height:13px;object-fit:contain;display:block;">' +
             'My Routines' +
           '</button>' +
         '</div>' +
