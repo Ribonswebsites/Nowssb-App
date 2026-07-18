@@ -1862,7 +1862,7 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 .nmh-trend-shop-banner {
   width: 100%; border-radius: 22px !important; overflow: hidden; cursor: pointer; position: relative;
   background: #000; box-shadow: 8px 8px 20px rgba(163,177,198,0.5), -6px -6px 14px #ffffff;
-  display: flex; align-items: center; gap: 14px; padding: 18px 20px 30px; margin: 4px 0 0; box-sizing: border-box;
+  display: flex; align-items: center; gap: 14px; padding: 26px 20px 36px; margin: 4px 0 0; box-sizing: border-box;
 }
 .nmh-trend-shop-logo {
   width: 44px; height: 44px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden;
@@ -1895,8 +1895,11 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 16px; cursor: pointer;
 }
 .nmh-trend-shop-cart { width: 15px; height: 15px; flex-shrink: 0; }
-.nmh-trend-shop-dots { position: absolute; bottom: 10px; left: 0; right: 0; display: flex; justify-content: center; gap: 5px; z-index: 2; }
-.nmh-trend-shop-dot { width: 5px; height: 5px; border-radius: 50% !important; background: rgba(255,255,255,0.28); transition: all 0.3s; cursor: pointer; }
+.nmh-trend-shop-dots { position: absolute; bottom: 12px; left: 0; right: 0; height: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; z-index: 2; }
+.nmh-trend-shop-dot {
+  width: 5px; height: 5px; min-width: 0; min-height: 0; flex-shrink: 0;
+  border-radius: 50% !important; background: rgba(255,255,255,0.28); transition: all 0.3s; cursor: pointer;
+}
 .nmh-trend-shop-dot.on { background: #e8d5a3; width: 15px; border-radius: 3px !important; }
 /* Fashion home — same two banners, styled to match its sharp-corner dark
    cards instead of the light neumorphic frame. */
