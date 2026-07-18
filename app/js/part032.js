@@ -557,6 +557,7 @@ function ssRenderPlans() {
   }
   if (ctaEl) ctaEl.innerHTML = ctaHtml;
   ssPlanBannerSync();
+  ssSubBgSync();
 }
 
 // Plan banner (video, text right-middle) mirrors whichever plan is selected.
@@ -566,6 +567,27 @@ function ssPlanBannerSync() {
   var activePlan = SS_PLANS.find(function (p) { return p.id === _ssSelectedPlan; }) || SS_PLANS[0];
   var priceStr = (_ssBilling === 'yearly') ? '$' + activePlan.price.yearly + '/year' : '$' + activePlan.price.monthly + '/mo';
   bannerText.innerHTML = '<div class="ss-plan-banner-name">' + activePlan.name + '</div><div class="ss-plan-banner-price">' + priceStr + '</div>';
+}
+
+// Subscription screen background — same custom Fashion background the user
+// picked, if any; otherwise the first image from that same picker's list.
+// Set directly as this element's own opaque background (image + dark
+// gradient baked into one background-image value) rather than relying on
+// transparency to reveal whatever sits behind the panel — a translucent
+// panel let the Settings list behind it bleed through into a broken
+// double-exposure instead of showing just the intended image.
+function ssSubBgSync() {
+  var panel = document.getElementById('ss-panel-subscription');
+  if (!panel) return;
+  var custom = null;
+  try { custom = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
+  var fallback = (window.NWSB_FASHION_BGS && window.NWSB_FASHION_BGS[0]) ||
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261485118_fnnndw.jpg';
+  var imgUrl = custom || fallback;
+  panel.style.setProperty('background-image', "linear-gradient(rgba(6,12,24,0.72),rgba(6,12,24,0.92)), url('" + imgUrl + "')", 'important');
+  panel.style.setProperty('background-size', 'cover', 'important');
+  panel.style.setProperty('background-position', 'center', 'important');
+  panel.style.setProperty('background-color', '#060c18', 'important');
 }
 
 

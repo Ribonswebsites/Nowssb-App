@@ -585,9 +585,13 @@ body.nm-mode #sub-social .ss-check { border-color: rgba(0,0,0,0.25) !important; 
 /* Subscription screen is explicitly excluded from the block above — it
    must render identically whether opened from normal or Fashion home, no
    neumorphic reskin. ID selector beats the .ss-panel/attribute-selector
-   rules above regardless of source order. Translucent (not opaque) so the
-   Fashion home's own #appBg shows through behind it, same on both homes. */
-#sub-social #ss-panel-subscription { background: rgba(6,12,24,0.55) !important; }
+   rules above regardless of source order. Opaque fallback color only —
+   the actual background image + dark gradient is set by ssSubBgSync() in
+   part032.js (background-image alone can't safely be !important-free here
+   without risking the .ss-panel rule winning back, and a separate
+   absolutely-positioned image layer risks bleeding through to whatever
+   sits behind the panel, which is exactly the ghosting bug this replaced). */
+#sub-social #ss-panel-subscription { background-color: #060c18 !important; }
 body.nm-mode #sub-social #ss-panel-subscription [style*="#fff"],
 body.nm-mode #sub-social #ss-panel-subscription [style*="255,255,255"],
 body.nm-mode #sub-social #ss-panel-subscription [style*="255, 255, 255"] { color: #fff !important; }

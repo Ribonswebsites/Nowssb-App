@@ -66,6 +66,7 @@
     'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263836740_atjk35.jpg',
     'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg'
   ];
+  window.NWSB_FASHION_BGS = NWSB_FASHION_BGS;
 
   window.nwsbSetFashionBg = function (url) {
     document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + url + "')");
