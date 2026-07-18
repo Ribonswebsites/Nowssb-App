@@ -493,7 +493,9 @@
     w.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:flex-end;justify-content:center;';
     w.innerHTML =
       '<div onclick="nwsbCloseBannerUI()" style="position:absolute;inset:0;background:rgba(20,22,34,.5);backdrop-filter:blur(3px);"></div>' +
-      '<div style="position:relative;width:100%;max-width:520px;background:#f0f2f7;border-radius:28px 28px 0 0;padding:22px 20px ' + navH + ';box-shadow:0 -10px 40px rgba(0,0,0,.25);">' +
+      '<div style="position:relative;width:100%;max-width:520px;background:#f0f2f7;border-radius:28px 28px 0 0;padding:0 0 ' + navH + ';box-shadow:0 -10px 40px rgba(0,0,0,.25);overflow:hidden;">' +
+        '<img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784368347/grok_image_1784368231258_qti4xe.jpg" alt="" style="width:100%;height:140px;object-fit:cover;display:block;">' +
+        '<div style="padding:22px 20px 0;">' +
         '<div style="width:42px;height:5px;border-radius:3px !important;background:rgba(0,0,0,.14);margin:0 auto 18px;"></div>' +
         '<div style="font-family:DM Sans,sans-serif;font-size:18px;font-weight:800;color:#1a1a2e;margin-bottom:16px;">Change Banner</div>' +
         '<button onclick="nwsbCloseBannerUI();nwsbPickImage(\'banner\')" class="nwsb-bch-btn" style="width:100%;display:flex;align-items:center;gap:14px;background:#f0f2f7;border:none;cursor:pointer;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:6px 6px 14px rgba(0,0,0,.12),-4px -4px 11px rgba(255,255,255,.95);text-align:left;">' +
@@ -504,6 +506,7 @@
           '<span style="width:46px;height:46px;border-radius:50% !important;background:#f0f2f7;box-shadow:inset 3px 3px 7px rgba(0,0,0,.1),inset -2px -2px 6px rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg></span>' +
           '<span><span style="display:block;font-family:DM Sans,sans-serif;font-size:15px;font-weight:700;color:#1a1a2e;">Prebuilt Banner</span><span style="display:block;font-family:DM Sans,sans-serif;font-size:12px;color:rgba(0,0,0,.45);">Pick from ready-made banners</span></span>' +
         '</button>' +
+        '</div>' +
       '</div>';
     document.body.appendChild(w);
   };
