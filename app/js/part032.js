@@ -507,8 +507,8 @@ function ssRenderPlans() {
     var isSel = _ssSelectedPlan === p.id;
     var isCur = tier === p.id;
     var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? (p.price.yearly/12).toFixed(2) : p.price.monthly;
-    var borderColor = isSel ? p.color : 'rgba(255,255,255,.08)';
-    html += '<div class="plan-card" onclick="ssSelectPlan(\''+p.id+'\')" style="border-color:'+borderColor+';background:#000;">';
+    var borderColor = isSel ? p.color : 'rgba(255,255,255,.22)';
+    html += '<div class="plan-card" onclick="ssSelectPlan(\''+p.id+'\')" style="border:1px solid '+borderColor+';background:rgba(255,255,255,0.09);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--glass-shadow);">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
     html += '<span style="font-size:22px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
     if (p.badge) html += '<span style="font-size:9px;font-weight:700;letter-spacing:.7px;color:'+p.color+';background:'+p.color+'18;padding:3px 8px;border-radius:5px;">'+p.badge.toUpperCase()+'</span>';
