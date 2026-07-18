@@ -130,18 +130,14 @@
   function getWordTier() { try { return (typeof RM_WORD_TIER     !== 'undefined') ? RM_WORD_TIER     : {}; } catch (e) { return {}; } }
 
   function renderTrending() {
-    var box = document.getElementById('nmh-trending-row');
-    if (!box) return;
-    var picks = rotate(getLib(), 6, 0);
-    if (!picks.length) { var s = document.getElementById('nmh-trending-section'); if (s) s.style.display = 'none'; return; }
+    var box = document.getElementById('nmh-trending-text');
+    var section = document.getElementById('nmh-trending-section');
+    if (!box || !section) return;
+    var picks = rotate(getLib(), 3, 0);
+    if (!picks.length) { section.style.display = 'none'; return; }
+    section.style.display = '';
     box.innerHTML = picks.map(function (w) {
-      return '<div class="nmh-trend-card" onclick="nwsbOpenStoreWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
-        '<div class="nmh-trend-badge">Trending</div>' +
-        '<div class="nmh-trend-word">' + (w.word || '') + '</div>' +
-        '<div class="nmh-trend-organ">' + (w.organ || '') + '</div>' +
-        '<div class="nmh-trend-benefit">' + (w.benefit || '') + '</div>' +
-        '<div class="nmh-trend-cta">View in Store →</div>' +
-      '</div>';
+      return '<div class="nmh-trend-banner-word" onclick="event.stopPropagation();nwsbOpenStoreWord(\'' + String(w.word).replace(/'/g, '') + '\')">' + (w.word || '') + '</div>';
     }).join('');
   }
 

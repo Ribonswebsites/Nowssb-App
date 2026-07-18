@@ -1835,6 +1835,26 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   box-shadow:10px 10px 28px rgba(0,0,0,0.88), -5px -5px 18px rgba(50,50,110,0.32);
 }
 .nmh-video-banner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Today Trending banner — true 16:9 (source video's own ratio), so
+   object-fit:cover never actually crops anything, it just fills. */
+.nmh-trend-banner {
+  position: relative; width: 100%; margin: 4px 0;
+  aspect-ratio: 16 / 9; border-radius: 28px !important; overflow: hidden;
+  cursor: pointer;
+  border: 10px solid #f0f2f7 !important;
+  box-shadow: 12px 12px 28px rgba(163,177,198,0.7), -9px -9px 22px #ffffff;
+}
+#home-nm.nm-dark .nmh-trend-banner {
+  border-color: #0c0c20 !important;
+  box-shadow: 10px 10px 28px rgba(0,0,0,0.88), -5px -5px 18px rgba(50,50,110,0.32);
+}
+.nmh-trend-banner-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.nmh-trend-banner-fade { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 35%, rgba(4,10,24,0.75) 100%); }
+.nmh-trend-banner-text { position: absolute; top: 50%; right: 6%; transform: translateY(-50%); z-index: 2; text-align: right; max-width: 52%; }
+.nmh-trend-banner-word {
+  font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #fff;
+  line-height: 1.4; text-shadow: 0 2px 10px rgba(0,0,0,0.5); cursor: pointer;
+}
 /* small word-search bar overlaid on the right side of a video banner */
 .nmh-video-banner-search { cursor: pointer; }
 .nmh-vbs-search {

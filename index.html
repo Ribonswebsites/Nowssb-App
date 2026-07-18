@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=297">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=350">
+<link rel="stylesheet" href="nowssb-nm.css?v=351">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -909,13 +909,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 
-    <!-- Today Trending -->
-    <div class="nmh-store-section" id="nmh-trending-section">
-      <div class="nmh-store-head">
-        <div class="nmh-store-title">Today <span class="accent">Trending</span></div>
-        <div class="nmh-store-link" onclick="openSub('nowssb-store')">See all</div>
-      </div>
-      <div class="nmh-hscroll" id="nmh-trending-row"></div>
+    <!-- Today Trending — video banner, no heading, trending words overlaid mid-right -->
+    <div class="nmh-trend-banner" id="nmh-trending-section" onclick="openSub('nowssb-store')">
+      <video class="nmh-trend-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
+      <div class="nmh-trend-banner-fade"></div>
+      <div class="nmh-trend-banner-text" id="nmh-trending-text"></div>
     </div>
 
     <!-- Today Offers -->
@@ -7833,7 +7831,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part050.js?v=241"></script>
 <script src="app/js/part051.js?v=5" defer></script>
 <script src="nowssb-social.js?v=176" defer></script>
-<script src="nowssb-nm.js?v=169" defer></script>
+<script src="nowssb-nm.js?v=170" defer></script>
 <script src="nowssb-player.js?v=284" defer></script>
 
 </body>
