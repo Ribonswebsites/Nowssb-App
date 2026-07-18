@@ -1695,18 +1695,26 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 28px) !important;
 }
 
-/* ── Subscription plans: horizontal swipe carousel (one plan per panel) ── */
+/* ── Subscription plans: 3D coverflow carousel — same perspective/transform
+   language as the Fashion Background picker (.fbgci / fbgCfg / fbgPaint in
+   part047.js). The selected plan card is always the one full-width /
+   full-feature-list, so it doubles as the "centered, full size" card here;
+   the other two collapse to their 4-feature preview automatically via the
+   existing ssSelectPlan() logic, which keeps them short enough to fit the
+   same fixed-height stage without internal scrolling in the normal case —
+   overflow-y:auto is still there as a safety net for very small screens. ── */
 #ss-plan-cards {
-  display: flex !important; flex-direction: row !important; gap: 14px !important;
-  overflow-x: auto !important; overflow-y: visible;
-  -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;
-  padding: 6px 2px 16px !important; scrollbar-width: none;
+  position: relative !important; width: 100%; height: 620px;
+  perspective: 1000px; perspective-origin: 50% 50%;
+  overflow: visible !important; margin: 6px 0 16px;
 }
-#ss-plan-cards::-webkit-scrollbar { display: none; }
 #ss-plan-cards .plan-card {
-  flex: 0 0 87% !important; max-width: 340px; margin-bottom: 0 !important;
-  scroll-snap-align: center; box-sizing: border-box; align-self: flex-start;
+  position: absolute !important; width: 280px; max-height: 580px; overflow-y: auto;
+  top: 50%; left: 50%; margin-left: -140px; margin-top: -290px;
+  box-sizing: border-box; will-change: transform, opacity; backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; opacity: 0;
 }
+#ss-plan-dots { display: flex; justify-content: center; gap: 6px; margin: 0 0 18px; }
 
 /* ── Hide scrollbars app-wide (scrolling still works via touch) ── */
 *::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
