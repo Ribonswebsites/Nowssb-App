@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=297">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=352">
+<link rel="stylesheet" href="nowssb-nm.css?v=353">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -916,6 +916,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="nmh-trend-banner-text" id="nmh-trending-text"></div>
     </div>
 
+    <!-- Today Trending — Shop Now banner, black card like the Connect carousel, same word -->
+    <div class="nmh-trend-shop-banner" id="nmh-trending-shop-banner" onclick="openSub('nowssb-store')">
+      <div class="nmh-trend-shop-logo">
+        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB">
+      </div>
+      <div class="nmh-trend-shop-text">
+        <div class="nmh-trend-shop-label">Trending Today</div>
+        <div class="nmh-trend-shop-word" id="nmh-trending-shop-word"></div>
+      </div>
+      <button class="nmh-trend-shop-btn" onclick="event.stopPropagation();openSub('nowssb-store')">Shop Now</button>
+    </div>
+
     <!-- Today Offers -->
     <div class="nmh-store-section" id="nmh-offers-section">
       <div class="nmh-store-head">
@@ -1236,6 +1248,25 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   <!-- Connect features carousel (fashion) -->
   <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
+
+  <!-- Today Trending — video banner (fashion) -->
+  <div class="nmh-trend-banner fash-trend-banner" id="nmh-trending-section-fash" onclick="openSub('nowssb-store')">
+    <video class="nmh-trend-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
+    <div class="nmh-trend-banner-fade"></div>
+    <div class="nmh-trend-banner-text" id="nmh-trending-text-fash"></div>
+  </div>
+
+  <!-- Today Trending — Shop Now banner (fashion) -->
+  <div class="nmh-trend-shop-banner fash-trend-shop-banner" id="nmh-trending-shop-banner-fash" onclick="openSub('nowssb-store')">
+    <div class="nmh-trend-shop-logo">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB">
+    </div>
+    <div class="nmh-trend-shop-text">
+      <div class="nmh-trend-shop-label">Trending Today</div>
+      <div class="nmh-trend-shop-word" id="nmh-trending-shop-word-fash"></div>
+    </div>
+    <button class="nmh-trend-shop-btn" onclick="event.stopPropagation();openSub('nowssb-store')">Shop Now</button>
+  </div>
 
   <!-- Video banner — above the subscription promo -->
   <div class="fash-video-banner" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
@@ -7831,7 +7862,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part050.js?v=241"></script>
 <script src="app/js/part051.js?v=5" defer></script>
 <script src="nowssb-social.js?v=176" defer></script>
-<script src="nowssb-nm.js?v=171" defer></script>
+<script src="nowssb-nm.js?v=172" defer></script>
 <script src="nowssb-player.js?v=284" defer></script>
 
 </body>

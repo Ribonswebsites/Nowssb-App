@@ -133,28 +133,48 @@
   var _trendCycleTimer = null;
 
   /* One trending word at a time, paired with the store icon — cycles
-     through the day's picks on a loop rather than listing them all at once. */
+     through the day's picks on a loop rather than listing them all at once.
+     Drives both the video banner AND the Shop Now banner below it, on both
+     normal and Fashion home, all in sync on the same word. */
   function renderTrending() {
-    var box = document.getElementById('nmh-trending-text');
-    var section = document.getElementById('nmh-trending-section');
-    if (!box || !section) return;
+    var targets = [
+      { sec: document.getElementById('nmh-trending-section'),      box: document.getElementById('nmh-trending-text') },
+      { sec: document.getElementById('nmh-trending-section-fash'), box: document.getElementById('nmh-trending-text-fash') }
+    ].filter(function (t) { return t.sec && t.box; });
+    var shopTargets = [
+      { sec: document.getElementById('nmh-trending-shop-banner'),      word: document.getElementById('nmh-trending-shop-word') },
+      { sec: document.getElementById('nmh-trending-shop-banner-fash'), word: document.getElementById('nmh-trending-shop-word-fash') }
+    ].filter(function (t) { return t.sec && t.word; });
+    if (!targets.length && !shopTargets.length) return;
     if (_trendCycleTimer) { clearInterval(_trendCycleTimer); _trendCycleTimer = null; }
     var picks = rotate(getLib(), 5, 0);
-    if (!picks.length) { section.style.display = 'none'; return; }
-    section.style.display = '';
+    if (!picks.length) {
+      targets.forEach(function (t) { t.sec.style.display = 'none'; });
+      shopTargets.forEach(function (t) { t.sec.style.display = 'none'; });
+      return;
+    }
+    targets.forEach(function (t) { t.sec.style.display = ''; });
+    shopTargets.forEach(function (t) { t.sec.style.display = ''; });
     var idx = 0;
     function paint() {
       var w = picks[idx % picks.length];
       idx++;
-      box.innerHTML = '<div class="nmh-trend-banner-item" onclick="event.stopPropagation();nwsbOpenStoreWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
-        '<div class="nmh-trend-banner-word">' + (w.word || '') + '</div>' +
-        '<img class="nmh-trend-banner-icon" decoding="async" loading="lazy" src="' + STORE_ICON_URL + '" alt="">' +
-      '</div>';
-      var item = box.querySelector('.nmh-trend-banner-item');
-      if (item) {
-        item.style.opacity = '0';
-        requestAnimationFrame(function () { item.style.opacity = '1'; });
-      }
+      var wordSafe = String(w.word).replace(/'/g, '');
+      targets.forEach(function (t) {
+        t.box.innerHTML = '<div class="nmh-trend-banner-item" onclick="event.stopPropagation();nwsbOpenStoreWord(\'' + wordSafe + '\')">' +
+          '<div class="nmh-trend-banner-word">' + (w.word || '') + '</div>' +
+          '<img class="nmh-trend-banner-icon" decoding="async" loading="lazy" src="' + STORE_ICON_URL + '" alt="">' +
+        '</div>';
+        var item = t.box.querySelector('.nmh-trend-banner-item');
+        if (item) {
+          item.style.opacity = '0';
+          requestAnimationFrame(function () { item.style.opacity = '1'; });
+        }
+      });
+      shopTargets.forEach(function (t) {
+        t.word.style.opacity = '0';
+        setTimeout(function () { t.word.textContent = w.word || ''; t.word.style.opacity = '1'; }, 250);
+      });
     }
     paint();
     _trendCycleTimer = setInterval(paint, 2400);
