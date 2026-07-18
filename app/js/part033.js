@@ -1486,3 +1486,19 @@
   }
   wrapPanel();
 })();
+
+/* ── Shop Verified pill: traveling ring around the icon cycles through the
+   verification tier colors — Blue -> Silver -> Gold -> Diamond -> loop.
+   Pill itself (icon, text) never changes, just the rotating ring color. ── */
+(function () {
+  var KEYS = ['blue', 'silver', 'gold', 'diamond'];
+  var idx = 0;
+  function tick() {
+    var ring = document.getElementById('ig-vshop-ring');
+    if (!ring) { setTimeout(tick, 1000); return; } // not mounted yet — retry
+    ring.className = 'ig-vshop-ring tier-' + KEYS[idx];
+    idx = (idx + 1) % KEYS.length;
+    setTimeout(tick, 2200);
+  }
+  tick();
+})();
