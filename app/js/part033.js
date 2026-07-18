@@ -633,6 +633,7 @@
       var css='#nwsb-verify{position:fixed;inset:0;z-index:100001;background:#eef0f5;display:flex;flex-direction:column;}'+
         '#nwsb-verify *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
         '#nwsb-verify .nwsb-vr-bar{position:sticky;top:0;display:flex;align-items:center;gap:12px;padding:max(env(safe-area-inset-top,14px),14px) 16px 14px;background:#eef0f5;box-shadow:0 4px 14px rgba(0,0,0,.07);}'+
+        '#nwsb-verify .nwsb-vr-bar-ic{width:32px;height:32px;object-fit:contain;flex-shrink:0;}'+
         '#nwsb-verify .nwsb-vr-h{flex:1;font-size:18px;font-weight:800;color:#1a1a2e;}'+
         '#nwsb-verify .nwsb-vr-x{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;color:#1a1a2e;font-size:22px;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.13),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
         '#nwsb-verify .nwsb-vr-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(env(safe-area-inset-bottom,20px) + 26px);}'+
@@ -667,7 +668,7 @@
       var ov=document.createElement('div');
       ov.id='nwsb-verify';
       ov.innerHTML='<style>'+css+'</style>'+
-        '<div class="nwsb-vr-bar"><span class="nwsb-vr-h">NowssB Verified</span><button class="nwsb-vr-x" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-verify\');if(p)p.remove();">&times;</button></div>'+
+        '<div class="nwsb-vr-bar"><img class="nwsb-vr-bar-ic" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt=""><span class="nwsb-vr-h">NowssB Verified</span><button class="nwsb-vr-x" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-verify\');if(p)p.remove();">&times;</button></div>'+
         '<div class="nwsb-vr-scroll">'+
           '<div class="nwsb-vr-intro">Wear the headphone check-mark. Show the world you\'re a real NowssB practitioner — and climb from Blue all the way to Diamond.</div>'+
           (curName ? '<div class="nwsb-vr-cur">Your badge: '+curName+'</div>' : '<div class="nwsb-vr-cur">You\'re not verified yet</div>')+
