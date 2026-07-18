@@ -128,7 +128,7 @@
     });
     if (fbgDotEls) fbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === fbgActive); });
     var label = document.getElementById('fbgSelectedLabel');
-    if (label) label.textContent = 'Photo ' + (fbgActive + 1) + ' of ' + FBG_N;
+    if (label) label.textContent = 'Background ' + (fbgActive + 1) + ' of ' + FBG_N;
     var previewBg = document.getElementById('fbgPreviewBg');
     if (previewBg) previewBg.style.backgroundImage = "url('" + NWSB_FASHION_BGS[fbgActive] + "')";
   }

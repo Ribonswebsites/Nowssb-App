@@ -1212,7 +1212,7 @@
     });
     if (ncbgDotEls) ncbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === ncbgActive); });
     var label = document.getElementById('ncbgSelectedLabel');
-    if (label) label.textContent = 'Photo ' + (ncbgActive + 1) + ' of ' + NCBG_N;
+    if (label) label.textContent = 'Background ' + (ncbgActive + 1) + ' of ' + NCBG_N;
     var previewBg = document.getElementById('ncbgPreviewBg');
     if (previewBg) previewBg.style.backgroundImage = "url('" + NWSB_CONNECT_BGS[ncbgActive] + "')";
   }

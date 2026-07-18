@@ -1,4 +1,15 @@
 
+// ── Block the native long-press context menu (Copy/Download/Share image,
+// "Open in Chrome browser") on every image/video app-wide, on the PWA and
+// the plain website alike. CSS alone (-webkit-touch-callout etc., see
+// app.css) doesn't reliably suppress Android Chrome's own long-press menu —
+// this explicit prevention is what actually stops it. Doesn't touch normal
+// taps/clicks, only the long-press/right-click menu and native drag-out. ──
+document.addEventListener('contextmenu', function (e) { e.preventDefault(); }, { passive: false });
+document.addEventListener('dragstart', function (e) {
+  if (e.target && (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO')) e.preventDefault();
+});
+
 // ── BACKGROUND IMAGES — 1 per screen, never repeated ──
 const bgImages = {
   splash:     null, // splash uses its own inline bg
