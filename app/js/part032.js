@@ -518,8 +518,12 @@ window.ssSelectPlan = function(id) {
 // Each tier reads as its own distinct card, not a tinted variant of one
 // template: Resonance = white card, Frequency = black card, Frequency X =
 // gold-rimmed glass card (the top tier).
+// flatText: this tier's big name/price text never switches to the accent
+// color on selection — it stays a plain, always-readable color (the accent
+// is still used for the border glow, badge and checkmarks). Resonance's
+// white card read wrong with blue headline text flashing in on selection.
 var SS_CARD_STYLE = {
-  resonance:  { bg:'#f3f5f8', text:'#0a0e1a', sub:'rgba(10,14,26,.58)', accent:'#3f7ea6', chipBg:'rgba(63,126,166,.14)', restBorder:'rgba(10,14,26,.14)', glass:false },
+  resonance:  { bg:'#f3f5f8', text:'#0a0e1a', sub:'rgba(10,14,26,.58)', accent:'#3f7ea6', chipBg:'rgba(63,126,166,.14)', restBorder:'rgba(10,14,26,.14)', glass:false, flatText:true },
   frequency:  { bg:'#0c0c0e', text:'#ffffff', sub:'rgba(255,255,255,.55)', accent:'#e8d5a3', chipBg:'rgba(232,213,163,.16)', restBorder:'rgba(255,255,255,.14)', glass:false },
   frequencyX: { bg:'rgba(255,255,255,.05)', text:'#ffffff', sub:'rgba(255,255,255,.6)', accent:'#e8d5a3', chipBg:'rgba(232,213,163,.16)', restBorder:'rgba(232,213,163,.45)', glass:true }
 };
@@ -536,9 +540,10 @@ function ssRenderPlans() {
     var s = SS_CARD_STYLE[p.id] || SS_CARD_STYLE.frequency;
     var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? (p.price.yearly/12).toFixed(2) : p.price.monthly;
     var borderColor = isSel ? s.accent : s.restBorder;
+    var textColor = (isSel && !s.flatText) ? s.accent : s.text;
     html += '<div class="plan-card" data-plan-id="'+p.id+'" onclick="ssSelectPlan(\''+p.id+'\')" style="border:'+(isSel?'2px':'1px')+' solid '+borderColor+';background:'+s.bg+';backdrop-filter:'+(s.glass?'blur(18px)':'none')+';-webkit-backdrop-filter:'+(s.glass?'blur(18px)':'none')+';box-shadow:'+(isSel?'0 0 0 1px '+s.accent+'55, 0 8px 28px '+s.accent+'2e':'var(--glass-shadow)')+';">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
-    html += '<span class="plan-card-name" style="font-size:22px;font-weight:800;color:'+(isSel?s.accent:s.text)+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
+    html += '<span class="plan-card-name" style="font-size:22px;font-weight:800;color:'+textColor+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
     if (p.badge) html += '<span style="font-size:9px;font-weight:700;letter-spacing:.7px;color:'+s.accent+';background:'+s.chipBg+';padding:3px 8px;border-radius:5px;">'+p.badge.toUpperCase()+'</span>';
     if (isCur) html += '<span style="font-size:9px;color:#6ee7b7;background:rgba(110,231,183,.12);padding:3px 8px;border-radius:5px;font-weight:700;">CURRENT</span>';
     html += '</div>';
@@ -546,7 +551,7 @@ function ssRenderPlans() {
     if (p.price.monthly===0) {
       html += '<div class="plan-card-price" style="font-size:26px;font-weight:800;color:'+s.text+';font-family:\'DM Sans\',sans-serif;">Free</div>';
     } else {
-      html += '<div class="plan-card-price" style="font-size:26px;font-weight:800;color:'+(isSel?s.accent:s.text)+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:13px;font-weight:400;color:'+s.sub+';">/mo</span></div>';
+      html += '<div class="plan-card-price" style="font-size:26px;font-weight:800;color:'+textColor+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:13px;font-weight:400;color:'+s.sub+';">/mo</span></div>';
       if (_ssBilling==='yearly') html += '<div style="font-size:11px;color:'+s.sub+';font-family:\'DM Sans\',sans-serif;margin-top:2px;">$'+p.price.yearly+'/year</div>';
     }
     // Features — up to 7, same list on every card regardless of selection
@@ -586,7 +591,7 @@ function ssRenderCTA() {
   var ctaHtml = '';
   var curTier = window.GATE ? window.GATE.tier() : 'expired';
   var isCurrentPlan = curTier === plan.id;
-  var bgMap = { resonance:'linear-gradient(135deg,#a8d4e8,#7ab8d4)', frequency:'linear-gradient(135deg,#e8d5a3,#c8a96e)', frequencyX:'linear-gradient(135deg,#f0f0f0,#c8c8c8)' };
+  var bgMap = { resonance:'linear-gradient(135deg,#a8d4e8,#7ab8d4)', frequency:'linear-gradient(135deg,#e8d5a3,#c8a96e)', frequencyX:'linear-gradient(135deg,#f5e6b8,#c9a227)' };
   var planBg = bgMap[plan.id] || 'linear-gradient(135deg,#e8d5a3,#c8a96e)';
   var trialLabel = (curTier === 'trial' || curTier === 'expired')
     ? 'Start 15-Day Free Trial — then $' + ((_ssBilling==='yearly') ? plan.price.yearly + '/year' : plan.price.monthly + '/mo')
@@ -626,10 +631,11 @@ function ssPlanUpdateSelectionUI(container) {
       var isSel = id === _ssSelectedPlan;
       card.style.border = (isSel ? '2px' : '1px') + ' solid ' + (isSel ? s.accent : s.restBorder);
       card.style.boxShadow = isSel ? ('0 0 0 1px ' + s.accent + '55, 0 8px 28px ' + s.accent + '2e') : 'var(--glass-shadow)';
+      var textColor = (isSel && !s.flatText) ? s.accent : s.text;
       var nameEl = card.querySelector('.plan-card-name');
-      if (nameEl) nameEl.style.color = isSel ? s.accent : s.text;
+      if (nameEl) nameEl.style.color = textColor;
       var priceEl = card.querySelector('.plan-card-price');
-      if (priceEl) priceEl.style.color = isSel ? s.accent : s.text;
+      if (priceEl) priceEl.style.color = textColor;
     });
   }
   ssPlanUpdateDots();
