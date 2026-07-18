@@ -130,54 +130,109 @@
   function getWordTier() { try { return (typeof RM_WORD_TIER     !== 'undefined') ? RM_WORD_TIER     : {}; } catch (e) { return {}; } }
 
   var STORE_ICON_URL = 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png';
-  var _trendCycleTimer = null;
+  var _trendVidTimer = null;
+  var _trendShopTimer = null;
+  window._nwsbTrendPicks = [];
 
-  /* One trending word at a time, paired with the store icon — cycles
-     through the day's picks on a loop rather than listing them all at once.
-     Drives both the video banner AND the Shop Now banner below it, on both
-     normal and Fashion home, all in sync on the same word. */
+  function trendEyebrow(w) {
+    return 'Heals ' + (w.organ || w.benefit || '');
+  }
+
+  /* Video banner — one trending word at a time, paired with the store icon.
+     Runs on its own timer (see renderTrending) so it drifts independently
+     from the Shop Now banner below it. */
+  function paintTrendVideo(targets, picks, idx) {
+    var w = picks[idx % picks.length];
+    var wordSafe = String(w.word).replace(/'/g, '');
+    targets.forEach(function (t) {
+      t.box.innerHTML = '<div class="nmh-trend-banner-item" onclick="event.stopPropagation();nwsbOpenStoreWord(\'' + wordSafe + '\')">' +
+        '<div class="nmh-trend-banner-word">' + (w.word || '') + '</div>' +
+        '<img class="nmh-trend-banner-icon" decoding="async" loading="lazy" src="' + STORE_ICON_URL + '" alt="">' +
+      '</div>';
+      var item = t.box.querySelector('.nmh-trend-banner-item');
+      if (item) {
+        item.style.opacity = '0';
+        requestAnimationFrame(function () { item.style.opacity = '1'; });
+      }
+    });
+  }
+
+  /* Shop Now banner — dots let a person jump straight to any word's store
+     page; the active dot also tracks whichever word is currently showing. */
+  function paintTrendShop(shopTargets, picks, idx) {
+    var w = picks[idx % picks.length];
+    shopTargets.forEach(function (t) {
+      if (t.label) t.label.textContent = trendEyebrow(w);
+      if (t.word) {
+        t.word.textContent = w.word || '';
+        t.word.classList.remove('dash-in');
+        void t.word.offsetWidth;
+        t.word.classList.add('dash-in');
+      }
+      if (t.dots) {
+        var dots = t.dots.querySelectorAll('.nmh-trend-shop-dot');
+        for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('on', i === (idx % picks.length));
+      }
+    });
+  }
+
+  /* Tap a dot → jump every Shop Now banner to that word and open its store page. */
+  window.nwsbTrendDotTap = function (dotEl) {
+    var i = parseInt(dotEl.getAttribute('data-i'), 10);
+    var picks = window._nwsbTrendPicks || [];
+    var w = picks[i];
+    if (!w) return;
+    document.querySelectorAll('.nmh-trend-shop-banner').forEach(function (banner) {
+      var label = banner.querySelector('.nmh-trend-shop-label');
+      var word = banner.querySelector('.nmh-trend-shop-word');
+      var dots = banner.querySelector('.nmh-trend-shop-dots');
+      if (label) label.textContent = trendEyebrow(w);
+      if (word) { word.textContent = w.word || ''; word.classList.remove('dash-in'); void word.offsetWidth; word.classList.add('dash-in'); }
+      if (dots) {
+        var ds = dots.querySelectorAll('.nmh-trend-shop-dot');
+        for (var j = 0; j < ds.length; j++) ds[j].classList.toggle('on', j === i);
+      }
+    });
+    if (window.nwsbOpenStoreWord) nwsbOpenStoreWord(w.word);
+  };
+
   function renderTrending() {
     var targets = [
       { sec: document.getElementById('nmh-trending-section'),      box: document.getElementById('nmh-trending-text') },
       { sec: document.getElementById('nmh-trending-section-fash'), box: document.getElementById('nmh-trending-text-fash') }
     ].filter(function (t) { return t.sec && t.box; });
     var shopTargets = [
-      { sec: document.getElementById('nmh-trending-shop-banner'),      word: document.getElementById('nmh-trending-shop-word') },
-      { sec: document.getElementById('nmh-trending-shop-banner-fash'), word: document.getElementById('nmh-trending-shop-word-fash') }
+      { sec: document.getElementById('nmh-trending-shop-banner'),      label: document.getElementById('nmh-trending-shop-label'),      word: document.getElementById('nmh-trending-shop-word'),      dots: document.getElementById('nmh-trending-shop-dots') },
+      { sec: document.getElementById('nmh-trending-shop-banner-fash'), label: document.getElementById('nmh-trending-shop-label-fash'), word: document.getElementById('nmh-trending-shop-word-fash'), dots: document.getElementById('nmh-trending-shop-dots-fash') }
     ].filter(function (t) { return t.sec && t.word; });
     if (!targets.length && !shopTargets.length) return;
-    if (_trendCycleTimer) { clearInterval(_trendCycleTimer); _trendCycleTimer = null; }
+    if (_trendVidTimer)  { clearInterval(_trendVidTimer);  _trendVidTimer = null; }
+    if (_trendShopTimer) { clearInterval(_trendShopTimer); _trendShopTimer = null; }
     var picks = rotate(getLib(), 5, 0);
+    window._nwsbTrendPicks = picks;
     if (!picks.length) {
       targets.forEach(function (t) { t.sec.style.display = 'none'; });
       shopTargets.forEach(function (t) { t.sec.style.display = 'none'; });
       return;
     }
     targets.forEach(function (t) { t.sec.style.display = ''; });
-    shopTargets.forEach(function (t) { t.sec.style.display = ''; });
-    var idx = 0;
-    function paint() {
-      var w = picks[idx % picks.length];
-      idx++;
-      var wordSafe = String(w.word).replace(/'/g, '');
-      targets.forEach(function (t) {
-        t.box.innerHTML = '<div class="nmh-trend-banner-item" onclick="event.stopPropagation();nwsbOpenStoreWord(\'' + wordSafe + '\')">' +
-          '<div class="nmh-trend-banner-word">' + (w.word || '') + '</div>' +
-          '<img class="nmh-trend-banner-icon" decoding="async" loading="lazy" src="' + STORE_ICON_URL + '" alt="">' +
-        '</div>';
-        var item = t.box.querySelector('.nmh-trend-banner-item');
-        if (item) {
-          item.style.opacity = '0';
-          requestAnimationFrame(function () { item.style.opacity = '1'; });
-        }
-      });
-      shopTargets.forEach(function (t) {
-        t.word.style.opacity = '0';
-        setTimeout(function () { t.word.textContent = w.word || ''; t.word.style.opacity = '1'; }, 250);
-      });
-    }
-    paint();
-    _trendCycleTimer = setInterval(paint, 2400);
+    shopTargets.forEach(function (t) {
+      t.sec.style.display = '';
+      if (t.dots && !t.dots.dataset.built) {
+        t.dots.innerHTML = picks.map(function (_, i) {
+          return '<span class="nmh-trend-shop-dot" data-i="' + i + '" onclick="event.stopPropagation();nwsbTrendDotTap(this)"></span>';
+        }).join('');
+        t.dots.dataset.built = '1';
+      }
+    });
+
+    var vidIdx = 0;
+    paintTrendVideo(targets, picks, vidIdx);
+    _trendVidTimer = setInterval(function () { vidIdx++; paintTrendVideo(targets, picks, vidIdx); }, 2400);
+
+    var shopIdx = 0;
+    paintTrendShop(shopTargets, picks, shopIdx);
+    _trendShopTimer = setInterval(function () { shopIdx++; paintTrendShop(shopTargets, picks, shopIdx); }, 3000);
   }
 
   function renderOffers() {
