@@ -1759,6 +1759,15 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   flex: 0 0 100% !important; max-width: none; margin-bottom: 0 !important;
   scroll-snap-align: center; box-sizing: border-box; align-self: flex-start;
 }
+.ss-plan-dots {
+  display: flex !important; align-items: center; justify-content: center; gap: 6px;
+  margin: -8px 0 16px;
+}
+.ss-plan-dots .ss-plan-dot {
+  width: 6px; height: 6px; min-width: 0; min-height: 0; flex-shrink: 0;
+  border-radius: 50% !important; background: rgba(255,255,255,0.25); transition: all 0.25s; cursor: pointer;
+}
+.ss-plan-dots .ss-plan-dot.on { background: #e8d5a3; width: 18px; border-radius: 3px !important; }
 
 /* ── Hide scrollbars app-wide (scrolling still works via touch) ── */
 *::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }

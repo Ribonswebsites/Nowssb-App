@@ -455,11 +455,17 @@ function ssSyncProfile() {
   if (!nameEl) return;
   // Try reading from existing profile DOM
   var profileName  = document.getElementById('profileDisplayName');
-  var profileEmail = document.getElementById('profileEmail');
+  var profileEmail = document.getElementById('profileMainEmail');
   var isPro = (window._userDataCache && window._userDataCache.isPro);
   var tier = window.GATE ? window.GATE.tier() : ((window._userDataCache && window._userDataCache.tier) || (isPro ? 'pro' : 'free'));
   if (profileName  && profileName.textContent)  nameEl.textContent  = profileName.textContent;
-  if (profileEmail && profileEmail.textContent) emailEl.textContent = profileEmail.textContent;
+  // The signed-in email lives on the auth user / Firestore doc, not some
+  // dedicated DOM node — read it straight from those, falling back to the
+  // (also-populated) profile-panel email text if neither is ready yet.
+  var email = (window._currentUser && window._currentUser.email) ||
+              (window._userDataCache && window._userDataCache.email) ||
+              (profileEmail && profileEmail.textContent) || '';
+  if (email) emailEl.textContent = email;
   badgeEl.className = 'sub-badge ' + badgeClass(tier);
   badgeEl.textContent = badgeLabel(tier);
   // Appearance row
@@ -500,55 +506,85 @@ window.ssBilling = function(b) {
 window.ssSelectPlan = function(id) {
   _ssSelectedPlan = id;
   ssRenderPlans();
+  // A card tap can only ever target whatever's already on screen, but a dot
+  // tap deliberately jumps to a card that may be scrolled out of view — bring
+  // it into view too, or the scroll-sync observer would immediately see the
+  // still-visible old card and snap the selection right back to it.
+  var container = document.getElementById('ss-plan-cards');
+  var card = container && container.querySelector('.plan-card[data-plan-id="'+id+'"]');
+  if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+};
+
+// Each tier reads as its own distinct card, not a tinted variant of one
+// template: Resonance = white card, Frequency = black card, Frequency X =
+// gold-rimmed glass card (the top tier).
+var SS_CARD_STYLE = {
+  resonance:  { bg:'#f3f5f8', text:'#0a0e1a', sub:'rgba(10,14,26,.58)', accent:'#3f7ea6', chipBg:'rgba(63,126,166,.14)', restBorder:'rgba(10,14,26,.14)', glass:false },
+  frequency:  { bg:'#0c0c0e', text:'#ffffff', sub:'rgba(255,255,255,.55)', accent:'#e8d5a3', chipBg:'rgba(232,213,163,.16)', restBorder:'rgba(255,255,255,.14)', glass:false },
+  frequencyX: { bg:'rgba(255,255,255,.05)', text:'#ffffff', sub:'rgba(255,255,255,.6)', accent:'#e8d5a3', chipBg:'rgba(232,213,163,.16)', restBorder:'rgba(232,213,163,.45)', glass:true }
 };
 
 function ssRenderPlans() {
   var container = document.getElementById('ss-plan-cards');
-  var ctaEl     = document.getElementById('ss-plan-cta');
+  var dotsEl    = document.getElementById('ss-plan-dots');
   if (!container) return;
   var tier = window.GATE ? window.GATE.tier() : ((window._userDataCache && window._userDataCache.tier) || 'free');
   var html = '';
-  // Simple black cards — name, badge, tagline, price. No feature checklist.
   SS_PLANS.forEach(function(p) {
     var isSel = _ssSelectedPlan === p.id;
     var isCur = tier === p.id;
+    var s = SS_CARD_STYLE[p.id] || SS_CARD_STYLE.frequency;
     var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? (p.price.yearly/12).toFixed(2) : p.price.monthly;
-    var borderColor = isSel ? p.color : 'rgba(255,255,255,.22)';
-    // Each tier gets its own tinted glass card (Resonance pale blue, Frequency
-    // gold, Frequency X silver/white) instead of one uniform color for all three.
-    html += '<div class="plan-card" data-plan-id="'+p.id+'" onclick="ssSelectPlan(\''+p.id+'\')" style="border:1px solid '+borderColor+';background:'+p.color+'24;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--glass-shadow);">';
+    var borderColor = isSel ? s.accent : s.restBorder;
+    html += '<div class="plan-card" data-plan-id="'+p.id+'" onclick="ssSelectPlan(\''+p.id+'\')" style="border:'+(isSel?'2px':'1px')+' solid '+borderColor+';background:'+s.bg+';backdrop-filter:'+(s.glass?'blur(18px)':'none')+';-webkit-backdrop-filter:'+(s.glass?'blur(18px)':'none')+';box-shadow:'+(isSel?'0 0 0 1px '+s.accent+'55, 0 8px 28px '+s.accent+'2e':'var(--glass-shadow)')+';">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
-    html += '<span style="font-size:22px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
-    if (p.badge) html += '<span style="font-size:9px;font-weight:700;letter-spacing:.7px;color:'+p.color+';background:'+p.color+'18;padding:3px 8px;border-radius:5px;">'+p.badge.toUpperCase()+'</span>';
+    html += '<span class="plan-card-name" style="font-size:22px;font-weight:800;color:'+(isSel?s.accent:s.text)+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
+    if (p.badge) html += '<span style="font-size:9px;font-weight:700;letter-spacing:.7px;color:'+s.accent+';background:'+s.chipBg+';padding:3px 8px;border-radius:5px;">'+p.badge.toUpperCase()+'</span>';
     if (isCur) html += '<span style="font-size:9px;color:#6ee7b7;background:rgba(110,231,183,.12);padding:3px 8px;border-radius:5px;font-weight:700;">CURRENT</span>';
     html += '</div>';
-    html += '<div style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:18px;font-family:\'DM Sans\',sans-serif;">'+p.tagline+'</div>';
+    html += '<div style="font-size:13px;color:'+s.sub+';line-height:1.5;margin-bottom:18px;font-family:\'DM Sans\',sans-serif;">'+p.tagline+'</div>';
     if (p.price.monthly===0) {
-      html += '<div style="font-size:26px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;">Free</div>';
+      html += '<div class="plan-card-price" style="font-size:26px;font-weight:800;color:'+s.text+';font-family:\'DM Sans\',sans-serif;">Free</div>';
     } else {
-      html += '<div style="font-size:26px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:13px;font-weight:400;color:rgba(255,255,255,.52);">/mo</span></div>';
-      if (_ssBilling==='yearly') html += '<div style="font-size:11px;color:rgba(255,255,255,.52);font-family:\'DM Sans\',sans-serif;margin-top:2px;">$'+p.price.yearly+'/year</div>';
+      html += '<div class="plan-card-price" style="font-size:26px;font-weight:800;color:'+(isSel?s.accent:s.text)+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:13px;font-weight:400;color:'+s.sub+';">/mo</span></div>';
+      if (_ssBilling==='yearly') html += '<div style="font-size:11px;color:'+s.sub+';font-family:\'DM Sans\',sans-serif;margin-top:2px;">$'+p.price.yearly+'/year</div>';
     }
     // Features — up to 7, same list on every card regardless of selection
     html += '<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">';
     p.features.forEach(function(f) {
       var text = f[1];
       html += '<div style="display:flex;align-items:flex-start;gap:9px;">';
-      html += '<div style="width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:1px;background:'+p.color+'18;border:1.5px solid '+p.color+';display:flex;align-items:center;justify-content:center;">';
-      html += checkSvg(p.color);
+      html += '<div style="width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:1px;background:'+s.chipBg+';border:1.5px solid '+s.accent+';display:flex;align-items:center;justify-content:center;">';
+      html += checkSvg(s.accent);
       html += '</div>';
-      html += '<span style="font-size:12px;color:#fff;font-family:\'DM Sans\',sans-serif;line-height:1.4;">'+text+'</span>';
+      html += '<span style="font-size:12px;color:'+s.text+';font-family:\'DM Sans\',sans-serif;line-height:1.4;">'+text+'</span>';
       html += '</div>';
     });
     html += '</div>';
     html += '</div>';
   });
   container.innerHTML = html;
-  // CTA
+  if (dotsEl) {
+    dotsEl.innerHTML = SS_PLANS.map(function(p) {
+      return '<span class="ss-plan-dot" data-plan-id="'+p.id+'" onclick="ssSelectPlan(\''+p.id+'\')"></span>';
+    }).join('');
+  }
+  ssRenderCTA();
+  ssPlanBannerSync();
+  ssSubBgSync();
+  ssPlanUpdateDots();
+  ssPlanScrollSync(container);
+}
+
+// CTA is rebuilt on every plan-selection change (tap OR scroll) but never
+// needs to touch the card list itself, so it's split out from ssRenderPlans().
+function ssRenderCTA() {
+  var ctaEl = document.getElementById('ss-plan-cta');
+  if (!ctaEl) return;
   var plan = SS_PLANS.find(function(p){return p.id===_ssSelectedPlan;});
   if (!plan) plan = SS_PLANS[1]; // default to Frequency
   var ctaHtml = '';
-  var curTier = window.GATE ? window.GATE.tier() : (tier || 'expired');
+  var curTier = window.GATE ? window.GATE.tier() : 'expired';
   var isCurrentPlan = curTier === plan.id;
   var bgMap = { resonance:'linear-gradient(135deg,#a8d4e8,#7ab8d4)', frequency:'linear-gradient(135deg,#e8d5a3,#c8a96e)', frequencyX:'linear-gradient(135deg,#f0f0f0,#c8c8c8)' };
   var planBg = bgMap[plan.id] || 'linear-gradient(135deg,#e8d5a3,#c8a96e)';
@@ -563,18 +599,54 @@ function ssRenderPlans() {
   } else {
     ctaHtml = '<div style="text-align:center;padding:14px 0;font-size:13px;color:rgba(255,255,255,.38);font-family:\'DM Sans\',sans-serif;">This is your current plan</div>';
   }
-  if (ctaEl) ctaEl.innerHTML = ctaHtml;
+  ctaEl.innerHTML = ctaHtml;
+}
+
+function ssPlanUpdateDots() {
+  var dotsEl = document.getElementById('ss-plan-dots');
+  if (!dotsEl) return;
+  Array.from(dotsEl.querySelectorAll('.ss-plan-dot')).forEach(function(d) {
+    d.classList.toggle('on', d.getAttribute('data-plan-id') === _ssSelectedPlan);
+  });
+}
+
+// Lightweight selection sync used while the user is actively scrolling —
+// surgically restyles the EXISTING card/dot nodes in place (border, glow,
+// name/price color) instead of rebuilding #ss-plan-cards.innerHTML. A full
+// rebuild mid-gesture (what ssSelectPlan()/ssRenderPlans() do) replaces the
+// DOM nodes the browser is actively tracking touch/scroll momentum against,
+// which silently breaks native scrolling on real devices even though it
+// looks fine in an instant/scripted scrollLeft jump.
+function ssPlanUpdateSelectionUI(container) {
+  container = container || document.getElementById('ss-plan-cards');
+  if (container) {
+    Array.from(container.querySelectorAll('.plan-card')).forEach(function(card) {
+      var id = card.getAttribute('data-plan-id');
+      var s = SS_CARD_STYLE[id] || SS_CARD_STYLE.frequency;
+      var isSel = id === _ssSelectedPlan;
+      card.style.border = (isSel ? '2px' : '1px') + ' solid ' + (isSel ? s.accent : s.restBorder);
+      card.style.boxShadow = isSel ? ('0 0 0 1px ' + s.accent + '55, 0 8px 28px ' + s.accent + '2e') : 'var(--glass-shadow)';
+      var nameEl = card.querySelector('.plan-card-name');
+      if (nameEl) nameEl.style.color = isSel ? s.accent : s.text;
+      var priceEl = card.querySelector('.plan-card-price');
+      if (priceEl) priceEl.style.color = isSel ? s.accent : s.text;
+    });
+  }
+  ssPlanUpdateDots();
+  ssRenderCTA();
   ssPlanBannerSync();
   ssSubBgSync();
-  ssPlanScrollSync(container);
 }
 
 // Banner should track whichever card is actually in view while scrolling,
 // not just whichever was last tapped — a plain swipe without tapping a
 // card never used to update it. The observer instance is created once and
-// reused, but re-observing the current cards has to happen after EVERY
-// render since ssSelectPlan() rebuilds the whole card list (fresh DOM
-// elements each time — the old observed nodes are gone).
+// reused, but re-observing the current cards has to happen after every FULL
+// render (tap/billing change), since those rebuild the card list — fresh
+// DOM elements each time, so the old observed nodes are gone. Scroll-driven
+// selection changes go through the lightweight surgical update above and
+// never touch container.innerHTML, so the observer's own nodes stay valid
+// and native scroll momentum is never interrupted mid-gesture.
 function ssPlanScrollSync(container) {
   if (typeof IntersectionObserver === 'undefined') return;
   if (!container._ssIO) {
@@ -585,7 +657,10 @@ function ssPlanScrollSync(container) {
       });
       if (!best) return;
       var id = best.target.getAttribute('data-plan-id');
-      if (id && id !== _ssSelectedPlan) ssSelectPlan(id);
+      if (id && id !== _ssSelectedPlan) {
+        _ssSelectedPlan = id;
+        ssPlanUpdateSelectionUI(container);
+      }
     }, { root: container, threshold: [0.5, 0.6, 0.7, 0.8, 0.9, 1] });
   }
   container._ssIO.disconnect();
