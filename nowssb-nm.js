@@ -92,7 +92,9 @@
   function patchIntros() {
     if (typeof window.shouldShowIntro !== 'function') { return setTimeout(patchIntros, 150); }
     window.shouldShowIntro = function (key) {
-      if (document.body.classList.contains('nm-mode')) return false; /* skip straight to content */
+      /* Daily Practice (routine) intro is exempt — it must behave identically
+         in normal home and Fashion home, not get silently skipped here. */
+      if (key !== 'routine' && document.body.classList.contains('nm-mode')) return false; /* skip straight to content */
       var mode; try { mode = localStorage.getItem('nwsb_intros'); } catch (e) {}
       if (mode === 'off') return false;
       /* Show each intro ONCE per app session (resets only on full close + reopen) */
