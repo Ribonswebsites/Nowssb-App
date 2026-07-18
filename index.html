@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=297">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=356">
+<link rel="stylesheet" href="nowssb-nm.css?v=357">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -6316,6 +6316,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         Yearly <span style="font-size:10px;background:rgba(110,231,183,.12);color:#6ee7b7;padding:2px 7px;border-radius:5px;font-weight:700;">Save 30%</span>
       </button>
     </div>
+    <!-- Plan banner — video, text on the right-middle like Today's Trending -->
+    <div class="ss-plan-banner" id="ssPlanBanner">
+      <video class="ss-plan-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784378125/grok_video_2026-07-18-18-04-01_zr8f4m.mp4"></video>
+      <div class="ss-plan-banner-fade"></div>
+      <div class="ss-plan-banner-text" id="ssPlanBannerText"></div>
+    </div>
+
     <!-- Plan cards rendered by JS — 3D coverflow -->
     <div id="ss-plan-cards"></div>
     <div id="ss-plan-dots"></div>
@@ -6634,7 +6641,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-wrap -->
 </div><!-- /sub-social -->
 
-<script src="app/js/part032.js?v=214"></script>
+<script src="app/js/part032.js?v=215"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      NOWSSB SOCIAL — People / Explore / Search / Profile / Social Home

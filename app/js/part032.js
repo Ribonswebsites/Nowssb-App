@@ -587,10 +587,13 @@ function ssRenderPlans() {
 // Background picker's fbgCfg/fbgPaint (part047.js). Re-run after every
 // ssRenderPlans() since the DOM is fully rebuilt each time. ──
 function ssPlanCfg(s) {
+  // Cards here are wider/text-heavy (250px) vs the 170px image cards this
+  // pattern was copied from — no Z-boost on the active card, or it balloons
+  // to swallow the whole screen. Scale alone signals "active".
   var a = Math.abs(s), d = s < 0 ? -1 : 1;
-  if (a === 0) return {tx: 0,     tz: 200,  ry: 0,     sc: 1.00, op: 1.00, zi: 20};
-  if (a === 1) return {tx: d*230, tz: -10,  ry: d*-28, sc: 0.76, op: 0.55, zi: 15};
-  return             {tx: d*360, tz: -155, ry: d*-46, sc: 0.5,  op: 0.15, zi: 10};
+  if (a === 0) return {tx: 0,     tz: 0,    ry: 0,     sc: 1.00, op: 1.00, zi: 20};
+  if (a === 1) return {tx: d*150, tz: -50,  ry: d*-24, sc: 0.7,  op: 0.4,  zi: 15};
+  return             {tx: d*230, tz: -120, ry: d*-38, sc: 0.45, op: 0.12, zi: 10};
 }
 function ssPlanCoverflowPaint(container) {
   var cards = Array.from(container.querySelectorAll('.plan-card'));
@@ -631,6 +634,13 @@ function ssPlanCoverflowPaint(container) {
       var next = ((idx + (dx < 0 ? 1 : -1)) % SS_PLANS.length + SS_PLANS.length) % SS_PLANS.length;
       ssSelectPlan(SS_PLANS[next].id);
     }, {passive: true});
+  }
+  // Plan banner (video, text right-middle) — mirrors whichever plan is centered
+  var bannerText = document.getElementById('ssPlanBannerText');
+  if (bannerText) {
+    var activePlan = SS_PLANS[activeIdx];
+    var priceStr = (_ssBilling === 'yearly') ? '$' + activePlan.price.yearly + '/year' : '$' + activePlan.price.monthly + '/mo';
+    bannerText.innerHTML = '<div class="ss-plan-banner-name">' + activePlan.name + '</div><div class="ss-plan-banner-price">' + priceStr + '</div>';
   }
 }
 
