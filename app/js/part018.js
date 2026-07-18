@@ -417,7 +417,15 @@ function renderRoutineDetail_inline() {
 
 function rtIntroEnter(id) { rtStartSession(id); }
 
-function rtIntroSkip() { openSub('routine-detail'); setTimeout(renderRoutineDetail, 60); }
+function rtIntroSkip() {
+  // Close 'routines' too (same pattern as rtStartSession) — it still has the
+  // "1 Sacred <name>" intro rendered inside #routinesBody, so leaving it open
+  // meant pressing back from routine-detail revealed that stale intro
+  // instead of the actual routines list.
+  closeSub('routines');
+  openSub('routine-detail');
+  setTimeout(renderRoutineDetail, 60);
+}
 
 function rtToggleActivate(el) {
   var thumb = el.querySelector('div');
@@ -515,10 +523,10 @@ function renderRoutineDetail() {
         <div class="rt-banner-img" style="background-image:url('${bannerUrl}');"></div>
         <div class="rt-banner-fade"></div>
         <div class="rtd-header" style="position:absolute;top:0;left:0;right:0;">
-          <button onclick="closeSub('routine-detail')" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;">
+          <button onclick="closeSub('routine-detail');openSub('routines');" style="width:34px;height:34px;min-width:34px !important;min-height:34px !important;border-radius:50% !important;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.65)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/></svg>
           </button>
-          <button onclick="closeSub('routine-detail');setTimeout(renderRoutines,60);" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:100px;cursor:pointer;padding:6px 14px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.65);">
+          <button onclick="closeSub('routine-detail');openSub('routines');" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:100px;cursor:pointer;padding:6px 14px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.65);">
             <svg width="12" height="10" viewBox="0 0 14 12" fill="none"><path d="M1 1H13M1 6H10M1 11H7" stroke="rgba(255,255,255,0.65)" stroke-width="1.4" stroke-linecap="square"/></svg>
             My Routines
           </button>
