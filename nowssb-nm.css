@@ -1047,6 +1047,8 @@ body.nm-mode:not(.nwsb-soc-glass) #sub-social-home .ig-userrow .ig-n { color: rg
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-banner:not([style*="url"]) { background: linear-gradient(160deg, #e8eef7 0%, #dfe6f2 55%, #f0f2f7 100%) !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-top { background: #f0f2f7 !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-name { color: #1a1a2e !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-vshop-title { color: #1a1a2e !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-vshop-sub { color: rgba(26,26,46,0.55) !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-cat { color: #a8854a !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-bio,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-biotext { color: rgba(0,0,0,0.7) !important; }
@@ -3596,6 +3598,8 @@ html body.nwsb-soc-glass #sub-ig-profile .ig-stat {
 html body.nwsb-soc-glass #sub-ig-profile .ig-stat .n { color: #fff !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-stat .l { color: rgba(255,255,255,0.62) !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-name { color: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-vshop-title { color: #fff !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-vshop-sub { color: rgba(255,255,255,0.45) !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-cat { color: rgba(255,255,255,0.66) !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray,
 html body.nwsb-soc-glass #sub-ig-profile .ig-btn.icon {
@@ -3923,7 +3927,14 @@ html body.nwsb-soc-glass.nwsb-custom-connect-bg #sub-ig-feed {
 }
 /* My Profile (#sub-ig-profile) — same Connect background, very low
    visibility (0.16 opacity on #igProfileBgLayer, see index.html). No
-   selection yet = no background-image, plain #000 shows through untouched. */
+   selection yet = no background-image, plain #000 shows through untouched.
+   Fashion (glass) theme ONLY — the neumorphism theme must never be touched
+   by this at all, not even the .sub-screen-bg::after dark gradient that
+   normally comes free with that shared class, since neumorphism is a
+   completely different, plain-light-background design. */
+html body:not(.nwsb-soc-glass) #igProfileBgLayer {
+  display: none !important;
+}
 html body.nwsb-soc-glass.nwsb-custom-connect-bg #igProfileBgLayer {
   background-image: var(--nwsb-connect-bg-url) !important;
 }
