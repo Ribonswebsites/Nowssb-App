@@ -34,18 +34,10 @@ var SS_PLANS = [
       [true, 'Unlimited words per day'],
       [true, 'All 5 player modes (Listen, Repeat, Speak, Library, AI)'],
       [true, 'AI pronunciation scoring'],
-      [true, 'Session sentence builder from owned words'],
       [true, 'All 20 health categories'],
-      [true, 'AI persona feedback after each session'],
       [true, 'AI daily word prescription'],
-      [true, 'Chat with community members — all 5 routine slots'],
-      [true, 'Word Mastery Certificates (standard)'],
       [true, 'The Word Atelier — acquire up to 10 words/month'],
       [true, 'Enhanced profile (bio, banner)'],
-      [false,'Voice Resonance Score overlay'],
-      [false,'Sentence Alchemy (personalised AI)'],
-      [false,'Premium certificate designs + export'],
-      [false,'Custom word requests'],
     ]
   },
   {
@@ -57,15 +49,10 @@ var SS_PLANS = [
       [true, 'Everything in Resonance'],
       [true, 'Voice Resonance Score'],
       [true, 'Sentence Alchemy — personalised AI sentences'],
-      [true, 'All AI personas + exclusive ones'],
       [true, 'Full AI Conversation with session memory'],
       [true, 'Premium certificate designs + export'],
-      [true, 'Featured in community search'],
       [true, 'Priority chat + exclusive community access'],
-      [true, 'Custom word requests — 2 per month'],
-      [true, 'Unlimited Word Atelier acquisitions'],
       [true, 'Healing Body Map — full organ tracking'],
-      [true, 'Early access to new health categories'],
     ]
   },
   {
@@ -78,11 +65,8 @@ var SS_PLANS = [
       [true, 'Custom words — 5 requests/month (team-crafted)'],
       [true, 'Word Drop — 48h early access before anyone'],
       [true, 'Premium studio-quality voice'],
-      [true, 'Physical certificate printing (posted to you)'],
       [true, '1:1 monthly Shabdapathy session (video call)'],
-      [true, 'Exclusive Frequency X community (private)'],
       [true, 'Profile badge: Frequency X (gold + verified)'],
-      [true, 'All future elite features — first access, always'],
       [true, 'Premium support (24h response)'],
     ]
   },
@@ -530,13 +514,25 @@ function ssRenderPlans() {
     if (p.badge) html += '<span style="font-size:9px;font-weight:700;letter-spacing:.7px;color:'+p.color+';background:'+p.color+'18;padding:3px 8px;border-radius:5px;">'+p.badge.toUpperCase()+'</span>';
     if (isCur) html += '<span style="font-size:9px;color:#6ee7b7;background:rgba(110,231,183,.12);padding:3px 8px;border-radius:5px;font-weight:700;">CURRENT</span>';
     html += '</div>';
-    html += '<div style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:20px;font-family:\'DM Sans\',sans-serif;">'+p.tagline+'</div>';
+    html += '<div style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:18px;font-family:\'DM Sans\',sans-serif;">'+p.tagline+'</div>';
     if (p.price.monthly===0) {
       html += '<div style="font-size:26px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;">Free</div>';
     } else {
       html += '<div style="font-size:26px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:13px;font-weight:400;color:rgba(255,255,255,.52);">/mo</span></div>';
       if (_ssBilling==='yearly') html += '<div style="font-size:11px;color:rgba(255,255,255,.52);font-family:\'DM Sans\',sans-serif;margin-top:2px;">$'+p.price.yearly+'/year</div>';
     }
+    // Features — up to 7, same list on every card regardless of selection
+    html += '<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">';
+    p.features.forEach(function(f) {
+      var text = f[1];
+      html += '<div style="display:flex;align-items:flex-start;gap:9px;">';
+      html += '<div style="width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:1px;background:'+p.color+'18;border:1.5px solid '+p.color+';display:flex;align-items:center;justify-content:center;">';
+      html += checkSvg(p.color);
+      html += '</div>';
+      html += '<span style="font-size:12px;color:#fff;font-family:\'DM Sans\',sans-serif;line-height:1.4;">'+text+'</span>';
+      html += '</div>';
+    });
+    html += '</div>';
     html += '</div>';
   });
   container.innerHTML = html;
@@ -567,13 +563,13 @@ function ssRenderPlans() {
 // Background picker's fbgCfg/fbgPaint (part047.js). Re-run after every
 // ssRenderPlans() since the DOM is fully rebuilt each time. ──
 function ssPlanCfg(s) {
-  // Cards here are wider/text-heavy (250px) vs the 170px image cards this
-  // pattern was copied from — no Z-boost on the active card, or it balloons
-  // to swallow the whole screen. Scale alone signals "active".
+  // Exact same numbers as fbgCfg (part047.js) — card width matched to 170px
+  // to match, so this produces the identical proportions/depth as the
+  // Fashion Background picker instead of an adapted approximation.
   var a = Math.abs(s), d = s < 0 ? -1 : 1;
-  if (a === 0) return {tx: 0,     tz: 0,    ry: 0,     sc: 1.00, op: 1.00, zi: 20};
-  if (a === 1) return {tx: d*150, tz: -50,  ry: d*-24, sc: 0.7,  op: 0.4,  zi: 15};
-  return             {tx: d*230, tz: -120, ry: d*-38, sc: 0.45, op: 0.12, zi: 10};
+  if (a === 0) return {tx: 0,     tz: 200,  ry: 0,     sc: 1.00, op: 1.00, zi: 20};
+  if (a === 1) return {tx: d*172, tz: -10,  ry: d*-28, sc: 0.78, op: 0.68, zi: 15};
+  return             {tx: d*290, tz: -155, ry: d*-50, sc: 0.52, op: 0.22, zi: 10};
 }
 function ssPlanCoverflowPaint(container) {
   var cards = Array.from(container.querySelectorAll('.plan-card'));
