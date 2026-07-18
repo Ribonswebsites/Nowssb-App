@@ -3921,6 +3921,12 @@ html body.nwsb-soc-glass.nwsb-custom-connect-bg #sub-ig-feed {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
     var(--nwsb-connect-bg-url) center/cover no-repeat !important;
 }
+/* My Profile (#sub-ig-profile) — same Connect background, very low
+   visibility (0.16 opacity on #igProfileBgLayer, see index.html). No
+   selection yet = no background-image, plain #000 shows through untouched. */
+html body.nwsb-soc-glass.nwsb-custom-connect-bg #igProfileBgLayer {
+  background-image: var(--nwsb-connect-bg-url) !important;
+}
 
 /* ═══ POST VIEWER (#nwsb-postviewer) — glassmorphism under Fashion/glass theme ═══
    Built entirely in JS (part033.js openExplorePost) with its own injected

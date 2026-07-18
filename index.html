@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=287">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=344">
+<link rel="stylesheet" href="nowssb-nm.css?v=345">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -6664,6 +6664,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ── PROFILE SUB-SCREEN ── -->
 <div class="sub-screen ig" id="sub-ig-profile">
+  <!-- Same background the user picked in Connect Home Background, very
+       low visibility — nothing shows until they've actually selected one. -->
+  <div class="sub-screen-bg" id="igProfileBgLayer" style="opacity:0.16;"></div>
   <div class="ig-topbar">
     <button class="ig-iconbtn" id="ig-prof-back" onclick="IG.closeProfile()" style="display:none;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
@@ -6828,11 +6831,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <button onclick="nwsbCloseConnectBgPanel()" aria-label="Back" style="width:34px;height:34px;min-width:34px !important;min-height:34px !important;border-radius:50% !important;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
-        <span style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.55);font-family:'DM Sans',sans-serif;font-weight:700;">NowssB Connect Background</span>
+        <div style="font-size:20px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Connect Background</div>
       </div>
-      <div style="padding-top:20px;">
-        <div style="font-size:26px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Background</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.4);font-family:'DM Sans',sans-serif;margin-top:4px;line-height:1.4;">Tap a background to preview, tap again to apply. NowssB Fashion theme only.</div>
+      <div style="display:flex;align-items:center;gap:14px;padding-top:20px;">
+        <div style="width:48px;height:48px;border-radius:12px;overflow:hidden;border:1px solid rgba(232,213,163,0.3);flex-shrink:0;">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+        </div>
+        <div style="min-width:0;">
+          <div style="font-size:15px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Choose Your Backdrop</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;margin-top:2px;line-height:1.4;">Tap a background to preview, tap again to apply. NowssB Fashion theme only.</div>
+        </div>
       </div>
     </div>
 
@@ -7552,8 +7560,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
       <!-- Icon + text row -->
       <div style="display:flex;align-items:center;gap:14px;padding-top:20px;">
-        <div style="width:48px;height:48px;border-radius:12px;background:rgba(232,213,163,0.12);border:1px solid rgba(232,213,163,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div style="width:48px;height:48px;border-radius:12px;overflow:hidden;border:1px solid rgba(232,213,163,0.3);flex-shrink:0;">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div style="min-width:0;">
           <div style="font-size:15px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Choose Your Backdrop</div>
@@ -7703,7 +7711,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=221"></script>
+<script src="app/js/part042.js?v=222"></script>
 
 
 

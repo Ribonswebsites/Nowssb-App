@@ -129,7 +129,7 @@
       </div>
       <div class="sr last" onclick="SS.open('fashionbg')">
         <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_0000000024dc72068ec5c996ab6c1eb4_omvzjk.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Fashion Background</div><div class="sr-sub">Backdrop for the Fashion home</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
