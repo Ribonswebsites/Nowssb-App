@@ -1049,6 +1049,14 @@ body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-top { background: #f0f2f7 !im
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-name { color: #1a1a2e !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-vshop-title { color: #1a1a2e !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-vshop-sub { color: rgba(26,26,46,0.55) !important; }
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-vshop-pill {
+  background: #f0f2f7 !important;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.12), -3px -3px 8px rgba(255,255,255,0.95) !important;
+}
+body:not(.nwsb-soc-glass) #sub-ig-profile .ig-vshop-dimple {
+  background: #f0f2f7 !important;
+  box-shadow: inset 3px 3px 6px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.9) !important;
+}
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-cat { color: #a8854a !important; }
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-bio,
 body:not(.nwsb-soc-glass) #sub-ig-profile .ig-prof-biotext { color: rgba(0,0,0,0.7) !important; }
@@ -3600,6 +3608,15 @@ html body.nwsb-soc-glass #sub-ig-profile .ig-stat .l { color: rgba(255,255,255,0
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-name { color: #fff !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-vshop-title { color: #fff !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-vshop-sub { color: rgba(255,255,255,0.45) !important; }
+html body.nwsb-soc-glass #sub-ig-profile .ig-vshop-pill {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  box-shadow: none !important;
+}
+html body.nwsb-soc-glass #sub-ig-profile .ig-vshop-dimple {
+  background: rgba(0,0,0,0.25) !important;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.4) !important;
+}
 html body.nwsb-soc-glass #sub-ig-profile .ig-prof-cat { color: rgba(255,255,255,0.66) !important; }
 html body.nwsb-soc-glass #sub-ig-profile .ig-btn.gray,
 html body.nwsb-soc-glass #sub-ig-profile .ig-btn.icon {

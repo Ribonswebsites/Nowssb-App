@@ -225,7 +225,9 @@
     var fnEl = $('ig-prof-fullname');
     if(fnEl){
       var vtier = verifyTierOf(p);
-      fnEl.innerHTML = (p.fullName || '') + (vtier ? '<span style="cursor:pointer" onclick="IG.openVerify()">'+verifyBadgeImg(vtier, 22)+'</span>' : (p.self ? ' <span onclick="IG.openVerify()" style="cursor:pointer;font-size:12px;font-weight:700;color:#a8854a;margin-left:6px;vertical-align:1px;">Get Verified ✓</span>' : ''));
+      // "Get Verified" prompt for self removed — the dedicated Shop Verified
+      // pill above the name already covers that, this was redundant.
+      fnEl.innerHTML = (p.fullName || '') + (vtier ? '<span style="cursor:pointer" onclick="IG.openVerify()">'+verifyBadgeImg(vtier, 22)+'</span>' : '');
     }
     $('ig-prof-category').textContent = p.category||'';
     $('ig-prof-biotext').textContent = p.bio||'';

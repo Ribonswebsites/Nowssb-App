@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
-<link rel="stylesheet" href="app/app.css?v=288">
+<link rel="stylesheet" href="app/app.css?v=289">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=346">
+<link rel="stylesheet" href="nowssb-nm.css?v=347">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -6697,11 +6697,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div class="ig-stat"><div class="n" id="ig-prof-score">0</div><div class="l">score</div></div>
         </div>
       </div>
-      <div id="ig-prof-vshop" onclick="if(window.IG&&IG.openVerify)IG.openVerify()" style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:10px 0 4px;cursor:pointer;">
-        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt="Shop Verified" style="width:44px;height:44px;object-fit:contain;flex-shrink:0;">
-        <div style="text-align:right;">
-          <div class="ig-vshop-title" style="font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;">Shop Verified</div>
-          <div class="ig-vshop-sub" style="font-size:11px;font-family:'DM Sans',sans-serif;">Get your verified badge</div>
+      <div style="display:flex;justify-content:flex-end;margin:10px 0 4px;">
+        <div id="ig-prof-vshop" class="ig-vshop-pill" onclick="if(window.IG&&IG.openVerify)IG.openVerify()">
+          <div class="ig-vshop-dimple">
+            <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt="Shop Verified" style="width:20px;height:20px;object-fit:contain;">
+          </div>
+          <div style="text-align:left;">
+            <div class="ig-vshop-title" style="font-family:'DM Sans',sans-serif;">Shop Verified</div>
+            <div class="ig-vshop-sub" style="font-family:'DM Sans',sans-serif;">Get your verified badge</div>
+          </div>
         </div>
       </div>
       <div class="ig-prof-name" id="ig-prof-fullname"></div>
@@ -6933,7 +6937,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 
-<script src="app/js/part033.js?v=221"></script>
+<script src="app/js/part033.js?v=222"></script>
 
 
 
