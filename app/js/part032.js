@@ -518,46 +518,26 @@ function ssRenderPlans() {
   if (!container) return;
   var tier = window.GATE ? window.GATE.tier() : ((window._userDataCache && window._userDataCache.tier) || 'free');
   var html = '';
+  // Simple black cards — name, badge, tagline, price. No feature checklist.
   SS_PLANS.forEach(function(p) {
     var isSel = _ssSelectedPlan === p.id;
     var isCur = tier === p.id;
     var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? (p.price.yearly/12).toFixed(2) : p.price.monthly;
     var borderColor = isSel ? p.color : 'rgba(255,255,255,.08)';
-    var bg = isSel ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)';
-    html += '<div class="plan-card" onclick="ssSelectPlan(\''+p.id+'\')" style="border-color:'+borderColor+';background:'+bg+';">';
-    // glow
-    if (isSel) html += '<div style="position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:'+p.color+';opacity:.07;filter:blur(25px);pointer-events:none;"></div>';
-    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">';
-    html += '<div>';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">';
-    html += '<span style="font-size:17px;font-weight:700;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
+    html += '<div class="plan-card" onclick="ssSelectPlan(\''+p.id+'\')" style="border-color:'+borderColor+';background:#000;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
+    html += '<span style="font-size:22px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
     if (p.badge) html += '<span style="font-size:9px;font-weight:700;letter-spacing:.7px;color:'+p.color+';background:'+p.color+'18;padding:3px 8px;border-radius:5px;">'+p.badge.toUpperCase()+'</span>';
     if (isCur) html += '<span style="font-size:9px;color:#6ee7b7;background:rgba(110,231,183,.12);padding:3px 8px;border-radius:5px;font-weight:700;">CURRENT</span>';
     html += '</div>';
-    html += '<div style="font-size:11px;color:rgba(255,255,255,.52);max-width:180px;line-height:1.4;font-family:\'DM Sans\',sans-serif;">'+p.tagline+'</div>';
-    html += '</div>';
-    html += '<div style="text-align:right;flex-shrink:0;">';
+    html += '<div style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:20px;font-family:\'DM Sans\',sans-serif;">'+p.tagline+'</div>';
     if (p.price.monthly===0) {
-      html += '<div style="font-size:22px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;">Free</div>';
+      html += '<div style="font-size:26px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;">Free</div>';
     } else {
-      html += '<div style="font-size:22px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,.52);">/mo</span></div>';
-      if (_ssBilling==='yearly') html += '<div style="font-size:10px;color:rgba(255,255,255,.52);font-family:\'DM Sans\',sans-serif;">$'+p.price.yearly+'/year</div>';
+      html += '<div style="font-size:26px;font-weight:800;color:'+(isSel?p.color:'#fff')+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:13px;font-weight:400;color:rgba(255,255,255,.52);">/mo</span></div>';
+      if (_ssBilling==='yearly') html += '<div style="font-size:11px;color:rgba(255,255,255,.52);font-family:\'DM Sans\',sans-serif;margin-top:2px;">$'+p.price.yearly+'/year</div>';
     }
-    html += '</div></div>';
-    // Features
-    html += '<div style="margin-top:14px;display:flex;flex-direction:column;gap:7px;">';
-    var feats = isSel ? p.features : p.features.slice(0,4);
-    feats.forEach(function(f) {
-      var on = f[0]; var text = f[1];
-      html += '<div style="display:flex;align-items:flex-start;gap:9px;opacity:'+(on?1:0.3)+';">';
-      html += '<div style="width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:1px;background:'+(on?p.color+'18':'transparent')+';border:1.5px solid '+(on?p.color:'rgba(255,255,255,.08)')+';display:flex;align-items:center;justify-content:center;">';
-      if (on) html += checkSvg(p.color);
-      html += '</div>';
-      html += '<span style="font-size:12px;color:'+(on?'#fff':'rgba(255,255,255,.52)')+';font-family:\'DM Sans\',sans-serif;line-height:1.4;">'+text+'</span>';
-      html += '</div>';
-    });
-    if (!isSel && p.features.length>4) html += '<div style="font-size:11px;color:rgba(255,255,255,.52);font-family:\'DM Sans\',sans-serif;margin-top:2px;">+'+(p.features.length-4)+' more included</div>';
-    html += '</div></div>';
+    html += '</div>';
   });
   container.innerHTML = html;
   // CTA
