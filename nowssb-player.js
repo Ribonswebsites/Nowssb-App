@@ -261,7 +261,7 @@
        settings icon in the middle with the options in a glass circle around it. */
     var wInfo =
       '<div class="lgp-arc-bottom">' +
-        '<div class="lgp-arc-banner"><div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.brand + '\')"></div><div class="lgp-info-banner-divider"></div><div class="lgp-info-banner-text">NowssB Player</div></div>' +
+        '<div class="lgp-arc-banner"><div class="lgp-arc-banner-icon" style="background-image:url(\'' + IC.brand + '\')"></div><div class="lgp-arc-banner-divider"></div><div class="lgp-arc-banner-text" id="lgpArcBannerText"></div></div>' +
         '<div class="lgp-arc-info">' +
           '<div class="lgp-arc-info-word">' + (w.word || '') + (w.phonetic ? ' <span>' + w.phonetic + '</span>' : '') + '</div>' +
           (w.meaning ? '<div class="lgp-arc-info-row"><span class="k">Meaning</span><span class="v">' + w.meaning + '</span></div>' : '') +
@@ -273,7 +273,8 @@
       '<div class="lgp-arc" id="lgpArc" style="--lg-accent:' + th.accent + '">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
         '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
-        '<div class="lgp-arc-brand"><span class="lgp-arc-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-arc-brand-txt">NowssB Player</span></div>' +
+        '<div class="lgp-arc-brand"><span class="lgp-arc-brand-txt">NowssB Player</span></div>' +
+        '<span class="lgp-arc-brand-ico-corner" style="background-image:url(\'' + IC.brand + '\')"></span>' +
         '<div class="lgp-arc-radial">' +
           '<div class="lgp-arc-ring"></div>' +
           '<button class="lgp-arc-opt o1" onclick="pwSetVoice&&pwSetVoice(\'' + (voice === 'F' ? 'M' : 'F') + '\');renderPractice&&renderPractice()"><span class="lbl">Voice</span><span class="val">' + (voice === 'F' ? 'Female' : 'Male') + '</span></button>' +
@@ -351,7 +352,7 @@
           '<button class="lgp-back lgp-imgbtn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
             '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
           '</button>' +
-          '<div class="lgp-brand">NowssB</div>' +
+          '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
           '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
             '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
           '</button>' +
@@ -456,6 +457,33 @@
       var tmp = document.createElement('div');
       tmp.innerHTML = arc;
       document.body.appendChild(tmp.firstChild);
+
+      /* Banner cycles through the actual practice procedure, one step at a
+         time — same immediate-then-animated paint pattern as the main
+         banner, so it's never caught mid-animation looking blank. */
+      (function () {
+        var el = document.getElementById('lgpArcBannerText');
+        if (!el) return;
+        var steps = ['Listen', 'Speak', 'Learn', 'Heal', 'Check your Score'];
+        var i = 0;
+        function paint(animate) {
+          el.textContent = steps[i % steps.length];
+          el.classList.remove('dash-in');
+          if (animate) {
+            el.style.opacity = ''; el.style.transform = ''; el.style.animation = '';
+            void el.offsetWidth;
+            el.classList.add('dash-in');
+          } else {
+            el.style.animation = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+          }
+          i++;
+        }
+        paint(false);
+        if (window._lgpArcBannerTimer) clearInterval(window._lgpArcBannerTimer);
+        window._lgpArcBannerTimer = setInterval(function () { paint(true); }, 2200);
+      })();
     }
 
     /* Same reasoning as the arc — the info panel must live outside .sub-screen's
@@ -603,6 +631,7 @@
       rad.style.opacity = willOpen ? '1' : '0';
       rad.style.transform = 'translate(-50%,-50%) scale(' + (willOpen ? '1' : '.55') + ')';
     }
+    if (!willOpen && window._lgpArcBannerTimer) { clearInterval(window._lgpArcBannerTimer); window._lgpArcBannerTimer = null; }
   };
 
   window.lgpToggleInfo = function (forceOpen) {
