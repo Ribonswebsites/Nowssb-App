@@ -4219,7 +4219,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
 
         <!-- Subscription — links straight into the existing plans panel -->
-        <div class="nss-mini-card" onclick="nssOpenSub('social'); setTimeout(function(){ if (typeof ssOpenPanel==='function') ssOpenPanel('subscription'); }, 100);">
+        <div class="nss-mini-card" onclick="if(window.SS)SS.open('subscription');">
           <div class="nss-mini-card-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l2-9 4 5 3-7 3 7 4-5 2 9z"/></svg>
           </div>
