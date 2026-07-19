@@ -412,6 +412,7 @@ function nssOpenSub(id) {
     if (msVid) { msVid.muted = true; msVid.play().catch(function(){}); }
     if (typeof msRenderStore   === 'function') setTimeout(msRenderStore,   80);
     if (typeof msInitParallax  === 'function') setTimeout(msInitParallax, 200);
+    if (typeof window.nwsbMaybeShowLocationPrompt === 'function') setTimeout(window.nwsbMaybeShowLocationPrompt, 900);
   }
   // Init real-meaning (Word Store)
   if (id === 'real-meaning') {

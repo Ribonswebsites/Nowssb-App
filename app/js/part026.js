@@ -2,6 +2,14 @@
 (function(){
 'use strict';
 
+/* Meaning Store prices are stored natively in INR (e.g. 49 = ₹49). Display
+   converts to the user's detected local currency when available (see
+   part052.js) — the raw INR number is still what's added to cart/charged. */
+function msMoneyLabel(inr) {
+  if (typeof window.nwsbFormatINR === 'function') return window.nwsbFormatINR(inr);
+  return '₹' + inr;
+}
+
 /* ── DATA ── */
 var MS_BASE_MEANINGS = [
   // Elements
@@ -116,25 +124,49 @@ window.msBuy = function(key, wordDisplay, price) {
   var safeImg = MS_CARD_IMG.replace(/'/g, '');
   var itemArgs = "{id:'" + itemId + "',name:'" + wordSafe + "',type:'Meaning',price:" + price + ",img:'" + safeImg + "'}";
 
+  var buyNowArgs = "'" + itemId + "','" + wordSafe + "'," + price + ",'" + safeImg + "'";
+
   dc.innerHTML =
     '<div class="ms-locked-page">' +
+      '<div class="ms-info-banner">' +
+        '<div class="ms-info-row">' +
+          '<div class="ms-info-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.8"><path d="M9 18V6l8 6-8 6Z"/></svg></div>' +
+          '<div>' +
+            '<div class="ms-info-title">What is a Meaning?</div>' +
+            '<div class="ms-info-sub">The true phonetic origin of this word — its natural-origin root, the organ it activates, and the vibration it carries in the body.</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ms-info-divider"></div>' +
+        '<div class="ms-info-row">' +
+          '<div class="ms-info-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.8"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke-linejoin="round"/></svg></div>' +
+          '<div>' +
+            '<div class="ms-info-title">How You&rsquo;ll Receive It</div>' +
+            '<div class="ms-info-sub">Unlocked instantly in your library after purchase — no waiting, available offline anytime.</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
       '<div class="ms-locked-hero">' +
         '<img loading="lazy" decoding="async" src="' + MS_CARD_IMG + '" alt="">' +
         '<div class="ms-locked-hero-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>Locked</div>' +
       '</div>' +
       '<div class="ms-locked-info">' +
         '<div class="ms-locked-eyebrow">Sound Origin &amp; Vibration Study</div>' +
-        '<div class="ms-locked-price">\u20b9' + price + '</div>' +
+        '<div class="ms-locked-price">' + msMoneyLabel(price) + '</div>' +
         '<div class="ms-locked-desc">Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin of &ldquo;' + wordDisplay + '&rdquo; — what the sound does inside your body, which organ it activates, and where it existed before anyone wrote it down.</div>' +
         '<div class="ms-locked-actions">' +
           '<div class="ms-locked-wish-btn' + (inWish ? ' wishlisted' : '') + '" data-nss-wish="' + itemId + '" onclick="nssToggleWishlist(' + itemArgs + ')" aria-label="Wishlist">' +
             '<svg width="18" height="18" viewBox="0 0 16 16" fill="' + (inWish ? 'rgba(220,80,80,0.9)' : 'none') + '"><path d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linejoin="round"/></svg>' +
           '</div>' +
           '<button class="ms-locked-cart-btn' + (inCart ? ' carted' : '') + '" data-nss-cart="' + itemId + '" onclick="nssAddToCart(' + itemArgs + ')">' +
-            '<span class="ms-locked-cart-btn-add">Add to Cart · \u20b9' + price + '</span>' +
+            '<span class="ms-locked-cart-btn-add">Add to Cart · ' + msMoneyLabel(price) + '</span>' +
             '<span class="ms-locked-cart-btn-in">In Cart ✓</span>' +
           '</button>' +
         '</div>' +
+        '<button class="ms-locked-buynow-btn" onclick="window.msBuyNow(' + buyNowArgs + ')">Buy Now <span style="opacity:.6;">→</span></button>' +
+      '</div>' +
+      '<div class="fash-video-banner" style="margin:0 0 20px;border-radius:16px !important;" onclick="SS&&SS.open(\'subscription\')">' +
+        '<video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102734/grok_video_2026-07-15-13-34-04_htvekp.mp4"></video>' +
+        '<button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open(\'subscription\')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>' +
       '</div>' +
       '<div class="rm-req-banner" onclick="msOpenMeaningRequest()">' +
         '<div class="rm-req-banner-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>' +
@@ -158,6 +190,12 @@ window.msBuy = function(key, wordDisplay, price) {
     '</div>';
 
   dp.classList.add('open');
+};
+
+/* Buy Now — adds to cart if needed, then jumps straight to checkout. */
+window.msBuyNow = function(itemId, name, price, img) {
+  if (typeof nssAddToCart === 'function') nssAddToCart({ id: itemId, name: name, type: 'Meaning', price: price, img: img });
+  if (typeof openSub === 'function') openSub('checkout');
 };
 
 /* ── Category banners — same black-banner-with-logo-and-divider treatment
@@ -251,7 +289,7 @@ window.msRenderStore = function() {
         '<div class="ms-card-root">' + m.root + '</div>' +
         (isPur
           ? '<div class="ms-card-unlocked-badge"><svg width="8" height="7" viewBox="0 0 10 9" fill="none"><path d="M1 4L3.5 7L9 1" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/></svg>Unlocked</div>'
-          : '<div class="ms-card-price">\u20b9' + m.price + '</div>') +
+          : '<div class="ms-card-price">' + msMoneyLabel(m.price) + '</div>') +
         '</div></div>';
     });
     var sig = MS_SIGNATURE[cat];
@@ -269,7 +307,7 @@ window.msRenderStore = function() {
         '<div class="ms-card-root">' + sig.root + '</div>' +
         (sigIsPur
           ? '<div class="ms-card-unlocked-badge"><svg width="8" height="7" viewBox="0 0 10 9" fill="none"><path d="M1 4L3.5 7L9 1" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/></svg>Unlocked</div>'
-          : '<div class="ms-card-price">\u20b9' + MS_SIGNATURE_PRICE + '</div>') +
+          : '<div class="ms-card-price">' + msMoneyLabel(MS_SIGNATURE_PRICE) + '</div>') +
         '</div></div>';
     }
     html += '</div>';
@@ -302,7 +340,7 @@ window.msRenderStore = function() {
         '<div class="ms-card-root">NowssB Word</div>' +
         (isPur
           ? '<div class="ms-card-unlocked-badge"><svg width="8" height="7" viewBox="0 0 10 9" fill="none"><path d="M1 4L3.5 7L9 1" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/></svg>Unlocked</div>'
-          : '<div class="ms-card-price">\u20b929</div>') +
+          : '<div class="ms-card-price">' + msMoneyLabel(29) + '</div>') +
         '</div></div>';
     });
     html += '</div>';
