@@ -1924,24 +1924,23 @@ const RM_TIERS = {
   elite_karma:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974067/ffbb0340-516c-11f1-9b86-d16f5852128e_aavqzy.png'] },
   elite_energy:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png'] },
   // ── SIGNATURE TIERS — $2.99, the most expensive word in each category.
-  // One per category section (see part010.js's SIGNATURE map) — reuses
-  // the same styled photo banner that used to sit above the category as
-  // that word's own product image, instead of discarding it. ──
-  sig_off50:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/sale-white.webp'] },
-  sig_elements: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/elements-dark.webp'] },
-  sig_sacred:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/sacred-divine-dark.webp'] },
-  sig_identity: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/identity-mind-dark.webp'] },
-  sig_cosmos:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/cosmos-time-purple.webp'] },
-  sig_nature:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/nature-forest-white.webp'] },
-  sig_family:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/family-love-dark.webp'] },
-  sig_elite:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/elite-sovereign-dark.webp'] },
-  sig_premium:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/premium-exclusive-silver.webp'] },
-  sig_mythical: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/mythical-dark.png'] },
-  sig_warriors: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/warriors-dark.png'] },
-  sig_ancient:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/ancient-civilizations.png'] },
-  sig_peace:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/peace-edition.png'] },
-  sig_white:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/white-edition-2.png'] },
-  sig_black:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/black-edition.png'] }
+  // One per category section (see part010.js's SIGNATURE map) — every
+  // signature word shares the same gold NowssB product shot as its image. ──
+  sig_off50:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_elements: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_sacred:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_identity: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_cosmos:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_nature:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_family:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_elite:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_premium:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_mythical: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_warriors: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_ancient:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_peace:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_white:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_black:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] }
 };
 
 // ── SIGNATURE WORDS — display-name overrides (loadWordOrigin only

@@ -7,23 +7,24 @@
         // old rotating photo banner as its own product image instead of
         // discarding it, and sits as a gold-glass card at the end of the
         // row. Keep in sync with part012.js's RM_DISPLAY_NAME/RM_SIGNATURE_TIER.
-        var CDN='https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/';
+        // Every signature word shares the same gold NowssB product shot.
+        var SIG_IMG='https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png';
         var SIGNATURE={
-          off50:    {key:'sale',                 name:'Sale',                  img:CDN+'sale-white.webp'},
-          elements: {key:'elements',              name:'Elements',              img:CDN+'elements-dark.webp'},
-          sacred:   {key:'sacreddivine',          name:'Sacred Divine',         img:CDN+'sacred-divine-dark.webp'},
-          identity: {key:'identitymind',          name:'Identity Mind',         img:CDN+'identity-mind-dark.webp'},
-          cosmos:   {key:'cosmostime',            name:'Cosmos Time',           img:CDN+'cosmos-time-purple.webp'},
-          nature:   {key:'natureforest',          name:'Nature Forest',         img:CDN+'nature-forest-white.webp'},
-          family:   {key:'familylove',            name:'Family Love',           img:CDN+'family-love-dark.webp'},
-          elite:    {key:'elitesovereign',        name:'Elite Sovereign',       img:CDN+'elite-sovereign-dark.webp'},
-          premium:  {key:'premiumexclusive',      name:'Premium Exclusive',     img:CDN+'premium-exclusive-silver.webp'},
-          mythical: {key:'mythicaledition',       name:'Mythical Edition',      img:CDN+'mythical-dark.png'},
-          warriors: {key:'warriorsedition',       name:'Warriors Edition',      img:CDN+'warriors-dark.png'},
-          ancient:  {key:'ancientcivilizations',  name:'Ancient Civilizations', img:CDN+'ancient-civilizations.png'},
-          peace:    {key:'peaceedition',          name:'Peace Edition',         img:CDN+'peace-edition.png'},
-          white:    {key:'whiteedition',          name:'White Edition',         img:CDN+'white-edition-2.png'},
-          black:    {key:'blackedition',          name:'Black Edition',         img:CDN+'black-edition.png'}
+          off50:    {key:'sale',                 name:'Sale',                  img:SIG_IMG},
+          elements: {key:'elements',              name:'Elements',              img:SIG_IMG},
+          sacred:   {key:'sacreddivine',          name:'Sacred Divine',         img:SIG_IMG},
+          identity: {key:'identitymind',          name:'Identity Mind',         img:SIG_IMG},
+          cosmos:   {key:'cosmostime',            name:'Cosmos Time',           img:SIG_IMG},
+          nature:   {key:'natureforest',          name:'Nature Forest',         img:SIG_IMG},
+          family:   {key:'familylove',            name:'Family Love',           img:SIG_IMG},
+          elite:    {key:'elitesovereign',        name:'Elite Sovereign',       img:SIG_IMG},
+          premium:  {key:'premiumexclusive',      name:'Premium Exclusive',     img:SIG_IMG},
+          mythical: {key:'mythicaledition',       name:'Mythical Edition',      img:SIG_IMG},
+          warriors: {key:'warriorsedition',       name:'Warriors Edition',      img:SIG_IMG},
+          ancient:  {key:'ancientcivilizations',  name:'Ancient Civilizations', img:SIG_IMG},
+          peace:    {key:'peaceedition',          name:'Peace Edition',         img:SIG_IMG},
+          white:    {key:'whiteedition',          name:'White Edition',         img:SIG_IMG},
+          black:    {key:'blackedition',          name:'Black Edition',         img:SIG_IMG}
         };
         var container=document.getElementById('rm-word-sections-container');
         var html='';
