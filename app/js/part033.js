@@ -729,7 +729,7 @@
         '#nwsb-verify .nwsb-vr-banner-slide img{width:100%;height:100%;display:block;object-fit:cover;}'+
         '#nwsb-verify .nwsb-vr-intro{font-size:13px;color:var(--vr-text-dim);line-height:1.5;margin-bottom:6px;}'+
         '#nwsb-verify .nwsb-vr-cur{font-size:12px;font-weight:700;color:var(--vr-accent);margin-bottom:18px;}'+
-        '#nwsb-verify .nwsb-vr-loop{display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.08);border-radius:16px !important;padding:14px 16px;margin-bottom:10px;}'+
+        '#nwsb-verify .nwsb-vr-loop{display:flex;align-items:center;gap:14px;background:#0a0a0a;border:1px solid rgba(255,255,255,.08);border-radius:16px !important;padding:14px 16px;margin-bottom:10px;}'+
         '#nwsb-verify .nwsb-vr-loop-left{flex-shrink:0;}'+
         '#nwsb-verify .nwsb-vr-loop-icon{width:48px;height:48px;min-width:0 !important;min-height:0 !important;border-radius:50% !important;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.18);}'+
         '#nwsb-verify .nwsb-vr-loop-divider{width:1px;height:48px;background:rgba(255,255,255,.15);flex-shrink:0;}'+
@@ -807,21 +807,28 @@
       // requirement, all tiers advancing together on one shared timer.
       var loopData = VERIFY_TIERS.map(function(t){ return [t.name, t.tag].concat(t.req); });
       var loopIdx = 0;
-      function paintLoops() {
+      function paintLoops(animate) {
         VERIFY_TIERS.forEach(function(t, i){
           var el = document.getElementById('nwsbVrLoop_' + t.key);
           if (!el) return;
           var arr = loopData[i];
           el.textContent = arr[loopIdx % arr.length];
           el.classList.remove('dash-in');
-          void el.offsetWidth;
-          el.classList.add('dash-in');
+          if (animate) {
+            el.style.opacity = ''; el.style.transform = ''; el.style.animation = '';
+            void el.offsetWidth;
+            el.classList.add('dash-in');
+          } else {
+            el.style.animation = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+          }
         });
         loopIdx++;
       }
-      paintLoops();
+      paintLoops(false);
       if (window._nwsbVrLoopTimer) clearInterval(window._nwsbVrLoopTimer);
-      window._nwsbVrLoopTimer = setInterval(paintLoops, 2600);
+      window._nwsbVrLoopTimer = setInterval(function () { paintLoops(true); }, 2600);
     },
     /* ── Verification KYC wizard — real name → DOB → residence → documents →
        review, then hands off to the real payment gateway (buyVerify → cart →

@@ -61,7 +61,7 @@
    old two separate static lines (tagline + ritual counter) */
 .lgp .lgp-info-banner {
   display:flex; align-items:center; gap:14px; margin-top:10px; width:100%;
-  background:rgba(0,0,0,.82); border:1px solid rgba(255,255,255,.08);
+  background:#0a0a0a; border:1px solid rgba(255,255,255,.08);
   border-radius:16px !important; padding:14px 16px;
 }
 .lgp .lgp-info-banner-icon {

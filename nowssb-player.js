@@ -351,7 +351,7 @@
           '</button>' +
         '</div>' +
         '<div class="lgp-info-banner">' +
-          '<div class="lgp-info-banner-icon" style="background-image:url(\'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png\')"></div>' +
+          '<div class="lgp-info-banner-icon" style="background-image:url(\'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png\')"></div>' +
           '<div class="lgp-info-banner-divider"></div>' +
           '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
         '</div>' +
@@ -383,16 +383,33 @@
       if (!el) return;
       var lines = ['The new fashion trend of meditation', ritual + ' Ritual · ' + (idx + 1) + ' of ' + total];
       var i = 0;
-      function paint() {
+      /* animate=false forces the line to full opacity via inline style —
+         the dash-in keyframe starts at opacity:0 (both fill-mode) and only
+         reaches opacity:1 partway through, so a re-render (word change,
+         play/pause, phase change — this whole panel is rebuilt on all of
+         them) landing mid-animation, or interrupting one cycle's animation
+         with the next, can leave the class-based animation stuck at its
+         0%-opacity starting style. Setting opacity/transform directly
+         sidesteps that entirely for the "must be visible right now" case;
+         animate=true clears the inline override first so the class-based
+         dash-in keyframe is free to run for the timer-driven cycling. */
+      function paint(animate) {
         el.textContent = lines[i % lines.length];
         el.classList.remove('dash-in');
-        void el.offsetWidth;
-        el.classList.add('dash-in');
+        if (animate) {
+          el.style.opacity = ''; el.style.transform = ''; el.style.animation = '';
+          void el.offsetWidth;
+          el.classList.add('dash-in');
+        } else {
+          el.style.animation = 'none';
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        }
         i++;
       }
-      paint();
+      paint(false);
       if (window._lgpBannerTimer) clearInterval(window._lgpBannerTimer);
-      window._lgpBannerTimer = setInterval(paint, 2800);
+      window._lgpBannerTimer = setInterval(function () { paint(true); }, 2800);
     })();
 
     /* Re-insert the preserved video element (kept playing, no reload/seek). */
