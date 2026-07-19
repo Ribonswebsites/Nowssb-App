@@ -3152,11 +3152,10 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   background: transparent !important; border-bottom: none !important;
 }
 
-/* the transparent frosted GLASS PANEL (be9hpf.png — no baked background).
-   Bigger card (small margins), strongly rounded corners + overflow:hidden so
-   the glass fills edge-to-edge as a CURVED panel; the block image is zoomed
-   (background-size >100%) so it reaches the rounded corners instead of sitting
-   small in the middle. A faint frost overlay keeps it uniform. */
+/* Transparent frosted GLASS PANEL — real backdrop-filter:blur over the
+   screen's own crystal background, no baked-in photo. Bigger card (small
+   margins), strongly rounded corners + overflow:hidden so the glass fills
+   edge-to-edge as a CURVED panel. A faint frost overlay keeps it uniform. */
 .wsg-card {
   position: relative; margin: 6px 16px 12px; border-radius: 26px !important;
   padding: 44px 24px 44px; overflow: hidden;
@@ -3188,10 +3187,10 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .wsg-card::after {
   content: ''; position: absolute; z-index: 1; inset: 2px; border-radius: 24px; pointer-events: none;
   background:
-    linear-gradient(rgba(4,8,16,0.60), rgba(4,8,16,0.60)),
-    linear-gradient(155deg, rgba(244,248,253,0.16), rgba(214,228,244,0.06) 55%, rgba(244,248,253,0.13)),
-    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783105775/file_00000000092071fa987c573af7825e6d_be9hpf.png') center center / 165% no-repeat;
+    linear-gradient(rgba(4,8,16,0.45), rgba(4,8,16,0.45)),
+    linear-gradient(155deg, rgba(244,248,253,0.16), rgba(214,228,244,0.06) 55%, rgba(244,248,253,0.13));
   background-color: rgba(230,238,248,0.09);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), inset 0 0 90px rgba(255,255,255,0.07);
 }
 .wsg-card > * { position: relative; z-index: 2; flex-shrink: 0; }   /* pills keep their height — never squished/cropped */
