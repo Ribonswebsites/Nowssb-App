@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=297">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=379">
+<link rel="stylesheet" href="nowssb-nm.css?v=380">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -7739,14 +7739,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div style="font-size:11px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;margin-top:2px;line-height:1.4;">Tap a background to preview, tap again to apply. Hero stays the same.</div>
         </div>
       </div>
-      <!-- No-background option — one banner, toggle switch flips between
-           Default (off, clears customization) and Black (on, plain solid). -->
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;margin-top:16px;">
-        <div style="min-width:0;">
-          <div id="fbgModeLabel" style="font-size:13px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;">Default</div>
-          <div style="font-size:10.5px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;margin-top:2px;">Skip the photos — toggle for plain black</div>
+      <!-- No-background option — two swipeable cards: Default (frosted glass)
+           and Black (flat solid, no glassmorphism), same swipe-to-browse
+           language as the photo carousel below. -->
+      <div id="fbgModeCards" class="fbg-mode-cards">
+        <div id="fbgModeCardDefault" class="fbg-mode-card fbg-mode-card-default" onclick="fbgSelectMode('default')">
+          <div class="fbg-mode-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M4.5 16.5l4.5-6 3.5 4.5 2.5-3L19.5 16.5"/><circle cx="8.2" cy="8.5" r="1.3"/></svg></div>
+          <div class="fbg-mode-card-label">Default</div>
+          <div class="fbg-mode-card-sub">Photo background</div>
         </div>
-        <div id="fbgModeToggle" class="fbg-mode-toggle" onclick="fbgToggleMode()"><div class="fbg-mode-toggle-knob"></div></div>
+        <div id="fbgModeCardBlack" class="fbg-mode-card fbg-mode-card-black" onclick="fbgSelectMode('black')">
+          <div class="fbg-mode-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/></svg></div>
+          <div class="fbg-mode-card-label">Black</div>
+          <div class="fbg-mode-card-sub">Plain solid black</div>
+        </div>
       </div>
     </div>
 
@@ -7970,7 +7976,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ── NOWSSB FASHION HOME THEMES — scoped via body.fashion-home-active ── -->
 
 
-<script src="app/js/part047.js?v=176"></script>
+<script src="app/js/part047.js?v=177"></script>
 
 <!-- ── BLACK EDITION INTRO + CAROUSEL ── -->
 <script src="app/js/part048.js?v=164"></script>

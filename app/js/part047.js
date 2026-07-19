@@ -295,22 +295,20 @@
     }
   };
 
-  // "Default" / "Black" toggle — an alternative to picking one of the 9
-  // photos: off = clear all customization, on = force plain solid black.
-  window.fbgToggleMode = function () {
-    var cur = null;
-    try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
-    if (cur === NWSB_BG_BLACK) window.nwsbClearFashionBg();
-    else window.nwsbSetFashionBgBlack();
+  // "Default" / "Black" cards — an alternative to picking one of the 9
+  // photos: Default clears all customization, Black forces plain solid black.
+  window.fbgSelectMode = function (mode) {
+    if (mode === 'black') window.nwsbSetFashionBgBlack();
+    else window.nwsbClearFashionBg();
     fbgSyncModeButtons();
   };
   function fbgSyncModeButtons() {
     var cur = null;
     try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
     var isBlack = cur === NWSB_BG_BLACK;
-    var toggle = document.getElementById('fbgModeToggle');
-    var label  = document.getElementById('fbgModeLabel');
-    if (toggle) toggle.classList.toggle('on', isBlack);
-    if (label)  label.textContent = isBlack ? 'Black' : 'Default';
+    var cardDefault = document.getElementById('fbgModeCardDefault');
+    var cardBlack   = document.getElementById('fbgModeCardBlack');
+    if (cardDefault) cardDefault.classList.toggle('on', !isBlack);
+    if (cardBlack)   cardBlack.classList.toggle('on', isBlack);
   }
 })();
