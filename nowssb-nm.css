@@ -1862,6 +1862,23 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   padding: 3px 8px; border-radius: 999px !important;
 }
 
+/* ── Meaning Store's own signature card — same gold-glass treatment,
+   scoped to .ms-card's own child class names. ── */
+.ms-card-signature {
+  border: 1.5px solid rgba(232,213,163,0.55) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 18px rgba(232,213,163,0.25);
+}
+.ms-card-signature .ms-card-img { opacity: 0.55; }
+.ms-card-signature.unlocked .ms-card-img { opacity: 0.6; }
+.ms-card-signature .ms-card-word { color: #f5e6c8; }
+.ms-card-signature .ms-card-root { color: rgba(232,213,163,0.65); }
+.ms-card-signature-tag {
+  position: absolute; top: 6px; left: 6px; z-index: 2;
+  font-family: 'DM Sans', sans-serif; font-size: 7px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: #060c18; background: #e8d5a3;
+  padding: 2px 6px; border-radius: 999px !important;
+}
+
 /* ── Subscription plans: plain horizontal swipe carousel — no 3D/perspective,
    just a normal scroll-snap row. Same on normal home and Fashion home;
    this screen doesn't take on the neumorphic theme either way. ── */

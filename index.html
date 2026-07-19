@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=297">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=371">
+<link rel="stylesheet" href="nowssb-nm.css?v=372">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -3248,6 +3248,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Main content -->
   <div id="msMcontent" style="display:none;flex-direction:column;height:100%;overflow:hidden;position:relative;">
+    <div class="sub-screen-bg" id="msBg"></div>
 
     <!-- Nav bar -->
     <!-- Scrollable body — no fixed nav bar, back btn floats over banner -->
@@ -3270,8 +3271,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
           </svg>
         </button>
-        <!-- Tag top right -->
-        <div class="ms-hero-tag">Shabdapathy · True Origin</div>
+        <!-- Tag top right + background customize icon -->
+        <div style="position:absolute;top:max(env(safe-area-inset-top,18px),18px);right:18px;z-index:10;display:flex;align-items:center;gap:8px;">
+          <button class="ms-bg-customize-btn" onclick="SS.open('fashionbg')" aria-label="Customize background">
+            <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
+          </button>
+          <div class="ms-hero-tag" style="position:static;">Shabdapathy · True Origin</div>
+        </div>
         <!-- Bottom content -->
         <div class="ms-hero-bottom">
           <span class="ms-hero-eyebrow">Hidden · Meaning · Store</span>
@@ -3295,8 +3301,46 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="ms-store-desc-text">Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin — what the sound does inside your body, which organ it activates, and where this word existed before anyone wrote it down. Nothing here is free. Every meaning is a one-time unlock, yours forever.</div>
       </div>
 
+      <!-- ── VIDEO BANNER — icon fixed, tagline cycles in from the right ── -->
+      <div class="nss-vid-banner" style="margin:16px 0;">
+        <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+        <div class="nss-vid-banner-fade"></div>
+        <div class="nss-vid-banner-pill-wrap">
+          <div class="nss-vid-banner-pill">
+            <img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">
+            <span class="nss-vid-banner-pill-text" id="msVidBannerText">The Meaning Store</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Dynamic grid (JS-populated) -->
       <div id="msMeaningGrid"></div>
+
+      <!-- ── REQUEST-A-MEANING BANNER ── -->
+      <div class="rm-req-banner" onclick="msOpenMeaningRequest()">
+        <div class="rm-req-banner-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="rm-req-banner-text">
+          <div class="rm-req-banner-eyebrow">Can't find your meaning?</div>
+          <div class="rm-req-banner-title">Request a Meaning</div>
+          <div class="rm-req-banner-sub">Personally decoded &amp; delivered within 48 hours.</div>
+        </div>
+        <button class="rm-req-banner-btn" onclick="event.stopPropagation();msOpenMeaningRequest()">
+          Request
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+        </button>
+      </div>
+
+      <!-- ── DISCLAIMER + FOOTER ── -->
+      <div class="rm-disclaimer">
+        <div class="rm-disclaimer-title">Disclaimer &amp; Confidentiality</div>
+        <div class="rm-disclaimer-text">Meanings, phonetic breakdowns and healing associations shared here are for educational and wellness purposes only — they are not medical advice and do not replace professional diagnosis or treatment. Requested and purchased meanings, and any information you share with us, are kept strictly confidential and are never sold or shared with third parties.</div>
+      </div>
+      <div class="rm-footer">
+        <div class="rm-footer-brand"><span class="b">Nowss</span><span class="t">B</span></div>
+        <div class="rm-footer-copy">© 2026 Adv. Sanjaykumar Gadge · Shabdapathy</div>
+      </div>
 
     </div><!-- /sub-body -->
 
@@ -4743,7 +4787,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      Screens: word-science, profile, real-meaning, shabdapathy
 ══════════════════════════════════════════ -->
 <script src="app/js/part025.js?v=163"></script><!-- ══ MEANING STORE JS ══ -->
-<script src="app/js/part026.js?v=163"></script>
+<script src="app/js/part026.js?v=164"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════

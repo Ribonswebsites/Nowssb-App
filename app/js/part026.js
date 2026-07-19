@@ -111,6 +111,30 @@ window.msBuy = function(key, wordDisplay, price) {
 
 var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
 
+/* ── Category banners — same black-banner-with-logo-and-divider treatment
+   as the Word Atelier (reuses its rm-cat-banner* CSS directly). ── */
+var MS_CAT_LOGO = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png';
+var MS_CAT_SUB = {
+  'Elements':          'The original sounds of the natural world',
+  'Human':              'The truth of body, mind and soul',
+  'Emotions':           'What every feeling really means',
+  'Cosmos':             'Origins beyond understanding',
+  'Nations & People':   'The people and places behind the words'
+};
+
+/* ── Signature meaning — the most expensive item in each category, same
+   gold-glassmorphism treatment and shared product image as the Word
+   Atelier's signature words. ── */
+var MS_SIGNATURE = {
+  'Elements':          { key:'elementssignature', word:'Elements Signature',        root:'Most Exclusive' },
+  'Human':              { key:'humansignature',     word:'Human Signature',          root:'Most Exclusive' },
+  'Emotions':           { key:'emotionssignature',  word:'Emotions Signature',       root:'Most Exclusive' },
+  'Cosmos':             { key:'cosmossignature',    word:'Cosmos Signature',         root:'Most Exclusive' },
+  'Nations & People':   { key:'nationssignature',   word:'Nations Signature',        root:'Most Exclusive' }
+};
+var MS_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png';
+var MS_SIGNATURE_PRICE = 299;
+
 /* ── RENDER STORE GRID ── */
 window.msRenderStore = function() {
   var container = document.getElementById('msMeaningGrid');
@@ -155,7 +179,14 @@ window.msRenderStore = function() {
   }
 
   Object.keys(cats).forEach(function(cat) {
-    html += '<div class="ms-cat-header"><span class="ms-cat-label">' + cat + '</span></div>';
+    html += '<div class="rm-cat-banner">';
+    html += '<div class="rm-cat-banner-logo"><img decoding="async" loading="lazy" src="' + MS_CAT_LOGO + '" alt=""></div>';
+    html += '<div class="rm-cat-banner-divider"></div>';
+    html += '<div class="rm-cat-banner-text">';
+    html += '<div class="rm-cat-banner-title">' + cat + '</div>';
+    html += '<div class="rm-cat-banner-sub">' + (MS_CAT_SUB[cat] || '') + '</div>';
+    html += '</div>';
+    html += '</div>';
     html += '<div class="ms-grid">';
     cats[cat].forEach(function(m) {
       var isPur = purchasedKeys.indexOf(m.key) !== -1;
@@ -174,6 +205,24 @@ window.msRenderStore = function() {
           : '<div class="ms-card-price">\u20b9' + m.price + '</div>') +
         '</div></div>';
     });
+    var sig = MS_SIGNATURE[cat];
+    if (sig) {
+      var sigIsPur = purchasedKeys.indexOf(sig.key) !== -1;
+      html += '<div class="ms-card ms-card-signature' + (sigIsPur ? ' unlocked' : '') + '" style="position:relative;" onclick="' +
+        (sigIsPur ? 'window.msShowDetail(\'' + sig.key + '\',\'' + sig.word + '\')' : 'window.msBuy(\'' + sig.key + '\',\'' + sig.word + '\',' + MS_SIGNATURE_PRICE + ')') +
+        '">' +
+        '<span class="ms-card-signature-tag">Signature</span>' +
+        cardActions(sig.key, sig.word, MS_SIGNATURE_PRICE, MS_SIGNATURE_IMG, sigIsPur) +
+        '<div class="ms-card-img" style="background-image:url(\'' + MS_SIGNATURE_IMG + '\')"></div>' +
+        '<div class="ms-card-overlay"></div>' +
+        '<div class="ms-card-body">' +
+        '<div class="ms-card-word">' + sig.word + '</div>' +
+        '<div class="ms-card-root">' + sig.root + '</div>' +
+        (sigIsPur
+          ? '<div class="ms-card-unlocked-badge"><svg width="8" height="7" viewBox="0 0 10 9" fill="none"><path d="M1 4L3.5 7L9 1" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/></svg>Unlocked</div>'
+          : '<div class="ms-card-price">\u20b9' + MS_SIGNATURE_PRICE + '</div>') +
+        '</div></div>';
+    }
     html += '</div>';
   });
 
@@ -181,7 +230,14 @@ window.msRenderStore = function() {
   var wsPurchased = [];
   try { wsPurchased = JSON.parse(localStorage.getItem('nwsb_purchased') || '[]'); } catch(e) {}
   if (wsPurchased.length > 0) {
-    html += '<div class="ms-cat-header"><span class="ms-cat-label">Your Words</span><div class="ms-cat-sub">Words you own from The Word Atelier</div></div>';
+    html += '<div class="rm-cat-banner">';
+    html += '<div class="rm-cat-banner-logo"><img decoding="async" loading="lazy" src="' + MS_CAT_LOGO + '" alt=""></div>';
+    html += '<div class="rm-cat-banner-divider"></div>';
+    html += '<div class="rm-cat-banner-text">';
+    html += '<div class="rm-cat-banner-title">Your Words</div>';
+    html += '<div class="rm-cat-banner-sub">Words you own from The Word Atelier</div>';
+    html += '</div>';
+    html += '</div>';
     html += '<div class="ms-grid">';
     wsPurchased.forEach(function(p) {
       var key = p.word.toLowerCase();
@@ -218,6 +274,83 @@ window.msEnterFromIntro = function() {
   if (vid && vid.tagName === 'VIDEO') { try { vid.play(); } catch(e) {} }
   setTimeout(msRenderStore, 80);
   setTimeout(msInitParallax, 120);
+  msVidBannerCycle();
+  window.msStoreBgSync();
+};
+
+// Meaning Store's own backdrop — mirrors rmStoreBgSync() in part012.js
+// exactly: same custom Fashion background if the user has picked one
+// (via this screen's own customize icon or anywhere else it's exposed),
+// otherwise left at the plain default. #msBg already carries the
+// app-wide .sub-screen-bg dark gradient overlay.
+window.msStoreBgSync = function() {
+  var bg = document.getElementById('msBg');
+  if (!bg) return;
+  var custom = null;
+  try { custom = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
+  if (custom) bg.style.backgroundImage = "url('" + custom + "')";
+};
+
+// Video banner text — icon stays fixed, only the tagline cycles (mirrors
+// nssVidBannerCycle() in part012.js).
+var MS_VID_BANNER_TAGLINES = ['Buy Request Meanings', 'Build Your Library', 'Heal with Sound'];
+var _msVidBannerTimer = null;
+function msVidBannerCycle() {
+  var el = document.getElementById('msVidBannerText');
+  if (!el || _msVidBannerTimer) return;
+  var idx = 0;
+  function paint() {
+    el.textContent = MS_VID_BANNER_TAGLINES[idx % MS_VID_BANNER_TAGLINES.length];
+    el.classList.remove('dash-in');
+    void el.offsetWidth;
+    el.classList.add('dash-in');
+    idx++;
+  }
+  paint();
+  _msVidBannerTimer = setInterval(paint, 3000);
+}
+
+// ── Request-a-meaning flow — mirrors rmOpenWordRequest()/rmConfirmWordRequest()
+// in part012.js, with Meaning-flavored copy and ₹ pricing.
+window.msOpenMeaningRequest = function() {
+  var existing = document.getElementById('msReqSheet');
+  if (existing) existing.remove();
+  var sheet = document.createElement('div');
+  sheet.id = 'msReqSheet';
+  sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);';
+  sheet.innerHTML = '<div style="width:100%;background:#0e1828;border-top:1px solid rgba(232,213,163,0.2);padding:32px 24px max(env(safe-area-inset-bottom,28px),28px);font-family:\'DM Sans\',sans-serif;box-sizing:border-box;">' +
+    '<div style="font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.6);margin-bottom:12px;">Request a Meaning</div>' +
+    '<div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;">Any word. Its true meaning.</div>' +
+    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:20px;">Type any word or name — our team personally decodes its phonetic origin, healing intention and hidden meaning, delivered to your library within 48 hours.</div>' +
+    '<input id="msReqInput" type="text" placeholder="Type a word…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:\'DM Sans\',sans-serif;font-size:15px;padding:14px 16px;margin-bottom:16px;outline:none;">' +
+    '<button onclick="msConfirmMeaningRequest()" style="width:100%;background:#e8d5a3;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:700;color:#060c18;padding:16px 20px;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">Request · ₹199 <span style="opacity:0.5;font-weight:400;">48 hrs delivery</span></button>' +
+    '<button onclick="document.getElementById(\'msReqSheet\').remove()" style="width:100%;background:none;border:1px solid rgba(255,255,255,0.12);cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:400;color:rgba(255,255,255,0.45);padding:14px 20px;">Cancel</button>' +
+    '</div>';
+  sheet.onclick = function(e){ if (e.target === sheet) sheet.remove(); };
+  document.body.appendChild(sheet);
+  setTimeout(function() { var inp = document.getElementById('msReqInput'); if (inp) inp.focus(); }, 50);
+};
+
+window.msConfirmMeaningRequest = function() {
+  var inp = document.getElementById('msReqInput');
+  var word = inp ? inp.value.trim() : '';
+  if (!word) { if (inp) inp.style.borderColor = 'rgba(255,100,100,0.6)'; return; }
+  word = word.charAt(0).toUpperCase() + word.slice(1);
+  var sheet = document.getElementById('msReqSheet');
+  if (sheet) sheet.remove();
+  // TODO: integrate payment ₹199 here — same placeholder pattern as
+  // rmConfirmWordRequest() in part012.js until Razorpay is wired up.
+  var waiting = document.createElement('div');
+  waiting.id = 'msReqWaiting';
+  waiting.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.95);font-family:\'DM Sans\',sans-serif;flex-direction:column;gap:16px;';
+  waiting.innerHTML = '<div style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(232,213,163,0.2);border-top-color:#e8d5a3;animation:wsSpinAnim 0.8s linear infinite;"></div>' +
+    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);letter-spacing:1px;">Decoding request…</div>';
+  document.body.appendChild(waiting);
+  setTimeout(function() {
+    var w = document.getElementById('msReqWaiting');
+    if (w) w.remove();
+    if (typeof _wsShowSuccessSheet === 'function') _wsShowSuccessSheet(word);
+  }, 1800);
 };
 
 // Parallax scroll on the 2:3 banner
