@@ -129,16 +129,26 @@ window.msBuy = function(key, wordDisplay, price, img) {
 
   dc.innerHTML =
     '<div class="ms-locked-page">' +
-      '<div class="ms-info-banner">' +
-        '<div class="ms-info-left"><div class="ms-info-logo"><img decoding="async" loading="lazy" src="' + MS_CAT_LOGO + '" alt=""></div></div>' +
-        '<div class="ms-info-divider-v"></div>' +
-        '<div class="ms-info-body">' +
-          '<div class="ms-info-title">What is a Meaning?</div>' +
-          '<div class="ms-info-sub">The true phonetic origin of this word — its natural-origin root, the organ it activates, and the vibration it carries in the body.</div>' +
-          '<div class="ms-info-sep"></div>' +
-          '<div class="ms-info-title">How You&rsquo;ll Receive It</div>' +
-          '<div class="ms-info-sub">Unlocked instantly in your library after purchase — no waiting, available offline anytime.</div>' +
+      '<div class="nss-vid-banner" style="margin:0 0 20px;border-radius:16px !important;cursor:pointer;" onclick="SS&&SS.open(\'subscription\')">' +
+        '<video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
+        '<div class="nss-vid-banner-fade"></div>' +
+        '<div class="nss-vid-banner-pill-wrap">' +
+          '<div class="nss-vid-banner-pill">' +
+            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">' +
+            '<span class="nss-vid-banner-pill-text">Subscribe Today</span>' +
+          '</div>' +
         '</div>' +
+      '</div>' +
+      '<div class="rm-desc-banner">' +
+        '<div class="rm-desc-banner-row">' +
+          '<div class="rm-desc-banner-left"><div class="rm-desc-banner-logo"><img decoding="async" loading="lazy" src="' + MS_CAT_LOGO + '" alt=""></div></div>' +
+          '<div class="rm-desc-banner-divider"></div>' +
+          '<div class="rm-desc-banner-body">' +
+            '<div class="rm-desc-banner-eyebrow" id="msBuyInfoLabel">What is a Meaning?</div>' +
+            '<div class="rm-desc-banner-text" id="msBuyInfoText"></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="rm-desc-banner-dots" id="msBuyInfoDots"></div>' +
       '</div>' +
       '<div class="ms-locked-hero-banner">' +
         '<div class="ms-locked-hero-imgwrap">' +
@@ -166,16 +176,6 @@ window.msBuy = function(key, wordDisplay, price, img) {
         '</div>' +
         '<button class="ms-locked-buynow-btn" onclick="window.msBuyNow(' + buyNowArgs + ')">Buy Now <span style="opacity:.6;">→</span></button>' +
       '</div>' +
-      '<div class="nss-vid-banner" style="margin:0 0 20px;border-radius:16px !important;cursor:pointer;" onclick="SS&&SS.open(\'subscription\')">' +
-        '<video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
-        '<div class="nss-vid-banner-fade"></div>' +
-        '<div class="nss-vid-banner-pill-wrap">' +
-          '<div class="nss-vid-banner-pill">' +
-            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">' +
-            '<span class="nss-vid-banner-pill-text">Subscribe Today</span>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
       '<div class="rm-req-banner" onclick="msOpenMeaningRequest()">' +
         '<div class="rm-req-banner-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>' +
         '<div class="rm-req-banner-text">' +
@@ -198,7 +198,42 @@ window.msBuy = function(key, wordDisplay, price, img) {
     '</div>';
 
   dp.classList.add('open');
+  msBuyInfoBannerCycle();
 };
+
+// "What is a Meaning? / How You'll Receive It" — same rotating dot-carousel
+// banner already used for the store's own description banner (rm-desc-banner),
+// just cycling between these two cards instead of numbered steps. Rebuilt
+// fresh every time msBuy() runs, so the old timer is always cleared first —
+// otherwise it keeps painting into DOM nodes msBuy() just replaced.
+var MS_BUY_INFO_STEPS = [
+  { label: 'What is a Meaning?', text: 'The true phonetic origin of this word — its natural-origin root, the organ it activates, and the vibration it carries in the body.' },
+  { label: 'How You’ll Receive It', text: 'Unlocked instantly in your library after purchase — no waiting, available offline anytime.' }
+];
+var _msBuyInfoTimer = null;
+function msBuyInfoBannerCycle() {
+  if (_msBuyInfoTimer) { clearInterval(_msBuyInfoTimer); _msBuyInfoTimer = null; }
+  var labelEl = document.getElementById('msBuyInfoLabel');
+  var textEl  = document.getElementById('msBuyInfoText');
+  var dotsEl  = document.getElementById('msBuyInfoDots');
+  if (!labelEl || !textEl) return;
+  dotsEl.innerHTML = MS_BUY_INFO_STEPS.map(function (_, i) { return '<span class="rm-desc-dot" data-i="' + i + '"></span>'; }).join('');
+  var idx = 0;
+  function paint() {
+    var step = MS_BUY_INFO_STEPS[idx % MS_BUY_INFO_STEPS.length];
+    labelEl.textContent = step.label;
+    textEl.textContent = step.text;
+    textEl.classList.remove('dash-in');
+    void textEl.offsetWidth;
+    textEl.classList.add('dash-in');
+    Array.from(dotsEl.querySelectorAll('.rm-desc-dot')).forEach(function (d, i) {
+      d.classList.toggle('on', i === idx % MS_BUY_INFO_STEPS.length);
+    });
+    idx++;
+  }
+  paint();
+  _msBuyInfoTimer = setInterval(paint, 3500);
+}
 
 /* Buy Now — adds to cart if needed, then jumps straight to checkout. */
 window.msBuyNow = function(itemId, name, price, img) {

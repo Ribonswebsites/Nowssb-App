@@ -2041,26 +2041,6 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 
-/* ── "What is a Meaning / How you'll receive it" explainer — one black
-   banner, one icon+divider on the left (same language as the category and
-   description banners), two stacked cards on the right. ── */
-.ms-info-banner {
-  background: #000; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px !important;
-  padding: 16px; margin-bottom: 20px; display: flex; gap: 14px; align-items: stretch;
-}
-.ms-info-left { flex-shrink: 0; padding-top: 2px; }
-.ms-info-logo {
-  width: 34px; height: 34px; min-width: 0 !important; min-height: 0 !important;
-  border-radius: 50% !important; overflow: hidden;
-  background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
-  display: flex; align-items: center; justify-content: center;
-}
-.ms-info-logo img { width: 60%; height: 60%; object-fit: contain; display: block; }
-.ms-info-divider-v { width: 1px; align-self: stretch; background: rgba(255,255,255,0.1); flex-shrink: 0; }
-.ms-info-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.ms-info-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 0; }
-.ms-info-title { font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-.ms-info-sub { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: rgba(255,255,255,0.45); line-height: 1.6; }
 
 /* ── Signature word card — the most expensive item in each category,
    using that category's old banner photo as its own product image. Gold
