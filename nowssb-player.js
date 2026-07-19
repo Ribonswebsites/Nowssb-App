@@ -154,7 +154,8 @@
       mic:      'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png',
       library:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
       settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png',
-      info:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782986898/file_000000002038722fac63c79466d73f0f_jnhjvg.png'
+      info:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782986898/file_000000002038722fac63c79466d73f0f_jnhjvg.png',
+      brand:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png'
     };
     /* render every icon as a background-image SPAN (never an <img>) so the
        browser can't open/zoom it on tap and taps always hit the button */
@@ -259,16 +260,20 @@
     /* RADIAL liquid-glass settings menu — opens centred, blurs everything behind,
        settings icon in the middle with the options in a glass circle around it. */
     var wInfo =
-      '<div class="lgp-arc-info">' +
-        '<div class="lgp-arc-info-word">' + (w.word || '') + (w.phonetic ? ' <span>' + w.phonetic + '</span>' : '') + '</div>' +
-        (w.meaning ? '<div class="lgp-arc-info-row"><span class="k">Meaning</span><span class="v">' + w.meaning + '</span></div>' : '') +
-        (w.benefit ? '<div class="lgp-arc-info-row"><span class="k">Heals</span><span class="v">' + w.benefit + '</span></div>' : '') +
-        ((w.categories && w.categories.length) ? '<div class="lgp-arc-info-row"><span class="k">Category</span><span class="v">' + w.categories.join(' · ') + '</span></div>' : (w.organ ? '<div class="lgp-arc-info-row"><span class="k">Category</span><span class="v">' + w.organ + '</span></div>' : '')) +
+      '<div class="lgp-arc-bottom">' +
+        '<div class="lgp-arc-banner"><div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.brand + '\')"></div><div class="lgp-info-banner-divider"></div><div class="lgp-info-banner-text">NowssB Player</div></div>' +
+        '<div class="lgp-arc-info">' +
+          '<div class="lgp-arc-info-word">' + (w.word || '') + (w.phonetic ? ' <span>' + w.phonetic + '</span>' : '') + '</div>' +
+          (w.meaning ? '<div class="lgp-arc-info-row"><span class="k">Meaning</span><span class="v">' + w.meaning + '</span></div>' : '') +
+          (w.benefit ? '<div class="lgp-arc-info-row"><span class="k">Heals</span><span class="v">' + w.benefit + '</span></div>' : '') +
+          ((w.categories && w.categories.length) ? '<div class="lgp-arc-info-row"><span class="k">Category</span><span class="v">' + w.categories.join(' · ') + '</span></div>' : (w.organ ? '<div class="lgp-arc-info-row"><span class="k">Category</span><span class="v">' + w.organ + '</span></div>' : '')) +
+        '</div>' +
       '</div>';
     var arc =
       '<div class="lgp-arc" id="lgpArc" style="--lg-accent:' + th.accent + '">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
         '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
+        '<div class="lgp-arc-brand"><span class="lgp-arc-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-arc-brand-txt">NowssB Player</span></div>' +
         '<div class="lgp-arc-radial">' +
           '<div class="lgp-arc-ring"></div>' +
           '<button class="lgp-arc-opt o1" onclick="pwSetVoice&&pwSetVoice(\'' + (voice === 'F' ? 'M' : 'F') + '\');renderPractice&&renderPractice()"><span class="lbl">Voice</span><span class="val">' + (voice === 'F' ? 'Female' : 'Male') + '</span></button>' +
@@ -322,6 +327,7 @@
               '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
             '</button>' +
             '<div class="lgp-info-sheet-title">' + (w.word || '') + '</div>' +
+            '<div class="lgp-info-sheet-brand" style="background-image:url(\'' + IC.brand + '\')"></div>' +
           '</div>' +
           '<div class="lgp-info-video-wrap">' + infoVideo + '</div>' +
           (bodyRows ? '<div class="lgp-info-sec"><div class="lgp-info-sec-h">What\'s Happening</div><div class="lgp-info-card">' + bodyRows + '</div></div>' : '') +
@@ -351,7 +357,7 @@
           '</button>' +
         '</div>' +
         '<div class="lgp-info-banner">' +
-          '<div class="lgp-info-banner-icon" style="background-image:url(\'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png\')"></div>' +
+          '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.brand + '\')"></div>' +
           '<div class="lgp-info-banner-divider"></div>' +
           '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
         '</div>' +
