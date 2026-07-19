@@ -243,7 +243,7 @@ window.msBuyNow = function(itemId, name, price, img) {
 
 /* ── Category banners — same black-banner-with-logo-and-divider treatment
    as the Word Atelier (reuses its rm-cat-banner* CSS directly). ── */
-var MS_CAT_LOGO = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png';
+var MS_CAT_LOGO = 'https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png';
 var MS_CAT_SUB = {
   'Elements':          'The original sounds of the natural world',
   'Human':              'The truth of body, mind and soul',
