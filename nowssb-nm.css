@@ -1989,18 +1989,28 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
    replaces: hero image, description, Add to Cart / Wishlist, request
    banner, disclaimer, footer — same sections as the rest of the store. ── */
 .ms-locked-page { display: flex; flex-direction: column; }
-.ms-locked-hero {
-  position: relative; width: 140px; aspect-ratio: 4 / 5; border-radius: 14px !important;
+/* Image on the left, divider, word + one-line blurb on the right — same
+   horizontal "icon + divider + text" language as the other banners. */
+.ms-locked-hero-banner {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+  background: #000; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px !important; padding: 14px;
+}
+.ms-locked-hero-imgwrap {
+  position: relative; width: 92px; aspect-ratio: 4 / 5; border-radius: 12px !important;
   overflow: hidden; background: #0a1120; border: 1px solid rgba(255,255,255,0.08);
-  margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
 }
-.ms-locked-hero img { width: 100%; height: 100%; object-fit: contain; display: block; opacity: 0.95; }
+.ms-locked-hero-imgwrap img { width: 100%; height: 100%; object-fit: contain; display: block; opacity: 0.95; }
 .ms-locked-hero-badge {
-  position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 5px;
+  position: absolute; top: 6px; left: 6px; display: flex; align-items: center; gap: 4px;
   background: rgba(6,12,24,0.75); border: 1px solid rgba(232,213,163,0.3); border-radius: 20px !important;
-  padding: 6px 11px 6px 9px; font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 700;
-  letter-spacing: 0.5px; color: #e8d5a3;
+  padding: 4px 8px 4px 6px; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.4px; color: #e8d5a3;
 }
+.ms-locked-hero-divider { width: 1px; align-self: stretch; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+.ms-locked-hero-textcol { flex: 1; min-width: 0; }
+.ms-locked-hero-word { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 800; color: #e8d5a3; margin-bottom: 6px; line-height: 1.1; }
+.ms-locked-hero-blurb { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.55; }
 .ms-locked-info { margin-bottom: 24px; }
 .ms-locked-eyebrow {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px;

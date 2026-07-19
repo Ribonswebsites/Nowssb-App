@@ -139,9 +139,16 @@ window.msBuy = function(key, wordDisplay, price) {
           '<div class="ms-info-sub">Unlocked instantly in your library after purchase — no waiting, available offline anytime.</div>' +
         '</div>' +
       '</div>' +
-      '<div class="ms-locked-hero">' +
-        '<img loading="lazy" decoding="async" src="' + MS_CARD_IMG + '" alt="">' +
-        '<div class="ms-locked-hero-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>Locked</div>' +
+      '<div class="ms-locked-hero-banner">' +
+        '<div class="ms-locked-hero-imgwrap">' +
+          '<img loading="lazy" decoding="async" src="' + MS_CARD_IMG + '" alt="">' +
+          '<div class="ms-locked-hero-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>Locked</div>' +
+        '</div>' +
+        '<div class="ms-locked-hero-divider"></div>' +
+        '<div class="ms-locked-hero-textcol">' +
+          '<div class="ms-locked-hero-word">' + wordDisplay + '</div>' +
+          '<div class="ms-locked-hero-blurb">' + msWordBlurb(key) + '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="ms-locked-info">' +
         '<div class="ms-locked-eyebrow">Sound Origin &amp; Vibration Study</div>' +
@@ -221,6 +228,45 @@ var MS_SIGNATURE = {
 };
 var MS_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png';
 var MS_SIGNATURE_PRICE = 299;
+
+/* ── One-line plain-language blurb per word, shown next to the product
+   image on the buy page. Keyed by the same lowercase key as everything
+   else — falls back to a generic line for anything not listed here
+   (e.g. words bought over from the Word Atelier in "Your Words"). ── */
+var MS_WORD_BLURB = {
+  earth:   'Earth is the place where we live — solid ground beneath every step.',
+  water:   'Water is what moves through everything alive, the first thing the body remembers.',
+  fire:    'Fire is the spark that turns still matter into motion and light.',
+  sun:     'Sun is the source every living rhythm on this planet keeps time by.',
+  moon:    'Moon is the quiet pull that shapes tides, sleep, and the turning of months.',
+  light:   'Light is what makes anything visible at all — the first sense to arrive.',
+  dark:    'Dark is the space light hasn&rsquo;t reached yet — rest, depth, the unseen.',
+  body:    'Body is the vessel every sound, breath, and feeling moves through.',
+  mind:    'Mind is the quiet voice that names, remembers, and decides.',
+  soul:    'Soul is the part of you that stays the same through every change.',
+  blood:   'Blood is the current that carries life to every corner of the body.',
+  breath:  'Breath is the one rhythm that never stops until everything else does.',
+  love:    'Love is the pull that makes distance feel like the wrong direction.',
+  fear:    'Fear is the body&rsquo;s oldest warning, still firing long after the danger is real.',
+  joy:     'Joy is what the body does when nothing needs fixing anymore.',
+  god:     'God is the word every culture reaches for when explaining feels impossible.',
+  time:    'Time is the one thing spent by everyone, saved by no one.',
+  space:   'Space is the distance that makes it possible for anything to move at all.',
+  truth:   'Truth is what&rsquo;s still standing after everything false has been said.',
+  country: 'Country is the shared ground a people agree to call home.',
+  india:   'India is the ancient root many of these very sounds first grew from.',
+  mother:  'Mother is the first voice, the first shape, the first safety.',
+  father:  'Father is the first structure — the one who shows what holding steady looks like.',
+  name:    'Name is the sound a person is called back to, again and again.',
+  elementssignature: 'The complete elemental set — every natural force, one origin story.',
+  humansignature:    'The full human story — body, mind and soul in one unlocked meaning.',
+  emotionssignature: 'Every core feeling, decoded to its first phonetic root.',
+  cosmossignature:   'The largest ideas we have words for, traced back to pure sound.',
+  nationssignature:  'Where a people, a land and a name become one meaning.'
+};
+function msWordBlurb(key) {
+  return MS_WORD_BLURB[key] || 'A word carrying its own natural-origin vibration and history.';
+}
 
 /* ── RENDER STORE GRID ── */
 window.msRenderStore = function() {
