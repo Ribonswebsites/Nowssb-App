@@ -141,7 +141,30 @@
     if (typeof window.msStoreBgSync === 'function') window.msStoreBgSync();
     if (typeof window.nwsbConnectSetupBgSync === 'function') window.nwsbConnectSetupBgSync();
     if (typeof window.nwsbVerifyBgSync === 'function') window.nwsbVerifyBgSync();
+    if (typeof window.nwsbVkycBgSync === 'function') window.nwsbVkycBgSync();
   }
+
+  // The Fashion Background picker lives inside #sub-social, a plain
+  // .sub-screen (z-index:600). Screens that call SS.open('fashionbg') from
+  // their OWN much-higher-z-index overlay (NowssB Verified at 100001, the
+  // Connect setup wizard at 9400, ...) need #sub-social bumped above that
+  // overlay first — otherwise the picker opens but paints invisibly behind
+  // it, which reads as "the button doesn't do anything". Reset happens the
+  // moment #sub-social loses its .open class again (SS.close removes it).
+  window.nwsbOpenFashionBgOverlay = function () {
+    var sc = document.getElementById('sub-social');
+    if (sc) {
+      sc.style.zIndex = '200000';
+      var mo = new MutationObserver(function () {
+        if (!sc.classList.contains('open')) {
+          sc.style.zIndex = '';
+          mo.disconnect();
+        }
+      });
+      mo.observe(sc, { attributes: true, attributeFilter: ['class'] });
+    }
+    if (window.SS) window.SS.open('fashionbg');
+  };
 
   // Explicitly picking a Black-Edition theme card clears any custom photo —
   // otherwise the !important custom override would keep winning over the

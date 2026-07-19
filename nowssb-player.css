@@ -60,19 +60,18 @@
 /* banner under the top bar — icon + divider + looping text, replaces the
    old two separate static lines (tagline + ritual counter) */
 .lgp .lgp-info-banner {
-  display:flex; align-items:center; gap:10px; margin-top:8px; height:44px;
-  background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.14);
-  border-radius:14px !important; padding:0 14px;
-  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
-  max-width:88%;
+  display:flex; align-items:center; gap:14px; margin-top:10px; width:100%;
+  background:rgba(0,0,0,.82); border:1px solid rgba(255,255,255,.08);
+  border-radius:16px !important; padding:14px 16px;
 }
 .lgp .lgp-info-banner-icon {
-  width:26px; height:26px; min-width:0 !important; min-height:0 !important;
+  width:48px; height:48px; min-width:0 !important; min-height:0 !important;
   border-radius:50% !important; background-size:cover; background-position:center; flex-shrink:0;
+  border:1px solid rgba(255,255,255,.18);
 }
-.lgp .lgp-info-banner-divider { width:1px; align-self:stretch; margin:8px 0; background:rgba(255,255,255,.2); flex-shrink:0; }
+.lgp .lgp-info-banner-divider { width:1px; height:48px; background:rgba(255,255,255,.15); flex-shrink:0; }
 .lgp .lgp-info-banner-text {
-  font-size:12px; font-weight:700; letter-spacing:.3px; color:rgba(255,255,255,.92);
+  font-size:15px; font-weight:800; letter-spacing:.2px; color:#fff;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .lgp .lgp-info-banner-text.dash-in { animation:nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both; }
