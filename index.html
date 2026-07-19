@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=297">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=364">
+<link rel="stylesheet" href="nowssb-nm.css?v=366">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -3117,14 +3117,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
       <!-- ── LIBRARY VIEW: categories + pills ── -->
       <div id="rmLibraryContent">
-      
 
-
-      <div id="rm-word-sections-container"></div>
-      <script src="app/js/part010.js?v=163"></script>
-
-      <!-- ── VIDEO BANNER — store icon + text pill middle-right ── -->
-      <div class="nss-vid-banner" style="margin:16px 0;border-radius:22px !important;">
+      <!-- ── VIDEO BANNER — below the search bar, square corners, plain
+           icon+text (no pill background) middle-right ── -->
+      <div class="nss-vid-banner" style="margin:16px 0;">
         <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
         <div class="nss-vid-banner-fade"></div>
         <div class="nss-vid-banner-pill-wrap">
@@ -3135,6 +3131,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
 
+      <div id="rm-word-sections-container"></div>
+      <script src="app/js/part010.js?v=163"></script>
+
       <!-- Search any word CTA -->
       <div class="rm-search-any">
         <span class="rm-search-any-label">AI-Powered · Any Language</span>
@@ -3142,112 +3141,30 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="rm-search-any-sub">Country names, ancient words, your own name — the Shabdapathy AI decodes the phonetic origin of every word ever spoken.</div>
       </div>
 
-      <span class="sub-section-label" style="margin-top:20px;">All Words</span>
-      <div class="rm-pills">
-        <div class="rm-pill" onclick="loadWordOrigin('earth')">Earth</div>
-        <div class="rm-pill" onclick="loadWordOrigin('water')">Water</div>
-        <div class="rm-pill" onclick="loadWordOrigin('fire')">Fire</div>
-        <div class="rm-pill" onclick="loadWordOrigin('sun')">Sun</div>
-        <div class="rm-pill" onclick="loadWordOrigin('moon')">Moon</div>
-        <div class="rm-pill" onclick="loadWordOrigin('stone')">Stone</div>
-        <div class="rm-pill" onclick="loadWordOrigin('rain')">Rain</div>
-        <div class="rm-pill" onclick="loadWordOrigin('thunder')">Thunder</div>
-        <div class="rm-pill" onclick="loadWordOrigin('storm')">Storm</div>
-        <div class="rm-pill" onclick="loadWordOrigin('god')">God</div>
-        <div class="rm-pill" onclick="loadWordOrigin('soul')">Soul</div>
-        <div class="rm-pill" onclick="loadWordOrigin('love')">Love</div>
-        <div class="rm-pill" onclick="loadWordOrigin('truth')">Truth</div>
-        <div class="rm-pill" onclick="loadWordOrigin('light')">Light</div>
-        <div class="rm-pill" onclick="loadWordOrigin('grace')">Grace</div>
-        <div class="rm-pill" onclick="loadWordOrigin('prayer')">Prayer</div>
-        <div class="rm-pill" onclick="loadWordOrigin('spirit')">Spirit</div>
-        <div class="rm-pill" onclick="loadWordOrigin('divine')">Divine</div>
-        <div class="rm-pill" onclick="loadWordOrigin('name')">Name</div>
-        <div class="rm-pill" onclick="loadWordOrigin('mind')">Mind</div>
-        <div class="rm-pill" onclick="loadWordOrigin('india')">India</div>
-        <div class="rm-pill" onclick="loadWordOrigin('breath')">Breath</div>
-        <div class="rm-pill" onclick="loadWordOrigin('blood')">Blood</div>
-        <div class="rm-pill" onclick="loadWordOrigin('dream')">Dream</div>
-        <div class="rm-pill" onclick="loadWordOrigin('voice')">Voice</div>
-        <div class="rm-pill" onclick="loadWordOrigin('vision')">Vision</div>
-        <div class="rm-pill" onclick="loadWordOrigin('thought')">Thought</div>
-        <div class="rm-pill" onclick="loadWordOrigin('time')">Time</div>
-        <div class="rm-pill" onclick="loadWordOrigin('space')">Space</div>
-        <div class="rm-pill" onclick="loadWordOrigin('dark')">Dark</div>
-        <div class="rm-pill" onclick="loadWordOrigin('star')">Star</div>
-        <div class="rm-pill" onclick="loadWordOrigin('cosmos')">Cosmos</div>
-        <div class="rm-pill" onclick="loadWordOrigin('void')">Void</div>
-        <div class="rm-pill" onclick="loadWordOrigin('eternal')">Eternal</div>
-        <div class="rm-pill" onclick="loadWordOrigin('infinity')">Infinity</div>
-        <div class="rm-pill" onclick="loadWordOrigin('abyss')">Abyss</div>
-        <div class="rm-pill" onclick="loadWordOrigin('sky')">Sky</div>
-        <div class="rm-pill" onclick="loadWordOrigin('sea')">Sea</div>
-        <div class="rm-pill" onclick="loadWordOrigin('tree')">Tree</div>
-        <div class="rm-pill" onclick="loadWordOrigin('wind')">Wind</div>
-        <div class="rm-pill" onclick="loadWordOrigin('river')">River</div>
-        <div class="rm-pill" onclick="loadWordOrigin('forest')">Forest</div>
-        <div class="rm-pill" onclick="loadWordOrigin('mountain')">Mountain</div>
-        <div class="rm-pill" onclick="loadWordOrigin('ocean')">Ocean</div>
-        <div class="rm-pill" onclick="loadWordOrigin('jungle')">Jungle</div>
-        <div class="rm-pill" onclick="loadWordOrigin('mother')">Mother</div>
-        <div class="rm-pill" onclick="loadWordOrigin('father')">Father</div>
-        <div class="rm-pill" onclick="loadWordOrigin('child')">Child</div>
-        <div class="rm-pill" onclick="loadWordOrigin('man')">Man</div>
-        <div class="rm-pill" onclick="loadWordOrigin('woman')">Woman</div>
-        <div class="rm-pill" onclick="loadWordOrigin('king')">King</div>
-        <div class="rm-pill" onclick="loadWordOrigin('queen')">Queen</div>
-        <div class="rm-pill" onclick="loadWordOrigin('brother')">Brother</div>
-        <div class="rm-pill" onclick="loadWordOrigin('sister')">Sister</div>
-        <div class="rm-pill" onclick="loadWordOrigin('life')">Life</div>
-        <div class="rm-pill" onclick="loadWordOrigin('death')">Death</div>
-        <div class="rm-pill" onclick="loadWordOrigin('power')">Power</div>
-        <div class="rm-pill" onclick="loadWordOrigin('heart')">Heart</div>
-        <div class="rm-pill" onclick="loadWordOrigin('peace')">Peace</div>
-        <div class="rm-pill" onclick="loadWordOrigin('wisdom')">Wisdom</div>
-        <div class="rm-pill" onclick="loadWordOrigin('freedom')">Freedom</div>
-        <div class="rm-pill" onclick="loadWordOrigin('karma')">Karma</div>
-        <div class="rm-pill" onclick="loadWordOrigin('energy')">Energy</div>
-        <div class="rm-pill" onclick="loadWordOrigin('zeus')">Zeus</div>
-        <div class="rm-pill" onclick="loadWordOrigin('anubis')">Anubis</div>
-        <div class="rm-pill" onclick="loadWordOrigin('medusa')">Medusa</div>
-        <div class="rm-pill" onclick="loadWordOrigin('kitsune')">Kitsune</div>
-        <div class="rm-pill" onclick="loadWordOrigin('oni')">Oni</div>
-        <div class="rm-pill" onclick="loadWordOrigin('valkyrie')">Valkyrie</div>
-        <div class="rm-pill" onclick="loadWordOrigin('dragon')">Dragon</div>
-        <div class="rm-pill" onclick="loadWordOrigin('phoenix')">Phoenix</div>
-        <div class="rm-pill" onclick="loadWordOrigin('hydra')">Hydra</div>
-        <div class="rm-pill" onclick="loadWordOrigin('titan')">Titan</div>
-        <div class="rm-pill" onclick="loadWordOrigin('odin')">Odin</div>
-        <div class="rm-pill" onclick="loadWordOrigin('thor')">Thor</div>
-        <div class="rm-pill" onclick="loadWordOrigin('samurai')">Samurai</div>
-        <div class="rm-pill" onclick="loadWordOrigin('viking')">Viking</div>
-        <div class="rm-pill" onclick="loadWordOrigin('spartan')">Spartan</div>
-        <div class="rm-pill" onclick="loadWordOrigin('centurion')">Centurion</div>
-        <div class="rm-pill" onclick="loadWordOrigin('ninja')">Ninja</div>
-        <div class="rm-pill" onclick="loadWordOrigin('warrior')">Warrior</div>
-        <div class="rm-pill" onclick="loadWordOrigin('blade')">Blade</div>
-        <div class="rm-pill" onclick="loadWordOrigin('shield')">Shield</div>
-        <div class="rm-pill" onclick="loadWordOrigin('gladiator')">Gladiator</div>
-        <div class="rm-pill" onclick="loadWordOrigin('archer')">Archer</div>
-        <div class="rm-pill" onclick="loadWordOrigin('egypt')">Egypt</div>
-        <div class="rm-pill" onclick="loadWordOrigin('babylon')">Babylon</div>
-        <div class="rm-pill" onclick="loadWordOrigin('troy')">Troy</div>
-        <div class="rm-pill" onclick="loadWordOrigin('sparta')">Sparta</div>
-        <div class="rm-pill" onclick="loadWordOrigin('rome')">Rome</div>
-        <div class="rm-pill" onclick="loadWordOrigin('indus')">Indus</div>
-        <div class="rm-pill" onclick="loadWordOrigin('maya')">Maya</div>
-        <div class="rm-pill" onclick="loadWordOrigin('aztec')">Aztec</div>
-        <div class="rm-pill" onclick="loadWordOrigin('persia')">Persia</div>
-        <div class="rm-pill" onclick="loadWordOrigin('carthage')">Carthage</div>
-        <div class="rm-pill" onclick="loadWordOrigin('calm')">Calm</div>
-        <div class="rm-pill" onclick="loadWordOrigin('silence')">Silence</div>
-        <div class="rm-pill" onclick="loadWordOrigin('harmony')">Harmony</div>
-        <div class="rm-pill" onclick="loadWordOrigin('still')">Still</div>
-        <div class="rm-pill" onclick="loadWordOrigin('breathe')">Breathe</div>
-        <div class="rm-pill" onclick="loadWordOrigin('forgive')">Forgive</div>
-        <div class="rm-pill" onclick="loadWordOrigin('release')">Release</div>
-        <div class="rm-pill" onclick="loadWordOrigin('serenity')">Serenity</div>
-        <div class="rm-pill" onclick="loadWordOrigin('strength')">Strength</div>
+      <!-- ── REQUEST-A-WORD BANNER ── -->
+      <div class="rm-req-banner" onclick="rmOpenWordRequest()">
+        <div class="rm-req-banner-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="rm-req-banner-text">
+          <div class="rm-req-banner-eyebrow">Can't find your word?</div>
+          <div class="rm-req-banner-title">Request a Word</div>
+          <div class="rm-req-banner-sub">Personally crafted &amp; delivered within 48 hours.</div>
+        </div>
+        <button class="rm-req-banner-btn" onclick="event.stopPropagation();rmOpenWordRequest()">
+          Request
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+        </button>
+      </div>
+
+      <!-- ── DISCLAIMER + FOOTER ── -->
+      <div class="rm-disclaimer">
+        <div class="rm-disclaimer-title">Disclaimer &amp; Confidentiality</div>
+        <div class="rm-disclaimer-text">Word origins, phonetic breakdowns and healing associations shared here are for educational and wellness purposes only — they are not medical advice and do not replace professional diagnosis or treatment. Requested and purchased words, and any information you share with us, are kept strictly confidential and are never sold or shared with third parties.</div>
+      </div>
+      <div class="rm-footer">
+        <div class="rm-footer-brand"><span class="b">Nowss</span><span class="t">B</span></div>
+        <div class="rm-footer-copy">© 2026 Adv. Sanjaykumar Gadge · Shabdapathy</div>
       </div>
 
       </div>
@@ -3577,7 +3494,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=311"></script>
+<script src="app/js/part012.js?v=312"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">

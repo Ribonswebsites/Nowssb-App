@@ -2273,6 +2273,51 @@ function rmdBackToLibrary() {
   if (sub)  sub.scrollTop = 0;
 }
 
+// ── Request-a-word flow (replaces the old fixed "All Words" pill grid) —
+// mirrors the per-word $2.99 request sheet already used in Word Science
+// (part030.js's wsRequestThisWord/_wsShowRequestSheet), but generalized
+// with a text field since there's no word already in view here.
+function rmOpenWordRequest() {
+  var existing = document.getElementById('rmReqSheet');
+  if (existing) existing.remove();
+  var sheet = document.createElement('div');
+  sheet.id = 'rmReqSheet';
+  sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);';
+  sheet.innerHTML = '<div style="width:100%;background:#0e1828;border-top:1px solid rgba(232,213,163,0.2);padding:32px 24px max(env(safe-area-inset-bottom,28px),28px);font-family:\'DM Sans\',sans-serif;box-sizing:border-box;">' +
+    '<div style="font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.6);margin-bottom:12px;">Request a Word</div>' +
+    '<div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;">Any word. Yours alone.</div>' +
+    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:20px;">Type any word, name or phrase — our team personally crafts its phonetic breakdown, natural origin and healing intention, delivered to your library within 48 hours.</div>' +
+    '<input id="rmReqInput" type="text" placeholder="Type a word…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:\'DM Sans\',sans-serif;font-size:15px;padding:14px 16px;margin-bottom:16px;outline:none;">' +
+    '<button onclick="rmConfirmWordRequest()" style="width:100%;background:#e8d5a3;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:700;color:#060c18;padding:16px 20px;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">Request · $2.99 <span style="opacity:0.5;font-weight:400;">48 hrs delivery</span></button>' +
+    '<button onclick="document.getElementById(\'rmReqSheet\').remove()" style="width:100%;background:none;border:1px solid rgba(255,255,255,0.12);cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:400;color:rgba(255,255,255,0.45);padding:14px 20px;">Cancel</button>' +
+    '</div>';
+  sheet.onclick = function(e){ if (e.target === sheet) sheet.remove(); };
+  document.body.appendChild(sheet);
+  setTimeout(function() { var inp = document.getElementById('rmReqInput'); if (inp) inp.focus(); }, 50);
+}
+
+function rmConfirmWordRequest() {
+  var inp = document.getElementById('rmReqInput');
+  var word = inp ? inp.value.trim() : '';
+  if (!word) { if (inp) inp.style.borderColor = 'rgba(255,100,100,0.6)'; return; }
+  word = word.charAt(0).toUpperCase() + word.slice(1);
+  var sheet = document.getElementById('rmReqSheet');
+  if (sheet) sheet.remove();
+  // TODO: integrate payment $2.99 here — same placeholder pattern as
+  // wsConfirmRequest() in part030.js until Razorpay is wired up.
+  var waiting = document.createElement('div');
+  waiting.id = 'rmReqWaiting';
+  waiting.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.95);font-family:\'DM Sans\',sans-serif;flex-direction:column;gap:16px;';
+  waiting.innerHTML = '<div style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(232,213,163,0.2);border-top-color:#e8d5a3;animation:wsSpinAnim 0.8s linear infinite;"></div>' +
+    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);letter-spacing:1px;">Processing request…</div>';
+  document.body.appendChild(waiting);
+  setTimeout(function() {
+    var w = document.getElementById('rmReqWaiting');
+    if (w) w.remove();
+    if (typeof _wsShowSuccessSheet === 'function') _wsShowSuccessSheet(word);
+  }, 1800);
+}
+
 function rmSearch() {
   var val = (document.getElementById('rmSearchInput')||{}).value;
   if (!val) return;
