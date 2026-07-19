@@ -1820,6 +1820,26 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   color: rgba(255,255,255,0.4); margin-top: 8px;
 }
 
+/* ── Signature word card — the most expensive item in each category,
+   using that category's old banner photo as its own product image. Gold
+   glassmorphism sets it apart from the plain word cards beside it. ── */
+.rm-word-card-signature {
+  border: 1.5px solid rgba(232,213,163,0.55) !important;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5), 0 0 22px rgba(232,213,163,0.28), inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.rm-word-card-signature .rm-word-card-body {
+  background: rgba(232,213,163,0.14) !important; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(232,213,163,0.35) !important;
+}
+.rm-word-card-signature .rm-word-card-name { color: #f5e6c8; }
+.rm-word-card-signature .rm-word-card-root { color: rgba(232,213,163,0.8); }
+.rm-word-card-signature-tag {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: #060c18; background: #e8d5a3;
+  padding: 3px 8px; border-radius: 999px !important;
+}
+
 /* ── Subscription plans: plain horizontal swipe carousel — no 3D/perspective,
    just a normal scroll-snap row. Same on normal home and Fashion home;
    this screen doesn't take on the neumorphic theme either way. ── */

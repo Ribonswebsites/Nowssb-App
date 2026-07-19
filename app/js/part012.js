@@ -1922,7 +1922,44 @@ const RM_TIERS = {
   elite_grace:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974064/f1849ab0-517c-11f1-9c9e-43067f971164_gyqpko.png'] },
   elite_freedom:  { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974065/f185ac20-517c-11f1-9c9e-43067f971164_vfyfa0.png'] },
   elite_karma:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974067/ffbb0340-516c-11f1-9b86-d16f5852128e_aavqzy.png'] },
-  elite_energy:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png'] }
+  elite_energy:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png'] },
+  // ── SIGNATURE TIERS — $2.99, the most expensive word in each category.
+  // One per category section (see part010.js's SIGNATURE map) — reuses
+  // the same styled photo banner that used to sit above the category as
+  // that word's own product image, instead of discarding it. ──
+  sig_off50:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/sale-white.webp'] },
+  sig_elements: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/elements-dark.webp'] },
+  sig_sacred:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/sacred-divine-dark.webp'] },
+  sig_identity: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/identity-mind-dark.webp'] },
+  sig_cosmos:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/cosmos-time-purple.webp'] },
+  sig_nature:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/nature-forest-white.webp'] },
+  sig_family:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/family-love-dark.webp'] },
+  sig_elite:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/elite-sovereign-dark.webp'] },
+  sig_premium:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/premium-exclusive-silver.webp'] },
+  sig_mythical: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/mythical-dark.png'] },
+  sig_warriors: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/warriors-dark.png'] },
+  sig_ancient:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/ancient-civilizations.png'] },
+  sig_peace:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/peace-edition.png'] },
+  sig_white:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/white-edition-2.png'] },
+  sig_black:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://cdn.jsdelivr.net/gh/ribonswebsites/nowssb-app@main/assets/banners/black-edition.png'] }
+};
+
+// ── SIGNATURE WORDS — display-name overrides (loadWordOrigin only
+// auto-capitalizes the first letter, which breaks for these multi-word
+// names) and their tier mapping. Keys/names/images mirror part010.js's
+// SIGNATURE map — keep both in sync if a category is added or removed. ──
+const RM_DISPLAY_NAME = {
+  sale: 'Sale', elements: 'Elements', sacreddivine: 'Sacred Divine', identitymind: 'Identity Mind',
+  cosmostime: 'Cosmos Time', natureforest: 'Nature Forest', familylove: 'Family Love',
+  elitesovereign: 'Elite Sovereign', premiumexclusive: 'Premium Exclusive', mythicaledition: 'Mythical Edition',
+  warriorsedition: 'Warriors Edition', ancientcivilizations: 'Ancient Civilizations', peaceedition: 'Peace Edition',
+  whiteedition: 'White Edition', blackedition: 'Black Edition'
+};
+const RM_SIGNATURE_TIER = {
+  sale: 'sig_off50', elements: 'sig_elements', sacreddivine: 'sig_sacred', identitymind: 'sig_identity',
+  cosmostime: 'sig_cosmos', natureforest: 'sig_nature', familylove: 'sig_family', elitesovereign: 'sig_elite',
+  premiumexclusive: 'sig_premium', mythicaledition: 'sig_mythical', warriorsedition: 'sig_warriors',
+  ancientcivilizations: 'sig_ancient', peaceedition: 'sig_peace', whiteedition: 'sig_white', blackedition: 'sig_black'
 };
 
 // ── ELITE WORDS — each has its own single banner ──
@@ -1999,6 +2036,10 @@ const RM_WORD_TIER = {
   karma:    'elite_karma',
   energy:   'elite_energy'
 };
+// Fold the signature words (see RM_SIGNATURE_TIER above) into the same
+// lookup table loadWordOrigin() reads, so they behave exactly like every
+// other purchasable word.
+Object.keys(RM_SIGNATURE_TIER).forEach(function(k) { RM_WORD_TIER[k] = RM_SIGNATURE_TIER[k]; });
 
 // ── WORD ROOT/ORIGIN LABELS ──
 const RM_ROOTS = {
@@ -2101,11 +2142,16 @@ function rmdGoSlide(idx) {
   dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
 }
 
+// Multi-word signature names (e.g. "cosmostime" -> "Cosmos Time") need an
+// explicit lookup — every other word is a single token, so a plain
+// first-letter capitalize is enough for those.
+function rmDisplayName(key) { return RM_DISPLAY_NAME[key] || (key.charAt(0).toUpperCase() + key.slice(1)); }
+
 // ── LOAD WORD ORIGIN ──
 function loadWordOrigin(key) {
   key = key.toLowerCase();
   _rmdCurrentKey = key;
-  var word = key.charAt(0).toUpperCase() + key.slice(1);
+  var word = rmDisplayName(key);
   var tierKey = RM_WORD_TIER[key] || 'basic_a';
   var tier = RM_TIERS[tierKey];
   var root = RM_ROOTS[key] || 'Natural Origin · ' + word;
@@ -2196,7 +2242,7 @@ function rmdPopulateSimilar(key) {
      that's actually meant to represent "a word" consistently. */
   var img = 'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778571475/grok_image_1778520937416_jazknf.jpg';
   row.innerHTML = matches.map(function(k) {
-    var w = k.charAt(0).toUpperCase() + k.slice(1);
+    var w = rmDisplayName(k);
     var t = RM_TIERS[RM_WORD_TIER[k] || 'basic_a'];
     return '<div onclick="loadWordOrigin(\'' + k + '\')" style="flex-shrink:0;width:96px;cursor:pointer;">' +
       '<div style="width:96px;height:96px;border-radius:10px;background:#111 url(\'' + img + '\') center/cover;border:1px solid rgba(255,255,255,0.1);"></div>' +
@@ -2210,7 +2256,7 @@ function _rmdRefreshActions() {
   var key = _rmdCurrentKey; if (!key) return;
   var tierKey = RM_WORD_TIER[key] || 'basic_a';
   var tier = RM_TIERS[tierKey];
-  var word = key.charAt(0).toUpperCase() + key.slice(1);
+  var word = rmDisplayName(key);
   var tier_img = tier.banners[0] || '';
   var inWish = (window.nssWishlist||[]).some(function(w){ return w.id === 'rm-'+key; });
   var inCart  = (window.nssCart||[]).some(function(c){ return c.id === 'rm-'+key; });
@@ -2226,7 +2272,7 @@ function rmdToggleWish() {
   var key = _rmdCurrentKey; if (!key) return;
   var tierKey = RM_WORD_TIER[key] || 'basic_a';
   var tier = RM_TIERS[tierKey];
-  var word = key.charAt(0).toUpperCase() + key.slice(1);
+  var word = rmDisplayName(key);
   if (typeof nssToggleWishlist === 'function')
     nssToggleWishlist({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:tier.banners[0]||'' });
   _rmdRefreshActions();
@@ -2236,7 +2282,7 @@ function rmdAddCart() {
   var key = _rmdCurrentKey; if (!key) return;
   var tierKey = RM_WORD_TIER[key] || 'basic_a';
   var tier = RM_TIERS[tierKey];
-  var word = key.charAt(0).toUpperCase() + key.slice(1);
+  var word = rmDisplayName(key);
   if (typeof nssAddToCart === 'function')
     nssAddToCart({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:tier.banners[0]||'' });
   _rmdRefreshActions();
