@@ -145,22 +145,6 @@ function _runSequentialPreload() {
 }
 _runSequentialPreload();
 
-// #homeHeader is a fixed overlay (position:fixed) sitting on top of #home, so
-// content that isn't meant to sit *behind* it (e.g. the store banner carousel)
-// needs real top clearance equal to the header's actual rendered height —
-// which varies by device via safe-area-inset-top, so it's measured live
-// rather than hardcoded.
-function syncHomeHeaderHeight(hdr) {
-  requestAnimationFrame(() => {
-    const h = hdr.offsetHeight;
-    if (h) document.documentElement.style.setProperty('--home-header-h', h + 'px');
-  });
-}
-window.addEventListener('resize', () => {
-  const homeHdr = document.getElementById('homeHeader');
-  if (homeHdr && homeHdr.style.display !== 'none') syncHomeHeaderHeight(homeHdr);
-});
-
 let currentScreen = 'splash';
 function goTo(id) {
   const cur = document.getElementById(currentScreen);
@@ -178,10 +162,7 @@ function goTo(id) {
      guard it here too so every caller is protected, not just the ones
      that remembered to. */
   if (cur === next) {
-    if (homeHdr) {
-      homeHdr.style.display = (id === 'home') ? 'flex' : 'none';
-      if (id === 'home') syncHomeHeaderHeight(homeHdr);
-    }
+    if (homeHdr) homeHdr.style.display = (id === 'home') ? 'flex' : 'none';
     return;
   }
 
@@ -228,10 +209,7 @@ function goTo(id) {
   next.classList.add('active');
   next.scrollTop = 0;
   currentScreen = id;
-  if (homeHdr) {
-    homeHdr.style.display = (id === 'home') ? 'flex' : 'none';
-    if (id === 'home') syncHomeHeaderHeight(homeHdr);
-  }
+  if (homeHdr) homeHdr.style.display = (id === 'home') ? 'flex' : 'none';
 
   /* Light screens must not show the dark app background in any bottom gap.
      Toggle a plain body/html class (works where :has() doesn't) that lightens
