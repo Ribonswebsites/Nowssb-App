@@ -350,8 +350,11 @@
             '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
           '</button>' +
         '</div>' +
-        '<div class="lgp-tagline">' + ['The','new','fashion','trend','of','meditation'].map(function (wd, i) { return '<span style="animation-delay:' + (0.25 + i * 0.18).toFixed(2) + 's">' + wd + '</span>'; }).join(' ') + '</div>' +
-        '<div class="lgp-ritual">' + ritual + ' Ritual · ' + (idx + 1) + ' of ' + total + '</div>' +
+        '<div class="lgp-info-banner">' +
+          '<div class="lgp-info-banner-icon" style="background-image:url(\'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png\')"></div>' +
+          '<div class="lgp-info-banner-divider"></div>' +
+          '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
+        '</div>' +
         '<div class="lgp-visual">' + visual +
           '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
@@ -369,6 +372,28 @@
         '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
         center +
       '</div>';
+
+    /* Banner under the top bar — icon + divider + looping text (was two
+       separate static lines: the "fashion trend" tagline and the "Ritual ·
+       N of total" counter). Cycles between them on a shared timer, reset on
+       every re-render since the whole body (including this text node) gets
+       rebuilt on every word/phase change. */
+    (function () {
+      var el = document.getElementById('lgpBannerText');
+      if (!el) return;
+      var lines = ['The new fashion trend of meditation', ritual + ' Ritual · ' + (idx + 1) + ' of ' + total];
+      var i = 0;
+      function paint() {
+        el.textContent = lines[i % lines.length];
+        el.classList.remove('dash-in');
+        void el.offsetWidth;
+        el.classList.add('dash-in');
+        i++;
+      }
+      paint();
+      if (window._lgpBannerTimer) clearInterval(window._lgpBannerTimer);
+      window._lgpBannerTimer = setInterval(paint, 2800);
+    })();
 
     /* Re-insert the preserved video element (kept playing, no reload/seek). */
     if (_keepVid) {

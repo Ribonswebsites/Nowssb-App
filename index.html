@@ -104,10 +104,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
-<link rel="stylesheet" href="app/app.css?v=299">
+<link rel="stylesheet" href="app/app.css?v=300">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
 <link rel="stylesheet" href="nowssb-nm.css?v=391">
-<link rel="stylesheet" href="nowssb-player.css?v=191">
+<link rel="stylesheet" href="nowssb-player.css?v=192">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -620,10 +620,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <span class="brand-name" style="font-size:22px;text-shadow:0 1px 8px rgba(0,0,0,0.5);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');window._fashionHomeIntroSeen=true;goTo('home-nm')" title="Light Mode" style="width:40px;height:40px;min-width:40px;min-height:40px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;backdrop-filter:none;-webkit-backdrop-filter:none;flex-shrink:0;padding:0;box-sizing:border-box;">
+    <button onclick="SS.open('fashionbg')" aria-label="Customize background" title="Customize Background" style="width:40px;height:40px;min-width:40px;min-height:40px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex-shrink:0;padding:0;box-sizing:border-box;">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:36px;height:36px;object-fit:contain;display:block;" alt="">
+    </button>
+    <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');window._fashionHomeIntroSeen=true;goTo('home-nm')" title="Light Mode" style="width:40px;height:40px;min-width:40px;min-height:40px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex-shrink:0;padding:0;box-sizing:border-box;">
       <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780398892/11eba830-5e74-11f1-850d-112dd967e66d_uy7e7p.png" style="width:36px;height:36px;object-fit:contain;display:block;" alt="">
     </button>
-    <div id="homeMenuBtn" style="width:40px;height:40px;min-width:40px;min-height:40px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;padding:0;box-sizing:border-box;" onclick="openMenu()">
+    <div id="homeMenuBtn" style="width:40px;height:40px;min-width:40px;min-height:40px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;padding:0;box-sizing:border-box;" onclick="openMenu()">
       <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780207753/25935860-5cb7-11f1-a488-eb4ba8668ed2_vhv3rm.png" style="width:38px;height:38px;object-fit:contain;display:block;opacity:0.9;" alt="">
     </div>
   </div>
@@ -3627,7 +3630,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=319"></script>
+<script src="app/js/part012.js?v=320"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -7109,7 +7112,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 
-<script src="app/js/part033.js?v=229"></script>
+<script src="app/js/part033.js?v=230"></script>
 
 
 
@@ -8060,7 +8063,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part052.js?v=2"></script>
 <script src="nowssb-social.js?v=177" defer></script>
 <script src="nowssb-nm.js?v=173" defer></script>
-<script src="nowssb-player.js?v=284" defer></script>
+<script src="nowssb-player.js?v=285" defer></script>
 
 </body>
 </html>
