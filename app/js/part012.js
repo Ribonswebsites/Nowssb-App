@@ -1882,7 +1882,16 @@ function rmStoreBgSync() {
   if (!bg) return;
   var custom = null;
   try { custom = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
-  if (custom) bg.style.backgroundImage = "url('" + custom + "')";
+  if (custom === '__black__') {
+    bg.style.backgroundImage = 'none';
+    bg.style.backgroundColor = '#000';
+  } else if (custom) {
+    bg.style.backgroundImage = "url('" + custom + "')";
+    bg.style.backgroundColor = '';
+  } else {
+    bg.style.backgroundImage = '';
+    bg.style.backgroundColor = '';
+  }
 }
 
 // Video banner text — icon stays fixed, only the tagline cycles (same

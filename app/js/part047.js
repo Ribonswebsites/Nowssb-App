@@ -68,21 +68,57 @@
   ];
   window.NWSB_FASHION_BGS = NWSB_FASHION_BGS;
 
+  // Sentinel stored in localStorage when "Black" is picked instead of a
+  // real photo — lets every consumer (this file's own CSS var, rmStoreBgSync,
+  // msStoreBgSync) tell "plain black" apart from "no customization at all".
+  var NWSB_BG_BLACK = '__black__';
+
   window.nwsbSetFashionBg = function (url) {
     document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + url + "')");
+    document.body.style.setProperty('--nwsb-custom-bg-color', 'transparent');
     document.body.classList.add('nwsb-custom-fashion-bg');
     try { localStorage.setItem('nwsb_fashion_bg_custom', url); } catch (e) {}
     if (window._currentUid && window._fbSetDoc) {
       window._fbSetDoc(window._currentUid, { fashionBgCustom: url }).catch(function () {});
     }
     if (window.nwsbToast) nwsbToast('Background updated ✓');
-    // Other screens with their own "customize background" icon (Word
-    // Atelier, Meaning Store, ...) reuse this exact picker — re-sync them
-    // immediately so the change shows the moment you close the picker,
-    // whether or not that screen happens to be the one visible right now.
+    _nwsbSyncBgConsumers();
+  };
+
+  // "Black" toggle — plain solid black, no photo.
+  window.nwsbSetFashionBgBlack = function () {
+    document.body.style.setProperty('--nwsb-custom-bg-url', 'none');
+    document.body.style.setProperty('--nwsb-custom-bg-color', '#000');
+    document.body.classList.add('nwsb-custom-fashion-bg');
+    try { localStorage.setItem('nwsb_fashion_bg_custom', NWSB_BG_BLACK); } catch (e) {}
+    if (window._currentUid && window._fbSetDoc) {
+      window._fbSetDoc(window._currentUid, { fashionBgCustom: NWSB_BG_BLACK }).catch(function () {});
+    }
+    if (window.nwsbToast) nwsbToast('Background set to black ✓');
+    _nwsbSyncBgConsumers();
+  };
+
+  // "Default" toggle — clears all customization, back to the built-in look.
+  window.nwsbClearFashionBg = function () {
+    document.body.classList.remove('nwsb-custom-fashion-bg');
+    document.body.style.removeProperty('--nwsb-custom-bg-url');
+    document.body.style.removeProperty('--nwsb-custom-bg-color');
+    try { localStorage.removeItem('nwsb_fashion_bg_custom'); } catch (e) {}
+    if (window._currentUid && window._fbSetDoc) {
+      window._fbSetDoc(window._currentUid, { fashionBgCustom: null }).catch(function () {});
+    }
+    if (window.nwsbToast) nwsbToast('Background reset to default ✓');
+    _nwsbSyncBgConsumers();
+  };
+
+  // Other screens with their own "customize background" icon (Word
+  // Atelier, Meaning Store, ...) reuse this exact picker — re-sync them
+  // immediately so the change shows the moment you close the picker,
+  // whether or not that screen happens to be the one visible right now.
+  function _nwsbSyncBgConsumers() {
     if (typeof window.rmStoreBgSync === 'function') window.rmStoreBgSync();
     if (typeof window.msStoreBgSync === 'function') window.msStoreBgSync();
-  };
+  }
 
   // Explicitly picking a Black-Edition theme card clears any custom photo —
   // otherwise the !important custom override would keep winning over the
@@ -92,6 +128,7 @@
   window.setNwsbTheme = function (theme, explicit) {
     document.body.classList.remove('nwsb-custom-fashion-bg');
     document.body.style.removeProperty('--nwsb-custom-bg-url');
+    document.body.style.removeProperty('--nwsb-custom-bg-color');
     try { localStorage.removeItem('nwsb_fashion_bg_custom'); } catch (e) {}
     return _origSetNwsbTheme(theme, explicit);
   };
@@ -99,7 +136,11 @@
   (function initFashionBg() {
     var saved2 = null;
     try { saved2 = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
-    if (saved2) {
+    if (saved2 === NWSB_BG_BLACK) {
+      document.body.style.setProperty('--nwsb-custom-bg-url', 'none');
+      document.body.style.setProperty('--nwsb-custom-bg-color', '#000');
+      document.body.classList.add('nwsb-custom-fashion-bg');
+    } else if (saved2) {
       document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + saved2 + "')");
       document.body.classList.add('nwsb-custom-fashion-bg');
     }
@@ -142,8 +183,10 @@
   function fbgGo(n) { fbgActive = ((n % FBG_N) + FBG_N) % FBG_N; fbgPaint(); }
 
   /* ── Intro: enter picker from intro page (same pattern as Black Edition's
-     beEnterFromIntro/beIntroReset in part048.js) ── */
+     beEnterFromIntro/beIntroReset in part048.js) — shown once ever, then
+     every later open skips straight to the picker itself. ── */
   window.fbgEnterFromIntro = function () {
+    try { localStorage.setItem('nwsb_fbg_intro_seen', '1'); } catch (e) {}
     var intro = document.getElementById('fbgIntroPage');
     var main  = document.getElementById('fbgMainContent');
     if (intro) intro.classList.add('sl-intro-hidden');
@@ -156,6 +199,14 @@
   window.fbgIntroReset = function () {
     var intro = document.getElementById('fbgIntroPage');
     var main  = document.getElementById('fbgMainContent');
+    var seen = false;
+    try { seen = localStorage.getItem('nwsb_fbg_intro_seen') === '1'; } catch (e) {}
+    if (seen) {
+      if (intro) { intro.style.display = 'none'; intro.classList.add('sl-intro-hidden'); }
+      if (main)  main.style.display = 'block';
+      fbgCarouselInit();
+      return;
+    }
     if (intro) { intro.style.display = 'flex'; intro.classList.remove('sl-intro-hidden'); }
     if (main)  main.style.display = 'none';
   };
@@ -214,11 +265,14 @@
         else fbgApply();
       };
     });
+
+    fbgSyncModeButtons();
   };
 
   window.fbgApply = function () {
     var url = NWSB_FASHION_BGS[fbgActive];
     nwsbSetFashionBg(url);
+    fbgSyncModeButtons();
     var btn = document.getElementById('fbgApplyBtn');
     if (btn) {
       btn.textContent = 'APPLIED!';
@@ -229,4 +283,30 @@
       }, 1400);
     }
   };
+
+  // "Default" / "Black" toggle row — an alternative to picking one of the
+  // 9 photos: either clear all customization or force plain solid black.
+  window.fbgSelectMode = function (mode) {
+    if (mode === 'default') window.nwsbClearFashionBg();
+    else if (mode === 'black') window.nwsbSetFashionBgBlack();
+    fbgSyncModeButtons();
+  };
+  function fbgSyncModeButtons() {
+    var cur = null;
+    try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
+    var isDefault = !cur;
+    var isBlack = cur === NWSB_BG_BLACK;
+    var defBtn = document.getElementById('fbgDefaultBtn');
+    var blkBtn = document.getElementById('fbgBlackBtn');
+    if (defBtn) {
+      defBtn.style.background = isDefault ? '#e8d5a3' : 'rgba(255,255,255,0.05)';
+      defBtn.style.color      = isDefault ? '#060c18' : '#fff';
+      defBtn.style.borderColor = isDefault ? '#e8d5a3' : 'rgba(255,255,255,0.14)';
+    }
+    if (blkBtn) {
+      blkBtn.style.background = isBlack ? '#e8d5a3' : 'rgba(255,255,255,0.05)';
+      blkBtn.style.color      = isBlack ? '#060c18' : '#fff';
+      blkBtn.style.borderColor = isBlack ? '#e8d5a3' : 'rgba(255,255,255,0.14)';
+    }
+  }
 })();

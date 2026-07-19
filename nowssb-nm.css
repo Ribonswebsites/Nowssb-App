@@ -616,6 +616,17 @@ body.nm-mode #sub-social #ss-panel-subscription .bill-btn[style*="background:rgb
 /* Gold gradient CTA buttons keep dark text (already dark via re-whiten rule) */
 body.nm-mode #sub-social .ss-btn-primary { color: #060c18 !important; }
 
+/* Fashion Background picker — same dark-panel-in-nm-mode leak as the
+   subscription screen had: #sub-social's broad nm-mode rules were forcing
+   this panel's white text dark against its own still-dark backdrop,
+   making it unreadable. Same fix, same pattern. */
+#sub-social #ss-panel-fashionbg { background-color: #060c18 !important; }
+body.nm-mode #sub-social #ss-panel-fashionbg [style*="#fff"],
+body.nm-mode #sub-social #ss-panel-fashionbg [style*="255,255,255"],
+body.nm-mode #sub-social #ss-panel-fashionbg [style*="255, 255, 255"] { color: #fff !important; }
+body.nm-mode #sub-social #ss-panel-fashionbg [style*="e8d5a3"] { color: #e8d5a3 !important; }
+body.nm-mode #sub-social #ss-panel-fashionbg button[style*="background:#e8d5a3"] { color: #060c18 !important; }
+
 /* ═══════════════════════════════════════════════════════════════
    INNER PAGE 4 — ROUTINES  (#sub-routines + #sub-routine-detail)
    No neumorphic reskin here — the Daily Practice flow renders
@@ -1906,6 +1917,18 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 /* ── Hide scrollbars app-wide (scrolling still works via touch) ── */
 *::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
 * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+
+/* #msMeaningBody/#mpBody/#routinesBody/#routineDetailBody are display:flex;
+   flex-direction:column (app.css) so a footer-style element can margin-top:auto
+   to the bottom on short content. Flex items default to flex-shrink:1 though,
+   so on TALL content (more common — banners, grids, cards) every child gets
+   squeezed to fit the viewport instead of the page just scrolling, which on
+   a low min-height child (e.g. a request banner pinned to 44px by the
+   accessibility min-height rule) crushes it down to that floor and spills
+   its real content out above/below the collapsed box. Scrollable columns
+   should never shrink their children below natural size — pin it here once
+   instead of chasing flex-shrink:0 onto every individual child. */
+#msMeaningBody > *, #mpBody > *, #routinesBody > *, #routineDetailBody > * { flex-shrink: 0 !important; }
 /* ── Profile avatar edit pencil — always a perfect circle ── */
 #profilePhotoPencil, .ps-avatar-pencil {
   width: 30px !important; height: 30px !important; border-radius: 50% !important;
@@ -4072,6 +4095,7 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 
 body.fashion-home-active.nwsb-custom-fashion-bg #appBg {
   background-image: var(--nwsb-custom-bg-url) !important;
+  background-color: var(--nwsb-custom-bg-color, transparent) !important;
   background-size: cover !important;
   background-position: center !important;
 }
@@ -4083,6 +4107,7 @@ body.nwsb-custom-fashion-bg #appBgLayer2 { opacity: 0 !important; transition: no
    the plain #060c18 on #profileMainContent shows through untouched. */
 body.fashion-home-active.nwsb-custom-fashion-bg #profileBgLayer {
   background-image: var(--nwsb-custom-bg-url) !important;
+  background-color: var(--nwsb-custom-bg-color, transparent) !important;
 }
 
 /* NowssB Connect Home — custom background. Extra class on top of the
