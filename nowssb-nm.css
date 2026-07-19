@@ -1769,7 +1769,7 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
    centered together the normal way). The wrap is anchored from the LEFT
    instead of the right, so the icon's position never depends on how long
    the tagline is — only the text grows further right as it cycles. */
-.nss-vid-banner-pill-wrap { position: absolute; top: 50%; left: 50%; transform: translateY(-50%); z-index: 2; }
+.nss-vid-banner-pill-wrap { position: absolute; top: 50%; left: 56%; transform: translateY(-50%); z-index: 2; }
 .nss-vid-banner-pill { display: flex; align-items: center; gap: 8px; }
 .nss-vid-banner-pill-icon { width: 24px; height: 24px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
 .nss-vid-banner-pill-text {
