@@ -949,6 +949,7 @@
     document.getElementById('nwsbcs-stage-profile').style.display = 'none';
     document.getElementById('nwsbcs-stage-welcome').style.display = 'none';
     overlay.style.display = 'block';
+    window.nwsbConnectSetupBgSync();
   };
 
   window.nwsbConnectSetupBack = function () {
@@ -1038,6 +1039,26 @@
     var cb = _csOnComplete;
     _csOnComplete = null;
     if (cb) cb();
+  };
+
+  // Mirrors rmStoreBgSync()/msStoreBgSync() — same customize-background
+  // picker (opened from the welcome stage's header icon), applied to this
+  // wizard's own backdrop (#nwsbcsBg).
+  window.nwsbConnectSetupBgSync = function () {
+    var bg = document.getElementById('nwsbcsBg');
+    if (!bg) return;
+    var custom = null;
+    try { custom = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
+    if (custom === '__black__') {
+      bg.style.backgroundImage = 'none';
+      bg.style.backgroundColor = '#000';
+    } else if (custom) {
+      bg.style.backgroundImage = "url('" + custom + "')";
+      bg.style.backgroundColor = '';
+    } else {
+      bg.style.backgroundImage = '';
+      bg.style.backgroundColor = '';
+    }
   };
 
   /* ═══════════════════════════════════════════════════════════════

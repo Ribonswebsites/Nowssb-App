@@ -139,6 +139,7 @@
   function _nwsbSyncBgConsumers() {
     if (typeof window.rmStoreBgSync === 'function') window.rmStoreBgSync();
     if (typeof window.msStoreBgSync === 'function') window.msStoreBgSync();
+    if (typeof window.nwsbConnectSetupBgSync === 'function') window.nwsbConnectSetupBgSync();
   }
 
   // Explicitly picking a Black-Edition theme card clears any custom photo —

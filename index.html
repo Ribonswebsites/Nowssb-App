@@ -7303,6 +7303,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ NowssB Connect — one-time account setup wizard ══ -->
 <div id="nwsbConnectSetup" style="display:none;position:fixed;inset:0;z-index:9400;background:#060c18;overflow:hidden;">
 
+  <div class="sub-screen-bg" id="nwsbcsBg"></div>
+
   <!-- Stage 1 — intro -->
   <div class="nwsbcs-stage" id="nwsbcs-stage-intro">
     <div class="nwsbcs-scroll">
@@ -7392,6 +7394,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Stage 3 — welcome / complete -->
   <div class="nwsbcs-stage nwsbcs-stage-welcome" id="nwsbcs-stage-welcome" style="display:none;">
+    <div class="nwsbcs-brand-row" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:0;right:0;justify-content:space-between;padding-right:20px;z-index:2;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <img class="nwsbcs-brand-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="">
+        <span class="nwsbcs-brand-name" style="text-transform:none;letter-spacing:0.3px;font-size:13px;color:#fff;">NowssB Connect</span>
+      </div>
+      <button class="ms-bg-customize-btn" onclick="SS.open('fashionbg')" aria-label="Customize background">
+        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
+      </button>
+    </div>
     <div class="nwsbcs-welcome-content">
       <img class="nwsbcs-welcome-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="">
       <div class="nwsbcs-welcome-check">
@@ -8018,7 +8029,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ── NOWSSB FASHION HOME THEMES — scoped via body.fashion-home-active ── -->
 
 
-<script src="app/js/part047.js?v=178"></script>
+<script src="app/js/part047.js?v=179"></script>
 
 <!-- ── BLACK EDITION INTRO + CAROUSEL ── -->
 <script src="app/js/part048.js?v=164"></script>
@@ -8047,7 +8058,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part050.js?v=241"></script>
 <script src="app/js/part051.js?v=6" defer></script>
 <script src="app/js/part052.js?v=2"></script>
-<script src="nowssb-social.js?v=176" defer></script>
+<script src="nowssb-social.js?v=177" defer></script>
 <script src="nowssb-nm.js?v=173" defer></script>
 <script src="nowssb-player.js?v=284" defer></script>
 
