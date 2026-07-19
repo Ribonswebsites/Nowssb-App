@@ -1745,6 +1745,28 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   margin-top: 3px; text-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 
+/* ── Word Store — third banner: full-bleed video (same edge-to-edge
+   treatment as the store's other banners, no rounded corners/margin),
+   with a frosted store-icon+text pill parked middle-right. ── */
+.nss-vid-banner {
+  position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+  flex-shrink: 0; background: #000;
+}
+.nss-vid-banner-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.nss-vid-banner-fade { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 45%, rgba(4,10,24,0.45) 100%); pointer-events: none; }
+.nss-vid-banner-pill-wrap { position: absolute; top: 50%; right: 6%; transform: translateY(-50%); z-index: 2; }
+.nss-vid-banner-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(6,12,24,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.18); border-radius: 999px !important;
+  padding: 10px 18px 10px 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+.nss-vid-banner-pill-icon { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+.nss-vid-banner-pill-text {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff;
+  white-space: nowrap; text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
 /* ── Subscription plans: plain horizontal swipe carousel — no 3D/perspective,
    just a normal scroll-snap row. Same on normal home and Fashion home;
    this screen doesn't take on the neumorphic theme either way. ── */
