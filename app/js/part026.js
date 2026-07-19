@@ -99,26 +99,32 @@ window.msOpenDetailFromPlayer = function(key, wordDisplay) {
   if (window.msIsPurchased(key)) { window.msShowDetail(key, wordDisplay); }
 };
 
-/* ── BUY FLOW — custom bottom sheet, not the native confirm() popup (which
-   read as "the page is broken" rather than a purchase prompt). Same visual
-   language as the Word Atelier's request sheet. Razorpay integration slot
-   still simulated, mirrors the rest of the app's stub checkout flows. ── */
+/* ── BUY FLOW — reuses the same full-page detail panel purchased words
+   open into (#msDetailPanel), just showing a locked/preview state instead
+   of the AI-decoded meaning. A small anchored sheet (and before that, the
+   native confirm() popup) both read as "this doesn't look like the app,
+   it looks broken" — a real page, matching the Word Atelier's own word
+   detail page, is what this is supposed to feel like. ── */
 window.msBuy = function(key, wordDisplay, price) {
-  var existing = document.getElementById('msBuySheet');
-  if (existing) existing.remove();
-  var sheet = document.createElement('div');
-  sheet.id = 'msBuySheet';
-  sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);';
+  var dp = document.getElementById('msDetailPanel');
+  var dw = document.getElementById('msDetailWord');
+  var dc = document.getElementById('msDetailContent');
+  if (!dp || !dc) return;
   var wordSafe = wordDisplay.replace(/'/g, "\\'");
-  sheet.innerHTML = '<div style="width:100%;background:#0e1828;border-top:1px solid rgba(232,213,163,0.2);padding:32px 24px max(env(safe-area-inset-bottom,28px),28px);font-family:\'DM Sans\',sans-serif;box-sizing:border-box;">' +
-    '<div style="font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.6);margin-bottom:12px;">Unlock True Meaning</div>' +
-    '<div style="font-size:26px;font-weight:800;color:#fff;margin-bottom:8px;">' + wordDisplay + '</div>' +
-    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:24px;">One-time purchase. The meaning is revealed here and in your player, forever.</div>' +
-    '<button onclick="window.msConfirmBuy(\'' + key + '\',\'' + wordSafe + '\',' + price + ')" style="width:100%;background:#e8d5a3;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:700;color:#060c18;padding:16px 20px;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">Unlock · \u20b9' + price + ' <span style="opacity:0.5;font-weight:400;">→</span></button>' +
-    '<button onclick="document.getElementById(\'msBuySheet\').remove()" style="width:100%;background:none;border:1px solid rgba(255,255,255,0.12);cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:400;color:rgba(255,255,255,0.45);padding:14px 20px;">Cancel</button>' +
+  dw.textContent = wordDisplay;
+  dc.innerHTML = '<div class="ms-locked-state">' +
+    '<div class="ms-locked-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>' +
+    '<div class="ms-locked-title">This meaning is locked</div>' +
+    '<div class="ms-locked-desc">Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin of &ldquo;' + wordDisplay + '&rdquo; — what the sound does inside your body, which organ it activates, and where it existed before anyone wrote it down.</div>' +
+    '<button class="ms-locked-buy-btn" onclick="window.msConfirmBuy(\'' + key + '\',\'' + wordSafe + '\',' + price + ')">Unlock · \u20b9' + price + ' <span style="opacity:.6;">→</span></button>' +
     '</div>';
-  sheet.onclick = function (e) { if (e.target === sheet) sheet.remove(); };
-  document.body.appendChild(sheet);
+  dp.classList.add('open');
+};
+
+window.msConfirmBuy = function (key, wordDisplay, price) {
+  msMarkPurchased(key);
+  msRenderStore();
+  window.msShowDetail(key, wordDisplay);
 };
 
 window.msConfirmBuy = function (key, wordDisplay, price) {
