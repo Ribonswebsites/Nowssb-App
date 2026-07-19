@@ -1896,7 +1896,7 @@ function rmStoreBgSync() {
 
 // Video banner text — icon stays fixed, only the tagline cycles (same
 // dash-in-from-right treatment as the home Shop Now banner's word).
-var NSS_VID_BANNER_TAGLINES = ['Buy Request Words', 'Build Your Library', 'Heal with Sound'];
+var NSS_VID_BANNER_TAGLINES = ['Buy Words', 'Request Words', 'Build Your Library', 'Heal with Sound'];
 var _nssVidBannerTimer = null;
 function nssVidBannerCycle() {
   var el = document.getElementById('nssVidBannerText');

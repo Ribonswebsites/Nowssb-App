@@ -515,7 +515,7 @@ window.msStoreBgSync = function() {
 
 // Video banner text — icon stays fixed, only the tagline cycles (mirrors
 // nssVidBannerCycle() in part012.js).
-var MS_VID_BANNER_TAGLINES = ['Buy Request Meanings', 'Build Your Library', 'Heal with Sound'];
+var MS_VID_BANNER_TAGLINES = ['Buy Meanings', 'Request Meanings', 'Build Your Library', 'Heal with Sound'];
 var _msVidBannerTimer = null;
 function msVidBannerCycle() {
   var el = document.getElementById('msVidBannerText');
