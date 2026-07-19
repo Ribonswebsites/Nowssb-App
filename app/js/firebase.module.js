@@ -243,6 +243,17 @@ window.finishOnboarding = async () => {
     window._fbSetDoc(window._currentUid, { onboardingDone: true }, { merge: true }).catch(() => {});
   }
   try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
+  // Onboarding's own screens never touch .sub-screen overlays (the Store,
+  // Cart, etc.) — goTo() only manages which top-level .screen is active, so
+  // any overlay left .open from earlier in the session (its z-index sits
+  // above every .screen) would stay visibly on top of the freshly-reached
+  // home instead of the clean landing this is supposed to be. Same
+  // no-animation cleanup IG.nav('home') already does.
+  document.querySelectorAll('.sub-screen.open').forEach(function (el) {
+    el.style.transition = 'none';
+    el.classList.remove('open');
+    requestAnimationFrame(function () { el.style.transition = ''; });
+  });
   goTo('home');
 };
 
