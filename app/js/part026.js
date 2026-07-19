@@ -275,8 +275,49 @@ window.msEnterFromIntro = function() {
   setTimeout(msRenderStore, 80);
   setTimeout(msInitParallax, 120);
   msVidBannerCycle();
+  msDescBannerCycle();
   window.msStoreBgSync();
 };
+
+// Description banner — rotates the intro overview, then each step, one at
+// a time, dash-in from the right (same treatment as the video banner's
+// cycling tagline). Dots track progress.
+var MS_DESC_STEPS = [
+  { label: 'Overview', text: 'Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin — what the sound does inside your body, which organ it activates, and where this word existed before anyone wrote it down. Nothing here is free. Every meaning is a one-time unlock, yours forever.' },
+  { label: 'Step 1',   text: 'Every word carries a vibration that predates its dictionary definition.' },
+  { label: 'Step 2',   text: 'Unlock the true phonetic origin — what the sound does inside your body.' },
+  { label: 'Step 3',   text: 'Discover which organ it activates, and where it existed before anyone wrote it down.' },
+  { label: 'Step 4',   text: 'Every meaning is a one-time unlock, yours forever.' }
+];
+var _msDescTimer = null;
+function msDescBannerCycle() {
+  var labelEl = document.getElementById('msDescStepLabel');
+  var textEl  = document.getElementById('msDescStepText');
+  var dotsEl  = document.getElementById('msDescDots');
+  if (!labelEl || !textEl) return;
+  if (dotsEl && !dotsEl.dataset.built) {
+    dotsEl.innerHTML = MS_DESC_STEPS.map(function (_, i) { return '<span class="rm-desc-dot" data-i="' + i + '"></span>'; }).join('');
+    dotsEl.dataset.built = '1';
+  }
+  if (_msDescTimer) return;
+  var idx = 0;
+  function paint() {
+    var step = MS_DESC_STEPS[idx % MS_DESC_STEPS.length];
+    labelEl.textContent = step.label;
+    textEl.textContent = step.text;
+    textEl.classList.remove('dash-in');
+    void textEl.offsetWidth;
+    textEl.classList.add('dash-in');
+    if (dotsEl) {
+      Array.from(dotsEl.querySelectorAll('.rm-desc-dot')).forEach(function (d, i) {
+        d.classList.toggle('on', i === idx % MS_DESC_STEPS.length);
+      });
+    }
+    idx++;
+  }
+  paint();
+  _msDescTimer = setInterval(paint, 3500);
+}
 
 // Meaning Store's own backdrop — mirrors rmStoreBgSync() in part012.js
 // exactly: same custom Fashion background if the user has picked one

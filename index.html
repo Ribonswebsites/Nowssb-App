@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=297">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=373">
+<link rel="stylesheet" href="nowssb-nm.css?v=374">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -3250,8 +3250,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div id="msMcontent" style="display:none;flex-direction:column;height:100%;overflow:hidden;position:relative;">
     <div class="sub-screen-bg" id="msBg"></div>
 
-    <!-- Nav bar -->
-    <!-- Scrollable body — no fixed nav bar, back btn floats over banner -->
+    <!-- Persistent header — stays put like the Word Atelier's, so back and
+         the customize icon are always reachable, not just while the hero
+         banner hasn't scrolled away yet. -->
+    <div class="sub-header nav-bar">
+      <div class="sub-back" onclick="closeSub('meaning-store')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
+      </div>
+      <div class="sub-title" style="text-align:center;">Shabdapathy · True Origin</div>
+      <button class="ms-bg-customize-btn" onclick="SS.open('fashionbg')" aria-label="Customize background">
+        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
+      </button>
+    </div>
+
+    <!-- Scrollable body -->
     <div class="sub-body" id="msMeaningBody" style="position:relative;">
 
       <!-- ── CINEMATIC 2:3 HERO BANNER ── -->
@@ -3264,20 +3276,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           style="object-fit:cover;width:100%;height:100%;position:absolute;inset:0;background:#060c18;"></video>
         <!-- Gradient fade to page bg -->
         <div class="ms-hero-fade"></div>
-        <!-- Floating back btn -->
-        <button class="ms-hero-back" onclick="closeSub('meaning-store')">
-          <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-            <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/>
-            <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
-          </svg>
-        </button>
-        <!-- Tag top right + background customize icon -->
-        <div style="position:absolute;top:max(env(safe-area-inset-top,18px),18px);right:18px;z-index:10;display:flex;align-items:center;gap:8px;">
-          <button class="ms-bg-customize-btn" onclick="SS.open('fashionbg')" aria-label="Customize background">
-            <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
-          </button>
-          <div class="ms-hero-tag" style="position:static;">Shabdapathy · True Origin</div>
-        </div>
         <!-- Bottom content -->
         <div class="ms-hero-bottom">
           <span class="ms-hero-eyebrow">Hidden · Meaning · Store</span>
@@ -3293,12 +3291,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
 
-      
-
-      <!-- Description -->
-      <div class="ms-store-desc">
-        <div class="ms-store-desc-title">What is hidden behind every word?</div>
-        <div class="ms-store-desc-text">Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin — what the sound does inside your body, which organ it activates, and where this word existed before anyone wrote it down. Nothing here is free. Every meaning is a one-time unlock, yours forever.</div>
+      <!-- ── DESCRIPTION — black banner, rotates: overview then step 1,2,3... ── -->
+      <div class="rm-desc-banner">
+        <div class="rm-desc-banner-eyebrow" id="msDescStepLabel">Overview</div>
+        <div class="rm-desc-banner-text" id="msDescStepText"></div>
+        <div class="rm-desc-banner-dots" id="msDescDots"></div>
       </div>
 
       <!-- ── VIDEO BANNER — icon fixed, tagline cycles in from the right ── -->
@@ -4787,7 +4784,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      Screens: word-science, profile, real-meaning, shabdapathy
 ══════════════════════════════════════════ -->
 <script src="app/js/part025.js?v=163"></script><!-- ══ MEANING STORE JS ══ -->
-<script src="app/js/part026.js?v=165"></script>
+<script src="app/js/part026.js?v=166"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
