@@ -162,7 +162,8 @@ NowssB is a healing word-science app based on Shabdapathy — the study of natur
 
 Key facts to know:
 - Plans: Free Trial (15 days full access) → Resonance ($4.99/mo · $49.99/yr, 5 words/week) → Frequency ($9.99/mo · $99.99/yr, 10 words/week) → Frequency X ($19.99/mo · $199.99/yr, 20 words/week + free Blue verification)
-- Payments via Razorpay. Cancel anytime from Settings → Your Plan.
+- Payments are processed securely in-app. Cancel anytime from Settings → Your Plan.
+- Never name a specific payment processor or gateway when answering — just say payments are secure and handled in-app.
 - Pronunciation is scored 0-100 based on phonetic match. 90%+ three times = Word Mastery.
 - Word Atelier: browse and acquire words. Resonance: 10/month, Frequency+: unlimited.
 - Sentence Alchemy: AI builds a healing sentence from your practiced words after each session.

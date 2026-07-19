@@ -81,6 +81,7 @@ function nssAddToCart(item) {
   nssSaveCart();
   nssUpdateBadges();
   nssUpdateCartPanel();
+  nssRefreshCardStates();
   nssShowToast('Added to cart');
   // Flash the cart badge
   var badge = document.getElementById('nssCartBadge');

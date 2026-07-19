@@ -1984,22 +1984,46 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 }
 .rm-desc-banner-dots .rm-desc-dot.on { background: #e8d5a3; width: 16px; border-radius: 3px !important; }
 
-/* ── Meaning Store's "locked" preview — shown in the same full-page
-   #msDetailPanel an unlocked word's real content later replaces, so
-   buying a meaning feels like a page, not a popup. ── */
-.ms-locked-state { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 36px 8px 12px; }
-.ms-locked-icon {
-  width: 64px; height: 64px; border-radius: 50% !important; flex-shrink: 0;
-  background: rgba(232,213,163,0.08); border: 1px solid rgba(232,213,163,0.25);
-  display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+/* ── Meaning Store's "locked" preview — a real product page shown in the
+   same full-page #msDetailPanel an unlocked word's real content later
+   replaces: hero image, description, Add to Cart / Wishlist, request
+   banner, disclaimer, footer — same sections as the rest of the store. ── */
+.ms-locked-page { display: flex; flex-direction: column; }
+.ms-locked-hero {
+  position: relative; width: 100%; aspect-ratio: 1.3 / 1; border-radius: 18px !important;
+  overflow: hidden; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 20px;
 }
-.ms-locked-title { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 10px; }
-.ms-locked-desc { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 28px; max-width: 320px; }
-.ms-locked-buy-btn {
-  width: 100%; max-width: 320px; background: #e8d5a3; border: none; border-radius: 14px !important;
-  padding: 16px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #060c18;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+.ms-locked-hero img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.9; }
+.ms-locked-hero-badge {
+  position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 5px;
+  background: rgba(6,12,24,0.75); border: 1px solid rgba(232,213,163,0.3); border-radius: 20px !important;
+  padding: 6px 11px 6px 9px; font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.5px; color: #e8d5a3;
 }
+.ms-locked-info { margin-bottom: 24px; }
+.ms-locked-eyebrow {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(200,232,245,0.4); margin-bottom: 8px;
+}
+.ms-locked-price { font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 800; color: #e8d5a3; margin-bottom: 14px; }
+.ms-locked-desc { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 22px; }
+.ms-locked-actions { display: flex; align-items: stretch; gap: 10px; }
+.ms-locked-wish-btn {
+  width: 52px; height: 52px; min-width: 0 !important; min-height: 0 !important; flex-shrink: 0;
+  border-radius: 14px !important; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.ms-locked-wish-btn.wishlisted { background: rgba(220,80,80,0.12); border-color: rgba(220,80,80,0.4); }
+.ms-locked-cart-btn {
+  flex: 1; min-width: 0; background: #e8d5a3; border: none; border-radius: 14px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #060c18;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.ms-locked-cart-btn.carted { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+.ms-locked-cart-btn-in { display: none; }
+.ms-locked-cart-btn.carted .ms-locked-cart-btn-add { display: none; }
+.ms-locked-cart-btn.carted .ms-locked-cart-btn-in { display: inline; }
 
 /* ── Signature word card — the most expensive item in each category,
    using that category's old banner photo as its own product image. Gold

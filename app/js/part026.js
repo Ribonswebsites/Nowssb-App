@@ -40,16 +40,9 @@ function msGetPurchased() {
   try { return JSON.parse(localStorage.getItem('nwsb_meaning_purchased') || '[]'); } catch(e) { return []; }
 }
 window.msIsPurchased = function(key) {
-  return msGetPurchased().some(function(p){ return p.word === key.toLowerCase(); });
+  var k = key.toLowerCase();
+  return msGetPurchased().some(function(p){ return (p.word||'').toLowerCase() === k; });
 };
-function msMarkPurchased(key) {
-  var list = msGetPurchased();
-  if (!window.msIsPurchased(key)) {
-    list.push({ word: key.toLowerCase(), purchasedAt: Date.now() });
-    localStorage.setItem('nwsb_meaning_purchased', JSON.stringify(list));
-  }
-}
-
 /* ── AI MEANING GENERATION (Claude API) ── */
 async function msGenerateMeaning(key, wordDisplay) {
   var cached = localStorage.getItem('nwsb_meaning_cache_' + key);
@@ -99,12 +92,14 @@ window.msOpenDetailFromPlayer = function(key, wordDisplay) {
   if (window.msIsPurchased(key)) { window.msShowDetail(key, wordDisplay); }
 };
 
-/* ── BUY FLOW — reuses the same full-page detail panel purchased words
-   open into (#msDetailPanel), just showing a locked/preview state instead
-   of the AI-decoded meaning. A small anchored sheet (and before that, the
-   native confirm() popup) both read as "this doesn't look like the app,
-   it looks broken" — a real page, matching the Word Atelier's own word
-   detail page, is what this is supposed to feel like. ── */
+var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
+
+/* ── BUY FLOW ─ a real product page inside the same full-page detail panel
+   purchased words open into (#msDetailPanel): hero image, description,
+   Add to Cart / Wishlist (the same cart+checkout every other purchase in
+   the app goes through), request banner, disclaimer and footer. No
+   separate popup/sheet, no instant fake-unlock ─ buying a meaning works
+   exactly like buying anything else in the store. ── */
 window.msBuy = function(key, wordDisplay, price) {
   var dp = document.getElementById('msDetailPanel');
   var dw = document.getElementById('msDetailWord');
@@ -112,30 +107,58 @@ window.msBuy = function(key, wordDisplay, price) {
   if (!dp || !dc) return;
   var wordSafe = wordDisplay.replace(/'/g, "\\'");
   dw.textContent = wordDisplay;
-  dc.innerHTML = '<div class="ms-locked-state">' +
-    '<div class="ms-locked-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>' +
-    '<div class="ms-locked-title">This meaning is locked</div>' +
-    '<div class="ms-locked-desc">Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin of &ldquo;' + wordDisplay + '&rdquo; — what the sound does inside your body, which organ it activates, and where it existed before anyone wrote it down.</div>' +
-    '<button class="ms-locked-buy-btn" onclick="window.msConfirmBuy(\'' + key + '\',\'' + wordSafe + '\',' + price + ')">Unlock · \u20b9' + price + ' <span style="opacity:.6;">→</span></button>' +
+
+  var itemId = 'ms-' + key;
+  var cartIds = (window.nssCart || []).map(function(c){ return c.id; });
+  var wishIds = (window.nssWishlist || []).map(function(w){ return w.id; });
+  var inCart = cartIds.indexOf(itemId) >= 0;
+  var inWish = wishIds.indexOf(itemId) >= 0;
+  var safeImg = MS_CARD_IMG.replace(/'/g, '');
+  var itemArgs = "{id:'" + itemId + "',name:'" + wordSafe + "',type:'Meaning',price:" + price + ",img:'" + safeImg + "'}";
+
+  dc.innerHTML =
+    '<div class="ms-locked-page">' +
+      '<div class="ms-locked-hero">' +
+        '<img loading="lazy" decoding="async" src="' + MS_CARD_IMG + '" alt="">' +
+        '<div class="ms-locked-hero-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>Locked</div>' +
+      '</div>' +
+      '<div class="ms-locked-info">' +
+        '<div class="ms-locked-eyebrow">Sound Origin &amp; Vibration Study</div>' +
+        '<div class="ms-locked-price">\u20b9' + price + '</div>' +
+        '<div class="ms-locked-desc">Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin of &ldquo;' + wordDisplay + '&rdquo; — what the sound does inside your body, which organ it activates, and where it existed before anyone wrote it down.</div>' +
+        '<div class="ms-locked-actions">' +
+          '<div class="ms-locked-wish-btn' + (inWish ? ' wishlisted' : '') + '" data-nss-wish="' + itemId + '" onclick="nssToggleWishlist(' + itemArgs + ')" aria-label="Wishlist">' +
+            '<svg width="18" height="18" viewBox="0 0 16 16" fill="' + (inWish ? 'rgba(220,80,80,0.9)' : 'none') + '"><path d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linejoin="round"/></svg>' +
+          '</div>' +
+          '<button class="ms-locked-cart-btn' + (inCart ? ' carted' : '') + '" data-nss-cart="' + itemId + '" onclick="nssAddToCart(' + itemArgs + ')">' +
+            '<span class="ms-locked-cart-btn-add">Add to Cart · \u20b9' + price + '</span>' +
+            '<span class="ms-locked-cart-btn-in">In Cart ✓</span>' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rm-req-banner" onclick="msOpenMeaningRequest()">' +
+        '<div class="rm-req-banner-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>' +
+        '<div class="rm-req-banner-text">' +
+          '<div class="rm-req-banner-eyebrow">Can&rsquo;t find your meaning?</div>' +
+          '<div class="rm-req-banner-title">Request a Meaning</div>' +
+          '<div class="rm-req-banner-sub">Personally decoded &amp; delivered within 48 hours.</div>' +
+        '</div>' +
+        '<button class="rm-req-banner-btn" onclick="event.stopPropagation();msOpenMeaningRequest()">Request' +
+          '<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<div class="rm-disclaimer">' +
+        '<div class="rm-disclaimer-title">Disclaimer &amp; Confidentiality</div>' +
+        '<div class="rm-disclaimer-text">Meanings, phonetic breakdowns and healing associations shared here are for educational and wellness purposes only — they are not medical advice and do not replace professional diagnosis or treatment. Requested and purchased meanings, and any information you share with us, are kept strictly confidential and are never sold or shared with third parties.</div>' +
+      '</div>' +
+      '<div class="rm-footer">' +
+        '<div class="rm-footer-brand"><span class="b">Nowss</span><span class="t">B</span></div>' +
+        '<div class="rm-footer-copy">© 2026 Adv. Sanjaykumar Gadge · Shabdapathy</div>' +
+      '</div>' +
     '</div>';
+
   dp.classList.add('open');
 };
-
-window.msConfirmBuy = function (key, wordDisplay, price) {
-  msMarkPurchased(key);
-  msRenderStore();
-  window.msShowDetail(key, wordDisplay);
-};
-
-window.msConfirmBuy = function (key, wordDisplay, price) {
-  var sheet = document.getElementById('msBuySheet');
-  if (sheet) sheet.remove();
-  msMarkPurchased(key);
-  msRenderStore();
-  setTimeout(function () { window.msShowDetail(key, wordDisplay); }, 80);
-};
-
-var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
 
 /* ── Category banners — same black-banner-with-logo-and-divider treatment
    as the Word Atelier (reuses its rm-cat-banner* CSS directly). ── */
@@ -167,7 +190,7 @@ window.msRenderStore = function() {
   if (!container) return;
 
   var purchased = msGetPurchased();
-  var purchasedKeys = purchased.map(function(p){ return p.word; });
+  var purchasedKeys = purchased.map(function(p){ return (p.word||'').toLowerCase(); });
 
   // Group base meanings by category
   var cats = {};
