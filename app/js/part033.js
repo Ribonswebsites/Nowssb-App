@@ -643,6 +643,11 @@
         '#nwsb-verify .nwsb-vr-h{flex:1;font-size:18px;font-weight:800;color:#1a1a2e;}'+
         '#nwsb-verify .nwsb-vr-x{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;color:#1a1a2e;font-size:22px;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.13),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
         '#nwsb-verify .nwsb-vr-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(env(safe-area-inset-bottom,20px) + 26px);}'+
+        '#nwsb-verify .nwsb-vr-banner-outer{width:calc(100% + 32px);margin:-16px -16px 16px;background:transparent;}'+
+        '#nwsb-verify .nwsb-vr-banner-wrap{width:100%;position:relative;overflow:hidden;background:transparent;aspect-ratio:16/9;}'+
+        '#nwsb-verify .nwsb-vr-banner-track{display:flex;height:100%;transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);}'+
+        '#nwsb-verify .nwsb-vr-banner-slide{flex:0 0 100%;height:100%;display:flex;align-items:stretch;justify-content:center;}'+
+        '#nwsb-verify .nwsb-vr-banner-slide img{width:100%;height:100%;display:block;object-fit:cover;}'+
         '#nwsb-verify .nwsb-vr-intro{font-size:13px;color:rgba(0,0,0,.55);line-height:1.5;margin-bottom:6px;}'+
         '#nwsb-verify .nwsb-vr-cur{font-size:12px;font-weight:700;color:#a8854a;margin-bottom:18px;}'+
         '#nwsb-verify .nwsb-vr-loop{display:flex;align-items:center;gap:10px;height:44px;background:#eef0f5;border-radius:14px !important;padding:0 14px;margin-bottom:10px;box-shadow:5px 5px 12px rgba(0,0,0,.1),-3px -3px 8px rgba(255,255,255,.9);}'+
@@ -682,13 +687,39 @@
       var ov=document.createElement('div');
       ov.id='nwsb-verify';
       ov.innerHTML='<style>'+css+'</style>'+
-        '<div class="nwsb-vr-bar"><img class="nwsb-vr-bar-ic" src="https://res.cloudinary.com/eenvubod/image/upload/v1784356872/file_00000000de10820b822213b89af7be7f_fpjdrh.png" alt=""><span class="nwsb-vr-h">NowssB Verified</span><button class="nwsb-vr-x" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-verify\');if(p)p.remove();if(window._nwsbVrLoopTimer){clearInterval(window._nwsbVrLoopTimer);window._nwsbVrLoopTimer=null;}">&times;</button></div>'+
+        '<div class="nwsb-vr-bar"><img class="nwsb-vr-bar-ic" src="https://res.cloudinary.com/eenvubod/image/upload/v1784356872/file_00000000de10820b822213b89af7be7f_fpjdrh.png" alt=""><span class="nwsb-vr-h">NowssB Verified</span><button class="nwsb-vr-x" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-verify\');if(p)p.remove();if(window._nwsbVrLoopTimer){clearInterval(window._nwsbVrLoopTimer);window._nwsbVrLoopTimer=null;}if(window._nwsbVrBannerTimer){clearInterval(window._nwsbVrBannerTimer);window._nwsbVrBannerTimer=null;}">&times;</button></div>'+
         '<div class="nwsb-vr-scroll">'+
+          '<div class="nwsb-vr-banner-outer"><div class="nwsb-vr-banner-wrap" id="nwsbVrBannerWrap"><div class="nwsb-vr-banner-track" id="nwsbVrBannerTrack">'+
+            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648338/grok_image_1778648156568_qdbaux.jpg" alt="Banner 1"></div>'+
+            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648270/grok_image_1778647948774_mntgip.jpg" alt="Banner 2"></div>'+
+            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648317/grok_image_1778648109536_exlolv.jpg" alt="Banner 3"></div>'+
+            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648290/grok_image_1778647959913_fdzsgc.jpg" alt="Banner 4"></div>'+
+          '</div></div></div>'+
           '<div class="nwsb-vr-intro">Wear the headphone check-mark. Show the world you\'re a real NowssB practitioner — and climb from Blue all the way to Diamond.</div>'+
           (curName ? '<div class="nwsb-vr-cur">Your badge: '+curName+'</div>' : '<div class="nwsb-vr-cur">You\'re not verified yet</div>')+
           cards+
         '</div>';
       document.body.appendChild(ov);
+
+      // Swipeable/auto-advancing image banner directly under the header bar —
+      // same 4 images and mechanics as the Fashion Home store banner, own DOM
+      // ids so the two carousels never collide.
+      (function(){
+        var TOTAL=4, INTERVAL=4000, cur=0;
+        var track=document.getElementById('nwsbVrBannerTrack');
+        var wrap=document.getElementById('nwsbVrBannerWrap');
+        if(!track||!wrap) return;
+        function go(i){ cur=(i+TOTAL)%TOTAL; track.style.transform='translateX(-'+(cur*100)+'%)'; }
+        if(window._nwsbVrBannerTimer) clearInterval(window._nwsbVrBannerTimer);
+        window._nwsbVrBannerTimer=setInterval(function(){ go(cur+1); }, INTERVAL);
+        var startX=0;
+        wrap.addEventListener('touchstart',function(e){ startX=e.touches[0].clientX; clearInterval(window._nwsbVrBannerTimer); },{passive:true});
+        wrap.addEventListener('touchend',function(e){
+          var dx=e.changedTouches[0].clientX-startX;
+          if(Math.abs(dx)>36) go(cur+(dx<0?1:-1));
+          window._nwsbVrBannerTimer=setInterval(function(){ go(cur+1); }, INTERVAL);
+        },{passive:true});
+      })();
 
       // Rotating loop banner, one per tier — cycles name → tag → each
       // requirement, all tiers advancing together on one shared timer.
