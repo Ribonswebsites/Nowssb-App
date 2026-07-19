@@ -104,7 +104,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
-<link rel="stylesheet" href="app/app.css?v=298">
+<link rel="stylesheet" href="app/app.css?v=299">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
 <link rel="stylesheet" href="nowssb-nm.css?v=391">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
@@ -4438,15 +4438,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Welcome/Done card -->
 <div id="nwWelcome">
-  <!-- Full bleed banner image — top half -->
-  <div class="nww-banner" style="position:absolute;top:0;left:0;right:0;height:55%;z-index:0;">
+  <!-- Full bleed banner image — top portion. Capped with min()/vh so it never
+       eats so much height that the content below (button included) has to
+       be clipped on shorter phones — overflow-y:auto on the outer wrapper
+       is the safety net if a screen is still too small even for this. -->
+  <div class="nww-banner" style="position:absolute;top:0;left:0;right:0;height:min(40%,280px);z-index:0;">
     <img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778359330/grok_image_1778359267657_qdrs3l.jpg" alt="NowssB" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" />
     <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to bottom,transparent,#060c18);"></div>
   </div>
-  <!-- Spacer: pushes content flow below the banner (55% of fixed viewport height) -->
-  <div style="height:55%;flex-shrink:0;min-height:55%;"></div>
+  <!-- Spacer: pushes content flow below the banner -->
+  <div style="height:min(40%,280px);flex-shrink:0;min-height:min(40%,280px);"></div>
   <!-- Content below image -->
-  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;padding:24px 32px 52px;text-align:center;flex:1;justify-content:center;">
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;padding:16px 32px max(env(safe-area-inset-bottom,20px),20px);text-align:center;flex:1;justify-content:center;">
     <div class="nww-ring">
       <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB Logo" />
     </div>
