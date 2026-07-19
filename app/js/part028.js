@@ -8,12 +8,14 @@
 function getCart()     { return window.nssCart     || []; }
 function getWish()     { return window.nssWishlist || []; }
 function getAllOrders() {
-  var w = [], m = [];
-  try { w = JSON.parse(localStorage.getItem('nwsb_purchased')          || '[]'); } catch(e){}
-  try { m = JSON.parse(localStorage.getItem('nwsb_meaning_purchased')  || '[]'); } catch(e){}
+  var w = [], m = [], e = [];
+  try { w = JSON.parse(localStorage.getItem('nwsb_purchased')          || '[]'); } catch(err){}
+  try { m = JSON.parse(localStorage.getItem('nwsb_meaning_purchased')  || '[]'); } catch(err){}
+  try { e = JSON.parse(localStorage.getItem('nwsb_ebook_purchased')    || '[]'); } catch(err){}
   var all = [];
-  w.forEach(function(p){ all.push({ name:p.word, type:'Word',    at:p.purchasedAt||0, img:p.img||'' }); });
-  m.forEach(function(p){ all.push({ name:p.word, type:'Meaning', at:p.purchasedAt||0, img:p.img||'' }); });
+  w.forEach(function(p){ all.push({ name:p.word,  type:'Word',    at:p.purchasedAt||0, img:p.img||'' }); });
+  m.forEach(function(p){ all.push({ name:p.word,  type:'Meaning', at:p.purchasedAt||0, img:p.img||'' }); });
+  e.forEach(function(p){ all.push({ name:p.title, type:'Ebook',   at:p.purchasedAt||0, img:p.img||'' }); });
   all.sort(function(a,b){ return b.at - a.at; });
   return all;
 }
@@ -33,6 +35,12 @@ function thumbHTML(item) {
 window.cwpIconFor = function(type) {
   if (type === 'Meaning') {
     return '<div class="cwp-item-thumb-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" stroke="rgba(232,213,163,0.55)" stroke-width="1.2"/><path d="M6 9H16M6 13H11" stroke="rgba(232,213,163,0.55)" stroke-width="1.2"/></svg></div>';
+  }
+  if (type === 'Ebook') {
+    return '<div class="cwp-item-thumb-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 4.5A2 2 0 016 3h11v15H6a2 2 0 00-2 1.5" stroke="rgba(232,213,163,0.55)" stroke-width="1.2"/><path d="M4 4.5V18a2 2 0 002 2h11" stroke="rgba(232,213,163,0.55)" stroke-width="1.2"/></svg></div>';
+  }
+  if (type === 'Badge') {
+    return '<div class="cwp-item-thumb-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2l2.4 4.8 5.3.8-3.8 3.7.9 5.3L11 14.2l-4.8 2.4.9-5.3-3.8-3.7 5.3-.8z" stroke="rgba(200,232,245,0.55)" stroke-width="1.2"/></svg></div>';
   }
   return '<div class="cwp-item-thumb-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="rgba(200,232,245,0.55)" stroke-width="1.2"/><path d="M7 11h8M11 7v8" stroke="rgba(200,232,245,0.55)" stroke-width="1.2"/></svg></div>';
 };

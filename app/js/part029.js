@@ -226,8 +226,10 @@ function chkHandleSuccess(response, cart) {
   // Mark all cart items as purchased in localStorage
   var wordPurchased    = [];
   var meaningPurchased = [];
+  var ebookPurchased   = [];
   try { wordPurchased    = JSON.parse(localStorage.getItem('nwsb_purchased')           || '[]'); } catch(e) {}
   try { meaningPurchased = JSON.parse(localStorage.getItem('nwsb_meaning_purchased')   || '[]'); } catch(e) {}
+  try { ebookPurchased   = JSON.parse(localStorage.getItem('nwsb_ebook_purchased')     || '[]'); } catch(e) {}
 
   var badgeOrder = ['blue','silver','gold','diamond'];
   var grantBadge = '';
@@ -235,6 +237,14 @@ function chkHandleSuccess(response, cart) {
     // Verified badge purchase — grant the tier, don't treat it as a word/meaning
     if (item.type === 'Badge' && item.tier) {
       if (badgeOrder.indexOf(item.tier) > badgeOrder.indexOf(grantBadge)) grantBadge = item.tier;
+      return;
+    }
+    // Ebook purchase — its own purchased-list, not a word/meaning
+    if (item.type === 'Ebook') {
+      var ebKey = String(item.id).replace(/^ebook-/, '');
+      if (!ebookPurchased.some(function(p){ return p.key === ebKey; })) {
+        ebookPurchased.push({ key: ebKey, title: item.name, purchasedAt: Date.now(), img: item.img || '', price: item.price });
+      }
       return;
     }
     var entry = { word: item.name, purchasedAt: Date.now(), img: item.img || '', price: item.price };
@@ -251,6 +261,7 @@ function chkHandleSuccess(response, cart) {
 
   try { localStorage.setItem('nwsb_purchased',          JSON.stringify(wordPurchased));    } catch(e) {}
   try { localStorage.setItem('nwsb_meaning_purchased',  JSON.stringify(meaningPurchased)); } catch(e) {}
+  try { localStorage.setItem('nwsb_ebook_purchased',    JSON.stringify(ebookPurchased));   } catch(e) {}
 
   // Grant the verified badge tier that was bought
   if (grantBadge) {

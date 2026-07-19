@@ -1844,6 +1844,28 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 .rm-footer-brand .t { color: #e8d5a3; }
 .rm-footer-copy { font-family: 'DM Sans', sans-serif; font-size: 10.5px; color: rgba(255,255,255,0.3); }
 
+/* ── Store chooser — Verification/Ebooks/Subscription quick-access cards.
+   Same black-banner language as the request/category banners elsewhere. ── */
+.nss-mini-card {
+  display: flex; align-items: center; gap: 14px;
+  background: #000; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px !important; padding: 16px; margin: 0 0 12px;
+  cursor: pointer; box-shadow: 0 8px 22px rgba(0,0,0,0.32);
+}
+.nss-mini-card-icon {
+  width: 44px; height: 44px; border-radius: 12px !important; flex-shrink: 0;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.28);
+  display: flex; align-items: center; justify-content: center;
+}
+.nss-mini-card-text { flex: 1; min-width: 0; }
+.nss-mini-card-eyebrow {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: rgba(232,213,163,0.7); margin-bottom: 4px;
+}
+.nss-mini-card-title { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800; color: #fff; }
+.nss-mini-card-sub { font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; line-height: 1.4; }
+.nss-mini-card-arrow { flex-shrink: 0; color: rgba(255,255,255,0.3); }
+
 /* ── Word Atelier — category section headers: a plain black banner card
    (replaces the old rotating character/photo banners) with the title set
    in the same font treatment as the home hero ("Begin Your Healing Path")
@@ -1997,6 +2019,11 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
    should never shrink their children below natural size — pin it here once
    instead of chasing flex-shrink:0 onto every individual child. */
 #msMeaningBody > *, #mpBody > *, #routinesBody > *, #routineDetailBody > * { flex-shrink: 0 !important; }
+/* Same flex-column-scroll shape (.nss-body is display:flex;flex-direction:
+   column;overflow-y:auto, and .nss-sections nested inside it is too) — the
+   Store chooser page gained enough new content (3 more cards + disclaimer +
+   footer) to risk the identical shrink-to-fit bug. */
+.nss-body > *, .nss-sections > * { flex-shrink: 0 !important; }
 /* ── Profile avatar edit pencil — always a perfect circle ── */
 #profilePhotoPencil, .ps-avatar-pencil {
   width: 30px !important; height: 30px !important; border-radius: 50% !important;
