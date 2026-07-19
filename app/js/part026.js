@@ -283,11 +283,12 @@ window.msEnterFromIntro = function() {
 // a time, dash-in from the right (same treatment as the video banner's
 // cycling tagline). Dots track progress.
 var MS_DESC_STEPS = [
-  { label: 'Overview', text: 'Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin — what the sound does inside your body, which organ it activates, and where this word existed before anyone wrote it down. Nothing here is free. Every meaning is a one-time unlock, yours forever.' },
-  { label: 'Step 1',   text: 'Every word carries a vibration that predates its dictionary definition.' },
-  { label: 'Step 2',   text: 'Unlock the true phonetic origin — what the sound does inside your body.' },
-  { label: 'Step 3',   text: 'Discover which organ it activates, and where it existed before anyone wrote it down.' },
-  { label: 'Step 4',   text: 'Every meaning is a one-time unlock, yours forever.' }
+  { label: 'Overview · 1/2', text: 'Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin — what the sound does inside your body.' },
+  { label: 'Overview · 2/2', text: 'Which organ it activates, and where this word existed before anyone wrote it down. Nothing here is free — every meaning is a one-time unlock, yours forever.' },
+  { label: 'Step 1', text: 'Every word carries a vibration that predates its dictionary definition.' },
+  { label: 'Step 2', text: 'Unlock the true phonetic origin — what the sound does inside your body.' },
+  { label: 'Step 3', text: 'Discover which organ it activates, and where it existed before anyone wrote it down.' },
+  { label: 'Step 4', text: 'Every meaning is a one-time unlock, yours forever.' }
 ];
 var _msDescTimer = null;
 function msDescBannerCycle() {

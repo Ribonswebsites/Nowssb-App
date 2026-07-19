@@ -251,8 +251,19 @@
       });
     });
 
-    var tx0 = 0;
-    carousel.addEventListener('touchstart', function (e) { tx0 = e.touches[0].clientX; }, {passive: true});
+    // touch-action:pan-y (inline on #fbgCarousel) already tells the browser
+    // this element handles its own horizontal gestures, but Android
+    // WebViews can still kick off their native edge-swipe-back page slide
+    // on a horizontal drag unless touchmove is actively prevented too —
+    // belt-and-braces so swiping through the carousel never drags the
+    // whole page sideways with it.
+    var tx0 = 0, ty0 = 0;
+    carousel.addEventListener('touchstart', function (e) { tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY; }, {passive: true});
+    carousel.addEventListener('touchmove', function (e) {
+      var dx = e.touches[0].clientX - tx0;
+      var dy = e.touches[0].clientY - ty0;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8 && e.cancelable) e.preventDefault();
+    }, {passive: false});
     carousel.addEventListener('touchend', function (e) {
       var dx = e.changedTouches[0].clientX - tx0;
       if (Math.abs(dx) > 40) fbgGo(fbgActive + (dx < 0 ? 1 : -1));
@@ -284,29 +295,22 @@
     }
   };
 
-  // "Default" / "Black" toggle row — an alternative to picking one of the
-  // 9 photos: either clear all customization or force plain solid black.
-  window.fbgSelectMode = function (mode) {
-    if (mode === 'default') window.nwsbClearFashionBg();
-    else if (mode === 'black') window.nwsbSetFashionBgBlack();
+  // "Default" / "Black" toggle — an alternative to picking one of the 9
+  // photos: off = clear all customization, on = force plain solid black.
+  window.fbgToggleMode = function () {
+    var cur = null;
+    try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
+    if (cur === NWSB_BG_BLACK) window.nwsbClearFashionBg();
+    else window.nwsbSetFashionBgBlack();
     fbgSyncModeButtons();
   };
   function fbgSyncModeButtons() {
     var cur = null;
     try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
-    var isDefault = !cur;
     var isBlack = cur === NWSB_BG_BLACK;
-    var defBtn = document.getElementById('fbgDefaultBtn');
-    var blkBtn = document.getElementById('fbgBlackBtn');
-    if (defBtn) {
-      defBtn.style.background = isDefault ? '#e8d5a3' : 'rgba(255,255,255,0.05)';
-      defBtn.style.color      = isDefault ? '#060c18' : '#fff';
-      defBtn.style.borderColor = isDefault ? '#e8d5a3' : 'rgba(255,255,255,0.14)';
-    }
-    if (blkBtn) {
-      blkBtn.style.background = isBlack ? '#e8d5a3' : 'rgba(255,255,255,0.05)';
-      blkBtn.style.color      = isBlack ? '#060c18' : '#fff';
-      blkBtn.style.borderColor = isBlack ? '#e8d5a3' : 'rgba(255,255,255,0.14)';
-    }
+    var toggle = document.getElementById('fbgModeToggle');
+    var label  = document.getElementById('fbgModeLabel');
+    if (toggle) toggle.classList.toggle('on', isBlack);
+    if (label)  label.textContent = isBlack ? 'Black' : 'Default';
   }
 })();
