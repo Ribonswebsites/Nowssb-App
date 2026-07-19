@@ -671,10 +671,10 @@
         var owned = cur && VERIFY_ORDER.indexOf(cur) >= VERIFY_ORDER.indexOf(t.key);
         var reqs = t.req.map(function(r){ return '<div class="nwsb-vr-req"><span class="nwsb-vr-tick">✓</span><span>'+r+'</span></div>'; }).join('');
         return '<div class="nwsb-vr-loop">'+
-              '<div class="nwsb-vr-loop-left"><img class="nwsb-vr-loop-icon" src="'+t.img+'" alt=""></div>'+
+              '<div class="nwsb-vr-loop-left"><img class="nwsb-vr-loop-icon" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt=""></div>'+
               '<div class="nwsb-vr-loop-divider"></div>'+
               '<div class="nwsb-vr-loop-body"><div class="nwsb-vr-loop-text" id="nwsbVrLoop_'+t.key+'"></div></div>'+
-              '<img class="nwsb-vr-loop-badge" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt="">'+
+              '<img class="nwsb-vr-loop-badge" src="'+t.img+'" alt="">'+
             '</div>'+
             '<div class="nwsb-vr-card'+(t.key==='diamond'?' diamond':'')+'">'+
             '<div class="nwsb-vr-banner"><img class="nwsb-vr-banner-img" src="'+(t.promo||t.img)+'" alt="">'+
@@ -729,7 +729,7 @@
         '#nwsb-verify .nwsb-vr-banner-slide img{width:100%;height:100%;display:block;object-fit:cover;}'+
         '#nwsb-verify .nwsb-vr-intro{font-size:13px;color:var(--vr-text-dim);line-height:1.5;margin-bottom:6px;}'+
         '#nwsb-verify .nwsb-vr-cur{font-size:12px;font-weight:700;color:var(--vr-accent);margin-bottom:18px;}'+
-        '#nwsb-verify .nwsb-vr-loop{display:flex;align-items:center;gap:14px;background:#0a0a0a;border:1px solid rgba(255,255,255,.08);border-radius:16px !important;padding:14px 16px;margin-bottom:10px;}'+
+        '#nwsb-verify .nwsb-vr-loop{display:flex;align-items:center;gap:14px;background:#000;border-radius:16px !important;padding:14px 16px;margin-bottom:10px;}'+
         '#nwsb-verify .nwsb-vr-loop-left{flex-shrink:0;}'+
         '#nwsb-verify .nwsb-vr-loop-icon{width:48px;height:48px;min-width:0 !important;min-height:0 !important;border-radius:50% !important;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.18);}'+
         '#nwsb-verify .nwsb-vr-loop-divider{width:1px;height:48px;background:rgba(255,255,255,.15);flex-shrink:0;}'+
