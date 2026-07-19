@@ -73,6 +73,27 @@
   // msStoreBgSync) tell "plain black" apart from "no customization at all".
   var NWSB_BG_BLACK = '__black__';
 
+  // Dedicated success toast for the Fashion Background picker — black pill,
+  // the same customize-background icon on the left, a proper checkmark
+  // badge instead of a bare "✓" character. Kept separate from the generic
+  // nwsbToast() (used app-wide for unrelated messages) so this redesign
+  // only touches this one flow.
+  function fbgApplyToast(msg) {
+    var t = document.createElement('div');
+    t.className = 'fbg-toast';
+    t.innerHTML =
+      '<div class="fbg-toast-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>' +
+      '<div class="fbg-toast-text"></div>' +
+      '<div class="fbg-toast-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>';
+    t.querySelector('.fbg-toast-text').textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { t.classList.add('show'); }); });
+    setTimeout(function () {
+      t.classList.remove('show');
+      setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 260);
+    }, 2200);
+  }
+
   window.nwsbSetFashionBg = function (url) {
     document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + url + "')");
     document.body.style.setProperty('--nwsb-custom-bg-color', 'transparent');
@@ -81,7 +102,7 @@
     if (window._currentUid && window._fbSetDoc) {
       window._fbSetDoc(window._currentUid, { fashionBgCustom: url }).catch(function () {});
     }
-    if (window.nwsbToast) nwsbToast('Background updated ✓');
+    fbgApplyToast('Background updated');
     _nwsbSyncBgConsumers();
   };
 
@@ -94,7 +115,7 @@
     if (window._currentUid && window._fbSetDoc) {
       window._fbSetDoc(window._currentUid, { fashionBgCustom: NWSB_BG_BLACK }).catch(function () {});
     }
-    if (window.nwsbToast) nwsbToast('Background set to black ✓');
+    fbgApplyToast('Background set to black');
     _nwsbSyncBgConsumers();
   };
 
@@ -107,7 +128,7 @@
     if (window._currentUid && window._fbSetDoc) {
       window._fbSetDoc(window._currentUid, { fashionBgCustom: null }).catch(function () {});
     }
-    if (window.nwsbToast) nwsbToast('Background reset to default ✓');
+    fbgApplyToast('Background reset to default');
     _nwsbSyncBgConsumers();
   };
 
@@ -152,6 +173,10 @@
      purpose — no border-radius anywhere in here. ── */
   var fbgActive = 0, fbgItems = null, fbgDotEls = null;
   var FBG_N = NWSB_FASHION_BGS.length;
+  // Staged (not-yet-applied) Default/Black card selection. null = defer to
+  // the carousel's centered photo instead — nothing actually changes on
+  // the live background until fbgApply() runs (APPLY THIS BACKGROUND).
+  var fbgStagedMode = null;
 
   function fbgCfg(s) {
     var a = Math.abs(s), d = s < 0 ? -1 : 1;
@@ -171,7 +196,7 @@
       el.style.opacity       = String(c.op);
       el.style.zIndex        = String(c.zi);
       el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
-      el.style.borderColor   = (i === fbgActive) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
+      el.style.borderColor   = (!fbgStagedMode && i === fbgActive) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
     });
     if (fbgDotEls) fbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === fbgActive); });
     var label = document.getElementById('fbgSelectedLabel');
@@ -229,9 +254,14 @@
     fbgDotEls = Array.from(dotsEl.querySelectorAll('.becd'));
     FBG_N = fbgItems.length;
 
-    // Start from whichever photo is currently applied, if any
+    // Start from whichever photo is currently applied, if any — and seed
+    // the staged mode from the currently COMMITTED state (not just left
+    // over from a previous open) so reopening the picker shows the truth.
     var cur = null;
     try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
+    if (cur === NWSB_BG_BLACK) fbgStagedMode = 'black';
+    else if (!cur) fbgStagedMode = 'default';
+    else fbgStagedMode = null;
     var idx = NWSB_FASHION_BGS.indexOf(cur);
     fbgActive = idx >= 0 ? idx : 0;
     var previewBg0 = document.getElementById('fbgPreviewBg');
@@ -266,12 +296,18 @@
     }, {passive: false});
     carousel.addEventListener('touchend', function (e) {
       var dx = e.changedTouches[0].clientX - tx0;
-      if (Math.abs(dx) > 40) fbgGo(fbgActive + (dx < 0 ? 1 : -1));
+      if (Math.abs(dx) > 40) {
+        fbgStagedMode = null;
+        fbgSyncModeButtons();
+        fbgGo(fbgActive + (dx < 0 ? 1 : -1));
+      }
     }, {passive: true});
 
     fbgItems.forEach(function (el, i) {
       el.onclick = function (e) {
         e.stopPropagation();
+        fbgStagedMode = null;
+        fbgSyncModeButtons();
         if (i !== fbgActive) fbgGo(i);
         else fbgApply();
       };
@@ -281,9 +317,16 @@
   };
 
   window.fbgApply = function () {
-    var url = NWSB_FASHION_BGS[fbgActive];
-    nwsbSetFashionBg(url);
+    if (fbgStagedMode === 'black') {
+      window.nwsbSetFashionBgBlack();
+    } else if (fbgStagedMode === 'default') {
+      window.nwsbClearFashionBg();
+    } else {
+      var url = NWSB_FASHION_BGS[fbgActive];
+      nwsbSetFashionBg(url);
+    }
     fbgSyncModeButtons();
+    fbgPaint();
     var btn = document.getElementById('fbgApplyBtn');
     if (btn) {
       btn.textContent = 'APPLIED!';
@@ -296,19 +339,18 @@
   };
 
   // "Default" / "Black" cards — an alternative to picking one of the 9
-  // photos: Default clears all customization, Black forces plain solid black.
+  // photos. Tapping only STAGES the choice (highlights the card, dims the
+  // carousel's gold border) — nothing on the live background actually
+  // changes until APPLY THIS BACKGROUND is pressed, same as picking a photo.
   window.fbgSelectMode = function (mode) {
-    if (mode === 'black') window.nwsbSetFashionBgBlack();
-    else window.nwsbClearFashionBg();
+    fbgStagedMode = (mode === 'black') ? 'black' : 'default';
     fbgSyncModeButtons();
+    fbgPaint();
   };
   function fbgSyncModeButtons() {
-    var cur = null;
-    try { cur = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
-    var isBlack = cur === NWSB_BG_BLACK;
     var cardDefault = document.getElementById('fbgModeCardDefault');
     var cardBlack   = document.getElementById('fbgModeCardBlack');
-    if (cardDefault) cardDefault.classList.toggle('on', !isBlack);
-    if (cardBlack)   cardBlack.classList.toggle('on', isBlack);
+    if (cardDefault) cardDefault.classList.toggle('on', fbgStagedMode === 'default');
+    if (cardBlack)   cardBlack.classList.toggle('on', fbgStagedMode === 'black');
   }
 })();

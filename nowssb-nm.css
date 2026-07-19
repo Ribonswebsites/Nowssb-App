@@ -1845,6 +1845,34 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 }
 .fbg-mode-card-label { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff; }
 .fbg-mode-card-sub { font-family: 'DM Sans', sans-serif; font-size: 10.5px; color: rgba(255,255,255,.45); margin-top: 2px; }
+
+/* ── Fashion Background apply toast — black pill, customize icon on the
+   left, gold checkmark badge instead of a bare "✓" character. ── */
+.fbg-toast {
+  position: fixed; left: 50%; bottom: 90px; z-index: 99999;
+  display: flex; align-items: center; gap: 10px;
+  background: #000; border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px 8px 8px; border-radius: 30px !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+  max-width: calc(100vw - 40px);
+  opacity: 0; transform: translateX(-50%) translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+.fbg-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.fbg-toast-icon {
+  width: 30px; height: 30px; min-width: 0 !important; min-height: 0 !important;
+  border-radius: 50% !important; overflow: hidden; flex-shrink: 0;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(232,213,163,0.3);
+  display: flex; align-items: center; justify-content: center;
+}
+.fbg-toast-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fbg-toast-text { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; }
+.fbg-toast-check {
+  width: 20px; height: 20px; min-width: 0 !important; min-height: 0 !important;
+  border-radius: 50% !important; background: #e8d5a3; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
 .rm-disclaimer { margin: 28px 0 0; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
 .rm-disclaimer-title {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px;
