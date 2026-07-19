@@ -48,16 +48,22 @@
     });
   }
 
+  var warmedUrls = {}; // every URL we've ever kicked off a warmOne() for — never re-queue it
+
   function warmAll(urls) {
+    var fresh = urls.filter(function (u) { return !warmedUrls[u]; });
+    if (!fresh.length) return;
+    fresh.forEach(function (u) { warmedUrls[u] = true; });
     var cache;
     var i = 0;
     function next() {
-      if (i >= urls.length) return;
-      var url = urls[i++];
+      if (i >= fresh.length) return;
+      var url = fresh[i++];
       warmOne(cache, url).catch(function () {}).then(function () {
-        // stagger — one every couple seconds so this never competes with
-        // whatever the user is actively doing on a real device
-        setTimeout(next, 2500);
+        // Still staggered (never fire dozens of fetches in the same tick and
+        // choke whatever the user is actively doing), but short — the goal
+        // is "download everything soon", not "trickle it in over minutes".
+        setTimeout(next, 800);
       });
     }
     caches.open(VIDEO_CACHE).then(function (c) { cache = c; next(); });
@@ -71,6 +77,26 @@
 
   var idle = window.requestIdleCallback || function (cb) { setTimeout(cb, 4000); };
   idle(start, { timeout: 8000 });
+
+  // Screens/banners built dynamically after the initial scan (e.g. a store's
+  // buy-page video banner, injected via innerHTML only once the user opens
+  // it) never existed in the DOM when collectVideoUrls() first ran, so their
+  // videos were silently never warmed. Watch for any newly-inserted <video>
+  // and warm it too, same rules (Data Saver still respected).
+  if ('MutationObserver' in window) {
+    var mo = new MutationObserver(function () {
+      if (shouldSkip()) return;
+      var urls = collectVideoUrls();
+      if (urls.length) warmAll(urls);
+    });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  // A PWA install is exactly the moment the user commits to this being a
+  // real app on their device — that's the signal to eagerly grab everything
+  // right away instead of waiting for idle time, so it's already fast by the
+  // time they actually open it again.
+  window.addEventListener('appinstalled', function () { start(); });
 })();
 
 /* ── Pause offscreen videos ────────────────────────────────────────────────
@@ -153,5 +179,23 @@
     });
   }
 
-  setInterval(refresh, 1800);
+  setInterval(refresh, 500);
+
+  // Don't wait for the next poll tick to react to a screen opening/closing —
+  // run refresh() the instant any .open/.active class change happens, so a
+  // freshly-revealed video starts immediately instead of sitting blank for
+  // up to half a second first. Coalesced to once per frame (class changes
+  // often fire in bursts — dots, badges, etc. — no need to rescan per-node).
+  if ('MutationObserver' in window) {
+    var refreshQueued = false;
+    function queueRefresh() {
+      if (refreshQueued) return;
+      refreshQueued = true;
+      requestAnimationFrame(function () { refreshQueued = false; refresh(); });
+    }
+    var classMo = new MutationObserver(queueRefresh);
+    classMo.observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class'], subtree: true
+    });
+  }
 })();
