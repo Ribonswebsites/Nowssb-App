@@ -617,7 +617,12 @@
       var cards = VERIFY_TIERS.map(function(t){
         var owned = cur && VERIFY_ORDER.indexOf(cur) >= VERIFY_ORDER.indexOf(t.key);
         var reqs = t.req.map(function(r){ return '<div class="nwsb-vr-req"><span class="nwsb-vr-tick">✓</span><span>'+r+'</span></div>'; }).join('');
-        return '<div class="nwsb-vr-card'+(t.key==='diamond'?' diamond':'')+'">'+
+        return '<div class="nwsb-vr-loop">'+
+              '<div class="nwsb-vr-loop-left"><img class="nwsb-vr-loop-icon" src="'+t.img+'" alt=""></div>'+
+              '<div class="nwsb-vr-loop-divider"></div>'+
+              '<div class="nwsb-vr-loop-body"><div class="nwsb-vr-loop-text" id="nwsbVrLoop_'+t.key+'"></div></div>'+
+            '</div>'+
+            '<div class="nwsb-vr-card'+(t.key==='diamond'?' diamond':'')+'">'+
             '<div class="nwsb-vr-banner"><img class="nwsb-vr-banner-img" src="'+(t.promo||t.img)+'" alt="">'+
               (owned ? '<span class="nwsb-vr-owned-flag">Owned ✓</span>' : '')+
             '</div>'+
@@ -639,6 +644,13 @@
         '#nwsb-verify .nwsb-vr-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(env(safe-area-inset-bottom,20px) + 26px);}'+
         '#nwsb-verify .nwsb-vr-intro{font-size:13px;color:rgba(0,0,0,.55);line-height:1.5;margin-bottom:6px;}'+
         '#nwsb-verify .nwsb-vr-cur{font-size:12px;font-weight:700;color:#a8854a;margin-bottom:18px;}'+
+        '#nwsb-verify .nwsb-vr-loop{display:flex;align-items:center;gap:12px;background:#eef0f5;border-radius:16px !important;padding:12px 14px;margin-bottom:10px;box-shadow:5px 5px 12px rgba(0,0,0,.1),-3px -3px 8px rgba(255,255,255,.9);}'+
+        '#nwsb-verify .nwsb-vr-loop-left{flex-shrink:0;}'+
+        '#nwsb-verify .nwsb-vr-loop-icon{width:30px;height:30px;min-width:0 !important;min-height:0 !important;border-radius:50% !important;object-fit:cover;display:block;box-shadow:2px 2px 6px rgba(0,0,0,.12),-2px -2px 5px rgba(255,255,255,.9);}'+
+        '#nwsb-verify .nwsb-vr-loop-divider{width:1px;align-self:stretch;background:rgba(0,0,0,.1);flex-shrink:0;}'+
+        '#nwsb-verify .nwsb-vr-loop-body{flex:1;min-width:0;}'+
+        '#nwsb-verify .nwsb-vr-loop-text{font-size:12.5px;font-weight:700;color:#1a1a2e;}'+
+        '#nwsb-verify .nwsb-vr-loop-text.dash-in{animation:nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both;}'+
         '#nwsb-verify .nwsb-vr-card{background:#eef0f5;border-radius:22px !important;padding:18px;margin-bottom:16px;box-shadow:7px 7px 18px rgba(0,0,0,.12),-5px -5px 14px rgba(255,255,255,.97);overflow:hidden;}'+
         '#nwsb-verify .nwsb-vr-card.diamond{box-shadow:7px 7px 18px rgba(0,0,0,.13),-5px -5px 14px rgba(255,255,255,.97),inset 0 0 0 2px rgba(120,200,232,.45);}'+
         '#nwsb-verify .nwsb-vr-banner{position:relative;width:calc(100% + 36px);margin:-18px -18px 16px;height:230px;background:#0a0a12;overflow:hidden;}'+
@@ -668,13 +680,33 @@
       var ov=document.createElement('div');
       ov.id='nwsb-verify';
       ov.innerHTML='<style>'+css+'</style>'+
-        '<div class="nwsb-vr-bar"><img class="nwsb-vr-bar-ic" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt=""><span class="nwsb-vr-h">NowssB Verified</span><button class="nwsb-vr-x" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-verify\');if(p)p.remove();">&times;</button></div>'+
+        '<div class="nwsb-vr-bar"><img class="nwsb-vr-bar-ic" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt=""><span class="nwsb-vr-h">NowssB Verified</span><button class="nwsb-vr-x" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-verify\');if(p)p.remove();if(window._nwsbVrLoopTimer){clearInterval(window._nwsbVrLoopTimer);window._nwsbVrLoopTimer=null;}">&times;</button></div>'+
         '<div class="nwsb-vr-scroll">'+
           '<div class="nwsb-vr-intro">Wear the headphone check-mark. Show the world you\'re a real NowssB practitioner — and climb from Blue all the way to Diamond.</div>'+
           (curName ? '<div class="nwsb-vr-cur">Your badge: '+curName+'</div>' : '<div class="nwsb-vr-cur">You\'re not verified yet</div>')+
           cards+
         '</div>';
       document.body.appendChild(ov);
+
+      // Rotating loop banner, one per tier — cycles name → tag → each
+      // requirement, all tiers advancing together on one shared timer.
+      var loopData = VERIFY_TIERS.map(function(t){ return [t.name, t.tag].concat(t.req); });
+      var loopIdx = 0;
+      function paintLoops() {
+        VERIFY_TIERS.forEach(function(t, i){
+          var el = document.getElementById('nwsbVrLoop_' + t.key);
+          if (!el) return;
+          var arr = loopData[i];
+          el.textContent = arr[loopIdx % arr.length];
+          el.classList.remove('dash-in');
+          void el.offsetWidth;
+          el.classList.add('dash-in');
+        });
+        loopIdx++;
+      }
+      paintLoops();
+      if (window._nwsbVrLoopTimer) clearInterval(window._nwsbVrLoopTimer);
+      window._nwsbVrLoopTimer = setInterval(paintLoops, 2600);
     },
     /* ── Verification KYC wizard — real name → DOB → residence → documents →
        review, then hands off to the real payment gateway (buyVerify → cart →

@@ -1123,6 +1123,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ SCREEN 5: HOME ══ -->
 <div class="screen" id="home">
 
+  <!-- ══ STORE BANNER — IMAGE CAROUSEL (moved to sit right below the fixed
+       header, above everything else, instead of further down the page) ══ -->
+  <div class="store-banner-outer">
+    <div class="store-banner-wrap" id="storeBannerWrap">
+      <div class="store-banner-track" id="storeBannerTrack">
+        <div class="store-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648338/grok_image_1778648156568_qdbaux.jpg" alt="Store Banner 1"></div>
+        <div class="store-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648270/grok_image_1778647948774_mntgip.jpg" alt="Store Banner 2"></div>
+        <div class="store-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648317/grok_image_1778648109536_exlolv.jpg" alt="Store Banner 3"></div>
+        <div class="store-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648290/grok_image_1778647959913_fdzsgc.jpg" alt="Store Banner 4"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ HERO HEADER ══ -->
   <div class="hero-section">
     <div class="hero-bg on" id="hb0"></div>
@@ -1520,21 +1533,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   </div><!-- /section-glass-wrap: Sound Before Meaning -->
 
-  <!-- ══ STORE BANNER — IMAGE CAROUSEL ══ -->
-  
-
-  <div class="store-banner-outer">
-    <div class="store-banner-wrap" id="storeBannerWrap">
-      <div class="store-banner-track" id="storeBannerTrack">
-        <div class="store-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648338/grok_image_1778648156568_qdbaux.jpg" alt="Store Banner 1"></div>
-        <div class="store-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648270/grok_image_1778647948774_mntgip.jpg" alt="Store Banner 2"></div>
-        <div class="store-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648317/grok_image_1778648109536_exlolv.jpg" alt="Store Banner 3"></div>
-        <div class="store-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648290/grok_image_1778647959913_fdzsgc.jpg" alt="Store Banner 4"></div>
-      </div>
-    </div>
-  </div>
   <script src="app/js/part003.js?v=163"></script>
-  <!-- /Store Banner -->
+  <!-- /Store Banner (moved to just below the fixed header — see top of #home) -->
 
   <!-- ══ NOWSSB STORE — HOME TRIGGER CARD ══ -->
   
@@ -7109,7 +7109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 
-<script src="app/js/part033.js?v=228"></script>
+<script src="app/js/part033.js?v=229"></script>
 
 
 
