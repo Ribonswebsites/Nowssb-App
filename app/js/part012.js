@@ -1377,16 +1377,19 @@ if ('serviceWorker' in navigator) {
   // never the 24h HTTP cache. This breaks the "stale service worker" trap where
   // an old cache-first SW keeps serving outdated CSS/JS no matter how many times
   // we ship a fix.
+  //
+  // Deliberately NOT reloading on 'controllerchange' here (a previous version
+  // did, via location.reload()). sw.js's activate handler already calls
+  // skipWaiting()+clients.claim(), so a new SW installed during THIS same page
+  // load takes control almost immediately — while the splash animation is
+  // still mid-run — and reloading right then restarted the whole splash from
+  // scratch, i.e. the "start animation plays twice" bug. It's also
+  // unnecessary: every HTML/CSS/JS/asset request already goes network-first
+  // through sw.js's own fetch handler, and every asset URL carries its own
+  // ?v= cache-busting query string, so the very next natural navigation
+  // already gets fully fresh content without forcing a reload mid-session.
   navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
     try { reg.update(); } catch (e) {}
-    // When a freshly-installed SW takes control, reload once so the page is
-    // running the new HTML/CSS/JS instead of whatever the old SW had cached.
-    var refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', function () {
-      if (refreshing) return;
-      refreshing = true;
-      location.reload();
-    });
   }).catch(err => {
     console.info('PWA service worker not registered:', err.message);
   });
