@@ -3123,6 +3123,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div id="rm-word-sections-container"></div>
       <script src="app/js/part010.js?v=163"></script>
 
+      <!-- ── VIDEO BANNER — store icon + text pill middle-right ── -->
+      <div class="nss-vid-banner" style="margin:16px 0;border-radius:22px !important;">
+        <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+        <div class="nss-vid-banner-fade"></div>
+        <div class="nss-vid-banner-pill-wrap">
+          <div class="nss-vid-banner-pill">
+            <img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">
+            <span class="nss-vid-banner-pill-text">The Word Atelier</span>
+          </div>
+        </div>
+      </div>
 
       <!-- Search any word CTA -->
       <div class="rm-search-any">
@@ -3280,24 +3291,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="ms-intro-page" id="msIntroPage">
     <div class="ms-intro-bg"></div>
     <div class="sl-intro-vignette"></div>
-    <!-- Top group: nav + eyebrow + title -->
-    <div style="position:relative;z-index:10;">
-      <div class="sl-intro-top">
-        <div class="sl-intro-back" onclick="closeSub('meaning-store')">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
-        </div>
-        <div class="sl-intro-tag">Shabdapathy · True Origin</div>
-        <button onclick="openIntroSetting()" style="width:44px;height:44px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;touch-action:manipulation;">
-          <svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>
-        </button>
+    <!-- Top group: nav only — eyebrow + title live in the bottom group,
+         same as the Word Atelier intro's layout ── -->
+    <div class="sl-intro-top">
+      <div class="sl-intro-back" onclick="closeSub('meaning-store')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
       </div>
-      <div class="sl-intro-top-text">
-        <span class="sl-intro-eyebrow">Hidden · Meaning · Store</span>
-        <div class="sl-intro-title">The True<br>Hidden<br>Meaning.</div>
-      </div>
+      <div class="sl-intro-tag">Shabdapathy · True Origin</div>
+      <button onclick="openIntroSetting()" style="width:44px;height:44px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;touch-action:manipulation;">
+        <svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>
+      </button>
     </div>
-    <!-- Bottom: desc + stats + button -->
+    <!-- Bottom: eyebrow + title + desc + stats + button -->
     <div class="sl-intro-bottom">
+      <span class="sl-intro-eyebrow">Hidden · Meaning · Store</span>
+      <div class="sl-intro-title">The True<br>Hidden<br>Meaning.</div>
       <div class="sl-intro-divider"></div>
       <div class="sl-intro-desc">Every word you know has a meaning you were never told. Before the dictionary — there was only vibration. Unlock the truth.</div>
       <div class="sl-intro-stats-row">
@@ -3914,24 +3922,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Cinematic image bg -->
   <div class="nss-intro-img" style="position:absolute;inset:0;background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581669/grok_image_1778575628589_dttgob.jpg');background-size:cover;background-position:center top;z-index:0;animation:slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);"></div>
     <div class="nss-intro-vignette"></div>
-    <!-- Top group: nav + eyebrow + title -->
-    <div style="position:relative;z-index:10;">
-      <div class="sl-intro-top">
-        <div class="sl-intro-back" onclick="nssClose()">
-          <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-            <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/>
-            <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
-          </svg>
-        </div>
-        <div class="sl-intro-tag">Shabdapathy · Collections</div>
+    <!-- Top group: nav only — eyebrow + title live in the bottom group,
+         same as the Word Atelier intro's layout ── -->
+    <div class="sl-intro-top">
+      <div class="sl-intro-back" onclick="nssClose()">
+        <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
+          <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/>
+          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
+        </svg>
       </div>
-      <div class="sl-intro-top-text">
-        <span class="sl-intro-eyebrow">Word · Meaning · Store</span>
-        <div class="sl-intro-title">The NowssB<br>Store.</div>
-      </div>
+      <div class="sl-intro-tag">Shabdapathy · Collections</div>
     </div>
-    <!-- Bottom content: subtitle + stats + button -->
+    <!-- Bottom content: eyebrow + title + subtitle + stats + button -->
     <div class="sl-intro-bottom">
+      <span class="sl-intro-eyebrow">Word · Meaning · Store</span>
+      <div class="sl-intro-title">The NowssB<br>Store.</div>
       <div class="sl-intro-divider"></div>
       <div class="sl-intro-desc">Two libraries. One destination. Own the words that heal — unlock the origins that no dictionary ever told you.</div>
       <div class="sl-intro-stats-row">
@@ -4054,18 +4059,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       >
       <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to bottom,transparent,#060c18);pointer-events:none;"></div>
       <div style="position:absolute;top:0;left:0;right:0;height:40px;background:linear-gradient(to top,transparent,rgba(6,12,24,0.55));pointer-events:none;"></div>
-    </div>
-
-    <!-- ── THIRD BANNER — video, store icon + text pill middle-right ── -->
-    <div class="nss-vid-banner">
-      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
-      <div class="nss-vid-banner-fade"></div>
-      <div class="nss-vid-banner-pill-wrap">
-        <div class="nss-vid-banner-pill">
-          <img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">
-          <span class="nss-vid-banner-pill-text">The NowssB Store</span>
-        </div>
-      </div>
     </div>
 
     <!-- ── TWO LIBRARY SECTIONS ── -->
