@@ -1761,6 +1761,9 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800; color: #fff;
   white-space: nowrap; text-shadow: 0 2px 10px rgba(0,0,0,0.6);
 }
+/* Icon stays put — only the text cycles, dashing in from the right on
+   each change. Reuses the Shop Now banner's dash-in keyframe. */
+.nss-vid-banner-pill-text.dash-in { animation: nmhTrendWordDash .6s cubic-bezier(.34,1.56,.64,1) both; }
 
 /* ── Word Atelier — "Request a Word" banner (replaces the removed giant
    All Words pill grid) plus the page-end disclaimer/footer block. ── */

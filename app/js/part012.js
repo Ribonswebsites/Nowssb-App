@@ -1860,12 +1860,33 @@ function rmEnterFromIntro() {
   var main  = document.getElementById('rmMainContent');
   if (intro) { intro.style.opacity = '0'; intro.style.pointerEvents = 'none'; setTimeout(function(){ intro.classList.add('rm-intro-hidden'); }, 350); }
   if (main)  { main.style.display = 'flex'; }
+  nssVidBannerCycle();
 }
 function rmSkipIntro() {
   var intro = document.getElementById('rmIntroPage');
   var main  = document.getElementById('rmMainContent');
   if (intro) intro.classList.add('rm-intro-hidden');
   if (main)  main.style.display = 'flex';
+  nssVidBannerCycle();
+}
+
+// Video banner text — icon stays fixed, only the tagline cycles (same
+// dash-in-from-right treatment as the home Shop Now banner's word).
+var NSS_VID_BANNER_TAGLINES = ['Buy Request Words', 'Build Your Library', 'Heal with Sound'];
+var _nssVidBannerTimer = null;
+function nssVidBannerCycle() {
+  var el = document.getElementById('nssVidBannerText');
+  if (!el || _nssVidBannerTimer) return;
+  var idx = 0;
+  function paint() {
+    el.textContent = NSS_VID_BANNER_TAGLINES[idx % NSS_VID_BANNER_TAGLINES.length];
+    el.classList.remove('dash-in');
+    void el.offsetWidth;
+    el.classList.add('dash-in');
+    idx++;
+  }
+  paint();
+  _nssVidBannerTimer = setInterval(paint, 3000);
 }
 
 // ── WORD ORIGINS: TIER DEFINITIONS ──
