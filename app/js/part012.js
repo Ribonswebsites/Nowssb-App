@@ -1861,6 +1861,7 @@ function rmEnterFromIntro() {
   if (intro) { intro.style.opacity = '0'; intro.style.pointerEvents = 'none'; setTimeout(function(){ intro.classList.add('rm-intro-hidden'); }, 350); }
   if (main)  { main.style.display = 'flex'; }
   nssVidBannerCycle();
+  rmStoreBgSync();
 }
 function rmSkipIntro() {
   var intro = document.getElementById('rmIntroPage');
@@ -1868,6 +1869,20 @@ function rmSkipIntro() {
   if (intro) intro.classList.add('rm-intro-hidden');
   if (main)  main.style.display = 'flex';
   nssVidBannerCycle();
+  rmStoreBgSync();
+}
+
+// Word Atelier's own backdrop — same custom Fashion background the user
+// picked (via the header's customize icon, which just opens the existing
+// Fashion Background picker), or left as the plain default if none is set
+// yet. #rmBg already carries the app-wide .sub-screen-bg dark gradient
+// overlay, so only the image itself needs setting here.
+function rmStoreBgSync() {
+  var bg = document.getElementById('rmBg');
+  if (!bg) return;
+  var custom = null;
+  try { custom = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
+  if (custom) bg.style.backgroundImage = "url('" + custom + "')";
 }
 
 // Video banner text — icon stays fixed, only the tagline cycles (same

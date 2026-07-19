@@ -1790,6 +1790,16 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   border: none; border-radius: 999px !important; background: #e8d5a3; color: #060c18;
   font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 700; padding: 10px 14px; cursor: pointer;
 }
+
+/* ── Header "customize background" icon — opens the same Fashion
+   background picker used in Settings, applied as this screen's own
+   backdrop (#rmBg / #msBg) once chosen. ── */
+.rm-bg-customize-btn, .ms-bg-customize-btn {
+  width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px !important; overflow: hidden;
+  border: 1px solid rgba(232,213,163,0.32); background: rgba(255,255,255,0.06);
+  padding: 0; cursor: pointer;
+}
+.rm-bg-customize-btn img, .ms-bg-customize-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .rm-disclaimer { margin: 28px 0 0; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
 .rm-disclaimer-title {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px;

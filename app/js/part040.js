@@ -34,7 +34,13 @@
 
   /* ── Open / close panel (improved) ── */
   var _stack = [];
-  var _ssReturnScreen = null; // screen to return to when subscription closed externally
+  var _ssReturnScreen = null; // screen to return to when opened externally
+  // Panels that can be opened directly from OUTSIDE the settings flow (e.g. a
+  // header icon on some other screen) — these need the same "remember where
+  // we came from, close settings behind us when done" handling subscription
+  // already had. Add an id here whenever a new screen gets its own trigger
+  // into a settings panel.
+  var _ssExternalPanels = ['subscription', 'fashionbg'];
   window.SS = {
     open: function(id){
       var social = document.getElementById('sub-social');
@@ -49,7 +55,7 @@
         el.style.transform  = 'translateX(0)';
         el.style.display    = 'block';
         // Remember where to return when this panel is closed
-        if (id === 'subscription') _ssReturnScreen = (typeof currentScreen !== 'undefined' && currentScreen) ? currentScreen : 'home';
+        if (_ssExternalPanels.indexOf(id) !== -1) _ssReturnScreen = (typeof currentScreen !== 'undefined' && currentScreen) ? currentScreen : 'home';
         if (social) {
           social.classList.add('open');
           if (typeof ssSyncProfile === 'function') ssSyncProfile();
@@ -74,9 +80,9 @@
       el.style.transform  = 'translateX(100%)';
       setTimeout(function(){ el.style.display='none'; }, 310);
       _stack = _stack.filter(function(x){ return x!==id; });
-      // If subscription was opened from outside settings, close settings and
+      // If this panel was opened from outside settings, close settings and
       // return to the screen we came from.
-      if (id === 'subscription' && _ssReturnScreen) {
+      if (_ssExternalPanels.indexOf(id) !== -1 && _ssReturnScreen) {
         var ret = _ssReturnScreen;
         _ssReturnScreen = null;
         var social = document.getElementById('sub-social');

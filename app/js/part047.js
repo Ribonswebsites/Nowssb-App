@@ -76,6 +76,12 @@
       window._fbSetDoc(window._currentUid, { fashionBgCustom: url }).catch(function () {});
     }
     if (window.nwsbToast) nwsbToast('Background updated ✓');
+    // Other screens with their own "customize background" icon (Word
+    // Atelier, Meaning Store, ...) reuse this exact picker — re-sync them
+    // immediately so the change shows the moment you close the picker,
+    // whether or not that screen happens to be the one visible right now.
+    if (typeof window.rmStoreBgSync === 'function') window.rmStoreBgSync();
+    if (typeof window.msStoreBgSync === 'function') window.msStoreBgSync();
   };
 
   // Explicitly picking a Black-Edition theme card clears any custom photo —
