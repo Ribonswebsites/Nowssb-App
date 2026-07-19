@@ -1820,7 +1820,8 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 
 /* Fashion Background picker — Default/Black toggle switch */
 .fbg-mode-toggle {
-  width: 46px; height: 26px; border-radius: 13px !important; position: relative;
+  width: 46px; height: 26px; min-height: 0 !important; min-width: 0 !important;
+  border-radius: 13px !important; position: relative;
   cursor: pointer; background: rgba(255,255,255,0.15); transition: background 0.2s; flex-shrink: 0;
 }
 .fbg-mode-toggle.on { background: #2a2410; border: 1px solid rgba(232,213,163,0.5); }
@@ -1903,11 +1904,12 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 }
 .rm-desc-banner-row { display: flex; align-items: flex-start; gap: 14px; }
 .rm-desc-banner-logo {
-  width: 40px; height: 40px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden;
-  background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
+  width: 40px; height: 40px; min-width: 0 !important; min-height: 0 !important;
+  flex-shrink: 0; border-radius: 50% !important; overflow: hidden;
+  background: rgba(232,213,163,0.12); border: 1px solid rgba(232,213,163,0.3);
   display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800; color: #e8d5a3;
 }
-.rm-desc-banner-logo img { width: 60%; height: 60%; object-fit: contain; display: block; }
 .rm-desc-banner-divider { width: 1px; align-self: stretch; margin: 2px 0; background: rgba(255,255,255,0.15); flex-shrink: 0; }
 .rm-desc-banner-body { flex: 1; min-width: 0; }
 .rm-desc-banner-eyebrow {

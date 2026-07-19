@@ -99,14 +99,34 @@ window.msOpenDetailFromPlayer = function(key, wordDisplay) {
   if (window.msIsPurchased(key)) { window.msShowDetail(key, wordDisplay); }
 };
 
-/* ── BUY FLOW ── */
+/* ── BUY FLOW — custom bottom sheet, not the native confirm() popup (which
+   read as "the page is broken" rather than a purchase prompt). Same visual
+   language as the Word Atelier's request sheet. Razorpay integration slot
+   still simulated, mirrors the rest of the app's stub checkout flows. ── */
 window.msBuy = function(key, wordDisplay, price) {
-  // Razorpay integration slot — simulated for now
-  var confirmed = confirm('Unlock true meaning of "' + wordDisplay + '" for \u20b9' + price + '?\n\nThis is a one-time purchase. The meaning will be revealed here and in your player forever.');
-  if (!confirmed) return;
+  var existing = document.getElementById('msBuySheet');
+  if (existing) existing.remove();
+  var sheet = document.createElement('div');
+  sheet.id = 'msBuySheet';
+  sheet.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);';
+  var wordSafe = wordDisplay.replace(/'/g, "\\'");
+  sheet.innerHTML = '<div style="width:100%;background:#0e1828;border-top:1px solid rgba(232,213,163,0.2);padding:32px 24px max(env(safe-area-inset-bottom,28px),28px);font-family:\'DM Sans\',sans-serif;box-sizing:border-box;">' +
+    '<div style="font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(232,213,163,0.6);margin-bottom:12px;">Unlock True Meaning</div>' +
+    '<div style="font-size:26px;font-weight:800;color:#fff;margin-bottom:8px;">' + wordDisplay + '</div>' +
+    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:24px;">One-time purchase. The meaning is revealed here and in your player, forever.</div>' +
+    '<button onclick="window.msConfirmBuy(\'' + key + '\',\'' + wordSafe + '\',' + price + ')" style="width:100%;background:#e8d5a3;border:none;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:700;color:#060c18;padding:16px 20px;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">Unlock · \u20b9' + price + ' <span style="opacity:0.5;font-weight:400;">→</span></button>' +
+    '<button onclick="document.getElementById(\'msBuySheet\').remove()" style="width:100%;background:none;border:1px solid rgba(255,255,255,0.12);cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:400;color:rgba(255,255,255,0.45);padding:14px 20px;">Cancel</button>' +
+    '</div>';
+  sheet.onclick = function (e) { if (e.target === sheet) sheet.remove(); };
+  document.body.appendChild(sheet);
+};
+
+window.msConfirmBuy = function (key, wordDisplay, price) {
+  var sheet = document.getElementById('msBuySheet');
+  if (sheet) sheet.remove();
   msMarkPurchased(key);
   msRenderStore();
-  setTimeout(function(){ window.msShowDetail(key, wordDisplay); }, 80);
+  setTimeout(function () { window.msShowDetail(key, wordDisplay); }, 80);
 };
 
 var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
@@ -283,17 +303,18 @@ window.msEnterFromIntro = function() {
 // a time, dash-in from the right (same treatment as the video banner's
 // cycling tagline). Dots track progress.
 var MS_DESC_STEPS = [
-  { label: 'Overview · 1/2', text: 'Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin — what the sound does inside your body.' },
-  { label: 'Overview · 2/2', text: 'Which organ it activates, and where this word existed before anyone wrote it down. Nothing here is free — every meaning is a one-time unlock, yours forever.' },
-  { label: 'Step 1', text: 'Every word carries a vibration that predates its dictionary definition.' },
-  { label: 'Step 2', text: 'Unlock the true phonetic origin — what the sound does inside your body.' },
-  { label: 'Step 3', text: 'Discover which organ it activates, and where it existed before anyone wrote it down.' },
-  { label: 'Step 4', text: 'Every meaning is a one-time unlock, yours forever.' }
+  { label: 'Overview · 1/2', badge: '★', text: 'Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin — what the sound does inside your body.' },
+  { label: 'Overview · 2/2', badge: '★', text: 'Which organ it activates, and where this word existed before anyone wrote it down. Nothing here is free — every meaning is a one-time unlock, yours forever.' },
+  { label: 'Step 1', badge: '1', text: 'Every word carries a vibration that predates its dictionary definition.' },
+  { label: 'Step 2', badge: '2', text: 'Unlock the true phonetic origin — what the sound does inside your body.' },
+  { label: 'Step 3', badge: '3', text: 'Discover which organ it activates, and where it existed before anyone wrote it down.' },
+  { label: 'Step 4', badge: '4', text: 'Every meaning is a one-time unlock, yours forever.' }
 ];
 var _msDescTimer = null;
 function msDescBannerCycle() {
   var labelEl = document.getElementById('msDescStepLabel');
   var textEl  = document.getElementById('msDescStepText');
+  var badgeEl = document.getElementById('msDescStepBadge');
   var dotsEl  = document.getElementById('msDescDots');
   if (!labelEl || !textEl) return;
   if (dotsEl && !dotsEl.dataset.built) {
@@ -306,6 +327,7 @@ function msDescBannerCycle() {
     var step = MS_DESC_STEPS[idx % MS_DESC_STEPS.length];
     labelEl.textContent = step.label;
     textEl.textContent = step.text;
+    if (badgeEl) badgeEl.textContent = step.badge;
     textEl.classList.remove('dash-in');
     void textEl.offsetWidth;
     textEl.classList.add('dash-in');

@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=261"></script>
 <link rel="stylesheet" href="app/app.css?v=297">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=376">
+<link rel="stylesheet" href="nowssb-nm.css?v=377">
 <link rel="stylesheet" href="nowssb-player.css?v=191">
 </head>
 <body>
@@ -3294,7 +3294,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <!-- ── DESCRIPTION — black banner, rotates: overview then step 1,2,3... ── -->
       <div class="rm-desc-banner">
         <div class="rm-desc-banner-row">
-          <div class="rm-desc-banner-logo"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png" alt=""></div>
+          <div class="rm-desc-banner-logo" id="msDescStepBadge">1</div>
           <div class="rm-desc-banner-divider"></div>
           <div class="rm-desc-banner-body">
             <div class="rm-desc-banner-eyebrow" id="msDescStepLabel">Overview</div>
@@ -4924,7 +4924,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      Screens: word-science, profile, real-meaning, shabdapathy
 ══════════════════════════════════════════ -->
 <script src="app/js/part025.js?v=163"></script><!-- ══ MEANING STORE JS ══ -->
-<script src="app/js/part026.js?v=167"></script>
+<script src="app/js/part026.js?v=169"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -7685,7 +7685,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ FASHION HOME BACKGROUND PANEL — separate from Black Edition, which
      only controls the app-wide theme skin. This only changes the two
      Fashion-home background photos; the hero header never changes. ══ -->
-<div class="ss-panel" id="ss-panel-fashionbg" style="padding:0;overflow:hidden;">
+<div class="ss-panel" id="ss-panel-fashionbg" style="padding:0;overflow:hidden;touch-action:pan-y;overscroll-behavior-x:none;">
 
   <!-- ══ INTRO PAGE — shown first, tap Enter to reach the picker ══ -->
   <div class="sl-intro-page" id="fbgIntroPage" style="display:none;">
@@ -7714,7 +7714,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- ══ MAIN PICKER (hidden until intro dismissed) ══ -->
-  <div id="fbgMainContent" style="display:none;height:100%;position:relative;">
+  <div id="fbgMainContent" style="display:none;height:100%;position:relative;touch-action:pan-y;overscroll-behavior-x:none;">
   <div id="fbgPreviewBg" style="position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;transition:background-image 0.35s ease;"></div>
   <div style="position:absolute;inset:0;z-index:0;background:linear-gradient(rgba(6,12,24,0.62),rgba(6,12,24,0.88));"></div>
   <div style="position:relative;height:100%;display:flex;flex-direction:column;z-index:1;">
