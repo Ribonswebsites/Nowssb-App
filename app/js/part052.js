@@ -27,12 +27,17 @@
   }
   window.nwsbCurrencyForCountry = currencyForCountry;
 
+  // window.nwsbCurrency stays null until a real location is detected —
+  // formatters fall back to each screen's own native currency (₹ for the
+  // INR-native Meaning Store, $ for USD-native screens) rather than
+  // silently assuming USD, which was showing $0.59 for a ₹49 meaning
+  // before the user had ever granted location access.
   function loadCurrency() {
     try {
       var raw = localStorage.getItem('nwsb_user_currency');
       if (raw) return JSON.parse(raw);
     } catch (e) {}
-    return { code: 'USD', symbol: '$', rate: 1, dec: 2 };
+    return null;
   }
   window.nwsbCurrency = loadCurrency();
 
@@ -47,18 +52,25 @@
     if (typeof window.ebRenderStore === 'function') window.ebRenderStore();
   }
 
-  window.nwsbFormatUSD = function(usd) {
-    var cur = window.nwsbCurrency;
-    var v = (usd || 0) * cur.rate;
-    var s = cur.dec === 0 ? String(Math.round(v)) : v.toFixed(2);
+  function fmt(v, symbol, dec) {
+    var s = dec === 0 ? String(Math.round(v)) : v.toFixed(2);
     s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return cur.symbol + s;
+    return symbol + s;
+  }
+  window.nwsbFormatUSD = function(usd) {
+    usd = usd || 0;
+    var cur = window.nwsbCurrency;
+    if (!cur) return fmt(usd, '$', 2);
+    return fmt(usd * cur.rate, cur.symbol, cur.dec);
   };
   // Meaning Store prices are stored natively in INR — convert INR → USD →
   // the detected local currency for display.
   window.nwsbFormatINR = function(inr) {
-    var usd = (inr || 0) / CURRENCY_MAP['India'][2];
-    return window.nwsbFormatUSD(usd);
+    inr = inr || 0;
+    var cur = window.nwsbCurrency;
+    if (!cur) return fmt(inr, '₹', 0);
+    var usd = inr / CURRENCY_MAP['India'][2];
+    return fmt(usd * cur.rate, cur.symbol, cur.dec);
   };
 
   /* ── One-time "Enable Location Access" prompt ── */
@@ -90,4 +102,24 @@
     var el = document.getElementById('nwsbLocOverlay');
     if (el) el.classList.add('open');
   };
+
+  /* Fire once, right after the splash finishes and the user lands on Home —
+     not tied to any one screen, so the app knows the user's country from
+     the very start of the session. Hooks goTo() the same way part021.js
+     already does (check currentScreen === 'splash' BEFORE calling through)
+     so this stacks safely instead of fighting that existing hook. */
+  (function hookGoToForLocationPrompt() {
+    var _prevGoTo = window.goTo;
+    if (!_prevGoTo) { setTimeout(hookGoToForLocationPrompt, 200); return; }
+    window.goTo = function(dest) {
+      var fromSplash = (typeof currentScreen !== 'undefined' && currentScreen === 'splash');
+      var result = _prevGoTo.apply(this, arguments);
+      if (fromSplash && (dest === 'home' || dest === 'home-nm')) {
+        setTimeout(function() {
+          if (typeof window.nwsbMaybeShowLocationPrompt === 'function') window.nwsbMaybeShowLocationPrompt();
+        }, 1200);
+      }
+      return result;
+    };
+  })();
 })();

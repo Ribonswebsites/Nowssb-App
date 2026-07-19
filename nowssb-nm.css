@@ -1990,9 +1990,9 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
    banner, disclaimer, footer — same sections as the rest of the store. ── */
 .ms-locked-page { display: flex; flex-direction: column; }
 .ms-locked-hero {
-  position: relative; width: 100%; aspect-ratio: 4 / 5; border-radius: 18px !important;
+  position: relative; width: 140px; aspect-ratio: 4 / 5; border-radius: 14px !important;
   overflow: hidden; background: #0a1120; border: 1px solid rgba(255,255,255,0.08);
-  margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
 }
 .ms-locked-hero img { width: 100%; height: 100%; object-fit: contain; display: block; opacity: 0.95; }
 .ms-locked-hero-badge {
@@ -2016,33 +2016,39 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 }
 .ms-locked-wish-btn.wishlisted { background: rgba(220,80,80,0.12); border-color: rgba(220,80,80,0.4); }
 .ms-locked-cart-btn {
-  flex: 1; min-width: 0; background: #e8d5a3; border: none; border-radius: 14px !important;
+  flex: 1; min-width: 0; background: #e8d5a3; border: none; border-radius: 0 !important;
   font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #060c18;
   cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .ms-locked-cart-btn.carted { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
-.ms-locked-cart-btn-in { display: none; }
+.ms-locked-cart-btn-add, .ms-locked-cart-btn-in { display: none; align-items: center; gap: 8px; }
+.ms-locked-cart-btn-add { display: inline-flex; }
 .ms-locked-cart-btn.carted .ms-locked-cart-btn-add { display: none; }
-.ms-locked-cart-btn.carted .ms-locked-cart-btn-in { display: inline; }
+.ms-locked-cart-btn.carted .ms-locked-cart-btn-in { display: inline-flex; }
 .ms-locked-buynow-btn {
-  width: 100%; margin-top: 10px; background: transparent; border: 1.5px solid #e8d5a3; border-radius: 14px !important;
-  padding: 15px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #e8d5a3;
+  width: 100%; margin-top: 10px; background: #fff; border: none; border-radius: 0 !important;
+  padding: 15px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #060c18;
   cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 
-/* ── "What is a Meaning / How you'll receive it" explainer — black info
-   banner shown right under the header, before the product itself. ── */
+/* ── "What is a Meaning / How you'll receive it" explainer — one black
+   banner, one icon+divider on the left (same language as the category and
+   description banners), two stacked cards on the right. ── */
 .ms-info-banner {
   background: #000; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px !important;
-  padding: 4px 16px; margin-bottom: 20px;
+  padding: 16px; margin-bottom: 20px; display: flex; gap: 14px; align-items: stretch;
 }
-.ms-info-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; }
-.ms-info-divider { height: 1px; background: rgba(255,255,255,0.08); }
-.ms-info-icon {
-  width: 30px; height: 30px; min-width: 0 !important; min-height: 0 !important; flex-shrink: 0;
-  border-radius: 50% !important; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.25);
-  display: flex; align-items: center; justify-content: center; margin-top: 1px;
+.ms-info-left { flex-shrink: 0; padding-top: 2px; }
+.ms-info-logo {
+  width: 34px; height: 34px; min-width: 0 !important; min-height: 0 !important;
+  border-radius: 50% !important; overflow: hidden;
+  background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
 }
+.ms-info-logo img { width: 60%; height: 60%; object-fit: contain; display: block; }
+.ms-info-divider-v { width: 1px; align-self: stretch; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+.ms-info-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ms-info-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 0; }
 .ms-info-title { font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 700; color: #fff; margin-bottom: 4px; }
 .ms-info-sub { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: rgba(255,255,255,0.45); line-height: 1.6; }
 
@@ -4398,7 +4404,9 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-caption { color: rgba(255,255,255,
 body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot { background: rgba(255,255,255,0.22) !important; }
 body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !important; }
 
-/* ── Location access prompt — one-time bottom sheet, black/gold. ── */
+/* ── Location access prompt — one-time bottom sheet, pure black banner.
+   Left column: NowssB logo above a location pin, same "icon + vertical
+   divider" language as the category/description banners elsewhere. ── */
 .nwsb-loc-overlay {
   position: fixed; inset: 0; z-index: 99998;
   background: rgba(0,0,0,0.6);
@@ -4408,10 +4416,9 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 .nwsb-loc-overlay.open { opacity: 1; pointer-events: auto; }
 .nwsb-loc-sheet {
   position: relative; width: 100%; max-width: 480px;
-  background: #060c18; border: 1px solid rgba(255,255,255,0.08);
+  background: #000; border: 1px solid rgba(255,255,255,0.08);
   border-radius: 24px 24px 0 0 !important;
-  padding: 16px 24px max(env(safe-area-inset-bottom,20px),20px);
-  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 20px 20px max(env(safe-area-inset-bottom,20px),20px);
   transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .nwsb-loc-overlay.open .nwsb-loc-sheet { transform: translateY(0); }
@@ -4419,26 +4426,36 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   position: absolute; top: 14px; right: 14px; width: 30px; height: 30px;
   min-width: 0 !important; min-height: 0 !important; border-radius: 50% !important;
   background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2;
 }
-.nwsb-loc-icon {
-  width: 64px; height: 64px; border-radius: 50% !important; flex-shrink: 0;
-  background: rgba(232,213,163,0.08); border: 1px solid rgba(232,213,163,0.25);
+.nwsb-loc-row { display: flex; align-items: flex-start; gap: 14px; padding-top: 20px; }
+.nwsb-loc-left { display: flex; flex-direction: column; align-items: center; gap: 10px; flex-shrink: 0; }
+.nwsb-loc-logo {
+  width: 40px; height: 40px; min-width: 0 !important; min-height: 0 !important;
+  border-radius: 50% !important; overflow: hidden;
+  background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
   display: flex; align-items: center; justify-content: center;
-  margin: 36px 0 20px;
 }
-.nwsb-loc-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 8px; }
-.nwsb-loc-sub { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; max-width: 320px; margin-bottom: 24px; }
-.nwsb-loc-features { display: flex; gap: 10px; width: 100%; margin-bottom: 24px; }
+.nwsb-loc-logo img { width: 60%; height: 60%; object-fit: contain; display: block; }
+.nwsb-loc-pin {
+  width: 34px; height: 34px; min-width: 0 !important; min-height: 0 !important;
+  border-radius: 50% !important; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.nwsb-loc-divider-v { width: 1px; align-self: stretch; background: rgba(255,255,255,0.12); flex-shrink: 0; margin-bottom: 4px; }
+.nwsb-loc-body { flex: 1; min-width: 0; }
+.nwsb-loc-title { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+.nwsb-loc-sub { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 20px; }
+.nwsb-loc-features { display: flex; gap: 10px; margin-bottom: 20px; }
 .nwsb-loc-feature {
-  flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px !important; padding: 16px 10px;
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.75);
+  flex: 1; min-width: 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px !important; padding: 14px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,0.75);
 }
 .nwsb-loc-cta {
   width: 100%; background: #e8d5a3; border: none; border-radius: 14px !important;
-  padding: 16px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
-  color: #060c18; cursor: pointer; margin-bottom: 12px;
+  padding: 15px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  color: #060c18; cursor: pointer; margin-bottom: 10px;
 }
-.nwsb-loc-skip { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.4); cursor: pointer; }
+.nwsb-loc-skip { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.4); cursor: pointer; text-align: center; }

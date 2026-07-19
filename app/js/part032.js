@@ -517,14 +517,10 @@ window.ssSelectPlan = function(id) {
 };
 
 // Each tier reads as its own distinct card, not a tinted variant of one
-// template: Resonance = white card, Frequency = black card, Frequency X =
-// gold-rimmed glass card (the top tier).
-// flatText: this tier's big name/price text never switches to the accent
-// color on selection — it stays a plain, always-readable color (the accent
-// is still used for the border glow, badge and checkmarks). Resonance's
-// white card read wrong with blue headline text flashing in on selection.
+// template: Resonance = blue-tinted glass, Frequency = black card,
+// Frequency X = gold-rimmed glass card (the top tier).
 var SS_CARD_STYLE = {
-  resonance:  { bg:'#f3f5f8', text:'#0a0e1a', sub:'rgba(10,14,26,.58)', accent:'#3f7ea6', chipBg:'rgba(63,126,166,.14)', restBorder:'rgba(10,14,26,.14)', glass:false, flatText:true },
+  resonance:  { bg:'rgba(122,184,212,.08)', text:'#ffffff', sub:'rgba(255,255,255,.55)', accent:'#7ab8d4', chipBg:'rgba(122,184,212,.16)', restBorder:'rgba(255,255,255,.14)', glass:true },
   frequency:  { bg:'#0c0c0e', text:'#ffffff', sub:'rgba(255,255,255,.55)', accent:'#e8d5a3', chipBg:'rgba(232,213,163,.16)', restBorder:'rgba(255,255,255,.14)', glass:false },
   frequencyX: { bg:'rgba(255,255,255,.05)', text:'#ffffff', sub:'rgba(255,255,255,.6)', accent:'#e8d5a3', chipBg:'rgba(232,213,163,.16)', restBorder:'rgba(232,213,163,.45)', glass:true }
 };

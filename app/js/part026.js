@@ -129,20 +129,14 @@ window.msBuy = function(key, wordDisplay, price) {
   dc.innerHTML =
     '<div class="ms-locked-page">' +
       '<div class="ms-info-banner">' +
-        '<div class="ms-info-row">' +
-          '<div class="ms-info-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.8"><path d="M9 18V6l8 6-8 6Z"/></svg></div>' +
-          '<div>' +
-            '<div class="ms-info-title">What is a Meaning?</div>' +
-            '<div class="ms-info-sub">The true phonetic origin of this word — its natural-origin root, the organ it activates, and the vibration it carries in the body.</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="ms-info-divider"></div>' +
-        '<div class="ms-info-row">' +
-          '<div class="ms-info-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.8"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke-linejoin="round"/></svg></div>' +
-          '<div>' +
-            '<div class="ms-info-title">How You&rsquo;ll Receive It</div>' +
-            '<div class="ms-info-sub">Unlocked instantly in your library after purchase — no waiting, available offline anytime.</div>' +
-          '</div>' +
+        '<div class="ms-info-left"><div class="ms-info-logo"><img decoding="async" loading="lazy" src="' + MS_CAT_LOGO + '" alt=""></div></div>' +
+        '<div class="ms-info-divider-v"></div>' +
+        '<div class="ms-info-body">' +
+          '<div class="ms-info-title">What is a Meaning?</div>' +
+          '<div class="ms-info-sub">The true phonetic origin of this word — its natural-origin root, the organ it activates, and the vibration it carries in the body.</div>' +
+          '<div class="ms-info-sep"></div>' +
+          '<div class="ms-info-title">How You&rsquo;ll Receive It</div>' +
+          '<div class="ms-info-sub">Unlocked instantly in your library after purchase — no waiting, available offline anytime.</div>' +
         '</div>' +
       '</div>' +
       '<div class="ms-locked-hero">' +
@@ -158,15 +152,21 @@ window.msBuy = function(key, wordDisplay, price) {
             '<svg width="18" height="18" viewBox="0 0 16 16" fill="' + (inWish ? 'rgba(220,80,80,0.9)' : 'none') + '"><path d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linejoin="round"/></svg>' +
           '</div>' +
           '<button class="ms-locked-cart-btn' + (inCart ? ' carted' : '') + '" data-nss-cart="' + itemId + '" onclick="nssAddToCart(' + itemArgs + ')">' +
-            '<span class="ms-locked-cart-btn-add">Add to Cart · ' + msMoneyLabel(price) + '</span>' +
-            '<span class="ms-locked-cart-btn-in">In Cart ✓</span>' +
+            '<span class="ms-locked-cart-btn-add"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.3"/><circle cx="18" cy="21" r="1.3"/><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6"/></svg>Add to Cart · ' + msMoneyLabel(price) + '</span>' +
+            '<span class="ms-locked-cart-btn-in"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>In Cart</span>' +
           '</button>' +
         '</div>' +
         '<button class="ms-locked-buynow-btn" onclick="window.msBuyNow(' + buyNowArgs + ')">Buy Now <span style="opacity:.6;">→</span></button>' +
       '</div>' +
-      '<div class="fash-video-banner" style="margin:0 0 20px;border-radius:16px !important;" onclick="SS&&SS.open(\'subscription\')">' +
-        '<video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102734/grok_video_2026-07-15-13-34-04_htvekp.mp4"></video>' +
-        '<button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open(\'subscription\')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>' +
+      '<div class="nss-vid-banner" style="margin:0 0 20px;border-radius:16px !important;cursor:pointer;" onclick="SS&&SS.open(\'subscription\')">' +
+        '<video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
+        '<div class="nss-vid-banner-fade"></div>' +
+        '<div class="nss-vid-banner-pill-wrap">' +
+          '<div class="nss-vid-banner-pill">' +
+            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">' +
+            '<span class="nss-vid-banner-pill-text">Subscribe Today</span>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="rm-req-banner" onclick="msOpenMeaningRequest()">' +
         '<div class="rm-req-banner-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>' +
