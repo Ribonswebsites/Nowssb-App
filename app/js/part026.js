@@ -108,7 +108,7 @@ var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_au
    the app goes through), request banner, disclaimer and footer. No
    separate popup/sheet, no instant fake-unlock ─ buying a meaning works
    exactly like buying anything else in the store. ── */
-window.msBuy = function(key, wordDisplay, price) {
+window.msBuy = function(key, wordDisplay, price, img) {
   var dp = document.getElementById('msDetailPanel');
   var dw = document.getElementById('msDetailWord');
   var dc = document.getElementById('msDetailContent');
@@ -116,12 +116,13 @@ window.msBuy = function(key, wordDisplay, price) {
   var wordSafe = wordDisplay.replace(/'/g, "\\'");
   dw.textContent = wordDisplay;
 
+  var heroImg = img || MS_CARD_IMG;
   var itemId = 'ms-' + key;
   var cartIds = (window.nssCart || []).map(function(c){ return c.id; });
   var wishIds = (window.nssWishlist || []).map(function(w){ return w.id; });
   var inCart = cartIds.indexOf(itemId) >= 0;
   var inWish = wishIds.indexOf(itemId) >= 0;
-  var safeImg = MS_CARD_IMG.replace(/'/g, '');
+  var safeImg = heroImg.replace(/'/g, '');
   var itemArgs = "{id:'" + itemId + "',name:'" + wordSafe + "',type:'Meaning',price:" + price + ",img:'" + safeImg + "'}";
 
   var buyNowArgs = "'" + itemId + "','" + wordSafe + "'," + price + ",'" + safeImg + "'";
@@ -141,7 +142,7 @@ window.msBuy = function(key, wordDisplay, price) {
       '</div>' +
       '<div class="ms-locked-hero-banner">' +
         '<div class="ms-locked-hero-imgwrap">' +
-          '<img loading="lazy" decoding="async" src="' + MS_CARD_IMG + '" alt="">' +
+          '<img loading="lazy" decoding="async" src="' + heroImg + '" alt="">' +
           '<div class="ms-locked-hero-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>Locked</div>' +
         '</div>' +
         '<div class="ms-locked-hero-divider"></div>' +
@@ -226,7 +227,7 @@ var MS_SIGNATURE = {
   'Cosmos':             { key:'cosmossignature',    word:'Cosmos Signature',         root:'Most Exclusive' },
   'Nations & People':   { key:'nationssignature',   word:'Nations Signature',        root:'Most Exclusive' }
 };
-var MS_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png';
+var MS_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784460713/file_000000008eb081fba87f16fe9146e413_mk9wbe.png';
 var MS_SIGNATURE_PRICE = 299;
 
 /* ── One-line plain-language blurb per word, shown next to the product
@@ -342,7 +343,7 @@ window.msRenderStore = function() {
     if (sig) {
       var sigIsPur = purchasedKeys.indexOf(sig.key) !== -1;
       html += '<div class="ms-card ms-card-signature' + (sigIsPur ? ' unlocked' : '') + '" style="position:relative;" onclick="' +
-        (sigIsPur ? 'window.msShowDetail(\'' + sig.key + '\',\'' + sig.word + '\')' : 'window.msBuy(\'' + sig.key + '\',\'' + sig.word + '\',' + MS_SIGNATURE_PRICE + ')') +
+        (sigIsPur ? 'window.msShowDetail(\'' + sig.key + '\',\'' + sig.word + '\')' : 'window.msBuy(\'' + sig.key + '\',\'' + sig.word + '\',' + MS_SIGNATURE_PRICE + ',\'' + MS_SIGNATURE_IMG + '\')') +
         '">' +
         '<span class="ms-card-signature-tag">Signature</span>' +
         cardActions(sig.key, sig.word, MS_SIGNATURE_PRICE, MS_SIGNATURE_IMG, sigIsPur) +
