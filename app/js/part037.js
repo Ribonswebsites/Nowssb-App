@@ -154,23 +154,34 @@
       '</div>';
   }
 
-  // Start a single word — load it into player
+  // Start a single word — load it into player and enter practice directly
+  // (no intro screen, no detour through the active routine's own words).
+  //
+  // This used to call a `setPracticeWords` function that doesn't exist
+  // anywhere in the app (always silently false), so it fell through to
+  // openPracticeIntro() instead — which loads the ACTIVE ROUTINE's words
+  // (not the one word tapped here) and forces the intro screen. Assigning
+  // PRACTICE_WORDS directly + _rtManualLaunch=true is the same mechanism
+  // openPracticeIntro() itself uses, minus the parts that were wrong here.
   window.rxStartWord = function(wordName){
     var lib = (typeof MASTER_WORD_LIBRARY !== "undefined" && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     var w = lib.find(function(x){ return x.word === wordName; });
     if (!w) return;
-    if (typeof setPracticeWords === 'function') setPracticeWords([w]);
-    else if (typeof openPracticeIntro === 'function') openPracticeIntro();
+    PRACTICE_WORDS = [w];
+    window._rtManualLaunch = true;
     if (typeof openSub === 'function') openSub('practice');
   };
 
-  // Start all 3 as a mini-routine
+  // Start all 3 as a mini-routine — same fix as rxStartWord above.
   window.rxStartAll = function(words){
     var lib = (typeof MASTER_WORD_LIBRARY !== "undefined" && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     var wordObjs = words.map(function(pw){
       return lib.find(function(lw){ return lw.word === pw.word; }) || { word:pw.word, phonetic:pw.word.toLowerCase(), syllables:[pw.word.toLowerCase()], organ:pw.organ||'', origin:'', benefit:'', meaning:'', mouthPos:'', resonance:'', mistake:'', tip:'' };
     }).filter(Boolean);
-    if (wordObjs.length && typeof setPracticeWords === 'function') setPracticeWords(wordObjs);
+    if (wordObjs.length) {
+      PRACTICE_WORDS = wordObjs;
+      window._rtManualLaunch = true;
+    }
     if (typeof openSub === 'function') openSub('practice');
   };
 
