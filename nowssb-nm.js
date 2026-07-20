@@ -483,7 +483,7 @@
   function nwsbToast(msg) {
     var t = document.createElement('div');
     t.textContent = msg;
-    t.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1a1a2e;color:#e8d5a3;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;padding:11px 20px;border-radius:24px;z-index:99999;box-shadow:0 6px 20px rgba(0,0,0,.3);';
+    t.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1a1a2e;color:#e8d5a3;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;padding:11px 20px;border-radius:24px;z-index:99999;box-shadow:0 6px 20px rgba(0,0,0,.3);pointer-events:none;';
     document.body.appendChild(t);
     setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 2200);
   }

@@ -303,7 +303,7 @@ function nssShowToast(msg) {
       'background:rgba(11,17,32,0.95);border:1px solid rgba(255,255,255,0.1);' +
       'backdrop-filter:none;-webkit-backdrop-filter:none;' +
       'color:rgba(255,255,255,0.9);font-size:12px;font-weight:600;letter-spacing:0.3px;' +
-      'padding:10px 18px;border-radius:20px;z-index:9999;' +
+      'padding:10px 18px;border-radius:20px;z-index:9999;pointer-events:none;' +
       'opacity:0;transition:opacity 0.2s ease,transform 0.2s ease;white-space:nowrap;';
     document.body.appendChild(t);
   }
