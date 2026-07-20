@@ -47,6 +47,17 @@ function nssEnterStore() {
 var nssCart     = JSON.parse(localStorage.getItem('nowssb_cart') || '[]');
 var nssWishlist = JSON.parse(localStorage.getItem('nowssb_wish') || '[]');
 
+// Word-type items never had a genuine per-word image — they inherited a
+// promotional banner shared across every word in the same price tier,
+// and several of those banners have a DIFFERENT word's name baked into
+// the artwork. Anything saved with that stale img before this was fixed
+// would keep showing the wrong name forever; strip it once here so every
+// render path (cart, wishlist, checkout) that reads from these same
+// arrays falls back to the neutral icon instead.
+[nssCart, nssWishlist].forEach(function (list) {
+  list.forEach(function (item) { if (item && item.type === 'Word') item.img = ''; });
+});
+
 function nssSaveCart()     { localStorage.setItem('nowssb_cart', JSON.stringify(nssCart)); }
 function nssSaveWishlist() { localStorage.setItem('nowssb_wish', JSON.stringify(nssWishlist)); }
 
@@ -62,11 +73,27 @@ function nssUpdateBadges() {
     wb.textContent = nssWishlist.length;
     wb.classList.toggle('show', nssWishlist.length > 0);
   }
+  // Cart icon also appears in the Word Atelier / Meaning Store headers, and
+  // the wishlist icon in the Cart page's own header — every instance shares
+  // its class so they all stay in sync together.
+  document.querySelectorAll('.nss-cart-badge-shared').forEach(function (el) {
+    el.textContent = nssCart.length;
+    el.classList.toggle('show', nssCart.length > 0);
+  });
+  document.querySelectorAll('.nss-wish-badge-shared').forEach(function (el) {
+    el.textContent = nssWishlist.length;
+    el.classList.toggle('show', nssWishlist.length > 0);
+  });
   /* Visibility of the topbar itself is owned by nssEnterStore() (show) and
      nssClose() (hide) — forcing it visible here too meant any badge-count
      refresh (e.g. adding a word while browsing) could pop the cart/wishlist
      icons up over the intro page even before the store was entered. */
 }
+// Sync every badge once at boot (Word Atelier / Meaning Store headers are
+// static markup already in the DOM, unlike the store topbar's own badge
+// which nssEnterStore() syncs on entry) so a returning user with items
+// already in their cart doesn't see a stale "0" until the next change.
+nssUpdateBadges();
 
 // ── ADD TO CART ──
 function nssAddToCart(item) {
@@ -255,11 +282,12 @@ function nssWishOverlayClick(e) {
 // ── CHECKOUT (Razorpay placeholder) ──
 function nssCheckout() {
   if (!nssCart || nssCart.length === 0) return;
-  // Close cart page and open checkout sub-screen
+  // Open checkout ON TOP of the still-open cart (checkout sits later in the
+  // DOM, so it paints above cart at the same z-index) BEFORE closing cart —
+  // closing cart first briefly reveals whatever screen sits underneath both
+  // (e.g. Fashion Home) as a visible flash while checkout hasn't slid in yet.
+  if (typeof openSub === 'function') openSub('checkout');
   if (typeof closeSub === 'function') closeSub('cart');
-  setTimeout(function() {
-    if (typeof openSub === 'function') openSub('checkout');
-  }, 80);
 }
 
 // ── TOAST NOTIFICATION ──

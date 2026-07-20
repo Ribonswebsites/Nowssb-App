@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
-<link rel="stylesheet" href="app/app.css?v=302">
+<link rel="stylesheet" href="app/app.css?v=303">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=392">
+<link rel="stylesheet" href="nowssb-nm.css?v=393">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -2947,6 +2947,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="sub-header nav-bar">
       <div class="sub-back" onclick="rmHeaderBack()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
       <div class="sub-title">The Word Atelier</div>
+      <button class="rm-cart-btn" onclick="nssOpenCart()" aria-label="Cart">
+        <svg width="17" height="17" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg>
+        <div class="nss-icon-badge nss-cart-badge-shared" id="rmCartBadge">0</div>
+      </button>
       <button class="rm-bg-customize-btn" onclick="SS.open('fashionbg')" aria-label="Customize background">
         <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
       </button>
@@ -3251,6 +3255,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
       </div>
       <div class="sub-title" style="text-align:center;">Shabdapathy · True Origin</div>
+      <button class="ms-cart-btn" onclick="nssOpenCart()" aria-label="Cart">
+        <svg width="17" height="17" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg>
+        <div class="nss-icon-badge nss-cart-badge-shared" id="msCartBadge">0</div>
+      </button>
       <button class="ms-bg-customize-btn" onclick="SS.open('fashionbg')" aria-label="Customize background">
         <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
       </button>
@@ -4240,7 +4248,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 </div><!-- /sub-nowssb-store -->
 
-<script src="app/js/part017.js?v=196"></script>
+<script src="app/js/part017.js?v=197"></script>
 
 <!-- intro rendered inline -->
 
@@ -4986,6 +4994,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </svg>
     </div>
     <div class="cwp-topbar-title">My Cart</div>
+    <button class="cwp-wish-btn" onclick="nssOpenWishlist()" aria-label="Wishlist">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+      <div class="nss-icon-badge nss-wish-badge-shared" id="cartPageWishBadge">0</div>
+    </button>
     <div class="cwp-topbar-count" id="cartPageCount">0 items</div>
   </div>
 
@@ -5413,26 +5425,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ SUB-SCREEN: CHECKOUT ══ -->
 <div class="sub-screen cwp-screen" id="sub-checkout">
 
-  <!-- Hero -->
-  <div class="chk-hero">
-    <div class="chk-hero-bg" id="chkHeroBg"></div>
-    <div class="chk-hero-overlay"></div>
-    <div class="chk-hero-top">
-      <div class="chk-back" onclick="navFromSub('checkout',function(){openSub('cart');});">
-        <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-          <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/>
-          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
-        </svg>
+  <!-- Scrollable body — hero lives INSIDE so it scrolls away with the rest
+       of the page instead of staying pinned at the top. -->
+  <div class="chk-body" id="chkBody">
+
+    <!-- Hero -->
+    <div class="chk-hero">
+      <div class="chk-hero-bg" id="chkHeroBg"></div>
+      <div class="chk-hero-overlay"></div>
+      <div class="chk-hero-top">
+        <div class="chk-back" onclick="navFromSub('checkout',function(){openSub('cart');});">
+          <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
+            <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/>
+            <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="chk-hero-bottom">
+        <span class="chk-hero-eyebrow">NowssB Store · Secure Checkout</span>
+        <div class="chk-hero-title">Complete <span>Your Order</span></div>
       </div>
     </div>
-    <div class="chk-hero-bottom">
-      <span class="chk-hero-eyebrow">NowssB Store · Secure Checkout</span>
-      <div class="chk-hero-title">Complete <span>Your Order</span></div>
-    </div>
-  </div>
-
-  <!-- Scrollable body -->
-  <div class="chk-body" id="chkBody">
 
     <!-- ── ORDER SUMMARY ── -->
     <span class="chk-label">Order Summary</span>

@@ -1815,6 +1815,14 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   padding: 0; cursor: pointer;
 }
 .rm-bg-customize-btn img, .ms-bg-customize-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Header cart icon, left of customize — same footprint as the customize
+   button so the two sit evenly in the header's icon group. */
+.rm-cart-btn, .ms-cart-btn {
+  position: relative; width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px !important;
+  border: 1px solid rgba(232,213,163,0.32); background: rgba(255,255,255,0.06);
+  padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.rm-cart-btn .nss-icon-badge, .ms-cart-btn .nss-icon-badge { top: -4px; right: -4px; }
 /* Meaning Store's header centers its title between two equal-width side
    buttons (back + customize) — match the customize icon to the back
    button's 44px so the middle title lands on the row's true center. */
