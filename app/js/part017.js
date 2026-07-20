@@ -291,6 +291,14 @@ function nssCheckout() {
   // (e.g. Fashion Home) as a visible flash while checkout hasn't slid in yet.
   if (typeof openSub === 'function') openSub('checkout');
   if (typeof closeSub === 'function') closeSub('cart');
+  // "Proceed to Checkout" is also reachable from the slide-out cart PANEL
+  // (#nssCartOverlay/#nssCartPanel, opened by the store's cart icon) — a
+  // completely separate widget from the #sub-cart full screen, sitting at
+  // z-index 1200 (well above every .sub-screen's 600). closeSub('cart')
+  // only ever touched #sub-cart, so opening checkout from THIS panel left
+  // the dark scrim + panel covering the newly-opened checkout screen the
+  // entire time, which read as "checkout never opens / goes back to store".
+  if (typeof nssCloseCart === 'function') nssCloseCart();
 }
 
 // ── TOAST NOTIFICATION ──
