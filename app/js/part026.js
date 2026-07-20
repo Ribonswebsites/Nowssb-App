@@ -42,6 +42,7 @@ var MS_BASE_MEANINGS = [
   { word:'Father',  key:'father',  root:'Proto-Indo-European · ph₂tḗr',  category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030423/grok_image_1777030062742_2_f7k7eo.jpg' },
   { word:'Name',    key:'name',    root:'Proto-Indo-European · h₁nómn̥', category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg' },
 ];
+window.MS_BASE_MEANINGS = MS_BASE_MEANINGS; // exposed for the AI Prescription page's "Recommended Meanings" row (app/js/part053.js)
 
 /* ── HELPERS ── */
 function msGetPurchased() {
