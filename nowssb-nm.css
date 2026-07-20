@@ -2341,25 +2341,33 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 }
 .nmh-trend-shop-dot.on { background: #e8d5a3; width: 15px; border-radius: 3px !important; }
 
-/* Normal Home — section identifier banner. Completely solid black (no
-   glassmorphism/blur, matching the rest of the app's black-banner
-   language), plain SVG glyph with no circular clip/wrapper since it's a
-   decorative icon rather than a photo badge, thin divider, uppercase
-   label. Same markup dropped above every #home-nm section that didn't
-   already carry its own distinct heading. Deliberately theme-independent
-   (stays #000 in both light and dark #home-nm modes). */
+/* Normal Home — section identifier banner. Same card language as the
+   Connect features carousel (.ncb-*, the "Reels" card): solid black,
+   rounded icon box on the left, bold title + explanatory subtitle in the
+   middle, circular arrow button on the right that jumps to the section
+   this banner introduces. Same markup dropped above every #home-nm
+   section that didn't already carry its own distinct heading.
+   Deliberately theme-independent (stays #000 in both light and dark
+   #home-nm modes). */
 .nmh-sec-banner {
-  width: 100%; display: flex; align-items: center; gap: 14px;
-  background: #000; border-radius: 14px !important; padding: 15px 18px;
-  margin: 14px 0 6px; box-sizing: border-box;
+  width: 100%; display: flex; align-items: center; gap: 14px; cursor: pointer;
+  background: #000; border-radius: 22px !important; padding: 20px 18px;
+  margin: 16px 0 8px; box-sizing: border-box;
+  box-shadow: 8px 8px 20px rgba(163,177,198,0.5), -6px -6px 14px #ffffff;
 }
-.nmh-sec-banner-icon { width: 22px; height: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-.nmh-sec-banner-icon svg { width: 100%; height: 100%; display: block; }
-.nmh-sec-banner-divider { width: 1px; align-self: stretch; margin: 1px 0; background: rgba(255,255,255,0.25); flex-shrink: 0; }
-.nmh-sec-banner-text {
-  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 700;
-  letter-spacing: 1.4px; text-transform: uppercase; color: #fff;
+.nmh-sec-banner-icon {
+  width: 54px; height: 54px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  border-radius: 15px !important; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
 }
+.nmh-sec-banner-icon svg { width: 27px; height: 27px; display: block; }
+.nmh-sec-banner-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.nmh-sec-banner-title { font-family: 'DM Sans', sans-serif; font-size: 15.5px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+.nmh-sec-banner-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.62); line-height: 1.35; }
+.nmh-sec-banner-arrow {
+  width: 38px; height: 38px; flex-shrink: 0; border-radius: 50% !important; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.24);
+}
+.nmh-sec-banner-arrow svg { width: 17px; height: 17px; display: block; }
 /* Fashion home — same two banners, styled to match its sharp-corner dark
    cards instead of the light neumorphic frame. */
 .fash-trend-banner {

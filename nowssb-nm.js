@@ -829,4 +829,13 @@
     apply();
   })();
 
+  /* ── Normal Home section-identifier banners (.nmh-sec-banner) — the whole
+     card is tappable, like the Connect "Reels" carousel card it's styled
+     after; the arrow jumps straight to the section it introduces (its next
+     sibling in the DOM) instead of doing nothing. */
+  window.nmhBannerGo = function (el) {
+    var sec = el && el.nextElementSibling;
+    if (sec && sec.scrollIntoView) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
 })();
