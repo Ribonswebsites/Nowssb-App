@@ -103,6 +103,13 @@ function renderCartPage() {
   if (total) total.textContent = '$' + (sum/100).toFixed(2);
   if (btn)   btn.disabled = false;
 }
+// Was only ever callable from this file's own IIFE-internal handlers
+// (remove item, move to wishlist, ...) — never exposed, so nothing
+// refreshed this screen when it was simply opened after adding an item
+// elsewhere in the app. That's the actual "checkout does nothing" bug:
+// the button sat on its hardcoded `disabled` and the body on whatever
+// (usually nothing) was last rendered.
+window.renderCartPage = renderCartPage;
 
 /* ─────────────────────────────────────────────
    WISHLIST PAGE RENDER

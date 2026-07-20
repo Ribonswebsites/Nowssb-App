@@ -14,6 +14,28 @@
     el.src = COUPON_BANNERS[Math.floor(Math.random() * COUPON_BANNERS.length)];
   };
 
+  // Reusable "scroll down" hint — same behavior as the App Guide's own
+  // nwagShowScrollHint()/scroll listener: show briefly on entry, hide once
+  // the user actually starts scrolling. Any banner using .nwsb-scroll-hint
+  // can opt in with these two calls.
+  window.nwsbShowScrollHint = function (hintId) {
+    var hint = document.getElementById(hintId);
+    if (!hint) return;
+    hint.classList.add('visible');
+    setTimeout(function () { hint.classList.remove('visible'); }, 2200);
+  };
+  window.nwsbBindScrollHintHide = function (scrollElId, hintId) {
+    var el = document.getElementById(scrollElId);
+    if (!el || el._nwsbHintBound) return;
+    el._nwsbHintBound = true;
+    el.addEventListener('scroll', function () {
+      if (el.scrollTop > 8) {
+        var hint = document.getElementById(hintId);
+        if (hint) hint.classList.remove('visible');
+      }
+    }, { passive: true });
+  };
+
   var THEME_CLASSES = ['nwsb-theme-default','nwsb-theme-black','nwsb-theme-neo','nwsb-theme-glass-black'];
   var OLD_BE_CLASSES = ['be-fashion','be-neo','be-glass'];
 

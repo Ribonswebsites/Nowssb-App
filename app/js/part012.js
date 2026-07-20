@@ -1617,6 +1617,23 @@ function openSub(id) {
     var msVid = document.getElementById('msBannerImg');
     if (msVid) { msVid.muted = true; msVid.play().catch(function(){}); }
   }
+  if (id === 'cart') {
+    /* The full Cart screen (#cartPageBody / #cartPageCheckoutBtn) is a
+       SEPARATE render target from the slide-out cart panel that
+       nssAddToCart() already keeps in sync (#nssCartList) — nothing
+       refreshed this screen on entry, so opening it after adding an item
+       elsewhere in the app showed whatever was last rendered (usually
+       nothing, with the Checkout button stuck on its hardcoded
+       `disabled`), which reads as "checkout does nothing" / falls
+       through to the empty-cart screen's own "Browse Store" link. */
+    if (typeof renderCartPage === 'function') renderCartPage();
+    if (typeof window.nwsbBindScrollHintHide === 'function') window.nwsbBindScrollHintHide('cartMainContent', 'cartScrollHint');
+    if (typeof window.nwsbShowScrollHint === 'function') setTimeout(function () { window.nwsbShowScrollHint('cartScrollHint'); }, 500);
+  }
+  if (id === 'checkout') {
+    if (typeof window.nwsbBindScrollHintHide === 'function') window.nwsbBindScrollHintHide('chkBody', 'chkScrollHint');
+    if (typeof window.nwsbShowScrollHint === 'function') setTimeout(function () { window.nwsbShowScrollHint('chkScrollHint'); }, 500);
+  }
   if (id === 'practice') {
     // Load active routine words if not manually set
     if (!window._rtManualLaunch) {
@@ -1916,10 +1933,12 @@ function nssVidBannerCycle() {
   _nssVidBannerTimer = setInterval(paint, 3000);
 }
 
-// Generic "NowssB Store" badge — same role as Meaning Store's own
-// MS_CAT_LOGO, used as the cart/wishlist/checkout thumbnail for every
-// Word Atelier item since words don't have a genuine per-word image.
-const RM_CAT_LOGO = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160870/file_0000000037547208b91bfd167f401961_eesfpn.png';
+// "Word Science" badge — the one icon in the app actually about words
+// specifically (not shared with Meanings, unlike the generic Store
+// badge) — same role as Meaning Store's own MS_CAT_LOGO, used as the
+// cart/wishlist/checkout thumbnail for every Word Atelier item since
+// words don't have a genuine per-word image.
+const RM_CAT_LOGO = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png';
 
 // ── WORD ORIGINS: TIER DEFINITIONS ──
 const RM_TIERS = {
