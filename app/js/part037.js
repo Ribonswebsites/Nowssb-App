@@ -129,8 +129,8 @@
         '</div>'+
         '<div class="rx-footer">'+
           '<span class="rx-cta-text">Tap word to practice</span>'+
-          '<div class="rx-start-btn" onclick="rxStartAll('+JSON.stringify(data.words).replace(/"/g,"'")+')">'+
-            '<span class="rx-start-label">Start All</span>'+
+          '<div class="rx-start-btn" onclick="openSub(\'ai-prescription\')">'+
+            '<span class="rx-start-label">Enter</span>'+
             '<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="square"/></svg>'+
           '</div>'+
         '</div>'+

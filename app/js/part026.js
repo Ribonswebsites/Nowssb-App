@@ -247,6 +247,7 @@ window.msBuyNow = function(itemId, name, price, img) {
 /* ── Category banners — same black-banner-with-logo-and-divider treatment
    as the Word Atelier (reuses its rm-cat-banner* CSS directly). ── */
 var MS_CAT_LOGO = 'https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png';
+window.MS_CAT_LOGO = MS_CAT_LOGO; // exposed for the AI Prescription page (app/js/part053.js) — same reason as MS_BASE_MEANINGS
 var MS_CAT_SUB = {
   'Elements':          'The original sounds of the natural world',
   'Human':              'The truth of body, mind and soul',

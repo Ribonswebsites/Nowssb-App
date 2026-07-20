@@ -2544,15 +2544,12 @@ body.nwsb-custom-fashion-bg .bgp-rx-screen .bgp-body {
   background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
   background-attachment: fixed !important;
 }
-.bgp-rx-hero-glass {
-  position: relative; margin: 100px 18px 20px; padding: 24px 20px; text-align: center;
-  border-radius: 22px !important; background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-}
-.bgp-rx-hero-glass .bgp-hero-icon { margin: 0 auto 12px; background: rgba(232,213,163,0.14); }
-.bgp-rx-hero-glass .bgp-hero-title { font-size: 22px; }
+/* "For Every Organ" — vertical list of standard icon+divider+text banners
+   (same component/height as every other banner on this page), not a
+   horizontal-scroll row. */
+.bgp-rx-organ-list { display: flex; flex-direction: column; gap: 10px; }
+.bgp-rx-organ-list .nmh-sec-banner { margin: 0; }
+.nmh-sec-banner-icon img { width: 60%; height: 60%; object-fit: contain; display: block; }
 
 /* PS5/Bravia-style horizontal tile row */
 .bgp-rx-scroll-row { display: flex; gap: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 2px 2px 6px; }
@@ -2568,7 +2565,7 @@ body.nwsb-custom-fashion-bg .bgp-rx-screen .bgp-body {
 .bgp-rx-tile-benefit { font-family: 'DM Sans', sans-serif; font-size: 10.5px; color: rgba(255,255,255,0.5); margin-top: 6px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 /* Meaning recommendation tile — image-led */
 .bgp-rx-mtile { flex: 0 0 108px; }
-.bgp-rx-mtile-img { width: 100%; aspect-ratio: 1; border-radius: 14px !important; object-fit: cover; display: block; margin-bottom: 8px; background: rgba(255,255,255,0.06); }
+.bgp-rx-mtile-img { width: 100%; aspect-ratio: 1; border-radius: 14px !important; object-fit: contain; display: block; margin-bottom: 8px; background: rgba(255,255,255,0.06); padding: 14px; box-sizing: border-box; }
 .bgp-rx-mtile-name { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800; color: #fff; }
 .bgp-rx-mtile-price { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; color: #e8d5a3; margin-top: 3px; }
 
@@ -2576,6 +2573,12 @@ body.nwsb-custom-fashion-bg .bgp-rx-screen .bgp-body {
 .bgp-rx-rotator { position: relative; border-radius: 22px !important; overflow: hidden; background: rgba(255,255,255,0.05); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.12); }
 .bgp-rx-rotator-track { display: flex; transition: transform 0.6s cubic-bezier(0.4,0,0.2,1); }
 .bgp-rx-rotator-slide { flex: 0 0 100%; box-sizing: border-box; padding: 26px 22px 32px; text-align: center; cursor: pointer; }
+.bgp-rx-rotator-icon {
+  width: 44px; height: 44px; margin: 0 auto 12px; border-radius: 14px !important;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.bgp-rx-rotator-icon img { width: 60%; height: 60%; object-fit: contain; display: block; }
 .bgp-rx-rotator-organ { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #e8d5a3; }
 .bgp-rx-rotator-word { font-family: 'DM Sans', sans-serif; font-size: 30px; font-weight: 800; color: #fff; margin-top: 8px; letter-spacing: -0.5px; }
 .bgp-rx-rotator-benefit { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 8px; line-height: 1.5; max-width: 300px; margin-left: auto; margin-right: auto; }
