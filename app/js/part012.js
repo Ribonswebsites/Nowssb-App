@@ -1634,6 +1634,12 @@ function openSub(id) {
     if (typeof window.nwsbBindScrollHintHide === 'function') window.nwsbBindScrollHintHide('chkBody', 'chkScrollHint');
     if (typeof window.nwsbShowScrollHint === 'function') setTimeout(function () { window.nwsbShowScrollHint('chkScrollHint'); }, 500);
   }
+  if (id === 'offers') {
+    if (typeof window.renderOffersPage === 'function') window.renderOffersPage();
+  }
+  if (id === 'streak') {
+    if (typeof window.renderStreakPage === 'function') window.renderStreakPage();
+  }
   if (id === 'practice') {
     // Load active routine words if not manually set
     if (!window._rtManualLaunch) {
