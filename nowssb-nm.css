@@ -2360,6 +2360,7 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   border-radius: 15px !important; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
 }
 .nmh-sec-banner-icon svg { width: 27px; height: 27px; display: block; }
+.nmh-sec-banner-divider { width: 1px; align-self: stretch; margin: 2px 0; background: rgba(255,255,255,0.2); flex-shrink: 0; }
 .nmh-sec-banner-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .nmh-sec-banner-title { font-family: 'DM Sans', sans-serif; font-size: 15.5px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
 .nmh-sec-banner-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.62); line-height: 1.35; }
