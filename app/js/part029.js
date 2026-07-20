@@ -22,6 +22,7 @@ var NSS_COUPONS = {
   NOWSSB30: { pct: 30, min: 5,  label: 'Flat 30% off · 5+ words' },
   NOWSSB50: { pct: 50, min: 10, label: 'Flat 50% off · 10+ words' }
 };
+window.NSS_COUPONS = NSS_COUPONS; // exposed for the All Offers page (app/js/part053.js)
 window._nssCoupon = window._nssCoupon || null;
 
 /* discount for the current cart (coupon drops silently if the cart shrinks

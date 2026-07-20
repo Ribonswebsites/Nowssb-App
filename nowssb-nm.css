@@ -2375,6 +2375,133 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   border-radius: 0 !important; width: calc(100% - 32px) !important; margin: 16px 16px 6px !important;
   box-shadow: 0 14px 36px rgba(0,0,0,.42) !important; border: 1px solid rgba(255,255,255,.08);
 }
+
+/* ══════════════════════════════════════════════════════════
+   BLACK/GOLD DEDICATED PAGES (.bgp-*) — Today's Offer, Daily
+   Streak and Quick Access each get their own full sub-screen
+   instead of redirecting into an unrelated existing screen.
+   Shared fixed-header/scrolling-body/hero-banner skeleton,
+   same mechanic as #sub-checkout's .chk-* pages, always solid
+   black + gold regardless of light/dark home mode.
+   ══════════════════════════════════════════════════════════ */
+/* No position override here — .sub-screen's own position:fixed (with inset:0)
+   is exactly what .bgp-header-fixed/.bgp-body (position:absolute) need as
+   their positioning context; overriding it to relative collapses the whole
+   screen to 0 height since it loses its definite viewport-anchored size. */
+.bgp-screen { background: #060c18; overflow: hidden; }
+.bgp-header-fixed {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 10; display: flex; align-items: center; gap: 14px;
+  padding: max(env(safe-area-inset-top,20px),20px) 18px 16px;
+  background: linear-gradient(to bottom, rgba(6,12,24,.92) 0%, rgba(6,12,24,.6) 70%, transparent 100%);
+}
+.bgp-back {
+  width: 38px; height: 38px; flex-shrink: 0; border-radius: 50% !important;
+  background: rgba(232,213,163,0.12); border: 1px solid rgba(232,213,163,0.3);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.bgp-back:active { background: rgba(232,213,163,0.22); }
+.bgp-header-title { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+.bgp-body { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.bgp-hero {
+  position: relative; padding: 104px 20px 30px; text-align: center;
+  background: radial-gradient(ellipse at top, rgba(232,213,163,0.16) 0%, transparent 65%), #060c18;
+}
+.bgp-hero-icon {
+  width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 20px !important;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.28);
+  display: flex; align-items: center; justify-content: center;
+}
+.bgp-hero-icon svg { width: 30px; height: 30px; display: block; }
+.bgp-hero-title { font-family: 'DM Sans', sans-serif; font-size: 25px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.bgp-hero-sub { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.55); margin-top: 6px; }
+.bgp-content { padding: 8px 18px 60px; }
+.bgp-section-label {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: #e8d5a3; margin: 26px 0 12px;
+}
+.bgp-content > .bgp-section-label:first-child { margin-top: 4px; }
+.bgp-cta-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px;
+  border-radius: 16px !important; background: linear-gradient(135deg,#e8d5a3,#c8a96e); color: #060c18;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; margin-top: 18px; border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.bgp-cta-btn:active { filter: brightness(0.94); }
+
+/* Offers page */
+.bgp-promo-scroll { display: flex; gap: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }
+.bgp-promo-scroll::-webkit-scrollbar { display: none; }
+.bgp-promo-card { flex: 0 0 240px; height: 135px; border-radius: 16px; object-fit: cover; cursor: pointer; scroll-snap-align: start; }
+.bgp-coupon-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(232,213,163,0.18); border-radius: 18px; padding: 16px 18px; margin-bottom: 12px; }
+.bgp-coupon-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.bgp-coupon-code { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 15px; color: #fff; letter-spacing: 0.3px; }
+.bgp-coupon-pct { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 15px; color: #e8d5a3; flex-shrink: 0; }
+.bgp-coupon-req { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.bgp-coupon-bar-track { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); margin-top: 12px; overflow: hidden; }
+.bgp-coupon-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,#c8a96e,#e8d5a3); transition: width 0.4s; }
+.bgp-coupon-status { font-size: 11px; font-weight: 700; margin-top: 8px; }
+.bgp-coupon-status.unlocked { color: #8ce6aa; }
+.bgp-coupon-status.locked { color: rgba(255,255,255,0.4); }
+.bgp-offers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.bgp-offer-card {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px;
+  padding: 16px 14px 14px; position: relative; cursor: pointer; box-sizing: border-box;
+}
+.bgp-offer-card.bgp-hidden-extra { display: none; }
+.bgp-offer-badge {
+  position: absolute; top: 12px; right: 12px; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 800;
+  letter-spacing: .3px; color: #fff; background: linear-gradient(135deg,#e0644b,#c8442e); padding: 4px 9px; border-radius: 20px !important;
+}
+.bgp-offer-word { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #fff; letter-spacing: .3px; margin-top: 22px; }
+.bgp-offer-price { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+.bgp-offer-now { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #e8d5a3; }
+.bgp-offer-was { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.32); text-decoration: line-through; }
+.bgp-offer-cta { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; color: #e8d5a3; margin-top: 12px; }
+.bgp-showmore-btn {
+  width: 100%; padding: 14px; border-radius: 14px !important; background: rgba(232,213,163,0.08);
+  border: 1px solid rgba(232,213,163,0.25); color: #e8d5a3; font-family: 'DM Sans', sans-serif;
+  font-weight: 700; font-size: 13px; text-align: center; cursor: pointer; margin-top: 4px; -webkit-tap-highlight-color: transparent;
+}
+.bgp-showmore-btn.bgp-hidden-extra { display: none; }
+
+/* Streak page */
+.bgp-streak-num { font-family: 'DM Sans', sans-serif; font-size: 60px; font-weight: 800; color: #e8d5a3; line-height: 1; }
+.bgp-streak-cal { display: grid; grid-template-columns: repeat(7,1fr); gap: 8px; }
+.bgp-streak-day {
+  aspect-ratio: 1; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.35);
+}
+.bgp-streak-day-label { font-size: 8px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.bgp-streak-day.bgp-done { background: linear-gradient(135deg,#c8a96e,#e8d5a3); color: #060c18; border-color: transparent; }
+.bgp-milestone-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.bgp-milestone-row:last-child { border-bottom: none; }
+.bgp-milestone-badge {
+  width: 44px; height: 44px; border-radius: 50% !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 12px; color: rgba(255,255,255,0.4);
+}
+.bgp-milestone-badge.bgp-unlocked { background: linear-gradient(135deg,#c8a96e,#e8d5a3); border-color: transparent; color: #060c18; }
+.bgp-milestone-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; color: #fff; }
+.bgp-milestone-desc { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+/* Quick Access page */
+.bgp-qa-row {
+  display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: 18px !important;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.bgp-qa-row:active { background: rgba(255,255,255,0.07); }
+.bgp-qa-icon {
+  width: 50px; height: 50px; border-radius: 15px !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.25);
+}
+.bgp-qa-title { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 15.5px; color: #fff; }
+.bgp-qa-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.bgp-qa-arrow {
+  width: 32px; height: 32px; border-radius: 50% !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+}
 .fash-trend-shop-banner {
   border-radius: 0 !important; width: calc(100% - 32px) !important; margin: 0 16px 16px !important;
   box-shadow: 0 14px 36px rgba(0,0,0,.42) !important; border: 1px solid rgba(255,255,255,.08);
