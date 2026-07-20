@@ -352,7 +352,7 @@
           '<button class="lgp-back lgp-imgbtn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
             '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
           '</button>' +
-          '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
+          '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
           '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
             '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
           '</button>' +
