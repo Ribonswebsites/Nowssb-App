@@ -2375,6 +2375,18 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.24);
 }
 .nmh-sec-banner-arrow svg { width: 17px; height: 17px; display: block; }
+
+/* Inverted variant — white background, black text/icon/divider/arrow.
+   Same component, same height, colors flipped. Icon SVGs on inverted
+   banners are authored with dark stroke/fill directly in the markup
+   (not overridden here) since the icons are inline, not CSS-driven. */
+.nmh-sec-banner-inverse { background: #fff; box-shadow: 0 14px 32px rgba(0,0,0,0.35); }
+.nmh-sec-banner-inverse .nmh-sec-banner-icon { background: rgba(6,12,24,0.06); border-color: rgba(6,12,24,0.12); }
+.nmh-sec-banner-inverse .nmh-sec-banner-divider { background: rgba(6,12,24,0.15); }
+.nmh-sec-banner-inverse .nmh-sec-banner-title { color: #060c18; }
+.nmh-sec-banner-inverse .nmh-sec-banner-sub { color: rgba(6,12,24,0.6); }
+.nmh-sec-banner-inverse .nmh-sec-banner-arrow { background: rgba(6,12,24,0.06); }
+
 /* Fashion home — same two banners, styled to match its sharp-corner dark
    cards instead of the light neumorphic frame. */
 .fash-trend-banner {
@@ -2491,6 +2503,24 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 .bgp-milestone-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; color: #fff; }
 .bgp-milestone-desc { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 
+/* Restore Streak — real purchase card */
+.bgp-restore-card { background: rgba(232,213,163,0.08); border: 1px solid rgba(232,213,163,0.25); border-radius: 18px !important; padding: 18px; margin-bottom: 14px; }
+.bgp-restore-price { font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800; color: #e8d5a3; }
+.bgp-restore-desc { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 6px; line-height: 1.5; }
+
+/* Settings toggles */
+.bgp-toggle-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px !important;
+  margin-bottom: 10px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.bgp-toggle-label { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; color: #fff; }
+.bgp-toggle-sub { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: rgba(255,255,255,0.5); margin-top: 3px; line-height: 1.4; }
+.bgp-toggle-switch { width: 44px; height: 26px; border-radius: 14px !important; background: rgba(255,255,255,0.15); position: relative; flex-shrink: 0; transition: background 0.2s; }
+.bgp-toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50% !important; background: #fff; transition: transform 0.2s; }
+.bgp-toggle-switch.on { background: #e8d5a3; }
+.bgp-toggle-switch.on::after { transform: translateX(18px); background: #060c18; }
+
 /* Quick Access page */
 .bgp-qa-row {
   display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: 18px !important;
@@ -2530,7 +2560,8 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 /* Pure black + glassmorphism variant for THIS page specifically (PS5/Bravia
    dashboard reference) — other .bgp-screen pages keep the near-black
    #060c18 they already had. */
-.bgp-rx-screen, .bgp-rx-screen .bgp-body { background: #000; }
+.bgp-rx-screen, .bgp-rx-screen .bgp-body,
+.bgp-streak-screen, .bgp-streak-screen .bgp-body { background: #000; }
 /* Header "customize background" button (SS.open('fashionbg')) writes a
    --nwsb-custom-bg-url variable + nwsb-custom-fashion-bg body class onto
    <body> — the same mechanism Fashion Home/Profile already consume. This
@@ -2538,7 +2569,9 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
    here. The glassmorphism cards were built to sit on top of exactly this
    kind of photo backdrop, so wiring it in is a straight fit, not a retrofit. */
 body.nwsb-custom-fashion-bg .bgp-rx-screen,
-body.nwsb-custom-fashion-bg .bgp-rx-screen .bgp-body {
+body.nwsb-custom-fashion-bg .bgp-rx-screen .bgp-body,
+body.nwsb-custom-fashion-bg .bgp-streak-screen,
+body.nwsb-custom-fashion-bg .bgp-streak-screen .bgp-body {
   background-image: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.72) 40%, rgba(0,0,0,0.92) 100%), var(--nwsb-custom-bg-url) !important;
   background-color: var(--nwsb-custom-bg-color, #000) !important;
   background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;

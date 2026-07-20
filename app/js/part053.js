@@ -116,7 +116,92 @@
         '<div><div class="bgp-milestone-title">' + m.title + '</div><div class="bgp-milestone-desc">' + m.desc + '</div></div>' +
       '</div>';
     }).join('');
+
+    var priceEl = document.getElementById('streakRestorePrice');
+    if (priceEl) priceEl.textContent = (typeof window.nwsbFormatINR === 'function') ? window.nwsbFormatINR(10) : '₹10';
+
+    syncStreakToggle('profile', 'nwsb_streak_show_profile');
+    syncStreakToggle('connect', 'nwsb_streak_show_connect');
   }
+
+  /* ── Restore Streak — real ₹10 purchase, same cart/checkout path every
+     other purchase in the store uses. Price stored in cart as ~12 cents
+     (₹10 / 83 INR-per-USD ≈ $0.12, matching the cents-scaled convention
+     every other cart item already uses), while the on-page price label
+     shows the user's own local currency via the real conversion helper. */
+  window.streakBuyRestore = function () {
+    if (typeof nssAddToCart !== 'function') return;
+    nssAddToCart({ id: 'streak-restore', name: 'Streak Restore', type: 'Streak', price: 12, img: '' });
+    if (typeof openSub === 'function') openSub('checkout');
+  };
+
+  /* ── Settings toggles — "show streak on My Profile / NowssB Connect".
+     Same on/off localStorage convention as nwsb_nm_dark elsewhere in the
+     app: '1' when on, key removed when off. ── */
+  var STREAK_TOGGLE_KEYS = { profile: 'nwsb_streak_show_profile', connect: 'nwsb_streak_show_connect' };
+  function syncStreakToggle(which, key) {
+    var sw = document.getElementById('streakToggle' + (which === 'profile' ? 'Profile' : 'Connect') + 'Switch');
+    if (!sw) return;
+    sw.classList.toggle('on', localStorage.getItem(key) === '1');
+  }
+  window.streakToggleSetting = function (which) {
+    var key = STREAK_TOGGLE_KEYS[which];
+    if (!key) return;
+    var isOn = localStorage.getItem(key) === '1';
+    if (isOn) localStorage.removeItem(key); else localStorage.setItem(key, '1');
+    syncStreakToggle(which, key);
+    renderProfileStreakBanners();
+  };
+
+  /* ── Inject a streak banner onto Profile / NowssB Connect profile when
+     their matching toggle is on. Uses a MutationObserver on each screen's
+     .open class rather than hooking their own render functions directly
+     (profileLoadAll in part008.js, renderProfile in part033.js are not
+     safely wrappable without risking those screens' existing behavior) —
+     this only ever adds/removes one self-contained banner element. ── */
+  function streakBannerHtml() {
+    var d = window._userDataCache || {};
+    var streak = d.currentStreak || d.streakCount || 0;
+    return '<div class="nmh-sec-banner" id="streakProfileBanner" onclick="openSub(\'streak\')">' +
+      '<div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>' +
+      '<div class="nmh-sec-banner-divider"></div>' +
+      '<div class="nmh-sec-banner-txt">' +
+        '<div class="nmh-sec-banner-title">' + streak + ' Day Streak</div>' +
+        '<div class="nmh-sec-banner-sub">Tap to see your ritual calendar &amp; rewards</div>' +
+      '</div>' +
+      '<div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+    '</div>';
+  }
+  function renderProfileStreakBanners() {
+    // #sub-ig-profile is also used to view OTHER people's Connect profiles
+    // (IG.openProfile(id)), not just your own (IG.openMyProfile()) — only
+    // inject there when it's genuinely your own profile open. #ig-prof-back
+    // is the reliable signal for that: part033.js's own renderProfile()
+    // hides it (display:none) exactly when p.self is true.
+    var backBtn = document.getElementById('ig-prof-back');
+    var onOwnConnectProfile = !backBtn || getComputedStyle(backBtn).display === 'none';
+    var targets = [
+      { anchorSel: '#profilePlanBadge', on: localStorage.getItem(STREAK_TOGGLE_KEYS.profile) === '1' },
+      { anchorSel: '#ig-prof-banner', on: onOwnConnectProfile && localStorage.getItem(STREAK_TOGGLE_KEYS.connect) === '1' }
+    ];
+    targets.forEach(function (t) {
+      // Remove any stale copy right after this anchor first, then re-add if on.
+      var anchor = document.querySelector(t.anchorSel);
+      if (!anchor) return;
+      var next = anchor.nextElementSibling;
+      if (next && next.id === 'streakProfileBanner') next.remove();
+      if (t.on) anchor.insertAdjacentHTML('afterend', streakBannerHtml());
+    });
+  }
+  (function watchProfileScreens() {
+    ['sub-profile', 'sub-ig-profile'].forEach(function (id) {
+      var scr = document.getElementById(id);
+      if (!scr) return;
+      new MutationObserver(function () {
+        if (scr.classList.contains('open')) setTimeout(renderProfileStreakBanners, 150);
+      }).observe(scr, { attributes: true, attributeFilter: ['class'] });
+    });
+  })();
   window.renderStreakPage = renderStreakPage;
 
   /* ── "Everything NowssB" features menu — explainer carousel below the
