@@ -3693,6 +3693,32 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 #sub-features .feat-title { font-family: 'DM Sans', sans-serif; font-weight: 200; font-size: 27px; line-height: 1.05; color: rgba(255,255,255,0.9); white-space: nowrap; }
 #sub-features .feat-title .brand-name { font-size: 27px !important; text-shadow: none !important; }
 #sub-features .feat-hsub { font-size: 13px; margin-top: 10px; }
+
+/* Black/gold explainer carousel below the glass tube — one card at a time,
+   auto-cycling with dots, explaining what this menu is and then each
+   feature below it one by one. Mirrored from the Connect features
+   carousel (.ncb-*): icon on the RIGHT here instead of the left (just DOM
+   order reversed — text block first, icon last), no arrow/button since
+   these aren't individually tappable links, just explanations. */
+#sub-features .feat-banner-carousel {
+  width: 100%; border-radius: 22px !important; overflow: hidden; position: relative;
+  background: #000; box-shadow: 8px 8px 20px rgba(163,177,198,0.5), -6px -6px 14px #ffffff;
+  margin: 4px 0 24px;
+}
+#sub-features .feat-banner-track { display: flex; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); will-change: transform; }
+#sub-features .feat-banner-slide { flex: 0 0 100%; box-sizing: border-box; display: flex; align-items: center; gap: 14px; padding: 24px 20px 30px; }
+#sub-features .feat-banner-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+#sub-features .feat-banner-name { font-family: 'DM Sans', sans-serif; font-size: 15.5px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+#sub-features .feat-banner-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.62); line-height: 1.35; }
+#sub-features .feat-banner-ico {
+  width: 54px; height: 54px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  border-radius: 15px !important; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
+}
+#sub-features .feat-banner-ico img { width: 62%; height: 62%; object-fit: contain; display: block; }
+#sub-features .feat-banner-dots { position: absolute; bottom: 10px; left: 0; right: 0; display: flex; justify-content: center; gap: 5px; z-index: 2; }
+#sub-features .feat-banner-dot { width: 5px; height: 5px; border-radius: 50% !important; background: rgba(255,255,255,0.28); transition: all 0.3s; }
+#sub-features .feat-banner-dot.on { background: #e8d5a3; width: 15px; border-radius: 3px !important; }
+
 /* vertical LIST: each row = big icon on the left, text on the right, NO pill,
    with a soft glassmorphism divider line between rows */
 #sub-features .feat-grid { display: flex; flex-direction: column; gap: 0; }
