@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
-<link rel="stylesheet" href="app/app.css?v=308">
+<link rel="stylesheet" href="app/app.css?v=309">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=405">
+<link rel="stylesheet" href="nowssb-nm.css?v=406">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -778,11 +778,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Streak -->
-    <div class="nmh-streak-bar">
-      <div class="nmh-streak-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#c8a96e" opacity="0.85"/>
-          <path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.7"/>
+    <div class="nmh-streak-bar" onclick="openSub('streak')" style="cursor:pointer;">
+      <div class="nmh-streak-icon nmh-streak-icon-lg">
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+          <path d="M17 3c0 0-8 8.5-8 15.5a8 8 0 0016 0C25 11.5 17 3 17 3z" fill="#e8d5a3"/>
+          <path d="M17 12c0 0-4.5 5-4.5 9a4.5 4.5 0 009 0c0-4-4.5-9-4.5-9z" fill="#c8a96e"/>
+          <path d="M17 19c0 0-2 2.3-2 4.2a2 2 0 004 0c0-1.9-2-4.2-2-4.2z" fill="#fff"/>
         </svg>
       </div>
       <div>
@@ -5703,7 +5704,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ══ DAILY STREAK PAGE — dedicated black/gold page for the "Daily Streak" banner ══ -->
-<div class="sub-screen bgp-screen" id="sub-streak">
+<!-- ══ DAILY STREAK PAGE — dedicated black/gold page for the "Daily Streak"
+     banner. Same real-page treatment as AI Prescription: pure black
+     background, customize-background header button. Section banners here
+     are INVERTED (white background, black text/icon) per explicit
+     request, to visually set this page apart — the page background
+     itself stays solid black, only the banner cards flip. ══ -->
+<div class="sub-screen bgp-screen bgp-streak-screen" id="sub-streak">
   <div class="bgp-header-fixed">
     <div class="bgp-back" onclick="closeSub('streak')">
       <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
@@ -5711,20 +5718,84 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <line x1="1" y1="7" x2="15" y2="7" stroke="#e8d5a3" stroke-width="1.5"/>
       </svg>
     </div>
-    <div class="bgp-header-title">Daily Streak</div>
+    <div class="bgp-header-title" style="flex:1;">Daily Streak</div>
+    <button class="rm-bg-customize-btn" onclick="SS.open('fashionbg')" aria-label="Customize background">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
+    </button>
   </div>
   <div class="bgp-body">
-    <div class="bgp-hero">
-      <div class="bgp-hero-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#060c18" opacity="0.85"/></svg></div>
+    <div class="bgp-content" style="padding-top:96px;">
+
+      <div class="nmh-sec-banner nmh-sec-banner-inverse" style="cursor:default;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#060c18" opacity="0.85"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.85"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Daily Streak</div>
+          <div class="nmh-sec-banner-sub">Keep going — practice every day</div>
+        </div>
+      </div>
       <div class="bgp-streak-num" id="streakPageNum">0</div>
-      <div class="bgp-hero-sub">day streak — keep going</div>
-    </div>
-    <div class="bgp-content">
-      <div class="bgp-section-label">Last 7 Days</div>
+      <div class="bgp-hero-sub" style="text-align:center;margin-top:-8px;">day streak</div>
+
+      <div class="nmh-sec-banner nmh-sec-banner-inverse" style="cursor:default;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Last 7 Days</div>
+          <div class="nmh-sec-banner-sub">Every day you've shown up, at a glance</div>
+        </div>
+      </div>
       <div class="bgp-streak-cal" id="streakPageCal"><!-- rendered by JS --></div>
 
-      <div class="bgp-section-label">Milestones</div>
+      <div class="nmh-sec-banner nmh-sec-banner-inverse" style="cursor:default;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6l2.3 1.7 2.9.2 1 2.7 2.2 1.9-1 2.7 1 2.7-2.2 1.9-1 2.7-2.9.2L12 21.4l-2.3-1.7-2.9-.2-1-2.7-2.2-1.9 1-2.7-1-2.7 2.2-1.9 1-2.7 2.9-.2z"/><path d="M8.6 12l2.2 2.2 4.6-4.7"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Rewards</div>
+          <div class="nmh-sec-banner-sub">Milestones that unlock as your streak grows</div>
+        </div>
+      </div>
       <div id="streakPageMilestones"><!-- rendered by JS --></div>
+
+      <div class="nmh-sec-banner nmh-sec-banner-inverse" style="cursor:default;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Restore Your Streak</div>
+          <div class="nmh-sec-banner-sub">Missed a day? Bring your streak back</div>
+        </div>
+      </div>
+      <div class="bgp-restore-card">
+        <div class="bgp-restore-price" id="streakRestorePrice">₹10</div>
+        <div class="bgp-restore-desc">Restores 1 day to your streak — real purchase, goes through checkout like everything else in the store.</div>
+        <button class="bgp-cta-btn" id="streakRestoreBtn" onclick="window.streakBuyRestore()" style="margin-top:12px;">
+          Restore Now
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+        </button>
+      </div>
+
+      <div class="nmh-sec-banner nmh-sec-banner-inverse" style="cursor:default;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Settings</div>
+          <div class="nmh-sec-banner-sub">Show your streak in more places</div>
+        </div>
+      </div>
+      <div class="bgp-toggle-row" id="streakToggleProfile" onclick="window.streakToggleSetting('profile')">
+        <div>
+          <div class="bgp-toggle-label">Show on My Profile</div>
+          <div class="bgp-toggle-sub">Display your streak count on your profile page</div>
+        </div>
+        <div class="bgp-toggle-switch" id="streakToggleProfileSwitch"></div>
+      </div>
+      <div class="bgp-toggle-row" id="streakToggleConnect" onclick="window.streakToggleSetting('connect')">
+        <div>
+          <div class="bgp-toggle-label">Show on NowssB Connect</div>
+          <div class="bgp-toggle-sub">Display your streak count on your public Connect profile</div>
+        </div>
+        <div class="bgp-toggle-switch" id="streakToggleConnectSwitch"></div>
+      </div>
 
       <button class="bgp-cta-btn" onclick="openPracticeIntro()">
         Continue Practice
@@ -5879,10 +5950,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 </div>
-<script src="app/js/part053.js?v=5"></script>
+<script src="app/js/part053.js?v=6"></script>
 
 <!-- ══ CHECKOUT PAGE JS ══ -->
-<script src="app/js/part029.js?v=277"></script>
+<script src="app/js/part029.js?v=278"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════

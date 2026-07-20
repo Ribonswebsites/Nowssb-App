@@ -234,10 +234,17 @@ function chkHandleSuccess(response, cart) {
 
   var badgeOrder = ['blue','silver','gold','diamond'];
   var grantBadge = '';
+  var streakRestoreDays = 0;
   cart.forEach(function(item) {
     // Verified badge purchase — grant the tier, don't treat it as a word/meaning
     if (item.type === 'Badge' && item.tier) {
       if (badgeOrder.indexOf(item.tier) > badgeOrder.indexOf(grantBadge)) grantBadge = item.tier;
+      return;
+    }
+    // Streak Restore purchase — bump the streak, its own thing entirely,
+    // not a word/meaning purchase.
+    if (item.type === 'Streak') {
+      streakRestoreDays += 1;
       return;
     }
     // Ebook purchase — its own purchased-list, not a word/meaning
@@ -272,6 +279,17 @@ function chkHandleSuccess(response, cart) {
     if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { verifyTier: grantBadge }).catch(function(){});
   }
 
+  // Apply the Streak Restore(s) that were bought — same persistence
+  // mechanism as the badge grant above (local cache + Firestore sync).
+  if (streakRestoreDays > 0) {
+    window._userDataCache = window._userDataCache || {};
+    var newStreak = (window._userDataCache.currentStreak || window._userDataCache.streakCount || 0) + streakRestoreDays;
+    window._userDataCache.currentStreak = newStreak;
+    if (window._fbSetDoc && window._currentUid) window._fbSetDoc(window._currentUid, { currentStreak: newStreak }).catch(function(){});
+    if (typeof nmhRefresh === 'function') nmhRefresh();
+    if (typeof window.renderStreakPage === 'function') window.renderStreakPage();
+  }
+
   // Clear cart
   if (window.nssCart) window.nssCart = [];
   if (typeof nssUpdateBadges       === 'function') nssUpdateBadges();
@@ -283,7 +301,10 @@ function chkHandleSuccess(response, cart) {
   setTimeout(function() {
     if (typeof openSub === 'function') openSub('orders');
     if (typeof nssShowToast === 'function') {
-      nssShowToast(grantBadge ? "You're now "+grantBadge.charAt(0).toUpperCase()+grantBadge.slice(1)+" verified ✓" : 'Purchase complete — words unlocked');
+      var msg = grantBadge ? "You're now "+grantBadge.charAt(0).toUpperCase()+grantBadge.slice(1)+" verified ✓"
+        : streakRestoreDays ? 'Streak restored +' + streakRestoreDays + ' day' + (streakRestoreDays > 1 ? 's' : '') + ' ✓'
+        : 'Purchase complete — words unlocked';
+      nssShowToast(msg);
     }
   }, 120);
 }
