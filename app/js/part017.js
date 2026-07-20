@@ -51,11 +51,14 @@ var nssWishlist = JSON.parse(localStorage.getItem('nowssb_wish') || '[]');
 // promotional banner shared across every word in the same price tier,
 // and several of those banners have a DIFFERENT word's name baked into
 // the artwork. Anything saved with that stale img before this was fixed
-// would keep showing the wrong name forever; strip it once here so every
-// render path (cart, wishlist, checkout) that reads from these same
-// arrays falls back to the neutral icon instead.
+// would keep showing the wrong name forever; swap it once here (for
+// every render path that reads from these same arrays — cart, wishlist,
+// checkout) to the generic "NowssB Store" badge instead, same as new
+// Word items already get from rmdAddCart()/rmdToggleWish().
 [nssCart, nssWishlist].forEach(function (list) {
-  list.forEach(function (item) { if (item && item.type === 'Word') item.img = ''; });
+  list.forEach(function (item) {
+    if (item && item.type === 'Word' && typeof RM_CAT_LOGO !== 'undefined') item.img = RM_CAT_LOGO;
+  });
 });
 
 function nssSaveCart()     { localStorage.setItem('nowssb_cart', JSON.stringify(nssCart)); }

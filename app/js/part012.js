@@ -1916,6 +1916,11 @@ function nssVidBannerCycle() {
   _nssVidBannerTimer = setInterval(paint, 3000);
 }
 
+// Generic "NowssB Store" badge — same role as Meaning Store's own
+// MS_CAT_LOGO, used as the cart/wishlist/checkout thumbnail for every
+// Word Atelier item since words don't have a genuine per-word image.
+const RM_CAT_LOGO = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160870/file_0000000037547208b91bfd167f401961_eesfpn.png';
+
 // ── WORD ORIGINS: TIER DEFINITIONS ──
 const RM_TIERS = {
   basic_a: {
@@ -2325,9 +2330,10 @@ function rmdToggleWish() {
     /* Deliberately NOT tier.banners[0] — those are shared promotional
        banners reused across every word in the same price tier, several
        of which have a DIFFERENT word's name baked into the artwork.
-       Leaving img empty falls back to the neutral generic icon instead
-       of risking a mismatched word name in the cart/wishlist thumbnail. */
-    nssToggleWishlist({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:'' });
+       RM_CAT_LOGO is the generic "NowssB Store" badge (same idea as
+       Meaning Store's own MS_CAT_LOGO) — safe because it's not tied to
+       any specific word, so it can never show a mismatched name. */
+    nssToggleWishlist({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:RM_CAT_LOGO });
   _rmdRefreshActions();
 }
 
@@ -2337,7 +2343,7 @@ function rmdAddCart() {
   var tier = RM_TIERS[tierKey];
   var word = rmDisplayName(key);
   if (typeof nssAddToCart === 'function')
-    nssAddToCart({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:'' });
+    nssAddToCart({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:RM_CAT_LOGO });
   _rmdRefreshActions();
 }
 

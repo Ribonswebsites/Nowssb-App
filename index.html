@@ -104,7 +104,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
-<link rel="stylesheet" href="app/app.css?v=304">
+<link rel="stylesheet" href="app/app.css?v=305">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
 <link rel="stylesheet" href="nowssb-nm.css?v=393">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
@@ -3628,7 +3628,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=322"></script>
+<script src="app/js/part012.js?v=323"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -4248,7 +4248,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 </div><!-- /sub-nowssb-store -->
 
-<script src="app/js/part017.js?v=197"></script>
+<script src="app/js/part017.js?v=198"></script>
 
 <!-- intro rendered inline -->
 
@@ -5425,27 +5425,34 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ SUB-SCREEN: CHECKOUT ══ -->
 <div class="sub-screen cwp-screen" id="sub-checkout">
 
-  <!-- Scrollable body — hero lives INSIDE so it scrolls away with the rest
-       of the page instead of staying pinned at the top. -->
+  <!-- Fixed header floats above everything — same mechanic as the App
+       Guide's #nwag-header: pointer-events:none on the bar itself (so
+       scroll gestures pass straight through to the body underneath),
+       pointer-events:all only on the actual back button. -->
+  <div class="chk-header-fixed">
+    <div class="chk-back" onclick="navFromSub('checkout',function(){openSub('cart');});">
+      <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
+        <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/>
+        <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="chk-header-inner">
+      <div class="chk-header-eyebrow">NowssB Store · Secure Checkout</div>
+      <div class="chk-header-title">Complete Your Order</div>
+    </div>
+  </div>
+
+  <!-- Scrollable body — banner + content scroll together, same mechanic
+       as the App Guide's #nwag-body / #nwag-banner. -->
   <div class="chk-body" id="chkBody">
 
     <!-- Hero -->
     <div class="chk-hero">
       <img class="chk-hero-bg" id="chkHeroBg" loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778848481/74b583c0-504e-11f1-8632-f17e96ecf719_catojv.png">
-      <div class="chk-hero-overlay"></div>
-      <div class="chk-hero-top">
-        <div class="chk-back" onclick="navFromSub('checkout',function(){openSub('cart');});">
-          <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-            <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="square"/>
-            <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
-          </svg>
-        </div>
-      </div>
-      <div class="chk-hero-bottom">
-        <span class="chk-hero-eyebrow">NowssB Store · Secure Checkout</span>
-        <div class="chk-hero-title">Complete <span>Your Order</span></div>
-      </div>
+      <div class="chk-hero-fade"></div>
     </div>
+
+    <div class="chk-content">
 
     <!-- ── ORDER SUMMARY ── -->
     <span class="chk-label">Order Summary</span>
@@ -5541,6 +5548,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="chk-secure-text">Secure checkout · 256-bit SSL encryption · Your payment data never touches our servers</div>
     </div>
 
+    </div>
   </div>
 
   <!-- ── FIXED PAYMENT BAR ── -->
