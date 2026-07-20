@@ -1,4 +1,4 @@
-const CACHE = 'nowsbansiu-v487';
+const CACHE = 'nowsbansiu-v488';
 // Separate, stable-named bucket for background-prefetched videos (see
 // app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
 // routine JS/CSS deploy never wipes out videos the user already has warmed —
@@ -44,8 +44,10 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
 
   // Never serve HTML from cache — always go to network so updates land immediately.
+  // cache:'reload' for the same reason as the static-asset handler below: skip
+  // straight past the browser's own HTTP cache, not just this SW's Cache Storage.
   if (req.mode === 'navigate' || req.destination === 'document') {
-    e.respondWith(fetch(req).catch(() => caches.match(req)));
+    e.respondWith(fetch(req, { cache: 'reload' }).catch(() => caches.match(req)));
     return;
   }
 
@@ -61,9 +63,18 @@ self.addEventListener('fetch', e => {
   // returns a bad status (e.g. a transient CDN 5xx during a deploy). This means a
   // broken deploy-time response can never leave a page half-styled — the last
   // known-good asset is served instead.
+  //
+  // cache:'reload' on the fetch below is deliberate: passing the intercepted
+  // `req` straight to fetch() still lets the BROWSER's own HTTP cache satisfy
+  // it (or silently 304-revalidate it) whenever the CDN's Cache-Control on
+  // these files allows it — meaning "network-first" wasn't actually
+  // guaranteeing a live round-trip past that layer. Every URL already carries
+  // its own ?v= cache-busting query string, so forcing a genuine bypass here
+  // is always safe and closes off an entire class of "still stale after
+  // clearing the SW cache" bugs.
   e.respondWith((async () => {
     try {
-      const res = await fetch(req);
+      const res = await fetch(req, { cache: 'reload' });
       if (res && res.ok) {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
