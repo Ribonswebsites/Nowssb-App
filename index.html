@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
 <link rel="stylesheet" href="app/app.css?v=308">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=400">
+<link rel="stylesheet" href="nowssb-nm.css?v=401">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -3694,7 +3694,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=326"></script>
+<script src="app/js/part012.js?v=327"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -5776,7 +5776,68 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 </div>
-<script src="app/js/part053.js?v=2"></script>
+
+<!-- ══ AI PRESCRIPTION PAGE — dedicated black/gold page for the AI daily word
+     prescription (real Groq/static engine in app/js/part037.js, not a
+     prototype: same recommendation data, same Start/tap-to-practice
+     actions as the existing home card) ══ -->
+<div class="sub-screen bgp-screen" id="sub-ai-prescription">
+  <div class="bgp-header-fixed">
+    <div class="bgp-back" onclick="closeSub('ai-prescription')">
+      <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
+        <path d="M7 1L1 7L7 13" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="square"/>
+        <line x1="1" y1="7" x2="15" y2="7" stroke="#e8d5a3" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="bgp-header-title">AI Prescription</div>
+  </div>
+  <div class="bgp-body">
+    <div class="bgp-hero">
+      <div class="bgp-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="3.5"/></svg></div>
+      <div class="bgp-hero-title">AI Prescription</div>
+      <div class="bgp-hero-sub">Your personalized word ritual, built by AI</div>
+    </div>
+    <div class="bgp-content">
+
+      <div class="bgp-section-label">Today's Ritual</div>
+      <div class="bgp-rx-reason" id="rxPageReason">Building your ritual…</div>
+      <div class="bgp-rx-words" id="rxPageWords"><div class="bgp-rx-loading">Loading your prescription…</div></div>
+
+      <button class="bgp-cta-btn" id="rxPageStartAllBtn" onclick="window.rxPageStartAll()" disabled>
+        Start All Three
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+      </button>
+
+      <div class="bgp-section-label">How It Works</div>
+      <div class="nmh-sec-banner" style="cursor:default;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3.5A3 3 0 0 0 6.6 6.9 2.7 2.7 0 0 0 5 9.3a3 3 0 0 0 1 5.6v3.6a1.5 1.5 0 0 0 1.5 1.5h9a1.5 1.5 0 0 0 1.5-1.5v-3.6a3 3 0 0 0 1-5.6 2.7 2.7 0 0 0-1.6-3.4A3 3 0 0 0 14.5 3.5 3 3 0 0 0 12 5a3 3 0 0 0-2.5-1.5Z"/><path d="M12 5v15"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">AI-Analyzed, Not Random</div>
+          <div class="nmh-sec-banner-sub">Reads the time of day and your practice history to prescribe exactly 3 words</div>
+        </div>
+      </div>
+      <div class="nmh-sec-banner" style="cursor:default;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="#fff" stroke="none"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Personalized For You</div>
+          <div class="nmh-sec-banner-sub">Prioritizes words you haven't practiced recently, never repeats blindly</div>
+        </div>
+      </div>
+      <div class="nmh-sec-banner" style="cursor:default;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Refreshes Every Day</div>
+          <div class="nmh-sec-banner-sub">A new ritual each day, tuned to morning, midday, evening or night</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="app/js/part053.js?v=3"></script>
 
 <!-- ══ CHECKOUT PAGE JS ══ -->
 <script src="app/js/part029.js?v=277"></script>
@@ -7434,7 +7495,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 ═══════════════════════════════════════════════════════════ -->
 
 
-<script src="app/js/part037.js?v=279"></script>
+<script src="app/js/part037.js?v=280"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      REMAINING FEATURES BUNDLE
