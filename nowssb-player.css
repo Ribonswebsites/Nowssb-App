@@ -488,15 +488,16 @@
 }
 /* self-sufficient (not scoped under .lgp — the arc lives directly in
    <body>, same reasoning as .lgp-arc-close/.lgp-arc-info above) */
-.lgp-arc-banner { display:flex; align-items:center; gap:14px; background:#000; border-radius:16px !important; padding:12px 16px; }
+.lgp-arc-banner { display:flex; align-items:center; gap:14px; min-height:74px; background:#000; border-radius:16px !important; padding:14px 18px; }
 .lgp-arc-banner-icon {
-  width:34px; height:34px; flex-shrink:0;
+  width:48px; height:48px; flex-shrink:0;
   background-size:contain; background-repeat:no-repeat; background-position:center;
 }
-.lgp-arc-banner-divider { width:1px; height:34px; background:rgba(255,255,255,.15); flex-shrink:0; }
+.lgp-arc-banner-divider { width:1px; align-self:stretch; background:rgba(255,255,255,.15); flex-shrink:0; }
 .lgp-arc-banner-text {
-  font-size:14px; font-weight:800; letter-spacing:.2px; color:#fff; font-family:'DM Sans',sans-serif;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  flex:1; min-width:0;
+  font-size:14px; font-weight:700; letter-spacing:.2px; color:#fff; font-family:'DM Sans',sans-serif;
+  line-height:1.4;
 }
 .lgp-arc-banner-text.dash-in { animation:nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both; }
 /* word meaning / heals / category — shown INSIDE the settings menu */

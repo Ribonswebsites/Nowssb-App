@@ -155,7 +155,7 @@
       library:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
       settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png',
       info:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782986898/file_000000002038722fac63c79466d73f0f_jnhjvg.png',
-      brand:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png'
+      brand:    'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png'
     };
     /* render every icon as a background-image SPAN (never an <img>) so the
        browser can't open/zoom it on tap and taps always hit the button */
@@ -352,7 +352,7 @@
           '<button class="lgp-back lgp-imgbtn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
             '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
           '</button>' +
-          '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
+          '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
           '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
             '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
           '</button>' +
@@ -464,7 +464,13 @@
       (function () {
         var el = document.getElementById('lgpArcBannerText');
         if (!el) return;
-        var steps = ['Listen', 'Speak', 'Learn', 'Heal', 'Check your Score'];
+        var steps = [
+          'Listen — hear the word\'s true pronunciation',
+          'Speak — repeat it out loud, syllable by syllable',
+          'Learn — understand its meaning and origin',
+          'Heal — feel the vibration resonate in your body',
+          'Check your Score — track your pronunciation progress'
+        ];
         var i = 0;
         function paint(animate) {
           el.textContent = steps[i % steps.length];
