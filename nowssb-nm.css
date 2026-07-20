@@ -2531,6 +2531,19 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
    dashboard reference) — other .bgp-screen pages keep the near-black
    #060c18 they already had. */
 .bgp-rx-screen, .bgp-rx-screen .bgp-body { background: #000; }
+/* Header "customize background" button (SS.open('fashionbg')) writes a
+   --nwsb-custom-bg-url variable + nwsb-custom-fashion-bg body class onto
+   <body> — the same mechanism Fashion Home/Profile already consume. This
+   page never read either, so the picker worked but visibly did nothing
+   here. The glassmorphism cards were built to sit on top of exactly this
+   kind of photo backdrop, so wiring it in is a straight fit, not a retrofit. */
+body.nwsb-custom-fashion-bg .bgp-rx-screen,
+body.nwsb-custom-fashion-bg .bgp-rx-screen .bgp-body {
+  background-image: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.72) 40%, rgba(0,0,0,0.92) 100%), var(--nwsb-custom-bg-url) !important;
+  background-color: var(--nwsb-custom-bg-color, #000) !important;
+  background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
 .bgp-rx-hero-glass {
   position: relative; margin: 100px 18px 20px; padding: 24px 20px; text-align: center;
   border-radius: 22px !important; background: rgba(255,255,255,0.06);
