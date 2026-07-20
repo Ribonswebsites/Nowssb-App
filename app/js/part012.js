@@ -1640,6 +1640,9 @@ function openSub(id) {
   if (id === 'streak') {
     if (typeof window.renderStreakPage === 'function') window.renderStreakPage();
   }
+  if (id === 'ai-prescription') {
+    if (typeof window.renderAiPrescriptionPage === 'function') window.renderAiPrescriptionPage();
+  }
   if (id === 'practice') {
     // Load active routine words if not manually set
     if (!window._rtManualLaunch) {

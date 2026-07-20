@@ -174,4 +174,48 @@
     if (scr.classList.contains('open')) startFeatBanner();
   })();
 
+  /* ── AI PRESCRIPTION PAGE — real data, not a mock. Reuses the exact
+     same recommendation engine (window.rxGetData, part037.js: Groq when
+     configured, deterministic static fallback otherwise) and the exact
+     same practice actions (window.rxStartWord/rxStartAll) as the home
+     card, so tapping a word or "Start All Three" here does the real
+     thing. ── */
+  var _rxPageData = null;
+  window.renderAiPrescriptionPage = function () {
+    var reasonEl = document.getElementById('rxPageReason');
+    var wordsEl  = document.getElementById('rxPageWords');
+    var btn      = document.getElementById('rxPageStartAllBtn');
+    if (!reasonEl || !wordsEl) return;
+    if (typeof window.rxGetData !== 'function') {
+      reasonEl.textContent = 'Prescription engine unavailable right now.';
+      return;
+    }
+    reasonEl.textContent = 'Building your ritual…';
+    wordsEl.innerHTML = '<div class="bgp-rx-loading">Loading your prescription…</div>';
+    if (btn) btn.disabled = true;
+    window.rxGetData().then(function (data) {
+      _rxPageData = data;
+      reasonEl.textContent = data.reason || '';
+      wordsEl.innerHTML = (data.words || []).map(function (w) {
+        return '<div class="bgp-rx-word-card" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
+          '<div>' +
+            '<div class="bgp-rx-word-name">' + w.word + '</div>' +
+            (w.organ ? '<div class="bgp-rx-word-organ">' + w.organ + '</div>' : '') +
+            '<div class="bgp-rx-word-why">' + (w.why || '') + '</div>' +
+          '</div>' +
+          '<div class="bgp-rx-word-play"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 3l7 4-7 4V3z" fill="#e8d5a3"/></svg></div>' +
+        '</div>';
+      }).join('');
+      if (btn) btn.disabled = false;
+    }).catch(function () {
+      reasonEl.textContent = 'Could not load your prescription — pull to retry.';
+      wordsEl.innerHTML = '';
+    });
+  };
+  window.rxPageStartAll = function () {
+    if (_rxPageData && _rxPageData.words && typeof window.rxStartAll === 'function') {
+      window.rxStartAll(_rxPageData.words);
+    }
+  };
+
 })();

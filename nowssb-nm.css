@@ -2502,6 +2502,25 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   width: 32px; height: 32px; border-radius: 50% !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.06);
 }
+
+/* AI Prescription page */
+.bgp-rx-reason { font-family: 'DM Sans', sans-serif; font-style: italic; font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.55; margin-bottom: 16px; }
+.bgp-rx-words { display: flex; flex-direction: column; gap: 10px; }
+.bgp-rx-word-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(232,213,163,0.18); border-radius: 16px !important;
+  padding: 16px 18px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.bgp-rx-word-card:active { background: rgba(255,255,255,0.07); }
+.bgp-rx-word-name { font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 16px; color: #fff; }
+.bgp-rx-word-organ { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; color: #e8d5a3; margin-top: 3px; }
+.bgp-rx-word-why { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: rgba(255,255,255,0.5); margin-top: 5px; line-height: 1.4; }
+.bgp-rx-word-play {
+  width: 36px; height: 36px; border-radius: 50% !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.12); border: 1px solid rgba(232,213,163,0.3);
+}
+.bgp-rx-loading { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.4); text-align: center; padding: 30px 0; }
+
 .fash-trend-shop-banner {
   border-radius: 0 !important; width: calc(100% - 32px) !important; margin: 0 16px 16px !important;
   box-shadow: 0 14px 36px rgba(0,0,0,.42) !important; border: 1px solid rgba(255,255,255,.08);

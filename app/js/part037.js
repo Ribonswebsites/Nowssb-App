@@ -110,7 +110,7 @@
 
     wrap.innerHTML =
       '<div class="rx-card">'+
-        '<div class="rx-header">'+
+        '<div class="rx-header" onclick="openSub(\'ai-prescription\')" style="cursor:pointer;">'+
           '<div class="rx-header-left">'+
             '<div class="rx-ai-dot"></div>'+
             '<span class="rx-label">AI Prescription</span>'+
@@ -174,18 +174,27 @@
     if (typeof openSub === 'function') openSub('practice');
   };
 
+  // Shared data pipeline — cache check, Groq fetch with static fallback, save.
+  // Exposed so the full AI Prescription page (app/js/part053.js) reuses the
+  // exact same real recommendations instead of duplicating/faking this logic.
+  window.rxGetData = async function(forceRefresh){
+    if (!forceRefresh){
+      var cached = loadCached();
+      if (cached) return cached;
+    }
+    var data = await fetchGroqPrescription();
+    if (!data) data = staticPrescription();
+    saveCache(data);
+    return data;
+  };
+
   // Main init — called on home load
   window.rxInit = async function(){
     var cached = loadCached();
     if (cached){ render(cached); return; }
 
     renderLoading();
-
-    // Try Groq first, fall back to static
-    var data = await fetchGroqPrescription();
-    if (!data) data = staticPrescription();
-
-    saveCache(data);
+    var data = await window.rxGetData();
     render(data);
   };
 
