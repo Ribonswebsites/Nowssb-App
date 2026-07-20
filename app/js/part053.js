@@ -218,18 +218,25 @@
     }
   };
 
-  /* "For Every Organ" — one tile per word in the real library, tap to
-     practice that exact word (window.rxStartWord already handles lookup). */
+  /* "For Every Organ" — vertical list, one banner per word in the real
+     library (same icon+divider+text component used everywhere else on
+     this page, not a horizontal scroll), tap to practice that exact word.
+     Icon is the real Word Science badge (RM_CAT_LOGO, part012.js) — the
+     same "word" icon used app-wide, not a mismatched per-word image. */
   function renderRxOrganRow() {
     var box = document.getElementById('rxOrganRow');
     if (!box) return;
     var lib = (typeof MASTER_WORD_LIBRARY !== 'undefined' && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     if (!lib.length) { box.innerHTML = '<div class="bgp-rx-loading">Library unavailable</div>'; return; }
+    var wordIcon = (typeof RM_CAT_LOGO !== 'undefined' && RM_CAT_LOGO) || window.RM_CAT_LOGO || '';
     box.innerHTML = lib.map(function (w) {
-      return '<div class="bgp-rx-tile" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
-        '<div class="bgp-rx-tile-organ">' + (w.organ || '') + '</div>' +
-        '<div class="bgp-rx-tile-word">' + w.word + '</div>' +
-        '<div class="bgp-rx-tile-benefit">' + (w.benefit || '') + '</div>' +
+      return '<div class="nmh-sec-banner" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
+        '<div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="' + wordIcon + '" alt=""></div>' +
+        '<div class="nmh-sec-banner-divider"></div>' +
+        '<div class="nmh-sec-banner-txt">' +
+          '<div class="nmh-sec-banner-title">' + w.word + '</div>' +
+          '<div class="nmh-sec-banner-sub">' + (w.organ || '') + (w.benefit ? ' — ' + w.benefit : '') + '</div>' +
+        '</div>' +
       '</div>';
     }).join('');
   }
@@ -243,8 +250,10 @@
     if (!track || !dots) return;
     var lib = (typeof MASTER_WORD_LIBRARY !== 'undefined' && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     if (!lib.length) return;
+    var wordIcon = (typeof RM_CAT_LOGO !== 'undefined' && RM_CAT_LOGO) || window.RM_CAT_LOGO || '';
     track.innerHTML = lib.map(function (w) {
       return '<div class="bgp-rx-rotator-slide" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
+        '<div class="bgp-rx-rotator-icon"><img loading="lazy" decoding="async" src="' + wordIcon + '" alt=""></div>' +
         '<div class="bgp-rx-rotator-organ">' + (w.organ || '') + '</div>' +
         '<div class="bgp-rx-rotator-word">' + w.word + '</div>' +
         '<div class="bgp-rx-rotator-benefit">' + (w.benefit || '') + '</div>' +
@@ -265,12 +274,19 @@
   }
 
   /* "You Might Also Like" — real Meaning Store items, real Buy Now action
-     (window.msBuyNow — same function the Meaning Store itself uses). */
+     (window.msBuyNow — same function the Meaning Store itself uses).
+     Uses the consistent Meaning Store badge (MS_CAT_LOGO) instead of each
+     item's own `img`, since MS_BASE_MEANINGS reuses the same handful of
+     stock images across many unrelated words (e.g. Fire/Sun/Light all
+     share one image) — the exact same "wrong/shared image" problem
+     already fixed for Word Atelier cart thumbnails earlier, now fixed
+     here the same way. */
   function renderRxMeanings() {
     var box = document.getElementById('rxMeaningRow');
     if (!box) return;
     var lib = window.MS_BASE_MEANINGS || [];
     if (!lib.length) { box.innerHTML = '<div class="bgp-rx-loading">Recommendations unavailable</div>'; return; }
+    var meaningIcon = window.MS_CAT_LOGO || '';
     // Deterministic-but-varied pick so it isn't always the same 6 —
     // rotates by day of year, same pattern used by the static word prescription.
     var doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
@@ -278,9 +294,9 @@
     for (var i = 0; i < 8 && i < lib.length; i++) picks.push(lib[(doy + i * 5) % lib.length]);
     box.innerHTML = picks.map(function (m) {
       var safeName = String(m.word).replace(/'/g, '');
-      var safeImg = String(m.img || '').replace(/'/g, '');
+      var safeImg = String(meaningIcon).replace(/'/g, '');
       return '<div class="bgp-rx-tile bgp-rx-mtile" onclick="window.msBuyNow(\'ms-' + m.key + '\',\'' + safeName + '\',' + m.price + ',\'' + safeImg + '\')">' +
-        '<img class="bgp-rx-mtile-img" loading="lazy" decoding="async" src="' + m.img + '" alt="">' +
+        '<img class="bgp-rx-mtile-img" loading="lazy" decoding="async" src="' + meaningIcon + '" alt="">' +
         '<div class="bgp-rx-mtile-name">' + m.word + '</div>' +
         '<div class="bgp-rx-mtile-price">$' + (m.price / 100).toFixed(2) + '</div>' +
       '</div>';
