@@ -119,4 +119,59 @@
   }
   window.renderStreakPage = renderStreakPage;
 
+  /* ── "Everything NowssB" features menu — explainer carousel below the
+     glass tube. One card visible at a time, auto-cycling with dots: the
+     menu itself first ("Quick access to everything on NowssB"), then one
+     card per feature row beneath it, one by one. Mirrored from the
+     Connect features carousel — icon on the RIGHT (text block first in
+     the DOM, icon last), no arrow/button since these aren't links. ── */
+  var FEAT_BANNER_CARDS = [
+    { name: 'Everything NowssB', sub: 'Quick access to everything on NowssB', img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png' },
+    { name: 'NowssB Player',    sub: 'Your sound library — listen, heal, repeat',           img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png' },
+    { name: 'NowssB Connect',   sub: 'The social space of NowssB — share your journey',     img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png' },
+    { name: 'NowssB Store',     sub: 'Words & meanings — own the sounds that heal',         img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160870/file_0000000037547208b91bfd167f401961_eesfpn.png' },
+    { name: 'Verification',     sub: 'Earn your NowssB check-mark',                          img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png' },
+    { name: 'Search',           sub: 'Find any word or meaning, instantly',                  img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png' },
+    { name: 'Daily Practice',   sub: 'Your morning ritual, every day',                        img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000050d472089de0ad57116dba0f_tht26i.png' },
+    { name: 'Word Science',     sub: 'The NOWSBANSIU system, decoded',                        img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png' },
+    { name: 'My Progress',      sub: 'Track your healing journey',                            img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png' },
+    { name: 'Wishlist',         sub: 'Words you\'ve saved for later',                         img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png' },
+    { name: 'Cart',             sub: 'Your bag, ready for checkout',                          img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png' }
+  ];
+  var _featBannerTimer = null;
+  function buildFeatBanner(track, dots) {
+    track.innerHTML = FEAT_BANNER_CARDS.map(function (f) {
+      return '<div class="feat-banner-slide">' +
+        '<span class="feat-banner-txt"><span class="feat-banner-name">' + f.name + '</span><span class="feat-banner-sub">' + f.sub + '</span></span>' +
+        '<span class="feat-banner-ico"><img loading="lazy" decoding="async" src="' + f.img + '" alt=""></span>' +
+      '</div>';
+    }).join('');
+    dots.innerHTML = FEAT_BANNER_CARDS.map(function (_, i) { return '<span class="feat-banner-dot' + (i === 0 ? ' on' : '') + '"></span>'; }).join('');
+  }
+  function startFeatBanner() {
+    var car = document.getElementById('featBannerCarousel'); if (!car) return;
+    var track = car.querySelector('.feat-banner-track'); var dots = car.querySelector('.feat-banner-dots');
+    if (!track || !dots) return;
+    if (!track._built) { buildFeatBanner(track, dots); track._built = true; }
+    var idx = 0;
+    if (_featBannerTimer) clearInterval(_featBannerTimer);
+    _featBannerTimer = setInterval(function () {
+      if (document.hidden) return;
+      var scr = document.getElementById('sub-features');
+      if (!scr || !scr.classList.contains('open')) return;
+      idx = (idx + 1) % FEAT_BANNER_CARDS.length;
+      track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      var ds = dots.querySelectorAll('.feat-banner-dot');
+      for (var i = 0; i < ds.length; i++) ds[i].classList.toggle('on', i === idx);
+    }, 3200);
+  }
+  (function watchFeaturesOpen() {
+    var scr = document.getElementById('sub-features');
+    if (!scr) { setTimeout(watchFeaturesOpen, 300); return; }
+    new MutationObserver(function () {
+      if (scr.classList.contains('open')) startFeatBanner();
+    }).observe(scr, { attributes: true, attributeFilter: ['class'] });
+    if (scr.classList.contains('open')) startFeatBanner();
+  })();
+
 })();
