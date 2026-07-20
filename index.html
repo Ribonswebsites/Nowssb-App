@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
-<link rel="stylesheet" href="app/app.css?v=301">
+<link rel="stylesheet" href="app/app.css?v=302">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=391">
+<link rel="stylesheet" href="nowssb-nm.css?v=392">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -3078,6 +3078,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" style="flex-shrink:0;"><path d="M9 18l6-6-6-6"/></svg>
         </div>
 
+        <!-- COUPON BANNER — one of the store's rotating coupon images, picked
+             at random per word so it's never the exact same one twice in a row. -->
+        <img id="rmdCouponBanner" class="rmd-coupon-banner" loading="lazy" decoding="async" alt="NowssB Store coupon" onclick="var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}" style="display:block;width:100%;margin-top:16px;border-radius:14px;cursor:pointer;">
+
         <!-- ALL DETAILS (expandable) -->
         <div class="rmd-alldetails-block" style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);">
           <div onclick="rmdToggleDetails()" style="display:flex;align-items:center;justify-content:space-between;padding:16px 2px;cursor:pointer;">
@@ -3616,7 +3620,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=321"></script>
+<script src="app/js/part012.js?v=322"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -4921,7 +4925,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      Screens: word-science, profile, real-meaning, shabdapathy
 ══════════════════════════════════════════ -->
 <script src="app/js/part025.js?v=163"></script><!-- ══ MEANING STORE JS ══ -->
-<script src="app/js/part026.js?v=178"></script>
+<script src="app/js/part026.js?v=179"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -5443,6 +5447,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <input class="chk-field-input" id="chkCouponInput" type="text" placeholder="Enter coupon code" autocapitalize="characters" autocomplete="off" onkeydown="if(event.key==='Enter')chkApplyCoupon()">
         <button class="chk-coupon-apply" id="chkCouponBtn" onclick="chkApplyCoupon()">Apply</button>
       </div>
+      <div class="chk-coupon-suggest">
+        <button type="button" class="chk-coupon-chip" onclick="document.getElementById('chkCouponInput').value='NOWSSB10';chkApplyCoupon();">NOWSSB10 · 10% off</button>
+        <button type="button" class="chk-coupon-chip" onclick="document.getElementById('chkCouponInput').value='NOWSSB30';chkApplyCoupon();">NOWSSB30 · 30% off</button>
+        <button type="button" class="chk-coupon-chip" onclick="document.getElementById('chkCouponInput').value='NOWSSB50';chkApplyCoupon();">NOWSSB50 · 50% off</button>
+      </div>
       <div class="chk-coupon-msg" id="chkCouponMsg"></div>
     </div>
 
@@ -5539,7 +5548,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ══ CHECKOUT PAGE JS ══ -->
-<script src="app/js/part029.js?v=275"></script>
+<script src="app/js/part029.js?v=276"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -8018,7 +8027,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ── NOWSSB FASHION HOME THEMES — scoped via body.fashion-home-active ── -->
 
 
-<script src="app/js/part047.js?v=181"></script>
+<script src="app/js/part047.js?v=182"></script>
 
 <!-- ── BLACK EDITION INTRO + CAROUSEL ── -->
 <script src="app/js/part048.js?v=164"></script>

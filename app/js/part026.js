@@ -187,6 +187,7 @@ window.msBuy = function(key, wordDisplay, price, img) {
           '<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>' +
         '</button>' +
       '</div>' +
+      '<img id="msdCouponBanner" class="rmd-coupon-banner" loading="lazy" decoding="async" alt="NowssB Store coupon" onclick="var s=document.getElementById(\'sub-nowssb-store\');if(s){s.classList.add(\'open\');}" style="display:block;width:100%;margin:0 0 20px;border-radius:14px;cursor:pointer;">' +
       '<div class="rm-disclaimer">' +
         '<div class="rm-disclaimer-title">Disclaimer &amp; Confidentiality</div>' +
         '<div class="rm-disclaimer-text">Meanings, phonetic breakdowns and healing associations shared here are for educational and wellness purposes only — they are not medical advice and do not replace professional diagnosis or treatment. Requested and purchased meanings, and any information you share with us, are kept strictly confidential and are never sold or shared with third parties.</div>' +
@@ -199,6 +200,7 @@ window.msBuy = function(key, wordDisplay, price, img) {
 
   dp.classList.add('open');
   msBuyInfoBannerCycle();
+  if (typeof window.nwsbSetRandomCouponBanner === 'function') window.nwsbSetRandomCouponBanner('msdCouponBanner');
 };
 
 // "What is a Meaning? / How You'll Receive It" — same rotating dot-carousel

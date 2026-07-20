@@ -2566,6 +2566,14 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
 }
 .chk-coupon-apply:active { background: rgba(232,213,163,0.22); }
+.chk-coupon-suggest { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.chk-coupon-chip {
+  padding: 8px 14px; min-height: 0 !important; border: 1px solid rgba(232,213,163,0.28);
+  background: rgba(232,213,163,0.08); color: #e8d5a3; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+  -webkit-tap-highlight-color: transparent;
+}
+.chk-coupon-chip:active { background: rgba(232,213,163,0.18); }
 .chk-coupon-msg { font-family: 'DM Sans', sans-serif; font-size: 12px; margin-top: 8px; min-height: 14px; }
 
 /* ===== PILL TOGGLES — force true pill/tube shape (beats *{border-radius:0!important}) ===== */

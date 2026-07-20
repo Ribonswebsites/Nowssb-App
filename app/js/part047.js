@@ -1,5 +1,19 @@
 
 (function(){
+  // Same rotating coupon images already used on Normal Home's greeting
+  // banner — reused here so every word/meaning detail page can show one at
+  // random instead of needing its own dedicated art.
+  var COUPON_BANNERS = [
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
+  ];
+  window.nwsbSetRandomCouponBanner = function (elId) {
+    var el = document.getElementById(elId);
+    if (!el) return;
+    el.src = COUPON_BANNERS[Math.floor(Math.random() * COUPON_BANNERS.length)];
+  };
+
   var THEME_CLASSES = ['nwsb-theme-default','nwsb-theme-black','nwsb-theme-neo','nwsb-theme-glass-black'];
   var OLD_BE_CLASSES = ['be-fashion','be-neo','be-glass'];
 

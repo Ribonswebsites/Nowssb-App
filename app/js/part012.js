@@ -2214,6 +2214,7 @@ function loadWordOrigin(key) {
   if (hero) hero.style.display = 'none';
   if (srch) srch.style.display = 'none';
   if (sub)  sub.scrollTop = 0;
+  if (typeof window.nwsbSetRandomCouponBanner === 'function') window.nwsbSetRandomCouponBanner('rmdCouponBanner');
 
   // Build slider
   rmdBuildSlider(tier.banners);
@@ -2321,7 +2322,12 @@ function rmdToggleWish() {
   var tier = RM_TIERS[tierKey];
   var word = rmDisplayName(key);
   if (typeof nssToggleWishlist === 'function')
-    nssToggleWishlist({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:tier.banners[0]||'' });
+    /* Deliberately NOT tier.banners[0] — those are shared promotional
+       banners reused across every word in the same price tier, several
+       of which have a DIFFERENT word's name baked into the artwork.
+       Leaving img empty falls back to the neutral generic icon instead
+       of risking a mismatched word name in the cart/wishlist thumbnail. */
+    nssToggleWishlist({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:'' });
   _rmdRefreshActions();
 }
 
@@ -2331,7 +2337,7 @@ function rmdAddCart() {
   var tier = RM_TIERS[tierKey];
   var word = rmDisplayName(key);
   if (typeof nssAddToCart === 'function')
-    nssAddToCart({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:tier.banners[0]||'' });
+    nssAddToCart({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:'' });
   _rmdRefreshActions();
 }
 
