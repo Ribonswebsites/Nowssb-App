@@ -218,4 +218,81 @@
     }
   };
 
+  /* "For Every Organ" — one tile per word in the real library, tap to
+     practice that exact word (window.rxStartWord already handles lookup). */
+  function renderRxOrganRow() {
+    var box = document.getElementById('rxOrganRow');
+    if (!box) return;
+    var lib = (typeof MASTER_WORD_LIBRARY !== 'undefined' && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
+    if (!lib.length) { box.innerHTML = '<div class="bgp-rx-loading">Library unavailable</div>'; return; }
+    box.innerHTML = lib.map(function (w) {
+      return '<div class="bgp-rx-tile" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
+        '<div class="bgp-rx-tile-organ">' + (w.organ || '') + '</div>' +
+        '<div class="bgp-rx-tile-word">' + w.word + '</div>' +
+        '<div class="bgp-rx-tile-benefit">' + (w.benefit || '') + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* "Rotating Words" — one word visible at a time, auto-cycling through the
+     whole library, tap to practice it directly. */
+  var _rxRotatorTimer = null;
+  function renderRxRotator() {
+    var track = document.getElementById('rxRotatorTrack');
+    var dots  = document.getElementById('rxRotatorDots');
+    if (!track || !dots) return;
+    var lib = (typeof MASTER_WORD_LIBRARY !== 'undefined' && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
+    if (!lib.length) return;
+    track.innerHTML = lib.map(function (w) {
+      return '<div class="bgp-rx-rotator-slide" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
+        '<div class="bgp-rx-rotator-organ">' + (w.organ || '') + '</div>' +
+        '<div class="bgp-rx-rotator-word">' + w.word + '</div>' +
+        '<div class="bgp-rx-rotator-benefit">' + (w.benefit || '') + '</div>' +
+      '</div>';
+    }).join('');
+    dots.innerHTML = lib.map(function (_, i) { return '<span class="bgp-rx-rotator-dot' + (i === 0 ? ' on' : '') + '"></span>'; }).join('');
+    var idx = 0;
+    if (_rxRotatorTimer) clearInterval(_rxRotatorTimer);
+    _rxRotatorTimer = setInterval(function () {
+      if (document.hidden) return;
+      var scr = document.getElementById('sub-ai-prescription');
+      if (!scr || !scr.classList.contains('open')) return;
+      idx = (idx + 1) % lib.length;
+      track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      var ds = dots.querySelectorAll('.bgp-rx-rotator-dot');
+      for (var i = 0; i < ds.length; i++) ds[i].classList.toggle('on', i === idx);
+    }, 3200);
+  }
+
+  /* "You Might Also Like" — real Meaning Store items, real Buy Now action
+     (window.msBuyNow — same function the Meaning Store itself uses). */
+  function renderRxMeanings() {
+    var box = document.getElementById('rxMeaningRow');
+    if (!box) return;
+    var lib = window.MS_BASE_MEANINGS || [];
+    if (!lib.length) { box.innerHTML = '<div class="bgp-rx-loading">Recommendations unavailable</div>'; return; }
+    // Deterministic-but-varied pick so it isn't always the same 6 —
+    // rotates by day of year, same pattern used by the static word prescription.
+    var doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    var picks = [];
+    for (var i = 0; i < 8 && i < lib.length; i++) picks.push(lib[(doy + i * 5) % lib.length]);
+    box.innerHTML = picks.map(function (m) {
+      var safeName = String(m.word).replace(/'/g, '');
+      var safeImg = String(m.img || '').replace(/'/g, '');
+      return '<div class="bgp-rx-tile bgp-rx-mtile" onclick="window.msBuyNow(\'ms-' + m.key + '\',\'' + safeName + '\',' + m.price + ',\'' + safeImg + '\')">' +
+        '<img class="bgp-rx-mtile-img" loading="lazy" decoding="async" src="' + m.img + '" alt="">' +
+        '<div class="bgp-rx-mtile-name">' + m.word + '</div>' +
+        '<div class="bgp-rx-mtile-price">$' + (m.price / 100).toFixed(2) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  var _origRenderAiPrescriptionPage = window.renderAiPrescriptionPage;
+  window.renderAiPrescriptionPage = function () {
+    _origRenderAiPrescriptionPage();
+    renderRxOrganRow();
+    renderRxRotator();
+    renderRxMeanings();
+  };
+
 })();
