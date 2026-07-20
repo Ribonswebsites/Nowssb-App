@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
 <link rel="stylesheet" href="app/app.css?v=306">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=393">
+<link rel="stylesheet" href="nowssb-nm.css?v=394">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -720,6 +720,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Scrollable content area -->
   <div class="nmh-wrap">
 
+    <!-- Section label — black banner -->
+    <div class="nmh-sec-banner">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 2.5H20a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-.44 1.06l-9 9a1.5 1.5 0 0 1-2.12 0l-8-8a1.5 1.5 0 0 1 0-2.12l9-9A1.5 1.5 0 0 1 12.5 2.5Z"/><circle cx="16.5" cy="7.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-text">Today's Offer</div>
+    </div>
+
     <!-- Rotating STORE COUPON banners (replaces the old greeting) — tap opens the store -->
     <div class="nmh-banner-wrap">
       <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
@@ -753,6 +760,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="npc-flash" id="npcStoreFlash"></div>
       </div>
       <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
+    </div>
+
+    <!-- Section label — black banner -->
+    <div class="nmh-sec-banner">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#c8a96e" opacity="0.85"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.7"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-text">Daily Streak</div>
     </div>
 
     <!-- Streak -->
@@ -794,6 +808,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
       <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
       <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+    </div>
+
+    <!-- Section label — black banner -->
+    <div class="nmh-sec-banner">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="#c8a96e" stroke-width="1.6"/><rect x="12" y="3" width="7" height="7" rx="1.5" stroke="#c8a96e" stroke-width="1.6"/><rect x="3" y="12" width="7" height="7" rx="1.5" stroke="#c8a96e" stroke-width="1.6"/><rect x="12" y="12" width="7" height="7" rx="1.5" stroke="#c8a96e" stroke-width="1.6"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-text">Quick Access</div>
     </div>
 
     <!-- 2x2 Grid -->
@@ -885,6 +906,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Connect features carousel — slides through what NowssB Connect offers -->
     <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
 
+    <!-- Section label — black banner -->
+    <div class="nmh-sec-banner">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#c8a96e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-text">Quick Links</div>
+    </div>
+
     <!-- Quick access row -->
     <div class="nmh-quick-row">
       <div class="nmh-quick-btn" onclick="openSub('nowssb-store')">
@@ -910,6 +938,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </svg>
         <span>Community</span>
       </div>
+    </div>
+
+    <!-- Section label — black banner -->
+    <div class="nmh-sec-banner">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h4v4" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-text">Today's Trending</div>
     </div>
 
     <!-- Today Trending — video banner, no heading, trending words overlaid mid-right -->
@@ -993,6 +1028,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Section label — black banner -->
+    <div class="nmh-sec-banner">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><circle cx="9.5" cy="9.5" r="6" stroke="#c8a96e" stroke-width="1.7"/><path d="M18 18l-4-4" stroke="#c8a96e" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-text">Meaning Search</div>
     </div>
 
     <!-- Meaning Search -->
