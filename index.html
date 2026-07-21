@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
 <link rel="stylesheet" href="app/app.css?v=309">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=406">
+<link rel="stylesheet" href="nowssb-nm.css?v=407">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -766,6 +766,25 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
     </div>
 
+    <!-- Streak section — taller card, heading + the same 3-cube glass
+         streak visual used on Fashion Home (real shared asset/markup,
+         .fash-streak, not a duplicate). Now sits ABOVE the black banner. -->
+    <div class="nmh-streak-section">
+      <div class="nmh-streak-heading">Start Building Your Streak Today</div>
+      <div class="nmh-streak-subheading">Practice daily to keep it alive — and unlock exclusive offers</div>
+      <div class="fash-streak w100" onclick="openPracticeIntro()" style="margin:16px 0 0;">
+        <div class="fash-streak-box fash-streak-box1">
+          <div class="fash-streak-label">Day<br>Streak</div>
+        </div>
+        <div class="fash-streak-box fash-streak-box2">
+          <div class="fash-streak-num" id="nmhStreakNum">0</div>
+        </div>
+        <div class="fash-streak-box fash-streak-box3">
+          <div class="fash-streak-cta">Keep<br>Going</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Section label — black banner -->
     <div class="nmh-sec-banner" onclick="openSub('streak')">
       <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>
@@ -775,23 +794,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nmh-sec-banner-sub">Practice daily to keep your healing streak alive</div>
       </div>
       <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-
-    <!-- Streak -->
-    <div class="nmh-streak-bar" onclick="openSub('streak')" style="cursor:pointer;">
-      <div class="nmh-streak-icon nmh-streak-icon-lg">
-        <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
-          <path d="M17 3c0 0-8 8.5-8 15.5a8 8 0 0016 0C25 11.5 17 3 17 3z" fill="#e8d5a3"/>
-          <path d="M17 12c0 0-4.5 5-4.5 9a4.5 4.5 0 009 0c0-4-4.5-9-4.5-9z" fill="#c8a96e"/>
-          <path d="M17 19c0 0-2 2.3-2 4.2a2 2 0 004 0c0-1.9-2-4.2-2-4.2z" fill="#fff"/>
-        </svg>
-      </div>
-      <div>
-        <div class="nmh-streak-num" id="nmhStreakNum">0</div>
-        <div class="nmh-streak-label">day streak</div>
-      </div>
-      <div style="flex:1;"></div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;color:rgba(0,0,0,0.3);letter-spacing:1px;text-transform:uppercase;">Keep Going</div>
     </div>
 
     <!-- Today's Practice -->
@@ -1266,6 +1268,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
+  <!-- Streak heading — above the glass-box streak visual -->
+  <div class="nmh-streak-heading nmh-streak-heading-dark w100">Start Building Your Streak Today</div>
+  <div class="nmh-streak-subheading nmh-streak-subheading-dark w100">Practice daily to keep it alive — and unlock exclusive offers</div>
+
   <!-- Streak (below Today's Practice) — three glass boxes: label · number · keep -->
   <div class="fash-streak w100" onclick="openPracticeIntro()">
     <div class="fash-streak-box fash-streak-box1">
@@ -1277,6 +1283,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="fash-streak-box fash-streak-box3">
       <div class="fash-streak-cta">Keep<br>Going</div>
     </div>
+  </div>
+
+  <!-- Section label — black banner (below the streak section) -->
+  <div class="nmh-sec-banner w100" onclick="openSub('streak')">
+    <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>
+    <div class="nmh-sec-banner-divider"></div>
+    <div class="nmh-sec-banner-txt">
+      <div class="nmh-sec-banner-title">Daily Streak</div>
+      <div class="nmh-sec-banner-sub">Practice daily to keep your healing streak alive</div>
+    </div>
+    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
 
   <!-- Video banner — below Today's Practice / streak -->
