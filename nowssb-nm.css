@@ -4025,10 +4025,12 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .nwsb-pv-carousel::-webkit-scrollbar { display: none; }
 .nwsb-pv-carousel .nwsb-pv-media { flex: 0 0 100%; scroll-snap-align: center; }
 
-/* ══ FASHION HOME (and now also Normal Home) — streak: three glass boxes
-   (label · number · keep). Same real shared image asset + markup on both
-   homes, not a duplicate. ══ */
-#home .fash-streak, #home-nm .fash-streak {
+/* ══ Streak: three glass boxes (label · number · keep). Global — same real
+   shared image asset + markup reused wherever the streak is shown
+   (Fashion Home, Normal Home, and the dedicated Daily Streak page), not
+   a duplicate. Un-scoped deliberately so it doesn't need re-extending to
+   a selector list every time it's reused somewhere new. ══ */
+.fash-streak {
   position: relative; display: block; box-sizing: border-box; overflow: hidden;
   width: calc(100% - 32px) !important; margin: 16px 16px 20px; padding: 0; border: none; cursor: pointer;
   /* show only the middle band with the glass boxes — crop the metallic top/bottom */
@@ -4036,29 +4038,31 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png') center center / 100% auto no-repeat;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.38));
 }
-#home .fash-streak:active, #home-nm .fash-streak:active { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)) brightness(1.06); }
+.fash-streak:active { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)) brightness(1.06); }
 /* each label/number/cta centered over its glass box */
-#home .fash-streak-box, #home-nm .fash-streak-box {
+.fash-streak-box {
   position: absolute; top: 46%; transform: translate(-50%,-50%);
   display: flex; align-items: center; justify-content: center; text-align: center;
   width: 26%;
 }
-#home .fash-streak-box1, #home-nm .fash-streak-box1 { left: 17%; }
-#home .fash-streak-box2, #home-nm .fash-streak-box2 { left: 50%; }
-#home .fash-streak-box3, #home-nm .fash-streak-box3 { left: 83%; }
-#home .fash-streak-num, #home-nm .fash-streak-num {
+.fash-streak-box1 { left: 17%; }
+.fash-streak-box2 { left: 50%; }
+.fash-streak-box3 { left: 83%; }
+.fash-streak-num {
   font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 40px; line-height: 1;
   color: #1a2230; text-shadow: 0 1px 1px rgba(255,255,255,0.6);
 }
-#home .fash-streak-label, #home-nm .fash-streak-label,
-#home .fash-streak-cta, #home-nm .fash-streak-cta {
+.fash-streak-label,
+.fash-streak-cta {
   font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800; line-height: 1.15;
   letter-spacing: 1.5px; text-transform: uppercase; text-shadow: 0 1px 1px rgba(255,255,255,0.6);
 }
-#home .fash-streak-label, #home-nm .fash-streak-label { color: #2a3140; }
-#home .fash-streak-cta, #home-nm .fash-streak-cta { color: #9c7b3a; }
+.fash-streak-label { color: #2a3140; }
+.fash-streak-cta { color: #9c7b3a; }
 
-/* Streak section heading (Normal Home card + Fashion Home bare heading) */
+/* Streak section heading + card (Normal Home / Daily Streak page: solid
+   light card; Fashion Home: glassmorphism card — see
+   .nmh-streak-glass-section below) */
 .nmh-streak-section {
   width: 100%; border-radius: 22px !important; background: #f0f2f7; padding: 22px 20px 20px;
   box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97); box-sizing: border-box;
@@ -4068,9 +4072,23 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .nmh-streak-subheading { font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 400; color: rgba(0,0,0,0.45); margin-top: 6px; line-height: 1.5; }
 #home-nm.nm-dark .nmh-streak-heading { color: #fff; }
 #home-nm.nm-dark .nmh-streak-subheading { color: rgba(255,255,255,0.4); }
-/* Dark variant for use directly on Fashion Home's cinematic background (no card wrapper there) */
-.nmh-streak-heading-dark { color: #fff; margin: 0 16px; width: calc(100% - 32px); box-sizing: border-box; }
-.nmh-streak-subheading-dark { color: rgba(255,255,255,0.55); margin: 6px 16px 0; width: calc(100% - 32px); box-sizing: border-box; }
+/* Dark variant — light text, used inside .nmh-streak-glass-section below */
+.nmh-streak-heading-dark { color: #fff; }
+.nmh-streak-subheading-dark { color: rgba(255,255,255,0.55); }
+
+/* Fashion Home — glassmorphism version of .nmh-streak-section: heading +
+   subheading + the 3-cube visual together inside one translucent card,
+   matching the AI Prescription page's glass hero treatment. Own explicit
+   width/margin (not the ambiguous shared .w100 utility, which has several
+   conflicting same-name definitions elsewhere and was stripping this
+   element's padding/corners). */
+.nmh-streak-glass-section {
+  width: calc(100% - 32px); margin: 16px 16px 20px; padding: 22px 20px 20px; box-sizing: border-box;
+  border-radius: 22px !important; background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
 
 /* ══ SEARCH RESULT — separate full-screen page (was dumped below the card) ══ */
 .ws-result-page {
