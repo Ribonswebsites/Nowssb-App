@@ -4089,6 +4089,11 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   border: 1px solid rgba(255,255,255,0.14);
   box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
+/* Heading row inside the glass card — icon + divider + text, same pieces
+   as .nmh-sec-banner (.nmh-sec-banner-icon/-divider/-txt are already
+   standalone/reusable), just without a banner's own background/padding
+   since the glass card already provides those. */
+.nmh-streak-glass-header { display: flex; align-items: center; gap: 14px; }
 
 /* ══ SEARCH RESULT — separate full-screen page (was dumped below the card) ══ */
 .ws-result-page {

@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=262"></script>
 <link rel="stylesheet" href="app/app.css?v=309">
 <link rel="stylesheet" href="nowssb-social.css?v=202">
-<link rel="stylesheet" href="nowssb-nm.css?v=409">
+<link rel="stylesheet" href="nowssb-nm.css?v=410">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -766,23 +766,33 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
     </div>
 
-    <!-- Streak section — taller card, heading + the same 3-cube glass
-         streak visual used on Fashion Home (real shared asset/markup,
-         .fash-streak, not a duplicate). Now sits ABOVE the black banner. -->
+    <!-- Streak section — taller card: heading, the ORIGINAL compact streak
+         row (icon + number + label + "Keep Going", not the glass cube —
+         that stays on Fashion Home / the dedicated Streak page only) plus
+         a new Enter button into the full page. -->
     <div class="nmh-streak-section">
       <div class="nmh-streak-heading">Start Building Your Streak Today</div>
       <div class="nmh-streak-subheading">Practice daily to keep it alive — and unlock exclusive offers</div>
-      <div class="fash-streak w100" onclick="openPracticeIntro()" style="margin:16px 0 0;">
-        <div class="fash-streak-box fash-streak-box1">
-          <div class="fash-streak-label">Day<br>Streak</div>
+
+      <div class="nmh-streak-bar" style="margin-top:18px;background:transparent;box-shadow:none;padding:0;">
+        <div class="nmh-streak-icon nmh-streak-icon-lg">
+          <svg width="24" height="24" viewBox="0 0 18 18" fill="none">
+            <path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#c8a96e" opacity="0.85"/>
+            <path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.7"/>
+          </svg>
         </div>
-        <div class="fash-streak-box fash-streak-box2">
-          <div class="fash-streak-num" id="nmhStreakNum">0</div>
+        <div>
+          <div class="nmh-streak-num" id="nmhStreakNum">0</div>
+          <div class="nmh-streak-label">day streak</div>
         </div>
-        <div class="fash-streak-box fash-streak-box3">
-          <div class="fash-streak-cta">Keep<br>Going</div>
-        </div>
+        <div style="flex:1;"></div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;color:rgba(0,0,0,0.3);letter-spacing:1px;text-transform:uppercase;">Keep Going</div>
       </div>
+
+      <button class="bgp-cta-btn" onclick="openSub('streak')" style="margin-top:18px;">
+        Enter
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+      </button>
     </div>
 
     <!-- Section label — black banner -->
@@ -5746,12 +5756,22 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="bgp-body">
     <div class="bgp-content" style="padding-top:96px;">
 
-      <!-- Same streak section as Normal Home (heading + real 3-cube glass
-           visual, .fash-streak) — made taller here, not a re-design. -->
-      <div class="nmh-streak-section" style="padding:28px 20px 26px;">
-        <div class="nmh-streak-heading">Start Building Your Streak Today</div>
-        <div class="nmh-streak-subheading">Practice daily to keep it alive — and unlock exclusive offers</div>
-        <div class="fash-streak w100" onclick="openPracticeIntro()" style="margin:20px 0 0;">
+      <!-- Glassmorphism streak section (this page is black — the solid
+           white card used on Normal Home showed as a stray white glow
+           here, same light-neumorphic-shadow-on-dark-bg bug already hit
+           twice before). Heading is now icon+divider+text like every
+           other banner, reusing the same .nmh-sec-banner-icon/-divider/-txt
+           pieces rather than a bare stacked heading. -->
+      <div class="nmh-streak-glass-section" style="width:100%;margin:0 0 20px;padding:26px 20px 26px;">
+        <div class="nmh-streak-glass-header">
+          <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>
+          <div class="nmh-sec-banner-divider"></div>
+          <div class="nmh-sec-banner-txt">
+            <div class="nmh-streak-heading nmh-streak-heading-dark">Start Building Your Streak Today</div>
+            <div class="nmh-streak-subheading nmh-streak-subheading-dark">Practice daily to keep it alive — and unlock exclusive offers</div>
+          </div>
+        </div>
+        <div class="fash-streak" onclick="openPracticeIntro()" style="width:100% !important;margin:20px 0 0;">
           <div class="fash-streak-box fash-streak-box1">
             <div class="fash-streak-label">Day<br>Streak</div>
           </div>
