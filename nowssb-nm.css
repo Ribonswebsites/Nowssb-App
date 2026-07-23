@@ -4794,12 +4794,11 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 .nwsb-loc-title-wrap { flex: 1; min-width: 0; }
 .nwsb-loc-title { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; }
 .nwsb-loc-sub { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.6; }
-/* Sits below the icon+divider+title row (not indented alongside the
-   divider) — margin-left matches that row's icon-column + gaps + divider
-   width (40 + 14 + 1 + 14 = 69px) so it still lines up under the title text,
-   while the vertical divider itself only spans the title/sub, ending
-   before these pills and buttons start. */
-.nwsb-loc-bottom { margin: 20px 0 0 69px; }
+/* Sits below the icon+divider+title row, full width (not indented under
+   the title — the icon column doesn't run this far down, so indenting
+   left an empty gap on the left). The vertical divider itself only spans
+   the title/sub above, ending before these pills and buttons start. */
+.nwsb-loc-bottom { margin: 20px 0 0; }
 .nwsb-loc-features { display: flex; gap: 10px; margin-bottom: 20px; }
 .nwsb-loc-feature {
   flex: 1; min-width: 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
