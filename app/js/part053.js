@@ -306,17 +306,20 @@
   /* "For Every Organ" — vertical list, one banner per word in the real
      library (same icon+divider+text component used everywhere else on
      this page, not a horizontal scroll), tap to practice that exact word.
-     Icon is the real Word Science badge (RM_CAT_LOGO, part012.js) — the
-     same "word" icon used app-wide, not a mismatched per-word image. */
+     Icon is the "words icon" badge (same one used for the Quick Access
+     "NowssB Store" row) — distinct from RM_CAT_LOGO, which is reserved
+     for cart/checkout/Word Atelier word items specifically.
+     Shows the first 5, rest revealed via "Show More". */
+  var RX_WORD_ICON = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160870/file_0000000037547208b91bfd167f401961_eesfpn.png';
   function renderRxOrganRow() {
     var box = document.getElementById('rxOrganRow');
+    var moreBtn = document.getElementById('rxOrganShowMoreBtn');
     if (!box) return;
     var lib = (typeof MASTER_WORD_LIBRARY !== 'undefined' && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
-    if (!lib.length) { box.innerHTML = '<div class="bgp-rx-loading">Library unavailable</div>'; return; }
-    var wordIcon = (typeof RM_CAT_LOGO !== 'undefined' && RM_CAT_LOGO) || window.RM_CAT_LOGO || '';
-    box.innerHTML = lib.map(function (w) {
-      return '<div class="nmh-sec-banner" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
-        '<div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="' + wordIcon + '" alt=""></div>' +
+    if (!lib.length) { box.innerHTML = '<div class="bgp-rx-loading">Library unavailable</div>'; if (moreBtn) moreBtn.classList.add('bgp-hidden-extra'); return; }
+    box.innerHTML = lib.map(function (w, i) {
+      return '<div class="nmh-sec-banner' + (i >= 5 ? ' bgp-hidden-extra' : '') + '" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
+        '<div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="' + RX_WORD_ICON + '" alt=""></div>' +
         '<div class="nmh-sec-banner-divider"></div>' +
         '<div class="nmh-sec-banner-txt">' +
           '<div class="nmh-sec-banner-title">' + w.word + '</div>' +
@@ -324,7 +327,21 @@
         '</div>' +
       '</div>';
     }).join('');
+    if (moreBtn) {
+      if (lib.length > 5) {
+        moreBtn.classList.remove('bgp-hidden-extra');
+        moreBtn.textContent = 'Show More (' + (lib.length - 5) + ')';
+      } else {
+        moreBtn.classList.add('bgp-hidden-extra');
+      }
+    }
   }
+  window.rxOrganShowMore = function () {
+    var box = document.getElementById('rxOrganRow');
+    if (box) box.querySelectorAll('.bgp-hidden-extra').forEach(function (el) { el.classList.remove('bgp-hidden-extra'); });
+    var btn = document.getElementById('rxOrganShowMoreBtn');
+    if (btn) btn.classList.add('bgp-hidden-extra');
+  };
 
   /* "Rotating Words" — one word visible at a time, auto-cycling through the
      whole library, tap to practice it directly. */
@@ -335,10 +352,9 @@
     if (!track || !dots) return;
     var lib = (typeof MASTER_WORD_LIBRARY !== 'undefined' && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     if (!lib.length) return;
-    var wordIcon = (typeof RM_CAT_LOGO !== 'undefined' && RM_CAT_LOGO) || window.RM_CAT_LOGO || '';
     track.innerHTML = lib.map(function (w) {
       return '<div class="bgp-rx-rotator-slide" onclick="window.rxStartWord(\'' + String(w.word).replace(/'/g, '') + '\')">' +
-        '<div class="bgp-rx-rotator-icon"><img loading="lazy" decoding="async" src="' + wordIcon + '" alt=""></div>' +
+        '<div class="bgp-rx-rotator-icon"><img loading="lazy" decoding="async" src="' + RX_WORD_ICON + '" alt=""></div>' +
         '<div class="bgp-rx-rotator-organ">' + (w.organ || '') + '</div>' +
         '<div class="bgp-rx-rotator-word">' + w.word + '</div>' +
         '<div class="bgp-rx-rotator-benefit">' + (w.benefit || '') + '</div>' +
