@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=309">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=422">
+<link rel="stylesheet" href="nowssb-nm.css?v=423">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -5738,121 +5738,149 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Page 1 — Individual Coupon, 10% off -->
 <div class="sub-screen bgp-screen" id="sub-coupon-individual">
-  <div class="bgp-header-fixed">
-    <div class="bgp-back" onclick="closeSub('coupon-individual')">
-      <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-        <path d="M7 1L1 7L7 13" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="square"/>
-        <line x1="1" y1="7" x2="15" y2="7" stroke="#e8d5a3" stroke-width="1.5"/>
-      </svg>
-    </div>
-    <div class="bgp-header-title">10% Off</div>
+  <div class="sub-header nav-bar">
+    <div class="sub-back" onclick="closeSub('coupon-individual')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div class="sub-title">10% Off</div>
+    <button class="rm-cart-btn" onclick="nssOpenCart()" aria-label="Cart">
+      <svg width="17" height="17" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg>
+      <div class="nss-icon-badge nss-cart-badge-shared">0</div>
+    </button>
   </div>
-  <div class="bgp-body">
-    <div class="bgp-hero">
+  <div class="sub-body">
+    <div class="nss-vid-banner" style="margin:0 0 16px;">
+      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+      <div class="nss-vid-banner-fade"></div>
+      <div class="nss-vid-banner-pill-wrap">
+        <div class="nss-vid-banner-pill">
+          <img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">
+          <span class="nss-vid-banner-pill-text">Individual Coupon</span>
+        </div>
+      </div>
+    </div>
+    <div class="bgp-hero bgp-hero-inline">
       <div class="bgp-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 2.5H20a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-.44 1.06l-9 9a1.5 1.5 0 0 1-2.12 0l-8-8a1.5 1.5 0 0 1 0-2.12l9-9A1.5 1.5 0 0 1 12.5 2.5Z"/><circle cx="16.5" cy="7.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg></div>
       <div class="bgp-hero-title">Individual Coupon</div>
       <div class="bgp-hero-sub">10% off any single word below — code NOWSSB10</div>
     </div>
-    <div class="bgp-content">
-      <div class="bgp-section-label">Eligible Words</div>
-      <div class="bgp-word-grid" id="couponIndividualGrid"><!-- rendered by JS --></div>
-      <button class="bgp-cta-btn" onclick="couponProceedCheckout('NOWSSB10')">
-        Continue to Checkout
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
-      </button>
-    </div>
+    <div class="bgp-section-label">Eligible Words</div>
+    <div class="bgp-word-grid" id="couponIndividualGrid"><!-- rendered by JS --></div>
+    <button class="bgp-cta-btn" onclick="couponProceedCheckout('NOWSSB10')">
+      Continue to Checkout
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
   </div>
 </div>
 
 <!-- Page 2 — Bundle, buy 5 get 30% off -->
 <div class="sub-screen bgp-screen" id="sub-coupon-bundle5">
-  <div class="bgp-header-fixed">
-    <div class="bgp-back" onclick="closeSub('coupon-bundle5')">
-      <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-        <path d="M7 1L1 7L7 13" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="square"/>
-        <line x1="1" y1="7" x2="15" y2="7" stroke="#e8d5a3" stroke-width="1.5"/>
-      </svg>
-    </div>
-    <div class="bgp-header-title">Bundle · 30% Off</div>
+  <div class="sub-header nav-bar">
+    <div class="sub-back" onclick="closeSub('coupon-bundle5')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div class="sub-title">Bundle · 30% Off</div>
+    <button class="rm-cart-btn" onclick="nssOpenCart()" aria-label="Cart">
+      <svg width="17" height="17" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg>
+      <div class="nss-icon-badge nss-cart-badge-shared">0</div>
+    </button>
   </div>
-  <div class="bgp-body">
-    <div class="bgp-hero">
+  <div class="sub-body">
+    <div class="nss-vid-banner" style="margin:0 0 16px;">
+      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+      <div class="nss-vid-banner-fade"></div>
+      <div class="nss-vid-banner-pill-wrap">
+        <div class="nss-vid-banner-pill">
+          <img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">
+          <span class="nss-vid-banner-pill-text">Bundle · 30% Off</span>
+        </div>
+      </div>
+    </div>
+    <div class="bgp-hero bgp-hero-inline">
       <div class="bgp-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 2.5H20a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-.44 1.06l-9 9a1.5 1.5 0 0 1-2.12 0l-8-8a1.5 1.5 0 0 1 0-2.12l9-9A1.5 1.5 0 0 1 12.5 2.5Z"/><circle cx="16.5" cy="7.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg></div>
       <div class="bgp-hero-title">Buy 5, Get 30% Off</div>
       <div class="bgp-hero-sub">Add any 5 of these words to your cart to unlock — code NOWSSB30</div>
     </div>
-    <div class="bgp-content">
-      <div id="couponBundle5Progress"><!-- rendered by JS --></div>
-      <div class="bgp-section-label">Eligible Words</div>
-      <div class="bgp-word-grid" id="couponBundle5Grid"><!-- rendered by JS --></div>
-      <button class="bgp-cta-btn" onclick="couponProceedCheckout('NOWSSB30')">
-        Continue to Checkout
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
-      </button>
-    </div>
+    <div id="couponBundle5Progress"><!-- rendered by JS --></div>
+    <div class="bgp-section-label">Eligible Words</div>
+    <div class="bgp-word-grid" id="couponBundle5Grid"><!-- rendered by JS --></div>
+    <button class="bgp-cta-btn" onclick="couponProceedCheckout('NOWSSB30')">
+      Continue to Checkout
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
   </div>
 </div>
 
 <!-- Page 3 — Signature Bundle, buy 5 signature words/meanings get 50% off -->
 <div class="sub-screen bgp-screen" id="sub-coupon-signature">
-  <div class="bgp-header-fixed">
-    <div class="bgp-back" onclick="closeSub('coupon-signature')">
-      <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-        <path d="M7 1L1 7L7 13" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="square"/>
-        <line x1="1" y1="7" x2="15" y2="7" stroke="#e8d5a3" stroke-width="1.5"/>
-      </svg>
-    </div>
-    <div class="bgp-header-title">Signature Bundle · 50% Off</div>
+  <div class="sub-header nav-bar">
+    <div class="sub-back" onclick="closeSub('coupon-signature')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div class="sub-title">Signature · 50% Off</div>
+    <button class="rm-cart-btn" onclick="nssOpenCart()" aria-label="Cart">
+      <svg width="17" height="17" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg>
+      <div class="nss-icon-badge nss-cart-badge-shared">0</div>
+    </button>
   </div>
-  <div class="bgp-body">
-    <div class="bgp-hero">
+  <div class="sub-body">
+    <div class="nss-vid-banner" style="margin:0 0 16px;">
+      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+      <div class="nss-vid-banner-fade"></div>
+      <div class="nss-vid-banner-pill-wrap">
+        <div class="nss-vid-banner-pill">
+          <img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">
+          <span class="nss-vid-banner-pill-text">Signature Bundle</span>
+        </div>
+      </div>
+    </div>
+    <div class="bgp-hero bgp-hero-inline">
       <div class="bgp-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 2.5H20a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-.44 1.06l-9 9a1.5 1.5 0 0 1-2.12 0l-8-8a1.5 1.5 0 0 1 0-2.12l9-9A1.5 1.5 0 0 1 12.5 2.5Z"/><circle cx="16.5" cy="7.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg></div>
       <div class="bgp-hero-title">Buy 5 Signature, Get 50% Off</div>
       <div class="bgp-hero-sub">Add any 5 signature words or meanings to unlock — code NOWSSB50</div>
     </div>
-    <div class="bgp-content">
-      <div id="couponSigProgress"><!-- rendered by JS --></div>
-      <div class="bgp-toggle-row">
-        <button type="button" class="bgp-toggle-btn active" id="couponSigToggleWords" onclick="couponSigToggle('words')">Words</button>
-        <button type="button" class="bgp-toggle-btn" id="couponSigToggleMeanings" onclick="couponSigToggle('meanings')">Meanings</button>
-      </div>
-      <div class="bgp-section-label">Eligible Signature Words</div>
-      <div class="bgp-word-grid" id="couponSigWordsGrid"><!-- rendered by JS --></div>
-      <div class="ms-grid" id="couponSigMeaningsGrid" style="display:none;"><!-- rendered by JS --></div>
-      <button class="bgp-cta-btn" onclick="couponProceedCheckout('NOWSSB50')">
-        Continue to Checkout
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
-      </button>
+    <div id="couponSigProgress"><!-- rendered by JS --></div>
+    <div class="bgp-toggle-row">
+      <button type="button" class="bgp-toggle-btn active" id="couponSigToggleWords" onclick="couponSigToggle('words')">Words</button>
+      <button type="button" class="bgp-toggle-btn" id="couponSigToggleMeanings" onclick="couponSigToggle('meanings')">Meanings</button>
     </div>
+    <div class="bgp-section-label">Eligible Signature Words</div>
+    <div class="bgp-word-grid" id="couponSigWordsGrid"><!-- rendered by JS --></div>
+    <div class="ms-grid" id="couponSigMeaningsGrid" style="display:none;"><!-- rendered by JS --></div>
+    <button class="bgp-cta-btn" onclick="couponProceedCheckout('NOWSSB50')">
+      Continue to Checkout
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
   </div>
 </div>
 
 <!-- Page 4 — Bundle, buy 20 get 60% off -->
 <div class="sub-screen bgp-screen" id="sub-coupon-bundle20">
-  <div class="bgp-header-fixed">
-    <div class="bgp-back" onclick="closeSub('coupon-bundle20')">
-      <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-        <path d="M7 1L1 7L7 13" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="square"/>
-        <line x1="1" y1="7" x2="15" y2="7" stroke="#e8d5a3" stroke-width="1.5"/>
-      </svg>
-    </div>
-    <div class="bgp-header-title">Bundle · 60% Off</div>
+  <div class="sub-header nav-bar">
+    <div class="sub-back" onclick="closeSub('coupon-bundle20')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div class="sub-title">Bundle · 60% Off</div>
+    <button class="rm-cart-btn" onclick="nssOpenCart()" aria-label="Cart">
+      <svg width="17" height="17" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg>
+      <div class="nss-icon-badge nss-cart-badge-shared">0</div>
+    </button>
   </div>
-  <div class="bgp-body">
-    <div class="bgp-hero">
+  <div class="sub-body">
+    <div class="nss-vid-banner" style="margin:0 0 16px;">
+      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+      <div class="nss-vid-banner-fade"></div>
+      <div class="nss-vid-banner-pill-wrap">
+        <div class="nss-vid-banner-pill">
+          <img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">
+          <span class="nss-vid-banner-pill-text">Bundle · 60% Off</span>
+        </div>
+      </div>
+    </div>
+    <div class="bgp-hero bgp-hero-inline">
       <div class="bgp-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 2.5H20a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-.44 1.06l-9 9a1.5 1.5 0 0 1-2.12 0l-8-8a1.5 1.5 0 0 1 0-2.12l9-9A1.5 1.5 0 0 1 12.5 2.5Z"/><circle cx="16.5" cy="7.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg></div>
       <div class="bgp-hero-title">Buy 20, Get 60% Off</div>
       <div class="bgp-hero-sub">Add any 20 of these words to your cart to unlock — code NOWSSB60</div>
     </div>
-    <div class="bgp-content">
-      <div id="couponBundle20Progress"><!-- rendered by JS --></div>
-      <div class="bgp-section-label">Eligible Words</div>
-      <div class="bgp-word-grid" id="couponBundle20Grid"><!-- rendered by JS --></div>
-      <button class="bgp-cta-btn" onclick="couponProceedCheckout('NOWSSB60')">
-        Continue to Checkout
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
-      </button>
-    </div>
+    <div id="couponBundle20Progress"><!-- rendered by JS --></div>
+    <div class="bgp-section-label">Eligible Words</div>
+    <div class="bgp-word-grid" id="couponBundle20Grid"><!-- rendered by JS --></div>
+    <button class="bgp-cta-btn" onclick="couponProceedCheckout('NOWSSB60')">
+      Continue to Checkout
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+    </button>
   </div>
 </div>
 
