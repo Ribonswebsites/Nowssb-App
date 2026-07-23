@@ -17,36 +17,43 @@
 
   var PWG_SLIDES = [
     {
+      title: 'NowssB Player Guide',
       icon: PWG_ICONS.welcome,
       heading: 'Welcome to Your Practice Player',
       desc: 'This is where you listen to, pronounce and master every word in your daily routine. Let’s walk through exactly how it works — button by button.'
     },
     {
+      title: 'Player Listen',
       icon: PWG_ICONS.listen,
       heading: 'Listen & Navigate',
       desc: 'Tap the centre Play button to hear the word pronounced aloud. Use the arrows on either side to move to the Previous or Next word, and tap Replay anytime to hear it again.'
     },
     {
+      title: 'Player Record',
       icon: PWG_ICONS.practice,
       heading: 'Practice & Get Scored',
       desc: 'Tap Practice to record your own voice saying the word. Each syllable lights up as you speak it, and you get an instant pronunciation score — the more you repeat, the more it builds your streak.'
     },
     {
+      title: 'Player Library',
       icon: PWG_ICONS.library,
       heading: 'Build Your Library & Sentences',
       desc: 'Tap the Library icon to open every word you’ve unlocked. Every word you purchase is added here automatically — combine them to build your own healing sentences, saved for practice anytime.'
     },
     {
+      title: 'Player Settings',
       icon: PWG_ICONS.settings,
       heading: 'Word Info & Player Settings',
       desc: 'Tap the info icon to see the word’s meaning, the organ it benefits, and healing detail. Tap the settings gear to switch the voice (male or female), turn Loop on, or change your rep target.'
     },
     {
+      title: 'Player Store',
       icon: PWG_ICONS.store,
       heading: 'Grow Your Collection',
       desc: 'Tap the Store icon anytime to buy new words and meanings — every purchase instantly joins your Library, so you can keep expanding your personal word ritual.'
     },
     {
+      title: 'Player Ready',
       icon: PWG_ICONS.flame,
       heading: 'You’re All Set',
       desc: 'That’s everything you need to know. Tap Begin to start your first practice session.',
@@ -58,12 +65,17 @@
   var _pwgOnDone = null;
 
   function pwgSlideHtml(s, i) {
+    var tryAction = (i === PWG_SLIDES.length - 1) ? 'pwgFinish()' : 'pwgNext()';
     return (
       '<div class="pwg-slide' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
         '<div class="pwg-illus"><div class="pwg-illus-icon">' + s.icon + '</div></div>' +
         '<div class="pwg-text">' +
           '<div class="pwg-heading">' + s.heading + '</div>' +
           '<div class="pwg-desc">' + s.desc + '</div>' +
+          '<div class="pwg-try-link" onclick="' + tryAction + '">' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            'Try it now' +
+          '</div>' +
         '</div>' +
       '</div>'
     );
@@ -83,7 +95,7 @@
       '<div class="pwg-screen">' +
         '<div class="pwg-header">' +
           '<div class="pwg-close" onclick="pwgSkip()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>' +
-          '<div class="pwg-title">Player Guide</div>' +
+          '<div class="pwg-title" id="pwgTitle">' + PWG_SLIDES[0].title + '</div>' +
         '</div>' +
         PWG_SLIDES.map(pwgSlideHtml).join('') +
         '<div class="pwg-footer">' +
@@ -104,12 +116,10 @@
       : '';
     if (isLast) {
       nav.innerHTML = backBtn +
-        '<div class="pwg-final-btn" onclick="pwgFinish()" style="flex:1;">Begin' +
+        '<div class="pwg-final-btn" onclick="pwgFinish()">Begin' +
           '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>' +
         '</div>';
-      nav.style.width = '100%';
     } else {
-      nav.style.width = '';
       nav.innerHTML = backBtn +
         '<div class="pwg-nav-btn pwg-nav-fwd" onclick="pwgNext()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#0a0f1e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
     }
@@ -123,6 +133,8 @@
     document.querySelectorAll('.pwg-dot').forEach(function (el) {
       el.classList.toggle('active', parseInt(el.getAttribute('data-i'), 10) === i);
     });
+    var titleEl = document.getElementById('pwgTitle');
+    if (titleEl) titleEl.textContent = PWG_SLIDES[i].title;
     pwgRenderNav();
   }
 
