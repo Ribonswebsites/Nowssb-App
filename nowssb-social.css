@@ -1258,17 +1258,16 @@
 .nwsbcs-stage-welcome {
   background: linear-gradient(180deg, #1c2c5e 0%, #101a3c 32%, #060c18 68%, #000 100%);
 }
-/* Header row — small logo, divider, bold wordmark, top-left, a little
-   down from the very top edge; customize-bg stays top-right. */
+/* Logo + divider + big bold wordmark — sits directly above the checkmark,
+   as part of the same centered group (not pinned separately at the top). */
 .nwsbcs-welcome-header {
-  display: flex; align-items: center; gap: 14px; flex-shrink: 0;
-  padding: max(env(safe-area-inset-top,20px) + 10px, 30px) 20px 6px;
+  display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 4px;
 }
-.nwsbcs-welcome-header-logo { width: 44px; height: 44px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0; }
-.nwsbcs-welcome-header-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.22); flex-shrink: 0; }
-.nwsbcs-welcome-header-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
+.nwsbcs-welcome-header-logo { width: 68px; height: 68px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0; }
+.nwsbcs-welcome-header-divider { width: 1px; height: 42px; background: rgba(255,255,255,0.25); flex-shrink: 0; }
+.nwsbcs-welcome-header-title { font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800; color: #fff; }
 
-/* Checkmark + "You're all set!" sit together, centered, in the middle. */
+/* Header + checkmark + "You're all set!" sit together, centered, middle. */
 .nwsbcs-welcome-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; }
 .nwsbcs-welcome-check-wrap { position: relative; width: 52px; height: 52px; }
 .nwsbcs-welcome-check-ring, .nwsbcs-welcome-check-ring::before {
@@ -1291,8 +1290,20 @@
 .nwsbcs-welcome-title { font-size: 26px; font-weight: 800; color: #fff; line-height: 1.15; }
 
 /* Bottom block — "Welcome to NowssB Connect" then the person's name,
-   bigger and bolder than the line above it, then the button. */
-.nwsbcs-welcome-bottom { flex-shrink: 0; text-align: left; padding: 0 28px max(env(safe-area-inset-bottom,24px),24px); }
+   bigger and bolder than the line above it. */
+.nwsbcs-welcome-bottom { flex-shrink: 0; text-align: left; padding: 0 28px 4px; }
 .nwsbcs-welcome-sub { font-size: 16px; font-weight: 700; color: rgba(255,255,255,.65); margin-bottom: 2px; }
-.nwsbcs-welcome-name { font-size: 34px; font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 22px; }
-.nwsbcs-welcome-cta { width: 100%; margin: 0; }
+.nwsbcs-welcome-name { font-size: 34px; font-weight: 800; color: #fff; line-height: 1.15; }
+
+/* Footer — circular back button (left) + pill CTA (right), matching the
+   Motorola reference's bottom-right nav treatment. */
+.nwsbcs-welcome-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-shrink: 0;
+  padding: 18px 24px max(env(safe-area-inset-bottom,20px),20px);
+}
+.nwsbcs-welcome-back {
+  width: 52px; height: 52px; box-sizing: border-box; border-radius: 50% !important;
+  background: transparent; border: 1.5px solid #fff; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.nwsbcs-welcome-cta { width: auto; margin: 0; padding: 16px 30px; }
