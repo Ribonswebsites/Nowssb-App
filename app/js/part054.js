@@ -5,13 +5,17 @@
 // already owns the "pg" prefix — pgShow/pgClose/pgMarkSeen/pgSchedule).
 (function () {
 
+  // Listen/Record/Library/Settings/Store reuse the exact same chrome-orb
+  // button images the real Liquid Glass Player uses (nowssb-player.js's IC
+  // map + its inline store-icon URL) — so the guide shows the literal
+  // button the user will tap, not a generic lookalike icon.
   var PWG_ICONS = {
     welcome: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0116 0v2"/><rect x="2" y="14" width="5" height="7" rx="2"/><rect x="17" y="14" width="5" height="7" rx="2"/></svg>',
-    listen: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><path d="M10 8.2l5.2 3.8-5.2 3.8z" fill="#e8d5a3" stroke="none"/></svg>',
-    practice: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v4M8 22h8"/></svg>',
-    library: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A2.5 2.5 0 016.5 2H12v18H6.5A2.5 2.5 0 004 17.5v-13z"/><path d="M20 4.5A2.5 2.5 0 0017.5 2H12v18h5.5a2.5 2.5 0 012.5 2.5v-18z"/></svg>',
-    settings: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.97 7.97 0 000-2l2-1.5-2-3.5-2.4 1a8 8 0 00-1.7-1L15 3h-4l-.3 2.5a8 8 0 00-1.7 1l-2.4-1-2 3.5L6.6 11a7.97 7.97 0 000 2l-2 1.5 2 3.5 2.4-1a8 8 0 001.7 1L11 21h4l.3-2.5a8 8 0 001.7-1l2.4 1 2-3.5-2-1.5z"/></svg>',
-    store: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>',
+    listen: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718777/e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    practice: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    library: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    settings: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    store: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
     flame: '<svg width="40" height="40" viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.85"/></svg>'
   };
 
@@ -96,6 +100,8 @@
         '<div class="pwg-header">' +
           '<div class="pwg-close" onclick="pwgSkip()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>' +
           '<div class="pwg-title" id="pwgTitle">' + PWG_SLIDES[0].title + '</div>' +
+          '<div style="flex:1;"></div>' +
+          '<div class="pwg-header-icon" id="pwgHeaderIcon">' + PWG_SLIDES[0].icon + '</div>' +
         '</div>' +
         PWG_SLIDES.map(pwgSlideHtml).join('') +
         '<div class="pwg-footer">' +
@@ -135,6 +141,8 @@
     });
     var titleEl = document.getElementById('pwgTitle');
     if (titleEl) titleEl.textContent = PWG_SLIDES[i].title;
+    var headerIconEl = document.getElementById('pwgHeaderIcon');
+    if (headerIconEl) headerIconEl.innerHTML = PWG_SLIDES[i].icon;
     pwgRenderNav();
   }
 
