@@ -1270,11 +1270,11 @@
   font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);
 }
 /* Divider line on the left of the customize icon, matching the header's
-   logo-divider-title treatment used elsewhere on this screen. */
-.nwsbcs-welcome-customize-btn::before {
-  content: ''; position: absolute; left: -13px; top: 50%; transform: translateY(-50%);
-  width: 1px; height: 22px; background: rgba(255,255,255,0.25);
-}
+   logo-divider-title treatment used elsewhere on this screen. A plain
+   sibling (not a ::before on the button) since .ms-bg-customize-btn has
+   overflow:hidden and would clip anything positioned outside its own box. */
+.nwsbcs-welcome-customize-wrap { display: flex; align-items: center; gap: 13px; }
+.nwsbcs-welcome-customize-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.25); flex-shrink: 0; }
 /* Logo + divider + big bold wordmark — sits directly above the checkmark,
    as part of the same centered group (not pinned separately at the top). */
 .nwsbcs-welcome-header {
@@ -1327,7 +1327,11 @@
    (white highlight + soft grey) meant for Normal Home's light background —
    shows as a wrong white glow here since the welcome page is dark. */
 #ncbCarouselWelcome { box-shadow: 0 14px 32px rgba(0,0,0,0.4) !important; }
-.nwsbcs-welcome-cta { width: auto; margin: 0; padding: 14px 16px 14px 30px; display: flex; align-items: center; gap: 10px; }
+.nwsbcs-welcome-cta { position: relative; width: auto; margin: 0; padding: 14px 16px 14px 30px; display: flex; align-items: center; gap: 10px; }
+.nwsbcs-welcome-cta::before {
+  content: ''; position: absolute; left: -13px; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 26px; background: rgba(255,255,255,0.25);
+}
 .nwsbcs-welcome-cta-arrow {
   width: 26px; height: 26px; border-radius: 50% !important; background: #fff; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
