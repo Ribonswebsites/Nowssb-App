@@ -2365,10 +2365,10 @@ function rmdToggleWish() {
     /* Deliberately NOT tier.banners[0] — those are shared promotional
        banners reused across every word in the same price tier, several
        of which have a DIFFERENT word's name baked into the artwork.
-       RM_CAT_LOGO is the generic "NowssB Store" badge (same idea as
-       Meaning Store's own MS_CAT_LOGO) — safe because it's not tied to
-       any specific word, so it can never show a mismatched name. */
-    nssToggleWishlist({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:RM_CAT_LOGO });
+       RM_WORD_IMG is the real Word Atelier card image (part010.js) — the
+       same image already shown on every word card in the store — safe
+       because it's not tied to any specific word's name in the artwork. */
+    nssToggleWishlist({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:window.RM_WORD_IMG || RM_CAT_LOGO });
   _rmdRefreshActions();
 }
 
@@ -2378,7 +2378,7 @@ function rmdAddCart() {
   var tier = RM_TIERS[tierKey];
   var word = rmDisplayName(key);
   if (typeof nssAddToCart === 'function')
-    nssAddToCart({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:RM_CAT_LOGO });
+    nssAddToCart({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:window.RM_WORD_IMG || RM_CAT_LOGO });
   _rmdRefreshActions();
 }
 
