@@ -2481,6 +2481,7 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   font-weight: 700; font-size: 13px; text-align: center; cursor: pointer; margin-top: 4px; -webkit-tap-highlight-color: transparent;
 }
 .bgp-showmore-btn.bgp-hidden-extra { display: none; }
+#rxOrganRow .bgp-hidden-extra { display: none; }
 
 /* Streak page */
 .bgp-streak-num { font-family: 'DM Sans', sans-serif; font-size: 60px; font-weight: 800; color: #e8d5a3; line-height: 1; }
