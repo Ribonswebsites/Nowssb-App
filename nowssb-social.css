@@ -1237,11 +1237,12 @@
   border-radius: 12px !important;
   background-size: contain; background-repeat: no-repeat; background-position: center;
   background-color: transparent;
-  /* Extra defence alongside the real background removal in nwsbStripCornerBg
-     (nowssb-social.js): if that ever falls back to the untouched source
-     image, multiply blend still drops white toward invisible against the
-     dark page behind it, while the darker mockup content stays visible. */
-  mix-blend-mode: multiply;
+  /* mix-blend-mode:multiply used to live here as a fallback for stripping
+     white corners — but multiply against this screen's dark/black
+     background multiplies every color toward black too, making the whole
+     preview invisible. The real corner-stripping (nwsbStripCornerBg in
+     nowssb-social.js, canvas alpha removal) is the only mechanism needed;
+     it works the same regardless of what's behind it. */
   margin-bottom: 8px; box-shadow: none;
 }
 .nwsb-theme-opt-label { font-size: 12.5px; font-weight: 700; color: #fff; text-align: center; }
@@ -1252,10 +1253,14 @@
 #ss-panel-profile-edit .nwsb-theme-opt-label { color: #1a1a2e; }
 #ss-panel-profile-edit .nwsb-theme-opt.active { border-color: #c8a96e; background: rgba(200,169,110,.1); }
 
-/* Stage 3 — welcome / complete */
-.nwsbcs-stage-welcome { align-items: center; justify-content: center; text-align: center; }
+/* Stage 3 — welcome / complete — dark navy-to-black gradient, same
+   cinematic "intro" mood as the Player Guide (part054.js/.pwg-screen). */
+.nwsbcs-stage-welcome {
+  align-items: center; justify-content: center; text-align: center;
+  background: linear-gradient(180deg, #1c2c5e 0%, #101a3c 32%, #060c18 68%, #000 100%);
+}
 .nwsbcs-welcome-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; }
-.nwsbcs-welcome-logo { width: 64px; height: 64px; border-radius: 50% !important; object-fit: cover; }
+.nwsbcs-welcome-logo { width: 96px; height: 96px; border-radius: 50% !important; object-fit: cover; }
 .nwsbcs-welcome-check {
   width: 52px; height: 52px; border-radius: 50% !important;
   background: linear-gradient(135deg,#e8d5a3,#c8a96e);

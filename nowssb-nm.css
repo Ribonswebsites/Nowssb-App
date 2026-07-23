@@ -4791,18 +4791,24 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   display: flex; align-items: center; justify-content: center;
 }
 .nwsb-loc-divider-v { width: 1px; align-self: stretch; background: rgba(255,255,255,0.12); flex-shrink: 0; margin-bottom: 4px; }
-.nwsb-loc-body { flex: 1; min-width: 0; }
+.nwsb-loc-title-wrap { flex: 1; min-width: 0; }
 .nwsb-loc-title { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; }
-.nwsb-loc-sub { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 20px; }
+.nwsb-loc-sub { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+/* Sits below the icon+divider+title row (not indented alongside the
+   divider) — margin-left matches that row's icon-column + gaps + divider
+   width (40 + 14 + 1 + 14 = 69px) so it still lines up under the title text,
+   while the vertical divider itself only spans the title/sub, ending
+   before these pills and buttons start. */
+.nwsb-loc-bottom { margin: 20px 0 0 69px; }
 .nwsb-loc-features { display: flex; gap: 10px; margin-bottom: 20px; }
 .nwsb-loc-feature {
   flex: 1; min-width: 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px !important; padding: 14px 8px;
+  border-radius: 0 !important; padding: 14px 8px;
   display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
   font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,0.75);
 }
 .nwsb-loc-cta {
-  width: 100%; background: #e8d5a3; border: none; border-radius: 14px !important;
+  width: 100%; background: #e8d5a3; border: none; border-radius: 0 !important;
   padding: 15px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
   color: #060c18; cursor: pointer; margin-bottom: 10px;
 }
@@ -4823,7 +4829,8 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   padding: max(env(safe-area-inset-top,20px),20px) 20px 6px;
 }
 .pwg-close {
-  width: 34px; height: 34px; border-radius: 50% !important; background: rgba(255,255,255,0.12);
+  width: 34px; height: 34px; min-width: 34px; min-height: 34px; max-width: 34px; max-height: 34px;
+  box-sizing: border-box; border-radius: 50% !important; background: transparent; border: 1.5px solid #fff;
   display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
 }
 .pwg-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
