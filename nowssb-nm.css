@@ -4819,38 +4819,38 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
      Motorola "Getting started" onboarding reference the user supplied. ── */
 .pwg-screen {
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, #1c2c5e 0%, #101a3c 32%, #060c18 68%, #000 100%);
-  display: flex; flex-direction: column; overflow: hidden;
+  background: #000;
+  overflow: hidden;
 }
-.pwg-slide { display: none; flex-direction: column; height: 100%; }
+/* Each slide is a full-bleed photo (placeholder for now — real per-slide
+   artwork comes later) with a dark scrim, matching the Motorola
+   "Getting started" onboarding reference: image runs edge-to-edge behind
+   the header, text sits over the darkened bottom portion. */
+.pwg-slide { display: none; position: absolute; inset: 0; flex-direction: column; }
 .pwg-slide.active { display: flex; }
+.pwg-illus-full { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.pwg-illus-scrim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(4,10,24,0.15) 0%, rgba(4,10,24,0.05) 22%, rgba(4,10,24,0.6) 56%, rgba(4,10,24,0.97) 80%, #000 100%);
+}
 .pwg-header {
-  display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+  position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+  display: flex; align-items: center; gap: 14px;
   padding: max(env(safe-area-inset-top,20px),20px) 20px 6px;
 }
 .pwg-close {
   width: 34px; height: 34px; min-width: 34px; min-height: 34px; max-width: 34px; max-height: 34px;
-  box-sizing: border-box; border-radius: 50% !important; background: transparent; border: 1.5px solid #fff;
+  box-sizing: border-box; border-radius: 50% !important; background: rgba(6,12,24,0.35); border: 1.5px solid #fff;
   display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
 }
-.pwg-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
+.pwg-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
 .pwg-header-icon {
-  width: 36px; height: 36px; flex-shrink: 0; box-sizing: border-box;
-  border-radius: 50% !important; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.28);
+  width: 46px; height: 46px; flex-shrink: 0; box-sizing: border-box;
+  border-radius: 50% !important; background: rgba(6,12,24,0.35); border: 1px solid rgba(232,213,163,0.4);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
-.pwg-header-icon img, .pwg-header-icon svg { width: 24px !important; height: 24px !important; object-fit: contain; }
-.pwg-illus {
-  margin: 8px auto 0; width: 180px; height: 180px; border-radius: 50%; flex-shrink: 0;
-  background: radial-gradient(circle, rgba(232,213,163,0.18) 0%, transparent 70%);
-  display: flex; align-items: center; justify-content: center;
-}
-.pwg-illus-icon {
-  width: 92px; height: 92px; border-radius: 28px !important; background: rgba(232,213,163,0.12);
-  border: 1px solid rgba(232,213,163,0.32); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  display: flex; align-items: center; justify-content: center;
-}
-.pwg-text { margin-top: auto; padding: 0 26px 22px; }
+.pwg-header-icon img, .pwg-header-icon svg { width: 30px !important; height: 30px !important; object-fit: contain; }
+.pwg-text { position: relative; z-index: 2; margin-top: auto; padding: 0 26px 22px; }
 .pwg-heading { font-family: 'DM Sans', sans-serif; font-size: 29px; font-weight: 800; color: #fff; line-height: 1.16; margin-bottom: 12px; }
 .pwg-desc { font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.68); }
 .pwg-try-link {
@@ -4858,7 +4858,8 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #fff;
 }
 .pwg-footer {
-  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: space-between;
   padding: 18px 24px max(env(safe-area-inset-bottom,20px),20px);
 }
 .pwg-dots { display: flex; align-items: center; gap: 6px; }
