@@ -1654,12 +1654,19 @@ function openSub(id) {
     _pwIdx = 0; _pwRepCount = 0; _pwRepTarget = 7;
     _pwSteps = new Set(); _pwPlaying = false; _pwDone = false; _pwMode = 'listen';
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    if (window._pwShowIntro && (typeof shouldShowIntro !== 'function' || shouldShowIntro('practice'))) {
-      window._pwShowIntro = false;
-      setTimeout(renderPracticeIntro, 80);
+    const _pwShowIntroNext = window._pwShowIntro && (typeof shouldShowIntro !== 'function' || shouldShowIntro('practice'));
+    window._pwShowIntro = false;
+    const _pwProceed = function () {
+      if (_pwShowIntroNext) setTimeout(renderPracticeIntro, 80);
+      else setTimeout(renderPractice, 80);
+    };
+    // One-time-ever Player Guide — fires on the very first entry into the
+    // player from ANY route (this is the single funnel every openSub('practice')
+    // call passes through), before the routine intro or the player itself.
+    if (typeof window.pwgShouldShow === 'function' && window.pwgShouldShow()) {
+      setTimeout(function () { window.renderPwGuide(_pwProceed); }, 80);
     } else {
-      window._pwShowIntro = false;
-      setTimeout(renderPractice, 80);
+      _pwProceed();
     }
   }
 }
