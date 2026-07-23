@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=309">
 <link rel="stylesheet" href="nowssb-social.css?v=204">
-<link rel="stylesheet" href="nowssb-nm.css?v=417">
+<link rel="stylesheet" href="nowssb-nm.css?v=418">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -6846,7 +6846,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div id="nm-settings-view"></div>
 
   <!-- ── PANEL: SUBSCRIPTION ── -->
-  <div class="ss-panel" id="ss-panel-subscription" style="padding:0 20px 80px;">
+  <div class="ss-panel" id="ss-panel-subscription" style="padding:0 20px 80px;overflow:hidden;">
 
     <!-- ── SUBSCRIPTION INTRO PAGE ── -->
     <div id="sub-intro-page" style="position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;background:#060c18;overflow:hidden;transition:opacity 0.48s cubic-bezier(0.4,0,0.2,1);">
@@ -6874,6 +6874,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
     <!-- /subscription intro page -->
+
+    <!-- Real plan content — its own scroll region, isolated from the fixed
+         intro overlay above (same split as #fbgMainContent for the Fashion
+         Background picker: intro never scrolls, content scrolls internally). -->
+    <div style="position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 20px 80px;box-sizing:border-box;">
 
     <!-- Hero Banner flush to top, back button overlaid -->
     <div style="position:relative;margin:0 -20px 0;overflow:hidden;">
@@ -6913,6 +6918,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.22);font-family:'DM Sans',sans-serif;line-height:1.7;margin-top:8px;">
       Secure payment · Cancel anytime<br>Auto-renews unless cancelled 24h before period end
     </div>
+    </div>
+    <!-- /real plan content scroll region -->
   </div>
 
   <!-- ── PANEL: PROFILE EDIT ── -->
@@ -8527,7 +8534,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part050.js?v=241"></script>
 <script src="app/js/part051.js?v=6" defer></script>
 <script src="app/js/part052.js?v=3"></script>
-<script src="app/js/part054.js?v=5"></script>
+<script src="app/js/part054.js?v=6"></script>
 <script src="nowssb-social.js?v=180" defer></script>
 <script src="nowssb-nm.js?v=176" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
