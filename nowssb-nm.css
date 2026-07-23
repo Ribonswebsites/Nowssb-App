@@ -2474,11 +2474,19 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 }
 .bgp-cta-btn:active { filter: brightness(0.94); }
 
-/* Coupon/bundle shop pages (app/js/part055.js) — wrapping card grid
-   (unlike the real store's horizontal-scroll .rm-word-row, these are
-   short curated lists shown all at once, shop-grid style) + the
-   Signature page's Words/Meanings toggle. */
-.bgp-word-grid { display: flex; flex-wrap: wrap; gap: 14px; padding: 4px 0 6px; }
+/* Coupon/bundle shop pages (app/js/part055.js) — fluid 2-column grid
+   (same 1fr/1fr pattern already proven bug-free on .bgp-offers-grid,
+   the sibling Offers hub) so cards fill the row instead of leaving a
+   dead gap on the right — unlike the real store's horizontal-scroll
+   .rm-word-row, these are short curated lists shown all at once,
+   shop-grid style. Overrides .rm-word-card's fixed 148px scroll-row
+   width so each card stretches to fill its grid cell. */
+.bgp-word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 4px 0 6px; }
+.bgp-word-grid .rm-word-card { width: 100%; flex-shrink: unset; }
+/* Real store header/hero reused inline (not absolute-overlaid) on these
+   pages — no longer needs the fixed-header top-clearance padding or
+   full-bleed radial background .bgp-hero normally carries. */
+.bgp-hero-inline { padding: 8px 0 22px; background: none; }
 .bgp-toggle-row { display: flex; gap: 8px; margin: 4px 0 6px; }
 .bgp-toggle-btn {
   flex: 1; padding: 11px; text-align: center; border-radius: 14px !important;
