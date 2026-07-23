@@ -767,14 +767,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Streak section — taller card: heading, the ORIGINAL compact streak
-         row (icon + number + label + "Keep Going", not the glass cube —
-         that stays on Fashion Home / the dedicated Streak page only) plus
-         a new Enter button into the full page. -->
+         row at its own natural size (icon + number + label + "Keep
+         Going" — not the glass cube, that stays on Fashion Home / the
+         dedicated Streak page only), then the "Daily Streak" black
+         banner itself as the entry point into the full page. -->
     <div class="nmh-streak-section">
       <div class="nmh-streak-heading">Start Building Your Streak Today</div>
       <div class="nmh-streak-subheading">Practice daily to keep it alive — and unlock exclusive offers</div>
 
-      <div class="nmh-streak-bar" style="margin-top:18px;background:transparent;box-shadow:none;padding:0;">
+      <div class="nmh-streak-bar" style="margin-top:18px;">
         <div class="nmh-streak-icon nmh-streak-icon-lg">
           <svg width="24" height="24" viewBox="0 0 18 18" fill="none">
             <path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#c8a96e" opacity="0.85"/>
@@ -786,24 +787,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div class="nmh-streak-label">day streak</div>
         </div>
         <div style="flex:1;"></div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;color:rgba(0,0,0,0.3);letter-spacing:1px;text-transform:uppercase;">Keep Going</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;color:rgba(0,0,0,0.3);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">Keep Going</div>
       </div>
 
-      <button class="bgp-cta-btn" onclick="openSub('streak')" style="margin-top:18px;">
-        Enter
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
-      </button>
-    </div>
-
-    <!-- Section label — black banner -->
-    <div class="nmh-sec-banner" onclick="openSub('streak')">
-      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>
-      <div class="nmh-sec-banner-divider"></div>
-      <div class="nmh-sec-banner-txt">
-        <div class="nmh-sec-banner-title">Daily Streak</div>
-        <div class="nmh-sec-banner-sub">Practice daily to keep your healing streak alive</div>
+      <div class="nmh-sec-banner" onclick="openSub('streak')" style="margin:16px 0 0;">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Daily Streak</div>
+          <div class="nmh-sec-banner-sub">Practice daily to keep your healing streak alive</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
-      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
     <!-- Today's Practice -->
