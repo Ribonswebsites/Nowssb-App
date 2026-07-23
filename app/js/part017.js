@@ -53,11 +53,11 @@ var nssWishlist = JSON.parse(localStorage.getItem('nowssb_wish') || '[]');
 // the artwork. Anything saved with that stale img before this was fixed
 // would keep showing the wrong name forever; swap it once here (for
 // every render path that reads from these same arrays — cart, wishlist,
-// checkout) to the generic "NowssB Store" badge instead, same as new
+// checkout) to the real Word Atelier card image instead, same as new
 // Word items already get from rmdAddCart()/rmdToggleWish().
 [nssCart, nssWishlist].forEach(function (list) {
   list.forEach(function (item) {
-    if (item && item.type === 'Word' && typeof RM_CAT_LOGO !== 'undefined') item.img = RM_CAT_LOGO;
+    if (item && item.type === 'Word') item.img = window.RM_WORD_IMG || (typeof RM_CAT_LOGO !== 'undefined' ? RM_CAT_LOGO : item.img);
   });
 });
 
