@@ -1258,10 +1258,22 @@
 .nwsbcs-stage-welcome {
   background: linear-gradient(180deg, #1c2c5e 0%, #101a3c 32%, #060c18 68%, #000 100%);
 }
-.nwsbcs-welcome-eyebrow {
+.nwsbcs-welcome-eyebrow-wrap {
   position: absolute; top: max(env(safe-area-inset-top,16px),16px); left: 20px; z-index: 2;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.nwsbcs-welcome-eyebrow {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
   text-transform: uppercase; color: rgba(255,255,255,0.45);
+}
+.nwsbcs-welcome-eyebrow-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.78);
+}
+/* Divider line on the left of the customize icon, matching the header's
+   logo-divider-title treatment used elsewhere on this screen. */
+.nwsbcs-welcome-customize-btn::before {
+  content: ''; position: absolute; left: -13px; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 22px; background: rgba(255,255,255,0.25);
 }
 /* Logo + divider + big bold wordmark — sits directly above the checkmark,
    as part of the same centered group (not pinned separately at the top). */
