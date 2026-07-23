@@ -105,7 +105,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=309">
-<link rel="stylesheet" href="nowssb-social.css?v=204">
+<link rel="stylesheet" href="nowssb-social.css?v=205">
 <link rel="stylesheet" href="nowssb-nm.css?v=418">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
@@ -7864,26 +7864,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Stage 3 — welcome / complete -->
   <div class="nwsbcs-stage nwsbcs-stage-welcome" id="nwsbcs-stage-welcome" style="display:none;">
-    <div class="nwsbcs-welcome-header">
-      <img class="nwsbcs-welcome-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="">
-      <div class="nwsbcs-welcome-header-divider"></div>
-      <div class="nwsbcs-welcome-header-title">NowssB Connect</div>
-      <div style="flex:1;"></div>
-      <button class="ms-bg-customize-btn" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background">
-        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
-      </button>
-    </div>
+    <button class="ms-bg-customize-btn" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);right:20px;z-index:2;">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
+    </button>
     <div class="nwsbcs-welcome-content">
+      <img class="nwsbcs-welcome-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="">
       <div class="nwsbcs-welcome-check-wrap">
         <div class="nwsbcs-welcome-check-ring"></div>
         <div class="nwsbcs-welcome-check">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>
         </div>
       </div>
+    </div>
+    <div class="nwsbcs-welcome-bottom">
       <div class="nwsbcs-welcome-title">You're all set!</div>
       <div class="nwsbcs-welcome-sub" id="nwsbcsWelcomeSub">Welcome to NowssB Connect.</div>
-    </div>
-    <div class="nwsbcs-welcome-footer">
       <button class="nwsbcs-cta nwsbcs-welcome-cta" onclick="nwsbConnectSetupFinish()">Enter NowssB Connect</button>
     </div>
   </div>
