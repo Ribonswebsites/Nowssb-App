@@ -105,8 +105,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=309">
-<link rel="stylesheet" href="nowssb-social.css?v=208">
-<link rel="stylesheet" href="nowssb-nm.css?v=420">
+<link rel="stylesheet" href="nowssb-social.css?v=209">
+<link rel="stylesheet" href="nowssb-nm.css?v=421">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -7864,8 +7864,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Stage 3 — welcome / complete -->
   <div class="nwsbcs-stage nwsbcs-stage-welcome" id="nwsbcs-stage-welcome" style="display:none;">
-    <div class="nwsbcs-welcome-eyebrow">Set-up Page</div>
-    <button class="ms-bg-customize-btn" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);right:20px;z-index:2;">
+    <div class="nwsbcs-welcome-eyebrow-wrap">
+      <div class="nwsbcs-welcome-eyebrow">Set-up Page</div>
+      <div class="nwsbcs-welcome-eyebrow-sub">One last step, and enjoy the connect</div>
+    </div>
+    <button class="ms-bg-customize-btn nwsbcs-welcome-customize-btn" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);right:20px;z-index:2;">
       <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
     </button>
     <div class="nwsbcs-welcome-content">
