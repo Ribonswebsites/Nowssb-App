@@ -100,9 +100,16 @@ window.GATE = (function(){
     if (d.tier === 'frequencyX' || d.tier === 'elite_x')  return 'frequencyX';
     if (d.tier === 'frequency'  || d.tier === 'elite')    return 'frequency';
     if (d.tier === 'resonance'  || d.isPro)               return 'resonance';
-    // Trial check
-    if (d.trialEndDate && new Date() < new Date(d.trialEndDate)) return 'trial';
-    return 'expired';
+    // Trial check — 'expired' means a real trial was started and genuinely
+    // ran out. An account with no trialEndDate at all never started one
+    // (never subscribed, never entered payment) — that's 'free', not
+    // 'expired'. The two used to be conflated, which is why accounts that
+    // never touched the Subscription screen were incorrectly shown the
+    // "trial expired" block.
+    if (d.trialEndDate) {
+      return new Date() < new Date(d.trialEndDate) ? 'trial' : 'expired';
+    }
+    return 'free';
   }
 
   /* ── Weekly new-word limit — 5 / 10 / 20 by tier, unlimited on trial.
@@ -195,15 +202,14 @@ window.GATE = (function(){
        under the weekly cap (and records it); shows the upgrade prompt and
        returns false if the cap is already hit. */
     checkWordLimit: function(word) {
-      var t = _tier();
-      if (t === 'expired') { _showExpiredOverlay(); return false; }
+      // The player always opens — 'expired'/'free' tiers no longer hard-block
+      // here (see _wordsPerWeek, which already gives them the same unlimited
+      // access as 'trial'). Only an actual paid-tier weekly cap can deny.
       var ok = _canStartWord(word);
       if (!ok) _showWordLimitModal();
       return ok;
     },
     check: function(featureLevel, onDenied) {
-      var t = _tier();
-      if (t === 'expired') { _showExpiredOverlay(); return false; }
       var ok = false;
       if (featureLevel === 'resonance')  ok = this.isResonance();
       if (featureLevel === 'frequency')  ok = this.isFrequency();

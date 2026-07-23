@@ -146,6 +146,10 @@
   window.pwgSkip = window.pwgFinish;
 
   window.pwgShouldShow = function () {
+    // TEMP-DEBUG: always show, ignoring the seen-flag below — for now, so
+    // it can be reviewed every session. Remove this early return to
+    // restore normal once-ever behavior.
+    if (true) return true;
     try { if (localStorage.getItem('nwsb_player_guide_seen') === '1') return false; } catch (e) {}
     if (window._userDataCache && window._userDataCache.playerGuideSeen) return false;
     return true;

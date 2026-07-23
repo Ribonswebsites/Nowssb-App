@@ -96,9 +96,15 @@
     try { localStorage.setItem('nwsb_location_prompt_seen', '1'); } catch (e) {}
   };
   window.nwsbMaybeShowLocationPrompt = function() {
-    var seen = false;
-    try { seen = localStorage.getItem('nwsb_location_prompt_seen') === '1'; } catch (e) {}
-    if (seen) return;
+    // TEMP-DEBUG: bypasses the "seen" check below so this shows every
+    // session for review — delete this early return to restore normal
+    // once-ever behavior.
+    var TEMP_DEBUG_ALWAYS_SHOW = true;
+    if (!TEMP_DEBUG_ALWAYS_SHOW) {
+      var seen = false;
+      try { seen = localStorage.getItem('nwsb_location_prompt_seen') === '1'; } catch (e) {}
+      if (seen) return;
+    }
     var el = document.getElementById('nwsbLocOverlay');
     if (el) el.classList.add('open');
   };

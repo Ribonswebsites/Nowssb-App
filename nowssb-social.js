@@ -874,6 +874,7 @@
   var _csBannerObserver = null;
 
   window.nwsbSocialOnboardingDone = function () {
+    return false; // TEMP-DEBUG: forces the NowssB Connect setup wizard every time you open Connect — delete this line to restore normal "once ever" behavior
     try { if (localStorage.getItem('nwsb_social_onboarding_done') === '1') return true; } catch (e) {}
     var ud = window._userDataCache;
     if (ud && ud.socialOnboardingDone) return true;
