@@ -4816,51 +4816,48 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 
 /* ── Player Guide (one-time-ever tutorial before the practice player,
      first entry) — dark navy-to-black vertical gradient, matching the
-     Motorola "Getting started" onboarding reference the user supplied. ── */
+     Motorola "Getting started" onboarding reference the user supplied.
+     The illustration is a contained, rounded-corner card (not a
+     full-bleed edge-to-edge photo) — header/footer sit in normal flex
+     flow above/below it, so nothing ever overlaps. ── */
 .pwg-screen {
   position: absolute; inset: 0;
-  background: #000;
-  overflow: hidden;
+  background: linear-gradient(180deg, #1c2c5e 0%, #101a3c 32%, #060c18 68%, #000 100%);
+  display: flex; flex-direction: column; overflow: hidden;
 }
-/* Each slide is a full-bleed photo (placeholder for now — real per-slide
-   artwork comes later) with a dark scrim, matching the Motorola
-   "Getting started" onboarding reference: image runs edge-to-edge behind
-   the header, text sits over the darkened bottom portion. */
-.pwg-slide { display: none; position: absolute; inset: 0; flex-direction: column; }
+.pwg-slide { display: none; flex-direction: column; flex: 1; min-height: 0; }
 .pwg-slide.active { display: flex; }
-.pwg-illus-full { position: absolute; inset: 0; background-size: cover; background-position: center; }
-.pwg-illus-scrim {
-  position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(to bottom, rgba(4,10,24,0.15) 0%, rgba(4,10,24,0.05) 22%, rgba(4,10,24,0.6) 56%, rgba(4,10,24,0.97) 80%, #000 100%);
+.pwg-illus-card {
+  margin: 10px 20px 0; height: 38%; flex-shrink: 0; border-radius: 24px !important;
+  background-size: cover; background-position: center; background-color: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.45);
 }
 .pwg-header {
-  position: absolute; top: 0; left: 0; right: 0; z-index: 3;
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 14px; flex-shrink: 0;
   padding: max(env(safe-area-inset-top,20px),20px) 20px 6px;
 }
 .pwg-close {
   width: 34px; height: 34px; min-width: 34px; min-height: 34px; max-width: 34px; max-height: 34px;
-  box-sizing: border-box; border-radius: 50% !important; background: rgba(6,12,24,0.35); border: 1.5px solid #fff;
+  box-sizing: border-box; border-radius: 50% !important; background: transparent; border: 1.5px solid #fff;
   display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
 }
-.pwg-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
+.pwg-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
 .pwg-header-icon {
-  width: 46px; height: 46px; flex-shrink: 0; box-sizing: border-box;
-  border-radius: 50% !important; background: rgba(6,12,24,0.35); border: 1px solid rgba(232,213,163,0.4);
+  width: 58px; height: 58px; flex-shrink: 0; box-sizing: border-box;
+  border-radius: 50% !important; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.4);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
-.pwg-header-icon img, .pwg-header-icon svg { width: 30px !important; height: 30px !important; object-fit: contain; }
-.pwg-text { position: relative; z-index: 2; margin-top: auto; padding: 0 26px 22px; }
+.pwg-header-icon img, .pwg-header-icon svg { width: 40px !important; height: 40px !important; object-fit: contain; }
+.pwg-text { margin-top: auto; padding: 20px 26px 4px; min-height: 0; overflow-y: auto; }
 .pwg-heading { font-family: 'DM Sans', sans-serif; font-size: 29px; font-weight: 800; color: #fff; line-height: 1.16; margin-bottom: 12px; }
 .pwg-desc { font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.68); }
 .pwg-try-link {
-  display: flex; align-items: center; gap: 8px; margin-top: 18px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; margin-top: 18px; margin-bottom: 6px; cursor: pointer;
   font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #fff;
 }
 .pwg-footer {
-  position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 24px max(env(safe-area-inset-bottom,20px),20px);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  padding: 16px 24px max(env(safe-area-inset-bottom,20px),20px);
 }
 .pwg-dots { display: flex; align-items: center; gap: 6px; }
 .pwg-dot { width: 7px; height: 7px; border-radius: 50% !important; background: rgba(255,255,255,0.25); transition: all 0.25s; }

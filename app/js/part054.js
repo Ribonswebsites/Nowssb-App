@@ -21,16 +21,20 @@
     flame: '<svg width="40" height="40" viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.85"/></svg>'
   };
 
-  // Full-bleed slide background — placeholder for now (reusing an existing
-  // app asset, the Today's Practice "Morning" banner) until real per-slide
-  // photography is supplied; swap PWG_SLIDES[i].img then.
+  // Illustration card background — placeholder for now (reusing an
+  // existing app asset, the Today's Practice "Morning" banner) until real
+  // per-slide photography is supplied; swap PWG_SLIDES[i].img then.
   var PWG_PLACEHOLDER_IMG = 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg';
+  // Same "NowssB Player" art as the header badge — used as the final
+  // slide's card image too (raw URL, since the card sets it via CSS
+  // background-image rather than an <img> tag).
+  var PWG_PLAYER_BRAND_IMG = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png';
 
   var PWG_SLIDES = [
     {
       title: 'NowssB Player Guide',
       icon: PWG_ICONS.playerBrand,
-      img: PWG_PLACEHOLDER_IMG,
+      img: PWG_PLAYER_BRAND_IMG,
       heading: 'Welcome to Your Practice Player',
       desc: 'This is where you listen to, pronounce and master every word in your daily routine. Let’s walk through exactly how it works — button by button.'
     },
@@ -72,7 +76,7 @@
     {
       title: 'Player Ready',
       icon: PWG_ICONS.flame,
-      img: PWG_PLACEHOLDER_IMG,
+      img: PWG_PLAYER_BRAND_IMG,
       heading: 'You’re All Set',
       desc: 'That’s everything you need to know. Tap Begin to start your first practice session.',
       final: true
@@ -86,8 +90,7 @@
     var tryAction = (i === PWG_SLIDES.length - 1) ? 'pwgFinish()' : 'pwgNext()';
     return (
       '<div class="pwg-slide' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
-        '<div class="pwg-illus-full" style="background-image:url(\'' + s.img + '\')"></div>' +
-        '<div class="pwg-illus-scrim"></div>' +
+        '<div class="pwg-illus-card" style="background-image:url(\'' + s.img + '\')"></div>' +
         '<div class="pwg-text">' +
           '<div class="pwg-heading">' + s.heading + '</div>' +
           '<div class="pwg-desc">' + s.desc + '</div>' +
