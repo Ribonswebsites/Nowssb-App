@@ -701,8 +701,33 @@
     if (window.IG && igp && igp.classList.contains('open') && typeof IG.openMyProfile === 'function') {
       try { IG.openMyProfile(); } catch (e) {}
     }
-    if (window.nwsbToast) nwsbToast(theme === 'glass' ? 'NowssB Fashion theme ✓' : 'NowssB theme ✓');
+    nwsbShowThemeToast(theme);
   };
+
+  // Dedicated success toast for the theme switch — white pill, a real
+  // preview thumbnail of the theme just applied (not a generic icon), and
+  // a gold checkmark badge. Same shape as fbgApplyToast (part047.js) for
+  // the Fashion Background picker, kept separate since this one always
+  // shows a theme-specific image rather than one fixed icon.
+  var NWSB_THEME_TOAST_IMG_NEU   = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png';
+  var NWSB_THEME_TOAST_IMG_GLASS = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png';
+  function nwsbShowThemeToast(theme) {
+    var img = (theme === 'glass') ? NWSB_THEME_TOAST_IMG_GLASS : NWSB_THEME_TOAST_IMG_NEU;
+    var msg = (theme === 'glass') ? 'NowssB Fashion theme ✓' : 'NowssB theme ✓';
+    var t = document.createElement('div');
+    t.className = 'nwsb-theme-toast';
+    t.innerHTML =
+      '<div class="nwsb-theme-toast-icon"><img loading="lazy" decoding="async" src="' + img + '" alt=""></div>' +
+      '<div class="nwsb-theme-toast-text"></div>' +
+      '<div class="nwsb-theme-toast-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>';
+    t.querySelector('.nwsb-theme-toast-text').textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { t.classList.add('show'); }); });
+    setTimeout(function () {
+      t.classList.remove('show');
+      setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 260);
+    }, 2200);
+  }
   function nwsbSyncThemeButtons() {
     var theme = 'neu';
     try { theme = localStorage.getItem('nwsb_social_theme') || 'neu'; } catch (e) {}
