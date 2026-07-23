@@ -233,9 +233,10 @@ window.fashionHomeIntroEnter = function() {
     }, 3200);
   };
   function initAll() {
-    if (!document.getElementById('ncbCarouselNm') && !document.getElementById('ncbCarouselFash')) { return setTimeout(initAll, 400); }
+    if (!document.getElementById('ncbCarouselNm') && !document.getElementById('ncbCarouselFash') && !document.getElementById('ncbCarouselWelcome')) { return setTimeout(initAll, 400); }
     _ncbInit('ncbCarouselNm', function () { if (window.IG) IG.nav('profile'); });
     _ncbInit('ncbCarouselFash', function () { if (typeof openConnectIntro === 'function') openConnectIntro(); else if (window.IG) IG.nav('profile'); });
+    _ncbInit('ncbCarouselWelcome', function () { if (typeof nwsbConnectSetupFinish === 'function') nwsbConnectSetupFinish(); });
   }
   initAll();
 })();

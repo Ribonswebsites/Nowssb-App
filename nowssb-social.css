@@ -1258,6 +1258,11 @@
 .nwsbcs-stage-welcome {
   background: linear-gradient(180deg, #1c2c5e 0%, #101a3c 32%, #060c18 68%, #000 100%);
 }
+.nwsbcs-welcome-eyebrow {
+  position: absolute; top: max(env(safe-area-inset-top,16px),16px); left: 20px; z-index: 2;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(255,255,255,0.45);
+}
 /* Logo + divider + big bold wordmark — sits directly above the checkmark,
    as part of the same centered group (not pinned separately at the top). */
 .nwsbcs-welcome-header {
@@ -1306,4 +1311,12 @@
   background: transparent; border: 1.5px solid #fff; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
-.nwsbcs-welcome-cta { width: auto; margin: 0; padding: 16px 30px; }
+/* .ncb-carousel's shared box-shadow is a light-mode neumorphic shadow
+   (white highlight + soft grey) meant for Normal Home's light background —
+   shows as a wrong white glow here since the welcome page is dark. */
+#ncbCarouselWelcome { box-shadow: 0 14px 32px rgba(0,0,0,0.4) !important; }
+.nwsbcs-welcome-cta { width: auto; margin: 0; padding: 14px 16px 14px 30px; display: flex; align-items: center; gap: 10px; }
+.nwsbcs-welcome-cta-arrow {
+  width: 26px; height: 26px; border-radius: 50% !important; background: #fff; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
