@@ -874,11 +874,18 @@
   var _csBannerObserver = null;
 
   window.nwsbSocialOnboardingDone = function () {
-    return false; // TEMP-DEBUG: forces the NowssB Connect setup wizard every time you open Connect — delete this line to restore normal "once ever" behavior
+    // TEMP-DEBUG: forces the setup wizard once per app session (not on every
+    // single navigation — that looped forever, since the wizard's own
+    // "Enter NowssB Connect" completion re-navigates to 'profile' too) —
+    // delete this whole if-block to restore normal "once ever" behavior.
+    if (!window._nwsbConnectDebugShown) {
+      window._nwsbConnectDebugShown = true;
+      return false;
+    }
     try { if (localStorage.getItem('nwsb_social_onboarding_done') === '1') return true; } catch (e) {}
     var ud = window._userDataCache;
     if (ud && ud.socialOnboardingDone) return true;
-    return false;
+    return true; // TEMP-DEBUG: already shown once this session — let it through
   };
 
   // Avatar/banner pickers are the app's existing shared sheets (profileEditPhoto()
