@@ -1273,21 +1273,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <!-- Section label — black banner (now first, own explicit margin, not
-       the ambiguous shared .w100 utility — that was stripping its
-       padding/corners via a conflicting later .w100 rule). -->
-  <div class="nmh-sec-banner" onclick="openSub('streak')" style="width:calc(100% - 32px);margin:16px 16px 20px;">
-    <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>
-    <div class="nmh-sec-banner-divider"></div>
-    <div class="nmh-sec-banner-txt">
-      <div class="nmh-sec-banner-title">Daily Streak</div>
-      <div class="nmh-sec-banner-sub">Practice daily to keep your healing streak alive</div>
-    </div>
-    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  </div>
-
-  <!-- Glassmorphism streak section — heading + real 3-cube glass visual
-       together inside one glass card, below the banner. -->
+  <!-- Glassmorphism streak section — heading + real 3-cube glass visual,
+       then the "Daily Streak" black banner itself as the entry point,
+       all inside one glass card. -->
   <div class="nmh-streak-glass-section">
     <div class="nmh-streak-heading nmh-streak-heading-dark">Start Building Your Streak Today</div>
     <div class="nmh-streak-subheading nmh-streak-subheading-dark">Practice daily to keep it alive — and unlock exclusive offers</div>
@@ -1301,6 +1289,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="fash-streak-box fash-streak-box3">
         <div class="fash-streak-cta">Keep<br>Going</div>
       </div>
+    </div>
+
+    <div class="nmh-sec-banner" onclick="openSub('streak')" style="margin:16px 0 0;">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-txt">
+        <div class="nmh-sec-banner-title">Daily Streak</div>
+        <div class="nmh-sec-banner-sub">Practice daily to keep your healing streak alive</div>
+      </div>
+      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
   </div>
 
