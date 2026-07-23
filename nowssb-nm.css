@@ -4807,3 +4807,52 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   color: #060c18; cursor: pointer; margin-bottom: 10px;
 }
 .nwsb-loc-skip { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.4); cursor: pointer; text-align: center; }
+
+/* ── Player Guide (one-time-ever tutorial before the practice player,
+     first entry) — dark navy-to-black vertical gradient, matching the
+     Motorola "Getting started" onboarding reference the user supplied. ── */
+.pwg-screen {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #1c2c5e 0%, #101a3c 32%, #060c18 68%, #000 100%);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.pwg-slide { display: none; flex-direction: column; height: 100%; }
+.pwg-slide.active { display: flex; }
+.pwg-header {
+  display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+  padding: max(env(safe-area-inset-top,20px),20px) 20px 6px;
+}
+.pwg-close {
+  width: 34px; height: 34px; border-radius: 50% !important; background: rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+}
+.pwg-title { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; color: #fff; }
+.pwg-illus {
+  margin: 8px auto 0; width: 180px; height: 180px; border-radius: 50%; flex-shrink: 0;
+  background: radial-gradient(circle, rgba(232,213,163,0.18) 0%, transparent 70%);
+  display: flex; align-items: center; justify-content: center;
+}
+.pwg-illus-icon {
+  width: 92px; height: 92px; border-radius: 28px !important; background: rgba(232,213,163,0.12);
+  border: 1px solid rgba(232,213,163,0.32); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+}
+.pwg-text { margin-top: auto; padding: 0 26px 22px; }
+.pwg-heading { font-family: 'DM Sans', sans-serif; font-size: 29px; font-weight: 800; color: #fff; line-height: 1.16; margin-bottom: 12px; }
+.pwg-desc { font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.68); }
+.pwg-footer {
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  padding: 18px 24px max(env(safe-area-inset-bottom,20px),20px);
+}
+.pwg-dots { display: flex; align-items: center; gap: 6px; }
+.pwg-dot { width: 7px; height: 7px; border-radius: 50% !important; background: rgba(255,255,255,0.25); transition: all 0.25s; }
+.pwg-dot.active { width: 20px; border-radius: 4px !important; background: #fff; }
+.pwg-nav { display: flex; align-items: center; gap: 12px; }
+.pwg-nav-btn { width: 52px; height: 52px; border-radius: 50% !important; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.pwg-nav-back { background: transparent; border: 1.5px solid rgba(255,255,255,0.38); }
+.pwg-nav-fwd { background: #fff; border: none; }
+.pwg-final-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px;
+  border-radius: 16px !important; background: linear-gradient(135deg,#e8d5a3,#c8a96e); color: #060c18;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; border: none;
+}

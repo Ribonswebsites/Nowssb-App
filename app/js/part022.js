@@ -189,12 +189,14 @@ var _prevOpenSub = window.openSub;
 window.openSub = function(id) {
   if (_prevOpenSub) _prevOpenSub.apply(this, arguments);
 
-  var pgScreens = ['practice','routines','routine-detail','health-journey','health-male','health-female','health-category','sound-library','my-progress'];
+  // 'practice' intentionally excluded — the one-time-ever full-screen Player
+  // Guide (part054.js) now owns first-time player education; this smaller
+  // coach card would otherwise double up with it on every practice-screen open.
+  var pgScreens = ['routines','routine-detail','health-journey','health-male','health-female','health-category','sound-library','my-progress'];
   window._pgActiveScreens = pgScreens;
 
   var d = 700;
-  if      (id === 'practice')        pgSchedule('practice',        d);
-  else if (id === 'routines')        pgSchedule('routines',        d);
+  if      (id === 'routines')        pgSchedule('routines',        d);
   else if (id === 'routine-detail')  pgSchedule('routine-detail',  d + 200);
   else if (id === 'health-journey')  pgSchedule('health-journey',  d);
   else if (id === 'health-male')     pgSchedule('health-male',     d);
