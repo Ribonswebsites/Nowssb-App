@@ -965,6 +965,11 @@
     document.getElementById('nwsbcs-stage-intro').style.display = 'flex';
   };
 
+  window.nwsbConnectSetupBackFromWelcome = function () {
+    document.getElementById('nwsbcs-stage-welcome').style.display = 'none';
+    document.getElementById('nwsbcs-stage-profile').style.display = 'flex';
+  };
+
   window.nwsbConnectSetupNext = function (stage) {
     if (stage === 'profile') {
       document.getElementById('nwsbcs-stage-intro').style.display = 'none';

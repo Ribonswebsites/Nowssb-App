@@ -105,7 +105,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=309">
-<link rel="stylesheet" href="nowssb-social.css?v=206">
+<link rel="stylesheet" href="nowssb-social.css?v=207">
 <link rel="stylesheet" href="nowssb-nm.css?v=419">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
@@ -7864,16 +7864,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Stage 3 — welcome / complete -->
   <div class="nwsbcs-stage nwsbcs-stage-welcome" id="nwsbcs-stage-welcome" style="display:none;">
-    <div class="nwsbcs-welcome-header">
-      <img class="nwsbcs-welcome-header-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="">
-      <div class="nwsbcs-welcome-header-divider"></div>
-      <div class="nwsbcs-welcome-header-title">NowssB Connect</div>
-      <div style="flex:1;"></div>
-      <button class="ms-bg-customize-btn" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background">
-        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
-      </button>
-    </div>
+    <button class="ms-bg-customize-btn" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background" style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);right:20px;z-index:2;">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
+    </button>
     <div class="nwsbcs-welcome-content">
+      <div class="nwsbcs-welcome-header">
+        <img class="nwsbcs-welcome-header-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="">
+        <div class="nwsbcs-welcome-header-divider"></div>
+        <div class="nwsbcs-welcome-header-title">NowssB Connect</div>
+      </div>
       <div class="nwsbcs-welcome-check-wrap">
         <div class="nwsbcs-welcome-check-ring"></div>
         <div class="nwsbcs-welcome-check">
@@ -7885,6 +7884,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nwsbcs-welcome-bottom">
       <div class="nwsbcs-welcome-sub">Welcome to NowssB Connect</div>
       <div class="nwsbcs-welcome-name" id="nwsbcsWelcomeName">there</div>
+    </div>
+    <div class="nwsbcs-welcome-footer">
+      <div class="nwsbcs-welcome-back" onclick="nwsbConnectSetupBackFromWelcome()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
       <button class="nwsbcs-cta nwsbcs-welcome-cta" onclick="nwsbConnectSetupFinish()">Enter NowssB Connect</button>
     </div>
   </div>
@@ -8535,8 +8539,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part050.js?v=241"></script>
 <script src="app/js/part051.js?v=6" defer></script>
 <script src="app/js/part052.js?v=3"></script>
-<script src="app/js/part054.js?v=7"></script>
-<script src="nowssb-social.js?v=181" defer></script>
+<script src="app/js/part054.js?v=8"></script>
+<script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=176" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
 

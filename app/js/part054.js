@@ -17,8 +17,9 @@
     practice: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
     library: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
     settings: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
-    store: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
-    flame: '<svg width="40" height="40" viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.85"/></svg>'
+    store: '<img src="https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    flame: '<svg width="40" height="40" viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.85"/></svg>',
+    playerReady: '<img src="https://res.cloudinary.com/eenvubod/image/upload/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png" style="width:70px;height:70px;object-fit:contain;" alt="">'
   };
 
   // Illustration card background — placeholder for now (reusing an
@@ -75,7 +76,7 @@
     },
     {
       title: 'Player Ready',
-      icon: PWG_ICONS.playerBrand,
+      icon: PWG_ICONS.playerReady,
       img: PWG_PLAYER_BRAND_IMG,
       heading: 'You’re All Set',
       desc: 'That’s everything you need to know. Tap Begin to start your first practice session.',
