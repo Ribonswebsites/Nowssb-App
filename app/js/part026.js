@@ -268,6 +268,11 @@ var MS_SIGNATURE = {
 };
 var MS_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784460713/file_000000008eb081fba87f16fe9146e413_mk9wbe.png';
 var MS_SIGNATURE_PRICE = 299;
+// Reused by the coupon/bundle pages (app/js/part055.js) for the Signature
+// page's "Meanings" side of the toggle.
+window.MS_SIGNATURE = MS_SIGNATURE;
+window.MS_SIGNATURE_IMG = MS_SIGNATURE_IMG;
+window.MS_SIGNATURE_PRICE = MS_SIGNATURE_PRICE;
 
 /* ── One-line plain-language blurb per word, shown next to the product
    image on the buy page. Keyed by the same lowercase key as everything

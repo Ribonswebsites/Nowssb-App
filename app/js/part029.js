@@ -13,25 +13,38 @@ window.chkSelectPay = function(method) {
   });
 };
 
-/* ── COUPONS (match the home-page banner offers) ──
+/* ── COUPONS (match the home-page banner offers + the dedicated coupon
+   pages in app/js/part055.js) ──
    NOWSSB10 — flat 10% off, any order (your first word)
    NOWSSB30 — flat 30% off when the cart has 5+ items
-   NOWSSB50 — flat 50% off when the cart has 10+ items */
+   NOWSSB50 — flat 50% off, Signature Bundle — needs 5+ items tagged
+              sigTag:'signature' specifically (not just any 5 items)
+   NOWSSB60 — flat 60% off when the cart has 20+ items */
 var NSS_COUPONS = {
   NOWSSB10: { pct: 10, min: 1,  label: 'Flat 10% off' },
   NOWSSB30: { pct: 30, min: 5,  label: 'Flat 30% off · 5+ words' },
-  NOWSSB50: { pct: 50, min: 10, label: 'Flat 50% off · 10+ words' }
+  NOWSSB50: { pct: 50, min: 5,  label: 'Signature Bundle · 50% off · 5+ signature words', requireTag: 'signature' },
+  NOWSSB60: { pct: 60, min: 20, label: 'Flat 60% off · 20+ words' }
 };
-window.NSS_COUPONS = NSS_COUPONS; // exposed for the All Offers page (app/js/part053.js)
+window.NSS_COUPONS = NSS_COUPONS; // exposed for the All Offers page (app/js/part053.js) + coupon pages (part055.js)
 window._nssCoupon = window._nssCoupon || null;
+
+/* Cart items counted toward a coupon's minimum — every item for a plain
+   coupon, or only the ones tagged for a requireTag coupon (e.g. Signature
+   Bundle only counts items added from the Signature coupon page). */
+function chkQualifyingItems(cart, c) {
+  return c.requireTag ? cart.filter(function(i) { return i.sigTag === c.requireTag; }) : cart;
+}
 
 /* discount for the current cart (coupon drops silently if the cart shrinks
    below the coupon's minimum) */
 function chkCouponFor(cart) {
   var c = NSS_COUPONS[window._nssCoupon];
-  if (!c || cart.length < c.min) return null;
+  if (!c || chkQualifyingItems(cart, c).length < c.min) return null;
   return c;
 }
+window.chkCouponFor = chkCouponFor;
+window.chkQualifyingItems = chkQualifyingItems; // reused by the offers hub (part053.js) for live progress
 
 window.chkApplyCoupon = function() {
   var inp  = document.getElementById('chkCouponInput');
@@ -41,14 +54,16 @@ window.chkApplyCoupon = function() {
   if (!msg) return;
   if (!code) { window._nssCoupon = null; msg.textContent = ''; chkRenderSummary(); return; }
   var c = NSS_COUPONS[code];
+  var qualifying = c ? chkQualifyingItems(cart, c) : [];
   if (!c) {
     window._nssCoupon = null;
     msg.style.color = 'rgba(255,120,120,0.85)';
     msg.textContent = 'Invalid coupon code.';
-  } else if (cart.length < c.min) {
+  } else if (qualifying.length < c.min) {
     window._nssCoupon = null;
     msg.style.color = 'rgba(255,120,120,0.85)';
-    msg.textContent = 'This coupon needs at least ' + c.min + ' items in your cart (you have ' + cart.length + ').';
+    msg.textContent = 'This coupon needs at least ' + c.min + (c.requireTag ? ' signature items' : ' items') +
+      ' in your cart (you have ' + qualifying.length + ').';
   } else {
     window._nssCoupon = code;
     msg.style.color = 'rgba(140,230,170,0.9)';

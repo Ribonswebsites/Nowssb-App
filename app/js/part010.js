@@ -27,6 +27,12 @@
           white:    {key:'whiteedition',          name:'White Edition',         img:SIG_IMG},
           black:    {key:'blackedition',          name:'Black Edition',         img:SIG_IMG}
         };
+        // Reused by the coupon/bundle pages (app/js/part055.js): the curated
+        // "50% OFF / Sale" word pool, the per-category signature word map +
+        // its shared product image, and the card image every plain word uses.
+        window.RM_SALE_WORDS = CATS[0].words;
+        window.RM_SIGNATURE_WORDS = SIGNATURE;
+        window.RM_SIGNATURE_IMG = SIG_IMG;
         var container=document.getElementById('rm-word-sections-container');
         var html='';
         CATS.forEach(function(cat){
