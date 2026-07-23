@@ -1258,10 +1258,18 @@
 .nwsbcs-stage-welcome {
   background: linear-gradient(180deg, #1c2c5e 0%, #101a3c 32%, #060c18 68%, #000 100%);
 }
-/* No header — big logo + checkmark sit centered together, a little below
-   the top, in the middle content block. */
-.nwsbcs-welcome-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 24px; text-align: center; }
-.nwsbcs-welcome-logo { width: 140px; height: 140px; border-radius: 50% !important; object-fit: cover; }
+/* Header row — small logo, divider, bold wordmark, top-left, a little
+   down from the very top edge; customize-bg stays top-right. */
+.nwsbcs-welcome-header {
+  display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+  padding: max(env(safe-area-inset-top,20px) + 10px, 30px) 20px 6px;
+}
+.nwsbcs-welcome-header-logo { width: 44px; height: 44px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0; }
+.nwsbcs-welcome-header-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.22); flex-shrink: 0; }
+.nwsbcs-welcome-header-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
+
+/* Checkmark + "You're all set!" sit together, centered, in the middle. */
+.nwsbcs-welcome-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; }
 .nwsbcs-welcome-check-wrap { position: relative; width: 52px; height: 52px; }
 .nwsbcs-welcome-check-ring, .nwsbcs-welcome-check-ring::before {
   position: absolute; inset: 0; border-radius: 50% !important;
@@ -1280,10 +1288,11 @@
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 8px 24px rgba(200,169,110,.35);
 }
+.nwsbcs-welcome-title { font-size: 26px; font-weight: 800; color: #fff; line-height: 1.15; }
 
-/* Bottom block — bold, left-aligned heading + subtitle + button, matching
-   the Motorola reference's bottom-of-screen text treatment. */
+/* Bottom block — "Welcome to NowssB Connect" then the person's name,
+   bigger and bolder than the line above it, then the button. */
 .nwsbcs-welcome-bottom { flex-shrink: 0; text-align: left; padding: 0 28px max(env(safe-area-inset-bottom,24px),24px); }
-.nwsbcs-welcome-title { font-size: 32px; font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 10px; }
-.nwsbcs-welcome-sub { font-size: 14px; color: rgba(255,255,255,.55); margin-bottom: 22px; }
+.nwsbcs-welcome-sub { font-size: 16px; font-weight: 700; color: rgba(255,255,255,.65); margin-bottom: 2px; }
+.nwsbcs-welcome-name { font-size: 34px; font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 22px; }
 .nwsbcs-welcome-cta { width: 100%; margin: 0; }
