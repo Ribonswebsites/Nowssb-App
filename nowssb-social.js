@@ -981,7 +981,8 @@
       saveCsProfile(name);
       document.getElementById('nwsbcs-stage-profile').style.display = 'none';
       document.getElementById('nwsbcs-stage-welcome').style.display = 'flex';
-      document.getElementById('nwsbcsWelcomeSub').textContent = 'Welcome to NowssB Connect, ' + name.split(' ')[0] + '.';
+      var nameEl = document.getElementById('nwsbcsWelcomeName');
+      if (nameEl) nameEl.textContent = name.split(' ')[0];
       // No auto-advance — waits for an explicit tap on "Enter NowssB Connect"
       // (nwsbConnectSetupFinish, wired to the button's onclick below).
     }

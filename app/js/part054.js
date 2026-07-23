@@ -75,7 +75,7 @@
     },
     {
       title: 'Player Ready',
-      icon: PWG_ICONS.flame,
+      icon: PWG_ICONS.playerBrand,
       img: PWG_PLAYER_BRAND_IMG,
       heading: 'You’re All Set',
       desc: 'That’s everything you need to know. Tap Begin to start your first practice session.',

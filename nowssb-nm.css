@@ -4847,7 +4847,12 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   border-radius: 50% !important; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.4);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
-.pwg-header-icon img, .pwg-header-icon svg { width: 40px !important; height: 40px !important; object-fit: contain; }
+/* object-fit:cover + filling the whole circle so the circular clip-mask
+   (overflow:hidden above) crops away the source images' own square
+   black canvas instead of showing it as a visible black box. SVGs
+   (welcome/flame, no baked-in background) stay smaller via contain. */
+.pwg-header-icon img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+.pwg-header-icon svg { width: 30px !important; height: 30px !important; object-fit: contain; }
 .pwg-text { margin-top: auto; padding: 20px 26px 4px; min-height: 0; overflow-y: auto; }
 .pwg-heading { font-family: 'DM Sans', sans-serif; font-size: 29px; font-weight: 800; color: #fff; line-height: 1.16; margin-bottom: 12px; }
 .pwg-desc { font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.68); }
