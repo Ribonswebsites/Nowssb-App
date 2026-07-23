@@ -41,16 +41,17 @@ async function saveUser(user) {
   const ref  = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
-    var _tStart = new Date();
-    var _tEnd   = new Date(_tStart.getTime() + 15 * 24 * 60 * 60 * 1000);
+    // No trialStartDate/trialEndDate here — a trial only begins when the
+    // user explicitly starts one from the Subscription screen (card saved,
+    // see part032.js). A brand-new account with no card and no explicit
+    // opt-in is just the free tier (GATE._tier() reads this as 'free'),
+    // never a silently-started, silently-expiring trial.
     await setDoc(ref, {
       uid: user.uid, email: user.email,
       displayName: user.displayName || '',
       photoURL: user.photoURL || '',
       isPro: false,
       tier: null,
-      trialStartDate: _tStart.toISOString(),
-      trialEndDate:   _tEnd.toISOString(),
       createdAt: serverTimestamp(),
       lastLogin: serverTimestamp()
     });
