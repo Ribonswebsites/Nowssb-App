@@ -17,19 +17,27 @@
     // Coupon tiers unlock against the CURRENT CART size — real, live logic
     // (not decorative), matching exactly what chkCouponFor() checks at
     // checkout, so "more words -> more offers unlock" is always accurate.
+    // Each tier is also its own dedicated shop page (app/js/part055.js) —
+    // tapping the card takes you straight there instead of the plain store.
+    var COUPON_PAGE = { NOWSSB10: 'coupon-individual', NOWSSB30: 'coupon-bundle5', NOWSSB50: 'coupon-signature', NOWSSB60: 'coupon-bundle20' };
     var cart = window.nssCart || [];
     var coupons = window.NSS_COUPONS || {};
+    var qualifyFn = window.chkQualifyingItems || function (c) { return c; };
     couponsBox.innerHTML = Object.keys(coupons).map(function (code) {
       var c = coupons[code];
-      var pct = Math.min(100, Math.round((cart.length / c.min) * 100));
-      var unlocked = cart.length >= c.min;
-      return '<div class="bgp-coupon-card">' +
+      var qualifying = qualifyFn(cart, c);
+      var pct = Math.min(100, Math.round((qualifying.length / c.min) * 100));
+      var unlocked = qualifying.length >= c.min;
+      var page = COUPON_PAGE[code];
+      var reqNoun = c.requireTag ? 'signature word' : 'item';
+      return '<div class="bgp-coupon-card bgp-coupon-card-link" onclick="openSub(\'' + page + '\')">' +
         '<div class="bgp-coupon-top"><span class="bgp-coupon-code">' + code + '</span><span class="bgp-coupon-pct">' + c.pct + '% OFF</span></div>' +
-        '<div class="bgp-coupon-req">Add ' + c.min + '+ item' + (c.min > 1 ? 's' : '') + ' to your cart to unlock</div>' +
+        '<div class="bgp-coupon-req">' + c.label + '</div>' +
         '<div class="bgp-coupon-bar-track"><div class="bgp-coupon-bar-fill" style="width:' + pct + '%;"></div></div>' +
         '<div class="bgp-coupon-status ' + (unlocked ? 'unlocked' : 'locked') + '">' +
-          (unlocked ? 'Unlocked ✓ — apply at checkout' : cart.length + ' / ' + c.min + ' items in cart') +
+          (unlocked ? 'Unlocked ✓ — apply at checkout' : qualifying.length + ' / ' + c.min + ' ' + reqNoun + (c.min > 1 ? 's' : '') + ' in cart') +
         '</div>' +
+        '<div class="bgp-coupon-chevron"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
       '</div>';
     }).join('');
 
