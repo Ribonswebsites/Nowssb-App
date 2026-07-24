@@ -108,7 +108,8 @@
     var tryAction = (i === PWG_SLIDES.length - 1) ? 'pwgFinish()' : 'pwgNext()';
     return (
       '<div class="pwg-slide' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
-        '<div class="pwg-illus-card" style="background-image:url(\'' + s.img + '\')"></div>' +
+        '<div class="pwg-illus-bg" style="background-image:url(\'' + s.img + '\')"></div>' +
+        '<div class="pwg-illus-fade"></div>' +
         '<div class="pwg-text">' +
           '<div class="pwg-heading">' + s.heading + '</div>' +
           '<div class="pwg-desc">' + s.desc + '</div>' +
@@ -133,13 +134,15 @@
 
     body.innerHTML =
       '<div class="pwg-screen">' +
+        '<div class="pwg-slides-wrap">' +
+          PWG_SLIDES.map(pwgSlideHtml).join('') +
+        '</div>' +
         '<div class="pwg-header">' +
           '<div class="pwg-close" onclick="pwgSkip()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>' +
           '<div class="pwg-title" id="pwgTitle">' + PWG_SLIDES[0].title + '</div>' +
           '<div style="flex:1;"></div>' +
           '<div class="pwg-header-icon" id="pwgHeaderIcon">' + PWG_SLIDES[0].icon + '</div>' +
         '</div>' +
-        PWG_SLIDES.map(pwgSlideHtml).join('') +
         '<div class="pwg-footer">' +
           '<div class="pwg-dots" id="pwgDots">' + dots + '</div>' +
           '<div class="pwg-nav" id="pwgNav"></div>' +
