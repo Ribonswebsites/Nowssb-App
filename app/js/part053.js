@@ -55,21 +55,22 @@
       return;
     }
 
-    var wordImg = window.RM_WORD_IMG || '';
+    var wordImg = 'https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png';
     gridBox.innerHTML = discounted.map(function (word, i) {
       var t = tiers[wordTier[word]] || {};
       return '<div class="bgp-offer-card' + (i >= 6 ? ' bgp-hidden-extra' : '') + '" onclick="nwsbOpenStoreWord(\'' + String(word).replace(/'/g, '') + '\')">' +
         (t.discount ? '<div class="bgp-offer-badge">' + t.discount + '</div>' : '') +
-        '<div class="bgp-offer-row">' +
+        '<div class="bgp-offer-split">' +
           '<img class="bgp-offer-img" src="' + wordImg + '" alt="" loading="lazy" decoding="async">' +
+          '<div class="bgp-offer-divider"></div>' +
           '<div class="bgp-offer-info">' +
             '<div class="bgp-offer-word">' + word + '</div>' +
             '<div class="bgp-offer-price"><span class="bgp-offer-now">' + (t.price || '') + '</span>' +
               (t.origPrice ? '<span class="bgp-offer-was">' + t.origPrice + '</span>' : '') +
             '</div>' +
+            '<div class="bgp-offer-cta">Grab Deal →</div>' +
           '</div>' +
         '</div>' +
-        '<div class="bgp-offer-cta">Grab Deal →</div>' +
       '</div>';
     }).join('');
 
