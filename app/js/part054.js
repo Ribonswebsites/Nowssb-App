@@ -36,6 +36,7 @@
   var PWG_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876918/file_0000000035ac81fa8d163588e627b067_xjpm5r.png';
   var PWG_READY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876917/file_00000000b6c481fab8074cb5a1d16756_thikfl.png';
   var PWG_STORE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876916/file_00000000c70081faab87b58c23b3edcb_yzyrbf.png';
+  var PWG_PRACTICE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877225/file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png';
 
   var PWG_SLIDES = [
     {
@@ -55,7 +56,7 @@
     {
       title: 'Player Record',
       icon: PWG_ICONS.practice,
-      img: PWG_PLACEHOLDER_IMG,
+      img: PWG_PRACTICE_IMG,
       heading: 'Practice & Get Scored',
       desc: 'Tap Practice to record your own voice saying the word. Each syllable lights up as you speak it, and you get an instant pronunciation score — the more you repeat, the more it builds your streak.'
     },
