@@ -2396,6 +2396,11 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
      background with just a dark shadow, and it's correct everywhere else. */
   box-shadow: 0 14px 32px rgba(0,0,0,0.4);
 }
+/* Quick Access banner — inset from the sides, extra space below, square
+   corners (per request). */
+.nmh-sec-banner.nmh-qa-banner {
+  width: auto !important; margin: 16px 16px 22px !important; border-radius: 0 !important;
+}
 .nmh-sec-banner-icon {
   width: 54px; height: 54px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
   border-radius: 15px !important; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
@@ -3617,7 +3622,7 @@ body.nm-glass #sub-health-journey .gsel-card {
 .home-grid { grid-template-columns: 1fr 1fr !important; }
 .home-tile { aspect-ratio: 16/9 !important; padding: 0 !important; min-height: 0 !important; }
 .home-tile-enter {
-  position: absolute; top: 50%; right: 8px; transform: translateY(-50%); z-index: 2;
+  position: absolute; bottom: 10px; right: 8px; z-index: 2;
   display: flex; align-items: center; gap: 4px; white-space: nowrap;
   background: #fff; color: #060c18; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
   letter-spacing: 0.2px; padding: 6px 9px; border-radius: 0 !important;
