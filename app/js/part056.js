@@ -1,28 +1,31 @@
-// Home page "Unlock your full healing potential" (.nmh-fsec) subscription
-// banner — auto-rotating crossfade background, no dot indicators. Same
+// "Unlock your full healing potential" subscription banners — Normal Home
+// (.nmh-fsec, prefix nmhFsec) and Fashion Home (#sub-promo-card, prefix
+// fashFsec) — auto-rotating crossfade background, no dot indicators. Same
 // pattern as Word Atelier's rmBannerReset (app/js/part009.js), generalized
-// to iterate however many nmhFsecSlideN elements exist. Home is always in
-// the DOM once the app boots, so this just self-starts once on load.
+// to iterate however many <prefix>SlideN elements exist per banner. Both
+// screens are always in the DOM once the app boots, so each just
+// self-starts once on load.
 (function () {
-  function collectSlides() {
+  function collectSlides(prefix) {
     var slides = [];
     var i = 0;
     var el;
-    while ((el = document.getElementById('nmhFsecSlide' + i))) { slides.push(el); i++; }
+    while ((el = document.getElementById(prefix + 'Slide' + i))) { slides.push(el); i++; }
     return slides;
   }
 
-  function nmhFsecBannerReset() {
-    var slides = collectSlides();
+  function startRotator(prefix) {
+    var slides = collectSlides(prefix);
     if (!slides.length) return;
-    if (window._nmhFsecBannerInterval) { clearInterval(window._nmhFsecBannerInterval); window._nmhFsecBannerInterval = null; }
+    var intervalKey = '_' + prefix + 'BannerInterval';
+    if (window[intervalKey]) { clearInterval(window[intervalKey]); window[intervalKey] = null; }
     slides.forEach(function (s) { s.style.transition = 'none'; s.style.opacity = '0'; });
     slides[0].style.opacity = '1';
     var cur = 0;
     setTimeout(function () {
       slides.forEach(function (s) { s.style.transition = 'opacity 0.9s ease'; });
       if (slides.length > 1) {
-        window._nmhFsecBannerInterval = setInterval(function () {
+        window[intervalKey] = setInterval(function () {
           slides[cur].style.opacity = '0';
           cur = (cur + 1) % slides.length;
           slides[cur].style.opacity = '1';
@@ -31,6 +34,8 @@
     }, 50);
   }
 
-  window.nmhFsecBannerReset = nmhFsecBannerReset;
-  nmhFsecBannerReset();
+  window.nmhFsecBannerReset = function () { startRotator('nmhFsec'); };
+  window.fashFsecBannerReset = function () { startRotator('fashFsec'); };
+  window.nmhFsecBannerReset();
+  window.fashFsecBannerReset();
 })();
