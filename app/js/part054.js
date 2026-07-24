@@ -30,12 +30,18 @@
   // slide's card image too (raw URL, since the card sets it via CSS
   // background-image rather than an <img> tag).
   var PWG_PLAYER_BRAND_IMG = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png';
+  // Per-slide illustration photography, supplied for the welcome,
+  // Signature Word, Player Store and Player Ready slides.
+  var PWG_WELCOME_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876918/file_00000000af488207996ed12b2ce7274e_tvqqfg.png';
+  var PWG_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876918/file_0000000035ac81fa8d163588e627b067_xjpm5r.png';
+  var PWG_READY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876917/file_00000000b6c481fab8074cb5a1d16756_thikfl.png';
+  var PWG_STORE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876916/file_00000000c70081faab87b58c23b3edcb_yzyrbf.png';
 
   var PWG_SLIDES = [
     {
       title: 'NowssB Player Guide',
       icon: PWG_ICONS.playerBrand,
-      img: PWG_PLAYER_BRAND_IMG,
+      img: PWG_WELCOME_IMG,
       heading: 'Welcome to Your Practice Player',
       desc: 'This is where you listen to, pronounce and master every word in your daily routine. Let’s walk through exactly how it works — button by button.'
     },
@@ -70,21 +76,21 @@
     {
       title: 'Player Store',
       icon: PWG_ICONS.store,
-      img: PWG_PLACEHOLDER_IMG,
+      img: PWG_STORE_IMG,
       heading: 'Grow Your Collection',
       desc: 'Tap the Store icon anytime to buy new words and meanings — every purchase instantly joins your Library, so you can keep expanding your personal word ritual.'
     },
     {
       title: 'Signature Word',
       icon: PWG_ICONS.store,
-      img: PWG_PLACEHOLDER_IMG,
+      img: PWG_SIGNATURE_IMG,
       heading: 'Unlock a Signature Word',
       desc: 'Signature words are the rarest word in each category — one per set, own only in a special gold edition. Look for the Signature tag in the Store to add one to your collection.'
     },
     {
       title: 'Player Ready',
       icon: PWG_ICONS.playerReady,
-      img: PWG_PLAYER_BRAND_IMG,
+      img: PWG_READY_IMG,
       heading: 'You’re All Set',
       desc: 'That’s everything you need to know. Tap Begin to start your first practice session.',
       final: true
