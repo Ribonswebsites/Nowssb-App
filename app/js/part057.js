@@ -30,7 +30,8 @@
     { id: 'chat',         label: 'Chat',       img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png', run: function () { if (typeof chatInboxOpen === 'function') chatInboxOpen(); } },
     { id: 'ai',           label: 'AI Rx',      img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png', run: function () { openSub('ai-prescription'); } },
     { id: 'streak',       label: 'Streak',     img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png', run: function () { openSub('streak'); } },
-    { id: 'settings',     label: 'Settings',   img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png', run: function () { openSub('social'); } }
+    { id: 'settings',     label: 'Settings',   img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png', run: function () { openSub('social'); } },
+    { id: 'everything',   label: 'Everything', img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png', run: function () { openSub('features'); } }
   ];
   var DEFAULT_SLOTS = ['connect', 'practice', 'library', 'store', 'profile'];
   var SHAPES  = [{ id: 'default', label: 'Default' }, { id: 'pill', label: 'Floating Pill' }, { id: 'rect', label: 'Floating Rectangle' }];
@@ -156,13 +157,22 @@
 
   // ── Toast ─────────────────────────────────────────────────────
   var _toastT = null;
+  var QA_TOAST_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png';
   function toast(msg) {
     var scr = document.getElementById('sub-quick-access'); if (!scr) return;
     var t = document.getElementById('qaToast');
-    if (!t) { t = document.createElement('div'); t.id = 'qaToast'; t.className = 'qa-toast'; scr.appendChild(t); }
-    t.textContent = msg; t.classList.add('show');
+    if (!t) {
+      t = document.createElement('div'); t.id = 'qaToast'; t.className = 'qa-toast';
+      t.innerHTML =
+        '<div class="qa-toast-icon"><img decoding="async" src="' + QA_TOAST_ICON + '" alt=""></div>' +
+        '<div class="qa-toast-text"></div>' +
+        '<div class="qa-toast-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>';
+      scr.appendChild(t);
+    }
+    t.querySelector('.qa-toast-text').textContent = msg;
+    t.classList.add('show');
     if (_toastT) clearTimeout(_toastT);
-    _toastT = setTimeout(function () { t.classList.remove('show'); }, 1600);
+    _toastT = setTimeout(function () { t.classList.remove('show'); }, 1800);
   }
 
   // ── Staged actions (preview only — nothing hits the live nav) ─
