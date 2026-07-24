@@ -38,6 +38,8 @@
   var PWG_STORE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876916/file_00000000c70081faab87b58c23b3edcb_yzyrbf.png';
   var PWG_PRACTICE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877225/file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png';
   var PWG_LISTEN_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877426/file_00000000e0948207852ee99ed468fbb0_gon5be.png';
+  var PWG_SETTINGS_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784878540/file_00000000cf00820b83f17dc392a0071d_hhm18g.png';
+  var PWG_LIBRARY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784878540/file_00000000b154820baa4e6ffade37f478_aivsiv.png';
 
   var PWG_SLIDES = [
     {
@@ -64,14 +66,14 @@
     {
       title: 'Player Library',
       icon: PWG_ICONS.library,
-      img: PWG_PLACEHOLDER_IMG,
+      img: PWG_LIBRARY_IMG,
       heading: 'Build Your Library & Sentences',
       desc: 'Tap the Library icon to open every word you’ve unlocked. Every word you purchase is added here automatically — combine them to build your own healing sentences, saved for practice anytime.'
     },
     {
       title: 'Player Settings',
       icon: PWG_ICONS.settings,
-      img: PWG_PLACEHOLDER_IMG,
+      img: PWG_SETTINGS_IMG,
       heading: 'Word Info & Player Settings',
       desc: 'Tap the info icon to see the word’s meaning, the organ it benefits, and healing detail. Tap the settings gear to switch the voice (male or female), turn Loop on, or change your rep target.'
     },
