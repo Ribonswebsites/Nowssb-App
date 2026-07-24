@@ -2637,12 +2637,19 @@ body.navcolor-black #ig-social-nav#ig-social-nav {
 
 /* ── Customizer UI ── */
 #sub-quick-access .bgp-content { padding-bottom: 60px; }
+/* Title takes the slack so the customize + Reset buttons sit in the
+   top-right corner, together. */
+#sub-quick-access .bgp-header-title { flex: 1; }
 .qa-hdr-cust { flex-shrink: 0; }
 .qa-reset-hdr {
   background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
   color: #e8d5a3; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
   padding: 7px 14px; border-radius: 0 !important; cursor: pointer; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
 }
+/* Bigger NowssB Connect logo everywhere it appears */
+.ig-nav-img-connect { width: 30px !important; height: 30px !important; }
+.qa-feat-connect .qa-feat-ic img { width: 30px; height: 30px; }
+.qa-prev-connect img { width: 26px !important; height: 26px !important; }
 .qa-hint { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; margin-bottom: 12px; }
 
 /* Explainer banner */
