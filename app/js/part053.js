@@ -440,6 +440,15 @@
     _rxVidBannerTimer = setInterval(paint, 3000);
   }
 
+  // Intro page → main content, same transition Word Atelier's
+  // rmEnterFromIntro() uses (app/js/part012.js).
+  window.rxEnterFromIntro = function () {
+    var intro = document.getElementById('rxIntroPage');
+    var main = document.getElementById('rxMainContent');
+    if (intro) intro.classList.add('rm-intro-hidden');
+    if (main) main.style.display = 'block';
+  };
+
   var _origRenderAiPrescriptionPage = window.renderAiPrescriptionPage;
   window.renderAiPrescriptionPage = function () {
     _origRenderAiPrescriptionPage();
