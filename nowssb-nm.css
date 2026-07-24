@@ -2592,35 +2592,97 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 .bgp-milestone-title { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; color: #fff; }
 .bgp-milestone-desc { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 
-/* Quick Access page — floating black glassmorphism dock replacing the old
-   plain list-row nav, covering every major app section (not just 4). */
-#sub-quick-access .bgp-content { padding-bottom: 320px; }
-.qa-dock-hint { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
-.qa-dock-wrap {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 15;
-  padding: 0 16px max(env(safe-area-inset-bottom,14px),14px); pointer-events: none;
+/* ══════════════════════════════════════════════════════════
+   QUICK ACCESS = bottom nav-bar customizer (app/js/part057.js).
+   Live shape/colour overrides for the real bottom nav (#ig-bottomnav
+   + #ig-social-nav) plus the customizer UI on the page itself.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Live nav SHAPE — floating pill / floating rectangle (default = no
+   override, stays full-width bottom-anchored). !important beats both the
+   base #ig-bottomnav rules and #ig-social-nav's inline styles. ── */
+body.navshape-pill #ig-bottomnav, body.navshape-pill #ig-social-nav {
+  left: 16px !important; right: 16px !important;
+  bottom: calc(14px + env(safe-area-inset-bottom,0px)) !important;
+  height: 60px !important; padding-bottom: 0 !important;
+  border-radius: 34px !important; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.13) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.5) !important;
 }
-.qa-dock {
-  pointer-events: auto; background: rgba(8,8,12,0.74);
-  -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
-  border: 1px solid rgba(255,255,255,0.1); border-radius: 26px !important; padding: 14px 8px;
-  display: grid; grid-template-columns: repeat(4,1fr); gap: 2px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+body.navshape-rect #ig-bottomnav, body.navshape-rect #ig-social-nav {
+  left: 12px !important; right: 12px !important;
+  bottom: calc(12px + env(safe-area-inset-bottom,0px)) !important;
+  height: 60px !important; padding-bottom: 0 !important;
+  border-radius: 14px !important; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.13) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.5) !important;
 }
-.qa-dock-item {
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 6px;
-  padding: 8px 2px; cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: 14px !important;
+/* ── Live nav COLOUR — black (default = glass, no override). Doubled-id
+   selector deliberately out-specifies the base glass rule
+   (body:not(.nav-neo):not(.nav-solid) #ig-bottomnav) so black wins no
+   matter which Settings nav-style (glass/neo/solid) is also active. ── */
+body.navcolor-black #ig-bottomnav#ig-bottomnav,
+body.navcolor-black #ig-social-nav#ig-social-nav {
+  background: #000 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  border-top-color: rgba(255,255,255,0.08) !important;
 }
-.qa-dock-item:active { background: rgba(255,255,255,0.08); }
-.qa-dock-icon {
-  width: 40px; height: 40px; border-radius: 50% !important; flex-shrink: 0;
-  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.22);
-  display: flex; align-items: center; justify-content: center;
+
+/* ── Customizer UI ── */
+#sub-quick-access .bgp-content { padding-bottom: 60px; }
+.qa-reset-hdr {
+  margin-left: auto; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+  color: #e8d5a3; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+  padding: 7px 14px; border-radius: 0 !important; cursor: pointer; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
 }
-.qa-dock-label {
-  font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,0.75);
-  text-align: center; letter-spacing: 0.1px; line-height: 1.25;
+.qa-hint { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; margin-bottom: 10px; }
+
+/* Live preview strip */
+.qa-nav-preview { margin-bottom: 4px; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 4px; }
+.qa-prevcol-black.qa-nav-preview { background: rgba(255,255,255,0.05); }
+.qa-prev-bar {
+  display: flex; align-items: center; justify-content: space-around; height: 58px;
+  background: rgba(6,12,24,0.55); border: 1px solid rgba(255,255,255,0.12);
 }
+.qa-prevcol-black .qa-prev-bar { background: #000; }
+.qa-prev-default .qa-prev-bar { border-radius: 0; }
+.qa-prev-pill .qa-prev-bar { border-radius: 30px; margin: 4px 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+.qa-prev-rect .qa-prev-bar { border-radius: 12px; margin: 4px 6px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+.qa-prev-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; min-width: 0; }
+.qa-prev-puck img { width: 22px; height: 22px; object-fit: contain; display: block; }
+.qa-prev-lbl { font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
+
+/* Shape / colour option chips */
+.qa-opt-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.qa-opt {
+  flex: 1; min-width: 88px; text-align: center; padding: 12px 8px; border-radius: 0 !important;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.qa-opt.active { background: #fff; color: #060c18; border-color: #fff; }
+
+/* Feature-icon grid */
+.qa-feat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.qa-feat {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px;
+  border-radius: 0 !important; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.qa-feat.sel { background: #fff; border-color: #fff; }
+.qa-feat-ic {
+  width: 34px; height: 34px; border-radius: 50% !important; flex-shrink: 0;
+  background: rgba(232,213,163,0.1); display: flex; align-items: center; justify-content: center;
+}
+.qa-feat.sel .qa-feat-ic { background: rgba(6,12,24,0.08); }
+.qa-feat-ic img { width: 22px; height: 22px; object-fit: contain; display: block; }
+.qa-feat-lbl { font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,0.7); text-align: center; line-height: 1.2; }
+.qa-feat.sel .qa-feat-lbl { color: #060c18; }
+.qa-feat-num {
+  position: absolute; top: 5px; right: 5px; width: 16px; height: 16px; border-radius: 50%;
+  background: #c8a96e; color: #060c18; font-size: 9px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif;
+}
+.qa-reset-cta { margin-top: 22px; }
 
 /* Restore Streak — real purchase card */
 .bgp-restore-card { background: rgba(232,213,163,0.08); border: 1px solid rgba(232,213,163,0.25); border-radius: 18px !important; padding: 18px; margin-bottom: 14px; }
