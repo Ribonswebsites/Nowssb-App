@@ -75,6 +75,13 @@
       desc: 'Tap the Store icon anytime to buy new words and meanings — every purchase instantly joins your Library, so you can keep expanding your personal word ritual.'
     },
     {
+      title: 'Signature Word',
+      icon: PWG_ICONS.store,
+      img: PWG_PLACEHOLDER_IMG,
+      heading: 'Unlock a Signature Word',
+      desc: 'Signature words are the rarest word in each category — one per set, own only in a special gold edition. Look for the Signature tag in the Store to add one to your collection.'
+    },
+    {
       title: 'Player Ready',
       icon: PWG_ICONS.playerReady,
       img: PWG_PLAYER_BRAND_IMG,
