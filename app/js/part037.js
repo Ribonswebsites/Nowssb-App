@@ -110,6 +110,7 @@
 
     wrap.innerHTML =
       '<div class="rx-card">'+
+        '<img class="rx-banner" loading="lazy" decoding="async" onclick="openSub(\'ai-prescription\')" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png" alt="AI Prescription">'+
         '<div class="rx-header" onclick="openSub(\'ai-prescription\')" style="cursor:pointer;">'+
           '<div class="rx-header-left">'+
             '<div class="rx-ai-dot"></div>'+
@@ -142,6 +143,7 @@
     if (!wrap) return;
     wrap.innerHTML =
       '<div class="rx-card">'+
+        '<img class="rx-banner" loading="lazy" decoding="async" onclick="openSub(\'ai-prescription\')" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png" alt="AI Prescription">'+
         '<div class="rx-header">'+
           '<div class="rx-header-left"><div class="rx-ai-dot"></div><span class="rx-label">AI Prescription</span></div>'+
           '<span class="rx-time-badge">Building your ritual…</span>'+
