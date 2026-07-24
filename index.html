@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=309">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=425">
+<link rel="stylesheet" href="nowssb-nm.css?v=426">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1028,9 +1028,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
     </div>
 
-    <!-- Subscription -->
+    <!-- Subscription — auto-rotating crossfade background, no dots -->
     <div class="nmh-fsec" onclick="if(window.SS)SS.open('subscription')">
-      <div class="nmh-fsec-bg" style="background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779901344/1bd75700-59eb-11f1-919c-855cd6228d78_j7fnos.webp');"></div>
+      <div class="nmh-fsec-bg" id="nmhFsecSlide0" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784883053/grok_image_1784881903512_cvc7zo.jpg');opacity:1;"></div>
+      <div class="nmh-fsec-bg" id="nmhFsecSlide1" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784883054/file_0000000018c081f4a22308c811ff3be0_arrkkd.png');opacity:0;"></div>
       <div class="nmh-fsec-fade"></div>
       <div class="nmh-fsec-inner">
         <span class="nmh-fsec-eyebrow">NowssB Edition · Premium</span>
@@ -1039,6 +1040,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <button class="nmh-fsec-btn">Upgrade — from $4.99/mo</button>
       </div>
     </div>
+    <script src="app/js/part056.js?v=2"></script>
 
     <!-- Video banner — small word-search bar on the right -->
     <div class="nmh-video-banner nmh-video-banner-search">
@@ -7038,19 +7040,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          Background picker: intro never scrolls, content scrolls internally). -->
     <div style="position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 20px 80px;box-sizing:border-box;">
 
-    <!-- Hero Banner flush to top, back button overlaid — auto-rotating
-         crossfade (no dots), taller than the old single static image. -->
-    <div style="position:relative;margin:0 -20px 0;overflow:hidden;height:280px;">
-      <img decoding="async" loading="eager" id="ssHeroSlide0" alt="Healing is Fashion"
-        src="https://res.cloudinary.com/eenvubod/image/upload/v1784883053/grok_image_1784881903512_cvc7zo.jpg"
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:1;">
-      <img decoding="async" loading="lazy" id="ssHeroSlide1" alt="Healing is Fashion"
-        src="https://res.cloudinary.com/eenvubod/image/upload/v1784883054/file_0000000018c081f4a22308c811ff3be0_arrkkd.png"
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:0;">
+    <!-- Hero Banner flush to top, back button overlaid -->
+    <div style="position:relative;margin:0 -20px 0;overflow:hidden;">
+      <img decoding="async" loading="eager"
+        src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779959490/f5dbb980-5a74-11f1-b395-7149fc656cdb_wft1nx.webp"
+        alt="Healing is Fashion"
+        style="width:100%;height:220px;object-fit:cover;object-position:center top;display:block;">
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0) 40%,rgba(6,12,24,0.85) 100%);pointer-events:none;"></div>
       <button class="ss-back" onclick="ssClosePanel('subscription')" style="position:absolute;top:max(env(safe-area-inset-top,12px),12px);left:12px;"></button>
     </div>
-    <script src="app/js/part056.js?v=1"></script>
     <!-- Hero text -->
     <div style="text-align:center;padding:20px 0 32px;">
       <div style="font-size:10px;letter-spacing:3.5px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:10px;">NOWSBANSIU EDITION</div>
@@ -8121,7 +8119,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 
 
-<script src="app/js/part040.js?v=169"></script>
+<script src="app/js/part040.js?v=170"></script>
 
 <!-- ══ REBUILT SETTINGS PANELS ══ -->
 
