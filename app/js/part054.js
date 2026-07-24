@@ -37,6 +37,7 @@
   var PWG_READY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876917/file_00000000b6c481fab8074cb5a1d16756_thikfl.png';
   var PWG_STORE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876916/file_00000000c70081faab87b58c23b3edcb_yzyrbf.png';
   var PWG_PRACTICE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877225/file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png';
+  var PWG_LISTEN_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877426/file_00000000e0948207852ee99ed468fbb0_gon5be.png';
 
   var PWG_SLIDES = [
     {
@@ -49,7 +50,7 @@
     {
       title: 'Player Listen',
       icon: PWG_ICONS.listen,
-      img: PWG_PLACEHOLDER_IMG,
+      img: PWG_LISTEN_IMG,
       heading: 'Listen & Navigate',
       desc: 'Tap the centre Play button to hear the word pronounced aloud. Use the arrows on either side to move to the Previous or Next word, and tap Replay anytime to hear it again.'
     },
