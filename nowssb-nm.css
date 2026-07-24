@@ -3363,7 +3363,7 @@ body.nm-glass #sub-health-journey .gsel-card {
 /* Subscription card (normal home) */
 .nmh-fsec {
   position:relative; width:100%; border-radius:24px !important; overflow:hidden;
-  aspect-ratio:16/14; min-height:360px; background:#0a1020;
+  aspect-ratio:16/18; min-height:420px; background:#0a1020;
   box-shadow:10px 10px 26px rgba(0,0,0,0.16), -7px -7px 20px rgba(255,255,255,0.98); cursor:pointer;
 }
 .nmh-fsec-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
