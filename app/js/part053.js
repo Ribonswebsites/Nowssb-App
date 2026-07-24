@@ -38,6 +38,7 @@
           (unlocked ? 'Unlocked ✓ — apply at checkout' : qualifying.length + ' / ' + c.min + ' ' + reqNoun + (c.min > 1 ? 's' : '') + ' in cart') +
         '</div>' +
         '<div class="bgp-coupon-chevron"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+        '<button class="bgp-coupon-apply-btn" onclick="event.stopPropagation();couponProceedCheckout(\'' + code + '\')">Apply Coupon</button>' +
       '</div>';
     }).join('');
 
@@ -54,13 +55,19 @@
       return;
     }
 
+    var wordImg = window.RM_WORD_IMG || '';
     gridBox.innerHTML = discounted.map(function (word, i) {
       var t = tiers[wordTier[word]] || {};
       return '<div class="bgp-offer-card' + (i >= 6 ? ' bgp-hidden-extra' : '') + '" onclick="nwsbOpenStoreWord(\'' + String(word).replace(/'/g, '') + '\')">' +
         (t.discount ? '<div class="bgp-offer-badge">' + t.discount + '</div>' : '') +
-        '<div class="bgp-offer-word">' + word + '</div>' +
-        '<div class="bgp-offer-price"><span class="bgp-offer-now">' + (t.price || '') + '</span>' +
-          (t.origPrice ? '<span class="bgp-offer-was">' + t.origPrice + '</span>' : '') +
+        '<div class="bgp-offer-row">' +
+          '<img class="bgp-offer-img" src="' + wordImg + '" alt="" loading="lazy" decoding="async">' +
+          '<div class="bgp-offer-info">' +
+            '<div class="bgp-offer-word">' + word + '</div>' +
+            '<div class="bgp-offer-price"><span class="bgp-offer-now">' + (t.price || '') + '</span>' +
+              (t.origPrice ? '<span class="bgp-offer-was">' + t.origPrice + '</span>' : '') +
+            '</div>' +
+          '</div>' +
         '</div>' +
         '<div class="bgp-offer-cta">Grab Deal →</div>' +
       '</div>';
