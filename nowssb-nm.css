@@ -2600,11 +2600,12 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 
 /* ── Live nav SHAPE — floating pill / floating rectangle (default = no
    override, stays full-width bottom-anchored). !important beats both the
-   base #ig-bottomnav rules and #ig-social-nav's inline styles. ── */
+   base #ig-bottomnav rules and #ig-social-nav's inline styles. Labels stay
+   visible on the floating shapes (taller bar). ── */
 body.navshape-pill #ig-bottomnav, body.navshape-pill #ig-social-nav {
   left: 16px !important; right: 16px !important;
   bottom: calc(14px + env(safe-area-inset-bottom,0px)) !important;
-  height: 60px !important; padding-bottom: 0 !important;
+  height: 62px !important; padding-bottom: 0 !important;
   border-radius: 34px !important; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.13) !important;
   box-shadow: 0 14px 34px rgba(0,0,0,0.5) !important;
@@ -2612,11 +2613,17 @@ body.navshape-pill #ig-bottomnav, body.navshape-pill #ig-social-nav {
 body.navshape-rect #ig-bottomnav, body.navshape-rect #ig-social-nav {
   left: 12px !important; right: 12px !important;
   bottom: calc(12px + env(safe-area-inset-bottom,0px)) !important;
-  height: 60px !important; padding-bottom: 0 !important;
+  height: 62px !important; padding-bottom: 0 !important;
   border-radius: 14px !important; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.13) !important;
   box-shadow: 0 14px 34px rgba(0,0,0,0.5) !important;
 }
+/* Rectangle corner variant — Edge = sharp corners */
+body.navshape-rect.navcorner-edge #ig-bottomnav, body.navshape-rect.navcorner-edge #ig-social-nav { border-radius: 0 !important; }
+/* Nav labels always visible (never hidden on inactive tabs) */
+#ig-bottomnav .ig-nav-label { color: rgba(255,255,255,0.6) !important; opacity: 1 !important; display: block !important; }
+#ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #fff !important; }
+
 /* ── Live nav COLOUR — black (default = glass, no override). Doubled-id
    selector deliberately out-specifies the base glass rule
    (body:not(.nav-neo):not(.nav-solid) #ig-bottomnav) so black wins no
@@ -2630,30 +2637,50 @@ body.navcolor-black #ig-social-nav#ig-social-nav {
 
 /* ── Customizer UI ── */
 #sub-quick-access .bgp-content { padding-bottom: 60px; }
+.qa-hdr-cust { flex-shrink: 0; }
 .qa-reset-hdr {
-  margin-left: auto; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
   color: #e8d5a3; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
   padding: 7px 14px; border-radius: 0 !important; cursor: pointer; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
 }
-.qa-hint { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; margin-bottom: 10px; }
+.qa-hint { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; margin-bottom: 12px; }
 
-/* Live preview strip */
-.qa-nav-preview { margin-bottom: 4px; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 4px; }
-.qa-prevcol-black.qa-nav-preview { background: rgba(255,255,255,0.05); }
+/* Explainer banner */
+.qa-explain {
+  display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; margin: 2px 0 10px;
+  background: #000; border: 1px solid rgba(232,213,163,0.2); border-radius: 16px !important;
+}
+.qa-explain-ic {
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: 50% !important;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.qa-explain-ic svg { width: 18px; height: 18px; }
+.qa-explain-txt { font-family: 'DM Sans', sans-serif; font-size: 12px; line-height: 1.55; color: rgba(255,255,255,0.62); }
+.qa-explain-txt b { color: #e8d5a3; font-weight: 700; }
+
+/* Live preview strip — larger, faithfully reflects shape + corner + colour */
+.qa-nav-preview { margin-bottom: 4px; background: rgba(255,255,255,0.03); border-radius: 16px !important; padding: 10px; }
+.qa-prevcol-black.qa-nav-preview { background: rgba(255,255,255,0.06); }
 .qa-prev-bar {
-  display: flex; align-items: center; justify-content: space-around; height: 58px;
-  background: rgba(6,12,24,0.55); border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: space-around; height: 72px;
+  background: rgba(6,12,24,0.55); border: 1px solid rgba(255,255,255,0.14);
 }
 .qa-prevcol-black .qa-prev-bar { background: #000; }
-.qa-prev-default .qa-prev-bar { border-radius: 0; }
-.qa-prev-pill .qa-prev-bar { border-radius: 30px; margin: 4px 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-.qa-prev-rect .qa-prev-bar { border-radius: 12px; margin: 4px 6px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-.qa-prev-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; min-width: 0; }
-.qa-prev-puck img { width: 22px; height: 22px; object-fit: contain; display: block; }
-.qa-prev-lbl { font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
+/* border-radius needs !important to beat app.css's global *{border-radius:0!important} reset */
+.qa-prev-default .qa-prev-bar { border-radius: 0 !important; }
+.qa-prev-pill .qa-prev-bar { border-radius: 36px !important; margin: 2px 14px; box-shadow: 0 10px 24px rgba(0,0,0,0.55); }
+.qa-prev-rect .qa-prev-bar { border-radius: 16px !important; margin: 2px 8px; box-shadow: 0 10px 24px rgba(0,0,0,0.55); }
+.qa-prev-rect.qa-prevcorner-edge .qa-prev-bar { border-radius: 0 !important; }
+.qa-prev-item { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; min-width: 0; }
+.qa-prev-puck { width: 30px; height: 30px; border-radius: 50% !important; background: #000; display: flex; align-items: center; justify-content: center; }
+.qa-prev-puck.qa-prev-connect { background: rgba(232,213,163,0.14); }
+.qa-prev-puck img { width: 20px; height: 20px; object-fit: contain; display: block; }
+.qa-prev-lbl { font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.62); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
 
-/* Shape / colour option chips */
+/* Shape / corner / colour option chips */
 .qa-opt-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.qa-corner-row { margin-top: 8px; }
 .qa-opt {
   flex: 1; min-width: 88px; text-align: center; padding: 12px 8px; border-radius: 0 !important;
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);
@@ -2661,19 +2688,32 @@ body.navcolor-black #ig-social-nav#ig-social-nav {
 }
 .qa-opt.active { background: #fff; color: #060c18; border-color: #fff; }
 
+/* Feature grouping — In-Nav vs Available, split by a thin divider, each
+   under its own black banner. */
+.qa-group-banner {
+  background: #000; border: 1px solid rgba(232,213,163,0.18); border-radius: 0 !important;
+  padding: 9px 14px; margin-bottom: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #e8d5a3;
+}
+.qa-group-divider { height: 1px; background: rgba(255,255,255,0.14); margin: 18px 0; }
+
 /* Feature-icon grid */
-.qa-feat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.qa-feat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 4px; }
+.qa-feat-empty { grid-column: 1 / -1; font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.4); padding: 8px 0; }
 .qa-feat {
-  position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px;
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 4px 12px;
   border-radius: 0 !important; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
 .qa-feat.sel { background: #fff; border-color: #fff; }
+/* Icon wrapper is a completely black circle — except Connect, which keeps
+   its gold-tint puck. */
 .qa-feat-ic {
-  width: 34px; height: 34px; border-radius: 50% !important; flex-shrink: 0;
-  background: rgba(232,213,163,0.1); display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50% !important; flex-shrink: 0;
+  background: #000; display: flex; align-items: center; justify-content: center;
 }
-.qa-feat.sel .qa-feat-ic { background: rgba(6,12,24,0.08); }
+.qa-feat-connect .qa-feat-ic { background: rgba(232,213,163,0.14); }
 .qa-feat-ic img { width: 22px; height: 22px; object-fit: contain; display: block; }
 .qa-feat-lbl { font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,0.7); text-align: center; line-height: 1.2; }
 .qa-feat.sel .qa-feat-lbl { color: #060c18; }
@@ -2682,7 +2722,21 @@ body.navcolor-black #ig-social-nav#ig-social-nav {
   background: #c8a96e; color: #060c18; font-size: 9px; font-weight: 800;
   display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif;
 }
-.qa-reset-cta { margin-top: 22px; }
+/* Pencil edit affordance on every tile (selected + unselected) */
+.qa-feat-edit { position: absolute; top: 5px; left: 5px; width: 13px; height: 13px; color: rgba(255,255,255,0.4); }
+.qa-feat.sel .qa-feat-edit { color: rgba(6,12,24,0.5); }
+.qa-feat-edit svg { width: 13px; height: 13px; display: block; }
+
+.qa-apply-cta { margin-top: 24px; }
+
+/* Toast */
+.qa-toast {
+  position: absolute; left: 50%; bottom: 84px; transform: translate(-50%, 12px);
+  background: rgba(255,255,255,0.96); color: #060c18; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800;
+  padding: 10px 18px; border-radius: 22px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  opacity: 0; pointer-events: none; transition: opacity .22s ease, transform .22s ease; z-index: 40;
+}
+.qa-toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 /* Restore Streak — real purchase card */
 .bgp-restore-card { background: rgba(232,213,163,0.08); border: 1px solid rgba(232,213,163,0.25); border-radius: 18px !important; padding: 18px; margin-bottom: 14px; }
