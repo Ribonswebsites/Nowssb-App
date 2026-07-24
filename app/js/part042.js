@@ -54,6 +54,16 @@
       </div>
     </div>
 
+    <!-- ── PERSONALIZATION ── -->
+    <div class="ss-section-title">PERSONALIZATION</div>
+    <div class="ss-section">
+      <div class="sr last" onclick="openSub('quick-access')">
+        <div class="sr-icon gold"><svg width="16" height="16" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="12" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="12" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <div class="sr-body"><div class="sr-label">Quick Access</div><div class="sr-sub">Customize your bottom navigation bar</div></div>
+        <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+
     <!-- ── PRACTICE ── -->
     <div class="ss-section-title">PRACTICE</div>
     <div class="ss-section">
