@@ -3368,12 +3368,31 @@ body.nm-glass #sub-health-journey .gsel-card {
 }
 .nmh-fsec-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
 .nmh-fsec-fade { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(6,12,24,0) 26%, rgba(6,12,24,.5) 60%, rgba(6,12,24,.96) 100%); }
-.nmh-fsec-inner { position:absolute; left:0; right:0; bottom:0; padding:24px 22px; z-index:1; }
-.nmh-fsec-eyebrow { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#e8d5a3; }
-.nmh-fsec-title { font-family:'DM Sans',sans-serif; font-size:24px; font-weight:800; color:#fff; line-height:1.15; margin:8px 0; }
-.nmh-fsec-sub { font-family:'DM Sans',sans-serif; font-size:12px; color:rgba(255,255,255,.72); line-height:1.6; margin-bottom:16px; max-width:300px; }
-.nmh-fsec-btn { border:none; background:#fff; color:#060c18; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; padding:13px 22px; border-radius:0 !important; cursor:pointer; }
-.nmh-fsec-btn:active { transform:scale(.97); }
+/* Eyebrow + headline pinned top-left, narrow column so it never reaches
+   the model's face/head in the upper-center of the photo. */
+.nmh-fsec-top { position:absolute; top:20px; left:20px; width:55%; z-index:1; }
+.nmh-fsec-eyebrow { display:block; font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#e8d5a3; }
+.nmh-fsec-title { font-family:'DM Sans',sans-serif; font-size:16px; font-weight:800; color:#fff; line-height:1.2; margin:8px 0 0; }
+/* Subtitle pinned bottom-left, independent of the top block. */
+.nmh-fsec-sub { position:absolute; left:20px; bottom:20px; max-width:55%; z-index:1; margin:0; font-family:'DM Sans',sans-serif; font-size:12px; color:rgba(255,255,255,.72); line-height:1.6; }
+/* CTA floats on the right, vertically centered over the empty area
+   between the model and the wave graphic — compact, not full-width. */
+.nmh-fsec-btn {
+  position:absolute; top:50%; right:20px; transform:translateY(-50%); z-index:1; width:auto; white-space:nowrap;
+  border:none; background:#fff; color:#060c18; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:800;
+  letter-spacing:.5px; padding:13px 22px; border-radius:0 !important; cursor:pointer;
+}
+.nmh-fsec-btn:active { transform:translateY(-50%) scale(.97); }
+/* Very small widths — drop the button back below the subtitle instead
+   of it overlapping the wave/edge. */
+@media (max-width:350px) {
+  .nmh-fsec-sub { bottom:96px; }
+  .nmh-fsec-btn { top:auto; bottom:20px; right:auto; left:20px; transform:none; }
+  .nmh-fsec-btn:active { transform:scale(.97); }
+  /* Fashion Home's equivalent inline-styled promo card */
+  #fashFsecSub { bottom:100px !important; }
+  #fashFsecCta { top:auto !important; bottom:20px !important; right:auto !important; left:20px !important; transform:none !important; text-align:left !important; }
+}
 
 /* ===== EXPLORE (#sub-people) — header + search below + centered empty ===== */
 /* the scroll area flows BELOW the header/search now (was absolute-filling) */
