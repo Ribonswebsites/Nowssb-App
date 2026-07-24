@@ -7038,15 +7038,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          Background picker: intro never scrolls, content scrolls internally). -->
     <div style="position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 20px 80px;box-sizing:border-box;">
 
-    <!-- Hero Banner flush to top, back button overlaid -->
-    <div style="position:relative;margin:0 -20px 0;overflow:hidden;">
-      <img decoding="async" loading="eager"
-        src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779959490/f5dbb980-5a74-11f1-b395-7149fc656cdb_wft1nx.webp"
-        alt="Healing is Fashion"
-        style="width:100%;height:220px;object-fit:cover;object-position:center top;display:block;">
+    <!-- Hero Banner flush to top, back button overlaid — auto-rotating
+         crossfade (no dots), taller than the old single static image. -->
+    <div style="position:relative;margin:0 -20px 0;overflow:hidden;height:280px;">
+      <img decoding="async" loading="eager" id="ssHeroSlide0" alt="Healing is Fashion"
+        src="https://res.cloudinary.com/eenvubod/image/upload/v1784883053/grok_image_1784881903512_cvc7zo.jpg"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:1;">
+      <img decoding="async" loading="lazy" id="ssHeroSlide1" alt="Healing is Fashion"
+        src="https://res.cloudinary.com/eenvubod/image/upload/v1784883054/file_0000000018c081f4a22308c811ff3be0_arrkkd.png"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:0;">
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0) 40%,rgba(6,12,24,0.85) 100%);pointer-events:none;"></div>
       <button class="ss-back" onclick="ssClosePanel('subscription')" style="position:absolute;top:max(env(safe-area-inset-top,12px),12px);left:12px;"></button>
     </div>
+    <script src="app/js/part056.js?v=1"></script>
     <!-- Hero text -->
     <div style="text-align:center;padding:20px 0 32px;">
       <div style="font-size:10px;letter-spacing:3.5px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:10px;">NOWSBANSIU EDITION</div>
@@ -8117,7 +8121,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 
 
-<script src="app/js/part040.js?v=168"></script>
+<script src="app/js/part040.js?v=169"></script>
 
 <!-- ══ REBUILT SETTINGS PANELS ══ -->
 
