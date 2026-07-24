@@ -3382,6 +3382,18 @@ body.nm-glass #sub-health-journey .gsel-card {
 .nmh-fsec-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
 .nmh-fsec-fade { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(6,12,24,0.0) 0%, rgba(6,12,24,0.15) 40%, rgba(6,12,24,0.72) 100%); }
 
+/* Home quick-tiles (Sound Library / My Progress / Word Science / Profile) —
+   4 wide 16:9 rows instead of a 2x2 grid, so the new 16:9 photography
+   fits properly instead of being cropped into a near-square tile. */
+.home-grid { grid-template-columns: 1fr !important; }
+.home-tile { aspect-ratio: 16/9 !important; padding: 0 !important; min-height: 0 !important; }
+.home-tile-enter {
+  position: absolute; top: 50%; right: 14px; transform: translateY(-50%); z-index: 2;
+  display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  background: #fff; color: #060c18; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800;
+  letter-spacing: 0.3px; padding: 10px 16px; border-radius: 0 !important;
+}
+
 /* ===== EXPLORE (#sub-people) — header + search below + centered empty ===== */
 /* the scroll area flows BELOW the header/search now (was absolute-filling) */
 #sub-people .ig-scroll {
