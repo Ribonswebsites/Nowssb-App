@@ -23,6 +23,7 @@
     var cart = window.nssCart || [];
     var coupons = window.NSS_COUPONS || {};
     var qualifyFn = window.chkQualifyingItems || function (c) { return c; };
+    var couponImg = 'https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png';
     couponsBox.innerHTML = Object.keys(coupons).map(function (code) {
       var c = coupons[code];
       var qualifying = qualifyFn(cart, c);
@@ -31,14 +32,20 @@
       var page = COUPON_PAGE[code];
       var reqNoun = c.requireTag ? 'signature word' : 'item';
       return '<div class="bgp-coupon-card bgp-coupon-card-link" onclick="openSub(\'' + page + '\')">' +
-        '<div class="bgp-coupon-top"><span class="bgp-coupon-code">' + code + '</span><span class="bgp-coupon-pct">' + c.pct + '% OFF</span></div>' +
-        '<div class="bgp-coupon-req">' + c.label + '</div>' +
-        '<div class="bgp-coupon-bar-track"><div class="bgp-coupon-bar-fill" style="width:' + pct + '%;"></div></div>' +
-        '<div class="bgp-coupon-status ' + (unlocked ? 'unlocked' : 'locked') + '">' +
-          (unlocked ? 'Unlocked ✓ — apply at checkout' : qualifying.length + ' / ' + c.min + ' ' + reqNoun + (c.min > 1 ? 's' : '') + ' in cart') +
+        '<img class="bgp-coupon-img" src="' + couponImg + '" alt="" loading="lazy" decoding="async">' +
+        '<div class="bgp-coupon-main">' +
+          '<div class="bgp-coupon-top"><span class="bgp-coupon-code">' + code + '</span><span class="bgp-coupon-pct">' + c.pct + '% OFF</span></div>' +
+          '<div class="bgp-coupon-req">' + c.label + '</div>' +
+          '<div class="bgp-coupon-bar-track"><div class="bgp-coupon-bar-fill" style="width:' + pct + '%;"></div></div>' +
+          '<div class="bgp-coupon-status ' + (unlocked ? 'unlocked' : 'locked') + '">' +
+            (unlocked ? 'Unlocked ✓ — apply at checkout' : qualifying.length + ' / ' + c.min + ' ' + reqNoun + (c.min > 1 ? 's' : '') + ' in cart') +
+          '</div>' +
+          '<div class="bgp-coupon-actions">' +
+            '<button class="bgp-coupon-apply-btn" onclick="event.stopPropagation();couponProceedCheckout(\'' + code + '\')">Apply Coupon</button>' +
+            '<button class="bgp-coupon-cart-btn" onclick="event.stopPropagation();nssOpenCart()" aria-label="Cart"><svg width="16" height="16" viewBox="0 0 22 22" fill="none" stroke="#060c18" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#060c18" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#060c18" stroke="none"/></svg></button>' +
+          '</div>' +
         '</div>' +
         '<div class="bgp-coupon-chevron"><svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
-        '<button class="bgp-coupon-apply-btn" onclick="event.stopPropagation();couponProceedCheckout(\'' + code + '\')">Apply Coupon</button>' +
       '</div>';
     }).join('');
 
