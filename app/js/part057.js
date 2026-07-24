@@ -146,6 +146,14 @@
   function render() { renderPreview(); renderChips(); renderFeatures(); }
   window.qaNavRender = function () { loadStage(); render(); };
 
+  // Intro page → main content, same transition Streak/AI Prescription use.
+  window.qaEnterFromIntro = function () {
+    var intro = document.getElementById('qaIntroPage');
+    var main = document.getElementById('qaMainContent');
+    if (intro) intro.classList.add('rm-intro-hidden');
+    if (main) main.style.display = 'block';
+  };
+
   // ── Toast ─────────────────────────────────────────────────────
   var _toastT = null;
   function toast(msg) {

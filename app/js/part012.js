@@ -1638,6 +1638,12 @@ function openSub(id) {
     if (typeof window.renderOffersPage === 'function') window.renderOffersPage();
   }
   if (id === 'quick-access') {
+    // Reset the intro splash so it shows fresh on every open (same
+    // pattern as AI Prescription / Daily Streak).
+    var qaIntro = document.getElementById('qaIntroPage');
+    var qaMain = document.getElementById('qaMainContent');
+    if (qaIntro) qaIntro.classList.remove('rm-intro-hidden');
+    if (qaMain) qaMain.style.display = 'none';
     if (typeof window.qaNavRender === 'function') window.qaNavRender();
   }
   if (id === 'streak') {
