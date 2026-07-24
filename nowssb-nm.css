@@ -2620,9 +2620,12 @@ body.navshape-rect #ig-bottomnav, body.navshape-rect #ig-social-nav {
 }
 /* Rectangle corner variant — Edge = sharp corners */
 body.navshape-rect.navcorner-edge #ig-bottomnav, body.navshape-rect.navcorner-edge #ig-social-nav { border-radius: 0 !important; }
-/* Nav labels always visible (never hidden on inactive tabs) */
-#ig-bottomnav .ig-nav-label { color: rgba(255,255,255,0.6) !important; opacity: 1 !important; display: block !important; }
-#ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #fff !important; }
+/* Nav labels always visible (never hidden on inactive tabs). Doubled-id
+   selector (id=2) beats body.nm-mode #ig-bottomnav .ig-nav-label (id=1),
+   which otherwise paints inactive labels near-black — invisible on the
+   dark/black nav bar. */
+#ig-bottomnav#ig-bottomnav .ig-nav-label { color: rgba(255,255,255,0.72) !important; opacity: 1 !important; display: block !important; }
+#ig-bottomnav#ig-bottomnav .ig-nav-btn.active .ig-nav-label { color: #e8d5a3 !important; }
 
 /* ── Live nav COLOUR — black (default = glass, no override). Doubled-id
    selector deliberately out-specifies the base glass rule
