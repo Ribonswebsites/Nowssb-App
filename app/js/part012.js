@@ -1638,6 +1638,12 @@ function openSub(id) {
     if (typeof window.renderOffersPage === 'function') window.renderOffersPage();
   }
   if (id === 'streak') {
+    // Reset the intro splash so it shows fresh on every open (same
+    // pattern as AI Prescription's #rxIntroPage below).
+    var streakIntro = document.getElementById('streakIntroPage');
+    var streakMain = document.getElementById('streakMainContent');
+    if (streakIntro) streakIntro.classList.remove('rm-intro-hidden');
+    if (streakMain) streakMain.style.display = 'none';
     if (typeof window.renderStreakPage === 'function') window.renderStreakPage();
   }
   if (id === 'ai-prescription') {
