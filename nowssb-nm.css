@@ -2306,6 +2306,9 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   box-shadow:10px 10px 28px rgba(0,0,0,0.88), -5px -5px 18px rgba(50,50,110,0.32);
 }
 .nmh-video-banner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Subscription video banner — taller so its baked-in "NowssB Subscription
+   Home" text isn't cropped by the short default banner ratio. */
+.nmh-video-banner.nmh-vb-tall { aspect-ratio: 1080 / 620 !important; }
 /* Today Trending banner — true 16:9 (source video's own ratio), so
    object-fit:cover never actually crops anything, it just fills. */
 .nmh-trend-banner {
@@ -2938,6 +2941,8 @@ body.nwsb-custom-fashion-bg .bgp-streak-screen .bgp-body {
   border: 1px solid rgba(255,255,255,.08);
 }
 .fash-video-banner video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Subscription video banner — taller (see .nmh-vb-tall). */
+.fash-video-banner.fash-vb-tall { aspect-ratio: 1080 / 620 !important; }
 .fash-video-banner-search { cursor: pointer; }
 
 /* ── Shop Now / Subscribe Today CTA buttons overlaid on the coupon + video
@@ -3502,16 +3507,27 @@ body.nm-glass #sub-health-journey .gsel-card {
 /* Artwork tiles — original icon + title + subtitle stay on the LEFT, the 16:9
    artwork sits BIG on the RIGHT (absolutely placed, vertically centered). The
    tile reserves left space and the title shrinks a touch so the art can be large. */
-.nmh-tile.nmh-tile-art { position: relative; padding: 18px 63% 18px 18px; min-height: 128px; overflow: hidden; }
+.nmh-tile.nmh-tile-art { position: relative; padding: 18px 63% 46px 18px; min-height: 158px; overflow: hidden; }
 .nmh-tile.nmh-tile-art .nmh-tile-title { font-size: 13px; }
 .nmh-tile.nmh-tile-art .nmh-tile-title,
 .nmh-tile.nmh-tile-art .nmh-tile-sub { position: relative; z-index: 2; }
+/* Image nudged up (was vertically centered) to free room at the bottom for
+   the Enter button. */
 .nmh-tile-img {
-  position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+  position: absolute; right: -6px; top: 40%; transform: translateY(-50%);
   width: 68%; aspect-ratio: 16/9; object-fit: contain; display: block;
   pointer-events: none; z-index: 1;
   filter: drop-shadow(3px 4px 6px rgba(163,177,198,0.5)) drop-shadow(-2px -2px 4px rgba(255,255,255,0.66));
 }
+/* Enter pill at the bottom-left of each tile */
+.nmh-tile-enter {
+  position: absolute; left: 18px; bottom: 14px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 5px;
+  background: linear-gradient(135deg,#e8d5a3,#c8a96e); color: #060c18;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 0.3px;
+  padding: 6px 12px; border-radius: 20px !important;
+}
+.nmh-tile-enter svg { display: block; }
 #home-nm.nm-dark .nmh-tile-img {
   filter: drop-shadow(3px 4px 7px rgba(0,0,0,0.6)) drop-shadow(-2px -2px 5px rgba(50,50,110,0.28));
 }
