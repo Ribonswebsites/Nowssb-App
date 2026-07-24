@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=432">
+<link rel="stylesheet" href="nowssb-nm.css?v=434">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1028,17 +1028,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
     </div>
 
-    <!-- Subscription — auto-rotating crossfade background, no dots -->
+    <!-- Subscription — auto-rotating crossfade background (3 images), no
+         dots. Exact same structure/styling as the Fashion Home version
+         (#sub-promo-card) — top labels row, image, then pushed-down text. -->
     <div class="nmh-fsec" onclick="if(window.SS)SS.open('subscription')">
       <div class="nmh-fsec-bg" id="nmhFsecSlide0" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784883053/grok_image_1784881903512_cvc7zo.jpg');opacity:1;"></div>
       <div class="nmh-fsec-bg" id="nmhFsecSlide1" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784883054/file_0000000018c081f4a22308c811ff3be0_arrkkd.png');opacity:0;"></div>
       <div class="nmh-fsec-bg" id="nmhFsecSlide2" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784883053/file_00000000da4081f4805fabb5455a970d_sfrgs6.png');opacity:0;"></div>
       <div class="nmh-fsec-fade"></div>
-      <div class="nmh-fsec-inner">
-        <span class="nmh-fsec-eyebrow">NowssB Edition · Premium</span>
-        <div class="nmh-fsec-title">Unlock your full<br>healing potential</div>
-        <div class="nmh-fsec-sub">50+ premium words · AI pronunciation scoring · 5 custom routines · priority word drops</div>
-        <button class="nmh-fsec-btn">Upgrade — from $4.99/mo</button>
+      <!-- Labels pinned to top of card -->
+      <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
+      </div>
+      <!-- Main content pushed lower -->
+      <div style="position:relative;z-index:1;padding:360px 20px 68px;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;">Unlock your full<br>healing potential</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:28px;max-width:280px;">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.75);letter-spacing:0.5px;">from $4.99/mo</div>
+        </div>
       </div>
     </div>
 
@@ -1409,7 +1419,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
     </div>
     <!-- Main content pushed lower -->
-    <div style="position:relative;z-index:1;padding:330px 20px 68px;">
+    <div style="position:relative;z-index:1;padding:360px 20px 68px;">
       <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;">Unlock your full<br>healing potential</div>
       <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:28px;max-width:280px;">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
       <div style="display:flex;align-items:center;gap:12px;">
