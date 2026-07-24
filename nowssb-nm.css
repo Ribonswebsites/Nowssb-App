@@ -3367,20 +3367,12 @@ body.nm-glass #sub-health-journey .gsel-card {
   box-shadow:10px 10px 26px rgba(0,0,0,0.16), -7px -7px 20px rgba(255,255,255,0.98); cursor:pointer;
 }
 .nmh-fsec-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
-/* Text sits over the wave graphic on the right of every one of these
-   photos, not stacked in a bottom bar — a vertical fade for the CTA
-   area plus a horizontal fade behind the text block for legibility. */
-.nmh-fsec-fade {
-  position:absolute; inset:0;
-  background:
-    linear-gradient(90deg, transparent 38%, rgba(6,12,24,0.4) 62%, rgba(6,12,24,0.8) 100%),
-    linear-gradient(to bottom, transparent 62%, rgba(6,12,24,0.55) 100%);
-}
-.nmh-fsec-inner { position:absolute; top:46%; right:0; left:40%; transform:translateY(-50%); padding:0 22px; z-index:1; text-align:right; }
+.nmh-fsec-fade { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(6,12,24,0) 26%, rgba(6,12,24,.5) 60%, rgba(6,12,24,.96) 100%); }
+.nmh-fsec-inner { position:absolute; left:0; right:0; bottom:0; padding:24px 22px; z-index:1; }
 .nmh-fsec-eyebrow { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#e8d5a3; }
 .nmh-fsec-title { font-family:'DM Sans',sans-serif; font-size:24px; font-weight:800; color:#fff; line-height:1.15; margin:8px 0; }
-.nmh-fsec-sub { font-family:'DM Sans',sans-serif; font-size:12px; color:rgba(255,255,255,.72); line-height:1.6; margin-bottom:16px; margin-left:auto; max-width:220px; }
-.nmh-fsec-btn { border:none; background:#fff; color:#060c18; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; padding:13px 22px; border-radius:12px !important; cursor:pointer; }
+.nmh-fsec-sub { font-family:'DM Sans',sans-serif; font-size:12px; color:rgba(255,255,255,.72); line-height:1.6; margin-bottom:16px; max-width:300px; }
+.nmh-fsec-btn { border:none; background:#fff; color:#060c18; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:800; letter-spacing:.5px; padding:13px 22px; border-radius:0 !important; cursor:pointer; }
 .nmh-fsec-btn:active { transform:scale(.97); }
 
 /* ===== EXPLORE (#sub-people) — header + search below + centered empty ===== */
