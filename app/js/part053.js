@@ -171,7 +171,7 @@
     var d = window._userDataCache || {};
     var streak = d.currentStreak || d.streakCount || 0;
     return '<div class="nmh-sec-banner" id="streakProfileBanner" onclick="openSub(\'streak\')">' +
-      '<div class="nmh-sec-banner-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.8"/></svg></div>' +
+      '<div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>' +
       '<div class="nmh-sec-banner-divider"></div>' +
       '<div class="nmh-sec-banner-txt">' +
         '<div class="nmh-sec-banner-title">' + streak + ' Day Streak</div>' +
