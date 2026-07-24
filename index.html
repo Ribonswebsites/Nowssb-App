@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=446">
+<link rel="stylesheet" href="nowssb-nm.css?v=447">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -6143,6 +6143,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ══ MAIN CONTENT ══ -->
   <div id="qaMainContent" style="display:none;height:100%;">
+  <!-- Custom background layer (driven by the header customize-background
+       button → body.nwsb-custom-fashion-bg + CSS vars). Hidden unless a
+       custom background is active. -->
+  <div class="qa-page-bg" id="qaPageBg"></div>
   <div class="bgp-header-fixed">
     <div class="bgp-back bgp-back-white" onclick="closeSub('quick-access')">
       <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
@@ -6151,7 +6155,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </svg>
     </div>
     <div class="bgp-header-title">Quick Access</div>
-    <button class="rm-bg-customize-btn qa-hdr-cust" onclick="SS.open('fashionbg')" aria-label="Customize background">
+    <button class="rm-bg-customize-btn qa-hdr-cust" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background">
       <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
     </button>
     <button class="qa-reset-hdr" onclick="qaResetNav()" aria-label="Reset to default">Reset</button>
@@ -8896,7 +8900,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=14"></script>
 <script src="app/js/part056.js?v=4"></script>
-<script src="app/js/part057.js?v=4"></script>
+<script src="app/js/part057.js?v=5"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=177" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
