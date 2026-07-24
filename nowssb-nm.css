@@ -2446,6 +2446,14 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
 .bgp-back:active { background: rgba(232,213,163,0.22); }
+/* AI Prescription page's back button — solid white, forced perfect
+   circle (equal fixed width/height, no stretching from the flex row). */
+.bgp-back-white {
+  width: 38px !important; height: 38px !important; min-width: 38px !important; max-width: 38px !important;
+  min-height: 38px !important; max-height: 38px !important; box-sizing: border-box !important;
+  background: #fff !important; border: none !important;
+}
+.bgp-back-white:active { background: rgba(255,255,255,0.85) !important; }
 .bgp-header-title { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
 .bgp-body { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 .bgp-hero {

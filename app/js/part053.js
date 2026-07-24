@@ -412,12 +412,41 @@
     }).join('');
   }
 
+  /* Video banner tagline — icon stays fixed, only the text cycles, same
+     dash-in-from-right treatment as the Word Atelier / Meaning Store
+     video banners (app/js/part012.js's nssVidBannerCycle). Rotates
+     through 5 lines instead of repeating "AI Prescription" (already
+     baked into the video itself, right below the banner title). */
+  var RX_VID_BANNER_TAGLINES = [
+    'Monitoring Your Daily Practice',
+    'Tracking Your Healing Progress',
+    'Personalized Word Ritual',
+    'Built By Real-Time AI',
+    'Your Frequency, Decoded Daily'
+  ];
+  var _rxVidBannerTimer = null;
+  function rxVidBannerCycle() {
+    var el = document.getElementById('rxVidBannerText');
+    if (!el || _rxVidBannerTimer) return;
+    var idx = 0;
+    function paint() {
+      el.textContent = RX_VID_BANNER_TAGLINES[idx % RX_VID_BANNER_TAGLINES.length];
+      el.classList.remove('dash-in');
+      void el.offsetWidth;
+      el.classList.add('dash-in');
+      idx++;
+    }
+    paint();
+    _rxVidBannerTimer = setInterval(paint, 3000);
+  }
+
   var _origRenderAiPrescriptionPage = window.renderAiPrescriptionPage;
   window.renderAiPrescriptionPage = function () {
     _origRenderAiPrescriptionPage();
     renderRxOrganRow();
     renderRxRotator();
     renderRxMeanings();
+    rxVidBannerCycle();
   };
 
 })();
