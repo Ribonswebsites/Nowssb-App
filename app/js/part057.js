@@ -20,9 +20,12 @@
     { id: 'library',      label: 'Library',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png', run: function () { openSub('sound-library'); } },
     { id: 'store',        label: 'Store',      img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png', run: function () { openSub('nowssb-store'); } },
     { id: 'profile',      label: 'Profile',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png', run: function () { openSub('profile'); } },
-    { id: 'progress',     label: 'Progress',   img: 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/a7b04840-5789-11f1-9331-1302872077be_bqobig.png', run: function () { openSub('my-progress'); } },
-    { id: 'wordscience',  label: 'Word Sci',   img: 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png', run: function () { openSub('word-science'); } },
-    { id: 'meaningstore', label: 'Meaning',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558988/cb456de0-56cf-11f1-8fad-095787cce754_zplzrc.png', run: function () { openSub('meaning-store'); } },
+    { id: 'progress',     label: 'Progress',   img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png', run: function () { openSub('my-progress'); } },
+    { id: 'wordscience',  label: 'Word Sci',   img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png', run: function () { openSub('word-science'); } },
+    { id: 'meaningstore', label: 'Meaning',    img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png', run: function () { openSub('meaning-store'); } },
+    { id: 'search',       label: 'Search',     img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png', run: function () { openSub('search-choice'); } },
+    { id: 'cart',         label: 'Cart',       img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png', run: function () { openSub('cart'); } },
+    { id: 'wishlist',     label: 'Wishlist',   img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png', run: function () { openSub('wishlist'); } },
     { id: 'routines',     label: 'Routines',   img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png', run: function () { openSub('routines'); } },
     { id: 'chat',         label: 'Chat',       img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png', run: function () { if (typeof chatInboxOpen === 'function') chatInboxOpen(); } },
     { id: 'ai',           label: 'AI Rx',      img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png', run: function () { openSub('ai-prescription'); } },
@@ -76,7 +79,7 @@
       var f = feat(slots[i]) || feat(DEFAULT_SLOTS[i]);
       var btn = btns[i];
       btn.innerHTML =
-        '<span class="ig-nav-puck"><img class="ig-nav-img" decoding="async" loading="lazy" src="' + f.img + '" alt=""></span>' +
+        '<span class="ig-nav-puck"><img class="ig-nav-img' + (f.id === 'connect' ? ' ig-nav-img-connect' : '') + '" decoding="async" loading="lazy" src="' + f.img + '" alt=""></span>' +
         '<span class="ig-nav-label">' + f.label + '</span>';
       (function (run) { btn.onclick = function () { if (run) run(); }; })(f.run);
     }
