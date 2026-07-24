@@ -92,6 +92,8 @@
     var d = window._userDataCache || {};
     var streak = d.currentStreak || d.streakCount || 0;
     numEl.textContent = streak;
+    var introNumEl = document.getElementById('streakIntroNum');
+    if (introNumEl) introNumEl.textContent = streak + ' Day Streak';
 
     // No separate per-day practice log exists yet — the last `streak`
     // consecutive days (capped to the 7 shown here) are marked practiced,
@@ -211,6 +213,15 @@
     });
   })();
   window.renderStreakPage = renderStreakPage;
+
+  // Intro page → main content, same transition Word Atelier's
+  // rmEnterFromIntro() / AI Prescription's rxEnterFromIntro() use.
+  window.streakEnterFromIntro = function () {
+    var intro = document.getElementById('streakIntroPage');
+    var main = document.getElementById('streakMainContent');
+    if (intro) intro.classList.add('rm-intro-hidden');
+    if (main) main.style.display = 'block';
+  };
 
   /* ── "Everything NowssB" features menu — explainer carousel below the
      glass tube. One card visible at a time, auto-cycling with dots: the
