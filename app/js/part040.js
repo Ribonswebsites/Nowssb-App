@@ -237,6 +237,7 @@
             subIntro.style.opacity = '1';
             subIntro.style.pointerEvents = 'all';
           }
+          if (typeof window.ssHeroBannerReset === 'function') window.ssHeroBannerReset();
         },
         'profile-edit': function(){ _renderProfileEdit(); },
         'voice': function(){ _renderOptions('ss-opts-voice', ['F','M'], S.voice, function(v){SS.setVoice(v);}, ['Female','Male']); },
