@@ -1641,6 +1641,12 @@ function openSub(id) {
     if (typeof window.renderStreakPage === 'function') window.renderStreakPage();
   }
   if (id === 'ai-prescription') {
+    // Reset the intro splash so it shows fresh on every open (same
+    // pattern as the Subscription panel's #sub-intro-page).
+    var rxIntro = document.getElementById('rxIntroPage');
+    var rxMain = document.getElementById('rxMainContent');
+    if (rxIntro) rxIntro.classList.remove('rm-intro-hidden');
+    if (rxMain) rxMain.style.display = 'none';
     if (typeof window.renderAiPrescriptionPage === 'function') window.renderAiPrescriptionPage();
   }
   if (id === 'practice') {
