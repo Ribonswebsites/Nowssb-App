@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=437">
+<link rel="stylesheet" href="nowssb-nm.css?v=438">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -6047,7 +6047,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<!-- ══ QUICK ACCESS PAGE — dedicated black/gold page for the "Quick Access" banner ══ -->
+<!-- ══ QUICK ACCESS PAGE — dedicated black/gold page for the "Quick Access"
+     banner. Redesigned as a floating black glassmorphism dock covering
+     every major section of the app (not just 4), instead of a plain list. ══ -->
 <div class="sub-screen bgp-screen" id="sub-quick-access">
   <div class="bgp-header-fixed">
     <div class="bgp-back" onclick="closeSub('quick-access')">
@@ -6062,43 +6064,66 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="bgp-hero">
       <div class="bgp-hero-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="#e8d5a3" stroke-width="1.6"/><rect x="12" y="3" width="7" height="7" rx="1.5" stroke="#e8d5a3" stroke-width="1.6"/><rect x="3" y="12" width="7" height="7" rx="1.5" stroke="#e8d5a3" stroke-width="1.6"/><rect x="12" y="12" width="7" height="7" rx="1.5" stroke="#e8d5a3" stroke-width="1.6"/></svg></div>
       <div class="bgp-hero-title">Quick Access</div>
-      <div class="bgp-hero-sub">Everything you use most, one tap away</div>
+      <div class="bgp-hero-sub">Every feature, one tap away</div>
     </div>
     <div class="bgp-content">
-      <div class="bgp-qa-row" onclick="openSub('sound-library')">
-        <div class="bgp-qa-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 11h2l3-6 4 12 3-7 2 1h2" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div style="flex:1;min-width:0;">
-          <div class="bgp-qa-title">Sound Library</div>
-          <div class="bgp-qa-sub">Root frequencies for every word</div>
-        </div>
-        <div class="bgp-qa-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="square"/></svg></div>
-      </div>
-      <div class="bgp-qa-row" onclick="openSub('my-progress')">
-        <div class="bgp-qa-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div style="flex:1;min-width:0;">
-          <div class="bgp-qa-title">My Progress</div>
-          <div class="bgp-qa-sub">Your healing journey so far</div>
-        </div>
-        <div class="bgp-qa-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="square"/></svg></div>
-      </div>
-      <div class="bgp-qa-row" onclick="openSub('word-science')">
-        <div class="bgp-qa-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="3" stroke="#e8d5a3" stroke-width="1.7"/><path d="M7 8h8M7 11h6M7 14h4" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        <div style="flex:1;min-width:0;">
-          <div class="bgp-qa-title">Word Science</div>
-          <div class="bgp-qa-sub">NOWSBANSIU texts &amp; origins</div>
-        </div>
-        <div class="bgp-qa-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="square"/></svg></div>
-      </div>
-      <div class="bgp-qa-row" onclick="openSub('profile')">
-        <div class="bgp-qa-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="#e8d5a3" stroke-width="1.7"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round"/></svg></div>
-        <div style="flex:1;min-width:0;">
-          <div class="bgp-qa-title">My Profile</div>
-          <div class="bgp-qa-sub">Your settings &amp; account</div>
-        </div>
-        <div class="bgp-qa-arrow"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="square"/></svg></div>
-      </div>
+      <div class="bgp-section-label">All Features</div>
+      <div class="qa-dock-hint">Tap any icon in the floating dock below to jump straight there.</div>
     </div>
   </div>
+
+  <!-- Floating black glassmorphism dock — replaces the old plain list-row nav -->
+  <div class="qa-dock-wrap">
+    <div class="qa-dock">
+      <div class="qa-dock-item" onclick="openSub('sound-library')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M3 11h2l3-6 4 12 3-7 2 1h2" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="qa-dock-label">Sound<br>Library</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('word-science')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="3" stroke="#e8d5a3" stroke-width="1.7"/><path d="M7 8h8M7 11h6M7 14h4" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="qa-dock-label">Word<br>Science</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('my-progress')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="qa-dock-label">My<br>Progress</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('profile')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="#e8d5a3" stroke-width="1.7"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+        <div class="qa-dock-label">My<br>Profile</div>
+      </div>
+      <div class="qa-dock-item" onclick="openPracticeIntro()">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#e8d5a3" stroke-width="1.7"/><path d="M9 7.5l6 3.5-6 3.5z" fill="#e8d5a3"/></svg></div>
+        <div class="qa-dock-label">Practice</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('ai-prescription')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><rect x="2.5" y="8" width="17" height="6" rx="3" stroke="#e8d5a3" stroke-width="1.6"/><line x1="11" y1="8" x2="11" y2="14" stroke="#e8d5a3" stroke-width="1.6"/></svg></div>
+        <div class="qa-dock-label">AI<br>Prescription</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('streak')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M11 2c1 3-3 4-3 7.5a3 3 0 006 0c0-1.2-.6-2-1-2.7.8.3 3 1.8 3 5.2a5 5 0 01-10 0c0-4.5 3.5-6 5-10z" stroke="#e8d5a3" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+        <div class="qa-dock-label">Daily<br>Streak</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('offers')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 2.5H20a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-.44 1.06l-9 9a1.5 1.5 0 0 1-2.12 0l-8-8a1.5 1.5 0 0 1 0-2.12l9-9A1.5 1.5 0 0 1 12.5 2.5Z"/><circle cx="16.5" cy="7.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg></div>
+        <div class="qa-dock-label">All<br>Offers</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('nowssb-store')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M5 8h12l-1 11H6L5 8z" stroke="#e8d5a3" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 8V6a3 3 0 016 0v2" stroke="#e8d5a3" stroke-width="1.6"/></svg></div>
+        <div class="qa-dock-label">Store</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('cart')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg></div>
+        <div class="qa-dock-label">Cart</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('wishlist')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M11 18.5S3 13.8 3 8.4C3 5.6 5.2 3.5 7.8 3.5c1.5 0 2.8.7 3.2 1.9.4-1.2 1.7-1.9 3.2-1.9 2.6 0 4.8 2.1 4.8 4.9 0 5.4-8 10.1-8 10.1z" stroke="#e8d5a3" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <div class="qa-dock-label">Wishlist</div>
+      </div>
+      <div class="qa-dock-item" onclick="openSub('people')">
+        <div class="qa-dock-icon"><svg width="19" height="19" viewBox="0 0 22 22" fill="none"><circle cx="8" cy="9" r="3.3" stroke="#e8d5a3" stroke-width="1.6"/><circle cx="15" cy="10" r="2.6" stroke="#e8d5a3" stroke-width="1.6"/><path d="M2.5 18c0-3 2.5-5.3 5.5-5.3s5.5 2.3 5.5 5.3" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round"/><path d="M13 13.2c2.3.3 4 2.1 4 4.5" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <div class="qa-dock-label">Explore</div>
+      </div>
+    </div>
   </div>
 </div>
 
