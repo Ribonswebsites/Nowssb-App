@@ -1635,6 +1635,12 @@ function openSub(id) {
     if (typeof window.nwsbShowScrollHint === 'function') setTimeout(function () { window.nwsbShowScrollHint('chkScrollHint'); }, 500);
   }
   if (id === 'offers') {
+    // Reset the intro splash so it shows fresh on every open (same
+    // pattern as AI Prescription / Daily Streak).
+    var offIntro = document.getElementById('offersIntroPage');
+    var offMain = document.getElementById('offersMainContent');
+    if (offIntro) offIntro.classList.remove('rm-intro-hidden');
+    if (offMain) offMain.style.display = 'none';
     if (typeof window.renderOffersPage === 'function') window.renderOffersPage();
   }
   if (id === 'quick-access') {

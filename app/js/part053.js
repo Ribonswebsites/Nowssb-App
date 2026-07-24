@@ -84,6 +84,14 @@
     }
   }
   window.renderOffersPage = renderOffersPage;
+
+  // Intro page → main content, same transition Streak/AI Prescription use.
+  window.offersEnterFromIntro = function () {
+    var intro = document.getElementById('offersIntroPage');
+    var main = document.getElementById('offersMainContent');
+    if (intro) intro.classList.add('rm-intro-hidden');
+    if (main) main.style.display = 'block';
+  };
   window.offersShowMore = function () {
     document.querySelectorAll('#offersDealsGrid .bgp-hidden-extra').forEach(function (el) { el.classList.remove('bgp-hidden-extra'); });
     var btn = document.getElementById('offersShowMoreBtn');
