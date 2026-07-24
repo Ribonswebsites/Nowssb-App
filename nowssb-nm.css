@@ -2510,6 +2510,9 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 /* Opened from #sub-offers (which stays open underneath) — must layer above
    it, same treatment as #sub-explore-choice/#sub-search-choice below. */
 #sub-coupon-individual, #sub-coupon-bundle5, #sub-coupon-signature, #sub-coupon-bundle20 { z-index: 700 !important; }
+/* Quick Access opens from the Settings page (#sub-social) too — layer it
+   above so Settings stays underneath and Back returns there. */
+#sub-quick-access { z-index: 720 !important; }
 
 /* Offers page */
 .bgp-promo-scroll { display: flex; gap: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }

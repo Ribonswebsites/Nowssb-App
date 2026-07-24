@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=445">
+<link rel="stylesheet" href="nowssb-nm.css?v=446">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1323,6 +1323,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- AI Prescription Card -->
   <div id="rxCardWrap" style="width:100%;"></div>
+
+  <!-- Quick Access (nav-bar customizer) — same banner as Normal Home -->
+  <div class="nmh-sec-banner" onclick="openSub('quick-access')" style="margin:16px 0 0;">
+    <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="#fff" stroke-width="1.6"/><rect x="12" y="3" width="7" height="7" rx="1.5" stroke="#fff" stroke-width="1.6"/><rect x="3" y="12" width="7" height="7" rx="1.5" stroke="#fff" stroke-width="1.6"/><rect x="12" y="12" width="7" height="7" rx="1.5" stroke="#fff" stroke-width="1.6"/></svg></div>
+    <div class="nmh-sec-banner-divider"></div>
+    <div class="nmh-sec-banner-txt">
+      <div class="nmh-sec-banner-title">Quick Access</div>
+      <div class="nmh-sec-banner-sub">Customize your bottom navigation bar</div>
+    </div>
+    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
 
   <!-- 4 wide 16:9 rows (was a 2x2 grid) — each image already carries its
        own title text baked in, so the old top icon + DOM title/sub text
@@ -8660,7 +8671,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=222"></script>
+<script src="app/js/part042.js?v=223"></script>
 
 
 
