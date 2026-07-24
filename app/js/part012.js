@@ -1637,6 +1637,9 @@ function openSub(id) {
   if (id === 'offers') {
     if (typeof window.renderOffersPage === 'function') window.renderOffersPage();
   }
+  if (id === 'quick-access') {
+    if (typeof window.qaNavRender === 'function') window.qaNavRender();
+  }
   if (id === 'streak') {
     // Reset the intro splash so it shows fresh on every open (same
     // pattern as AI Prescription's #rxIntroPage below).
