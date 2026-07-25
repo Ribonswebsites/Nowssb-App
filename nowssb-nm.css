@@ -6213,11 +6213,14 @@ body.nmcorner-circle .nmh-tile.nmh-tile-art { border-radius: 999px !important; }
 #home .health-journey-card .hjc-content { min-height: 558px; }
 #home-nm .health-journey-card .hjc-content { min-height: 536px; }
 
-/* Today's Offer banner on the Fashion Home — inset to the same 16px the
-   coupon art above it uses, and tucked directly under it. .nmh-offer-banner
-   zeroes its margins for the Normal Home's wrapper, so they're restored here. */
+/* Today's Offer banner on the Fashion Home — inset to the same 16px the coupon
+   art above it uses, with a gap between the two (the Normal Home's version has
+   the same 14px) and square corners. The radius needs the #home scope: both
+   .nmh-sec-banner's 22px and .nmh-offer-banner's 0 are !important at equal
+   specificity, so source order was deciding it and the round one was winning. */
 #home .fash-offer-banner {
   width: calc(100% - 32px) !important;
-  margin: 0 16px 8px !important;
+  margin: 14px 16px 20px !important;
+  border-radius: 0 !important;
   box-sizing: border-box;
 }
