@@ -45,12 +45,14 @@
       art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_00000000536071f4bf5172014811968f_jkt450.png' }
   ];
 
-  /* The Normal Home's identity is the neumorphic card the rest of that page is
+  /* The Normal Home's identity is the soft raised card the rest of that page is
      built from, so that stays its default; the Fashion Home defaults to black. */
   var FASH_STYLES = [{ id: 'black', label: 'Black Banner' }, { id: 'image', label: 'Cover Image' },
                      { id: 'artwork', label: 'Artwork' }, { id: 'classic', label: 'Classic Glass' }];
-  var NM_STYLES   = [{ id: 'neuro', label: 'Neumorphic' }, { id: 'black', label: 'Black' },
-                     { id: 'image', label: 'Cover Image' }];
+  var NM_STYLES   = [{ id: 'neuro', label: 'Standard' }, { id: 'artwork', label: 'Artwork' },
+                     { id: 'black', label: 'Black' }, { id: 'image', label: 'Cover Image' }];
+  var NM_SURFACES = [{ id: 'convex', label: 'Convex' }, { id: 'concave', label: 'Concave (Dimple)' }];
+  function isSoft(style) { return style === 'neuro' || style === 'artwork'; }
   var CORNERS     = [{ id: 'rounded', label: 'Rounded Corners' }, { id: 'edge', label: 'Edge Corners' }];
 
   var _stage = null;   // staged (unsaved) config
@@ -61,7 +63,8 @@
   // ── APPLIED (persisted) config ────────────────────────────────
   function savedFashStyle()  { var s = ls('nwsb_tile_style', 'black'); return (s === 'image' || s === 'classic' || s === 'artwork') ? s : 'black'; }
   function savedFashCorner() { return ls('nwsb_tile_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
-  function savedNmStyle()    { var s = ls('nwsb_nm_tile_style', 'neuro'); return (s === 'black' || s === 'image') ? s : 'neuro'; }
+  function savedNmStyle()    { var s = ls('nwsb_nm_tile_style', 'neuro'); return (s === 'black' || s === 'image' || s === 'artwork') ? s : 'neuro'; }
+  function savedNmSurface()  { return ls('nwsb_nm_tile_surface', 'convex') === 'concave' ? 'concave' : 'convex'; }
   function savedNmCorner()   { return ls('nwsb_nm_tile_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
 
   function applyLive() {
@@ -70,8 +73,10 @@
     b.classList.add('fashtile-' + savedFashStyle());
     b.classList.remove('fashcorner-rounded', 'fashcorner-edge');
     b.classList.add('fashcorner-' + savedFashCorner());
-    b.classList.remove('nmtile-neuro', 'nmtile-black', 'nmtile-image');
+    b.classList.remove('nmtile-neuro', 'nmtile-artwork', 'nmtile-black', 'nmtile-image');
     b.classList.add('nmtile-' + savedNmStyle());
+    b.classList.remove('nmsurface-convex', 'nmsurface-concave');
+    b.classList.add('nmsurface-' + savedNmSurface());
     b.classList.remove('nmcorner-rounded', 'nmcorner-edge');
     b.classList.add('nmcorner-' + savedNmCorner());
   }
@@ -79,7 +84,7 @@
   // ── Render the picker (uses STAGED values) ────────────────────
   function loadStage() {
     _stage = { fashStyle: savedFashStyle(), fashCorner: savedFashCorner(),
-               nmStyle: savedNmStyle(), nmCorner: savedNmCorner() };
+               nmStyle: savedNmStyle(), nmCorner: savedNmCorner(), nmSurface: savedNmSurface() };
   }
   var ARROW = '<span class="qat-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span>';
   function previewHtml() {
@@ -104,13 +109,34 @@
     var f = document.getElementById('htFashGrid');
     if (f) { f.className = 'qat-grid qat-' + _stage.fashStyle + ' qat-corner-' + _stage.fashCorner; f.innerHTML = previewHtml(); }
     var n = document.getElementById('htNmGrid');
-    if (n) { n.className = 'qat-grid qat-' + _stage.nmStyle + ' qat-corner-' + _stage.nmCorner; n.innerHTML = previewHtml(); }
+    if (n) {
+      // Own class prefix: the Normal Home's looks are soft-surface cards, not
+      // the Fashion Home's dark ones, so they can't share qat-<style>.
+      n.className = 'qat-grid qat-nm-' + _stage.nmStyle + ' qat-corner-' + _stage.nmCorner +
+                    ' qat-surf-' + _stage.nmSurface;
+      n.innerHTML = previewHtml();
+    }
     fill('htFashStyleRow',  FASH_STYLES.map(function (o) { return chip(_stage.fashStyle, o, 'htSetFashStyle'); }).join(''));
     fill('htFashCornerRow', CORNERS.map(function (o) { return chip(_stage.fashCorner, o, 'htSetFashCorner'); }).join(''));
     fill('htNmStyleRow',    NM_STYLES.map(function (o) { return chip(_stage.nmStyle, o, 'htSetNmStyle'); }).join(''));
     fill('htNmCornerRow',   CORNERS.map(function (o) { return chip(_stage.nmCorner, o, 'htSetNmCorner'); }).join(''));
+    var sr = document.getElementById('htNmSurfaceRow');
+    if (sr) {
+      if (isSoft(_stage.nmStyle)) { sr.style.display = ''; sr.innerHTML = NM_SURFACES.map(function (o) { return chip(_stage.nmSurface, o, 'htSetNmSurface'); }).join(''); }
+      else { sr.style.display = 'none'; sr.innerHTML = ''; }
+    }
   }
   window.htRender = function () { loadStage(); render(); };
+
+  /* Opening is self-contained on purpose. window.openSub is wrapped by ~17
+     files, so relying on part012's branch to call htRender() means a single
+     stale file in that chain leaves this page rendered but empty. Opening the
+     screen and rendering it here keeps the two inseparable. */
+  window.htOpen = function () {
+    if (typeof window.openSub === 'function') window.openSub('home-tiles');
+    else { var s = document.getElementById('sub-home-tiles'); if (s) s.classList.add('open'); }
+    window.htRender();
+  };
 
   // ── Toast ─────────────────────────────────────────────────────
   var HT_ICON = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png';
@@ -137,22 +163,39 @@
   window.htSetFashCorner = function (c) { if (!_stage) loadStage(); _stage.fashCorner = c; render(); };
   window.htSetNmStyle    = function (s) { if (!_stage) loadStage(); _stage.nmStyle = s; render(); };
   window.htSetNmCorner   = function (c) { if (!_stage) loadStage(); _stage.nmCorner = c; render(); };
+  window.htSetNmSurface  = function (v) { if (!_stage) loadStage(); _stage.nmSurface = v; render(); };
 
   // ── Apply / Reset (these DO write to the live tiles) ──────────
-  window.htApply = function () {
-    if (!_stage) loadStage();
+  function applyFash() {
     lsSet('nwsb_tile_style', _stage.fashStyle);
     lsSet('nwsb_tile_corner', _stage.fashCorner);
+  }
+  function applyNm() {
     lsSet('nwsb_nm_tile_style', _stage.nmStyle);
     lsSet('nwsb_nm_tile_corner', _stage.nmCorner);
-    applyLive();
-    toast('Applied to your home ✓');
+    lsSet('nwsb_nm_tile_surface', _stage.nmSurface);
+  }
+  /* Each home applies on its own so the two sections never surprise each other,
+     and Default is scoped the same way — the header Reset still does both. */
+  window.htApplyFash = function () { if (!_stage) loadStage(); applyFash(); applyLive(); toast('Fashion home updated ✓'); };
+  window.htApplyNm   = function () { if (!_stage) loadStage(); applyNm();   applyLive(); toast('Normal home updated ✓'); };
+  window.htApply     = function () { if (!_stage) loadStage(); applyFash(); applyNm(); applyLive(); toast('Applied to your home ✓'); };
+  window.htDefaultFash = function () {
+    if (!_stage) loadStage();
+    _stage.fashStyle = 'black'; _stage.fashCorner = 'rounded';
+    applyFash(); applyLive(); render(); toast('Fashion home back to default');
+  };
+  window.htDefaultNm = function () {
+    if (!_stage) loadStage();
+    _stage.nmStyle = 'neuro'; _stage.nmCorner = 'rounded'; _stage.nmSurface = 'convex';
+    applyNm(); applyLive(); render(); toast('Normal home back to default');
   };
   window.htReset = function () {
     lsSet('nwsb_tile_style', 'black');
     lsSet('nwsb_tile_corner', 'rounded');
     lsSet('nwsb_nm_tile_style', 'neuro');
     lsSet('nwsb_nm_tile_corner', 'rounded');
+    lsSet('nwsb_nm_tile_surface', 'convex');
     applyLive();
     loadStage(); render();
     toast('Reset to default');
@@ -165,16 +208,22 @@
      one has fully closed, the settings circle itself grows leftward into
      a pill pointing back at the tap target. */
   var OPEN_MS = 900, HOLD_MS = 2100, CLOSE_MS = 900, GAP_MS = 450;
-  var RAILS = [{ tip: 'nmhTileTip', set: 'nmhTileSet' }, { tip: 'fashTileTip', set: 'fashTileSet' }];
+  var RAILS = [{ tip: 'nmhTileTip', set: 'nmhTileSet', end: 'nmhTileEnd' },
+               { tip: 'fashTileTip', set: 'fashTileSet', end: 'fashTileEnd' }];
   var _timers = [];
   function later(fn, ms) { _timers.push(setTimeout(fn, ms)); }
   function eachTip(fn) { RAILS.forEach(function (r) { var el = document.getElementById(r.tip); if (el) fn(el); }); }
   function eachSet(fn) { RAILS.forEach(function (r) { var el = document.getElementById(r.set); if (el) fn(el); }); }
+  function eachEnd(fn) { RAILS.forEach(function (r) { var el = document.getElementById(r.end); if (el) fn(el); }); }
 
   function showTip(i) {
     if (i >= HOME_TILES.length) {
-      // Every pill is closed by now, so the circle can grow without overlapping it.
-      later(function () { eachSet(function (el) { el.classList.add('open'); }); }, GAP_MS);
+      // Every tip is closed by now, so the circle can grow without overlapping it.
+      later(function () {
+        eachSet(function (el) { el.classList.add('open'); });
+        // ...and once that pill has settled, the closing one opens on the far right.
+        later(function () { eachEnd(function (el) { el.classList.add('open'); }); }, OPEN_MS + 500);
+      }, GAP_MS);
       return;
     }
     var t = HOME_TILES[i];
@@ -195,12 +244,15 @@
     _timers.forEach(clearTimeout); _timers = [];
     eachTip(function (el) { el.classList.remove('open'); });
     eachSet(function (el) { el.classList.remove('open'); });
+    eachEnd(function (el) { el.classList.remove('open'); });
     later(function () { showTip(0); }, 600);
   };
 
   // ── Init — apply the saved look, then run the rail once ───────
   function init() {
     applyLive();
+    loadStage();
+    render();   // so the page is never blank, whichever way it gets opened
     if (!document.getElementById('nmhTileTip') && !document.getElementById('fashTileTip')) return;
     later(function () { if (!document.hidden) window.htRunTipRail(); }, 1800);
   }
