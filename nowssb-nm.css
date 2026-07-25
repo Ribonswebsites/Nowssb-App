@@ -5949,7 +5949,7 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
               opacity   0.35s ease;
 }
 .htg-end:not(.open) { border-width: 0; }
-.htg-end.open { max-width: 190px; padding: 0 14px 0 12px; opacity: 1; gap: 11px; }
+.htg-end.open { max-width: 215px; padding: 0 14px 0 11px; opacity: 1; gap: 9px; }
 /* Vertical rule down the pill's left side, same divider the black banners use */
 .htg-end-rule { width: 1px; height: 17px; flex-shrink: 0; background: rgba(232,213,163,0.4); display: block; }
 .htg-end-txt {
@@ -6100,3 +6100,35 @@ body.nmsurface-concave.nmtile-artwork .nmh-tile-enter {
 .qat-grid.qat-surf-concave.qat-nm-artwork .qat-ic {
   box-shadow: inset 3px 3px 7px rgba(163,177,198,0.6), inset -2px -2px 6px #ffffff;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   HOME TILES page — labelled section furniture. A centred tag under each
+   preview plate, then a tagged rule introducing each group of options.
+   ══════════════════════════════════════════════════════════════════ */
+.ht-tag-pill {
+  display: inline-flex; align-items: center; flex-shrink: 0; white-space: nowrap;
+  background: #000; border: 1px solid rgba(232,213,163,0.28);
+  border-radius: 999px !important; padding: 6px 16px;
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.3px; color: #e8d5a3; line-height: 1;
+}
+.ht-preview-tag { display: flex; justify-content: center; margin: 14px 0 0; }
+/* Tag on the left, thin rule running out to the right edge */
+.ht-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 12px; }
+.ht-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.14); }
+/* The scoped Default button was running tall next to the heading — the app's
+   global 44px tap-target min-height was setting its height, not the padding. */
+.ht-default-btn { padding: 5px 13px; line-height: 1; align-self: center; min-height: 0 !important; height: 30px; }
+
+/* ── Third corner option: a full pill ── */
+body.fashcorner-pill .home-tile { border-radius: 999px !important; }
+body.nmcorner-pill .nmh-tile.nmh-tile-art { border-radius: 999px !important; }
+.qat-grid.qat-corner-pill .qat-tile { border-radius: 999px !important; }
+
+/* Last-resort net so a label can never spill out of the rail on any width */
+.htg-end { min-width: 0; }
+.htg-end-txt { overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Logo on the far left of the closing pill, before its divider ── */
+.htg-end-logo { width: 20px; height: 20px; flex-shrink: 0; display: block; }
+.htg-end-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }

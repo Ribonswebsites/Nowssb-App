@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=482">
+<link rel="stylesheet" href="nowssb-nm.css?v=486">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -834,7 +834,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <span class="htg-tip-rule"></span>
     <span class="htg-tip-txt"></span>
   </div>
-  <div class="htg-end" id="nmhTileEnd"><span class="htg-end-rule"></span><span class="htg-end-txt">Begin your healing</span></div>
+  <div class="htg-end" id="nmhTileEnd"><span class="htg-end-logo"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""></span><span class="htg-end-rule"></span><span class="htg-end-txt">Begin your healing</span></div>
 </div>
 <div class="nmh-grid">
       <div class="nmh-tile nmh-tile-art" onclick="openSub('sound-library')">
@@ -1117,7 +1117,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Video banner — above the subscription section -->
     <div class="nmh-video-banner nmh-vb-tall" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
-      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4"></video>
       <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
     </div>
 
@@ -1430,7 +1430,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <span class="htg-tip-rule"></span>
       <span class="htg-tip-txt"></span>
     </div>
-    <div class="htg-end" id="fashTileEnd"><span class="htg-end-rule"></span><span class="htg-end-txt">Begin your healing</span></div>
+    <div class="htg-end" id="fashTileEnd"><span class="htg-end-logo"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""></span><span class="htg-end-rule"></span><span class="htg-end-txt">Begin your healing</span></div>
   </div>
   <div class="home-grid w100">
     <div class="home-tile" onclick="openSub('sound-library')">
@@ -1551,7 +1551,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Video banner — above the subscription promo -->
   <div class="fash-video-banner fash-vb-tall" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
-    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4"></video>
     <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
   </div>
 
@@ -6446,7 +6446,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="qat-plate">
         <div class="qat-grid" id="htFashGrid"><!-- rendered by JS --></div>
       </div>
+      <div class="ht-preview-tag"><span class="ht-tag-pill">Preview your style</span></div>
+
+      <div class="ht-divider"><span class="ht-tag-pill">Pick Your Styles</span></div>
       <div class="qa-opt-row" id="htFashStyleRow"><!-- rendered by JS --></div>
+
+      <div class="ht-divider"><span class="ht-tag-pill">Pick the Corners</span></div>
       <div class="qa-opt-row qa-corner-row" id="htFashCornerRow"><!-- rendered by JS --></div>
       <button class="bgp-cta-btn qa-apply-cta" onclick="htApplyFash()">
         Apply Changes
@@ -6461,8 +6466,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="qat-plate">
         <div class="qat-grid" id="htNmGrid"><!-- rendered by JS --></div>
       </div>
+      <div class="ht-preview-tag"><span class="ht-tag-pill">Preview your style</span></div>
+
+      <div class="ht-divider"><span class="ht-tag-pill">Pick Your Styles</span></div>
       <div class="qa-opt-row" id="htNmStyleRow"><!-- rendered by JS --></div>
       <div class="qa-opt-row qa-corner-row" id="htNmSurfaceRow"><!-- rendered by JS when a soft-surface style is picked --></div>
+
+      <div class="ht-divider"><span class="ht-tag-pill">Pick the Corners</span></div>
       <div class="qa-opt-row qa-corner-row" id="htNmCornerRow"><!-- rendered by JS --></div>
       <button class="bgp-cta-btn qa-apply-cta" onclick="htApplyNm()">
         Apply Changes
@@ -9031,7 +9041,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=224"></script>
+<script src="app/js/part042.js?v=225"></script>
 
 
 
@@ -9178,7 +9188,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part056.js?v=4"></script>
 <script src="app/js/part057.js?v=10"></script>
 <script src="app/js/part058.js?v=1"></script>
-<script src="app/js/part059.js?v=3"></script>
+<script src="app/js/part059.js?v=6"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=177" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
