@@ -1,6 +1,12 @@
 // "Unlock your full healing potential" subscription banners — Normal Home
 // (.nmh-fsec, prefix nmhFsec) and Fashion Home (#sub-promo-card, prefix
-// fashFsec) — auto-rotating crossfade background, no dot indicators. Same
+// fashFsec) — auto-rotating crossfade background, no dot indicators.
+//
+// NOTE: both of those cards now use a single background VIDEO instead of
+// crossfading stills, so there are no <prefix>SlideN elements left for this
+// to drive and startRotator() returns immediately. It's kept because the
+// generic rotator is still the pattern to reuse if either card goes back to
+// a set of images. Same
 // pattern as Word Atelier's rmBannerReset (app/js/part009.js), generalized
 // to iterate however many <prefix>SlideN elements exist per banner. Both
 // screens are always in the DOM once the app boots, so each just

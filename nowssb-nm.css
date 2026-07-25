@@ -2667,9 +2667,14 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
   cursor: pointer; border: none; -webkit-tap-highlight-color: transparent;
 }
 .bgp-coupon-apply-btn:active { filter: brightness(0.94); }
+/* 44 square, not 38: app/app.css enforces a 44px min-height tap target on
+   buttons, so a 38px height rendered 38 wide by 44 tall — an oval. Matching
+   the enforced size keeps it a true circle AND the same height as the Apply
+   pill beside it, which that rule sizes too. */
 .bgp-coupon-cart-btn {
-  width: 38px; height: 38px; flex-shrink: 0; border-radius: 50% !important; background: #fff; border: none;
+  width: 44px; height: 44px; flex-shrink: 0; border-radius: 50% !important; background: #fff; border: none;
   display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  padding: 0;
 }
 .bgp-coupon-cart-btn:active { filter: brightness(0.94); }
 .bgp-coupon-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -6120,10 +6125,11 @@ body.nmsurface-concave.nmtile-artwork .nmh-tile-enter {
    global 44px tap-target min-height was setting its height, not the padding. */
 .ht-default-btn { padding: 5px 13px; line-height: 1; align-self: center; min-height: 0 !important; height: 30px; }
 
-/* ── Third corner option: a full pill ── */
-body.fashcorner-pill .home-tile { border-radius: 999px !important; }
-body.nmcorner-pill .nmh-tile.nmh-tile-art { border-radius: 999px !important; }
-.qat-grid.qat-corner-pill .qat-tile { border-radius: 999px !important; }
+/* ── Third corner option, Normal Home only: full radius, which lands as a
+   clean circle on that card. The Fashion Home's taller cards warp into a
+   stadium at the same radius, so it isn't offered there. ── */
+body.nmcorner-circle .nmh-tile.nmh-tile-art { border-radius: 999px !important; }
+.qat-grid.qat-corner-circle .qat-tile { border-radius: 999px !important; }
 
 /* Last-resort net so a label can never spill out of the rail on any width */
 .htg-end { min-width: 0; }
@@ -6132,3 +6138,15 @@ body.nmcorner-pill .nmh-tile.nmh-tile-art { border-radius: 999px !important; }
 /* ── Logo on the far left of the closing pill, before its divider ── */
 .htg-end-logo { width: 20px; height: 20px; flex-shrink: 0; display: block; }
 .htg-end-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Subscription section — the card's backdrop is a video now, not the three
+   crossfading stills. It sits under the existing gradient scrim (z-index 0),
+   so the labels, copy and Upgrade button (z-index 2) read exactly as before. */
+/* width/height are explicit, not just inset:0 — a <video> is a replaced
+   element, so with auto sizing it falls back to its intrinsic 300px instead
+   of stretching. 100% resolves against the card's padding box, which sits
+   inside the Normal Home's 12px neumorphic frame, exactly as intended. */
+.fsec-video {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none;
+}
