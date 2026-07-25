@@ -64,8 +64,9 @@
     }
     var prev = document.getElementById('sbgPreviewBg');
     if (prev) prev.style.backgroundImage = "url('" + art()[sbgActive] + "')";
-    var head = document.getElementById('sbgHeadArt');
-    if (head) head.src = art()[sbgActive];
+    /* #sbgHeadArt is this page's identity icon, like the Fashion Background
+       panel's, so it is NOT repainted with whatever is centred — the carousel
+       and the full-bleed preview behind it already show the selection. */
   }
 
   function go(n) { sbgActive = ((n % SBG_N) + SBG_N) % SBG_N; paint(); }

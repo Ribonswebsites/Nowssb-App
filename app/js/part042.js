@@ -135,8 +135,8 @@
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="SS.open('startbg')">
-        <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);display:flex;align-items:center;justify-content:center;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M4.5 16.5l4.5-6 3.5 4.5 2.5-3L19.5 16.5"/><circle cx="8.2" cy="8.5" r="1.3"/></svg>
+        <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);overflow:hidden;">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1785014506/file_000000009f10820bb6872a5ed8007148_pvqjaa.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Start Page Image</div><div class="sr-sub">Art behind the start animation</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
