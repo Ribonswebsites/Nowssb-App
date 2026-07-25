@@ -3764,23 +3764,34 @@ body.nm-glass .nmh-tile.nmh-tile-art {
   display: grid !important; grid-template-columns: auto 1px 1fr; align-items: center; gap: 10px;
   align-content: start;
 }
+/* Round wrapper holding the real feature artwork (from the Everything on
+   NowssB page) instead of a line SVG. */
 .home-tile-icon {
-  width: 36px; height: 36px; flex-shrink: 0; border-radius: 12px !important;
+  width: 42px; height: 42px; flex-shrink: 0; border-radius: 50% !important;
   background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.24);
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
+.home-tile-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .home-tile-rule { width: 1px; align-self: stretch; background: rgba(255,255,255,0.18); }
 .home-tile-txt { min-width: 0; }
 .home-tile-title { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800; color: #fff; line-height: 1.25; }
 .home-tile-sub { font-family: 'DM Sans', sans-serif; font-size: 10px; color: rgba(255,255,255,0.5); line-height: 1.4; margin-top: 3px; }
+/* White Enter pill with the arrow in its own circle wrapper */
 .home-tile-enter {
-  position: absolute; bottom: 11px; right: 11px; z-index: 2;
-  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
-  background: rgba(255,255,255,0.08); color: #e8d5a3; border: 1px solid rgba(232,213,163,0.28);
-  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
-  letter-spacing: 0.3px; padding: 6px 11px; border-radius: 20px !important;
+  position: absolute; bottom: 10px; right: 10px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  background: #fff; border: none;
+  padding: 4px 4px 4px 11px; border-radius: 30px !important;
 }
-.home-tile-enter svg { display: block; }
+.home-tile-enter-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  letter-spacing: 0.3px; color: #060c18;
+}
+.home-tile-enter-go {
+  width: 20px; height: 20px; flex-shrink: 0; border-radius: 50% !important;
+  background: rgba(6,12,24,0.1); display: flex; align-items: center; justify-content: center;
+}
+.home-tile-enter-go svg { width: 10px; height: 10px; display: block; }
 
 /* ===== EXPLORE (#sub-people) — header + search below + centered empty ===== */
 /* the scroll area flows BELOW the header/search now (was absolute-filling) */
