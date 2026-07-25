@@ -2106,8 +2106,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ── SOUND LIBRARY INTRO PAGE ── -->
   <div class="sl-intro-page" id="slIntroPage">
-    <!-- Background image -->
-    <div class="sl-intro-bg"></div>
+    <!-- Background image — set inline so app.css's shared .sl-intro-bg default
+         stays available to any future intro page that doesn't want its own. -->
+    <div class="sl-intro-bg" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/v1785007237/file_00000000c66081faa0761524553f5545_tla2go.png');"></div>
     <!-- Overlay gradient -->
     <div class="sl-intro-vignette"></div>
     <!-- Top bar -->
@@ -2212,7 +2213,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="sl-intro-page" id="mpIntroPage">
 
     <!-- Hero image — glass cube / headphone artwork -->
-    <div class="sl-intro-bg" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778235407/grok_image_1778234748702_hf0ta7.jpg'); background-position: center center;"></div>
+    <div class="sl-intro-bg" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/v1785007237/file_000000004738820ea48974114d0c6926_pxjrbc.png'); background-position: center center;"></div>
     <div class="sl-intro-vignette"></div>
 
     <!-- Top bar -->
