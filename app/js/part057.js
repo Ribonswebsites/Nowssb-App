@@ -64,8 +64,13 @@
       cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png',
       photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130232/grok_image_1784119291881_s6pws0.jpg', photoPos: 'center', art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_00000000536071f4bf5172014811968f_jkt450.png' }
   ];
-  var TILE_STYLES  = [{ id: 'black', label: 'Black Banner' }, { id: 'image', label: 'Cover Image' },
+  /* The two homes are styled INDEPENDENTLY — the Normal Home's identity is the
+     neumorphic card, so that stays its default, while the Fashion Home defaults
+     to the black banner. */
+  var FASH_STYLES  = [{ id: 'black', label: 'Black Banner' }, { id: 'image', label: 'Cover Image' },
                       { id: 'artwork', label: 'Artwork' }, { id: 'classic', label: 'Classic Glass' }];
+  var NM_STYLES    = [{ id: 'neuro', label: 'Neumorphic' }, { id: 'black', label: 'Black' },
+                      { id: 'image', label: 'Cover Image' }];
   var TILE_CORNERS = [{ id: 'rounded', label: 'Rounded Corners' }, { id: 'edge', label: 'Edge Corners' }];
   var SHAPES  = [{ id: 'default', label: 'Default' }, { id: 'pill', label: 'Floating Pill' }, { id: 'rect', label: 'Floating Rectangle' }];
   var CORNERS = [{ id: 'rounded', label: 'Rounded Corners' }, { id: 'edge', label: 'Edge Corners' }];
@@ -85,6 +90,8 @@
   function savedCorner() { return ls('nwsb_nav_rect_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
   function savedTileStyle()  { var s = ls('nwsb_tile_style', 'black'); return (s === 'image' || s === 'classic' || s === 'artwork') ? s : 'black'; }
   function savedTileCorner() { return ls('nwsb_tile_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
+  function savedNmStyle()    { var s = ls('nwsb_nm_tile_style', 'neuro'); return (s === 'black' || s === 'image') ? s : 'neuro'; }
+  function savedNmCorner()   { return ls('nwsb_nm_tile_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
   function savedSlots() {
     var raw = ls('nwsb_nav_slots', null);
     if (raw) { try { var a = JSON.parse(raw); if (a && a.length) { a = a.filter(function (id) { return !!feat(id); }).slice(0, 5); if (a.length) return a; } } catch (e) {} }
@@ -109,10 +116,14 @@
   }
   function applyTileLook() {
     var b = document.body; if (!b) return;
-    b.classList.remove('tilestyle-black', 'tilestyle-image', 'tilestyle-artwork', 'tilestyle-classic');
-    b.classList.add('tilestyle-' + savedTileStyle());
-    b.classList.remove('tilecorner-rounded', 'tilecorner-edge');
-    b.classList.add('tilecorner-' + savedTileCorner());
+    b.classList.remove('fashtile-black', 'fashtile-image', 'fashtile-artwork', 'fashtile-classic');
+    b.classList.add('fashtile-' + savedTileStyle());
+    b.classList.remove('fashcorner-rounded', 'fashcorner-edge');
+    b.classList.add('fashcorner-' + savedTileCorner());
+    b.classList.remove('nmtile-neuro', 'nmtile-black', 'nmtile-image');
+    b.classList.add('nmtile-' + savedNmStyle());
+    b.classList.remove('nmcorner-rounded', 'nmcorner-edge');
+    b.classList.add('nmcorner-' + savedNmCorner());
   }
   function applyIcons() {
     var nav = document.getElementById('ig-bottomnav'); if (!nav) return;
@@ -141,13 +152,12 @@
   // ── Render the customizer (uses STAGED values) ────────────────
   function loadStage() {
     _stage = { shape: savedShape(), color: savedColor(), corner: savedCorner(), slots: savedSlots(),
-               tileStyle: savedTileStyle(), tileCorner: savedTileCorner() };
+               tileStyle: savedTileStyle(), tileCorner: savedTileCorner(),
+               nmStyle: savedNmStyle(), nmCorner: savedNmCorner() };
   }
   var QAT_ARROW = '<span class="qat-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span>';
-  function renderTilePreview() {
-    var g = document.getElementById('qaTileGrid'); if (!g || !_stage) return;
-    g.className = 'qat-grid qat-' + _stage.tileStyle + ' qat-corner-' + _stage.tileCorner;
-    g.innerHTML = HOME_TILES.map(function (t) {
+  function tilePreviewHtml() {
+    return HOME_TILES.map(function (t) {
       return '<div class="qat-tile">' +
         '<div class="qat-cover" style="background-image:url(\'' + t.cover + '\');"></div>' +
         '<div class="qat-scrim"></div>' +
@@ -160,6 +170,13 @@
         '<span class="qat-enter"><span class="qat-enter-lbl">Enter</span>' + QAT_ARROW + '</span>' +
       '</div>';
     }).join('');
+  }
+  function renderTilePreview() {
+    if (!_stage) return;
+    var f = document.getElementById('qaTileGrid');
+    if (f) { f.className = 'qat-grid qat-' + _stage.tileStyle + ' qat-corner-' + _stage.tileCorner; f.innerHTML = tilePreviewHtml(); }
+    var n = document.getElementById('qaNmTileGrid');
+    if (n) { n.className = 'qat-grid qat-' + _stage.nmStyle + ' qat-corner-' + _stage.nmCorner; n.innerHTML = tilePreviewHtml(); }
   }
   function renderPreview() {
     var el = document.getElementById('qaNavPreview'); if (!el || !_stage) return;
@@ -184,9 +201,13 @@
     var co = document.getElementById('qaColorRow');
     if (co) co.innerHTML = COLORS.map(function (o) { return chip(_stage.color, o, 'qaSetColor'); }).join('');
     var ts = document.getElementById('qaTileStyleRow');
-    if (ts) ts.innerHTML = TILE_STYLES.map(function (o) { return chip(_stage.tileStyle, o, 'qaSetTileStyle'); }).join('');
+    if (ts) ts.innerHTML = FASH_STYLES.map(function (o) { return chip(_stage.tileStyle, o, 'qaSetTileStyle'); }).join('');
     var tc = document.getElementById('qaTileCornerRow');
     if (tc) tc.innerHTML = TILE_CORNERS.map(function (o) { return chip(_stage.tileCorner, o, 'qaSetTileCorner'); }).join('');
+    var ns = document.getElementById('qaNmTileStyleRow');
+    if (ns) ns.innerHTML = NM_STYLES.map(function (o) { return chip(_stage.nmStyle, o, 'qaSetNmTileStyle'); }).join('');
+    var nc = document.getElementById('qaNmTileCornerRow');
+    if (nc) nc.innerHTML = TILE_CORNERS.map(function (o) { return chip(_stage.nmCorner, o, 'qaSetNmTileCorner'); }).join('');
   }
   function tileHtml(f, selIdx) {
     var sel = selIdx >= 0;
@@ -247,6 +268,8 @@
   window.qaSetColor = function (c) { if (!_stage) loadStage(); _stage.color = c; render(); };
   window.qaSetTileStyle = function (s) { if (!_stage) loadStage(); _stage.tileStyle = s; render(); };
   window.qaSetTileCorner = function (c) { if (!_stage) loadStage(); _stage.tileCorner = c; render(); };
+  window.qaSetNmTileStyle = function (s) { if (!_stage) loadStage(); _stage.nmStyle = s; render(); };
+  window.qaSetNmTileCorner = function (c) { if (!_stage) loadStage(); _stage.nmCorner = c; render(); };
   window.qaToggleFeature = function (id) {
     if (!_stage) loadStage();
     var slots = _stage.slots.slice();
@@ -265,6 +288,8 @@
     lsSet('nwsb_nav_slots', JSON.stringify(_stage.slots));
     lsSet('nwsb_tile_style', _stage.tileStyle);
     lsSet('nwsb_tile_corner', _stage.tileCorner);
+    lsSet('nwsb_nm_tile_style', _stage.nmStyle);
+    lsSet('nwsb_nm_tile_corner', _stage.nmCorner);
     applyLive();
     toast('Applied to your nav ✓');
   };
@@ -275,6 +300,8 @@
     lsSet('nwsb_nav_slots', JSON.stringify(DEFAULT_SLOTS.slice()));
     lsSet('nwsb_tile_style', 'black');
     lsSet('nwsb_tile_corner', 'rounded');
+    lsSet('nwsb_nm_tile_style', 'neuro');
+    lsSet('nwsb_nm_tile_corner', 'rounded');
     applyShapeColor();
     applyTileLook();
     restoreDefaultNav();

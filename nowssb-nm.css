@@ -3637,59 +3637,120 @@ body.nm-glass #sub-health-journey .gsel-card {
 .fash-connect-banner img { border-radius: 0 !important; }
 .fash-connect { box-shadow: 0 14px 36px rgba(0,0,0,0.45) !important; border: 1px solid rgba(255,255,255,0.08); }
 .fash-connect-banner { margin-top: 16px !important; margin-bottom: 8px !important; box-shadow: 0 12px 30px rgba(0,0,0,0.42) !important; border: 1px solid rgba(255,255,255,0.08); }
-/* Artwork tiles — original icon + title + subtitle stay on the LEFT, the 16:9
-   artwork sits BIG on the RIGHT (absolutely placed, vertically centered). The
-   tile reserves left space and the title shrinks a touch so the art can be large. */
-/* Black-banner tiles — same language as .nmh-sec-banner (black card, icon,
-   vertical rule, text) but stacked to fit the 2x2 grid, with the Enter pill
-   pinned bottom-right. The cover artwork these used to carry is gone. */
-.nmh-tile.nmh-tile-art {
+/* ══════════════════════════════════════════════════════════════════
+   NORMAL HOME · the four tiles (.nmh-tile.nmh-tile-art) — three looks,
+   picked from Quick Access → Normal Home Tiles and driven by body.nmtile-*:
+     nmtile-neuro  — the ORIGINAL neumorphic card (default): soft light
+                     surface, gold line SVG in a raised puck, dark text
+     nmtile-black  — black card, real feature artwork in a round puck,
+                     vertical rule, white Enter pill (no neumorphic halo)
+     nmtile-image  — the 16:9 cover artwork
+   The Fashion Home has its own independent body.fashtile-* set below.
+   ══════════════════════════════════════════════════════════════════ */
+.nmh-tile-rule { display: none; width: 1px; align-self: stretch; background: rgba(255,255,255,0.18); }
+.nmh-tile-txt { min-width: 0; }
+.nmh-tile-picon { display: none !important; width: 100%; height: 100%; object-fit: cover; }
+
+/* ── NEURO (default) — everything the black banner added is off, so the
+   base .nmh-tile neumorphic card in app/app.css shows through. Only the
+   Enter pill needs styling, since that markup is newer than the card. ── */
+body.nmtile-neuro .nmh-tile.nmh-tile-art { position: relative; padding: 24px 20px 48px; }
+body.nmtile-neuro .nmh-tile-enter {
+  position: absolute; right: 14px; bottom: 14px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  background: #f0f2f7; border: none; padding: 6px 12px; border-radius: 20px !important;
+  box-shadow: 3px 3px 7px rgba(163,177,198,0.6), -3px -3px 7px #ffffff;
+}
+body.nmtile-neuro #home-nm.nm-dark .nmh-tile-enter {
+  background: #0c0c20; box-shadow: 3px 3px 8px rgba(0,0,0,0.7), -2px -2px 6px rgba(50,50,110,0.28);
+}
+body.nmtile-neuro .nmh-tile-enter-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  letter-spacing: 0.3px; color: #c8a96e;
+}
+body.nmtile-neuro #home-nm.nm-dark .nmh-tile-enter-lbl { color: #e8d5a3; }
+body.nmtile-neuro .nmh-tile-enter-go {
+  width: 11px; height: 11px; flex-shrink: 0; border-radius: 0 !important;
+  background: none; display: flex; align-items: center; justify-content: center;
+}
+body.nmtile-neuro .nmh-tile-enter-go svg { width: 11px; height: 11px; display: block; }
+body.nmtile-neuro .nmh-tile-enter-go svg path { stroke: #c8a96e; }
+
+/* ── BLACK — the banner card. Same language as .nmh-sec-banner (black card,
+   icon, vertical rule, text) stacked to fit the 2x2 grid, Enter pill pinned
+   bottom-right. ── */
+body.nmtile-black .nmh-tile.nmh-tile-art,
+body.nmtile-image .nmh-tile.nmh-tile-art {
   position: relative; padding: 16px 14px 50px; min-height: 150px; overflow: hidden;
   background: #000 !important; border: 1px solid rgba(255,255,255,0.08);
   box-shadow: 0 10px 26px rgba(0,0,0,0.38) !important;
   display: grid; grid-template-columns: auto 1px 1fr; align-items: center; gap: 11px;
   align-content: start;
 }
-#home-nm.nm-dark .nmh-tile.nmh-tile-art { box-shadow: 0 10px 26px rgba(0,0,0,0.7) !important; }
+body.nmtile-black #home-nm.nm-dark .nmh-tile.nmh-tile-art,
+body.nmtile-image #home-nm.nm-dark .nmh-tile.nmh-tile-art { box-shadow: 0 10px 26px rgba(0,0,0,0.7) !important; }
 /* Glass mode paints .nmh-tile translucent white with !important — these four
    are deliberately black banners in every mode, so out-specify it. */
-body.nm-glass .nmh-tile.nmh-tile-art {
+body.nm-glass.nmtile-black .nmh-tile.nmh-tile-art,
+body.nm-glass.nmtile-image .nmh-tile.nmh-tile-art {
   background: #000 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
 }
-/* Vertical rule between the icon and the text, as on the black banners */
-.nmh-tile-rule { width: 1px; align-self: stretch; background: rgba(255,255,255,0.18); }
-.nmh-tile-txt { min-width: 0; }
-.nmh-tile.nmh-tile-art .nmh-tile-title { font-size: 13.5px; font-weight: 800; color: #fff; line-height: 1.25; }
-.nmh-tile.nmh-tile-art .nmh-tile-sub { font-size: 10.5px; color: rgba(255,255,255,0.5); line-height: 1.4; margin-top: 3px; }
-/* Icon puck goes dark to sit on the black card instead of the light
-   neumorphic chip it used to be. */
-.nmh-tile.nmh-tile-art .nmh-tile-icon {
-  width: 38px; height: 38px; flex-shrink: 0; margin-bottom: 0 !important;
+body.nmtile-black .nmh-tile-rule { display: block; }
+body.nmtile-black .nmh-tile.nmh-tile-art .nmh-tile-title,
+body.nmtile-image .nmh-tile.nmh-tile-art .nmh-tile-title { font-size: 13.5px; font-weight: 800; color: #fff; line-height: 1.25; }
+body.nmtile-black .nmh-tile.nmh-tile-art .nmh-tile-sub,
+body.nmtile-image .nmh-tile.nmh-tile-art .nmh-tile-sub { font-size: 10.5px; color: rgba(255,255,255,0.5); line-height: 1.4; margin-top: 3px; }
+/* Round puck carrying the real feature artwork. box-shadow:none kills the
+   neumorphic white halo #home-nm:not(.nm-dark) .nmh-tile-icon paints — on a
+   black card that inner light reads as a glow ring around every icon. */
+body.nmtile-black .nmh-tile.nmh-tile-art .nmh-tile-icon {
+  width: 42px; height: 42px; flex-shrink: 0; margin-bottom: 0 !important;
+  border-radius: 50% !important; overflow: hidden;
   background: rgba(232,213,163,0.1) !important; border: 1px solid rgba(232,213,163,0.24);
   box-shadow: none !important; display: flex; align-items: center; justify-content: center;
 }
-/* Enter pill, bottom-right — the Normal Home keeps its original gold outline
-   pill with an inline gold arrow (the white pill + circle arrow was only ever
-   asked for on the Fashion Home). The markup is shared with .home-tile so the
-   style engine can drive both, hence the circle wrapper is flattened here
-   rather than removed from the DOM. */
-.nmh-tile-enter {
-  position: absolute; right: 12px; bottom: 12px; z-index: 3;
-  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(232,213,163,0.28);
-  padding: 6px 12px; border-radius: 20px !important;
+body.nmtile-black .nmh-tile.nmh-tile-art .nmh-tile-icon svg { display: none; }
+/* #home-nm:not(.nm-dark) .nmh-tile-icon paints the neumorphic halo from an ID
+   selector, so killing it needs an ID in the selector too — otherwise the
+   white inner light survives and rings every icon on the black card. */
+body.nmtile-black #home-nm .nmh-tile.nmh-tile-art .nmh-tile-icon,
+body.nmtile-image #home-nm .nmh-tile.nmh-tile-art .nmh-tile-icon { box-shadow: none !important; }
+body.nmtile-black .nmh-tile-picon { display: block !important; }
+/* The card itself must lose the neumorphic halo too */
+body.nmtile-black #home-nm:not(.nm-dark) .nmh-tile.nmh-tile-art,
+body.nmtile-image #home-nm:not(.nm-dark) .nmh-tile.nmh-tile-art { box-shadow: 0 10px 26px rgba(0,0,0,0.38) !important; }
+/* White Enter pill with the arrow in its own circle wrapper */
+body.nmtile-black .nmh-tile-enter, body.nmtile-image .nmh-tile-enter {
+  position: absolute; right: 10px; bottom: 10px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  background: #fff; border: none; padding: 4px 4px 4px 11px; border-radius: 30px !important;
+  box-shadow: none;
 }
-.nmh-tile-enter-lbl {
+body.nmtile-black .nmh-tile-enter-lbl, body.nmtile-image .nmh-tile-enter-lbl {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
-  letter-spacing: 0.3px; color: #e8d5a3;
+  letter-spacing: 0.3px; color: #060c18;
 }
-.nmh-tile-enter-go {
-  width: 11px; height: 11px; flex-shrink: 0; border-radius: 0 !important;
-  background: none; display: flex; align-items: center; justify-content: center;
+body.nmtile-black .nmh-tile-enter-go, body.nmtile-image .nmh-tile-enter-go {
+  width: 20px; height: 20px; flex-shrink: 0; border-radius: 50% !important;
+  background: rgba(6,12,24,0.1); display: flex; align-items: center; justify-content: center;
 }
-.nmh-tile-enter-go svg { width: 11px; height: 11px; display: block; }
-.nmh-tile-enter-go svg path { stroke: #c8a96e; }
+body.nmtile-black .nmh-tile-enter-go svg, body.nmtile-image .nmh-tile-enter-go svg { width: 10px; height: 10px; display: block; }
+body.nmtile-black .nmh-tile-enter-go svg path, body.nmtile-image .nmh-tile-enter-go svg path { stroke: #060c18; }
+
+/* ── IMAGE — the 16:9 cover artwork; the icon, rule and DOM text step aside
+   because each cover already carries its own title. ── */
+body.nmtile-image .nmh-tile.nmh-tile-art {
+  display: block !important; padding: 0 !important;
+  min-height: 0 !important; aspect-ratio: 16 / 9 !important;
+}
+body.nmtile-image .nmh-tile-cover, body.nmtile-image .nmh-tile-cover-scrim { display: block; }
+body.nmtile-image .nmh-tile-icon, body.nmtile-image .nmh-tile-rule, body.nmtile-image .nmh-tile-txt { display: none !important; }
+body.nmtile-image .nmh-tile-enter { bottom: 8px; right: 8px; }
+
+/* ── CORNERS (Normal Home) ── */
+body.nmcorner-rounded .nmh-tile.nmh-tile-art { border-radius: 22px !important; }
+body.nmcorner-edge .nmh-tile.nmh-tile-art { border-radius: 0 !important; }
 /* Traveling gold light — SEQUENTIAL relay: only ONE tile's ring sweeps at a
    time; when it finishes, the next tile's ring starts, and so on. Each tile runs
    the same 10s cycle but the sweep only happens during its own 1/4 slot (0-25%);
@@ -5563,15 +5624,14 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   HOME TILE STYLES — the four home buttons (Sound Library / My Progress /
-   Word Science / My Profile) exist on BOTH homes: Normal Home uses
-   .nmh-tile.nmh-tile-art, Fashion Home uses .home-tile. Both now carry the
-   SAME children (cover, icon, rule, text, Enter pill), so the whole look is
-   switched by a body class set from Quick Access → Home Tiles:
-     body.tilestyle-black   — black banner card (default, current)
-     body.tilestyle-image   — 16:9 cover artwork
-     body.tilestyle-classic — glass card, stacked icon over text
-   plus body.tilecorner-rounded | body.tilecorner-edge.
+   FASHION HOME · the four tiles (.home-tile) — four looks, picked from
+   Quick Access → Fashion Home Tiles and driven by body.fashtile-*:
+     fashtile-black   — black banner card (default)
+     fashtile-image   — 16:9 cover artwork
+     fashtile-artwork — per-tile photo background + its own icon artwork
+     fashtile-classic — glass card, icon stacked over the text
+   plus body.fashcorner-rounded | body.fashcorner-edge. Every tile carries
+   all four looks' pieces in its markup, so switching is a class swap only.
    ══════════════════════════════════════════════════════════════════ */
 
 /* Cover artwork layers — carried by every tile, only painted in image mode */
@@ -5584,25 +5644,21 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   background: linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.28) 58%, rgba(0,0,0,0.66) 100%);
 }
 
-/* ── STYLE 2 · COVER IMAGE — the artwork already carries its own title, so
-   the icon puck, vertical rule and DOM text all step aside. ── */
-body.tilestyle-image .nmh-tile.nmh-tile-art,
-body.tilestyle-image .home-tile {
+/* ── COVER IMAGE — the artwork already carries its own title, so the icon
+   puck, vertical rule and DOM text all step aside. ── */
+body.fashtile-image .home-tile {
   display: block !important; padding: 0 !important;
   min-height: 0 !important; aspect-ratio: 16 / 9 !important;
   background: #000 !important;
 }
-body.tilestyle-image .nmh-tile-cover, body.tilestyle-image .home-tile-cover,
-body.tilestyle-image .nmh-tile-cover-scrim, body.tilestyle-image .home-tile-cover-scrim { display: block; }
-body.tilestyle-image .nmh-tile-icon, body.tilestyle-image .home-tile-icon,
-body.tilestyle-image .nmh-tile-rule, body.tilestyle-image .home-tile-rule,
-body.tilestyle-image .nmh-tile-txt,  body.tilestyle-image .home-tile-txt { display: none !important; }
-body.tilestyle-image .nmh-tile-enter, body.tilestyle-image .home-tile-enter { bottom: 8px; right: 8px; }
+body.fashtile-image .home-tile-cover, body.fashtile-image .home-tile-cover-scrim { display: block; }
+body.fashtile-image .home-tile-icon, body.fashtile-image .home-tile-rule,
+body.fashtile-image .home-tile-txt { display: none !important; }
+body.fashtile-image .home-tile-enter { bottom: 8px; right: 8px; }
 
-/* ── STYLE 3 · CLASSIC — the pre-banner look: glass card, icon puck stacked
-   above the title, no vertical rule, gold outline Enter pill. ── */
-body.tilestyle-classic .nmh-tile.nmh-tile-art,
-body.tilestyle-classic .home-tile {
+/* ── CLASSIC — the pre-banner look: glass card, icon puck stacked above the
+   title, no vertical rule, gold outline Enter pill. ── */
+body.fashtile-classic .home-tile {
   display: flex !important; flex-direction: column; align-items: flex-start;
   aspect-ratio: auto !important; min-height: 148px !important;
   padding: 16px 14px 48px !important;
@@ -5611,31 +5667,55 @@ body.tilestyle-classic .home-tile {
   -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2);
   box-shadow: 0 10px 26px rgba(0,0,0,0.32) !important;
 }
-body.nm-glass .nmh-tile.nmh-tile-art { background: rgba(255,255,255,0.055) !important; }
-body.tilestyle-classic .nmh-tile-rule, body.tilestyle-classic .home-tile-rule { display: none !important; }
-body.tilestyle-classic .nmh-tile.nmh-tile-art .nmh-tile-icon,
-body.tilestyle-classic .home-tile-icon {
+body.fashtile-classic .home-tile-rule { display: none !important; }
+body.fashtile-classic .home-tile-icon {
   width: 44px !important; height: 44px !important; margin-bottom: 12px !important;
   border-radius: 15px !important;
 }
-body.tilestyle-classic .nmh-tile-title, body.tilestyle-classic .home-tile-title { font-size: 14px !important; }
-body.tilestyle-classic .nmh-tile-enter, body.tilestyle-classic .home-tile-enter {
+body.fashtile-classic .home-tile-title { font-size: 14px !important; }
+body.fashtile-classic .home-tile-enter {
   background: rgba(255,255,255,0.08) !important; border: 1px solid rgba(232,213,163,0.3) !important;
   padding: 5px 6px 5px 12px !important;
 }
-body.tilestyle-classic .nmh-tile-enter-lbl, body.tilestyle-classic .home-tile-enter-lbl { color: #e8d5a3 !important; }
-body.tilestyle-classic .nmh-tile-enter-go, body.tilestyle-classic .home-tile-enter-go {
+body.fashtile-classic .home-tile-enter-lbl { color: #e8d5a3 !important; }
+body.fashtile-classic .home-tile-enter-go {
   width: 17px !important; height: 17px !important; background: rgba(232,213,163,0.14) !important;
 }
-body.tilestyle-classic .nmh-tile-enter-go svg path,
-body.tilestyle-classic .home-tile-enter-go svg path { stroke: #e8d5a3 !important; }
+body.fashtile-classic .home-tile-enter-go svg path { stroke: #e8d5a3 !important; }
 
-/* ── CORNERS ── (app/app.css resets every radius with *{border-radius:0
-   !important}, so both variants need !important of their own) */
-body.tilecorner-rounded .nmh-tile.nmh-tile-art { border-radius: 22px !important; }
-body.tilecorner-rounded .home-tile { border-radius: 18px !important; }
-body.tilecorner-edge .nmh-tile.nmh-tile-art,
-body.tilecorner-edge .home-tile { border-radius: 0 !important; }
+/* ── ARTWORK — the look that came before the cover tiles: a full photo
+   background per tile with its own trimmed icon artwork stacked over title
+   + subtitle. Four different photos, four different icons. ── */
+.nmh-tile-photo, .home-tile-photo {
+  display: none; position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-repeat: no-repeat;
+}
+.nmh-tile-photo-scrim, .home-tile-photo-scrim {
+  display: none; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(160deg, rgba(6,12,24,0.28) 0%, rgba(6,12,24,0.66) 100%);
+}
+.nmh-tile-articon, .home-tile-articon {
+  display: none; position: relative; z-index: 2;
+  width: 36px; height: 36px; object-fit: contain;
+}
+body.fashtile-artwork .home-tile {
+  display: flex !important; flex-direction: column; align-items: flex-start;
+  aspect-ratio: auto !important; min-height: 148px !important;
+  padding: 16px 14px 48px !important;
+  background: #060c18 !important; border: 1px solid rgba(255,255,255,0.08) !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+body.fashtile-artwork .home-tile-photo, body.fashtile-artwork .home-tile-photo-scrim { display: block; }
+body.fashtile-artwork .home-tile-articon { display: block; margin-bottom: 10px; }
+body.fashtile-artwork .home-tile-icon, body.fashtile-artwork .home-tile-rule { display: none !important; }
+body.fashtile-artwork .home-tile-txt { position: relative; z-index: 2; }
+body.fashtile-artwork .home-tile-title { font-size: 14px !important; }
+body.fashtile-artwork .home-tile-sub { color: rgba(255,255,255,0.66) !important; }
+
+/* ── CORNERS (Fashion Home) ── (app/app.css resets every radius with
+   *{border-radius:0 !important}, so both variants need !important too) */
+body.fashcorner-rounded .home-tile { border-radius: 18px !important; }
+body.fashcorner-edge .home-tile { border-radius: 0 !important; }
 
 /* ══════════════════════════════════════════════════════════════════
    QUICK ACCESS → HOME TILES picker. A big glassmorphism plate holding a
@@ -5733,40 +5813,6 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
 /* The mid-list eBook banner acts as a divider inside the chapter run */
 #sub-shabdapathy .sc-banner-mid { margin: 20px 0 20px; }
 
-/* ── STYLE 4 · ARTWORK — the look that came before the cover tiles: a full
-   photo background per tile with its own trimmed icon artwork stacked over
-   title + subtitle. Four different photos, four different icons — all four
-   pairs restored from the versions that shipped earlier. ── */
-.nmh-tile-photo, .home-tile-photo {
-  display: none; position: absolute; inset: 0; z-index: 0;
-  background-size: cover; background-repeat: no-repeat;
-}
-.nmh-tile-photo-scrim, .home-tile-photo-scrim {
-  display: none; position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(160deg, rgba(6,12,24,0.28) 0%, rgba(6,12,24,0.66) 100%);
-}
-.nmh-tile-articon, .home-tile-articon {
-  display: none; position: relative; z-index: 2;
-  width: 36px; height: 36px; object-fit: contain;
-}
-body.tilestyle-artwork .nmh-tile.nmh-tile-art,
-body.tilestyle-artwork .home-tile {
-  display: flex !important; flex-direction: column; align-items: flex-start;
-  aspect-ratio: auto !important; min-height: 148px !important;
-  padding: 16px 14px 48px !important;
-  background: #060c18 !important; border: 1px solid rgba(255,255,255,0.08) !important;
-  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
-}
-body.nm-glass.tilestyle-artwork .nmh-tile.nmh-tile-art { background: #060c18 !important; }
-body.tilestyle-artwork .nmh-tile-photo, body.tilestyle-artwork .home-tile-photo,
-body.tilestyle-artwork .nmh-tile-photo-scrim, body.tilestyle-artwork .home-tile-photo-scrim { display: block; }
-body.tilestyle-artwork .nmh-tile-articon, body.tilestyle-artwork .home-tile-articon { display: block; margin-bottom: 10px; }
-body.tilestyle-artwork .nmh-tile-icon, body.tilestyle-artwork .home-tile-icon,
-body.tilestyle-artwork .nmh-tile-rule, body.tilestyle-artwork .home-tile-rule { display: none !important; }
-body.tilestyle-artwork .nmh-tile-txt, body.tilestyle-artwork .home-tile-txt { position: relative; z-index: 2; }
-body.tilestyle-artwork .nmh-tile-title, body.tilestyle-artwork .home-tile-title { font-size: 14px !important; }
-body.tilestyle-artwork .nmh-tile-sub, body.tilestyle-artwork .home-tile-sub { color: rgba(255,255,255,0.66) !important; }
-
 /* preview · artwork variant */
 .qat-art { display: none; position: relative; z-index: 2; width: 24px; height: 24px; object-fit: contain; }
 .qat-photo { display: none; position: absolute; inset: 0; z-index: 0; background-size: cover; background-repeat: no-repeat; }
@@ -5780,3 +5826,25 @@ body.tilestyle-artwork .nmh-tile-sub, body.tilestyle-artwork .home-tile-sub { co
 .qat-grid.qat-artwork .qat-art { display: block; margin-bottom: 7px; }
 .qat-grid.qat-artwork .qat-ic, .qat-grid.qat-artwork .qat-rule { display: none; }
 .qat-grid.qat-artwork .qat-txt { position: relative; z-index: 2; }
+
+/* preview · neumorphic variant (the Normal Home's default) */
+.qat-grid.qat-neuro .qat-tile {
+  display: flex; flex-direction: column; align-items: flex-start;
+  aspect-ratio: auto; min-height: 100px; padding: 13px 12px 32px;
+  background: #f0f2f7; border: none;
+  box-shadow: 5px 5px 12px rgba(163,177,198,0.55), -4px -4px 10px #ffffff;
+}
+.qat-grid.qat-neuro .qat-rule { display: none; }
+.qat-grid.qat-neuro .qat-ic {
+  width: 30px; height: 30px; border-radius: 9px !important; margin-bottom: 8px;
+  background: #f0f2f7; border: none;
+  box-shadow: 3px 3px 7px rgba(163,177,198,0.5), -2px -2px 6px #ffffff;
+}
+.qat-grid.qat-neuro .qat-name { color: #1a1a2e; }
+.qat-grid.qat-neuro .qat-sub { color: rgba(0,0,0,0.42); }
+.qat-grid.qat-neuro .qat-enter {
+  background: #f0f2f7; box-shadow: 2px 2px 5px rgba(163,177,198,0.6), -2px -2px 5px #ffffff;
+}
+.qat-grid.qat-neuro .qat-enter-lbl { color: #c8a96e; }
+.qat-grid.qat-neuro .qat-enter-go { background: none; width: 8px; height: 8px; border-radius: 0 !important; }
+.qat-grid.qat-neuro .qat-enter-go svg path { stroke: #c8a96e; }

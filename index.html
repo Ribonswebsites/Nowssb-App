@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=476">
+<link rel="stylesheet" href="nowssb-nm.css?v=477">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -895,6 +895,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
             <path d="M3 11h2l3-6 4 12 3-7 2 1h2" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
+          <img class="nmh-tile-picon" loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png" alt="">
         </div>
         <div class="nmh-tile-rule"></div>
         <div class="nmh-tile-txt">
@@ -914,6 +915,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             <path d="M3 17l4-5 4 2 5-7 3 3" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M3 18.5h16" stroke="#c8a96e" stroke-width="1.4" stroke-linecap="round" opacity="0.4"/>
           </svg>
+          <img class="nmh-tile-picon" loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png" alt="">
         </div>
         <div class="nmh-tile-rule"></div>
         <div class="nmh-tile-txt">
@@ -933,6 +935,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             <rect x="3" y="3" width="16" height="16" rx="3" stroke="#c8a96e" stroke-width="1.7"/>
             <path d="M7 8h8M7 11h6M7 14h4" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
+          <img class="nmh-tile-picon" loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png" alt="">
         </div>
         <div class="nmh-tile-rule"></div>
         <div class="nmh-tile-txt">
@@ -952,6 +955,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             <circle cx="11" cy="8" r="3.5" stroke="#c8a96e" stroke-width="1.7"/>
             <path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#c8a96e" stroke-width="1.7" stroke-linecap="round"/>
           </svg>
+          <img class="nmh-tile-picon" loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" alt="">
         </div>
         <div class="nmh-tile-rule"></div>
         <div class="nmh-tile-txt">
@@ -6347,13 +6351,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="bgp-section-label">Colour</div>
       <div class="qa-opt-row" id="qaColorRow"><!-- rendered by JS --></div>
 
-      <div class="bgp-section-label">Home Tiles</div>
-      <div class="qa-hint">Restyle the four home buttons — Sound Library, My Progress, Word Science and My Profile — on both your Normal and Fashion home. Pick a look and a corner shape, then tap <b>Apply Changes</b>.</div>
+      <div class="bgp-section-label">Fashion Home Tiles</div>
+      <div class="qa-hint">Restyle the four buttons — Sound Library, My Progress, Word Science and My Profile — on your <b>Fashion</b> home. Pick a look and a corner shape, then tap <b>Apply Changes</b>.</div>
       <div class="qat-plate">
         <div class="qat-grid" id="qaTileGrid"><!-- rendered by JS --></div>
       </div>
       <div class="qa-opt-row" id="qaTileStyleRow"><!-- rendered by JS --></div>
       <div class="qa-opt-row qa-corner-row" id="qaTileCornerRow"><!-- rendered by JS --></div>
+
+      <div class="bgp-section-label">Normal Home Tiles</div>
+      <div class="qa-hint">The same four buttons on your <b>Normal</b> home. Its default is the neumorphic card — the look the rest of that page is built from.</div>
+      <div class="qat-plate">
+        <div class="qat-grid" id="qaNmTileGrid"><!-- rendered by JS --></div>
+      </div>
+      <div class="qa-opt-row" id="qaNmTileStyleRow"><!-- rendered by JS --></div>
+      <div class="qa-opt-row qa-corner-row" id="qaNmTileCornerRow"><!-- rendered by JS --></div>
 
       <div class="bgp-section-label">Nav Bar Icons · <span id="qaSlotCount">5 / 5</span></div>
       <div class="qa-hint">Pick up to 5 features. Tap the pencil on any tile to add or remove it. Selected ones show in your nav in order; tapping a 6th replaces the oldest.</div>
@@ -9072,7 +9084,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=14"></script>
 <script src="app/js/part056.js?v=4"></script>
-<script src="app/js/part057.js?v=8"></script>
+<script src="app/js/part057.js?v=9"></script>
 <script src="app/js/part058.js?v=1"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=177" defer></script>
