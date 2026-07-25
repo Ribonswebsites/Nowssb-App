@@ -1214,6 +1214,15 @@ window.scOpenChapter = function(idx) {
   document.body.style.overflow = 'hidden';
 };
 
+/* The Foundations page's eBook route goes straight to the Store's eBook page,
+   not to the store chooser. openSub() runs the full wrapper chain (which is
+   what renders the shelf); nssOpenSub is the direct-DOM fallback used from
+   inside the store itself. */
+window.scOpenEbookStore = function () {
+  if (typeof openSub === 'function') openSub('ebooks-store');
+  else if (typeof nssOpenSub === 'function') nssOpenSub('ebooks-store');
+};
+
 window.scCloseChapter = function() {
   var overlay = document.getElementById('scReaderOverlay');
   if (overlay) overlay.style.display = 'none';
