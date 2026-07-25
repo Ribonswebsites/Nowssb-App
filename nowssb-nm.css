@@ -6311,8 +6311,8 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
 .shabda-featured-card .home-card-sub { flex: 1; min-width: 0; }
 
 /* ══════════════════════════════════════════════════════════════════
-   QUICK LINKS — banner under the store section, and the glassmorphism
-   sheet it lifts up.
+   QUICK LINKS — the banner under the store section, the glassmorphism sheet
+   it lifts up (list + settings panes), and the floating button.
    ══════════════════════════════════════════════════════════════════ */
 #home-nm .nmh-qlinks-banner { margin: 16px 0 8px; }
 
@@ -6334,33 +6334,105 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
   transform: translateY(14px) scale(0.98); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
 }
 .ql-overlay.open .ql-box { transform: translateY(0) scale(1); }
+
 .ql-head {
-  flex-shrink: 0; display: flex; align-items: center; gap: 12px;
-  padding: 20px 18px 14px; border-bottom: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+  padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 .ql-head-txt { flex: 1; min-width: 0; }
 .ql-head-title { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
 .ql-head-sub { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: rgba(255,255,255,0.6); margin-top: 3px; }
-.ql-close {
-  width: 34px; height: 34px; min-height: 0 !important; flex-shrink: 0; padding: 0; border: none; cursor: pointer;
-  border-radius: 50% !important; background: #fff;
-  display: flex; align-items: center; justify-content: center;
+.ql-hbtn {
+  width: 34px; height: 34px; min-width: 34px; min-height: 0 !important; flex-shrink: 0;
+  padding: 0; border: none; cursor: pointer; border-radius: 50% !important; overflow: hidden;
+  background: #fff; display: flex; align-items: center; justify-content: center;
 }
-.ql-close svg { width: 15px; height: 15px; display: block; }
+.ql-hbtn svg { width: 15px; height: 15px; display: block; }
+.ql-gear { background: #000; border: 1px solid rgba(255,255,255,0.16); }
+.ql-gear img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Back only exists in the settings pane; the gear only in the list pane. */
+.ql-back { display: none; }
+.ql-box.settings .ql-back { display: flex; }
+.ql-box.settings .ql-gear { display: none; }
+.ql-box.settings .ql-head-title::after { content: ' · Settings'; font-weight: 600; color: rgba(255,255,255,0.55); }
+
 .ql-scroll {
   flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
   padding: 14px; display: flex; flex-direction: column; gap: 10px;
   touch-action: pan-y; scrollbar-width: none;
 }
 .ql-scroll::-webkit-scrollbar { display: none; }
-/* The rows are the app's own black banner, just tightened for a list */
+.ql-pane-set { display: none; }
+.ql-box.settings .ql-pane-list { display: none; }
+.ql-box.settings .ql-pane-set { display: flex; }
+
+/* Rows are the app's own black banner, tightened for a list */
 .ql-overlay .ql-item {
   margin: 0 !important; padding: 14px 14px !important;
   border-radius: 16px !important; box-shadow: none !important;
 }
-.ql-overlay .ql-item .nmh-sec-banner-icon { width: 42px; height: 42px; }
-.ql-overlay .ql-item .nmh-sec-banner-icon svg { width: 21px; height: 21px; }
+.ql-overlay .ql-item .nmh-sec-banner-icon { width: 42px; height: 42px; overflow: hidden; }
+.ql-overlay .ql-item .nmh-sec-banner-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ql-overlay .ql-item .nmh-sec-banner-title { font-size: 14px; }
 .ql-overlay .ql-item .nmh-sec-banner-sub { font-size: 11px; }
 .ql-overlay .ql-item .nmh-sec-banner-arrow { width: 32px; height: 32px; }
 .ql-overlay .ql-item .nmh-sec-banner-arrow svg { width: 15px; height: 15px; }
+
+/* ── settings pane ── */
+.ql-float-row {
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px !important; padding: 14px;
+}
+.ql-float-txt { flex: 1; min-width: 0; display: block; }
+.ql-float-t { display: block; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 800; color: #fff; }
+.ql-float-s { display: block; font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.45; margin-top: 3px; }
+.ql-switch {
+  width: 46px; height: 27px; flex-shrink: 0; border-radius: 30px !important;
+  background: rgba(255,255,255,0.16); position: relative; transition: background 0.22s ease; display: block;
+}
+.ql-switch.on { background: #e8d5a3; }
+.ql-switch-knob {
+  position: absolute; top: 3px; left: 3px; width: 21px; height: 21px;
+  border-radius: 50% !important; background: #fff; display: block;
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+.ql-switch.on .ql-switch-knob { transform: translateX(19px); }
+.ql-set-label {
+  font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 700;
+  letter-spacing: 2.4px; text-transform: uppercase; color: #e8d5a3; margin: 6px 2px 0;
+}
+.ql-pick {
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 14px !important; padding: 10px 12px;
+}
+.ql-pick.on { background: rgba(232,213,163,0.12); border-color: rgba(232,213,163,0.34); }
+.ql-pick-ic {
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden; display: block;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.24);
+}
+.ql-pick-ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ql-pick-txt { flex: 1; min-width: 0; display: block; }
+.ql-pick-t { display: block; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff; }
+.ql-pick-s { display: block; font-family: 'DM Sans', sans-serif; font-size: 10.5px; color: rgba(255,255,255,0.48); margin-top: 2px; }
+.ql-pick-box {
+  width: 24px; height: 24px; flex-shrink: 0; border-radius: 50% !important;
+  border: 1.5px solid rgba(255,255,255,0.28); display: flex; align-items: center; justify-content: center;
+}
+.ql-pick.on .ql-pick-box { background: #e8d5a3; border-color: #e8d5a3; }
+.ql-pick-box svg { width: 12px; height: 12px; display: block; }
+
+/* ── floating button — rides above every screen, under the sheet itself ── */
+.ql-fab {
+  position: fixed; z-index: 3900; width: 54px; height: 54px;
+  align-items: center; justify-content: center; cursor: pointer;
+  border-radius: 50% !important; overflow: hidden;
+  background: #000; border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.5);
+  opacity: 0.92; touch-action: none; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.ql-fab img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.ql-fab.dragging { transform: scale(1.08); opacity: 1; transition: none; }
+.ql-fab:active { transform: scale(0.94); }
