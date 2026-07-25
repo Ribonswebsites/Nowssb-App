@@ -5848,3 +5848,76 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
 .qat-grid.qat-neuro .qat-enter-lbl { color: #c8a96e; }
 .qat-grid.qat-neuro .qat-enter-go { background: none; width: 8px; height: 8px; border-radius: 0 !important; }
 .qat-grid.qat-neuro .qat-enter-go svg path { stroke: #c8a96e; }
+
+/* ══════════════════════════════════════════════════════════════════
+   TIP RAIL — sits above the four home buttons on both homes, right-
+   aligned. A black settings circle (the NowssB player's settings icon)
+   opens the Home Tiles page; to its left a black pill opens one tile at a
+   time explaining what that button is, then closes again. After the last
+   pill has fully closed the circle itself grows leftward into a pill
+   pointing back at the tap target. Both grow from the right edge, so the
+   rail can never push past the screen or overlap the circle.
+   ══════════════════════════════════════════════════════════════════ */
+.htg-rail {
+  width: 100%; display: flex; justify-content: flex-end; align-items: center;
+  gap: 8px; min-height: 40px; margin-bottom: 10px; box-sizing: border-box;
+}
+.htg-tip {
+  display: flex; align-items: center; gap: 0; height: 34px; flex-shrink: 1;
+  background: #000; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 30px !important; overflow: hidden;
+  max-width: 0; padding: 0; opacity: 0;
+  transition: max-width 0.9s cubic-bezier(0.4,0,0.2,1),
+              padding   0.9s cubic-bezier(0.4,0,0.2,1),
+              gap       0.9s cubic-bezier(0.4,0,0.2,1),
+              opacity   0.35s ease;
+}
+.htg-tip:not(.open) { border-width: 0; }   /* else the 1px borders leave a 2px sliver at max-width:0 */
+.htg-tip.open { max-width: 300px; padding: 0 14px 0 5px; gap: 9px; opacity: 1; }
+.htg-tip-ic {
+  width: 24px; height: 24px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.24); display: block;
+}
+.htg-tip-ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.htg-tip-rule { width: 1px; height: 17px; flex-shrink: 0; background: rgba(255,255,255,0.22); display: block; }
+.htg-tip-txt {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 700;
+  color: rgba(255,255,255,0.9); white-space: nowrap; display: block;
+}
+.htg-set {
+  display: flex; align-items: center; flex-shrink: 0; cursor: pointer;
+  height: 40px; padding: 3px; background: #000;
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 30px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+.htg-set-ic {
+  width: 32px; height: 32px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden; display: block;
+}
+.htg-set-ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.htg-set-lbl {
+  display: flex; align-items: center; gap: 7px; overflow: hidden; white-space: nowrap;
+  max-width: 0; opacity: 0; margin-left: 0;
+  transition: max-width 0.9s cubic-bezier(0.4,0,0.2,1),
+              margin-left 0.9s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.35s ease 0.15s;
+}
+.htg-set.open .htg-set-lbl { max-width: 220px; opacity: 1; margin-left: 12px; }
+.htg-set-arrows { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
+.htg-set-arrows svg { width: 10px; height: 10px; display: block; }
+.htg-set-arrows svg:first-child { opacity: 0.45; }
+.htg-set-txt {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.2px; color: #e8d5a3;
+}
+/* The Normal Home's rail lives inside the light neumorphic column — the pills
+   stay black there on purpose, matching the black banners on that page. */
+#home-nm .htg-rail { margin-bottom: 12px; }
+
+/* Home Tiles page — same custom-background behaviour as Quick Access */
+#sub-home-tiles .qa-page-bg { position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; pointer-events: none; display: none; }
+body.nwsb-custom-fashion-bg #sub-home-tiles .qa-page-bg {
+  display: block; background-image: var(--nwsb-custom-bg-url); background-color: var(--nwsb-custom-bg-color);
+}
+body.nwsb-custom-fashion-bg #sub-home-tiles .qa-page-bg::after { content: ''; position: absolute; inset: 0; background: rgba(6,12,24,0.72); }
+body.nwsb-custom-fashion-bg #sub-home-tiles.bgp-screen { background: transparent !important; }
+body.nwsb-custom-fashion-bg #sub-home-tiles .bgp-hero { background: none !important; }

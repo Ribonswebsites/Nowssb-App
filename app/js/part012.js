@@ -1664,6 +1664,10 @@ function openSub(id) {
     if (qaMain) qaMain.style.display = 'none';
     if (typeof window.qaNavRender === 'function') window.qaNavRender();
   }
+  if (id === 'home-tiles') {
+    // No intro splash on this one — it opens straight into the pickers.
+    if (typeof window.htRender === 'function') window.htRender();
+  }
   if (id === 'streak') {
     // Reset the intro splash so it shows fresh on every open (same
     // pattern as AI Prescription's #rxIntroPage below).
