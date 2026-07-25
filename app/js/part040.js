@@ -40,7 +40,7 @@
   // we came from, close settings behind us when done" handling subscription
   // already had. Add an id here whenever a new screen gets its own trigger
   // into a settings panel.
-  var _ssExternalPanels = ['subscription', 'fashionbg'];
+  var _ssExternalPanels = ['subscription', 'fashionbg', 'startbg'];
   window.SS = {
     open: function(id){
       var social = document.getElementById('sub-social');
@@ -250,6 +250,7 @@
         'themecolor': function(){ _renderThemes(); },
         'blackedition': function(){ if(typeof beIntroReset==='function') beIntroReset(); },
         'fashionbg': function(){ if(typeof window.fbgIntroReset==='function') window.fbgIntroReset(); },
+        'startbg': function(){ if(typeof window.sbgInit==='function') window.sbgInit(); },
       };
       if(renderMap[id]) renderMap[id]();
     }
