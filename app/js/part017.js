@@ -547,10 +547,14 @@ window.ebRenderStore = function () {
   container.innerHTML = EB_BOOKS.map(function (b) {
     var isPur = purchasedKeys.indexOf(b.key) !== -1;
     return '<div class="eb-row" onclick="window.ebOpenBook(\'' + b.key + '\')">' +
-      '<img class="eb-row-cover" loading="lazy" decoding="async" src="' + (b.cover || EB_COVER) + '" alt="">' +
-      '<div class="eb-row-rule"></div>' +
-      '<div class="eb-row-body">' +
+      // Top band: cover | vertical rule | the book name in big bold type
+      '<div class="eb-row-head">' +
+        '<div class="eb-cover-wrap"><img class="eb-cover-img" loading="lazy" decoding="async" src="' + (b.cover || EB_COVER) + '" alt=""></div>' +
+        '<div class="eb-row-rule"></div>' +
         '<div class="eb-row-title">' + ebEsc(b.title) + '</div>' +
+      '</div>' +
+      // Everything else runs full width underneath the cover + name
+      '<div class="eb-row-meta">' +
         '<div class="eb-row-sub">' + ebEsc(b.sub) + '</div>' +
         '<div class="eb-row-about">' + ebEsc(b.about) + '</div>' +
         '<div class="eb-row-disc">' + ebEsc(EB_DISCLAIMER) + '</div>' +
@@ -582,10 +586,12 @@ window.ebOpenBook = function (key) {
   var args = "'" + esc(b.key) + "'";
 
   body.innerHTML =
-    '<div class="ebd-hero">' +
-      '<img class="ebd-hero-img" src="' + (b.cover || EB_COVER) + '" alt="">' +
-      '<div class="ebd-hero-fade"></div>' +
-      '<div class="ebd-hero-txt">' +
+    // Same shape as the list row: cover on the left, vertical rule, then
+    // the book name — everything else runs full width underneath.
+    '<div class="eb-row-head ebd-head">' +
+      '<div class="eb-cover-wrap ebd-cover-wrap"><img class="eb-cover-img" src="' + (b.cover || EB_COVER) + '" alt=""></div>' +
+      '<div class="eb-row-rule"></div>' +
+      '<div>' +
         '<div class="ebd-eyebrow">Read · Learn · Practice</div>' +
         '<div class="ebd-title">' + ebEsc(b.title) + '</div>' +
       '</div>' +
