@@ -5467,42 +5467,52 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 }
 
 /* ══════════════════════════════════════════════════════════
-   MY PROGRESS (#sub-my-progress) — solid black tiles, white buttons.
-   Every card here was translucent (rgba(255,255,255,0.04)-ish), so the
-   glass-cube background artwork behind the page showed straight through
-   them — that faint vertical edge running down the left of the body map
-   is that artwork, not a border. Making the cards opaque black hides it
-   and gives the page one consistent surface.
+   MY PROGRESS (#sub-my-progress) — black BOXES only, brighter text.
+   (An earlier pass blackened the section WRAPPERS too, which turned
+   whole regions into one big slab. Only the individual tiles/boxes
+   below get a solid black surface; the sections around them stay
+   transparent.)
    ══════════════════════════════════════════════════════════ */
 #sub-my-progress .mp-greeting,
 #sub-my-progress .mp-stat-box,
-#sub-my-progress .mp-week-grid,
+#sub-my-progress .mp-week-cell > div:first-child,
 #sub-my-progress .mp-session-row,
-#sub-my-progress .mp-session-list,
-#sub-my-progress .mp-milestone,
 #sub-my-progress .mp-milestones-grid > *,
-#sub-my-progress .mp-insight,
 #sub-my-progress .mp-insight-card,
-#sub-my-progress .mp-feedback-wrap,
-#sub-my-progress .mp-feedback-saved,
 #sub-my-progress .mp-empty-state,
-#sub-my-progress .hbm-wrap,
+#sub-my-progress .mp-chip,
+#sub-my-progress .mp-feedback-textarea,
 #sub-my-progress .hbm-chip {
   background: #000 !important;
   background-image: none !important;
-  border-color: rgba(255,255,255,0.10) !important;
+  border-color: rgba(255,255,255,0.14) !important;
   -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
 }
-/* Chips keep their pill shape; active ones get a gold edge so state still reads */
-#sub-my-progress .hbm-chip.active,
-#sub-my-progress .mp-chip.active { border-color: rgba(232,213,163,0.55) !important; }
-#sub-my-progress .mp-chip { background: #000 !important; }
-/* Decorative glow overlays inside those cards would sit on the black */
 #sub-my-progress .mp-greeting::before { display: none !important; }
+#sub-my-progress .hbm-chip.active,
+#sub-my-progress .mp-chip.active { border-color: rgba(232,213,163,0.6) !important; }
+
+/* Text was barely legible on the darkened surfaces — lift every muted tone. */
+#sub-my-progress .mp-chip,
+#sub-my-progress .hbm-chip-label,
+#sub-my-progress .mp-week-name,
+#sub-my-progress .mp-stat-sub,
+#sub-my-progress .mp-session-disc,
+#sub-my-progress .hbm-total { color: rgba(255,255,255,0.75) !important; }
+#sub-my-progress .mp-empty-text,
+#sub-my-progress .mp-session-reps-label,
+#sub-my-progress .mp-insight-eyebrow { color: rgba(255,255,255,0.62) !important; }
+#sub-my-progress .mp-milestone-name,
+#sub-my-progress .mp-feedback-question,
+#sub-my-progress .mp-empty-title,
+#sub-my-progress .mp-session-word,
+#sub-my-progress .hbm-title { color: #fff !important; }
+#sub-my-progress .mp-stat-label,
+#sub-my-progress .sub-section-label { color: #e8d5a3 !important; }
+#sub-my-progress .mp-feedback-textarea::placeholder { color: rgba(255,255,255,0.45) !important; }
 
 /* Buttons — white */
 #sub-my-progress .mp-submit-btn,
-#sub-my-progress .sl-intro-enter-btn,
 #sub-my-progress .mp-empty-cta {
   background: #fff !important; border-color: #fff !important; color: #060c18 !important;
 }
@@ -5510,6 +5520,18 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 #sub-my-progress .mp-empty-cta:active { background: #eee !important; }
 #sub-my-progress .mp-submit-btn svg path,
 #sub-my-progress .mp-empty-cta svg path { stroke: #060c18 !important; }
+
+/* Body map: the 1px drop-shadow traced the body PNG's alpha edge, and the
+   artwork is cropped flat on its left — so that outline drew a hard vertical
+   line down the left of the figure. Keep the soft glow, drop the outline. */
+#sub-my-progress .hbm-figure {
+  filter: brightness(1.22) contrast(1.1) drop-shadow(0 0 16px rgba(120,180,255,.55)) !important;
+}
+
+/* Scrolling: keep vertical panning working everywhere on this page, and stop
+   the feedback textarea from swallowing an upward swipe near the bottom. */
+#sub-my-progress .sub-body { touch-action: pan-y; overscroll-behavior-y: contain; }
+#sub-my-progress .mp-feedback-textarea { min-height: 96px; max-height: 140px; touch-action: pan-y; }
 
 /* Loading state — our loading video instead of the spinner ring */
 .mp-loading-video {
