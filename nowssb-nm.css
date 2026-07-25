@@ -2333,8 +2333,11 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 .nmh-rx-enter {
   display: inline-flex; align-items: center; gap: 8px; margin-top: 12px;
   background: #fff; border-radius: 30px !important; padding: 6px 6px 6px 16px;
-  align-self: flex-start;
+  align-self: flex-end;   /* sits at the right end of the row */
 }
+/* Icon rides up next to the title instead of centering against the taller
+   row the Enter pill creates. */
+.nmh-rx-cta .nmh-sec-banner-icon { align-self: flex-start; margin-top: 2px; }
 .nmh-rx-enter-lbl { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800; color: #060c18; letter-spacing: 0.3px; }
 .nmh-rx-enter-go {
   width: 26px; height: 26px; border-radius: 50% !important; flex-shrink: 0;
