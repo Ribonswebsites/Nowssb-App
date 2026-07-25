@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=455">
+<link rel="stylesheet" href="nowssb-nm.css?v=456">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -116,10 +116,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- BACKGROUND — changes per screen -->
 <div class="app-bg" id="appBg"></div>
 
-<!-- Auth transition loader — shown between login and home while Firestore resolves -->
+<!-- Auth transition loader — shown between login and home while Firestore
+     resolves. Two videos alternate while it's visible (app/js/part058.js);
+     the sub-line auto-escalates to "a few minutes" if it runs long. -->
 <div id="authLoader">
-  <video class="auth-loader-video" autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4"></video>
-  <div class="auth-loader-text">Opening…</div>
+  <div class="auth-loader-text-wrap">
+    <div class="auth-loader-please">Please wait</div>
+    <div class="auth-loader-sub" id="authLoaderSub">This might take a few seconds</div>
+  </div>
+  <div class="auth-loader-vid-wrap" id="authLoaderVidWrap">
+    <video class="auth-loader-video active" autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4"></video>
+    <video class="auth-loader-video" autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959261/gemini_generated_video_aa0d13e6_gzjzhw.mp4"></video>
+  </div>
 </div>
 <!-- SECONDARY BG LAYER — cross-fades in when Word Search scrolls into view -->
 <div class="app-bg-layer2" id="appBgLayer2"></div>
@@ -8917,6 +8925,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part054.js?v=14"></script>
 <script src="app/js/part056.js?v=4"></script>
 <script src="app/js/part057.js?v=5"></script>
+<script src="app/js/part058.js?v=1"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=177" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
