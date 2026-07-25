@@ -43,24 +43,29 @@
 
   /* The four home buttons, present on BOTH homes (.nmh-tile-art on the Normal
      Home, .home-tile on the Fashion Home). Every tile already carries all the
-     pieces of all three looks in its markup, so switching style is nothing but
+     pieces of all four looks in its markup, so switching style is nothing but
      a body class — no re-render, no DOM surgery. Icon + cover URLs mirror the
      ones in index.html exactly so the preview matches the real thing. */
   var HOME_TILES = [
     { name: 'Sound Library', sub: 'Root frequencies',
       icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
-      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png' },
+      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
+      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784119058739_g0ihh7.jpg', photoPos: 'center', art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123006/file_00000000048471f4ab69afc37df973c0_iab33r.png'},
     { name: 'My Progress', sub: 'Healing journey',
       icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png',
-      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899471/file_00000000345481faafd2bea97c8320ab_oknybe.png' },
+      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899471/file_00000000345481faafd2bea97c8320ab_oknybe.png',
+      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784120246538_thvpik.jpg', photoPos: 'center top', art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_000000009f8871f48dbd29b870dbdc9e_z9idoj.png'},
     { name: 'Word Science', sub: 'NOWSBANSIU texts',
       icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
-      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png' },
+      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
+      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784120203500_t6zwrf.jpg', photoPos: 'center', art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_0000000015b071f48397d34be0129b36_bx9cur.png'},
     { name: 'My Profile', sub: 'Your settings',
       icon: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
-      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png' }
+      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png',
+      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130232/grok_image_1784119291881_s6pws0.jpg', photoPos: 'center', art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_00000000536071f4bf5172014811968f_jkt450.png' }
   ];
-  var TILE_STYLES  = [{ id: 'black', label: 'Black Banner' }, { id: 'image', label: 'Cover Image' }, { id: 'classic', label: 'Classic Glass' }];
+  var TILE_STYLES  = [{ id: 'black', label: 'Black Banner' }, { id: 'image', label: 'Cover Image' },
+                      { id: 'artwork', label: 'Artwork' }, { id: 'classic', label: 'Classic Glass' }];
   var TILE_CORNERS = [{ id: 'rounded', label: 'Rounded Corners' }, { id: 'edge', label: 'Edge Corners' }];
   var SHAPES  = [{ id: 'default', label: 'Default' }, { id: 'pill', label: 'Floating Pill' }, { id: 'rect', label: 'Floating Rectangle' }];
   var CORNERS = [{ id: 'rounded', label: 'Rounded Corners' }, { id: 'edge', label: 'Edge Corners' }];
@@ -78,7 +83,7 @@
   function savedShape()  { var s = ls('nwsb_nav_shape', 'default'); return (s === 'pill' || s === 'rect') ? s : 'default'; }
   function savedColor()  { return ls('nwsb_nav_color', 'glass') === 'black' ? 'black' : 'glass'; }
   function savedCorner() { return ls('nwsb_nav_rect_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
-  function savedTileStyle()  { var s = ls('nwsb_tile_style', 'black'); return (s === 'image' || s === 'classic') ? s : 'black'; }
+  function savedTileStyle()  { var s = ls('nwsb_tile_style', 'black'); return (s === 'image' || s === 'classic' || s === 'artwork') ? s : 'black'; }
   function savedTileCorner() { return ls('nwsb_tile_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
   function savedSlots() {
     var raw = ls('nwsb_nav_slots', null);
@@ -104,7 +109,7 @@
   }
   function applyTileLook() {
     var b = document.body; if (!b) return;
-    b.classList.remove('tilestyle-black', 'tilestyle-image', 'tilestyle-classic');
+    b.classList.remove('tilestyle-black', 'tilestyle-image', 'tilestyle-artwork', 'tilestyle-classic');
     b.classList.add('tilestyle-' + savedTileStyle());
     b.classList.remove('tilecorner-rounded', 'tilecorner-edge');
     b.classList.add('tilecorner-' + savedTileCorner());
@@ -146,6 +151,9 @@
       return '<div class="qat-tile">' +
         '<div class="qat-cover" style="background-image:url(\'' + t.cover + '\');"></div>' +
         '<div class="qat-scrim"></div>' +
+        '<div class="qat-photo" style="background-image:url(\'' + t.photo + '\');background-position:' + t.photoPos + ';"></div>' +
+        '<div class="qat-photo-scrim"></div>' +
+        '<img class="qat-art" decoding="async" loading="lazy" src="' + t.art + '" alt="">' +
         '<span class="qat-ic"><img decoding="async" loading="lazy" src="' + t.icon + '" alt=""></span>' +
         '<span class="qat-rule"></span>' +
         '<span class="qat-txt"><span class="qat-name">' + t.name + '</span><span class="qat-sub">' + t.sub + '</span></span>' +
