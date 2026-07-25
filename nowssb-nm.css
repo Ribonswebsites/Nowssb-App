@@ -6212,3 +6212,12 @@ body.nmcorner-circle .nmh-tile.nmh-tile-art { border-radius: 999px !important; }
    gap between the label row and the copy — nothing clips. */
 #home .health-journey-card .hjc-content { min-height: 558px; }
 #home-nm .health-journey-card .hjc-content { min-height: 536px; }
+
+/* Today's Offer banner on the Fashion Home — inset to the same 16px the
+   coupon art above it uses, and tucked directly under it. .nmh-offer-banner
+   zeroes its margins for the Normal Home's wrapper, so they're restored here. */
+#home .fash-offer-banner {
+  width: calc(100% - 32px) !important;
+  margin: 0 16px 8px !important;
+  box-sizing: border-box;
+}
