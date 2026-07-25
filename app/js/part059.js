@@ -53,8 +53,12 @@
                      { id: 'black', label: 'Black' }, { id: 'image', label: 'Cover Image' }];
   var NM_SURFACES = [{ id: 'convex', label: 'Convex' }, { id: 'concave', label: 'Concave (Dimple)' }];
   function isSoft(style) { return style === 'neuro' || style === 'artwork'; }
-  var CORNERS     = [{ id: 'rounded', label: 'Rounded' }, { id: 'edge', label: 'Edge' },
-                     { id: 'pill', label: 'Pill Shape' }];
+  /* The Fashion Home's cards are too tall for a full-radius shape — it warps
+     them — so it only gets the two. On the Normal Home the same radius lands
+     as a clean circle, so it's offered there under that name. */
+  var FASH_CORNERS = [{ id: 'rounded', label: 'Rounded' }, { id: 'edge', label: 'Edge' }];
+  var NM_CORNERS   = [{ id: 'rounded', label: 'Rounded' }, { id: 'edge', label: 'Edge' },
+                      { id: 'circle', label: 'Circle' }];
 
   var _stage = null;   // staged (unsaved) config
 
@@ -63,22 +67,24 @@
 
   // ── APPLIED (persisted) config ────────────────────────────────
   function savedFashStyle()  { var s = ls('nwsb_tile_style', 'black'); return (s === 'image' || s === 'classic' || s === 'artwork') ? s : 'black'; }
-  function savedFashCorner() { var c = ls('nwsb_tile_corner', 'rounded'); return (c === 'edge' || c === 'pill') ? c : 'rounded'; }
+  function savedFashCorner() { return ls('nwsb_tile_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
   function savedNmStyle()    { var s = ls('nwsb_nm_tile_style', 'neuro'); return (s === 'black' || s === 'image' || s === 'artwork') ? s : 'neuro'; }
   function savedNmSurface()  { return ls('nwsb_nm_tile_surface', 'convex') === 'concave' ? 'concave' : 'convex'; }
-  function savedNmCorner()   { var c = ls('nwsb_nm_tile_corner', 'rounded'); return (c === 'edge' || c === 'pill') ? c : 'rounded'; }
+  function savedNmCorner()   { var c = ls('nwsb_nm_tile_corner', 'rounded');
+                               if (c === 'pill') c = 'circle';   // the option was renamed
+                               return (c === 'edge' || c === 'circle') ? c : 'rounded'; }
 
   function applyLive() {
     var b = document.body; if (!b) return;
     b.classList.remove('fashtile-black', 'fashtile-image', 'fashtile-artwork', 'fashtile-classic');
     b.classList.add('fashtile-' + savedFashStyle());
-    b.classList.remove('fashcorner-rounded', 'fashcorner-edge', 'fashcorner-pill');
+    b.classList.remove('fashcorner-rounded', 'fashcorner-edge');
     b.classList.add('fashcorner-' + savedFashCorner());
     b.classList.remove('nmtile-neuro', 'nmtile-artwork', 'nmtile-black', 'nmtile-image');
     b.classList.add('nmtile-' + savedNmStyle());
     b.classList.remove('nmsurface-convex', 'nmsurface-concave');
     b.classList.add('nmsurface-' + savedNmSurface());
-    b.classList.remove('nmcorner-rounded', 'nmcorner-edge', 'nmcorner-pill');
+    b.classList.remove('nmcorner-rounded', 'nmcorner-edge', 'nmcorner-circle');
     b.classList.add('nmcorner-' + savedNmCorner());
   }
 
@@ -118,9 +124,9 @@
       n.innerHTML = previewHtml();
     }
     fill('htFashStyleRow',  FASH_STYLES.map(function (o) { return chip(_stage.fashStyle, o, 'htSetFashStyle'); }).join(''));
-    fill('htFashCornerRow', CORNERS.map(function (o) { return chip(_stage.fashCorner, o, 'htSetFashCorner'); }).join(''));
+    fill('htFashCornerRow', FASH_CORNERS.map(function (o) { return chip(_stage.fashCorner, o, 'htSetFashCorner'); }).join(''));
     fill('htNmStyleRow',    NM_STYLES.map(function (o) { return chip(_stage.nmStyle, o, 'htSetNmStyle'); }).join(''));
-    fill('htNmCornerRow',   CORNERS.map(function (o) { return chip(_stage.nmCorner, o, 'htSetNmCorner'); }).join(''));
+    fill('htNmCornerRow',   NM_CORNERS.map(function (o) { return chip(_stage.nmCorner, o, 'htSetNmCorner'); }).join(''));
     var sr = document.getElementById('htNmSurfaceRow');
     if (sr) {
       if (isSoft(_stage.nmStyle)) { sr.style.display = ''; sr.innerHTML = NM_SURFACES.map(function (o) { return chip(_stage.nmSurface, o, 'htSetNmSurface'); }).join(''); }
