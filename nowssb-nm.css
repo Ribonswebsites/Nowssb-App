@@ -6247,3 +6247,20 @@ body:has(.sub-screen.open .rm-intro-page:not(.rm-intro-hidden):not([style*="disp
 body:has(.sub-screen.open .ms-intro-page:not(.sl-intro-hidden):not([style*="display:none"]):not([style*="display: none"])) #ig-bottomnav {
   display: none !important;
 }
+
+/* Sound Library intro — the art is sized to 88% of the height (zoomed out from
+   cover), so the shared .sl-intro-vignette, which only reaches 0.95 at the very
+   bottom, left a visible step where the photo stopped. This one fades to fully
+   solid AT 88%, so the bottom reads as the vignette closing out rather than the
+   image running out. */
+#slIntroPage .sl-intro-vignette {
+  background: linear-gradient(to bottom,
+    rgba(6,12,24,0.30) 0%,
+    rgba(6,12,24,0.02) 18%,
+    rgba(6,12,24,0.00) 36%,
+    rgba(6,12,24,0.10) 52%,
+    rgba(6,12,24,0.52) 70%,
+    rgba(6,12,24,0.88) 82%,
+    #060c18 88%,
+    #060c18 100%) !important;
+}
