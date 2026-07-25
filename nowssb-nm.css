@@ -2265,7 +2265,19 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 .nmh-greet-line { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400; color: rgba(26,26,46,0.55); margin-top: 6px; }
 #home-nm.nm-dark .nmh-greet-hello { color: #fff; }
 #home-nm.nm-dark .nmh-greet-line { color: rgba(255,255,255,0.6); }
-.nmh-offer-section { margin-top: 8px; }
+/* Combined "Today's Offer" section — coupon image on top, the offer
+   banner below it, both fitted inside one padded neumorphic card
+   (same white-card recipe as .nmh-streak-section) instead of two
+   separate floating cards. */
+.nmh-offer-section {
+  width: 100%; border-radius: 22px !important; background: #f0f2f7; padding: 18px;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97); box-sizing: border-box;
+  margin-top: 8px;
+}
+#home-nm.nm-dark .nmh-offer-section { background: #16163c; box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32); }
+.nmh-offer-section .nmh-banner-wrap { margin-bottom: 14px; }
+.nmh-offer-section .nmh-greet-img { margin-bottom: 0 !important; box-shadow: none !important; }
+.nmh-offer-section .nmh-offer-banner { margin: 0 !important; box-shadow: none !important; }
 .nmh-greet-img{
   display:block !important;
   width:100% !important;

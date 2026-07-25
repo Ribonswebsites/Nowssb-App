@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=452">
+<link rel="stylesheet" href="nowssb-nm.css?v=453">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -742,19 +742,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </filter>
     </svg>
 
-    <!-- NowssB Store promo card (purple) — below today's offer, tap opens the store -->
-    <div class="npc-card npc-purple" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
-      <div class="npc-fabric"></div>
-      <div class="npc-ambient"></div>
-      <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
-      <div class="npc-stage" id="npcStoreStage">
-        <div class="npc-ring"></div>
-        <div class="npc-disc"><img id="npcStoreImg" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt=""></div>
-        <div class="npc-flash" id="npcStoreFlash"></div>
-      </div>
-      <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
-    </div>
-
     <!-- Streak section — taller card: heading, the ORIGINAL compact streak
          row at its own natural size (icon + number + label + "Keep
          Going" — not the glass cube, that stays on Fashion Home / the
@@ -785,6 +772,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
         <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
+    </div>
+
+    <!-- NowssB Store promo card (purple) — between the streak section and
+         Today's Practice, tap opens the store -->
+    <div class="npc-card npc-purple" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
+      <div class="npc-fabric"></div>
+      <div class="npc-ambient"></div>
+      <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
+      <div class="npc-stage" id="npcStoreStage">
+        <div class="npc-ring"></div>
+        <div class="npc-disc"><img id="npcStoreImg" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt=""></div>
+        <div class="npc-flash" id="npcStoreFlash"></div>
+      </div>
+      <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
     </div>
 
     <!-- Today's Practice -->
@@ -1155,7 +1156,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), moved to
          the bottom and combined into one section per request. ══ -->
     <div class="nmh-offer-section">
-      <div class="nmh-sec-banner" onclick="openSub('offers')">
+      <div class="nmh-banner-wrap">
+        <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
+             onclick="openSub('offers')" />
+        <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();openSub('offers')"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+      </div>
+      <div class="nmh-sec-banner nmh-offer-banner" onclick="openSub('offers')">
         <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
         <div class="nmh-sec-banner-divider"></div>
         <div class="nmh-sec-banner-txt">
@@ -1163,11 +1169,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div class="nmh-sec-banner-sub">Rotating store coupons — tap to redeem today's deal</div>
         </div>
         <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="nmh-banner-wrap">
-        <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
-             onclick="openSub('offers')" />
-        <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();openSub('offers')"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
       </div>
     </div>
 
