@@ -1219,6 +1219,13 @@ window.scOpenChapter = function(idx) {
    what renders the shelf); nssOpenSub is the direct-DOM fallback used from
    inside the store itself. */
 window.scOpenEbookStore = function () {
+  /* Close this page FIRST. #sub-ebooks-store sits earlier in the DOM than
+     #sub-shabdapathy and openSub() only toggles a class — it does nothing with
+     z-index — so both end up at 600 and DOM order decides who paints on top.
+     Opening the store while this page was still open therefore put it behind,
+     and to the user the button looked dead. */
+  if (typeof closeSub === 'function') closeSub('shabdapathy');
+  else { var me = document.getElementById('sub-shabdapathy'); if (me) me.classList.remove('open'); }
   if (typeof openSub === 'function') openSub('ebooks-store');
   else if (typeof nssOpenSub === 'function') nssOpenSub('ebooks-store');
 };
