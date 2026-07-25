@@ -2259,6 +2259,13 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 #profilePhotoPencil svg { width: 13px !important; height: 13px !important; }
 
 /* ===== HOME PAGE — TIME-OF-DAY GREETING IMAGE ===== */
+/* Restored time-based greeting block at the top of Normal Home */
+.nmh-greet-block { margin: 4px 0 18px; }
+.nmh-greet-hello { font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800; color: #1a1a2e; letter-spacing: -0.6px; line-height: 1.12; }
+.nmh-greet-line { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400; color: rgba(26,26,46,0.55); margin-top: 6px; }
+#home-nm.nm-dark .nmh-greet-hello { color: #fff; }
+#home-nm.nm-dark .nmh-greet-line { color: rgba(255,255,255,0.6); }
+.nmh-offer-section { margin-top: 8px; }
 .nmh-greet-img{
   display:block !important;
   width:100% !important;

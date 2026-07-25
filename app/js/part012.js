@@ -643,6 +643,15 @@ function nmhRefresh() {
   var streak = d.currentStreak || d.streakCount || 0;
   var el = document.getElementById('nmhStreakNum');
   if (el) el.textContent = streak;
+
+  // Time-based greeting (Good Morning / Afternoon / Evening + first name)
+  var greetEl = document.getElementById('nmhGreetHello');
+  if (greetEl) {
+    var _hr = new Date().getHours();
+    var _g = _hr < 12 ? 'Good Morning' : (_hr < 17 ? 'Good Afternoon' : 'Good Evening');
+    var _nm = (d.displayName ? String(d.displayName).split(' ')[0] : '') || 'Healer';
+    greetEl.textContent = _g + ', ' + _nm;
+  }
   var elF = document.getElementById('fashStreakNum');
   if (elF) elF.textContent = streak;
 
