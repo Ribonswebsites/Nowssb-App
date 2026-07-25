@@ -2304,7 +2304,14 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 /* AI Prescription section reuses the same wrapper recipe — video on top
    (no outer border/shadow, it's already inside the padded card), banner
    below. */
-.nmh-rx-section .nmh-rx-video { margin: 0 0 14px !important; border: none !important; box-shadow: none !important; }
+/* No rounded corners anywhere in this section, per request. */
+.nmh-rx-section { border-radius: 0 !important; }
+.nmh-rx-section .nmh-rx-video {
+  margin: 0 0 14px !important; border: none !important; box-shadow: none !important;
+  border-radius: 0 !important; aspect-ratio: 1080 / 300 !important;
+}
+.nmh-rx-banner-img { display: block; width: 100%; height: 150px; object-fit: cover; border-radius: 0 !important; margin-bottom: 14px; cursor: pointer; }
+.nmh-rx-section .nmh-offer-banner { border-radius: 0 !important; }
 .nmh-greet-img{
   display:block !important;
   width:100% !important;
