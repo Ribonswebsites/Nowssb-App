@@ -1968,6 +1968,15 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.28);
   display: flex; align-items: center; justify-content: center;
 }
+/* Cards whose icon is a real image (not a line SVG) get a bigger wrapper and
+   a taller card, so the artwork reads properly instead of being squeezed
+   into a 44px chip. */
+.nss-mini-card:has(.nss-mini-card-icon img) { padding: 20px 16px; }
+.nss-mini-card-icon:has(img) {
+  width: 74px; height: 74px; border-radius: 16px !important;
+  background: transparent; border: none; overflow: hidden;
+}
+.nss-mini-card-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .nss-mini-card-text { flex: 1; min-width: 0; }
 .nss-mini-card-eyebrow {
   font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
@@ -5312,4 +5321,88 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 .screen:not(.active) *::before,
 .screen:not(.active) *::after {
   animation-play-state: paused !important;
+}
+
+/* ══════════════════════════════════════════════════════════
+   EBOOKS — list rows + per-book detail page (app/js/part017.js)
+   ══════════════════════════════════════════════════════════ */
+
+/* One row per book: big cover on the left, vertical rule, then the
+   title / subtitle / about / disclaimer stack, with Get It underneath. */
+.eb-row {
+  display: flex; gap: 14px; align-items: stretch;
+  background: #000; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px !important; padding: 16px; margin-bottom: 14px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+}
+.eb-row-cover {
+  width: 108px; flex-shrink: 0; aspect-ratio: 3/4; object-fit: cover; display: block;
+  border-radius: 10px !important; background: rgba(255,255,255,0.05);
+}
+.eb-row-rule { width: 1px; align-self: stretch; background: rgba(255,255,255,0.16); flex-shrink: 0; }
+.eb-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.eb-row-title {
+  font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #fff;
+  line-height: 1.2; letter-spacing: -0.3px;
+}
+.eb-row-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #e8d5a3; margin-top: 4px; }
+.eb-row-about { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: rgba(255,255,255,0.55); line-height: 1.5; margin-top: 8px; }
+.eb-row-disc {
+  font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-style: italic;
+  color: rgba(255,255,255,0.35); line-height: 1.45; margin-top: 8px;
+}
+.eb-row-foot { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.eb-row-price { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800; color: #e8d5a3; }
+.eb-get-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: #fff; color: #060c18; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.3px;
+  padding: 10px 14px; border-radius: 30px !important; -webkit-tap-highlight-color: transparent;
+}
+.eb-get-btn:active { filter: brightness(0.93); }
+.eb-row-owned { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800; color: #8ce6aa; }
+
+/* ── Detail page ── */
+.ebd-hero { position: relative; width: calc(100% + 40px); margin: -24px -20px 18px; background: #000; }
+.ebd-hero-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.ebd-hero-fade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(6,12,24,0) 45%, rgba(6,12,24,0.92)); }
+.ebd-hero-txt { position: absolute; bottom: 16px; left: 20px; right: 20px; }
+.ebd-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 3px; font-weight: 700; text-transform: uppercase; color: #e8d5a3; margin-bottom: 6px; }
+.ebd-title { font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800; color: #fff; line-height: 1.15; letter-spacing: -0.5px; }
+.ebd-sub { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 8px; line-height: 1.5; }
+.ebd-label {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: #e8d5a3; margin: 22px 0 8px;
+}
+.ebd-text { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.65; }
+.ebd-list { list-style: none; padding: 0; margin: 0; }
+.ebd-list li {
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.62);
+  line-height: 1.5; padding: 8px 0 8px 20px; position: relative;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.ebd-list li:last-child { border-bottom: none; }
+.ebd-list li::before { content: '·'; position: absolute; left: 6px; color: #e8d5a3; font-weight: 800; }
+.ebd-price-row { display: flex; align-items: baseline; gap: 10px; margin: 20px 0 12px; }
+.ebd-price { font-family: 'DM Sans', sans-serif; font-size: 30px; font-weight: 800; color: #e8d5a3; }
+.ebd-price-note { font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(255,255,255,0.4); }
+.ebd-buy-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(135deg,#e8d5a3,#c8a96e); color: #060c18; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.4px;
+  padding: 16px; border-radius: 30px !important; -webkit-tap-highlight-color: transparent;
+}
+.ebd-buy-btn:active { filter: brightness(0.94); }
+.ebd-action-row { display: flex; gap: 10px; margin-top: 10px; }
+.ebd-action-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #fff; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+  padding: 13px; border-radius: 30px !important; -webkit-tap-highlight-color: transparent;
+}
+.ebd-action-btn:active { background: rgba(255,255,255,0.12); }
+.ebd-owned-note {
+  text-align: center; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800;
+  color: #8ce6aa; padding: 16px; border: 1px solid rgba(140,230,170,0.3);
+  border-radius: 30px !important; background: rgba(140,230,170,0.07);
 }

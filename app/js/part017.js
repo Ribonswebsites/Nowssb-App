@@ -468,13 +468,58 @@ function nssOpenSub(id) {
    checkout pipeline (nssAddToCart), its own purchased-list localStorage
    key. No real reader built yet, so an owned ebook shows a "coming soon"
    stub instead of pretending to open real content. ══ */
-/* Two real titles, each with its own cover art. */
+/* Three real titles, each with its own cover art, long-form description and
+   contents list — the detail page (ebOpenBook) renders straight from this,
+   so a book is described in exactly one place. */
 var EB_BOOKS = [
-  { key: 'shabdapathy-codex',    title: 'The Shabdapathy Codex',           sub: 'The complete origin science, in one volume.', price: 499,
-    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007fec81f4b097aaae4e7ac297_ohtqy9.png' },
-  { key: 'phonetic-field-guide', title: 'Phonetic Origins: A Field Guide', sub: 'Trace any word back to its first sound.',     price: 399,
-    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007af081f49748cd0a1b77c566_f8qslq.png' }
+  {
+    key: 'shabdapathy-codex',
+    title: 'The Shabdapathy Codex',
+    sub: 'The complete origin science, in one volume.',
+    price: 499,
+    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007fec81f4b097aaae4e7ac297_ohtqy9.png',
+    about: 'The foundational text of Shabdapathy — how sound carried meaning long before dictionaries existed, and why the human body still responds to the original vibration of a word rather than its spelling.',
+    contents: [
+      'What Shabdapathy is, and what it is not',
+      'The natural origin of sound, before written language',
+      'Why the body reacts to vibration, not definition',
+      'Reading a word back to its first sound',
+      'Daily practice: building your own routine'
+    ]
+  },
+  {
+    key: 'phonetic-field-guide',
+    title: 'Phonetic Origins: A Field Guide',
+    sub: 'Trace any word back to its first sound.',
+    price: 399,
+    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007af081f49748cd0a1b77c566_f8qslq.png',
+    about: 'A practical companion for tracing any word back through its phonetic ancestry. Built as a working field guide rather than a theory book — open it mid-practice and follow the method on whatever word you are holding.',
+    contents: [
+      'The tracing method, step by step',
+      'Root syllables and how to isolate them',
+      'Common false trails and how to spot them',
+      'Cross-language sound families',
+      'Worked examples you can follow along with'
+    ]
+  },
+  {
+    key: 'sound-healing-atlas',
+    title: 'The Sound Healing Atlas',
+    sub: 'Which sounds reach which parts of the body.',
+    price: 599,
+    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784975675/file_00000000ee688208950f4126ed15d9b3_esohnw.png',
+    about: 'A mapped reference of sound to the body — which syllables carry to which regions, why speaking aloud lands differently than thinking a word, and how to build a session around the area you actually want to work on.',
+    contents: [
+      'The body map: sound to region',
+      'Why aloud differs from silent',
+      'Breath, pitch and placement',
+      'Building a session around one area',
+      'Sequencing and how long to hold'
+    ]
+  }
 ];
+/* One disclaimer, shown under every book and on every detail page. */
+var EB_DISCLAIMER = 'For educational and wellness purposes only — not medical advice, and not a replacement for professional diagnosis or treatment.';
 /* Fallback only — every book above ships its own cover. */
 var EB_COVER = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
 function ebCoverFor(key) {
@@ -487,41 +532,115 @@ function ebGetPurchased() {
 }
 window.ebIsPurchased = function (key) { return ebGetPurchased().some(function (p) { return p.key === key; }); };
 
+function ebBookByKey(key) {
+  for (var i = 0; i < EB_BOOKS.length; i++) if (EB_BOOKS[i].key === key) return EB_BOOKS[i];
+  return null;
+}
+function ebEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+/* Store list — one full-width row per book: big cover, vertical rule, then
+   title / subtitle / about / disclaimer, with its own Get It button. */
 window.ebRenderStore = function () {
   var container = document.getElementById('ebGrid');
   if (!container) return;
   var purchasedKeys = ebGetPurchased().map(function (p) { return p.key; });
-  var html = '<div class="ms-grid">';
-  EB_BOOKS.forEach(function (b) {
+  container.innerHTML = EB_BOOKS.map(function (b) {
     var isPur = purchasedKeys.indexOf(b.key) !== -1;
-    var titleSafe = b.title.replace(/'/g, "\\'");
-    html += '<div class="ms-card' + (isPur ? ' unlocked' : '') + '" style="position:relative;" onclick="' +
-      (isPur ? "window.ebOpenReader('" + b.key + "','" + titleSafe + "')" : "window.ebBuy('" + b.key + "','" + titleSafe + "'," + b.price + ")") +
-      '">' +
-      '<div class="ms-card-img" style="background-image:url(\'' + (b.cover || EB_COVER) + '\')"></div>' +
-      '<div class="ms-card-overlay"></div>' +
-      '<div class="ms-card-body">' +
-      '<div class="ms-card-word">' + b.title + '</div>' +
-      '<div class="ms-card-root">' + b.sub + '</div>' +
-      (isPur
-        ? '<div class="ms-card-unlocked-badge"><svg width="8" height="7" viewBox="0 0 10 9" fill="none"><path d="M1 4L3.5 7L9 1" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/></svg>Owned</div>'
-        : '<div class="ms-card-price">$' + (b.price / 100).toFixed(2) + '</div>') +
-      '</div></div>';
-  });
-  html += '</div>';
-  container.innerHTML = html;
+    return '<div class="eb-row" onclick="window.ebOpenBook(\'' + b.key + '\')">' +
+      '<img class="eb-row-cover" loading="lazy" decoding="async" src="' + (b.cover || EB_COVER) + '" alt="">' +
+      '<div class="eb-row-rule"></div>' +
+      '<div class="eb-row-body">' +
+        '<div class="eb-row-title">' + ebEsc(b.title) + '</div>' +
+        '<div class="eb-row-sub">' + ebEsc(b.sub) + '</div>' +
+        '<div class="eb-row-about">' + ebEsc(b.about) + '</div>' +
+        '<div class="eb-row-disc">' + ebEsc(EB_DISCLAIMER) + '</div>' +
+        '<div class="eb-row-foot">' +
+          (isPur
+            ? '<span class="eb-row-owned">✓ Owned</span><button class="eb-get-btn" onclick="event.stopPropagation();window.ebOpenBook(\'' + b.key + '\')">Read It</button>'
+            : '<span class="eb-row-price">$' + (b.price / 100).toFixed(2) + '</span>' +
+              '<button class="eb-get-btn" onclick="event.stopPropagation();window.ebOpenBook(\'' + b.key + '\')">Get It' +
+              '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg></button>') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
   if (typeof nssRefreshCardStates === 'function') nssRefreshCardStates();
 };
 
-window.ebBuy = function (key, title, price) {
-  if (typeof nssAddToCart === 'function') {
-    nssAddToCart({ id: 'ebook-' + key, name: title, type: 'Ebook', price: price, img: ebCoverFor(key) });
-  }
+/* ── Per-book detail page ── */
+window.ebOpenBook = function (key) {
+  var b = ebBookByKey(key);
+  if (!b) return;
+  var body = document.getElementById('ebdBody');
+  var titleEl = document.getElementById('ebdTitle');
+  if (!body) return;
+  if (titleEl) titleEl.textContent = b.title;
+
+  var isPur = window.ebIsPurchased(b.key);
+  var priceStr = '$' + (b.price / 100).toFixed(2);
+  var esc = function (s) { return String(s).replace(/'/g, "\\'"); };
+  var args = "'" + esc(b.key) + "'";
+
+  body.innerHTML =
+    '<div class="ebd-hero">' +
+      '<img class="ebd-hero-img" src="' + (b.cover || EB_COVER) + '" alt="">' +
+      '<div class="ebd-hero-fade"></div>' +
+      '<div class="ebd-hero-txt">' +
+        '<div class="ebd-eyebrow">Read · Learn · Practice</div>' +
+        '<div class="ebd-title">' + ebEsc(b.title) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ebd-sub">' + ebEsc(b.sub) + '</div>' +
+    '<div class="ebd-label">About This Book</div>' +
+    '<div class="ebd-text">' + ebEsc(b.about) + '</div>' +
+    '<div class="ebd-label">What\'s Inside</div>' +
+    '<ul class="ebd-list">' + (b.contents || []).map(function (c) { return '<li>' + ebEsc(c) + '</li>'; }).join('') + '</ul>' +
+    (isPur
+      ? '<div class="ebd-price-row"><span class="ebd-price">Owned</span></div>' +
+        '<div class="ebd-owned-note">✓ You own this book — the in-app reader is coming soon.</div>'
+      : '<div class="ebd-price-row"><span class="ebd-price">' + priceStr + '</span>' +
+          '<span class="ebd-price-note">one-time · yours forever</span></div>' +
+        '<button class="ebd-buy-btn" onclick="window.ebBuyNow(' + args + ')">Buy Now' +
+          '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></button>' +
+        '<div class="ebd-action-row">' +
+          '<button class="ebd-action-btn" onclick="window.ebAddToCart(' + args + ')">' +
+            '<svg width="15" height="15" viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#fff" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#fff" stroke="none"/></svg>Add to Cart</button>' +
+          '<button class="ebd-action-btn" onclick="window.ebToggleWishlist(' + args + ')">' +
+            '<svg width="15" height="15" viewBox="0 0 22 22" fill="none"><path d="M11 18.5S3 13.8 3 8.4C3 5.6 5.2 3.5 7.8 3.5c1.5 0 2.8.7 3.2 1.9.4-1.2 1.7-1.9 3.2-1.9 2.6 0 4.8 2.1 4.8 4.9 0 5.4-8 10.1-8 10.1z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>Wishlist</button>' +
+        '</div>') +
+    '<div class="rm-disclaimer" style="margin-top:22px;">' +
+      '<div class="rm-disclaimer-title">Disclaimer &amp; Confidentiality</div>' +
+      '<div class="rm-disclaimer-text">' + ebEsc(EB_DISCLAIMER) + ' Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.</div>' +
+    '</div>';
+
+  if (typeof openSub === 'function') openSub('ebook-detail');
 };
 
-window.ebOpenReader = function (key, title) {
-  alert('Opening "' + title + '" — the in-app reader is coming soon. Your purchase is saved.');
+function ebCartItem(b) {
+  return { id: 'ebook-' + b.key, name: b.title, type: 'Ebook', price: b.price, img: b.cover || EB_COVER };
+}
+
+window.ebAddToCart = function (key) {
+  var b = ebBookByKey(key); if (!b) return;
+  if (typeof nssAddToCart === 'function') nssAddToCart(ebCartItem(b));
 };
+
+window.ebToggleWishlist = function (key) {
+  var b = ebBookByKey(key); if (!b) return;
+  if (typeof nssToggleWishlist === 'function') nssToggleWishlist(ebCartItem(b));
+};
+
+window.ebBuyNow = function (key) {
+  var b = ebBookByKey(key); if (!b) return;
+  if (typeof nssAddToCart === 'function') nssAddToCart(ebCartItem(b));
+  if (typeof openSub === 'function') openSub('checkout');
+};
+
+/* Kept for older call sites (store chooser deep links) — now routes to the
+   real book page instead of silently dropping the book into the cart. */
+window.ebBuy = function (key) { window.ebOpenBook(key); };
+
+window.ebOpenReader = function (key) { window.ebOpenBook(key); };
 
 window.ebEnterFromIntro = function () {
   var intro = document.getElementById('ebIntroPage');

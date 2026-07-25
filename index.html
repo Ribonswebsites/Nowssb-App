@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=462">
+<link rel="stylesheet" href="nowssb-nm.css?v=463">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -3576,10 +3576,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <div class="sub-body" id="ebBody" style="position:relative;">
 
-      <!-- Hero banner -->
-      <div style="position:relative;width:calc(100% + 40px);margin:-24px -20px 16px;aspect-ratio:16/9;overflow:hidden;flex-shrink:0;background:#000;">
-        <img src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778571499/grok_image_1778521152376_il2xkh.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.15),rgba(6,12,24,0.85));"></div>
+      <!-- Hero banner — taller so the artwork isn't cropped to a thin strip -->
+      <div style="position:relative;width:calc(100% + 40px);margin:-24px -20px 16px;aspect-ratio:4/3;overflow:hidden;flex-shrink:0;background:#000;">
+        <img src="https://res.cloudinary.com/eenvubod/image/upload/v1784975674/grok_image_1784957219264_oulqx7.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.05) 40%,rgba(6,12,24,0.85));"></div>
         <div style="position:absolute;bottom:16px;left:20px;right:20px;">
           <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;text-transform:uppercase;font-family:'DM Sans',sans-serif;margin-bottom:6px;">Read · Learn · Practice</div>
           <div style="font-size:24px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">The NowssB Ebooks</div>
@@ -3604,6 +3604,24 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
 </div><!-- /sub-ebooks-store -->
+
+<!-- ══ SUB-SCREEN: EBOOK DETAIL — one real page per book, same shape as the
+     Word Atelier / Meaning Store detail views: cover hero, title, about,
+     what's inside, disclaimer, then Buy Now / Add to Cart / Wishlist.
+     Rendered by ebOpenBook() in app/js/part017.js. ══ -->
+<div class="sub-screen" id="sub-ebook-detail">
+  <div class="sub-header nav-bar">
+    <div class="sub-back" onclick="closeSub('ebook-detail')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
+    </div>
+    <span class="sub-title" id="ebdTitle">Ebook</span>
+    <button class="rm-cart-btn" onclick="nssOpenCart()" aria-label="Cart">
+      <svg width="17" height="17" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg>
+      <div class="nss-icon-badge nss-cart-badge-shared">0</div>
+    </button>
+  </div>
+  <div class="sub-body" id="ebdBody"><!-- rendered by JS --></div>
+</div>
 
 <!-- ══ SUB-SCREEN: SHABDAPATHY ══ -->
 <div class="sub-screen" id="sub-shabdapathy">
@@ -4406,7 +4424,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 </div><!-- /sub-nowssb-store -->
 
-<script src="app/js/part017.js?v=203"></script>
+<script src="app/js/part017.js?v=204"></script>
 
 <!-- intro rendered inline -->
 
