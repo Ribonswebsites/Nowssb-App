@@ -15,11 +15,17 @@
   'use strict';
 
   var FEATURES = [
-    { id: 'connect',      label: 'Connect',    img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png', run: function () { if (window.IG) IG.nav('home'); } },
-    { id: 'practice',     label: 'Practice',   img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png', run: function () { if (typeof openPracticeIntro === 'function') openPracticeIntro(); } },
-    { id: 'library',      label: 'Library',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png', run: function () { openSub('sound-library'); } },
-    { id: 'store',        label: 'Store',      img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png', run: function () { openSub('nowssb-store'); } },
-    { id: 'profile',      label: 'Profile',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png', run: function () { openSub('profile'); } },
+    /* The five default slots must go through IG.nav() with the SAME route the
+       stock nav bar uses — it also handles closing other screens, swapping to
+       the social nav and setting the active highlight. Connect in particular
+       is IG.nav('profile'), NOT 'home': routing it to 'home' just bounced the
+       user to the home screen, which is why Connect stopped working once a
+       nav customization had been applied. */
+    { id: 'connect',      label: 'Connect',    img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png', run: function () { if (window.IG) IG.nav('profile'); } },
+    { id: 'practice',     label: 'Practice',   img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png', run: function () { if (window.IG) IG.nav('practice'); else if (typeof openPracticeIntro === 'function') openPracticeIntro(); } },
+    { id: 'library',      label: 'Library',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png', run: function () { if (window.IG) IG.nav('library'); else openSub('sound-library'); } },
+    { id: 'store',        label: 'Store',      img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png', run: function () { if (window.IG) IG.nav('store'); else openSub('nowssb-store'); } },
+    { id: 'profile',      label: 'Profile',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png', run: function () { if (window.IG) IG.nav('myprofile'); else openSub('profile'); } },
     { id: 'progress',     label: 'Progress',   img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png', run: function () { openSub('my-progress'); } },
     { id: 'wordscience',  label: 'Word Sci',   img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png', run: function () { openSub('word-science'); } },
     { id: 'meaningstore', label: 'Meaning',    img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png', run: function () { openSub('meaning-store'); } },

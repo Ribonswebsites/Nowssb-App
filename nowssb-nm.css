@@ -3,6 +3,14 @@
    Auto-discovered and warmed into Cache Storage by app/js/part051.js
    (it scans every <video src>), so sw.js serves it instantly from cache
    on return visits; first-ever load just streams it normally. ══ */
+/* #authLoader is pointer-events:none while hidden, but app.css sets a global
+   `img,video{pointer-events:auto}` which overrides that inheritance — so the
+   loader's videos stayed tappable and silently swallowed taps across the
+   middle of the screen at z-index 9999 (Quick Access needing several taps
+   to open was this). Force the whole subtree inert unless it's visible. */
+#authLoader:not(.visible),
+#authLoader:not(.visible) * { pointer-events: none !important; }
+
 .auth-loader-text-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .auth-loader-please { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.3px; }
 .auth-loader-sub {
