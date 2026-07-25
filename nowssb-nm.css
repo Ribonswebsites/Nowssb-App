@@ -3669,26 +3669,27 @@ body.nm-glass .nmh-tile.nmh-tile-art {
   background: rgba(232,213,163,0.1) !important; border: 1px solid rgba(232,213,163,0.24);
   box-shadow: none !important; display: flex; align-items: center; justify-content: center;
 }
-/* White Enter pill with the arrow in its own circle wrapper, bottom-right */
+/* Enter pill, bottom-right — the Normal Home keeps its original gold outline
+   pill with an inline gold arrow (the white pill + circle arrow was only ever
+   asked for on the Fashion Home). The markup is shared with .home-tile so the
+   style engine can drive both, hence the circle wrapper is flattened here
+   rather than removed from the DOM. */
 .nmh-tile-enter {
-  position: absolute; right: 10px; bottom: 10px; z-index: 3;
-  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
-  background: #fff; border: none;
-  padding: 4px 4px 4px 11px; border-radius: 30px !important;
+  position: absolute; right: 12px; bottom: 12px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(232,213,163,0.28);
+  padding: 6px 12px; border-radius: 20px !important;
 }
 .nmh-tile-enter-lbl {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
-  letter-spacing: 0.3px; color: #060c18;
+  letter-spacing: 0.3px; color: #e8d5a3;
 }
 .nmh-tile-enter-go {
-  width: 20px; height: 20px; flex-shrink: 0; border-radius: 50% !important;
-  background: rgba(6,12,24,0.1); display: flex; align-items: center; justify-content: center;
+  width: 11px; height: 11px; flex-shrink: 0; border-radius: 0 !important;
+  background: none; display: flex; align-items: center; justify-content: center;
 }
-.nmh-tile-enter-go svg { width: 10px; height: 10px; display: block; }
-/* Round wrapper holding the real feature artwork (from the Everything on
-   NowssB page) instead of a line SVG — matches the Fashion Home tiles. */
-.nmh-tile.nmh-tile-art .nmh-tile-icon { border-radius: 50% !important; overflow: hidden; }
-.nmh-tile.nmh-tile-art .nmh-tile-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nmh-tile-enter-go svg { width: 11px; height: 11px; display: block; }
+.nmh-tile-enter-go svg path { stroke: #c8a96e; }
 /* Traveling gold light — SEQUENTIAL relay: only ONE tile's ring sweeps at a
    time; when it finishes, the next tile's ring starts, and so on. Each tile runs
    the same 10s cycle but the sweep only happens during its own 1/4 slot (0-25%);
@@ -5731,3 +5732,51 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
 #sub-shabdapathy .sc-banner .nmh-sec-banner-sub { font-size: 11.5px; }
 /* The mid-list eBook banner acts as a divider inside the chapter run */
 #sub-shabdapathy .sc-banner-mid { margin: 20px 0 20px; }
+
+/* ── STYLE 4 · ARTWORK — the look that came before the cover tiles: a full
+   photo background per tile with its own trimmed icon artwork stacked over
+   title + subtitle. Four different photos, four different icons — all four
+   pairs restored from the versions that shipped earlier. ── */
+.nmh-tile-photo, .home-tile-photo {
+  display: none; position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-repeat: no-repeat;
+}
+.nmh-tile-photo-scrim, .home-tile-photo-scrim {
+  display: none; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(160deg, rgba(6,12,24,0.28) 0%, rgba(6,12,24,0.66) 100%);
+}
+.nmh-tile-articon, .home-tile-articon {
+  display: none; position: relative; z-index: 2;
+  width: 36px; height: 36px; object-fit: contain;
+}
+body.tilestyle-artwork .nmh-tile.nmh-tile-art,
+body.tilestyle-artwork .home-tile {
+  display: flex !important; flex-direction: column; align-items: flex-start;
+  aspect-ratio: auto !important; min-height: 148px !important;
+  padding: 16px 14px 48px !important;
+  background: #060c18 !important; border: 1px solid rgba(255,255,255,0.08) !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+body.nm-glass.tilestyle-artwork .nmh-tile.nmh-tile-art { background: #060c18 !important; }
+body.tilestyle-artwork .nmh-tile-photo, body.tilestyle-artwork .home-tile-photo,
+body.tilestyle-artwork .nmh-tile-photo-scrim, body.tilestyle-artwork .home-tile-photo-scrim { display: block; }
+body.tilestyle-artwork .nmh-tile-articon, body.tilestyle-artwork .home-tile-articon { display: block; margin-bottom: 10px; }
+body.tilestyle-artwork .nmh-tile-icon, body.tilestyle-artwork .home-tile-icon,
+body.tilestyle-artwork .nmh-tile-rule, body.tilestyle-artwork .home-tile-rule { display: none !important; }
+body.tilestyle-artwork .nmh-tile-txt, body.tilestyle-artwork .home-tile-txt { position: relative; z-index: 2; }
+body.tilestyle-artwork .nmh-tile-title, body.tilestyle-artwork .home-tile-title { font-size: 14px !important; }
+body.tilestyle-artwork .nmh-tile-sub, body.tilestyle-artwork .home-tile-sub { color: rgba(255,255,255,0.66) !important; }
+
+/* preview · artwork variant */
+.qat-art { display: none; position: relative; z-index: 2; width: 24px; height: 24px; object-fit: contain; }
+.qat-photo { display: none; position: absolute; inset: 0; z-index: 0; background-size: cover; background-repeat: no-repeat; }
+.qat-photo-scrim { display: none; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(160deg, rgba(6,12,24,0.28) 0%, rgba(6,12,24,0.66) 100%); }
+.qat-grid.qat-artwork .qat-tile {
+  display: flex; flex-direction: column; align-items: flex-start;
+  aspect-ratio: auto; min-height: 100px; padding: 11px 10px 32px; background: #060c18;
+}
+.qat-grid.qat-artwork .qat-photo, .qat-grid.qat-artwork .qat-photo-scrim { display: block; }
+.qat-grid.qat-artwork .qat-art { display: block; margin-bottom: 7px; }
+.qat-grid.qat-artwork .qat-ic, .qat-grid.qat-artwork .qat-rule { display: none; }
+.qat-grid.qat-artwork .qat-txt { position: relative; z-index: 2; }
