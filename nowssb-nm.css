@@ -5327,23 +5327,29 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
    EBOOKS — list rows + per-book detail page (app/js/part017.js)
    ══════════════════════════════════════════════════════════ */
 
-/* One row per book: big cover on the left, vertical rule, then the
-   title / subtitle / about / disclaimer stack, with Get It underneath. */
+/* One card per book. Top band: cover | vertical rule | the book name in
+   big bold type. Everything else runs full width underneath. */
 .eb-row {
-  display: flex; gap: 14px; align-items: stretch;
   background: #000; border: 1px solid rgba(255,255,255,0.08);
   border-radius: 18px !important; padding: 16px; margin-bottom: 14px;
   box-shadow: 0 8px 22px rgba(0,0,0,0.35);
 }
-.eb-row-cover {
-  width: 108px; flex-shrink: 0; aspect-ratio: 3/4; object-fit: cover; display: block;
-  border-radius: 10px !important; background: rgba(255,255,255,0.05);
+.eb-row-head { display: flex; gap: 14px; align-items: center; }
+/* The covers are square source images. A 3:4 box with object-fit:cover was
+   slicing their sides off and zooming in — keep the box 1:1 and use
+   `contain` so the whole cover is always visible, never cropped. */
+.eb-cover-wrap {
+  width: 92px; height: 92px; flex-shrink: 0; border-radius: 12px !important;
+  overflow: hidden; background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1); padding: 6px; box-sizing: border-box;
 }
+.eb-cover-img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .eb-row-rule { width: 1px; align-self: stretch; background: rgba(255,255,255,0.16); flex-shrink: 0; }
-.eb-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.eb-row-meta { margin-top: 14px; }
 .eb-row-title {
-  font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #fff;
-  line-height: 1.2; letter-spacing: -0.3px;
+  flex: 1; min-width: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800; color: #fff;
+  line-height: 1.2; letter-spacing: -0.4px;
 }
 .eb-row-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #e8d5a3; margin-top: 4px; }
 .eb-row-about { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: rgba(255,255,255,0.55); line-height: 1.5; margin-top: 8px; }
@@ -5362,14 +5368,12 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 .eb-get-btn:active { filter: brightness(0.93); }
 .eb-row-owned { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800; color: #8ce6aa; }
 
-/* ── Detail page ── */
-.ebd-hero { position: relative; width: calc(100% + 40px); margin: -24px -20px 18px; background: #000; }
-.ebd-hero-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
-.ebd-hero-fade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(6,12,24,0) 45%, rgba(6,12,24,0.92)); }
-.ebd-hero-txt { position: absolute; bottom: 16px; left: 20px; right: 20px; }
+/* ── Detail page — same head as a list row (cover | rule | name) ── */
+.ebd-head { margin-bottom: 4px; }
+.ebd-cover-wrap { width: 116px; height: 116px; }
 .ebd-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 3px; font-weight: 700; text-transform: uppercase; color: #e8d5a3; margin-bottom: 6px; }
-.ebd-title { font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800; color: #fff; line-height: 1.15; letter-spacing: -0.5px; }
-.ebd-sub { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 8px; line-height: 1.5; }
+.ebd-title { font-family: 'DM Sans', sans-serif; font-size: 23px; font-weight: 800; color: #fff; line-height: 1.15; letter-spacing: -0.5px; }
+.ebd-sub { font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 14px; line-height: 1.5; }
 .ebd-label {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px;
   text-transform: uppercase; color: #e8d5a3; margin: 22px 0 8px;
