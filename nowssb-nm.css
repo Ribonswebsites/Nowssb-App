@@ -1,3 +1,22 @@
+/* ══ Loading video — splash boot screen + the login→home auth transition.
+   Auto-discovered and warmed into Cache Storage by app/js/part051.js
+   (it scans every <video src>), so sw.js serves it instantly from cache
+   on return visits; first-ever load just streams it normally. ══ */
+.splash-bg-video {
+  position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center; background: #060c18;
+}
+/* Scrim so the splash text stays legible over any frame of the video,
+   matching every other video-banner + text overlay in this app. */
+#splash::before {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(6,12,24,0.15) 0%, rgba(6,12,24,0.1) 45%, rgba(6,12,24,0.75) 100%);
+}
+.auth-loader-video {
+  width: 84px; height: 84px; border-radius: 50% !important; object-fit: cover;
+  box-shadow: 0 0 0 2px rgba(200,232,245,0.18);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    NowssB Normal-Home (Neumorphism) skin
    Light = day mode (cream #f0f2f7) · Dark = night (#0c0c20 navy)

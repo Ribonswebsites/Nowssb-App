@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=454">
+<link rel="stylesheet" href="nowssb-nm.css?v=455">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -118,7 +118,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Auth transition loader — shown between login and home while Firestore resolves -->
 <div id="authLoader">
-  <div class="auth-loader-ring"></div>
+  <video class="auth-loader-video" autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4"></video>
   <div class="auth-loader-text">Opening…</div>
 </div>
 <!-- SECONDARY BG LAYER — cross-fades in when Word Search scrolls into view -->
@@ -129,7 +129,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ══ SCREEN 1: SPLASH ══ -->
 <div class="screen active" id="splash">
-  <div class="splash-bg-image"></div>
+  <video class="splash-bg-video" autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4"></video>
   <div class="splash-words brand-tag">Words without a <strong>dictionary</strong></div>
   <div class="splash-bottom">
     <div class="splash-subtitle brand-tag">Natural Origin of <strong>Word Science</strong></div>
