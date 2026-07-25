@@ -235,6 +235,10 @@
     _trendShopTimer = setInterval(function () { shopIdx++; paintTrendShop(shopTargets, picks, shopIdx); }, 3000);
   }
 
+  /* The white neumorphic "Today Offers" row this filled was removed from the
+     Normal Home — the black Today's Offer banner covers it. Kept because it
+     already no-ops when the element is absent, and it's the renderer to reuse
+     if that row ever comes back. */
   function renderOffers() {
     var box = document.getElementById('nmh-offers-row');
     if (!box) return;
