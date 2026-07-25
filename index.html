@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=478">
+<link rel="stylesheet" href="nowssb-nm.css?v=480">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -885,23 +885,24 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- 2x2 Grid -->
 <div class="htg-rail">
-      <div class="htg-tip" id="nmhTileTip">
-        <span class="htg-tip-ic"><img decoding="async" alt=""></span>
-        <span class="htg-tip-rule"></span>
-        <span class="htg-tip-txt"></span>
-      </div>
-      <div class="htg-set" id="nmhTileSet" onclick="openSub('home-tiles')" role="button" aria-label="Restyle these buttons">
-        <span class="htg-set-lbl">
-          <span class="htg-set-arrows">
-            <svg viewBox="0 0 12 12" fill="none"><path d="M3 2L7 6L3 10" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="square"/></svg>
-            <svg viewBox="0 0 12 12" fill="none"><path d="M3 2L7 6L3 10" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="square"/></svg>
-          </span>
-          <span class="htg-set-txt">Tap to restyle these buttons</span>
-        </span>
-        <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
-      </div>
-    </div>
-        <div class="nmh-grid">
+  <div class="htg-set" id="nmhTileSet" onclick="htOpen()" role="button" aria-label="Restyle these buttons">
+    <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
+    <span class="htg-set-lbl">
+      <span class="htg-set-arrows">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M9 2L5 6L9 10" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="square"/></svg>
+        <svg viewBox="0 0 12 12" fill="none"><path d="M9 2L5 6L9 10" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="square"/></svg>
+      </span>
+      <span class="htg-set-txt">Tap to restyle</span>
+    </span>
+  </div>
+  <div class="htg-tip" id="nmhTileTip">
+    <span class="htg-tip-ic"><img decoding="async" alt=""></span>
+    <span class="htg-tip-rule"></span>
+    <span class="htg-tip-txt"></span>
+  </div>
+  <div class="htg-end" id="nmhTileEnd"><span class="htg-end-txt">Begin your healing</span></div>
+</div>
+<div class="nmh-grid">
       <div class="nmh-tile nmh-tile-art" onclick="openSub('sound-library')">
         <div class="nmh-tile-cover" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png');"></div>
         <div class="nmh-tile-cover-scrim"></div>
@@ -1430,22 +1431,23 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        own title text baked in, so the old top icon + DOM title/sub text
        overlay is gone; a white "Enter" pill sits on the right instead. -->
   <div class="htg-rail">
-        <div class="htg-tip" id="fashTileTip">
-          <span class="htg-tip-ic"><img decoding="async" alt=""></span>
-          <span class="htg-tip-rule"></span>
-          <span class="htg-tip-txt"></span>
-        </div>
-        <div class="htg-set" id="fashTileSet" onclick="openSub('home-tiles')" role="button" aria-label="Restyle these buttons">
-          <span class="htg-set-lbl">
-            <span class="htg-set-arrows">
-              <svg viewBox="0 0 12 12" fill="none"><path d="M3 2L7 6L3 10" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="square"/></svg>
-              <svg viewBox="0 0 12 12" fill="none"><path d="M3 2L7 6L3 10" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="square"/></svg>
-            </span>
-            <span class="htg-set-txt">Tap to restyle these buttons</span>
-          </span>
-          <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
-        </div>
+    <div class="htg-set" id="fashTileSet" onclick="htOpen()" role="button" aria-label="Restyle these buttons">
+      <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
+      <span class="htg-set-lbl">
+        <span class="htg-set-arrows">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M9 2L5 6L9 10" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="square"/></svg>
+          <svg viewBox="0 0 12 12" fill="none"><path d="M9 2L5 6L9 10" stroke="#e8d5a3" stroke-width="1.8" stroke-linecap="square"/></svg>
+        </span>
+        <span class="htg-set-txt">Tap to restyle</span>
+      </span>
     </div>
+    <div class="htg-tip" id="fashTileTip">
+      <span class="htg-tip-ic"><img decoding="async" alt=""></span>
+      <span class="htg-tip-rule"></span>
+      <span class="htg-tip-txt"></span>
+    </div>
+    <div class="htg-end" id="fashTileEnd"><span class="htg-end-txt">Begin your healing</span></div>
+  </div>
   <div class="home-grid w100">
     <div class="home-tile" onclick="openSub('sound-library')">
       <div class="home-tile-cover" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png');"></div>
@@ -6427,26 +6429,36 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="bgp-content">
       <div class="qa-explain">
         <div class="qa-explain-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></div>
-        <div class="qa-explain-txt">Change how <b>Sound Library</b>, <b>My Progress</b>, <b>Word Science</b> and <b>My Profile</b> look. Each home keeps its own style. Preview updates instantly — tap <b>Apply Changes</b> at the bottom to save it.</div>
+        <div class="qa-explain-txt">Change how <b>Sound Library</b>, <b>My Progress</b>, <b>Word Science</b> and <b>My Profile</b> look. Each home keeps its own style. Previews update instantly — tap <b>Apply Changes</b> under a section to save that home, or <b>Default</b> beside its heading to put it back.</div>
       </div>
 
-      <div class="bgp-section-label">Fashion Home Tiles</div>
+      <div class="ht-sec-head">
+        <span class="bgp-section-label">Fashion Home Tiles</span>
+        <button class="ht-default-btn" onclick="htDefaultFash()">Default</button>
+      </div>
       <div class="qa-hint">The four buttons on your <b>Fashion</b> home. Pick a look and a corner shape.</div>
       <div class="qat-plate">
         <div class="qat-grid" id="htFashGrid"><!-- rendered by JS --></div>
       </div>
       <div class="qa-opt-row" id="htFashStyleRow"><!-- rendered by JS --></div>
       <div class="qa-opt-row qa-corner-row" id="htFashCornerRow"><!-- rendered by JS --></div>
+      <button class="bgp-cta-btn qa-apply-cta" onclick="htApplyFash()">
+        Apply Changes
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+      </button>
 
-      <div class="bgp-section-label">Normal Home Tiles</div>
-      <div class="qa-hint">The same four buttons on your <b>Normal</b> home. Its default is the neumorphic card — the look the rest of that page is built from.</div>
+      <div class="ht-sec-head">
+        <span class="bgp-section-label">Normal Home Tiles</span>
+        <button class="ht-default-btn" onclick="htDefaultNm()">Default</button>
+      </div>
+      <div class="qa-hint">The same four buttons on your <b>Normal</b> home. Its default is the soft raised card — the look the rest of that page is built from.</div>
       <div class="qat-plate">
         <div class="qat-grid" id="htNmGrid"><!-- rendered by JS --></div>
       </div>
       <div class="qa-opt-row" id="htNmStyleRow"><!-- rendered by JS --></div>
+      <div class="qa-opt-row qa-corner-row" id="htNmSurfaceRow"><!-- rendered by JS when a soft-surface style is picked --></div>
       <div class="qa-opt-row qa-corner-row" id="htNmCornerRow"><!-- rendered by JS --></div>
-
-      <button class="bgp-cta-btn qa-apply-cta" onclick="htApply()">
+      <button class="bgp-cta-btn qa-apply-cta" onclick="htApplyNm()">
         Apply Changes
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
       </button>
@@ -9160,7 +9172,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part056.js?v=4"></script>
 <script src="app/js/part057.js?v=10"></script>
 <script src="app/js/part058.js?v=1"></script>
-<script src="app/js/part059.js?v=1"></script>
+<script src="app/js/part059.js?v=3"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=177" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>

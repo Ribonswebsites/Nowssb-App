@@ -5850,20 +5850,46 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
 .qat-grid.qat-neuro .qat-enter-go svg path { stroke: #c8a96e; }
 
 /* ══════════════════════════════════════════════════════════════════
-   TIP RAIL — sits above the four home buttons on both homes, right-
-   aligned. A black settings circle (the NowssB player's settings icon)
-   opens the Home Tiles page; to its left a black pill opens one tile at a
-   time explaining what that button is, then closes again. After the last
-   pill has fully closed the circle itself grows leftward into a pill
-   pointing back at the tap target. Both grow from the right edge, so the
-   rail can never push past the screen or overlap the circle.
+   TIP RAIL — sits above the four home buttons on both homes. The black
+   settings circle (the NowssB player's settings icon) is pinned LEFT and
+   opens the Home Tiles page; everything grows rightward from it: first a
+   pill that opens one tile at a time explaining what that button is, then
+   the circle itself into a pill with two chevrons pointing back at it, then
+   a closing pill parked on the far right. Growing away from the circle is
+   what keeps the two from ever colliding.
    ══════════════════════════════════════════════════════════════════ */
 .htg-rail {
-  width: 100%; display: flex; justify-content: flex-end; align-items: center;
-  gap: 8px; min-height: 40px; margin-bottom: 10px; box-sizing: border-box;
+  width: 100%; display: flex; justify-content: flex-start; align-items: center;
+  gap: 8px; min-height: 40px; margin-bottom: 10px; box-sizing: border-box; overflow: hidden;
+}
+.htg-set {
+  display: flex; align-items: center; flex-shrink: 0; cursor: pointer;
+  height: 40px; padding: 3px; background: #000;
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 30px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+.htg-set-ic { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden; display: block; }
+.htg-set-ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The label sits to the RIGHT of the icon and grows rightward, so the pill
+   never travels back over the circle. */
+.htg-set-lbl {
+  display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap;
+  max-width: 0; opacity: 0; margin-right: 0;
+  transition: max-width 0.9s cubic-bezier(0.4,0,0.2,1),
+              margin-right 0.9s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.35s ease 0.15s;
+}
+.htg-set.open .htg-set-lbl { max-width: 180px; opacity: 1; margin-right: 12px; }
+/* Two chevrons pointing back left at the settings icon */
+.htg-set-arrows { display: flex; align-items: center; gap: 1px; flex-shrink: 0; margin-left: 9px; }
+.htg-set-arrows svg { width: 10px; height: 10px; display: block; }
+.htg-set-arrows svg:last-child { opacity: 0.45; }
+.htg-set-txt {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.2px; color: #e8d5a3;
 }
 .htg-tip {
-  display: flex; align-items: center; gap: 0; height: 34px; flex-shrink: 1;
+  display: flex; align-items: center; gap: 0; height: 34px; min-width: 0;
   background: #000; border: 1px solid rgba(255,255,255,0.1);
   border-radius: 30px !important; overflow: hidden;
   max-width: 0; padding: 0; opacity: 0;
@@ -5884,33 +5910,22 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
   font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 700;
   color: rgba(255,255,255,0.9); white-space: nowrap; display: block;
 }
-.htg-set {
-  display: flex; align-items: center; flex-shrink: 0; cursor: pointer;
-  height: 40px; padding: 3px; background: #000;
-  border: 1px solid rgba(255,255,255,0.1); border-radius: 30px !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-}
-.htg-set-ic {
-  width: 32px; height: 32px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden; display: block;
-}
-.htg-set-ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.htg-set-lbl {
-  display: flex; align-items: center; gap: 7px; overflow: hidden; white-space: nowrap;
-  max-width: 0; opacity: 0; margin-left: 0;
+/* Closing pill — parked on the far right, opens last */
+.htg-end {
+  margin-left: auto; flex-shrink: 0; height: 34px; display: flex; align-items: center;
+  background: #000; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 30px !important; overflow: hidden;
+  max-width: 0; padding: 0; opacity: 0;
   transition: max-width 0.9s cubic-bezier(0.4,0,0.2,1),
-              margin-left 0.9s cubic-bezier(0.4,0,0.2,1),
-              opacity 0.35s ease 0.15s;
+              padding   0.9s cubic-bezier(0.4,0,0.2,1),
+              opacity   0.35s ease;
 }
-.htg-set.open .htg-set-lbl { max-width: 220px; opacity: 1; margin-left: 12px; }
-.htg-set-arrows { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
-.htg-set-arrows svg { width: 10px; height: 10px; display: block; }
-.htg-set-arrows svg:first-child { opacity: 0.45; }
-.htg-set-txt {
+.htg-end:not(.open) { border-width: 0; }
+.htg-end.open { max-width: 170px; padding: 0 14px; opacity: 1; }
+.htg-end-txt {
   font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 800;
-  letter-spacing: 0.2px; color: #e8d5a3;
+  letter-spacing: 0.2px; color: #e8d5a3; white-space: nowrap; display: block;
 }
-/* The Normal Home's rail lives inside the light neumorphic column — the pills
-   stay black there on purpose, matching the black banners on that page. */
 #home-nm .htg-rail { margin-bottom: 12px; }
 
 /* Home Tiles page — same custom-background behaviour as Quick Access */
@@ -5921,3 +5936,133 @@ body.nwsb-custom-fashion-bg #sub-home-tiles .qa-page-bg {
 body.nwsb-custom-fashion-bg #sub-home-tiles .qa-page-bg::after { content: ''; position: absolute; inset: 0; background: rgba(6,12,24,0.72); }
 body.nwsb-custom-fashion-bg #sub-home-tiles.bgp-screen { background: transparent !important; }
 body.nwsb-custom-fashion-bg #sub-home-tiles .bgp-hero { background: none !important; }
+
+/* ══════════════════════════════════════════════════════════════════
+   NORMAL HOME · ARTWORK — the soft raised card with the big per-tile
+   artwork on the right. Same card as Standard, but the icon puck carries
+   the real feature image instead of a line SVG, and the Enter pill keeps
+   its arrow. .nmh-tile-articon doubles as the large right-hand art here
+   (it's the small stacked icon in the Fashion Home's artwork look).
+   ══════════════════════════════════════════════════════════════════ */
+body.nmtile-artwork .nmh-tile.nmh-tile-art {
+  position: relative; overflow: hidden;
+  padding: 18px 60% 46px 18px; min-height: 158px;
+}
+body.nmtile-artwork .nmh-tile.nmh-tile-art .nmh-tile-icon svg { display: none; }
+body.nmtile-artwork .nmh-tile-picon { display: block !important; }
+body.nmtile-artwork .nmh-tile.nmh-tile-art .nmh-tile-icon { overflow: hidden; margin-bottom: 12px !important; }
+body.nmtile-artwork .nmh-tile-txt { position: relative; z-index: 2; }
+body.nmtile-artwork .nmh-tile.nmh-tile-art .nmh-tile-title { font-size: 13px; }
+body.nmtile-artwork .nmh-tile-articon {
+  display: block; position: absolute; right: -6px; top: 40%; transform: translateY(-50%);
+  width: 68%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; z-index: 1; pointer-events: none;
+  filter: drop-shadow(3px 4px 6px rgba(163,177,198,0.5)) drop-shadow(-2px -2px 4px rgba(255,255,255,0.66));
+}
+body.nmtile-artwork #home-nm.nm-dark .nmh-tile-articon {
+  filter: drop-shadow(3px 4px 7px rgba(0,0,0,0.6)) drop-shadow(-2px -2px 5px rgba(50,50,110,0.28));
+}
+/* Artwork shares Standard's Enter pill */
+body.nmtile-artwork .nmh-tile-enter {
+  position: absolute; right: 14px; bottom: 14px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  background: #f0f2f7; border: none; padding: 6px 12px; border-radius: 20px !important;
+  box-shadow: 3px 3px 7px rgba(163,177,198,0.6), -3px -3px 7px #ffffff;
+}
+body.nmtile-artwork .nmh-tile-enter-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  letter-spacing: 0.3px; color: #c8a96e;
+}
+body.nmtile-artwork .nmh-tile-enter-go {
+  width: 11px; height: 11px; flex-shrink: 0; border-radius: 0 !important;
+  background: none; display: flex; align-items: center; justify-content: center;
+}
+body.nmtile-artwork .nmh-tile-enter-go svg { width: 11px; height: 11px; display: block; }
+body.nmtile-artwork .nmh-tile-enter-go svg path { stroke: #c8a96e; }
+
+/* ── CONCAVE (dimple) vs CONVEX (raised) — only meaningful on the two
+   soft-surface looks. Convex is the default raised card; concave presses the
+   same card and its icon puck into the surface with inset shadows. The base
+   rules use an ID (#home-nm:not(.nm-dark)) so these need one too. ── */
+body.nmsurface-concave.nmtile-neuro #home-nm:not(.nm-dark) .nmh-tile.nmh-tile-art,
+body.nmsurface-concave.nmtile-artwork #home-nm:not(.nm-dark) .nmh-tile.nmh-tile-art {
+  box-shadow: inset 8px 8px 18px rgba(163,177,198,0.62), inset -7px -7px 16px #ffffff !important;
+}
+body.nmsurface-concave.nmtile-neuro #home-nm:not(.nm-dark) .nmh-tile.nmh-tile-art .nmh-tile-icon,
+body.nmsurface-concave.nmtile-artwork #home-nm:not(.nm-dark) .nmh-tile.nmh-tile-art .nmh-tile-icon {
+  box-shadow: inset 4px 4px 10px rgba(163,177,198,0.6), inset -3px -3px 8px #ffffff !important;
+}
+body.nmsurface-concave.nmtile-neuro #home-nm.nm-dark .nmh-tile.nmh-tile-art,
+body.nmsurface-concave.nmtile-artwork #home-nm.nm-dark .nmh-tile.nmh-tile-art {
+  box-shadow: inset 7px 7px 18px rgba(0,0,0,0.88), inset -4px -4px 13px rgba(50,50,110,0.32) !important;
+}
+body.nmsurface-concave.nmtile-neuro .nmh-tile-enter,
+body.nmsurface-concave.nmtile-artwork .nmh-tile-enter {
+  box-shadow: inset 2px 2px 5px rgba(163,177,198,0.6), inset -2px -2px 5px #ffffff;
+}
+
+/* ── Section head: label left, scoped Default button right ── */
+.ht-sec-head { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.ht-sec-head .bgp-section-label { flex: 1; min-width: 0; margin: 0; }
+.ht-default-btn {
+  flex-shrink: 0; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 0.3px;
+  color: #e8d5a3; background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(232,213,163,0.28); border-radius: 20px !important;
+  padding: 6px 14px;
+}
+.ht-default-btn:active { background: rgba(255,255,255,0.14); }
+/* Two Apply buttons now, one per home — give each some breathing room */
+#sub-home-tiles .qa-apply-cta { margin-bottom: 26px; }
+
+/* ── Header: Reset and the customize-background button belong in the right
+   corner, not crowded against the title. ── */
+#sub-home-tiles .bgp-header-fixed .bgp-header-title { flex: 1; min-width: 0; }
+#sub-home-tiles .bgp-header-fixed .qa-hdr-cust { margin-left: auto; }
+
+/* ── Preview variants for the Normal Home (own prefix: its looks are soft
+   cards, not the Fashion Home's dark ones) ── */
+.qat-grid.qat-nm-image .qat-tile { display: block; padding: 0; min-height: 0; aspect-ratio: 16 / 9; }
+.qat-grid.qat-nm-image .qat-cover, .qat-grid.qat-nm-image .qat-scrim { display: block; }
+.qat-grid.qat-nm-image .qat-ic, .qat-grid.qat-nm-image .qat-rule, .qat-grid.qat-nm-image .qat-txt { display: none; }
+.qat-grid.qat-nm-image .qat-enter { bottom: 5px; right: 5px; }
+/* qat-nm-black needs nothing — the base .qat-tile already is the black card */
+
+.qat-grid.qat-nm-neuro .qat-tile, .qat-grid.qat-nm-artwork .qat-tile {
+  display: flex; flex-direction: column; align-items: flex-start;
+  aspect-ratio: auto; min-height: 100px; padding: 13px 12px 32px;
+  background: #f0f2f7; border: none;
+  box-shadow: 5px 5px 12px rgba(163,177,198,0.55), -4px -4px 10px #ffffff;
+}
+.qat-grid.qat-nm-neuro .qat-rule, .qat-grid.qat-nm-artwork .qat-rule { display: none; }
+.qat-grid.qat-nm-neuro .qat-ic, .qat-grid.qat-nm-artwork .qat-ic {
+  width: 30px; height: 30px; border-radius: 9px !important; margin-bottom: 8px;
+  background: #f0f2f7; border: none;
+  box-shadow: 3px 3px 7px rgba(163,177,198,0.5), -2px -2px 6px #ffffff;
+}
+.qat-grid.qat-nm-neuro .qat-name, .qat-grid.qat-nm-artwork .qat-name { color: #1a1a2e; }
+.qat-grid.qat-nm-neuro .qat-sub, .qat-grid.qat-nm-artwork .qat-sub { color: rgba(0,0,0,0.42); }
+.qat-grid.qat-nm-neuro .qat-enter, .qat-grid.qat-nm-artwork .qat-enter {
+  background: #f0f2f7; box-shadow: 2px 2px 5px rgba(163,177,198,0.6), -2px -2px 5px #ffffff;
+}
+.qat-grid.qat-nm-neuro .qat-enter-lbl, .qat-grid.qat-nm-artwork .qat-enter-lbl { color: #c8a96e; }
+.qat-grid.qat-nm-neuro .qat-enter-go, .qat-grid.qat-nm-artwork .qat-enter-go {
+  background: none; width: 8px; height: 8px; border-radius: 0 !important;
+}
+.qat-grid.qat-nm-neuro .qat-enter-go svg path, .qat-grid.qat-nm-artwork .qat-enter-go svg path { stroke: #c8a96e; }
+/* artwork preview: art on the right, text column narrowed to clear it */
+.qat-grid.qat-nm-artwork .qat-tile { padding-right: 55%; }
+.qat-grid.qat-nm-artwork .qat-txt { position: relative; z-index: 2; }
+.qat-grid.qat-nm-artwork .qat-art {
+  display: block; position: absolute; right: -4px; top: 40%; transform: translateY(-50%);
+  width: 62%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; z-index: 1;
+  filter: drop-shadow(2px 3px 5px rgba(163,177,198,0.5));
+}
+/* concave preview */
+.qat-grid.qat-surf-concave.qat-nm-neuro .qat-tile,
+.qat-grid.qat-surf-concave.qat-nm-artwork .qat-tile {
+  box-shadow: inset 5px 5px 12px rgba(163,177,198,0.62), inset -4px -4px 10px #ffffff;
+}
+.qat-grid.qat-surf-concave.qat-nm-neuro .qat-ic,
+.qat-grid.qat-surf-concave.qat-nm-artwork .qat-ic {
+  box-shadow: inset 3px 3px 7px rgba(163,177,198,0.6), inset -2px -2px 6px #ffffff;
+}
