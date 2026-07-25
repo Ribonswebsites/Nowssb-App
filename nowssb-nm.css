@@ -6241,6 +6241,13 @@ body:has(.sub-screen.open .rm-intro-page:not(.rm-intro-hidden):not([style*="disp
 body:has(.sub-screen.open .ms-intro-page:not(.sl-intro-hidden):not([style*="display:none"]):not([style*="display: none"])) #ig-bottomnav {
   display: none !important;
 }
+/* The subscription intro is a bare #sub-intro-page with none of those classes,
+   and it dismisses by hand — opacity/pointer-events first, display:none 500ms
+   later. Keyed on pointer-events so the nav comes back as the fade starts
+   rather than half a second after it. */
+body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):not([style*="display:none"]):not([style*="display: none"])) #ig-bottomnav {
+  display: none !important;
+}
 
 /* Sound Library intro — the art is sized to 88% of the height (zoomed out from
    cover), so the shared .sl-intro-vignette, which only reaches 0.95 at the very
@@ -6257,4 +6264,31 @@ body:has(.sub-screen.open .ms-intro-page:not(.sl-intro-hidden):not([style*="disp
     rgba(6,12,24,0.88) 82%,
     #060c18 88%,
     #060c18 100%) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   INTRO PAGES — readability + bottom spacing
+   ══════════════════════════════════════════════════════════════════ */
+/* The bottom block reserved var(--nav-height) for a nav bar that is now
+   hidden while an intro is showing, so the button and stats floated ~58px
+   higher than they needed to. That space is theirs again. */
+.sl-intro-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 22px), 22px) !important;
+}
+/* Subtitles were rgba(255,255,255,0.52) at weight 300 with no shadow — over
+   busy photography that reads as unreadable on every intro page. Brighter,
+   slightly heavier, and carrying their own shadow so contrast no longer
+   depends on whatever happens to be behind them. */
+.sl-intro-desc {
+  color: rgba(255,255,255,0.92) !important;
+  font-weight: 400 !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 16px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.6);
+}
+/* Same problem, same page: the eyebrow above the title. */
+.sl-intro-eyebrow {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 14px rgba(0,0,0,0.75);
+}
+/* …and the stat row under the CTA. */
+.sl-intro-stat, .sl-intro-stat-sep {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 12px rgba(0,0,0,0.7);
 }
