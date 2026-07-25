@@ -138,6 +138,30 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ SCREEN 1: SPLASH ══ -->
 <div class="screen active" id="splash">
   <div class="splash-bg-image"></div>
+  <script>
+  /* Start animation art — a different one on every launch. Inline and right
+     after the element on purpose: the splash is the first thing painted, so
+     waiting for a partNNN.js file would flash app.css's default first. The
+     index ROTATES rather than picking at random, so two launches in a row can
+     never land on the same image. */
+  (function () {
+    var ART = [
+      'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717857/9ba2b940-5840-11f1-bb0c-71720609fd8f_hpizfv.png',
+      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000317/file_00000000115482309d295f43cfcf0b67_karuh8.png',
+      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000316/file_00000000d05c820794c1f45a6f51869c_fpasjy.png',
+      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000316/file_00000000786c82079f31ed572d4ad3f4_gdyf0r.png'
+    ];
+    var i = 0;
+    try {
+      i = (parseInt(localStorage.getItem('nwsb_splash_i'), 10) + 1) || 0;
+      if (!(i >= 0 && i < ART.length)) i = 0;
+      localStorage.setItem('nwsb_splash_i', String(i));
+    } catch (e) { i = Math.floor(Math.random() * ART.length); }
+    var el = document.currentScript.previousElementSibling;
+    if (el) el.style.backgroundImage = "url('" + ART[i] + "')";
+    window.NWSB_SPLASH_ART = ART;
+  })();
+  </script>
   <div class="splash-words brand-tag">Words without a <strong>dictionary</strong></div>
   <div class="splash-bottom">
     <div class="splash-subtitle brand-tag">Natural Origin of <strong>Word Science</strong></div>
