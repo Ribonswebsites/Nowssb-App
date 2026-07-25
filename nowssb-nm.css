@@ -5402,15 +5402,9 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
 .pwg-slides-wrap { position: relative; flex: 1; min-height: 0; overflow: hidden; }
 .pwg-slide { display: none; position: absolute; inset: 0; }
 .pwg-slide.active { display: block; }
-/* auto 82%, not cover. The slide box is around 390x844 — a 0.46 ratio — so
-   cover was height-driven and cut the bottom off every illustration. Sizing by
-   height instead maps the WHOLE image into 82% of the box, so nothing is lost
-   vertically, while still filling the width for any image squarer than 9:16.
-   The image ends where .pwg-illus-fade is already near-solid, so there's no
-   visible seam where the photo stops. */
 .pwg-illus-bg {
-  position: absolute; inset: 0; background-size: auto 82%; background-position: center top;
-  background-repeat: no-repeat; background-color: #060c18;
+  position: absolute; inset: 0; background-size: cover; background-position: center top;
+  background-color: #060c18;
 }
 .pwg-illus-fade {
   position: absolute; inset: 0; pointer-events: none;
