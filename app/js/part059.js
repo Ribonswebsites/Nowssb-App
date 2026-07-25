@@ -53,7 +53,8 @@
                      { id: 'black', label: 'Black' }, { id: 'image', label: 'Cover Image' }];
   var NM_SURFACES = [{ id: 'convex', label: 'Convex' }, { id: 'concave', label: 'Concave (Dimple)' }];
   function isSoft(style) { return style === 'neuro' || style === 'artwork'; }
-  var CORNERS     = [{ id: 'rounded', label: 'Rounded Corners' }, { id: 'edge', label: 'Edge Corners' }];
+  var CORNERS     = [{ id: 'rounded', label: 'Rounded' }, { id: 'edge', label: 'Edge' },
+                     { id: 'pill', label: 'Pill Shape' }];
 
   var _stage = null;   // staged (unsaved) config
 
@@ -62,22 +63,22 @@
 
   // ── APPLIED (persisted) config ────────────────────────────────
   function savedFashStyle()  { var s = ls('nwsb_tile_style', 'black'); return (s === 'image' || s === 'classic' || s === 'artwork') ? s : 'black'; }
-  function savedFashCorner() { return ls('nwsb_tile_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
+  function savedFashCorner() { var c = ls('nwsb_tile_corner', 'rounded'); return (c === 'edge' || c === 'pill') ? c : 'rounded'; }
   function savedNmStyle()    { var s = ls('nwsb_nm_tile_style', 'neuro'); return (s === 'black' || s === 'image' || s === 'artwork') ? s : 'neuro'; }
   function savedNmSurface()  { return ls('nwsb_nm_tile_surface', 'convex') === 'concave' ? 'concave' : 'convex'; }
-  function savedNmCorner()   { return ls('nwsb_nm_tile_corner', 'rounded') === 'edge' ? 'edge' : 'rounded'; }
+  function savedNmCorner()   { var c = ls('nwsb_nm_tile_corner', 'rounded'); return (c === 'edge' || c === 'pill') ? c : 'rounded'; }
 
   function applyLive() {
     var b = document.body; if (!b) return;
     b.classList.remove('fashtile-black', 'fashtile-image', 'fashtile-artwork', 'fashtile-classic');
     b.classList.add('fashtile-' + savedFashStyle());
-    b.classList.remove('fashcorner-rounded', 'fashcorner-edge');
+    b.classList.remove('fashcorner-rounded', 'fashcorner-edge', 'fashcorner-pill');
     b.classList.add('fashcorner-' + savedFashCorner());
     b.classList.remove('nmtile-neuro', 'nmtile-artwork', 'nmtile-black', 'nmtile-image');
     b.classList.add('nmtile-' + savedNmStyle());
     b.classList.remove('nmsurface-convex', 'nmsurface-concave');
     b.classList.add('nmsurface-' + savedNmSurface());
-    b.classList.remove('nmcorner-rounded', 'nmcorner-edge');
+    b.classList.remove('nmcorner-rounded', 'nmcorner-edge', 'nmcorner-pill');
     b.classList.add('nmcorner-' + savedNmCorner());
   }
 
@@ -216,13 +217,48 @@
   function eachSet(fn) { RAILS.forEach(function (r) { var el = document.getElementById(r.set); if (el) fn(el); }); }
   function eachEnd(fn) { RAILS.forEach(function (r) { var el = document.getElementById(r.end); if (el) fn(el); }); }
 
+  /* Measure an element's OPEN width without animating it there: kill the
+     transition, toggle the class, read, restore — all inside one frame, so
+     nothing paints. Reading it live instead would sample mid-transition and
+     always come back too small. */
+  function measureOpen(el) {
+    var wasOpen = el.classList.contains('open');
+    if (wasOpen) return el.getBoundingClientRect().width;
+    var prev = el.style.transition;
+    el.style.transition = 'none';
+    el.classList.add('open');
+    var w = el.getBoundingClientRect().width;
+    el.classList.remove('open');
+    void el.offsetWidth;              // flush, so removing the class can't animate
+    el.style.transition = prev;
+    return w;
+  }
+  /* Narrow phones can't hold both expanded pills at once. Checked just before
+     the closing pill opens, so the settings pill collapses as the other grows
+     — a handoff, not a visible open-then-close flip. */
+  function fitRail() {
+    RAILS.forEach(function (r) {
+      var set = document.getElementById(r.set), end = document.getElementById(r.end);
+      if (!set || !end) return;
+      var rail = set.parentElement;
+      if (!rail || !rail.clientWidth) return;
+      var style = window.getComputedStyle(rail);
+      var gap = parseFloat(style.columnGap || style.gap) || 0;
+      var avail = rail.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
+      if (measureOpen(set) + measureOpen(end) + gap * 2 > avail) set.classList.remove('open');
+    });
+  }
+
   function showTip(i) {
     if (i >= HOME_TILES.length) {
       // Every tip is closed by now, so the circle can grow without overlapping it.
       later(function () {
         eachSet(function (el) { el.classList.add('open'); });
         // ...and once that pill has settled, the closing one opens on the far right.
-        later(function () { eachEnd(function (el) { el.classList.add('open'); }); }, OPEN_MS + 500);
+        later(function () {
+          fitRail();
+          eachEnd(function (el) { el.classList.add('open'); });
+        }, OPEN_MS + 500);
       }, GAP_MS);
       return;
     }
