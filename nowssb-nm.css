@@ -5276,3 +5276,22 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   box-sizing: border-box; border-radius: 999px !important; background: #fff; color: #060c18; flex-shrink: 0;
   font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; border: none;
 }
+
+/* ══════════════════════════════════════════════════════════
+   PERFORMANCE — stop off-screen work.
+   The app keeps every screen in the DOM (11k nodes, 50 <video>,
+   76 infinite animations). Closed screens already get
+   contain:strict + visibility:hidden, but their CSS animations
+   still run on the compositor every frame, which is what makes
+   the phone heat up / stutter. Pausing them costs nothing
+   visually (they're invisible) and they resume the instant the
+   screen opens.
+   ══════════════════════════════════════════════════════════ */
+.sub-screen:not(.open) *,
+.sub-screen:not(.open) *::before,
+.sub-screen:not(.open) *::after,
+.screen:not(.active) *,
+.screen:not(.active) *::before,
+.screen:not(.active) *::after {
+  animation-play-state: paused !important;
+}
