@@ -1,4 +1,4 @@
-const CACHE = 'nowsbansiu-v646';
+const CACHE = 'nowsbansiu-v647';
 // Separate, stable-named bucket for background-prefetched videos (see
 // app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
 // routine JS/CSS deploy never wipes out videos the user already has warmed —
