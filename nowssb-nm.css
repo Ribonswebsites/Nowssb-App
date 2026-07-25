@@ -3659,7 +3659,17 @@ body.nm-glass #sub-health-journey .gsel-card {
 /* ── NEURO (default) — everything the black banner added is off, so the
    base .nmh-tile neumorphic card in app/app.css shows through. Only the
    Enter pill needs styling, since that markup is newer than the card. ── */
-body.nmtile-neuro .nmh-tile.nmh-tile-art { position: relative; padding: 24px 20px 48px; }
+/* Standard card. It carries the real feature artwork in its puck, same as the
+   Artwork look and the picker's preview — the line SVG the base markup ships
+   with is hidden rather than removed, so the other looks can still use it.
+   Tighter padding and a smaller puck too: at 24px/48px with a 52px puck the
+   card stood 171px tall against 169px wide for three short lines of content. */
+body.nmtile-neuro .nmh-tile.nmh-tile-art { position: relative; padding: 18px 16px 44px; }
+body.nmtile-neuro .nmh-tile.nmh-tile-art .nmh-tile-icon {
+  width: 44px; height: 44px; margin-bottom: 10px !important; overflow: hidden;
+}
+body.nmtile-neuro .nmh-tile.nmh-tile-art .nmh-tile-icon svg { display: none; }
+body.nmtile-neuro .nmh-tile-picon { display: block !important; }
 body.nmtile-neuro .nmh-tile-enter {
   position: absolute; right: 14px; bottom: 14px; z-index: 3;
   display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
