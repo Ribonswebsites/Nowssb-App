@@ -2324,6 +2324,25 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 }
 .nmh-rx-banner-img { display: block; width: 100%; height: 150px; object-fit: cover; border-radius: 0 !important; margin: 0; cursor: pointer; }
 .nmh-rx-section .nmh-offer-banner { border-radius: 0 !important; margin: 0 !important; }
+/* Inset the whole row so its icon lines up with the NowssB logo that's
+   baked into the video banner above (that logo sits ~30px in from the
+   frame's left edge, not flush with it). */
+.nmh-rx-cta { padding-left: 48px !important; }
+/* Enter pill under the text — replaces the old right-hand arrow, which is
+   what freed the horizontal space for the inset above. */
+.nmh-rx-enter {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 12px;
+  background: #fff; border-radius: 30px !important; padding: 6px 6px 6px 16px;
+  align-self: flex-start;
+}
+.nmh-rx-enter-lbl { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800; color: #060c18; letter-spacing: 0.3px; }
+.nmh-rx-enter-go {
+  width: 26px; height: 26px; border-radius: 50% !important; flex-shrink: 0;
+  background: rgba(6,12,24,0.1); display: flex; align-items: center; justify-content: center;
+}
+.nmh-rx-enter-go svg { width: 14px; height: 14px; display: block; }
+/* .nmh-sec-banner-txt is a flex column, so keep the pill from stretching */
+.nmh-rx-cta .nmh-sec-banner-txt { align-items: flex-start; }
 /* Disclaimer — separated from the connected block above it */
 .nmh-rx-disclaimer {
   font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 400; font-style: italic;
