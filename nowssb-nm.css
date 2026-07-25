@@ -5515,8 +5515,15 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-style: italic;
   color: rgba(255,255,255,0.35); line-height: 1.45; margin-top: 8px;
 }
-.eb-row-foot { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-.eb-row-price { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800; color: #e8d5a3; }
+.eb-row-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+/* margin-right:auto eats the slack, so the price stays hard left and the rule
+   + pill are pushed to the right edge — the gap lands between the price and
+   the rule, which is where it belongs. */
+.eb-row-price {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800; color: #e8d5a3;
+  margin-right: auto; line-height: 1;
+}
+.eb-row-owned { margin-right: auto; }
 /* Compact pill, not a full-width bar: flex:1 was stretching it across the
    whole row. min-height is overridden because app/app.css floors buttons at a
    44px tap target, which would keep it tall however little padding it has. */
@@ -5527,9 +5534,10 @@ body.nwsb-soc-glass #nwsb-postviewer .nwsb-pv-dot.on { background: #e8d5a3 !impo
   padding: 0 16px; height: 38px; min-height: 0 !important;
   border-radius: 30px !important; -webkit-tap-highlight-color: transparent;
 }
-/* Divider between the price and the pill, same rule the black banners use */
+/* Divider, sitting immediately left of the pill and centred against it —
+   its own height is what centres it, so it matches the pill's 38px box. */
 .eb-row-rule {
-  width: 1px; height: 22px; flex-shrink: 0; display: block;
+  width: 1px; height: 24px; flex-shrink: 0; display: block; align-self: center;
   background: rgba(255,255,255,0.2);
 }
 .eb-get-btn:active { filter: brightness(0.93); }
