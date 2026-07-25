@@ -560,8 +560,9 @@ window.ebRenderStore = function () {
         '<div class="eb-row-disc">' + ebEsc(EB_DISCLAIMER) + '</div>' +
         '<div class="eb-row-foot">' +
           (isPur
-            ? '<span class="eb-row-owned">✓ Owned</span><button class="eb-get-btn" onclick="event.stopPropagation();window.ebOpenBook(\'' + b.key + '\')">Read It</button>'
+            ? '<span class="eb-row-owned">✓ Owned</span><span class="eb-row-rule"></span><button class="eb-get-btn" onclick="event.stopPropagation();window.ebOpenBook(\'' + b.key + '\')">Read It</button>'
             : '<span class="eb-row-price">$' + (b.price / 100).toFixed(2) + '</span>' +
+              '<span class="eb-row-rule"></span>' +
               '<button class="eb-get-btn" onclick="event.stopPropagation();window.ebOpenBook(\'' + b.key + '\')">Get It' +
               '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg></button>') +
         '</div>' +
