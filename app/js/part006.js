@@ -9,30 +9,22 @@ window._mpData = null;
 
 // Called when openSub('my-progress') fires
 // Hook into openSub by patching it after definition
-(function patchOpenSubForProgress() {
-  const _origOpen = window.openSub;
-  if (!_origOpen) { setTimeout(patchOpenSubForProgress, 200); return; }
-  window.openSub = function(id) {
-    _origOpen(id);
-    if (id === 'my-progress') {
-      const introPage   = document.getElementById('mpIntroPage');
-      const mainContent = document.getElementById('mpMainContent');
-      var _mpIntroSeen = false;
-      try { _mpIntroSeen = localStorage.getItem('nwsb_mp_intro_seen') === '1'; } catch(e){}
-      if (_mpIntroSeen) {
-        // Intro already shown once — go straight to the content, never again
-        if (introPage)   { introPage.classList.add('sl-intro-hidden'); introPage.style.display = 'none'; }
-        if (mainContent) mainContent.style.display = 'flex';
-        if (window._mpData != null) { mpRender(window._mpData); } else { mpLoad(); }
-      } else {
-        // First time — show the cinematic intro
-        if (introPage)   { introPage.classList.remove('sl-intro-hidden'); introPage.style.display = ''; }
-        if (mainContent) mainContent.style.display = 'none';
-        mpLoadForIntro();
-      }
-    }
-  };
-})();
+/* Runs when openSub('my-progress') fires.
+   This used to wrap window.openSub itself, but it had to defer that wrap
+   (openSub isn't defined yet when this file loads) — and ~17 other files
+   wrap openSub synchronously, so by the time the deferred wrap ran it had
+   already lost the race and the hook silently never installed. That's why
+   the intro never appeared. It's now a plain function called directly from
+   openSub() in part012.js, which is the one place that actually owns it.
+   The intro shows on every open, matching every other intro page in the
+   app (Streak, AI Prescription, Quick Access, Today's Offer). */
+window.mpOnOpen = function () {
+  var introPage   = document.getElementById('mpIntroPage');
+  var mainContent = document.getElementById('mpMainContent');
+  if (introPage)   { introPage.classList.remove('sl-intro-hidden'); introPage.style.display = ''; }
+  if (mainContent) mainContent.style.display = 'none';
+  mpLoadForIntro();
+};
 
 // ── LOAD FOR INTRO — fetch data, populate stat preview ──
 async function mpLoadForIntro() {
@@ -102,7 +94,7 @@ async function mpLoad() {
   const body = document.getElementById('mpBody');
   if (!body) return;
 
-  body.innerHTML = '<div class="mp-loading"><div class="mp-loading-ring"></div><div class="mp-loading-text">Loading your journey…</div></div>';
+  body.innerHTML = '<div class="mp-loading"><video class="mp-loading-video" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4"></video><div class="mp-loading-text">Loading your journey…</div></div>';
 
   let userData = window._mpData;
   if (!userData && window._currentUid) {

@@ -1652,6 +1652,9 @@ function openSub(id) {
     if (offMain) offMain.style.display = 'none';
     if (typeof window.renderOffersPage === 'function') window.renderOffersPage();
   }
+  if (id === 'my-progress') {
+    if (typeof window.mpOnOpen === 'function') window.mpOnOpen();
+  }
   if (id === 'quick-access') {
     // Reset the intro splash so it shows fresh on every open (same
     // pattern as AI Prescription / Daily Streak).
