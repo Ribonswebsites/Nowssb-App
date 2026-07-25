@@ -3801,7 +3801,7 @@ body.nmcorner-edge .nmh-tile.nmh-tile-art { border-radius: 0 !important; }
    SAME raised neumorphic dual shadow the practice/tile cards use — every
    section on the normal home reads as soft-extruded, not flat */
 #home-nm .word-search-section, #home-nm .krm-section, #home-nm .nss-store-trigger,
-#home-nm .nmh-fsec, #home-nm .nmh-greet-img {
+#home-nm .nmh-fsec, #home-nm .nmh-greet-img, #home-nm .health-journey-card {
   width:100% !important; margin-left:0 !important; margin-right:0 !important; margin-bottom:0 !important;
   /* every section sits INSIDE a raised neumorphic plate: a surface-colored
      frame + rounded corners + the dual shadow, so the plate is the extruded
@@ -3832,13 +3832,14 @@ body.nmcorner-edge .nmh-tile.nmh-tile-art { border-radius: 0 !important; }
 /* Subscription card (normal home) — exact same structure/styling as the
    Fashion Home version (#sub-promo-card inline styles): min-height only
    (no forced aspect-ratio), content-driven so it never clips. */
-/* 9:16, matching the portrait video it carries, instead of the fixed 480px
-   that was sized for the crossfading stills this used to hold. aspect-ratio
-   scales it with the column, and the video fills it with no cropping to speak
-   of since the ratios agree. */
+/* Same 560px as .health-journey-card, so the two big sections stand equal on
+   both homes. 9:16 made it 622px — taller than that card — and the old 480px
+   was sized for the crossfading stills this used to hold. min-height rather
+   than a fixed height because every child is absolutely positioned, so the
+   box has nothing to size itself from. */
 .nmh-fsec {
   position:relative; width:100%; border-radius:16px !important; overflow:hidden; cursor:pointer;
-  aspect-ratio:9 / 16; background:#060c18; border:1px solid rgba(232,213,163,0.2);
+  min-height:560px; background:#060c18; border:1px solid rgba(232,213,163,0.2);
 }
 .nmh-fsec-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
 .nmh-fsec-fade { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(6,12,24,0.0) 0%, rgba(6,12,24,0.15) 40%, rgba(6,12,24,0.72) 100%); }
@@ -6198,3 +6199,16 @@ body.nmcorner-circle .nmh-tile.nmh-tile-art { border-radius: 999px !important; }
   background: rgba(6,12,24,0.1); display: flex; align-items: center; justify-content: center;
 }
 .tp-enter-go svg { width: 11px; height: 11px; display: block; }
+
+/* Health Journey on the Normal Home — the Fashion Home's own margins would
+   fight that page's neumorphic plate, so it sits flush in the column like
+   every other section embedded there. */
+#home-nm .health-journey-card { margin: 0 !important; }
+/* The card is sized by .hjc-content's own min-height:560px, not by the card
+   box, so whatever border frames it stacks on top: 562 on Fashion (1px) and
+   584 on the Normal Home (the plate's 12px). Subtract the frame from the
+   content so BOTH land on 560 outer, matching the subscription sections.
+   .hjc-content is a space-between flex column, so trimming it just closes the
+   gap between the label row and the copy — nothing clips. */
+#home .health-journey-card .hjc-content { min-height: 558px; }
+#home-nm .health-journey-card .hjc-content { min-height: 536px; }
