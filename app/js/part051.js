@@ -126,18 +126,39 @@
 
   var MARK = 'data-nwsb-vidmanaged';
 
+  // Is the video actually within (or just outside) the viewport? A phone
+  // only has ~2-4 hardware video decoders, but a single OPEN screen can hold
+  // 8-10 decorative loops — Home alone has 8. Checking only "is the screen
+  // open" therefore still left every one of them decoding at once, which is
+  // the stutter/heat you feel while scrolling. Anything more than half a
+  // screen away is paused; it resumes before it scrolls back into view, so
+  // nothing is ever visibly stopped.
+  function inViewport(el) {
+    var r = el.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return false;
+    var margin = (window.innerHeight || 800) * 0.5;
+    return r.bottom > -margin && r.top < (window.innerHeight || 800) + margin;
+  }
+
   function isVisible(el) {
-    while (el && el !== document.documentElement) {
-      if (el.classList) {
-        if (el.classList.contains('sub-screen')) return el.classList.contains('open');
-        if (el.classList.contains('screen')) return el.classList.contains('active');
-        if (el.classList.contains('menu-drawer')) return el.classList.contains('open');
+    var node = el;
+    while (node && node !== document.documentElement) {
+      if (node.classList) {
+        if (node.classList.contains('sub-screen')) return node.classList.contains('open') && inViewport(el);
+        if (node.classList.contains('screen'))     return node.classList.contains('active') && inViewport(el);
+        if (node.classList.contains('menu-drawer')) return node.classList.contains('open') && inViewport(el);
       }
-      var cs = window.getComputedStyle(el);
+      var cs = window.getComputedStyle(node);
       if (cs.display === 'none' || cs.visibility === 'hidden') return false;
-      el = el.parentElement;
+      // Overlays like #authLoader hide themselves with opacity:0 while still
+      // occupying layout — without this they'd keep a decoder running the
+      // whole time the app is open for something nobody can see.
+      if (parseFloat(cs.opacity) === 0) return false;
+      node = node.parentElement;
     }
-    return true; // not inside any known screen wrapper — always-visible chrome, leave alone
+    // Not inside any known screen wrapper — always-visible chrome (the auth
+    // loader, etc.). Still only worth decoding while it's actually on screen.
+    return inViewport(el);
   }
 
   function hasStaticSource(v) {
@@ -153,9 +174,14 @@
   }
 
   function refresh() {
+    // App backgrounded / phone locked: nothing is visible, so don't let the
+    // poll re-start what the visibilitychange handler just paused. (That
+    // fight also produced a stream of "play() interrupted by pause()"
+    // console warnings.)
+    if (document.hidden) return;
     // video[autoplay] catches ones not seen yet; [MARK] keeps tracking ones
     // whose autoplay attribute we already stripped after pausing them once.
-    document.querySelectorAll('video[autoplay], video[' + MARK + ']').forEach(function (v) {
+    document.querySelectorAll('video[autoplay], video[data-nwsb-auto], video[' + MARK + ']').forEach(function (v) {
       if (!hasStaticSource(v)) return; // live call stream (srcObject) — never touch
       v.setAttribute(MARK, '1');
       if (isVisible(v)) {
@@ -196,6 +222,29 @@
     var classMo = new MutationObserver(queueRefresh);
     classMo.observe(document.documentElement, {
       attributes: true, attributeFilter: ['class'], subtree: true
+    });
+
+    // Scrolling changes which videos are on screen just as much as opening a
+    // screen does. Capture-phase so it catches every inner scroller, passive
+    // so it never blocks the scroll itself, and coalesced to one pass per
+    // frame like everything else here.
+    document.addEventListener('scroll', queueRefresh, { capture: true, passive: true });
+    window.addEventListener('resize', queueRefresh, { passive: true });
+
+    // Phone locked / app backgrounded — nothing is visible, so stop every
+    // managed decoder instead of leaving them running against the battery.
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        document.querySelectorAll('video[autoplay], video[data-nwsb-auto], video[' + MARK + ']').forEach(function (v) {
+          if (hasStaticSource(v) && !v.paused) {
+            v.pause();
+            v.removeAttribute('autoplay');
+            autoPaused.add(v);
+          }
+        });
+      } else {
+        queueRefresh();
+      }
     });
   }
 })();

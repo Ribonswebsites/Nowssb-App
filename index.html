@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=460">
+<link rel="stylesheet" href="nowssb-nm.css?v=461">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -125,8 +125,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="auth-loader-sub" id="authLoaderSub">This might take a few seconds</div>
   </div>
   <div class="auth-loader-vid-wrap" id="authLoaderVidWrap">
-    <video class="auth-loader-video active" autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4"></video>
-    <video class="auth-loader-video" autoplay muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959261/gemini_generated_video_aa0d13e6_gzjzhw.mp4"></video>
+    <video class="auth-loader-video active" data-nwsb-auto muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4"></video>
+    <video class="auth-loader-video" data-nwsb-auto muted loop playsinline preload="auto" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959261/gemini_generated_video_aa0d13e6_gzjzhw.mp4"></video>
   </div>
 </div>
 <!-- SECONDARY BG LAYER — cross-fades in when Word Search scrolls into view -->
@@ -861,7 +861,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
       <img class="nmh-rx-banner-img" loading="lazy" decoding="async" onclick="openSub('ai-prescription')" alt="AI Prescription" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png">
       <div class="nmh-video-banner nmh-rx-video" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
-        <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/v1784958436/gemini_generated_video_4045e221_a4mza9.mp4"></video>
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784958436/gemini_generated_video_4045e221_a4mza9.mp4"></video>
         <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
       </div>
       <div class="nmh-rx-disclaimer">This is not a health prescription — just a personalized word recommendation.</div>
@@ -961,7 +961,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- NowssB Connect — what it is (video bg) -->
     <div class="nmh-connect-sec" onclick="window.IG&&IG.nav('profile')">
-      <video class="nmh-connect-vid" autoplay muted loop playsinline preload="metadata" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
+      <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
       <div class="nmh-connect-scrim"></div>
       <img class="nmh-connect-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="NowssB Connect">
       <div class="nmh-connect-title">NowssB <span class="accent">Connect</span></div>
@@ -1022,7 +1022,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Today Trending — video banner, no heading, trending words overlaid mid-right -->
     <div class="nmh-trend-banner" id="nmh-trending-section" onclick="openSub('nowssb-store')">
-      <video class="nmh-trend-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
+      <video class="nmh-trend-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
       <div class="nmh-trend-banner-fade"></div>
       <div class="nmh-trend-banner-text" id="nmh-trending-text"></div>
     </div>
@@ -1057,7 +1057,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Video banner — above the subscription section -->
     <div class="nmh-video-banner nmh-vb-tall" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
       <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
     </div>
 
@@ -1088,7 +1088,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Video banner — small word-search bar on the right -->
     <div class="nmh-video-banner nmh-video-banner-search">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784103663/grok_video_2026-07-15-13-50-19_krfkue.mp4"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784103663/grok_video_2026-07-15-13-50-19_krfkue.mp4"></video>
       <div class="nmh-vbs-search" onclick="event.stopPropagation()">
         <input class="nmh-vbs-input" id="nmhVbsSearchInput" type="text" placeholder="Search a word…" onkeydown="if(event.key==='Enter'){openSub('word-search');setTimeout(()=>{document.getElementById('wsPageInput').value=this.value;wsPageSearch();},220);}">
         <button class="nmh-vbs-btn" onclick="openSub('word-search');setTimeout(()=>{var v=document.getElementById('nmhVbsSearchInput').value;if(v){document.getElementById('wsPageInput').value=v;wsPageSearch();}},220);">
@@ -1099,7 +1099,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Word Search -->
     <div class="word-search-section" onclick="openSub('word-search')" style="cursor:pointer;margin-top:16px;border-radius:22px;overflow:hidden;">
-      <video class="word-search-video" autoplay muted loop playsinline preload="metadata">
+      <video class="word-search-video" data-nwsb-auto muted loop playsinline preload="none">
         <source src="https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4" type="video/mp4">
       </video>
       <div class="word-search-overlay"></div>
@@ -1129,7 +1129,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Meaning Search -->
     <div class="krm-section w100" onclick="openSub('meaning-search')" style="cursor:pointer;margin-top:16px;border-radius:22px;overflow:hidden;">
-      <video class="krm-video" autoplay muted loop playsinline preload="metadata">
+      <video class="krm-video" data-nwsb-auto muted loop playsinline preload="none">
         <source src="https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4" type="video/mp4">
       </video>
       <div class="krm-overlay"></div>
@@ -1179,7 +1179,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Video banner — above the Fashion Mode button -->
     <div class="nmh-video-banner">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102735/grok_video_2026-07-15-13-34-08_pacrtj.mp4"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784102735/grok_video_2026-07-15-13-34-08_pacrtj.mp4"></video>
     </div>
 
     <!-- Switch to Fashion Mode section -->
@@ -1354,7 +1354,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Video banner — below Today's Practice / streak -->
   <div class="fash-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
     <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
   </div>
 
@@ -1400,7 +1400,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- NowssB Connect — what it is (fashion, video bg) -->
   <div class="nmh-connect-sec fash-connect" onclick="openConnectIntro()">
-    <video class="nmh-connect-vid" autoplay muted loop playsinline preload="metadata" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
+    <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
     <div class="nmh-connect-scrim"></div>
     <img class="nmh-connect-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="NowssB Connect">
     <div class="nmh-connect-title">NowssB <span class="accent">Connect</span></div>
@@ -1412,7 +1412,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Today Trending — video banner (fashion) -->
   <div class="nmh-trend-banner fash-trend-banner" id="nmh-trending-section-fash" onclick="openSub('nowssb-store')">
-    <video class="nmh-trend-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
+    <video class="nmh-trend-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
     <div class="nmh-trend-banner-fade"></div>
     <div class="nmh-trend-banner-text" id="nmh-trending-text-fash"></div>
   </div>
@@ -1436,7 +1436,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Video banner — above the subscription promo -->
   <div class="fash-video-banner fash-vb-tall" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
     <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
   </div>
 
@@ -1580,7 +1580,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ══ HEALTH JOURNEY CARD ══ -->
   <div class="health-journey-card w100" onclick="openSub('health-journey')">
-    <video class="hjc-bg" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4"></video>
+    <video class="hjc-bg" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4"></video>
     <div class="hjc-content">
       <div class="hjc-top-row">
         <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/67f88680-578a-11f1-9331-1302872077be_r5mntz.png" class="hjc-icon" alt="Health Journey">
@@ -1596,7 +1596,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- Video banner — small word-search bar on the right, above word search -->
   <div class="fash-video-banner fash-video-banner-search">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784103663/grok_video_2026-07-15-13-50-19_krfkue.mp4"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784103663/grok_video_2026-07-15-13-50-19_krfkue.mp4"></video>
     <div class="nmh-vbs-search" onclick="event.stopPropagation()">
       <input class="nmh-vbs-input" id="fashVbsSearchInput" type="text" placeholder="Search a word…" onkeydown="if(event.key==='Enter'){openSub('word-search');setTimeout(()=>{document.getElementById('wsPageInput').value=this.value;wsPageSearch();},220);}">
       <button class="nmh-vbs-btn" onclick="openSub('word-search');setTimeout(()=>{var v=document.getElementById('fashVbsSearchInput').value;if(v){document.getElementById('wsPageInput').value=v;wsPageSearch();}},220);">
@@ -1608,7 +1608,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- STANDALONE BANNER ABOVE WORD SEARCH SECTION -->
   <div style="padding: 0 16px 16px; background: transparent;">
     <div style="position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.18); box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12); background: linear-gradient(135deg,rgba(6,12,24,0.95) 0%,rgba(12,20,40,0.92) 100%); aspect-ratio:16/9;">
-      <video autoplay muted loop playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" poster="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg">
+      <video data-nwsb-auto muted loop playsinline preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" poster="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg">
         <source src="https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.mp4" type="video/mp4">
       </video>
     </div>
@@ -1624,7 +1624,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- WORD SEARCH SECTION -->
   <div class="word-search-section" onclick="openSub('word-search')" style="cursor:pointer;">
-    <video class="word-search-video" autoplay muted loop playsinline preload="metadata">
+    <video class="word-search-video" data-nwsb-auto muted loop playsinline preload="none">
       <source src="https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4" type="video/mp4">
     </video>
     <div class="word-search-overlay"></div>
@@ -1653,7 +1653,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ══ KNOW THE REAL MEANING SECTION ══ -->
   <div class="krm-section w100" onclick="openSub('meaning-search')" style="cursor:pointer;">
-    <video class="krm-video" autoplay muted loop playsinline preload="metadata">
+    <video class="krm-video" data-nwsb-auto muted loop playsinline preload="none">
       <source src="https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4" type="video/mp4">
     </video>
     <div class="krm-overlay"></div>
@@ -1723,7 +1723,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- ══ VIDEO BANNER — 16:9 — above footer ══ -->
   <div class="hvb-glass-wrap">
   <div class="home-video-banner">
-    <video class="hvb-video" autoplay muted loop playsinline preload="metadata">
+    <video class="hvb-video" data-nwsb-auto muted loop playsinline preload="none">
       <source src="https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/v1778061531/grok_video_2026-05-06-15-27-23_zhylbe.mp4" type="video/mp4">
     </video>
     <div class="hvb-fade"></div>
@@ -1816,7 +1816,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        resolve aspect-ratio-only sizing on a flex item reliably, so height is
        pinned explicitly via the padding-top trick instead. -->
   <div style="position:relative;width:calc(100% - 32px);height:0;padding-top:calc((100% - 32px) * 0.3806);margin:16px 16px 6px;flex-shrink:0;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-41-24_x8z4mj.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-41-24_x8z4mj.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
 
   <div style="padding: 0 0 40px;">
@@ -3279,7 +3279,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <!-- ── VIDEO BANNER — below the search bar, square corners, plain
            icon+text (no pill background) middle-right ── -->
       <div class="nss-vid-banner" style="margin:16px 0;">
-        <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+        <video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
         <div class="nss-vid-banner-fade"></div>
         <div class="nss-vid-banner-pill-wrap">
           <div class="nss-vid-banner-pill">
@@ -3430,8 +3430,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <!-- Parallax video layer -->
         <video class="ms-hero-img" id="msBannerImg"
           src="https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4"
-          autoplay loop muted playsinline
-          preload="metadata"
+          data-nwsb-auto loop muted playsinline
+          preload="none"
           style="object-fit:cover;width:100%;height:100%;position:absolute;inset:0;background:#060c18;"></video>
         <!-- Gradient fade to page bg -->
         <div class="ms-hero-fade"></div>
@@ -3468,7 +3468,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
       <!-- ── VIDEO BANNER — icon fixed, tagline cycles in from the right ── -->
       <div class="nss-vid-banner" style="margin:16px 0;">
-        <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+        <video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
         <div class="nss-vid-banner-fade"></div>
         <div class="nss-vid-banner-pill-wrap">
           <div class="nss-vid-banner-pill">
@@ -4275,7 +4275,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
       <!-- ══ WORD LIBRARY SECTION ══ -->
         <div class="ws-store-section">
-          <video class="ws-store-video" autoplay muted loop playsinline preload="metadata" id="nssWordVid">
+          <video class="ws-store-video" data-nwsb-auto muted loop playsinline preload="none" id="nssWordVid">
             <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4" type="video/mp4">
           </video>
           <div class="ws-store-overlay"></div>
@@ -4311,7 +4311,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
       <!-- ══ MEANING LIBRARY SECTION ══ -->
         <div class="ms-home-card" onclick="(function(){var v=document.getElementById('nssMeaningVid');if(v){v.muted=true;v.play().catch(function(){});}nssOpenSub('meaning-store');})()">
-          <video class="ms-home-card-bg" id="nssMeaningVid" autoplay muted loop playsinline preload="metadata">
+          <video class="ms-home-card-bg" id="nssMeaningVid" data-nwsb-auto muted loop playsinline preload="none">
             <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4" type="video/mp4">
           </video>
           <div class="ms-home-card-overlay"></div>
@@ -5841,7 +5841,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   <div class="sub-body">
     <div class="nss-vid-banner" style="margin:0 0 16px;">
-      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+      <video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
       <div class="nss-vid-banner-fade"></div>
       <div class="nss-vid-banner-pill-wrap">
         <div class="nss-vid-banner-pill">
@@ -5876,7 +5876,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   <div class="sub-body">
     <div class="nss-vid-banner" style="margin:0 0 16px;">
-      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+      <video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
       <div class="nss-vid-banner-fade"></div>
       <div class="nss-vid-banner-pill-wrap">
         <div class="nss-vid-banner-pill">
@@ -5912,7 +5912,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   <div class="sub-body">
     <div class="nss-vid-banner" style="margin:0 0 16px;">
-      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+      <video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
       <div class="nss-vid-banner-fade"></div>
       <div class="nss-vid-banner-pill-wrap">
         <div class="nss-vid-banner-pill">
@@ -5953,7 +5953,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   <div class="sub-body">
     <div class="nss-vid-banner" style="margin:0 0 16px;">
-      <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
+      <video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>
       <div class="nss-vid-banner-fade"></div>
       <div class="nss-vid-banner-pill-wrap">
         <div class="nss-vid-banner-pill">
@@ -6295,7 +6295,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="bgp-content" style="padding-top:96px;">
 
       <div class="nss-vid-banner" style="margin:0 0 16px;">
-        <video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/v1784892265/grok_video_2026-07-24-13-59-14_xsqgse.mp4"></video>
+        <video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784892265/grok_video_2026-07-24-13-59-14_xsqgse.mp4"></video>
         <div class="nss-vid-banner-fade"></div>
         <div class="nss-vid-banner-pill-wrap">
           <div class="nss-vid-banner-pill">
@@ -7290,7 +7290,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <!-- Plan banner — video, text on the right-middle like Today's Trending -->
     <div class="ss-plan-banner" id="ssPlanBanner">
-      <video class="ss-plan-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784378125/grok_video_2026-07-18-18-04-01_zr8f4m.mp4"></video>
+      <video class="ss-plan-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784378125/grok_video_2026-07-18-18-04-01_zr8f4m.mp4"></video>
       <div class="ss-plan-banner-fade"></div>
       <div class="ss-plan-banner-text" id="ssPlanBannerText"></div>
     </div>
@@ -7447,7 +7447,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">My Certificates</div>
     </div>
     <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
     </div>
     <div style="padding:16px 0 22px;">
       <div style="font-size:10px;letter-spacing:3px;color:#e8d5a3;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:6px;">WORD MASTERY</div>
@@ -7464,7 +7464,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Privacy Settings</div>
     </div>
     <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
     </div>
     <div style="padding:16px 0 24px;">
       <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;">Control who can see your profile and stats.</div>
@@ -7487,7 +7487,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Chat Settings</div>
     </div>
     <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
     </div>
     <div style="padding:16px 0 24px;">
       <div style="font-size:13px;color:rgba(255,255,255,.52);font-family:'DM Sans',sans-serif;">Manage who can message you.</div>
@@ -7517,7 +7517,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">About NowssB</div>
     </div>
     <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
     </div>
     <div style="text-align:center;padding:24px 0 28px;">
       <div style="width:64px;height:64px;border-radius:50%;background:conic-gradient(from 0deg,#ff0080,#ff8c00,#ffe000,#00ff80,#00cfff,#7b2fff,#ff0080);padding:3px;margin:0 auto 16px;">
@@ -7564,7 +7564,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="font-size:17px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;">Terms &amp; Privacy</div>
     </div>
     <div style="position:relative;width:100%;margin:16px 0 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
     </div>
     <div style="padding:16px 0 20px;"></div>
     <div style="font-size:13px;color:rgba(255,255,255,.62);font-family:'DM Sans',sans-serif;line-height:1.8;">
@@ -7775,7 +7775,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   <div class="nch-scroll">
     <div style="position:relative;width:100%;margin:4px 0 16px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
     </div>
     <div class="nch-row" onclick="IG.editProfile()">
       <span class="nch-row-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></span>
@@ -8128,8 +8128,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div id="chatCallOverlay" style="display:none;position:fixed;inset:0;z-index:9300;overflow:hidden;">
   <div class="chat-call-bg" id="chatCallBg"></div>
   <div class="chat-call-scrim"></div>
-  <video id="chatCallRemoteVideo" class="chat-call-remote-video" autoplay playsinline style="display:none;"></video>
-  <video id="chatCallLocalVideo" class="chat-call-local-video" autoplay playsinline muted style="display:none;"></video>
+  <video id="chatCallRemoteVideo" class="chat-call-remote-video" data-nwsb-auto playsinline style="display:none;"></video>
+  <video id="chatCallLocalVideo" class="chat-call-local-video" data-nwsb-auto playsinline muted style="display:none;"></video>
   <audio id="chatCallRemoteAudio" autoplay style="display:none;"></audio>
   <div class="chat-call-content">
     <div class="chat-call-kind" id="chatCallKind">Voice Call</div>
@@ -8363,7 +8363,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-voice"></div></div>
 </div>
@@ -8379,7 +8379,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-speed"></div></div>
 </div>
@@ -8395,7 +8395,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-reps"></div></div>
 </div>
@@ -8411,7 +8411,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-sensitivity"></div></div>
 </div>
@@ -8427,7 +8427,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-persona"></div></div>
 </div>
@@ -8443,7 +8443,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-ambient"></div></div>
 </div>
@@ -8459,7 +8459,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <div style="position:relative;width:calc(100% - 40px);margin:16px 20px 6px;aspect-ratio:1080/411;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
   </div>
   <div class="ss-section" style="margin:20px 16px;"><div id="ss-opts-chatperm"></div></div>
 </div>
@@ -8934,7 +8934,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <script src="app/js/part049.js?v=291"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="app/js/part051.js?v=6" defer></script>
+<script src="app/js/part051.js?v=9" defer></script>
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=14"></script>
 <script src="app/js/part056.js?v=4"></script>
