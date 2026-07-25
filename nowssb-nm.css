@@ -2313,12 +2313,12 @@ body:has(#sub-meaning-store.open) #ig-bottomnav {
 /* AI Prescription section — AI Prescription banner, photo banner and
    video banner sit edge-to-edge (zero gap) as one connected block, no
    rounded corners anywhere. */
-.nmh-rx-section { border-radius: 0 !important; }
-/* Video banner pulled a little left — it bleeds past the section's 18px
-   left padding while staying inside on the right, so the frame sits
-   slightly left of the block it's stacked with. */
+/* The whole stack sits a little further left (trimmed left padding) so it
+   lines up closer to the bottom nav, and the video no longer overhangs:
+   all three pieces share one flush left edge. */
+.nmh-rx-section { border-radius: 0 !important; padding-left: 8px !important; }
 .nmh-rx-section .nmh-rx-video {
-  margin: 0 0 0 -14px !important; width: calc(100% + 14px) !important;
+  margin: 0 !important; width: 100% !important;
   border: none !important; box-shadow: none !important;
   border-radius: 0 !important; aspect-ratio: 1080 / 335 !important;
 }
