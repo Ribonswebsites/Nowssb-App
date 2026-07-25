@@ -468,15 +468,19 @@ function nssOpenSub(id) {
    checkout pipeline (nssAddToCart), its own purchased-list localStorage
    key. No real reader built yet, so an owned ebook shows a "coming soon"
    stub instead of pretending to open real content. ══ */
+/* Two real titles, each with its own cover art. */
 var EB_BOOKS = [
-  { key: 'shabdapathy-codex',    title: 'The Shabdapathy Codex',           sub: 'The complete origin science, in one volume.', price: 499 },
-  { key: 'phonetic-field-guide', title: 'Phonetic Origins: A Field Guide', sub: 'Trace any word back to its first sound.',     price: 399 },
-  { key: 'healing-frequencies',  title: 'Healing Frequencies Handbook',    sub: 'Which sounds activate which organs.',         price: 599 },
-  { key: 'vagus-voice',          title: 'The Vagus Nerve & Voice',         sub: 'Why speaking aloud heals the body.',          price: 499 },
-  { key: 'ancient-sounds',       title: 'Ancient Sounds, Modern Body',     sub: 'Pre-dictionary vibration, explained.',        price: 399 },
-  { key: 'atelier-companion',    title: 'The Word Atelier Companion',      sub: 'A guide to your word library.',               price: 699 }
+  { key: 'shabdapathy-codex',    title: 'The Shabdapathy Codex',           sub: 'The complete origin science, in one volume.', price: 499,
+    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007fec81f4b097aaae4e7ac297_ohtqy9.png' },
+  { key: 'phonetic-field-guide', title: 'Phonetic Origins: A Field Guide', sub: 'Trace any word back to its first sound.',     price: 399,
+    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007af081f49748cd0a1b77c566_f8qslq.png' }
 ];
+/* Fallback only — every book above ships its own cover. */
 var EB_COVER = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
+function ebCoverFor(key) {
+  for (var i = 0; i < EB_BOOKS.length; i++) if (EB_BOOKS[i].key === key) return EB_BOOKS[i].cover || EB_COVER;
+  return EB_COVER;
+}
 
 function ebGetPurchased() {
   try { return JSON.parse(localStorage.getItem('nwsb_ebook_purchased') || '[]'); } catch (e) { return []; }
@@ -494,7 +498,7 @@ window.ebRenderStore = function () {
     html += '<div class="ms-card' + (isPur ? ' unlocked' : '') + '" style="position:relative;" onclick="' +
       (isPur ? "window.ebOpenReader('" + b.key + "','" + titleSafe + "')" : "window.ebBuy('" + b.key + "','" + titleSafe + "'," + b.price + ")") +
       '">' +
-      '<div class="ms-card-img" style="background-image:url(\'' + EB_COVER + '\')"></div>' +
+      '<div class="ms-card-img" style="background-image:url(\'' + (b.cover || EB_COVER) + '\')"></div>' +
       '<div class="ms-card-overlay"></div>' +
       '<div class="ms-card-body">' +
       '<div class="ms-card-word">' + b.title + '</div>' +
@@ -511,7 +515,7 @@ window.ebRenderStore = function () {
 
 window.ebBuy = function (key, title, price) {
   if (typeof nssAddToCart === 'function') {
-    nssAddToCart({ id: 'ebook-' + key, name: title, type: 'Ebook', price: price, img: EB_COVER });
+    nssAddToCart({ id: 'ebook-' + key, name: title, type: 'Ebook', price: price, img: ebCoverFor(key) });
   }
 };
 
