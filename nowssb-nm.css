@@ -6292,3 +6292,20 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
 .sl-intro-stat, .sl-intro-stat-sep {
   text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 12px rgba(0,0,0,0.7);
 }
+
+/* Shabdapathy Foundations feature card — taller than the stock 215px
+   .home-card so the artwork has room and the copy stops fighting it, plus a
+   scrim behind the bottom block so the title and subtitle stay readable over
+   the busy photography. Carries the same white Enter pill as Today's
+   Practice and the home tiles. */
+.shabda-featured-card { min-height: 300px !important; }
+.shabda-featured-card .home-card-bottom {
+  position: relative; z-index: 2;
+  padding: 40px 0 0;
+}
+.shabda-featured-card .home-card-bottom::before {
+  content: ''; position: absolute; left: -20px; right: -20px; bottom: -20px; top: 0;
+  z-index: -1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(6,12,24,0) 0%, rgba(6,12,24,0.62) 45%, rgba(6,12,24,0.9) 100%);
+}
+.shabda-featured-card .home-card-sub { flex: 1; min-width: 0; }
