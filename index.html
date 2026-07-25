@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=453">
+<link rel="stylesheet" href="nowssb-nm.css?v=454">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -807,21 +807,42 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 
-    <!-- Section label — black banner -->
-    <div class="nmh-sec-banner" onclick="openSub('ai-prescription')">
-      <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-      <div class="nmh-sec-banner-divider"></div>
-      <div class="nmh-sec-banner-txt">
-        <div class="nmh-sec-banner-title">AI Prescription</div>
-        <div class="nmh-sec-banner-sub">Your personalized word ritual, built by AI — tap to see today's</div>
+    <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), right
+         below Today's Practice, combined into one padded section. ══ -->
+    <div class="nmh-offer-section">
+      <div class="nmh-banner-wrap">
+        <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
+             onclick="openSub('offers')" />
+        <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();openSub('offers')"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
       </div>
-      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nmh-sec-banner nmh-offer-banner" onclick="openSub('offers')">
+        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Today's Offer</div>
+          <div class="nmh-sec-banner-sub">Rotating store coupons — tap to redeem today's deal</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
     </div>
 
-    <!-- Video banner — same height as the animated promo cards above -->
-    <div class="nmh-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
-      <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+    <!-- ══ AI PRESCRIPTION — video banner on top, AI Prescription banner
+         below, both fitted inside one padded section (same recipe as the
+         offer section). Icon reused from the Fashion Home rx card. ══ -->
+    <div class="nmh-offer-section nmh-rx-section">
+      <div class="nmh-video-banner nmh-rx-video" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
+        <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/v1784958436/gemini_generated_video_4045e221_a4mza9.mp4"></video>
+        <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+      </div>
+      <div class="nmh-sec-banner nmh-offer-banner" onclick="openSub('ai-prescription')">
+        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">AI Prescription</div>
+          <div class="nmh-sec-banner-sub">Your personalized word ritual, built by AI — tap to see today's</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
     </div>
 
     <!-- Section label — black banner -->
@@ -1150,25 +1171,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
           <path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/>
         </svg>
-      </div>
-    </div>
-
-    <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), moved to
-         the bottom and combined into one section per request. ══ -->
-    <div class="nmh-offer-section">
-      <div class="nmh-banner-wrap">
-        <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
-             onclick="openSub('offers')" />
-        <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();openSub('offers')"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
-      </div>
-      <div class="nmh-sec-banner nmh-offer-banner" onclick="openSub('offers')">
-        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-        <div class="nmh-sec-banner-divider"></div>
-        <div class="nmh-sec-banner-txt">
-          <div class="nmh-sec-banner-title">Today's Offer</div>
-          <div class="nmh-sec-banner-sub">Rotating store coupons — tap to redeem today's deal</div>
-        </div>
-        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
     </div>
 
