@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=481">
+<link rel="stylesheet" href="nowssb-nm.css?v=482">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -815,75 +815,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 
-    <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), right
-         below Today's Practice, combined into one padded section. ══ -->
-    <div class="nmh-offer-section">
-      <div class="nmh-banner-wrap">
-        <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
-             onclick="openSub('offers')" />
-        <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();openSub('offers')"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
-      </div>
-      <div class="nmh-sec-banner nmh-offer-banner" onclick="openSub('offers')">
-        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-        <div class="nmh-sec-banner-divider"></div>
-        <div class="nmh-sec-banner-txt">
-          <div class="nmh-sec-banner-title">Today's Offer</div>
-          <div class="nmh-sec-banner-sub">Rotating store coupons — tap to redeem today's deal</div>
-        </div>
-        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-    </div>
-
-    <!-- Heading above the AI Prescription section — icon + vertical divider
-         + title/sub, no background/box, just a section label. -->
-    <div class="nmh-rx-heading">
-      <div class="nmh-rx-heading-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png" alt=""></div>
-      <div class="nmh-rx-heading-divider"></div>
-      <div class="nmh-rx-heading-txt">
-        <div class="nmh-rx-heading-title">AI Prescription</div>
-        <div class="nmh-rx-heading-sub">Your daily routine words recommendation</div>
-      </div>
-    </div>
-
-    <!-- ══ AI PRESCRIPTION — AI Prescription banner, photo banner and video
-         banner fitted edge-to-edge (no gaps) inside one square-cornered
-         section, plus a disclaimer at the bottom. Icon reused from the
-         Fashion Home rx card. ══ -->
-    <div class="nmh-offer-section nmh-rx-section">
-      <div class="nmh-video-banner nmh-rx-video" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
-        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784958436/gemini_generated_video_4045e221_a4mza9.mp4"></video>
-      </div>
-      <img class="nmh-rx-banner-img" loading="lazy" decoding="async" onclick="openSub('ai-prescription')" alt="AI Prescription" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png">
-      <!-- Icon is inset to line up with the logo baked into the video above.
-           The side arrow is gone; an Enter pill sits below the text instead,
-           which is what frees the horizontal room for that alignment. -->
-      <div class="nmh-sec-banner nmh-offer-banner nmh-rx-cta" onclick="openSub('ai-prescription')">
-        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-        <div class="nmh-sec-banner-divider"></div>
-        <div class="nmh-sec-banner-txt">
-          <div class="nmh-sec-banner-title">AI Prescription</div>
-          <div class="nmh-sec-banner-sub">Your personalized word ritual, built by AI — tap to see today's</div>
-          <div class="nmh-rx-enter">
-            <span class="nmh-rx-enter-lbl">Enter</span>
-            <span class="nmh-rx-enter-go"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
-        </div>
-      </div>
-      <div class="nmh-rx-disclaimer">This is not a health prescription — just a personalized word recommendation.</div>
-    </div>
-
-    <!-- Section label — black banner -->
-    <div class="nmh-sec-banner nmh-qa-banner" onclick="openSub('quick-access')">
-      <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-      <div class="nmh-sec-banner-divider"></div>
-      <div class="nmh-sec-banner-txt">
-        <div class="nmh-sec-banner-title">Quick Access</div>
-        <div class="nmh-sec-banner-sub">Customize your bottom navigation bar</div>
-      </div>
-      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-
-    <!-- 2x2 Grid -->
+    <!-- The four home buttons + their tip rail, directly below Today's
+         Practice. The Quick Access banner is a separate thing and stays
+         where it is, further down. -->
 <div class="htg-rail">
   <div class="htg-set" id="nmhTileSet" onclick="htOpen()" role="button" aria-label="Restyle these buttons">
     <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
@@ -900,7 +834,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <span class="htg-tip-rule"></span>
     <span class="htg-tip-txt"></span>
   </div>
-  <div class="htg-end" id="nmhTileEnd"><span class="htg-end-txt">Begin your healing</span></div>
+  <div class="htg-end" id="nmhTileEnd"><span class="htg-end-rule"></span><span class="htg-end-txt">Begin your healing</span></div>
 </div>
 <div class="nmh-grid">
       <div class="nmh-tile nmh-tile-art" onclick="openSub('sound-library')">
@@ -983,6 +917,77 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nmh-tile-enter"><span class="nmh-tile-enter-lbl">Enter</span><span class="nmh-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
       </div>
     </div>
+
+    <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), right
+         below Today's Practice, combined into one padded section. ══ -->
+    <div class="nmh-offer-section">
+      <div class="nmh-banner-wrap">
+        <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
+             onclick="openSub('offers')" />
+        <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();openSub('offers')"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+      </div>
+      <div class="nmh-sec-banner nmh-offer-banner" onclick="openSub('offers')">
+        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Today's Offer</div>
+          <div class="nmh-sec-banner-sub">Rotating store coupons — tap to redeem today's deal</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+
+    <!-- Heading above the AI Prescription section — icon + vertical divider
+         + title/sub, no background/box, just a section label. -->
+    <div class="nmh-rx-heading">
+      <div class="nmh-rx-heading-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png" alt=""></div>
+      <div class="nmh-rx-heading-divider"></div>
+      <div class="nmh-rx-heading-txt">
+        <div class="nmh-rx-heading-title">AI Prescription</div>
+        <div class="nmh-rx-heading-sub">Your daily routine words recommendation</div>
+      </div>
+    </div>
+
+    <!-- ══ AI PRESCRIPTION — AI Prescription banner, photo banner and video
+         banner fitted edge-to-edge (no gaps) inside one square-cornered
+         section, plus a disclaimer at the bottom. Icon reused from the
+         Fashion Home rx card. ══ -->
+    <div class="nmh-offer-section nmh-rx-section">
+      <div class="nmh-video-banner nmh-rx-video" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784958436/gemini_generated_video_4045e221_a4mza9.mp4"></video>
+      </div>
+      <img class="nmh-rx-banner-img" loading="lazy" decoding="async" onclick="openSub('ai-prescription')" alt="AI Prescription" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png">
+      <!-- Icon is inset to line up with the logo baked into the video above.
+           The side arrow is gone; an Enter pill sits below the text instead,
+           which is what frees the horizontal room for that alignment. -->
+      <div class="nmh-sec-banner nmh-offer-banner nmh-rx-cta" onclick="openSub('ai-prescription')">
+        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">AI Prescription</div>
+          <div class="nmh-sec-banner-sub">Your personalized word ritual, built by AI — tap to see today's</div>
+          <div class="nmh-rx-enter">
+            <span class="nmh-rx-enter-lbl">Enter</span>
+            <span class="nmh-rx-enter-go"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </div>
+      <div class="nmh-rx-disclaimer">This is not a health prescription — just a personalized word recommendation.</div>
+    </div>
+
+    <!-- Section label — black banner -->
+    <div class="nmh-sec-banner nmh-qa-banner" onclick="openSub('quick-access')">
+      <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-txt">
+        <div class="nmh-sec-banner-title">Quick Access</div>
+        <div class="nmh-sec-banner-sub">Customize your bottom navigation bar</div>
+      </div>
+      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+
+    <!-- 2x2 Grid -->
+
 
     <!-- My Routines -->
     <div class="home-card home-card-static w100" onclick="openDailyPracticeIntro()" style="width:100% !important; margin-left:0; margin-right:0; aspect-ratio:16/9; height:auto; min-height:0; background-color:#060c18; backdrop-filter:none; -webkit-backdrop-filter:none;">
@@ -1407,30 +1412,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <!-- Video banner — below Today's Practice / streak -->
-  <div class="fash-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
-    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
-    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
-  </div>
-
-  <!-- AI Prescription Card -->
-  <div id="rxCardWrap" style="width:100%;"></div>
-
-  <!-- Quick Access (nav-bar customizer) — same banner as Normal Home -->
-  <div class="nmh-sec-banner nmh-qa-banner" onclick="openSub('quick-access')">
-    <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-    <div class="nmh-sec-banner-divider"></div>
-    <div class="nmh-sec-banner-txt">
-      <div class="nmh-sec-banner-title">Quick Access</div>
-      <div class="nmh-sec-banner-sub">Customize your bottom navigation bar</div>
-    </div>
-    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  </div>
-
-  <!-- 4 wide 16:9 rows (was a 2x2 grid) — each image already carries its
-       own title text baked in, so the old top icon + DOM title/sub text
-       overlay is gone; a white "Enter" pill sits on the right instead. -->
-  <div class="htg-rail">
+  <!-- The four home buttons + their tip rail, directly below the streak
+       section. The Quick Access banner stays where it is, further down. -->
+<div class="htg-rail">
     <div class="htg-set" id="fashTileSet" onclick="htOpen()" role="button" aria-label="Restyle these buttons">
       <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
       <span class="htg-set-lbl">
@@ -1446,7 +1430,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <span class="htg-tip-rule"></span>
       <span class="htg-tip-txt"></span>
     </div>
-    <div class="htg-end" id="fashTileEnd"><span class="htg-end-txt">Begin your healing</span></div>
+    <div class="htg-end" id="fashTileEnd"><span class="htg-end-rule"></span><span class="htg-end-txt">Begin your healing</span></div>
   </div>
   <div class="home-grid w100">
     <div class="home-tile" onclick="openSub('sound-library')">
@@ -1506,6 +1490,28 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
     </div>
   </div>
+
+  <!-- Video banner — below Today's Practice / streak -->
+  <div class="fash-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
+    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+  </div>
+
+  <!-- AI Prescription Card -->
+  <div id="rxCardWrap" style="width:100%;"></div>
+
+  <!-- Quick Access (nav-bar customizer) — same banner as Normal Home -->
+  <div class="nmh-sec-banner nmh-qa-banner" onclick="openSub('quick-access')">
+    <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+    <div class="nmh-sec-banner-divider"></div>
+    <div class="nmh-sec-banner-txt">
+      <div class="nmh-sec-banner-title">Quick Access</div>
+      <div class="nmh-sec-banner-sub">Customize your bottom navigation bar</div>
+    </div>
+    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
+  
 
   <!-- NowssB Connect — what it is (fashion, video bg) -->
   <div class="nmh-connect-sec fash-connect" onclick="openConnectIntro()">
