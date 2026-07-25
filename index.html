@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=509">
+<link rel="stylesheet" href="nowssb-nm.css?v=510">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1064,16 +1064,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Connect features carousel — slides through what NowssB Connect offers -->
     <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
 
-    <!-- Section label — black banner -->
-    <div class="nmh-sec-banner" onclick="openSub('nowssb-store')">
-      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="nmh-sec-banner-divider"></div>
-      <div class="nmh-sec-banner-txt">
-        <div class="nmh-sec-banner-title">Quick Links</div>
-        <div class="nmh-sec-banner-sub">One-tap shortcuts to Store, Health &amp; Community</div>
-      </div>
-      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
 
     <!-- Quick access row -->
     <div class="nmh-quick-row">
@@ -1135,15 +1125,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         Shop Now
       </button>
       <div class="nmh-trend-shop-dots" id="nmh-trending-shop-dots"></div>
-    </div>
-
-    <!-- Today Offers -->
-    <div class="nmh-store-section" id="nmh-offers-section">
-      <div class="nmh-store-head">
-        <div class="nmh-store-title">Today <span class="accent">Offers</span></div>
-        <div class="nmh-store-link" onclick="openSub('nowssb-store')">See all</div>
-      </div>
-      <div class="nmh-hscroll" id="nmh-offers-row"></div>
     </div>
 
     <!-- ══ FASHION SECTIONS ON NORMAL HOME (Word Search · Meaning · Store · Subscription) ══ -->
@@ -1282,6 +1263,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Quick Links — sits below the store section; the up arrow reads as
+         "lifts a sheet up", which is what tapping it does. -->
+    <div class="nmh-sec-banner nmh-qlinks-banner" onclick="qlOpen()">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-txt">
+        <div class="nmh-sec-banner-title">Quick Links</div>
+        <div class="nmh-sec-banner-sub">One-tap shortcuts to every corner of NowssB</div>
+      </div>
+      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
     <!-- Switch to Fashion Mode section -->
@@ -3949,6 +3942,106 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- Download FAB removed — install is now only via Settings → Download App -->
+
+<!-- ══ QUICK LINKS SHEET — a glassmorphism box centred on screen, holding the
+     app's black banners as one-tap shortcuts. Opened by the Quick Links
+     banner under the store section. ══ -->
+<div class="ql-overlay" id="qlOverlay" onclick="qlClose(event)">
+  <div class="ql-box" id="qlBox" onclick="event.stopPropagation()">
+    <div class="ql-head">
+      <div class="ql-head-txt">
+        <div class="ql-head-title">Quick Links</div>
+        <div class="ql-head-sub">Jump straight to any corner of NowssB</div>
+      </div>
+      <button class="ql-close" onclick="qlClose()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="ql-scroll">
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ openSub('nowssb-store'); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">NowssB Store</div>
+          <div class="nmh-sec-banner-sub">Word Atelier, Meaning Store and more</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ openSub('health-journey'); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Health Journey</div>
+          <div class="nmh-sec-banner-sub">Body, organ and mind wellness</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ openSub('people'); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">NowssB Community</div>
+          <div class="nmh-sec-banner-sub">See what the community is practising</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ openSub('streak'); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Daily Streak</div>
+          <div class="nmh-sec-banner-sub">Keep your healing streak alive</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ openSub('offers'); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Today's Offer</div>
+          <div class="nmh-sec-banner-sub">Rotating store coupons</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ openSub('ai-prescription'); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">AI Prescription</div>
+          <div class="nmh-sec-banner-sub">Your personalized word ritual</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ openSub('meaning-search'); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Meaning Search</div>
+          <div class="nmh-sec-banner-sub">Uncover the meaning of any word</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ openSub('quick-access'); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Quick Access</div>
+          <div class="nmh-sec-banner-sub">Customize your bottom navigation bar</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="nmh-sec-banner ql-item" onclick="qlGo(function(){ htOpen(); })">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Home Tiles</div>
+          <div class="nmh-sec-banner-sub">Restyle your four home buttons</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ INSTALL POPUP OVERLAY ══ -->
 <div class="dl-overlay" id="dlOverlay" onclick="closeDlPopup(event)">
@@ -9291,8 +9384,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part058.js?v=1"></script>
 <script src="app/js/part059.js?v=7"></script>
 <script src="app/js/part060.js?v=2"></script>
+<script src="app/js/part061.js?v=1"></script>
 <script src="nowssb-social.js?v=182" defer></script>
-<script src="nowssb-nm.js?v=177" defer></script>
+<script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
 
 </body>
