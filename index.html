@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=521">
+<link rel="stylesheet" href="nowssb-nm.css?v=522">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -744,6 +744,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
     <div class="nmh-btn-group">
+      <button class="nmh-settings-btn" id="nmhCustomizeBtn" onclick="cuOpen()" title="Customize">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/>
+          <path d="M1.5 14h5M9.5 8h5M17.5 16h5"/>
+        </svg>
+      </button>
       <button class="nmh-settings-btn" id="nmhSettingsBtn" onclick="openSub('social')" title="Settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7">
           <circle cx="12" cy="12" r="3"/>
@@ -1364,9 +1370,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="margin-left:18px;margin-right:18px;align-self:stretch;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
           <span class="brand-name" style="font-size:clamp(32px,9vw,52px);"><span class="b">Nowss</span><span class="t">B</span></span>
-          <button class="hero-feat-btn" onclick="openSub('features')" aria-label="All features">
-            <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png" alt="">
-          </button>
+          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+            <button class="hero-cust-btn" onclick="cuOpen()" aria-label="Customize">
+              <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
+            </button>
+            <button class="hero-feat-btn" onclick="openSub('features')" aria-label="All features">
+              <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png" alt="">
+            </button>
+          </div>
         </div>
         <div style="margin-top:6px;overflow:hidden;">
           <span id="heroTagline" style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;display:inline-block;animation:taglineReveal 1.4s 0.6s both cubic-bezier(0.16,1,0.3,1);"><span style="font-weight:700;color:#fff;" id="tagWord">VIBRATION</span></span>
@@ -9167,7 +9178,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=229"></script>
+<script src="app/js/part042.js?v=230"></script>
 
 
 
@@ -9318,6 +9329,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=7"></script>
 <script src="app/js/part062.js?v=1"></script>
+<script src="app/js/part063.js?v=1"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
