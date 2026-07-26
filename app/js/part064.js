@@ -22,31 +22,45 @@
   var K_FEED   = 'nwsb_notif_feed';
   var FEED_MAX = 60;
 
-  /* Icons come from the section each kind belongs to, so a row in the feed
-     reads as "this is from the store / your routine / Connect" at a glance.
-     Image URLs are the ones those sections already use — nothing new. */
+  /* Icons come from the section each kind belongs to — the same image files
+     those sections already use, so a row in the feed reads as "this is from
+     the store / your routine / Connect" at a glance. No new assets: every
+     URL here is already loaded somewhere else in the app. */
   function img(u) { return '<img loading="lazy" decoding="async" alt="" src="' + u + '">'; }
-  function sv(d, extra) {
-    return '<svg viewBox="0 0 24 24" fill="none">' +
-           '<path d="' + d + '" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
-           (extra || '') + '</svg>';
-  }
+
+  var A = {
+    chat:     'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
+    reels:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/10d7afe0-5bf2-11f1-8248-b91d5cd919c2_b0bff9.png',
+    connect:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/04d5f4e0-5bf2-11f1-8248-b91d5cd919c2_mcohzv.png',
+    profile:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+    store:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
+    cart:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png',
+    library:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png',
+    offer:    'https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png',
+    wordsci:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
+    routines: 'https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png',
+    ai:       'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png',
+    streak:   'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png',
+    every:    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png',
+    settings: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
+  };
+
   var IC = {
-    messages:  sv('M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-3.4-.6L3 21l1.7-4.6A8.3 8.3 0 0 1 3.5 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z'),
-    posts:     sv('M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zM10 9.2l5 2.8-5 2.8z'),
-    reactions: sv('M20.8 6.6a4.7 4.7 0 0 0-6.7 0L12 8.7l-2.1-2.1a4.7 4.7 0 1 0-6.7 6.7l8.8 8.8 8.8-8.8a4.7 4.7 0 0 0 0-6.7z'),
-    follows:   sv('M16 20v-1.6a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4V20M9 10.5a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2M19 8v6M22 11h-6'),
-    orders:    img('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'),
-    delivery:  sv('M2 6.5h10v9H2zM12 9.5h4l3 3.2v2.8h-7zM4.5 19a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2M16.5 19a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2'),
-    cart:      sv('M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6', '<circle cx="9" cy="19" r="1.4" fill="currentColor"/><circle cx="17" cy="19" r="1.4" fill="currentColor"/>'),
-    arrivals:  sv('M12 3l2.1 5.3L20 9.4l-4 4 1 5.6-5-2.8-5 2.8 1-5.6-4-4 5.8-1.1z'),
-    offers:    img('https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png'),
-    trending:  sv('M3 17l5.5-5.5 3.5 3.5L21 6M15 6h6v6'),
-    routine:   img('https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png'),
-    rx:        sv('M6 20V5.5A1.5 1.5 0 0 1 7.5 4h4a3.5 3.5 0 0 1 0 7H6M12 11l6 8'),
-    streak:    sv('M12 2.5s5.5 4.4 5.5 9.3A5.5 5.5 0 0 1 12 21.5a5.5 5.5 0 0 1-5.5-9.7C6.5 6.9 12 2.5 12 2.5Z'),
-    subscription: sv('M3 8.5l4 3 5-6.5 5 6.5 4-3-2 10.5H5z'),
-    support:   sv('M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M5.6 5.6l3.9 3.9M14.5 14.5l3.9 3.9M18.4 5.6l-3.9 3.9M9.5 14.5l-3.9 3.9')
+    messages:     img(A.chat),
+    posts:        img(A.reels),
+    reactions:    img(A.connect),
+    follows:      img(A.profile),
+    orders:       img(A.store),
+    delivery:     img(A.store),      // same order, later in its life
+    cart:         img(A.cart),
+    arrivals:     img(A.library),
+    offers:       img(A.offer),
+    trending:     img(A.wordsci),
+    routine:      img(A.routines),
+    rx:           img(A.ai),
+    streak:       img(A.streak),
+    subscription: img(A.every),
+    support:      img(A.settings)
   };
 
   /* Every kind of notification the app can send, grouped as the app is. */
