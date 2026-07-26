@@ -22,6 +22,33 @@
   var K_FEED   = 'nwsb_notif_feed';
   var FEED_MAX = 60;
 
+  /* Icons come from the section each kind belongs to, so a row in the feed
+     reads as "this is from the store / your routine / Connect" at a glance.
+     Image URLs are the ones those sections already use — nothing new. */
+  function img(u) { return '<img loading="lazy" decoding="async" alt="" src="' + u + '">'; }
+  function sv(d, extra) {
+    return '<svg viewBox="0 0 24 24" fill="none">' +
+           '<path d="' + d + '" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
+           (extra || '') + '</svg>';
+  }
+  var IC = {
+    messages:  sv('M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-3.4-.6L3 21l1.7-4.6A8.3 8.3 0 0 1 3.5 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z'),
+    posts:     sv('M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zM10 9.2l5 2.8-5 2.8z'),
+    reactions: sv('M20.8 6.6a4.7 4.7 0 0 0-6.7 0L12 8.7l-2.1-2.1a4.7 4.7 0 1 0-6.7 6.7l8.8 8.8 8.8-8.8a4.7 4.7 0 0 0 0-6.7z'),
+    follows:   sv('M16 20v-1.6a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4V20M9 10.5a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2M19 8v6M22 11h-6'),
+    orders:    img('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'),
+    delivery:  sv('M2 6.5h10v9H2zM12 9.5h4l3 3.2v2.8h-7zM4.5 19a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2M16.5 19a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2'),
+    cart:      sv('M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6', '<circle cx="9" cy="19" r="1.4" fill="currentColor"/><circle cx="17" cy="19" r="1.4" fill="currentColor"/>'),
+    arrivals:  sv('M12 3l2.1 5.3L20 9.4l-4 4 1 5.6-5-2.8-5 2.8 1-5.6-4-4 5.8-1.1z'),
+    offers:    img('https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png'),
+    trending:  sv('M3 17l5.5-5.5 3.5 3.5L21 6M15 6h6v6'),
+    routine:   img('https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png'),
+    rx:        sv('M6 20V5.5A1.5 1.5 0 0 1 7.5 4h4a3.5 3.5 0 0 1 0 7H6M12 11l6 8'),
+    streak:    sv('M12 2.5s5.5 4.4 5.5 9.3A5.5 5.5 0 0 1 12 21.5a5.5 5.5 0 0 1-5.5-9.7C6.5 6.9 12 2.5 12 2.5Z'),
+    subscription: sv('M3 8.5l4 3 5-6.5 5 6.5 4-3-2 10.5H5z'),
+    support:   sv('M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M5.6 5.6l3.9 3.9M14.5 14.5l3.9 3.9M18.4 5.6l-3.9 3.9M9.5 14.5l-3.9 3.9')
+  };
+
   /* Every kind of notification the app can send, grouped as the app is. */
   var GROUPS = [
     { name: 'NowssB Connect', items: [
@@ -35,7 +62,8 @@
       { k: 'delivery',  label: 'On Its Way',      sub: 'Where your order is and how long it will take' },
       { k: 'cart',      label: 'Cart Reminders',  sub: 'Words still in your cart, before they are gone' },
       { k: 'arrivals',  label: 'New Arrivals',    sub: 'New words, meanings and drops' },
-      { k: 'offers',    label: "Today's Offers",  sub: 'Coupons and limited-time discounts' }
+      { k: 'offers',    label: "Today's Offers",  sub: 'Coupons and limited-time discounts' },
+      { k: 'trending',  label: "Today's Trending", sub: 'The word healing the most today' }
     ]},
     { name: 'Your Practice', items: [
       { k: 'routine',   label: 'Daily Routine',   sub: 'Reminders for each routine slot' },
@@ -173,9 +201,11 @@
       list.forEach(function (n, i) {
         html +=
           '<div class="nt-item' + (n.read ? '' : ' unread') + '" onclick="ntRead(' + i + ')">' +
-            '<div class="nt-item-dot"></div>' +
+            '<div class="nt-item-icon">' + (IC[n.type] || IC.support) + '</div>' +
             '<div class="nt-item-txt">' +
-              '<div class="nt-item-title">' + esc(n.title) + '</div>' +
+              '<div class="nt-item-title">' +
+                (n.read ? '' : '<span class="nt-item-dot"></span>') + esc(n.title) +
+              '</div>' +
               (n.body ? '<div class="nt-item-body">' + esc(n.body) + '</div>' : '') +
               '<div class="nt-item-meta">' + esc(labelOf(n.type)) + ' · ' + ago(n.at) + '</div>' +
             '</div>' +
@@ -191,6 +221,7 @@
         var isOn = on && off.indexOf(it.k) < 0;
         html +=
           '<div class="nt-row' + (on ? '' : ' nt-row-muted') + '">' +
+            '<div class="nt-row-icon">' + (IC[it.k] || IC.support) + '</div>' +
             '<div class="nt-row-txt">' +
               '<div class="nt-row-title">' + it.label + '</div>' +
               '<div class="nt-row-sub">' + it.sub + '</div>' +
@@ -238,7 +269,96 @@
     if (sc) sc.classList.remove('open');
   };
 
-  function boot() { paintBadge(); }
+  /* ── Producers ──────────────────────────────────────────────────────
+     What actually puts notifications in the feed. Each one reads real app
+     state and fires at most once a day, keyed on the day plus the thing it
+     is about — so the trending word changing tomorrow sends a new one, but
+     reopening the app ten times today does not send ten.
+
+     Nothing here invents a fact. If the state a producer needs isn't there
+     (no cart, no trending word yet), it sends nothing. ── */
+  var K_SENT = 'nwsb_notif_sent';
+
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+  }
+  function sentKeys() {
+    var raw; try { raw = JSON.parse(ls(K_SENT, '[]')); } catch (e) { raw = []; }
+    return Array.isArray(raw) ? raw : [];
+  }
+  function once(key, n) {
+    var keys = sentKeys();
+    if (keys.indexOf(key) >= 0) return false;
+    // The list only needs to remember today, so anything from another day goes.
+    keys = keys.filter(function (k) { return k.indexOf(today() + '|') === 0; });
+    keys.push(key);
+    lsSet(K_SENT, JSON.stringify(keys));
+    return window.nwsbNotify(n);
+  }
+  function txt(id) {
+    var e = document.getElementById(id);
+    return e ? (e.textContent || '').trim() : '';
+  }
+
+  function produce() {
+    var day = today();
+
+    // Today's Offer — the coupon rail rotates daily, so this is a real
+    // daily event rather than a made-up one.
+    once(day + '|offers', {
+      type: 'offers',
+      title: "Today's Offer is live",
+      body: 'New coupons on the store — tap Today’s Offer to see what you can claim.'
+    });
+
+    // Trending — only if the home has actually resolved a word.
+    var word = txt('nmh-trending-shop-word') || txt('nmh-trending-text');
+    if (word) {
+      once(day + '|trending|' + word, {
+        type: 'trending',
+        title: word + ' is trending today',
+        body: 'The word healing the most people right now.'
+      });
+    }
+
+    // Cart — only when something is genuinely sitting in it.
+    var cart = window._nssCart;
+    if (cart && cart.length) {
+      once(day + '|cart|' + cart.length, {
+        type: 'cart',
+        title: cart.length + (cart.length === 1 ? ' word is' : ' words are') + ' waiting in your cart',
+        body: 'Finish checking out before they are gone.'
+      });
+    }
+
+    // Streak — only once there is a streak to talk about.
+    var d = window._userDataCache || {};
+    var streak = d.currentStreak || d.streakCount || 0;
+    if (streak > 0) {
+      once(day + '|streak|' + streak, {
+        type: 'streak',
+        title: streak + '-day streak',
+        body: 'Practise today to keep it alive.'
+      });
+    }
+
+    // Daily routine — the slot the clock is actually in.
+    var h = new Date().getHours();
+    var slot = h < 10 ? 'Morning' : h < 13 ? 'Midday' : h < 17 ? 'Afternoon' : h < 21 ? 'Evening' : 'Night';
+    once(day + '|routine|' + slot, {
+      type: 'routine',
+      title: 'Your ' + slot + ' routine is ready',
+      body: 'Open My Routines to start this session.'
+    });
+  }
+
+  function boot() {
+    paintBadge();
+    // After first paint, so the home has had a chance to fill in the
+    // trending word and the cart before the producers read them.
+    setTimeout(function () { try { produce(); } catch (e) {} }, 2200);
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
