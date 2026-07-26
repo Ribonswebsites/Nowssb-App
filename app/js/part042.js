@@ -146,6 +146,13 @@
         <div class="sr-body"><div class="sr-label">Quick Access</div><div class="sr-sub">Customize your bottom navigation bar</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
+      <div class="sr" onclick="qlOpen()">
+        <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;">
+          <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="sr-body"><div class="sr-label">Quick Links</div><div class="sr-sub">One-tap shortcuts to every corner of NowssB</div></div>
+        <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
       <div class="sr last" onclick="htOpen()">
         <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);overflow:hidden;">
           <img loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">

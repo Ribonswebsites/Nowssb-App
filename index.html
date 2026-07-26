@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=519">
+<link rel="stylesheet" href="nowssb-nm.css?v=520">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1510,6 +1510,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
       <div class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
     </div>
+  </div>
+
+  <!-- Quick Links — same banner the Normal home carries, sitting under the four
+       buttons. Arrow points up because tapping it lifts the sheet. -->
+  <div class="nmh-sec-banner fash-qlinks-banner" onclick="qlOpen()">
+    <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="nmh-sec-banner-divider"></div>
+    <div class="nmh-sec-banner-txt">
+      <div class="nmh-sec-banner-title">Quick Links</div>
+      <div class="nmh-sec-banner-sub">One-tap shortcuts to every corner of NowssB</div>
+    </div>
+    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
 
   <!-- Video banner — below Today's Practice / streak -->
@@ -9133,7 +9145,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=227"></script>
+<script src="app/js/part042.js?v=228"></script>
 
 
 
