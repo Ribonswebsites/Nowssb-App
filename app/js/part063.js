@@ -65,19 +65,29 @@
                      '<div class="cu-card-icon">' + c.icon + '</div>' +
                      '<div class="cu-card-label">' + c.label + '</div>' +
                      '<div class="cu-card-sub">' + c.sub + '</div>' +
+                     '<div class="tp-enter cu-card-enter">' +
+                       '<span class="tp-enter-lbl">Enter</span>' +
+                       '<span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none">' +
+                         '<path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/>' +
+                       '</svg></span>' +
+                     '</div>' +
                    '</div>';
           }).join('') +
         '</div>' +
         '<div class="cu-corners">' +
           '<div class="cu-corners-label">Corners · every section, both homes</div>' +
           '<div class="cu-corners-row">' +
-            '<div class="cu-corner-chip" id="cuCornerRound" onclick="cuSetCorners(\'round\')">' +
+            '<div class="cu-corner-chip" id="cuCornerRound" onclick="cuPickCorners(\'round\')">' +
               '<span class="cu-corner-swatch cu-corner-swatch-round"></span>Rounded</div>' +
-            '<div class="cu-corner-chip" id="cuCornerEdge" onclick="cuSetCorners(\'edge\')">' +
+            '<div class="cu-corner-chip" id="cuCornerEdge" onclick="cuPickCorners(\'edge\')">' +
               '<span class="cu-corner-swatch cu-corner-swatch-edge"></span>Edges</div>' +
-            '<div class="cu-corner-chip" id="cuCornerDefault" onclick="cuSetCorners(\'\')">Default</div>' +
+            '<div class="cu-corner-chip" id="cuCornerDefault" onclick="cuPickCorners(\'\')">Default</div>' +
           '</div>' +
+          '<div class="cu-apply" id="cuApplyBtn" onclick="cuApplyCorners()">Apply</div>' +
         '</div>' +
+        '<div class="cu-toast" id="cuToast"><span class="cu-toast-tick">' +
+          '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#060c18" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '</span>Applied</div>' +
       '</div>' +
     '</div>';
 
@@ -101,26 +111,63 @@
     var v; try { v = localStorage.getItem(CKEY); } catch (e) { v = null; }
     return (v === 'round' || v === 'edge') ? v : '';
   }
+  /* What the chips are showing. Starts as whatever is committed; picking a
+     chip only stages it, so nothing changes on the page until Apply. */
+  var staged = null;
+
   function paintCorners() {
     var v = readCorners();
     document.body.classList.toggle('homecorner-round', v === 'round');
     document.body.classList.toggle('homecorner-edge', v === 'edge');
+    var shown = (staged === null) ? v : staged;
+    var btn = document.getElementById('cuApplyBtn');
+    if (btn) {
+      var dirty = shown !== v;
+      btn.classList.toggle('on', dirty);
+      btn.textContent = dirty ? 'Apply' : 'Applied';
+    }
     [['cuCornerRound', 'round'], ['cuCornerEdge', 'edge'], ['cuCornerDefault', '']].forEach(function (pair) {
       var el = document.getElementById(pair[0]);
-      if (el) el.classList.toggle('on', v === pair[1]);
+      if (el) el.classList.toggle('on', shown === pair[1]);
     });
   }
-  window.cuSetCorners = function (v) {
+
+  window.cuPickCorners = function (v) {
+    staged = (v === 'round' || v === 'edge') ? v : '';
+    paintCorners();
+    haptic(20);
+  };
+
+  window.cuApplyCorners = function () {
+    if (staged === null) return;
     try {
-      if (v === 'round' || v === 'edge') localStorage.setItem(CKEY, v);
+      if (staged === 'round' || staged === 'edge') localStorage.setItem(CKEY, staged);
       else localStorage.removeItem(CKEY);
     } catch (e) {}
+    staged = null;
     paintCorners();
-    haptic(28);
+    toast();
+    haptic([30, 55, 30]);
   };
+
+  /* The small "Applied" confirmation, same idea as the Fashion Background
+     picker's — you need to see that the tap landed, since the change is
+     behind the sheet you are still looking at. */
+  var toastTimer = null;
+  function toast() {
+    var t = document.getElementById('cuToast');
+    if (!t) return;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 1500);
+  }
+
+  /* Kept for anything that set corners directly before Apply existed. */
+  window.cuSetCorners = function (v) { window.cuPickCorners(v); window.cuApplyCorners(); };
 
   window.cuOpen = function () {
     mount();
+    staged = null;
     paintCorners();
     var ov = document.getElementById('cuOverlay');
     requestAnimationFrame(function () { if (ov) ov.classList.add('open'); });
