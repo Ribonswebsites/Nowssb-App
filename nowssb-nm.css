@@ -7380,3 +7380,84 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   line-height: 1.6; color: rgba(255,255,255,0.6);
 }
 .ql-float-help b { font-weight: 700; color: #e8d5a3; }
+
+/* ══════════════════════════════════════════════════════════════════
+   NOTIFICATIONS TAB — what the bell opens. Same glass shell as the Quick
+   Links sheet: the updates live here, and the gear leads through to the
+   full settings page.
+   ══════════════════════════════════════════════════════════════════ */
+.nt-overlay {
+  position: fixed; inset: 0; z-index: 4000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(4,8,18,0.72);
+  opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
+  content-visibility: hidden;
+}
+.nt-overlay.open {
+  opacity: 1; pointer-events: auto; content-visibility: visible;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.nt-sheet {
+  width: 100%; max-width: 420px; max-height: 80vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14); border-radius: 24px !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.35); backdrop-filter: blur(26px) saturate(1.35);
+  box-shadow: 0 26px 60px rgba(0,0,0,0.55);
+  transform: translateY(14px) scale(0.98); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+}
+.nt-overlay.open .nt-sheet { transform: translateY(0) scale(1); }
+
+.nt-sheet-head {
+  flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+  padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.nt-sheet-txt { flex: 1; min-width: 0; }
+.nt-sheet-title {
+  font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800;
+  color: #fff; letter-spacing: -0.2px;
+}
+.nt-sheet-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.6); margin-top: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nt-hbtn {
+  width: 38px !important; height: 38px !important; min-height: 38px !important;
+  flex-shrink: 0; padding: 0; cursor: pointer; border: none;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50% !important; background: #fff;
+}
+.nt-hbtn svg { width: 16px; height: 16px; display: block; }
+.nt-hbtn-gear { background: #e8d5a3; }
+.nt-hbtn:active { filter: brightness(0.92); }
+
+.nt-sheet-scroll {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 12px 12px 6px; scrollbar-width: none;
+}
+.nt-sheet-scroll::-webkit-scrollbar { display: none; }
+/* Rows in the tab are self-contained cards rather than a divided list. */
+.nt-sheet-scroll .nt-item {
+  margin-bottom: 8px; border-bottom: none;
+  background: rgba(0,0,0,0.32);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 16px !important;
+}
+.nt-sheet-scroll .nt-item:active { background: rgba(0,0,0,0.5); }
+.nt-sheet-scroll .nt-empty { margin: 8px 4px 12px; }
+
+.nt-sheet-foot {
+  flex-shrink: 0; display: flex; gap: 10px; padding: 12px 16px 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.nt-sheet-clear, .nt-sheet-manage {
+  flex: 1; text-align: center; cursor: pointer; padding: 13px 6px;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; border-radius: 12px !important;
+}
+.nt-sheet-clear {
+  color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.13);
+}
+.nt-sheet-manage { color: #060c18; background: #fff; border: 1px solid #fff; }
