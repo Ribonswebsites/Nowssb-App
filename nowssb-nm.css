@@ -7557,12 +7557,6 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
 .glass-wrap > .htg-rail .htg-end-txt {
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-/* Tile copy has ~24px less width in here than it had as a full-width
-   section, so let it wrap rather than be cut off mid-word. */
-.glass-wrap .nmh-tile-sub, .glass-wrap .home-tile-sub,
-.glass-wrap .nmh-tile-title, .glass-wrap .home-tile-title {
-  min-width: 0; overflow-wrap: anywhere;
-}
 /* Flex children default to min-width:auto, so the rail's pills refuse to
    shrink below their content and push past the card's edge. Letting them
    shrink — with the ellipsis above doing the visual work — keeps the whole
@@ -7574,3 +7568,39 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
    they are allowed to give, and the ellipsis above takes over. */
 .glass-wrap > .htg-rail .htg-end,
 .glass-wrap > .htg-rail .htg-set { flex-shrink: 1; }
+
+/* ── Tiles inside the wrapper ──────────────────────────────────────────
+   The wrapper takes ~24px off the row, which all came out of the text
+   column — it was down to about 70px, so "Sound Library" wrapped and
+   "Progress" split across two lines. Trimming the icon, the side padding
+   and the column gaps hands that width back to the words.
+
+   grid-auto-rows:1fr with a fixed height is what makes all four the same
+   size: without it each row sizes to its own tallest tile, so a two-line
+   title made one row taller than the other. ── */
+.glass-wrap .nmh-grid, .glass-wrap .home-grid {
+  grid-auto-rows: 1fr !important; gap: 10px !important;
+}
+.glass-wrap .home-tile, .glass-wrap .nmh-tile {
+  min-height: 0 !important; height: 118px !important;
+  padding: 12px 10px 38px !important;
+  gap: 8px !important;
+}
+.glass-wrap .home-tile-icon, .glass-wrap .nmh-tile-icon {
+  width: 34px !important; height: 34px !important;
+}
+.glass-wrap .home-tile-icon img, .glass-wrap .nmh-tile-icon img {
+  width: 100% !important; height: 100% !important;
+}
+.glass-wrap .home-tile-title, .glass-wrap .nmh-tile-title {
+  font-size: 12px !important; line-height: 1.2 !important;
+}
+.glass-wrap .home-tile-sub, .glass-wrap .nmh-tile-sub {
+  font-size: 9.5px !important; line-height: 1.35 !important; margin-top: 2px !important;
+}
+.glass-wrap .home-tile-txt, .glass-wrap .nmh-tile-txt { min-width: 0; }
+/* The Enter pill sits absolutely at the bottom — keep it clear of the
+   shorter tile's text. */
+.glass-wrap .home-tile-enter, .glass-wrap .nmh-tile-enter {
+  bottom: 8px !important; right: 8px !important;
+}
