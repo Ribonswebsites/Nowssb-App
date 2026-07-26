@@ -185,8 +185,8 @@ function renderPracticeIntro() {
       '<div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:max(env(safe-area-inset-top,18px),18px) 28px calc(var(--nav-height,0px) + max(env(safe-area-inset-bottom,20px),20px));">' +
 
         '<div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:4px;">' +
-          '<div onclick="closeSub(\'practice\')" style="width:44px;height:44px;cursor:pointer;flex-shrink:0;border:1px solid rgba(255,255,255,0.28);border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);"></div>' +
-          '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
+          '<div onclick="closeSub(\'practice\')" style="width:44px;height:44px;cursor:pointer;flex-shrink:0;border:1px solid rgba(255,255,255,0.28);border-radius:50% !important;box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);"></div>' +
+          '<span style="font-size:9px;font-weight:800;letter-spacing:6px;text-transform:uppercase;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,0.7);">NOWSBANSIU</span>' +
           '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;">' +
             '<svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>' +
           '</button>' +
@@ -195,24 +195,23 @@ function renderPracticeIntro() {
         '<div style="flex:1;min-height:20px;"></div>' +
 
         '<div style="flex-shrink:0;">' +
-          '<div style="font-size:56px;font-weight:800;color:#fff;line-height:1.05;letter-spacing:-1px;">' + countText + ' Natural</div>' +
-          '<div style="font-size:56px;font-weight:800;display:inline-block;line-height:1.05;letter-spacing:-1px;margin-bottom:18px;color:#f5c842;background:linear-gradient(90deg,#f5c842,#e8913a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + routineName + ' Sounds</div>' +
+          /* One line, sized off the viewport so the longest routine name
+             ("Afternoon") still fits without wrapping. It used to be two
+             56px lines, which sat right across the sphere in the art. */
+          '<div style="white-space:nowrap;font-weight:800;font-size:clamp(16px,5.4vw,26px);line-height:1.15;letter-spacing:-0.4px;margin-bottom:14px;">' +
+            '<span style="color:#fff;">' + countText + ' Natural </span>' +
+            '<span style="display:inline-block;color:#f5c842;background:linear-gradient(90deg,#f5c842,#e8913a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">' + routineName + ' Sounds</span>' +
+          '</div>' +
           '<div style="font-size:14px;font-weight:300;color:rgba(255,255,255,0.72);line-height:1.7;margin-bottom:24px;max-width:300px;">' + desc + '</div>' +
 
-          '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(10,18,38,0.75);border-radius:14px !important;padding:14px 20px;margin-bottom:22px;">' +
-            '<span style="font-size:14px;font-weight:700;color:#fff;">Voice Guidance</span>' +
-            '<div id="piToggle" class="nwsb-pill-toggle" onclick="pwIntroToggle(this)" data-on="true" style="width:46px;height:26px;border-radius:999px !important;background:#e8b100;position:relative;flex-shrink:0;cursor:pointer;box-shadow:0 2px 12px rgba(232,177,0,0.45);transition:background 0.25s,box-shadow 0.25s;">' +
-              '<div class="nwsb-pill-knob" style="width:20px;height:20px;border-radius:50% !important;background:#fff;position:absolute;top:3px;right:3px;display:flex;align-items:center;justify-content:center;transition:right 0.25s;box-shadow:0 1px 4px rgba(0,0,0,.25);">' +
-                '<svg width="11" height="9" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#e8b100" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-
           '<div style="display:flex;align-items:center;justify-content:space-between;">' +
-            '<div onclick="pwIntroBegin()" style="display:flex;align-items:center;gap:10px;cursor:pointer;background:rgba(20,28,48,0.85);border:1px solid rgba(255,255,255,0.18);padding:15px 34px;font-size:13px;font-weight:600;letter-spacing:1.5px;color:#fff;text-transform:uppercase;">' +
-              '<svg width="15" height="13" viewBox="0 0 16 14" fill="none"><path d="M3 7H13M8 2L13 7L8 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>&nbsp;Begin' +
-            '</div>' +
             '<span onclick="renderPractice()" style="font-size:13px;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.45);cursor:pointer;padding:15px 8px;">Skip</span>' +
+            /* border-radius carries !important because app.css resets every
+               element to 0 — without it this reads as a rectangle, which is
+               what flattened the back button too. */
+            '<div onclick="pwIntroBegin()" style="display:flex;align-items:center;gap:10px;cursor:pointer;background:#fff;border:1px solid #fff;border-radius:999px !important;padding:15px 30px;font-size:13px;font-weight:800;letter-spacing:1.5px;color:#060c18;text-transform:uppercase;box-shadow:0 8px 24px rgba(0,0,0,0.35);">' +
+              'Begin&nbsp;<svg width="15" height="13" viewBox="0 0 16 14" fill="none"><path d="M3 7H13M8 2L13 7L8 12" stroke="#060c18" stroke-width="1.9" stroke-linecap="round"/></svg>' +
+            '</div>' +
           '</div>' +
         '</div>' +
       '</div>' +
