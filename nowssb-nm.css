@@ -7491,3 +7491,11 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   background: #000 !important;
   box-shadow: 0 140px 0 0 #000;
 }
+
+/* The rows used to be direct children of .ql-scroll and got its 10px flex
+   gap. Wrapping them in #qlList (to sit the bubble switch above the list)
+   moved that gap up a level, so the rows themselves ended up flush against
+   each other. Give the wrappers the same column gap. */
+#qlList, #qlSetList {
+  display: flex; flex-direction: column; gap: 12px;
+}
