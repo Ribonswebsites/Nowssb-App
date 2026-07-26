@@ -495,12 +495,7 @@
         '#sub-ig-feed *{box-sizing:border-box;font-family:DM Sans,sans-serif;}'+
         '#sub-ig-feed .nwsbf-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(58px + env(safe-area-inset-bottom,0px) + 22px);}'+
         '#sub-ig-feed .nwsbf-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:max(env(safe-area-inset-top,12px),12px) 16px 12px;background:#eef0f5;box-shadow:0 4px 14px rgba(0,0,0,.06);}'+
-        /* Back out of Connect to whichever home you came from */
-        '#sub-ig-feed .nwsbf-back{width:38px;height:38px;min-width:38px;min-height:38px;flex-shrink:0;padding:0;border:none;cursor:pointer;border-radius:50% !important;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 9px rgba(0,0,0,.16),-2px -2px 7px rgba(255,255,255,.9);}'+
-        '#sub-ig-feed .nwsbf-back svg{width:17px;height:17px;display:block;}'+
-        '#sub-ig-feed .nwsbf-back:active{filter:brightness(.94);}'+
-        '#sub-ig-feed .nwsbf-backrule{width:1px;height:26px;flex-shrink:0;background:rgba(26,26,46,.18);display:block;}'+
-        '#sub-ig-feed .nwsbf-brand{display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;}'+
+                                        '#sub-ig-feed .nwsbf-brand{display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;}'+
         '#sub-ig-feed .nwsbf-brandlogo{width:72px;height:72px;border-radius:50% !important;object-fit:cover;background:#eef0f5;box-shadow:4px 4px 11px rgba(0,0,0,.18),-3px -3px 8px rgba(255,255,255,.96);flex-shrink:0;}'+
         '#sub-ig-feed .nwsbf-logo{font-size:20px;font-weight:800;color:#1a1a2e;letter-spacing:-.3px;}'+
         '#sub-ig-feed .nwsbf-icon{width:42px;height:42px;border:none;border-radius:50% !important;background:#eef0f5;cursor:pointer;box-shadow:4px 4px 10px rgba(0,0,0,.12),-3px -3px 8px rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;}'+
@@ -533,10 +528,7 @@
 
       screen.innerHTML='<style>'+css+'</style>'+
         '<div class="nwsbf-scroll">'+
-          '<div class="nwsbf-top">' +
-            '<button class="nwsbf-back" aria-label="Back" onclick="IG.nav(\'home\')"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1420" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>' +
-            '<span class="nwsbf-backrule"></span>' +
-            '<div class="nwsbf-brand"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt=""><span class="nwsbf-logo">NowssB <span style="color:#c8a96e;">Connect</span></span></div>'+
+          '<div class="nwsbf-top"><div class="nwsbf-brand"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt=""><span class="nwsbf-logo">NowssB <span style="color:#c8a96e;">Connect</span></span></div>'+
             '<button class="nwsbf-icon" aria-label="Messages" onclick="if(typeof chatInboxOpen===\'function\')chatInboxOpen()"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png" alt="Chat"></button>'+
             '<button class="nwsbf-icon" aria-label="Home" onclick="IG.socialNav(\'home\')"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" alt="Home"></button>'+
           '</div>'+
