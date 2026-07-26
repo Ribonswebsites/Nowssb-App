@@ -6593,3 +6593,12 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
 #ig-social-nav#ig-social-nav .ig-social-btn.on span:not(.ig-social-img) {
   color: #e8d5a3 !important;
 }
+
+/* Quick Links banner on the Fashion Home — square corners and inset to the
+   same 16px the tile grid uses, with clear air above and below. */
+#home .fash-qlinks-banner {
+  width: calc(100% - 32px) !important;
+  margin: 18px 16px 22px !important;
+  border-radius: 0 !important;
+  box-sizing: border-box;
+}
