@@ -7461,3 +7461,33 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.13);
 }
 .nt-sheet-manage { color: #060c18; background: #fff; border: 1px solid #fff; }
+
+/* ── Customize panel: three BLACK banners inside the glass wrapper ─────
+   The wrapper is the glass; the rows are not. They were transparent, so
+   the fashion backdrop showed straight through them and they read as part
+   of the glass instead of as the three black banners they replaced. */
+.cust-panel .cust-row {
+  background: #000;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px !important;
+  margin: 0 12px 10px;
+}
+.cust-panel .cust-row:first-of-type { margin-top: 12px; }
+.cust-panel .cust-row:last-child { margin-bottom: 14px; }
+.cust-panel .cust-row:active { background: #0b0b16; }
+/* The row icons are already black tiles; on a black banner they need their
+   own edge to stay visible. */
+.cust-panel .cust-row-icon { border-color: rgba(255,255,255,0.22); }
+
+/* ── Below the footer ─────────────────────────────────────────────────
+   Both home wraps carry 90px of padding after the footer to clear the nav
+   bar, and the footer itself is transparent on the Fashion home — so the
+   backdrop photo showed through the footer and through the strip under it.
+   The shadow paints black past the footer and is clipped by the scroller,
+   without adding any scrollable height. */
+#home-nm .home-footer,
+#home .home-footer {
+  background: #000 !important;
+  box-shadow: 0 140px 0 0 #000;
+}
