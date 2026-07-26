@@ -44,6 +44,20 @@
     every:    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'
   };
 
+  /* Floating-button faces. Each is the same black NowssB orb with a different
+     energy wave, so the tracing ring around the wrapper is tinted to match. */
+  var FAB_ICONS = [
+    { id: 'blue',   label: 'Blue',   img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785040037/file_00000000f6e881fa9c614af0994b5dda_pxkbl4.png' },
+    { id: 'yellow', label: 'Yellow', img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785040061/file_00000000989482309ec4a5e82fead5e0_i4cbfw.png' },
+    { id: 'red',    label: 'Red',    img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785040038/file_00000000394081fa9924bcd31a345869_magp1x.png' },
+    { id: 'purple', label: 'Purple', img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785040038/file_00000000944081fabf1a7c01b225f478_qbxhjq.png' }
+  ];
+  function fabIcon() {
+    var id = ls('nwsb_ql_icon', 'blue');
+    for (var i = 0; i < FAB_ICONS.length; i++) if (FAB_ICONS[i].id === id) return FAB_ICONS[i];
+    return FAB_ICONS[0];
+  }
+
   function sub(id) { return function () { if (typeof openSub === 'function') openSub(id); }; }
 
   var CATALOG = [
@@ -110,6 +124,16 @@
     var picked = chosen();
     var tgl = document.getElementById('qlFloatToggle');
     if (tgl) tgl.classList.toggle('on', floatOn());
+    var faces = document.getElementById('qlFaceRow');
+    if (faces) {
+      var cur = fabIcon().id;
+      faces.innerHTML = FAB_ICONS.map(function (o) {
+        return '<div class="ql-face ic-' + o.id + (o.id === cur ? ' on' : '') + '" onclick="qlSetIcon(\'' + o.id + '\')">' +
+          '<span class="ql-face-orb"><img decoding="async" loading="lazy" src="' + o.img + '" alt=""></span>' +
+          '<span class="ql-face-lbl">' + o.label + '</span>' +
+        '</div>';
+      }).join('');
+    }
     box.innerHTML = CATALOG.map(function (it) {
       var on = picked.indexOf(it.id) >= 0;
       return '<div class="ql-pick' + (on ? ' on' : '') + '" onclick="qlTogglePick(\'' + it.id + '\')">' +
@@ -154,6 +178,11 @@
     lsSet('nwsb_ql_items', JSON.stringify(a));
     renderSettings(); renderList();
   };
+  window.qlSetIcon = function (id) {
+    lsSet('nwsb_ql_icon', id);
+    renderSettings();
+    applyFloat();
+  };
   window.qlToggleFloat = function () {
     lsSet('nwsb_ql_float', floatOn() ? '0' : '1');
     renderSettings(); applyFloat();
@@ -162,6 +191,11 @@
   // ── floating button ──────────────────────────────────────────
   function applyFloat() {
     var fab = document.getElementById('qlFab'); if (!fab) return;
+    var ic = fabIcon();
+    FAB_ICONS.forEach(function (o) { fab.classList.remove('ic-' + o.id); });
+    fab.classList.add('ic-' + ic.id);
+    var img = fab.querySelector('img');
+    if (img && img.getAttribute('src') !== ic.img) img.setAttribute('src', ic.img);
     fab.style.display = floatOn() ? 'flex' : 'none';
     if (!floatOn()) return;
     var pos = null;
