@@ -7499,3 +7499,78 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
 #qlList, #qlSetList {
   display: flex; flex-direction: column; gap: 12px;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   GLASS WRAPPERS — the four home buttons with their settings rail, and
+   NowssB Connect with its community carousel, each gathered into one
+   glass card instead of sitting as loose siblings.
+
+   Same glass as the Customize panel. The children inside were written to
+   be top-level sections with their own outer margins, so those margins are
+   zeroed here and the wrapper's padding does the spacing — otherwise the
+   contents sit off-centre inside their own card.
+   ══════════════════════════════════════════════════════════════════ */
+.glass-wrap {
+  box-sizing: border-box; overflow: hidden;
+  padding: 12px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 22px !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.34);
+}
+#home-nm .glass-wrap { width: 100%; margin: 16px 0; }
+/* Square and inset to the same 16px the rest of the Fashion home uses. */
+#home .glass-wrap {
+  width: calc(100% - 32px); margin: 18px 16px;
+  border-radius: 0 !important;
+}
+/* The Normal home is a light neumorphic surface — glass over cream is
+   unreadable, so it gets the same solid dark card the Customize panel has. */
+#home-nm:not(.nm-dark) .glass-wrap {
+  background: #14142a; border-color: rgba(255,255,255,0.08);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* ── Contents: drop the outer margins, they are the wrapper's job now ── */
+.glass-wrap > .htg-rail { margin: 0 0 12px !important; }
+.glass-wrap > .nmh-grid,
+.glass-wrap > .home-grid {
+  width: 100% !important; margin: 0 !important; padding: 0 !important;
+}
+.glass-wrap > .nmh-connect-sec,
+.glass-wrap > .ncb-carousel {
+  width: 100% !important; margin: 0 !important;
+}
+.glass-wrap > .nmh-connect-sec { margin-bottom: 12px !important; }
+
+/* The tip rail measures itself against the viewport; inside the wrapper it
+   has 14px of padding either side to live within. */
+.glass-wrap > .htg-rail { padding-left: 0; padding-right: 0; }
+
+/* The tip rail's pill is sized to its text and was written for the full page
+   width; inside the wrapper it has less to work with, so it truncates
+   cleanly instead of running under the card's edge. */
+.glass-wrap > .htg-rail { max-width: 100%; }
+.glass-wrap > .htg-rail .htg-tip { min-width: 0; max-width: 100%; }
+.glass-wrap > .htg-rail .htg-tip-txt,
+.glass-wrap > .htg-rail .htg-end-txt {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Tile copy has ~24px less width in here than it had as a full-width
+   section, so let it wrap rather than be cut off mid-word. */
+.glass-wrap .nmh-tile-sub, .glass-wrap .home-tile-sub,
+.glass-wrap .nmh-tile-title, .glass-wrap .home-tile-title {
+  min-width: 0; overflow-wrap: anywhere;
+}
+/* Flex children default to min-width:auto, so the rail's pills refuse to
+   shrink below their content and push past the card's edge. Letting them
+   shrink — with the ellipsis above doing the visual work — keeps the whole
+   rail inside the wrapper on the narrower Normal home too. */
+.glass-wrap > .htg-rail { overflow: hidden; }
+.glass-wrap > .htg-rail > * { min-width: 0; }
+/* .htg-end and .htg-set are flex-shrink:0 by design — on a full-width rail
+   they should never be squeezed. Inside the wrapper there is less room, so
+   they are allowed to give, and the ellipsis above takes over. */
+.glass-wrap > .htg-rail .htg-end,
+.glass-wrap > .htg-rail .htg-set { flex-shrink: 1; }
