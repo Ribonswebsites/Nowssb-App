@@ -7083,3 +7083,157 @@ body.homecorner-round #home-nm .nmh-wrap > .nmh-greet-block {
 }
 .cu-corner-swatch-round { border-radius: 5px !important; }
 .cu-corner-swatch-edge  { border-radius: 0 !important; }
+
+/* ══════════════════════════════════════════════════════════════════
+   NOTIFICATIONS (app/js/part064.js) — the bell in the Fashion home's
+   fixed header, and the page behind it.
+   ══════════════════════════════════════════════════════════════════ */
+.nt-badge {
+  position: absolute; top: -6px; right: -6px;
+  min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  background: #e8434f; border: 1.5px solid #060c18;
+  border-radius: 999px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 800;
+  color: #fff; line-height: 1; pointer-events: none;
+}
+
+/* Master switch — the one that mutes everything below it. */
+.nt-master {
+  display: flex; align-items: center; gap: 13px;
+  padding: 16px; margin: 4px 0 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px !important;
+}
+.nt-master.on { border-color: rgba(232,213,163,0.32); background: rgba(232,213,163,0.07); }
+.nt-master-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 13px !important; color: rgba(255,255,255,0.55);
+}
+.nt-master.on .nt-master-icon { color: #e8d5a3; border-color: rgba(232,213,163,0.35); }
+.nt-master-icon svg { width: 21px; height: 21px; }
+.nt-master-txt { flex: 1; min-width: 0; }
+.nt-master-title {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; color: #fff;
+}
+.nt-master-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.48); margin-top: 2px;
+}
+
+/* The page body renders straight into .bgp-body, which carries no side
+   padding of its own — without this the section labels and cards ran off
+   both edges. */
+#ntBody { padding: 0 16px calc(110px + env(safe-area-inset-bottom, 0px)); }
+
+.nt-sec-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 22px 0 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 2.4px; text-transform: uppercase; color: rgba(255,255,255,0.38);
+}
+/* app.css floors every [onclick] at min-height:44px, which blew this chip up
+   to the height of a button and pushed the section label out of line. */
+.nt-clear {
+  cursor: pointer; letter-spacing: 1.4px; color: #e8d5a3;
+  height: 26px !important; min-height: 26px !important;
+  display: inline-flex; align-items: center;
+  padding: 0 12px; border-radius: 999px !important;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.3);
+}
+.nt-clear:active { background: rgba(232,213,163,0.24); }
+
+/* Updates list */
+.nt-list {
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 18px !important;
+}
+.nt-item {
+  display: flex; align-items: flex-start; gap: 11px; cursor: pointer;
+  padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.nt-item:last-child { border-bottom: none; }
+.nt-item:active { background: rgba(255,255,255,0.05); }
+.nt-item-dot {
+  width: 7px; height: 7px; flex-shrink: 0; margin-top: 6px;
+  border-radius: 50% !important; background: transparent;
+}
+.nt-item.unread .nt-item-dot { background: #e8d5a3; box-shadow: 0 0 8px rgba(232,213,163,0.6); }
+.nt-item-txt { flex: 1; min-width: 0; }
+.nt-item-title {
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+  color: rgba(255,255,255,0.72);
+}
+.nt-item.unread .nt-item-title { color: #fff; font-weight: 700; }
+.nt-item-body {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,0.5); margin-top: 3px; line-height: 1.5;
+}
+.nt-item-meta {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.4px; color: rgba(255,255,255,0.32); margin-top: 5px;
+}
+
+.nt-empty {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 34px 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed rgba(255,255,255,0.12);
+  border-radius: 18px !important;
+}
+.nt-empty-icon { width: 40px; height: 40px; margin-bottom: 12px; }
+.nt-empty-icon svg { width: 100%; height: 100%; display: block; }
+.nt-empty-title {
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  color: rgba(255,255,255,0.62);
+}
+.nt-empty-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.38); margin-top: 6px; line-height: 1.6; max-width: 250px;
+}
+
+/* Per-kind switches */
+.nt-group-label {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(232,213,163,0.6); margin: 16px 0 8px 4px;
+}
+.nt-group {
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 18px !important;
+}
+.nt-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.nt-row:last-child { border-bottom: none; }
+.nt-row-muted { opacity: 0.42; }
+.nt-row-txt { flex: 1; min-width: 0; }
+.nt-row-title {
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600; color: #fff;
+}
+.nt-row-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.42); margin-top: 2px; line-height: 1.4;
+}
+
+.nt-sw {
+  width: 46px !important; height: 26px !important; min-height: 26px !important;
+  flex-shrink: 0; position: relative; cursor: pointer;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px !important; transition: background 0.22s, border-color 0.22s;
+}
+.nt-sw.on { background: rgba(232,213,163,0.9); border-color: rgba(232,213,163,0.95); }
+.nt-sw-knob {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+  border-radius: 50% !important; background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: left 0.22s;
+}
+.nt-sw.on .nt-sw-knob { left: 22px; }
