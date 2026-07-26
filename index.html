@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=514">
+<link rel="stylesheet" href="nowssb-nm.css?v=515">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -8265,6 +8265,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ── SOCIAL NAV — shown only when People section is active ── -->
 <div id="ig-social-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:rgba(6,12,24,0.97);border-top:1px solid rgba(255,255,255,.1);backdrop-filter:none;-webkit-backdrop-filter:none;height:58px;padding-bottom:env(safe-area-inset-bottom,0px);align-items:center;justify-content:space-around;">
+  <!-- Back to whichever home you came from, pinned at the far left with a rule
+       separating it from the nav items themselves. -->
+  <button onclick="IG.nav('home')" class="ig-social-back" id="igsn-back" aria-label="Back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#0f1420" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <span class="ig-social-backrule"></span>
   <button onclick="IG.socialNav('feedhome')" class="ig-social-btn" id="igsn-home">
     <img decoding="async" loading="lazy" class="ig-social-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" alt="Home" style="width:22px;height:22px;object-fit:contain;">
     <span>Home</span>
@@ -8297,7 +8303,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 
-<script src="app/js/part033.js?v=239"></script>
+<script src="app/js/part033.js?v=240"></script>
 
 
 
