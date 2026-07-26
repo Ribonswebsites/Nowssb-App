@@ -6293,12 +6293,17 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
   text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 12px rgba(0,0,0,0.7);
 }
 
-/* Shabdapathy Foundations feature card — taller than the stock 215px
-   .home-card so the artwork has room and the copy stops fighting it, plus a
-   scrim behind the bottom block so the title and subtitle stay readable over
-   the busy photography. Carries the same white Enter pill as Today's
-   Practice and the home tiles. */
-.shabda-featured-card { min-height: 300px !important; }
+/* Shabdapathy Foundations feature card — a scrim behind the bottom block so
+   the title and subtitle stay readable over the busy photography, and the
+   same white Enter pill as Today's Practice and the home tiles. */
+.shabda-featured-card {
+  /* 16:9 like the other media cards. It was a fixed 300px, which at 358px
+     wide is ~1.2:1 — far taller than the art was cropped for, so `cover`
+     zoomed in hard to fill it. */
+  aspect-ratio: 16 / 9;
+  min-height: 0 !important;
+  height: auto !important;
+}
 .shabda-featured-card .home-card-bottom {
   position: relative; z-index: 2;
   padding: 40px 0 0;
@@ -6931,3 +6936,150 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
    gap hands those pixels back to the brand text. */
 .nmh-toprow .nmh-btn-group { gap: 6px; }
 .nmh-brand-sub { white-space: nowrap; letter-spacing: 1.6px; }
+
+/* ══════════════════════════════════════════════════════════════════
+   CUSTOMIZE PANEL — Quick Access, Quick Links and Set As You Like in one
+   glass card on each home, instead of three black banners spread down the
+   page. The header row opens the full Customize hub.
+   ══════════════════════════════════════════════════════════════════ */
+.cust-panel {
+  box-sizing: border-box; overflow: hidden;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 22px !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.34);
+}
+/* Normal home sits inside .nmh-wrap's own 20px padding; the Fashion home
+   insets to the same 16px its tile grid uses. */
+#home-nm .nmh-cust-panel { width: 100%; margin: 16px 0 8px; }
+/* Square by default, because every other section on the Fashion home is —
+   the Corners option in the hub is what rounds it, not this. */
+#home .fash-cust-panel {
+  width: calc(100% - 32px); margin: 18px 16px 22px;
+  border-radius: 0 !important;
+}
+
+.cust-panel-head {
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  padding: 15px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.18);
+}
+.cust-panel-head:active { background: rgba(0,0,0,0.3); }
+.cust-panel-icon {
+  width: 38px; height: 38px; flex-shrink: 0; overflow: hidden;
+  background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 12px !important;
+}
+.cust-panel-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cust-panel-txt { flex: 1; min-width: 0; }
+.cust-panel-title {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+  color: #fff; letter-spacing: 0.2px;
+}
+.cust-panel-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.5); margin-top: 2px;
+}
+.cust-panel-more { width: 20px; height: 20px; flex-shrink: 0; }
+.cust-panel-more svg { width: 100%; height: 100%; display: block; }
+
+.cust-row {
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.cust-row:last-child { border-bottom: none; }
+.cust-row:active { background: rgba(255,255,255,0.06); }
+.cust-row-icon {
+  width: 38px !important; height: 38px !important; flex-shrink: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: #000; border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 11px !important;
+}
+.cust-row-icon svg { width: 19px; height: 19px; }
+.cust-row-divider { width: 1px; align-self: stretch; flex-shrink: 0; background: rgba(255,255,255,0.14); }
+.cust-row-txt { flex: 1; min-width: 0; }
+.cust-row-title {
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+  color: #fff; letter-spacing: 0.1px;
+}
+.cust-row-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.45); margin-top: 2px; line-height: 1.4;
+}
+.cust-row-arrow {
+  width: 30px !important; height: 30px !important; min-height: 30px !important;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 50% !important;
+}
+.cust-row-arrow svg { width: 14px; height: 14px; }
+
+/* The Normal home is a light neumorphic surface — the same glass over cream
+   would be unreadable, so it gets the dark card treatment the black banners
+   had, while the night skin keeps the glass. */
+#home-nm:not(.nm-dark) .nmh-cust-panel {
+  background: #14142a; border-color: rgba(255,255,255,0.08);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* ── Corners — one choice, every top-level section, both homes ──────
+   Scoped to the wraps' direct children (plus the handful of section
+   wrappers whose visible box is one level in), so this changes section
+   corners without reaching into icons, pills and badges nested deeper. */
+body.homecorner-edge #home-nm .nmh-wrap > *,
+body.homecorner-edge #home .home-body > *,
+body.homecorner-edge #home .home-body > #fashPromoVid > *,
+body.homecorner-edge #home .home-body > #fashCubeSec > *,
+body.homecorner-edge #home .home-body > .section-glass-wrap > *,
+body.homecorner-edge #home .home-body > .hvb-glass-wrap > *,
+body.homecorner-edge #home .home-body > .fash-banner-wrap > *,
+body.homecorner-edge #home .home-body > #rxCardWrap > * {
+  border-radius: 0 !important;
+}
+body.homecorner-round #home-nm .nmh-wrap > *,
+body.homecorner-round #home .home-body > *,
+body.homecorner-round #home .home-body > #fashPromoVid > *,
+body.homecorner-round #home .home-body > #fashCubeSec > *,
+body.homecorner-round #home .home-body > .section-glass-wrap > *,
+body.homecorner-round #home .home-body > .hvb-glass-wrap > *,
+body.homecorner-round #home .home-body > .fash-banner-wrap > *,
+body.homecorner-round #home .home-body > #rxCardWrap > * {
+  border-radius: 22px !important;
+}
+/* The tip rail above the four tiles is a pill by design and the greeting /
+   tagline are bare text — neither is a "section" the user means here. */
+body.homecorner-round #home-nm .nmh-wrap > .htg-rail,
+body.homecorner-round #home .home-body > .htg-rail,
+body.homecorner-round #home .home-body > .home-greeting,
+body.homecorner-round #home .home-body > .home-tagline,
+body.homecorner-round #home-nm .nmh-wrap > .nmh-greet-block {
+  border-radius: 0 !important;
+}
+
+/* Corner chips in the hub */
+.cu-corners {
+  flex-shrink: 0; padding: 14px 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.cu-corners-label {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: rgba(255,255,255,0.4); margin-bottom: 10px;
+}
+.cu-corners-row { display: flex; gap: 8px; }
+.cu-corner-chip {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+  cursor: pointer; padding: 11px 6px; min-height: 0 !important;
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.6px; color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px !important; transition: all 0.2s;
+}
+.cu-corner-chip.on { color: #060c18; background: #e8d5a3; border-color: #e8d5a3; }
+.cu-corner-swatch {
+  width: 14px; height: 14px; flex-shrink: 0;
+  border: 1.6px solid currentColor; opacity: 0.85;
+}
+.cu-corner-swatch-round { border-radius: 5px !important; }
+.cu-corner-swatch-edge  { border-radius: 0 !important; }
