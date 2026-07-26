@@ -6454,24 +6454,43 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 9vh);
   pointer-events: none; opacity: 0; transition: opacity 0.24s ease;
   background: linear-gradient(to bottom, rgba(4,8,18,0) 0%, rgba(4,8,18,0.55) 45%, rgba(4,8,18,0.86) 100%);
-  -webkit-backdrop-filter: blur(14px) saturate(0.9); backdrop-filter: blur(14px) saturate(0.9);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 38%);
           mask-image: linear-gradient(to bottom, transparent 0%, #000 38%);
+  /* No backdrop-filter until it's actually shown. A 46vh blur layer sitting
+     in the page permanently forces the compositor to re-render that region on
+     every frame, which is what made scrolling stutter. content-visibility
+     keeps it out of layout entirely while hidden. */
+  visibility: hidden; content-visibility: hidden;
 }
-.ql-drop.show { opacity: 1; }
+.ql-drop.show {
+  opacity: 1; visibility: visible; content-visibility: visible;
+  -webkit-backdrop-filter: blur(14px) saturate(0.9); backdrop-filter: blur(14px) saturate(0.9);
+}
 /* The bin artwork runs edge to edge; the vignette over it feathers all four
    sides so the art has no visible box, it just emerges out of the darkened
    zone. No red on arming — it simply gets removed when it's close enough. */
 .ql-drop-target {
-  position: relative; width: 100%; display: block;
+  position: relative; width: 100%; display: block; margin-top: 7vh;
+  /* floor so the box (and the hotspot's % offset) still resolves if the
+     artwork hasn't decoded yet */
+  min-height: 220px;
   transition: transform 0.24s cubic-bezier(0.34,1.4,0.64,1);
 }
 .ql-drop-target img { width: 100%; height: auto; display: block; }
 .ql-drop-vignette {
   position: absolute; inset: 0; pointer-events: none; display: block;
+  /* The bin sits in the TOP fifth of the artwork, so the top feather starts
+     well above it — it was washing the bin out before. */
   background:
-    linear-gradient(to right,  rgba(4,8,18,0.98) 0%, rgba(4,8,18,0) 26%, rgba(4,8,18,0) 74%, rgba(4,8,18,0.98) 100%),
-    linear-gradient(to bottom, rgba(4,8,18,0.98) 0%, rgba(4,8,18,0) 30%, rgba(4,8,18,0) 68%, rgba(4,8,18,0.98) 100%);
+    linear-gradient(to right,  rgba(4,8,18,0.98) 0%, rgba(4,8,18,0) 24%, rgba(4,8,18,0) 76%, rgba(4,8,18,0.98) 100%),
+    linear-gradient(to bottom, rgba(4,8,18,0.9) 0%, rgba(4,8,18,0) 9%, rgba(4,8,18,0) 70%, rgba(4,8,18,0.98) 100%);
+}
+/* Invisible hotspot over the bin itself. The magnet aims at THIS, not the
+   middle of the artwork — the centre of the image is her lap, which is why
+   the button was being pulled onto her face instead of into the bin. */
+.ql-drop-hot {
+  position: absolute; left: 50%; top: 17%; width: 96px; height: 96px;
+  transform: translate(-50%, -50%); pointer-events: none; display: block;
 }
 .ql-drop.armed .ql-drop-target { transform: scale(1.06); }
 .ql-drop-label {
@@ -6551,4 +6570,15 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
 #ig-social-nav .ig-social-backrule {
   width: 1px; height: 24px; flex-shrink: 0; display: block;
   background: rgba(255,255,255,0.18); margin: 0 2px 0 12px;
+}
+
+/* Connect nav labels were computing to rgba(0,0,0,0.4) — black text on the
+   black bar, so only the gold active one was legible. Doubled id to outrank
+   whatever mode rule is setting that, exactly as #ig-bottomnav needed. */
+#ig-social-nav#ig-social-nav .ig-social-btn span:not(.ig-social-img) {
+  color: rgba(255,255,255,0.72) !important; display: block !important; opacity: 1 !important;
+}
+#ig-social-nav#ig-social-nav .ig-social-btn.active span:not(.ig-social-img),
+#ig-social-nav#ig-social-nav .ig-social-btn.on span:not(.ig-social-img) {
+  color: #e8d5a3 !important;
 }
