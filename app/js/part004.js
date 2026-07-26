@@ -126,9 +126,41 @@ function openPracticeIntro() {
   openSub('practice');
 }
 
+/* The player intro's cover art. It rotates rather than sitting on one photo,
+   so opening the player twice in a row doesn't look identical.
+
+   Sequential, not random: the index is remembered, so the next launch is
+   always a photo you did not just see. Random would repeat roughly one
+   launch in eight, which is exactly what this is meant to avoid. */
+const PI_ART = [
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069166/file_00000000210881fabda4b62a827e2b7d_shsdnw.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_000000005c28820693e31425ac03a99a_myqo9z.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000fbb481fa897d6c4b800c7abc_x0fmja.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069167/file_0000000013088209a33ed2b6c15a7dfe_l6j2wf.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000868081fa8048698268ae60bb_rw97tp.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000112882069935a3c4bce3b4ca_r6awjq.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000fdb08207a6e3e5e768f47448_apuryf.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000280082069ad442c609cdd790_ci1kbd.png'
+];
+window.NWSB_PLAYER_INTRO_ART = PI_ART;
+
+function piNextArt() {
+  var i;
+  try {
+    i = (parseInt(localStorage.getItem('nwsb_pi_art'), 10) + 1) || 0;
+    if (!(i >= 0)) i = 0;
+    i = i % PI_ART.length;
+    localStorage.setItem('nwsb_pi_art', String(i));
+  } catch (e) {
+    i = Math.floor(Math.random() * PI_ART.length);
+  }
+  return PI_ART[i];
+}
+
 function renderPracticeIntro() {
   const body = document.getElementById('practiceBody');
   if (!body) return;
+  const piArt = piNextArt();
 
   const routine = getActiveRoutine();
   const hr = new Date().getHours();
@@ -148,7 +180,7 @@ function renderPracticeIntro() {
 
   body.innerHTML =
     '<div style="position:relative;width:100%;height:100%;overflow:hidden;background:#060c18;">' +
-      '<div style="position:absolute;inset:0;background-image:url(https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777973723/grok_image_1777967661568_pbau2f.jpg);background-size:cover;background-position:center center;"></div>' +
+      '<div style="position:absolute;inset:0;background-image:url(' + piArt + ');background-size:cover;background-position:center center;background-repeat:no-repeat;"></div>' +
       '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,10,24,0.1) 0%,rgba(4,10,24,0.02) 20%,rgba(4,10,24,0.55) 58%,rgba(4,10,24,0.97) 100%);pointer-events:none;"></div>' +
       '<div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:max(env(safe-area-inset-top,18px),18px) 28px calc(var(--nav-height,0px) + max(env(safe-area-inset-bottom,20px),20px));">' +
 
