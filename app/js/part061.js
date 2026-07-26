@@ -131,6 +131,7 @@
         return '<div class="ql-face ic-' + o.id + (o.id === cur ? ' on' : '') + '" onclick="qlSetIcon(\'' + o.id + '\')">' +
           '<span class="ql-face-orb"><img decoding="async" loading="lazy" src="' + o.img + '" alt=""></span>' +
           '<span class="ql-face-lbl">' + o.label + '</span>' +
+          '<span class="ql-face-pick">' + (o.id === cur ? '<svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' : '') + '</span>' +
         '</div>';
       }).join('');
     }
