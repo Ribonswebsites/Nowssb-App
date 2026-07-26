@@ -7252,3 +7252,97 @@ body.homecorner-round #home-nm .nmh-wrap > .nmh-greet-block {
   box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: left 0.22s;
 }
 .nt-sw.on .nt-sw-knob { left: 22px; }
+
+/* ── Customize hub: card Enter pills, staged Corners, Applied toast ──── */
+
+/* Every card carries the same white Enter pill the home cards use, pinned to
+   the bottom so the pills line up across a row whatever the copy length. */
+/* align-content:start is load-bearing. .cu-grid is a scrollable flex child,
+   so its rows were being stretched to a single shared height computed before
+   the pill existed — the pills then spilled out of the bottom of every card
+   and landed in the gap over the row below. */
+.cu-grid { align-content: start; }
+.cu-card { position: relative; }
+.cu-card-enter { align-self: flex-start; margin-top: auto; padding-top: 2px; }
+.cu-card .cu-card-sub { margin-bottom: 10px; }
+
+/* Icon boxes render an <img> or an <svg> — same box, same optical weight, so
+   a mixed grid doesn't read as two different kinds of card. */
+.cu-card-icon svg { width: 21px; height: 21px; display: block; }
+.cu-card-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.cu-apply {
+  margin-top: 10px; text-align: center; cursor: pointer;
+  padding: 12px 6px; min-height: 0 !important;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  border-radius: 12px !important; transition: all 0.2s;
+  /* Nothing staged yet — reads as "already applied", not as a live button. */
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+}
+.cu-apply.on {
+  color: #060c18; background: #fff; border-color: #fff;
+}
+.cu-apply.on:active { background: #e8d5a3; border-color: #e8d5a3; }
+
+.cu-toast {
+  position: absolute; left: 50%; bottom: 84px; z-index: 6;
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px 10px 10px;
+  background: #fff; border-radius: 999px !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 1.4px; text-transform: uppercase; color: #060c18;
+  white-space: nowrap; pointer-events: none;
+  transform: translate(-50%, 10px); opacity: 0;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+.cu-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.cu-toast-tick {
+  width: 20px; height: 20px; flex-shrink: 0; border-radius: 50% !important;
+  background: #e8d5a3; display: flex; align-items: center; justify-content: center;
+}
+.cu-toast-tick svg { width: 11px; height: 11px; display: block; }
+
+/* ══════════════════════════════════════════════════════════════════
+   Appearance panels opened from the NORMAL home.
+
+   #sub-social's panels are dark surfaces, but the Normal home's light
+   neumorphic skin (body.nm-mode) repaints text dark — so Black Edition and
+   Start Page Image came up as navy text on navy, a cream label on a cream
+   button, and a strip of light body showing under a short panel. Exactly
+   what #ss-panel-fashionbg already needed; same fix, extended to the other
+   two so all three read as the Fashion home wherever they were opened from.
+   ══════════════════════════════════════════════════════════════════ */
+#sub-social #ss-panel-blackedition,
+#sub-social #ss-panel-startbg {
+  background-color: #060c18 !important;
+  min-height: 100% !important;
+}
+body.nm-mode #sub-social #ss-panel-blackedition [style*="#fff"],
+body.nm-mode #sub-social #ss-panel-blackedition [style*="255,255,255"],
+body.nm-mode #sub-social #ss-panel-blackedition [style*="255, 255, 255"],
+body.nm-mode #sub-social #ss-panel-startbg [style*="#fff"],
+body.nm-mode #sub-social #ss-panel-startbg [style*="255,255,255"],
+body.nm-mode #sub-social #ss-panel-startbg [style*="255, 255, 255"] { color: #fff !important; }
+body.nm-mode #sub-social #ss-panel-blackedition [style*="e8d5a3"],
+body.nm-mode #sub-social #ss-panel-startbg [style*="e8d5a3"] { color: #e8d5a3 !important; }
+body.nm-mode #sub-social #ss-panel-blackedition button[style*="background:#e8d5a3"],
+body.nm-mode #sub-social #ss-panel-startbg button[style*="background:#e8d5a3"],
+body.nm-mode #sub-social #ss-panel-blackedition .bgp-cta-btn,
+body.nm-mode #sub-social #ss-panel-startbg .bgp-cta-btn { color: #060c18 !important; }
+/* Headings and body copy inside these panels are class-styled, not inline,
+   so the inline-attribute rules above can't reach them. */
+body.nm-mode #sub-social #ss-panel-blackedition .ss-panel-title,
+body.nm-mode #sub-social #ss-panel-blackedition .be-title,
+body.nm-mode #sub-social #ss-panel-blackedition .be-hero-title,
+body.nm-mode #sub-social #ss-panel-startbg .ss-panel-title { color: #fff !important; }
+body.nm-mode #sub-social #ss-panel-blackedition .ss-panel-sub,
+body.nm-mode #sub-social #ss-panel-blackedition .be-sub,
+body.nm-mode #sub-social #ss-panel-blackedition .be-hero-sub,
+body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,255,0.6) !important; }
+
+/* Guaranteed room for the card's Enter pill. The grid was handing every row
+   a height computed without it, so the pills spilled into the gap below. */
+.cu-grid { grid-auto-rows: minmax(148px, auto); }
