@@ -155,7 +155,10 @@
       library:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
       settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png',
       info:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782986898/file_000000002038722fac63c79466d73f0f_jnhjvg.png',
-      brand:    'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png'
+      brand:    'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png',
+      /* Only the two black banners use this. The top bar, the corner mark
+         and the info sheet keep IC.brand — same icon there as before. */
+      banner:   'https://res.cloudinary.com/eenvubod/image/upload/v1785070108/1000002027_o74vwe.png'
     };
     /* render every icon as a background-image SPAN (never an <img>) so the
        browser can't open/zoom it on tap and taps always hit the button */
@@ -261,7 +264,7 @@
        settings icon in the middle with the options in a glass circle around it. */
     var wInfo =
       '<div class="lgp-arc-bottom">' +
-        '<div class="lgp-arc-banner"><div class="lgp-arc-banner-icon" style="background-image:url(\'' + IC.brand + '\')"></div><div class="lgp-arc-banner-divider"></div><div class="lgp-arc-banner-text" id="lgpArcBannerText"></div></div>' +
+        '<div class="lgp-arc-banner"><div class="lgp-arc-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div><div class="lgp-arc-banner-divider"></div><div class="lgp-arc-banner-text" id="lgpArcBannerText"></div></div>' +
         '<div class="lgp-arc-info">' +
           '<div class="lgp-arc-info-word">' + (w.word || '') + (w.phonetic ? ' <span>' + w.phonetic + '</span>' : '') + '</div>' +
           (w.meaning ? '<div class="lgp-arc-info-row"><span class="k">Meaning</span><span class="v">' + w.meaning + '</span></div>' : '') +
@@ -358,7 +361,7 @@
           '</button>' +
         '</div>' +
         '<div class="lgp-info-banner">' +
-          '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.brand + '\')"></div>' +
+          '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
           '<div class="lgp-info-banner-divider"></div>' +
           '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
         '</div>' +
