@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=531">
+<link rel="stylesheet" href="nowssb-nm.css?v=532">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -861,6 +861,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- The four home buttons + their tip rail, directly below Today's
          Practice. The Quick Access banner is a separate thing and stays
          where it is, further down. -->
+    <!-- The tip rail, its settings circle and the four buttons, in one glass wrapper. -->
+    <div class="glass-wrap tiles-wrap nmh-tiles-wrap">
 <div class="htg-rail">
   <div class="htg-set" id="nmhTileSet" onclick="htOpen()" role="button" aria-label="Restyle these buttons">
     <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
@@ -960,6 +962,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nmh-tile-enter"><span class="nmh-tile-enter-lbl">Enter</span><span class="nmh-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
       </div>
     </div>
+    </div>
 
     <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), right
          below Today's Practice, combined into one padded section. ══ -->
@@ -1052,6 +1055,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- NowssB Connect — what it is (video bg) -->
+    <!-- NowssB Connect and its community carousel share one glass wrapper. -->
+    <div class="glass-wrap connect-wrap nmh-connect-wrap">
     <div class="nmh-connect-sec" onclick="window.IG&&IG.nav('profile')">
       <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
       <div class="nmh-connect-scrim"></div>
@@ -1062,6 +1067,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <!-- Connect features carousel — slides through what NowssB Connect offers -->
     <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
+    </div>
 
 
     <!-- Quick access row -->
@@ -1457,6 +1463,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- The four home buttons + their tip rail, directly below the streak
        section. The Quick Access banner stays where it is, further down. -->
+  <!-- The tip rail, its settings circle and the four buttons, in one glass wrapper. -->
+  <div class="glass-wrap tiles-wrap fash-tiles-wrap">
 <div class="htg-rail">
     <div class="htg-set" id="fashTileSet" onclick="htOpen()" role="button" aria-label="Restyle these buttons">
       <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
@@ -1533,6 +1541,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
     </div>
   </div>
+  </div>
 
   <!-- Customize panel — Quick Access, Quick Links and Set As You Like in one
        glass card instead of three banners scattered down the page. Tapping the
@@ -1587,6 +1596,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   
 
   <!-- NowssB Connect — what it is (fashion, video bg) -->
+  <!-- NowssB Connect and its community carousel share one glass wrapper. -->
+  <div class="glass-wrap connect-wrap fash-connect-wrap">
   <div class="nmh-connect-sec fash-connect" onclick="openConnectIntro()">
     <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
     <div class="nmh-connect-scrim"></div>
@@ -1597,6 +1608,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   <!-- Connect features carousel (fashion) -->
   <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
+  </div>
 
   <!-- Today Trending — video banner (fashion) -->
   <div class="nmh-trend-banner fash-trend-banner" id="nmh-trending-section-fash" onclick="openSub('nowssb-store')">
@@ -9354,7 +9366,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=7"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=4"></script>
+<script src="app/js/part062.js?v=5"></script>
 <script src="app/js/part063.js?v=3"></script>
 <script src="app/js/part064.js?v=4"></script>
 <script src="nowssb-social.js?v=182" defer></script>
