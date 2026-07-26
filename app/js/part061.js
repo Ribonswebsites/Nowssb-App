@@ -225,11 +225,13 @@
     fab._qlBound = true;
     var drop = document.getElementById('qlDrop');
     var target = document.getElementById('qlDropTarget');
+    var hot = document.getElementById('qlDropHot');   // the bin itself, not the artwork's centre
     var dragging = false, moved = false, armed = false, sx = 0, sy = 0, ox = 0, oy = 0;
 
     function targetCentre() {
-      if (!target) return null;
-      var r = target.getBoundingClientRect();
+      var el = hot || target;
+      if (!el) return null;
+      var r = el.getBoundingClientRect();
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     }
 
@@ -238,7 +240,7 @@
       var r = fab.getBoundingClientRect(); ox = r.left; oy = r.top;
       fab.classList.add('dragging');
       if (drop) drop.classList.add('show');
-      haptic(12);
+      haptic(28);
     }
 
     function move(cx, cy) {
@@ -263,7 +265,7 @@
           var pull = d <= SNAP ? 1 : (1 - (d - SNAP) / (MAGNET - SNAP)) * 0.9;
           x += (c.x - w / 2 - x) * pull;
           y += (c.y - h / 2 - y) * pull;
-          if (!armed) { armed = true; haptic(22); }
+          if (!armed) { armed = true; haptic(45); }
         } else if (armed) {
           armed = false;
         }
@@ -282,7 +284,7 @@
 
       if (armed) {                       // dropped on the target — turn it off
         armed = false;
-        haptic([18, 40, 18]);
+        haptic([30, 55, 30, 55, 60]);
         lsSet('nwsb_ql_float', '0');
         applyFloat();
         renderSettings();
@@ -307,7 +309,74 @@
     window.addEventListener('resize', applyFloat);
   }
 
-  function init() { bindFab(); applyFloat(); }
+
+  /* The sheet, the floating button and the drop zone are injected here rather
+     than shipped in index.html — that document is already ~9k lines and this
+     markup is inert until something opens it. */
+  var MARKUP = '<div class="ql-overlay" id="qlOverlay" onclick="qlClose(event)">' +
+    '  <div class="ql-box" id="qlBox" onclick="event.stopPropagation()">' +
+    '    <div class="ql-head">' +
+    '      <button class="ql-hbtn ql-back" onclick="qlShowList()" aria-label="Back">' +
+    '        <svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>' +
+    '      </button>' +
+    '      <div class="ql-head-txt">' +
+    '        <div class="ql-head-title">Quick Links</div>' +
+    '        <div class="ql-head-sub">Jump straight to any corner of NowssB</div>' +
+    '      </div>' +
+    '      <button class="ql-hbtn ql-gear" onclick="qlShowSettings()" aria-label="Quick Links settings">' +
+    '        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt="">' +
+    '      </button>' +
+    '      <button class="ql-hbtn ql-close" onclick="qlClose()" aria-label="Close">' +
+    '        <svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
+    '      </button>' +
+    '    </div>' +
+    '' +
+    '    <!-- LIST pane -->' +
+    '    <div class="ql-scroll ql-pane-list" id="qlList"><!-- rendered by JS --></div>' +
+    '' +
+    '    <!-- SETTINGS pane -->' +
+    '    <div class="ql-scroll ql-pane-set">' +
+    '      <div class="ql-float-row" onclick="qlToggleFloat()">' +
+    '        <span class="ql-float-txt">' +
+    '          <span class="ql-float-t">Floating button</span>' +
+    '          <span class="ql-float-s">A circle that floats over every screen — tap it to open Quick Links from anywhere, drag it wherever you like.</span>' +
+    '        </span>' +
+    '        <span class="ql-switch" id="qlFloatToggle"><span class="ql-switch-knob"></span></span>' +
+    '      </div>' +
+    '      <div class="ql-set-label">Button look</div>' +
+    '      <div class="ql-face-row" id="qlFaceRow"><!-- rendered by JS --></div>' +
+    '      <div class="ql-set-label">Shortcuts in your list</div>' +
+    '      <div id="qlSetList"><!-- rendered by JS --></div>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>' +
+    '' +
+    '<!-- Floating Quick Links button — off by default, enabled in the sheet\'s settings -->' +
+    '<div class="ql-fab" id="qlFab" style="display:none;" role="button" aria-label="Quick Links">' +
+    '  <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="">' +
+    '</div>' +
+    '<!-- Drag-to-remove zone — fades up under the floating button while it\'s held,' +
+    '     with a target the button magnets into when it gets close. -->' +
+    '<div class="ql-drop" id="qlDrop" aria-hidden="true">' +
+    '  <div class="ql-drop-target" id="qlDropTarget">' +
+    '    <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1785040037/file_00000000735c8207b7fa48448b9f6ecf_ouac1f.png" alt="">' +
+    '    <span class="ql-drop-vignette"></span>' +
+    '    <span class="ql-drop-hot" id="qlDropHot"></span>' +
+    '  </div>' +
+    '  <div class="ql-drop-label" id="qlDropLabel">Drag here to remove</div>' +
+    '</div>';
+
+  function mount() {
+    if (document.getElementById('qlOverlay')) return true;
+    if (!document.body) return false;
+    var host = document.createElement('div');
+    host.id = 'qlHost';
+    host.innerHTML = MARKUP;
+    while (host.firstChild) document.body.appendChild(host.firstChild);
+    return true;
+  }
+
+  function init() { mount(); bindFab(); applyFloat(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 

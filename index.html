@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=515">
+<link rel="stylesheet" href="nowssb-nm.css?v=517">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -3932,60 +3932,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Download FAB removed — install is now only via Settings → Download App -->
 
-<!-- ══ QUICK LINKS — a glassmorphism sheet centred on screen holding the app's
-     black banners as one-tap shortcuts. The list, the settings pane and the
-     floating button are all driven by app/js/part061.js. ══ -->
-<div class="ql-overlay" id="qlOverlay" onclick="qlClose(event)">
-  <div class="ql-box" id="qlBox" onclick="event.stopPropagation()">
-    <div class="ql-head">
-      <button class="ql-hbtn ql-back" onclick="qlShowList()" aria-label="Back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-      <div class="ql-head-txt">
-        <div class="ql-head-title">Quick Links</div>
-        <div class="ql-head-sub">Jump straight to any corner of NowssB</div>
-      </div>
-      <button class="ql-hbtn ql-gear" onclick="qlShowSettings()" aria-label="Quick Links settings">
-        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt="">
-      </button>
-      <button class="ql-hbtn ql-close" onclick="qlClose()" aria-label="Close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
-
-    <!-- LIST pane -->
-    <div class="ql-scroll ql-pane-list" id="qlList"><!-- rendered by JS --></div>
-
-    <!-- SETTINGS pane -->
-    <div class="ql-scroll ql-pane-set">
-      <div class="ql-float-row" onclick="qlToggleFloat()">
-        <span class="ql-float-txt">
-          <span class="ql-float-t">Floating button</span>
-          <span class="ql-float-s">A circle that floats over every screen — tap it to open Quick Links from anywhere, drag it wherever you like.</span>
-        </span>
-        <span class="ql-switch" id="qlFloatToggle"><span class="ql-switch-knob"></span></span>
-      </div>
-      <div class="ql-set-label">Button look</div>
-      <div class="ql-face-row" id="qlFaceRow"><!-- rendered by JS --></div>
-      <div class="ql-set-label">Shortcuts in your list</div>
-      <div id="qlSetList"><!-- rendered by JS --></div>
-    </div>
-  </div>
-</div>
-
-<!-- Floating Quick Links button — off by default, enabled in the sheet's settings -->
-<div class="ql-fab" id="qlFab" style="display:none;" role="button" aria-label="Quick Links">
-  <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="">
-</div>
-<!-- Drag-to-remove zone — fades up under the floating button while it's held,
-     with a target the button magnets into when it gets close. -->
-<div class="ql-drop" id="qlDrop" aria-hidden="true">
-  <div class="ql-drop-target" id="qlDropTarget">
-    <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1785040037/file_00000000735c8207b7fa48448b9f6ecf_ouac1f.png" alt="">
-    <span class="ql-drop-vignette"></span>
-  </div>
-  <div class="ql-drop-label" id="qlDropLabel">Drag here to remove</div>
-</div>
+<!-- Quick Links sheet, floating button and drag-to-remove zone are injected
+     by app/js/part061.js — kept out of index.html so the document stays lean. -->
 
 <!-- ══ INSTALL POPUP OVERLAY ══ -->
 <div class="dl-overlay" id="dlOverlay" onclick="closeDlPopup(event)">
@@ -9334,7 +9282,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part058.js?v=1"></script>
 <script src="app/js/part059.js?v=7"></script>
 <script src="app/js/part060.js?v=2"></script>
-<script src="app/js/part061.js?v=6"></script>
+<script src="app/js/part061.js?v=7"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
