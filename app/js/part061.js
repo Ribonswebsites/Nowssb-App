@@ -174,32 +174,90 @@
   }
   window.qlApplyFloat = applyFloat;
 
+  /* Short buzz on grab, a firmer one when it snaps into the remove target and
+     again when it actually goes. navigator.vibrate is Android-only and a no-op
+     elsewhere, so it's feature-checked rather than assumed. */
+  function haptic(ms) {
+    try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
+  }
+
+  var MAGNET = 104;  // px from the target centre where the pull starts
+  var SNAP   = 42;   // inside this it locks onto the centre
+
   function bindFab() {
     var fab = document.getElementById('qlFab');
     if (!fab || fab._qlBound) return;
     fab._qlBound = true;
-    var dragging = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    var drop = document.getElementById('qlDrop');
+    var target = document.getElementById('qlDropTarget');
+    var dragging = false, moved = false, armed = false, sx = 0, sy = 0, ox = 0, oy = 0;
+
+    function targetCentre() {
+      if (!target) return null;
+      var r = target.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
     function down(cx, cy) {
-      dragging = true; moved = false; sx = cx; sy = cy;
+      dragging = true; moved = false; armed = false; sx = cx; sy = cy;
       var r = fab.getBoundingClientRect(); ox = r.left; oy = r.top;
       fab.classList.add('dragging');
+      if (drop) drop.classList.add('show');
+      haptic(12);
     }
+
     function move(cx, cy) {
       if (!dragging) return;
       var dx = cx - sx, dy = cy - sy;
       if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
       var w = fab.offsetWidth, h = fab.offsetHeight;
-      fab.style.left = Math.max(6, Math.min(ox + dx, window.innerWidth - w - 6)) + 'px';
-      fab.style.top  = Math.max(6, Math.min(oy + dy, window.innerHeight - h - 6)) + 'px';
+      var x = Math.max(6, Math.min(ox + dx, window.innerWidth - w - 6));
+      var y = Math.max(6, Math.min(oy + dy, window.innerHeight - h - 6));
+
+      // Magnet: inside MAGNET px the button is pulled toward the target,
+      // harder the closer it gets, so it visibly snaps in rather than
+      // needing to be dropped precisely.
+      var c = targetCentre();
+      if (c) {
+        var fcx = x + w / 2, fcy = y + h / 2;
+        var d = Math.sqrt((c.x - fcx) * (c.x - fcx) + (c.y - fcy) * (c.y - fcy));
+        if (d < MAGNET) {
+          // Inside SNAP it goes all the way in, so it reads as being sucked
+          // into the target rather than hovering near it. Between SNAP and
+          // MAGNET the pull ramps up linearly.
+          var pull = d <= SNAP ? 1 : (1 - (d - SNAP) / (MAGNET - SNAP)) * 0.9;
+          x += (c.x - w / 2 - x) * pull;
+          y += (c.y - h / 2 - y) * pull;
+          if (!armed) { armed = true; haptic(22); }
+        } else if (armed) {
+          armed = false;
+        }
+      }
+      if (drop) drop.classList.toggle('armed', armed);
+      fab.classList.toggle('arming', armed);
+      fab.style.left = x + 'px';
+      fab.style.top  = y + 'px';
     }
+
     function up() {
       if (!dragging) return;
       dragging = false;
-      fab.classList.remove('dragging');
+      fab.classList.remove('dragging', 'arming');
+      if (drop) drop.classList.remove('show', 'armed');
+
+      if (armed) {                       // dropped on the target — turn it off
+        armed = false;
+        haptic([18, 40, 18]);
+        lsSet('nwsb_ql_float', '0');
+        applyFloat();
+        renderSettings();
+        return;
+      }
       var r = fab.getBoundingClientRect();
       lsSet('nwsb_ql_fab_pos', JSON.stringify({ x: Math.round(r.left), y: Math.round(r.top) }));
-      if (!moved) window.qlOpen();   // a tap, not a drag
+      if (!moved) window.qlOpen();       // a tap, not a drag
     }
+
     fab.addEventListener('touchstart', function (e) { down(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
     fab.addEventListener('touchmove', function (e) {
       if (!dragging) return;
@@ -207,6 +265,7 @@
       move(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: false });
     fab.addEventListener('touchend', up, { passive: true });
+    fab.addEventListener('touchcancel', up, { passive: true });
     fab.addEventListener('mousedown', function (e) { down(e.clientX, e.clientY); e.preventDefault(); });
     window.addEventListener('mousemove', function (e) { move(e.clientX, e.clientY); });
     window.addEventListener('mouseup', up);
