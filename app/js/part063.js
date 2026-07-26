@@ -68,6 +68,16 @@
                    '</div>';
           }).join('') +
         '</div>' +
+        '<div class="cu-corners">' +
+          '<div class="cu-corners-label">Corners · every section, both homes</div>' +
+          '<div class="cu-corners-row">' +
+            '<div class="cu-corner-chip" id="cuCornerRound" onclick="cuSetCorners(\'round\')">' +
+              '<span class="cu-corner-swatch cu-corner-swatch-round"></span>Rounded</div>' +
+            '<div class="cu-corner-chip" id="cuCornerEdge" onclick="cuSetCorners(\'edge\')">' +
+              '<span class="cu-corner-swatch cu-corner-swatch-edge"></span>Edges</div>' +
+            '<div class="cu-corner-chip" id="cuCornerDefault" onclick="cuSetCorners(\'\')">Default</div>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
     '</div>';
 
@@ -79,8 +89,39 @@
   }
   function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
 
+  /* ── Corners ───────────────────────────────────────────────────────
+     One body class drives the radius of every top-level section on both
+     homes at once. Unset is a real third state, not an absent one: the
+     Normal home ships rounded and the Fashion home ships square, and
+     without a way back to that mix, picking either option once would be
+     a one-way door. ── */
+  var CKEY = 'nwsb_home_corners';
+
+  function readCorners() {
+    var v; try { v = localStorage.getItem(CKEY); } catch (e) { v = null; }
+    return (v === 'round' || v === 'edge') ? v : '';
+  }
+  function paintCorners() {
+    var v = readCorners();
+    document.body.classList.toggle('homecorner-round', v === 'round');
+    document.body.classList.toggle('homecorner-edge', v === 'edge');
+    [['cuCornerRound', 'round'], ['cuCornerEdge', 'edge'], ['cuCornerDefault', '']].forEach(function (pair) {
+      var el = document.getElementById(pair[0]);
+      if (el) el.classList.toggle('on', v === pair[1]);
+    });
+  }
+  window.cuSetCorners = function (v) {
+    try {
+      if (v === 'round' || v === 'edge') localStorage.setItem(CKEY, v);
+      else localStorage.removeItem(CKEY);
+    } catch (e) {}
+    paintCorners();
+    haptic(28);
+  };
+
   window.cuOpen = function () {
     mount();
+    paintCorners();
     var ov = document.getElementById('cuOverlay');
     requestAnimationFrame(function () { if (ov) ov.classList.add('open'); });
     haptic(28);
@@ -102,5 +143,10 @@
       try { new Function(card.run)(); } catch (e) {}
     }, 300);
   };
+
+  // The corner choice has to be on <body> before first paint of the homes,
+  // not only once the hub has been opened for the first time.
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paintCorners);
+  else paintCorners();
 
 })();
