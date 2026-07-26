@@ -7346,3 +7346,37 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
 /* Guaranteed room for the card's Enter pill. The grid was handing every row
    a height computed without it, so the pills spilled into the gap below. */
 .cu-grid { grid-auto-rows: minmax(148px, auto); }
+
+/* ── Quick Links: the bubble's arrow, its switch in the list pane, and the
+   how-to that goes with it ──────────────────────────────────────────── */
+
+/* A small arrow riding the bubble, so it reads as "this opens something"
+   rather than as a decoration. Part of the button, not a separate target —
+   the whole bubble opens the list. */
+.ql-fab-arrow {
+  position: absolute; right: -3px; bottom: -3px;
+  width: 20px; height: 20px; border-radius: 50% !important;
+  background: #fff; border: 1.5px solid rgba(6,12,24,0.25);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4); pointer-events: none;
+}
+.ql-fab-arrow svg { width: 11px; height: 11px; display: block; }
+/* While the bubble is held long enough to arm the bin, the arrow would be
+   a lie — it is about to be dropped, not opened. */
+.ql-fab.held .ql-fab-arrow { opacity: 0; transform: scale(0.6); }
+.ql-fab-arrow { transition: opacity 0.18s ease, transform 0.18s ease; }
+/* The held state also needs to look different from a plain drag. */
+.ql-fab.held { transform: scale(1.12); }
+
+/* The switch repeated at the top of the list pane. */
+.ql-float-row-list { margin-bottom: 4px; }
+
+.ql-float-help {
+  margin: 0 0 14px; padding: 11px 13px;
+  background: rgba(232,213,163,0.07);
+  border: 1px solid rgba(232,213,163,0.2);
+  border-radius: 12px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  line-height: 1.6; color: rgba(255,255,255,0.6);
+}
+.ql-float-help b { font-weight: 700; color: #e8d5a3; }

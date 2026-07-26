@@ -119,11 +119,25 @@
     }).join('');
   }
 
+  /* The bubble switch appears twice — once in the list pane, once in
+     settings — so both have to move together whichever one was tapped, and
+     the how-to only makes sense while the bubble is actually on. */
+  function paintFloatToggles() {
+    var on = floatOn();
+    ['qlFloatToggle', 'qlFloatToggleList'].forEach(function (id) {
+      var t = document.getElementById(id);
+      if (t) t.classList.toggle('on', on);
+    });
+    ['qlFloatHelp', 'qlFloatHelpList'].forEach(function (id) {
+      var h = document.getElementById(id);
+      if (h) h.style.display = on ? 'block' : 'none';
+    });
+  }
+
   function renderSettings() {
     var box = document.getElementById('qlSetList'); if (!box) return;
     var picked = chosen();
-    var tgl = document.getElementById('qlFloatToggle');
-    if (tgl) tgl.classList.toggle('on', floatOn());
+    paintFloatToggles();
     var faces = document.getElementById('qlFaceRow');
     if (faces) {
       var cur = fabIcon().id;
@@ -146,11 +160,18 @@
   }
 
   // ── sheet ────────────────────────────────────────────────────
+  /* Belt and braces against the ghost click: even with touchend prevented,
+     nothing in the sheet responds for a moment after it opens, so a stray
+     synthesised click can't fire the row that happens to be under the
+     finger. */
+  var openedAt = 0;
   window.qlOpen = function () {
     var ov = document.getElementById('qlOverlay'); if (!ov) return;
     window.qlShowList();
     renderList();
     ov.classList.add('open');
+    paintFloatToggles();
+    openedAt = Date.now();
     var sc = ov.querySelector('.ql-scroll'); if (sc) sc.scrollTop = 0;
   };
   window.qlClose = function (e) {
@@ -159,6 +180,7 @@
     var ov = document.getElementById('qlOverlay'); if (ov) ov.classList.remove('open');
   };
   window.qlRun = function (id) {
+    if (Date.now() - openedAt < 400) return;
     var it = byId(id); if (!it) return;
     var ov = document.getElementById('qlOverlay'); if (ov) ov.classList.remove('open');
     setTimeout(function () { try { it.go(); } catch (err) {} }, 180);
@@ -186,7 +208,8 @@
   };
   window.qlToggleFloat = function () {
     lsSet('nwsb_ql_float', floatOn() ? '0' : '1');
-    renderSettings(); applyFloat();
+    renderSettings(); paintFloatToggles(); applyFloat();
+    try { if (navigator.vibrate) navigator.vibrate(28); } catch (e) {}
   };
 
   // ── floating button ──────────────────────────────────────────
@@ -218,6 +241,7 @@
 
   var MAGNET = 104;  // px from the target centre where the pull starts
   var SNAP   = 42;   // inside this it locks onto the centre
+  var HOLD   = 1000; // ms the button must be held before the bin appears
 
   function bindFab() {
     var fab = document.getElementById('qlFab');
@@ -227,6 +251,21 @@
     var target = document.getElementById('qlDropTarget');
     var hot = document.getElementById('qlDropHot');   // the bin itself, not the artwork's centre
     var dragging = false, moved = false, armed = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    // The bin only exists after a deliberate press-and-hold. A quick drag
+    // just repositions the button; you can't lose it by accident.
+    var binMode = false, holdTimer = null;
+
+    function startHold() {
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(function () {
+        if (!dragging) return;
+        binMode = true;
+        fab.classList.add('held');
+        if (drop) drop.classList.add('show');
+        haptic([0, 40]);              // the buzz that says "now you can bin it"
+      }, HOLD);
+    }
+    function cancelHold() { clearTimeout(holdTimer); holdTimer = null; }
 
     function targetCentre() {
       var el = hot || target;
@@ -236,17 +275,21 @@
     }
 
     function down(cx, cy) {
-      dragging = true; moved = false; armed = false; sx = cx; sy = cy;
+      dragging = true; moved = false; armed = false; binMode = false;
+      sx = cx; sy = cy;
       var r = fab.getBoundingClientRect(); ox = r.left; oy = r.top;
       fab.classList.add('dragging');
-      if (drop) drop.classList.add('show');
-      haptic(28);
+      startHold();
+      haptic(20);
     }
 
     function move(cx, cy) {
       if (!dragging) return;
       var dx = cx - sx, dy = cy - sy;
       if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      // Moving off the spot before the hold completes means this is a drag,
+      // not a press — so the bin never comes up.
+      if (!binMode && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) cancelHold();
       var w = fab.offsetWidth, h = fab.offsetHeight;
       var x = Math.max(6, Math.min(ox + dx, window.innerWidth - w - 6));
       var y = Math.max(6, Math.min(oy + dy, window.innerHeight - h - 6));
@@ -254,7 +297,7 @@
       // Magnet: inside MAGNET px the button is pulled toward the target,
       // harder the closer it gets, so it visibly snaps in rather than
       // needing to be dropped precisely.
-      var c = targetCentre();
+      var c = binMode ? targetCentre() : null;
       if (c) {
         var fcx = x + w / 2, fcy = y + h / 2;
         var d = Math.sqrt((c.x - fcx) * (c.x - fcx) + (c.y - fcy) * (c.y - fcy));
@@ -279,17 +322,19 @@
     function up() {
       if (!dragging) return;
       dragging = false;
-      fab.classList.remove('dragging', 'arming');
+      cancelHold();
+      fab.classList.remove('dragging', 'arming', 'held');
       if (drop) drop.classList.remove('show', 'armed');
 
       if (armed) {                       // dropped on the target — turn it off
-        armed = false;
+        armed = false; binMode = false;
         haptic([30, 55, 30, 55, 60]);
         lsSet('nwsb_ql_float', '0');
         applyFloat();
         renderSettings();
         return;
       }
+      binMode = false;
       var r = fab.getBoundingClientRect();
       lsSet('nwsb_ql_fab_pos', JSON.stringify({ x: Math.round(r.left), y: Math.round(r.top) }));
       if (!moved) window.qlOpen();       // a tap, not a drag
@@ -301,8 +346,15 @@
       if (e.cancelable) e.preventDefault();
       move(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: false });
-    fab.addEventListener('touchend', up, { passive: true });
-    fab.addEventListener('touchcancel', up, { passive: true });
+    // Not passive, and prevented on a tap: otherwise the browser synthesises
+    // a click ~300ms later that lands on the sheet qlOpen() just put under
+    // the finger — which is why tapping the button opened the Store.
+    fab.addEventListener('touchend', function (e) {
+      var wasTap = dragging && !moved;
+      up();
+      if (wasTap && e.cancelable) e.preventDefault();
+    }, { passive: false });
+    fab.addEventListener('touchcancel', function () { cancelHold(); up(); }, { passive: true });
     fab.addEventListener('mousedown', function (e) { down(e.clientX, e.clientY); e.preventDefault(); });
     window.addEventListener('mousemove', function (e) { move(e.clientX, e.clientY); });
     window.addEventListener('mouseup', up);
@@ -332,7 +384,19 @@
     '    </div>' +
     '' +
     '    <!-- LIST pane -->' +
-    '    <div class="ql-scroll ql-pane-list" id="qlList"><!-- rendered by JS --></div>' +
+    '    <div class="ql-scroll ql-pane-list">' +
+    '      <div class="ql-float-row ql-float-row-list" onclick="qlToggleFloat()">' +
+    '        <span class="ql-float-txt">' +
+    '          <span class="ql-float-t">Floating bubble</span>' +
+    '          <span class="ql-float-s">A circle over every screen. Tap it — or its arrow — to open this list from anywhere.</span>' +
+    '        </span>' +
+    '        <span class="ql-switch" id="qlFloatToggleList"><span class="ql-switch-knob"></span></span>' +
+    '      </div>' +
+    '      <div class="ql-float-help" id="qlFloatHelpList">' +
+    '        <b>To remove it:</b> switch it off here, or press and hold the bubble for a second until it buzzes, then drag it down into the bin.' +
+    '      </div>' +
+    '      <div id="qlList"><!-- rendered by JS --></div>' +
+    '    </div>' +
     '' +
     '    <!-- SETTINGS pane -->' +
     '    <div class="ql-scroll ql-pane-set">' +
@@ -342,6 +406,9 @@
     '          <span class="ql-float-s">A circle that floats over every screen — tap it to open Quick Links from anywhere, drag it wherever you like.</span>' +
     '        </span>' +
     '        <span class="ql-switch" id="qlFloatToggle"><span class="ql-switch-knob"></span></span>' +
+    '      </div>' +
+    '      <div class="ql-float-help" id="qlFloatHelp">' +
+    '        <b>To remove it:</b> switch it off here, or press and hold the bubble for a second until it buzzes, then drag it down into the bin.' +
     '      </div>' +
     '      <div class="ql-set-label">Button look</div>' +
     '      <div class="ql-face-row" id="qlFaceRow"><!-- rendered by JS --></div>' +
@@ -354,6 +421,9 @@
     '<!-- Floating Quick Links button — off by default, enabled in the sheet\'s settings -->' +
     '<div class="ql-fab" id="qlFab" style="display:none;" role="button" aria-label="Quick Links">' +
     '  <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="">' +
+    '  <span class="ql-fab-arrow" aria-hidden="true">' +
+    '    <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#060c18" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+    '  </span>' +
     '</div>' +
     '<!-- Drag-to-remove zone — fades up under the floating button while it\'s held,' +
     '     with a target the button magnets into when it gets close. -->' +
