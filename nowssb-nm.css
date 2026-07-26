@@ -6449,13 +6449,22 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
 
 /* ── Drag-to-remove — appears while the floating button is held ── */
 .ql-drop {
-  position: fixed; left: 0; right: 0; bottom: 0; height: 46vh; z-index: 3890;
-  display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 9vh);
+  position: fixed; left: 0; right: 0; bottom: 0; height: 56vh; z-index: 3890;
+  /* Anchored from the TOP, not the bottom: with flex-end a full-height image
+     would push its own top (the bin) back up into the mask ramp on a real
+     device. From the top the bin always lands the same distance down, and any
+     excess just runs off the bottom edge, which is black anyway. */
+  display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start;
+  padding-top: 14vh; padding-bottom: 0; overflow: hidden;
   pointer-events: none; opacity: 0; transition: opacity 0.24s ease;
-  background: linear-gradient(to bottom, rgba(4,8,18,0) 0%, rgba(4,8,18,0.55) 45%, rgba(4,8,18,0.86) 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 38%);
-          mask-image: linear-gradient(to bottom, transparent 0%, #000 38%);
+  /* Solid black from just under halfway down, so everything below the artwork
+     is black rather than the page showing through. */
+  background: linear-gradient(to bottom,
+    rgba(4,8,18,0) 0%, rgba(4,8,18,0.5) 16%, rgba(4,8,18,0.9) 30%, #000 44%, #000 100%);
+  /* The mask ramp finishes high up, well above where the bin now sits, so the
+     bin isn't faded out by the zone's own edge. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 13%);
+          mask-image: linear-gradient(to bottom, transparent 0%, #000 13%);
   /* No backdrop-filter until it's actually shown. A 46vh blur layer sitting
      in the page permanently forces the compositor to re-render that region on
      every frame, which is what made scrolling stutter. content-visibility
@@ -6470,7 +6479,7 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
    sides so the art has no visible box, it just emerges out of the darkened
    zone. No red on arming — it simply gets removed when it's close enough. */
 .ql-drop-target {
-  position: relative; width: 100%; display: block; margin-top: 7vh;
+  position: relative; width: 100%; display: block; margin-top: 0;
   /* floor so the box (and the hotspot's % offset) still resolves if the
      artwork hasn't decoded yet */
   min-height: 220px;
@@ -6483,7 +6492,7 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
      well above it — it was washing the bin out before. */
   background:
     linear-gradient(to right,  rgba(4,8,18,0.98) 0%, rgba(4,8,18,0) 24%, rgba(4,8,18,0) 76%, rgba(4,8,18,0.98) 100%),
-    linear-gradient(to bottom, rgba(4,8,18,0.9) 0%, rgba(4,8,18,0) 9%, rgba(4,8,18,0) 70%, rgba(4,8,18,0.98) 100%);
+    linear-gradient(to bottom, rgba(4,8,18,0.55) 0%, rgba(4,8,18,0) 4%, rgba(4,8,18,0) 74%, #000 100%);
 }
 /* Invisible hotspot over the bin itself. The magnet aims at THIS, not the
    middle of the artwork — the centre of the image is her lap, which is why
@@ -6494,7 +6503,9 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
 }
 .ql-drop.armed .ql-drop-target { transform: scale(1.06); }
 .ql-drop-label {
-  margin-top: 10px; text-align: center; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+  position: absolute; left: 0; right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  text-align: center; margin-top: 0; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
   letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.7);
   transition: color 0.2s ease;
 }
