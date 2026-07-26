@@ -39,10 +39,10 @@
       wrap:  '#home-nm .nmh-wrap',
       items: [
         { k:'greet',    sel:['.nmh-greet-block'],                                          t:S, label:'Greeting',              sub:'Good morning · hero header', locked:1 },
-        { k:'streak',   sel:['.nmh-streak-section'],                                       t:S, label:'Streak',                sub:'Your daily practice streak' },
+        { k:'streak',   sel:['.nmh-streak-section'],                                       t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc' },
         { k:'practice', sel:['.nmh-practice'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1 },
-        { k:'tiles',    sel:['.htg-rail', '.nmh-grid'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail' },
+        { k:'tiles',    sel:['.htg-rail', '.nmh-grid'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'offer',    sel:['.nmh-offer-section:not(.nmh-rx-section)'],                   t:S, label:"Today's Offer",         sub:'Rotating store coupons' },
         { k:'rx',       sel:['.nmh-rx-heading', '.nmh-rx-section'],                        t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'routines', sel:['.home-card.home-card-static.w100'],                          t:S, label:'My Routines',           sub:'Daily practice system' },
@@ -54,14 +54,14 @@
         { k:'trendwd',  sel:['#nmh-trending-section'],                                     t:S, label:'Trending Word',         sub:'The word healing the most today' },
         { k:'trendshop',sel:['#nmh-trending-shop-banner'],                                 t:B, label:'Trending Shop',         sub:'Buy the trending word' },
         { k:'subvid',   sel:['.nmh-video-banner.nmh-vb-tall'],                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
-        { k:'edition',  sel:['.nmh-fsec'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade' },
-        { k:'healing',  sel:['.health-journey-card'],                                      t:S, label:'Personalised Healing',  sub:'Choose your health journey' },
-        { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word' },
+        { k:'edition',  sel:['.nmh-fsec'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
+        { k:'healing',  sel:['.health-journey-card'],                                      t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
+        { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', always:1 },
         { k:'msearch',  sel:['.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name' },
-        { k:'store',    sel:['.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store' },
-        { k:'custom',   sel:['.nmh-cust-panel'],                                           t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like', always:1 },
+        { k:'store',    sel:['.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
+        { k:'custom',   sel:['.nmh-cust-panel'],                                           t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like', defOff:1 },
         { k:'fashsw',   sel:['#nmhFashSwitch'],                                            t:S, label:'Fashion Mode',          sub:'Switch to the Fashion home' },
-        { k:'footer',   sel:['#homeFooterNm'],                                             t:S, label:'Footer',                sub:'Across Every Language' }
+        { k:'footer',   sel:['#homeFooterNm'],                                             t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
     },
     fash: {
@@ -71,9 +71,9 @@
       items: [
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
         { k:'practice', sel:['#todayPracticeCard'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
-        { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak' },
-        { k:'tiles',    sel:['.htg-rail', '.home-grid'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail' },
-        { k:'custom',   sel:['.fash-cust-panel'],                                          t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like', always:1 },
+        { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
+        { k:'tiles',    sel:['.htg-rail', '.home-grid'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
+        { k:'custom',   sel:['.fash-cust-panel'],                                          t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like', defOff:1 },
         { k:'shopvid',  sel:['.fash-video-banner:not(.fash-vb-tall):not(.fash-video-banner-search)'], t:B, label:'Store Video', sub:'Shop Now video banner' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect'],                                             t:S, label:'NowssB Connect',        sub:'What the social space is' },
@@ -81,19 +81,19 @@
         { k:'trendwd',  sel:['#nmh-trending-section-fash'],                                t:S, label:'Trending Word',         sub:'The word healing the most today' },
         { k:'trendshop',sel:['#nmh-trending-shop-banner-fash'],                            t:B, label:'Trending Shop',         sub:'Buy the trending word' },
         { k:'subvid',   sel:['.fash-vb-tall'],                                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
-        { k:'edition',  sel:['#sub-promo-card'],                                           t:S, label:'Your Edition',          sub:'Current plan and upgrade' },
+        { k:'edition',  sel:['#sub-promo-card'],                                           t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'routines', sel:['.home-card.home-card-static.w100:not(.shabda-featured-card)'],t:S, label:'My Routines',          sub:'Daily practice system' },
         { k:'shopban',  sel:['.fash-banner-wrap'],                                         t:B, label:'Shop Banner',           sub:'Shop Now image banner' },
         { k:'offer',    sel:['.fash-offer-banner'],                                        t:B, label:"Today's Offer",         sub:'Rotating store coupons' },
         { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Your Fashion Drops',    sub:'The rotating cube section' },
         { k:'shabda',   sel:['.shabda-featured-card'],                                     t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science' },
-        { k:'healing',  sel:['.health-journey-card'],                                      t:S, label:'Personalised Healing',  sub:'Choose your health journey' },
+        { k:'healing',  sel:['.health-journey-card'],                                      t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search' },
-        { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section' },
+        { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', always:1 },
         { k:'msearch',  sel:['#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' },
-        { k:'store',    sel:['.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store' },
+        { k:'store',    sel:['.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer' },
-        { k:'footer',   sel:['#homeFooter'],                                               t:S, label:'Footer',                sub:'Across Every Language' }
+        { k:'footer',   sel:['#homeFooter'],                                               t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
     }
   };
@@ -108,7 +108,11 @@
     // Anything the saved order doesn't mention is new since it was written —
     // append it in its shipped position rather than dropping it silently.
     all.forEach(function (k) { if (order.indexOf(k) < 0) order.splice(all.indexOf(k), 0, k); });
-    var off = (raw && Array.isArray(raw.off)) ? raw.off.filter(function (k) { return all.indexOf(k) >= 0; }) : [];
+    // With nothing saved yet, entries flagged defOff start switched off —
+    // they are opt-in additions rather than part of the shipped page.
+    var off = (raw && Array.isArray(raw.off))
+      ? raw.off.filter(function (k) { return all.indexOf(k) >= 0; })
+      : reg.items.filter(function (i) { return i.defOff; }).map(function (i) { return i.k; });
     // Entries flagged `always` can be reordered but never switched off, so the
     // user can't hide the only on-page way back into this editor.
     off = off.filter(function (k) { return !itemOf(which, k).always; });
@@ -281,6 +285,9 @@
   };
 
   window.hlToggle = function (k) {
+    // An `always` entry renders no switch, but the function is still on
+    // window — refuse here too so the guard lives with the rule.
+    if (itemOf(cur, k).always) return;
     var st = load(cur), i = st.off.indexOf(k);
     if (i >= 0) st.off.splice(i, 1); else st.off.push(k);
     save(cur, st); apply(cur); render(); haptic(28);
