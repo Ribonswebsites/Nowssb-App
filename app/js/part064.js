@@ -135,15 +135,14 @@
     });
     saveFeed(a);
     paintBadge();
-    if (document.getElementById('sub-notifications') &&
-        document.getElementById('sub-notifications').classList.contains('open')) render();
+    render(); renderSheet();
     return true;
   };
 
   window.nwsbNotifClear = function () {
     saveFeed([]);
     paintBadge();
-    render();
+    render(); renderSheet();
     haptic([30, 55, 30]);
   };
 
@@ -252,17 +251,110 @@
     var a = feed();
     if (!a[i] || a[i].read) return;
     a[i].read = true;
-    saveFeed(a); paintBadge(); render();
+    saveFeed(a); paintBadge(); render(); renderSheet();
   };
 
-  /* Self-contained opener — openSub is chain-wrapped by a dozen files, so
-     this page does not depend on any of them running its branch. */
+  /* ── The sheet ─────────────────────────────────────────────────────
+     The bell opens this, not the settings page: a glass tab with the
+     updates in it and a gear that leads through to the full page, the same
+     shape as the Quick Links sheet. ── */
+  var SHEET =
+    '<div class="nt-overlay" id="ntOverlay" onclick="if(event.target===this)ntSheetClose()">' +
+      '<div class="nt-sheet">' +
+        '<div class="nt-sheet-head">' +
+          '<div class="nt-sheet-txt">' +
+            '<div class="nt-sheet-title">Notifications</div>' +
+            '<div class="nt-sheet-sub" id="ntSheetSub">Everything NowssB has told you</div>' +
+          '</div>' +
+          '<button class="nt-hbtn nt-hbtn-gear" onclick="ntOpenSettings()" aria-label="Notification settings">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' +
+              '<circle cx="12" cy="12" r="3"/>' +
+              '<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>' +
+            '</svg>' +
+          '</button>' +
+          '<button class="nt-hbtn nt-hbtn-close" onclick="ntSheetClose()" aria-label="Close">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="nt-sheet-scroll" id="ntSheetBody"><!-- rendered by JS --></div>' +
+        '<div class="nt-sheet-foot">' +
+          '<div class="nt-sheet-clear" onclick="nwsbNotifClear()">Clear all</div>' +
+          '<div class="nt-sheet-manage" onclick="ntOpenSettings()">Manage</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  function mountSheet() {
+    if (document.getElementById('ntOverlay')) return;
+    if (!document.body) return;
+    var d = document.createElement('div');
+    d.innerHTML = SHEET;
+    document.body.appendChild(d.firstChild);
+  }
+
+  function renderSheet() {
+    var body = document.getElementById('ntSheetBody');
+    if (!body) return;
+    var list = feed(), on = master();
+    var sub = document.getElementById('ntSheetSub');
+    if (sub) {
+      var unread = list.filter(function (x) { return !x.read; }).length;
+      sub.textContent = !on ? 'Muted — nothing is coming through'
+                      : !list.length ? 'Nothing new right now'
+                      : unread ? unread + ' unread of ' + list.length
+                      : list.length + (list.length === 1 ? ' update' : ' updates');
+    }
+    if (!list.length) {
+      body.innerHTML =
+        '<div class="nt-empty">' +
+          '<div class="nt-empty-icon"><svg viewBox="0 0 24 24" fill="none">' +
+            '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<path d="M13.7 21a2 2 0 0 1-3.4 0" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/>' +
+          '</svg></div>' +
+          '<div class="nt-empty-title">' + (on ? 'You are all caught up' : 'Notifications are off') + '</div>' +
+          '<div class="nt-empty-sub">' + (on
+            ? 'New updates land here — orders, messages, offers, your routine and everything else you have switched on.'
+            : 'Turn them back on from the gear above to start receiving updates again.') + '</div>' +
+        '</div>';
+      return;
+    }
+    body.innerHTML = list.map(function (n, i) {
+      return '<div class="nt-item' + (n.read ? '' : ' unread') + '" onclick="ntRead(' + i + ')">' +
+               '<div class="nt-item-icon">' + (IC[n.type] || IC.support) + '</div>' +
+               '<div class="nt-item-txt">' +
+                 '<div class="nt-item-title">' +
+                   (n.read ? '' : '<span class="nt-item-dot"></span>') + esc(n.title) +
+                 '</div>' +
+                 (n.body ? '<div class="nt-item-body">' + esc(n.body) + '</div>' : '') +
+                 '<div class="nt-item-meta">' + esc(labelOf(n.type)) + ' · ' + ago(n.at) + '</div>' +
+               '</div>' +
+             '</div>';
+    }).join('');
+  }
+
+  /* The bell opens the tab. */
   window.ntOpen = function () {
-    var sc = document.getElementById('sub-notifications');
-    if (!sc) return;
-    render();
-    sc.classList.add('open');
+    mountSheet();
+    renderSheet();
+    var ov = document.getElementById('ntOverlay');
+    requestAnimationFrame(function () { if (ov) ov.classList.add('open'); });
     haptic(28);
+  };
+  window.ntSheetClose = function () {
+    var ov = document.getElementById('ntOverlay');
+    if (ov) ov.classList.remove('open');
+  };
+
+  /* The gear leads through to the full settings page. */
+  window.ntOpenSettings = function () {
+    window.ntSheetClose();
+    haptic(45);
+    setTimeout(function () {
+      var sc = document.getElementById('sub-notifications');
+      if (!sc) return;
+      render();
+      sc.classList.add('open');
+    }, 280);
   };
   window.ntClose = function () {
     var sc = document.getElementById('sub-notifications');
