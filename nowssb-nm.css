@@ -6602,3 +6602,223 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
   border-radius: 0 !important;
   box-sizing: border-box;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   SET AS YOU LIKE — the home layout editor (app/js/part062.js).
+
+   Same glass language as the Quick Links sheet so the two Appearance
+   surfaces read as one family: a blurred scrim, a translucent card, and
+   rows that are legible over whatever home is behind them.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* The entry banner, matched to the Quick Links banner on both homes. */
+#home .fash-layout-banner {
+  width: calc(100% - 32px) !important;
+  margin: 0 16px 22px !important;
+  border-radius: 0 !important;
+  box-sizing: border-box;
+}
+#home-nm .nmh-layout-banner { margin: 0 0 8px; }
+
+/* A section switched off keeps its node in the wrap so turning it back on is
+   a class flip, not a re-render — but nothing about it may take up space. */
+.hl-off { display: none !important; }
+
+.hl-overlay {
+  position: fixed; inset: 0; z-index: 4000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(4,8,18,0.72);
+  opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
+  content-visibility: hidden;
+}
+/* Blur only while open. A backdrop-filter that is always mounted makes the
+   compositor re-render the layer behind it every frame — that is exactly what
+   froze scrolling when the Quick Links drop zone carried one full time. */
+.hl-overlay.open {
+  opacity: 1; pointer-events: auto; content-visibility: visible;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+
+.hl-box {
+  position: relative;
+  width: 100%; max-width: 420px; max-height: 82vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14); border-radius: 24px !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.35); backdrop-filter: blur(26px) saturate(1.35);
+  box-shadow: 0 26px 60px rgba(0,0,0,0.55);
+  transform: translateY(14px) scale(0.98); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+}
+.hl-overlay.open .hl-box { transform: translateY(0) scale(1); }
+
+.hl-head {
+  flex-shrink: 0; display: flex; align-items: center; gap: 12px;
+  padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.hl-head-icon {
+  width: 38px; height: 38px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.42); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 12px !important;
+}
+.hl-head-icon svg { width: 20px; height: 20px; }
+.hl-head-txt { flex: 1; min-width: 0; }
+.hl-head-title {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+  color: #fff; letter-spacing: 0.2px;
+}
+.hl-head-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.5); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hl-close {
+  width: 34px !important; height: 34px !important; min-height: 34px !important;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 50% !important; cursor: pointer;
+}
+.hl-close svg { width: 15px; height: 15px; }
+
+.hl-tabs {
+  flex-shrink: 0; display: flex; gap: 8px; padding: 12px 16px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.hl-tab {
+  flex: 1; text-align: center; cursor: pointer;
+  padding: 9px 6px; min-height: 0 !important;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: rgba(255,255,255,0.42);
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px !important; transition: all 0.2s;
+}
+.hl-tab.on {
+  color: #060c18; background: #e8d5a3; border-color: #e8d5a3;
+}
+
+.hl-list {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 10px 12px 14px; scrollbar-width: none;
+}
+.hl-list::-webkit-scrollbar { display: none; }
+
+.hl-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 12px; margin-bottom: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 14px !important;
+}
+.hl-row-locked { background: rgba(255,255,255,0.03); border-style: dashed; }
+.hl-row-off { opacity: 0.42; }
+
+.hl-num {
+  width: 30px !important; height: 30px !important; min-height: 30px !important;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.14); border: 1px solid rgba(232,213,163,0.34);
+  border-radius: 9px !important; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+  color: #e8d5a3;
+}
+.hl-num:active { background: rgba(232,213,163,0.28); }
+.hl-num-lock { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); cursor: default; }
+.hl-num-lock svg { width: 15px; height: 15px; }
+
+.hl-body { flex: 1; min-width: 0; }
+.hl-label {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  color: #fff; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.hl-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 300;
+  color: rgba(255,255,255,0.44); margin-top: 2px; line-height: 1.4;
+}
+.hl-chip {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 5px !important; flex-shrink: 0;
+}
+.hl-chip-ban  { color: rgba(200,232,245,0.85); background: rgba(200,232,245,0.1); border: 1px solid rgba(200,232,245,0.25); }
+.hl-chip-lock { color: rgba(255,255,255,0.5);  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); }
+
+.hl-arrows { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.hl-arw {
+  width: 26px !important; height: 21px !important; min-height: 21px !important;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 7px !important; cursor: pointer; color: rgba(255,255,255,0.8);
+}
+.hl-arw svg { width: 12px; height: 12px; }
+.hl-arw:active { background: rgba(255,255,255,0.16); }
+.hl-arw-off { opacity: 0.22; pointer-events: none; }
+
+.hl-eye {
+  width: 42px !important; height: 24px !important; min-height: 24px !important;
+  flex-shrink: 0; position: relative; cursor: pointer;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px !important; transition: background 0.22s, border-color 0.22s;
+}
+.hl-eye.on { background: rgba(232,213,163,0.85); border-color: rgba(232,213,163,0.95); }
+.hl-eye-knob {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px;
+  border-radius: 50% !important; background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: left 0.22s;
+}
+.hl-eye.on .hl-eye-knob { left: 20px; }
+.hl-eye-fixed { width: 42px; height: 24px; flex-shrink: 0; }
+
+.hl-foot {
+  flex-shrink: 0; display: flex; gap: 10px; padding: 12px 16px 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.hl-reset, .hl-done {
+  flex: 1; text-align: center; cursor: pointer; padding: 13px 6px;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; border-radius: 12px !important;
+}
+.hl-reset { color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.13); }
+.hl-done  { color: #060c18; background: #fff; border: 1px solid #fff; }
+
+/* Move-to-position sheet — sits inside the box so it can't be scrolled away
+   from the row that opened it. */
+.hl-picker {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  /* Solid on purpose: translucent, the Reset/Done row and the list rows
+     underneath stayed legible straight through and read as a second layout
+     competing with the number grid. Solid also means no backdrop-filter,
+     so this sheet costs nothing while it sits closed. */
+  background: #080d1a;
+  border-top: 1px solid rgba(255,255,255,0.14);
+  border-radius: 22px 22px 24px 24px !important;
+  transform: translateY(102%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.hl-picker.open { transform: translateY(0); }
+.hl-picker-head {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase; line-height: 1.6;
+  color: rgba(255,255,255,0.55); margin: 0 6px 12px; text-align: center;
+  overflow-wrap: anywhere;
+}
+.hl-picker-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
+  max-height: 34vh; overflow-y: auto; scrollbar-width: none;
+}
+.hl-picker-grid::-webkit-scrollbar { display: none; }
+.hl-pn {
+  height: 40px !important; min-height: 40px !important;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 11px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  color: rgba(255,255,255,0.82);
+}
+.hl-pn.on { background: #e8d5a3; border-color: #e8d5a3; color: #060c18; }
+.hl-pn:active { background: rgba(255,255,255,0.16); }
+.hl-picker-cancel {
+  margin-top: 12px; text-align: center; cursor: pointer; padding: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px !important;
+}

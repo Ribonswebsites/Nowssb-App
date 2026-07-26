@@ -153,6 +153,13 @@
         <div class="sr-body"><div class="sr-label">Quick Links</div><div class="sr-sub">One-tap shortcuts to every corner of NowssB</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
+      <div class="sr" onclick="hlOpen()">
+        <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;">
+          <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><rect x="3" y="2.5" width="16" height="4.2" rx="1" stroke="#fff" stroke-width="1.5"/><rect x="3" y="8.9" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><rect x="3" y="15.3" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/></svg>
+        </div>
+        <div class="sr-body"><div class="sr-label">Set As You Like</div><div class="sr-sub">Order every section and banner on your home</div></div>
+        <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
       <div class="sr last" onclick="htOpen()">
         <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);overflow:hidden;">
           <img loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">

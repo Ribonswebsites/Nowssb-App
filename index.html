@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=520">
+<link rel="stylesheet" href="nowssb-nm.css?v=521">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1266,8 +1266,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
+    <!-- Set As You Like — opens the home layout editor (app/js/part062.js) -->
+    <div class="nmh-sec-banner nmh-layout-banner" onclick="hlOpen('nm')">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="3" y="2.5" width="16" height="4.2" rx="1" stroke="#fff" stroke-width="1.5"/><rect x="3" y="8.9" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><rect x="3" y="15.3" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-txt">
+        <div class="nmh-sec-banner-title">Set As You Like</div>
+        <div class="nmh-sec-banner-sub">Order every section and banner on this home</div>
+      </div>
+      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+
     <!-- Switch to Fashion Mode section -->
-    <div onclick="localStorage.setItem('nwsb_home_mode','home');goTo('home')" style="width:100%;margin-top:16px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
+    <div id="nmhFashSwitch" onclick="localStorage.setItem('nwsb_home_mode','home');goTo('home')" style="width:100%;margin-top:16px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
       <div>
         <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(232,213,163,0.65);margin-bottom:4px;">Experience</div>
         <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:600;color:#fff;letter-spacing:0.2px;">Fashion Mode</div>
@@ -1524,6 +1535,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
 
+  <!-- Set As You Like — opens the home layout editor (app/js/part062.js) -->
+  <div class="nmh-sec-banner fash-layout-banner" onclick="hlOpen('fash')">
+    <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="3" y="2.5" width="16" height="4.2" rx="1" stroke="#fff" stroke-width="1.5"/><rect x="3" y="8.9" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><rect x="3" y="15.3" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/></svg></div>
+    <div class="nmh-sec-banner-divider"></div>
+    <div class="nmh-sec-banner-txt">
+      <div class="nmh-sec-banner-title">Set As You Like</div>
+      <div class="nmh-sec-banner-sub">Order every section and banner on this home</div>
+    </div>
+    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
   <!-- Video banner — below Today's Practice / streak -->
   <div class="fash-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
     <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
@@ -1650,7 +1672,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- ══ STORE QUICK-ACCESS: LOGO + 2×2 GRID ══ -->
 
 
-  <div style="margin-top:28px;margin-bottom:20px;width:100%;">
+  <div id="fashCubeSec" style="margin-top:28px;margin-bottom:20px;width:100%;">
   <div class="home-cw-cube-wrap">
 
     <img decoding="async" class="home-cw-cube-img" src="https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_1000/v1778922166/grok_image_1778922009415_qtoteo.jpg" alt="" loading="eager" draggable="false">
@@ -1764,7 +1786,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- STANDALONE BANNER ABOVE WORD SEARCH SECTION -->
-  <div style="padding: 0 16px 16px; background: transparent;">
+  <div id="fashPromoVid" style="padding: 0 16px 16px; background: transparent;">
     <div style="position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.18); box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12); background: linear-gradient(135deg,rgba(6,12,24,0.95) 0%,rgba(12,20,40,0.92) 100%); aspect-ratio:16/9;">
       <video data-nwsb-auto muted loop playsinline preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" poster="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg">
         <source src="https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.mp4" type="video/mp4">
@@ -1773,7 +1795,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- ══ WORD SEARCH — COMPLETE GLASS SECTION ══ -->
-  <div class="section-glass-wrap">
+  <div class="section-glass-wrap" id="fashWordSearchWrap">
 
   <!-- BANNER ABOVE WORD SEARCH -->
   <div class="section-promo-banner">
@@ -1802,7 +1824,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div><!-- /section-glass-wrap: Word Search -->
 
   <!-- ══ SOUND BEFORE MEANING — COMPLETE GLASS SECTION ══ -->
-  <div class="section-glass-wrap">
+  <div class="section-glass-wrap" id="fashMeaningSearchWrap">
 
   <!-- BANNER INSIDE GLASS WRAP -->
   <div class="section-promo-banner" style="width:100%;margin:0 0 0 0;height:220px;">
@@ -9145,7 +9167,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=228"></script>
+<script src="app/js/part042.js?v=229"></script>
 
 
 
@@ -9295,6 +9317,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=7"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=7"></script>
+<script src="app/js/part062.js?v=1"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=292" defer></script>
