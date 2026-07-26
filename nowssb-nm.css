@@ -6822,3 +6822,112 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
   border-radius: 12px !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   CUSTOMIZE HUB — every appearance control behind one tap
+   (app/js/part063.js). Same glass shell as Set As You Like and Quick
+   Links; the body is a 2-up card grid rather than a list because these
+   are destinations, not settings with state.
+   ══════════════════════════════════════════════════════════════════ */
+.cu-overlay {
+  position: fixed; inset: 0; z-index: 4000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(4,8,18,0.72);
+  opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
+  content-visibility: hidden;
+}
+/* Blur only while open — an always-mounted backdrop-filter re-composites the
+   whole page every frame, which is what froze scrolling once already. */
+.cu-overlay.open {
+  opacity: 1; pointer-events: auto; content-visibility: visible;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+
+.cu-box {
+  width: 100%; max-width: 420px; max-height: 82vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14); border-radius: 24px !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.35); backdrop-filter: blur(26px) saturate(1.35);
+  box-shadow: 0 26px 60px rgba(0,0,0,0.55);
+  transform: translateY(14px) scale(0.98); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+}
+.cu-overlay.open .cu-box { transform: translateY(0) scale(1); }
+
+.cu-head {
+  flex-shrink: 0; display: flex; align-items: center; gap: 12px;
+  padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.cu-head-icon {
+  width: 38px; height: 38px; flex-shrink: 0; overflow: hidden;
+  background: rgba(0,0,0,0.42); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 12px !important;
+}
+.cu-head-txt { flex: 1; min-width: 0; }
+.cu-head-title {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+  color: #fff; letter-spacing: 0.2px;
+}
+.cu-head-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.5); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cu-close {
+  width: 34px !important; height: 34px !important; min-height: 34px !important;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 50% !important; cursor: pointer;
+}
+.cu-close svg { width: 15px; height: 15px; }
+
+.cu-grid {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 14px 14px 18px; scrollbar-width: none;
+}
+.cu-grid::-webkit-scrollbar { display: none; }
+
+.cu-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  padding: 14px 13px 15px; cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px !important; transition: background 0.18s, border-color 0.18s;
+}
+.cu-card:active { background: rgba(255,255,255,0.13); border-color: rgba(232,213,163,0.4); }
+.cu-card-icon {
+  width: 40px; height: 40px; margin-bottom: 9px; overflow: hidden; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.42); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px !important;
+}
+.cu-card-icon svg { width: 21px; height: 21px; }
+.cu-card-label {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+  color: #fff; letter-spacing: 0.1px; line-height: 1.25;
+}
+.cu-card-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 300;
+  color: rgba(255,255,255,0.45); line-height: 1.35;
+}
+
+/* Header entry points. The Normal home's group already styles its buttons
+   via .nmh-settings-btn; the Fashion hero needs its own, matched to the
+   All-features button that sits beside it. */
+.hero-cust-btn {
+  width: 44px !important; height: 44px !important; min-height: 44px !important;
+  flex-shrink: 0; padding: 0; cursor: pointer; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(6,12,24,0.42); border: 1px solid rgba(232,213,163,0.32);
+  /* Round, to read as the smaller sibling of the round All-features button
+     it sits next to rather than a different kind of control. */
+  border-radius: 50% !important;
+}
+.hero-cust-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Three header buttons instead of two left "NOWSBANSIU EDITION" about two
+   pixels short of fitting on one line, so it wrapped. Tightening the group's
+   gap hands those pixels back to the brand text. */
+.nmh-toprow .nmh-btn-group { gap: 6px; }
+.nmh-brand-sub { white-space: nowrap; letter-spacing: 1.6px; }
