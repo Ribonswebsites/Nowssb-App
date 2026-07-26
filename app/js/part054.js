@@ -32,14 +32,14 @@
   var PWG_PLAYER_BRAND_IMG = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png';
   // Per-slide illustration photography, supplied for the welcome,
   // Signature Word, Player Store and Player Ready slides.
-  var PWG_WELCOME_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876918/file_00000000af488207996ed12b2ce7274e_tvqqfg.png';
+  var PWG_WELCOME_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1785069853/file_00000000d7e88209a05b0cd46d3c9204_yylblf.png';
   var PWG_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876918/file_0000000035ac81fa8d163588e627b067_xjpm5r.png';
   var PWG_READY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876917/file_00000000b6c481fab8074cb5a1d16756_thikfl.png';
   var PWG_STORE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876916/file_00000000c70081faab87b58c23b3edcb_yzyrbf.png';
   var PWG_PRACTICE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877225/file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png';
   var PWG_LISTEN_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877426/file_00000000e0948207852ee99ed468fbb0_gon5be.png';
   var PWG_SETTINGS_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784878540/file_00000000cf00820b83f17dc392a0071d_hhm18g.png';
-  var PWG_LIBRARY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784878540/file_00000000b154820baa4e6ffade37f478_aivsiv.png';
+  var PWG_LIBRARY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1785069871/file_00000000bc3481fba068b600e71ed418_xt5arr.png';
 
   var PWG_SLIDES = [
     {
