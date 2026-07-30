@@ -8315,3 +8315,66 @@ body.fashplus #home .fp-banner { display: flex; }
 .rd-erow-toc { cursor: pointer; color: rgba(232,213,163,0.85) !important; font-weight: 700; }
 /* Text has to be selectable for any of the tools to work. */
 .rd-page, .rd-page * { -webkit-user-select: text; user-select: text; }
+
+/* ══════════════════════════════════════════════════════════════════
+   VIDEO BANNERS (app/js/part067.js) — 16:9 clips placed above sections.
+   Square and inset on the Fashion home, rounded and full-width on the
+   Normal home, matching whatever they sit next to.
+   ══════════════════════════════════════════════════════════════════ */
+.vb-banner {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; box-sizing: border-box; background: #060c18;
+  border-radius: 22px !important;
+}
+.vb-banner video {
+  position: absolute; inset: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block;
+}
+#home-nm .vb-banner { margin: 16px 0; }
+#home .vb-banner {
+  width: calc(100% - 32px); margin: 18px 16px;
+  border-radius: 0 !important;
+}
+/* Inside a page body rather than a home column. */
+#qaMainContent > .vb-banner,
+#offersMainContent > .vb-banner,
+#ebBody > .vb-banner,
+#msMeaningBody > .vb-banner {
+  width: calc(100% - 32px); margin: 14px 16px 18px;
+}
+
+/* The variant that carries copy: subject on the left, words on the right
+   of a rule — the same reading order as the Reader section. */
+.vb-rule {
+  position: absolute; left: 46%; top: 14%; bottom: 14%; width: 1px; z-index: 2;
+  background: rgba(255,255,255,0.4);
+}
+.vb-txt {
+  position: absolute; left: 46%; right: 0; top: 0; bottom: 0; z-index: 3;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 1px; padding: 0 14px 0 16px;
+  background: linear-gradient(90deg, rgba(6,12,24,0.55) 0%, rgba(6,12,24,0.72) 100%);
+}
+.vb-hello {
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 400;
+  color: rgba(255,255,255,0.66); line-height: 1.15;
+}
+.vb-name {
+  font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 800;
+  color: #fff; letter-spacing: -0.5px; line-height: 1.1;
+}
+.vb-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 300;
+  color: rgba(255,255,255,0.6); line-height: 1.45; margin-top: 4px;
+}
+.vb-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; }
+.vb-cta-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 1.6px; text-transform: uppercase; color: #fff;
+}
+.vb-go {
+  width: 26px; height: 26px; flex-shrink: 0; border-radius: 50% !important;
+  background: #fff; display: flex; align-items: center; justify-content: center;
+}
+.vb-go svg { width: 12px; height: 12px; display: block; }
