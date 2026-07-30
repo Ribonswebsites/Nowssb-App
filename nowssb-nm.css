@@ -8478,8 +8478,18 @@ body.fashplus #home .fp-tile .home-tile-enter {
   letter-spacing: -0.3px; color: #fff;
   text-shadow: 0 2px 14px rgba(0,0,0,0.85), 0 0 30px rgba(0,0,0,0.6);
 }
-.vb-g-f { left: 22px; }
-.vb-g-m { right: 22px; }
+.vb-g {
+  display: flex; align-items: center; gap: 9px;
+}
+.vb-g-lbl { display: block; }
+.vb-g-f { left: 16px; }
+.vb-g-m { right: 14px; }
+/* Each side carries its own Enter, sized down so both a word and an arrow
+   fit inside half a banner. */
+.vb-g-cta { margin-top: 0 !important; gap: 6px; }
+.vb-g-cta .vb-cta-lbl { font-size: 9.5px; letter-spacing: 1.2px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+.vb-g-cta .vb-go { width: 22px; height: 22px; }
+.vb-g-cta .vb-go svg { width: 10px; height: 10px; }
 .vb-g:active { opacity: 0.7; }
 /* Enter sits between them, clear of both labels. */
 .vb-cta-mid {
@@ -8662,3 +8672,262 @@ body.fashplus #home .fp-tile::after {
    rounded inside the Normal one — matching each home's own language. */
 #home .fash-ebsec-wrap .reader-sec { border-radius: 0 !important; }
 .rdsec-wrap > .nmh-sec-banner { width: 100% !important; margin: 10px 0 0 !important; box-sizing: border-box; }
+
+/* ══════════════════════════════════════════════════════════════════
+   READER — swipe highlight, the notepad bubble, and the look-up sheet
+   (app/js/part065.js)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* While swipe mode is on the page must not scroll under the finger, and
+   the text must be selectable by drag rather than by long-press. */
+.rd-swipe .rd-stage { touch-action: pan-x; }
+.rd-swipe .rd-page .rd-p {
+  -webkit-user-select: text; user-select: text;
+  -webkit-touch-callout: none; cursor: text;
+}
+.rd-swipe .rd-page .rd-p::selection { background: rgba(232,213,163,0.55); }
+.rd-swipe .rd-page .rd-p ::selection { background: rgba(232,213,163,0.55); }
+/* A quiet reminder the mode is live. */
+.rd-swipe .rd-stage::before {
+  content: 'Swipe a line to highlight it';
+  position: absolute; left: 50%; top: 6px; transform: translateX(-50%); z-index: 24;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  letter-spacing: 1.2px; text-transform: uppercase; color: #060c18;
+  background: #e8d5a3; padding: 4px 12px; border-radius: 99px !important;
+  pointer-events: none; box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+/* ...so the page moves down to make room for it. */
+.rd-swipe .rd-page { margin-top: 30px; }
+.rd-tool.on, .rd-np-b.on {
+  background: rgba(232,213,163,0.16) !important;
+  border-color: rgba(232,213,163,0.5) !important; color: #e8d5a3 !important;
+}
+
+/* ── The bubble ──────────────────────────────────────────────────── */
+.rd-npbub {
+  position: absolute; right: 14px; z-index: 34;
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  width: 52px !important; height: 52px !important; min-height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  background: #000; color: #e8d5a3;
+  border: 1px solid rgba(232,213,163,0.34); border-radius: 50% !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.55); padding: 0 !important;
+}
+.rd-npbub svg { width: 22px; height: 22px; display: block; }
+.rd-npbub:active { transform: scale(0.94); }
+.rd-npbub-n {
+  position: absolute; top: -3px; right: -3px; min-width: 19px; height: 19px;
+  display: flex; align-items: center; justify-content: center; padding: 0 5px;
+  background: #e8d5a3; color: #060c18; border-radius: 99px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  box-sizing: border-box;
+}
+
+/* ── The notepad and look-up sheets ──────────────────────────────── */
+.rd-np, .rd-web {
+  position: absolute; inset: 0; z-index: 42;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(4,6,12,0.62);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
+}
+.rd-np.open, .rd-web.open { opacity: 1; pointer-events: auto; }
+.rd-np-card, .rd-web-card {
+  width: 100%; max-height: 84%; box-sizing: border-box;
+  display: flex; flex-direction: column;
+  padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: rgba(15,15,19,0.98); border-top: 1px solid rgba(255,255,255,0.12);
+  border-radius: 22px 22px 0 0 !important;
+  box-shadow: 0 -18px 44px rgba(0,0,0,0.6);
+  transform: translateY(14px); transition: transform 0.26s cubic-bezier(0.4,0,0.2,1);
+}
+.rd-np.open .rd-np-card, .rd-web.open .rd-web-card { transform: translateY(0); }
+.rd-np-head { display: flex; align-items: baseline; gap: 9px; flex-shrink: 0; margin-bottom: 10px; }
+.rd-np-title { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800; color: #fff; }
+.rd-np-sub {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(255,255,255,0.45);
+}
+.rd-np-x {
+  width: 30px !important; height: 30px !important; min-height: 30px; flex-shrink: 0;
+  background: rgba(255,255,255,0.08); border: none; color: rgba(255,255,255,0.8);
+  border-radius: 50% !important; font-size: 19px; line-height: 1; padding: 0 !important;
+}
+.rd-np-on {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  padding: 7px 10px; background: rgba(232,213,163,0.1);
+  border: 1px solid rgba(232,213,163,0.24); border-radius: 12px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: #e8d5a3; line-height: 1.4;
+}
+.rd-np-on button {
+  margin-left: auto; flex-shrink: 0; width: 22px !important; height: 22px !important;
+  min-height: 22px; padding: 0 !important; background: none; border: none;
+  color: #e8d5a3; font-size: 17px; line-height: 1;
+}
+.rd-np-new { display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+.rd-np-new textarea {
+  flex: 1; min-width: 0; resize: none; box-sizing: border-box;
+  padding: 10px 12px; background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14); border-radius: 14px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: #fff; line-height: 1.45;
+}
+.rd-np-new textarea::placeholder { color: rgba(255,255,255,0.35); }
+.rd-np-add {
+  flex-shrink: 0; height: 44px; padding: 0 16px !important; background: #e8d5a3; color: #060c18;
+  border: none; border-radius: 14px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 800;
+}
+.rd-np-tools {
+  display: flex; gap: 7px; flex-wrap: wrap; margin: 10px 0 4px; flex-shrink: 0;
+}
+.rd-np-b {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 11px !important; min-height: 0 !important;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.86); border-radius: 99px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+}
+.rd-np-b svg { width: 13px; height: 13px; flex-shrink: 0; }
+.rd-np-list { flex: 1; min-height: 0; overflow-y: auto; margin-top: 8px; }
+.rd-np-empty {
+  padding: 22px 6px; font-family: 'DM Sans', sans-serif; font-size: 12px;
+  color: rgba(255,255,255,0.45); line-height: 1.6; text-align: center;
+}
+.rd-np-i {
+  display: flex; align-items: flex-start; gap: 9px; padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.rd-np-pg {
+  flex-shrink: 0; width: 26px !important; height: 26px !important; min-height: 26px;
+  padding: 0 !important; background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.75);
+  border-radius: 50% !important;
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 800;
+}
+.rd-np-hl .rd-np-pg { background: rgba(232,213,163,0.18); border-color: rgba(232,213,163,0.4); color: #e8d5a3; }
+.rd-np-txt {
+  flex: 1; min-width: 0; font-family: 'DM Sans', sans-serif; font-size: 12.5px;
+  color: rgba(255,255,255,0.88); line-height: 1.5; word-break: break-word;
+}
+.rd-np-txt em { display: block; margin-top: 3px; font-size: 11px; color: rgba(255,255,255,0.45); font-style: italic; }
+.rd-np-tag {
+  display: inline-block; margin-top: 4px; padding: 2px 7px;
+  background: rgba(232,213,163,0.14); color: #e8d5a3; border-radius: 99px !important;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; font-style: normal;
+}
+.rd-np-go, .rd-np-rm {
+  flex-shrink: 0; width: 26px !important; height: 26px !important; min-height: 26px;
+  padding: 0 !important; background: none; border: none;
+  color: rgba(255,255,255,0.45); border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+}
+.rd-np-go svg { width: 14px; height: 14px; }
+.rd-np-rm { font-size: 18px; line-height: 1; }
+
+/* ── Look up / translate ─────────────────────────────────────────── */
+.rd-web-src {
+  flex-shrink: 0; padding: 10px 12px; margin-bottom: 10px;
+  background: rgba(255,255,255,0.05); border-left: 2px solid rgba(232,213,163,0.6);
+  border-radius: 0 12px 12px 0 !important;
+  font-family: 'Lora', Georgia, serif; font-size: 13px;
+  color: rgba(255,255,255,0.72); line-height: 1.5;
+}
+.rd-web-langs { display: flex; gap: 6px; overflow-x: auto; flex-shrink: 0; padding-bottom: 8px; }
+.rd-web-lang {
+  flex-shrink: 0; padding: 6px 12px !important; min-height: 0 !important;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.8); border-radius: 99px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 700; white-space: nowrap;
+}
+.rd-web-lang.on { background: #e8d5a3; border-color: #e8d5a3; color: #060c18; }
+.rd-web-body { flex: 1; min-height: 90px; overflow-y: auto; padding: 4px 0 2px; }
+.rd-web-wait, .rd-web-note {
+  padding: 18px 4px; font-family: 'DM Sans', sans-serif; font-size: 12px;
+  color: rgba(255,255,255,0.5); line-height: 1.6;
+}
+.rd-web-res { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.rd-web-from {
+  display: inline-block; margin-bottom: 6px;
+  font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 800;
+  letter-spacing: 1.4px; text-transform: uppercase; color: #e8d5a3;
+}
+.rd-web-txt {
+  font-family: 'DM Sans', sans-serif; font-size: 14px;
+  color: #fff; line-height: 1.6; word-break: break-word;
+}
+.rd-web-save {
+  margin-top: 12px; padding: 9px 15px !important; min-height: 0 !important;
+  background: rgba(232,213,163,0.14); border: 1px solid rgba(232,213,163,0.4);
+  color: #e8d5a3; border-radius: 99px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 800;
+}
+.rd-web-out {
+  flex-shrink: 0; margin-top: 10px; width: 100%;
+  padding: 12px !important; background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.16); color: rgba(255,255,255,0.86);
+  border-radius: 14px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ENTER SITS BESIDE THE COPY, NOT UNDER IT
+   The Reader and eBooks copy is four siblings in a column; a grid puts
+   the three lines of text in one column and the Enter in a second,
+   centred against them, with no change to the markup.
+   ══════════════════════════════════════════════════════════════════ */
+.reader-sec-txt {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'hello cta' 'name cta' 'sub cta';
+  align-items: center; column-gap: 14px; row-gap: 0;
+}
+.reader-sec-hello { grid-area: hello; }
+.reader-sec-name  { grid-area: name; }
+.reader-sec-sub   { grid-area: sub; }
+.reader-sec-cta {
+  grid-area: cta; align-self: center; justify-self: end;
+  margin-top: 0 !important; margin-right: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FASHION PLUS PLAYER — show the whole frame
+   A fixed 250px box cropped a 16:9 clip hard, which is what made it look
+   zoomed in and pushed the copy on top of the artwork baked into it.
+   ══════════════════════════════════════════════════════════════════ */
+body.fashplus #home .fp-card {
+  aspect-ratio: 16 / 9;
+  min-height: 0 !important; height: auto !important;
+}
+/* Enough wash along the bottom to carry the copy without dimming the clip. */
+body.fashplus #home .fp-card::after {
+  background:
+    linear-gradient(0deg, rgba(6,12,24,0.86) 0%, rgba(6,12,24,0.45) 26%, rgba(6,12,24,0) 52%),
+    linear-gradient(100deg, rgba(6,12,24,0.55) 0%, rgba(6,12,24,0.18) 46%, rgba(6,12,24,0) 74%) !important;
+}
+body.fashplus #home .fp-card .home-card-top { padding-bottom: 0 !important; }
+body.fashplus #home .fp-card .home-card-title { margin-bottom: 2px; }
+
+/* ══════════════════════════════════════════════════════════════════
+   ROUNDED MODE — each of the new blocks opens at the top and closes at
+   the bottom, the same way the trending pair already does.
+   ══════════════════════════════════════════════════════════════════ */
+body.homecorner-round #home .fash-plyr-wrap > #todayPracticeCard,
+body.homecorner-round #home-nm .nmh-plyr-wrap > .nmh-practice,
+body.homecorner-round #home .fash-rdsec-wrap > .reader-sec,
+body.homecorner-round #home .fash-ebsec-wrap > .reader-sec,
+body.homecorner-round #home-nm .nmh-rdsec-wrap > .reader-sec,
+body.homecorner-round #home-nm .nmh-ebsec-wrap > .reader-sec {
+  border-radius: 18px 18px 0 0 !important;
+}
+body.homecorner-round #home .fash-plyr-wrap > #fpBanner,
+body.homecorner-round #home .fash-rdsec-wrap > .rdsec-banner,
+body.homecorner-round #home .fash-ebsec-wrap > .rdsec-banner,
+body.homecorner-round #home-nm .nmh-rdsec-wrap > .rdsec-banner,
+body.homecorner-round #home-nm .nmh-ebsec-wrap > .rdsec-banner {
+  border-radius: 0 0 18px 18px !important;
+}
+/* The rail above them is a pill by design, not a section. */
+body.homecorner-round #home .home-body > .plyr-wrap > .spill,
+body.homecorner-round #home .home-body > .rdsec-wrap > .spill,
+body.homecorner-round #home-nm .nmh-wrap > .plyr-wrap > .spill,
+body.homecorner-round #home-nm .nmh-wrap > .rdsec-wrap > .spill { border-radius: 0 !important; }
