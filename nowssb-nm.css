@@ -8483,9 +8483,9 @@ body.fashplus #home .fp-tile .home-tile-enter {
 }
 .vb-g-lbl { display: block; }
 .vb-g-f { left: 16px; }
-/* Just past the divider the clip is composed around, not jammed against the
-   right edge. */
-.vb-g-m { left: 53%; right: auto; }
+/* Past the divider the clip is composed around, with a little air after it,
+   and nowhere near the right edge. */
+.vb-g-m { left: 57%; right: auto; }
 /* Each side carries its own Enter, sized down so both a word and an arrow
    fit inside half a banner. */
 .vb-g-cta { margin-top: 0 !important; gap: 6px; }
@@ -9078,3 +9078,20 @@ body.homecorner-round #home .fash-shabda-wrap > .shabda-banner {
    the left of the word without moving the block. */
 .nmh-trend-banner-icon { order: -1; }
 .nmh-trend-banner-item { align-items: center; }
+
+/* ── Daily Practice and its black banner, in one wrapper. The card ships
+   its own 16px side margins as a top-level section; inside the wrapper the
+   wrapper owns them. ── */
+#home .fash-routines-wrap > .home-card {
+  width: 100% !important; margin-left: 0 !important; margin-right: 0 !important;
+  margin-bottom: 0 !important;
+}
+#home .fash-routines-wrap > .routines-banner {
+  width: 100% !important; margin: 10px 0 0 !important; box-sizing: border-box;
+}
+body.homecorner-round #home .fash-routines-wrap > .home-card {
+  border-radius: 18px 18px 0 0 !important;
+}
+body.homecorner-round #home .fash-routines-wrap > .routines-banner {
+  border-radius: 0 0 18px 18px !important;
+}
