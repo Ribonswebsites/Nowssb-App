@@ -7709,8 +7709,9 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   background: #16163c;
   box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
 }
+/* The banner closes the block now, so its margin is above it. */
 .rdsec-wrap > .rdsec-banner {
-  width: 100% !important; margin: 0 0 10px !important; box-sizing: border-box;
+  width: 100% !important; margin: 10px 0 0 !important; box-sizing: border-box;
 }
 
 .reader-sec {
@@ -7730,13 +7731,11 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   position: absolute; left: 46%; top: 14%; bottom: 14%; width: 1px; z-index: 2;
   background: rgba(255,255,255,0.4);
 }
-/* Everything reads on the right half; a soft panel keeps it legible over
-   whatever the video is doing without dimming the whole frame. */
+/* The copy sits under the clip now — nothing is drawn over the video. */
 .reader-sec-txt {
-  position: absolute; left: 46%; right: 0; top: 0; bottom: 0; z-index: 3;
-  display: flex; flex-direction: column; justify-content: center;
-  gap: 1px; padding: 0 14px 0 16px;
-  background: linear-gradient(90deg, rgba(6,12,24,0.55) 0%, rgba(6,12,24,0.72) 100%);
+  position: static; display: flex; flex-direction: column;
+  gap: 1px; padding: 12px 2px 2px; cursor: pointer;
+  background: none;
 }
 /* Same two-line treatment as "Good Morning / Healer". */
 .reader-sec-hello {
@@ -8143,13 +8142,13 @@ body.fashplus #home .fp-card .fp-enter {
   transform: translateY(-50%); z-index: 4;
 }
 body.fashplus #home .fp-card .home-card-bottom .tp-enter { display: none; }
-/* The black banner above it, matched to the Fashion home's other banners. */
+/* The banner below the player, inside the player's wrapper. It carries the
+   switch, so it is visible whether the mode is on or off. */
 #home .fp-banner {
-  display: none;
-  width: calc(100% - 32px) !important; margin: 18px 16px 10px !important;
+  display: flex;
+  width: 100% !important; margin: 12px 0 0 !important;
   border-radius: 0 !important; box-sizing: border-box;
 }
-body.fashplus #home .fp-banner { display: flex; }
 
 /* ══════════════════════════════════════════════════════════════════
    TILE SIZE IS THE SAME IN EVERY LOOK
@@ -8447,19 +8446,15 @@ body.fashplus #home .fp-card .home-card-bottom { padding-bottom: 14px !important
 body.fashplus #home .fp-card .home-card-sub { max-width: 62%; }
 
 /* ══════════════════════════════════════════════════════════════════
-   READER SECTION — no wrapper, no rule, Enter on the right
-   The wrapper element stays so the layout editor keeps treating the banner
-   and the video as one movable unit; it just stops drawing anything.
+   READER / EBOOKS SECTION — rail, clip, copy, banner, in one wrapper
+   The copy used to be a panel laid over the right half of the clip, which
+   meant the clip was never actually visible. It is a plain block under the
+   clip now and the rule is gone.
    ══════════════════════════════════════════════════════════════════ */
-#home .fash-rdsec-wrap, #home-nm .nmh-rdsec-wrap {
-  background: none !important; border: none !important;
-  box-shadow: none !important; padding: 0 !important;
-  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
-}
 #home .fash-rdsec-wrap { width: calc(100% - 32px); margin: 18px 16px; }
 #home-nm .nmh-rdsec-wrap { width: 100%; margin: 16px 0; }
 .reader-sec-rule { display: none !important; }
-/* Copy still reads on the right half; the Enter goes to the far right of it. */
+/* Enter to the far right of the copy. */
 .reader-sec-cta {
   align-self: flex-end; margin-right: 2px;
 }
@@ -8525,3 +8520,145 @@ body.fashplus #home .fp-tile .home-tile-enter {
   width: 100% !important; margin: 10px 0 0 !important;
   border-radius: 0 !important; box-sizing: border-box;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   SECTION PILL RAIL (.spill) — the circle-and-pill introduction the
+   four home buttons already use, reused above the player, the Reader
+   and the eBooks sections. Static rather than animated open: these are
+   not a tour, they just name the section under them.
+   ══════════════════════════════════════════════════════════════════ */
+.spill {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; margin: 0 0 10px; box-sizing: border-box;
+  cursor: pointer; min-height: 40px;
+}
+.spill-circle {
+  position: relative; flex-shrink: 0;
+  width: 40px !important; height: 40px !important; min-height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: #000; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px !important; box-sizing: border-box; overflow: hidden;
+}
+.spill-circle svg { width: 19px; height: 19px; display: block; }
+.spill-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The same travelling gold light the tip rail's settings pill carries. */
+.spill-circle::before {
+  content: ''; position: absolute; inset: -1px; border-radius: 999px; padding: 1.6px;
+  pointer-events: none; z-index: 2;
+  background: conic-gradient(from var(--ctang),
+    transparent 0deg, transparent 230deg,
+    rgba(255,214,150,0.55) 300deg, #fff4e2 340deg, rgba(255,214,150,0.55) 352deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: htgRingSeq 4.5s linear infinite; will-change: --ctang;
+}
+.spill-pill {
+  display: flex; align-items: center; gap: 9px; min-width: 0;
+  height: 34px; padding: 0 14px 0 5px; box-sizing: border-box;
+  background: #000; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 30px !important; overflow: hidden;
+}
+.spill-pill-ic {
+  width: 24px; height: 24px; flex-shrink: 0; overflow: hidden;
+  border-radius: 50% !important; display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.24);
+}
+.spill-pill-ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.spill-pill-ic svg { width: 13px; height: 13px; display: block; }
+.spill-pill-rule { width: 1px; height: 17px; flex-shrink: 0; background: rgba(255,255,255,0.22); display: block; }
+.spill-pill-txt {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 700;
+  color: rgba(255,255,255,0.9); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; display: block;
+}
+.spill:active { opacity: 0.82; }
+
+/* ══════════════════════════════════════════════════════════════════
+   PLAYER WRAPPER — the rail, the player and the Fashion Plus switch in
+   one card. "Begin Your Healing Path" stays outside it, above.
+   ══════════════════════════════════════════════════════════════════ */
+.plyr-wrap { box-sizing: border-box; overflow: hidden; }
+#home .fash-plyr-wrap {
+  width: calc(100% - 32px); margin: 10px 16px 18px; padding: 12px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 0 !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.34);
+}
+/* Neumorphic on the Normal home, the same way the Reader wrapper is. */
+#home-nm .nmh-plyr-wrap {
+  width: 100%; margin: 16px 0; padding: 14px;
+  background: #f0f2f7; border-radius: 22px !important;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+}
+#home-nm.nm-dark .nmh-plyr-wrap {
+  background: #16163c;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
+}
+/* The cards inside give up their own outer margins — the wrapper owns them. */
+.plyr-wrap > #todayPracticeCard,
+.plyr-wrap > .nmh-practice { width: 100% !important; margin: 0 !important; }
+
+/* ══════════════════════════════════════════════════════════════════
+   FASHION PLUS PLAYER — copy at the bottom, sub on one line, a bigger
+   Enter inside a glass pill.
+   ══════════════════════════════════════════════════════════════════ */
+body.fashplus #home .fp-card {
+  display: flex !important; flex-direction: column; justify-content: flex-end;
+}
+body.fashplus #home .fp-card .home-card-top {
+  margin-top: auto; padding-top: 0 !important;
+}
+/* One line, however long the ritual copy runs. */
+body.fashplus #home .fp-card .home-card-sub {
+  max-width: none !important; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  font-size: 10px !important; margin-bottom: 0 !important;
+}
+body.fashplus #home .fp-card .fp-enter {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3);
+  border-radius: 999px !important;
+  padding: 6px 6px 6px 15px !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.3) !important;
+  gap: 9px;
+}
+body.fashplus #home .fp-card .fp-enter .tp-enter-lbl { font-size: 13px !important; letter-spacing: 1.4px; }
+body.fashplus #home .fp-card .fp-enter .tp-enter-go { width: 28px !important; height: 28px !important; }
+body.fashplus #home .fp-card .fp-enter .tp-enter-go svg { width: 13px; height: 13px; }
+
+/* ── The four buttons: smaller Enter, and far less scrim over the clip ── */
+body.fashplus #home .fp-tile .home-tile-enter-lbl {
+  font-size: 9.5px !important; letter-spacing: 1.2px;
+}
+body.fashplus #home .fp-tile .home-tile-enter-go {
+  width: 20px !important; height: 20px !important;
+}
+body.fashplus #home .fp-tile .home-tile-enter-go svg { width: 9px !important; height: 9px !important; }
+body.fashplus #home .fp-tile::after {
+  background: linear-gradient(90deg, rgba(6,12,24,0) 0%, rgba(6,12,24,0) 64%, rgba(6,12,24,0.34) 100%) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   READER / EBOOKS COPY — under the clip, and readable on the Normal
+   home's cream surface as well as the Fashion home's dark one.
+   ══════════════════════════════════════════════════════════════════ */
+#home-nm .reader-sec-hello { color: rgba(26,26,46,0.6); }
+#home-nm .reader-sec-name  { color: #1a1a2e; }
+#home-nm .reader-sec-sub   { color: rgba(26,26,46,0.58); }
+#home-nm .reader-sec-cta-lbl { color: #1a1a2e; }
+#home-nm .reader-sec-go { background: #1a1a2e; }
+#home-nm .reader-sec-go svg path { stroke: #fff; }
+#home-nm.nm-dark .reader-sec-hello { color: rgba(255,255,255,0.66); }
+#home-nm.nm-dark .reader-sec-name  { color: #fff; }
+#home-nm.nm-dark .reader-sec-sub   { color: rgba(255,255,255,0.6); }
+#home-nm.nm-dark .reader-sec-cta-lbl { color: #fff; }
+#home-nm.nm-dark .reader-sec-go { background: #fff; }
+#home-nm.nm-dark .reader-sec-go svg path { stroke: #060c18; }
+/* The clip is square-cornered inside the Fashion wrapper and softly
+   rounded inside the Normal one — matching each home's own language. */
+#home .fash-ebsec-wrap .reader-sec { border-radius: 0 !important; }
+.rdsec-wrap > .nmh-sec-banner { width: 100% !important; margin: 10px 0 0 !important; box-sizing: border-box; }
