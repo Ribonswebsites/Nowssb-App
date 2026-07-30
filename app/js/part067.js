@@ -63,6 +63,46 @@
       vid: V + 'v1785407198/grok_video_2026-07-30-15-55-42_onadht.mp4' }
   ];
 
+  /* ── What a banner leads to, named down its right-hand side ────────
+     Every icon here is a file the app already ships and already uses for
+     that section — the Quick Links rail's own map — so a chip reads as the
+     same thing the user taps elsewhere. ── */
+  var I = 'https://res.cloudinary.com/';
+  var CHIP_IC = {
+    meaning: I + 'eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png',
+    words:   I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
+    ebooks:  I + 'eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png',
+    connect: I + 'eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+    chat:    I + 'ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
+    profile: I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
+  };
+  var STORE_CHIPS  = [['meaning', 'Meanings'], ['words', 'Words'], ['ebooks', 'eBooks']];
+  var CONNECT_CHIPS = [['connect', 'Community'], ['chat', 'Chat'], ['profile', 'Profile']];
+  var READER_CHIPS = [['meaning', 'Meanings'], ['ebooks', 'eBooks']];
+
+  var CHIPS = [
+    { sel: '#home-nm .vb-banner[data-vb="vb0"], #home .vb-banner[data-vb="vb1"]', items: STORE_CHIPS },
+    { sel: '#home-nm .vb-banner[data-vb="vb4"], #home .vb-banner[data-vb="vb5"]', items: CONNECT_CHIPS },
+    { sel: '#home-nm .nmh-rdsec-wrap .reader-sec, #home .fash-rdsec-wrap .reader-sec', items: READER_CHIPS }
+  ];
+
+  function chipsHtml(items) {
+    return '<div class="vb-chips">' + items.map(function (c) {
+      return '<span class="vb-chip">' +
+        '<span class="vb-chip-ic"><img loading="lazy" decoding="async" alt="" src="' + CHIP_IC[c[0]] + '"></span>' +
+        '<span class="vb-chip-t">' + esc(c[1]) + '</span></span>';
+    }).join('') + '</div>';
+  }
+
+  function paintChips() {
+    CHIPS.forEach(function (c) {
+      document.querySelectorAll(c.sel).forEach(function (host) {
+        if (host.querySelector(':scope > .vb-chips')) return;
+        host.insertAdjacentHTML('beforeend', chipsHtml(c.items));
+      });
+    });
+  }
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
@@ -189,6 +229,7 @@
       grid.parentNode.insertBefore(ebBlock('Deep-dive guides on word science and sound healing'), grid);
     }
     wrapBookDetail();
+    paintChips();
 
     SWAP.forEach(function (s) {
       document.querySelectorAll(s.sel).forEach(function (v) {
