@@ -7683,43 +7683,80 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
    (app/js/part065.js)
    ══════════════════════════════════════════════════════════════════ */
 
-/* ── Home section: video with the Enter pill centred on the right ── */
+/* ── Home section: black banner + video in one wrapper, under the player.
+   The text sits to the right of a vertical rule; the left of the frame is
+   left to the artwork. No vignette — the art carries itself. ── */
+.rdsec-wrap { box-sizing: border-box; overflow: hidden; }
+#home .fash-rdsec-wrap {
+  width: calc(100% - 32px); margin: 18px 16px; padding: 12px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 0 !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.34);
+}
+/* The Normal home is neumorphic, so the wrapper is too — glass over cream
+   would be unreadable. */
+#home-nm .nmh-rdsec-wrap {
+  width: 100%; margin: 16px 0; padding: 14px;
+  background: #f0f2f7; border-radius: 22px !important;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+}
+#home-nm.nm-dark .nmh-rdsec-wrap {
+  background: #16163c;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
+}
+.rdsec-wrap > .rdsec-banner {
+  width: 100% !important; margin: 0 0 10px !important; box-sizing: border-box;
+}
+
 .reader-sec {
   position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
   box-sizing: border-box; cursor: pointer; background: #060c18;
-  border-radius: 22px !important;
+  border-radius: 16px !important;
 }
+#home .fash-rdsec-wrap .reader-sec { border-radius: 0 !important; }
 .reader-sec video {
   position: absolute; inset: 0;
   width: 100% !important; height: 100% !important;
   object-fit: cover; display: block;
 }
-.reader-sec-fade {
-  position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, rgba(6,12,24,0.82) 0%, rgba(6,12,24,0.35) 46%, rgba(6,12,24,0.12) 100%);
+/* The divider the copy sits behind. */
+.reader-sec-rule {
+  position: absolute; left: 46%; top: 14%; bottom: 14%; width: 1px; z-index: 2;
+  background: rgba(255,255,255,0.4);
 }
+/* Everything reads on the right half; a soft panel keeps it legible over
+   whatever the video is doing without dimming the whole frame. */
 .reader-sec-txt {
-  position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
-  z-index: 2; display: flex; flex-direction: column; gap: 4px; max-width: 52%;
+  position: absolute; left: 46%; right: 0; top: 0; bottom: 0; z-index: 3;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 1px; padding: 0 14px 0 16px;
+  background: linear-gradient(90deg, rgba(6,12,24,0.55) 0%, rgba(6,12,24,0.72) 100%);
 }
-.reader-sec-eyebrow {
-  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
-  letter-spacing: 3.4px; text-transform: uppercase; color: #e8d5a3;
+/* Same two-line treatment as "Good Morning / Healer". */
+.reader-sec-hello {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 400;
+  color: rgba(255,255,255,0.66); letter-spacing: -0.1px; line-height: 1.15;
 }
-.reader-sec-title {
-  font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800;
-  color: #fff; letter-spacing: -0.5px; line-height: 1.05;
-  text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+.reader-sec-name {
+  font-family: 'DM Sans', sans-serif; font-size: 23px; font-weight: 800;
+  color: #fff; letter-spacing: -0.5px; line-height: 1.1;
 }
-/* Right, vertically centred — as asked. */
-.reader-sec-enter {
-  position: absolute; right: 16px; top: 50%; transform: translateY(-50%); z-index: 2;
+.reader-sec-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 300;
+  color: rgba(255,255,255,0.6); line-height: 1.45; margin-top: 4px;
 }
-#home-nm .nmh-reader-sec { margin: 16px 0; }
-#home .fash-reader-sec {
-  width: calc(100% - 32px); margin: 18px 16px;
-  border-radius: 0 !important;
+.reader-sec-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; }
+.reader-sec-cta-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 1.6px; text-transform: uppercase; color: #fff;
 }
+.reader-sec-go {
+  width: 26px; height: 26px; flex-shrink: 0; border-radius: 50% !important;
+  background: #fff; display: flex; align-items: center; justify-content: center;
+}
+.reader-sec-go svg { width: 12px; height: 12px; display: block; }
 
 /* ── Chooser ─────────────────────────────────────────────────────── */
 .rd-hub { background: #060c18; display: flex; flex-direction: column; }
@@ -8026,3 +8063,121 @@ body.homecorner-round #home .fash-trend-wrap > .nmh-trend-shop-banner {
 /* The side rail floats over the page, so the page needs to start clear of
    it or the rail sits on top of the first few characters of every line. */
 #sub-reader-meaning .rd-stage { padding-left: 52px; }
+
+/* ══════════════════════════════════════════════════════════════════
+   CUSTOMIZE PANEL — all eight entries, scrolling, with an indicator
+   ══════════════════════════════════════════════════════════════════ */
+.cust-scroll {
+  position: relative;
+  max-height: 316px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 12px 12px 14px;
+}
+.cust-scroll::-webkit-scrollbar { display: none; }
+.cust-rows { display: flex; flex-direction: column; gap: 10px; }
+/* The panel's own rows carry their margins now that the scroller has the
+   padding, so the old per-row margins would double up. */
+.cust-panel .cust-scroll .cust-row { margin: 0 !important; }
+/* Track pinned to the scroller, thumb sized and moved by part063.js. */
+.cust-scrollbar {
+  position: absolute; top: 12px; right: 4px; bottom: 14px; width: 3px;
+  background: rgba(255,255,255,0.09); border-radius: 99px !important;
+  pointer-events: none;
+}
+.cust-scrollthumb {
+  width: 100%; min-height: 28px; background: rgba(232,213,163,0.75);
+  border-radius: 99px !important; transition: transform 0.06s linear;
+}
+.cust-scroll.no-scroll .cust-scrollbar { opacity: 0; }
+
+/* Mode rows and cards carry a switch instead of an arrow or an Enter pill. */
+.cust-mode-sw, .cu-mode-sw {
+  width: 42px !important; height: 24px !important; min-height: 24px !important;
+  flex-shrink: 0; position: relative;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px !important; transition: background 0.22s, border-color 0.22s;
+}
+.cu-mode-sw { position: absolute; left: 13px; bottom: 15px; }
+.cust-mode-sw.on, .cu-mode-sw.on { background: rgba(232,213,163,0.85); border-color: rgba(232,213,163,0.95); }
+.cust-mode-knob, .cu-mode-knob {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px;
+  border-radius: 50% !important; background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3); transition: left 0.22s;
+}
+.cust-mode-sw.on .cust-mode-knob, .cu-mode-sw.on .cu-mode-knob { left: 20px; }
+
+/* ══════════════════════════════════════════════════════════════════
+   FASHION PLUS — moving art on the Fashion home (app/js/part066.js)
+   The layers sit under the existing content and are invisible until the
+   mode is on, so switching off restores the shipped look exactly.
+   ══════════════════════════════════════════════════════════════════ */
+.fp-media {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: none; pointer-events: none;
+}
+body.fashplus #home .fp-media { display: block; }
+/* Everything already in the tile has to sit above the new layer. */
+body.fashplus #home .fp-tile > *:not(.fp-media),
+body.fashplus #home .fp-card > *:not(.fp-media) { position: relative; z-index: 2; }
+/* The art needs a scrim or the copy on top of it is unreadable. */
+body.fashplus #home .fp-tile::after,
+body.fashplus #home .fp-card::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(6,12,24,0.30) 0%, rgba(6,12,24,0.62) 58%, rgba(6,12,24,0.88) 100%);
+}
+body.fashplus #home .fp-tile, body.fashplus #home .fp-card { position: relative; overflow: hidden; }
+/* The tiles' own artwork would sit on top of the video. */
+body.fashplus #home .fp-tile .home-tile-icon { display: none; }
+body.fashplus #home .fp-tile .home-tile-rule { display: none; }
+
+/* Today's Practice: the mode's own pill, at the middle of the right edge.
+   The card's original pill is hidden while this is on. */
+#home .fp-enter { display: none; }
+body.fashplus #home .fp-card .fp-enter {
+  display: inline-flex;
+  position: absolute !important; right: 16px; top: 50%;
+  transform: translateY(-50%); z-index: 4;
+}
+body.fashplus #home .fp-card .home-card-bottom .tp-enter { display: none; }
+/* The black banner above it, matched to the Fashion home's other banners. */
+#home .fp-banner {
+  display: none;
+  width: calc(100% - 32px) !important; margin: 18px 16px 10px !important;
+  border-radius: 0 !important; box-sizing: border-box;
+}
+body.fashplus #home .fp-banner { display: flex; }
+
+/* ══════════════════════════════════════════════════════════════════
+   TILE SIZE IS THE SAME IN EVERY LOOK
+
+   Each style set its own padding and puck size, so switching look also
+   changed the height of the row — the neuro card stood ~165px against the
+   black card's 118px, and its titles wrapped onto two lines. The look is
+   the skin; the shape of the page should not move with it. Every grid tile
+   is now the compact black card's size, whichever style is on.
+   ══════════════════════════════════════════════════════════════════ */
+#home-nm .nmh-grid, #home .home-grid { grid-auto-rows: 1fr !important; }
+#home-nm .nmh-grid > .nmh-tile,
+#home .home-grid > .home-tile {
+  height: 118px !important; min-height: 0 !important;
+  padding: 12px 11px 38px !important;
+  overflow: hidden;
+}
+#home-nm .nmh-grid > .nmh-tile .nmh-tile-icon,
+#home .home-grid > .home-tile .home-tile-icon {
+  width: 34px !important; height: 34px !important; margin-bottom: 8px !important;
+}
+#home-nm .nmh-grid > .nmh-tile .nmh-tile-title,
+#home .home-grid > .home-tile .home-tile-title {
+  font-size: 12.5px !important; line-height: 1.2 !important;
+}
+#home-nm .nmh-grid > .nmh-tile .nmh-tile-sub,
+#home .home-grid > .home-tile .home-tile-sub {
+  font-size: 9.5px !important; line-height: 1.35 !important; margin-top: 2px !important;
+}
+#home-nm .nmh-grid > .nmh-tile .nmh-tile-enter,
+#home .home-grid > .home-tile .home-tile-enter {
+  bottom: 8px !important; right: 8px !important;
+}
+/* The decorative artwork layer some looks add must not add height either. */
+#home-nm .nmh-grid > .nmh-tile .nmh-tile-picon { max-height: 100%; }

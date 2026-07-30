@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=536">
+<link rel="stylesheet" href="nowssb-nm.css?v=538">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -867,6 +867,29 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
+    <!-- Reader — a black banner and the video, in one wrapper, under the
+         player. Text sits right of a vertical rule; no vignette. -->
+    <div class="rdsec-wrap nmh-rdsec-wrap">
+      <div class="nmh-sec-banner rdsec-banner" onclick="rdOpen()">
+        <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 4.5A1.4 1.4 0 0 1 4.4 3H10v16H4.4A1.4 1.4 0 0 1 3 17.6z" stroke="#fff" stroke-width="1.5"/><path d="M19 4.5A1.4 1.4 0 0 0 17.6 3H12v16h5.6a1.4 1.4 0 0 0 1.4-1.4z" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/></svg></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">Reader</div>
+          <div class="nmh-sec-banner-sub">Meanings and eBooks, in one place</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="reader-sec" onclick="rdOpen()">
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
+        <span class="reader-sec-rule"></span>
+        <div class="reader-sec-txt">
+          <span class="reader-sec-hello">NowssB</span>
+          <span class="reader-sec-name">Reader</span>
+          <span class="reader-sec-sub">Read every meaning, and every eBook.</span>
+          <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+        </div>
+      </div>
+    </div>
 
     <!-- The four home buttons + their tip rail, directly below Today's
          Practice. The Quick Access banner is a separate thing and stays
@@ -1169,15 +1192,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- ══ HEALTH JOURNEY CARD — same section the Fashion Home carries ══ -->
     <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
-    <div class="reader-sec nmh-reader-sec" onclick="rdOpen()">
-      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
-      <div class="reader-sec-fade"></div>
-      <div class="reader-sec-txt">
-        <span class="reader-sec-eyebrow">Read</span>
-        <span class="reader-sec-title">Reader</span>
-      </div>
-      <div class="tp-enter reader-sec-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
-    </div>
     <div class="health-journey-card w100" onclick="openSub('health-journey')">
       <video class="hjc-bg" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4"></video>
       <div class="hjc-content">
@@ -1274,32 +1288,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
         <div class="cust-panel-more"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
-      <div class="cust-row" onclick="openSub('quick-access')">
-        <div class="cust-row-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-        <div class="cust-row-divider"></div>
-        <div class="cust-row-txt">
-          <div class="cust-row-title">Quick Access</div>
-          <div class="cust-row-sub">Customize your bottom navigation bar</div>
-        </div>
-        <div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="cust-row" onclick="qlOpen()">
-        <div class="cust-row-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="cust-row-divider"></div>
-        <div class="cust-row-txt">
-          <div class="cust-row-title">Quick Links</div>
-          <div class="cust-row-sub">One-tap shortcuts to every corner of NowssB</div>
-        </div>
-        <div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="cust-row" onclick="hlOpen('nm')">
-        <div class="cust-row-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="3" y="2.5" width="16" height="4.2" rx="1" stroke="#fff" stroke-width="1.5"/><rect x="3" y="8.9" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><rect x="3" y="15.3" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/></svg></div>
-        <div class="cust-row-divider"></div>
-        <div class="cust-row-txt">
-          <div class="cust-row-title">Set As You Like</div>
-          <div class="cust-row-sub">Order every section and banner on this home</div>
-        </div>
-        <div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <!-- Rows rendered by app/js/part063.js from the same list the
+           Customize hub uses, so the two can never drift apart. -->
+      <div class="cust-scroll">
+        <div class="cust-rows"></div>
+        <div class="cust-scrollbar"><div class="cust-scrollthumb"></div></div>
       </div>
     </div>
 
@@ -1445,6 +1438,29 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
     </div>
   </div>
+  <!-- Reader — a black banner and the video, in one wrapper, under the
+       player. Text sits right of a vertical rule; no vignette. -->
+  <div class="rdsec-wrap fash-rdsec-wrap">
+    <div class="nmh-sec-banner rdsec-banner" onclick="rdOpen()">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 4.5A1.4 1.4 0 0 1 4.4 3H10v16H4.4A1.4 1.4 0 0 1 3 17.6z" stroke="#fff" stroke-width="1.5"/><path d="M19 4.5A1.4 1.4 0 0 0 17.6 3H12v16h5.6a1.4 1.4 0 0 0 1.4-1.4z" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-txt">
+        <div class="nmh-sec-banner-title">Reader</div>
+        <div class="nmh-sec-banner-sub">Meanings and eBooks, in one place</div>
+      </div>
+      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="reader-sec" onclick="rdOpen()">
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
+      <span class="reader-sec-rule"></span>
+      <div class="reader-sec-txt">
+        <span class="reader-sec-hello">NowssB</span>
+        <span class="reader-sec-name">Reader</span>
+        <span class="reader-sec-sub">Read every meaning, and every eBook.</span>
+        <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+      </div>
+    </div>
+  </div>
 
   <!-- Glassmorphism streak section — heading + real 3-cube glass visual,
        then the "Daily Streak" black banner itself as the entry point,
@@ -1573,32 +1589,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
       <div class="cust-panel-more"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
-    <div class="cust-row" onclick="openSub('quick-access')">
-      <div class="cust-row-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-      <div class="cust-row-divider"></div>
-      <div class="cust-row-txt">
-        <div class="cust-row-title">Quick Access</div>
-        <div class="cust-row-sub">Customize your bottom navigation bar</div>
-      </div>
-      <div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-    <div class="cust-row" onclick="qlOpen()">
-      <div class="cust-row-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="cust-row-divider"></div>
-      <div class="cust-row-txt">
-        <div class="cust-row-title">Quick Links</div>
-        <div class="cust-row-sub">One-tap shortcuts to every corner of NowssB</div>
-      </div>
-      <div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-    <div class="cust-row" onclick="hlOpen('fash')">
-      <div class="cust-row-icon"><svg viewBox="0 0 22 22" fill="none"><rect x="3" y="2.5" width="16" height="4.2" rx="1" stroke="#fff" stroke-width="1.5"/><rect x="3" y="8.9" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><rect x="3" y="15.3" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/></svg></div>
-      <div class="cust-row-divider"></div>
-      <div class="cust-row-txt">
-        <div class="cust-row-title">Set As You Like</div>
-        <div class="cust-row-sub">Order every section and banner on this home</div>
-      </div>
-      <div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <!-- Rows rendered by app/js/part063.js from the same list the
+         Customize hub uses, so the two can never drift apart. -->
+    <div class="cust-scroll">
+      <div class="cust-rows"></div>
+      <div class="cust-scrollbar"><div class="cust-scrollthumb"></div></div>
     </div>
   </div>
 
@@ -1811,15 +1806,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ══ HEALTH JOURNEY CARD ══ -->
   <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
-  <div class="reader-sec fash-reader-sec" onclick="rdOpen()">
-    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
-    <div class="reader-sec-fade"></div>
-    <div class="reader-sec-txt">
-      <span class="reader-sec-eyebrow">Read</span>
-      <span class="reader-sec-title">Reader</span>
-    </div>
-    <div class="tp-enter reader-sec-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
-  </div>
   <div class="health-journey-card w100" onclick="openSub('health-journey')">
     <video class="hjc-bg" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4"></video>
     <div class="hjc-content">
@@ -9442,10 +9428,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=6"></script>
-<script src="app/js/part063.js?v=3"></script>
+<script src="app/js/part062.js?v=7"></script>
+<script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=4"></script>
 <script src="app/js/part065.js?v=1"></script>
+<script src="app/js/part066.js?v=1"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=293" defer></script>
