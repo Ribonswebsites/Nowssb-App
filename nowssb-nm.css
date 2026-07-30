@@ -9304,3 +9304,40 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
   padding: 0 !important; border-radius: 0 !important;
 }
 #home-nm.nm-dark .nmh-plyr-wrap { background: none !important; box-shadow: none !important; }
+
+/* ══════════════════════════════════════════════════════════════════
+   PERSONALISED HEALING — the card and its chooser, in one wrapper
+   The banner is appended below the card by app/js/part067.js.
+   ══════════════════════════════════════════════════════════════════ */
+.healing-wrap { box-sizing: border-box; overflow: hidden; }
+#home .fash-healing-wrap {
+  width: calc(100% - 32px); margin: 18px 16px; padding: 12px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 0 !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.34);
+}
+#home-nm .nmh-healing-wrap {
+  width: 100%; margin: 16px 0; padding: 14px;
+  background: #f0f2f7; border-radius: 22px !important;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+}
+#home-nm.nm-dark .nmh-healing-wrap {
+  background: #16163c;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
+}
+/* The card and the banner were both written as top-level sections; inside
+   the wrapper its padding does the spacing. */
+.healing-wrap > .health-journey-card {
+  width: 100% !important; margin: 0 !important;
+}
+.healing-wrap > .vb-banner {
+  width: 100% !important; margin: 10px 0 0 !important; box-sizing: border-box;
+}
+body.homecorner-round .healing-wrap > .health-journey-card {
+  border-radius: 18px 18px 0 0 !important;
+}
+body.homecorner-round .healing-wrap > .vb-banner {
+  border-radius: 0 0 18px 18px !important;
+}

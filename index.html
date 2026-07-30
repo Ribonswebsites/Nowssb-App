@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=575">
+<link rel="stylesheet" href="nowssb-nm.css?v=576">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1241,6 +1241,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- ══ HEALTH JOURNEY CARD — same section the Fashion Home carries ══ -->
     <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
+    <!-- Personalised Healing and its chooser banner, in one wrapper.
+         The banner is appended below the card by app/js/part067.js. -->
+    <div class="healing-wrap nmh-healing-wrap">
     <div class="health-journey-card w100" onclick="openSub('health-journey')">
       <video class="hjc-bg" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4"></video>
       <div class="hjc-content">
@@ -1255,6 +1258,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
+    </div><!-- /nmh-healing-wrap -->
 
     <!-- Word Search -->
     <div class="word-search-section" onclick="openSub('word-search')" style="cursor:pointer;margin-top:16px;border-radius:22px;overflow:hidden;">
@@ -1931,6 +1935,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ══ HEALTH JOURNEY CARD ══ -->
   <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
+  <!-- Personalised Healing and its chooser banner, in one wrapper.
+       The banner is appended below the card by app/js/part067.js. -->
+  <div class="healing-wrap fash-healing-wrap">
   <div class="health-journey-card w100" onclick="openSub('health-journey')">
     <video class="hjc-bg" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4"></video>
     <div class="hjc-content">
@@ -1945,6 +1952,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
   </div>
+  </div><!-- /fash-healing-wrap -->
 
   <!-- STANDALONE BANNER ABOVE WORD SEARCH SECTION -->
   <div id="fashPromoVid" style="padding: 0 16px 16px; background: transparent;">
@@ -9561,12 +9569,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=13"></script>
+<script src="app/js/part062.js?v=14"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=5"></script>
 <script src="app/js/part065.js?v=9"></script>
 <script src="app/js/part066.js?v=2"></script>
-<script src="app/js/part067.js?v=9"></script>
+<script src="app/js/part067.js?v=10"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=293" defer></script>
