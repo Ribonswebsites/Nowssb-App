@@ -8947,3 +8947,16 @@ body.fashplus #home .fp-card .home-card-label {
    honours z-index while static — so it can give the position back and keep
    its place above the scrim. */
 body.fashplus #home .fp-card .home-card-top { position: static !important; }
+
+/* The Meaning Reader's side rail carries the notes library, so the floating
+   bubble would be a second door to the same panel. The eBook reader has no
+   rail, so it keeps the bubble. */
+#sub-reader-meaning .rd-npbub { display: none !important; }
+/* The footer's middle button is the highlight toggle now — Contents keeps
+   the header icon, which is the one place it is reached from. */
+.rd-nav-mid { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.rd-nav-mid svg { width: 15px; height: 15px; flex-shrink: 0; }
+.rd-nav-mid.rd-sw-btn.on {
+  background: rgba(232,213,163,0.16) !important;
+  border-color: rgba(232,213,163,0.5) !important; color: #e8d5a3 !important;
+}

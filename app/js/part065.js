@@ -261,7 +261,10 @@
       '<div class="rd-stage" id="rdMStage">' + pageHtml(pg, pages.length, mIdx) + '</div>' +
 
       '<div class="rd-rail">' +
-        '<button onclick="rdToggleContents(\'meaning\')" aria-label="Contents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.6h3.1v14.8H4zM8.9 4.6H12v14.8H8.9z"/><path d="m14.4 5.6 2.9-.8 3 11.1-2.9.8z"/><path d="M4 19.4h16"/></svg></button>' +
+        /* Contents already has the header icon; this slot is the notes
+           library instead, which is why the floating bubble is hidden in
+           this reader — the rail is its one home here. */
+        '<button onclick="rdNotepad(1)" aria-label="Notes library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14.5 3v4.5H19M8.5 12h7M8.5 16h4.5"/></svg></button>' +
         '<button onclick="rdTogglePanel(\'meaning\')" aria-label="Text settings"><span class="rd-aa">Aa</span></button>' +
         '<button onclick="rdSetPref(\'theme\',\'light\')" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg></button>' +
         '<button onclick="rdSetPref(\'theme\',\'black\')" aria-label="Black theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a6.9 6.9 0 0 0 11.1 11.1Z"/></svg></button>' +
@@ -285,7 +288,8 @@
         '<div class="rd-nav">' +
           '<button class="rd-nav-side" onclick="rdGo(\'meaning\',-1)"' + (mIdx === 0 ? ' disabled' : '') + '>' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Previous</button>' +
-          '<button class="rd-nav-mid" onclick="rdToggleContents(\'meaning\')">Contents</button>' +
+          '<button class="rd-nav-mid rd-sw-btn' + (swipeOn ? ' on' : '') + '" onclick="rdSwipe()">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m6.5 16.5 8.4-8.4a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8l-8.4 8.4H6.5z"/></svg>Highlight</button>' +
           '<button class="rd-nav-side" onclick="rdGo(\'meaning\',1)"' + (mIdx === pages.length - 1 ? ' disabled' : '') + '>Next ' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>' +
         '</div>' +
