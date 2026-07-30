@@ -74,7 +74,8 @@
     ebooks:  I + 'eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png',
     connect: I + 'eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
     chat:    I + 'ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
-    profile: I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
+    profile: I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+    offer:   I + 'eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png'
   };
   var STORE_CHIPS = [
     ['meaning', 'Meanings', 'The origin behind any word'],
@@ -86,6 +87,11 @@
     ['chat',    'Chat',      'Your conversations, in one place'],
     ['profile', 'Profile',   'Your space on NowssB']
   ];
+  var TREND_CHIPS = [
+    ['words',   'Trending Word', 'What is healing the most today'],
+    ['meaning', 'Meanings',      'The origin behind any word'],
+    ['offer',   "Today's Offer", 'Rotating store coupons']
+  ];
   var READER_CHIPS = [
     ['meaning', 'Meanings', 'Read every meaning as a book'],
     ['ebooks',  'eBooks',   'Every guide, page by page']
@@ -94,6 +100,7 @@
   var CHIPS = [
     { sel: '#home-nm .vb-banner[data-vb="vb0"], #home .vb-banner[data-vb="vb1"]', items: STORE_CHIPS },
     { sel: '#home-nm .vb-banner[data-vb="vb4"], #home .vb-banner[data-vb="vb5"]', items: CONNECT_CHIPS },
+    { sel: '#home-nm .vb-banner[data-vb="vb6"], #home .vb-banner[data-vb="vb7"]', items: TREND_CHIPS },
     { sel: '#home-nm .nmh-rdsec-wrap .reader-sec, #home .fash-rdsec-wrap .reader-sec', items: READER_CHIPS }
   ];
 
