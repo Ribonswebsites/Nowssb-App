@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=542">
+<link rel="stylesheet" href="nowssb-nm.css?v=543">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -890,6 +890,29 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
+    <!-- eBooks — same black-banner-over-video block as the Reader above it,
+         pointing at the Ebooks store rather than the reader. -->
+    <div class="rdsec-wrap nmh-ebsec-wrap">
+      <div class="nmh-sec-banner rdsec-banner" onclick="ebSecOpen()">
+        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title">eBooks</div>
+          <div class="nmh-sec-banner-sub">Deep-dive guides, yours to keep</div>
+        </div>
+        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="reader-sec ebsec-vid" onclick="ebSecOpen()">
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4"></video>
+        <span class="reader-sec-rule"></span>
+        <div class="reader-sec-txt">
+          <span class="reader-sec-hello">NowssB</span>
+          <span class="reader-sec-name">eBooks</span>
+          <span class="reader-sec-sub">Word science and sound healing, read anywhere.</span>
+          <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+        </div>
+      </div>
+    </div>
 
     <!-- The four home buttons + their tip rail, directly below Today's
          Practice. The Quick Access banner is a separate thing and stays
@@ -1457,6 +1480,29 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <span class="reader-sec-hello">NowssB</span>
         <span class="reader-sec-name">Reader</span>
         <span class="reader-sec-sub">Read every meaning, and every eBook.</span>
+        <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+      </div>
+    </div>
+  </div>
+  <!-- eBooks — same black-banner-over-video block as the Reader above it,
+       pointing at the Ebooks store rather than the reader. -->
+  <div class="rdsec-wrap fash-ebsec-wrap">
+    <div class="nmh-sec-banner rdsec-banner" onclick="ebSecOpen()">
+      <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-txt">
+        <div class="nmh-sec-banner-title">eBooks</div>
+        <div class="nmh-sec-banner-sub">Deep-dive guides, yours to keep</div>
+      </div>
+      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="reader-sec ebsec-vid" onclick="ebSecOpen()">
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4"></video>
+      <span class="reader-sec-rule"></span>
+      <div class="reader-sec-txt">
+        <span class="reader-sec-hello">NowssB</span>
+        <span class="reader-sec-name">eBooks</span>
+        <span class="reader-sec-sub">Word science and sound healing, read anywhere.</span>
         <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
       </div>
     </div>
@@ -9428,12 +9474,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=8"></script>
+<script src="app/js/part062.js?v=9"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=5"></script>
 <script src="app/js/part065.js?v=2"></script>
 <script src="app/js/part066.js?v=1"></script>
-<script src="app/js/part067.js?v=3"></script>
+<script src="app/js/part067.js?v=4"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=293" defer></script>
