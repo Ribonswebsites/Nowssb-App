@@ -8378,3 +8378,92 @@ body.fashplus #home .fp-banner { display: flex; }
   background: #fff; display: flex; align-items: center; justify-content: center;
 }
 .vb-go svg { width: 12px; height: 12px; display: block; }
+
+/* ══════════════════════════════════════════════════════════════════
+   FASHION PLUS — second pass
+
+   The tiles keep nothing but the clip and a way in: no icon, no rule, no
+   title, no subtitle. The player keeps its words but loses its artwork,
+   grows taller, and sits under a much lighter scrim so the video actually
+   reads. Both use the same bare Enter — the word and a white circle, no
+   pill behind it.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── The bare Enter, shared by the tiles and the player ── */
+body.fashplus #home .fp-tile .home-tile-enter,
+body.fashplus #home .fp-card .fp-enter {
+  background: none !important; border: none !important;
+  box-shadow: none !important; padding: 0 !important;
+  border-radius: 0 !important;
+  display: inline-flex !important; align-items: center; gap: 8px;
+}
+body.fashplus #home .fp-tile .home-tile-enter-lbl,
+body.fashplus #home .fp-card .fp-enter .tp-enter-lbl {
+  color: #fff !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 1.6px; text-transform: uppercase;
+}
+body.fashplus #home .fp-tile .home-tile-enter-go,
+body.fashplus #home .fp-card .fp-enter .tp-enter-go {
+  width: 26px !important; height: 26px !important; flex-shrink: 0;
+  background: #fff !important; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+}
+body.fashplus #home .fp-tile .home-tile-enter-go svg,
+body.fashplus #home .fp-card .fp-enter .tp-enter-go svg { width: 12px; height: 12px; }
+
+/* ── Tiles: clip and Enter only ── */
+body.fashplus #home .fp-tile .home-tile-txt,
+body.fashplus #home .fp-tile .home-tile-title,
+body.fashplus #home .fp-tile .home-tile-sub { display: none !important; }
+/* The clip is the content, so the scrim only needs to carry the Enter. */
+body.fashplus #home .fp-tile::after {
+  background: linear-gradient(90deg, rgba(6,12,24,0) 0%, rgba(6,12,24,0) 45%, rgba(6,12,24,0.55) 100%) !important;
+}
+body.fashplus #home .fp-tile .home-tile-enter {
+  position: absolute !important; right: 12px; top: 50%;
+  transform: translateY(-50%); bottom: auto !important; z-index: 3;
+}
+
+/* ── Player: no artwork, taller, lighter scrim, copy nudged down ── */
+body.fashplus #home .fp-card .tile-img-bg,
+body.fashplus #home .fp-card .tile-overlay,
+body.fashplus #home .fp-card .home-card-top img,
+body.fashplus #home .fp-card > img { display: none !important; }
+body.fashplus #home .fp-card {
+  min-height: 250px !important; height: auto !important;
+}
+/* Was a heavy top-to-bottom wash that buried the clip; now only enough on
+   the left to hold the copy, and clear on the right where the art is. */
+body.fashplus #home .fp-card::after {
+  background: linear-gradient(100deg, rgba(6,12,24,0.78) 0%, rgba(6,12,24,0.42) 44%, rgba(6,12,24,0.10) 72%, rgba(6,12,24,0.20) 100%) !important;
+}
+body.fashplus #home .fp-card .home-card-top { padding-top: 16px !important; }
+body.fashplus #home .fp-card .home-card-bottom { padding-bottom: 14px !important; }
+body.fashplus #home .fp-card .home-card-sub { max-width: 62%; }
+
+/* ══════════════════════════════════════════════════════════════════
+   READER SECTION — no wrapper, no rule, Enter on the right
+   The wrapper element stays so the layout editor keeps treating the banner
+   and the video as one movable unit; it just stops drawing anything.
+   ══════════════════════════════════════════════════════════════════ */
+#home .fash-rdsec-wrap, #home-nm .nmh-rdsec-wrap {
+  background: none !important; border: none !important;
+  box-shadow: none !important; padding: 0 !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+#home .fash-rdsec-wrap { width: calc(100% - 32px); margin: 18px 16px; }
+#home-nm .nmh-rdsec-wrap { width: 100%; margin: 16px 0; }
+.reader-sec-rule { display: none !important; }
+/* Copy still reads on the right half; the Enter goes to the far right of it. */
+.reader-sec-cta {
+  align-self: flex-end; margin-right: 2px;
+}
+/* The per-look tile rules and the uniform-height block both set these with
+   !important, so hiding the icon and moving the Enter has to as well. */
+body.fashplus #home .fp-tile .home-tile-icon,
+body.fashplus #home .fp-tile .home-tile-rule { display: none !important; }
+body.fashplus #home .fp-tile .home-tile-enter {
+  bottom: auto !important; right: 12px !important;
+  top: 50% !important; transform: translateY(-50%) !important;
+}
