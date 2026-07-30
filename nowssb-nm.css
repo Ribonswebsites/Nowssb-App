@@ -8983,11 +8983,11 @@ body.fashplus #home .fp-card .home-card-top { padding: 0 14px 2px !important; }
    wide as the column so the artwork on the left is untouched.
    (app/js/part067.js)
    ══════════════════════════════════════════════════════════════════ */
-/* No panel behind any of it — these clips are all composed with a bright
-   vertical divider about 45% across, so the copy starts just to the right
-   of that line and the artwork on the left is left alone. */
+/* No panel behind any of it. These clips carry their own wordmark across
+   the left half — the Store one runs to about 47% — so the copy starts past
+   that, clear of both the artwork and the lettering baked into the frame. */
 .vb-chips {
-  position: absolute; left: 45%; right: 10px; top: 50%; transform: translateY(-50%);
+  position: absolute; left: 52%; right: 10px; top: 50%; transform: translateY(-50%);
   z-index: 3; display: flex; align-items: center;
   padding: 0; pointer-events: none; background: none;
 }
