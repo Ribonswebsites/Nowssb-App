@@ -8181,3 +8181,137 @@ body.fashplus #home .fp-banner { display: flex; }
 }
 /* The decorative artwork layer some looks add must not add height either. */
 #home-nm .nmh-grid > .nmh-tile .nmh-tile-picon { max-height: 100%; }
+
+/* ══════════════════════════════════════════════════════════════════
+   READER TOOLS — selection toolbar, page tools, reminders, toast
+   ══════════════════════════════════════════════════════════════════ */
+.rd-hl { background: rgba(232,177,0,0.34); color: inherit; border-radius: 3px !important; padding: 0 1px; }
+
+.rd-seltools {
+  position: absolute; left: 10px; right: 10px; bottom: 12px; z-index: 46;
+  display: flex; gap: 4px; padding: 6px;
+  background: rgba(14,14,17,0.97); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px !important; box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+  opacity: 0; pointer-events: none; transform: translateY(8px);
+  transition: opacity 0.18s ease, transform 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+.rd-seltools.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.rd-seltools button {
+  flex: 1; min-width: 0; min-height: 46px !important; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  background: none; border: none; color: rgba(255,255,255,0.85);
+  border-radius: 11px !important; padding: 4px 2px;
+}
+.rd-seltools button:active { background: rgba(255,255,255,0.1); }
+.rd-seltools svg { width: 17px; height: 17px; }
+.rd-seltools span {
+  font-family: 'DM Sans', sans-serif; font-size: 8.5px; font-weight: 600;
+  letter-spacing: 0.2px; white-space: nowrap;
+}
+
+.rd-tools {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 47;
+  padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: #0e0e11; border-top: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px 20px 0 0 !important;
+  max-height: 82%; overflow-y: auto;
+  transform: translateY(102%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.rd-tools.open { transform: translateY(0); }
+.rd-tools-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #fff;
+  margin-bottom: 12px;
+}
+.rd-tools-head button {
+  width: 32px !important; height: 32px !important; min-height: 32px !important;
+  cursor: pointer; background: rgba(255,255,255,0.08); border: none;
+  border-radius: 50% !important; color: #fff; font-size: 18px; line-height: 1;
+}
+.rd-tools-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.rd-tool {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  min-height: 74px !important; cursor: pointer; padding: 10px 6px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.11);
+  border-radius: 14px !important; color: rgba(255,255,255,0.85);
+}
+.rd-tool.on { background: rgba(232,213,163,0.16); border-color: rgba(232,213,163,0.45); color: #e8d5a3; }
+.rd-tool svg { width: 19px; height: 19px; }
+.rd-tool span {
+  font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 600;
+  text-align: center; line-height: 1.25;
+}
+.rd-tools-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.38); margin: 16px 0 8px;
+}
+.rd-mk-list { display: flex; flex-direction: column; gap: 7px; }
+.rd-mk {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.82);
+  line-height: 1.5;
+}
+.rd-mk span { flex: 1; min-width: 0; }
+.rd-mk em {
+  display: block; font-style: normal; font-size: 10.5px;
+  color: rgba(255,255,255,0.42); margin-top: 3px;
+}
+.rd-mk button {
+  width: 24px !important; height: 24px !important; min-height: 24px !important;
+  flex-shrink: 0; cursor: pointer; background: rgba(255,255,255,0.08); border: none;
+  border-radius: 50% !important; color: rgba(255,255,255,0.7); font-size: 15px; line-height: 1;
+}
+.rd-mk-hl { border-left: 2px solid rgba(232,177,0,0.7); }
+.rd-mk-note { border-left: 2px solid rgba(200,232,245,0.6); }
+.rd-mk-empty {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.38); line-height: 1.6; padding: 2px 2px 4px;
+}
+
+.rd-remind {
+  position: absolute; inset: 0; z-index: 48;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(4,8,18,0.7);
+  opacity: 0; pointer-events: none; transition: opacity 0.24s ease;
+}
+.rd-remind.open { opacity: 1; pointer-events: auto; }
+.rd-remind-card {
+  width: 100%; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  background: #101014; border-top: 1px solid rgba(255,255,255,0.13);
+  border-radius: 20px 20px 0 0 !important;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.rd-remind-head {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff;
+  margin-bottom: 4px; line-height: 1.4;
+}
+.rd-remind-b, .rd-remind-x {
+  cursor: pointer; padding: 14px; min-height: 44px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  border-radius: 13px !important; text-align: center;
+}
+.rd-remind-b {
+  color: #fff; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+}
+.rd-remind-b:active { background: rgba(232,213,163,0.2); }
+.rd-remind-x {
+  color: rgba(255,255,255,0.55); background: none; border: none; margin-top: 2px;
+}
+
+.rd-toast {
+  position: absolute; left: 50%; bottom: 96px; z-index: 60;
+  transform: translate(-50%, 8px); opacity: 0; pointer-events: none;
+  padding: 10px 18px; background: #fff; color: #060c18;
+  border-radius: 999px !important; box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 800;
+  letter-spacing: 0.6px; white-space: nowrap;
+  transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+.rd-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.rd-erow-toc { cursor: pointer; color: rgba(232,213,163,0.85) !important; font-weight: 700; }
+/* Text has to be selectable for any of the tools to work. */
+.rd-page, .rd-page * { -webkit-user-select: text; user-select: text; }

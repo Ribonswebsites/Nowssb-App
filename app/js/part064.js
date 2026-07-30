@@ -59,6 +59,7 @@
     routine:      img(A.routines),
     rx:           img(A.ai),
     streak:       img(A.streak),
+    reader:       img(A.library),
     subscription: img(A.every),
     support:      img(A.settings)
   };
@@ -82,7 +83,8 @@
     { name: 'Your Practice', items: [
       { k: 'routine',   label: 'Daily Routine',   sub: 'Reminders for each routine slot' },
       { k: 'rx',        label: 'AI Prescription', sub: 'When your daily words are ready' },
-      { k: 'streak',    label: 'Streak',          sub: 'Before your streak is about to break' }
+      { k: 'streak',    label: 'Streak',          sub: 'Before your streak is about to break' },
+      { k: 'reader',    label: 'Reading Reminders', sub: 'Reminders you set yourself in the Reader' }
     ]},
     { name: 'Account', items: [
       { k: 'subscription', label: 'Subscription', sub: 'Renewals, plan changes and billing' },
