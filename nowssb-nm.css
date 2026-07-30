@@ -9021,6 +9021,16 @@ body.fashplus #home .fp-card .home-card-top { padding: 0 14px 2px !important; }
    rounded corners were drawn against something the same colour and nothing
    appeared to change. Rounded mode rounds the top only — the bottom is the
    end of the page — and lifts it off what is above so the notch reads. */
+/* Default is the rounded look everywhere else on the page, so the footer
+   opens that way too; Edges mode below squares it off again. */
+/* app/app.css resets every element to square with `* { border-radius: 0
+   !important }`, so this has to be !important to exist at all. Edges mode
+   below carries the same weight at a higher specificity and still wins. */
+#home .home-body > .home-footer,
+#home-nm .nmh-wrap > .home-footer {
+  border-radius: 26px 26px 0 0 !important;
+  margin-top: 18px !important;
+}
 body.homecorner-round #home .home-body > .home-footer,
 body.homecorner-round #home-nm .nmh-wrap > .home-footer {
   border-radius: 26px 26px 0 0 !important;
@@ -9125,17 +9135,25 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
 .rd-rail-fold:not(.open) .rd-rail-set { padding-left: 0; padding-right: 0; }
 .rd-rail-fold.open .rd-rail-set { max-width: 60px; opacity: 1; pointer-events: auto; }
 /* The tab is the only thing showing while it is shut. */
-.rd-rail-tab {
-  width: 26px !important; height: 54px !important; min-height: 54px; flex-shrink: 0;
+/* Shut, it is a small nub — it should not read as a component of its own.
+   .rd-rail button pins every control to 42px with !important, so the tab has
+   to out-specify it, not just declare a size. */
+.rd-rail-fold > .rd-rail-tab {
+  width: 17px !important; height: 34px !important; min-height: 34px !important; flex-shrink: 0;
   padding: 0 !important; display: flex; align-items: center; justify-content: center;
-  background: rgba(12,12,16,0.92); color: rgba(255,255,255,0.75);
-  border: 1px solid rgba(255,255,255,0.1); border-left: none;
-  border-radius: 0 14px 14px 0 !important;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.45);
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  background: rgba(12,12,16,0.78); color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.08); border-left: none;
+  border-radius: 0 10px 10px 0 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: width 0.25s, height 0.25s, transform 0.3s cubic-bezier(0.4,0,0.2,1),
+              background 0.25s, color 0.25s;
 }
-.rd-rail-tab svg { width: 15px; height: 15px; display: block; }
-.rd-rail-fold.open .rd-rail-tab { transform: rotate(180deg); }
+.rd-rail-fold > .rd-rail-tab svg { width: 11px !important; height: 11px !important; display: block; }
+.rd-rail-fold.open > .rd-rail-tab {
+  transform: rotate(180deg);
+  width: 22px !important; height: 44px !important; min-height: 44px !important;
+  background: rgba(12,12,16,0.92); color: rgba(255,255,255,0.8);
+}
 .rd-rail-fold.open { flex-direction: row-reverse; }
 /* The Meaning Reader's rail is unchanged — it is not folded. */
 #sub-reader-ebook .rd-rail { z-index: 26; }
@@ -9143,22 +9161,32 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
 /* ══════════════════════════════════════════════════════════════════
    PAGE TURN — the leaf hinges in from the edge it came from, 280ms.
    ══════════════════════════════════════════════════════════════════ */
-.rd-stage { perspective: 1600px; }
-.rd-page { transform-style: preserve-3d; backface-visibility: hidden; }
-@keyframes rdTurnNext {
-  0%   { transform: rotateY(-22deg) translateX(24%); opacity: 0.15; }
-  60%  { opacity: 1; }
-  100% { transform: none; opacity: 1; }
+/* The page you are leaving is lifted out as a copy and swung over on its
+   spine, darkening as it goes, with the next page already sitting under it.
+   Going back, the page you are returning to swings in the same way. 200ms —
+   long enough to read as paper, short enough to feel instant. */
+.rd-stage { perspective: 1500px; position: relative; }
+.rd-page { backface-visibility: hidden; }
+.rd-leaf {
+  transform-origin: left center; will-change: transform, filter;
+  pointer-events: none; backface-visibility: hidden;
+  box-shadow: 0 0 40px rgba(0,0,0,0.55);
 }
-@keyframes rdTurnPrev {
-  0%   { transform: rotateY(22deg) translateX(-24%); opacity: 0.15; }
-  60%  { opacity: 1; }
-  100% { transform: none; opacity: 1; }
+@keyframes rdLeafGo {
+  0%   { transform: rotateY(0deg); filter: brightness(1); }
+  100% { transform: rotateY(-122deg); filter: brightness(0.62); }
 }
-.rd-page.rd-turn-n { transform-origin: left center; animation: rdTurnNext .28s cubic-bezier(.22,.61,.36,1) both; }
-.rd-page.rd-turn-p { transform-origin: right center; animation: rdTurnPrev .28s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes rdLeafBack {
+  0%   { transform: rotateY(-122deg); filter: brightness(0.62); }
+  100% { transform: rotateY(0deg); filter: brightness(1); }
+}
+.rd-leaf.rd-leaf-go { animation: rdLeafGo .2s cubic-bezier(.35,0,.25,1) forwards; }
+.rd-page.rd-turn-p {
+  transform-origin: left center; will-change: transform, filter;
+  animation: rdLeafBack .2s cubic-bezier(.35,0,.25,1) both;
+}
 @media (prefers-reduced-motion: reduce) {
-  .rd-page.rd-turn-n, .rd-page.rd-turn-p { animation: none; }
+  .rd-leaf.rd-leaf-go, .rd-page.rd-turn-p { animation: none; }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -9188,3 +9216,32 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
   border: 1px dashed rgba(232,213,163,0.4);
 }
 .rd-lib-open .rd-lib-cov-open svg { width: 24px; height: 24px; }
+
+/* ══════════════════════════════════════════════════════════════════
+   FULL SCREEN — everything but the page steps out
+   The rail tab stays, and a corner chip appears, so there is always a
+   way back. (app/js/part065.js)
+   ══════════════════════════════════════════════════════════════════ */
+.rd-immersive .rd-top,
+.rd-immersive .rd-foot,
+.rd-immersive .rd-erow,
+.rd-immersive .rd-prog-wide,
+.rd-immersive .rd-chev { display: none !important; }
+.rd-immersive .rd-stage {
+  padding-top: max(env(safe-area-inset-top, 10px), 10px) !important;
+  padding-bottom: max(env(safe-area-inset-bottom, 10px), 10px) !important;
+}
+.rd-immersive .rd-page { min-height: 100%; box-sizing: border-box; }
+#sub-reader-meaning.rd-immersive .rd-stage { padding-left: 24px !important; }
+/* The way out, small and out of the reading column. */
+.rd-full-out {
+  display: none; position: fixed; z-index: 40;
+  top: max(env(safe-area-inset-top, 12px), 12px); right: 12px;
+  width: 34px !important; height: 34px !important; min-height: 34px; padding: 0 !important;
+  align-items: center; justify-content: center;
+  background: rgba(12,12,16,0.8); color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 50% !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+.rd-immersive .rd-full-out { display: flex; }
+.rd-full-out svg { width: 15px; height: 15px; display: block; }

@@ -312,6 +312,7 @@
     bindPageSwipe(host, 'meaning');
     reapplyHighlights();
     refreshNotepad();
+    paintRail();
   }
 
   /* ══ EBOOK READER — library, then a page with a bottom settings tray ══ */
@@ -421,25 +422,62 @@
     var c = ctx();
     var at = c.idx, last = c.pages.length - 1;
     if ((dir > 0 && at >= last) || (dir < 0 && at <= 0)) { haptic(8); return; }
+
+    var sc = document.getElementById('sub-reader-' + which);
+    var stage = sc && sc.querySelector('.rd-stage');
+    /* Going forward, the page you are leaving is the one that moves: it is
+       lifted out as a copy first, so it can swing over the top of the new
+       page underneath instead of the new page sliding in behind nothing. */
+    var leaf = null;
+    if (stage && dir > 0 && !reduceMotion()) {
+      var cur = stage.querySelector('.rd-page');
+      if (cur) {
+        var r = cur.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+        leaf = cur.cloneNode(true);
+        leaf.classList.add('rd-leaf');
+        leaf.style.cssText += ';position:absolute;margin:0;z-index:14;' +
+          'left:' + (r.left - sr.left + stage.scrollLeft) + 'px;' +
+          'top:' + (r.top - sr.top + stage.scrollTop) + 'px;' +
+          'width:' + r.width + 'px;height:' + r.height + 'px;';
+      }
+    }
+
     if (which === 'meaning') { mIdx += dir; renderMeaning(); }
     else { eIdx += dir; renderEbook(); }
     haptic(12);
-    var sc = document.getElementById('sub-reader-' + which);
+
+    sc = document.getElementById('sub-reader-' + which);
     var st = sc && sc.querySelector('.rd-stage');
     if (st) st.scrollTop = 0;
-    turnPage(which, dir);
+    if (leaf && st) {
+      st.appendChild(leaf);
+      void leaf.offsetWidth;
+      leaf.classList.add('rd-leaf-go');
+      setTimeout(function () { if (leaf.parentNode) leaf.parentNode.removeChild(leaf); }, 260);
+    } else if (dir < 0 && !reduceMotion()) {
+      var pg = st && st.querySelector('.rd-page');
+      if (pg) { pg.classList.remove('rd-turn-p'); void pg.offsetWidth; pg.classList.add('rd-turn-p'); }
+    }
   };
 
-  /* The leaf hinges in from the edge it came from — quick, 280ms, the way a
-     page actually behaves rather than a slide. */
-  function turnPage(which, dir) {
-    var sc = document.getElementById('sub-reader-' + which);
-    var pg = sc && sc.querySelector('.rd-page');
-    if (!pg) return;
-    pg.classList.remove('rd-turn-n', 'rd-turn-p');
-    void pg.offsetWidth;
-    pg.classList.add(dir > 0 ? 'rd-turn-n' : 'rd-turn-p');
+  function reduceMotion() {
+    try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   }
+
+  /* ── Full screen ───────────────────────────────────────────────────
+     Header, footer, progress row and page chrome all step out; the leaf
+     takes the whole screen. The rail tab and a corner chip are the way
+     back, so there is always something to press. ── */
+  var immersive = false;
+  window.rdFull = function () {
+    immersive = !immersive;
+    ['sub-reader-meaning', 'sub-reader-ebook'].forEach(function (id) {
+      var sc = document.getElementById(id);
+      if (sc) sc.classList.toggle('rd-immersive', immersive);
+    });
+    toast(immersive ? 'Full screen — tap the corner to come back' : 'Full screen off');
+    haptic(immersive ? [18, 30, 18] : 18);
+  };
 
   /* Swipe across the page to turn it. Highlight mode owns the drag while it
      is on, so this stands down rather than fighting it for the gesture. */
@@ -477,10 +515,35 @@
     haptic(15);
   };
   window.rdOpenBook = function (key) {
-    var list = books();
-    for (var i = 0; i < list.length; i++) if (list[i].key === key) eBook = list[i];
-    eIdx = 0; renderEbook(); haptic(28);
+    var list = books(), found = null;
+    for (var i = 0; i < list.length; i++) if (list[i].key === key) found = list[i];
+    if (!found) return;
+    eBook = found; eIdx = 0; renderEbook(); haptic(28);
+    /* A shelf title that ships an .epub is read the same way a file picked
+       off the device is — same unzip, same manifest, same pages. Give any
+       EB_BOOKS entry an `epub` URL and it opens as a real book. */
+    if (found.epub && !found.pages) loadEpubUrl(found);
   };
+
+  function loadEpubUrl(book) {
+    if (book._loading) return;
+    book._loading = true;
+    toast('Opening ' + book.title + '…');
+    fetch(book.epub)
+      .then(function (r) { if (!r.ok) throw new Error('http'); return r.arrayBuffer(); })
+      .then(function (buf) { return readZip(new Uint8Array(buf)); })
+      .then(function (files) { return buildEpub(files, book.title + '.epub'); })
+      .then(function (built) {
+        book.pages = built.pages;
+        book._loading = false;
+        if (eBook && eBook.key === book.key) { eIdx = 0; renderEbook(); }
+        toast(built.pages.length + ' chapters');
+      })
+      .catch(function () {
+        book._loading = false;
+        toast('Could not open that book file');
+      });
+  }
   window.rdBackToLibrary = function () { eBook = null; renderEbook(); haptic(20); };
 
   function reminderHtml() {
@@ -1194,13 +1257,21 @@
         '<button onclick="rdSetPref(\'theme\',\'light\')" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg></button>' +
         '<button onclick="rdSetPref(\'theme\',\'black\')" aria-label="Black theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a6.9 6.9 0 0 0 11.1 11.1Z"/></svg></button>' +
         '<button onclick="rdToggleTools(' + w + ')" aria-label="Page tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m6.5 16.5 8.4-8.4a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8l-8.4 8.4H6.5z"/></svg></button>' +
+        '<button onclick="rdFull()" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M15 20h5v-5M9 20H4v-5"/></svg></button>' +
       '</div>' +
+      '<button class="rd-full-out" onclick="rdFull()" aria-label="Leave full screen">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h5V4M20 9h-5V4M20 15h-5v5M4 15h5v5"/></svg>' +
+      '</button>' +
     '</div>';
   }
 
   function paintRail() {
     document.querySelectorAll('.rd-rail-fold').forEach(function (r) {
       r.classList.toggle('open', railOpen);
+    });
+    ['sub-reader-meaning', 'sub-reader-ebook'].forEach(function (id) {
+      var sc = document.getElementById(id);
+      if (sc) sc.classList.toggle('rd-immersive', immersive);
     });
   }
   window.rdRail = function () { railOpen = !railOpen; paintRail(); haptic(15); };
