@@ -98,153 +98,155 @@
   // time they actually open it again.
   window.addEventListener('appinstalled', function () { start(); });
 })();
+/* ── Decorative-video playback controller ─────────────────────────────────
+   Every looping background video in the app is managed here: play the few
+   that are actually on screen, keep everything else paused.
 
-/* ── Pause offscreen videos ────────────────────────────────────────────────
-   Every autoplay/loop video keeps decoding frames even after its screen is
-   closed and covered by whatever opened next — that's a real, continuous
-   CPU/battery cost with nothing on screen to show for it. This periodically
-   checks each video's actual visibility (via the same .open/.active classes
-   the app already uses to show/hide screens, not a guess) and pauses ones
-   that are hidden.
-   Only ever resumes a video THIS script itself paused (tracked in
-   autoPaused) — anything already paused for some other reason (the user
-   tapped pause, a carousel deliberately stopped it, etc.) is never touched,
-   so no existing pause/play behavior anywhere in the app can be overridden.
-   Skips WebRTC call videos entirely (they use srcObject, not src/<source>,
-   so a live call is never paused by this).
-   Important: the plain <video autoplay> HTML attribute is the browser's OWN
-   standing instruction to keep the element playing — calling .pause() via
-   JS does not cancel that instruction, so if the browser's media pipeline
-   ever resets (observed in testing: an internal abort/reload cycle on a
-   stalled load) the autoplay attribute silently resumes playback again a
-   moment later, fighting our own pause. Stripping the attribute the first
-   time we pause a video hands full control to this script from then on —
-   .play()/.pause() calls here still work exactly the same either way. ── */
+   This used to poll every 500ms and, on every scroll frame, walk each
+   video's ancestor chain calling getComputedStyle and getBoundingClientRect.
+   With a handful of videos that was fine. It is not fine now — there are
+   around thirty, and that work happened per video per frame while the
+   finger was moving, which is a forced synchronous layout on the scroll
+   path. That is what made scrolling stutter.
+
+   Three changes:
+     · An IntersectionObserver reports what is on screen, so scrolling costs
+       nothing — no layout reads on the scroll path at all.
+     · The expensive part, "is this inside a screen that is currently
+       shown", is cached per element and only recomputed when a class
+       actually changes, not on every frame.
+     · At most MAX_PLAYING videos decode at once — the ones nearest the
+       middle of the viewport. Everything else stays paused even if it is
+       technically on screen. Decoders, not downloads, are the cost.
+
+   Behaviour is otherwise unchanged: only videos this script paused are ever
+   resumed, WebRTC streams are never touched, the practice player keeps its
+   own pause control, and everything stops when the app is backgrounded.
+   ── */
 (function () {
-  var autoPaused = (typeof WeakSet !== 'undefined') ? new WeakSet() : null;
-  if (!autoPaused) return; // no WeakSet support — skip rather than leak references
-
-  var MARK = 'data-nwsb-vidmanaged';
-
-  // Is the video actually within (or just outside) the viewport? A phone
-  // only has ~2-4 hardware video decoders, but a single OPEN screen can hold
-  // 8-10 decorative loops — Home alone has 8. Checking only "is the screen
-  // open" therefore still left every one of them decoding at once, which is
-  // the stutter/heat you feel while scrolling. Anything more than half a
-  // screen away is paused; it resumes before it scrolls back into view, so
-  // nothing is ever visibly stopped.
-  function inViewport(el) {
-    var r = el.getBoundingClientRect();
-    if (r.width === 0 || r.height === 0) return false;
-    var margin = (window.innerHeight || 800) * 0.5;
-    return r.bottom > -margin && r.top < (window.innerHeight || 800) + margin;
-  }
-
-  function isVisible(el) {
-    var node = el;
-    while (node && node !== document.documentElement) {
-      if (node.classList) {
-        if (node.classList.contains('sub-screen')) return node.classList.contains('open') && inViewport(el);
-        if (node.classList.contains('screen'))     return node.classList.contains('active') && inViewport(el);
-        if (node.classList.contains('menu-drawer')) return node.classList.contains('open') && inViewport(el);
-      }
-      var cs = window.getComputedStyle(node);
-      if (cs.display === 'none' || cs.visibility === 'hidden') return false;
-      // Overlays like #authLoader hide themselves with opacity:0 while still
-      // occupying layout — without this they'd keep a decoder running the
-      // whole time the app is open for something nobody can see.
-      if (parseFloat(cs.opacity) === 0) return false;
-      node = node.parentElement;
-    }
-    // Not inside any known screen wrapper — always-visible chrome (the auth
-    // loader, etc.). Still only worth decoding while it's actually on screen.
-    return inViewport(el);
-  }
+  var MARK = 'data-nwsb-vis';
+  var MAX_PLAYING = 4;
+  var autoPaused = new WeakSet();
+  var onScreen = new WeakSet();
+  var shownCache = new WeakMap();   // element -> boolean, cleared on class changes
+  var tracked = [];
 
   function hasStaticSource(v) {
-    // Checks the HTML itself (src attribute or a <source> child), not the
-    // resolved .currentSrc/.src PROPERTY — those stay empty for a
-    // <source>-child video until the browser actually starts loading it,
-    // which made this check wrongly treat several real decorative videos
-    // (the ones built with <source> instead of a plain src attribute) as
-    // WebRTC call streams and skip them entirely, forever. A true call
-    // video (srcObject-driven) has neither a src attribute nor a <source>
-    // child, so this still correctly excludes those.
-    return v.hasAttribute('src') || !!v.querySelector('source[src]');
+    if (v.getAttribute('src')) return true;
+    return !!v.querySelector('source[src]');
   }
 
-  function refresh() {
-    // App backgrounded / phone locked: nothing is visible, so don't let the
-    // poll re-start what the visibilitychange handler just paused. (That
-    // fight also produced a stream of "play() interrupted by pause()"
-    // console warnings.)
-    if (document.hidden) return;
-    // video[autoplay] catches ones not seen yet; [MARK] keeps tracking ones
-    // whose autoplay attribute we already stripped after pausing them once.
-    document.querySelectorAll('video[autoplay], video[data-nwsb-auto], video[' + MARK + ']').forEach(function (v) {
-      if (!hasStaticSource(v)) return; // live call stream (srcObject) — never touch
+  /* Is every ancestor of this video actually being shown? The screens use
+     .open / .active classes, so this only changes when a class changes —
+     which is why the answer is cached rather than recomputed per frame. */
+  function shown(el) {
+    if (shownCache.has(el)) return shownCache.get(el);
+    var ok = true, node = el;
+    while (node && node !== document.documentElement) {
+      if (node.classList) {
+        if (node.classList.contains('sub-screen')) { ok = node.classList.contains('open'); break; }
+        if (node.classList.contains('screen'))     { ok = node.classList.contains('active'); break; }
+        if (node.classList.contains('menu-drawer')) { ok = node.classList.contains('open'); break; }
+      }
+      var cs = window.getComputedStyle(node);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) { ok = false; break; }
+      node = node.parentElement;
+    }
+    shownCache.set(el, ok);
+    return ok;
+  }
+
+  var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) onScreen.add(e.target); else onScreen.delete(e.target);
+    });
+    queue();
+  }, { rootMargin: '15% 0px 15% 0px', threshold: 0.01 }) : null;
+
+  function track() {
+    document.querySelectorAll('video').forEach(function (v) {
+      if (v.getAttribute(MARK)) return;
+      if (!hasStaticSource(v)) return;          // live call stream — never touch
       v.setAttribute(MARK, '1');
-      if (isVisible(v)) {
-        autoPaused.delete(v);
-        // Not just "resume if WE paused it" — also actively (re)try any
-        // visible decorative video that's sitting paused for any reason,
-        // including one whose own autoplay attribute never actually
-        // managed to start it in the first place (the real bug this was
-        // fixing: those videos looked permanently blank because nothing
-        // ever asked them to play). Safe here because every video this
-        // reaches is a controls-free decorative loop — never something
-        // with a real pause button a user could have intentionally hit.
-        // The practice-session video is explicitly excluded below since
-        // it DOES have a real pause control.
-        if (v.paused && !v.classList.contains('lgp-video')) v.play().catch(function () {});
+      tracked.push(v);
+      if (io) io.observe(v);
+      /* The browser's own autoplay attribute is a standing instruction that
+         survives a JS pause, so it is stripped and playback is driven here. */
+      v.removeAttribute('autoplay');
+    });
+  }
+
+  function apply() {
+    if (document.hidden) return;
+    var live = [];
+    for (var i = tracked.length - 1; i >= 0; i--) {
+      var v = tracked[i];
+      if (!v.isConnected) { tracked.splice(i, 1); continue; }
+      if ((io ? onScreen.has(v) : true) && shown(v)) live.push(v);
+    }
+    /* Nearest the middle of the screen wins the decoders. */
+    if (live.length > MAX_PLAYING) {
+      var mid = (window.innerHeight || 800) / 2;
+      live.sort(function (a, b) {
+        var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+        return Math.abs((ra.top + ra.bottom) / 2 - mid) - Math.abs((rb.top + rb.bottom) / 2 - mid);
+      });
+    }
+    var play = live.slice(0, MAX_PLAYING);
+    var playSet = new Set(play);
+    tracked.forEach(function (v) {
+      if (playSet.has(v)) {
+        if (v.paused && !v.classList.contains('lgp-video')) {
+          autoPaused.delete(v);
+          var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+        }
       } else if (!v.paused) {
         v.pause();
-        v.removeAttribute('autoplay');
         autoPaused.add(v);
       }
     });
   }
 
-  setInterval(refresh, 500);
+  var queued = false;
+  function queue() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () { queued = false; track(); apply(); });
+  }
+  window.nwsbVideoRefresh = queue;
 
-  // Don't wait for the next poll tick to react to a screen opening/closing —
-  // run refresh() the instant any .open/.active class change happens, so a
-  // freshly-revealed video starts immediately instead of sitting blank for
-  // up to half a second first. Coalesced to once per frame (class changes
-  // often fire in bursts — dots, badges, etc. — no need to rescan per-node).
   if ('MutationObserver' in window) {
-    var refreshQueued = false;
-    function queueRefresh() {
-      if (refreshQueued) return;
-      refreshQueued = true;
-      requestAnimationFrame(function () { refreshQueued = false; refresh(); });
-    }
-    var classMo = new MutationObserver(queueRefresh);
-    classMo.observe(document.documentElement, {
-      attributes: true, attributeFilter: ['class'], subtree: true
-    });
-
-    // Scrolling changes which videos are on screen just as much as opening a
-    // screen does. Capture-phase so it catches every inner scroller, passive
-    // so it never blocks the scroll itself, and coalesced to one pass per
-    // frame like everything else here.
-    document.addEventListener('scroll', queueRefresh, { capture: true, passive: true });
-    window.addEventListener('resize', queueRefresh, { passive: true });
-
-    // Phone locked / app backgrounded — nothing is visible, so stop every
-    // managed decoder instead of leaving them running against the battery.
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) {
-        document.querySelectorAll('video[autoplay], video[data-nwsb-auto], video[' + MARK + ']').forEach(function (v) {
-          if (hasStaticSource(v) && !v.paused) {
-            v.pause();
-            v.removeAttribute('autoplay');
-            autoPaused.add(v);
-          }
-        });
-      } else {
-        queueRefresh();
-      }
+    /* A class change can change what is shown, so the cache is dropped and
+       the pass re-runs. childList catches videos injected after load. */
+    new MutationObserver(function (muts) {
+      var classChanged = false, added = false;
+      muts.forEach(function (m) {
+        if (m.type === 'attributes') classChanged = true;
+        else if (m.addedNodes && m.addedNodes.length) added = true;
+      });
+      if (classChanged) shownCache = new WeakMap();
+      if (classChanged || added) queue();
+    }).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class'], childList: true, subtree: true
     });
   }
+
+  /* Scrolling no longer measures anything — the observer already knows what
+     moved in and out. This only re-ranks which of them get the decoders. */
+  document.addEventListener('scroll', queue, { capture: true, passive: true });
+  window.addEventListener('resize', function () { shownCache = new WeakMap(); queue(); }, { passive: true });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      tracked.forEach(function (v) {
+        if (!v.paused) { v.pause(); autoPaused.add(v); }
+      });
+    } else queue();
+  });
+
+  /* A slow heartbeat as a backstop for anything the observers miss —
+     seconds apart rather than twice a second, and it does no layout work
+     unless something actually needs to change. */
+  setInterval(queue, 4000);
+  queue();
 })();
