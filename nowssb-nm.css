@@ -9236,18 +9236,13 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
   padding: max(env(safe-area-inset-top, 26px), 26px) 22px
            max(env(safe-area-inset-bottom, 26px), 26px) !important;
 }
-/* The way out, small and out of the reading column. */
-.rd-full-out {
-  display: none; position: fixed; z-index: 40;
-  top: max(env(safe-area-inset-top, 12px), 12px); right: 12px;
-  width: 34px !important; height: 34px !important; min-height: 34px; padding: 0 !important;
-  align-items: center; justify-content: center;
-  background: rgba(12,12,16,0.8); color: rgba(255,255,255,0.8);
-  border: 1px solid rgba(255,255,255,0.12); border-radius: 50% !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-}
-.rd-immersive .rd-full-out { display: flex; }
-.rd-full-out svg { width: 15px; height: 15px; display: block; }
+/* The way out is the rail's own full-screen button — it just swaps its
+   glyph. A second floating chip was a duplicate of it, and being fixed
+   inside the rail (a transformed ancestor) it was laid out against the rail
+   rather than the screen, so it sat on top of the handle. */
+.rd-full-btn .rd-full-off { display: none; }
+.rd-immersive .rd-full-btn .rd-full-in { display: none; }
+.rd-immersive .rd-full-btn .rd-full-off { display: block; }
 
 /* ══════════════════════════════════════════════════════════════════
    WORD / MEANING SEARCH — the clip is the page, no glass panel
