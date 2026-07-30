@@ -8138,7 +8138,7 @@ body.fashplus #home .fp-tile .home-tile-rule { display: none; }
 #home .fp-enter { display: none; }
 body.fashplus #home .fp-card .fp-enter {
   display: inline-flex;
-  position: absolute !important; right: 16px; top: 47%;
+  position: absolute !important; right: 16px; top: 53%;
   transform: translateY(-50%); z-index: 4;
 }
 body.fashplus #home .fp-card .home-card-bottom .tp-enter { display: none; }
@@ -8906,7 +8906,7 @@ body.fashplus #home .fp-card::after {
     linear-gradient(100deg, rgba(6,12,24,0.55) 0%, rgba(6,12,24,0.18) 46%, rgba(6,12,24,0) 74%) !important;
 }
 body.fashplus #home .fp-card .home-card-top { padding-bottom: 0 !important; }
-body.fashplus #home .fp-card .home-card-title { margin-bottom: 2px; }
+body.fashplus #home .fp-card .home-card-title { margin-bottom: 2px; font-size: 13.5px !important; }
 
 /* ══════════════════════════════════════════════════════════════════
    ROUNDED MODE — each of the new blocks opens at the top and closes at
