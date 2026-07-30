@@ -8976,12 +8976,14 @@ body.fashplus #home .fp-card .home-card-top { padding: 0 16px 2px !important; }
    (app/js/part067.js)
    ══════════════════════════════════════════════════════════════════ */
 .vb-chips {
-  position: absolute; right: 0; top: 0; bottom: 0; z-index: 3;
-  display: flex; flex-direction: column; justify-content: center; gap: 7px;
-  padding: 0 12px 0 16px; pointer-events: none;
-  background: linear-gradient(90deg, rgba(6,12,24,0) 0%, rgba(6,12,24,0.5) 42%, rgba(6,12,24,0.72) 100%);
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 3;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 8px 12px 8px 22px; pointer-events: none; overflow: hidden;
+  background: linear-gradient(90deg, rgba(6,12,24,0) 0%, rgba(6,12,24,0.42) 40%, rgba(6,12,24,0.62) 100%);
 }
 .vb-chip { display: flex; align-items: center; gap: 8px; }
+/* The app's own dash — in from the right, with the same settle. */
+.vb-chip.dash-in { animation: nmhTrendWordDash .6s cubic-bezier(.34,1.56,.64,1) both; }
 .vb-chip-ic {
   width: 26px; height: 26px; flex-shrink: 0; overflow: hidden;
   border-radius: 50% !important;
@@ -8993,8 +8995,8 @@ body.fashplus #home .fp-card .home-card-top { padding: 0 16px 2px !important; }
   letter-spacing: 0.2px; color: #fff; white-space: nowrap;
   text-shadow: 0 2px 8px rgba(0,0,0,0.7);
 }
-/* The Reader clip is shorter than the banners, so its column tightens up. */
-.reader-sec .vb-chips { gap: 9px; padding: 0 12px 0 14px; }
+/* The Reader clip is shorter than the banners, so its row tightens up. */
+.reader-sec .vb-chips { padding: 7px 12px 7px 20px; }
 
 /* ── The corner choice reaches the footer ──────────────────────────────
    It always had the radius, but the footer runs edge to edge and the black

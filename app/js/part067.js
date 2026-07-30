@@ -86,12 +86,17 @@
     { sel: '#home-nm .nmh-rdsec-wrap .reader-sec, #home .fash-rdsec-wrap .reader-sec', items: READER_CHIPS }
   ];
 
+  /* One at a time: the chip dashes in from the right, holds, and the next
+     one replaces it. Stacked they covered the whole right half of the clip;
+     a single row leaves the artwork alone and still names everything. The
+     dash is the app's own nmhTrendWordDash, the same move the trending word
+     and the store pills already make. */
+  var chipRails = [];
+
   function chipsHtml(items) {
-    return '<div class="vb-chips">' + items.map(function (c) {
-      return '<span class="vb-chip">' +
-        '<span class="vb-chip-ic"><img loading="lazy" decoding="async" alt="" src="' + CHIP_IC[c[0]] + '"></span>' +
-        '<span class="vb-chip-t">' + esc(c[1]) + '</span></span>';
-    }).join('') + '</div>';
+    return '<div class="vb-chips"><span class="vb-chip dash-in">' +
+      '<span class="vb-chip-ic"><img loading="lazy" decoding="async" alt="" src="' + CHIP_IC[items[0][0]] + '"></span>' +
+      '<span class="vb-chip-t">' + esc(items[0][1]) + '</span></span></div>';
   }
 
   function paintChips() {
@@ -99,9 +104,29 @@
       document.querySelectorAll(c.sel).forEach(function (host) {
         if (host.querySelector(':scope > .vb-chips')) return;
         host.insertAdjacentHTML('beforeend', chipsHtml(c.items));
+        chipRails.push({ el: host.querySelector(':scope > .vb-chips'), items: c.items, i: 0 });
       });
     });
   }
+
+  function tickChips() {
+    for (var n = chipRails.length - 1; n >= 0; n--) {
+      var r = chipRails[n];
+      if (!r.el || !r.el.isConnected) { chipRails.splice(n, 1); continue; }
+      if (r.items.length < 2) continue;
+      r.i = (r.i + 1) % r.items.length;
+      var chip = r.el.firstChild;
+      var it = r.items[r.i];
+      chip.querySelector('.vb-chip-ic img').setAttribute('src', CHIP_IC[it[0]]);
+      chip.querySelector('.vb-chip-t').textContent = it[1];
+      /* Removing the class is not enough on its own — the animation only
+         restarts once the element has been reflowed without it. */
+      chip.classList.remove('dash-in');
+      void chip.offsetWidth;
+      chip.classList.add('dash-in');
+    }
+  }
+  setInterval(tickChips, 2600);
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
