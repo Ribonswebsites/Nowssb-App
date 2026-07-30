@@ -39,11 +39,17 @@
     { before: '#home #fashMeaningSearchWrap',      vid: V + 'v1785406062/grok_video_2026-07-30-15-36-37_mrnmll.mp4' },
     { top:    '#msMeaningBody',                    vid: V + 'v1785406069/grok_video_2026-07-30-15-36-38_uq9l5d.mp4' },
 
-    // Today's Offer page, Quick Access page, eBooks store
+    // Today's Offer page, Quick Access page
     { top:    '#offersMainContent',                vid: V + 'v1785402975/grok_video_2026-07-30-14-43-34_lqppzd.mp4' },
-    { top:    '#qaMainContent',                    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' },
-    { top:    '#ebBody',                           vid: V + 'v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4' }
+    { top:    '#qaMainContent',                    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' }
   ];
+
+  /* The eBooks clip is not a plain banner — it carries its own black banner
+     underneath it inside one glass wrapper, and it goes in three places: the
+     home sections, above the shelf on the store page, and above the copy on
+     every book's own page. */
+  var EB_VID  = V + 'v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4';
+  var EB_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png';
 
   /* The subscription clip was the same one in several places. The two home
      banners keep a clip of their own; the plan banner on the subscription
@@ -98,6 +104,51 @@
     return d;
   }
 
+  /* Video on top, black banner under it, one wrapper around both. */
+  function ebBlock(sub) {
+    var d = document.createElement('div');
+    d.className = 'ebvb-wrap';
+    d.innerHTML =
+      '<div class="ebvb-vid">' +
+        '<video data-nwsb-auto muted loop playsinline preload="none" src="' + EB_VID + '"></video>' +
+      '</div>' +
+      '<div class="nmh-sec-banner">' +
+        '<div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="' + EB_ICON + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>' +
+        '<div class="nmh-sec-banner-divider"></div>' +
+        '<div class="nmh-sec-banner-txt">' +
+          '<div class="nmh-sec-banner-title">The NowssB Ebooks</div>' +
+          '<div class="nmh-sec-banner-sub">' + esc(sub) + '</div>' +
+        '</div>' +
+      '</div>';
+    return d;
+  }
+
+  /* The home eBook sections open the store the long way round, through
+     openSub — that is the call that renders the shelf. */
+  window.ebSecOpen = function () {
+    if (window.openSub) window.openSub('ebooks-store');
+    else if (window.nssOpenSub) window.nssOpenSub('ebooks-store');
+    try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
+  };
+
+  /* ebOpenBook rewrites #ebdBody wholesale, so the block has to go back in
+     after every render rather than once at boot. */
+  function wrapBookDetail() {
+    if (!window.ebOpenBook || window.ebOpenBook.__vb) return;
+    var inner = window.ebOpenBook;
+    var wrapped = function (key) {
+      var r = inner.apply(this, arguments);
+      var body = document.getElementById('ebdBody');
+      if (body && !body.querySelector(':scope > .ebvb-wrap')) {
+        body.insertBefore(ebBlock('Read · Learn · Practice'), body.firstChild);
+        if (window.nwsbVideoRefresh) window.nwsbVideoRefresh();
+      }
+      return r;
+    };
+    wrapped.__vb = 1;
+    window.ebOpenBook = wrapped;
+  }
+
   window.vbGender = function (g) {
     try { if (g) window._userGender = g; } catch (e) {}
     if (window.openSub) window.openSub('health-journey');
@@ -128,6 +179,14 @@
        newly injected one has to be run through that pass or it stays where
        it landed while its section moves away. */
     if (added && window.hlApplyLayout) { try { window.hlApplyLayout(); } catch (e) {} }
+
+    /* Store page: the block introduces the shelf, so it sits directly above
+       #ebGrid rather than at the top of the page above the hero. */
+    var grid = document.getElementById('ebGrid');
+    if (grid && grid.parentNode && !grid.parentNode.querySelector(':scope > .ebvb-wrap')) {
+      grid.parentNode.insertBefore(ebBlock('Deep-dive guides on word science and sound healing'), grid);
+    }
+    wrapBookDetail();
 
     SWAP.forEach(function (s) {
       document.querySelectorAll(s.sel).forEach(function (v) {
