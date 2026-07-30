@@ -8471,7 +8471,7 @@ body.fashplus #home .fp-tile .home-tile-enter {
    The clip runs pink on the left and blue on the right, so each label sits
    over its own half. No panel behind any of it — the video is the point. */
 .vb-g {
-  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  position: absolute; top: 54%; transform: translateY(-50%); z-index: 3;
   cursor: pointer; background: none !important; border: none !important;
   padding: 0 !important; min-height: 0 !important;
   font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800;
@@ -8482,9 +8482,9 @@ body.fashplus #home .fp-tile .home-tile-enter {
   display: flex; align-items: center; gap: 9px;
 }
 .vb-g-lbl { display: block; }
-.vb-g-f { left: 16px; }
-/* Centred in its own half of the clip rather than pinned to either the
-   divider or the right edge. */
+/* Each word centred in its own half of the clip — neither pinned to the
+   divider nor to an outside edge. */
+.vb-g-f { left: 0; right: 50%; justify-content: center; }
 .vb-g-m { left: 50%; right: 0; justify-content: center; }
 /* Each side carries its own Enter, sized down so both a word and an arrow
    fit inside half a banner. */
@@ -8949,10 +8949,11 @@ body.fashplus #home .fp-card .home-card-label {
    its place above the scrim. */
 body.fashplus #home .fp-card .home-card-top { position: static !important; }
 
-/* The Meaning Reader's side rail carries the notes library, so the floating
-   bubble would be a second door to the same panel. The eBook reader has no
-   rail, so it keeps the bubble. */
-#sub-reader-meaning .rd-npbub { display: none !important; }
+/* Both readers carry the notes library in their rail now — the eBook one
+   behind its arrow — so the floating bubble would be a second door to the
+   same panel. The markup stays; it just never shows. */
+#sub-reader-meaning .rd-npbub,
+#sub-reader-ebook .rd-npbub { display: none !important; }
 /* The footer's middle button is the highlight toggle now — Contents keeps
    the header icon, which is the one place it is reached from. */
 .rd-nav-mid { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
@@ -9101,3 +9102,89 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
    of the card looking unfinished. */
 #home .fash-routines-wrap .home-card-bottom { align-items: flex-end; gap: 12px; }
 #home .fash-routines-wrap .home-card-bottom .tp-enter { flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════════════════════
+   THE RAIL, FOLDED — the eBook page has no room for a permanent rail,
+   so the same five controls sit behind an arrow on the left edge.
+   (app/js/part065.js)
+   ══════════════════════════════════════════════════════════════════ */
+.rd-rail-fold {
+  left: 0 !important; padding: 0 !important; background: none !important;
+  border: none !important; box-shadow: none !important;
+  display: flex; align-items: center; gap: 0;
+}
+.rd-rail-fold .rd-rail-set {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 8px 6px; box-sizing: border-box;
+  background: rgba(12,12,16,0.92); border: 1px solid rgba(255,255,255,0.1);
+  border-left: none; border-radius: 0 18px 18px 0 !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.5);
+  max-width: 0; opacity: 0; overflow: hidden; pointer-events: none;
+  transition: max-width 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, padding 0.3s;
+}
+.rd-rail-fold:not(.open) .rd-rail-set { padding-left: 0; padding-right: 0; }
+.rd-rail-fold.open .rd-rail-set { max-width: 60px; opacity: 1; pointer-events: auto; }
+/* The tab is the only thing showing while it is shut. */
+.rd-rail-tab {
+  width: 26px !important; height: 54px !important; min-height: 54px; flex-shrink: 0;
+  padding: 0 !important; display: flex; align-items: center; justify-content: center;
+  background: rgba(12,12,16,0.92); color: rgba(255,255,255,0.75);
+  border: 1px solid rgba(255,255,255,0.1); border-left: none;
+  border-radius: 0 14px 14px 0 !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.45);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.rd-rail-tab svg { width: 15px; height: 15px; display: block; }
+.rd-rail-fold.open .rd-rail-tab { transform: rotate(180deg); }
+.rd-rail-fold.open { flex-direction: row-reverse; }
+/* The Meaning Reader's rail is unchanged — it is not folded. */
+#sub-reader-ebook .rd-rail { z-index: 26; }
+
+/* ══════════════════════════════════════════════════════════════════
+   PAGE TURN — the leaf hinges in from the edge it came from, 280ms.
+   ══════════════════════════════════════════════════════════════════ */
+.rd-stage { perspective: 1600px; }
+.rd-page { transform-style: preserve-3d; backface-visibility: hidden; }
+@keyframes rdTurnNext {
+  0%   { transform: rotateY(-22deg) translateX(24%); opacity: 0.15; }
+  60%  { opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes rdTurnPrev {
+  0%   { transform: rotateY(22deg) translateX(-24%); opacity: 0.15; }
+  60%  { opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+.rd-page.rd-turn-n { transform-origin: left center; animation: rdTurnNext .28s cubic-bezier(.22,.61,.36,1) both; }
+.rd-page.rd-turn-p { transform-origin: right center; animation: rdTurnPrev .28s cubic-bezier(.22,.61,.36,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .rd-page.rd-turn-n, .rd-page.rd-turn-p { animation: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EPUB — the book's own markup, in the reader's type
+   ══════════════════════════════════════════════════════════════════ */
+.rd-epub { font: inherit; color: inherit; }
+.rd-epub p, .rd-epub li, .rd-epub blockquote {
+  font: inherit; margin: 0 0 0.9em; text-align: justify; hyphens: auto;
+}
+.rd-epub h1, .rd-epub h2, .rd-epub h3, .rd-epub h4 {
+  font-family: inherit; font-weight: 700; line-height: 1.25;
+  margin: 1.2em 0 0.5em; text-align: left;
+}
+.rd-epub h1 { font-size: 1.5em; } .rd-epub h2 { font-size: 1.3em; }
+.rd-epub h3 { font-size: 1.12em; } .rd-epub h4 { font-size: 1em; }
+.rd-epub img { max-width: 100%; height: auto; display: block; margin: 1em auto; }
+.rd-epub blockquote { padding-left: 14px; border-left: 2px solid currentColor; opacity: 0.8; }
+.rd-epub ul, .rd-epub ol { margin: 0 0 0.9em; padding-left: 1.3em; }
+.rd-epub table { width: 100%; border-collapse: collapse; margin: 0 0 0.9em; font-size: 0.9em; }
+.rd-epub td, .rd-epub th { border: 1px solid currentColor; padding: 5px 7px; opacity: 0.85; }
+.rd-epub hr { border: none; border-top: 1px solid currentColor; opacity: 0.28; margin: 1.2em 0; }
+
+/* The Open an EPUB row at the top of the library. */
+.rd-lib-open .rd-lib-cov-open {
+  display: flex; align-items: center; justify-content: center;
+  color: #e8d5a3; background: rgba(232,213,163,0.1);
+  border: 1px dashed rgba(232,213,163,0.4);
+}
+.rd-lib-open .rd-lib-cov-open svg { width: 24px; height: 24px; }
