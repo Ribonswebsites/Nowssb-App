@@ -453,7 +453,7 @@
       st.appendChild(leaf);
       void leaf.offsetWidth;
       leaf.classList.add('rd-leaf-go');
-      setTimeout(function () { if (leaf.parentNode) leaf.parentNode.removeChild(leaf); }, 260);
+      setTimeout(function () { if (leaf.parentNode) leaf.parentNode.removeChild(leaf); }, 470);
     } else if (dir < 0 && !reduceMotion()) {
       var pg = st && st.querySelector('.rd-page');
       if (pg) { pg.classList.remove('rd-turn-p'); void pg.offsetWidth; pg.classList.add('rd-turn-p'); }
