@@ -5944,7 +5944,7 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
               margin-right 0.9s cubic-bezier(0.4,0,0.2,1),
               opacity 0.35s ease 0.15s;
 }
-.htg-set.open .htg-set-lbl { max-width: 180px; opacity: 1; margin-right: 12px; }
+.htg-set.open .htg-set-lbl { max-width: 260px; opacity: 1; margin-right: 8px; }
 /* Two chevrons pointing back left at the settings icon */
 .htg-set-arrows { display: flex; align-items: center; gap: 1px; flex-shrink: 0; margin-left: 9px; }
 .htg-set-arrows svg { width: 10px; height: 10px; display: block; }
@@ -5964,7 +5964,7 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
               opacity   0.35s ease;
 }
 .htg-tip:not(.open) { border-width: 0; }   /* else the 1px borders leave a 2px sliver at max-width:0 */
-.htg-tip.open { max-width: 300px; padding: 0 14px 0 5px; gap: 9px; opacity: 1; }
+.htg-tip.open { max-width: 380px; padding: 0 14px 0 5px; gap: 9px; opacity: 1; }
 .htg-tip-ic {
   width: 24px; height: 24px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden;
   background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.24); display: block;
@@ -5986,7 +5986,7 @@ body.nwsb-custom-fashion-bg #shabdaMainContent { background: transparent; }
               opacity   0.35s ease;
 }
 .htg-end:not(.open) { border-width: 0; }
-.htg-end.open { max-width: 215px; padding: 0 14px 0 11px; opacity: 1; gap: 9px; }
+.htg-end.open { max-width: 300px; padding: 0 10px 0 8px; opacity: 1; gap: 7px; }
 /* Vertical rule down the pill's left side, same divider the black banners use */
 .htg-end-rule { width: 1px; height: 17px; flex-shrink: 0; background: rgba(232,213,163,0.4); display: block; }
 .htg-end-txt {
@@ -7510,7 +7510,7 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
    zeroed here and the wrapper's padding does the spacing — otherwise the
    contents sit off-centre inside their own card.
    ══════════════════════════════════════════════════════════════════ */
-.glass-wrap {
+#home .glass-wrap {
   box-sizing: border-box; overflow: hidden;
   padding: 12px;
   background: rgba(255,255,255,0.055);
@@ -7519,55 +7519,30 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
   box-shadow: 0 16px 40px rgba(0,0,0,0.34);
 }
-#home-nm .glass-wrap { width: 100%; margin: 16px 0; }
-/* Square and inset to the same 16px the rest of the Fashion home uses. */
+/* Square and inset to the same 16px the rest of the Fashion home uses.
+   These wrappers are a Fashion-home idea only — the Normal home keeps its
+   sections loose in the column, the way it has always been. */
 #home .glass-wrap {
   width: calc(100% - 32px); margin: 18px 16px;
   border-radius: 0 !important;
 }
-/* The Normal home is a light neumorphic surface — glass over cream is
-   unreadable, so it gets the same solid dark card the Customize panel has. */
-#home-nm:not(.nm-dark) .glass-wrap {
-  background: #14142a; border-color: rgba(255,255,255,0.08);
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-}
 
 /* ── Contents: drop the outer margins, they are the wrapper's job now ── */
-.glass-wrap > .htg-rail { margin: 0 0 12px !important; }
-.glass-wrap > .nmh-grid,
-.glass-wrap > .home-grid {
+#home .glass-wrap > .htg-rail { margin: 0 0 12px !important; }
+#home .glass-wrap > .nmh-grid,
+#home .glass-wrap > .home-grid {
   width: 100% !important; margin: 0 !important; padding: 0 !important;
 }
-.glass-wrap > .nmh-connect-sec,
-.glass-wrap > .ncb-carousel {
+#home .glass-wrap > .nmh-connect-sec,
+#home .glass-wrap > .ncb-carousel {
   width: 100% !important; margin: 0 !important;
 }
-.glass-wrap > .nmh-connect-sec { margin-bottom: 12px !important; }
+#home .glass-wrap > .nmh-connect-sec { margin-bottom: 12px !important; }
 
 /* The tip rail measures itself against the viewport; inside the wrapper it
    has 14px of padding either side to live within. */
-.glass-wrap > .htg-rail { padding-left: 0; padding-right: 0; }
+#home .glass-wrap > .htg-rail { padding-left: 0; padding-right: 0; }
 
-/* The tip rail's pill is sized to its text and was written for the full page
-   width; inside the wrapper it has less to work with, so it truncates
-   cleanly instead of running under the card's edge. */
-.glass-wrap > .htg-rail { max-width: 100%; }
-.glass-wrap > .htg-rail .htg-tip { min-width: 0; max-width: 100%; }
-.glass-wrap > .htg-rail .htg-tip-txt,
-.glass-wrap > .htg-rail .htg-end-txt {
-  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-/* Flex children default to min-width:auto, so the rail's pills refuse to
-   shrink below their content and push past the card's edge. Letting them
-   shrink — with the ellipsis above doing the visual work — keeps the whole
-   rail inside the wrapper on the narrower Normal home too. */
-.glass-wrap > .htg-rail { overflow: hidden; }
-.glass-wrap > .htg-rail > * { min-width: 0; }
-/* .htg-end and .htg-set are flex-shrink:0 by design — on a full-width rail
-   they should never be squeezed. Inside the wrapper there is less room, so
-   they are allowed to give, and the ellipsis above takes over. */
-.glass-wrap > .htg-rail .htg-end,
-.glass-wrap > .htg-rail .htg-set { flex-shrink: 1; }
 
 /* ── Tiles inside the wrapper ──────────────────────────────────────────
    The wrapper takes ~24px off the row, which all came out of the text
@@ -7578,29 +7553,127 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
    grid-auto-rows:1fr with a fixed height is what makes all four the same
    size: without it each row sizes to its own tallest tile, so a two-line
    title made one row taller than the other. ── */
-.glass-wrap .nmh-grid, .glass-wrap .home-grid {
+#home .glass-wrap .nmh-grid, #home .glass-wrap .home-grid {
   grid-auto-rows: 1fr !important; gap: 10px !important;
 }
-.glass-wrap .home-tile, .glass-wrap .nmh-tile {
+#home .glass-wrap .home-tile, #home .glass-wrap .nmh-tile {
   min-height: 0 !important; height: 118px !important;
   padding: 12px 10px 38px !important;
   gap: 8px !important;
 }
-.glass-wrap .home-tile-icon, .glass-wrap .nmh-tile-icon {
+#home .glass-wrap .home-tile-icon, #home .glass-wrap .nmh-tile-icon {
   width: 34px !important; height: 34px !important;
 }
-.glass-wrap .home-tile-icon img, .glass-wrap .nmh-tile-icon img {
+#home .glass-wrap .home-tile-icon img, #home .glass-wrap .nmh-tile-icon img {
   width: 100% !important; height: 100% !important;
 }
-.glass-wrap .home-tile-title, .glass-wrap .nmh-tile-title {
+#home .glass-wrap .home-tile-title, #home .glass-wrap .nmh-tile-title {
   font-size: 12px !important; line-height: 1.2 !important;
 }
-.glass-wrap .home-tile-sub, .glass-wrap .nmh-tile-sub {
+#home .glass-wrap .home-tile-sub, #home .glass-wrap .nmh-tile-sub {
   font-size: 9.5px !important; line-height: 1.35 !important; margin-top: 2px !important;
 }
-.glass-wrap .home-tile-txt, .glass-wrap .nmh-tile-txt { min-width: 0; }
+#home .glass-wrap .home-tile-txt, #home .glass-wrap .nmh-tile-txt { min-width: 0; }
 /* The Enter pill sits absolutely at the bottom — keep it clear of the
    shorter tile's text. */
-.glass-wrap .home-tile-enter, .glass-wrap .nmh-tile-enter {
+#home .glass-wrap .home-tile-enter, #home .glass-wrap .nmh-tile-enter {
   bottom: 8px !important; right: 8px !important;
+}
+
+/* Today's Trending and its word banner, gathered the same way. Both were
+   full-width sections with their own outer margins; the wrapper's padding
+   does that job now. */
+#home .glass-wrap > .nmh-trend-banner,
+#home .glass-wrap > .nmh-trend-shop-banner {
+  width: 100% !important; margin: 0 !important;
+}
+#home .glass-wrap > .nmh-trend-banner { margin-bottom: 12px !important; }
+
+/* ══════════════════════════════════════════════════════════════════
+   FASHION HEADER — bare icons, hairline between each
+   The three controls were each boxed in their own bordered, blurred
+   square. They are now just the artwork, with a rule between them.
+   ══════════════════════════════════════════════════════════════════ */
+.hdr-icons { display: flex; align-items: center; gap: 10px; }
+.hdr-ico {
+  position: relative; flex-shrink: 0; cursor: pointer;
+  width: 38px !important; height: 38px !important; min-height: 38px !important;
+  padding: 0; background: none !important; border: none !important;
+  border-radius: 0 !important; box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  display: flex; align-items: center; justify-content: center;
+}
+.hdr-ico img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.hdr-ico:active { opacity: 0.65; }
+.hdr-rule {
+  width: 1px; height: 22px; flex-shrink: 0;
+  background: rgba(255,255,255,0.22);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NORMAL HOME GREETING — neumorphic disc, then greeting / name / line
+   ══════════════════════════════════════════════════════════════════ */
+.nmh-greet-block {
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.nmh-greet-orb {
+  width: 54px; height: 54px; flex-shrink: 0; margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50% !important; background: #f0f2f7; color: #c8a96e;
+  box-shadow: 6px 6px 14px rgba(163,177,198,0.6), -5px -5px 12px #ffffff;
+}
+.nmh-greet-orb svg { width: 25px; height: 25px; display: block; }
+.nmh-greet-txt { flex: 1; min-width: 0; }
+/* Greeting is the light line, the name the heavy one under it. */
+.nmh-greet-hello {
+  font-size: 20px !important; font-weight: 400 !important;
+  color: rgba(26,26,46,0.62) !important; letter-spacing: -0.2px !important;
+}
+.nmh-greet-name {
+  font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800;
+  color: #1a1a2e; letter-spacing: -0.6px; line-height: 1.12; margin-top: 1px;
+}
+#home-nm.nm-dark .nmh-greet-orb {
+  background: #16163c; color: #e8d5a3;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.8), -4px -4px 12px rgba(50,50,110,0.3);
+}
+#home-nm.nm-dark .nmh-greet-hello { color: rgba(255,255,255,0.62) !important; }
+#home-nm.nm-dark .nmh-greet-name { color: #fff; }
+
+/* ══════════════════════════════════════════════════════════════════
+   CONNECT WRAPPER — the section rounds only at the top, the banner
+   under it only at the bottom, so the pair reads as one block.
+   ══════════════════════════════════════════════════════════════════ */
+#home .fash-connect-wrap > .nmh-connect-sec {
+  border-radius: 18px 18px 0 0 !important;
+  margin-bottom: 0 !important;
+}
+#home .fash-connect-wrap > .ncb-carousel {
+  border-radius: 0 0 18px 18px !important;
+}
+/* The rail's pills keep their natural width — measured at 146 + 164 + 8 in a
+   332px rail, they fit — and the rail simply clips anything that somehow
+   does not, rather than squeezing the text into an ellipsis. */
+#home .glass-wrap > .htg-rail { max-width: 100%; overflow: hidden; }
+
+/* ══════════════════════════════════════════════════════════════════
+   HERO VIDEO BANNER — full-bleed 16:9, sits above the streak section on
+   both homes. The <video> is a replaced element, so inset alone will not
+   stretch it; it needs explicit width/height.
+   ══════════════════════════════════════════════════════════════════ */
+.hero-vid-banner {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; box-sizing: border-box;
+  background: #060c18; border-radius: 22px !important;
+}
+.hero-vid-banner video {
+  position: absolute; inset: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block;
+}
+#home-nm .nmh-hero-vid { margin: 4px 0 16px; }
+/* Square and inset to the same 16px the rest of the Fashion home uses. */
+#home .fash-hero-vid {
+  width: calc(100% - 32px); margin: 8px 16px 18px;
+  border-radius: 0 !important;
 }
