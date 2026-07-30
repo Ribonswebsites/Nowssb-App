@@ -8483,9 +8483,9 @@ body.fashplus #home .fp-tile .home-tile-enter {
 }
 .vb-g-lbl { display: block; }
 .vb-g-f { left: 16px; }
-/* Past the divider the clip is composed around, with a little air after it,
-   and nowhere near the right edge. */
-.vb-g-m { left: 57%; right: auto; }
+/* Centred in its own half of the clip rather than pinned to either the
+   divider or the right edge. */
+.vb-g-m { left: 50%; right: 0; justify-content: center; }
 /* Each side carries its own Enter, sized down so both a word and an arrow
    fit inside half a banner. */
 .vb-g-cta { margin-top: 0 !important; gap: 6px; }
@@ -9095,3 +9095,9 @@ body.homecorner-round #home .fash-routines-wrap > .home-card {
 body.homecorner-round #home .fash-routines-wrap > .routines-banner {
   border-radius: 0 0 18px 18px !important;
 }
+
+/* Daily Practice closes with the same white Enter pill Shabdapathy
+   Foundations carries, rather than the small bare arrow that left the right
+   of the card looking unfinished. */
+#home .fash-routines-wrap .home-card-bottom { align-items: flex-end; gap: 12px; }
+#home .fash-routines-wrap .home-card-bottom .tp-enter { flex-shrink: 0; }
