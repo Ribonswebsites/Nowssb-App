@@ -1257,11 +1257,11 @@
         '<button onclick="rdSetPref(\'theme\',\'light\')" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg></button>' +
         '<button onclick="rdSetPref(\'theme\',\'black\')" aria-label="Black theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a6.9 6.9 0 0 0 11.1 11.1Z"/></svg></button>' +
         '<button onclick="rdToggleTools(' + w + ')" aria-label="Page tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m6.5 16.5 8.4-8.4a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8l-8.4 8.4H6.5z"/></svg></button>' +
-        '<button onclick="rdFull()" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M15 20h5v-5M9 20H4v-5"/></svg></button>' +
+        '<button class="rd-full-btn" onclick="rdFull()" aria-label="Full screen">' +
+          '<svg class="rd-full-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M15 20h5v-5M9 20H4v-5"/></svg>' +
+          '<svg class="rd-full-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h5V4M20 9h-5V4M20 15h-5v5M4 15h5v5"/></svg>' +
+        '</button>' +
       '</div>' +
-      '<button class="rd-full-out" onclick="rdFull()" aria-label="Leave full screen">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h5V4M20 9h-5V4M20 15h-5v5M4 15h5v5"/></svg>' +
-      '</button>' +
     '</div>';
   }
 
