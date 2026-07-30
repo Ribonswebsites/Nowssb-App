@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=576">
+<link rel="stylesheet" href="nowssb-nm.css?v=577">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1174,6 +1174,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Section label — black banner -->
+    <!-- Today's Trending: its black banner, its clip and the Shop Now
+         banner are one block. -->
+    <div class="nmh-sec-wrap nmh-trend-wrap">
     <div class="nmh-sec-banner" onclick="openSub('nowssb-store')">
       <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="nmh-sec-banner-divider"></div>
@@ -1207,6 +1210,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </button>
       <div class="nmh-trend-shop-dots" id="nmh-trending-shop-dots"></div>
     </div>
+    </div><!-- /nmh-trend-wrap -->
 
     <!-- ══ FASHION SECTIONS ON NORMAL HOME (Word Search · Meaning · Store · Subscription) ══ -->
 
@@ -1300,6 +1304,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Store -->
+    <!-- The store's video banner and the section it introduces, in one
+         wrapper. The banner is injected at the top by app/js/part067.js. -->
+    <div class="nmh-sec-wrap nmh-store-wrap">
     <div class="nss-store-trigger" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="margin-top:16px;">
       <div class="nss-trigger-slides">
         <div class="nss-trigger-slide" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581670/grok_image_1778581463094_eucw6p.jpg');"></div>
@@ -1328,6 +1335,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
+    </div><!-- /nmh-store-wrap -->
 
     <!-- Customize panel — Quick Access, Quick Links and Set As You Like in one
          glass card instead of three banners scattered down the page. Tapping the
@@ -7105,7 +7113,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             <img loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png" alt="Search">
           </div>
           <div class="wsg-brandcol">
-            <span class="wsg-wordglass"><span class="wsg-wordmark">Nowss<b>B</b></span></span>
+            <span class="wsg-wordmark">NowssB <b>Word</b></span>
             <div class="wsg-sub">by Nowsbansiu,</div>
           </div>
         </div>
@@ -7287,7 +7295,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             <img loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png" alt="Search">
           </div>
           <div class="wsg-brandcol">
-            <span class="wsg-wordglass"><span class="wsg-wordmark">Nowss<b>B</b></span></span>
+            <span class="wsg-wordmark">NowssB <b>Meaning</b></span>
             <div class="wsg-sub">by Nowsbansiu,</div>
           </div>
         </div>
@@ -9569,12 +9577,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=14"></script>
+<script src="app/js/part062.js?v=15"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=5"></script>
-<script src="app/js/part065.js?v=9"></script>
+<script src="app/js/part065.js?v=10"></script>
 <script src="app/js/part066.js?v=2"></script>
-<script src="app/js/part067.js?v=10"></script>
+<script src="app/js/part067.js?v=11"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=293" defer></script>

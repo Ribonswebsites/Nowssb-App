@@ -19,7 +19,7 @@
      bottom: the banner is appended as the element's last child. */
   var PLACE = [
     // Above the NowssB Store section, on both homes
-    { before: '#home-nm .nss-store-trigger',      vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
+    { top:    '#home-nm .nmh-store-wrap',          vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
     { before: '#home .nss-store-trigger',          vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
 
     // Above Personalised Healing — the clip's subject sits left, so the
