@@ -42,7 +42,7 @@
         { k:'herovid',  sel:['.nmh-hero-vid'],                                             t:B, label:'Hero Video',            sub:'Video banner above the streak' },
         { k:'streak',   sel:['.nmh-streak-section'],                                       t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc' },
-        { k:'practice', sel:['.nmh-practice'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1 },
+        { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1 },
         { k:'tiles',    sel:['.htg-rail', '.nmh-grid'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'offer',    sel:['.nmh-offer-section:not(.nmh-rx-section)'],                   t:S, label:"Today's Offer",         sub:'Rotating store coupons' },
         { k:'rx',       sel:['.nmh-rx-heading', '.nmh-rx-section'],                        t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
@@ -73,7 +73,7 @@
       wrap:  '#home .home-body',
       items: [
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
-        { k:'practice', sel:['#todayPracticeCard'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
+        { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
         { k:'herovid',  sel:['.fash-hero-vid'],                                            t:B, label:'Hero Video',            sub:'Video banner above the streak' },
         { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },

@@ -82,13 +82,17 @@
       card.appendChild(e);
     }
 
-    /* The black banner above Today's Practice. Only present in this mode,
-       so it is created here rather than living in the markup. */
+    /* The Fashion Plus banner, below the player and inside the player's
+       wrapper. It carries the switch that turns the mode on and off, so
+       unlike the rest of this file it is present whether the mode is on or
+       not — otherwise there would be nothing here to switch it back on with.
+       cuPaintModes() keeps the knob in step with every other copy of the
+       switch, because it paints any [data-k="fashplus"]. */
     if (card && !document.getElementById('fpBanner')) {
       var b = document.createElement('div');
       b.id = 'fpBanner';
       b.className = 'nmh-sec-banner fp-banner';
-      b.setAttribute('onclick', 'openPracticeIntro()');
+      b.setAttribute('onclick', 'fpToggle()');
       b.innerHTML =
         '<div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none">' +
           '<path d="M4 3.5 17 11 4 18.5z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>' +
@@ -98,10 +102,8 @@
           '<div class="nmh-sec-banner-title">Fashion Plus</div>' +
           '<div class="nmh-sec-banner-sub">Your practice, in motion</div>' +
         '</div>' +
-        '<div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none">' +
-          '<path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '</svg></div>';
-      card.parentNode.insertBefore(b, card);
+        '<div class="cust-mode-sw" data-k="fashplus"><div class="cust-mode-knob"></div></div>';
+      (card.parentNode || home).appendChild(b);
     }
   }
 

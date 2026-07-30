@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=543">
+<link rel="stylesheet" href="nowssb-nm.css?v=544">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -849,27 +849,54 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
     </div>
 
-    <!-- Today's Practice -->
-    <div class="nmh-practice" onclick="openPracticeIntro()">
-      <img class="nmh-practice-img" loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_500/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png">
-      <div class="nmh-practice-label">Today's Practice</div>
-      <div class="nmh-practice-icon">
-        <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784128570/file_000000006bc871f484d039fa1139dc11_d6rlu8.png" style="width:46px;height:46px;object-fit:contain;display:block;" alt="Today's Practice">
-      </div>
-      <div class="nmh-practice-word" id="nmhTodayWord">Loading...</div>
-      <div class="nmh-practice-meaning" id="nmhTodayMeaning">Your personalized word ritual for right now.</div>
-      <div class="nmh-practice-footer">
-        <div class="nmh-practice-cta">Enter</div>
-        <div class="nmh-practice-arrow">
-          <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
-            <path d="M3 7H11M7 3L11 7L7 11" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="square"/>
-          </svg>
+    <!-- Today's Practice, with its pill rail, in one wrapper. -->
+    <div class="plyr-wrap nmh-plyr-wrap">
+      <div class="spill" onclick="openPracticeIntro()">
+        <span class="spill-circle"><svg viewBox="0 0 22 22" fill="none"><path d="M5 3.5 18 11 5 18.5z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+        <span class="spill-pill">
+          <span class="spill-pill-ic"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png" alt="" style="width:100%;height:100%;object-fit:cover;"></span>
+          <span class="spill-pill-rule"></span>
+          <span class="spill-pill-txt">Your daily word ritual</span>
+        </span>
+        </div>
+      <div class="nmh-practice" onclick="openPracticeIntro()">
+        <img class="nmh-practice-img" loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_500/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png">
+        <div class="nmh-practice-label">Today's Practice</div>
+        <div class="nmh-practice-icon">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784128570/file_000000006bc871f484d039fa1139dc11_d6rlu8.png" style="width:46px;height:46px;object-fit:contain;display:block;" alt="Today's Practice">
+        </div>
+        <div class="nmh-practice-word" id="nmhTodayWord">Loading...</div>
+        <div class="nmh-practice-meaning" id="nmhTodayMeaning">Your personalized word ritual for right now.</div>
+        <div class="nmh-practice-footer">
+          <div class="nmh-practice-cta">Enter</div>
+          <div class="nmh-practice-arrow">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
+              <path d="M3 7H11M7 3L11 7L7 11" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="square"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
-    <!-- Reader — a black banner and the video, in one wrapper, under the
-         player. Text sits right of a vertical rule; no vignette. -->
+    <!-- Reader — pill rail, then the clip, then the copy, then the black
+         banner, all in one wrapper. Nothing is laid over the clip. -->
     <div class="rdsec-wrap nmh-rdsec-wrap">
+      <div class="spill" onclick="rdOpen()">
+        <span class="spill-circle"><svg viewBox="0 0 22 22" fill="none"><path d="M3 4.5A1.4 1.4 0 0 1 4.4 3H10v16H4.4A1.4 1.4 0 0 1 3 17.6z" stroke="#fff" stroke-width="1.5"/><path d="M19 4.5A1.4 1.4 0 0 0 17.6 3H12v16h5.6a1.4 1.4 0 0 0 1.4-1.4z" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/></svg></span>
+        <span class="spill-pill">
+          <span class="spill-pill-ic"><svg viewBox="0 0 22 22" fill="none"><path d="M3 4.5A1.4 1.4 0 0 1 4.4 3H10v16H4.4A1.4 1.4 0 0 1 3 17.6z" stroke="#fff" stroke-width="1.5"/><path d="M19 4.5A1.4 1.4 0 0 0 17.6 3H12v16h5.6a1.4 1.4 0 0 0 1.4-1.4z" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/></svg></span>
+          <span class="spill-pill-rule"></span>
+          <span class="spill-pill-txt">Meanings and eBooks, in one place</span>
+        </span>
+      </div>
+      <div class="reader-sec" onclick="rdOpen()">
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
+      </div>
+      <div class="reader-sec-txt" onclick="rdOpen()">
+        <span class="reader-sec-hello">NowssB</span>
+        <span class="reader-sec-name">Reader</span>
+        <span class="reader-sec-sub">Read every meaning, and every eBook.</span>
+        <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+      </div>
       <div class="nmh-sec-banner rdsec-banner" onclick="rdOpen()">
         <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 4.5A1.4 1.4 0 0 1 4.4 3H10v16H4.4A1.4 1.4 0 0 1 3 17.6z" stroke="#fff" stroke-width="1.5"/><path d="M19 4.5A1.4 1.4 0 0 0 17.6 3H12v16h5.6a1.4 1.4 0 0 0 1.4-1.4z" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/></svg></div>
         <div class="nmh-sec-banner-divider"></div>
@@ -879,20 +906,26 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
         <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
-      <div class="reader-sec" onclick="rdOpen()">
-        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
-        <span class="reader-sec-rule"></span>
-        <div class="reader-sec-txt">
-          <span class="reader-sec-hello">NowssB</span>
-          <span class="reader-sec-name">Reader</span>
-          <span class="reader-sec-sub">Read every meaning, and every eBook.</span>
-          <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
-        </div>
-      </div>
     </div>
-    <!-- eBooks — same black-banner-over-video block as the Reader above it,
-         pointing at the Ebooks store rather than the reader. -->
+    <!-- eBooks — the same rail / clip / copy / banner order as the Reader. -->
     <div class="rdsec-wrap nmh-ebsec-wrap">
+      <div class="spill" onclick="ebSecOpen()">
+        <span class="spill-circle"><svg viewBox="0 0 22 22" fill="none"><path d="M4 5.2h9.5a2 2 0 0 1 2 2V18H6a2 2 0 0 1-2-2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 3h9.2a1.8 1.8 0 0 1 1.8 1.8V15" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+        <span class="spill-pill">
+          <span class="spill-pill-ic"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png" alt="" style="width:100%;height:100%;object-fit:cover;"></span>
+          <span class="spill-pill-rule"></span>
+          <span class="spill-pill-txt">Deep-dive guides, yours to keep</span>
+        </span>
+      </div>
+      <div class="reader-sec ebsec-vid" onclick="ebSecOpen()">
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4"></video>
+      </div>
+      <div class="reader-sec-txt" onclick="ebSecOpen()">
+        <span class="reader-sec-hello">NowssB</span>
+        <span class="reader-sec-name">eBooks</span>
+        <span class="reader-sec-sub">Word science and sound healing, read anywhere.</span>
+        <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+      </div>
       <div class="nmh-sec-banner rdsec-banner" onclick="ebSecOpen()">
         <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
         <div class="nmh-sec-banner-divider"></div>
@@ -901,16 +934,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div class="nmh-sec-banner-sub">Deep-dive guides, yours to keep</div>
         </div>
         <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="reader-sec ebsec-vid" onclick="ebSecOpen()">
-        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4"></video>
-        <span class="reader-sec-rule"></span>
-        <div class="reader-sec-txt">
-          <span class="reader-sec-hello">NowssB</span>
-          <span class="reader-sec-name">eBooks</span>
-          <span class="reader-sec-sub">Word science and sound healing, read anywhere.</span>
-          <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
-        </div>
       </div>
     </div>
 
@@ -1448,22 +1471,52 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="home-greeting w100">Begin Your<br>Healing Path</div>
   <div class="home-tagline w100"><span class="brand-tag" style="font-size:12px;">Natural Origin of <strong>Word Science</strong></span></div>
 
-  <div class="home-card w100" id="todayPracticeCard" onclick="openPracticeIntro()" style="background-color:#060c18; backdrop-filter:none; -webkit-backdrop-filter:none;">
-    <div class="tile-img-bg" id="todayPracticeBg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg');"></div>
-    <div class="tile-overlay"></div>
-    <div class="home-card-top">
-      <span class="home-card-label" id="todayPracticeLabel">Today's Practice</span>
-      <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png" style="width:40px;height:40px;object-fit:contain;display:block;margin:4px 0 6px;" alt="Today's Practice">
-      <div class="home-card-title" id="todayPracticeTitle">Loading...</div>
+  <!-- The player, its pill rail and the Fashion Plus switch in one wrapper.
+       The greeting above stays outside it. -->
+  <div class="plyr-wrap fash-plyr-wrap">
+    <div class="spill" onclick="openPracticeIntro()">
+      <span class="spill-circle"><svg viewBox="0 0 22 22" fill="none"><path d="M5 3.5 18 11 5 18.5z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+      <span class="spill-pill">
+        <span class="spill-pill-ic"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png" alt="" style="width:100%;height:100%;object-fit:cover;"></span>
+        <span class="spill-pill-rule"></span>
+        <span class="spill-pill-txt">Your daily word ritual</span>
+      </span>
     </div>
-    <div class="home-card-bottom">
-      <div class="home-card-sub" id="todayPracticeSub">Your personalized word ritual for right now.</div>
+    <div class="home-card w100" id="todayPracticeCard" onclick="openPracticeIntro()" style="background-color:#060c18; backdrop-filter:none; -webkit-backdrop-filter:none;">
+      <div class="tile-img-bg" id="todayPracticeBg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg');"></div>
+      <div class="tile-overlay"></div>
+      <div class="home-card-top">
+        <span class="home-card-label" id="todayPracticeLabel">Today's Practice</span>
+        <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png" style="width:40px;height:40px;object-fit:contain;display:block;margin:4px 0 6px;" alt="Today's Practice">
+        <div class="home-card-title" id="todayPracticeTitle">Loading...</div>
+    </div>
+      <div class="home-card-bottom">
+        <div class="home-card-sub" id="todayPracticeSub">Your personalized word ritual for right now.</div>
       <div class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
+      </div>
     </div>
+    <!-- #fpBanner is appended here by app/js/part066.js -->
   </div>
-  <!-- Reader — a black banner and the video, in one wrapper, under the
-       player. Text sits right of a vertical rule; no vignette. -->
+  <!-- Reader — pill rail, then the clip, then the copy, then the black
+       banner, all in one wrapper. Nothing is laid over the clip. -->
   <div class="rdsec-wrap fash-rdsec-wrap">
+    <div class="spill" onclick="rdOpen()">
+      <span class="spill-circle"><svg viewBox="0 0 22 22" fill="none"><path d="M3 4.5A1.4 1.4 0 0 1 4.4 3H10v16H4.4A1.4 1.4 0 0 1 3 17.6z" stroke="#fff" stroke-width="1.5"/><path d="M19 4.5A1.4 1.4 0 0 0 17.6 3H12v16h5.6a1.4 1.4 0 0 0 1.4-1.4z" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/></svg></span>
+      <span class="spill-pill">
+        <span class="spill-pill-ic"><svg viewBox="0 0 22 22" fill="none"><path d="M3 4.5A1.4 1.4 0 0 1 4.4 3H10v16H4.4A1.4 1.4 0 0 1 3 17.6z" stroke="#fff" stroke-width="1.5"/><path d="M19 4.5A1.4 1.4 0 0 0 17.6 3H12v16h5.6a1.4 1.4 0 0 0 1.4-1.4z" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/></svg></span>
+        <span class="spill-pill-rule"></span>
+        <span class="spill-pill-txt">Meanings and eBooks, in one place</span>
+      </span>
+    </div>
+    <div class="reader-sec" onclick="rdOpen()">
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
+    </div>
+    <div class="reader-sec-txt" onclick="rdOpen()">
+      <span class="reader-sec-hello">NowssB</span>
+      <span class="reader-sec-name">Reader</span>
+      <span class="reader-sec-sub">Read every meaning, and every eBook.</span>
+      <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+    </div>
     <div class="nmh-sec-banner rdsec-banner" onclick="rdOpen()">
       <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 4.5A1.4 1.4 0 0 1 4.4 3H10v16H4.4A1.4 1.4 0 0 1 3 17.6z" stroke="#fff" stroke-width="1.5"/><path d="M19 4.5A1.4 1.4 0 0 0 17.6 3H12v16h5.6a1.4 1.4 0 0 0 1.4-1.4z" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/></svg></div>
       <div class="nmh-sec-banner-divider"></div>
@@ -1473,20 +1526,26 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
       <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
-    <div class="reader-sec" onclick="rdOpen()">
-      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
-      <span class="reader-sec-rule"></span>
-      <div class="reader-sec-txt">
-        <span class="reader-sec-hello">NowssB</span>
-        <span class="reader-sec-name">Reader</span>
-        <span class="reader-sec-sub">Read every meaning, and every eBook.</span>
-        <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
-      </div>
-    </div>
   </div>
-  <!-- eBooks — same black-banner-over-video block as the Reader above it,
-       pointing at the Ebooks store rather than the reader. -->
+  <!-- eBooks — the same rail / clip / copy / banner order as the Reader. -->
   <div class="rdsec-wrap fash-ebsec-wrap">
+    <div class="spill" onclick="ebSecOpen()">
+      <span class="spill-circle"><svg viewBox="0 0 22 22" fill="none"><path d="M4 5.2h9.5a2 2 0 0 1 2 2V18H6a2 2 0 0 1-2-2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 3h9.2a1.8 1.8 0 0 1 1.8 1.8V15" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+      <span class="spill-pill">
+        <span class="spill-pill-ic"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png" alt="" style="width:100%;height:100%;object-fit:cover;"></span>
+        <span class="spill-pill-rule"></span>
+        <span class="spill-pill-txt">Deep-dive guides, yours to keep</span>
+      </span>
+    </div>
+    <div class="reader-sec ebsec-vid" onclick="ebSecOpen()">
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4"></video>
+    </div>
+    <div class="reader-sec-txt" onclick="ebSecOpen()">
+      <span class="reader-sec-hello">NowssB</span>
+      <span class="reader-sec-name">eBooks</span>
+      <span class="reader-sec-sub">Word science and sound healing, read anywhere.</span>
+      <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+    </div>
     <div class="nmh-sec-banner rdsec-banner" onclick="ebSecOpen()">
       <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
       <div class="nmh-sec-banner-divider"></div>
@@ -1495,16 +1554,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nmh-sec-banner-sub">Deep-dive guides, yours to keep</div>
       </div>
       <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-    <div class="reader-sec ebsec-vid" onclick="ebSecOpen()">
-      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4"></video>
-      <span class="reader-sec-rule"></span>
-      <div class="reader-sec-txt">
-        <span class="reader-sec-hello">NowssB</span>
-        <span class="reader-sec-name">eBooks</span>
-        <span class="reader-sec-sub">Word science and sound healing, read anywhere.</span>
-        <span class="reader-sec-cta"><span class="reader-sec-cta-lbl">Enter</span><span class="reader-sec-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
-      </div>
     </div>
   </div>
 
@@ -9474,11 +9523,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=9"></script>
+<script src="app/js/part062.js?v=10"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=5"></script>
 <script src="app/js/part065.js?v=2"></script>
-<script src="app/js/part066.js?v=1"></script>
+<script src="app/js/part066.js?v=2"></script>
 <script src="app/js/part067.js?v=4"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
