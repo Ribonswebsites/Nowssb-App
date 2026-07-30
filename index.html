@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=534">
+<link rel="stylesheet" href="nowssb-nm.css?v=536">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1168,6 +1168,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- ══ HEALTH JOURNEY CARD — same section the Fashion Home carries ══ -->
+    <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
+    <div class="reader-sec nmh-reader-sec" onclick="rdOpen()">
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
+      <div class="reader-sec-fade"></div>
+      <div class="reader-sec-txt">
+        <span class="reader-sec-eyebrow">Read</span>
+        <span class="reader-sec-title">Reader</span>
+      </div>
+      <div class="tp-enter reader-sec-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
+    </div>
     <div class="health-journey-card w100" onclick="openSub('health-journey')">
       <video class="hjc-bg" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4"></video>
       <div class="hjc-content">
@@ -1800,6 +1810,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- ══ HEALTH JOURNEY CARD ══ -->
+  <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
+  <div class="reader-sec fash-reader-sec" onclick="rdOpen()">
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4"></video>
+    <div class="reader-sec-fade"></div>
+    <div class="reader-sec-txt">
+      <span class="reader-sec-eyebrow">Read</span>
+      <span class="reader-sec-title">Reader</span>
+    </div>
+    <div class="tp-enter reader-sec-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
+  </div>
   <div class="health-journey-card w100" onclick="openSub('health-journey')">
     <video class="hjc-bg" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4"></video>
     <div class="hjc-content">
@@ -6505,6 +6525,51 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
+<!-- ══ READER — the chooser, then the two readers. Rendered by
+     app/js/part065.js. ══ -->
+<div class="sub-screen rd-hub" id="sub-reader">
+  <div class="rd-hub-head">
+    <button class="rd-back" onclick="rdCloseHub()" aria-label="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="rd-hub-txt">
+      <div class="rd-hub-title">Reader</div>
+      <div class="rd-hub-sub">Two ways to read what NowssB holds</div>
+    </div>
+  </div>
+  <div class="rd-hub-body">
+    <button class="rd-card" onclick="rdOpenMeaning()">
+      <span class="rd-card-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/>
+          <path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>
+        </svg>
+      </span>
+      <span class="rd-card-txt">
+        <span class="rd-card-t">Meaning Reader</span>
+        <span class="rd-card-s">Every meaning in the catalogue, read as one book — grouped into chapters by category.</span>
+      </span>
+      <span class="tp-enter rd-card-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+    </button>
+    <button class="rd-card" onclick="rdOpenEbook()">
+      <span class="rd-card-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5A2.5 2.5 0 0 0 4 20.5z"/>
+          <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v4H6.5A2.5 2.5 0 0 1 4 19.5z"/>
+        </svg>
+      </span>
+      <span class="rd-card-txt">
+        <span class="rd-card-t">eBook Reader</span>
+        <span class="rd-card-s">Open any title from the NowssB library and read it chapter by chapter.</span>
+      </span>
+      <span class="tp-enter rd-card-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+    </button>
+  </div>
+</div>
+
+<div class="sub-screen rd-screen" id="sub-reader-meaning"><div class="rd-body" id="rdMeaningBody"><!-- rendered by app/js/part065.js --></div></div>
+<div class="sub-screen rd-screen" id="sub-reader-ebook"><div class="rd-body" id="rdEbookBody"><!-- rendered by app/js/part065.js --></div></div>
+
 <!-- ══ NOTIFICATIONS PAGE — reached from the bell in the Fashion home's
      fixed header. Turn each kind of notification on or off, and clear the
      updates that have arrived. Rendered by app/js/part064.js. ══ -->
@@ -9380,6 +9445,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part062.js?v=6"></script>
 <script src="app/js/part063.js?v=3"></script>
 <script src="app/js/part064.js?v=4"></script>
+<script src="app/js/part065.js?v=1"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=293" defer></script>

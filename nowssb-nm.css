@@ -7677,3 +7677,352 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   width: calc(100% - 32px); margin: 8px 16px 18px;
   border-radius: 0 !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   READER — the home section, the chooser, and the two readers.
+   (app/js/part065.js)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Home section: video with the Enter pill centred on the right ── */
+.reader-sec {
+  position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+  box-sizing: border-box; cursor: pointer; background: #060c18;
+  border-radius: 22px !important;
+}
+.reader-sec video {
+  position: absolute; inset: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block;
+}
+.reader-sec-fade {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(6,12,24,0.82) 0%, rgba(6,12,24,0.35) 46%, rgba(6,12,24,0.12) 100%);
+}
+.reader-sec-txt {
+  position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+  z-index: 2; display: flex; flex-direction: column; gap: 4px; max-width: 52%;
+}
+.reader-sec-eyebrow {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 3.4px; text-transform: uppercase; color: #e8d5a3;
+}
+.reader-sec-title {
+  font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800;
+  color: #fff; letter-spacing: -0.5px; line-height: 1.05;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+}
+/* Right, vertically centred — as asked. */
+.reader-sec-enter {
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%); z-index: 2;
+}
+#home-nm .nmh-reader-sec { margin: 16px 0; }
+#home .fash-reader-sec {
+  width: calc(100% - 32px); margin: 18px 16px;
+  border-radius: 0 !important;
+}
+
+/* ── Chooser ─────────────────────────────────────────────────────── */
+.rd-hub { background: #060c18; display: flex; flex-direction: column; }
+.rd-hub-head {
+  flex-shrink: 0; display: flex; align-items: center; gap: 12px;
+  padding: max(env(safe-area-inset-top,18px),18px) 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.rd-hub-txt { flex: 1; min-width: 0; }
+.rd-hub-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
+.rd-hub-sub { font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.rd-hub-body {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 16px 16px calc(110px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 14px;
+}
+.rd-card {
+  position: relative; display: block; width: 100%; text-align: left; cursor: pointer;
+  padding: 18px 16px 64px; box-sizing: border-box;
+  background: #000; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px !important; box-shadow: 0 12px 30px rgba(0,0,0,0.42);
+}
+.rd-card:active { background: #0b0b16; }
+.rd-card-ico {
+  display: flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px; margin-bottom: 12px;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.28);
+  border-radius: 14px !important; color: #e8d5a3;
+}
+.rd-card-ico svg { width: 23px; height: 23px; }
+.rd-card-txt { display: block; }
+.rd-card-t { display: block; font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800; color: #fff; }
+.rd-card-s { display: block; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.5); margin-top: 5px; line-height: 1.55; }
+.rd-card-enter { position: absolute; left: 16px; bottom: 16px; }
+
+/* ── Reader shell, shared ─────────────────────────────────────────── */
+.rd-screen { background: #0a0a0c; }
+.rd-body { position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+/* Brightness is a dimming veil rather than a real backlight change — it is
+   the only thing a web page can actually do here. */
+.rd-dim { position: absolute; inset: 0; z-index: 40; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+
+.rd-top {
+  position: relative; z-index: 20; flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: max(env(safe-area-inset-top,14px),14px) 14px 12px;
+  color: #fff;
+}
+.rd-back, .rd-tbtn {
+  display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; cursor: pointer;
+  height: 38px !important; min-height: 38px !important; padding: 0 10px;
+  background: none; border: none; color: inherit;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+}
+.rd-back svg, .rd-tbtn svg { width: 19px; height: 19px; }
+.rd-aa { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; }
+.rd-top-txt { flex: 1; min-width: 0; text-align: center; }
+.rd-top-title { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rd-top-sub { font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300; opacity: 0.6; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.rd-stage {
+  flex: 1; min-height: 0; overflow-y: auto; position: relative;
+  padding: 4px 14px 14px; -webkit-overflow-scrolling: touch;
+}
+.rd-stage-e { padding-left: 34px; padding-right: 34px; }
+
+/* ── The page ─────────────────────────────────────────────────────── */
+.rd-page {
+  padding: 30px 24px 26px; box-sizing: border-box; min-height: 100%;
+  border-radius: 12px !important;
+  background: #f4efe4; color: #241f18;
+}
+.rd-ch {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; text-align: center; opacity: 0.5;
+}
+.rd-title {
+  font-size: 1.72em; font-weight: 600; text-align: center;
+  line-height: 1.18; margin-top: 10px;
+}
+.rd-orn { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 14px 0 6px; opacity: 0.4; }
+.rd-orn span { width: 54px; height: 1px; background: currentColor; }
+.rd-orn i { font-style: normal; font-size: 11px; }
+.rd-root {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.4px;
+  text-align: center; opacity: 0.6; margin-bottom: 14px;
+}
+.rd-p { margin: 0 0 1em; line-height: 1.72; text-align: justify; hyphens: auto; }
+.rd-drop::first-letter { float: left; font-size: 3.1em; line-height: 0.86; padding: 0.04em 0.1em 0 0; font-weight: 600; }
+.rd-pending {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.7;
+  opacity: 0.62; text-align: center; padding: 26px 6px; font-style: italic;
+}
+.rd-folio { font-family: 'DM Sans', sans-serif; font-size: 11px; text-align: center; opacity: 0.45; margin-top: 22px; }
+/* Line spacing */
+.rd-sp-0 .rd-p { line-height: 1.5; }
+.rd-sp-1 .rd-p { line-height: 1.72; }
+.rd-sp-2 .rd-p { line-height: 2.02; }
+
+/* Themes */
+.rd-theme-light .rd-page { background: #fbfaf7; color: #1d1d1f; }
+.rd-theme-sepia .rd-page { background: #f4efe4; color: #241f18; }
+.rd-theme-dark  .rd-page { background: #22242a; color: #e6e3dc; }
+.rd-theme-black .rd-page { background: #000; color: #d8d5cf; }
+.rd-theme-light, .rd-theme-sepia { background: #14151a; }
+.rd-theme-dark { background: #101115; }
+.rd-theme-black { background: #000; }
+
+/* ── Meaning reader: side rail, popover, footer ───────────────────── */
+.rd-rail {
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 25;
+  display: flex; flex-direction: column; gap: 2px; padding: 6px 4px;
+  background: rgba(12,12,14,0.9); border: 1px solid rgba(255,255,255,0.1); border-left: none;
+  border-radius: 0 16px 16px 0 !important;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.rd-rail button {
+  width: 42px !important; height: 42px !important; min-height: 42px !important;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  background: none; border: none; color: rgba(255,255,255,0.82); border-radius: 12px !important;
+}
+.rd-rail button:active { background: rgba(255,255,255,0.1); }
+.rd-rail svg { width: 19px; height: 19px; }
+
+.rd-pop {
+  position: absolute; right: 10px; top: 50%; transform: translate(0, -50%) scale(0.96); z-index: 30;
+  width: min(268px, 74vw); padding: 14px 14px 6px; box-sizing: border-box;
+  background: rgba(16,16,19,0.97); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px !important; box-shadow: 0 20px 46px rgba(0,0,0,0.6);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.24s cubic-bezier(0.4,0,0.2,1);
+  max-height: 78%; overflow-y: auto;
+}
+.rd-pop.open { opacity: 1; pointer-events: auto; transform: translate(0, -50%) scale(1); }
+
+.rd-foot {
+  position: relative; z-index: 20; flex-shrink: 0;
+  padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.75);
+}
+.rd-prog-row {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; opacity: 0.65;
+}
+.rd-prog { flex: 1; height: 3px; background: rgba(255,255,255,0.16); border-radius: 99px !important; overflow: hidden; }
+.rd-prog-fill { height: 100%; background: #e8d5a3; border-radius: 99px !important; }
+.rd-prog-wide { margin: 0 16px 10px; }
+.rd-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.rd-nav button {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  background: none; border: none; color: rgba(255,255,255,0.85);
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 600;
+  min-height: 38px !important; padding: 0 4px;
+}
+.rd-nav button[disabled] { opacity: 0.28; pointer-events: none; }
+.rd-nav svg { width: 15px; height: 15px; }
+.rd-nav-mid { opacity: 0.7; }
+
+/* ── eBook reader: chevrons, stat row, bottom tray ────────────────── */
+.rd-chev {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 15;
+  width: 30px !important; height: 46px !important; min-height: 46px !important;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  background: none; border: none; color: rgba(255,255,255,0.45);
+}
+.rd-chev[disabled] { opacity: 0.18; pointer-events: none; }
+.rd-chev svg { width: 20px; height: 20px; }
+.rd-chev-l { left: 0; }
+.rd-chev-r { right: 0; }
+
+.rd-erow {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 6px; color: rgba(255,255,255,0.5);
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px;
+}
+.rd-tray {
+  position: relative; z-index: 20; flex-shrink: 0;
+  padding: 12px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: rgba(14,14,17,0.97); border-top: 1px solid rgba(255,255,255,0.1);
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease, padding 0.3s;
+}
+.rd-tray.open { max-height: 60vh; overflow-y: auto; opacity: 1; }
+.rd-tray:not(.open) { padding-top: 0; padding-bottom: 0; }
+
+/* ── Settings controls, shared by the popover and the tray ────────── */
+.rd-set-row {
+  display: flex; align-items: center; gap: 12px; padding: 9px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.rd-set-row:last-child { border-bottom: none; }
+.rd-set-lbl {
+  flex-shrink: 0; width: 74px;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+.rd-font, .rd-size { flex: 1; display: flex; align-items: center; gap: 10px; }
+.rd-font { justify-content: space-between; }
+.rd-font button {
+  width: 28px !important; height: 28px !important; min-height: 28px !important;
+  cursor: pointer; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 8px !important; color: #fff; font-size: 15px; line-height: 1;
+}
+.rd-font span { flex: 1; text-align: center; font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: #fff; }
+.rd-size input[type=range] { flex: 1; accent-color: #e8d5a3; }
+.rd-a-sm { font-size: 11px; color: rgba(255,255,255,0.6); }
+.rd-a-lg { font-size: 17px; color: rgba(255,255,255,0.85); }
+.rd-sun-sm { font-size: 11px; color: rgba(255,255,255,0.5); }
+.rd-sun-lg { font-size: 15px; color: rgba(255,255,255,0.8); }
+.rd-seg { display: flex; gap: 6px; }
+.rd-seg-b {
+  width: 46px !important; height: 32px !important; min-height: 32px !important;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 9px !important;
+}
+.rd-seg-b.on { background: rgba(232,213,163,0.22); border-color: rgba(232,213,163,0.5); }
+.rd-sp { display: block; width: 18px; }
+.rd-sp0 { height: 10px; border-top: 1.6px solid rgba(255,255,255,0.85); border-bottom: 1.6px solid rgba(255,255,255,0.85); }
+.rd-sp1 { height: 14px; border-top: 1.6px solid rgba(255,255,255,0.85); border-bottom: 1.6px solid rgba(255,255,255,0.85); }
+.rd-sp2 { height: 18px; border-top: 1.6px solid rgba(255,255,255,0.85); border-bottom: 1.6px solid rgba(255,255,255,0.85); }
+.rd-themes { display: flex; gap: 8px; }
+.rd-th {
+  width: 38px !important; height: 38px !important; min-height: 38px !important;
+  cursor: pointer; border-radius: 50% !important;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  border: 1.5px solid transparent;
+}
+.rd-th.on { border-color: #e8d5a3; }
+.rd-th-light { background: #fbfaf7; color: #1d1d1f; }
+.rd-th-sepia { background: #cbb894; color: #241f18; }
+.rd-th-dark  { background: #4a4d55; color: #e6e3dc; }
+.rd-th-black { background: #000; color: #d8d5cf; border-color: rgba(255,255,255,0.25); }
+.rd-th-black.on { border-color: #e8d5a3; }
+
+/* ── Library list ─────────────────────────────────────────────────── */
+.rd-lib { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 14px calc(110px + env(safe-area-inset-bottom,0px)); display: flex; flex-direction: column; gap: 12px; }
+.rd-lib-i {
+  display: flex; align-items: center; gap: 13px; width: 100%; text-align: left; cursor: pointer;
+  padding: 12px; box-sizing: border-box; color: #fff;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px !important;
+}
+.rd-lib-i:active { background: rgba(255,255,255,0.11); }
+.rd-lib-cov { width: 52px; height: 72px; flex-shrink: 0; overflow: hidden; border-radius: 7px !important; background: #000; }
+.rd-lib-cov img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rd-lib-txt { flex: 1; min-width: 0; display: block; }
+.rd-lib-t { display: block; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; }
+.rd-lib-s { display: block; font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300; color: rgba(255,255,255,0.5); margin-top: 3px; line-height: 1.45; }
+.rd-lib-m { display: block; font-family: 'DM Sans', sans-serif; font-size: 10px; color: rgba(232,213,163,0.8); margin-top: 5px; letter-spacing: 0.4px; }
+.rd-lib-go { width: 17px; height: 17px; flex-shrink: 0; color: rgba(255,255,255,0.35); }
+
+/* ── Contents drawer ──────────────────────────────────────────────── */
+.rd-toc {
+  position: absolute; inset: 0; z-index: 45;
+  background: rgba(8,8,10,0.97); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none; transition: opacity 0.24s ease;
+}
+.rd-toc.open { opacity: 1; pointer-events: auto; }
+.rd-toc-head {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: max(env(safe-area-inset-top,18px),18px) 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; color: #fff;
+}
+.rd-toc-head button {
+  width: 34px !important; height: 34px !important; min-height: 34px !important;
+  cursor: pointer; background: rgba(255,255,255,0.08); border: none;
+  border-radius: 50% !important; color: #fff; font-size: 19px; line-height: 1;
+}
+.rd-toc-list { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 12px calc(110px + env(safe-area-inset-bottom,0px)); }
+.rd-toc-i {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
+  padding: 11px 12px; background: none; border: none; color: rgba(255,255,255,0.8);
+  border-radius: 11px !important;
+}
+.rd-toc-i.on { background: rgba(232,213,163,0.12); color: #fff; }
+.rd-toc-n {
+  width: 30px; flex-shrink: 0; text-align: center;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; color: rgba(232,213,163,0.8);
+}
+.rd-toc-t { flex: 1; min-width: 0; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600; }
+.rd-toc-t em { display: block; font-style: normal; font-size: 10.5px; font-weight: 300; opacity: 0.5; margin-top: 2px; }
+.rd-empty {
+  padding: 40px 24px; text-align: center; color: rgba(255,255,255,0.45);
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+}
+
+/* In rounded mode the trending pair reads as one block opening at the top
+   and closing at the bottom: the video rounds only its top corners, the
+   banner under it only its bottom ones, and the gap between them stays. */
+body.homecorner-round #home .fash-trend-wrap > .nmh-trend-banner {
+  border-radius: 18px 18px 0 0 !important;
+}
+body.homecorner-round #home .fash-trend-wrap > .nmh-trend-shop-banner {
+  border-radius: 0 0 18px 18px !important;
+}
+
+/* .rd-body is a flex column, so .rd-prog-wide — which is a direct child
+   rather than sitting inside the flex row the other bar lives in — was
+   being stretched to fill the leftover height as one enormous pill. */
+.rd-prog-wide { flex: 0 0 3px; height: 3px; }
+
+/* The side rail floats over the page, so the page needs to start clear of
+   it or the rail sits on top of the first few characters of every line. */
+#sub-reader-meaning .rd-stage { padding-left: 52px; }
