@@ -54,7 +54,7 @@
     { sel: '.ss-plan-banner-vid',
       vid: V + 'v1785406071/grok_video_2026-07-30-15-36-45_ihftsp.mp4' },
     { sel: '.fsec-video',
-      vid: V + 'v1785406082/grok_video_2026-07-30-15-37-03_sf0rmw.mp4' }
+      vid: V + 'v1785407198/grok_video_2026-07-30-15-55-42_onadht.mp4' }
   ];
 
   function esc(s) {
