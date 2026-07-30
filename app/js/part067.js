@@ -74,19 +74,21 @@
     d.className = 'vb-banner';
     var html = '<video data-nwsb-auto muted loop playsinline preload="none" src="' + spec.vid + '"></video>';
     if (spec.gender) {
-      /* Two words over their own halves of the clip and a bare Enter — no
-         panel behind any of it, so the video is not covered. Each label
-         opens Personalised Healing with that side already highlighted,
-         using the page's own applyHealthGenderHighlight. */
-      html +=
-        '<button class="vb-g vb-g-f" onclick="event.stopPropagation();vbGender(\'female\')">Female</button>' +
-        '<button class="vb-g vb-g-m" onclick="event.stopPropagation();vbGender(\'male\')">Male</button>' +
-        '<span class="vb-cta vb-cta-mid" onclick="event.stopPropagation();vbGender()">' +
+      /* Two words over their own halves of the clip, each with its own
+         Enter to the right of it — no panel behind any of it, so the video
+         is not covered. Each side opens Personalised Healing already
+         highlighted, using the page's own applyHealthGenderHighlight. */
+      var go = '<span class="vb-cta vb-g-cta">' +
           '<span class="vb-cta-lbl">Enter</span>' +
           '<span class="vb-go"><svg viewBox="0 0 12 12" fill="none">' +
             '<path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/>' +
           '</svg></span>' +
         '</span>';
+      html +=
+        '<button class="vb-g vb-g-f" onclick="event.stopPropagation();vbGender(\'female\')">' +
+          '<span class="vb-g-lbl">Female</span>' + go + '</button>' +
+        '<button class="vb-g vb-g-m" onclick="event.stopPropagation();vbGender(\'male\')">' +
+          '<span class="vb-g-lbl">Male</span>' + go + '</button>';
     } else if (spec.cta) {
       html += '<span class="vb-rule"></span>' +
         '<div class="vb-txt">' +
