@@ -650,7 +650,32 @@ function nmhRefresh() {
     var _hr = new Date().getHours();
     var _g = _hr < 12 ? 'Good Morning' : (_hr < 17 ? 'Good Afternoon' : 'Good Evening');
     var _nm = (d.displayName ? String(d.displayName).split(' ')[0] : '') || 'Healer';
-    greetEl.textContent = _g + ', ' + _nm;
+    /* Greeting and name are two lines now, so the name is its own node
+       rather than being glued on with a comma. */
+    greetEl.textContent = _g;
+    var nameEl = document.getElementById('nmhGreetName');
+    if (nameEl) nameEl.textContent = _nm;
+
+    /* The disc next to them carries a mark for the same time of day. Drawn
+       inline rather than fetched, so it can never be the thing that fails
+       to load on a cold start. */
+    var orb = document.getElementById('nmhGreetOrb');
+    if (orb) {
+      var STROKE = 'currentColor';
+      var sun =
+        '<circle cx="12" cy="12" r="4.2"/>' +
+        '<path d="M12 2.4v2.3M12 19.3v2.3M4.2 12H1.9M22.1 12h-2.3' +
+              'M6.5 6.5 4.9 4.9M19.1 19.1l-1.6-1.6M17.5 6.5l1.6-1.6M4.9 19.1l1.6-1.6"/>';
+      var midday =
+        '<circle cx="12" cy="11" r="4.6"/>' +
+        '<path d="M12 1.6v2.2M3.4 11H1.2M22.8 11h-2.2M5.9 4.9 4.3 3.3M19.7 3.3l-1.6 1.6"/>' +
+        '<path d="M3 19.6h18M6 22.4h12"/>';
+      var moon = '<path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a6.9 6.9 0 0 0 11.1 11.1Z"/>';
+      var mark = _hr < 12 ? sun : (_hr < 17 ? midday : moon);
+      orb.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="' + STROKE + '" stroke-width="1.6" ' +
+             'stroke-linecap="round" stroke-linejoin="round">' + mark + '</svg>';
+    }
   }
   var elF = document.getElementById('fashStreakNum');
   if (elF) elF.textContent = streak;

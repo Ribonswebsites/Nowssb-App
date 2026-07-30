@@ -215,6 +215,9 @@
      one has fully closed, the settings circle itself grows leftward into
      a pill pointing back at the tap target. */
   var OPEN_MS = 900, HOLD_MS = 2100, CLOSE_MS = 900, GAP_MS = 450;
+  /* Once the settings pill and the closing pill are both out, they stay put
+     for this long before the whole sequence starts over. */
+  var REST_MS = 10000;
   var RAILS = [{ tip: 'nmhTileTip', set: 'nmhTileSet', end: 'nmhTileEnd' },
                { tip: 'fashTileTip', set: 'fashTileSet', end: 'fashTileEnd' }];
   var _timers = [];
@@ -264,6 +267,10 @@
         later(function () {
           fitRail();
           eachEnd(function (el) { el.classList.add('open'); });
+          // Hold the finished state, then run the whole thing again.
+          later(function () {
+            if (!document.hidden) window.htRunTipRail();
+          }, OPEN_MS + REST_MS);
         }, OPEN_MS + 500);
       }, GAP_MS);
       return;

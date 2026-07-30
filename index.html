@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=533">
+<link rel="stylesheet" href="nowssb-nm.css?v=534">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -660,23 +660,22 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <img decoding="async" class="logo-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowsBansiu" loading="lazy">
     <span class="brand-name" style="font-size:22px;text-shadow:0 1px 8px rgba(0,0,0,0.5);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <button onclick="ntOpen()" aria-label="Notifications" title="Notifications" style="position:relative;width:40px;height:40px;min-width:40px;min-height:40px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex-shrink:0;padding:0;box-sizing:border-box;">
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M13.7 21a2 2 0 0 1-3.4 0" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round"/>
-      </svg>
+  <!-- Bare icons, no button wrapper, separated by hairlines. -->
+  <div class="hdr-icons">
+    <button class="hdr-ico" onclick="ntOpen()" aria-label="Notifications" title="Notifications">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_000000002d8481fa9065a82d78dfc023_ayk5gv.png" alt="">
       <span class="nt-badge" id="homeNotifBadge" style="display:none;">0</span>
     </button>
-    <button id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');window._fashionHomeIntroSeen=true;goTo('home-nm')" title="Light Mode" style="width:40px;height:40px;min-width:40px;min-height:40px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex-shrink:0;padding:0;box-sizing:border-box;">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780398892/11eba830-5e74-11f1-850d-112dd967e66d_uy7e7p.png" style="width:36px;height:36px;object-fit:contain;display:block;" alt="">
+    <span class="hdr-rule"></span>
+    <button class="hdr-ico" id="homeNmToggle" onclick="localStorage.setItem('nwsb_home_mode','nm');window._fashionHomeIntroSeen=true;goTo('home-nm')" title="Light Mode" aria-label="Normal home">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_00000000639c82078e3623f3dab8d1af_dvw8yx.png" alt="">
     </button>
-    <div id="homeMenuBtn" style="width:40px;height:40px;min-width:40px;min-height:40px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;padding:0;box-sizing:border-box;" onclick="openMenu()">
-      <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780207753/25935860-5cb7-11f1-a488-eb4ba8668ed2_vhv3rm.png" style="width:38px;height:38px;object-fit:contain;display:block;opacity:0.9;" alt="">
-    </div>
+    <span class="hdr-rule"></span>
+    <button class="hdr-ico" id="homeMenuBtn" onclick="openMenu()" aria-label="Menu">
+      <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_0000000054ac81fa9e379e63228aba3a_h5alpl.png" alt="">
+    </button>
   </div>
 </div>
-
 <!-- ══ LANDING TRANSITION OVERLAY ══ -->
 <div id="ld-transition">
   <img decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779713364/ee429d10-5835-11f1-9971-736215a430db_lii4mj.png" alt="" loading="eager">
@@ -774,8 +773,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Time-based greeting (restored) — Good Morning/Afternoon/Evening +
          the user's name; set by the home render in app/js/part012.js. -->
     <div class="nmh-greet-block">
-      <div class="nmh-greet-hello" id="nmhGreetHello">Good Morning</div>
-      <div class="nmh-greet-line">Ready for today's healing practice?</div>
+      <!-- Neumorphic disc on the left holding a mark for the time of day —
+           sun at dawn, high sun at midday, moon at night. Swapped by
+           app/js/part012.js alongside the greeting text. -->
+      <div class="nmh-greet-orb" id="nmhGreetOrb" aria-hidden="true"></div>
+      <div class="nmh-greet-txt">
+        <div class="nmh-greet-hello" id="nmhGreetHello">Good Morning</div>
+        <div class="nmh-greet-name" id="nmhGreetName">Healer</div>
+        <div class="nmh-greet-line">Ready for today's healing practice?</div>
+      </div>
     </div>
 
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -798,6 +804,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          Going" — not the glass cube, that stays on Fashion Home / the
          dedicated Streak page only), then the "Daily Streak" black
          banner itself as the entry point into the full page. -->
+    <!-- Full-bleed 16:9 video banner, above the streak section. -->
+    <div class="hero-vid-banner nmh-hero-vid">
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
+    </div>
     <div class="nmh-streak-section">
       <div class="nmh-streak-heading">Start Building Your Streak Today</div>
       <div class="nmh-streak-subheading">Practice daily to keep it alive — and unlock exclusive offers</div>
@@ -861,8 +871,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- The four home buttons + their tip rail, directly below Today's
          Practice. The Quick Access banner is a separate thing and stays
          where it is, further down. -->
-    <!-- The tip rail, its settings circle and the four buttons, in one glass wrapper. -->
-    <div class="glass-wrap tiles-wrap nmh-tiles-wrap">
 <div class="htg-rail">
   <div class="htg-set" id="nmhTileSet" onclick="htOpen()" role="button" aria-label="Restyle these buttons">
     <span class="htg-set-ic"><img decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt=""></span>
@@ -962,7 +970,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nmh-tile-enter"><span class="nmh-tile-enter-lbl">Enter</span><span class="nmh-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
       </div>
     </div>
-    </div>
 
     <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), right
          below Today's Practice, combined into one padded section. ══ -->
@@ -1055,8 +1062,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- NowssB Connect — what it is (video bg) -->
-    <!-- NowssB Connect and its community carousel share one glass wrapper. -->
-    <div class="glass-wrap connect-wrap nmh-connect-wrap">
     <div class="nmh-connect-sec" onclick="window.IG&&IG.nav('profile')">
       <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
       <div class="nmh-connect-scrim"></div>
@@ -1067,7 +1072,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <!-- Connect features carousel — slides through what NowssB Connect offers -->
     <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
-    </div>
 
 
     <!-- Quick access row -->
@@ -1435,6 +1439,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Glassmorphism streak section — heading + real 3-cube glass visual,
        then the "Daily Streak" black banner itself as the entry point,
        all inside one glass card. -->
+  <!-- Full-bleed 16:9 video banner, above the streak section. -->
+  <div class="hero-vid-banner fash-hero-vid">
+    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
+  </div>
   <div class="nmh-streak-glass-section">
     <div class="nmh-streak-heading nmh-streak-heading-dark">Start Building Your Streak Today</div>
     <div class="nmh-streak-subheading nmh-streak-subheading-dark">Practice daily to keep it alive — and unlock exclusive offers</div>
@@ -1610,6 +1618,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
   </div>
 
+  <!-- Today's Trending and the word banner under it, in one glass wrapper. -->
+  <div class="glass-wrap trend-wrap fash-trend-wrap">
   <!-- Today Trending — video banner (fashion) -->
   <div class="nmh-trend-banner fash-trend-banner" id="nmh-trending-section-fash" onclick="openSub('nowssb-store')">
     <video class="nmh-trend-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
@@ -1632,6 +1642,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       Shop Now
     </button>
     <div class="nmh-trend-shop-dots" id="nmh-trending-shop-dots-fash"></div>
+  </div>
   </div>
 
   <!-- Video banner — above the subscription promo -->
@@ -4046,7 +4057,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=337"></script>
+<script src="app/js/part012.js?v=338"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -9363,10 +9374,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part056.js?v=5"></script>
 <script src="app/js/part057.js?v=10"></script>
 <script src="app/js/part058.js?v=1"></script>
-<script src="app/js/part059.js?v=7"></script>
+<script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=5"></script>
+<script src="app/js/part062.js?v=6"></script>
 <script src="app/js/part063.js?v=3"></script>
 <script src="app/js/part064.js?v=4"></script>
 <script src="nowssb-social.js?v=182" defer></script>
