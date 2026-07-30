@@ -15,7 +15,8 @@
   var V = 'https://res.cloudinary.com/eenvubod/video/upload/';
 
   /* before: the banner is inserted as the element's previous sibling.
-     top:    the banner is inserted as the element's first child. */
+     top:    the banner is inserted as the element's first child.
+     bottom: the banner is appended as the element's last child. */
   var PLACE = [
     // Above the NowssB Store section, on both homes
     { before: '#home-nm .nss-store-trigger',      vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
@@ -23,8 +24,8 @@
 
     // Above Personalised Healing — the clip's subject sits left, so the
     // copy and the arrow go right, the same way the Reader section reads.
-    { before: '#home-nm .health-journey-card',     vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
-    { before: '#home .health-journey-card',        vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
+    { bottom: '#home-nm .nmh-healing-wrap',        vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
+    { bottom: '#home .fash-healing-wrap',          vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
 
     // Above NowssB Connect
     { before: '#home-nm .nmh-connect-sec',         vid: V + 'v1785402935/grok_video_2026-07-30-14-43-48_lfrvok.mp4' },
@@ -251,7 +252,7 @@
     var added = false;
     PLACE.forEach(function (spec, i) {
       var key = 'vb' + i;
-      var sel = spec.before || spec.top;
+      var sel = spec.before || spec.top || spec.bottom;
       var host = document.querySelector(sel);
       if (!host) return;
       /* One banner per target, however many times this runs. */
@@ -260,6 +261,7 @@
       var el = makeBanner(spec);
       el.setAttribute('data-vb', key);
       if (spec.before) host.parentNode.insertBefore(el, host);
+      else if (spec.bottom) host.appendChild(el);
       else host.insertBefore(el, host.firstChild);
       added = true;
     });
