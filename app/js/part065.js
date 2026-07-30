@@ -125,6 +125,9 @@
      no body text, so a chapter page says that plainly instead of inventing
      the author's words. */
   function bookPages(b) {
+    /* An EPUB brings its own chapters — the placeholder shelf below is only
+       for the three titles the store ships without body text. */
+    if (b && b.pages) return b.pages;
     var pages = [{ chapter: 0, chapterName: 'About', first: true, title: b.title, root: b.sub, body: [b.about] }];
     (b.contents || []).forEach(function (c, i) {
       pages.push({
@@ -136,7 +139,11 @@
     return pages;
   }
 
-  function books() { return window.EB_BOOKS || []; }
+  /* Opened EPUBs sit ahead of the shipped titles in the library. They live
+     in memory for the session: a whole book will not fit in localStorage,
+     so only the file name and the page you were on are remembered. */
+  var epubs = [];
+  function books() { return epubs.concat(window.EB_BOOKS || []); }
 
   /* ── State ─────────────────────────────────────────────────────────── */
   var mIdx = 0;        // meaning reader page
@@ -151,7 +158,9 @@
     h += '<div class="rd-title">' + esc(pg.title) + '</div>';
     h += '<div class="rd-orn"><span></span><i>✦</i><span></span></div>';
     if (pg.root) h += '<div class="rd-root">' + esc(pg.root) + '</div>';
-    if (pg.pending) {
+    if (pg.html) {
+      h += '<div class="rd-epub">' + pg.html + '</div>';
+    } else if (pg.pending) {
       h += '<div class="rd-pending">This chapter has no text in the app yet. ' +
            'When it is added it will open here, in this reader.</div>';
     } else {
@@ -260,16 +269,7 @@
 
       '<div class="rd-stage" id="rdMStage">' + pageHtml(pg, pages.length, mIdx) + '</div>' +
 
-      '<div class="rd-rail">' +
-        /* Contents already has the header icon; this slot is the notes
-           library instead, which is why the floating bubble is hidden in
-           this reader — the rail is its one home here. */
-        '<button onclick="rdNotepad(1)" aria-label="Notes library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14.5 3v4.5H19M8.5 12h7M8.5 16h4.5"/></svg></button>' +
-        '<button onclick="rdTogglePanel(\'meaning\')" aria-label="Text settings"><span class="rd-aa">Aa</span></button>' +
-        '<button onclick="rdSetPref(\'theme\',\'light\')" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg></button>' +
-        '<button onclick="rdSetPref(\'theme\',\'black\')" aria-label="Black theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a6.9 6.9 0 0 0 11.1 11.1Z"/></svg></button>' +
-        '<button onclick="rdToggleTools(\'meaning\')" aria-label="Page tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m6.5 16.5 8.4-8.4a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8l-8.4 8.4H6.5z"/></svg></button>' +
-      '</div>' +
+      railHtml('meaning') +
 
       /* Docked like the eBook reader's tray. As a floating popover it was
          narrower than its own controls, so the font name and the last theme
@@ -309,6 +309,7 @@
     curReader = 'meaning';
     bindSelection(host);
     bindSwipe(host);
+    bindPageSwipe(host, 'meaning');
     reapplyHighlights();
     refreshNotepad();
   }
@@ -330,12 +331,21 @@
           '<span style="width:38px"></span>' +
         '</div>' +
         '<div class="rd-lib">' +
+          '<button class="rd-lib-i rd-lib-open" onclick="rdEpubPick()">' +
+            '<span class="rd-lib-cov rd-lib-cov-open">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15"/></svg></span>' +
+            '<span class="rd-lib-txt"><span class="rd-lib-t">Open an EPUB</span>' +
+            '<span class="rd-lib-s">Read a .epub from this device</span>' +
+            '<span class="rd-lib-m">Opened here, nothing uploaded</span></span>' +
+            '<svg class="rd-lib-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>' +
+          '</button>' +
           (list.length ? list.map(function (b) {
             return '<button class="rd-lib-i" onclick="rdOpenBook(\'' + b.key + '\')">' +
-              '<span class="rd-lib-cov"><img loading="lazy" decoding="async" src="' + b.cover + '" alt=""></span>' +
+              '<span class="rd-lib-cov">' + (b.cover ? '<img loading="lazy" decoding="async" src="' + b.cover + '" alt="">' : '') + '</span>' +
               '<span class="rd-lib-txt"><span class="rd-lib-t">' + esc(b.title) + '</span>' +
               '<span class="rd-lib-s">' + esc(b.sub) + '</span>' +
-              '<span class="rd-lib-m">' + (b.contents || []).length + ' chapters</span></span>' +
+              '<span class="rd-lib-m">' + (b.pages ? b.pages.length : (b.contents || []).length) + ' chapters</span></span>' +
               '<svg class="rd-lib-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>' +
             '</button>';
           }).join('') : '<div class="rd-empty">No eBooks have loaded yet.</div>') +
@@ -362,6 +372,8 @@
         '<button class="rd-tbtn" onclick="rdToggleTools(\'ebook\')" aria-label="Page tools">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></svg></button>' +
       '</div>' +
+
+      railHtml('ebook') +
 
       '<div class="rd-stage rd-stage-e">' +
         '<button class="rd-chev rd-chev-l" onclick="rdGo(\'ebook\',-1)"' + (eIdx === 0 ? ' disabled' : '') + ' aria-label="Previous page">' +
@@ -398,19 +410,58 @@
     curReader = 'ebook';
     bindSelection(host);
     bindSwipe(host);
+    bindPageSwipe(host, 'ebook');
     reapplyHighlights();
     refreshNotepad();
+    paintRail();
   }
 
   /* ── Controls ──────────────────────────────────────────────────────── */
   window.rdGo = function (which, dir) {
+    var c = ctx();
+    var at = c.idx, last = c.pages.length - 1;
+    if ((dir > 0 && at >= last) || (dir < 0 && at <= 0)) { haptic(8); return; }
     if (which === 'meaning') { mIdx += dir; renderMeaning(); }
     else { eIdx += dir; renderEbook(); }
     haptic(12);
     var sc = document.getElementById('sub-reader-' + which);
     var st = sc && sc.querySelector('.rd-stage');
     if (st) st.scrollTop = 0;
+    turnPage(which, dir);
   };
+
+  /* The leaf hinges in from the edge it came from — quick, 280ms, the way a
+     page actually behaves rather than a slide. */
+  function turnPage(which, dir) {
+    var sc = document.getElementById('sub-reader-' + which);
+    var pg = sc && sc.querySelector('.rd-page');
+    if (!pg) return;
+    pg.classList.remove('rd-turn-n', 'rd-turn-p');
+    void pg.offsetWidth;
+    pg.classList.add(dir > 0 ? 'rd-turn-n' : 'rd-turn-p');
+  }
+
+  /* Swipe across the page to turn it. Highlight mode owns the drag while it
+     is on, so this stands down rather than fighting it for the gesture. */
+  function bindPageSwipe(sc, which) {
+    if (!sc || sc._rdNav) return;
+    sc._rdNav = true;
+    var x0 = null, y0 = 0, t0 = 0;
+    sc.addEventListener('touchstart', function (e) {
+      if (swipeOn || e.touches.length !== 1) { x0 = null; return; }
+      if (e.target.closest && e.target.closest('.rd-toc, .rd-tray, .rd-np, .rd-web, .rd-tools, .rd-rail')) { x0 = null; return; }
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+    }, { passive: true });
+    sc.addEventListener('touchend', function (e) {
+      if (x0 == null) return;
+      var t = e.changedTouches[0];
+      var dx = t.clientX - x0, dy = t.clientY - y0;
+      x0 = null;
+      if (Date.now() - t0 > 800) return;
+      if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      window.rdGo(which, dx < 0 ? 1 : -1);
+    }, { passive: true });
+  }
   window.rdJump = function (which, i) {
     if (which === 'meaning') { mIdx = i; renderMeaning(); } else { eIdx = i; renderEbook(); }
     haptic(20);
@@ -1117,6 +1168,266 @@
     setPageMarks(c.key, c.idx, pm);
     refreshNotepad(); refreshTools();
     toast('Saved to notepad'); haptic(28);
+  };
+
+
+  /* ══ THE RAIL, COLLAPSED ═══════════════════════════════════════════
+     The Meaning Reader's rail is always out because that page has room
+     for it. An eBook page does not, so the same five controls live behind
+     an arrow: a tab on the left edge that swings the rail out and back.
+     One markup builder for both, so the two readers cannot drift apart.
+     ══ */
+
+  var railOpen = false;
+
+  function railHtml(which) {
+    var w = "'" + which + "'";
+    return '<div class="rd-rail rd-rail-' + which + (which === 'ebook' ? ' rd-rail-fold' : '') + '">' +
+      (which === 'ebook'
+        ? '<button class="rd-rail-tab" onclick="rdRail()" aria-label="Tools">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>' +
+          '</button>'
+        : '') +
+      '<div class="rd-rail-set">' +
+        '<button onclick="rdNotepad(1)" aria-label="Notes library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14.5 3v4.5H19M8.5 12h7M8.5 16h4.5"/></svg></button>' +
+        '<button onclick="rdTogglePanel(' + w + ')" aria-label="Text settings"><span class="rd-aa">Aa</span></button>' +
+        '<button onclick="rdSetPref(\'theme\',\'light\')" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg></button>' +
+        '<button onclick="rdSetPref(\'theme\',\'black\')" aria-label="Black theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a6.9 6.9 0 0 0 11.1 11.1Z"/></svg></button>' +
+        '<button onclick="rdToggleTools(' + w + ')" aria-label="Page tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="m6.5 16.5 8.4-8.4a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8l-8.4 8.4H6.5z"/></svg></button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function paintRail() {
+    document.querySelectorAll('.rd-rail-fold').forEach(function (r) {
+      r.classList.toggle('open', railOpen);
+    });
+  }
+  window.rdRail = function () { railOpen = !railOpen; paintRail(); haptic(15); };
+
+  /* ══ EPUB ══════════════════════════════════════════════════════════
+     An EPUB is a ZIP of XHTML, so opening one means reading the archive.
+     The browser can already inflate — DecompressionStream('deflate-raw')
+     — so the whole thing is the central directory walk below plus the
+     manifest parse, and no library has to be shipped.
+
+     The file never leaves the device: it is read with FileReader and the
+     pages are built in memory.
+     ══ */
+
+  function dv(u8) { return new DataView(u8.buffer, u8.byteOffset, u8.byteLength); }
+
+  function inflateRaw(u8) {
+    if (typeof DecompressionStream === 'undefined') return Promise.reject(new Error('no-inflate'));
+    var ds = new DecompressionStream('deflate-raw');
+    return new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer()
+      .then(function (b) { return new Uint8Array(b); });
+  }
+
+  /* Central directory first — the local headers alone do not carry reliable
+     sizes when a file was written with a data descriptor. */
+  function readZip(u8) {
+    var d = dv(u8), i, eocd = -1;
+    for (i = u8.length - 22; i >= 0 && i > u8.length - 66000; i--) {
+      if (d.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) return Promise.reject(new Error('not-a-zip'));
+    var count = d.getUint16(eocd + 10, true);
+    var start = d.getUint32(eocd + 16, true);
+    var p = start, entries = [];
+    for (i = 0; i < count && p + 46 <= u8.length; i++) {
+      if (d.getUint32(p, true) !== 0x02014b50) break;
+      var method = d.getUint16(p + 10, true);
+      var csize  = d.getUint32(p + 20, true);
+      var nlen   = d.getUint16(p + 28, true);
+      var elen   = d.getUint16(p + 30, true);
+      var clen   = d.getUint16(p + 32, true);
+      var lho    = d.getUint32(p + 42, true);
+      var name   = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nlen));
+      entries.push({ name: name, method: method, csize: csize, lho: lho });
+      p += 46 + nlen + elen + clen;
+    }
+    var files = {};
+    return entries.reduce(function (chain, e) {
+      return chain.then(function () {
+        if (d.getUint32(e.lho, true) !== 0x04034b50) return;
+        var n = d.getUint16(e.lho + 26, true), x = d.getUint16(e.lho + 28, true);
+        var at = e.lho + 30 + n + x;
+        var raw = u8.subarray(at, at + e.csize);
+        if (e.method === 0) { files[e.name] = raw; return; }
+        if (e.method !== 8) return;
+        return inflateRaw(raw).then(function (out) { files[e.name] = out; })
+          .catch(function () {});
+      });
+    }, Promise.resolve()).then(function () { return files; });
+  }
+
+  function txt(files, name) {
+    var f = files[name];
+    return f ? new TextDecoder('utf-8').decode(f) : '';
+  }
+  function xml(str) {
+    try { return new DOMParser().parseFromString(str, 'application/xml'); } catch (e) { return null; }
+  }
+  /* EPUB paths are relative to the file that names them. */
+  function resolve(base, href) {
+    if (!href) return '';
+    href = href.split('#')[0];
+    if (href.charAt(0) === '/') return href.slice(1);
+    var parts = base.split('/'); parts.pop();
+    href.split('/').forEach(function (seg) {
+      if (seg === '.' || seg === '') return;
+      if (seg === '..') parts.pop(); else parts.push(seg);
+    });
+    return parts.join('/');
+  }
+
+  var MIME = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', svg: 'image/svg+xml', webp: 'image/webp' };
+
+  /* Whatever the book's markup is, only this comes through. */
+  var KEEP = { P: 1, DIV: 1, SPAN: 1, EM: 1, I: 1, STRONG: 1, B: 1, U: 1, BR: 1, HR: 1,
+               H1: 1, H2: 1, H3: 1, H4: 1, H5: 1, H6: 1, BLOCKQUOTE: 1, UL: 1, OL: 1,
+               LI: 1, IMG: 1, FIGURE: 1, FIGCAPTION: 1, SUP: 1, SUB: 1, SMALL: 1, TABLE: 1,
+               THEAD: 1, TBODY: 1, TR: 1, TD: 1, TH: 1, A: 1 };
+
+  function cleanNode(node, files, base, urls) {
+    var kids = Array.prototype.slice.call(node.childNodes);
+    kids.forEach(function (n) {
+      if (n.nodeType === 3) return;
+      if (n.nodeType !== 1) { n.parentNode.removeChild(n); return; }
+      var tag = n.tagName.toUpperCase();
+      if (!KEEP[tag]) { n.parentNode.removeChild(n); return; }
+      Array.prototype.slice.call(n.attributes).forEach(function (a) {
+        var k = a.name.toLowerCase();
+        if (k === 'src' || k === 'href' || k === 'alt' || k === 'colspan' || k === 'rowspan') return;
+        n.removeAttribute(a.name);
+      });
+      if (tag === 'A') {
+        /* Internal links have nowhere to go inside a paginated reader, and
+           external ones should not be launched from a book. */
+        n.removeAttribute('href');
+      }
+      if (tag === 'IMG') {
+        var src = n.getAttribute('src') || '';
+        var path = resolve(base, src);
+        var f = files[path];
+        if (!f) { n.parentNode.removeChild(n); return; }
+        if (!urls[path]) {
+          var ext = (path.split('.').pop() || '').toLowerCase();
+          urls[path] = URL.createObjectURL(new Blob([f], { type: MIME[ext] || 'application/octet-stream' }));
+        }
+        n.setAttribute('src', urls[path]);
+        n.setAttribute('loading', 'lazy');
+      }
+      if (tag === 'P' || tag === 'BLOCKQUOTE' || tag === 'LI') n.className = 'rd-p';
+      cleanNode(n, files, base, urls);
+    });
+  }
+
+  function chapterFrom(files, path, urls) {
+    var raw = txt(files, path);
+    if (!raw) return null;
+    var doc = xml(raw) || new DOMParser().parseFromString(raw, 'text/html');
+    var body = doc.querySelector('body') || doc.documentElement;
+    if (!body) return null;
+    cleanNode(body, files, path, urls);
+    /* The chapter's own opening heading becomes the page title, so leaving it
+       in the body prints the same words twice. */
+    var head = body.querySelector('h1, h2, h3');
+    var title = '';
+    if (head && !head.previousElementSibling) {
+      title = head.textContent.trim().slice(0, 90);
+      head.parentNode.removeChild(head);
+    } else if (head) {
+      title = head.textContent.trim().slice(0, 90);
+    }
+    var html = body.innerHTML.trim();
+    if (!html.replace(/<[^>]*>/g, '').trim() && !title) return null;
+    return { title: title, html: html };
+  }
+
+  function buildEpub(files, fileName) {
+    var container = txt(files, 'META-INF/container.xml');
+    var cdoc = xml(container);
+    var rootEl = cdoc && cdoc.querySelector('rootfile');
+    var opfPath = rootEl && rootEl.getAttribute('full-path');
+    if (!opfPath || !files[opfPath]) throw new Error('no-opf');
+
+    var odoc = xml(txt(files, opfPath));
+    if (!odoc) throw new Error('bad-opf');
+    var title = '';
+    var t = odoc.getElementsByTagName('dc:title')[0] || odoc.getElementsByTagName('title')[0];
+    if (t) title = t.textContent.trim();
+    if (!title) title = fileName.replace(/\.epub$/i, '');
+
+    var manifest = {};
+    Array.prototype.slice.call(odoc.getElementsByTagName('item')).forEach(function (it) {
+      manifest[it.getAttribute('id')] = {
+        href: resolve(opfPath, it.getAttribute('href')),
+        type: it.getAttribute('media-type') || ''
+      };
+    });
+    var spine = Array.prototype.slice.call(odoc.getElementsByTagName('itemref'))
+      .map(function (r) { return manifest[r.getAttribute('idref')]; })
+      .filter(function (m) { return m && /html/.test(m.type); });
+    if (!spine.length) throw new Error('empty-spine');
+
+    var urls = {}, pages = [];
+    spine.forEach(function (m, i) {
+      var ch = chapterFrom(files, m.href, urls);
+      if (!ch) return;
+      pages.push({
+        chapter: pages.length + 1,
+        chapterName: ch.title || ('Chapter ' + (pages.length + 1)),
+        first: true,
+        title: ch.title || title,
+        root: null,
+        html: ch.html
+      });
+    });
+    if (!pages.length) throw new Error('no-text');
+    return { key: 'epub:' + fileName, title: title, sub: fileName, cover: '', pages: pages };
+  }
+
+  window.rdEpubPick = function () {
+    var inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.epub,application/epub+zip';
+    inp.style.display = 'none';
+    inp.addEventListener('change', function () {
+      var f = inp.files && inp.files[0];
+      inp.remove();
+      if (!f) return;
+      toast('Opening ' + f.name + '…');
+      var fr = new FileReader();
+      fr.onerror = function () { toast('Could not read that file'); };
+      fr.onload = function () {
+        readZip(new Uint8Array(fr.result))
+          .then(function (files) { return buildEpub(files, f.name); })
+          .then(function (book) {
+            var at = -1;
+            epubs.forEach(function (b, i) { if (b.key === book.key) at = i; });
+            if (at >= 0) epubs[at] = book; else epubs.unshift(book);
+            eBook = book; eIdx = 0;
+            renderEbook();
+            toast(book.pages.length + ' chapters');
+            haptic([20, 40, 20]);
+          })
+          .catch(function (e) {
+            var why = { 'not-a-zip': 'That file is not an EPUB.',
+                        'no-opf': 'That EPUB has no readable index.',
+                        'bad-opf': 'That EPUB has no readable index.',
+                        'empty-spine': 'That EPUB lists no chapters.',
+                        'no-text': 'That EPUB has no text to show.',
+                        'no-inflate': 'This browser cannot unpack an EPUB.' };
+            toast(why[e && e.message] || 'Could not open that EPUB');
+          });
+      };
+      fr.readAsArrayBuffer(f);
+    });
+    document.body.appendChild(inp);
+    inp.click();
+    haptic(20);
   };
 
   /* ── Screens ───────────────────────────────────────────────────────── */
