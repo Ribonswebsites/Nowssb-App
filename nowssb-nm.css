@@ -9119,41 +9119,39 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
    (app/js/part065.js)
    ══════════════════════════════════════════════════════════════════ */
 .rd-rail-fold {
-  left: 0 !important; padding: 0 !important; background: none !important;
+  left: 8px !important; padding: 0 !important; background: none !important;
   border: none !important; box-shadow: none !important;
-  display: flex; align-items: center; gap: 0;
+  display: flex; align-items: center; gap: 6px;
 }
+/* Open, it is a complete vertical pill floating clear of the edge — rounded
+   the whole way round, not a panel welded to the side of the screen. */
 .rd-rail-fold .rd-rail-set {
-  display: flex; flex-direction: column; gap: 2px;
-  padding: 8px 6px; box-sizing: border-box;
-  background: rgba(12,12,16,0.92); border: 1px solid rgba(255,255,255,0.1);
-  border-left: none; border-radius: 0 18px 18px 0 !important;
-  box-shadow: 0 14px 34px rgba(0,0,0,0.5);
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 9px 6px; box-sizing: border-box;
+  background: rgba(12,12,16,0.94); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px !important;
+  box-shadow: 0 16px 38px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07);
   max-width: 0; opacity: 0; overflow: hidden; pointer-events: none;
   transition: max-width 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, padding 0.3s;
 }
-.rd-rail-fold:not(.open) .rd-rail-set { padding-left: 0; padding-right: 0; }
-.rd-rail-fold.open .rd-rail-set { max-width: 60px; opacity: 1; pointer-events: auto; }
+.rd-rail-fold:not(.open) .rd-rail-set { padding-left: 0; padding-right: 0; border-width: 0; }
+.rd-rail-fold.open .rd-rail-set { max-width: 62px; opacity: 1; pointer-events: auto; }
+.rd-rail-fold.open .rd-rail-set button { border-radius: 50% !important; }
 /* The tab is the only thing showing while it is shut. */
 /* Shut, it is a small nub — it should not read as a component of its own.
    .rd-rail button pins every control to 42px with !important, so the tab has
    to out-specify it, not just declare a size. */
 .rd-rail-fold > .rd-rail-tab {
-  width: 17px !important; height: 34px !important; min-height: 34px !important; flex-shrink: 0;
+  width: 30px !important; height: 62px !important; min-height: 62px !important; flex-shrink: 0;
   padding: 0 !important; display: flex; align-items: center; justify-content: center;
-  background: rgba(12,12,16,0.78); color: rgba(255,255,255,0.6);
-  border: 1px solid rgba(255,255,255,0.08); border-left: none;
-  border-radius: 0 10px 10px 0 !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: width 0.25s, height 0.25s, transform 0.3s cubic-bezier(0.4,0,0.2,1),
-              background 0.25s, color 0.25s;
+  background: rgba(12,12,16,0.9); color: rgba(255,255,255,0.82);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.25s, color 0.25s;
 }
-.rd-rail-fold > .rd-rail-tab svg { width: 11px !important; height: 11px !important; display: block; }
-.rd-rail-fold.open > .rd-rail-tab {
-  transform: rotate(180deg);
-  width: 22px !important; height: 44px !important; min-height: 44px !important;
-  background: rgba(12,12,16,0.92); color: rgba(255,255,255,0.8);
-}
+.rd-rail-fold > .rd-rail-tab svg { width: 17px !important; height: 17px !important; display: block; }
+.rd-rail-fold.open > .rd-rail-tab { transform: rotate(180deg); }
 .rd-rail-fold.open { flex-direction: row-reverse; }
 /* The Meaning Reader's rail is unchanged — it is not folded. */
 #sub-reader-ebook .rd-rail { z-index: 26; }
@@ -9180,10 +9178,10 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
   0%   { transform: rotateY(-122deg); filter: brightness(0.62); }
   100% { transform: rotateY(0deg); filter: brightness(1); }
 }
-.rd-leaf.rd-leaf-go { animation: rdLeafGo .2s cubic-bezier(.35,0,.25,1) forwards; }
+.rd-leaf.rd-leaf-go { animation: rdLeafGo .42s cubic-bezier(.33,0,.2,1) forwards; }
 .rd-page.rd-turn-p {
   transform-origin: left center; will-change: transform, filter;
-  animation: rdLeafBack .2s cubic-bezier(.35,0,.25,1) both;
+  animation: rdLeafBack .42s cubic-bezier(.33,0,.2,1) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .rd-leaf.rd-leaf-go, .rd-page.rd-turn-p { animation: none; }
@@ -9228,11 +9226,16 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
 .rd-immersive .rd-prog-wide,
 .rd-immersive .rd-chev { display: none !important; }
 .rd-immersive .rd-stage {
-  padding-top: max(env(safe-area-inset-top, 10px), 10px) !important;
-  padding-bottom: max(env(safe-area-inset-bottom, 10px), 10px) !important;
+  padding: 0 !important;
 }
-.rd-immersive .rd-page { min-height: 100%; box-sizing: border-box; }
-#sub-reader-meaning.rd-immersive .rd-stage { padding-left: 24px !important; }
+/* Edge to edge: no side padding on the stage, no margin or radius on the
+   leaf — the page is the screen. */
+.rd-immersive .rd-page {
+  min-height: 100%; box-sizing: border-box;
+  border-radius: 0 !important; margin: 0 !important;
+  padding: max(env(safe-area-inset-top, 26px), 26px) 22px
+           max(env(safe-area-inset-bottom, 26px), 26px) !important;
+}
 /* The way out, small and out of the reading column. */
 .rd-full-out {
   display: none; position: fixed; z-index: 40;
