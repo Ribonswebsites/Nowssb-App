@@ -23,10 +23,8 @@
 
     // Above Personalised Healing — the clip's subject sits left, so the
     // copy and the arrow go right, the same way the Reader section reads.
-    { before: '#home-nm .health-journey-card',     vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4',
-      cta: { hello: 'Personalised', name: 'Healing', sub: 'Your body, your journey.' } },
-    { before: '#home .health-journey-card',        vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4',
-      cta: { hello: 'Personalised', name: 'Healing', sub: 'Your body, your journey.' } },
+    { before: '#home-nm .health-journey-card',     vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
+    { before: '#home .health-journey-card',        vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
 
     // Above NowssB Connect
     { before: '#home-nm .nmh-connect-sec',         vid: V + 'v1785402935/grok_video_2026-07-30-14-43-48_lfrvok.mp4' },
@@ -69,7 +67,21 @@
     var d = document.createElement('div');
     d.className = 'vb-banner';
     var html = '<video data-nwsb-auto muted loop playsinline preload="none" src="' + spec.vid + '"></video>';
-    if (spec.cta) {
+    if (spec.gender) {
+      /* Two words over their own halves of the clip and a bare Enter — no
+         panel behind any of it, so the video is not covered. Each label
+         opens Personalised Healing with that side already highlighted,
+         using the page's own applyHealthGenderHighlight. */
+      html +=
+        '<button class="vb-g vb-g-f" onclick="event.stopPropagation();vbGender(\'female\')">Female</button>' +
+        '<button class="vb-g vb-g-m" onclick="event.stopPropagation();vbGender(\'male\')">Male</button>' +
+        '<span class="vb-cta vb-cta-mid" onclick="event.stopPropagation();vbGender()">' +
+          '<span class="vb-cta-lbl">Enter</span>' +
+          '<span class="vb-go"><svg viewBox="0 0 12 12" fill="none">' +
+            '<path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/>' +
+          '</svg></span>' +
+        '</span>';
+    } else if (spec.cta) {
       html += '<span class="vb-rule"></span>' +
         '<div class="vb-txt">' +
           '<span class="vb-hello">' + esc(spec.cta.hello) + '</span>' +
@@ -86,7 +98,17 @@
     return d;
   }
 
+  window.vbGender = function (g) {
+    try { if (g) window._userGender = g; } catch (e) {}
+    if (window.openSub) window.openSub('health-journey');
+    if (g && window.applyHealthGenderHighlight) {
+      setTimeout(function () { window.applyHealthGenderHighlight(g); }, 220);
+    }
+    try { if (navigator.vibrate) navigator.vibrate(28); } catch (e) {}
+  };
+
   function place() {
+    var added = false;
     PLACE.forEach(function (spec, i) {
       var key = 'vb' + i;
       var sel = spec.before || spec.top;
@@ -99,7 +121,13 @@
       el.setAttribute('data-vb', key);
       if (spec.before) host.parentNode.insertBefore(el, host);
       else host.insertBefore(el, host.firstChild);
+      added = true;
     });
+    /* The layout editor reorders the registered children of each home, and
+       every banner is registered alongside the section it introduces — so a
+       newly injected one has to be run through that pass or it stays where
+       it landed while its section moves away. */
+    if (added && window.hlApplyLayout) { try { window.hlApplyLayout(); } catch (e) {} }
 
     SWAP.forEach(function (s) {
       document.querySelectorAll(s.sel).forEach(function (v) {

@@ -8467,3 +8467,24 @@ body.fashplus #home .fp-tile .home-tile-enter {
   bottom: auto !important; right: 12px !important;
   top: 50% !important; transform: translateY(-50%) !important;
 }
+
+/* ── The Personalised Healing banner is a chooser ──────────────────────
+   The clip runs pink on the left and blue on the right, so each label sits
+   over its own half. No panel behind any of it — the video is the point. */
+.vb-g {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  cursor: pointer; background: none !important; border: none !important;
+  padding: 0 !important; min-height: 0 !important;
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800;
+  letter-spacing: -0.3px; color: #fff;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.85), 0 0 30px rgba(0,0,0,0.6);
+}
+.vb-g-f { left: 22px; }
+.vb-g-m { right: 22px; }
+.vb-g:active { opacity: 0.7; }
+/* Enter sits between them, clear of both labels. */
+.vb-cta-mid {
+  position: absolute; left: 50%; bottom: 14px; z-index: 3;
+  transform: translateX(-50%); margin-top: 0; cursor: pointer;
+}
+.vb-cta-mid .vb-cta-lbl { text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
