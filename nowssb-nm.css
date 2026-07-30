@@ -9106,47 +9106,9 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
 #home .fash-routines-wrap .home-card-bottom { align-items: flex-end; gap: 12px; }
 #home .fash-routines-wrap .home-card-bottom .tp-enter { flex-shrink: 0; }
 
-/* ══════════════════════════════════════════════════════════════════
-   THE RAIL, FOLDED — the eBook page has no room for a permanent rail,
-   so the same five controls sit behind an arrow on the left edge.
-   (app/js/part065.js)
-   ══════════════════════════════════════════════════════════════════ */
-.rd-rail-fold {
-  left: 8px !important; padding: 0 !important; background: none !important;
-  border: none !important; box-shadow: none !important;
-  display: flex; align-items: center; gap: 6px;
-}
-/* Open, it is a complete vertical pill floating clear of the edge — rounded
-   the whole way round, not a panel welded to the side of the screen. */
-.rd-rail-fold .rd-rail-set {
-  display: flex; flex-direction: column; gap: 3px;
-  padding: 9px 6px; box-sizing: border-box;
-  background: rgba(12,12,16,0.94); border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 999px !important;
-  box-shadow: 0 16px 38px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07);
-  max-width: 0; opacity: 0; overflow: hidden; pointer-events: none;
-  transition: max-width 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, padding 0.3s;
-}
-.rd-rail-fold:not(.open) .rd-rail-set { padding-left: 0; padding-right: 0; border-width: 0; }
-.rd-rail-fold.open .rd-rail-set { max-width: 62px; opacity: 1; pointer-events: auto; }
-.rd-rail-fold.open .rd-rail-set button { border-radius: 50% !important; }
-/* The tab is the only thing showing while it is shut. */
-/* Shut, it is a small nub — it should not read as a component of its own.
-   .rd-rail button pins every control to 42px with !important, so the tab has
-   to out-specify it, not just declare a size. */
-.rd-rail-fold > .rd-rail-tab {
-  width: 30px !important; height: 62px !important; min-height: 62px !important; flex-shrink: 0;
-  padding: 0 !important; display: flex; align-items: center; justify-content: center;
-  background: rgba(12,12,16,0.9); color: rgba(255,255,255,0.82);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 999px !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.25s, color 0.25s;
-}
-.rd-rail-fold > .rd-rail-tab svg { width: 17px !important; height: 17px !important; display: block; }
-.rd-rail-fold.open > .rd-rail-tab { transform: rotate(180deg); }
-.rd-rail-fold.open { flex-direction: row-reverse; }
-/* The Meaning Reader's rail is unchanged — it is not folded. */
+/* The eBook reader carries the same rail the Meaning reader does — the
+   page just has to start clear of it. */
+#sub-reader-ebook .rd-stage-e { padding-left: 52px; }
 #sub-reader-ebook .rd-rail { z-index: 26; }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -9273,22 +9235,15 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
   box-shadow: 0 10px 26px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .wsg-logo.wsg-logo-glass img { width: 70px; height: 70px; object-fit: contain; }
-.wsg-wordglass {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 9px 15px; box-sizing: border-box;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 20px !important;
-  -webkit-backdrop-filter: blur(16px) saturate(1.25); backdrop-filter: blur(16px) saturate(1.25);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.24);
-}
-/* The wordmark is type now, not an image. */
+/* The wordmark is type now — bare on the clip, no panel behind it, and it
+   names the search it belongs to. */
 .wsg-wordmark {
   display: block; font-family: 'DM Sans', sans-serif;
-  font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 1;
-  color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+  font-size: 30px; font-weight: 300; letter-spacing: -1px; line-height: 1.05;
+  color: #fff; white-space: nowrap;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.85), 0 0 34px rgba(0,0,0,0.5);
 }
-.wsg-wordmark b { font-weight: 800; color: #e8d5a3; }
+.wsg-wordmark b { font-weight: 800; color: #fff; }
 /* app/app.css squares every corner with `* { border-radius: 0 !important }`,
    which beat the inline 50% these back buttons were written with. */
 #sub-word-search .sub-header > button,
@@ -9341,3 +9296,28 @@ body.homecorner-round .healing-wrap > .health-journey-card {
 body.homecorner-round .healing-wrap > .vb-banner {
   border-radius: 0 0 18px 18px !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   NORMAL HOME — Today's Trending and the Store each in one neumorphic
+   wrapper: the section's clip and its black banners as one block.
+   ══════════════════════════════════════════════════════════════════ */
+#home-nm .nmh-sec-wrap {
+  box-sizing: border-box; overflow: hidden;
+  width: 100%; margin: 16px 0; padding: 14px;
+  background: #f0f2f7; border-radius: 22px !important;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+}
+#home-nm.nm-dark .nmh-sec-wrap {
+  background: #16163c;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
+}
+/* Everything inside was written as a top-level section; the wrapper's
+   padding does the spacing now. */
+#home-nm .nmh-sec-wrap > * {
+  width: 100% !important; margin-left: 0 !important; margin-right: 0 !important;
+}
+#home-nm .nmh-sec-wrap > * + * { margin-top: 10px !important; }
+#home-nm .nmh-sec-wrap > *:first-child { margin-top: 0 !important; }
+#home-nm .nmh-sec-wrap > *:last-child { margin-bottom: 0 !important; }
+body.homecorner-round #home-nm .nmh-sec-wrap > *:first-child { border-radius: 18px 18px 0 0 !important; }
+body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0 18px 18px !important; }

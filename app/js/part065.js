@@ -1241,16 +1241,9 @@
      One markup builder for both, so the two readers cannot drift apart.
      ══ */
 
-  var railOpen = false;
-
   function railHtml(which) {
     var w = "'" + which + "'";
-    return '<div class="rd-rail rd-rail-' + which + (which === 'ebook' ? ' rd-rail-fold' : '') + '">' +
-      (which === 'ebook'
-        ? '<button class="rd-rail-tab" onclick="rdRail()" aria-label="Tools">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>' +
-          '</button>'
-        : '') +
+    return '<div class="rd-rail rd-rail-' + which + '">' +
       '<div class="rd-rail-set">' +
         '<button onclick="rdNotepad(1)" aria-label="Notes library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14.5 3v4.5H19M8.5 12h7M8.5 16h4.5"/></svg></button>' +
         '<button onclick="rdTogglePanel(' + w + ')" aria-label="Text settings"><span class="rd-aa">Aa</span></button>' +
@@ -1266,15 +1259,11 @@
   }
 
   function paintRail() {
-    document.querySelectorAll('.rd-rail-fold').forEach(function (r) {
-      r.classList.toggle('open', railOpen);
-    });
     ['sub-reader-meaning', 'sub-reader-ebook'].forEach(function (id) {
       var sc = document.getElementById(id);
       if (sc) sc.classList.toggle('rd-immersive', immersive);
     });
   }
-  window.rdRail = function () { railOpen = !railOpen; paintRail(); haptic(15); };
 
   /* ══ EPUB ══════════════════════════════════════════════════════════
      An EPUB is a ZIP of XHTML, so opening one means reading the archive.
