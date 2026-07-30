@@ -8483,7 +8483,9 @@ body.fashplus #home .fp-tile .home-tile-enter {
 }
 .vb-g-lbl { display: block; }
 .vb-g-f { left: 16px; }
-.vb-g-m { right: 14px; }
+/* Just past the divider the clip is composed around, not jammed against the
+   right edge. */
+.vb-g-m { left: 53%; right: auto; }
 /* Each side carries its own Enter, sized down so both a word and an arrow
    fit inside half a banner. */
 .vb-g-cta { margin-top: 0 !important; gap: 6px; }
@@ -9025,7 +9027,8 @@ body.homecorner-edge #home-nm .nmh-wrap > .home-footer {
 /* ── The chooser's two Enters are the arrow alone, sitting a touch below
    the word they belong to. ── */
 .vb-g-cta .vb-cta-lbl { display: none !important; }
-.vb-g-cta { position: relative; top: 7px; gap: 0; }
+/* On the same line as the word it belongs to. */
+.vb-g-cta { position: relative; top: 0; gap: 0; }
 
 /* ── The coupon art with its offer banner, and Shabdapathy Foundations
    with its own black banner, each in one wrapper. ── */
