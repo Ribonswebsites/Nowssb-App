@@ -9021,16 +9021,9 @@ body.fashplus #home .fp-card .home-card-top { padding: 0 14px 2px !important; }
    rounded corners were drawn against something the same colour and nothing
    appeared to change. Rounded mode rounds the top only — the bottom is the
    end of the page — and lifts it off what is above so the notch reads. */
-/* Default is the rounded look everywhere else on the page, so the footer
-   opens that way too; Edges mode below squares it off again. */
-/* app/app.css resets every element to square with `* { border-radius: 0
-   !important }`, so this has to be !important to exist at all. Edges mode
-   below carries the same weight at a higher specificity and still wins. */
-#home .home-body > .home-footer,
-#home-nm .nmh-wrap > .home-footer {
-  border-radius: 26px 26px 0 0 !important;
-  margin-top: 18px !important;
-}
+/* Default leaves the footer square and flush — only the Rounded option
+   changes it. app/app.css squares everything with `* { border-radius: 0
+   !important }`, which is why these two carry the same weight. */
 body.homecorner-round #home .home-body > .home-footer,
 body.homecorner-round #home-nm .nmh-wrap > .home-footer {
   border-radius: 26px 26px 0 0 !important;
@@ -9279,7 +9272,7 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
   -webkit-backdrop-filter: blur(16px) saturate(1.25); backdrop-filter: blur(16px) saturate(1.25);
   box-shadow: 0 10px 26px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.3);
 }
-.wsg-logo.wsg-logo-glass img { width: 52px; height: 52px; object-fit: contain; }
+.wsg-logo.wsg-logo-glass img { width: 70px; height: 70px; object-fit: contain; }
 .wsg-wordglass {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 9px 15px; box-sizing: border-box;
@@ -9289,9 +9282,25 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
   -webkit-backdrop-filter: blur(16px) saturate(1.25); backdrop-filter: blur(16px) saturate(1.25);
   box-shadow: 0 10px 26px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.24);
 }
-.wsg-wordglass .wsg-logo-img { display: block; }
+/* The wordmark is type now, not an image. */
+.wsg-wordmark {
+  display: block; font-family: 'DM Sans', sans-serif;
+  font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 1;
+  color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+}
+.wsg-wordmark b { font-weight: 800; color: #e8d5a3; }
 /* app/app.css squares every corner with `* { border-radius: 0 !important }`,
    which beat the inline 50% these back buttons were written with. */
 #sub-word-search .sub-header > button,
 #sub-meaning-search .sub-header > button,
 #sub-search-choice .sub-header > button { border-radius: 50% !important; }
+
+/* ── The Normal home's player keeps its rail but not the panel — the card
+   is neumorphic already and a second raised surface around it read as a
+   box inside a box. The element stays so the layout editor still has one
+   thing to move. ── */
+#home-nm .nmh-plyr-wrap {
+  background: none !important; box-shadow: none !important;
+  padding: 0 !important; border-radius: 0 !important;
+}
+#home-nm.nm-dark .nmh-plyr-wrap { background: none !important; box-shadow: none !important; }
