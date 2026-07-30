@@ -76,9 +76,20 @@
     chat:    I + 'ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
     profile: I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
   };
-  var STORE_CHIPS  = [['meaning', 'Meanings'], ['words', 'Words'], ['ebooks', 'eBooks']];
-  var CONNECT_CHIPS = [['connect', 'Community'], ['chat', 'Chat'], ['profile', 'Profile']];
-  var READER_CHIPS = [['meaning', 'Meanings'], ['ebooks', 'eBooks']];
+  var STORE_CHIPS = [
+    ['meaning', 'Meanings', 'The origin behind any word'],
+    ['words',   'Words',    'Own the sounds that heal'],
+    ['ebooks',  'eBooks',   'Deep-dive guides, yours to keep']
+  ];
+  var CONNECT_CHIPS = [
+    ['connect', 'Community', 'See what others are practising'],
+    ['chat',    'Chat',      'Your conversations, in one place'],
+    ['profile', 'Profile',   'Your space on NowssB']
+  ];
+  var READER_CHIPS = [
+    ['meaning', 'Meanings', 'Read every meaning as a book'],
+    ['ebooks',  'eBooks',   'Every guide, page by page']
+  ];
 
   var CHIPS = [
     { sel: '#home-nm .vb-banner[data-vb="vb0"], #home .vb-banner[data-vb="vb1"]', items: STORE_CHIPS },
@@ -96,7 +107,10 @@
   function chipsHtml(items) {
     return '<div class="vb-chips"><span class="vb-chip dash-in">' +
       '<span class="vb-chip-ic"><img loading="lazy" decoding="async" alt="" src="' + CHIP_IC[items[0][0]] + '"></span>' +
-      '<span class="vb-chip-t">' + esc(items[0][1]) + '</span></span></div>';
+      '<span class="vb-chip-txt">' +
+        '<span class="vb-chip-t">' + esc(items[0][1]) + '</span>' +
+        '<span class="vb-chip-s">' + esc(items[0][2]) + '</span>' +
+      '</span></span></div>';
   }
 
   function paintChips() {
@@ -119,6 +133,7 @@
       var it = r.items[r.i];
       chip.querySelector('.vb-chip-ic img').setAttribute('src', CHIP_IC[it[0]]);
       chip.querySelector('.vb-chip-t').textContent = it[1];
+      chip.querySelector('.vb-chip-s').textContent = it[2];
       /* Removing the class is not enough on its own — the animation only
          restarts once the element has been reflowed without it. */
       chip.classList.remove('dash-in');
