@@ -9245,3 +9245,30 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
 }
 .rd-immersive .rd-full-out { display: flex; }
 .rd-full-out svg { width: 15px; height: 15px; display: block; }
+
+/* ══════════════════════════════════════════════════════════════════
+   WORD / MEANING SEARCH — the clip is the page, no glass panel
+   The frosted card, its travelling arc and the still crystal photo are
+   all gone; each screen plays its own loop behind the content with a
+   scrim over it so the copy still reads.
+   ══════════════════════════════════════════════════════════════════ */
+#sub-word-search, #sub-meaning-search { background: #000 !important; }
+.wsg-bgvid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block; pointer-events: none;
+}
+.wsg-bgvid-scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(4,8,16,0.52) 0%, rgba(4,8,16,0.4) 42%, rgba(4,8,16,0.66) 100%);
+}
+#sub-word-search > .sub-header, #sub-word-search > .ws-page-body,
+#sub-meaning-search > .sub-header, #sub-meaning-search > .ms-page-body {
+  position: relative; z-index: 2;
+}
+/* No panel, no ring, no frost — just the content over the clip. */
+.wsg-card {
+  background: transparent !important; box-shadow: none !important;
+  border: none !important; overflow: visible !important;
+}
+.wsg-card::before, .wsg-card::after { display: none !important; }
