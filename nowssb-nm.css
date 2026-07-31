@@ -8176,13 +8176,28 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   font-family: 'DM Sans', sans-serif; font-size: 13px;
 }
 
-/* In rounded mode the trending pair reads as one block opening at the top
-   and closing at the bottom: the video rounds only its top corners, the
-   banner under it only its bottom ones, and the gap between them stays. */
-body.homecorner-round #home .fash-trend-wrap > .nmh-trend-banner {
+/* Trending and the store clip each pair with their own banner in a glass
+   wrapper, the way the Normal home pairs them: Today's Trending names the
+   section above, Shop Now belongs to the store clip below. Both wrappers
+   own the insets, so their contents drop the margins they carry as
+   top-level sections — the same deal .fash-routines-wrap makes. */
+#home .fash-trend-wrap > .nmh-trend-banner,
+#home .fash-storevid-wrap > .vb-banner {
+  width: 100% !important; margin: 0 !important;
+}
+#home .fash-trend-wrap > .nmh-sec-banner,
+#home .fash-storevid-wrap > .nmh-trend-shop-banner {
+  width: 100% !important; margin: 10px 0 0 !important; box-sizing: border-box;
+}
+/* In rounded mode each pair reads as one block opening at the top and
+   closing at the bottom: the clip rounds only its top corners, the banner
+   under it only its bottom ones, and the gap between them stays. */
+body.homecorner-round #home .fash-trend-wrap > .nmh-trend-banner,
+body.homecorner-round #home .fash-storevid-wrap > .vb-banner {
   border-radius: 18px 18px 0 0 !important;
 }
-body.homecorner-round #home .fash-trend-wrap > .nmh-trend-shop-banner {
+body.homecorner-round #home .fash-trend-wrap > .nmh-sec-banner,
+body.homecorner-round #home .fash-storevid-wrap > .nmh-trend-shop-banner {
   border-radius: 0 0 18px 18px !important;
 }
 
@@ -9560,9 +9575,10 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 /* On a word page the banner is a section of the scroller, not a home block. */
 .rmd-desc-block ~ .vb-banner, .vb-banner + .rmd-desc-block { margin-top: 0; }
 
-/* The store clip's own wrapper under the trending block — glass, and only
-   as tall as the clip inside it. */
-#home .fash-storevid-wrap > .vb-banner { width: 100% !important; margin: 0 !important; }
+/* The store clip's own wrapper under the trending block — glass, holding
+   the clip and the Shop Now banner that belongs to it. Sizing for both
+   lives with the trending pair's, above. It carries the banner in the
+   markup now, so :empty only ever matches if the clip has yet to land. */
 #home .fash-storevid-wrap:empty { display: none; }
 
 /* One clip means Shop Now has nothing to hide for; the rotators still toggle

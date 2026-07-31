@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=598">
+<link rel="stylesheet" href="nowssb-nm.css?v=599">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -1744,7 +1744,24 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-trend-banner-text" id="nmh-trending-text-fash"></div>
   </div>
 
-  <!-- Today Trending — Shop Now banner (fashion) -->
+  <!-- The black banner that names the section, the same one the Normal
+       home carries here. The Shop Now banner belongs to the store clip
+       below — it was sitting on this wrapper, which left Trending
+       advertising the store and the store clip with no banner at all. -->
+  <div class="nmh-sec-banner" onclick="openSub('nowssb-store')">
+    <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="nmh-sec-banner-divider"></div>
+    <div class="nmh-sec-banner-txt">
+      <div class="nmh-sec-banner-title">Today's Trending</div>
+      <div class="nmh-sec-banner-sub">See which words are healing the most people right now</div>
+    </div>
+    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  </div>
+
+  <!-- The store clip and its Shop Now banner, in a wrapper of its own.
+       app/js/part067.js drops the clip in above the banner. -->
+  <div class="glass-wrap fash-storevid-wrap">
   <div class="nmh-trend-shop-banner fash-trend-shop-banner" id="nmh-trending-shop-banner-fash" onclick="openSub('nowssb-store')">
     <div class="nmh-trend-shop-logo">
       <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="Store">
@@ -1761,10 +1778,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-trend-shop-dots" id="nmh-trending-shop-dots-fash"></div>
   </div>
   </div>
-
-  <!-- The store clip sits below the trending block, in a wrapper of its
-       own. app/js/part067.js drops it in at the top. -->
-  <div class="glass-wrap fash-storevid-wrap"></div>
 
   <!-- Video banner — above the subscription promo -->
   <div class="fash-video-banner fash-vb-tall" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
@@ -9602,7 +9615,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=19"></script>
+<script src="app/js/part062.js?v=20"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=5"></script>
 <script src="app/js/part065.js?v=13"></script>
