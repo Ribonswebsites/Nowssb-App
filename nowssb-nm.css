@@ -9063,12 +9063,20 @@ body.fashplus #home .fp-card .home-card-title { margin-bottom: 2px; font-size: 1
    the bottom, the same way the trending pair already does.
    ══════════════════════════════════════════════════════════════════ */
 body.homecorner-round #home .fash-plyr-wrap > #todayPracticeCard,
-body.homecorner-round #home-nm .nmh-plyr-wrap > .nmh-practice,
 body.homecorner-round #home .fash-rdsec-wrap > .reader-sec,
 body.homecorner-round #home .fash-ebsec-wrap > .reader-sec,
 body.homecorner-round #home-nm .nmh-rdsec-wrap > .reader-sec,
 body.homecorner-round #home-nm .nmh-ebsec-wrap > .reader-sec {
   border-radius: 18px 18px 0 0 !important;
+}
+/* Opening at the top and closing at the bottom only works when something
+   closes it. The Normal home's player wrapper holds the practice card and
+   nothing else — the Fashion one has its Fashion Plus banner underneath,
+   the reader wrappers have theirs — so the card was left opened at the top
+   and cut off square at the bottom with nothing to meet. It rounds all
+   four corners instead. */
+body.homecorner-round #home-nm .nmh-plyr-wrap > .nmh-practice {
+  border-radius: 18px !important;
 }
 body.homecorner-round #home .fash-plyr-wrap > #fpBanner,
 body.homecorner-round #home .fash-rdsec-wrap > .rdsec-banner,

@@ -75,14 +75,15 @@
      banners keep a clip of their own; the plan banner on the subscription
      page and the Edition cards each get their own. */
   var SWAP = [
-    /* The main subscription banner on both homes — a different cloud from
-       the rest, so the full URL rather than the V prefix. */
     { sel: '#home-nm .nmh-vb-tall video, #home .fash-vb-tall video',
-      vid: 'https://res.cloudinary.com/dkzxw33ln/video/upload/v1785518003/grok_video_2026-07-31-22-26-26_xiytvf.mp4' },
+      vid: V + 'v1785403503/grok_video_2026-07-30-14-44-37_jufhyx.mp4' },
     { sel: '.ss-plan-banner-vid',
       vid: V + 'v1785406071/grok_video_2026-07-30-15-36-45_ihftsp.mp4' },
+    /* The Edition section — the card that carries the plan and Upgrade,
+       not the Subscribe Today banner above it. A different cloud from the
+       rest, so the full URL rather than the V prefix. */
     { sel: '.fsec-video',
-      vid: V + 'v1785407198/grok_video_2026-07-30-15-55-42_onadht.mp4' }
+      vid: 'https://res.cloudinary.com/dkzxw33ln/video/upload/v1785518003/grok_video_2026-07-31-22-26-26_xiytvf.mp4' }
   ];
 
   /* ── What a banner leads to, named down its right-hand side ────────
