@@ -16,7 +16,8 @@
 
   /* before: the banner is inserted as the element's previous sibling.
      top:    the banner is inserted as the element's first child.
-     bottom: the banner is appended as the element's last child. */
+     bottom: the banner is appended as the element's last child.
+     after:  the banner is inserted as the element's next sibling. */
   var PLACE = [
     // Above the NowssB Store section, on both homes
     { top:    '#home-nm .nmh-store-wrap',          vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
@@ -38,7 +39,10 @@
     // Meaning — a different clip in each place it appears
     { before: '#home-nm .krm-section',             vid: V + 'v1785402917/grok_video_2026-07-30-14-44-14_cqj4qc.mp4' },
     { before: '#home #fashMeaningSearchWrap',      vid: V + 'v1785406062/grok_video_2026-07-30-15-36-37_mrnmll.mp4' },
-    { top:    '#msMeaningBody',                    vid: V + 'v1785406069/grok_video_2026-07-30-15-36-38_uq9l5d.mp4' },
+    /* Below the store's own cinematic hero (#msBanner), not above it — a
+       `top` placement into #msMeaningBody had been landing it before the
+       hero as that host's first child instead. */
+    { after:  '#msBanner',                         vid: V + 'v1785406069/grok_video_2026-07-30-15-36-38_uq9l5d.mp4' },
 
     /* These two pages hang their scroller off `position: absolute; inset: 0`,
        so a banner at the top of the page box sits behind it. It goes at the
@@ -228,6 +232,14 @@
       img.setAttribute('data-vb-coupon', '1');
       var v = document.createElement('video');
       v.className = 'vb-coupon-vid ' + img.className;
+      /* .nmh-greet-img and .fash-coupon-img size themselves through their own
+         CSS class, but .rmd-coupon-banner (the word/meaning detail pages)
+         carries no CSS at all — every dimension it had lived only in this
+         img's inline style. Without copying that over too, the clip had no
+         width or height anywhere and rendered at a huge, unconstrained
+         default box. */
+      var style = img.getAttribute('style');
+      if (style) v.setAttribute('style', style);
       v.muted = true; v.loop = true; v.playsInline = true;
       v.setAttribute('data-nwsb-auto', '');
       v.setAttribute('playsinline', '');
@@ -303,16 +315,17 @@
     var added = false;
     PLACE.forEach(function (spec, i) {
       var key = 'vb' + i;
-      var sel = spec.before || spec.top || spec.bottom;
+      var sel = spec.before || spec.top || spec.bottom || spec.after;
       var host = document.querySelector(sel);
       if (!host) return;
       /* One banner per target, however many times this runs. */
-      var scope = spec.before ? host.parentNode : host;
+      var scope = (spec.before || spec.after) ? host.parentNode : host;
       if (!scope || scope.querySelector(':scope > .vb-banner[data-vb="' + key + '"]')) return;
       var el = makeBanner(spec);
       el.setAttribute('data-vb', key);
       if (spec.before) host.parentNode.insertBefore(el, host);
       else if (spec.bottom) host.appendChild(el);
+      else if (spec.after) host.parentNode.insertBefore(el, host.nextSibling);
       else host.insertBefore(el, host.firstChild);
       added = true;
     });

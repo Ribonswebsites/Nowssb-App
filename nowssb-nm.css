@@ -9323,11 +9323,17 @@ body.homecorner-round .healing-wrap > .vb-banner {
 body.homecorner-round #home-nm .nmh-sec-wrap > *:first-child { border-radius: 18px 18px 0 0 !important; }
 body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0 18px 18px !important; }
 
-/* ── The coupon art is a clip. The <video> copies the <img>'s classes, so it
-   inherits that exact box; the original is hidden with a class because the
-   hosts set `display: block !important`. ── */
+/* ── The coupon art is a clip. The <video> copies the <img>'s classes AND its
+   inline style, so it inherits that exact box — .rmd-coupon-banner (the word
+   and meaning detail pages) has no CSS of its own, only what the img's style
+   attribute carried. The aspect-ratio/object-fit here are a floor under that:
+   .nmh-greet-img/.fash-coupon-img already force their own !important 16:9 and
+   win over this, and rmd/msd — which set a width but no height anywhere —
+   get one from this instead of rendering at an unconstrained default box.
+   The original is hidden with a class because the hosts set
+   `display: block !important`. ── */
 .vb-coupon-hidden { display: none !important; }
-.vb-coupon-vid { background: #060c18; }
+.vb-coupon-vid { background: #060c18; aspect-ratio: 16 / 9; object-fit: cover; }
 
 /* ══════════════════════════════════════════════════════════════════
    PLAYER BANNER — on every word's page, above About This Word
