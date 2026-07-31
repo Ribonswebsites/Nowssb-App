@@ -85,7 +85,7 @@
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:B, label:'Store Clip',           sub:'The video banner under Trending' },
         { k:'subvid',   sel:['.fash-vb-tall'],                                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
         { k:'edition',  sel:['#sub-promo-card'],                                           t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
-        { k:'routines', sel:['.fash-routines-wrap'],                                       t:S, label:'My Routines',          sub:'Daily practice system' },
+        { k:'routines', sel:['#rtVidBanner', '.fash-routines-wrap'],                       t:S, label:'My Routines',          sub:'Daily practice system' },
         { k:'offer',    sel:['.fash-offer-wrap'],                                          t:S, label:"Today's Offer",         sub:'Coupon art and the offer banner' },
         { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Your Fashion Drops',    sub:'The rotating cube section' },
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science' },

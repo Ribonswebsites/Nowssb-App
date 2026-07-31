@@ -28,6 +28,29 @@
   ];
   var PRACTICE_VID = 'https://res.cloudinary.com/eenvubod/video/upload/v1785403502/grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
 
+  /* The clip above My Routines. It belongs to this file rather than the
+     banner table in part067.js because it is a Fashion Plus concern: it
+     shows on the Fashion home only while this mode is OFF. With the mode
+     on, the home already carries motion of its own and a clip here would
+     only double up — that is a CSS rule, so it costs nothing either way.
+
+     Three of them, one step further on each time the banner is built and
+     the position kept in localStorage, so it alternates from one session
+     to the next instead of being the same clip forever. */
+  var RT_VIDS = [
+    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511505/grok_video_2026-07-31-20-44-24_cgt3mc.mp4',
+    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511503/grok_video_2026-07-31-20-44-17_ebayxd.mp4',
+    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4'
+  ];
+  var RT_KEY = 'nwsb_rtvid_i';
+
+  function rtNextVid() {
+    var i = 0;
+    try { i = (parseInt(localStorage.getItem(RT_KEY), 10) || 0) % RT_VIDS.length; } catch (e) {}
+    try { localStorage.setItem(RT_KEY, String((i + 1) % RT_VIDS.length)); } catch (e) {}
+    return RT_VIDS[i];
+  }
+
   function on() { try { return localStorage.getItem(K) === '1'; } catch (e) { return false; } }
   function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
 
@@ -60,6 +83,26 @@
       tile.insertBefore(mediaEl(t), tile.firstChild);
       tile.classList.add('fp-tile');
     });
+
+    /* Above the routines wrapper, so it introduces that section the way
+       every other banner on this home introduces the one below it. It
+       borrows .vb-banner for its frame — that is the Fashion home's own
+       banner treatment, square and inset — and adds a marker class of its
+       own for the Fashion Plus rule to hide it by. */
+    var rt = home.querySelector('.fash-routines-wrap');
+    if (rt && rt.parentNode && !document.getElementById('rtVidBanner')) {
+      var rv = document.createElement('div');
+      rv.id = 'rtVidBanner';
+      rv.className = 'vb-banner rt-vid-banner';
+      rv.innerHTML = '<video data-nwsb-auto muted loop playsinline preload="none" src="' + rtNextVid() + '"></video>';
+      rt.parentNode.insertBefore(rv, rt);
+      /* The layout editor reorders this home's registered children, and it
+         only knows where to keep a banner if that banner is registered
+         alongside the section it introduces — #rtVidBanner is listed with
+         'routines' in part062.js. Without running the pass again after
+         inserting, it stays wherever it landed while its section moves. */
+      if (window.hlApplyLayout) { try { window.hlApplyLayout(); } catch (e) {} }
+    }
 
     var card = document.getElementById('todayPracticeCard');
     if (card && !card.querySelector('.fp-media')) {
