@@ -2278,6 +2278,11 @@ var RMD_VIDS = [
   'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-42-54_we5gke.mp4'
 ];
 var _rmdVidIdx = -1;
+/* Built only when a word is opened, so the pre-warmer cannot find them by
+   scanning the document beforehand — and the one not currently showing
+   would never be found at all. Registered the same way nowssb-player.js
+   registers its per-word clips. */
+window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(RMD_VIDS);
 
 function rmdBuildSlider() {
   _rmdSlideIdx = 0;

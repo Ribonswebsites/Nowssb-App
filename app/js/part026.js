@@ -108,6 +108,9 @@ var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_au
    app/js/part051.js warms it into the media cache like every other clip
    in the app and sw.js serves it from there offline. */
 var MS_MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4';
+/* The page is built only when a meaning is opened, so this has to be
+   registered for warming rather than left to be discovered in the DOM. */
+window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat([MS_MEANING_VID]);
 
 /* ── BUY FLOW ─ a real product page inside the same full-page detail panel
    purchased words open into (#msDetailPanel): hero image, description,

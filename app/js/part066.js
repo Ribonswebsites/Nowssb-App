@@ -43,6 +43,10 @@
     'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4'
   ];
   var RT_KEY = 'nwsb_rtvid_i';
+  /* Only whichever one this session picked is ever in the document, so the
+     other two have to be registered or they would each be downloaded on the
+     spot the first session they came up. */
+  window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(RT_VIDS);
 
   function rtNextVid() {
     var i = 0;

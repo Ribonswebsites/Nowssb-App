@@ -35,6 +35,14 @@
     // none of them exist in the DOM yet at this point — nowssb-player.js
     // exposes the full pre-transformed list separately for exactly this.
     if (window.NWSB_PLAYER_VIDEO_URLS) urls = urls.concat(window.NWSB_PLAYER_VIDEO_URLS);
+    // Same problem, everywhere else it happens: a clip that is only built
+    // when a screen opens cannot be found by scanning the DOM before the
+    // user goes there, which is precisely when warming it would have helped.
+    // Worse for the banners that alternate — only the one currently showing
+    // is ever in the document, so its alternates would never be warmed at
+    // all. Any file with clips like that appends them here (word pages in
+    // part012.js, meaning pages in part026.js, routines in part066.js).
+    if (window.NWSB_EXTRA_VIDEO_URLS) urls = urls.concat(window.NWSB_EXTRA_VIDEO_URLS);
     // de-dupe — several screens intentionally reuse the same background video
     return urls.filter(function (u, i) { return u && urls.indexOf(u) === i; });
   }
