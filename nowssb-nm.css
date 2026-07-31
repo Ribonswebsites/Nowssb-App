@@ -9229,6 +9229,52 @@ body.homecorner-round #home .fash-shabda-wrap > .shabda-banner {
 #home .fash-routines-wrap > .routines-banner {
   width: 100% !important; margin: 10px 0 0 !important; box-sizing: border-box;
 }
+/* The clip heads the wrapper, so it gives up the outer inset .vb-banner
+   carries as a top-level section — the wrapper owns that now. */
+#home .fash-routines-wrap > .rt-vid-banner {
+  width: 100% !important; margin: 0 0 10px !important;
+}
+/* In rounded mode the block opens on the clip instead of the card, so the
+   top corners belong to it. Only while it is actually showing — with
+   Fashion Plus off the card is first again and keeps its own. */
+body.homecorner-round #home .fash-routines-wrap > .rt-vid-banner {
+  border-radius: 18px 18px 0 0 !important;
+}
+body.homecorner-round.fashplus #home .fash-routines-wrap > .home-card {
+  border-radius: 0 !important;
+}
+
+/* The clip carries a vertical rule down its own middle; the words sit just
+   past it, centred on the height, and arrive one after another — Set, then
+   Your, then Routine — on the same overshoot every other dash-in on this
+   home uses, then hold and repeat. */
+#home .rt-vid-banner .rtv-txt {
+  position: absolute; left: 54%; right: 12px; top: 0; bottom: 0; z-index: 3;
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  pointer-events: none;
+}
+#home .rt-vid-banner .rtv-w {
+  font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800;
+  color: #fff; line-height: 1.14; letter-spacing: -0.2px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  animation: rtvWord 5.2s linear infinite both;
+}
+#home .rt-vid-banner .rtv-w:nth-child(2) { animation-delay: 0.3s; }
+#home .rt-vid-banner .rtv-w:nth-child(3) { animation-delay: 0.6s; }
+@keyframes rtvWord {
+  0%   { transform: translateX(46px); opacity: 0; }
+  6%   { transform: translateX(-7px); opacity: 1; }
+  9%   { transform: translateX(4px); }
+  12%  { transform: translateX(-2px); }
+  15%  { transform: translateX(0); opacity: 1; }
+  86%  { transform: translateX(0); opacity: 1; }
+  96%  { transform: translateX(0); opacity: 0; }
+  100% { transform: translateX(0); opacity: 0; }
+}
+/* Motion off means motion off — the words simply sit there. */
+@media (prefers-reduced-motion: reduce) {
+  #home .rt-vid-banner .rtv-w { animation: none; opacity: 1; transform: none; }
+}
 body.homecorner-round #home .fash-routines-wrap > .home-card {
   border-radius: 18px 18px 0 0 !important;
 }

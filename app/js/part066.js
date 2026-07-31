@@ -88,24 +88,28 @@
       tile.classList.add('fp-tile');
     });
 
-    /* Above the routines wrapper, so it introduces that section the way
-       every other banner on this home introduces the one below it. It
-       borrows .vb-banner for its frame — that is the Fashion home's own
-       banner treatment, square and inset — and adds a marker class of its
-       own for the Fashion Plus rule to hide it by. */
+    /* Inside the routines wrapper, at the top of it — the clip, the card
+       and the black banner are one block now, so the layout editor moves
+       them together as the wrapper's contents and the clip needs no entry
+       of its own. It borrows .vb-banner for its frame, which is the
+       Fashion home's own banner treatment, and adds a marker class for the
+       Fashion Plus rule to hide it by.
+
+       The clip carries a vertical rule down its middle; the words go just
+       past it, arriving one after another. */
     var rt = home.querySelector('.fash-routines-wrap');
-    if (rt && rt.parentNode && !document.getElementById('rtVidBanner')) {
+    if (rt && !document.getElementById('rtVidBanner')) {
       var rv = document.createElement('div');
       rv.id = 'rtVidBanner';
       rv.className = 'vb-banner rt-vid-banner';
-      rv.innerHTML = '<video data-nwsb-auto muted loop playsinline preload="none" src="' + rtNextVid() + '"></video>';
-      rt.parentNode.insertBefore(rv, rt);
-      /* The layout editor reorders this home's registered children, and it
-         only knows where to keep a banner if that banner is registered
-         alongside the section it introduces — #rtVidBanner is listed with
-         'routines' in part062.js. Without running the pass again after
-         inserting, it stays wherever it landed while its section moves. */
-      if (window.hlApplyLayout) { try { window.hlApplyLayout(); } catch (e) {} }
+      rv.innerHTML =
+        '<video data-nwsb-auto muted loop playsinline preload="none" src="' + rtNextVid() + '"></video>' +
+        '<div class="rtv-txt">' +
+          '<span class="rtv-w">Set</span>' +
+          '<span class="rtv-w">Your</span>' +
+          '<span class="rtv-w">Routine</span>' +
+        '</div>';
+      rt.insertBefore(rv, rt.firstChild);
     }
 
     var card = document.getElementById('todayPracticeCard');
