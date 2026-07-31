@@ -9579,16 +9579,30 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 #home .fash-offer-wrap .vb-coupon-vid {
   width: 100% !important; margin: 0 !important;
 }
-/* Shop Now to the right of the clip, clear of the artwork on the left. */
+/* Shop Now belongs in the right half of the clip, past the vertical rule
+   the artwork carries down its middle and centred on the height — it was
+   tucked into the bottom corner, below that half rather than beside it.
+   Anchored from the right edge rather than measured from the rule, so a
+   narrow screen shortens the gap instead of pushing the pill off the clip.
+   The transform is deliberately not !important: the dash-in below has to
+   be able to animate it. */
 #home .fash-offer-wrap .fash-banner-cta-tc,
 #home-nm .nmh-offer-section .nmh-banner-cta-tc {
-  left: auto !important; right: 14px !important;
-  bottom: 14px !important; top: auto !important;
-  transform: none !important;
+  left: auto !important; right: 12px !important;
+  top: 50% !important; bottom: auto !important;
+  transform: translateY(-50%);
 }
+/* The dash has to carry that centring through every frame, or the pill
+   snaps to the top of the clip for the length of it. */
 #home .fash-offer-wrap .fash-banner-cta-tc.coupon-dash-cta,
 #home-nm .nmh-offer-section .nmh-banner-cta-tc.coupon-dash-cta {
-  animation: couponDashCta 0.6s cubic-bezier(.2,.7,.3,1);
+  animation: couponDashCtaMid 0.6s cubic-bezier(.2,.7,.3,1);
+}
+@keyframes couponDashCtaMid {
+  0%   { transform: translateY(-50%) translateX(72px); opacity: 0; }
+  55%  { transform: translateY(-50%) translateX(-6px); opacity: 1; }
+  76%  { transform: translateY(-50%) translateX(2.5px); }
+  100% { transform: translateY(-50%) translateX(0); }
 }
 /* The page banners scroll with the content and keep the page's own inset. */
 #sub-offers .bgp-content > .vb-banner,
