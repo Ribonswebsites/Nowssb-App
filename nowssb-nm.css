@@ -9021,17 +9021,18 @@ body.fashplus #home .fp-card .home-card-top { padding: 0 14px 2px !important; }
    rounded corners were drawn against something the same colour and nothing
    appeared to change. Rounded mode rounds the top only — the bottom is the
    end of the page — and lifts it off what is above so the notch reads. */
-/* Default leaves the footer square and flush — only the Rounded option
-   changes it. app/app.css squares everything with `* { border-radius: 0
-   !important }`, which is why these two carry the same weight. */
+/* ── The footer is square. Always. ──────────────────────────────────
+   Rounded mode rounds every direct child of the two home wraps, and the
+   footer is one of them, so it needs an explicit exemption at a higher
+   specificity than that blanket rule — a plain default is not enough. */
+#home .home-body > .home-footer,
+#home-nm .nmh-wrap > .home-footer,
 body.homecorner-round #home .home-body > .home-footer,
-body.homecorner-round #home-nm .nmh-wrap > .home-footer {
-  border-radius: 26px 26px 0 0 !important;
-  margin-top: 18px !important;
-}
+body.homecorner-round #home-nm .nmh-wrap > .home-footer,
 body.homecorner-edge #home .home-body > .home-footer,
 body.homecorner-edge #home-nm .nmh-wrap > .home-footer {
-  border-radius: 0 !important; margin-top: 0 !important;
+  border-radius: 0 !important;
+  margin-top: 0 !important;
 }
 
 /* ── The chooser's two Enters are the arrow alone, sitting a touch below
@@ -9321,3 +9322,57 @@ body.homecorner-round .healing-wrap > .vb-banner {
 #home-nm .nmh-sec-wrap > *:last-child { margin-bottom: 0 !important; }
 body.homecorner-round #home-nm .nmh-sec-wrap > *:first-child { border-radius: 18px 18px 0 0 !important; }
 body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0 18px 18px !important; }
+
+/* ── The coupon art is a clip. The <video> copies the <img>'s classes, so it
+   inherits that exact box; the original is hidden with a class because the
+   hosts set `display: block !important`. ── */
+.vb-coupon-hidden { display: none !important; }
+.vb-coupon-vid { background: #060c18; }
+
+/* ══════════════════════════════════════════════════════════════════
+   PLAYER BANNER — on every word's page, above About This Word
+   The mark sits at the middle of the right edge, the copy to the left.
+   ══════════════════════════════════════════════════════════════════ */
+.vb-player {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 12px; padding: 0 14px 0 16px; pointer-events: none;
+}
+.vb-player-txt {
+  display: flex; flex-direction: column; gap: 1px; min-width: 0; text-align: right;
+}
+.vb-player-hello {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+  color: rgba(255,255,255,0.7); text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+.vb-player-name {
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800;
+  letter-spacing: -0.4px; color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+}
+.vb-player-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 300;
+  color: rgba(255,255,255,0.72); line-height: 1.35; margin-top: 3px;
+  max-width: 190px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+.vb-player-ic {
+  width: 52px; height: 52px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 50% !important;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.42);
+}
+.vb-player-ic img { width: 32px; height: 32px; object-fit: contain; display: block; }
+/* On a word page the banner is a section of the scroller, not a home block. */
+.rmd-desc-block ~ .vb-banner, .vb-banner + .rmd-desc-block { margin-top: 0; }
+
+/* The store clip's own wrapper under the trending block — glass, and only
+   as tall as the clip inside it. */
+#home .fash-storevid-wrap > .vb-banner { width: 100% !important; margin: 0 !important; }
+#home .fash-storevid-wrap:empty { display: none; }
+
+/* One clip means Shop Now has nothing to hide for; the rotators still toggle
+   the class on their own timer, so it is overridden here rather than chased. */
+#fashCouponCta.nmh-cta-hidden, #nmhCouponCta.nmh-cta-hidden {
+  opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;
+}
