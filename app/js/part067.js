@@ -40,9 +40,12 @@
     { before: '#home #fashMeaningSearchWrap',      vid: V + 'v1785406062/grok_video_2026-07-30-15-36-37_mrnmll.mp4' },
     { top:    '#msMeaningBody',                    vid: V + 'v1785406069/grok_video_2026-07-30-15-36-38_uq9l5d.mp4' },
 
-    // Today's Offer page, Quick Access page
-    { top:    '#offersMainContent',                vid: V + 'v1785402975/grok_video_2026-07-30-14-43-34_lqppzd.mp4' },
-    { top:    '#qaMainContent',                    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' },
+    /* These two pages hang their scroller off `position: absolute; inset: 0`,
+       so a banner at the top of the page box sits behind it. It goes at the
+       top of the scrolling content instead, below the hero and clear of the
+       fixed header. */
+    { top:    '#sub-offers .bgp-content',          vid: V + 'v1785402975/grok_video_2026-07-30-14-43-34_lqppzd.mp4' },
+    { top:    '#sub-quick-access .bgp-content',    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' },
 
     // Every word's own page, above About This Word — a player banner, so it
     // carries the player mark on the right and opens the practice.
