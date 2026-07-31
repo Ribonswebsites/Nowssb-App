@@ -43,16 +43,34 @@
     'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4'
   ];
   var RT_KEY = 'nwsb_rtvid_i';
-  /* Only whichever one this session picked is ever in the document, so the
-     other two have to be registered or they would each be downloaded on the
-     spot the first session they came up. */
+  /* Only whichever one is playing is ever in the document, so the other two
+     have to be registered or they would each be downloaded on the spot the
+     moment their turn came. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(RT_VIDS);
 
-  function rtNextVid() {
-    var i = 0;
-    try { i = (parseInt(localStorage.getItem(RT_KEY), 10) || 0) % RT_VIDS.length; } catch (e) {}
-    try { localStorage.setItem(RT_KEY, String((i + 1) % RT_VIDS.length)); } catch (e) {}
-    return RT_VIDS[i];
+  var rtIdx = 0;
+  try { rtIdx = (parseInt(localStorage.getItem(RT_KEY), 10) || 0) % RT_VIDS.length; } catch (e) {}
+
+  /* The three run as one set, not one per app launch. Handing out a single
+     clip per launch meant the banner never changed while you were looking
+     at it — the same one every time, unless the app was fully restarted.
+     So it does not loop: when a clip ends the next takes over, and all
+     three are seen in a sitting. Where it left off is kept, so it does not
+     always open on the same one either.
+
+     The playback controller in part051.js only restarts a video that is
+     paused and on screen, and this handler runs synchronously on `ended`,
+     so the source is already swapped before that pass can look at it. */
+  function rtRotate(v) {
+    if (!v || v._rtRot) return;
+    v._rtRot = true;
+    v.addEventListener('ended', function () {
+      rtIdx = (rtIdx + 1) % RT_VIDS.length;
+      try { localStorage.setItem(RT_KEY, String(rtIdx)); } catch (e) {}
+      v.setAttribute('src', RT_VIDS[rtIdx]);
+      try { v.load(); } catch (e) {}
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    });
   }
 
   function on() { try { return localStorage.getItem(K) === '1'; } catch (e) { return false; } }
@@ -103,13 +121,15 @@
       rv.id = 'rtVidBanner';
       rv.className = 'vb-banner rt-vid-banner';
       rv.innerHTML =
-        '<video data-nwsb-auto muted loop playsinline preload="none" src="' + rtNextVid() + '"></video>' +
+        /* No `loop` — rtRotate hands over to the next clip on `ended`. */
+        '<video data-nwsb-auto muted playsinline preload="none" src="' + RT_VIDS[rtIdx] + '"></video>' +
         '<div class="rtv-txt">' +
           '<span class="rtv-w">Set</span>' +
           '<span class="rtv-w">Your</span>' +
           '<span class="rtv-w">Routine</span>' +
         '</div>';
       rt.insertBefore(rv, rt.firstChild);
+      rtRotate(rv.querySelector('video'));
     }
 
     var card = document.getElementById('todayPracticeCard');
