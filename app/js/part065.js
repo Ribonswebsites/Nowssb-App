@@ -487,7 +487,7 @@
     var x0 = null, y0 = 0, t0 = 0;
     sc.addEventListener('touchstart', function (e) {
       if (swipeOn || e.touches.length !== 1) { x0 = null; return; }
-      if (e.target.closest && e.target.closest('.rd-toc, .rd-tray, .rd-np, .rd-web, .rd-tools, .rd-rail')) { x0 = null; return; }
+      if (e.target.closest && e.target.closest('.rd-toc, .rd-tray, .rd-np, .rd-web, .rd-tools, .rd-rail, .rd-rail-fab')) { x0 = null; return; }
       x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
     }, { passive: true });
     sc.addEventListener('touchend', function (e) {
@@ -1235,15 +1235,24 @@
 
 
   /* ══ THE RAIL, COLLAPSED ═══════════════════════════════════════════
-     The Meaning Reader's rail is always out because that page has room
-     for it. An eBook page does not, so the same five controls live behind
-     an arrow: a tab on the left edge that swings the rail out and back.
-     One markup builder for both, so the two readers cannot drift apart.
+     The rail used to sit permanently over the left edge of the page,
+     vertically centred — which meant it sat on top of whatever paragraph
+     happened to be in the middle of the screen once you scrolled. It now
+     starts closed, and its own handle — a small dark circle with a
+     pencil, .rd-rail-fab — is the only way to it: a tap opens/closes the
+     rail, a drag moves the handle itself clear of whatever it's covering.
+     One markup builder for both readers, so they cannot drift apart.
      ══ */
+
+  var RD_FAB_POS_KEY = 'nwsb_rd_fab_pos';
 
   function railHtml(which) {
     var w = "'" + which + "'";
-    return '<div class="rd-rail rd-rail-' + which + '">' +
+    var railId = which === 'meaning' ? 'rdRailM' : 'rdRailE';
+    return '<button class="rd-rail-fab" data-rd-fab="' + which + '" aria-label="Reader tools">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="M15 5l4 4"/></svg>' +
+      '</button>' +
+      '<div class="rd-rail rd-rail-' + which + '" id="' + railId + '">' +
       '<div class="rd-rail-set">' +
         '<button onclick="rdNotepad(1)" aria-label="Notes library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14.5 3v4.5H19M8.5 12h7M8.5 16h4.5"/></svg></button>' +
         '<button onclick="rdTogglePanel(' + w + ')" aria-label="Text settings"><span class="rd-aa">Aa</span></button>' +
@@ -1258,11 +1267,91 @@
     '</div>';
   }
 
+  window.rdToggleRail = function (which) {
+    var el = document.getElementById(which === 'meaning' ? 'rdRailM' : 'rdRailE');
+    if (el) el.classList.toggle('open');
+    haptic(15);
+  };
+
+  /* Drag state lives at module scope and the move/up listeners are bound
+     to the window exactly once — the fab itself is a fresh DOM node every
+     time a page turns (the whole reader body is rebuilt), so binding
+     move/up per-fab would pile up one more permanent window listener per
+     page turn. touchstart/mousedown are cheap to rebind since they live
+     on the fab and are discarded with it. */
+  var rdFabDrag = { el: null, which: null, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 };
+  var rdFabGlobalBound = false;
+
+  function rdFabApplyPos(fab) {
+    var pos = null;
+    try { pos = JSON.parse(localStorage.getItem(RD_FAB_POS_KEY) || 'null'); } catch (e) {}
+    var w = fab.offsetWidth || 44, h = fab.offsetHeight || 44;
+    var x = pos && typeof pos.x === 'number' ? pos.x : 8;
+    var y = pos && typeof pos.y === 'number' ? pos.y : Math.round(window.innerHeight / 2 - h / 2);
+    fab.style.left = Math.max(6, Math.min(x, window.innerWidth - w - 6)) + 'px';
+    fab.style.top  = Math.max(6, Math.min(y, window.innerHeight - h - 6)) + 'px';
+  }
+
+  function rdFabMove(cx, cy) {
+    var d = rdFabDrag; if (!d.el) return;
+    var dx = cx - d.sx, dy = cy - d.sy;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) d.moved = true;
+    var w = d.el.offsetWidth, h = d.el.offsetHeight;
+    var x = Math.max(6, Math.min(d.ox + dx, window.innerWidth - w - 6));
+    var y = Math.max(6, Math.min(d.oy + dy, window.innerHeight - h - 6));
+    d.el.style.left = x + 'px'; d.el.style.top = y + 'px';
+  }
+  function rdFabUp() {
+    var d = rdFabDrag; if (!d.el) return;
+    var fab = d.el, which = d.which, moved = d.moved;
+    fab.classList.remove('dragging');
+    var r = fab.getBoundingClientRect();
+    try { localStorage.setItem(RD_FAB_POS_KEY, JSON.stringify({ x: Math.round(r.left), y: Math.round(r.top) })); } catch (e) {}
+    d.el = null;
+    if (!moved) window.rdToggleRail(which);
+  }
+  function rdFabEnsureGlobalBind() {
+    if (rdFabGlobalBound) return;
+    rdFabGlobalBound = true;
+    window.addEventListener('mousemove', function (e) { rdFabMove(e.clientX, e.clientY); });
+    window.addEventListener('mouseup', rdFabUp);
+    window.addEventListener('touchmove', function (e) {
+      if (!rdFabDrag.el) return;
+      if (e.cancelable) e.preventDefault();
+      rdFabMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    window.addEventListener('touchend', function (e) {
+      var wasTap = !!rdFabDrag.el && !rdFabDrag.moved;
+      rdFabUp();
+      if (wasTap && e.cancelable) e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('touchcancel', rdFabUp, { passive: true });
+    window.addEventListener('resize', function () {
+      document.querySelectorAll('.rd-rail-fab').forEach(rdFabApplyPos);
+    });
+  }
+  function rdFabDown(fab, which, cx, cy) {
+    var r = fab.getBoundingClientRect();
+    rdFabDrag.el = fab; rdFabDrag.which = which; rdFabDrag.moved = false;
+    rdFabDrag.sx = cx; rdFabDrag.sy = cy; rdFabDrag.ox = r.left; rdFabDrag.oy = r.top;
+    fab.classList.add('dragging');
+    haptic(12);
+  }
+  function bindRailFab(fab) {
+    if (!fab) return;
+    rdFabEnsureGlobalBind();
+    rdFabApplyPos(fab);
+    var which = fab.getAttribute('data-rd-fab');
+    fab.addEventListener('touchstart', function (e) { rdFabDown(fab, which, e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+    fab.addEventListener('mousedown', function (e) { rdFabDown(fab, which, e.clientX, e.clientY); e.preventDefault(); });
+  }
+
   function paintRail() {
     ['sub-reader-meaning', 'sub-reader-ebook'].forEach(function (id) {
       var sc = document.getElementById(id);
       if (sc) sc.classList.toggle('rd-immersive', immersive);
     });
+    document.querySelectorAll('.rd-rail-fab').forEach(bindRailFab);
   }
 
   /* ══ EPUB ══════════════════════════════════════════════════════════
