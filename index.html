@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=597">
+<link rel="stylesheet" href="nowssb-nm.css?v=598">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -6460,10 +6460,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- ══ MAIN CONTENT ══ -->
   <div id="streakMainContent" style="display:none;height:100%;">
   <div class="bgp-header-fixed">
-    <div class="bgp-back" onclick="closeSub('streak')">
+    <div class="bgp-back bgp-back-white" onclick="closeSub('streak')">
       <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-        <path d="M7 1L1 7L7 13" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="square"/>
-        <line x1="1" y1="7" x2="15" y2="7" stroke="#e8d5a3" stroke-width="1.5"/>
+        <path d="M7 1L1 7L7 13" stroke="#060c18" stroke-width="1.5" stroke-linecap="square"/>
+        <line x1="1" y1="7" x2="15" y2="7" stroke="#060c18" stroke-width="1.5"/>
       </svg>
     </div>
     <div class="bgp-header-title" style="flex:1;">Daily Streak</div>
@@ -6473,6 +6473,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   <div class="bgp-body">
     <div class="bgp-content" style="padding-top:96px;">
+
+      <!-- Clip below the header, introducing the page. -->
+      <div class="vb-banner">
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dkzxw33ln/video/upload/v1785517999/grok_video_2026-07-31-22-41-02_fy7mnv.mp4"></video>
+      </div>
 
       <!-- Glassmorphism streak section (this page is black — the solid
            white card used on Normal Home showed as a stray white glow
@@ -9602,7 +9607,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part064.js?v=5"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=7"></script>
-<script src="app/js/part067.js?v=18"></script>
+<script src="app/js/part067.js?v=19"></script>
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=293" defer></script>

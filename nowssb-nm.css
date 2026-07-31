@@ -9606,6 +9606,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 }
 /* The page banners scroll with the content and keep the page's own inset. */
 #sub-offers .bgp-content > .vb-banner,
-#sub-quick-access .bgp-content > .vb-banner {
+#sub-quick-access .bgp-content > .vb-banner,
+#sub-streak .bgp-content > .vb-banner {
   width: 100% !important; margin: 4px 0 18px !important;
 }
