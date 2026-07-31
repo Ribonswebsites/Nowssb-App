@@ -475,7 +475,11 @@
       var sc = document.getElementById(id);
       if (sc) sc.classList.toggle('rd-immersive', immersive);
     });
-    toast(immersive ? 'Full screen — tap the corner to come back' : 'Full screen off');
+    /* Either way the rail starts from scratch: closed and un-positioned,
+       so full screen opens it off the handle and windowed mode gets its
+       docked place back rather than the last dragged coordinates. */
+    rdResetRail();
+    toast(immersive ? 'Full screen — tap the pencil for the tools' : 'Full screen off');
     haptic(immersive ? [18, 30, 18] : 18);
   };
 
@@ -1267,9 +1271,45 @@
     '</div>';
   }
 
+  function railEl(which) {
+    return document.getElementById(which === 'meaning' ? 'rdRailM' : 'rdRailE');
+  }
+
+  /* Full screen only. The bar hangs off its handle: the handle keeps its
+     place and the bar is drawn under it, centred on it, so the circle
+     reads as the head of the bar rather than landing across the middle
+     of it. Fixed coordinates, because the handle is dragged around the
+     viewport rather than the page box. */
+  function rdPlaceRail(which) {
+    var rail = railEl(which);
+    var sc = document.getElementById('sub-reader-' + which);
+    if (!rail || !sc || !sc.classList.contains('rd-immersive')) return;
+    var fab = sc.querySelector('.rd-rail-fab');
+    if (!fab) return;
+    var f = fab.getBoundingClientRect();
+    var w = rail.offsetWidth || 52, h = rail.offsetHeight || 300;
+    var left = f.left + f.width / 2 - w / 2;
+    var top  = f.top + f.height / 2;
+    rail.style.left = Math.round(Math.max(6, Math.min(left, window.innerWidth - w - 6))) + 'px';
+    rail.style.top  = Math.round(Math.max(6, Math.min(top, window.innerHeight - h - 6))) + 'px';
+  }
+
+  /* Leaving full screen hands the rail back to its docked CSS, so the
+     coordinates written above have to go with it. */
+  function rdResetRail() {
+    ['meaning', 'ebook'].forEach(function (which) {
+      var el = railEl(which);
+      if (!el) return;
+      el.classList.remove('open');
+      el.style.left = ''; el.style.top = '';
+    });
+  }
+
   window.rdToggleRail = function (which) {
-    var el = document.getElementById(which === 'meaning' ? 'rdRailM' : 'rdRailE');
-    if (el) el.classList.toggle('open');
+    var el = railEl(which);
+    if (!el) return;
+    if (!el.classList.contains('open')) rdPlaceRail(which);
+    el.classList.toggle('open');
     haptic(15);
   };
 
@@ -1300,6 +1340,9 @@
     var x = Math.max(6, Math.min(d.ox + dx, window.innerWidth - w - 6));
     var y = Math.max(6, Math.min(d.oy + dy, window.innerHeight - h - 6));
     d.el.style.left = x + 'px'; d.el.style.top = y + 'px';
+    /* An open bar is anchored to the handle, so it travels with it. */
+    var rail = railEl(d.which);
+    if (rail && rail.classList.contains('open')) rdPlaceRail(d.which);
   }
   function rdFabUp() {
     var d = rdFabDrag; if (!d.el) return;
@@ -1328,6 +1371,10 @@
     window.addEventListener('touchcancel', rdFabUp, { passive: true });
     window.addEventListener('resize', function () {
       document.querySelectorAll('.rd-rail-fab').forEach(rdFabApplyPos);
+      ['meaning', 'ebook'].forEach(function (which) {
+        var rail = railEl(which);
+        if (rail && rail.classList.contains('open')) rdPlaceRail(which);
+      });
     });
   }
   function rdFabDown(fab, which, cx, cy) {
