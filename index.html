@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=586">
+<link rel="stylesheet" href="nowssb-nm.css?v=587">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -6661,6 +6661,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ READER — the chooser, then the two readers. Rendered by
      app/js/part065.js. ══ -->
 <div class="sub-screen rd-hub" id="sub-reader">
+  <video class="rd-hub-bgvid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/yvi3d7ov/video/upload/v1785491039/grok_video_2026-07-31-15-12-09_rixqre.mp4"></video>
+  <div class="rd-hub-bgvid-scrim"></div>
   <div class="rd-hub-head">
     <button class="rd-back" onclick="rdCloseHub()" aria-label="Back">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -6673,10 +6675,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="rd-hub-body">
     <button class="rd-card" onclick="rdOpenMeaning()">
       <span class="rd-card-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/>
-          <path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>
-        </svg>
+        <img loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/yvi3d7ov/image/upload/v1785491031/file_00000000c4b481f4b128fbab24a3b51b_fjaec0.png">
       </span>
       <span class="rd-card-txt">
         <span class="rd-card-t">Meaning Reader</span>
@@ -6686,10 +6685,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </button>
     <button class="rd-card" onclick="rdOpenEbook()">
       <span class="rd-card-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5A2.5 2.5 0 0 0 4 20.5z"/>
-          <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v4H6.5A2.5 2.5 0 0 1 4 19.5z"/>
-        </svg>
+        <img loading="lazy" decoding="async" alt="" src="https://res.cloudinary.com/yvi3d7ov/image/upload/v1785491031/file_000000006f5481f4bbc8be77aa9ac96a_kslzw1.png">
       </span>
       <span class="rd-card-txt">
         <span class="rd-card-t">eBook Reader</span>
