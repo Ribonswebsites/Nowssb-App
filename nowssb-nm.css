@@ -8249,11 +8249,11 @@ body.homecorner-round #home .fash-trend-wrap > .nmh-trend-shop-banner {
   object-fit: cover; display: none; pointer-events: none;
 }
 body.fashplus #home .fp-media { display: block; }
-/* The clip above My Routines is the mirror image of the rest of this file:
-   it belongs to the mode being OFF. With Fashion Plus on, the home already
-   carries motion and a second clip here would only double up. It takes its
-   frame from .vb-banner, so there is nothing to state but the hiding. */
-body.fashplus #home .rt-vid-banner { display: none !important; }
+/* The clip above My Routines belongs to this mode like everything else
+   here: it is part of what turning Fashion Plus on puts on the home, and
+   it goes away with the rest of the motion when the mode is off. It takes
+   its frame from .vb-banner, so there is nothing to state but the hiding. */
+body:not(.fashplus) #home .rt-vid-banner { display: none !important; }
 /* Everything already in the tile has to sit above the new layer. */
 body.fashplus #home .fp-tile > *:not(.fp-media),
 body.fashplus #home .fp-card > *:not(.fp-media) { position: relative; z-index: 2; }
@@ -9393,6 +9393,11 @@ body.homecorner-round #home .fash-routines-wrap > .routines-banner {
 #home-nm .nmh-plyr-wrap {
   background: none !important; box-shadow: none !important;
   padding: 0 !important; border-radius: 0 !important;
+  /* Stripping the panel left one thing behind: .plyr-wrap clips, and with
+     no radius of its own it was cutting the practice card's 26px corners
+     and its neumorphic shadow off square — the raised surface was gone but
+     its hard outline stayed. Nothing here needs clipping now. */
+  overflow: visible !important;
 }
 #home-nm.nm-dark .nmh-plyr-wrap { background: none !important; box-shadow: none !important; }
 

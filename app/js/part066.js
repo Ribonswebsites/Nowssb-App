@@ -29,10 +29,10 @@
   var PRACTICE_VID = 'https://res.cloudinary.com/eenvubod/video/upload/v1785403502/grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
 
   /* The clip above My Routines. It belongs to this file rather than the
-     banner table in part067.js because it is a Fashion Plus concern: it
-     shows on the Fashion home only while this mode is OFF. With the mode
-     on, the home already carries motion of its own and a clip here would
-     only double up — that is a CSS rule, so it costs nothing either way.
+     banner table in part067.js because it is a Fashion Plus concern: on the
+     Fashion home only, and only while this mode is ON — it is part of what
+     the mode puts on the home, and goes away with the rest of the motion
+     when it is off. That is a CSS rule, so it costs nothing either way.
 
      Three of them, one step further on each time the banner is built and
      the position kept in localStorage, so it alternates from one session
