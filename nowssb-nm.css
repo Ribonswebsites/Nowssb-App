@@ -9376,3 +9376,28 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 #fashCouponCta.nmh-cta-hidden, #nmhCouponCta.nmh-cta-hidden {
   opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;
 }
+
+/* ── The coupon clip matches the banner under it ────────────────────────
+   .fash-coupon-img carries its own 16px side margins from when it was a
+   top-level banner; inside the wrapper the wrapper owns the inset, so the
+   clip and the black banner below it measure the same. ── */
+#home .fash-offer-wrap .fash-coupon-img,
+#home .fash-offer-wrap .vb-coupon-vid {
+  width: 100% !important; margin: 0 !important;
+}
+/* Shop Now to the right of the clip, clear of the artwork on the left. */
+#home .fash-offer-wrap .fash-banner-cta-tc,
+#home-nm .nmh-offer-section .nmh-banner-cta-tc {
+  left: auto !important; right: 14px !important;
+  bottom: 14px !important; top: auto !important;
+  transform: none !important;
+}
+#home .fash-offer-wrap .fash-banner-cta-tc.coupon-dash-cta,
+#home-nm .nmh-offer-section .nmh-banner-cta-tc.coupon-dash-cta {
+  animation: couponDashCta 0.6s cubic-bezier(.2,.7,.3,1);
+}
+/* The page banners scroll with the content and keep the page's own inset. */
+#sub-offers .bgp-content > .vb-banner,
+#sub-quick-access .bgp-content > .vb-banner {
+  width: 100% !important; margin: 4px 0 18px !important;
+}
