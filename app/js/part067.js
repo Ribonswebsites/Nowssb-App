@@ -178,7 +178,7 @@
 
   function makeBanner(spec) {
     var d = document.createElement('div');
-    d.className = 'vb-banner';
+    d.className = 'vb-banner' + (spec.player ? ' vb-banner-player' : '');
     var html = '<video data-nwsb-auto muted loop playsinline preload="none" src="' + spec.vid + '"></video>';
     if (spec.gender) {
       /* Two words over their own halves of the clip, each with its own
@@ -197,15 +197,11 @@
         '<button class="vb-g vb-g-m" onclick="event.stopPropagation();vbGender(\'male\')">' +
           '<span class="vb-g-lbl">Male</span>' + go + '</button>';
     } else if (spec.player) {
-      /* The mark sits at the middle of the right edge, the copy to the left
-         of it — the same reading order the Reader section uses. */
+      /* Just the mark, at the middle of the right edge — the clip's own
+         artwork already carries "NowssB Player" burned in, so a second,
+         separate line of copy over it only doubled up and overlapped. */
       html +=
         '<div class="vb-player">' +
-          '<span class="vb-player-txt">' +
-            '<span class="vb-player-hello">NowssB</span>' +
-            '<span class="vb-player-name">Player</span>' +
-            '<span class="vb-player-sub">Hear this word the way it was first spoken.</span>' +
-          '</span>' +
           '<span class="vb-player-ic"><img loading="lazy" decoding="async" alt="" src="' + PLAYER_ICON + '"></span>' +
         '</div>';
     } else if (spec.cta) {
