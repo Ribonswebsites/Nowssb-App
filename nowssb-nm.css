@@ -7915,8 +7915,7 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
 }
 
 /* The handle, full screen only — a small dark circle with a pencil, free
-   to be dragged anywhere clear of the text. A tap opens the rail directly
-   beneath it, so the circle reads as the head of the black bar. */
+   to be dragged anywhere clear of the text while the bar is away. */
 .rd-rail-fab { display: none; }
 .rd-immersive .rd-rail-fab {
   position: fixed; z-index: 28;
@@ -7926,27 +7925,25 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   background: #0c0c0e; color: #fff; border: 1px solid rgba(255,255,255,0.16);
   box-shadow: 0 8px 22px rgba(0,0,0,0.45);
   cursor: pointer; touch-action: none;
-  transition: box-shadow 0.15s ease;
+  transition: box-shadow 0.15s ease, left 0.22s cubic-bezier(0.4,0,0.2,1),
+              top 0.22s cubic-bezier(0.4,0,0.2,1);
 }
 .rd-rail-fab svg { width: 18px; height: 18px; }
-.rd-rail-fab.dragging { box-shadow: 0 4px 14px rgba(0,0,0,0.6); }
+/* Under the finger it has to track exactly, with no easing lagging behind. */
+.rd-rail-fab.dragging { box-shadow: 0 4px 14px rgba(0,0,0,0.6); transition: box-shadow 0.15s ease; }
 
-/* Full screen: the rail is hidden until the handle is tapped, and is then
-   placed by JS (rdPlaceRail) directly under it — fixed, so it is measured
-   against the viewport the handle was dragged around, not the page box. */
+/* Full screen: the bar opens in its own fixed place — docked to the left
+   edge, exactly where it sits when the reader is windowed — however far
+   the handle has been dragged from it. Only its visibility is different
+   here; the handle is what travels (JS parks it above the bar's top). */
 .rd-immersive .rd-rail {
-  position: fixed; left: 0; top: 0; transform: translateY(-6px) scale(0.96);
-  border-left: 1px solid rgba(255,255,255,0.1);
-  border-radius: 22px !important;
-  background: rgba(12,12,14,0.94);
-  box-shadow: 0 14px 34px rgba(0,0,0,0.45);
+  transform: translateY(-50%) translateX(-10px);
   opacity: 0; pointer-events: none;
   transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1);
 }
-.rd-immersive .rd-rail.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-/* The handle sits over the bar's rounded head, so the first button needs
-   to clear it rather than hide behind it. */
-.rd-immersive .rd-rail .rd-rail-set { padding-top: 30px; }
+.rd-immersive .rd-rail.open {
+  opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0);
+}
 .rd-rail button {
   width: 42px !important; height: 42px !important; min-height: 42px !important;
   display: flex; align-items: center; justify-content: center; cursor: pointer;

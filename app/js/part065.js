@@ -1275,41 +1275,72 @@
     return document.getElementById(which === 'meaning' ? 'rdRailM' : 'rdRailE');
   }
 
-  /* Full screen only. The bar hangs off its handle: the handle keeps its
-     place and the bar is drawn under it, centred on it, so the circle
-     reads as the head of the bar rather than landing across the middle
-     of it. Fixed coordinates, because the handle is dragged around the
-     viewport rather than the page box. */
-  function rdPlaceRail(which) {
-    var rail = railEl(which);
-    var sc = document.getElementById('sub-reader-' + which);
-    if (!rail || !sc || !sc.classList.contains('rd-immersive')) return;
-    var fab = sc.querySelector('.rd-rail-fab');
-    if (!fab) return;
-    var f = fab.getBoundingClientRect();
-    var w = rail.offsetWidth || 52, h = rail.offsetHeight || 300;
-    var left = f.left + f.width / 2 - w / 2;
-    var top  = f.top + f.height / 2;
-    rail.style.left = Math.round(Math.max(6, Math.min(left, window.innerWidth - w - 6))) + 'px';
-    rail.style.top  = Math.round(Math.max(6, Math.min(top, window.innerHeight - h - 6))) + 'px';
+  var RD_FAB_GAP = 12;   // clear air between the handle and the bar's top
+
+  /* The bar never moves: wherever the handle has been dragged to, opening
+     puts the bar in the one place it always lives — docked to the left
+     edge, vertically centred, the same place it sits when the reader is
+     windowed. It is the handle that travels, parking just above the bar's
+     top edge and going back to where it was dragged once the bar closes.
+
+     The bar's box is measured from its layout position (offsetLeft/Top
+     inside its positioned parent) rather than getBoundingClientRect: the
+     rect would be read mid-transition, while the open transform is still
+     animating in, and the handle would be left a few px out of true. */
+  function rdRailBox(rail) {
+    var host = rail.offsetParent;
+    var w = rail.offsetWidth, h = rail.offsetHeight;
+    if (!host) {
+      var r = rail.getBoundingClientRect();
+      return { left: r.left, top: r.top, w: r.width, h: r.height };
+    }
+    var hr = host.getBoundingClientRect();
+    /* top:50% puts offsetTop at half the host's height; the -50%
+       translate then lifts it by half its own height. */
+    return { left: hr.left + rail.offsetLeft, top: hr.top + rail.offsetTop - h / 2, w: w, h: h };
   }
 
-  /* Leaving full screen hands the rail back to its docked CSS, so the
-     coordinates written above have to go with it. */
+  function rdParkFab(which) {
+    var rail = railEl(which);
+    var sc = document.getElementById('sub-reader-' + which);
+    if (!rail || !sc) return;
+    var fab = sc.querySelector('.rd-rail-fab');
+    if (!fab) return;
+    var b = rdRailBox(rail);
+    var w = fab.offsetWidth || 44, h = fab.offsetHeight || 44;
+    var left = b.left + b.w / 2 - w / 2;
+    var top  = b.top - h - RD_FAB_GAP;
+    /* The bar is docked flush to the edge, so centring the handle on it
+       lands slightly inside the 6px margin a dragged handle keeps. Parked,
+       it only has to stay on screen — otherwise the clamp would push it a
+       couple of px off the bar's centre line. */
+    fab.style.left = Math.round(Math.max(0, Math.min(left, window.innerWidth - w))) + 'px';
+    fab.style.top  = Math.round(Math.max(6, Math.min(top, window.innerHeight - h - 6))) + 'px';
+  }
+
+  /* Closing — or leaving full screen — hands the handle back to wherever
+     the reader last dragged it. */
   function rdResetRail() {
     ['meaning', 'ebook'].forEach(function (which) {
       var el = railEl(which);
-      if (!el) return;
-      el.classList.remove('open');
-      el.style.left = ''; el.style.top = '';
+      if (el) el.classList.remove('open');
+      var sc = document.getElementById('sub-reader-' + which);
+      var fab = sc && sc.querySelector('.rd-rail-fab');
+      if (fab) rdFabApplyPos(fab);
     });
   }
 
   window.rdToggleRail = function (which) {
     var el = railEl(which);
     if (!el) return;
-    if (!el.classList.contains('open')) rdPlaceRail(which);
-    el.classList.toggle('open');
+    var opening = !el.classList.contains('open');
+    el.classList.toggle('open', opening);
+    if (opening) rdParkFab(which);
+    else {
+      var sc = document.getElementById('sub-reader-' + which);
+      var fab = sc && sc.querySelector('.rd-rail-fab');
+      if (fab) rdFabApplyPos(fab);
+    }
     haptic(15);
   };
 
@@ -1334,22 +1365,29 @@
 
   function rdFabMove(cx, cy) {
     var d = rdFabDrag; if (!d.el) return;
+    /* While the bar is out the handle is parked at its head, so it stays
+       put — dragging is for finding somewhere clear of the text, which is
+       only a question once the bar is away. The press still reads as a
+       tap, so it closes rather than doing nothing. */
+    var rail = railEl(d.which);
+    if (rail && rail.classList.contains('open')) return;
     var dx = cx - d.sx, dy = cy - d.sy;
     if (Math.abs(dx) > 4 || Math.abs(dy) > 4) d.moved = true;
     var w = d.el.offsetWidth, h = d.el.offsetHeight;
     var x = Math.max(6, Math.min(d.ox + dx, window.innerWidth - w - 6));
     var y = Math.max(6, Math.min(d.oy + dy, window.innerHeight - h - 6));
     d.el.style.left = x + 'px'; d.el.style.top = y + 'px';
-    /* An open bar is anchored to the handle, so it travels with it. */
-    var rail = railEl(d.which);
-    if (rail && rail.classList.contains('open')) rdPlaceRail(d.which);
   }
   function rdFabUp() {
     var d = rdFabDrag; if (!d.el) return;
     var fab = d.el, which = d.which, moved = d.moved;
     fab.classList.remove('dragging');
-    var r = fab.getBoundingClientRect();
-    try { localStorage.setItem(RD_FAB_POS_KEY, JSON.stringify({ x: Math.round(r.left), y: Math.round(r.top) })); } catch (e) {}
+    /* Only a real drag rewrites the handle's home. A tap while the bar is
+       out would otherwise save the parked spot over it. */
+    if (moved) {
+      var r = fab.getBoundingClientRect();
+      try { localStorage.setItem(RD_FAB_POS_KEY, JSON.stringify({ x: Math.round(r.left), y: Math.round(r.top) })); } catch (e) {}
+    }
     d.el = null;
     if (!moved) window.rdToggleRail(which);
   }
@@ -1371,9 +1409,10 @@
     window.addEventListener('touchcancel', rdFabUp, { passive: true });
     window.addEventListener('resize', function () {
       document.querySelectorAll('.rd-rail-fab').forEach(rdFabApplyPos);
+      /* An open bar keeps the handle at its head as the viewport changes. */
       ['meaning', 'ebook'].forEach(function (which) {
         var rail = railEl(which);
-        if (rail && rail.classList.contains('open')) rdPlaceRail(which);
+        if (rail && rail.classList.contains('open')) rdParkFab(which);
       });
     });
   }
