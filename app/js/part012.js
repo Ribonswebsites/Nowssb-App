@@ -2265,28 +2265,35 @@ function rmdDescriptionFor(word, root) {
 // ── SLIDER STATE ──
 var _rmdSlideIdx = 0;
 var _rmdSlideTimer = null;
-var _rmdBanners = [];
 var _rmdCurrentKey = null;
 
-function rmdBuildSlider(banners) {
-  _rmdBanners = banners;
+/* The word page's top banner is a clip now, in place of the tier's still
+   images. There are two, handed out in turn rather than at random, so
+   opening one word after another never shows the same one twice running.
+   They are real <video> tags, so app/js/part051.js warms them into the
+   media cache with every other clip in the app and sw.js serves them
+   from there offline. */
+var RMD_VIDS = [
+  'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-43-13_qh2qjg.mp4',
+  'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-42-54_we5gke.mp4'
+];
+var _rmdVidIdx = -1;
+
+function rmdBuildSlider() {
   _rmdSlideIdx = 0;
+  /* One clip means nothing to advance to — the old rotation timer would
+     otherwise keep firing against a single slide. */
   clearInterval(_rmdSlideTimer);
+  _rmdSlideTimer = null;
   var track = document.getElementById('rmdSlidesTrack');
   var dots  = document.getElementById('rmdDots');
-  if (!track || !dots) return;
-  track.innerHTML = banners.map(function(url) {
-    return '<div class="rmd-slide"><img decoding="async" src="' + url + '" loading="lazy"></div>';
-  }).join('');
-  dots.innerHTML = banners.length > 1 ? banners.map(function(_, i) {
-    return '<div class="rmd-dot' + (i === 0 ? ' active' : '') + '" onclick="rmdGoSlide(' + i + ')"></div>';
-  }).join('') : '';
+  if (!track) return;
+  _rmdVidIdx = (_rmdVidIdx + 1) % RMD_VIDS.length;
+  track.innerHTML = '<div class="rmd-slide">' +
+    '<video data-nwsb-auto muted loop playsinline preload="none" src="' + RMD_VIDS[_rmdVidIdx] + '"></video>' +
+  '</div>';
+  if (dots) dots.innerHTML = '';
   track.style.transform = 'translateX(0)';
-  if (banners.length > 1) {
-    _rmdSlideTimer = setInterval(function() {
-      rmdGoSlide((_rmdSlideIdx + 1) % banners.length);
-    }, 3500);
-  }
 }
 
 function rmdGoSlide(idx) {
@@ -2325,7 +2332,7 @@ function loadWordOrigin(key) {
   if (typeof window.nwsbSetRandomCouponBanner === 'function') window.nwsbSetRandomCouponBanner('rmdCouponBanner');
 
   // Build slider
-  rmdBuildSlider(tier.banners);
+  rmdBuildSlider();
 
   // Word info
   var wEl = document.getElementById('rmdWord');

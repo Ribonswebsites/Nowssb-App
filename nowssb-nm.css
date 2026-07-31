@@ -2004,6 +2004,29 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   margin: 22px 0 12px; box-shadow: 0 8px 22px rgba(0,0,0,0.32);
   display: flex; align-items: center; gap: 14px;
 }
+/* The word page's top banner is a clip (app/js/part012.js). The still it
+   replaced set the slider's height from its own intrinsic size; a video
+   has none to give, so the frame is stated here. */
+.rmd-slide video {
+  width: 100%; aspect-ratio: 16 / 9;
+  display: block; object-fit: cover;
+}
+
+/* A clip after every fifth category row (app/js/part010.js), wearing the
+   same frame and corners as the banner that heads each row so it reads as
+   part of the same column. */
+.rm-row-vid {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; box-sizing: border-box;
+  margin: 22px 0 12px; background: #000;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px !important; box-shadow: 0 8px 22px rgba(0,0,0,0.32);
+}
+.rm-row-vid video {
+  position: absolute; inset: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block;
+}
 .rm-cat-banner-logo {
   width: 44px; height: 44px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden;
   background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15);
@@ -4341,10 +4364,19 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
 .hero-feat-btn img { position: relative; z-index: 1; width: 60px; height: 60px; object-fit: contain; display: block; border-radius: 50% !important; }
 @keyframes wsgSpinBtn { to { transform: rotate(360deg); } }
 
-#sub-features {
-  background:
-    linear-gradient(rgba(6,10,20,0.55), rgba(6,10,20,0.68)),
-    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1200/v1783161316/grok_image_1783161280041_l9yxo1.jpg') center center / cover no-repeat #060c18 !important;
+/* The page's backdrop is a clip rather than a still now. #sub-features is
+   position:fixed (the shared .sub-screen base), so the video and its scrim
+   anchor to it directly; .feat-scroll already sits above at z-index 1. The
+   scrim keeps the two values the old image's gradient carried. */
+#sub-features { background: #060c18 !important; }
+#sub-features .feat-bgvid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block; pointer-events: none;
+}
+#sub-features .feat-bgvid-scrim {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(rgba(6,10,20,0.55), rgba(6,10,20,0.68));
 }
 #sub-features .feat-scroll {
   position: relative; z-index: 1; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -7805,6 +7837,20 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   flex: 1; min-height: 0; overflow-y: auto;
   padding: 16px 16px calc(110px + env(safe-area-inset-bottom, 0px));
   display: flex; flex-direction: column; gap: 14px;
+}
+/* The clip that heads the chooser, above both cards. Square-cornered
+   like the cards it introduces, and on the same 16:9 frame the app's
+   other banners use. */
+.rd-hub-vid {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; box-sizing: border-box; flex-shrink: 0;
+  background: #000; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px !important; box-shadow: 0 12px 30px rgba(0,0,0,0.42);
+}
+.rd-hub-vid video {
+  position: absolute; inset: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block;
 }
 .rd-card {
   position: relative; display: block; width: 100%; text-align: left; cursor: pointer;

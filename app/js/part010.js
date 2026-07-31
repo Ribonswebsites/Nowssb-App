@@ -33,9 +33,18 @@
         window.RM_SALE_WORDS = CATS[0].words;
         window.RM_SIGNATURE_WORDS = SIGNATURE;
         window.RM_SIGNATURE_IMG = SIG_IMG;
+        // Three clips break the fifteen category rows into blocks of five:
+        // one after the fifth row, the tenth and the last. They are real
+        // <video> tags, so app/js/part051.js warms them into the media cache
+        // with every other clip in the app and sw.js serves them offline.
+        var ROW_VIDS=[
+          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511425/grok_video_2026-07-31-15-36-41_blygoz.mp4",
+          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4",
+          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511500/grok_video_2026-07-31-20-40-30_vxozmt.mp4"
+        ];
         var container=document.getElementById('rm-word-sections-container');
         var html='';
-        CATS.forEach(function(cat){
+        CATS.forEach(function(cat,i){
           // Plain black banner heading — same treatment on every category,
           // no photo/character banner. Title reuses the home hero's font
           // styling (home-greeting), subtitle the small caps tagline style
@@ -74,6 +83,10 @@
             html+='</div>';
           }
           html+='</div>';
+          // Every fifth row closes a block, and a clip marks the break.
+          if((i+1)%5===0&&ROW_VIDS[(i+1)/5-1]){
+            html+='<div class="rm-row-vid"><video data-nwsb-auto muted loop playsinline preload="none" src="'+ROW_VIDS[(i+1)/5-1]+'"></video></div>';
+          }
         });
         container.innerHTML=html;
       })();
