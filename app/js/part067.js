@@ -32,8 +32,8 @@
     { before: '#home .fash-connect-wrap',          vid: V + 'v1785402935/grok_video_2026-07-30-14-43-48_lfrvok.mp4' },
 
     // Trending
-    { before: '#home-nm #nmh-trending-section',    vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
-    { before: '#home .fash-trend-wrap',            vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
+    { top:    '#home-nm .nmh-trend-shop-wrap',     vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
+    { top:    '#home .fash-storevid-wrap',         vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
 
     // Meaning — a different clip in each place it appears
     { before: '#home-nm .krm-section',             vid: V + 'v1785402917/grok_video_2026-07-30-14-44-14_cqj4qc.mp4' },
@@ -42,8 +42,20 @@
 
     // Today's Offer page, Quick Access page
     { top:    '#offersMainContent',                vid: V + 'v1785402975/grok_video_2026-07-30-14-43-34_lqppzd.mp4' },
-    { top:    '#qaMainContent',                    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' }
+    { top:    '#qaMainContent',                    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' },
+
+    // Every word's own page, above About This Word — a player banner, so it
+    // carries the player mark on the right and opens the practice.
+    { before: '.rmd-desc-block',                   vid: 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438349/grok_video_2026-07-31-00-34-23_ouxhic.mp4',
+      player: 1, go: 'openPracticeIntro()' }
   ];
+
+  /* The coupon art is a clip now. The rotators keep swapping the <img> they
+     have always swapped; it is simply hidden underneath, so nothing has to be
+     unpicked and every surface changes at once. */
+  var COUPON_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438343/grok_video_2026-07-31-00-34-06_c2fuko.mp4';
+  var COUPON_HOSTS = '#nmhGreetImg, #fashCouponImg, #rmdCouponBanner, #msdCouponBanner';
+  var PLAYER_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png';
 
   /* The eBooks clip is not a plain banner — it carries its own black banner
      underneath it inside one glass wrapper, and it goes in three places: the
@@ -177,6 +189,18 @@
           '<span class="vb-g-lbl">Female</span>' + go + '</button>' +
         '<button class="vb-g vb-g-m" onclick="event.stopPropagation();vbGender(\'male\')">' +
           '<span class="vb-g-lbl">Male</span>' + go + '</button>';
+    } else if (spec.player) {
+      /* The mark sits at the middle of the right edge, the copy to the left
+         of it — the same reading order the Reader section uses. */
+      html +=
+        '<div class="vb-player">' +
+          '<span class="vb-player-txt">' +
+            '<span class="vb-player-hello">NowssB</span>' +
+            '<span class="vb-player-name">Player</span>' +
+            '<span class="vb-player-sub">Hear this word the way it was first spoken.</span>' +
+          '</span>' +
+          '<span class="vb-player-ic"><img loading="lazy" decoding="async" alt="" src="' + PLAYER_ICON + '"></span>' +
+        '</div>';
     } else if (spec.cta) {
       html += '<span class="vb-rule"></span>' +
         '<div class="vb-txt">' +
@@ -191,7 +215,31 @@
         '</div>';
     }
     d.innerHTML = html;
+    if (spec.go) { d.setAttribute('onclick', spec.go); d.style.cursor = 'pointer'; }
     return d;
+  }
+
+  function couponVideo() {
+    document.querySelectorAll(COUPON_HOSTS).forEach(function (img) {
+      if (img.tagName !== 'IMG' || img.getAttribute('data-vb-coupon')) return;
+      img.setAttribute('data-vb-coupon', '1');
+      var v = document.createElement('video');
+      v.className = 'vb-coupon-vid ' + img.className;
+      v.muted = true; v.loop = true; v.playsInline = true;
+      v.setAttribute('data-nwsb-auto', '');
+      v.setAttribute('playsinline', '');
+      v.setAttribute('preload', 'none');
+      v.src = COUPON_VID;
+      var go = img.getAttribute('onclick');
+      if (go) { v.setAttribute('onclick', go); v.style.cursor = 'pointer'; }
+      /* The hosts carry `display: block !important`, so hiding the original
+         needs a class of equal weight rather than an inline style. */
+      img.classList.add('vb-coupon-hidden');
+      img.parentNode.insertBefore(v, img);
+    });
+    /* Shop Now used to hide on the one coupon image that carried its own
+       button; the rotators still toggle that class on their own timer, so a
+       stylesheet rule keeps it shown rather than a one-off removal here. */
   }
 
   /* Video on top, black banner under it, one wrapper around both. */
@@ -279,6 +327,7 @@
     }
     wrapBookDetail();
     paintChips();
+    couponVideo();
 
     SWAP.forEach(function (s) {
       document.querySelectorAll(s.sel).forEach(function (v) {
