@@ -103,6 +103,12 @@ window.msOpenDetailFromPlayer = function(key, wordDisplay) {
 
 var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
 
+/* The clip that heads every meaning's page, directly under the header —
+   the same one whichever meaning is open. A real <video>, so
+   app/js/part051.js warms it into the media cache like every other clip
+   in the app and sw.js serves it from there offline. */
+var MS_MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4';
+
 /* ── BUY FLOW ─ a real product page inside the same full-page detail panel
    purchased words open into (#msDetailPanel): hero image, description,
    Add to Cart / Wishlist (the same cart+checkout every other purchase in
@@ -130,14 +136,21 @@ window.msBuy = function(key, wordDisplay, price, img) {
 
   dc.innerHTML =
     '<div class="ms-locked-page">' +
-      '<div class="nss-vid-banner" style="margin:0 0 20px;border-radius:16px !important;cursor:pointer;" onclick="SS&&SS.open(\'subscription\')">' +
-        '<video class="nss-vid-banner-vid" autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
-        '<div class="nss-vid-banner-fade"></div>' +
-        '<div class="nss-vid-banner-pill-wrap">' +
-          '<div class="nss-vid-banner-pill">' +
-            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">' +
-            '<span class="nss-vid-banner-pill-text">Subscribe Today</span>' +
-          '</div>' +
+      /* The page opens on the clip, then the meaning's own locked card,
+         then what a meaning is. The subscription banner used to sit up
+         here ahead of all of it; it now follows the Buy Now button. */
+      '<div class="ms-meaning-vid">' +
+        '<video data-nwsb-auto muted loop playsinline preload="none" src="' + MS_MEANING_VID + '"></video>' +
+      '</div>' +
+      '<div class="ms-locked-hero-banner">' +
+        '<div class="ms-locked-hero-imgwrap">' +
+          '<img loading="lazy" decoding="async" src="' + heroImg + '" alt="">' +
+          '<div class="ms-locked-hero-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>Locked</div>' +
+        '</div>' +
+        '<div class="ms-locked-hero-divider"></div>' +
+        '<div class="ms-locked-hero-textcol">' +
+          '<div class="ms-locked-hero-word">' + wordDisplay + '</div>' +
+          '<div class="ms-locked-hero-blurb">' + msWordBlurb(key) + '</div>' +
         '</div>' +
       '</div>' +
       '<div class="rm-desc-banner">' +
@@ -150,17 +163,6 @@ window.msBuy = function(key, wordDisplay, price, img) {
           '</div>' +
         '</div>' +
         '<div class="rm-desc-banner-dots" id="msBuyInfoDots"></div>' +
-      '</div>' +
-      '<div class="ms-locked-hero-banner">' +
-        '<div class="ms-locked-hero-imgwrap">' +
-          '<img loading="lazy" decoding="async" src="' + heroImg + '" alt="">' +
-          '<div class="ms-locked-hero-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>Locked</div>' +
-        '</div>' +
-        '<div class="ms-locked-hero-divider"></div>' +
-        '<div class="ms-locked-hero-textcol">' +
-          '<div class="ms-locked-hero-word">' + wordDisplay + '</div>' +
-          '<div class="ms-locked-hero-blurb">' + msWordBlurb(key) + '</div>' +
-        '</div>' +
       '</div>' +
       '<div class="ms-locked-info">' +
         '<div class="ms-locked-eyebrow">Sound Origin &amp; Vibration Study</div>' +
@@ -176,6 +178,23 @@ window.msBuy = function(key, wordDisplay, price, img) {
           '</button>' +
         '</div>' +
         '<button class="ms-locked-buynow-btn" onclick="window.msBuyNow(' + buyNowArgs + ')">Buy Now <span style="opacity:.6;">→</span></button>' +
+      '</div>' +
+      /* Subscribing is the alternative to buying this one meaning, so the
+         offer follows the price and the button rather than leading the
+         page ahead of the meaning the reader came for. */
+      '<div class="nss-vid-banner" style="margin:0 0 20px;border-radius:16px !important;cursor:pointer;" onclick="SS&&SS.open(\'subscription\')">' +
+        /* Further down the page it starts off screen, and bare `autoplay`
+           raced the visibility controller pausing it — play() interrupted
+           by pause() on every open. The controller owns it now, the same
+           way it owns every other clip in the app. */
+        '<video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
+        '<div class="nss-vid-banner-fade"></div>' +
+        '<div class="nss-vid-banner-pill-wrap">' +
+          '<div class="nss-vid-banner-pill">' +
+            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">' +
+            '<span class="nss-vid-banner-pill-text">Subscribe Today</span>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="rm-req-banner" onclick="msOpenMeaningRequest()">' +
         '<div class="rm-req-banner-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>' +

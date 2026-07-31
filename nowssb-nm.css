@@ -2004,6 +2004,20 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
   margin: 22px 0 12px; box-shadow: 0 8px 22px rgba(0,0,0,0.32);
   display: flex; align-items: center; gap: 14px;
 }
+/* The clip heading every meaning's page (app/js/part026.js), on the same
+   16px corners and 20px rhythm as the banners stacked below it. */
+.ms-meaning-vid {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; box-sizing: border-box;
+  margin: 0 0 20px; background: #000;
+  border-radius: 16px !important;
+}
+.ms-meaning-vid video {
+  position: absolute; inset: 0;
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block;
+}
+
 /* The word page's top banner is a clip (app/js/part012.js). The still it
    replaced set the slider's height from its own intrinsic size; a video
    has none to give, so the frame is stated here. */
