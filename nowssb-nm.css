@@ -7780,7 +7780,18 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   padding: max(env(safe-area-inset-top,18px),18px) 18px 16px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-.rd-hub-txt { flex: 1; min-width: 0; }
+/* The hub's back button sat bare against the black header, the same
+   colour as the text past it, and effectively disappeared. It gets the
+   white circle every other round icon button in the app uses, and the
+   title block gets a divider off its own left edge to read as a
+   separate group next to it rather than crowding the circle. */
+.rd-hub-head .rd-back {
+  width: 38px !important; height: 38px !important; min-height: 38px !important;
+  padding: 0 !important; border-radius: 50% !important;
+  background: #fff; color: #060c18; box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
+.rd-hub-head .rd-back svg { width: 16px; height: 16px; }
+.rd-hub-txt { flex: 1; min-width: 0; padding-left: 14px; border-left: 1px solid rgba(255,255,255,0.16); }
 .rd-hub-title { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800; color: #fff; }
 .rd-hub-sub { font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300; color: rgba(255,255,255,0.5); margin-top: 2px; }
 .rd-hub-body {
@@ -7884,13 +7895,38 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
 .rd-theme-black { background: #000; }
 
 /* ── Meaning reader: side rail, popover, footer ───────────────────── */
+/* Docked open by default, the rail sat over whatever paragraph happened
+   to scroll to the screen's vertical centre. It now starts closed and
+   only appears when its own handle (.rd-rail-fab, below) is pressed —
+   a floating pill clear of the edge rather than a panel welded to it. */
 .rd-rail {
-  position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 25;
+  position: absolute; left: 8px; top: 50%; transform: translateY(-50%) translateX(-12px) scale(0.94);
+  z-index: 25;
   display: flex; flex-direction: column; gap: 2px; padding: 6px 4px;
-  background: rgba(12,12,14,0.9); border: 1px solid rgba(255,255,255,0.1); border-left: none;
-  border-radius: 0 16px 16px 0 !important;
+  background: rgba(12,12,14,0.94); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px !important;
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.45);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1);
 }
+.rd-rail.open { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0) scale(1); }
+
+/* The handle that replaces the rail's old permanent place on the edge —
+   a small dark circle with a pencil, free to be dragged anywhere clear
+   of the text, that opens/closes the rail on a plain tap. */
+.rd-rail-fab {
+  position: fixed; z-index: 28;
+  width: 44px !important; height: 44px !important; min-height: 44px !important;
+  padding: 0 !important; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+  background: #0c0c0e; color: #fff; border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+  cursor: pointer; touch-action: none;
+  transition: box-shadow 0.15s ease;
+}
+.rd-rail-fab svg { width: 18px; height: 18px; }
+.rd-rail-fab.dragging { box-shadow: 0 4px 14px rgba(0,0,0,0.6); }
 .rd-rail button {
   width: 42px !important; height: 42px !important; min-height: 42px !important;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
@@ -8077,10 +8113,6 @@ body.homecorner-round #home .fash-trend-wrap > .nmh-trend-shop-banner {
    rather than sitting inside the flex row the other bar lives in — was
    being stretched to fill the leftover height as one enormous pill. */
 .rd-prog-wide { flex: 0 0 3px; height: 3px; }
-
-/* The side rail floats over the page, so the page needs to start clear of
-   it or the rail sits on top of the first few characters of every line. */
-#sub-reader-meaning .rd-stage { padding-left: 52px; }
 
 /* ══════════════════════════════════════════════════════════════════
    CUSTOMIZE PANEL — all eight entries, scrolling, with an indicator
