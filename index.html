@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=607">
+<link rel="stylesheet" href="nowssb-nm.css?v=610">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -4828,64 +4828,31 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div><!-- /Meaning Library -->
 
       <!-- ══ NOWSSB SIGNATURE ══
-           The third library. Both of the sections above meet here: the Word
-           Atelier's clip and the Meaning Store's clip crossfade behind one
-           card, and the rail below carries both kinds of signature — the
-           fifteen signature words and the five signature meanings, each with
-           the gold product shot that already belongs to it. Rendered by
-           app/js/part074.js from the same RM_SIGNATURE_WORDS / MS_SIGNATURE
-           maps the Signature coupon page uses, so the two can never list
-           different things. ══ -->
-      <div class="sig-store-section" id="sigStoreSection">
-        <video class="sig-store-video sig-vid-a" data-nwsb-auto muted loop playsinline preload="none" id="sigVidWord">
-          <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4" type="video/mp4">
-        </video>
-        <video class="sig-store-video sig-vid-b" data-nwsb-auto muted loop playsinline preload="none" id="sigVidMeaning">
-          <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4" type="video/mp4">
-        </video>
+           A doorway, not the shop. The collection has its own page now
+           (#sub-signature-store) — the rail that used to sit here was a
+           second, smaller copy of it, so it is gone and this is short.
+           Both clips crossfade behind it, because the collection is both
+           the Word Atelier's and the Meaning Store's. ══ -->
+      <div class="sig-store-section" id="sigStoreSection" onclick="sigOpenStore()">
+        <img class="sig-store-art" src="./assets/signature/nowssb-signature.webp" alt="NowssB Signature" loading="lazy" decoding="async">
         <div class="sig-store-overlay"></div>
         <div class="sig-store-shine" aria-hidden="true"></div>
 
-        <div class="ws-store-eyebrow-wrap">
-          <span class="ws-store-eyebrow sig-store-eyebrow"><span style="font-weight:800;">THE</span> <span style="font-weight:800;">NOWSSB</span> <span style="font-weight:200;">SIGNATURE</span></span>
-        </div>
-
         <div class="sig-store-content">
-          <div class="ws-store-text-block">
-            <div class="ws-store-title">
-              <span class="ws-store-title-light">The Rarest</span><br>
-              <span class="ws-store-title-bold sig-store-title-bold">Words &amp; Meanings</span>
-            </div>
-          </div>
-          <div class="ws-store-btn-wrap">
-            <div class="ws-store-sub">One signature per category — the most exclusive word and the most exclusive meaning each collection has. Owned once, never restocked.</div>
+          <span class="ws-store-eyebrow sig-store-eyebrow">Shabdapathy · The Rarest</span>
+          <div class="sig-store-title">Words &amp; Meanings</div>
+          <div class="sig-store-line">One per category. Owned once, never restocked.</div>
+          <div class="sig-store-foot">
             <div class="sig-store-chips">
-              <span class="sig-chip">15 Signature Words</span>
-              <span class="sig-chip">5 Signature Meanings</span>
-              <span class="sig-chip">50% Bundle</span>
+              <span class="sig-chip">15 Words</span>
+              <span class="sig-chip">5 Meanings</span>
             </div>
-            <button class="ws-store-btn sig-store-btn" onclick="event.stopPropagation();sigBrowseAll()">
-              <span>Browse The Signature</span>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/>
-              </svg>
-            </button>
+            <span class="sig-store-go" aria-hidden="true">
+              <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="2" stroke-linecap="square"/></svg>
+            </span>
           </div>
         </div>
-      </div><!-- /NowssB Signature hero -->
-
-      <!-- The rail: both kinds, one toggle. -->
-      <div class="sig-rail-wrap">
-        <div class="sig-rail-head">
-          <span class="sub-section-label">The Signature Collection</span>
-          <div class="sig-toggle">
-            <button class="sig-toggle-btn active" id="sigToggleWords" onclick="sigTab('words')">Words</button>
-            <button class="sig-toggle-btn" id="sigToggleMeanings" onclick="sigTab('meanings')">Meanings</button>
-          </div>
-        </div>
-        <div class="sig-rail" id="sigWordsRail"><!-- rendered by app/js/part074.js --></div>
-        <div class="sig-rail" id="sigMeaningsRail" style="display:none;"><!-- rendered by app/js/part074.js --></div>
-      </div>
+      </div><!-- /NowssB Signature doorway -->
 
       <!-- ══ MORE TO EXPLORE — Verification, Ebooks, Subscription ══ -->
       <div style="padding:24px 20px 4px;">
@@ -4947,6 +4914,89 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div><!-- /nss-body -->
 
 </div><!-- /sub-nowssb-store -->
+
+<!-- ══ SCREEN: NOWSSB SIGNATURE STORE ══
+     Its own shop, not a filtered view of two others. Only signatures are
+     here — fifteen words and five meanings — and nothing in it hands you
+     off to the Word Atelier or the Meaning Store: the card opens a detail
+     panel on this page and the buy happens from there. The look is the two
+     stores put together, which is what the collection is: the Atelier's
+     clip and the Meaning Store's clip behind one gold banner, the Meaning
+     Store's grid, the Atelier's card. Rendered by app/js/part074.js. ══ -->
+<div class="sub-screen" id="sub-signature-store">
+
+  <div class="sig-page-top">
+    <div class="sig-page-back" onclick="sigCloseStore()" aria-label="Back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="#f5e6c8" stroke-width="1.6" stroke-linecap="square"/></svg>
+    </div>
+    <div style="flex:1;"></div>
+    <div class="nss-store-icon-btn" onclick="nssOpenWishlist()" title="Wishlist">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+      <div class="nss-icon-badge" id="sigWishBadge">0</div>
+    </div>
+    <div class="nss-store-icon-btn" onclick="nssOpenCart()" title="Cart">
+      <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#fff" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#fff" stroke="none"/></svg>
+      <div class="nss-icon-badge" id="sigCartBadge">0</div>
+    </div>
+  </div>
+
+  <div class="sig-page-body">
+
+    <!-- The banner: both stores' clips, one gold frame. -->
+    <div class="sig-page-hero">
+      <img class="sig-store-art sig-page-art" src="./assets/signature/nowssb-signature.webp" alt="NowssB Signature" loading="lazy" decoding="async">
+      <video class="sig-store-video sig-vid-a" data-nwsb-auto muted loop playsinline preload="none" id="sigPageVidA">
+        <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4" type="video/mp4">
+      </video>
+      <video class="sig-store-video sig-vid-b" data-nwsb-auto muted loop playsinline preload="none" id="sigPageVidB">
+        <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4" type="video/mp4">
+      </video>
+      <div class="sig-store-overlay"></div>
+      <div class="sig-store-shine" aria-hidden="true"></div>
+      <div class="sig-page-hero-inner">
+        <span class="sig-page-eyebrow">Shabdapathy · The Rarest</span>
+        <div class="sig-page-title"><span>NowssB</span><br><b>Signature</b></div>
+        <div class="sig-page-rule"></div>
+        <div class="sig-page-desc">One signature per category — the most exclusive word and the most exclusive meaning each collection has. Owned once, never restocked.</div>
+        <div class="sig-page-stats">
+          <span>15 Words</span><i>·</i><span>5 Meanings</span><i>·</i><span>50% Bundle</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sig-rail-head">
+      <span class="sub-section-label">The Collection</span>
+      <div class="sig-toggle">
+        <button class="sig-toggle-btn active" id="sigToggleWords" onclick="sigTab('words')">Words</button>
+        <button class="sig-toggle-btn" id="sigToggleMeanings" onclick="sigTab('meanings')">Meanings</button>
+      </div>
+    </div>
+
+    <div class="sig-grid" id="sigWordsGrid"><!-- rendered by app/js/part074.js --></div>
+    <div class="sig-grid" id="sigMeaningsGrid" style="display:none;"><!-- rendered by app/js/part074.js --></div>
+
+    <div class="rm-disclaimer" style="margin:24px 20px 0;">
+      <div class="rm-disclaimer-title">About the Signature</div>
+      <div class="rm-disclaimer-text">One signature exists per collection and is never restocked or discounted individually. Buy any five and the Signature Bundle takes 50% off at checkout. Purchases are final once unlocked.</div>
+    </div>
+    <div class="rm-footer" style="margin:24px 20px 28px;">
+      <div class="rm-footer-brand"><span class="b">Nowss</span><span class="t">B</span></div>
+      <div class="rm-footer-copy">© 2026 Adv. Sanjaykumar Gadge · Shabdapathy</div>
+    </div>
+  </div>
+
+  <!-- The detail, on this page. Nothing here opens another store. -->
+  <div class="sig-detail" id="sigDetail">
+    <div class="sig-detail-head">
+      <div class="sig-page-back" onclick="sigCloseDetail()" aria-label="Back">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="#f5e6c8" stroke-width="1.6" stroke-linecap="square"/></svg>
+      </div>
+      <div class="sig-detail-head-txt" id="sigDetailHead">Signature</div>
+    </div>
+    <div class="sig-detail-body" id="sigDetailBody"><!-- rendered by app/js/part074.js --></div>
+  </div>
+
+</div><!-- /sub-signature-store -->
 
 <script src="app/js/part017.js?v=206"></script>
 
@@ -9734,7 +9784,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
-<script src="app/js/part074.js?v=1"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
+<script src="app/js/part074.js?v=2"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>

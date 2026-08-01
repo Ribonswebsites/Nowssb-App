@@ -9823,26 +9823,58 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   .streak-vid .stv-w { animation: none; opacity: 1; transform: none; }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   NOWSSB SIGNATURE — the third library in the store.
 
-   Deliberately the two sections above it, combined. The frame is theirs
-   exactly — 9/16, the same inset, the same 18px corner — so it reads as a
-   third of the same thing rather than a different component. What changes
-   is the light: gold instead of white, both clips instead of one, and a
-   slow sheen across the card that nothing else in the store has, because
-   this is the shelf you are meant to stop at.
+/* Hairlines between the Normal home's three header buttons — the same
+   separator the Fashion header uses (.hdr-rule), darkened for a light
+   surface. Sits between the neumorphic discs rather than around them, so
+   the group reads as one strip. */
+.nmh-hdr-rule {
+  width: 1px; height: 22px; flex-shrink: 0;
+  background: rgba(26,26,46,0.16);
+}
+#home-nm.nm-dark .nmh-hdr-rule { background: rgba(255,255,255,0.18); }
+
+/* ══════════════════════════════════════════════════════════════════
+   NOWSSB SIGNATURE
+
+   Two things: a short doorway in the store hub, and the shop it opens.
+
+   The doorway used to be a 9/16 card with a rail of the collection
+   underneath — a tall column of mostly video, and a second smaller copy
+   of a page that now exists properly. It is a banner now, and the rail
+   is gone.
+
+   The shop is the two stores combined, which is what the collection is:
+   the Word Atelier's clip and the Meaning Store's clip behind one gold
+   frame, the Meaning Store's grid, the Atelier's card.
    ══════════════════════════════════════════════════════════════════ */
+
+/* ── The doorway ── */
 .sig-store-section {
-  position: relative; aspect-ratio: 9 / 16; height: auto; overflow: hidden;
+  position: relative; overflow: hidden; cursor: pointer;
+  /* Was aspect-ratio 9/16 — 636px tall on a phone, nearly all of it empty
+     video. A doorway needs to say what is behind it and be tapped. */
+  height: 178px;
   width: calc(100% - 32px); margin: 20px 16px 0;
   border-radius: 18px; background: #060c18;
   border: 1.5px solid rgba(232,213,163,0.42);
-  /* The gold bloom is what says "signature" from across the page — the
-     same glow the signature cards carry, scaled up to a section. */
-  box-shadow: 0 18px 48px rgba(0,0,0,0.55), 0 0 34px rgba(232,213,163,0.18);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.5), 0 0 26px rgba(232,213,163,0.16);
 }
-/* Both clips, stacked. B fades in over A on a timer (app/js/part074.js). */
+.sig-store-section:active { transform: scale(0.994); }
+
+/* The key art. Portrait 2:3 behind a landscape doorway, so it is anchored
+   on the two bags rather than centred — centring put the reflection under
+   the wordmark in the middle of the banner and the bags off the top. */
+.sig-store-art {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+  object-position: center 38%;
+  position: absolute; inset: 0; z-index: 0;
+}
+/* On the page the banner is twice as tall, so more of the art fits and it
+   sits behind the clips rather than instead of them. */
+.sig-page-art { object-position: center 22%; z-index: 0; opacity: 0.7; }
+
+/* Both clips, stacked; B fades over A on a timer (app/js/part074.js). */
 .sig-store-video {
   display: block; width: 100%; height: 100%; object-fit: cover;
   position: absolute; inset: 0; z-index: 0;
@@ -9851,20 +9883,29 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 .sig-store-video.sig-vid-b.on { opacity: 1; }
 
 /* Warmer than the white sections': the same shape of gradient with gold
-   worked through it, so the clips underneath read as gilded rather than
-   colour-shifted. */
+   worked through it, so the clips read as gilded rather than colour-shifted. */
 .sig-store-overlay {
   position: absolute; inset: 0; z-index: 1;
   background:
-    linear-gradient(160deg, rgba(3,8,20,0.14) 0%, rgba(4,12,28,0.06) 38%, rgba(3,8,20,0.62) 100%),
-    linear-gradient(to bottom, rgba(232,213,163,0.10) 0%, transparent 34%, rgba(232,213,163,0.07) 100%);
+    /* Only as far as the text runs — the gold bags on the right stay in
+       the clear, which is the whole reason the art is there. */
+    linear-gradient(100deg, rgba(3,8,20,0.94) 0%, rgba(3,8,20,0.86) 34%, rgba(3,8,20,0.42) 62%, rgba(3,8,20,0.12) 100%),
+    linear-gradient(to bottom, rgba(232,213,163,0.08) 0%, transparent 45%, rgba(232,213,163,0.07) 100%);
 }
-.sig-store-overlay::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 280px;
-  background: linear-gradient(to bottom, transparent, rgba(6,12,24,0.96));
+/* The page banner keeps the full-height wash — its copy sits across the
+   bottom rather than down the left. */
+.sig-page-hero .sig-store-overlay {
+  /* The copy runs three lines across the bottom half, straight over the
+     two bags. Art above, solid ground under the words — the earlier wash
+     only reached 0.92 at the very last pixel, which left the middle lines
+     sitting on gold. */
+  background:
+    linear-gradient(180deg, rgba(3,8,20,0.30) 0%, rgba(3,8,20,0.10) 22%,
+                    rgba(3,8,20,0.62) 44%, rgba(3,8,20,0.93) 62%, rgba(3,8,20,0.98) 100%),
+    linear-gradient(to bottom, rgba(232,213,163,0.10) 0%, transparent 40%, rgba(232,213,163,0.10) 100%);
 }
-/* One slow pass of light, edge to edge. Long and faint on purpose — a fast
-   or bright sweep on a 9/16 card reads as a loading shimmer. */
+/* One slow pass of light. Long and faint on purpose — a fast or bright
+   sweep reads as a loading shimmer. */
 .sig-store-shine {
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
   background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.13) 48%,
@@ -9883,38 +9924,105 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 
 .sig-store-content {
   position: absolute; inset: 0; z-index: 3;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 0 24px 32px;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 20px; gap: 0;
 }
-.sig-store-eyebrow { color: #f5e6c8; text-shadow: 0 1px 14px rgba(0,0,0,0.8); }
-.sig-store-title-bold {
-  color: #f5e6c8;
-  text-shadow: 0 2px 32px rgba(0,0,0,0.9), 0 0 30px rgba(232,213,163,0.28);
+.sig-store-eyebrow {
+  display: block; font-family: 'DM Sans', sans-serif;
+  font-size: 9px; letter-spacing: 2.6px; text-transform: uppercase;
+  color: #f5e6c8; text-shadow: 0 1px 12px rgba(0,0,0,0.85);
 }
-.sig-store-section .ws-store-eyebrow-wrap { z-index: 4; }
-
-.sig-store-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+.sig-store-title {
+  font-family: 'DM Sans', sans-serif; font-size: 25px; font-weight: 800;
+  color: #f5e6c8; letter-spacing: -0.4px; line-height: 1.1; margin-top: 7px;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.9), 0 0 26px rgba(232,213,163,0.24);
+}
+.sig-store-line {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.66); margin-top: 6px; max-width: 190px; line-height: 1.5;
+}
+.sig-store-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 12px;
+}
+.sig-store-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .sig-chip {
   font-family: 'DM Sans', sans-serif; font-size: 7px; font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase; color: rgba(245,230,200,0.9);
+  letter-spacing: 1.8px; text-transform: uppercase; color: rgba(245,230,200,0.9);
   background: rgba(232,213,163,0.13); border: 1px solid rgba(232,213,163,0.4);
-  padding: 5px 11px;
+  padding: 5px 10px;
 }
-/* Gold button rather than the white one the other two use — same shape. */
-.sig-store-btn {
-  background: linear-gradient(135deg, #f0dfb4, #e8d5a3 55%, #d4bd85) !important;
-  box-shadow: 0 8px 24px rgba(232,213,163,0.28);
+.sig-store-go {
+  width: 34px; height: 34px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #f0dfb4, #e8d5a3 55%, #d4bd85);
+  box-shadow: 0 6px 18px rgba(232,213,163,0.3);
+}
+.sig-store-go svg { width: 15px; height: 15px; display: block; }
+
+/* ── The shop ── */
+#sub-signature-store { background: #060c18; }
+.sig-page-top {
+  position: relative; z-index: 5; flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: max(env(safe-area-inset-top, 14px), 14px) 16px 12px;
+}
+.sig-page-back {
+  width: 44px; height: 44px; flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.12); border: 1px solid rgba(232,213,163,0.35);
+  border-radius: 50% !important;
+}
+.sig-page-back:active { background: rgba(232,213,163,0.26); }
+.sig-page-body {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
 }
 
-/* ── The rail ──────────────────────────────────────────────────────
-   Both kinds of signature behind one toggle. Word cards and meaning
-   cards are different shapes by design (148px portrait vs 3/4), so the
-   rail sizes the meaning card to match rather than letting the row
-   change height when the toggle flips. */
-.sig-rail-wrap { padding: 22px 0 4px; }
+.sig-page-hero {
+  position: relative; overflow: hidden;
+  width: calc(100% - 32px); margin: 4px 16px 0; height: 340px;
+  border-radius: 18px; background: #060c18;
+  border: 1.5px solid rgba(232,213,163,0.42);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.55), 0 0 30px rgba(232,213,163,0.16);
+}
+.sig-page-hero-inner {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 22px 24px;
+}
+.sig-page-eyebrow {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: rgba(245,230,200,0.85);
+}
+.sig-page-title {
+  font-family: 'DM Sans', sans-serif; font-size: 34px; line-height: 1.05;
+  margin-top: 8px; color: #fff;
+}
+.sig-page-title span { font-weight: 200; color: rgba(255,255,255,0.9); }
+.sig-page-title b {
+  font-weight: 800; color: #f5e6c8;
+  text-shadow: 0 2px 28px rgba(0,0,0,0.9), 0 0 26px rgba(232,213,163,0.26);
+}
+.sig-page-rule {
+  width: 46px; height: 1px; margin: 14px 0 12px;
+  background: rgba(232,213,163,0.55);
+}
+.sig-page-desc {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,0.62); line-height: 1.65; max-width: 300px;
+}
+.sig-page-stats {
+  display: flex; align-items: center; gap: 8px; margin-top: 14px;
+  font-family: 'DM Sans', sans-serif; font-size: 8.5px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: rgba(245,230,200,0.8);
+}
+.sig-page-stats i { font-style: normal; color: rgba(232,213,163,0.4); }
+
 .sig-rail-head {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 0 20px 12px;
+  gap: 12px; padding: 24px 20px 12px;
 }
 .sig-toggle {
   display: flex; gap: 6px; flex-shrink: 0;
@@ -9933,41 +10041,131 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 }
 .sig-toggle-btn.active { background: rgba(232,213,163,0.9); color: #060c18; }
 
-.sig-rail {
-  display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden;
-  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
-  padding: 4px 20px 18px; scrollbar-width: none;
+.sig-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  padding: 0 20px;
 }
-.sig-rail::-webkit-scrollbar { display: none; }
-/* One box for both kinds. A word card takes its height from its image
-   loading (.rm-word-card-img is height:auto), and a meaning card from a
-   3/4 aspect authored for a grid — so left alone the rail would be one
-   height before the images arrived, another after, and a third when the
-   toggle flipped. Pinned here instead, and the art is cropped to fit. */
-.sig-rail .sig-card {
-  flex-shrink: 0; scroll-snap-align: start;
-  width: 148px; height: 197px; aspect-ratio: auto;
-  border-radius: 0 !important;
+.sig-card2 {
+  position: relative; overflow: hidden; cursor: pointer;
+  background: #0a0f1c;
+  border: 1.5px solid rgba(232,213,163,0.5);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.5), 0 0 18px rgba(232,213,163,0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.sig-rail .rm-word-card-signature .rm-word-card-img {
-  width: 100%; height: 100%; object-fit: cover;
+.sig-card2:active { transform: scale(0.975); }
+.sig-card2.owned { border-color: rgba(232,213,163,0.8); }
+.sig-card2-tag {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase; color: #060c18;
+  background: rgba(232,213,163,0.94); padding: 3px 8px;
 }
-/* The body sits over the bottom of the art rather than under it, now that
-   the card no longer grows to fit both. */
-.sig-rail .rm-word-card-signature .rm-word-card-body {
-  position: absolute; bottom: 0; left: 0; right: 0;
+.sig-card2-img {
+  width: 100%; height: 150px;
+  background-size: cover; background-position: center;
+}
+.sig-card2-body {
+  padding: 11px 12px 13px;
+  background: rgba(232,213,163,0.12);
+  border-top: 1px solid rgba(232,213,163,0.3);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+.sig-card2-name {
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800;
+  color: #f5e6c8; line-height: 1.2;
+}
+.sig-card2-root {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 400;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: rgba(232,213,163,0.72); margin-top: 3px;
+}
+.sig-card2-price {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800;
+  color: #fff; margin-top: 7px;
+}
+.sig-card2-owned {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 1.4px; text-transform: uppercase; color: #8fe0b8; margin-top: 7px;
 }
 .sig-empty {
+  grid-column: 1 / -1;
   font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
   color: rgba(255,255,255,0.35); padding: 18px 2px;
 }
 
-/* Hairlines between the Normal home's three header buttons — the same
-   separator the Fashion header uses (.hdr-rule), darkened for a light
-   surface. Sits between the neumorphic discs rather than around them, so
-   the group reads as one strip. */
-.nmh-hdr-rule {
-  width: 1px; height: 22px; flex-shrink: 0;
-  background: rgba(26,26,46,0.16);
+/* ── The detail, on the same page ── */
+.sig-detail {
+  position: absolute; inset: 0; z-index: 20;
+  background: #060c18;
+  display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+  pointer-events: none;
 }
-#home-nm.nm-dark .nmh-hdr-rule { background: rgba(255,255,255,0.18); }
+.sig-detail.open { transform: translateX(0); pointer-events: auto; }
+.sig-detail-head {
+  flex-shrink: 0; display: flex; align-items: center; gap: 12px;
+  padding: max(env(safe-area-inset-top, 14px), 14px) 16px 12px;
+  border-bottom: 1px solid rgba(232,213,163,0.16);
+}
+.sig-detail-head-txt {
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800;
+  color: #f5e6c8; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sig-detail-body {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 20px 20px calc(110px + env(safe-area-inset-bottom, 0px));
+}
+.sig-detail-art {
+  position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden;
+  border: 1.5px solid rgba(232,213,163,0.5);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.55), 0 0 26px rgba(232,213,163,0.2);
+}
+.sig-detail-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sig-detail-badge {
+  position: absolute; top: 12px; left: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 8.5px; font-weight: 700;
+  letter-spacing: 1.4px; text-transform: uppercase; color: #060c18;
+  background: rgba(232,213,163,0.94); padding: 4px 10px;
+}
+.sig-detail-name {
+  font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800;
+  color: #f5e6c8; letter-spacing: -0.4px; line-height: 1.12; margin-top: 20px;
+}
+.sig-detail-root {
+  font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 700;
+  letter-spacing: 2.2px; text-transform: uppercase;
+  color: rgba(232,213,163,0.72); margin-top: 6px;
+}
+.sig-detail-copy {
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 300;
+  color: rgba(255,255,255,0.6); line-height: 1.7; margin-top: 14px;
+}
+.sig-detail-price {
+  font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800;
+  color: #fff; margin-top: 18px;
+}
+.sig-detail-owned {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: #8fe0b8; margin-top: 8px;
+}
+.sig-detail-btns { display: flex; gap: 10px; margin-top: 18px; }
+.sig-btn-ghost, .sig-btn-gold {
+  flex: 1; height: 50px !important; min-height: 50px !important;
+  border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 1.4px; text-transform: uppercase;
+}
+.sig-btn-ghost {
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.45);
+  color: #f5e6c8;
+}
+.sig-btn-ghost:active { background: rgba(232,213,163,0.2); }
+.sig-btn-gold {
+  background: linear-gradient(135deg, #f0dfb4, #e8d5a3 55%, #d4bd85);
+  color: #060c18; box-shadow: 0 8px 24px rgba(232,213,163,0.26);
+}
+.sig-btn-gold:active { transform: scale(0.98); }
+.sig-detail-note {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 300;
+  color: rgba(255,255,255,0.35); line-height: 1.6; margin-top: 14px;
+}
