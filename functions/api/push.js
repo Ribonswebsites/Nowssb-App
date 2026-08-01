@@ -35,6 +35,20 @@
                          contact whoever is sending
      ADMIN_UIDS          comma-separated Firebase uids allowed to send
      FIREBASE_PROJECT_ID nowssb-34f1b
+
+   And one more, only needed once the Android app ships (see CAPACITOR.md):
+
+     FCM_SERVICE_ACCOUNT the whole service-account JSON, pasted as one line.
+                         Firebase console → Project settings → Service
+                         accounts → Generate new private key. Without it the
+                         web half below still works exactly as before and
+                         Android subscriptions simply report as unsent.
+
+   Android and the web take different routes for the same reason phones and
+   browsers are different things: the shipped app has no push service and no
+   service worker, so it is reached through FCM with a token instead of
+   through a push endpoint with a key. Both live in the same pushSubs
+   collection and both are sent from this one call.
    ══════════════════════════════════════════════════════════════════════ */
 
 const enc = new TextEncoder();
@@ -198,6 +212,81 @@ function extractSpkiFromCert(der) {
   return null;
 }
 
+/* ── FCM, for the Android app ────────────────────────────────────────
+   The shipped app has no push endpoint and no keys, so none of the RFC 8291
+   work above applies to it. It has an FCM token, and FCM's HTTP v1 API wants
+   an OAuth access token, which is a service-account JWT exchanged at
+   Google's token endpoint. That is the whole of the difference. ── */
+function pemToPkcs8(pem) {
+  const b64 = pem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, '');
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+let _fcmToken = { at: 0, value: null };
+async function fcmAccessToken(sa) {
+  /* Google issues these for an hour; re-mint a minute early rather than
+     racing the expiry. */
+  if (_fcmToken.value && Date.now() - _fcmToken.at < 3540e3) return _fcmToken.value;
+
+  const now = Math.floor(Date.now() / 1000);
+  const header = { alg: 'RS256', typ: 'JWT', kid: sa.private_key_id };
+  const claims = {
+    iss: sa.client_email,
+    scope: 'https://www.googleapis.com/auth/firebase.messaging',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+  };
+  const signingInput = bytesToB64url(enc.encode(JSON.stringify(header))) + '.' +
+                       bytesToB64url(enc.encode(JSON.stringify(claims)));
+  const key = await crypto.subtle.importKey('pkcs8', pemToPkcs8(sa.private_key),
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+  const sig = new Uint8Array(await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, enc.encode(signingInput)));
+  const jwt = signingInput + '.' + bytesToB64url(sig);
+
+  const r = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=' + encodeURIComponent(jwt),
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok || !data.access_token) throw new Error('fcm auth: ' + (data.error_description || r.status));
+  _fcmToken = { at: Date.now(), value: data.access_token };
+  return data.access_token;
+}
+
+async function sendFcm(sa, token, msg) {
+  const access = await fcmAccessToken(sa);
+  const r = await fetch('https://fcm.googleapis.com/v1/projects/' + sa.project_id + '/messages:send', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + access, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: {
+        token,
+        /* The notification block is what Android draws when the app is in
+           the background or closed — which is the whole point. The data
+           block is what part072.js reads when it is open, and what a tap
+           carries either way, so both must be there. */
+        notification: { title: msg.title, body: msg.body },
+        data: { type: String(msg.type || ''), url: String(msg.url || './') },
+        android: {
+          priority: 'HIGH',
+          notification: { channel_id: 'nowssb', color: '#e8d5a3', default_vibrate_timings: true },
+        },
+      },
+    }),
+  });
+  const text = await r.text().catch(() => '');
+  /* UNREGISTERED / INVALID_ARGUMENT on the token mean the app was
+     uninstalled or the token rotated — the same "delete this one" the web
+     side signals with 404/410. */
+  const dead = r.status === 404 || /UNREGISTERED|NOT_FOUND/i.test(text);
+  return { ok: r.ok, status: r.status, expired: dead, error: r.ok ? undefined : text.slice(0, 200) };
+}
+
 /* ── the endpoint ────────────────────────────────────────────────────── */
 const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
   status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
@@ -238,8 +327,32 @@ export async function onRequestPost(context) {
     url: body.url || './',
   });
 
+  /* Parsed once, not once per subscription. A malformed value is worth
+     saying out loud rather than silently failing every Android send. */
+  let sa = null, saError = null;
+  if (env.FCM_SERVICE_ACCOUNT) {
+    try {
+      sa = JSON.parse(env.FCM_SERVICE_ACCOUNT);
+      if (!sa.private_key || !sa.client_email || !sa.project_id) throw new Error('missing fields');
+    } catch (e) { sa = null; saError = 'FCM_SERVICE_ACCOUNT is not valid service-account JSON.'; }
+  }
+
   const results = await Promise.all(subscriptions.map(async (sub) => {
     const endpoint = sub && sub.endpoint;
+
+    /* The Android app, reached through FCM rather than a push service. */
+    const fcm = (sub && sub.fcmToken) ||
+                (typeof endpoint === 'string' && endpoint.startsWith('fcm:') ? endpoint.slice(4) : null);
+    if (fcm) {
+      if (!sa) return { endpoint, ok: false, error: saError || 'FCM_SERVICE_ACCOUNT is not set.' };
+      try {
+        const r = await sendFcm(sa, fcm, { title, body: body.body || '', type: body.type, url: body.url });
+        return { endpoint, ...r };
+      } catch (e) {
+        return { endpoint, ok: false, error: String(e && e.message || e).slice(0, 200) };
+      }
+    }
+
     const p256dh = sub && sub.keys && sub.keys.p256dh;
     const authKey = sub && sub.keys && sub.keys.auth;
     if (!endpoint || !p256dh || !authKey) return { endpoint: endpoint || null, ok: false, error: 'malformed' };

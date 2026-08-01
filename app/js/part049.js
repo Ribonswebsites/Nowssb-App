@@ -577,6 +577,10 @@ window.pwCloseMeaning = function() {
     }
     return false;
   }
+  /* The Android shell's hardware back button is not a popstate — it arrives
+     through Capacitor's App plugin — but it wants exactly this behaviour.
+     See app/js/part072.js. */
+  window.nwsbCloseTop = closeTop;
   function arm() { try { history.pushState({ nwsbTrap: 1 }, ''); } catch (e) {} }
   // seed the trap once the app is ready
   if (document.readyState !== 'loading') arm();

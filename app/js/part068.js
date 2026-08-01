@@ -52,12 +52,25 @@
   function ls(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
+  /* Inside the Android shell there is no Notification API and no push
+     service — the phone is reached through FCM instead, and app/js/part072.js
+     installs itself here to answer for it. Everything below asks these two
+     rather than the browser directly, so one notifications page serves both
+     the web app and the shipped app. */
+  function backend() { return window.nwsbNativePush || null; }
+
   function supported() {
+    var b = backend();
+    if (b) return b.state() !== 'unsupported';
     return 'Notification' in window && 'serviceWorker' in navigator;
   }
-  function granted() {
-    return supported() && Notification.permission === 'granted';
+  function permission() {
+    var b = backend();
+    if (b) return b.state();
+    if (!('Notification' in window)) return 'unsupported';
+    return Notification.permission;
   }
+  function granted() { return permission() === 'granted'; }
 
   /* ── Where each kind of notification leads ──────────────────────────
      Keyed by the kinds part064.js already defines. Every entry is guarded:
@@ -87,11 +100,16 @@
     if (!f) return;
     try { f(); } catch (e) { /* screen not on this build — leave the app where it is */ }
   }
+  /* The Android shell gets its taps from FCM rather than from the service
+     worker, but they should land in the same places. */
+  window.nwsbPushGo = go;
 
   /* ── Raising one ───────────────────────────────────────────────────
      Through the service worker registration rather than new Notification(),
      because that is the only form Android accepts from an installed page. */
   function show(n) {
+    var b = backend();
+    if (b && b.show) { try { b.show(n); } catch (e) {} return; }
     if (!granted() || !navigator.serviceWorker) return;
     navigator.serviceWorker.ready.then(function (reg) {
       if (!reg || !reg.showNotification) return;
@@ -111,6 +129,8 @@
      Only ever off the back of something the reader did — a permission
      prompt fired on load is the fastest way to be blocked for good. */
   window.nwsbPushAsk = function () {
+    var b = backend();
+    if (b) { lsSet(K_ASKED, '1'); return b.ask(); }
     if (!supported()) return Promise.resolve('unsupported');
     if (Notification.permission !== 'default') {
       if (granted()) subscribe();
@@ -126,9 +146,10 @@
   window.nwsbPushStatus = function () {
     return {
       supported: supported(),
-      permission: supported() ? Notification.permission : 'unsupported',
+      permission: permission(),
+      native: !!backend(),
       pushConfigured: !!VAPID_PUBLIC_KEY,
-      subscribed: !!window.nwsbPushSubscription
+      subscribed: !!(window.nwsbPushSubscription || window.nwsbNativeToken)
     };
   };
 
@@ -148,7 +169,7 @@
                sub: 'This browser cannot show notifications. Install NowssB to your home screen, or open it in Chrome.',
                btn: '' };
     }
-    var p = Notification.permission;
+    var p = permission();
     if (p === 'granted') {
       return { cls: ' on', title: 'Notifications on this phone',
                sub: 'Allowed. NowssB can reach you here even when the app is closed.',

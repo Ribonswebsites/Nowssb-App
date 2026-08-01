@@ -1604,7 +1604,14 @@ async function loadSubs() {
   const out = [];
   snap.forEach(d => {
     const v = d.data();
-    if (v && v.endpoint && v.keys) out.push({ id: d.id, endpoint: v.endpoint, keys: v.keys });
+    if (!v) return;
+    /* Two kinds of phone in one collection. The Android app has an FCM
+       token and no keys; a browser has a push endpoint and keys. /api/push
+       tells them apart the same way and sends each the right way, and both
+       are identified by `endpoint` so the expired-cleanup below needs no
+       special case. */
+    if (v.fcmToken) out.push({ id: d.id, endpoint: 'fcm:' + v.fcmToken, fcmToken: v.fcmToken });
+    else if (v.endpoint && v.keys) out.push({ id: d.id, endpoint: v.endpoint, keys: v.keys });
   });
   return out;
 }

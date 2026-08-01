@@ -1,0 +1,15 @@
+# Capacitor / Android — all generated, all rebuildable.
+node_modules/
+www/
+android/
+ios/
+
+# Never commit these. google-services.json identifies the Firebase project to
+# the app and is not secret, but the signing keystore and the service-account
+# JSON that /api/push uses to talk to FCM absolutely are.
+*.keystore
+*.jks
+*service-account*.json
+key.properties
+
+.DS_Store
