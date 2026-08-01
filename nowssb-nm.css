@@ -10122,7 +10122,9 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
    ══════════════════════════════════════════════════════════════════ */
 #nssIntroPage .nss-intro-img,
 #rmIntroPage .rm-intro-bg,
-#msIntroPage .ms-intro-bg {
+#msIntroPage .ms-intro-bg,
+#ebIntroPage .ms-intro-bg,
+#sigIntroPage .sig-intro-bg {
   background-position: center top !important;
   background-size: cover !important;
 }
@@ -10133,6 +10135,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 #nssIntroPage .nss-intro-vignette,
 #rmIntroPage .rm-intro-vignette,
 #msIntroPage .sl-intro-vignette,
+#ebIntroPage .sl-intro-vignette,
 #sigIntroPage .sig-intro-vignette {
   display: block !important;
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
@@ -10154,8 +10157,10 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
    shadow rather than relying on the gradient alone. */
 #nssIntroPage .sl-intro-title, #rmIntroPage .sl-intro-title,
 #msIntroPage .sl-intro-title, #sigIntroPage .sl-intro-title,
+#ebIntroPage .sl-intro-title,
 #nssIntroPage .sl-intro-eyebrow, #rmIntroPage .sl-intro-eyebrow,
-#msIntroPage .sl-intro-eyebrow, #sigIntroPage .sl-intro-eyebrow {
+#msIntroPage .sl-intro-eyebrow, #sigIntroPage .sl-intro-eyebrow,
+#ebIntroPage .sl-intro-eyebrow {
   text-shadow: 0 2px 18px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.7);
 }
 
