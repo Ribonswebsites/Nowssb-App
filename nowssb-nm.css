@@ -9852,9 +9852,10 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 /* ── The doorway ── */
 .sig-store-section {
   position: relative; overflow: hidden; cursor: pointer;
-  /* Was aspect-ratio 9/16 — 636px tall on a phone, nearly all of it empty
-     video. A doorway needs to say what is behind it and be tapped. */
-  height: 178px;
+  /* 2:3 — the art is a portrait render and this is the frame it was drawn
+     for. It was 9/16 (too tall, mostly empty), then a 178px letterbox
+     (too short, cropped to a sliver). */
+  aspect-ratio: 2 / 3; height: auto;
   width: calc(100% - 32px); margin: 20px 16px 0;
   border-radius: 18px; background: #060c18;
   border: 1.5px solid rgba(232,213,163,0.42);
@@ -9867,12 +9868,10 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
    the wordmark in the middle of the banner and the bags off the top. */
 .sig-store-art {
   display: block; width: 100%; height: 100%; object-fit: cover;
-  object-position: center 38%;
+  /* 2:3 frame, 2:3 art — nothing to crop and nothing to re-anchor. */
+  object-position: center center;
   position: absolute; inset: 0; z-index: 0;
 }
-/* On the page the banner is twice as tall, so more of the art fits and it
-   sits behind the clips rather than instead of them. */
-.sig-page-art { object-position: center 22%; z-index: 0; opacity: 0.7; }
 
 /* Both clips, stacked; B fades over A on a timer (app/js/part074.js). */
 .sig-store-video {
@@ -9886,23 +9885,18 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
    worked through it, so the clips read as gilded rather than colour-shifted. */
 .sig-store-overlay {
   position: absolute; inset: 0; z-index: 1;
-  background:
-    /* Only as far as the text runs — the gold bags on the right stay in
-       the clear, which is the whole reason the art is there. */
-    linear-gradient(100deg, rgba(3,8,20,0.94) 0%, rgba(3,8,20,0.86) 34%, rgba(3,8,20,0.42) 62%, rgba(3,8,20,0.12) 100%),
-    linear-gradient(to bottom, rgba(232,213,163,0.08) 0%, transparent 45%, rgba(232,213,163,0.07) 100%);
-}
-/* The page banner keeps the full-height wash — its copy sits across the
-   bottom rather than down the left. */
-.sig-page-hero .sig-store-overlay {
-  /* The copy runs three lines across the bottom half, straight over the
-     two bags. Art above, solid ground under the words — the earlier wash
-     only reached 0.92 at the very last pixel, which left the middle lines
-     sitting on gold. */
-  background:
-    linear-gradient(180deg, rgba(3,8,20,0.30) 0%, rgba(3,8,20,0.10) 22%,
-                    rgba(3,8,20,0.62) 44%, rgba(3,8,20,0.93) 62%, rgba(3,8,20,0.98) 100%),
-    linear-gradient(to bottom, rgba(232,213,163,0.10) 0%, transparent 40%, rgba(232,213,163,0.10) 100%);
+  /* The copy sits across the bottom now that the frame is portrait, so the
+     wash is vertical and late — the bags and the gold splash stay clear.
+     The side-to-side version this replaces put 0.94 black over the left
+     two thirds of the art. */
+  background: linear-gradient(to bottom,
+    rgba(3,8,20,0.30) 0%,
+    rgba(3,8,20,0.00) 16%,
+    rgba(3,8,20,0.00) 52%,
+    rgba(3,8,20,0.34) 62%,
+    rgba(3,8,20,0.84) 76%,
+    rgba(3,8,20,0.97) 90%,
+    #060c18 100%);
 }
 /* One slow pass of light. Long and faint on purpose — a fast or bright
    sweep reads as a loading shimmer. */
@@ -9924,8 +9918,8 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 
 .sig-store-content {
   position: absolute; inset: 0; z-index: 3;
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 0 20px; gap: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 20px 20px; gap: 0;
 }
 .sig-store-eyebrow {
   display: block; font-family: 'DM Sans', sans-serif;
@@ -9933,13 +9927,13 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   color: #f5e6c8; text-shadow: 0 1px 12px rgba(0,0,0,0.85);
 }
 .sig-store-title {
-  font-family: 'DM Sans', sans-serif; font-size: 25px; font-weight: 800;
+  font-family: 'DM Sans', sans-serif; font-size: 30px; font-weight: 800;
   color: #f5e6c8; letter-spacing: -0.4px; line-height: 1.1; margin-top: 7px;
   text-shadow: 0 2px 24px rgba(0,0,0,0.9), 0 0 26px rgba(232,213,163,0.24);
 }
 .sig-store-line {
   font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
-  color: rgba(255,255,255,0.66); margin-top: 6px; max-width: 190px; line-height: 1.5;
+  color: rgba(255,255,255,0.72); margin-top: 6px; max-width: 260px; line-height: 1.5;
 }
 .sig-store-foot {
   display: flex; align-items: center; justify-content: space-between;
@@ -9961,136 +9955,74 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 }
 .sig-store-go svg { width: 15px; height: 15px; display: block; }
 
-/* ── The shop ── */
+/* ── The shop ──────────────────────────────────────────────────────
+   The page is the Word Atelier's and the Meaning Store's own markup —
+   .sub-header.nav-bar, .rm-banner-wrap, .rm-cat-banner, .rm-word-row,
+   .ms-grid, .rm-row-vid — so almost nothing needs styling here. Only
+   what makes it gold instead of white, and the banner's own caption. */
 #sub-signature-store { background: #060c18; }
-.sig-page-top {
-  position: relative; z-index: 5; flex-shrink: 0;
-  display: flex; align-items: center; gap: 10px;
-  padding: max(env(safe-area-inset-top, 14px), 14px) 16px 12px;
+#sub-signature-store .sub-title { color: #f5e6c8; }
+#sub-signature-store .rm-cat-banner {
+  border-color: rgba(232,213,163,0.22);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.5), 0 0 16px rgba(232,213,163,0.09);
 }
-.sig-page-back {
-  width: 44px; height: 44px; flex-shrink: 0; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(232,213,163,0.12); border: 1px solid rgba(232,213,163,0.35);
-  border-radius: 50% !important;
+#sub-signature-store .rm-cat-banner-title { color: #f5e6c8; }
+/* The page background sits behind the rows, the same way the Atelier's
+   does — its own art, heavily dimmed so the cards stay the subject. */
+#sub-signature-store .sig-bg {
+  background-image: url('./assets/signature/nowssb-signature.webp');
+  background-size: cover; background-position: center top;
+  opacity: 0.16;
 }
-.sig-page-back:active { background: rgba(232,213,163,0.26); }
-.sig-page-body {
-  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
-}
+/* A row of five is short; keep it a row rather than letting it centre. */
+#sub-signature-store .sig-row { justify-content: flex-start !important; }
 
-.sig-page-hero {
-  position: relative; overflow: hidden;
-  width: calc(100% - 32px); margin: 4px 16px 0; height: 340px;
-  border-radius: 18px; background: #060c18;
-  border: 1.5px solid rgba(232,213,163,0.42);
-  box-shadow: 0 18px 44px rgba(0,0,0,0.55), 0 0 30px rgba(232,213,163,0.16);
+/* The banner, in the slot the Atelier's slideshow occupies. */
+.sig-banner-wrap { position: relative; overflow: hidden; }
+.sig-banner-wrap .rm-banner-img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 30%;
+  display: block;
 }
-.sig-page-hero-inner {
-  position: absolute; inset: 0; z-index: 3;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 0 22px 24px;
+.sig-banner-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(6,12,24,0.35) 0%,
+              rgba(6,12,24,0.05) 34%, rgba(6,12,24,0.86) 100%);
 }
-.sig-page-eyebrow {
-  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
-  letter-spacing: 3px; text-transform: uppercase; color: rgba(245,230,200,0.85);
-}
-.sig-page-title {
-  font-family: 'DM Sans', sans-serif; font-size: 34px; line-height: 1.05;
-  margin-top: 8px; color: #fff;
-}
-.sig-page-title span { font-weight: 200; color: rgba(255,255,255,0.9); }
-.sig-page-title b {
-  font-weight: 800; color: #f5e6c8;
-  text-shadow: 0 2px 28px rgba(0,0,0,0.9), 0 0 26px rgba(232,213,163,0.26);
-}
-.sig-page-rule {
-  width: 46px; height: 1px; margin: 14px 0 12px;
-  background: rgba(232,213,163,0.55);
-}
-.sig-page-desc {
-  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
-  color: rgba(255,255,255,0.62); line-height: 1.65; max-width: 300px;
-}
-.sig-page-stats {
-  display: flex; align-items: center; gap: 8px; margin-top: 14px;
+.sig-banner-txt { position: absolute; left: 20px; right: 20px; bottom: 16px; }
+.sig-banner-eyebrow {
   font-family: 'DM Sans', sans-serif; font-size: 8.5px; font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase; color: rgba(245,230,200,0.8);
+  letter-spacing: 2.6px; text-transform: uppercase; color: rgba(245,230,200,0.85);
 }
-.sig-page-stats i { font-style: normal; color: rgba(232,213,163,0.4); }
-
-.sig-rail-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 24px 20px 12px;
+.sig-banner-title {
+  font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800;
+  color: #f5e6c8; letter-spacing: -0.4px; line-height: 1.1; margin-top: 5px;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.9), 0 0 24px rgba(232,213,163,0.22);
 }
-.sig-toggle {
-  display: flex; gap: 6px; flex-shrink: 0;
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 999px !important; padding: 3px;
-}
-/* app.css floors every button at 44px tall, which would make this pill the
-   height of a card. */
-.sig-toggle-btn {
-  height: 28px !important; min-height: 28px !important;
-  padding: 0 14px; border: none; cursor: pointer;
-  background: transparent; border-radius: 999px !important;
-  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
-  letter-spacing: 1.2px; text-transform: uppercase;
-  color: rgba(255,255,255,0.5); transition: background 0.18s, color 0.18s;
-}
-.sig-toggle-btn.active { background: rgba(232,213,163,0.9); color: #060c18; }
-
-.sig-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-  padding: 0 20px;
-}
-.sig-card2 {
-  position: relative; overflow: hidden; cursor: pointer;
-  background: #0a0f1c;
-  border: 1.5px solid rgba(232,213,163,0.5);
-  box-shadow: 0 6px 22px rgba(0,0,0,0.5), 0 0 18px rgba(232,213,163,0.2);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.sig-card2:active { transform: scale(0.975); }
-.sig-card2.owned { border-color: rgba(232,213,163,0.8); }
-.sig-card2-tag {
-  position: absolute; top: 8px; left: 8px; z-index: 2;
-  font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 700;
-  letter-spacing: 1.2px; text-transform: uppercase; color: #060c18;
-  background: rgba(232,213,163,0.94); padding: 3px 8px;
-}
-.sig-card2-img {
-  width: 100%; height: 150px;
-  background-size: cover; background-position: center;
-}
-.sig-card2-body {
-  padding: 11px 12px 13px;
-  background: rgba(232,213,163,0.12);
-  border-top: 1px solid rgba(232,213,163,0.3);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-}
-.sig-card2-name {
-  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800;
-  color: #f5e6c8; line-height: 1.2;
-}
-.sig-card2-root {
-  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 400;
-  letter-spacing: 1px; text-transform: uppercase;
-  color: rgba(232,213,163,0.72); margin-top: 3px;
-}
-.sig-card2-price {
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800;
-  color: #fff; margin-top: 7px;
-}
-.sig-card2-owned {
+.sig-banner-sub {
   font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
-  letter-spacing: 1.4px; text-transform: uppercase; color: #8fe0b8; margin-top: 7px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.55); margin-top: 6px;
 }
+
+/* The Meaning Store's rows are scoped to #msMeaningGrid; this page draws
+   the same .ms-grid markup and wants the same treatment, so the rules are
+   restated for it rather than the originals being loosened — widening
+   them would have changed the coupon pages, which use .ms-grid as a real
+   grid on purpose. */
+#sigSections .ms-grid {
+  display: flex !important; flex-wrap: nowrap !important; gap: 12px !important;
+  overflow-x: auto !important; overflow-y: visible !important;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  padding: 6px 0 10px !important; margin: 0 -20px !important;
+  padding-left: 20px !important; padding-right: 20px !important;
+}
+#sigSections .ms-grid::-webkit-scrollbar { display: none; }
+#sigSections .ms-card { flex: 0 0 128px !important; width: 128px !important; scroll-snap-align: start; }
+#sigSections .ms-card-img { opacity: 1 !important; }
+
 .sig-empty {
-  grid-column: 1 / -1;
   font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
-  color: rgba(255,255,255,0.35); padding: 18px 2px;
+  color: rgba(255,255,255,0.35); padding: 18px 20px;
 }
 
 /* ── The detail, on the same page ── */
@@ -10200,17 +10132,31 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
    phone these run on. */
 #nssIntroPage .nss-intro-vignette,
 #rmIntroPage .rm-intro-vignette,
-#msIntroPage .sl-intro-vignette {
+#msIntroPage .sl-intro-vignette,
+#sigIntroPage .sig-intro-vignette {
   display: block !important;
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  /* Clear where the render is, dark where the words are, and nothing in
+     between. The earlier version started shading at 34% and was already
+     at 0.62 by the halfway mark, which is exactly where the bags sit — it
+     put a grey film over the subject to protect copy that does not begin
+     until 60%. It ramps late and fast now. */
   background: linear-gradient(to bottom,
-    rgba(6,12,24,0.55) 0%,
-    rgba(6,12,24,0.10) 16%,
-    rgba(6,12,24,0.06) 34%,
-    rgba(6,12,24,0.62) 52%,
-    rgba(6,12,24,0.92) 68%,
-    rgba(6,12,24,0.985) 84%,
-    #060c18 100%) !important;
+    rgba(6,12,24,0.34) 0%,
+    rgba(6,12,24,0.00) 13%,
+    rgba(6,12,24,0.00) 47%,
+    rgba(6,12,24,0.22) 56%,
+    rgba(6,12,24,0.78) 66%,
+    rgba(6,12,24,0.95) 77%,
+    #060c18 90%) !important;
+}
+/* With less wash under it, the eyebrow and the title carry their own
+   shadow rather than relying on the gradient alone. */
+#nssIntroPage .sl-intro-title, #rmIntroPage .sl-intro-title,
+#msIntroPage .sl-intro-title, #sigIntroPage .sl-intro-title,
+#nssIntroPage .sl-intro-eyebrow, #rmIntroPage .sl-intro-eyebrow,
+#msIntroPage .sl-intro-eyebrow, #sigIntroPage .sl-intro-eyebrow {
+  text-shadow: 0 2px 18px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.7);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -10237,20 +10183,9 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   background-repeat: no-repeat;
   animation: slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);
 }
-/* The art carries its own "The Signature" script across the lower third,
-   and the page then sets its own title over the top of it. Same wash as
-   the other three intros: clear across the render, solid under the words. */
-.sig-intro-vignette {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(to bottom,
-    rgba(6,12,24,0.55) 0%,
-    rgba(6,12,24,0.10) 16%,
-    rgba(6,12,24,0.06) 34%,
-    rgba(6,12,24,0.62) 52%,
-    rgba(6,12,24,0.92) 68%,
-    rgba(6,12,24,0.985) 84%,
-    #060c18 100%);
-}
+/* Positioning only — the wash itself is shared with the other three
+   intros above, so they can never drift apart again. */
+.sig-intro-vignette { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .sig-intro-page .sl-intro-top,
 .sig-intro-page .sl-intro-bottom { position: relative; z-index: 2; }
 

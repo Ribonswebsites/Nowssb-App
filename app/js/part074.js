@@ -32,6 +32,9 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
+  /* For a value going into an onclick="…'here'…" — the attribute is already
+     double-quoted, so the single quotes are what need escaping. */
+  function jsq(s) { return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
   function money(n) {
     return (typeof window.nwsbFormatINR === 'function') ? window.nwsbFormatINR(n) : ('₹' + n);
   }
@@ -80,54 +83,128 @@
     return (window.nssCart || []).some(function (c) { return c.id === id; });
   }
 
-  /* ── The grid ──────────────────────────────────────────────────────
-     Same card the collection has always used, so the gold-glass treatment
-     and the Signature tag come from the stylesheet rather than from here. */
-  function card(it) {
-    var own = owned(it);
-    return '<div class="sig-card2' + (own ? ' owned' : '') + '" onclick="sigOpenDetail(\'' + esc(it.id) + '\')">' +
-             '<span class="sig-card2-tag">Signature</span>' +
-             '<div class="sig-card2-img" style="background-image:url(\'' + esc(it.img) + '\')"></div>' +
-             '<div class="sig-card2-body">' +
-               '<div class="sig-card2-name">' + esc(it.name) + '</div>' +
-               '<div class="sig-card2-root">' + esc(it.root) + '</div>' +
-               (own ? '<div class="sig-card2-owned">Unlocked</div>'
-                    : '<div class="sig-card2-price">' + money(price()) + '</div>') +
+  /* ── The rows ──────────────────────────────────────────────────────
+     Not a grid and not a toggle. The Word Atelier draws a black
+     .rm-cat-banner and then a horizontally scrolling .rm-word-row of
+     .rm-word-card; the Meaning Store draws the same banner and then an
+     .ms-grid of .ms-card, which nowssb-nm.css already turns into the
+     same kind of row. This page is both, one after the other, using
+     their markup rather than a shape of its own — which is the whole
+     point of a shop that is the two of them combined.
+
+     Cards carry the wishlist and cart chips the Meaning Store's cards
+     carry, so a signature can go into the basket from the row without
+     opening anything. ── */
+  function cardActions(it) {
+    if (owned(it)) return '';
+    var wishIds = (window.nssWishlist || []).map(function (w) { return w.id; });
+    var inW = wishIds.indexOf(it.id) >= 0;
+    var inC = inCart(it.id);
+    var args = "{id:'" + jsq(it.id) + "',name:'" + jsq(it.name) + "',type:'" +
+               (it.kind === 'word' ? 'Word' : 'Meaning') + "',price:" + price() +
+               ",img:'" + jsq(it.img) + "',sigTag:'signature'}";
+    return '<div class="nss-card-actions">' +
+      '<div class="nss-card-action' + (inW ? ' wishlisted' : '') + '" data-nss-wish="' + esc(it.id) + '" ' +
+        'onclick="event.stopPropagation();nssToggleWishlist(' + args + ')">' +
+        '<svg width="11" height="11" viewBox="0 0 16 16" fill="' + (inW ? 'rgba(220,80,80,0.9)' : 'none') + '">' +
+          '<path d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linejoin="round"/>' +
+        '</svg>' +
+      '</div>' +
+      '<div class="nss-card-action' + (inC ? ' carted' : '') + '" data-nss-cart="' + esc(it.id) + '" ' +
+        'onclick="event.stopPropagation();nssAddToCart(' + args + ');sigRenderStore()">' +
+        '<svg width="11" height="11" viewBox="0 0 16 16" fill="none">' +
+          '<path d="M2 2h1.5l2 8h7l1.5-5.5H4.5" stroke="rgba(232,213,163,0.8)" stroke-width="1.2" stroke-linecap="square"/>' +
+          '<circle cx="7" cy="12.5" r="1" fill="rgba(232,213,163,0.7)"/>' +
+          '<circle cx="11" cy="12.5" r="1" fill="rgba(232,213,163,0.7)"/>' +
+        '</svg>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* The Word Atelier's card, exactly. */
+  function wordCard(it) {
+    return '<div class="rm-word-card rm-word-card-signature" onclick="sigOpenDetail(\'' + esc(it.id) + '\')">' +
+             '<span class="rm-word-card-signature-tag">Signature</span>' +
+             cardActions(it) +
+             '<img decoding="async" class="rm-word-card-img" src="' + esc(it.img) + '" alt="" loading="lazy">' +
+             '<div class="rm-word-card-overlay"></div>' +
+             '<div class="rm-word-card-body">' +
+               '<div class="rm-word-card-name">' + esc(it.name) + '</div>' +
+               '<div class="rm-word-card-root">' + esc(it.root) + '</div>' +
              '</div>' +
            '</div>';
   }
 
+  /* The Meaning Store's card, exactly. */
+  function meaningCard(it) {
+    var own = owned(it);
+    return '<div class="ms-card ms-card-signature' + (own ? ' unlocked' : '') + '" style="position:relative;" ' +
+             'onclick="sigOpenDetail(\'' + esc(it.id) + '\')">' +
+             '<span class="ms-card-signature-tag">Signature</span>' +
+             cardActions(it) +
+             '<div class="ms-card-img" style="background-image:url(\'' + esc(it.img) + '\')"></div>' +
+             '<div class="ms-card-overlay"></div>' +
+             '<div class="ms-card-body">' +
+               '<div class="ms-card-word">' + esc(it.name) + '</div>' +
+               '<div class="ms-card-root">' + esc(it.root) + '</div>' +
+               (own
+                 ? '<div class="ms-card-unlocked-badge"><svg width="8" height="7" viewBox="0 0 10 9" fill="none"><path d="M1 4L3.5 7L9 1" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/></svg>Unlocked</div>'
+                 : '<div class="ms-card-price">' + money(price()) + '</div>') +
+             '</div>' +
+           '</div>';
+  }
+
+  /* The black section header both stores use. */
+  function catBanner(logo, title, sub) {
+    return '<div class="rm-cat-banner">' +
+             '<div class="rm-cat-banner-logo"><img decoding="async" loading="lazy" src="' + esc(logo) + '" alt=""></div>' +
+             '<div class="rm-cat-banner-divider"></div>' +
+             '<div class="rm-cat-banner-text">' +
+               '<div class="rm-cat-banner-title">' + esc(title) + '</div>' +
+               '<div class="rm-cat-banner-sub">' + esc(sub) + '</div>' +
+             '</div>' +
+           '</div>';
+  }
+  function rowVid(src) {
+    return '<div class="rm-row-vid"><video data-nwsb-auto muted loop playsinline preload="none" src="' + esc(src) + '"></video></div>';
+  }
+
+  /* The two clips the collection is made of — the Word Atelier's and the
+     Meaning Store's, one above each section it belongs to. */
+  var VID_WORDS = 'https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4';
+  var VID_MEANS = 'https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4';
+
   function render() {
-    var wg = document.getElementById('sigWordsGrid');
-    var mg = document.getElementById('sigMeaningsGrid');
-    if (!wg && !mg) return;
+    var host = document.getElementById('sigSections');
+    if (!host) return;
     var w = words(), m = meanings();
-    if (wg) wg.innerHTML = w.length ? w.map(card).join('') : '<div class="sig-empty">No signature words yet.</div>';
-    if (mg) mg.innerHTML = m.length ? m.map(card).join('') : '<div class="sig-empty">No signature meanings yet.</div>';
+    var html = '';
+
+    html += rowVid(VID_WORDS);
+    html += catBanner(wordImg(), 'Signature Words', 'One per collection — the rarest word each one has');
+    html += '<div class="rm-word-row sig-row">' +
+            (w.length ? w.map(wordCard).join('') : '<div class="sig-empty">No signature words yet.</div>') +
+            '</div>';
+
+    html += rowVid(VID_MEANS);
+    html += catBanner(meanImg(), 'Signature Meanings', 'The full decoded origin, not the base entry');
+    html += '<div class="ms-grid sig-row">' +
+            (m.length ? m.map(meaningCard).join('') : '<div class="sig-empty">No signature meanings yet.</div>') +
+            '</div>';
+
+    host.innerHTML = html;
     syncBadges();
+    /* The two clips are real <video> tags now, so the app's own idle
+       pre-warmer and autoplay handling pick them up like every other. */
+    if (window.nwsbAutoPlayVideos) { try { window.nwsbAutoPlayVideos(); } catch (e) {} }
   }
   window.sigRenderStore = render;
 
-  /* The page has its own cart and wishlist counts in its own top bar. */
+  /* The page has its own cart count in its own nav bar. */
   function syncBadges() {
     var c = document.getElementById('sigCartBadge');
-    var w = document.getElementById('sigWishBadge');
     if (c) c.textContent = (window.nssCart || []).length;
-    if (w) w.textContent = (window.nssWishlist || []).length;
   }
-
-  window.sigTab = function (which) {
-    var onWords = which !== 'meanings';
-    var w = document.getElementById('sigWordsGrid');
-    var m = document.getElementById('sigMeaningsGrid');
-    var wb = document.getElementById('sigToggleWords');
-    var mb = document.getElementById('sigToggleMeanings');
-    if (w) w.style.display = onWords ? '' : 'none';
-    if (m) m.style.display = onWords ? 'none' : '';
-    if (wb) wb.classList.toggle('active', onWords);
-    if (mb) mb.classList.toggle('active', !onWords);
-    try { if (navigator.vibrate) navigator.vibrate(16); } catch (e) {}
-  };
 
   /* ── The detail, on this page ──────────────────────────────────────
      The one thing that had to be built rather than borrowed: the Meaning
@@ -209,7 +286,6 @@
     var s = document.getElementById('sub-signature-store');
     if (!s) return;
     render();
-    window.sigTab('words');
     var intro = document.getElementById('sigIntroPage');
     if (intro) intro.classList.remove('sig-intro-hidden');
     s.classList.add('open');
@@ -233,9 +309,11 @@
      closed screen is a wakelock nobody asked for. ── */
   var flip = null, showB = false;
   function pairs() {
+    /* Only the doorway in the store hub crossfades now — the page shows
+       the two clips one above the other, as .rm-row-vid, the way the Word
+       Atelier already breaks its rows up. */
     return [
-      [document.getElementById('sigVidWord'), document.getElementById('sigVidMeaning')],
-      [document.getElementById('sigPageVidA'), document.getElementById('sigPageVidB')]
+      [document.getElementById('sigVidWord'), document.getElementById('sigVidMeaning')]
     ].filter(function (p) { return p[0] && p[1]; });
   }
   function crossfade(on) {

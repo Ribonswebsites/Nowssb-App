@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=612">
+<link rel="stylesheet" href="nowssb-nm.css?v=615">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -4965,55 +4965,39 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <div class="sig-page-top">
-    <div class="sig-page-back" onclick="sigCloseStore()" aria-label="Back">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="#f5e6c8" stroke-width="1.6" stroke-linecap="square"/></svg>
-    </div>
-    <div style="flex:1;"></div>
-    <div class="nss-store-icon-btn" onclick="nssOpenWishlist()" title="Wishlist">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
-      <div class="nss-icon-badge" id="sigWishBadge">0</div>
-    </div>
-    <div class="nss-store-icon-btn" onclick="nssOpenCart()" title="Cart">
-      <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#fff" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#fff" stroke="none"/></svg>
-      <div class="nss-icon-badge" id="sigCartBadge">0</div>
-    </div>
+  <!-- Everything below is the Word Atelier's and the Meaning Store's own
+       markup, not a new shape: .sub-header.nav-bar, .rm-banner-wrap,
+       .rm-cat-banner, .rm-word-row, .ms-grid, .rm-row-vid. Two sections —
+       words, then meanings — so there is nothing to toggle. -->
+  <div class="sub-screen-bg sig-bg"></div>
+
+  <div class="sub-header nav-bar">
+    <div class="sub-back" onclick="sigCloseStore()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div class="sub-title">The Signature</div>
+    <button class="rm-cart-btn" onclick="nssOpenCart()" aria-label="Cart">
+      <svg width="17" height="17" viewBox="0 0 22 22" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3" stroke="none"/></svg>
+      <div class="nss-icon-badge nss-cart-badge-shared" id="sigCartBadge">0</div>
+    </button>
+    <button class="rm-bg-customize-btn" onclick="nssOpenWishlist()" aria-label="Wishlist">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+    </button>
   </div>
 
-  <div class="sig-page-body">
+  <div class="sub-body" id="sigSubBody">
 
-    <!-- The banner: both stores' clips, one gold frame. -->
-    <div class="sig-page-hero">
-      <img class="sig-store-art sig-page-art" src="./assets/signature/nowssb-signature.webp" alt="NowssB Signature" loading="lazy" decoding="async">
-      <video class="sig-store-video sig-vid-a" data-nwsb-auto muted loop playsinline preload="none" id="sigPageVidA">
-        <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4" type="video/mp4">
-      </video>
-      <video class="sig-store-video sig-vid-b" data-nwsb-auto muted loop playsinline preload="none" id="sigPageVidB">
-        <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4" type="video/mp4">
-      </video>
-      <div class="sig-store-overlay"></div>
-      <div class="sig-store-shine" aria-hidden="true"></div>
-      <div class="sig-page-hero-inner">
-        <span class="sig-page-eyebrow">Shabdapathy · The Rarest</span>
-        <div class="sig-page-title"><span>NowssB</span><br><b>Signature</b></div>
-        <div class="sig-page-rule"></div>
-        <div class="sig-page-desc">One signature per category — the most exclusive word and the most exclusive meaning each collection has. Owned once, never restocked.</div>
-        <div class="sig-page-stats">
-          <span>15 Words</span><i>·</i><span>5 Meanings</span><i>·</i><span>50% Bundle</span>
-        </div>
+    <!-- Banner, the same slot the Word Atelier's slideshow sits in. -->
+    <div class="rm-banner-wrap sig-banner-wrap">
+      <img class="rm-banner-img" src="./assets/signature/nowssb-signature.webp" alt="NowssB Signature" loading="lazy" decoding="async">
+      <div class="sig-banner-scrim"></div>
+      <div class="sig-banner-txt">
+        <span class="sig-banner-eyebrow">Shabdapathy · The Rarest</span>
+        <div class="sig-banner-title">The Signature</div>
+        <div class="sig-banner-sub">15 Words · 5 Meanings · 50% Bundle</div>
       </div>
     </div>
 
-    <div class="sig-rail-head">
-      <span class="sub-section-label">The Collection</span>
-      <div class="sig-toggle">
-        <button class="sig-toggle-btn active" id="sigToggleWords" onclick="sigTab('words')">Words</button>
-        <button class="sig-toggle-btn" id="sigToggleMeanings" onclick="sigTab('meanings')">Meanings</button>
-      </div>
-    </div>
-
-    <div class="sig-grid" id="sigWordsGrid"><!-- rendered by app/js/part074.js --></div>
-    <div class="sig-grid" id="sigMeaningsGrid" style="display:none;"><!-- rendered by app/js/part074.js --></div>
+    <!-- The two sections, rendered by app/js/part074.js. -->
+    <div id="sigSections"></div>
 
     <div class="rm-disclaimer" style="margin:24px 20px 0;">
       <div class="rm-disclaimer-title">About the Signature</div>
@@ -9824,7 +9808,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
-<script src="app/js/part074.js?v=3"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
+<script src="app/js/part074.js?v=4"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>
