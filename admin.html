@@ -76,6 +76,18 @@ body::before {
 }
 .auth-btn:active { transform: scale(0.98); }
 .auth-btn:disabled { opacity: 0.55; cursor: default; }
+.auth-google {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-bottom: 18px;
+}
+.auth-or {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 18px;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.32); font-weight: 700;
+}
+.auth-or::before, .auth-or::after {
+  content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.12);
+}
 .auth-error { font-size: 12px; color: rgba(220,80,80,0.85); margin-top: 10px; min-height: 18px; }
 .auth-note {
   font-size: 11px; line-height: 1.55; color: rgba(200,232,245,0.72); margin-top: 6px;
@@ -250,6 +262,14 @@ body::before {
     <div class="auth-mark"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""></div>
     <div class="auth-logo">NowssB</div>
     <div class="auth-sub">CEO Content Studio</div>
+    <!-- The app signs people in with Google, so the studio has to as well:
+         a Google account has no password in Firebase, and asking one for
+         its password can only ever fail. -->
+    <button class="auth-btn auth-google" onclick="adminSignInGoogle()">
+      <svg viewBox="0 0 18 18" width="17" height="17" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.05-1.2-.16-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 010-3.4V5H.9a9 9 0 000 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 00.9 5l3 2.3C4.6 5.1 6.6 3.6 9 3.6z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-or"><span>or with a password</span></div>
     <label class="auth-label">Email</label>
     <input type="email" class="auth-input" id="emailInput" autocomplete="username" placeholder="you@nowssb.com" onkeydown="if(event.key==='Enter')doLogin()">
     <label class="auth-label">Password</label>
@@ -459,6 +479,41 @@ body::before {
       <label>Instagram Handle (tap to update)</label>
       <input id="igHandleInput" placeholder="@nowssb" style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;" oninput="updateIgLink(this.value)">
     </div>
+  </div>
+
+  <!-- ══ THE CATALOGUE ══
+       Every meaning and every word, as data. Editing here and publishing
+       reaches every open app without a deploy. ══ -->
+  <div class="sec-label" style="margin-top:40px;">THE CATALOGUE</div>
+  <div class="form-wrap">
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="rec-action-btn" id="catTabM" onclick="catTab('meanings')">Meanings</button>
+      <button class="rec-action-btn" id="catTabW" onclick="catTab('words')">Words</button>
+    </div>
+    <div id="catStatus" style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:12px;">Loading…</div>
+
+    <!-- MEANINGS -->
+    <div id="catPaneM">
+      <div id="catMList"></div>
+      <button class="rec-action-btn" onclick="catAddMeaning()" style="margin-top:10px;">+ Add a meaning</button>
+    </div>
+
+    <!-- WORDS -->
+    <div id="catPaneW" style="display:none;">
+      <div class="field">
+        <label>Add a word to</label>
+        <select id="catWCat"></select>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Word</label><input type="text" id="catWWord" placeholder="e.g. Aarogya"></div>
+        <div class="field"><label>Origin</label><input type="text" id="catWRoot" placeholder="e.g. Sanskrit"></div>
+      </div>
+      <button class="rec-action-btn" onclick="catAddWord()">+ Add word</button>
+      <div id="catWList" style="margin-top:16px;"></div>
+    </div>
+
+    <button class="btn-primary" id="catPublish" onclick="catPublishAll()" style="margin-top:18px;">Publish to the app</button>
+    <div id="catResult" style="font-size:12px;line-height:1.6;color:rgba(200,232,245,0.8);margin-top:12px;"></div>
   </div>
 
   <!-- ══ REQUESTS FROM THE APP ══
@@ -979,7 +1034,9 @@ window.addEventListener('DOMContentLoaded', function(){
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, orderBy, onSnapshot, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+         GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult
+       } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
 const _fbApp = initializeApp({
   apiKey: "AIzaSyBly5XnqNnpVom11thjlvT5q_BfxNJBfgQ",
@@ -1041,23 +1098,53 @@ window.adminSignIn = async function () {
   btn.disabled = true; btn.textContent = 'Checking…';
   try {
     const cred = await signInWithEmailAndPassword(_auth, email, pw);
-    if (await isAdmin(cred.user.uid)) { openStudio(); }
-    else {
-      authErr('That account is not an admin.');
-      authNote('Signed in as <b>' + cred.user.uid + '</b>.<br>Add a document at <b>admins/' + cred.user.uid +
-               '</b> in Firestore, then reload.');
-      await signOut(_auth);
-    }
+    await afterSignIn(cred.user);
   } catch (e) {
     const c = (e && e.code) || '';
+    /* An account created through Google has no password, so this is the
+       likeliest wrong turn — say so rather than "wrong password". */
     authErr(c.includes('password') || c.includes('credential') || c.includes('user-not-found')
-      ? 'Wrong email or password.'
+      ? 'No password account for that email — try Continue with Google.'
       : c.includes('too-many') ? 'Too many attempts — wait a moment.'
       : 'Could not sign in. Check the connection.');
   } finally {
     btn.disabled = false; btn.textContent = 'Enter Studio';
   }
 };
+
+/* Google, the way the app itself does it. A popup where one is allowed, a
+   redirect where it is not — an installed PWA usually blocks popups, and a
+   silently-nothing button is the worst possible answer. */
+window.adminSignInGoogle = async function () {
+  authErr(''); authNote('');
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  try {
+    const cred = await signInWithPopup(_auth, provider);
+    await afterSignIn(cred.user);
+  } catch (e) {
+    const c = (e && e.code) || '';
+    if (c.includes('popup-blocked') || c.includes('popup-closed') || c.includes('operation-not-supported')) {
+      try { await signInWithRedirect(_auth, provider); return; } catch (e2) {}
+    }
+    if (c.includes('cancelled') || c.includes('closed')) return;   // they changed their mind
+    authErr('Google sign-in did not complete.');
+  }
+};
+
+/* Coming back from that redirect. */
+getRedirectResult(_auth).then((res) => { if (res && res.user) afterSignIn(res.user); }).catch(() => {});
+
+/* One place decides what happens after any sign-in, whichever door was
+   used: on the list, or told exactly what to add and signed back out. */
+async function afterSignIn(user) {
+  if (await isAdmin(user.uid)) { openStudio(); return true; }
+  authErr('That account is not an admin.');
+  authNote('Signed in as <b>' + (user.email || user.uid) + '</b><br>uid <b>' + user.uid + '</b>.<br>' +
+           'Add a document at <b>admins/' + user.uid + '</b> in Firestore, then reload.');
+  await signOut(_auth);
+  return false;
+}
 
 window.adminSignOut = async function () {
   try { await signOut(_auth); } catch (e) {}
@@ -1067,7 +1154,7 @@ window.adminSignOut = async function () {
 /* A reload should not mean signing in again, but it must not mean trusting
    the last session either — the list is re-checked every time. */
 onAuthStateChanged(_auth, async (user) => {
-  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); watchRequests(); }
+  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); watchRequests(); catLoad(); }
   else closeStudio();
 });
 
@@ -1161,6 +1248,180 @@ window.reqFulfil = async function (id, word) {
 };
 window.reqDelete = async function (id) {
   try { await deleteDoc(doc(_db, 'requests', id)); } catch (e) {}
+};
+
+/* ══ THE CATALOGUE ═══════════════════════════════════════════════════
+   Two documents: content/meanings holds the list the Meaning Store draws,
+   content/words the categories the Word Atelier draws. The app watches
+   both (app/js/part069.js), so publishing here redraws every open copy.
+
+   Seeding is the awkward part of any migration like this — the first
+   publish has to be exactly what ships today, or the catalogue changes
+   the moment it moves. Rather than transcribing it and risking drift, the
+   studio boots the real app in a hidden frame and reads the arrays off
+   it. Same origin, so it is allowed, and it is right by construction.
+   ── */
+let _catM = null;   // meanings
+let _catW = null;   // word categories
+
+function catSay(msg) { const el = document.getElementById('catStatus'); if (el) el.textContent = msg; }
+
+window.catTab = function (which) {
+  document.getElementById('catPaneM').style.display = which === 'meanings' ? 'block' : 'none';
+  document.getElementById('catPaneW').style.display = which === 'words' ? 'block' : 'none';
+};
+
+/* Read the shipped catalogue out of the app itself. */
+function seedFromApp() {
+  return new Promise((resolve) => {
+    const f = document.createElement('iframe');
+    f.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;';
+    f.src = './index.html';
+    let done = false;
+    const finish = (v) => { if (done) return; done = true; try { f.remove(); } catch (e) {} resolve(v); };
+    f.onload = () => {
+      let tries = 0;
+      const poll = setInterval(() => {
+        const w = f.contentWindow;
+        const words = w && w.NWSB_DEFAULT_WORD_CATS;
+        const means = w && w.MS_BASE_MEANINGS;
+        if ((words && words.length) || (means && means.length)) {
+          clearInterval(poll);
+          finish({ words: words ? JSON.parse(JSON.stringify(words)) : null,
+                   meanings: means ? JSON.parse(JSON.stringify(means)) : null });
+        } else if (++tries > 40) { clearInterval(poll); finish(null); }
+      }, 250);
+    };
+    f.onerror = () => finish(null);
+    document.body.appendChild(f);
+    setTimeout(() => finish(null), 20000);
+  });
+}
+
+async function catLoad() {
+  catSay('Loading…');
+  try {
+    const [mSnap, wSnap] = await Promise.all([
+      getDoc(doc(_db, 'content', 'meanings')),
+      getDoc(doc(_db, 'content', 'words')),
+    ]);
+    _catM = mSnap.exists() ? (mSnap.data().items || null) : null;
+    _catW = wSnap.exists() ? (wSnap.data().categories || null) : null;
+
+    if (!_catM || !_catW) {
+      catSay('Nothing published yet — reading what the app ships…');
+      const seed = await seedFromApp();
+      if (seed) {
+        _catM = _catM || seed.meanings;
+        _catW = _catW || seed.words;
+        catSay('Loaded from the app. Nothing is live until you press Publish.');
+      } else {
+        catSay('Could not read the app’s catalogue. Publish will only send what is here.');
+      }
+    } else {
+      catSay('Live: ' + (_catM ? _catM.length : 0) + ' meanings, ' + (_catW ? _catW.length : 0) + ' categories.');
+    }
+  } catch (e) {
+    catSay('Could not read the catalogue — are the rules published?');
+  }
+  catRender();
+}
+
+function catRender() {
+  /* Meanings — every field the store shows, editable in place. */
+  const mw = document.getElementById('catMList');
+  if (mw) {
+    mw.innerHTML = (_catM || []).map((m, i) =>
+      '<div class="wl-card">' +
+        '<div class="grid-2">' +
+          '<div class="field"><label>Word</label><input type="text" value="' + esc(m.word || '') + '" oninput="catSetM(' + i + ',\'word\',this.value)"></div>' +
+          '<div class="field"><label>Key</label><input type="text" value="' + esc(m.key || '') + '" oninput="catSetM(' + i + ',\'key\',this.value)"></div>' +
+        '</div>' +
+        '<div class="field"><label>Root / origin</label><input type="text" value="' + esc(m.root || '') + '" oninput="catSetM(' + i + ',\'root\',this.value)"></div>' +
+        '<div class="grid-2">' +
+          '<div class="field"><label>Category</label><input type="text" value="' + esc(m.category || '') + '" oninput="catSetM(' + i + ',\'category\',this.value)"></div>' +
+          '<div class="field"><label>Price (₹)</label><input type="number" value="' + (m.price || 0) + '" oninput="catSetM(' + i + ',\'price\',this.value)"></div>' +
+        '</div>' +
+        '<div class="field"><label>Image URL</label><input type="text" value="' + esc(m.img || '') + '" oninput="catSetM(' + i + ',\'img\',this.value)"></div>' +
+        '<button class="rec-action-btn" onclick="catDelM(' + i + ')">Remove</button>' +
+      '</div>').join('') ||
+      '<div style="color:rgba(255,255,255,0.3);font-size:13px;">No meanings loaded.</div>';
+  }
+
+  /* Words — the category picker, and each category's list. */
+  const sel = document.getElementById('catWCat');
+  if (sel) {
+    sel.innerHTML = (_catW || []).map((c, i) => '<option value="' + i + '">' + esc(c.label || c.id || ('#' + i)) + '</option>').join('');
+  }
+  const ww = document.getElementById('catWList');
+  if (ww) {
+    ww.innerHTML = (_catW || []).map((c, i) =>
+      '<div class="wl-card">' +
+        '<div class="wl-name">' + esc(c.label || '') + '</div>' +
+        '<div class="wl-meta">' + (c.words || []).length + ' words · ' + esc(c.sub || '') + '</div>' +
+        '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">' +
+          (c.words || []).slice(0, 40).map((w, j) =>
+            '<span style="font-size:11px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);">' +
+              esc(w[0]) + ' <b style="cursor:pointer;color:rgba(220,80,80,0.85);" onclick="catDelWord(' + i + ',' + j + ')">×</b></span>').join('') +
+        '</div>' +
+      '</div>').join('') ||
+      '<div style="color:rgba(255,255,255,0.3);font-size:13px;">No categories loaded.</div>';
+  }
+}
+
+window.catSetM = function (i, field, val) {
+  if (!_catM || !_catM[i]) return;
+  _catM[i][field] = field === 'price' ? (Number(val) || 0) : val;
+};
+window.catDelM = function (i) { if (_catM) { _catM.splice(i, 1); catRender(); } };
+window.catAddMeaning = function () {
+  if (!_catM) _catM = [];
+  _catM.unshift({ word: '', key: '', root: '', category: '', price: 49, img: '' });
+  catRender();
+};
+window.catAddWord = function () {
+  const i = Number(document.getElementById('catWCat').value);
+  const word = (document.getElementById('catWWord').value || '').trim();
+  const root = (document.getElementById('catWRoot').value || '').trim();
+  if (!_catW || !_catW[i] || !word) return;
+  _catW[i].words = _catW[i].words || [];
+  _catW[i].words.unshift([word.toLowerCase(), root || 'Natural Origin']);
+  document.getElementById('catWWord').value = '';
+  document.getElementById('catWRoot').value = '';
+  catRender();
+  if (window.showToast) window.showToast('Added — press Publish to send it');
+};
+window.catDelWord = function (i, j) {
+  if (_catW && _catW[i] && _catW[i].words) { _catW[i].words.splice(j, 1); catRender(); }
+};
+
+/* Publishing. The app refuses a malformed catalogue rather than emptying
+   itself, so the same shape is checked here first — better to be told now
+   than to publish something every phone quietly ignores. */
+window.catPublishAll = async function () {
+  const btn = document.getElementById('catPublish');
+  const out = document.getElementById('catResult');
+  out.textContent = '';
+
+  const badM = !Array.isArray(_catM) || !_catM.length || _catM.some(m => !m.key || !m.word);
+  const badW = !Array.isArray(_catW) || !_catW.length ||
+               _catW.some(c => !c.label || !Array.isArray(c.words) || c.words.some(w => !Array.isArray(w) || !w[0]));
+  if (badM && badW) { out.textContent = 'Nothing valid to publish — every meaning needs a word and a key.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Publishing…';
+  const done = [];
+  try {
+    if (!badM) { await setDoc(doc(_db, 'content', 'meanings'), { items: _catM, at: Date.now() }); done.push(_catM.length + ' meanings'); }
+    if (!badW) { await setDoc(doc(_db, 'content', 'words'), { categories: _catW, at: Date.now() }); done.push(_catW.length + ' categories'); }
+    out.innerHTML = 'Published <b>' + done.join('</b> and <b>') + '</b>. Every open app has it now.' +
+      (badM ? '<br>Meanings were skipped — one is missing a word or key.' : '') +
+      (badW ? '<br>Words were skipped — a category is missing a label or a word.' : '');
+    if (window.showToast) window.showToast('Published');
+  } catch (e) {
+    out.textContent = 'Could not publish — check you are an admin and the rules are live.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Publish to the app';
+  }
 };
 
 /* The studio wants permission too — it is the thing being notified here. */
