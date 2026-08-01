@@ -177,7 +177,8 @@
     './assets/video/signature-a.mp4',
     './assets/video/signature-b.mp4',
     './assets/video/signature-c.mp4',
-    './assets/video/signature-d.mp4'
+    './assets/video/signature-d.mp4',
+    './assets/video/signature-e.mp4'
   ];
   /* Only the clips of a screen that has been opened are ever in the DOM, so
      a scan cannot find these until the reader has already been made to wait
@@ -219,6 +220,11 @@
                        'The full decoded origin, not the base entry');
     html += meaningRow(m[1], SIG_VIDS[3], 'Signature Meanings · II',
                        'The rest of the collection');
+
+    /* Two clips close the shop, below the last row — one is the clip that
+       used to be the top banner before the landscape render took that slot,
+       the other is new. */
+    if (html) html += rowVid(SIG_VIDS[1]) + rowVid(SIG_VIDS[4]);
 
     if (!html) html = '<div class="sig-empty">Nothing in the collection yet.</div>';
 

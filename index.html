@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=617">
+<link rel="stylesheet" href="nowssb-nm.css?v=621">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -4838,18 +4838,24 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="sig-store-overlay"></div>
         <div class="sig-store-shine" aria-hidden="true"></div>
 
+        <!-- Everything in one glass card in the top-left corner, so the art
+             below it is uninterrupted rather than being faded out to make
+             room for text. -->
         <div class="sig-store-content">
-          <span class="ws-store-eyebrow sig-store-eyebrow">Shabdapathy · The Rarest</span>
-          <div class="sig-store-title">Words &amp; Meanings</div>
-          <div class="sig-store-line">One per category. Owned once, never restocked.</div>
-          <div class="sig-store-foot">
+          <div class="sig-store-glass">
+            <span class="ws-store-eyebrow sig-store-eyebrow">Shabdapathy · The Rarest</span>
+            <div class="sig-store-title">Words &amp; Meanings</div>
+            <div class="sig-store-line">One per category. Owned once, never restocked.</div>
             <div class="sig-store-chips">
               <span class="sig-chip">15 Words</span>
               <span class="sig-chip">5 Meanings</span>
             </div>
-            <span class="sig-store-go" aria-hidden="true">
-              <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="2" stroke-linecap="square"/></svg>
-            </span>
+            <div class="sig-store-enter">
+              <span class="sig-store-enter-lbl">Enter</span>
+              <span class="sig-store-go" aria-hidden="true">
+                <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="2" stroke-linecap="square"/></svg>
+              </span>
+            </div>
           </div>
         </div>
       </div><!-- /NowssB Signature doorway -->
@@ -4985,16 +4991,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <div class="sub-body" id="sigSubBody">
 
-    <!-- Banner, the same slot the Word Atelier's slideshow sits in — a clip
-         rather than the still now, like every other banner in the app. -->
+    <!-- Banner, the same slot the Word Atelier's slideshow sits in. The
+         landscape gold render, which is the shape this slot actually is —
+         the clip that was here has moved below the last row. -->
     <div class="rm-banner-wrap sig-banner-wrap">
-      <video class="rm-banner-img sig-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="./assets/video/signature-b.mp4"></video>
-      <div class="sig-banner-scrim"></div>
-      <div class="sig-banner-txt">
-        <span class="sig-banner-eyebrow">Shabdapathy · The Rarest</span>
-        <div class="sig-banner-title">The Signature</div>
-        <div class="sig-banner-sub">15 Words · 5 Meanings · 50% Bundle</div>
-      </div>
+      <!-- No caption over it. The render carries its own subject and the
+           nav bar above already says whose shop this is — the same way the
+           Word Atelier's banner is just the picture. -->
+      <img class="rm-banner-img" src="./assets/signature/signature-banner.webp" alt="NowssB Signature" loading="lazy" decoding="async">
     </div>
 
     <!-- The two sections, rendered by app/js/part074.js. -->
@@ -9809,7 +9813,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
-<script src="app/js/part074.js?v=5"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
+<script src="app/js/part074.js?v=6"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>
