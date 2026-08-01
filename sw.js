@@ -1,4 +1,4 @@
-const CACHE = 'nowsbansiu-v759';
+const CACHE = 'nowsbansiu-v760';
 // Separate, stable-named bucket for background-prefetched videos (see
 // app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
 // routine JS/CSS deploy never wipes out videos the user already has warmed —
@@ -19,6 +19,65 @@ self.addEventListener('activate', e => {
       keys.filter(k => k !== CACHE && k !== VIDEO_CACHE && k.startsWith('nowsbansiu-')).map(k => caches.delete(k))
     );
     await clients.claim();
+  })());
+});
+
+/* ── Notifications ────────────────────────────────────────────────────
+   Two ways in, one way out.
+
+   `push` fires when a server sends one — that is the only path that works
+   with the app fully closed, and it needs a push subscription, which needs
+   a VAPID key (see VAPID_PUBLIC_KEY in app/js/part068.js). Until one
+   is set nothing subscribes and this handler simply never fires; everything
+   else below still works.
+
+   The app itself also raises notifications directly while it is running,
+   through registration.showNotification() in part068.js. Both end up as the
+   same system notification, so they look and behave identically.
+
+   The layout of that notification belongs to the phone, not to us: Android
+   draws the small icon and the app name along the top and the title and
+   body beneath. `icon` and `badge` are the two images we get to choose.
+   ── */
+const NOTIF_ICON  = './assets/icons/app-icon-192.png';
+const NOTIF_BADGE = './assets/icons/notif-badge.png';
+
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (err) { d = { body: e.data && e.data.text() }; }
+  const title = d.title || 'NowssB';
+  e.waitUntil(self.registration.showNotification(title, {
+    body: d.body || '',
+    icon: d.icon || NOTIF_ICON,
+    badge: NOTIF_BADGE,
+    tag: d.tag || d.type || 'nowssb',
+    renotify: true,
+    data: { type: d.type || '', url: d.url || './' },
+    vibrate: [28, 40, 28]
+  }));
+});
+
+/* Tapping one should land on the thing it is about: focus a window that is
+   already open and tell it where to go, or open the app if none is. */
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const type = (e.notification.data && e.notification.data.type) || '';
+  e.waitUntil((async () => {
+    const all = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of all) {
+      if ('focus' in c) {
+        await c.focus();
+        c.postMessage({ nwsb: 'notification-click', type });
+        return;
+      }
+    }
+    const url = (e.notification.data && e.notification.data.url) || './';
+    if (clients.openWindow) {
+      const w = await clients.openWindow(url);
+      /* A window opened from cold has not booted yet, so it cannot be told
+         where to go — part068.js reads this back out of storage instead. */
+      if (w && type) { try { await w.postMessage({ nwsb: 'notification-click', type }); } catch (err) {} }
+    }
   })());
 });
 
