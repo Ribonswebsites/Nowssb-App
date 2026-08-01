@@ -60,7 +60,36 @@
   /* The coupon art is a clip now. The rotators keep swapping the <img> they
      have always swapped; it is simply hidden underneath, so nothing has to be
      unpicked and every surface changes at once. */
-  var COUPON_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438343/grok_video_2026-07-31-00-34-06_c2fuko.mp4';
+  /* Three clips, not one. There are four coupon surfaces in the app and
+     they used to be the same ten seconds of video on all of them; each now
+     takes the next clip in the list, and the list starts at a different
+     place on each launch, so the same surface is not always the same clip
+     either. The two new ones are local files — they ship with the app and
+     the cache warms them like everything else. */
+  var COUPON_VIDS = [
+    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438343/grok_video_2026-07-31-00-34-06_c2fuko.mp4',
+    './assets/video/coupon-a.mp4',
+    './assets/video/coupon-b.mp4'
+  ];
+  /* The offset is per launch rather than per render, so a rotator redrawing
+     a banner does not make the clip jump under the reader. */
+  var COUPON_OFFSET = Math.floor(Math.random() * COUPON_VIDS.length);
+  var _couponSeen = 0;
+  function nextCouponVid() {
+    return COUPON_VIDS[(COUPON_OFFSET + _couponSeen++) % COUPON_VIDS.length];
+  }
+  /* Exposed so the Signature store can take one too, and so app/js/part051.js
+     can warm all three — only the one currently in the DOM would be found by
+     a scan, and the alternates never would. */
+  window.NWSB_COUPON_VIDS = COUPON_VIDS;
+  window.nwsbNextCouponVid = nextCouponVid;
+
+  /* Everything this file can put on screen but might not have put on screen
+     yet — the two coupon alternates and the subscription alternate. Only the
+     clip actually chosen this launch is in the DOM, so a scan would warm one
+     of three and leave the reader to download the others on the day they
+     finally appear. See collectVideoUrls() in app/js/part051.js. */
+  window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(COUPON_VIDS);
   var COUPON_HOSTS = '#nmhGreetImg, #fashCouponImg, #rmdCouponBanner, #msdCouponBanner';
   var PLAYER_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png';
 
@@ -74,9 +103,18 @@
   /* The subscription clip was the same one in several places. The two home
      banners keep a clip of their own; the plan banner on the subscription
      page and the Edition cards each get their own. */
+  /* Alternates that are not in the DOM until they are chosen — same reason
+     as the coupon list above. */
+  window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || [])
+    .concat(['./assets/video/subscription-a.mp4']);
+
   var SWAP = [
+    /* Two clips now, picked per launch — the banner that has always been
+       here, and the new one. Added rather than swapped: the existing clip
+       is the one the banner was designed around. */
     { sel: '#home-nm .nmh-vb-tall video, #home .fash-vb-tall video',
-      vid: V + 'v1785403503/grok_video_2026-07-30-14-44-37_jufhyx.mp4' },
+      vid: [V + 'v1785403503/grok_video_2026-07-30-14-44-37_jufhyx.mp4',
+            './assets/video/subscription-a.mp4'] },
     { sel: '.ss-plan-banner-vid',
       vid: V + 'v1785406071/grok_video_2026-07-30-15-36-45_ihftsp.mp4' },
     /* The Edition section — the card that carries the plan and Upgrade,
@@ -243,7 +281,7 @@
       v.setAttribute('data-nwsb-auto', '');
       v.setAttribute('playsinline', '');
       v.setAttribute('preload', 'none');
-      v.src = COUPON_VID;
+      v.src = nextCouponVid();
       var go = img.getAttribute('onclick');
       if (go) { v.setAttribute('onclick', go); v.style.cursor = 'pointer'; }
       /* The hosts carry `display: block !important`, so hiding the original
@@ -345,10 +383,18 @@
     couponVideo();
 
     SWAP.forEach(function (s) {
+      /* An entry may carry one clip or a list of them. A list is picked from
+         once per launch and then held, so `place()` running again — which it
+         does, several times, to catch late-rendered sections — does not
+         restart the video under the reader with a different one. */
+      if (Array.isArray(s.vid) && s.pick == null) {
+        s.pick = s.vid[Math.floor(Math.random() * s.vid.length)];
+      }
+      var src = s.pick || s.vid;
       document.querySelectorAll(s.sel).forEach(function (v) {
         if (v.tagName !== 'VIDEO') return;
-        if (v.getAttribute('src') === s.vid) return;
-        v.setAttribute('src', s.vid);
+        if (v.getAttribute('src') === src) return;
+        v.setAttribute('src', src);
         try { v.load(); } catch (e) {}
       });
     });

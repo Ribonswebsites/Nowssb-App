@@ -169,33 +169,63 @@
     return '<div class="rm-row-vid"><video data-nwsb-auto muted loop playsinline preload="none" src="' + esc(src) + '"></video></div>';
   }
 
-  /* The two clips the collection is made of — the Word Atelier's and the
-     Meaning Store's, one above each section it belongs to. */
-  var VID_WORDS = 'https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4';
-  var VID_MEANS = 'https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4';
+  /* The shop's own clips. Four of them, one above each of the four rows,
+     plus a coupon clip taken from the app's rotation so the Signature is
+     part of the same run of offers as everywhere else. Local files — they
+     ship with the app and warm into the media cache with everything else. */
+  var SIG_VIDS = [
+    './assets/video/signature-a.mp4',
+    './assets/video/signature-b.mp4',
+    './assets/video/signature-c.mp4',
+    './assets/video/signature-d.mp4'
+  ];
+  /* Only the clips of a screen that has been opened are ever in the DOM, so
+     a scan cannot find these until the reader has already been made to wait
+     for them. Handed to the warmer directly instead. */
+  window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(SIG_VIDS);
+
+  /* Fifteen words and five meanings, split in two so each kind gets two
+     rows rather than one long one — a single row of fifteen is a scroll
+     with no landmarks in it. Split down the middle, larger half first. */
+  function halves(a) {
+    var cut = Math.ceil(a.length / 2);
+    return [a.slice(0, cut), a.slice(cut)];
+  }
 
   function render() {
     var host = document.getElementById('sigSections');
     if (!host) return;
-    var w = words(), m = meanings();
+    var w = halves(words()), m = halves(meanings());
     var html = '';
 
-    html += rowVid(VID_WORDS);
-    html += catBanner(wordImg(), 'Signature Words', 'One per collection — the rarest word each one has');
-    html += '<div class="rm-word-row sig-row">' +
-            (w.length ? w.map(wordCard).join('') : '<div class="sig-empty">No signature words yet.</div>') +
-            '</div>';
+    function wordRow(list, vid, title, sub) {
+      if (!list.length) return '';
+      return rowVid(vid) + catBanner(wordImg(), title, sub) +
+        '<div class="rm-word-row sig-row">' + list.map(wordCard).join('') + '</div>';
+    }
+    function meaningRow(list, vid, title, sub) {
+      if (!list.length) return '';
+      return rowVid(vid) + catBanner(meanImg(), title, sub) +
+        '<div class="ms-grid sig-row">' + list.map(meaningCard).join('') + '</div>';
+    }
 
-    html += rowVid(VID_MEANS);
-    html += catBanner(meanImg(), 'Signature Meanings', 'The full decoded origin, not the base entry');
-    html += '<div class="ms-grid sig-row">' +
-            (m.length ? m.map(meaningCard).join('') : '<div class="sig-empty">No signature meanings yet.</div>') +
-            '</div>';
+    html += wordRow(w[0], SIG_VIDS[0], 'Signature Words',
+                    'One per collection — the rarest word each one has');
+    /* The coupon clip sits between the two word rows, where the app puts a
+       coupon on every other shelf. */
+    html += wordRow(w[1], (window.nwsbNextCouponVid ? window.nwsbNextCouponVid() : SIG_VIDS[1]),
+                    'Signature Words · II', 'The rest of the collection');
+    html += meaningRow(m[0], SIG_VIDS[2], 'Signature Meanings',
+                       'The full decoded origin, not the base entry');
+    html += meaningRow(m[1], SIG_VIDS[3], 'Signature Meanings · II',
+                       'The rest of the collection');
+
+    if (!html) html = '<div class="sig-empty">Nothing in the collection yet.</div>';
 
     host.innerHTML = html;
     syncBadges();
-    /* The two clips are real <video> tags now, so the app's own idle
-       pre-warmer and autoplay handling pick them up like every other. */
+    /* Real <video> tags, so the app's own autoplay handling picks them up
+       like every other clip on every other shelf. */
     if (window.nwsbAutoPlayVideos) { try { window.nwsbAutoPlayVideos(); } catch (e) {} }
   }
   window.sigRenderStore = render;

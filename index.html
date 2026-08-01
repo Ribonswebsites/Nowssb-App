@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=616">
+<link rel="stylesheet" href="nowssb-nm.css?v=617">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -4985,9 +4985,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <div class="sub-body" id="sigSubBody">
 
-    <!-- Banner, the same slot the Word Atelier's slideshow sits in. -->
+    <!-- Banner, the same slot the Word Atelier's slideshow sits in — a clip
+         rather than the still now, like every other banner in the app. -->
     <div class="rm-banner-wrap sig-banner-wrap">
-      <img class="rm-banner-img" src="./assets/signature/nowssb-signature.webp" alt="NowssB Signature" loading="lazy" decoding="async">
+      <video class="rm-banner-img sig-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="./assets/video/signature-b.mp4"></video>
       <div class="sig-banner-scrim"></div>
       <div class="sig-banner-txt">
         <span class="sig-banner-eyebrow">Shabdapathy · The Rarest</span>
@@ -9801,14 +9802,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=7"></script>
-<script src="app/js/part067.js?v=20"></script>
+<script src="app/js/part067.js?v=21"></script>
 <script src="app/js/part068.js?v=4"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
-<script src="app/js/part074.js?v=4"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
+<script src="app/js/part074.js?v=5"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>

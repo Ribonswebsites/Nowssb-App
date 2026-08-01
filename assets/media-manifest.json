@@ -1,8 +1,8 @@
 {
-  "generated": "2026-08-01T08:12:41.979Z",
+  "generated": "2026-08-01T11:45:26.677Z",
   "counts": {
     "audio": 5,
-    "image": 487,
+    "image": 485,
     "video": 61
   },
   "assets": [
@@ -931,7 +931,6 @@
       "kind": "image",
       "local": "image/de714c20-5dca-11f1-ac3a-211030203a65_royz93-91d9b498.png",
       "refs": [
-        "app/app.css",
         "index.html"
       ]
     },
@@ -1580,14 +1579,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_0000000076c48208b433925b357e3f72_g4tfmf.png",
-      "kind": "image",
-      "local": "image/file_0000000076c48208b433925b357e3f72_g4tfmf-5a7b9e8e.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000316/file_00000000786c82079f31ed572d4ad3f4_gdyf0r.png",
       "kind": "image",
       "local": "image/file_00000000786c82079f31ed572d4ad3f4_gdyf0r-8588420c.png",
@@ -2021,14 +2012,6 @@
       "local": "image/file_00000000ee688208950f4126ed15d9b3_esohnw-708c96dd.png",
       "refs": [
         "app/js/part017.js"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069853/file_00000000ee9482079592b5380d196d89_sd8ucv.png",
-      "kind": "image",
-      "local": "image/file_00000000ee9482079592b5380d196d89_sd8ucv-8536344c.png",
-      "refs": [
-        "index.html"
       ]
     },
     {
@@ -2931,7 +2914,6 @@
       "kind": "image",
       "local": "image/grok_image_1778322076841_rdsqad-ad1007d8.jpg",
       "refs": [
-        "app/app.css",
         "index.html"
       ]
     },
