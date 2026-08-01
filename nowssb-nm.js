@@ -265,10 +265,42 @@
     }).join('');
   }
 
-  /* Tap a trending/offer card → open the store */
+  /* ── Tapping a trending or offer banner ────────────────────────────
+     These banners name a word — "SURYA", "heals heart" — so a tap on one
+     should land on that word, not on the shop's front door with the word
+     forgotten. It used to park the name in _nwsbStoreTargetWord and open
+     the store; nothing ever read that variable back, so the name was
+     thrown away every time and every banner went to the same place.
+
+     The Word Atelier already knows how to open straight onto a word —
+     it is what the coupon pages do (couponOpenWordDetail, part055.js) —
+     so this does the same thing rather than inventing a second route.
+     Anything it cannot open still falls back to the store, which is
+     where it used to go. ── */
   window.nwsbOpenStoreWord = function (word) {
-    window._nwsbStoreTargetWord = word || null;
+    var key = String(word == null ? '' : word).trim().toLowerCase();
+    window._nwsbStoreTargetWord = key || null;
+
+    if (key && typeof loadWordOrigin === 'function') {
+      if (typeof nssOpenSub === 'function') nssOpenSub('real-meaning');
+      else if (typeof openSub === 'function') openSub('real-meaning');
+      /* The Atelier opens on its intro; the tap already chose a word. */
+      if (typeof rmSkipIntro === 'function') { try { rmSkipIntro(); } catch (e) {} }
+      try { loadWordOrigin(key); return; } catch (e) { /* fall through */ }
+    }
     if (typeof openSub === 'function') openSub('nowssb-store');
+  };
+
+  /* The Shop Now banner rotates through five words on a timer, so which
+     word a tap means is whatever it is showing at that moment. Read it off
+     the banner itself rather than tracking an index — the banner is the
+     thing the reader is looking at. */
+  window.nwsbTrendShopTap = function (el) {
+    var banner = el && (el.closest ? el.closest('.nmh-trend-shop-banner') : null);
+    var w = banner && banner.querySelector('.nmh-trend-shop-word');
+    var word = w && w.textContent && w.textContent.trim();
+    if (word) window.nwsbOpenStoreWord(word);
+    else if (typeof openSub === 'function') openSub('nowssb-store');
   };
 
   function renderHomeExtras() { renderTrending(); renderOffers(); }

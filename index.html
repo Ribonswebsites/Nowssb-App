@@ -1239,7 +1239,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Trending Shop: the clip goes in at the top by app/js/part067.js,
          the Shop Now banner sits under it. -->
     <div class="nmh-sec-wrap nmh-trend-shop-wrap">
-    <div class="nmh-trend-shop-banner" id="nmh-trending-shop-banner" onclick="openSub('nowssb-store')">
+    <div class="nmh-trend-shop-banner" id="nmh-trending-shop-banner" onclick="nwsbTrendShopTap(this)">
       <div class="nmh-trend-shop-logo">
         <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="Store">
       </div>
@@ -1248,7 +1248,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nmh-trend-shop-word" id="nmh-trending-shop-word"></div>
       </div>
       <div class="nmh-trend-shop-divider"></div>
-      <button class="nmh-trend-shop-btn" onclick="event.stopPropagation();openSub('nowssb-store')">
+      <button class="nmh-trend-shop-btn" onclick="event.stopPropagation();nwsbTrendShopTap(this)">
         <svg class="nmh-trend-shop-cart" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.3l1.9 12a1.4 1.4 0 0 0 1.4 1.2h9.4a1.4 1.4 0 0 0 1.4-1.1L21 8H6"/></svg>
         Shop Now
       </button>
@@ -1788,7 +1788,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- The store clip and its Shop Now banner, in a wrapper of its own.
        app/js/part067.js drops the clip in above the banner. -->
   <div class="glass-wrap fash-storevid-wrap">
-  <div class="nmh-trend-shop-banner fash-trend-shop-banner" id="nmh-trending-shop-banner-fash" onclick="openSub('nowssb-store')">
+  <div class="nmh-trend-shop-banner fash-trend-shop-banner" id="nmh-trending-shop-banner-fash" onclick="nwsbTrendShopTap(this)">
     <div class="nmh-trend-shop-logo">
       <img decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="Store">
     </div>
@@ -1797,7 +1797,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="nmh-trend-shop-word" id="nmh-trending-shop-word-fash"></div>
     </div>
     <div class="nmh-trend-shop-divider"></div>
-    <button class="nmh-trend-shop-btn" onclick="event.stopPropagation();openSub('nowssb-store')">
+    <button class="nmh-trend-shop-btn" onclick="event.stopPropagation();nwsbTrendShopTap(this)">
       <svg class="nmh-trend-shop-cart" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.3l1.9 12a1.4 1.4 0 0 0 1.4 1.2h9.4a1.4 1.4 0 0 0 1.4-1.1L21 8H6"/></svg>
       Shop Now
     </button>
@@ -9736,7 +9736,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
 <script src="app/js/part074.js?v=1"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
-<script src="nowssb-nm.js?v=178" defer></script>
+<script src="nowssb-nm.js?v=179" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>
 
 </body>
