@@ -9822,3 +9822,152 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 @media (prefers-reduced-motion: reduce) {
   .streak-vid .stv-w { animation: none; opacity: 1; transform: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   NOWSSB SIGNATURE — the third library in the store.
+
+   Deliberately the two sections above it, combined. The frame is theirs
+   exactly — 9/16, the same inset, the same 18px corner — so it reads as a
+   third of the same thing rather than a different component. What changes
+   is the light: gold instead of white, both clips instead of one, and a
+   slow sheen across the card that nothing else in the store has, because
+   this is the shelf you are meant to stop at.
+   ══════════════════════════════════════════════════════════════════ */
+.sig-store-section {
+  position: relative; aspect-ratio: 9 / 16; height: auto; overflow: hidden;
+  width: calc(100% - 32px); margin: 20px 16px 0;
+  border-radius: 18px; background: #060c18;
+  border: 1.5px solid rgba(232,213,163,0.42);
+  /* The gold bloom is what says "signature" from across the page — the
+     same glow the signature cards carry, scaled up to a section. */
+  box-shadow: 0 18px 48px rgba(0,0,0,0.55), 0 0 34px rgba(232,213,163,0.18);
+}
+/* Both clips, stacked. B fades in over A on a timer (app/js/part074.js). */
+.sig-store-video {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+  position: absolute; inset: 0; z-index: 0;
+}
+.sig-store-video.sig-vid-b { opacity: 0; transition: opacity 1.5s ease; }
+.sig-store-video.sig-vid-b.on { opacity: 1; }
+
+/* Warmer than the white sections': the same shape of gradient with gold
+   worked through it, so the clips underneath read as gilded rather than
+   colour-shifted. */
+.sig-store-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(160deg, rgba(3,8,20,0.14) 0%, rgba(4,12,28,0.06) 38%, rgba(3,8,20,0.62) 100%),
+    linear-gradient(to bottom, rgba(232,213,163,0.10) 0%, transparent 34%, rgba(232,213,163,0.07) 100%);
+}
+.sig-store-overlay::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 280px;
+  background: linear-gradient(to bottom, transparent, rgba(6,12,24,0.96));
+}
+/* One slow pass of light, edge to edge. Long and faint on purpose — a fast
+   or bright sweep on a 9/16 card reads as a loading shimmer. */
+.sig-store-shine {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.13) 48%,
+              rgba(232,213,163,0.20) 50%, rgba(255,255,255,0.13) 52%, transparent 62%);
+  transform: translateX(-115%);
+  animation: sigShine 7.5s ease-in-out infinite;
+}
+@keyframes sigShine {
+  0%, 62% { transform: translateX(-115%); }
+  92%, 100% { transform: translateX(115%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sig-store-shine { animation: none; opacity: 0; }
+  .sig-store-video.sig-vid-b { transition: none; }
+}
+
+.sig-store-content {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 24px 32px;
+}
+.sig-store-eyebrow { color: #f5e6c8; text-shadow: 0 1px 14px rgba(0,0,0,0.8); }
+.sig-store-title-bold {
+  color: #f5e6c8;
+  text-shadow: 0 2px 32px rgba(0,0,0,0.9), 0 0 30px rgba(232,213,163,0.28);
+}
+.sig-store-section .ws-store-eyebrow-wrap { z-index: 4; }
+
+.sig-store-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+.sig-chip {
+  font-family: 'DM Sans', sans-serif; font-size: 7px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: rgba(245,230,200,0.9);
+  background: rgba(232,213,163,0.13); border: 1px solid rgba(232,213,163,0.4);
+  padding: 5px 11px;
+}
+/* Gold button rather than the white one the other two use — same shape. */
+.sig-store-btn {
+  background: linear-gradient(135deg, #f0dfb4, #e8d5a3 55%, #d4bd85) !important;
+  box-shadow: 0 8px 24px rgba(232,213,163,0.28);
+}
+
+/* ── The rail ──────────────────────────────────────────────────────
+   Both kinds of signature behind one toggle. Word cards and meaning
+   cards are different shapes by design (148px portrait vs 3/4), so the
+   rail sizes the meaning card to match rather than letting the row
+   change height when the toggle flips. */
+.sig-rail-wrap { padding: 22px 0 4px; }
+.sig-rail-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 0 20px 12px;
+}
+.sig-toggle {
+  display: flex; gap: 6px; flex-shrink: 0;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px !important; padding: 3px;
+}
+/* app.css floors every button at 44px tall, which would make this pill the
+   height of a card. */
+.sig-toggle-btn {
+  height: 28px !important; min-height: 28px !important;
+  padding: 0 14px; border: none; cursor: pointer;
+  background: transparent; border-radius: 999px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); transition: background 0.18s, color 0.18s;
+}
+.sig-toggle-btn.active { background: rgba(232,213,163,0.9); color: #060c18; }
+
+.sig-rail {
+  display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  padding: 4px 20px 18px; scrollbar-width: none;
+}
+.sig-rail::-webkit-scrollbar { display: none; }
+/* One box for both kinds. A word card takes its height from its image
+   loading (.rm-word-card-img is height:auto), and a meaning card from a
+   3/4 aspect authored for a grid — so left alone the rail would be one
+   height before the images arrived, another after, and a third when the
+   toggle flipped. Pinned here instead, and the art is cropped to fit. */
+.sig-rail .sig-card {
+  flex-shrink: 0; scroll-snap-align: start;
+  width: 148px; height: 197px; aspect-ratio: auto;
+  border-radius: 0 !important;
+}
+.sig-rail .rm-word-card-signature .rm-word-card-img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+/* The body sits over the bottom of the art rather than under it, now that
+   the card no longer grows to fit both. */
+.sig-rail .rm-word-card-signature .rm-word-card-body {
+  position: absolute; bottom: 0; left: 0; right: 0;
+}
+.sig-empty {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,0.35); padding: 18px 2px;
+}
+
+/* Hairlines between the Normal home's three header buttons — the same
+   separator the Fashion header uses (.hdr-rule), darkened for a light
+   surface. Sits between the neumorphic discs rather than around them, so
+   the group reads as one strip. */
+.nmh-hdr-rule {
+  width: 1px; height: 22px; flex-shrink: 0;
+  background: rgba(26,26,46,0.16);
+}
+#home-nm.nm-dark .nmh-hdr-rule { background: rgba(255,255,255,0.18); }

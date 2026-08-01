@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=604">
+<link rel="stylesheet" href="nowssb-nm.css?v=607">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -761,13 +761,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <!-- Customize used to be a fourth button here. Four buttons pushed
            "NOWSBANSIU EDITION" under the group and clipped it, and the panel
            further down this page already opens the same hub with room to say
-           what it is. So it lives there now, not up here. -->
+           what it is. So it lives there now, not up here.
+           The hairlines are the Fashion header's, so the two read as the
+           same control strip rather than two different ones. -->
+      <span class="nmh-hdr-rule"></span>
       <button class="nmh-settings-btn" id="nmhSettingsBtn" onclick="openSub('social')" title="Settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
         </svg>
       </button>
+      <span class="nmh-hdr-rule"></span>
       <button class="nmh-settings-btn" id="nmhFashionBtn" onclick="localStorage.setItem('nwsb_home_mode','home');goTo('home')" title="Fashion Mode">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/>
@@ -1057,7 +1061,30 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 
-         header opens the full Customize hub (app/js/part063.js). -->
+
+    <!-- Today's Trending sits directly above Customize; part062.js REG order
+         is what decides this at runtime, so the two must stay in step. -->
+    <!-- Today's Trending: its clip, with its black banner under it. -->
+    <div class="nmh-sec-wrap nmh-trend-wrap">
+    <div class="nmh-trend-banner" id="nmh-trending-section" onclick="openSub('nowssb-store')">
+      <video class="nmh-trend-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
+      <div class="nmh-trend-banner-fade"></div>
+      <div class="nmh-trend-banner-text" id="nmh-trending-text"></div>
+    </div>
+    <div class="nmh-sec-banner" onclick="openSub('nowssb-store')">
+      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-txt">
+        <div class="nmh-sec-banner-title">Today's Trending</div>
+        <div class="nmh-sec-banner-sub">See which words are healing the most people right now</div>
+      </div>
+      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    </div><!-- /nmh-trend-wrap -->
+
+    <!-- Customize panel — Quick Access, Quick Links and Set As You Like in
+         one card instead of three banners scattered down the page. Tapping
+         the header opens the full Customize hub (app/js/part063.js). -->
     <div class="cust-panel nmh-cust-panel">
       <div class="cust-panel-head" onclick="cuOpen()">
         <div class="cust-panel-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>
@@ -1208,23 +1235,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Section label — black banner -->
     <!-- Today's Trending: its black banner, its clip and the Shop Now
          banner are one block. -->
-    <!-- Today's Trending: its clip, with its black banner under it. -->
-    <div class="nmh-sec-wrap nmh-trend-wrap">
-    <div class="nmh-trend-banner" id="nmh-trending-section" onclick="openSub('nowssb-store')">
-      <video class="nmh-trend-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
-      <div class="nmh-trend-banner-fade"></div>
-      <div class="nmh-trend-banner-text" id="nmh-trending-text"></div>
-    </div>
-    <div class="nmh-sec-banner" onclick="openSub('nowssb-store')">
-      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="nmh-sec-banner-divider"></div>
-      <div class="nmh-sec-banner-txt">
-        <div class="nmh-sec-banner-title">Today's Trending</div>
-        <div class="nmh-sec-banner-sub">See which words are healing the most people right now</div>
-      </div>
-      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-    </div><!-- /nmh-trend-wrap -->
 
     <!-- Trending Shop: the clip goes in at the top by app/js/part067.js,
          the Shop Now banner sits under it. -->
@@ -1370,9 +1380,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
     </div><!-- /nmh-store-wrap -->
-
-    <!-- Customize panel — Quick Access, Quick Links and Set As You Like in one
-         glass card instead of three banners scattered down the page. Tapping the
 
     <!-- Switch to Fashion Mode section -->
     <div id="nmhFashSwitch" onclick="localStorage.setItem('nwsb_home_mode','home');goTo('home')" style="width:100%;margin-top:16px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
@@ -1704,6 +1711,33 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   </div>
 
+
+    <!-- Today's Trending sits directly above Customize; part062.js REG order
+       is what decides this at runtime, so the two must stay in step. -->
+  <!-- Today's Trending and the word banner under it, in one glass wrapper. -->
+  <div class="glass-wrap trend-wrap fash-trend-wrap">
+  <!-- Today Trending — video banner (fashion) -->
+  <div class="nmh-trend-banner fash-trend-banner" id="nmh-trending-section-fash" onclick="openSub('nowssb-store')">
+    <video class="nmh-trend-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
+    <div class="nmh-trend-banner-fade"></div>
+    <div class="nmh-trend-banner-text" id="nmh-trending-text-fash"></div>
+  </div>
+
+  <!-- The black banner that names the section, the same one the Normal
+       home carries here. The Shop Now banner belongs to the store clip
+       below — it was sitting on this wrapper, which left Trending
+       advertising the store and the store clip with no banner at all. -->
+  <div class="nmh-sec-banner" onclick="openSub('nowssb-store')">
+    <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="nmh-sec-banner-divider"></div>
+    <div class="nmh-sec-banner-txt">
+      <div class="nmh-sec-banner-title">Today's Trending</div>
+      <div class="nmh-sec-banner-sub">See which words are healing the most people right now</div>
+    </div>
+    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  </div>
+
   <!-- Customize panel — Quick Access, Quick Links and Set As You Like in one
        glass card instead of three banners scattered down the page. Tapping the
        header opens the full Customize hub (app/js/part063.js). -->
@@ -1750,29 +1784,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
   </div>
 
-  <!-- Today's Trending and the word banner under it, in one glass wrapper. -->
-  <div class="glass-wrap trend-wrap fash-trend-wrap">
-  <!-- Today Trending — video banner (fashion) -->
-  <div class="nmh-trend-banner fash-trend-banner" id="nmh-trending-section-fash" onclick="openSub('nowssb-store')">
-    <video class="nmh-trend-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4"></video>
-    <div class="nmh-trend-banner-fade"></div>
-    <div class="nmh-trend-banner-text" id="nmh-trending-text-fash"></div>
-  </div>
-
-  <!-- The black banner that names the section, the same one the Normal
-       home carries here. The Shop Now banner belongs to the store clip
-       below — it was sitting on this wrapper, which left Trending
-       advertising the store and the store clip with no banner at all. -->
-  <div class="nmh-sec-banner" onclick="openSub('nowssb-store')">
-    <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M3 17l4-5 4 2 5-7 3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="nmh-sec-banner-divider"></div>
-    <div class="nmh-sec-banner-txt">
-      <div class="nmh-sec-banner-title">Today's Trending</div>
-      <div class="nmh-sec-banner-sub">See which words are healing the most people right now</div>
-    </div>
-    <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  </div>
-  </div>
 
   <!-- The store clip and its Shop Now banner, in a wrapper of its own.
        app/js/part067.js drops the clip in above the banner. -->
@@ -4715,7 +4726,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <span class="nss-banner-title-light">The</span>
           <span class="nss-banner-title-bold"> NowssB Store</span>
         </div>
-        <div class="nss-banner-sub">Word Library · Meaning Library · Healing Collections</div>
+        <div class="nss-banner-sub">Word Library · Meaning Library · NowssB Signature</div>
       </div>
     </div>
 
@@ -4731,7 +4742,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="position:absolute;top:0;left:0;right:0;height:40px;background:linear-gradient(to top,transparent,rgba(6,12,24,0.55));pointer-events:none;"></div>
     </div>
 
-    <!-- ── TWO LIBRARY SECTIONS ── -->
+    <!-- ── THREE LIBRARY SECTIONS — Words, Meanings, and the Signature ── -->
     <div class="nss-sections">
 
       <!-- ══ WORD LIBRARY SECTION ══ -->
@@ -4815,6 +4826,66 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             </div>
           </div>
         </div><!-- /Meaning Library -->
+
+      <!-- ══ NOWSSB SIGNATURE ══
+           The third library. Both of the sections above meet here: the Word
+           Atelier's clip and the Meaning Store's clip crossfade behind one
+           card, and the rail below carries both kinds of signature — the
+           fifteen signature words and the five signature meanings, each with
+           the gold product shot that already belongs to it. Rendered by
+           app/js/part074.js from the same RM_SIGNATURE_WORDS / MS_SIGNATURE
+           maps the Signature coupon page uses, so the two can never list
+           different things. ══ -->
+      <div class="sig-store-section" id="sigStoreSection">
+        <video class="sig-store-video sig-vid-a" data-nwsb-auto muted loop playsinline preload="none" id="sigVidWord">
+          <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4" type="video/mp4">
+        </video>
+        <video class="sig-store-video sig-vid-b" data-nwsb-auto muted loop playsinline preload="none" id="sigVidMeaning">
+          <source src="https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4" type="video/mp4">
+        </video>
+        <div class="sig-store-overlay"></div>
+        <div class="sig-store-shine" aria-hidden="true"></div>
+
+        <div class="ws-store-eyebrow-wrap">
+          <span class="ws-store-eyebrow sig-store-eyebrow"><span style="font-weight:800;">THE</span> <span style="font-weight:800;">NOWSSB</span> <span style="font-weight:200;">SIGNATURE</span></span>
+        </div>
+
+        <div class="sig-store-content">
+          <div class="ws-store-text-block">
+            <div class="ws-store-title">
+              <span class="ws-store-title-light">The Rarest</span><br>
+              <span class="ws-store-title-bold sig-store-title-bold">Words &amp; Meanings</span>
+            </div>
+          </div>
+          <div class="ws-store-btn-wrap">
+            <div class="ws-store-sub">One signature per category — the most exclusive word and the most exclusive meaning each collection has. Owned once, never restocked.</div>
+            <div class="sig-store-chips">
+              <span class="sig-chip">15 Signature Words</span>
+              <span class="sig-chip">5 Signature Meanings</span>
+              <span class="sig-chip">50% Bundle</span>
+            </div>
+            <button class="ws-store-btn sig-store-btn" onclick="event.stopPropagation();sigBrowseAll()">
+              <span>Browse The Signature</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div><!-- /NowssB Signature hero -->
+
+      <!-- The rail: both kinds, one toggle. -->
+      <div class="sig-rail-wrap">
+        <div class="sig-rail-head">
+          <span class="sub-section-label">The Signature Collection</span>
+          <div class="sig-toggle">
+            <button class="sig-toggle-btn active" id="sigToggleWords" onclick="sigTab('words')">Words</button>
+            <button class="sig-toggle-btn" id="sigToggleMeanings" onclick="sigTab('meanings')">Meanings</button>
+          </div>
+        </div>
+        <div class="sig-rail" id="sigWordsRail"><!-- rendered by app/js/part074.js --></div>
+        <div class="sig-rail" id="sigMeaningsRail" style="display:none;"><!-- rendered by app/js/part074.js --></div>
+      </div>
 
       <!-- ══ MORE TO EXPLORE — Verification, Ebooks, Subscription ══ -->
       <div style="padding:24px 20px 4px;">
@@ -9651,7 +9722,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=21"></script>
+<script src="app/js/part062.js?v=22"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>
@@ -9663,6 +9734,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
+<script src="app/js/part074.js?v=1"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=178" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>
