@@ -558,6 +558,29 @@ body::before {
     <div id="pnResult" style="font-size:12px;line-height:1.6;color:rgba(200,232,245,0.8);margin-top:12px;"></div>
   </div>
 
+  <!-- ══ PEOPLE ══
+       Everyone, who is here now, and what they are on. ══ -->
+  <div class="sec-label" style="margin-top:40px;">PEOPLE</div>
+  <div class="greeting-stats" style="padding:0 16px;margin-top:0;">
+    <div class="stat-chip"><div class="stat-num" id="pplTotal">—</div><div class="stat-lbl">People</div></div>
+    <div class="stat-chip"><div class="stat-num" id="pplLive">—</div><div class="stat-lbl">Here now</div></div>
+    <div class="stat-chip"><div class="stat-num" id="pplPro">—</div><div class="stat-lbl">Subscribed</div></div>
+  </div>
+  <div class="form-wrap" style="margin-top:14px;">
+    <div class="field" style="margin-bottom:10px;">
+      <label>Find someone</label>
+      <input type="text" id="pplFind" placeholder="name, email or uid" oninput="pplRender()">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+      <button class="rec-action-btn" onclick="pplLoad()">Refresh</button>
+      <button class="rec-action-btn" id="pplOnlyLive" onclick="pplToggleLive()">Only here now</button>
+      <button class="rec-action-btn" id="pplOnlyPro" onclick="pplTogglePro()">Only subscribed</button>
+    </div>
+  </div>
+  <div class="word-list-wrap" id="pplList">
+    <div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">Loading…</div>
+  </div>
+
   <!-- ══ USER ACCESS CONTROL ══ -->
   <div class="sec-label" style="margin-top:40px;">USER ACCESS CONTROL</div>
   <div class="form-wrap">
@@ -1154,7 +1177,7 @@ window.adminSignOut = async function () {
 /* A reload should not mean signing in again, but it must not mean trusting
    the last session either — the list is re-checked every time. */
 onAuthStateChanged(_auth, async (user) => {
-  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); watchRequests(); catLoad(); }
+  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); watchRequests(); catLoad(); pplLoad(); }
   else closeStudio();
 });
 
@@ -1422,6 +1445,146 @@ window.catPublishAll = async function () {
   } finally {
     btn.disabled = false; btn.textContent = 'Publish to the app';
   }
+};
+
+/* ══ PEOPLE ══════════════════════════════════════════════════════════
+   Everyone in the users collection, with what the app already honours:
+   isPro and tier decide what they can reach, blocked shuts them out —
+   both are read by firebase.module.js, so a change here is real rather
+   than cosmetic.
+
+   "Here now" is recency, not a live socket: app/js/part071.js stamps
+   lastSeen while somebody has the app open, and anything inside ten
+   minutes counts. Somebody who has never opened the app since this
+   shipped has no stamp at all and simply reads as unknown — absence of
+   evidence, which is why it says "here now" rather than "online".
+   ── */
+const LIVE_WINDOW = 10 * 60 * 1000;
+let _ppl = [];
+let _pplLive = false, _pplPro = false;
+
+function ago(ts) {
+  if (!ts) return 'never seen';
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return 'here now';
+  const m = Math.floor(s / 60); if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60); if (h < 24) return h + 'h ago';
+  const d = Math.floor(h / 24); return d + 'd ago';
+}
+const isLive = (u) => u.lastSeen && (Date.now() - u.lastSeen) < LIVE_WINDOW;
+
+window.pplLoad = async function () {
+  const wrap = document.getElementById('pplList');
+  try {
+    const snap = await getDocs(collection(_db, 'users'));
+    _ppl = [];
+    snap.forEach(d => _ppl.push({ uid: d.id, ...d.data() }));
+    _ppl.sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+    document.getElementById('pplTotal').textContent = _ppl.length;
+    document.getElementById('pplLive').textContent = _ppl.filter(isLive).length;
+    document.getElementById('pplPro').textContent = _ppl.filter(u => u.isPro).length;
+    pplRender();
+  } catch (e) {
+    if (wrap) wrap.innerHTML = '<div style="color:rgba(220,80,80,0.8);font-size:13px;padding:4px 2px;">Could not read people — are the rules published and is this account an admin?</div>';
+  }
+};
+
+window.pplToggleLive = function () {
+  _pplLive = !_pplLive;
+  document.getElementById('pplOnlyLive').style.opacity = _pplLive ? '1' : '0.55';
+  pplRender();
+};
+window.pplTogglePro = function () {
+  _pplPro = !_pplPro;
+  document.getElementById('pplOnlyPro').style.opacity = _pplPro ? '1' : '0.55';
+  pplRender();
+};
+
+window.pplRender = function () {
+  const wrap = document.getElementById('pplList');
+  if (!wrap) return;
+  const q = (document.getElementById('pplFind').value || '').trim().toLowerCase();
+  let rows = _ppl;
+  if (_pplLive) rows = rows.filter(isLive);
+  if (_pplPro) rows = rows.filter(u => u.isPro);
+  if (q) rows = rows.filter(u =>
+    (u.email || '').toLowerCase().includes(q) ||
+    (u.name || u.displayName || '').toLowerCase().includes(q) ||
+    u.uid.toLowerCase().includes(q));
+
+  if (!rows.length) {
+    wrap.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">Nobody matches.</div>';
+    return;
+  }
+  wrap.innerHTML = rows.slice(0, 200).map(u => {
+    const live = isLive(u);
+    const plan = u.isPro ? (u.tier || 'subscribed') : 'free';
+    return '<div class="wl-card">' +
+      '<span class="wl-status ' + (u.blocked ? 'rejected' : live ? 'approved' : 'pending') + '">' +
+        (u.blocked ? 'Blocked' : live ? 'Here now' : plan) + '</span>' +
+      '<div class="wl-name" style="letter-spacing:0;">' + esc(u.name || u.displayName || u.email || 'Unnamed') + '</div>' +
+      '<div class="wl-phonetic">' + esc(u.email || '—') + '</div>' +
+      '<div class="wl-meta">' + esc(u.uid) + ' · ' + ago(u.lastSeen) +
+        (u.lastPlatform ? ' · ' + esc(u.lastPlatform) + (u.lastStandalone ? ' app' : ' browser') : '') +
+        ' · ' + esc(plan) + '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
+        (u.isPro
+          ? '<button class="rec-action-btn" onclick="pplSub(\'' + u.uid + '\',false)">Revoke</button>'
+          : '<button class="rec-action-btn" onclick="pplSub(\'' + u.uid + '\',true)">Give subscription</button>') +
+        '<button class="rec-action-btn" onclick="pplBlock(\'' + u.uid + '\',' + (!u.blocked) + ')">' +
+          (u.blocked ? 'Unblock' : 'Block') + '</button>' +
+        '<button class="rec-action-btn" onclick="pplRemove(\'' + u.uid + '\')">Remove</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+};
+
+function pplPatch(uid, patch) {
+  const u = _ppl.find(x => x.uid === uid);
+  if (u) Object.assign(u, patch);
+  document.getElementById('pplPro').textContent = _ppl.filter(x => x.isPro).length;
+  pplRender();
+}
+
+window.pplSub = async function (uid, on) {
+  try {
+    await setDoc(doc(_db, 'users', uid), on
+      ? { isPro: true, tier: 'frequency', subscriptionType: 'admin_grant',
+          subscriptionGrantedAt: new Date().toISOString(), subscriptionGrantedBy: 'Studio' }
+      : { isPro: false, tier: null, subscriptionType: null },
+      { merge: true });
+    pplPatch(uid, on ? { isPro: true, tier: 'frequency' } : { isPro: false, tier: null });
+    if (window.showToast) window.showToast(on ? 'Subscription given' : 'Subscription revoked');
+  } catch (e) { if (window.showToast) window.showToast('Could not change that', true); }
+};
+
+window.pplBlock = async function (uid, block) {
+  try {
+    await setDoc(doc(_db, 'users', uid), {
+      blocked: block, blockedAt: block ? new Date().toISOString() : null,
+      blockedBy: block ? 'Studio' : null,
+    }, { merge: true });
+    pplPatch(uid, { blocked: block });
+    if (window.showToast) window.showToast(block ? 'Blocked' : 'Unblocked');
+  } catch (e) { if (window.showToast) window.showToast('Could not change that', true); }
+};
+
+/* Removing deletes what this app knows about somebody. It does NOT delete
+   their Firebase sign-in — no page can do that for another account; it
+   needs the Admin SDK on a server. So the account is blocked first and
+   then its record is dropped: blocked is what the app actually enforces,
+   so they are locked out either way, and without the flag a deleted
+   record would simply be recreated the next time they opened the app. */
+window.pplRemove = async function (uid) {
+  if (!confirm('Remove this person?\n\nThey are blocked and their record is deleted. Their Google/email sign-in still exists — delete that in Firebase console → Authentication if you want it gone entirely.')) return;
+  try {
+    await setDoc(doc(_db, 'users', uid), { blocked: true, removedAt: new Date().toISOString() }, { merge: true });
+    await deleteDoc(doc(_db, 'users', uid));
+    _ppl = _ppl.filter(x => x.uid !== uid);
+    document.getElementById('pplTotal').textContent = _ppl.length;
+    pplRender();
+    if (window.showToast) window.showToast('Removed');
+  } catch (e) { if (window.showToast) window.showToast('Could not remove that', true); }
 };
 
 /* The studio wants permission too — it is the thing being notified here. */
