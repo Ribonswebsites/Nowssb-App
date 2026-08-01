@@ -10169,3 +10169,99 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 300;
   color: rgba(255,255,255,0.35); line-height: 1.6; margin-top: 14px;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   STORE INTRO ART — the three key-art backgrounds.
+
+   These are full-bleed portrait renders with their own wordmark across
+   the bottom third, and each intro page then sets its OWN title, blurb
+   and Enter button over the top of them. Two things had to change.
+
+   The scrim. .nss-intro-vignette is display:none — the store intro has
+   never had one, because the art it used to carry was near-black where
+   the copy sits. And nowssb-nm.css already cut .sl-intro-vignette back
+   to a top fade only. So all three pages were putting white text
+   straight onto a lit render. Each gets a bottom wash sized to the copy.
+
+   The framing. Anchored to the top rather than centred, so what shows is
+   the bag and the splash — the part with no type in it — and the art's
+   own wordmark falls into the darkened zone instead of colliding with
+   the page's headline.
+   ══════════════════════════════════════════════════════════════════ */
+#nssIntroPage .nss-intro-img,
+#rmIntroPage .rm-intro-bg,
+#msIntroPage .ms-intro-bg {
+  background-position: center top !important;
+  background-size: cover !important;
+}
+
+/* One wash, three pages. Transparent across the art, solid under the
+   words — the stop at 46% is where the copy block starts on the shortest
+   phone these run on. */
+#nssIntroPage .nss-intro-vignette,
+#rmIntroPage .rm-intro-vignette,
+#msIntroPage .sl-intro-vignette {
+  display: block !important;
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(6,12,24,0.55) 0%,
+    rgba(6,12,24,0.10) 16%,
+    rgba(6,12,24,0.06) 34%,
+    rgba(6,12,24,0.62) 52%,
+    rgba(6,12,24,0.92) 68%,
+    rgba(6,12,24,0.985) 84%,
+    #060c18 100%) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   THE SIGNATURE INTRO — the way into the third shop.
+
+   Structurally the Word Atelier's intro: an absolutely-positioned cover
+   over the shop, faded out by a class rather than removed, so Enter is a
+   dissolve and coming back is instant. Gold where the other two are
+   white, because that is the only thing that separates this shop from
+   them.
+   ══════════════════════════════════════════════════════════════════ */
+.sig-intro-page {
+  position: absolute; inset: 0; z-index: 30;
+  display: flex; flex-direction: column;
+  background: #060c18; overflow: hidden;
+  transition: opacity 0.48s cubic-bezier(0.4,0,0.2,1);
+}
+.sig-intro-page.sig-intro-hidden { opacity: 0; pointer-events: none; }
+
+.sig-intro-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: url('./assets/store/intro-signature.webp');
+  background-size: cover; background-position: center top;
+  background-repeat: no-repeat;
+  animation: slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);
+}
+/* The art carries its own "The Signature" script across the lower third,
+   and the page then sets its own title over the top of it. Same wash as
+   the other three intros: clear across the render, solid under the words. */
+.sig-intro-vignette {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(6,12,24,0.55) 0%,
+    rgba(6,12,24,0.10) 16%,
+    rgba(6,12,24,0.06) 34%,
+    rgba(6,12,24,0.62) 52%,
+    rgba(6,12,24,0.92) 68%,
+    rgba(6,12,24,0.985) 84%,
+    #060c18 100%);
+}
+.sig-intro-page .sl-intro-top,
+.sig-intro-page .sl-intro-bottom { position: relative; z-index: 2; }
+
+.sig-intro-tag { color: #f5e6c8 !important; border-color: rgba(232,213,163,0.4) !important; }
+.sig-intro-eyebrow { color: rgba(245,230,200,0.85) !important; }
+.sig-intro-title span, .sig-intro-title { color: #fff; }
+.sig-intro-divider { background: rgba(232,213,163,0.55) !important; }
+/* Gold Enter, matching the shop it opens. */
+.sig-intro-enter {
+  background: linear-gradient(135deg, #f0dfb4, #e8d5a3 55%, #d4bd85) !important;
+  border-color: rgba(232,213,163,0.9) !important;
+  box-shadow: 0 10px 30px rgba(232,213,163,0.26);
+}
+.sig-intro-enter .sl-intro-enter-label { color: #060c18 !important; }

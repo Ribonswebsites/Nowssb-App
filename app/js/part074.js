@@ -201,15 +201,25 @@
     else if (typeof openSub === 'function') openSub('checkout');
   };
 
-  /* ── Opening and closing the shop ──────────────────────────────────── */
+  /* ── Opening and closing the shop ──────────────────────────────────
+     It opens on its intro, like the Word Atelier and the Meaning Store
+     do, and the intro is shown again on every visit rather than once —
+     it is the shop's cover, not an onboarding step. ── */
   window.sigOpenStore = function () {
     var s = document.getElementById('sub-signature-store');
     if (!s) return;
     render();
     window.sigTab('words');
+    var intro = document.getElementById('sigIntroPage');
+    if (intro) intro.classList.remove('sig-intro-hidden');
     s.classList.add('open');
     crossfade(true);
     try { if (navigator.vibrate) navigator.vibrate(22); } catch (e) {}
+  };
+  window.sigEnterStore = function () {
+    var intro = document.getElementById('sigIntroPage');
+    if (intro) intro.classList.add('sig-intro-hidden');
+    try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
   };
   window.sigCloseStore = function () {
     var s = document.getElementById('sub-signature-store');

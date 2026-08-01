@@ -104,9 +104,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- Firebase -->
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
-<link rel="stylesheet" href="app/app.css?v=311">
+<link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=610">
+<link rel="stylesheet" href="nowssb-nm.css?v=612">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -4601,7 +4601,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- ── INTRO PAGE ── -->
   <div class="nss-intro-page" id="nssIntroPage">
   <!-- Cinematic image bg -->
-  <div class="nss-intro-img" style="position:absolute;inset:0;background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1785069853/file_00000000ee9482079592b5380d196d89_sd8ucv.png');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:0;animation:slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);"></div>
+  <div class="nss-intro-img" style="position:absolute;inset:0;background-image:url('./assets/store/intro-store.webp');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:0;animation:slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);"></div>
     <div class="nss-intro-vignette"></div>
     <!-- Top group: nav only — eyebrow + title live in the bottom group,
          same as the Word Atelier intro's layout ── -->
@@ -4924,6 +4924,46 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      clip and the Meaning Store's clip behind one gold banner, the Meaning
      Store's grid, the Atelier's card. Rendered by app/js/part074.js. ══ -->
 <div class="sub-screen" id="sub-signature-store">
+
+  <!-- The way in. Same shape as the Word Atelier's and the Meaning
+       Store's intros — art, then the eyebrow, the title, the rule, the
+       blurb, the stats and one button — so arriving at the third shop
+       feels like arriving at the other two. -->
+  <div class="sig-intro-page" id="sigIntroPage">
+    <div class="sig-intro-bg"></div>
+    <div class="sig-intro-vignette"></div>
+
+    <div class="sl-intro-top">
+      <div class="sig-page-back" onclick="sigCloseStore()" aria-label="Back">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="#f5e6c8" stroke-width="1.6" stroke-linecap="square"/></svg>
+      </div>
+      <div class="sl-intro-tag sig-intro-tag">Shabdapathy · The Rarest</div>
+      <div style="width:44px;flex-shrink:0;"></div>
+    </div>
+
+    <div class="sl-intro-bottom">
+      <span class="sl-intro-eyebrow sig-intro-eyebrow">Signature · Words · Meanings</span>
+      <div class="sl-intro-title sig-intro-title">The<br>Signature.</div>
+      <div class="sl-intro-divider sig-intro-divider"></div>
+      <div class="sl-intro-desc">One signature per category — the most exclusive word and the most exclusive meaning each collection has. Owned once, and never restocked.</div>
+      <div class="sl-intro-stats-row">
+        <div class="sl-intro-stat">15 Words</div>
+        <div class="sl-intro-stat-sep">·</div>
+        <div class="sl-intro-stat">5 Meanings</div>
+        <div class="sl-intro-stat-sep">·</div>
+        <div class="sl-intro-stat">50% Bundle</div>
+      </div>
+      <div class="sl-intro-enter-btn sig-intro-enter" onclick="sigEnterStore()" style="margin-top:28px;">
+        <span class="sl-intro-enter-label">Enter The Signature</span>
+        <span class="sl-intro-enter-icon">
+          <svg width="16" height="14" viewBox="0 0 18 14" fill="none">
+            <path d="M11 1L17 7L11 13" stroke="#060c18" stroke-width="1.6" stroke-linecap="square"/>
+            <line x1="1" y1="7" x2="17" y2="7" stroke="#060c18" stroke-width="1.6"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
 
   <div class="sig-page-top">
     <div class="sig-page-back" onclick="sigCloseStore()" aria-label="Back">
@@ -9784,7 +9824,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
-<script src="app/js/part074.js?v=2"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
+<script src="app/js/part074.js?v=3"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>
