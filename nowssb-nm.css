@@ -6317,9 +6317,12 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
    ══════════════════════════════════════════════════════════════════ */
 /* The bottom block reserved var(--nav-height) for a nav bar that is now
    hidden while an intro is showing, so the button and stats floated ~58px
-   higher than they needed to. That space is theirs again. */
+   higher than they needed to. That space is theirs again — but 22px put the
+   Enter button hard against the bottom edge of the screen, which on a phone
+   is also where the gesture bar is. Enough to sit above it and read as a
+   button on a page rather than a bar stuck to the frame. */
 .sl-intro-bottom {
-  padding-bottom: max(env(safe-area-inset-bottom, 22px), 22px) !important;
+  padding-bottom: calc(max(env(safe-area-inset-bottom, 0px), 8px) + 40px) !important;
 }
 /* Subtitles were rgba(255,255,255,0.52) at weight 300 with no shadow — over
    busy photography that reads as unreadable on every intro page. Brighter,
