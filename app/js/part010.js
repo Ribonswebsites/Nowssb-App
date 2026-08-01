@@ -42,9 +42,17 @@
           "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4",
           "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511500/grok_video_2026-07-31-20-40-30_vxozmt.mp4"
         ];
+        /* The shipped catalogue, and the one thing that draws it. Both are
+           handed out so app/js/part069.js can redraw the shelf when the
+           studio publishes an edit, and fall back to this list when there
+           is nothing published or no connection. */
+        window.NWSB_DEFAULT_WORD_CATS = CATS;
+        window.rmRenderWordSections = function(cats){
+        cats = (cats && cats.length) ? cats : CATS;
         var container=document.getElementById('rm-word-sections-container');
+        if(!container) return;
         var html='';
-        CATS.forEach(function(cat,i){
+        cats.forEach(function(cat,i){
           // Plain black banner heading — same treatment on every category,
           // no photo/character banner. Title reuses the home hero's font
           // styling (home-greeting), subtitle the small caps tagline style
@@ -89,5 +97,7 @@
           }
         });
         container.innerHTML=html;
+        };
+        window.rmRenderWordSections(CATS);
       })();
       
