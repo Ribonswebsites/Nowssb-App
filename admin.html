@@ -6,120 +6,236 @@
 <title>NowssB — CEO Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* ══════════════════════════════════════════════════════════════════════
+   The studio wears the app's clothes.
+
+   Everything here is taken from nowssb-nm.css rather than invented: the
+   same ink (#060c18), the same gold and glass-blue, DM Sans, the glass
+   wrapper the Fashion home builds its sections from, the black section
+   banner with its icon, hairline divider and two lines of text, and the
+   white Enter pill. Class names are untouched — the markup and every
+   script in this file keep working; only the surfaces change.
+   ══════════════════════════════════════════════════════════════════════ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #060c18; --gold: #e8d5a3; --blue: #c8e8f5;
+  /* The app's glass wrapper, to the value. */
+  --glass: rgba(255,255,255,0.055);
+  --glass-line: rgba(255,255,255,0.13);
+  --glass-shadow: 0 16px 40px rgba(0,0,0,0.34);
   --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.09);
   --red: rgba(220,80,80,0.9); --green: rgba(16,185,129,0.9);
 }
-body { background: var(--bg); color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+body {
+  background: var(--bg); color: #fff; font-family: 'DM Sans', sans-serif;
+  min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+/* The app's own page wash — a slow radial rather than flat black. */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(232,213,163,0.07) 0%, transparent 60%),
+    radial-gradient(90% 60% at 50% 110%, rgba(200,232,245,0.05) 0%, transparent 60%);
+}
 
-/* ── AUTH ── */
+/* ── AUTH ─────────────────────────────────────────────────────────── */
 #authWrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
-.auth-card { width: 100%; max-width: 380px; background: rgba(255,255,255,0.03); border: 1px solid rgba(232,213,163,0.15); border-radius: 24px; padding: 36px 28px; }
-.auth-logo { font-size: 28px; font-weight: 800; color: var(--gold); letter-spacing: -0.5px; margin-bottom: 4px; }
-.auth-sub { font-size: 12px; letter-spacing: 1px; color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 32px; }
-.auth-label { font-size: 10px; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 7px; display: block; }
-.auth-input { width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; margin-bottom: 16px; }
-.auth-input:focus { border-color: rgba(232,213,163,0.4); }
-.auth-btn { width: 100%; padding: 14px; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.3); border-radius: 12px; color: var(--gold); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-.auth-btn:hover { background: rgba(232,213,163,0.18); }
-.auth-error { font-size: 12px; color: rgba(220,80,80,0.8); margin-top: 10px; text-align: center; min-height: 18px; }
+.auth-card {
+  width: 100%; max-width: 380px; padding: 34px 26px 30px;
+  background: var(--glass); border: 1px solid var(--glass-line);
+  border-radius: 22px; box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+  text-align: center;
+}
+.auth-mark {
+  width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%;
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.14);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+}
+.auth-mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.auth-logo { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.5px; margin-bottom: 4px; }
+.auth-sub { font-size: 10px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 26px; font-weight: 700; }
+.auth-label { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 7px; display: block; text-align: left; font-weight: 700; }
+.auth-input {
+  width: 100%; padding: 13px 16px; margin-bottom: 16px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 12px; color: #fff; font-size: 14px;
+  font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s;
+}
+.auth-input:focus { border-color: rgba(232,213,163,0.45); }
+/* The app closes every card with this white pill. */
+.auth-btn {
+  width: 100%; padding: 14px; background: #fff; border: none; border-radius: 999px;
+  color: #060c18; font-size: 14px; font-weight: 800; letter-spacing: 0.2px;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: transform 0.15s, opacity 0.2s;
+}
+.auth-btn:active { transform: scale(0.98); }
+.auth-btn:disabled { opacity: 0.55; cursor: default; }
+.auth-error { font-size: 12px; color: rgba(220,80,80,0.85); margin-top: 10px; min-height: 18px; }
+.auth-note {
+  font-size: 11px; line-height: 1.55; color: rgba(200,232,245,0.72); margin-top: 6px;
+  word-break: break-all; text-align: left;
+}
+.auth-note:not(:empty) {
+  padding: 12px 14px; background: rgba(200,232,245,0.06);
+  border: 1px solid rgba(200,232,245,0.16); border-radius: 12px;
+}
+.auth-note b { color: var(--gold); font-weight: 700; }
 
-/* ── MAIN LAYOUT ── */
+/* ── MAIN LAYOUT ──────────────────────────────────────────────────── */
 #mainWrap { display: none; max-width: 560px; margin: 0 auto; padding: 0 0 80px; }
 
-/* ── TOP BAR ── */
-.topbar { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 0; margin-bottom: 24px; }
-.topbar-brand { font-size: 16px; font-weight: 700; color: var(--gold); }
-.topbar-right { display: flex; align-items: center; gap: 12px; }
-.notif-btn { position: relative; width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.notif-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; background: var(--red); border-radius: 9px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 4px; display: none; }
+/* ── TOP BAR — the app's fixed header: mark, wordmark, actions ────── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 16px 0; margin-bottom: 22px;
+}
+.topbar-brand { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.notif-btn {
+  position: relative; width: 40px; height: 40px; flex-shrink: 0;
+  background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+}
+.notif-badge {
+  position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px;
+  background: var(--red); border-radius: 9px; font-size: 10px; font-weight: 700;
+  display: none; align-items: center; justify-content: center; padding: 0 4px;
+}
 .notif-badge.show { display: flex; }
-.logout-btn { font-size: 12px; color: rgba(255,255,255,0.35); cursor: pointer; padding: 8px; }
+.logout-btn { font-size: 12px; color: rgba(255,255,255,0.4); cursor: pointer; padding: 8px; }
 
-/* ── GREETING ── */
-.greeting-wrap { padding: 0 20px 24px; }
-.greeting-time { font-size: 11px; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 6px; }
-.greeting-name { font-size: 26px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 4px; }
-.greeting-name span { color: var(--gold); }
-.greeting-title { font-size: 13px; color: rgba(255,255,255,0.45); }
-.greeting-stats { display: flex; gap: 10px; margin-top: 16px; }
-.stat-chip { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; }
-.stat-num { font-size: 22px; font-weight: 700; color: var(--gold); }
-.stat-lbl { font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 0.5px; margin-top: 2px; }
+/* ── GREETING — the home's hero wording ───────────────────────────── */
+.greeting-wrap { padding: 0 16px 20px; }
+.greeting-time { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 6px; }
+.greeting-title { font-family: 'Quattrocento Sans','DM Sans',sans-serif; font-size: 27px; font-weight: 500; line-height: 1.12; color: rgba(255,255,255,0.92); }
+.greeting-name { font-weight: 800; color: #fff; }
+.greeting-stats { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.stat-chip {
+  flex: 1; min-width: 92px; padding: 12px 14px;
+  background: var(--glass); border: 1px solid var(--glass-line);
+  border-radius: 16px; box-shadow: var(--glass-shadow);
+}
+.stat-num { font-size: 20px; font-weight: 800; color: #fff; line-height: 1; }
+.stat-lbl { font-size: 9px; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-top: 6px; font-weight: 700; }
 
-/* ── SECTION LABELS ── */
-.sec-label { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.25); text-transform: uppercase; padding: 0 20px; margin: 24px 0 12px; }
-.sec-label:first-of-type { margin-top: 0; }
+/* ── SECTION LABEL — the app's black banner, icon + rule + text ───── */
+.sec-label {
+  display: flex; align-items: center; gap: 14px;
+  margin: 26px 16px 12px; padding: 16px 18px;
+  background: #000; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; box-shadow: 0 8px 22px rgba(0,0,0,0.32);
+  font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -0.2px;
+}
+.sec-label::before {
+  content: ''; width: 3px; align-self: stretch; flex-shrink: 0;
+  background: var(--gold); border-radius: 99px;
+}
 
-/* ── FORM ── */
-.form-wrap { padding: 0 16px; }
+/* ── CARDS — one glass wrapper per block, as the home does ────────── */
+.form-wrap, .record-wrap, .pronun-card, .word-list-wrap, .record-card {
+  margin: 0 16px 14px; padding: 16px;
+  background: var(--glass); border: 1px solid var(--glass-line);
+  border-radius: 20px; box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+}
+.word-list-wrap { background: none; border: none; box-shadow: none; padding: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+
 .field { margin-bottom: 14px; }
-.field label { display: block; font-size: 10px; letter-spacing: 1.5px; color: rgba(255,255,255,0.38); text-transform: uppercase; margin-bottom: 7px; }
-.field input, .field select, .field textarea { width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
-.field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(232,213,163,0.35); background: rgba(255,255,255,0.06); }
-.field textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
-.field select option { background: #0a1628; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; margin-bottom: 14px; }
+.field label, .lbl {
+  display: block; font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 7px; font-weight: 700;
+}
+.field input, .field textarea, .field select, input.auth-input {
+  width: 100%; padding: 12px 14px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 12px; color: #fff; font-size: 14px;
+  font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s;
+}
+.field input:focus, .field textarea:focus, .field select:focus { border-color: rgba(232,213,163,0.45); }
+.field textarea { min-height: 96px; resize: vertical; line-height: 1.55; }
+.field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,0.28); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-/* ── RECORD BUTTON ── */
-.record-wrap { padding: 0 16px; margin-bottom: 14px; }
-.record-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
-.record-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-.rec-btn { width: 56px; height: 56px; border-radius: 50%; background: rgba(220,80,80,0.1); border: 2px solid rgba(220,80,80,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-.rec-btn.recording { background: rgba(220,80,80,0.25); border-color: rgba(220,80,80,0.8); animation: rec-pulse 1s ease-in-out infinite; }
-@keyframes rec-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(220,80,80,0.3)} 50%{box-shadow:0 0 0 8px rgba(220,80,80,0)} }
-.rec-info { flex: 1; }
-.rec-status { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 3px; }
-.rec-sub { font-size: 12px; color: rgba(255,255,255,0.35); }
-.waveform-bars { display: flex; align-items: center; gap: 3px; height: 32px; }
-.wb { width: 3px; border-radius: 2px; background: rgba(232,213,163,0.2); transition: height 0.1s; }
-.wb.active { background: rgba(232,213,163,0.7); }
-.rec-actions { display: flex; gap: 8px; }
-.rec-action-btn { flex: 1; padding: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; transition: all 0.2s; }
-.rec-action-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
-.rec-action-btn.primary { background: rgba(232,213,163,0.08); border-color: rgba(232,213,163,0.25); color: var(--gold); }
+.btn-wrap { margin: 18px 16px 0; }
+.btn-primary, .primary {
+  width: 100%; padding: 15px; background: #fff; border: none; border-radius: 999px;
+  color: #060c18; font-size: 14px; font-weight: 800; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: transform 0.15s;
+}
+.btn-primary:active, .primary:active { transform: scale(0.98); }
 
-/* ── PRONUNCIATION PREVIEW ── */
-.pronun-card { background: rgba(232,213,163,0.04); border: 1px solid rgba(232,213,163,0.12); border-radius: 16px; padding: 20px; margin-bottom: 14px; }
-.pronun-title { font-size: 10px; letter-spacing: 2px; color: rgba(232,213,163,0.5); text-transform: uppercase; margin-bottom: 12px; }
-.pronun-notation { font-size: 18px; font-weight: 600; color: var(--gold); letter-spacing: 1px; line-height: 1.5; word-break: break-all; margin-bottom: 14px; font-style: italic; min-height: 28px; }
-.breath-guide { display: flex; flex-direction: column; gap: 6px; }
-.breath-step { display: flex; align-items: flex-start; gap: 10px; }
-.breath-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-.breath-text { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; }
-.breath-text strong { color: rgba(255,255,255,0.85); }
+/* ── RECORDER ─────────────────────────────────────────────────────── */
+.record-row { display: flex; align-items: center; gap: 14px; }
+.rec-btn {
+  width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%;
+  background: rgba(220,80,80,0.14); border: 1px solid rgba(220,80,80,0.4);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: transform 0.15s;
+}
+.rec-btn:active { transform: scale(0.94); }
+.rec-info { flex: 1; min-width: 0; }
+.rec-status { font-size: 13px; font-weight: 700; color: #fff; }
+.rec-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.waveform-bars { display: flex; align-items: center; gap: 2px; height: 34px; margin-top: 12px; }
+.wb { flex: 1; background: rgba(232,213,163,0.5); border-radius: 2px; transition: height 0.08s linear; min-height: 3px; }
+.rec-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.rec-action-btn {
+  padding: 9px 16px; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  border-radius: 999px; color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
 
-/* ── BUTTONS ── */
-.btn-primary { width: 100%; padding: 15px; background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.3); border-radius: 14px; color: var(--gold); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-.btn-primary:hover { background: rgba(232,213,163,0.18); }
-.btn-wrap { padding: 0 16px; margin-top: 8px; }
+/* ── PRONUNCIATION ────────────────────────────────────────────────── */
+.pronun-title { font-size: 13px; font-weight: 800; color: var(--gold); margin-bottom: 10px; letter-spacing: 0.2px; }
+.pronun-notation { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: 2px; margin-bottom: 8px; }
+.breath-guide { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; }
+.breath-icon { width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; background: rgba(200,232,245,0.1); border: 1px solid rgba(200,232,245,0.22); display: flex; align-items: center; justify-content: center; }
+.breath-text { flex: 1; min-width: 0; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.7); }
+.breath-step { margin-bottom: 6px; }
 
-/* ── WORD LIST ── */
-.word-list-wrap { padding: 0 16px; }
-.wl-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 10px; }
-.wl-status { display: inline-block; padding: 3px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; float: right; }
-.wl-status.pending { background: rgba(232,213,163,0.1); color: var(--gold); border: 1px solid rgba(232,213,163,0.2); }
-.wl-status.approved { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
-.wl-status.rejected { background: rgba(220,80,80,0.1); color: rgba(220,80,80,0.8); border: 1px solid rgba(220,80,80,0.2); }
-.wl-name { font-size: 17px; font-weight: 700; color: var(--gold); letter-spacing: 2px; margin-bottom: 4px; }
+/* ── WORD LIST ────────────────────────────────────────────────────── */
+.wl-card {
+  background: var(--glass); border: 1px solid var(--glass-line);
+  border-radius: 16px; padding: 16px; margin-bottom: 10px; box-shadow: var(--glass-shadow);
+}
+.wl-status { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; float: right; }
+.wl-status.pending  { background: rgba(232,213,163,0.1); color: var(--gold); border: 1px solid rgba(232,213,163,0.24); }
+.wl-status.approved { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.24); }
+.wl-status.rejected { background: rgba(220,80,80,0.1); color: rgba(220,80,80,0.85); border: 1px solid rgba(220,80,80,0.24); }
+.wl-name { font-size: 17px; font-weight: 800; color: var(--gold); letter-spacing: 2px; margin-bottom: 4px; }
 .wl-phonetic { font-size: 12px; color: rgba(200,232,245,0.7); margin-bottom: 4px; }
 .wl-meta { font-size: 11px; color: rgba(255,255,255,0.35); }
-.wl-note { margin-top: 8px; padding: 8px 12px; background: rgba(220,80,80,0.06); border: 1px solid rgba(220,80,80,0.15); border-radius: 8px; font-size: 12px; color: rgba(220,80,80,0.8); }
+.wl-note { margin-top: 8px; padding: 8px 12px; background: rgba(220,80,80,0.06); border: 1px solid rgba(220,80,80,0.15); border-radius: 10px; font-size: 12px; color: rgba(220,80,80,0.8); }
 
-/* ── NOTIF PANEL ── */
+/* ── NOTIF SHEET — the app's bottom sheet ─────────────────────────── */
 #notifPanel { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.7); }
-.notif-sheet { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 560px; background: #060c18; border-top: 1px solid rgba(232,213,163,0.15); border-radius: 20px 20px 0 0; padding: 24px 20px 40px; max-height: 80vh; overflow-y: auto; }
-.notif-sheet-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 16px; }
-.notif-item { padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; }
-.notif-item-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.notif-sheet {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 560px; background: #0a0f1c;
+  border-top: 1px solid var(--glass-line); border-radius: 22px 22px 0 0;
+  padding: 22px 18px 40px; max-height: 80vh; overflow-y: auto;
+}
+.notif-sheet::before {
+  content: ''; display: block; width: 42px; height: 4px; border-radius: 99px;
+  background: rgba(255,255,255,0.22); margin: -8px auto 16px;
+}
+.notif-sheet-title { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 16px; }
+.notif-item { padding: 14px; background: var(--glass); border: 1px solid var(--glass-line); border-radius: 14px; margin-bottom: 8px; }
+.notif-item-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
 .notif-item-sub { font-size: 11px; color: rgba(255,255,255,0.4); }
 
-/* ── TOAST ── */
-.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(16,185,129,0.92); color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+/* ── TOAST ────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: rgba(16,185,129,0.94); color: #fff; padding: 12px 24px;
+  border-radius: 999px; font-size: 13px; font-weight: 700; z-index: 9999;
+  pointer-events: none; opacity: 0; transition: opacity 0.3s; white-space: nowrap;
+}
 .toast.show { opacity: 1; }
-.toast.error { background: rgba(220,80,80,0.92); }
+.toast.error { background: rgba(220,80,80,0.94); }
 </style>
 </head>
 <body>
@@ -127,12 +243,16 @@ body { background: var(--bg); color: #fff; font-family: 'DM Sans', sans-serif; m
 <!-- ══ AUTH SCREEN ══ -->
 <div id="authWrap">
   <div class="auth-card">
+    <div class="auth-mark"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""></div>
     <div class="auth-logo">NowssB</div>
     <div class="auth-sub">CEO Content Studio</div>
+    <label class="auth-label">Email</label>
+    <input type="email" class="auth-input" id="emailInput" autocomplete="username" placeholder="you@nowssb.com" onkeydown="if(event.key==='Enter')doLogin()">
     <label class="auth-label">Password</label>
-    <input type="password" class="auth-input" id="pwInput" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="auth-btn" onclick="doLogin()">Enter Studio</button>
+    <input type="password" class="auth-input" id="pwInput" autocomplete="current-password" placeholder="Your account password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="auth-btn" id="authBtn" onclick="doLogin()">Enter Studio</button>
     <div class="auth-error" id="authErr"></div>
+    <div class="auth-note" id="authNote"></div>
   </div>
 </div>
 
@@ -415,28 +535,26 @@ body { background: var(--bg); color: #fff; font-family: 'DM Sans', sans-serif; m
 <div class="toast" id="toast"></div>
 
 <script>
-// ── PASSWORDS ──
-var CEO_PW = 'sanjay_nowssb_2026';
+/* ── AUTH ──────────────────────────────────────────────────────────
+   The real work is in the module block at the bottom of this file, which
+   is where Firebase lives: sign in properly, then check this account is
+   on the admin list. These two are the buttons' handlers and do nothing
+   but hand over — kept as globals because the markup calls them inline.
 
-// ── AUTH ──
+   What used to be here was a password compared in the browser. It was
+   printed in this file for anyone who opened View Source, and it guarded
+   nothing anyway: typing initPanel() in the console walked straight past
+   it, and this page writes real subscription grants. ── */
 function doLogin() {
-  var pw = document.getElementById('pwInput').value;
-  if (pw === CEO_PW) {
-    document.getElementById('authWrap').style.display = 'none';
-    document.getElementById('mainWrap').style.display = 'block';
-    initPanel();
-  } else {
-    document.getElementById('authErr').textContent = 'Incorrect password. Please try again.';
-    document.getElementById('pwInput').style.borderColor = 'rgba(220,80,80,0.5)';
-    setTimeout(function(){ document.getElementById('pwInput').style.borderColor = ''; document.getElementById('authErr').textContent = ''; }, 2000);
-  }
+  if (window.adminSignIn) return window.adminSignIn();
+  /* The module below carries Firebase, and it is what signs anyone in. If
+     it did not load — offline, or the CDN blocked — there is no way in,
+     which is the right answer. Say so rather than letting the button do
+     nothing at all. */
+  var e = document.getElementById('authErr');
+  if (e) e.textContent = 'Could not reach the sign-in service. Check the connection and reload.';
 }
-
-function doLogout() {
-  document.getElementById('authWrap').style.display = 'flex';
-  document.getElementById('mainWrap').style.display = 'none';
-  document.getElementById('pwInput').value = '';
-}
+function doLogout() { if (window.adminSignOut) window.adminSignOut(); }
 
 // ── GREETING TIME ──
 function setGreeting() {
@@ -778,6 +896,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
 const _fbApp = initializeApp({
   apiKey: "AIzaSyBly5XnqNnpVom11thjlvT5q_BfxNJBfgQ",
@@ -789,7 +908,85 @@ const _fbApp = initializeApp({
 }, 'admin-panel');
 
 const _db = getFirestore(_fbApp);
+const _auth = getAuth(_fbApp);
 var _foundUid = null;
+
+/* ══ ADMIN GATE ══════════════════════════════════════════════════════
+   Two locks, and the second is the one that counts.
+
+   Signing in proves who you are. Being listed at admins/<your-uid> proves
+   you are allowed in here. The check below decides what this page shows,
+   but showing and allowing are different things: what actually stops a
+   stranger writing to Firestore is the rules file (firestore.rules in
+   this repo) reading that same admins/<uid> document. A check in the
+   browser can always be walked around — the rules cannot.
+
+   First time in: sign in with your own NowssB account. If your uid is not
+   on the list yet the screen tells you the uid, so you can add
+   admins/<uid> in the Firebase console and reload.
+   ══════════════════════════════════════════════════════════════════ */
+function authErr(msg)  { const el = document.getElementById('authErr');  if (el) el.textContent = msg || ''; }
+function authNote(msg) { const el = document.getElementById('authNote'); if (el) el.innerHTML = msg || ''; }
+
+async function isAdmin(uid) {
+  try {
+    const snap = await getDoc(doc(_db, 'admins', uid));
+    return snap.exists();
+  } catch (e) {
+    /* Rules refusing the read is itself an answer: not an admin. */
+    return false;
+  }
+}
+
+function openStudio() {
+  document.getElementById('authWrap').style.display = 'none';
+  document.getElementById('mainWrap').style.display = 'block';
+  if (window.initPanel) window.initPanel();
+}
+function closeStudio() {
+  document.getElementById('authWrap').style.display = 'flex';
+  document.getElementById('mainWrap').style.display = 'none';
+  const pw = document.getElementById('pwInput'); if (pw) pw.value = '';
+}
+
+window.adminSignIn = async function () {
+  const email = (document.getElementById('emailInput').value || '').trim();
+  const pw    = document.getElementById('pwInput').value || '';
+  const btn   = document.getElementById('authBtn');
+  authErr(''); authNote('');
+  if (!email || !pw) { authErr('Email and password, please.'); return; }
+  btn.disabled = true; btn.textContent = 'Checking…';
+  try {
+    const cred = await signInWithEmailAndPassword(_auth, email, pw);
+    if (await isAdmin(cred.user.uid)) { openStudio(); }
+    else {
+      authErr('That account is not an admin.');
+      authNote('Signed in as <b>' + cred.user.uid + '</b>.<br>Add a document at <b>admins/' + cred.user.uid +
+               '</b> in Firestore, then reload.');
+      await signOut(_auth);
+    }
+  } catch (e) {
+    const c = (e && e.code) || '';
+    authErr(c.includes('password') || c.includes('credential') || c.includes('user-not-found')
+      ? 'Wrong email or password.'
+      : c.includes('too-many') ? 'Too many attempts — wait a moment.'
+      : 'Could not sign in. Check the connection.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Enter Studio';
+  }
+};
+
+window.adminSignOut = async function () {
+  try { await signOut(_auth); } catch (e) {}
+  closeStudio();
+};
+
+/* A reload should not mean signing in again, but it must not mean trusting
+   the last session either — the list is re-checked every time. */
+onAuthStateChanged(_auth, async (user) => {
+  if (user && await isAdmin(user.uid)) openStudio();
+  else closeStudio();
+});
 
 // ── INSTAGRAM LINK ──
 window.updateIgLink = function(val) {

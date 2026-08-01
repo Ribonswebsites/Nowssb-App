@@ -1,0 +1,91 @@
+rules_version = '2';
+
+/* ══════════════════════════════════════════════════════════════════════
+   NowssB — Firestore security rules
+
+   Deploy these from the Firebase console (Firestore → Rules → paste →
+   Publish) or with `firebase deploy --only firestore:rules`. Until they
+   are published they do nothing: this file is only the source of truth
+   for what SHOULD be enforced.
+
+   The admin page checks admins/<uid> before it shows anything, but a
+   check in a browser is a courtesy, not a lock — anyone can edit the page
+   they were served. These rules are the lock. Every admin-only write
+   below is decided here, on the server, from the same admins/<uid>
+   document, so bypassing the page's own check gains nothing.
+
+   Setting up the first admin: sign in to admin.html with your NowssB
+   account, and the screen will show your uid. Create a document at
+   admins/<that uid> in the console — any fields you like, the rules only
+   care that it exists. Nothing can create that document from a client.
+   ══════════════════════════════════════════════════════════════════════ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    /* One read, cached by Firestore for the rest of the evaluation. */
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    /* ── The admin list ──────────────────────────────────────────────
+       Readable only for your own entry, which is all the gate needs and
+       means the list is never enumerable. Writes are console-only: no
+       client, admin or not, can add an admin. That is deliberate —
+       otherwise one compromised admin account mints more. */
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+
+    /* ── People ──────────────────────────────────────────────────────
+       You own your document. Admins may read anyone's and write the
+       fields the studio grants — subscriptions, plans, flags. */
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create, update: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    /* ── Content: words, meanings, everything the studio publishes ───
+       The app reads this without signing in — content is public, that is
+       the point of it. Only an admin writes. (Step 2 fills these; the
+       rules go in now so the collections are never briefly open.) */
+    match /content/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /content/{docId}/{sub=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    /* ── Community ───────────────────────────────────────────────────
+       Signed-in people post; an author edits their own; admins moderate
+       anything. */
+    match /reels/{id} {
+      allow read: if true;
+      allow create: if signedIn();
+      allow update, delete: if signedIn() &&
+        (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
+    /* Call signalling — short-lived, between the two people on the call. */
+    match /calls/{callId} {
+      allow read, write: if signedIn();
+      match /{sub=**} {
+        allow read, write: if signedIn();
+      }
+    }
+
+    /* Anything not named above is closed. Add a match block rather than
+       loosening this. */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
