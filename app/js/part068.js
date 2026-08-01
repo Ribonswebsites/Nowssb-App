@@ -127,8 +127,87 @@
     return {
       supported: supported(),
       permission: supported() ? Notification.permission : 'unsupported',
-      pushConfigured: !!VAPID_PUBLIC_KEY
+      pushConfigured: !!VAPID_PUBLIC_KEY,
+      subscribed: !!window.nwsbPushSubscription
     };
+  };
+
+  /* ── The row on the notifications page ─────────────────────────────
+     The master switch above it is this app's own preference, kept in local
+     storage, and it ships ON. That is the right default for the in-app feed
+     — but it meant the one place that asked the phone for permission (the
+     off→on transition of that switch, below) could never fire for anybody
+     who had not first turned it off. So the permission had no way of ever
+     being requested. This row is that way: it shows what the phone actually
+     says and asks when it is asked to.
+
+     part064.js leaves #ntPhoneRow empty and calls this after every render. */
+  function permCopy() {
+    if (!supported()) {
+      return { cls: '', title: 'Not available on this browser',
+               sub: 'This browser cannot show notifications. Install NowssB to your home screen, or open it in Chrome.',
+               btn: '' };
+    }
+    var p = Notification.permission;
+    if (p === 'granted') {
+      return { cls: ' on', title: 'Notifications on this phone',
+               sub: 'Allowed. NowssB can reach you here even when the app is closed.',
+               btn: '<div class="nt-phone-btn" onclick="nwsbPushTest()">Send a test</div>' };
+    }
+    if (p === 'denied') {
+      return { cls: ' nt-phone-blocked', title: 'Notifications on this phone',
+               sub: 'Blocked. Your phone is refusing them — turn NowssB back on in your browser or app settings, then come back here.',
+               btn: '' };
+    }
+    return { cls: '', title: 'Notifications on this phone',
+             sub: 'Not on yet. Turn this on and your phone will show offers, your routine, your streak and everything else you have left switched on below.',
+             btn: '<div class="nt-phone-btn" onclick="nwsbPushEnable()">Turn on</div>' };
+  }
+
+  window.nwsbPushRenderRow = function () {
+    var el = document.getElementById('ntPhoneRow');
+    if (!el) return;
+    var c = permCopy();
+    el.innerHTML =
+      '<div class="nt-phone' + c.cls + '">' +
+        '<div class="nt-phone-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+          '<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/>' +
+        '</svg></div>' +
+        '<div class="nt-phone-txt">' +
+          '<div class="nt-phone-title">' + c.title + '</div>' +
+          '<div class="nt-phone-sub">' + c.sub + '</div>' +
+        '</div>' +
+        c.btn +
+      '</div>';
+  };
+
+  window.nwsbPushEnable = function () {
+    /* Phone notifications while the app's own master switch is muted would
+       be a contradiction, so this turns that on too. */
+    try { if (localStorage.getItem('nwsb_notif_master') === '0') localStorage.setItem('nwsb_notif_master', '1'); } catch (e) {}
+    try { if (navigator.vibrate) navigator.vibrate(28); } catch (e) {}
+    var redraw = function () {
+      if (window.nwsbNotifRender) { try { window.nwsbNotifRender(); } catch (e) {} }
+      else window.nwsbPushRenderRow();
+    };
+    /* requestPermission() has to be reached from this tap without an await
+       in between, or Android drops it as un-gestured — nwsbPushAsk() calls it
+       synchronously, so only the redraw waits. Redraw once now so the master
+       switch above reflects the flip immediately, and again when the phone
+       answers; a prompt the reader never answers leaves the first one
+       standing rather than a page that disagrees with itself. */
+    var pending = window.nwsbPushAsk();
+    redraw();
+    pending.then(redraw, redraw);
+  };
+
+  /* Proof it works, on the phone in your hand. This is the in-app path
+     (registration.showNotification), which is the same notification a push
+     from the server draws — so if this appears, the phone side is right and
+     anything left is the sending side. */
+  window.nwsbPushTest = function () {
+    if (!granted()) return;
+    show({ type: 'support', title: 'NowssB', body: 'Notifications are on. This is what they will look like.' });
   };
 
   /* ── Push subscription ─────────────────────────────────────────────

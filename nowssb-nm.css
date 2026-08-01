@@ -7148,6 +7148,57 @@ body.homecorner-round #home-nm .nmh-wrap > .nmh-greet-block {
   color: #fff; line-height: 1; pointer-events: none;
 }
 
+/* The bell on the Normal home. .nmh-settings-btn has no position of its own
+   and .nt-badge is absolutely positioned, so it would otherwise anchor to the
+   page. The badge's dark ring is drawn for the Fashion header's near-black
+   bar; against this light neumorphic one it needs a light ring instead. */
+.nmh-notif-btn { position: relative; }
+#home-nm .nmh-notif-btn .nt-badge { border-color: #f0f2f7; }
+#home-nm.nm-dark .nmh-notif-btn .nt-badge { border-color: #16163c; }
+
+/* ── Notifications on this phone ────────────────────────────────────
+   Sits directly under the master switch and reports the browser permission,
+   which is a different thing from the app's own preference. Rendered by
+   app/js/part068.js into the slot part064.js leaves for it. */
+.nt-phone {
+  display: flex; align-items: center; gap: 13px;
+  padding: 14px 16px; margin: 0 0 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px !important;
+}
+.nt-phone.on { border-color: rgba(120,220,170,0.3); background: rgba(120,220,170,0.06); }
+.nt-phone.nt-phone-blocked { border-color: rgba(232,67,79,0.32); background: rgba(232,67,79,0.06); }
+.nt-phone-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 13px !important; color: rgba(255,255,255,0.55);
+}
+.nt-phone.on .nt-phone-icon { color: #8fe0b8; border-color: rgba(120,220,170,0.35); }
+.nt-phone.nt-phone-blocked .nt-phone-icon { color: #f08b92; border-color: rgba(232,67,79,0.35); }
+.nt-phone-icon svg { width: 20px; height: 20px; }
+.nt-phone-txt { flex: 1; min-width: 0; }
+.nt-phone-title {
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #fff;
+}
+.nt-phone-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.48); margin-top: 3px; line-height: 1.5;
+}
+/* app.css floors every [onclick] at 44px tall, which would make this chip the
+   height of the whole row. */
+.nt-phone-btn {
+  flex-shrink: 0; cursor: pointer;
+  height: 32px !important; min-height: 32px !important;
+  display: inline-flex; align-items: center;
+  padding: 0 14px; border-radius: 999px !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase; white-space: nowrap;
+  color: #060c18; background: #e8d5a3; border: 1px solid rgba(232,213,163,0.6);
+}
+.nt-phone-btn:active { transform: scale(0.96); }
+
 /* Master switch — the one that mutes everything below it. */
 .nt-master {
   display: flex; align-items: center; gap: 13px;

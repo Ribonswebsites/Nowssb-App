@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=602">
+<link rel="stylesheet" href="nowssb-nm.css?v=603">
 <link rel="stylesheet" href="nowssb-player.css?v=200">
 </head>
 <body>
@@ -747,6 +747,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
     <div class="nmh-btn-group">
+      <!-- The bell used to exist only in the Fashion home's fixed header, which
+           is hidden on every other screen — so anyone who stayed on this home
+           had no way at all to reach the notifications page, and therefore no
+           way to turn phone notifications on. It belongs on both homes. -->
+      <button class="nmh-settings-btn nmh-notif-btn" id="nmhNotifBtn" onclick="ntOpen()" title="Notifications" aria-label="Notifications">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+        </svg>
+        <span class="nt-badge" id="nmhNotifBadge" style="display:none;">0</span>
+      </button>
       <button class="nmh-settings-btn" id="nmhCustomizeBtn" onclick="cuOpen()" title="Customize">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/>
@@ -2264,6 +2275,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="menu-nav-item" onclick="closeMenu();openSub('social')">
         <div class="menu-nav-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:22px;height:22px;object-fit:contain;display:block;" alt=""></div>
         <div class="menu-nav-body"><div class="menu-nav-label">Settings</div><div class="menu-nav-sub">Preferences</div></div>
+        <svg class="menu-nav-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <!-- Second way in to the notifications page, so it does not depend on
+           being on the Fashion home to find the bell. Goes straight to the
+           settings page rather than the updates sheet — this is the entry
+           people are looking for when they want to switch them on. -->
+      <div class="menu-nav-item" onclick="closeMenu();setTimeout(ntOpenSettings,60);">
+        <div class="menu-nav-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+        <div class="menu-nav-body"><div class="menu-nav-label">Notifications</div><div class="menu-nav-sub">Turn them on for this phone</div></div>
         <svg class="menu-nav-chev" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div class="menu-nav-item" onclick="closeMenu();openSub('connect-hub');setTimeout(nchOnOpen,60);">
@@ -9629,11 +9649,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part061.js?v=8"></script>
 <script src="app/js/part062.js?v=20"></script>
 <script src="app/js/part063.js?v=4"></script>
-<script src="app/js/part064.js?v=5"></script>
+<script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=7"></script>
 <script src="app/js/part067.js?v=20"></script>
-<script src="app/js/part068.js?v=3"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
+<script src="app/js/part068.js?v=4"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->

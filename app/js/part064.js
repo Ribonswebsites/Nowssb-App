@@ -117,13 +117,18 @@
 
   function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
 
-  /* ── Badge on the header bell ──────────────────────────────────── */
+  /* ── Badge on the header bells ─────────────────────────────────────
+     There is a bell on each home now, so paint every badge rather than the
+     Fashion one alone. */
+  var BADGES = ['homeNotifBadge', 'nmhNotifBadge'];
   function paintBadge() {
-    var el = document.getElementById('homeNotifBadge');
-    if (!el) return;
     var n = feed().filter(function (x) { return !x.read; }).length;
-    el.textContent = n > 99 ? '99+' : String(n);
-    el.style.display = n ? 'flex' : 'none';
+    BADGES.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = n > 99 ? '99+' : String(n);
+      el.style.display = n ? 'flex' : 'none';
+    });
   }
   window.nwsbNotifBadge = paintBadge;
 
@@ -197,6 +202,13 @@
         '<div class="nt-sw' + (on ? ' on' : '') + '" onclick="ntToggleMaster()"><div class="nt-sw-knob"></div></div>' +
       '</div>';
 
+    /* The master switch above is this app's own preference and nothing else.
+       Whether the PHONE will actually show anything is a separate permission
+       that only the browser can grant, and it defaults to neither on nor off.
+       app/js/part068.js fills this in with the real state and a way to ask
+       for it; if that file is absent the slot simply stays empty. */
+    html += '<div id="ntPhoneRow"></div>';
+
     html += '<div class="nt-sec-head"><span>Updates</span>' +
             (list.length ? '<span class="nt-clear" onclick="nwsbNotifClear()">Clear all</span>' : '') +
             '</div>';
@@ -248,7 +260,9 @@
     });
 
     body.innerHTML = html;
+    if (window.nwsbPushRenderRow) { try { window.nwsbPushRenderRow(); } catch (e) {} }
   }
+  window.nwsbNotifRender = render;
 
   window.ntToggleMaster = function () {
     lsSet(K_MASTER, master() ? '0' : '1');
