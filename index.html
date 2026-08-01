@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=621">
+<link rel="stylesheet" href="nowssb-nm.css?v=623">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -3487,17 +3487,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <div class="sl-intro-bottom">
-      <span class="sl-intro-eyebrow">Natural Origin · The Word Atelier</span>
-      <div class="sl-intro-title">Word<br>Without<br>Dictionary.</div>
-      <div class="sl-intro-divider"></div>
-      <div class="sl-intro-desc">Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.</div>
-      <div class="sl-intro-stats-row">
-        <div class="sl-intro-stat">Unlimited Words</div>
-        <div class="sl-intro-stat-sep">·</div>
-        <div class="sl-intro-stat">AI-Powered</div>
-        <div class="sl-intro-stat-sep">·</div>
-        <div class="sl-intro-stat">Every Language</div>
-      </div>
+      <!-- Copy removed — the render says it. Only the way in is left. -->
       <div class="sl-intro-enter-btn" onclick="rmEnterFromIntro()" style="margin-top:28px;">
         <span class="sl-intro-enter-label">Enter The Word Atelier</span>
         <span class="sl-intro-enter-icon">
@@ -3791,17 +3781,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <!-- Bottom: eyebrow + title + desc + stats + button -->
     <div class="sl-intro-bottom">
-      <span class="sl-intro-eyebrow">Hidden · Meaning · Store</span>
-      <div class="sl-intro-title">The True<br>Hidden<br>Meaning.</div>
-      <div class="sl-intro-divider"></div>
-      <div class="sl-intro-desc">Every word you know has a meaning you were never told. Before the dictionary — there was only vibration. Unlock the truth.</div>
-      <div class="sl-intro-stats-row">
-        <div class="sl-intro-stat">Any Language</div>
-        <div class="sl-intro-stat-sep">·</div>
-        <div class="sl-intro-stat">AI-Decoded</div>
-        <div class="sl-intro-stat-sep">·</div>
-        <div class="sl-intro-stat">One Time Unlock</div>
-      </div>
+      <!-- Copy removed — the render says it. Only the way in is left. -->
       <div class="sl-intro-enter-btn" onclick="msEnterFromIntro()" style="margin-top:28px;">
         <span class="sl-intro-enter-label">Explore Meanings</span>
         <span class="sl-intro-enter-icon">
@@ -4616,17 +4596,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <!-- Bottom content: eyebrow + title + subtitle + stats + button -->
     <div class="sl-intro-bottom">
-      <span class="sl-intro-eyebrow">Word · Meaning · Store</span>
-      <div class="sl-intro-title">The NowssB<br>Store.</div>
-      <div class="sl-intro-divider"></div>
-      <div class="sl-intro-desc">Two libraries. One destination. Own the words that heal — unlock the origins that no dictionary ever told you.</div>
-      <div class="sl-intro-stats-row">
-        <div class="sl-intro-stat">Word Library</div>
-        <div class="sl-intro-stat-sep">·</div>
-        <div class="sl-intro-stat">Meaning Library</div>
-        <div class="sl-intro-stat-sep">·</div>
-        <div class="sl-intro-stat">AI-Decoded</div>
-      </div>
+      <!-- Copy removed — the render says it. Only the way in is left. -->
       <div class="sl-intro-enter-btn" onclick="nssEnterStore()" style="margin-top:28px;">
         <span class="sl-intro-enter-label">Enter Store</span>
         <span class="sl-intro-enter-icon">
@@ -4838,25 +4808,23 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="sig-store-overlay"></div>
         <div class="sig-store-shine" aria-hidden="true"></div>
 
-        <!-- Everything in one glass card in the top-left corner, so the art
-             below it is uninterrupted rather than being faded out to make
-             room for text. -->
+        <!-- Text bare in the top-left; only Enter gets a wrapper, in the
+             opposite corner. The card that held all of it covered the art
+             it was sitting on. -->
         <div class="sig-store-content">
-          <div class="sig-store-glass">
-            <span class="ws-store-eyebrow sig-store-eyebrow">Shabdapathy · The Rarest</span>
-            <div class="sig-store-title">Words &amp; Meanings</div>
-            <div class="sig-store-line">One per category. Owned once, never restocked.</div>
-            <div class="sig-store-chips">
-              <span class="sig-chip">15 Words</span>
-              <span class="sig-chip">5 Meanings</span>
-            </div>
-            <div class="sig-store-enter">
-              <span class="sig-store-enter-lbl">Enter</span>
-              <span class="sig-store-go" aria-hidden="true">
-                <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="2" stroke-linecap="square"/></svg>
-              </span>
-            </div>
+          <span class="ws-store-eyebrow sig-store-eyebrow">Shabdapathy · The Rarest</span>
+          <div class="sig-store-title">Words &amp; Meanings</div>
+          <div class="sig-store-line">One per category. Owned once, never restocked.</div>
+          <div class="sig-store-chips">
+            <span class="sig-chip">15 Words</span>
+            <span class="sig-chip">5 Meanings</span>
           </div>
+        </div>
+        <div class="sig-store-enter">
+          <span class="sig-store-enter-lbl">Enter</span>
+          <span class="sig-store-go" aria-hidden="true">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="2" stroke-linecap="square"/></svg>
+          </span>
         </div>
       </div><!-- /NowssB Signature doorway -->
 
@@ -4995,10 +4963,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          landscape gold render, which is the shape this slot actually is —
          the clip that was here has moved below the last row. -->
     <div class="rm-banner-wrap sig-banner-wrap">
-      <!-- No caption over it. The render carries its own subject and the
-           nav bar above already says whose shop this is — the same way the
-           Word Atelier's banner is just the picture. -->
       <img class="rm-banner-img" src="./assets/signature/signature-banner.webp" alt="NowssB Signature" loading="lazy" decoding="async">
+      <!-- One line, top-left, over the empty half of the render. -->
+      <div class="sig-banner-line">Get Your NowssB<br>Signature Today</div>
     </div>
 
     <!-- The two sections, rendered by app/js/part074.js. -->
@@ -9813,7 +9780,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
-<script src="app/js/part074.js?v=6"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
+<script src="app/js/part074.js?v=7"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>

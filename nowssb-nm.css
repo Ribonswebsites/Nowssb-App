@@ -9913,10 +9913,9 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 }
 
 .sig-store-content {
-  position: absolute; inset: 0; z-index: 3;
-  display: flex; flex-direction: column; justify-content: flex-start;
-  align-items: flex-start;
-  padding: 16px; gap: 0;
+  position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 16px 18px;
 }
 .sig-store-eyebrow {
   display: block; font-family: 'DM Sans', sans-serif;
@@ -9934,30 +9933,27 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
   color: rgba(255,255,255,0.78); margin-top: 6px; line-height: 1.5;
 }
-.sig-store-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sig-store-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
 .sig-chip {
   font-family: 'DM Sans', sans-serif; font-size: 7px; font-weight: 700;
   letter-spacing: 1.8px; text-transform: uppercase; color: rgba(245,230,200,0.9);
   background: rgba(232,213,163,0.13); border: 1px solid rgba(232,213,163,0.4);
   padding: 5px 10px;
 }
-/* Glass, so the art reads through it instead of being covered. */
-.sig-store-glass {
-  max-width: 260px;
-  padding: 14px 15px 13px;
-  border-radius: 18px !important;
-  background: rgba(10,16,32,0.42);
-  border: 1px solid rgba(232,213,163,0.28);
-  -webkit-backdrop-filter: blur(18px) saturate(1.3);
-  backdrop-filter: blur(18px) saturate(1.3);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.42);
-}
-.sig-store-glass .sig-store-chips { margin-top: 11px; }
 
 /* Enter, then the arrow — the label was missing and the disc was gold on
    gold art. */
+/* The only thing in a wrapper, and in the far corner from the text. */
 .sig-store-enter {
-  display: inline-flex; align-items: center; gap: 9px; margin-top: 13px;
+  position: absolute; right: 14px; bottom: 14px; z-index: 4;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 8px 10px 8px 16px;
+  border-radius: 999px !important;
+  background: rgba(10,16,32,0.42);
+  border: 1px solid rgba(255,255,255,0.22);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
 }
 .sig-store-enter-lbl {
   font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
@@ -10123,8 +10119,17 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 #msIntroPage .ms-intro-bg,
 #ebIntroPage .ms-intro-bg,
 #sigIntroPage .sig-intro-bg {
+  /* `cover` on a 941x1672 render inside a 390x844 window crops about a
+     fifth off each side and pushes the subject up out of frame — which
+     read as "zoomed in too much". `contain` shows the whole render; the
+     page's own background fills whatever is left. */
+  /* Anchored to the top so the letterbox `contain` leaves lands at the
+     bottom, which is where the copy sits on the two intros that still have
+     any. Centred, the band split in two and the copy landed on the art. */
   background-position: center top !important;
-  background-size: cover !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-color: #060c18;
 }
 
 /* One wash, three pages. Transparent across the art, solid under the
@@ -10224,3 +10229,26 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   box-shadow: 0 10px 30px rgba(232,213,163,0.26);
 }
 .sig-intro-enter .sl-intro-enter-label { color: #060c18 !important; }
+
+/* The Signature page's banner line, top-left over the empty half of the
+   render. No wrapper — the render is black there. */
+.sig-banner-line {
+  position: absolute; top: 14px; left: 16px; right: 40%; z-index: 2;
+  font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800;
+  color: #f5e6c8; letter-spacing: -0.2px; line-height: 1.18;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,0.9);
+}
+
+/* The request banner that closes the shop, with a line above and below —
+   the same labelling the store uses around its own sections. */
+.sig-req-lead, .sig-req-tail {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2.4px; text-transform: uppercase;
+  color: rgba(245,230,200,0.72); padding: 0 20px;
+}
+.sig-req-lead { margin: 26px 0 10px; }
+.sig-req-tail {
+  margin: 10px 0 4px; font-weight: 300; letter-spacing: 1.2px;
+  text-transform: none; font-size: 11.5px; color: rgba(255,255,255,0.45);
+}
+#sigSections .sig-req-banner { margin: 0 20px; }

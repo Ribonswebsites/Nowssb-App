@@ -2,7 +2,7 @@
   "name": "NowssB Admin",
   "short_name": "NowssB Admin",
   "description": "Content, people and notifications for NowssB",
-  "start_url": "./admin.html",
+  "start_url": "./admin.html?src=installed",
   "scope": "./admin.html",
   "display": "standalone",
   "background_color": "#060c18",
@@ -33,5 +33,6 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "id": "/admin"
 }

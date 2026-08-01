@@ -188,6 +188,35 @@ body::before {
    built from the headings themselves (stuBuildNav), so adding a section
    is adding a heading — there is no menu to keep in step with the page.
    ══════════════════════════════════════════════════════════════════ */
+/* The section name can be long ("REQUESTS FROM THE APP") and the row also
+   carries Install, the bell and Back. It gets whatever is left and one
+   line, rather than wrapping into the buttons. */
+.topbar { gap: 10px; }
+.topbar-brand {
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 14px;
+}
+.topbar-right { flex-shrink: 0; gap: 8px; }
+.topbar-right .rec-action-btn { padding: 0 12px; font-size: 11px; white-space: nowrap; }
+.stu-back {
+  width: 38px; height: 38px; flex-shrink: 0; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.10); border: 1px solid rgba(232,213,163,0.28);
+  border-radius: 50%;
+}
+.stu-back:active { background: rgba(232,213,163,0.22); }
+.stu-back svg { width: 17px; height: 17px; }
+.stu-nav-out {
+  flex-shrink: 0; cursor: pointer; text-align: center;
+  margin: 0 12px calc(14px + env(safe-area-inset-bottom, 0px));
+  padding: 12px; border-radius: 12px;
+  background: rgba(220,80,80,0.10); border: 1px solid rgba(220,80,80,0.28);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 1px; color: rgba(240,150,150,0.95);
+}
+.stu-nav-out:active { background: rgba(220,80,80,0.2); }
+
 .stu-burger {
   width: 40px; height: 40px; flex-shrink: 0; padding: 0; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -402,7 +431,12 @@ input.nwsb-deva { font-size: 16px; }
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 015 5v2.5l1.5 2H2.5L4 9.5V7a5 5 0 015-5z" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/><path d="M7 14.5a2 2 0 004 0" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/></svg>
         <div class="notif-badge" id="notifBadge"></div>
       </div>
-      <div class="logout-btn" onclick="doLogout()">Sign out</div>
+      <!-- Back to the app, not out of the account. Signing out is a rare,
+           deliberate thing and it lives in the drawer; this is the button
+           you actually want after finishing a job here. -->
+      <button class="stu-back" onclick="stuBack()" aria-label="Back to the app">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
     </div>
   </div>
 
@@ -420,6 +454,7 @@ input.nwsb-deva { font-size: 16px; }
     </div>
     <div class="stu-nav-list" id="stuNavList"></div>
     <div class="stu-nav-foot" id="stuNavFoot"></div>
+    <div class="stu-nav-out" onclick="doLogout()">Sign out of the studio</div>
   </nav>
 
   <!-- WHO IS SIGNED IN — the real account, read from Firebase Auth. This
@@ -886,6 +921,15 @@ window.stuGo = function (i, quiet) {
   if (here) here.textContent = _stuSecs[i].name;
   try { localStorage.setItem('nwsb_studio_section', _stuSecs[i].name); } catch (e) {}
   if (!quiet) { stuMenu(0); window.scrollTo(0, 0); }
+};
+
+window.stuBack = function () {
+  /* Installed, the studio is its own app with nowhere to go back to, so
+     back means the app itself. In a tab, history is the better answer when
+     there is any. */
+  var standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+  if (!standalone && history.length > 1) { history.back(); return; }
+  location.href = './index.html';
 };
 
 window.stuMenu = function (open) {
@@ -2312,7 +2356,7 @@ window.updateIgLink = function(val) {
 // ── SEARCH USER ──
 window.searchUser = async function() {
   var input = document.getElementById('uSearch').value.trim();
-  if (!input) { showToast('Enter an email or UID', true); return; }
+  if (!input) { showToast('Enter a name, email or UID', true); return; }
   var btn = document.getElementById('uSearchBtn');
   btn.textContent = 'Searching…';
   btn.disabled = true;
@@ -2321,23 +2365,51 @@ window.searchUser = async function() {
 
   try {
     var userData = null;
-    // Try as UID first
-    var snap = await getDoc(doc(_db, 'users', input));
-    if (snap.exists()) {
-      _foundUid = input;
-      userData = snap.data();
-    } else {
-      // Try as email
-      var q = query(collection(_db, 'users'), where('email', '==', input));
-      var qs = await getDocs(q);
-      if (!qs.empty) {
-        qs.forEach(function(d){ _foundUid = d.id; userData = d.data(); });
+
+    /* Look in the loaded people first. That list is Auth-led, so it holds
+       accounts the app never wrote a document for — which the two Firestore
+       lookups below cannot see at all, and which is why an account that
+       signed in by email but never got further came back "User not found".
+       It also matches on part of a name or an address: an exact-email-only
+       search means you have to already know the answer. */
+    var q = input.toLowerCase();
+    var hits = (_ppl || []).filter(function (u) {
+      return (u.email || '').toLowerCase().indexOf(q) >= 0 ||
+             (u.name || u.displayName || '').toLowerCase().indexOf(q) >= 0 ||
+             (u.uid || '').toLowerCase().indexOf(q) >= 0;
+    });
+    if (hits.length) {
+      /* An exact email or uid wins over a partial one. */
+      var exact = hits.filter(function (u) {
+        return (u.email || '').toLowerCase() === q || (u.uid || '').toLowerCase() === q;
+      });
+      var pick = exact[0] || hits[0];
+      _foundUid = pick.uid;
+      userData = pick;
+      if (hits.length > 1 && !exact.length) {
+        showToast(hits.length + ' matches — showing ' + (pick.email || pick.uid));
       }
     }
-    if (!userData) { showToast('User not found', true); return; }
+
+    /* Not in the list: ask Firestore directly, in case People has not been
+       loaded yet or the account was created since. */
+    if (!userData) {
+      var snap = await getDoc(doc(_db, 'users', input));
+      if (snap.exists()) { _foundUid = input; userData = snap.data(); }
+    }
+    if (!userData) {
+      var qq = query(collection(_db, 'users'), where('email', '==', input));
+      var qs = await getDocs(qq);
+      if (!qs.empty) { qs.forEach(function (d) { _foundUid = d.id; userData = d.data(); }); }
+    }
+
+    if (!userData) {
+      showToast('No account matches "' + input + '"', true);
+      return;
+    }
     renderUserCard(_foundUid, userData);
-  } catch(e) {
-    showToast('Error: ' + e.message, true);
+  } catch (e) {
+    showToast('Could not search — ' + (e && e.message ? e.message : 'unknown error'), true);
   } finally {
     btn.textContent = 'Find User';
     btn.disabled = false;

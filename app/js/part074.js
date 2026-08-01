@@ -221,10 +221,29 @@
     html += meaningRow(m[1], SIG_VIDS[3], 'Signature Meanings · II',
                        'The rest of the collection');
 
-    /* Two clips close the shop, below the last row — one is the clip that
-       used to be the top banner before the landscape render took that slot,
-       the other is new. */
-    if (html) html += rowVid(SIG_VIDS[1]) + rowVid(SIG_VIDS[4]);
+    /* Two clips close the shop, with the request banner between them —
+       the same one the Word Atelier carries, because the answer to "the
+       signature I want is not here" is the same answer. A line above and a
+       line below, the way the store labels its own sections. */
+    if (html) {
+      html += rowVid(SIG_VIDS[1]);
+      html += '<div class="sig-req-lead">Not on the shelf?</div>' +
+              '<div class="rm-req-banner sig-req-banner" onclick="rmOpenWordRequest()">' +
+                '<div class="rm-req-banner-icon">' +
+                  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>' +
+                '</div>' +
+                '<div class="rm-req-banner-text">' +
+                  '<div class="rm-req-banner-eyebrow">Signature · Words &amp; Meanings</div>' +
+                  '<div class="rm-req-banner-title">Request a Signature</div>' +
+                  '<div class="rm-req-banner-sub">Personally crafted &amp; delivered within 48 hours.</div>' +
+                '</div>' +
+                '<button class="rm-req-banner-btn" onclick="event.stopPropagation();rmOpenWordRequest()">Request' +
+                  '<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>' +
+                '</button>' +
+              '</div>' +
+              '<div class="sig-req-tail">One per collection — when one is gone it is gone.</div>';
+      html += rowVid(SIG_VIDS[4]);
+    }
 
     if (!html) html = '<div class="sig-empty">Nothing in the collection yet.</div>';
 
