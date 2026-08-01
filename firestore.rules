@@ -49,6 +49,21 @@ service cloud.firestore {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
       allow create, update: if signedIn() && (request.auth.uid == uid || isAdmin());
       allow delete: if isAdmin();
+
+      /* ── Your inbox ────────────────────────────────────────────────
+         How the studio says something to one person: "the meaning you
+         asked for is ready". The app watches its own and raises a
+         notification from it, so the message survives the phone being
+         off and does not depend on a push getting through.
+
+         Only you and an admin can read it, which is the point — it is
+         addressed to you. You may mark one read or delete it; an admin
+         writes them. */
+      match /inbox/{msgId} {
+        allow read, delete: if signedIn() && (request.auth.uid == uid || isAdmin());
+        allow update: if signedIn() && request.auth.uid == uid;
+        allow create: if isAdmin();
+      }
     }
 
     /* ── Content: words, meanings, everything the studio publishes ───

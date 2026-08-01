@@ -135,9 +135,36 @@
     var ar = (typeof getActiveRoutine === 'function') ? getActiveRoutine() : null;
     var ritual = ar ? ar.name : timeLabel;
 
-    var syl = (w.syllables || []).map(function (s, i) {
-      return '<span class="lgp-syl" id="spSyl' + i + '">' + s + '</span>' +
-        (i < w.syllables.length - 1 ? '<span class="lgp-syl-dot">·</span>' : '');
+    /* ── The pronunciation boxes ──────────────────────────────────────
+       A NowssB word is written in Devanagari, which has sounds English has
+       no letter for — so a roman spelling alone cannot teach it. Each box
+       carries the roman spelling to read, the Devanagari above it to
+       recognise, how long to hold it, and, when one has been recorded, the
+       sound itself: tapping the box plays that syllable. The whole record
+       comes from the studio (see app/js/part073.js).
+
+       Words that predate this have only `syllables`, and still draw
+       exactly as they did — every extra line is conditional. */
+    var _e = function (s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    };
+    var boxes = (w.parts && w.parts.length)
+      ? w.parts
+      : (w.syllables || []).map(function (s) { return { roman: s }; });
+
+    window._lgpParts = boxes;
+    var syl = boxes.map(function (p, i) {
+      var hint = [p.say, p.hold ? 'hold ' + p.hold + 's' : ''].filter(Boolean).join(' · ');
+      return '<span class="lgp-syl' + (p.audio ? ' lgp-syl-say' : '') + '" id="spSyl' + i + '"' +
+               (hint ? ' title="' + _e(hint) + '"' : '') +
+               (p.audio ? ' onclick="window.lgpSayPart&&window.lgpSayPart(' + i + ')"' : '') + '>' +
+               (p.deva ? '<b class="lgp-syl-deva">' + _e(p.deva) + '</b>' : '') +
+               '<b class="lgp-syl-rom">' + _e(p.roman || p.deva || '') + '</b>' +
+               (p.hold ? '<b class="lgp-syl-hold">' + p.hold + 's</b>' : '') +
+             '</span>' +
+        (i < boxes.length - 1 ? '<span class="lgp-syl-dot">·</span>' : '');
     }).join('');
 
     var recBars = '';
@@ -374,6 +401,9 @@
           '</div>' +
           '<div class="lgp-visual-overlay">' +
             '<div class="lgp-title">' + (w.word || '') + '</div>' +
+            /* The word as it is actually written. The roman title above is
+               the reading aid, not the word. */
+            (w.deva ? '<div class="lgp-deva nwsb-deva">' + _e(w.deva) + '</div>' : '') +
             '<div class="lgp-syls">' + syl + '</div>' +
             '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
           '</div>' +
@@ -741,4 +771,30 @@
     if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 4000 });
     else setTimeout(run, 2500);
   })();
+})();
+
+/* ── Hearing one syllable ──────────────────────────────────────────────
+   The boxes under the word are the pronunciation guide, and a box that has
+   a recording behind it plays it when tapped. That recording is the only
+   part of the guide that cannot be argued with: Devanagari shows what the
+   sound is written as, the roman spelling gives something to read, and this
+   is what it actually sounds like.
+
+   One element, reused. Tapping a second box while the first is playing
+   should switch to it rather than layering two voices over each other. ── */
+(function () {
+  var el = null;
+  window.lgpSayPart = function (i) {
+    var parts = window._lgpParts || [];
+    var p = parts[i];
+    if (!p || !p.audio) return;
+    if (!el) { el = new Audio(); el.preload = 'none'; }
+    try {
+      el.pause();
+      if (el.src !== p.audio) el.src = p.audio;
+      el.currentTime = 0;
+      el.play().catch(function () {});
+      if (navigator.vibrate) navigator.vibrate(18);
+    } catch (e) {}
+  };
 })();

@@ -4,6 +4,11 @@ www/
 android/
 ios/
 
+# The downloaded copies of every image and video (tools/asset-manifest.mjs
+# --download). Hundreds of megabytes, all re-fetchable from the manifest,
+# which IS committed. Delete the folder and run the tool again.
+assets/media/
+
 # Never commit these. google-services.json identifies the Firebase project to
 # the app and is not secret, but the signing keystore and the service-account
 # JSON that /api/push uses to talk to FCM absolutely are.

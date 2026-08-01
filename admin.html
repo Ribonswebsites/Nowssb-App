@@ -175,6 +175,23 @@ body::before {
 .field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,0.28); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
+/* Devanagari is taller than latin at the same size and its matras sit
+   above and below the line, so it gets its own stack and room to breathe
+   rather than inheriting DM Sans and being clipped. Android, iOS, Windows
+   and macOS all ship one of these; nothing is downloaded. */
+.nwsb-deva {
+  font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Kohinoor Devanagari',
+               'Mangal', 'Noto Serif Devanagari', sans-serif !important;
+  line-height: 1.7 !important;
+}
+input.nwsb-deva { font-size: 16px; }
+
+/* One quiet sentence under a field, for the things that need saying once. */
+.ws-hint {
+  font-size: 11px; line-height: 1.55; color: rgba(255,255,255,0.4);
+  margin-top: 6px; font-family: 'DM Sans', sans-serif;
+}
+
 .btn-wrap { margin: 18px 16px 0; }
 .btn-primary, .primary {
   width: 100%; padding: 15px; background: #fff; border: none; border-radius: 999px;
@@ -478,6 +495,111 @@ body::before {
     <div class="field" style="margin-top:10px;">
       <label>Instagram Handle (tap to update)</label>
       <input id="igHandleInput" placeholder="@nowssb" style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;" oninput="updateIgLink(this.value)">
+    </div>
+  </div>
+
+  <!-- ══ WORD STUDIO ══
+       The control hub. Everything the app teaches about a word — what it
+       is written as, how to say it, what it heals, what it sounds like —
+       filled into boxes here and published to every open copy of the app
+       and the PWA at once. Add a word, or open one that already exists and
+       change it. ══ -->
+  <div class="sec-label" style="margin-top:40px;">WORD STUDIO</div>
+  <div class="form-wrap">
+    <div id="wsStatus" style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:12px;">Loading the library…</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <button class="rec-action-btn primary" onclick="wsNew()">+ New word</button>
+      <button class="rec-action-btn" onclick="wsLoad()">Refresh</button>
+    </div>
+    <div class="field">
+      <label>Find a word to edit</label>
+      <input type="text" id="wsFind" placeholder="type any part of the word" oninput="wsRenderList()">
+    </div>
+    <div class="word-list-wrap" id="wsList" style="padding:0;"></div>
+  </div>
+
+  <!-- The template. Hidden until a word is opened or a new one started. -->
+  <div id="wsEditor" style="display:none;">
+    <div class="sec-label" style="margin-top:26px;" id="wsEditorTitle">Editing</div>
+    <div class="form-wrap">
+
+      <!-- ── The word itself, in all the forms it takes ── -->
+      <div class="field">
+        <label>Word — roman spelling *</label>
+        <input type="text" id="wsWord" placeholder="e.g. AAROGYA" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div class="field">
+        <label>The real word — Devanagari</label>
+        <input type="text" id="wsDeva" class="nwsb-deva" placeholder="आरोग्य" dir="auto">
+        <div class="ws-hint">This is the word. The roman spelling above is only a reading aid — Devanagari has sounds English has no letter for, which is why the boxes and the recording below exist.</div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Transliteration (optional)</label><input type="text" id="wsTranslit" placeholder="ā-ro-gya"></div>
+        <div class="field"><label>Origin</label><input type="text" id="wsOrigin" placeholder="Natural Origin"></div>
+      </div>
+
+      <!-- ── The pronunciation boxes ── -->
+      <div class="sec-label" style="margin:22px 0 10px;padding:0;">HOW TO SAY IT — THE BOXES</div>
+      <div class="ws-hint" style="margin-bottom:10px;">Three to five boxes, in the order they are spoken. Each one is shown under the word in the player. A box with a recording can be tapped to hear just that sound.</div>
+      <div id="wsParts"></div>
+      <button class="rec-action-btn" onclick="wsAddPart()" style="margin-top:8px;">+ Add a box</button>
+
+      <!-- ── The whole word, spoken ── -->
+      <div class="sec-label" style="margin:22px 0 10px;padding:0;">THE WHOLE WORD, SPOKEN</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Male voice</label>
+          <input type="text" id="wsAudioM" placeholder="https://… .mp3">
+          <button class="rec-action-btn" onclick="wsRec('wsAudioM')" style="margin-top:6px;">● Record</button>
+        </div>
+        <div class="field">
+          <label>Female voice</label>
+          <input type="text" id="wsAudioF" placeholder="https://… .mp3">
+          <button class="rec-action-btn" onclick="wsRec('wsAudioF')" style="margin-top:6px;">● Record</button>
+        </div>
+      </div>
+
+      <!-- ── What it does ── -->
+      <div class="sec-label" style="margin:22px 0 10px;padding:0;">WHAT IT HEALS</div>
+      <div class="field"><label>Organ / body system *</label><input type="text" id="wsOrgan" placeholder="e.g. Immune System"></div>
+      <div class="field"><label>Healing benefit</label><input type="text" id="wsBenefit" placeholder="e.g. Activates cellular immunity and vital life force"></div>
+      <div class="field"><label>Meaning &amp; natural origin story</label><textarea id="wsMeaning" placeholder="What this word means, and where the sound comes from naturally."></textarea></div>
+
+      <!-- ── The guide tab in the player ── -->
+      <div class="sec-label" style="margin:22px 0 10px;padding:0;">THE GUIDE</div>
+      <div class="field"><label>Mouth position</label><input type="text" id="wsMouth" placeholder="Open jaw, tongue flat, breath from belly"></div>
+      <div class="field"><label>Resonance point</label><input type="text" id="wsResonance" placeholder="Feel vibration in chest and upper throat"></div>
+      <div class="field"><label>Common mistake</label><input type="text" id="wsMistake" placeholder="Don't rush the final syllable"></div>
+      <div class="field"><label>Tip</label><input type="text" id="wsTip" placeholder="Say 3 times on exhale, eyes closed"></div>
+
+      <!-- ── Where it appears ── -->
+      <div class="sec-label" style="margin:22px 0 10px;padding:0;">WHERE IT APPEARS</div>
+      <div class="field">
+        <label>Health categories (comma separated)</label>
+        <input type="text" id="wsCats" placeholder="Immunity Boost, Heart Health">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Gender</label>
+          <select id="wsGender"><option value="both">Both</option><option value="M">Male</option><option value="F">Female</option></select>
+        </div>
+        <div class="field">
+          <label>Best time</label>
+          <select id="wsTime"><option value="any">Any time</option><option value="morning">Morning</option><option value="evening">Evening</option><option value="night">Night</option></select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Price (₹)</label><input type="number" id="wsPrice" value="200"></div>
+        <div class="field"><label>Image URL</label><input type="text" id="wsImg" placeholder="https://…"></div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;">
+        <button class="btn-primary" onclick="wsSave()">Save this word</button>
+        <button class="rec-action-btn" onclick="wsCancel()">Close</button>
+        <button class="rec-action-btn" onclick="wsDelete()" id="wsDeleteBtn" style="display:none;">Delete</button>
+      </div>
+      <button class="btn-primary" id="wsPublish" onclick="wsPublish()" style="margin-top:12px;">Publish the library to the app</button>
+      <div id="wsResult" style="font-size:12px;line-height:1.6;color:rgba(200,232,245,0.8);margin-top:12px;"></div>
     </div>
   </div>
 
@@ -1056,7 +1178,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <!-- ── FIREBASE SDK ── -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, orderBy, onSnapshot, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, orderBy, onSnapshot, getDocs, addDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
          GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult
        } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
@@ -1177,7 +1299,7 @@ window.adminSignOut = async function () {
 /* A reload should not mean signing in again, but it must not mean trusting
    the last session either — the list is re-checked every time. */
 onAuthStateChanged(_auth, async (user) => {
-  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); watchRequests(); catLoad(); pplLoad(); }
+  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); watchRequests(); catLoad(); wsLoad(); pplLoad(); }
   else closeStudio();
 });
 
@@ -1220,7 +1342,7 @@ function renderRequests(rows) {
       '<div class="wl-meta">' + esc(r.name || r.email || r.uid || 'unknown') + ' · ' + when + '</div>' +
       (done ? '' :
         '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
-          '<button class="rec-action-btn" onclick="reqFulfil(\'' + r.id + '\',\'' + esc(r.word).replace(/'/g, "\\'") + '\')">Mark fulfilled &amp; tell them</button>' +
+          '<button class="rec-action-btn" onclick="reqFulfil(\'' + r.id + '\',\'' + esc(r.word).replace(/'/g, "\\'") + '\',\'' + (r.uid || '') + '\')">Fulfil, tell them &amp; open the template</button>' +
           '<button class="rec-action-btn" onclick="reqDelete(\'' + r.id + '\')">Delete</button>' +
         '</div>') +
     '</div>';
@@ -1254,23 +1376,353 @@ function watchRequests() {
 
 /* Fulfilling is two things at once: the queue is cleared, and the person
    who asked is told — through the same push the studio sends anyone. */
-window.reqFulfil = async function (id, word) {
+/* Telling one person their request is done.
+
+   Two ways, on purpose. The inbox document is the one that always
+   arrives: the app watches its own (app/js/part073.js) and raises the
+   notification whenever it is next opened, so the message survives a phone
+   that was off, a push that was refused, and a subscription that had
+   expired. The push is the one that arrives NOW. Neither is a substitute
+   for the other, and a person who gets both sees one notification, because
+   the inbox marks itself read the moment it is raised. */
+async function reqTellUser(uid, title, body) {
+  if (!uid) return 'no-account';
+  let inbox = false, pushed = 0;
+  try {
+    await addDoc(collection(_db, 'users', uid, 'inbox'), {
+      type: 'arrivals', title, body, at: Date.now(), read: false,
+    });
+    inbox = true;
+  } catch (e) { /* rules or offline — the push may still get there */ }
+
+  try {
+    const user = _auth.currentUser;
+    const subs = (await loadSubs()).filter(s => s.uid === uid);
+    if (user && subs.length) {
+      const res = await fetch('/api/push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (await user.getIdToken()) },
+        body: JSON.stringify({ title, body, type: 'arrivals', subscriptions: subs }),
+      });
+      const data = await res.json().catch(() => ({}));
+      pushed = data.sent || 0;
+    }
+  } catch (e) {}
+
+  return inbox
+    ? (pushed ? 'told them, and their phone buzzed' : 'told them — they will see it next time they open the app')
+    : (pushed ? 'their phone buzzed' : 'could not reach them');
+}
+
+window.reqFulfil = async function (id, word, uid) {
   try {
     await updateDoc(doc(_db, 'requests', id), { status: 'done', doneAt: Date.now() });
-    const t = document.getElementById('pnTitle'), b = document.getElementById('pnBody');
-    if (t && b) {
-      t.value = '“' + word + '” is ready';
-      b.value = 'The meaning you asked for is in your library now.';
-      document.getElementById('pnType').value = 'arrivals';
-      t.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    if (window.showToast) window.showToast('Marked fulfilled — message ready to send');
   } catch (e) {
     if (window.showToast) window.showToast('Could not update that request', true);
+    return;
   }
+
+  const how = await reqTellUser(uid,
+    '“' + word + '” is ready',
+    'The ' + 'meaning you asked for is in your library now.');
+
+  /* And open the template on that word, because marking it done is only
+     the announcement — the work is filling the boxes. */
+  if (window.wsFillFromRequest) window.wsFillFromRequest(word);
+
+  if (window.showToast) window.showToast('Fulfilled — ' + how);
 };
 window.reqDelete = async function (id) {
   try { await deleteDoc(doc(_db, 'requests', id)); } catch (e) {}
+};
+
+/* ══ WORD STUDIO ═════════════════════════════════════════════════════
+   The control hub. content/library holds every word the app teaches —
+   what it is written as in Devanagari, the boxes that say how to speak it,
+   the recording, the organ, the benefit, the meaning, the guide. The app
+   watches it (app/js/part073.js), so publishing here reaches every open
+   copy and every installed PWA without a deploy.
+
+   Recordings
+   ----------
+   A recording made in this page is a blob in this browser and nothing
+   else. To become part of a word it has to live at a URL. Fill in the two
+   constants below with an UNSIGNED Cloudinary upload preset — Cloudinary
+   console → Settings → Upload → Upload presets → Add, signing mode
+   Unsigned — and the record button uploads and fills the box itself.
+   Leave them empty and it still records and plays back, then hands you the
+   file to upload wherever you like and paste the URL in. Nothing is lost
+   either way; one is just two fewer steps.
+   ══════════════════════════════════════════════════════════════════════ */
+const CLOUDINARY_CLOUD  = '';   // e.g. 'eenvubod'
+const CLOUDINARY_PRESET = '';   // e.g. 'nowssb_audio'
+
+let _lib = null;          // the working copy
+let _libIdx = -1;         // which word is open, -1 for a new one
+let _libParts = [];       // the pronunciation boxes of the open word
+
+function wsSay(msg) { const el = document.getElementById('wsStatus'); if (el) el.textContent = msg; }
+
+async function wsLoad() {
+  wsSay('Loading the library…');
+  try {
+    const snap = await getDoc(doc(_db, 'content', 'library'));
+    _lib = snap.exists() ? (snap.data().items || null) : null;
+    if (!_lib || !_lib.length) {
+      wsSay('Nothing published yet — reading what the app ships…');
+      const seed = await seedFromApp();
+      _lib = (seed && seed.library) || [];
+      wsSay(_lib.length
+        ? _lib.length + ' words read from the app. Nothing is live until you press Publish.'
+        : 'Could not read the app’s library. Add a word to start one.');
+    } else {
+      wsSay('Live: ' + _lib.length + ' words.');
+    }
+  } catch (e) {
+    _lib = _lib || [];
+    wsSay('Could not read the library — are the rules published?');
+  }
+  wsRenderList();
+}
+
+function wsRenderList() {
+  const wrap = document.getElementById('wsList');
+  if (!wrap) return;
+  const q = (document.getElementById('wsFind').value || '').trim().toLowerCase();
+  const rows = (_lib || []).map((w, i) => ({ w, i }))
+    .filter(({ w }) => !q || (w.word || '').toLowerCase().includes(q) ||
+                             (w.deva || '').includes(q) ||
+                             (w.organ || '').toLowerCase().includes(q));
+  if (!rows.length) {
+    wrap.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:8px 2px;">' +
+      (_lib && _lib.length ? 'No word matches that.' : 'No words yet.') + '</div>';
+    return;
+  }
+  wrap.innerHTML = rows.map(({ w, i }) =>
+    '<div class="wl-card" style="cursor:pointer;" onclick="wsOpen(' + i + ')">' +
+      '<div class="wl-name">' + esc(w.word || '') +
+        (w.deva ? ' <span class="nwsb-deva" style="font-weight:500;opacity:.75;">' + esc(w.deva) + '</span>' : '') +
+      '</div>' +
+      '<div class="wl-phonetic">' + esc(w.phonetic || (w.parts || []).map(p => p.roman).join(' · ')) + '</div>' +
+      '<div class="wl-meta">' + esc(w.organ || '—') + ' · ' + ((w.parts || w.syllables || []).length) + ' boxes' +
+        ((w.audioMale || w.audioFemale) ? ' · recorded' : '') + '</div>' +
+    '</div>').join('');
+}
+
+/* Both of these are reached from inline handlers in the markup above —
+   the Refresh button and the find box — and an inline handler resolves
+   against the global scope, which a module's own declarations are not
+   part of. Everything else in this section is already assigned to window
+   for the same reason. */
+window.wsLoad = wsLoad;
+window.wsRenderList = wsRenderList;
+
+const WS_FIELDS = {
+  wsWord: 'word', wsDeva: 'deva', wsTranslit: 'translit', wsOrigin: 'origin',
+  wsAudioM: 'audioMale', wsAudioF: 'audioFemale',
+  wsOrgan: 'organ', wsBenefit: 'benefit', wsMeaning: 'meaning',
+  wsMouth: 'mouthPos', wsResonance: 'resonance', wsMistake: 'mistake', wsTip: 'tip',
+  wsImg: 'img',
+};
+
+function wsFill(w) {
+  w = w || {};
+  for (const id in WS_FIELDS) {
+    const el = document.getElementById(id);
+    if (el) el.value = w[WS_FIELDS[id]] || '';
+  }
+  document.getElementById('wsCats').value = (w.categories || []).join(', ');
+  document.getElementById('wsGender').value = w.gender || 'both';
+  document.getElementById('wsTime').value = w.time || 'any';
+  document.getElementById('wsPrice').value = w.price || 200;
+
+  _libParts = (w.parts && w.parts.length)
+    ? JSON.parse(JSON.stringify(w.parts))
+    : (w.syllables || []).map(s => ({ roman: s, deva: '', hold: 1.5, say: '', audio: '' }));
+  if (!_libParts.length) _libParts = [{ roman: '', deva: '', hold: 1.5, say: '', audio: '' }];
+  wsRenderParts();
+}
+
+function wsRenderParts() {
+  const wrap = document.getElementById('wsParts');
+  if (!wrap) return;
+  wrap.innerHTML = _libParts.map((p, i) =>
+    '<div class="wl-card" style="margin-bottom:10px;">' +
+      '<div class="wl-meta" style="margin-bottom:8px;">Box ' + (i + 1) + ' of ' + _libParts.length + '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Roman</label><input type="text" value="' + esc(p.roman || '') + '" oninput="wsSetPart(' + i + ',\'roman\',this.value)" placeholder="aa"></div>' +
+        '<div class="field"><label>Devanagari</label><input type="text" class="nwsb-deva" dir="auto" value="' + esc(p.deva || '') + '" oninput="wsSetPart(' + i + ',\'deva\',this.value)" placeholder="आ"></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Hold (seconds)</label><input type="number" step="0.5" value="' + (p.hold || 1.5) + '" oninput="wsSetPart(' + i + ',\'hold\',this.value)"></div>' +
+        '<div class="field"><label>Recording URL</label><input type="text" value="' + esc(p.audio || '') + '" oninput="wsSetPart(' + i + ',\'audio\',this.value)" placeholder="https://…"></div>' +
+      '</div>' +
+      '<div class="field"><label>How to make this sound</label><input type="text" value="' + esc(p.say || '') + '" oninput="wsSetPart(' + i + ',\'say\',this.value)" placeholder="long, like the a in father"></div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<button class="rec-action-btn" onclick="wsRecPart(' + i + ')">● Record this box</button>' +
+        (_libParts.length > 1 ? '<button class="rec-action-btn" onclick="wsDelPart(' + i + ')">Remove</button>' : '') +
+      '</div>' +
+    '</div>').join('');
+}
+
+window.wsSetPart = function (i, field, val) {
+  if (!_libParts[i]) return;
+  _libParts[i][field] = field === 'hold' ? (Number(val) || 1.5) : val;
+};
+window.wsAddPart = function () {
+  if (_libParts.length >= 5) { showToast('Five boxes is the most a word gets', true); return; }
+  _libParts.push({ roman: '', deva: '', hold: 1.5, say: '', audio: '' });
+  wsRenderParts();
+};
+window.wsDelPart = function (i) { _libParts.splice(i, 1); wsRenderParts(); };
+
+window.wsNew = function () {
+  _libIdx = -1;
+  document.getElementById('wsEditorTitle').textContent = 'New word';
+  document.getElementById('wsDeleteBtn').style.display = 'none';
+  wsFill({});
+  document.getElementById('wsEditor').style.display = 'block';
+  document.getElementById('wsWord').focus();
+  document.getElementById('wsEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+window.wsOpen = function (i) {
+  if (!_lib || !_lib[i]) return;
+  _libIdx = i;
+  document.getElementById('wsEditorTitle').textContent = 'Editing ' + (_lib[i].word || '');
+  document.getElementById('wsDeleteBtn').style.display = '';
+  wsFill(_lib[i]);
+  document.getElementById('wsEditor').style.display = 'block';
+  document.getElementById('wsEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+window.wsCancel = function () { document.getElementById('wsEditor').style.display = 'none'; };
+
+window.wsSave = function () {
+  const word = (document.getElementById('wsWord').value || '').trim();
+  if (!word) { document.getElementById('wsWord').focus(); showToast('The word needs a roman spelling', true); return; }
+
+  const parts = _libParts
+    .map(p => ({ roman: (p.roman || '').trim(), deva: (p.deva || '').trim(),
+                 hold: Number(p.hold) || 1.5, say: (p.say || '').trim(), audio: (p.audio || '').trim() }))
+    .filter(p => p.roman || p.deva);
+
+  const rec = { key: word.toLowerCase().replace(/\s+/g, '-'), word, parts,
+                syllables: parts.map(p => p.roman || p.deva),
+                phonetic: parts.map(p => p.roman || p.deva).join(' · ') };
+  for (const id in WS_FIELDS) rec[WS_FIELDS[id]] = (document.getElementById(id).value || '').trim();
+  rec.word = word;
+  rec.categories = (document.getElementById('wsCats').value || '').split(',').map(s => s.trim()).filter(Boolean);
+  rec.gender = document.getElementById('wsGender').value;
+  rec.time = document.getElementById('wsTime').value;
+  rec.price = Number(document.getElementById('wsPrice').value) || 0;
+  if (!rec.origin) rec.origin = 'Natural Origin';
+
+  if (!_lib) _lib = [];
+  /* Editing by key rather than by index, because the list may have been
+     re-sorted or refreshed since it was opened. */
+  const at = _libIdx >= 0 ? _libIdx : _lib.findIndex(w => (w.key || '').toLowerCase() === rec.key);
+  if (at >= 0 && _lib[at]) _lib[at] = rec; else _lib.unshift(rec);
+
+  _libIdx = _lib.indexOf(rec);
+  wsRenderList();
+  showToast('Saved — press Publish to send it to the app');
+  document.getElementById('wsResult').textContent =
+    'Saved in this page. It is not on anybody’s phone until you press Publish.';
+};
+
+window.wsDelete = function () {
+  if (_libIdx < 0 || !_lib || !_lib[_libIdx]) return;
+  _lib.splice(_libIdx, 1);
+  _libIdx = -1;
+  wsCancel();
+  wsRenderList();
+  showToast('Removed — press Publish to make it so');
+};
+
+window.wsPublish = async function () {
+  const btn = document.getElementById('wsPublish');
+  const out = document.getElementById('wsResult');
+  out.textContent = '';
+  if (!Array.isArray(_lib) || !_lib.length) { out.textContent = 'Nothing to publish.'; return; }
+  /* The app refuses a malformed library rather than emptying itself, so
+     the same check runs here — better to be told now than to publish
+     something every phone quietly ignores. */
+  const bad = _lib.filter(w => !w || !w.word);
+  if (bad.length) { out.textContent = bad.length + ' word(s) have no roman spelling. Fix those first.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Publishing…';
+  try {
+    await setDoc(doc(_db, 'content', 'library'), { items: _lib, at: Date.now() });
+    out.innerHTML = 'Published <b>' + _lib.length + '</b> words. Every open app has them now.';
+    showToast('Published');
+  } catch (e) {
+    out.textContent = 'Could not publish — check you are an admin and the rules are live.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Publish the library to the app';
+  }
+};
+
+/* ── Recording, into a box ──────────────────────────────────────────
+   One recorder, told where to put what it captures. Stops on a second
+   tap. Uploads if a preset is configured, hands you the file if not. ── */
+let _wsRecorder = null, _wsChunks = [], _wsStream = null, _wsTarget = null;
+
+function wsRecInto(setUrl, label) {
+  if (_wsRecorder && _wsRecorder.state === 'recording') { _wsRecorder.stop(); return; }
+  if (!navigator.mediaDevices) { showToast('No microphone in this browser', true); return; }
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    _wsStream = stream;
+    _wsChunks = [];
+    _wsRecorder = new MediaRecorder(stream);
+    _wsRecorder.ondataavailable = e => _wsChunks.push(e.data);
+    _wsRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(_wsChunks, { type: 'audio/webm' });
+      try { new Audio(URL.createObjectURL(blob)).play().catch(() => {}); } catch (e) {}
+      if (CLOUDINARY_CLOUD && CLOUDINARY_PRESET) {
+        showToast('Uploading…');
+        try {
+          const fd = new FormData();
+          fd.append('file', blob);
+          fd.append('upload_preset', CLOUDINARY_PRESET);
+          const r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/auto/upload', { method: 'POST', body: fd });
+          const d = await r.json();
+          if (d.secure_url) { setUrl(d.secure_url); showToast('Recorded and uploaded'); return; }
+          showToast('Upload refused — check the preset is unsigned', true);
+        } catch (e) { showToast('Upload failed — saving the file instead', true); }
+      }
+      /* No preset, or the upload did not take: hand over the file so it
+         can be put somewhere and pasted back in. Nothing is lost. */
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (label || 'nowssb') + '-' + Date.now() + '.webm';
+      a.click();
+      showToast('Saved to your downloads — upload it and paste the URL');
+    };
+    _wsRecorder.start();
+    showToast('Recording — tap the same button again to stop');
+  }).catch(() => showToast('Microphone refused', true));
+}
+
+window.wsRec = function (inputId) {
+  wsRecInto(url => { document.getElementById(inputId).value = url; },
+            (document.getElementById('wsWord').value || 'word').toLowerCase());
+};
+window.wsRecPart = function (i) {
+  wsRecInto(url => { _libParts[i].audio = url; wsRenderParts(); },
+            ((document.getElementById('wsWord').value || 'word') + '-' + (i + 1)).toLowerCase());
+};
+
+/* ── A request, straight into the template ─────────────────────────
+   Somebody asked for a word. This opens the template with what is already
+   known filled in, so the work is filling boxes rather than starting from
+   a blank page. ── */
+window.wsFillFromRequest = function (word) {
+  wsNew();
+  document.getElementById('wsWord').value = String(word || '').toUpperCase();
+  document.getElementById('wsResult').textContent =
+    'Started from a request. Fill the boxes, Save, then Publish — and the person who asked is told.';
 };
 
 /* ══ THE CATALOGUE ═══════════════════════════════════════════════════
@@ -1308,10 +1760,17 @@ function seedFromApp() {
         const w = f.contentWindow;
         const words = w && w.NWSB_DEFAULT_WORD_CATS;
         const means = w && w.MS_BASE_MEANINGS;
+        /* The rich library and the eBooks come the same way — see
+           nwsbLibraryDefaults() in app/js/part073.js. Reading them out of
+           the app rather than retyping them is the only way the first
+           publish cannot drift from what ships. */
+        const lib = w && w.nwsbLibraryDefaults ? w.nwsbLibraryDefaults() : null;
         if ((words && words.length) || (means && means.length)) {
           clearInterval(poll);
           finish({ words: words ? JSON.parse(JSON.stringify(words)) : null,
-                   meanings: means ? JSON.parse(JSON.stringify(means)) : null });
+                   meanings: means ? JSON.parse(JSON.stringify(means)) : null,
+                   library: lib && lib.library ? JSON.parse(JSON.stringify(lib.library)) : null,
+                   books: lib && lib.books ? JSON.parse(JSON.stringify(lib.books)) : null });
         } else if (++tries > 40) { clearInterval(poll); finish(null); }
       }, 250);
     };

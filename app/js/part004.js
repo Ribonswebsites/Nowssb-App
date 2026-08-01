@@ -27,6 +27,12 @@ const MASTER_WORD_LIBRARY = [
   { word:'CHANDRA', phonetic:'chan · dra', syllables:['chan','dra'], organ:'Mind · Emotions', origin:'Natural Origin', benefit:'Soothes the emotional mind and enhances intuition', meaning:'The moon — ruler of mind and emotions', mouthPos:'CH is soft like church, DRA flows together', resonance:'Feel coolness in the forehead and crown', mistake:'Do not separate D from R in DRA', tip:'Say this at night or under moonlight', categories:['Mental Clarity','Hormonal Balance','Reproductive Wellness'], gender:'F', time:'night' }
 ];
 
+/* Half a dozen files read `window.MASTER_WORD_LIBRARY` and fall back to an
+   empty array — but a top-level `const` is not a window property, so that
+   fallback was what they always got. Exposed here, which also gives
+   app/js/part073.js the array to publish edits into. */
+window.MASTER_WORD_LIBRARY = MASTER_WORD_LIBRARY;
+
 // Active session words — set by routine launch or direct open
 let PRACTICE_WORDS = [...MASTER_WORD_LIBRARY];
 

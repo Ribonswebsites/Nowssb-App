@@ -153,13 +153,47 @@
   margin-top:0; font-size:30px; font-weight:800; letter-spacing:.5px; text-align:center; line-height:1.05;
   text-shadow:0 2px 26px rgba(0,0,0,.6), 0 0 32px var(--lg-accent);
 }
+/* The word as it is actually written. Devanagari is taller than latin at
+   the same font-size and its matras sit above and below the line, so it
+   gets its own size and line-height rather than inheriting the title's. */
+.nwsb-deva {
+  font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Kohinoor Devanagari',
+               'Mangal', 'Noto Serif Devanagari', sans-serif;
+}
+.lgp .lgp-deva {
+  margin-top:6px; font-size:26px; line-height:1.45; font-weight:600;
+  text-align:center; color:#fff;
+  text-shadow:0 2px 20px rgba(0,0,0,.6), 0 0 26px var(--lg-accent);
+}
+
 .lgp .lgp-syls { margin-top:7px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
 .lgp .lgp-syl {
   padding:6px 13px; border-radius:12px !important; font-size:14px; font-weight:600;
   background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.34);
   -webkit-backdrop-filter:none; backdrop-filter:none;
   box-shadow:0 5px 16px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.45);
+  /* Three lines now — Devanagari, roman, hold — stacked and centred. Each
+     is optional, so a box with only a roman spelling looks exactly as it
+     did before this existed. */
+  display:inline-flex; flex-direction:column; align-items:center; gap:1px;
+  min-width:46px; line-height:1.25;
 }
+.lgp .lgp-syl-deva {
+  font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Kohinoor Devanagari',
+               'Mangal', 'Noto Serif Devanagari', sans-serif;
+  font-size:17px; font-weight:600; line-height:1.5;
+}
+.lgp .lgp-syl-rom { font-size:13px; font-weight:700; letter-spacing:.4px; }
+.lgp .lgp-syl-hold {
+  font-size:8.5px; font-weight:700; letter-spacing:1px; opacity:.6; text-transform:uppercase;
+}
+/* A box with a recording behind it says so, and is tappable. */
+.lgp .lgp-syl-say { cursor:pointer; border-color:rgba(255,255,255,.6); }
+.lgp .lgp-syl-say::after {
+  content:''; width:5px; height:5px; border-radius:50%;
+  background:var(--lg-accent, rgba(255,255,255,.9)); margin-top:2px;
+}
+.lgp .lgp-syl-say:active { transform:scale(.95); }
 .lgp .lgp-syl.active { background:rgba(255,255,255,.5); color:#10202e; box-shadow:0 0 22px var(--lg-accent); }
 .lgp .lgp-syl-dot { opacity:.55; }
 .lgp .lgp-organ {

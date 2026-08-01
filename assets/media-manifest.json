@@ -1,0 +1,4638 @@
+{
+  "generated": "2026-08-01T08:12:41.979Z",
+  "counts": {
+    "audio": 5,
+    "image": 487,
+    "video": 61
+  },
+  "assets": [
+    {
+      "url": "https://assets.mixkit.co/sfx/preview/mixkit-forest-birds-ambience-1210.mp3",
+      "kind": "audio",
+      "local": "audio/mixkit-forest-birds-ambience-1210-0840e977.mp3",
+      "refs": [
+        "app/js/part032.js"
+      ]
+    },
+    {
+      "url": "https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3",
+      "kind": "audio",
+      "local": "audio/mixkit-light-rain-loop-2393-c710e62c.mp3",
+      "refs": [
+        "app/js/part032.js"
+      ]
+    },
+    {
+      "url": "https://assets.mixkit.co/sfx/preview/mixkit-sea-waves-loop-1196.mp3",
+      "kind": "audio",
+      "local": "audio/mixkit-sea-waves-loop-1196-1684d49c.mp3",
+      "refs": [
+        "app/js/part032.js"
+      ]
+    },
+    {
+      "url": "https://pub-xxxx.r2.dev/words/word-female.mp3",
+      "kind": "audio",
+      "local": "audio/word-female-68da69c5.mp3",
+      "refs": [
+        "admin.html"
+      ]
+    },
+    {
+      "url": "https://pub-xxxx.r2.dev/words/word-male.mp3",
+      "kind": "audio",
+      "local": "audio/word-male-d3a6415a.mp3",
+      "refs": [
+        "admin.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/${cloud}/image/upload/${r.public_id}.${r.format",
+      "kind": "image",
+      "local": "image/--7Br.public_id-7D.--7Br-8a1ade55.jpg",
+      "refs": [
+        "fetch-nowssb-v2.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/002a6360-57ae-11f1-ae7e-3f26811e4481_vwjood.png",
+      "kind": "image",
+      "local": "image/002a6360-57ae-11f1-ae7e-3f26811e4481_vwjood-a01948fe.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png",
+      "kind": "image",
+      "local": "image/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c-606b76db.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/04d5f4e0-5bf2-11f1-8248-b91d5cd919c2_mcohzv.png",
+      "kind": "image",
+      "local": "image/04d5f4e0-5bf2-11f1-8248-b91d5cd919c2_mcohzv-929ed53c.png",
+      "refs": [
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785070108/1000002027_o74vwe.png",
+      "kind": "image",
+      "local": "image/1000002027_o74vwe-c1997656.png",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png",
+      "kind": "image",
+      "local": "image/1000033052-ezremove_vx4rib-a7c213b9.png",
+      "refs": [
+        "app/js/part012.js",
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png",
+      "kind": "image",
+      "local": "image/1000033063-ezremove_r22cph-0234112b.png",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850589/1000033069-ezremove_hz5p0s.png",
+      "kind": "image",
+      "local": "image/1000033069-ezremove_hz5p0s-147fcb73.png",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850607/1000033084-ezremove_ybzuzs.png",
+      "kind": "image",
+      "local": "image/1000033084-ezremove_ybzuzs-b16959c3.png",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850607/1000033084-ezremove_ybzuzs.png",
+      "kind": "image",
+      "local": "image/1000033084-ezremove_ybzuzs-ddf86cab.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850550/1000033096-ezremove_eb2gnu.png",
+      "kind": "image",
+      "local": "image/1000033096-ezremove_eb2gnu-b6203d3d.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png",
+      "kind": "image",
+      "local": "image/1000033096-ezremove_eb2gnu-e0162d3d.png",
+      "refs": [
+        "app/js/part026.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777653492/1000035456-ezremove_ypc5qy.png",
+      "kind": "image",
+      "local": "image/1000035456-ezremove_ypc5qy-992cef6f.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777653462/1000035458-ezremove_qrzunf.png",
+      "kind": "image",
+      "local": "image/1000035458-ezremove_qrzunf-afd01087.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148456/1000037180-ezremove_yors9c.png",
+      "kind": "image",
+      "local": "image/1000037180-ezremove_yors9c-c2f50d51.png",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148457/1000037181-ezremove_acyr0e.png",
+      "kind": "image",
+      "local": "image/1000037181-ezremove_acyr0e-4016b60d.png",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png",
+      "kind": "image",
+      "local": "image/1000038291_no_bg-1778521337465_slhlrx-176aa37d.png",
+      "refs": [
+        "app/js/part049.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png",
+      "kind": "image",
+      "local": "image/1000038291_no_bg-1778521337465_slhlrx-2c2e2de6.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778761450/1000038628-ezremove_rtkvji.png",
+      "kind": "image",
+      "local": "image/1000038628-ezremove_rtkvji-4e92f6f6.png",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/10d7afe0-5bf2-11f1-8248-b91d5cd919c2_b0bff9.png",
+      "kind": "image",
+      "local": "image/10d7afe0-5bf2-11f1-8248-b91d5cd919c2_b0bff9-c0260236.png",
+      "refs": [
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/112b2180-56d8-11f1-8fad-095787cce754_c3lk6m.png",
+      "kind": "image",
+      "local": "image/112b2180-56d8-11f1-8fad-095787cce754_c3lk6m-c4373284.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png",
+      "kind": "image",
+      "local": "image/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j-e0e3e7bd.png",
+      "refs": [
+        "app/js/part033.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png",
+      "kind": "image",
+      "local": "image/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h-baed1f0f.png",
+      "refs": [
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/1d205420-57ae-11f1-ae7e-3f26811e4481_wqkhag.png",
+      "kind": "image",
+      "local": "image/1d205420-57ae-11f1-ae7e-3f26811e4481_wqkhag-fd03c517.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778848481/1e40bfa0-5058-11f1-9378-191e032b08f8_o72am5.png",
+      "kind": "image",
+      "local": "image/1e40bfa0-5058-11f1-9378-191e032b08f8_o72am5-47fd3905.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png",
+      "kind": "image",
+      "local": "image/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq-d95e35b1.png",
+      "refs": [
+        "app/js/part028.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png",
+      "kind": "image",
+      "local": "image/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq-daa82ba7.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png",
+      "kind": "image",
+      "local": "image/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu-0cfd4b7a.png",
+      "refs": [
+        "app/js/part042.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png",
+      "kind": "image",
+      "local": "image/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu-3946f7d5.png",
+      "refs": [
+        "app/app.css",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_60/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png",
+      "kind": "image",
+      "local": "image/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu-e59f5e72.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/e_background_removal/v1779657311/25bb3d70-57ae-11f1-ae7e-3f26811e4481_fhfzwy.png",
+      "kind": "image",
+      "local": "image/25bb3d70-57ae-11f1-ae7e-3f26811e4481_fhfzwy-fcfd3678.png",
+      "refs": [
+        "app/js/part042.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png",
+      "kind": "image",
+      "local": "image/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi-9b5447a3.png",
+      "refs": [
+        "app/js/part042.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png",
+      "kind": "image",
+      "local": "image/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi-e65f9609.png",
+      "refs": [
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png",
+      "kind": "image",
+      "local": "image/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr-fbcda934.png",
+      "refs": [
+        "app/js/part054.js",
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657310/2cf955e0-57ae-11f1-ae7e-3f26811e4481_1_odxgyh.png",
+      "kind": "image",
+      "local": "image/2cf955e0-57ae-11f1-ae7e-3f26811e4481_1_odxgyh-aee7adfa.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png",
+      "kind": "image",
+      "local": "image/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn-d5e7afd9.png",
+      "refs": [
+        "admin.html",
+        "app/app.css",
+        "app/js/part053.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png",
+      "kind": "image",
+      "local": "image/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn-fd76f8a4.png",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png",
+      "kind": "image",
+      "local": "image/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs-240ec8cf.png",
+      "refs": [
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png",
+      "kind": "image",
+      "local": "image/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs-e08224b5.png",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/3208f590-57ae-11f1-ae7e-3f26811e4481_spytes.png",
+      "kind": "image",
+      "local": "image/3208f590-57ae-11f1-ae7e-3f26811e4481_spytes-d60180e8.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png",
+      "kind": "image",
+      "local": "image/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa-082d7dd8.png",
+      "refs": [
+        "app/js/part054.js",
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png",
+      "kind": "image",
+      "local": "image/38538b80-56d8-11f1-8fad-095787cce754_xam2bb-30898a3f.png",
+      "refs": [
+        "app/js/part057.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto,w_900/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png",
+      "kind": "image",
+      "local": "image/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me-e1c03910.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png",
+      "kind": "image",
+      "local": "image/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me-e9b3c801.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png",
+      "kind": "image",
+      "local": "image/411c2a10-517e-11f1-9c9e-43067f971164_cdezmw-1e9aa878.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c5120-517e-11f1-9c9e-43067f971164_igwnf1.png",
+      "kind": "image",
+      "local": "image/411c5120-517e-11f1-9c9e-43067f971164_igwnf1-4c55fcb1.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c7830-517e-11f1-9c9e-43067f971164_qzbtnk.png",
+      "kind": "image",
+      "local": "image/411c7830-517e-11f1-9c9e-43067f971164_qzbtnk-27f0cd7e.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png",
+      "kind": "image",
+      "local": "image/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw-15ae683b.png",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png",
+      "kind": "image",
+      "local": "image/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw-c9636d08.png",
+      "refs": [
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/46d6afc0-517e-11f1-9c9e-43067f971164_l7lezo.png",
+      "kind": "image",
+      "local": "image/46d6afc0-517e-11f1-9c9e-43067f971164_l7lezo-375fe391.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/480348e0-517e-11f1-9c9e-43067f971164_1_uiieto.png",
+      "kind": "image",
+      "local": "image/480348e0-517e-11f1-9c9e-43067f971164_1_uiieto-71403bcd.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/49427fa0-517e-11f1-9c9e-43067f971164_1_qlepve.png",
+      "kind": "image",
+      "local": "image/49427fa0-517e-11f1-9c9e-43067f971164_1_qlepve-bc4535cf.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/49a3a200-578a-11f1-9331-1302872077be_jgmnss.png",
+      "kind": "image",
+      "local": "image/49a3a200-578a-11f1-9331-1302872077be_jgmnss-551f7a2b.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/4b208e70-517e-11f1-9c9e-43067f971164_tcsrzl.png",
+      "kind": "image",
+      "local": "image/4b208e70-517e-11f1-9c9e-43067f971164_tcsrzl-5c69f9d1.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/4d2f7140-517e-11f1-9c9e-43067f971164_kcheth.png",
+      "kind": "image",
+      "local": "image/4d2f7140-517e-11f1-9c9e-43067f971164_kcheth-ebdf8ead.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780083905/51d59000-5b5e-11f1-aed0-2ba1e609569d_nwrv0w.png",
+      "kind": "image",
+      "local": "image/51d59000-5b5e-11f1-aed0-2ba1e609569d_nwrv0w-b4dca8bb.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780083906/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_o2zjbs.png",
+      "kind": "image",
+      "local": "image/54ce4880-5b5c-11f1-8fb4-b7babe7b9db6_o2zjbs-e340aa2c.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png",
+      "kind": "image",
+      "local": "image/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7-16fc5d1f.png",
+      "refs": [
+        "app/js/part033.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780083906/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_soknfu.png",
+      "kind": "image",
+      "local": "image/59b29270-5b5c-11f1-8fb4-b7babe7b9db6_soknfu-3b463a5d.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778973115/5c8e9a00-517c-11f1-a3dd-d923e87f1895_qggn8o.png",
+      "kind": "image",
+      "local": "image/5c8e9a00-517c-11f1-a3dd-d923e87f1895_qggn8o-ad23b031.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780213180/60d712a0-5cc0-11f1-b2eb-f765c6244362_1_gqljyn.webp",
+      "kind": "image",
+      "local": "image/60d712a0-5cc0-11f1-b2eb-f765c6244362_1_gqljyn-575e4a40.webp",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png",
+      "kind": "image",
+      "local": "image/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4-2122ee4c.png",
+      "refs": [
+        "app/js/part032.js",
+        "app/js/part042.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png",
+      "kind": "image",
+      "local": "image/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4-39960624.png",
+      "refs": [
+        "app/js/part057.js",
+        "app/js/part059.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/669d7570-57ad-11f1-ae7e-3f26811e4481_cetrs1.png",
+      "kind": "image",
+      "local": "image/669d7570-57ad-11f1-ae7e-3f26811e4481_cetrs1-8cb975e5.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019430/684ef220-516f-11f1-9b86-d16f5852128e_cjx9y8.png",
+      "kind": "image",
+      "local": "image/684ef220-516f-11f1-9b86-d16f5852128e_cjx9y8-8c229c4e.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657311/6d8a1280-57ad-11f1-ae7e-3f26811e4481_tjz4an.png",
+      "kind": "image",
+      "local": "image/6d8a1280-57ad-11f1-ae7e-3f26811e4481_tjz4an-0fe824d5.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779657311/6f8d5c90-57ad-11f1-ae7e-3f26811e4481_y6etkn.png",
+      "kind": "image",
+      "local": "image/6f8d5c90-57ad-11f1-ae7e-3f26811e4481_y6etkn-29f7e9f3.png",
+      "refs": [
+        "app/js/part042.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657311/6f8d5c90-57ad-11f1-ae7e-3f26811e4481_y6etkn.png",
+      "kind": "image",
+      "local": "image/6f8d5c90-57ad-11f1-ae7e-3f26811e4481_y6etkn-4ca385ce.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779657309/7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi.png",
+      "kind": "image",
+      "local": "image/7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi-209aae77.png",
+      "refs": [
+        "app/js/part042.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi.png",
+      "kind": "image",
+      "local": "image/7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi-87c6a81d.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778848481/74b583c0-504e-11f1-8632-f17e96ecf719_catojv.png",
+      "kind": "image",
+      "local": "image/74b583c0-504e-11f1-8632-f17e96ecf719_catojv-23a1e38d.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png",
+      "kind": "image",
+      "local": "image/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z-929f5f61.png",
+      "refs": [
+        "app/js/part017.js",
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb17020-516c-11f1-9b86-d16f5852128e_1_bbzls6.png",
+      "kind": "image",
+      "local": "image/7bb17020-516c-11f1-9b86-d16f5852128e_1_bbzls6-c075438a.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb519a0-516c-11f1-9b86-d16f5852128e_1_lnqxkr.png",
+      "kind": "image",
+      "local": "image/7bb519a0-516c-11f1-9b86-d16f5852128e_1_lnqxkr-94efdf7f.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb6c750-516c-11f1-9b86-d16f5852128e_appn0v.png",
+      "kind": "image",
+      "local": "image/7bb6c750-516c-11f1-9b86-d16f5852128e_appn0v-a6d09935.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778848481/7f7e0930-5053-11f1-b9f5-0d5aff7d8747_uozmkt.png",
+      "kind": "image",
+      "local": "image/7f7e0930-5053-11f1-b9f5-0d5aff7d8747_uozmkt-8430ee5a.png",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778873989/8939f440-5092-11f1-92fd-0b924bcc13ef_oih5w5.png",
+      "kind": "image",
+      "local": "image/8939f440-5092-11f1-92fd-0b924bcc13ef_oih5w5-a4aac3f4.png",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778761511/906bb480-4f7d-11f1-948a-2573bbbbb305_mxc2tx.webp",
+      "kind": "image",
+      "local": "image/906bb480-4f7d-11f1-948a-2573bbbbb305_mxc2tx-e6c01b45.webp",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780309836/933d3dc0-5da4-11f1-bb6a-cbf2afce6c90_xl2pmx.png",
+      "kind": "image",
+      "local": "image/933d3dc0-5da4-11f1-bb6a-cbf2afce6c90_xl2pmx-67d4d27b.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717857/9ba2b940-5840-11f1-bb0c-71720609fd8f_hpizfv.png",
+      "kind": "image",
+      "local": "image/9ba2b940-5840-11f1-bb0c-71720609fd8f_hpizfv-e2254c39.png",
+      "refs": [
+        "app/app.css",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/a3447b70-516f-11f1-9b86-d16f5852128e_q0eye7.png",
+      "kind": "image",
+      "local": "image/a3447b70-516f-11f1-9b86-d16f5852128e_q0eye7-a89ad734.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972781/a345db00-516f-11f1-9b86-d16f5852128e_s3mxiu.png",
+      "kind": "image",
+      "local": "image/a345db00-516f-11f1-9b86-d16f5852128e_s3mxiu-595ee179.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/a7215cf0-516e-11f1-9b86-d16f5852128e_edvhiv.png",
+      "kind": "image",
+      "local": "image/a7215cf0-516e-11f1-9b86-d16f5852128e_edvhiv-1fe1eac5.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639181/a7b04840-5789-11f1-9331-1302872077be_bqobig.png",
+      "kind": "image",
+      "local": "image/a7b04840-5789-11f1-9331-1302872077be_bqobig-09b2e287.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780065459/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png",
+      "kind": "image",
+      "local": "image/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko-4a799379.png",
+      "refs": [
+        "app/js/part033.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718778/ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png",
+      "kind": "image",
+      "local": "image/ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco-d2fbb2fb.png",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/ae3d15c0-516d-11f1-9b86-d16f5852128e_1_v9xplj.png",
+      "kind": "image",
+      "local": "image/ae3d15c0-516d-11f1-9b86-d16f5852128e_1_v9xplj-b402d685.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974063/b2064b60-5170-11f1-9b86-d16f5852128e_bo7cug.png",
+      "kind": "image",
+      "local": "image/b2064b60-5170-11f1-9b86-d16f5852128e_bo7cug-8365cca2.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974063/b2067270-5170-11f1-9b86-d16f5852128e_ajcacg.png",
+      "kind": "image",
+      "local": "image/b2067270-5170-11f1-9b86-d16f5852128e_ajcacg-aea644e4.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/b9dbe540-51e6-11f1-b02a-df809877b0f5_tt0cfk.png",
+      "kind": "image",
+      "local": "image/b9dbe540-51e6-11f1-b02a-df809877b0f5_tt0cfk-4103e09f.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/b9ebc3c0-51e6-11f1-b02a-df809877b0f5_drg3ft.png",
+      "kind": "image",
+      "local": "image/b9ebc3c0-51e6-11f1-b02a-df809877b0f5_drg3ft-1139e75a.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../buddha.jpg",
+      "kind": "image",
+      "local": "image/buddha-56bd80b3.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/c36f0950-517a-11f1-9d12-25df0fdf84f2_jwiys1.png",
+      "kind": "image",
+      "local": "image/c36f0950-517a-11f1-9d12-25df0fdf84f2_jwiys1-125647ce.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png",
+      "kind": "image",
+      "local": "image/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal-14836157.png",
+      "refs": [
+        "app/js/part042.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png",
+      "kind": "image",
+      "local": "image/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal-3d15e910.png",
+      "refs": [
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718778/c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png",
+      "kind": "image",
+      "local": "image/c5576970-7389-11f1-8c74-0593c060acc9_c4epec-5faf8c22.png",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/c7813730-516f-11f1-9b86-d16f5852128e_sb2bje.png",
+      "kind": "image",
+      "local": "image/c7813730-516f-11f1-9b86-d16f5852128e_sb2bje-60b908e9.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/c8ede950-56cf-11f1-8fad-095787cce754_lhp24x.png",
+      "kind": "image",
+      "local": "image/c8ede950-56cf-11f1-8fad-095787cce754_lhp24x-3ab0831c.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png",
+      "kind": "image",
+      "local": "image/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb-7d46d248.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png",
+      "kind": "image",
+      "local": "image/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb-a9c3caf7.png",
+      "refs": [
+        "app/js/part017.js",
+        "app/js/part028.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_240/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png",
+      "kind": "image",
+      "local": "image/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb-bfab73b3.png",
+      "refs": [
+        "app/js/part049.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558988/cb456de0-56cf-11f1-8fad-095787cce754_zplzrc.png",
+      "kind": "image",
+      "local": "image/cb456de0-56cf-11f1-8fad-095787cce754_zplzrc-47545e1c.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779558988/cb456de0-56cf-11f1-8fad-095787cce754_zplzrc.png",
+      "kind": "image",
+      "local": "image/cb456de0-56cf-11f1-8fad-095787cce754_zplzrc-c1e37a62.png",
+      "refs": [
+        "app/js/part017.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png",
+      "kind": "image",
+      "local": "image/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m-755733bb.png",
+      "refs": [
+        "app/js/part026.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html",
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780083905/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom.png",
+      "kind": "image",
+      "local": "image/dbb95e70-5b61-11f1-aed0-2ba1e609569d_alzpom-e1bc69d8.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780326375/de714c20-5dca-11f1-ac3a-211030203a65_royz93.png",
+      "kind": "image",
+      "local": "image/de714c20-5dca-11f1-ac3a-211030203a65_royz93-91d9b498.png",
+      "refs": [
+        "app/app.css",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718777/e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png",
+      "kind": "image",
+      "local": "image/e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl-f54d694a.png",
+      "refs": [
+        "app/js/part054.js",
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718776/e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png",
+      "kind": "image",
+      "local": "image/e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6-7f1be555.png",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780142466/e1bce500-5835-11f1-9971-736215a430db_qh1vfh.webp",
+      "kind": "image",
+      "local": "image/e1bce500-5835-11f1-9971-736215a430db_qh1vfh-3c426dd3.webp",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779657311/e3815a20-57ad-11f1-ae7e-3f26811e4481_y2zb7t.png",
+      "kind": "image",
+      "local": "image/e3815a20-57ad-11f1-ae7e-3f26811e4481_y2zb7t-30f8d0d3.png",
+      "refs": [
+        "app/js/part042.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657311/e3815a20-57ad-11f1-ae7e-3f26811e4481_y2zb7t.png",
+      "kind": "image",
+      "local": "image/e3815a20-57ad-11f1-ae7e-3f26811e4481_y2zb7t-4f34241e.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778761483/e64470a0-4f7c-11f1-948a-2573bbbbb305_wvionx.webp",
+      "kind": "image",
+      "local": "image/e64470a0-4f7c-11f1-948a-2573bbbbb305_wvionx-f940e9fc.webp",
+      "refs": [
+        "app/app.css",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779713364/ee429d10-5835-11f1-9971-736215a430db_lii4mj.png",
+      "kind": "image",
+      "local": "image/ee429d10-5835-11f1-9971-736215a430db_lii4mj-8c442d0d.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../egyptian-queen.jpg",
+      "kind": "image",
+      "local": "image/egyptian-queen-5224f6b8.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974064/f1849ab0-517c-11f1-9c9e-43067f971164_gyqpko.png",
+      "kind": "image",
+      "local": "image/f1849ab0-517c-11f1-9c9e-43067f971164_gyqpko-0e9b4d0f.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974065/f185ac20-517c-11f1-9c9e-43067f971164_vfyfa0.png",
+      "kind": "image",
+      "local": "image/f185ac20-517c-11f1-9c9e-43067f971164_vfyfa0-c1fe9c5a.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779959490/f5dbb980-5a74-11f1-b395-7149fc656cdb_wft1nx.webp",
+      "kind": "image",
+      "local": "image/f5dbb980-5a74-11f1-b395-7149fc656cdb_wft1nx-7fecd47b.webp",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639180/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png",
+      "kind": "image",
+      "local": "image/f89da3a0-578a-11f1-9331-1302872077be_xfgkbq-8a42ccd5.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png",
+      "kind": "image",
+      "local": "image/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk-3a518ec9.png",
+      "refs": [
+        "app/js/part042.js",
+        "app/js/part054.js",
+        "app/js/part059.js",
+        "app/js/part061.js",
+        "app/js/part063.js",
+        "index.html",
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1780340485/fd31c0b0-5deb-11f1-9e1a-9303081e5fda_finid1.png",
+      "kind": "image",
+      "local": "image/fd31c0b0-5deb-11f1-9e1a-9303081e5fda_finid1-82efe5bb.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/fd7c24e0-516e-11f1-9b86-d16f5852128e_bticry.png",
+      "kind": "image",
+      "local": "image/fd7c24e0-516e-11f1-9b86-d16f5852128e_bticry-397de938.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png",
+      "kind": "image",
+      "local": "image/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq-d9d42b1f.png",
+      "refs": [
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779657309/fdd80ef0-57ad-11f1-ae7e-3f26811e4481_lfscbr.png",
+      "kind": "image",
+      "local": "image/fdd80ef0-57ad-11f1-ae7e-3f26811e4481_lfscbr-32695ab1.png",
+      "refs": [
+        "app/js/part042.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/fdd80ef0-57ad-11f1-ae7e-3f26811e4481_lfscbr.png",
+      "kind": "image",
+      "local": "image/fdd80ef0-57ad-11f1-ae7e-3f26811e4481_lfscbr-a149d7c3.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148458/fe50c080-49fb-11f1-9ed8-61ad086d2bba_ydglxe.png",
+      "kind": "image",
+      "local": "image/fe50c080-49fb-11f1-9ed8-61ad086d2bba_ydglxe-5b438c25.png",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974067/ffbb0340-516c-11f1-9b86-d16f5852128e_aavqzy.png",
+      "kind": "image",
+      "local": "image/ffbb0340-516c-11f1-9b86-d16f5852128e_aavqzy-c56543d6.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971512/ffbb0340-516c-11f1-9b86-d16f5852128e_ekdtma.png",
+      "kind": "image",
+      "local": "image/ffbb0340-516c-11f1-9b86-d16f5852128e_ekdtma-61e63166.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971603/ffc4a030-516c-11f1-9b86-d16f5852128e_oahwvn.png",
+      "kind": "image",
+      "local": "image/ffc4a030-516c-11f1-9b86-d16f5852128e_oahwvn-bf568516.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971604/ffec7380-516c-11f1-9b86-d16f5852128e_1_xdqlio.png",
+      "kind": "image",
+      "local": "image/ffec7380-516c-11f1-9b86-d16f5852128e_1_xdqlio-5e6137e3.png",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png",
+      "kind": "image",
+      "local": "image/file_00000000029c71fa8c210e0f09870964_uwh8sc-3e391588.png",
+      "refs": [
+        "app/js/part049.js",
+        "app/js/part053.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png",
+      "kind": "image",
+      "local": "image/file_00000000029c7208b5e915d9af2c480c_tuccwo-82f4939a.png",
+      "refs": [
+        "app/js/part049.js",
+        "app/js/part053.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784356872/file_000000000418820690feafe33ae6f12a_idrvna.png",
+      "kind": "image",
+      "local": "image/file_000000000418820690feafe33ae6f12a_idrvna-9b1d23c5.png",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123006/file_00000000048471f4ab69afc37df973c0_iab33r.png",
+      "kind": "image",
+      "local": "image/file_00000000048471f4ab69afc37df973c0_iab33r-02be5045.png",
+      "refs": [
+        "app/js/part059.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/v1785015111/file_000000000e1481f48c725af03d03bb87_j6vlof.png",
+      "kind": "image",
+      "local": "image/file_000000000e1481f48c725af03d03bb87_j6vlof-55fe5d36.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069853/file_000000000fe081fa8126f6c41c3d35d3_ojtwkw.png",
+      "kind": "image",
+      "local": "image/file_000000000fe081fa8126f6c41c3d35d3_ojtwkw-91de05f2.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png",
+      "kind": "image",
+      "local": "image/file_0000000010fc820891f9e15a38316d2b_ffffhq-78a7fce5.png",
+      "refs": [
+        "app/js/part053.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000112882069935a3c4bce3b4ca_r6awjq.png",
+      "kind": "image",
+      "local": "image/file_00000000112882069935a3c4bce3b4ca_r6awjq-525009e0.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000317/file_00000000115482309d295f43cfcf0b67_karuh8.png",
+      "kind": "image",
+      "local": "image/file_00000000115482309d295f43cfcf0b67_karuh8-28624429.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069167/file_0000000013088209a33ed2b6c15a7dfe_l6j2wf.png",
+      "kind": "image",
+      "local": "image/file_0000000013088209a33ed2b6c15a7dfe_l6j2wf-f1286e21.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_0000000015b071f48397d34be0129b36_bx9cur.png",
+      "kind": "image",
+      "local": "image/file_0000000015b071f48397d34be0129b36_bx9cur-fb6c9150.png",
+      "refs": [
+        "app/js/part059.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim,f_auto,q_auto,w_800/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png",
+      "kind": "image",
+      "local": "image/file_0000000016bc71fab1ae5a054ac772af_gwttc6-2468fe74.png",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png",
+      "kind": "image",
+      "local": "image/file_0000000016bc71fab1ae5a054ac772af_gwttc6-324b60bd.png",
+      "refs": [
+        "nowssb-player.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784911166/file_000000001d48820b952dd7f9ae29b735_s6jtoa.png",
+      "kind": "image",
+      "local": "image/file_000000001d48820b952dd7f9ae29b735_s6jtoa-0836dc76.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782986898/file_000000002038722fac63c79466d73f0f_jnhjvg.png",
+      "kind": "image",
+      "local": "image/file_000000002038722fac63c79466d73f0f_jnhjvg-1201d89e.png",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1785014534/file_0000000020cc82089a4eded2b0c2c62b_hmu0qv.png",
+      "kind": "image",
+      "local": "image/file_0000000020cc82089a4eded2b0c2c62b_hmu0qv-3aa1f3cd.png",
+      "refs": [
+        "app/js/part061.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069166/file_00000000210881fabda4b62a827e2b7d_shsdnw.png",
+      "kind": "image",
+      "local": "image/file_00000000210881fabda4b62a827e2b7d_shsdnw-15cf88d8.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000280082069ad442c609cdd790_ci1kbd.png",
+      "kind": "image",
+      "local": "image/file_00000000280082069ad442c609cdd790_ci1kbd-85436732.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784914142/file_0000000028e081f8a7afffb4fac5481e_vbv0ft.png",
+      "kind": "image",
+      "local": "image/file_0000000028e081f8a7afffb4fac5481e_vbv0ft-4653d86c.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785054819/file_000000002a1481fbae984a694c298783_lkwus2.png",
+      "kind": "image",
+      "local": "image/file_000000002a1481fbae984a694c298783_lkwus2-0c03e186.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png",
+      "kind": "image",
+      "local": "image/file_000000002cf4820b865caf6fc0554959_k7drqx-d64eb590.png",
+      "refs": [
+        "app/js/part042.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part063.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_000000002d8481fa9065a82d78dfc023_ayk5gv.png",
+      "kind": "image",
+      "local": "image/file_000000002d8481fa9065a82d78dfc023_ayk5gv-fec3a9f1.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1785008158/file_000000003178820eaf8ce3c5585ae040_odmnce.png",
+      "kind": "image",
+      "local": "image/file_000000003178820eaf8ce3c5585ae040_odmnce-208b73bf.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_500/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png",
+      "kind": "image",
+      "local": "image/file_000000003254720aab81c7118e7cc24a_ohsba3-4c178fde.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png",
+      "kind": "image",
+      "local": "image/file_000000003254720aab81c7118e7cc24a_ohsba3-b12d055e.png",
+      "refs": [
+        "app/js/part067.js",
+        "index.html",
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png",
+      "kind": "image",
+      "local": "image/file_000000003254720aab81c7118e7cc24a_ohsba3-bee391b7.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899471/file_00000000345481faafd2bea97c8320ab_oknybe.png",
+      "kind": "image",
+      "local": "image/file_00000000345481faafd2bea97c8320ab_oknybe-d5b1b5c8.png",
+      "refs": [
+        "app/js/part059.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784899471/file_00000000345481faafd2bea97c8320ab_oknybe.png",
+      "kind": "image",
+      "local": "image/file_00000000345481faafd2bea97c8320ab_oknybe-e00d95de.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784876918/file_0000000035ac81fa8d163588e627b067_xjpm5r.png",
+      "kind": "image",
+      "local": "image/file_0000000035ac81fa8d163588e627b067_xjpm5r-f5848178.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160870/file_0000000037547208b91bfd167f401961_eesfpn.png",
+      "kind": "image",
+      "local": "image/file_0000000037547208b91bfd167f401961_eesfpn-851a6532.png",
+      "refs": [
+        "app/js/part053.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785040038/file_00000000394081fa9924bcd31a345869_magp1x.png",
+      "kind": "image",
+      "local": "image/file_00000000394081fa9924bcd31a345869_magp1x-7e5fa2dc.png",
+      "refs": [
+        "app/js/part061.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png",
+      "kind": "image",
+      "local": "image/file_0000000039c8720893ebc07bba4d3afd_iq64ts-44dc76ff.png",
+      "refs": [
+        "app/js/part053.js",
+        "app/js/part054.js",
+        "app/js/part059.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png",
+      "kind": "image",
+      "local": "image/file_000000003a70820783900e4c58acea82_nlzav4-03065b0a.png",
+      "refs": [
+        "app/js/part010.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png",
+      "kind": "image",
+      "local": "image/file_000000003a70820783900e4c58acea82_nlzav4-7018aa78.png",
+      "refs": [
+        "app/js/part053.js",
+        "app/js/part054.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782747508/file_0000000046b07246a11b7146b9ae4c88_oj8ke2.png",
+      "kind": "image",
+      "local": "image/file_0000000046b07246a11b7146b9ae4c88_oj8ke2-556b0f67.png",
+      "refs": [
+        "app/js/part035.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/v1785007237/file_000000004738820ea48974114d0c6926_pxjrbc.png",
+      "kind": "image",
+      "local": "image/file_000000004738820ea48974114d0c6926_pxjrbc-d64ddc34.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png",
+      "kind": "image",
+      "local": "image/file_000000004a88820bb7dc8e1daa118ea6_h2coem-938d528c.png",
+      "refs": [
+        "app/js/part033.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783162753/file_000000004f5471fa92179aacccd3cea8_nfw8gm.png",
+      "kind": "image",
+      "local": "image/file_000000004f5471fa92179aacccd3cea8_nfw8gm-823d87a7.png",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000050d472089de0ad57116dba0f_tht26i.png",
+      "kind": "image",
+      "local": "image/file_0000000050d472089de0ad57116dba0f_tht26i-04f9ca3d.png",
+      "refs": [
+        "app/js/part053.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_00000000536071f4bf5172014811968f_jkt450.png",
+      "kind": "image",
+      "local": "image/file_00000000536071f4bf5172014811968f_jkt450-76c543f6.png",
+      "refs": [
+        "app/js/part059.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783232336/file_000000005418720b94ddb92836d002b1_gyw6qo.png",
+      "kind": "image",
+      "local": "image/file_000000005418720b94ddb92836d002b1_gyw6qo-50e654b1.png",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_0000000054ac81fa9e379e63228aba3a_h5alpl.png",
+      "kind": "image",
+      "local": "image/file_0000000054ac81fa9e379e63228aba3a_h5alpl-d8b05f3e.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png",
+      "kind": "image",
+      "local": "image/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab-6f94fbbb.png",
+      "refs": [
+        "app/js/part053.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1785013441/file_000000005aa481f4be169ee2a6cee8a6_sbt23e.png",
+      "kind": "image",
+      "local": "image/file_000000005aa481f4be169ee2a6cee8a6_sbt23e-fd22e4ad.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_000000005c28820693e31425ac03a99a_myqo9z.png",
+      "kind": "image",
+      "local": "image/file_000000005c28820693e31425ac03a99a_myqo9z-8928d859.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png",
+      "kind": "image",
+      "local": "image/file_0000000062a882089abd27eb90ea3945_ngqyu6-cef95e0e.png",
+      "refs": [
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_00000000639c82078e3623f3dab8d1af_dvw8yx.png",
+      "kind": "image",
+      "local": "image/file_00000000639c82078e3623f3dab8d1af_dvw8yx-6399eeb8.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784892466/file_00000000659881f4a309effa4077346e_iwwk9f.png",
+      "kind": "image",
+      "local": "image/file_00000000659881f4a309effa4077346e_iwwk9f-e7f31eed.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png",
+      "kind": "image",
+      "local": "image/file_000000006b20820b84961321dcdcaaa8_be9meu-c6e02dd7.png",
+      "refs": [
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784128570/file_000000006bc871f484d039fa1139dc11_d6rlu8.png",
+      "kind": "image",
+      "local": "image/file_000000006bc871f484d039fa1139dc11_d6rlu8-07b75a36.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/image/upload/v1785491031/file_000000006f5481f4bbc8be77aa9ac96a_kslzw1.png",
+      "kind": "image",
+      "local": "image/file_000000006f5481f4bbc8be77aa9ac96a_kslzw1-52c8eddc.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785040037/file_00000000735c8207b7fa48448b9f6ecf_ouac1f.png",
+      "kind": "image",
+      "local": "image/file_00000000735c8207b7fa48448b9f6ecf_ouac1f-6734ff2c.png",
+      "refs": [
+        "app/js/part061.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_0000000076c48208b433925b357e3f72_g4tfmf.png",
+      "kind": "image",
+      "local": "image/file_0000000076c48208b433925b357e3f72_g4tfmf-5a7b9e8e.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000316/file_00000000786c82079f31ed572d4ad3f4_gdyf0r.png",
+      "kind": "image",
+      "local": "image/file_00000000786c82079f31ed572d4ad3f4_gdyf0r-8588420c.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007af081f49748cd0a1b77c566_f8qslq.png",
+      "kind": "image",
+      "local": "image/file_000000007af081f49748cd0a1b77c566_f8qslq-cc0be740.png",
+      "refs": [
+        "app/js/part017.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784877225/file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png",
+      "kind": "image",
+      "local": "image/file_000000007b8081fa9f8bfa346747e79f_pbkbqy-bab484ce.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007fec81f4b097aaae4e7ac297_ohtqy9.png",
+      "kind": "image",
+      "local": "image/file_000000007fec81f4b097aaae4e7ac297_ohtqy9-f29a7f2b.png",
+      "refs": [
+        "app/js/part017.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png",
+      "kind": "image",
+      "local": "image/file_0000000080688207a9599e17a28e7710_oefkxy-4d24ec12.png",
+      "refs": [
+        "app/js/part059.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png",
+      "kind": "image",
+      "local": "image/file_0000000080688207a9599e17a28e7710_oefkxy-fa14ed3a.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png",
+      "kind": "image",
+      "local": "image/file_00000000854881fa9a548a68fae59c15_w1utya-0d99cd84.png",
+      "refs": [
+        "app/js/part026.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000868081fa8048698268ae60bb_rw97tp.png",
+      "kind": "image",
+      "local": "image/file_00000000868081fa8048698268ae60bb_rw97tp-15f710be.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png",
+      "kind": "image",
+      "local": "image/file_0000000086d872089ce376674620d5f3_mtfftb-ad232d9a.png",
+      "refs": [
+        "app/js/part012.js",
+        "app/js/part053.js",
+        "app/js/part057.js",
+        "app/js/part059.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png",
+      "kind": "image",
+      "local": "image/file_000000008bf881faa9949f7b7d9824bf_niqhps-39b21d37.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png",
+      "kind": "image",
+      "local": "image/file_000000008bf881faa9949f7b7d9824bf_niqhps-a0048187.png",
+      "refs": [
+        "app/js/part059.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784460713/file_000000008eb081fba87f16fe9146e413_mk9wbe.png",
+      "kind": "image",
+      "local": "image/file_000000008eb081fba87f16fe9146e413_mk9wbe-cd862f1c.png",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785040038/file_00000000944081fabf1a7c01b225f478_qbxhjq.png",
+      "kind": "image",
+      "local": "image/file_00000000944081fabf1a7c01b225f478_qbxhjq-9bf5ebbc.png",
+      "refs": [
+        "app/js/part061.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785040061/file_00000000989482309ec4a5e82fead5e0_i4cbfw.png",
+      "kind": "image",
+      "local": "image/file_00000000989482309ec4a5e82fead5e0_i4cbfw-1c963ef6.png",
+      "refs": [
+        "app/js/part061.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1785014506/file_000000009f10820bb6872a5ed8007148_pvqjaa.png",
+      "kind": "image",
+      "local": "image/file_000000009f10820bb6872a5ed8007148_pvqjaa-92db8fe0.png",
+      "refs": [
+        "app/js/part042.js",
+        "app/js/part063.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_000000009f8871f48dbd29b870dbdc9e_z9idoj.png",
+      "kind": "image",
+      "local": "image/file_000000009f8871f48dbd29b870dbdc9e_z9idoj-3a902af1.png",
+      "refs": [
+        "app/js/part059.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png",
+      "kind": "image",
+      "local": "image/file_00000000a23c71f49581cfa65c26e6d2_bnwstr-0d4e5d79.png",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png",
+      "kind": "image",
+      "local": "image/file_00000000a24081fa83eeab9164647db8_w2fzuq-53baa3a7.png",
+      "refs": [
+        "app/js/part059.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png",
+      "kind": "image",
+      "local": "image/file_00000000a24081fa83eeab9164647db8_w2fzuq-8b3efe44.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/file_00000000a484720aa71b5f34f8539f05_amesbb.png",
+      "kind": "image",
+      "local": "image/file_00000000a484720aa71b5f34f8539f05_amesbb-05326b2f.png",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png",
+      "kind": "image",
+      "local": "image/file_00000000a718720aaba9aef2f7b1e757_sdk2a8-bca5a223.png",
+      "refs": [
+        "app/js/part041.js",
+        "index.html",
+        "nowssb-nm.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png",
+      "kind": "image",
+      "local": "image/file_00000000acd482469da31656911599dd_kany9z-0b8ff35c.png",
+      "refs": [
+        "app/js/part037.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png",
+      "kind": "image",
+      "local": "image/file_00000000ae5882089bc97a56b7368777_l4cq7e-2d04e075.png",
+      "refs": [
+        "app/js/part067.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png",
+      "kind": "image",
+      "local": "image/file_00000000ae6071fa982c6eec401328c6_uvgfjs-1efdccf1.png",
+      "refs": [
+        "app/app.css",
+        "app/js/part004.js",
+        "app/js/part018.js",
+        "index.html",
+        "nowssb-nm.css",
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png",
+      "kind": "image",
+      "local": "image/file_00000000ae6071fa982c6eec401328c6_uvgfjs-43be5b07.png",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png",
+      "kind": "image",
+      "local": "image/file_00000000ae6071fa982c6eec401328c6_uvgfjs-d1a65a04.png",
+      "refs": [
+        "index.html",
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png",
+      "kind": "image",
+      "local": "image/file_00000000ae607208aa51504989648920_ml2czc-b5b95f89.png",
+      "refs": [
+        "app/js/part053.js",
+        "app/js/part057.js",
+        "app/js/part059.js",
+        "app/js/part061.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png",
+      "kind": "image",
+      "local": "image/file_00000000b11472098a225d3703b04a60_phr6ph-922dbe61.png",
+      "refs": [
+        "app/js/part033.js",
+        "app/js/part042.js",
+        "app/js/part063.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png",
+      "kind": "image",
+      "local": "image/file_00000000b11472098a225d3703b04a60_phr6ph-fc779dc4.png",
+      "refs": [
+        "app/js/part042.js",
+        "app/js/part047.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784876917/file_00000000b6c481fab8074cb5a1d16756_thikfl.png",
+      "kind": "image",
+      "local": "image/file_00000000b6c481fab8074cb5a1d16756_thikfl-faf8c891.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png",
+      "kind": "image",
+      "local": "image/file_00000000b84c7209ab496862cacd6a7f_kagsie-93079f94.png",
+      "refs": [
+        "app/js/part049.js",
+        "app/js/part053.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png",
+      "kind": "image",
+      "local": "image/file_00000000b84c7209ab496862cacd6a7f_kagsie-dca76a93.png",
+      "refs": [
+        "app/js/part033.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png",
+      "kind": "image",
+      "local": "image/file_00000000b86c7207988c04376fd0529c_dunq9l-1297b974.png",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069871/file_00000000bc3481fba068b600e71ed418_xt5arr.png",
+      "kind": "image",
+      "local": "image/file_00000000bc3481fba068b600e71ed418_xt5arr-49c4b612.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png",
+      "kind": "image",
+      "local": "image/file_00000000be547207aaa56f43cfef4f67_nxhvw0-9a911ff0.png",
+      "refs": [
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785047545/file_00000000c0e081fb815178e186ea5044_dnv6ky.png",
+      "kind": "image",
+      "local": "image/file_00000000c0e081fb815178e186ea5044_dnv6ky-7dd8ef73.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/image/upload/v1785491031/file_00000000c4b481f4b128fbab24a3b51b_fjaec0.png",
+      "kind": "image",
+      "local": "image/file_00000000c4b481f4b128fbab24a3b51b_fjaec0-98e69f81.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png",
+      "kind": "image",
+      "local": "image/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa-06eeeb7d.png",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/v1785007237/file_00000000c66081faa0761524553f5545_tla2go.png",
+      "kind": "image",
+      "local": "image/file_00000000c66081faa0761524553f5545_tla2go-807f0f91.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784876916/file_00000000c70081faab87b58c23b3edcb_yzyrbf.png",
+      "kind": "image",
+      "local": "image/file_00000000c70081faab87b58c23b3edcb_yzyrbf-bde403bc.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/v1785493612/file_00000000c81c81fba2f7377fc71229be_uvvxfz.png",
+      "kind": "image",
+      "local": "image/file_00000000c81c81fba2f7377fc71229be_uvvxfz-03830788.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784878540/file_00000000cf00820b83f17dc392a0071d_hhm18g.png",
+      "kind": "image",
+      "local": "image/file_00000000cf00820b83f17dc392a0071d_hhm18g-19e66736.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png",
+      "kind": "image",
+      "local": "image/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz-eece9bc1.png",
+      "refs": [
+        "app/js/part041.js",
+        "index.html",
+        "nowssb-nm.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000316/file_00000000d05c820794c1f45a6f51869c_fpasjy.png",
+      "kind": "image",
+      "local": "image/file_00000000d05c820794c1f45a6f51869c_fpasjy-d1c5d645.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png",
+      "kind": "image",
+      "local": "image/file_00000000d39081faa073bf17312d89fc_q9ehat-340aee3b.png",
+      "refs": [
+        "app/js/part010.js",
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069853/file_00000000d7e88209a05b0cd46d3c9204_yylblf.png",
+      "kind": "image",
+      "local": "image/file_00000000d7e88209a05b0cd46d3c9204_yylblf-380e15c0.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784356872/file_00000000de10820b822213b89af7be7f_fpjdrh.png",
+      "kind": "image",
+      "local": "image/file_00000000de10820b822213b89af7be7f_fpjdrh-7fd6690d.png",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784877426/file_00000000e0948207852ee99ed468fbb0_gon5be.png",
+      "kind": "image",
+      "local": "image/file_00000000e0948207852ee99ed468fbb0_gon5be-a0043279.png",
+      "refs": [
+        "app/js/part054.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784975675/file_00000000ee688208950f4126ed15d9b3_esohnw.png",
+      "kind": "image",
+      "local": "image/file_00000000ee688208950f4126ed15d9b3_esohnw-708c96dd.png",
+      "refs": [
+        "app/js/part017.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069853/file_00000000ee9482079592b5380d196d89_sd8ucv.png",
+      "kind": "image",
+      "local": "image/file_00000000ee9482079592b5380d196d89_sd8ucv-8536344c.png",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png",
+      "kind": "image",
+      "local": "image/file_00000000f02c72088cd128f3f4b08af5_vskoom-f35c1354.png",
+      "refs": [
+        "app/js/part053.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785040037/file_00000000f6e881fa9c614af0994b5dda_pxkbl4.png",
+      "kind": "image",
+      "local": "image/file_00000000f6e881fa9c614af0994b5dda_pxkbl4-a741312d.png",
+      "refs": [
+        "app/js/part061.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png",
+      "kind": "image",
+      "local": "image/file_00000000f740820ba6aaa761133e8889_fitm0p-6ce21dea.png",
+      "refs": [
+        "app/js/part018.js",
+        "app/js/part057.js",
+        "app/js/part061.js",
+        "app/js/part064.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000fbb481fa897d6c4b800c7abc_x0fmja.png",
+      "kind": "image",
+      "local": "image/file_00000000fbb481fa897d6c4b800c7abc_x0fmja-bc820482.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000fdb08207a6e3e5e768f47448_apuryf.png",
+      "kind": "image",
+      "local": "image/file_00000000fdb08207a6e3e5e768f47448_apuryf-972642fd.png",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776753853585_luk2yh.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776753853585_luk2yh-2d5f3e28.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800798/grok_image_1776753853585_luk2yh.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776753853585_luk2yh-c7238917.jpg",
+      "refs": [
+        "app/js/part026.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776754047350_m02pef.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776754047350_m02pef-f099e414.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776754188034_snzcgu.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776754188034_snzcgu-519c95dc.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/c_fill,g_center,w_512,h_512/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776871816898_3_ll7c0m-0915d8d8.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/c_fill,g_center,w_1200,h_630/q_auto/f_auto/v1776871997/grok_image_1776871816898_3_ll7c0m.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776871816898_3_ll7c0m-d0827535.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931241446_2_oqn7z0.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776931241446_2_oqn7z0-5e762088.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931251298_2_nuhjin.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776931251298_2_nuhjin-3159d35d.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931253654_2_hrtsra.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776931253654_2_hrtsra-2a399550.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931659181_2_l3dxyi.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776931659181_2_l3dxyi-a5bdf190.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931991083_2_eyvogv.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776931991083_2_eyvogv-e02f879c.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776932343988_3_bofj1s.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776932343988_3_bofj1s-d6d093b0.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932486772_2_spplq4.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776932486772_2_spplq4-7c69e4bc.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934920/grok_image_1776932830246_2_x0yyb6.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776932830246_2_x0yyb6-29d32b63.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932933365_2_jb1lch.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776932933365_2_jb1lch-d25cf9f9.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776933033268_2_m3fmo9.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1776933033268_2_m3fmo9-b76040d8.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777029510370_2_lilo5x-1f1b10b0.jpg",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030372/grok_image_1777029845867_2_abtxad.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777029845867_2_abtxad-b30e42e2.jpg",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030389/grok_image_1777030001969_2_mpmpu2.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777030001969_2_mpmpu2-204c8cfe.jpg",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030423/grok_image_1777030062742_2_f7k7eo.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777030062742_2_f7k7eo-1e4dd206.jpg",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777570716/grok_image_1777570509389_ch0bif.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777570509389_ch0bif-5ac9161e.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584943/grok_image_1777580530017_nftrrb.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777580530017_nftrrb-213d9db2.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584978/grok_image_1777580577245_s0oftf.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777580577245_s0oftf-fd85c05f.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777591568/grok_image_1777591433417_rx2whb.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777591433417_rx2whb-2ff13ce0.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777615898/grok_image_1777615621529_xdxfj6.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777615621529_xdxfj6-238024d1.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777615898/grok_image_1777615621529_xdxfj6.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777615621529_xdxfj6-eb618b86.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777616006/grok_image_1777615631154_yddgyh.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777615631154_yddgyh-25c37146.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777616006/grok_image_1777615631154_yddgyh.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777615631154_yddgyh-c50a5124.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777635115/grok_image_1777632677047_2_rnnm0k.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777632677047_2_rnnm0k-e273a7c6.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777635128/grok_image_1777632687913_2_t4jezy.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777632687913_2_t4jezy-5496e48d.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777635201/grok_image_1777634717809_jbqvaq.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777634717809_jbqvaq-538b351f.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706671/grok_image_1777706008418_slbqza.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777706008418_slbqza-e96b2232.jpg",
+      "refs": [
+        "app/js/part016.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706671/grok_image_1777706116245_awevjm.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777706116245_awevjm-53dd9e20.jpg",
+      "refs": [
+        "app/js/part016.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706672/grok_image_1777706263630_mahjss.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777706263630_mahjss-6121481c.jpg",
+      "refs": [
+        "app/js/part016.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706672/grok_image_1777706360035_kdvj3e.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777706360035_kdvj3e-c5c27e83.jpg",
+      "refs": [
+        "app/js/part016.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777748597/grok_image_1777747756281_j10yta.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777747756281_j10yta-86150fc0.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777748690/grok_image_1777748446479_lotpls.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777748446479_lotpls-9fba1849.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777803046/grok_image_1777802759590_giabgl.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777802759590_giabgl-9365648b.jpg",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778221085/grok_image_1777883952599_et71xx.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777883952599_et71xx-6dc6f3dc.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777884920/grok_image_1777884641742_yowydl.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777884641742_yowydl-abb9db4b.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777884965/grok_image_1777884736477_wbarcd.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777884736477_wbarcd-73b6e391.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887443893_xvupmc.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777887443893_xvupmc-991d31ab.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887770266_zyexqb.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777887770266_zyexqb-3adc668a.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887913840_z9mkmd.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777887913840_z9mkmd-0f0d0af9.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888701/grok_image_1777887990036_wmmmjt.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777887990036_wmmmjt-3394dad0.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777888044011_sx7km5.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777888044011_sx7km5-67850990.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777888311729_kmtnzu.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777888311729_kmtnzu-fc77fe6a.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888701/grok_image_1777888420816_bkrtzw.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777888420816_bkrtzw-ade96ff1.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777892128/grok_image_1777891642236_lacz8v.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777891642236_lacz8v-59791062.jpg",
+      "refs": [
+        "app/js/part015.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965419/grok_image_1777891898700_zzskwn.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777891898700_zzskwn-f846c7bd.jpg",
+      "refs": [
+        "app/js/part018.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965473/grok_image_1777891938824_cxuhwm.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777891938824_cxuhwm-202ad8b4.jpg",
+      "refs": [
+        "app/app.css",
+        "app/js/part018.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777973723/grok_image_1777967661568_pbau2f.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777967661568_pbau2f-efbd3259.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777979724/grok_image_1777979418026_i2sdys.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777979418026_i2sdys-844dcd05.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777980772/grok_image_1777980580135_lkpcv2.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777980580135_lkpcv2-e2fa6605.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777982340/grok_image_1777982257091_q5lkbb.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777982257091_q5lkbb-d3d5389d.jpg",
+      "refs": [
+        "app/app.css",
+        "app/js/part018.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778246083/grok_image_1777988386974_xbaic7.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777988386974_xbaic7-3e814690.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989351/grok_image_1777988401110_loe5xq.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777988401110_loe5xq-c1466ec7.jpg",
+      "refs": [
+        "app/js/part018.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989351/grok_image_1777988498025_yn2kwz.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777988498025_yn2kwz-f3836b3f.jpg",
+      "refs": [
+        "app/js/part018.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988498991_vr7cc3.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777988498991_vr7cc3-6fe19f60.jpg",
+      "refs": [
+        "app/js/part018.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988560596_ihjsc6.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777988560596_ihjsc6-7a723433.jpg",
+      "refs": [
+        "app/js/part018.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988562428_tddkze.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777988562428_tddkze-eedefbaa.jpg",
+      "refs": [
+        "app/js/part018.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989351/grok_image_1777989145016_rkszz4.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1777989145016_rkszz4-2bfbc284.jpg",
+      "refs": [
+        "app/js/part018.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778052232385_qpdmgh-a270527c.jpg",
+      "refs": [
+        "app/js/part004.js",
+        "app/js/part054.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052611/grok_image_1778052238350_bxdyvx.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778052238350_bxdyvx-2f75c429.jpg",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052585/grok_image_1778052247702_xxo6jv.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778052247702_xxo6jv-ff731cc4.jpg",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052598/grok_image_1778052255147_welycg.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778052255147_welycg-8e8b5559.jpg",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052565/grok_image_1778052259502_s8fbkb.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778052259502_s8fbkb-b8bdfe39.jpg",
+      "refs": [
+        "app/js/part004.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778059670/grok_image_1778059394370_l8tun2.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778059394370_l8tun2-86dee67c.jpg",
+      "refs": [
+        "app/app.css",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778059694/grok_image_1778059487277_txwog5.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778059487277_txwog5-a86f2258.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778078302/grok_image_1778070967319_ys14eq.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778070967319_ys14eq-c18a50b2.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148458/grok_image_1778140366830_kr46gr.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140366830_kr46gr-25632fec.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148457/grok_image_1778140408500_ucsplo.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140408500_ucsplo-2a173c6f.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148457/grok_image_1778140415087_mn2kog.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140415087_mn2kog-dbeee556.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148458/grok_image_1778140433938_wvgmuz.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140433938_wvgmuz-f9f1f943.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148458/grok_image_1778140443107_b0z6fx.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140443107_b0z6fx-5528f56c.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148459/grok_image_1778140446573_w5qrvq.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140446573_w5qrvq-010da475.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148459/grok_image_1778140452371_ufrjom.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140452371_ufrjom-914fe820.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148459/grok_image_1778140457587_jdbnuo.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140457587_jdbnuo-fe505cbc.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148460/grok_image_1778140465237_rooq5n.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140465237_rooq5n-820d289b.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148460/grok_image_1778140472572_epkcrs.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140472572_epkcrs-e55ba2e1.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148460/grok_image_1778140482721_dwpsis.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140482721_dwpsis-d18f8fa3.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148460/grok_image_1778140492244_hkw4dr.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140492244_hkw4dr-8c7a9e3e.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148461/grok_image_1778140503138_vdaqrx.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140503138_vdaqrx-4828fc72.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148461/grok_image_1778140508637_kacgmf.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140508637_kacgmf-60f34c68.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148462/grok_image_1778140531353_onoaci.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140531353_onoaci-32317308.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148462/grok_image_1778140553935_lpejkk.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140553935_lpejkk-d4a24640.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148463/grok_image_1778140560786_ls3czt.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140560786_ls3czt-46480390.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148463/grok_image_1778140574785_c5nkph.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140574785_c5nkph-7f6ba685.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148464/grok_image_1778140578685_cpiw6n.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140578685_cpiw6n-6bc7fdc5.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148464/grok_image_1778140587120_ihuxzz.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140587120_ihuxzz-fc146522.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148465/grok_image_1778140594588_bidu9r.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140594588_bidu9r-063fe0d4.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148465/grok_image_1778140614054_n3nbsy.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140614054_n3nbsy-d4c27a67.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148466/grok_image_1778140619655_asmvnn.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140619655_asmvnn-47204fd5.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148466/grok_image_1778140642487_bb8mes.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140642487_bb8mes-ed21f905.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148466/grok_image_1778140813647_otjm5m.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140813647_otjm5m-dd035607.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778148467/grok_image_1778140862207_vid6oz.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778140862207_vid6oz-e4a639e0.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778224442/grok_image_1778224339812_jhranv.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778224339812_jhranv-0cdbac29.jpg",
+      "refs": [
+        "app/app.css",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778235407/grok_image_1778234748702_hf0ta7.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778234748702_hf0ta7-5ad0c51a.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778239613/grok_image_1778239219753_zoqjdn.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778239219753_zoqjdn-f9ccb3c1.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778246066/grok_image_1778245944595_jbjdb2.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778245944595_jbjdb2-03e08aff.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778269212/grok_image_1778269103150_aezjpr.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778269103150_aezjpr-016f06c3.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778269229/grok_image_1778269114853_bwe8jm.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778269114853_bwe8jm-de0589b8.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778309102/grok_image_1778309033334_fza02n.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778309033334_fza02n-ae87e39f.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778322179/grok_image_1778322076841_rdsqad.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778322076841_rdsqad-ad1007d8.jpg",
+      "refs": [
+        "app/app.css",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778352486/grok_image_1778351597613_x7wkrx.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778351597613_x7wkrx-aff711dd.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778352472/grok_image_1778352369803_v7fx3t.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778352369803_v7fx3t-713f82e1.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778359330/grok_image_1778359267657_qdrs3l.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778359267657_qdrs3l-801a4604.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778361307/grok_image_1778361133324_gmcoed.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778361133324_gmcoed-6a6dda9e.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778361293/grok_image_1778361190028_igaoto.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778361190028_igaoto-c658b384.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778571475/grok_image_1778520937416_jazknf.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778520937416_jazknf-d9e441a7.jpg",
+      "refs": [
+        "app/js/part010.js",
+        "app/js/part011.js",
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778571499/grok_image_1778521152376_il2xkh.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778521152376_il2xkh-3c466066.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581668/grok_image_1778575330887_cjuvgx.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778575330887_cjuvgx-1df8332e.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581668/grok_image_1778575335848_zvteyg.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778575335848_zvteyg-e049c5e5.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581669/grok_image_1778575348155_zfummr.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778575348155_zfummr-0532898c.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581669/grok_image_1778576394414_vdi2on.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778576394414_vdi2on-a8ac4e25.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581670/grok_image_1778576400577_mnxqkd.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778576400577_mnxqkd-d875ed19.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581670/grok_image_1778581463094_eucw6p.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778581463094_eucw6p-c33fe37e.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648270/grok_image_1778647948774_mntgip.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778647948774_mntgip-698baa47.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648290/grok_image_1778647959913_fdzsgc.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778647959913_fdzsgc-56ff75db.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648317/grok_image_1778648109536_exlolv.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778648109536_exlolv-46c90f5d.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648338/grok_image_1778648156568_qdbaux.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778648156568_qdbaux-5a76e2b5.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778656121/grok_image_1778655491471_ss3vax.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778655491471_ss3vax-75e76977.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778656146/grok_image_1778656028544_cih9iy.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778656028544_cih9iy-a571a653.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778774321/grok_image_1778773657342_pdufwz.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778773657342_pdufwz-09159f2a.jpg",
+      "refs": [
+        "app/js/part028.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778774379/grok_image_1778773664749_wfnnky.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778773664749_wfnnky-f2492265.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778774395/grok_image_1778773672967_vpae2x.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778773672967_vpae2x-4c438866.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778783778/grok_image_1778783018581_aeitdi.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778783018581_aeitdi-c48fc0c2.jpg",
+      "refs": [
+        "app/js/part028.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778918908/grok_image_1778917928268_zmeywq.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778917928268_zmeywq-3d159a69.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778918931/grok_image_1778918809769_t5dz01.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778918809769_t5dz01-55ba3926.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778919329/grok_image_1778919089382_gd1j8s.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778919089382_gd1j8s-0175b49d.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778921536/grok_image_1778921461863_thpnpp.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778921461863_thpnpp-d4e32705.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_1000/v1778922166/grok_image_1778922009415_qtoteo.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1778922009415_qtoteo-9ca8d462.jpg",
+      "refs": [
+        "app/app.css",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780209363/grok_image_1780209143800_i8lcry.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1780209143800_i8lcry-5460adb5.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1780209363/grok_image_1780209143800_i8lcry.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1780209143800_i8lcry-6e2e9920.jpg",
+      "refs": [
+        "app/js/part047.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780213180/grok_image_1780213016088_vdd4vv.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1780213016088_vdd4vv-68764266.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780213181/grok_image_1780213036353_uwv69l.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1780213036353_uwv69l-e6f39db6.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591559591_yxgud5.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591559591_yxgud5-0e166955.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591559591_yxgud5.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591559591_yxgud5-aad115a3.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591561380_ytpn3b.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591561380_ytpn3b-12f0cdff.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591561380_ytpn3b.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591561380_ytpn3b-f66793dd.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591627828_lmde11.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591627828_lmde11-b887480a.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591627828_lmde11.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591627828_lmde11-ce0268db.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591669371_kqnaf9.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591669371_kqnaf9-50172d41.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591669371_kqnaf9.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591669371_kqnaf9-fdd63e56.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592260/grok_image_1782591732123_epmpiu.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591732123_epmpiu-ab99ae2d.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592260/grok_image_1782591732123_epmpiu.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591732123_epmpiu-e3e62a06.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591857840_tbznap.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591857840_tbznap-8d58fe6b.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591857840_tbznap.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591857840_tbznap-f6b5e99b.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591933705_qq3l9g.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591933705_qq3l9g-c69095f4.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591933705_qq3l9g.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782591933705_qq3l9g-ebb49d33.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782592051446_womamz.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782592051446_womamz-1c745f24.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782592051446_womamz.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782592051446_womamz-b7e95785.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/grok_image_1782620063491_op58of.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782620063491_op58of-0ae6c6b3.jpg",
+      "refs": [
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/grok_image_1782620475749_fgncxl.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782620475749_fgncxl-a9b8345e.jpg",
+      "refs": [
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782622024/grok_image_1782621969038_uvugj1.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782621969038_uvugj1-0ec85c9d.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656918/grok_image_1782656676834_rzp2cz.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782656676834_rzp2cz-0086477c.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782657140/grok_image_1782656684101_o9vc93.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782656684101_o9vc93-4aac096b.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656704854_cfsah3.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782656704854_cfsah3-9890d9fc.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656710977_nj5r6x.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782656710977_nj5r6x-9e86cc56.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792072386_d8fifm.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782792072386_d8fifm-2726c960.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792074543_iasker.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782792074543_iasker-94a6f763.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792076655_amox3t.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782792076655_amox3t-a25a3b5e.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792148248_tpzn1r.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782792148248_tpzn1r-52f104d4.jpg",
+      "refs": [
+        "app/js/part033.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782795978/grok_image_1782795582310_llvpix.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782795582310_llvpix-45073e93.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796519587_thrrws.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782796519587_thrrws-002fbc6f.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796537731_vzyhwn.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782796537731_vzyhwn-9172a166.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796725/grok_image_1782796641824_izkh09.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782796641824_izkh09-7f4a8f0c.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796924745_nmksmi.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782796924745_nmksmi-889fac0a.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796933792_qwzfgx.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1782796933792_qwzfgx-c5c9e010.jpg",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783104242/grok_image_1783103445469_fdv2uu.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783103445469_fdv2uu-baa46830.jpg",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783104637863_uiynel-766f5ea6.jpg",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_700/v1783178179/grok_image_1783176033232_gwjjih.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783176033232_gwjjih-fbdc5ced.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_700/v1783178179/grok_image_1783177867840_nupzo9.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783177867840_nupzo9-f2f1afff.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_700/v1783178179/grok_image_1783177875299_xuf33h.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783177875299_xuf33h-b312651a.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_700/v1783178179/grok_image_1783177883710_zbhbq2.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783177883710_zbhbq2-07f573bf.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783179785/grok_image_1783178874949_zcbb28.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783178874949_zcbb28-ce1d0bbd.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783179785/grok_image_1783179042580_kdfmbl.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783179042580_kdfmbl-02ac0e4e.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783179785/grok_image_1783179567035_qgupmu.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783179567035_qgupmu-e7f4bf47.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783179785/grok_image_1783179620064_quvp6x.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1783179620064_quvp6x-e811c43d.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784044843386_iarpg7-65a663db.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "app/js/part047.js",
+        "app/js/part049.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784044844917_ocvbli-782f392b.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "app/js/part047.js",
+        "app/js/part049.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784044846126_pyqsll-bc46b866.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "app/js/part047.js",
+        "app/js/part049.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094183/grok_image_1784093977513_alcdo3.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784093977513_alcdo3-d47c78ab.jpg",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094627/grok_image_1784094543609_husz87.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784094543609_husz87-12eee00c.jpg",
+      "refs": [
+        "nowssb-nm.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_700/v1784130175/grok_image_1784119058739_g0ihh7.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784119058739_g0ihh7-51a9eae9.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784119058739_g0ihh7.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784119058739_g0ihh7-fafd47df.jpg",
+      "refs": [
+        "app/js/part059.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130232/grok_image_1784119291881_s6pws0.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784119291881_s6pws0-7fa21bf0.jpg",
+      "refs": [
+        "app/js/part059.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_700/v1784130232/grok_image_1784119291881_s6pws0.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784119291881_s6pws0-d24286c9.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784120203500_t6zwrf.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784120203500_t6zwrf-7f99bba8.jpg",
+      "refs": [
+        "app/js/part059.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_700/v1784130175/grok_image_1784120203500_t6zwrf.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784120203500_t6zwrf-870672d9.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784120246538_thvpik.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784120246538_thvpik-5cd7878b.jpg",
+      "refs": [
+        "app/js/part059.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_700/v1784130175/grok_image_1784120246538_thvpik.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784120246538_thvpik-793acd6a.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784144472932_h242ko-d6280714.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784171086/grok_image_1784171046763_kfygmv.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784171046763_kfygmv-2be7eba2.jpg",
+      "refs": [
+        "app/js/part041.js",
+        "nowssb-social.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto:best/v1784172445/grok_image_1784172374517_d9q0zs.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784172374517_d9q0zs-34c8eb4e.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177099346_a7zq1m.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784177099346_a7zq1m-47bae5c1.jpg",
+      "refs": [
+        "nowssb-nm.css",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177200001_clr7h6.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784177200001_clr7h6-90adf120.jpg",
+      "refs": [
+        "nowssb-nm.css",
+        "nowssb-social.css",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177237514_bbhcec.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784177237514_bbhcec-b3b4e384.jpg",
+      "refs": [
+        "nowssb-nm.css",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177245304_ihjubs.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784177245304_ihjubs-cca4706a.jpg",
+      "refs": [
+        "nowssb-nm.css",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784255344/grok_image_1784255334796_jew1ou.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784255334796_jew1ou-83361766.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261485118_fnnndw.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784261485118_fnnndw-d48dbae7.jpg",
+      "refs": [
+        "app/js/part032.js",
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261493254_szhsuw.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784261493254_szhsuw-20ef0539.jpg",
+      "refs": [
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263699783_tyf4l8.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784263699783_tyf4l8-4b1a2bb3.jpg",
+      "refs": [
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263702345_zlt99m.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784263702345_zlt99m-b94ef5cf.jpg",
+      "refs": [
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784263778179_okskwb-8acf9d3a.jpg",
+      "refs": [
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263836740_atjk35.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784263836740_atjk35-367d2300.jpg",
+      "refs": [
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263836740_qclr5g.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784263836740_qclr5g-ae286490.jpg",
+      "refs": [
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263881946_zespcn.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784263881946_zespcn-8f973bcf.jpg",
+      "refs": [
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784263996/grok_image_1784263979789_doxtcp.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784263979789_doxtcp-2c10d5c5.jpg",
+      "refs": [
+        "app/js/part047.js",
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784323854/grok_image_1784323780299_lesd3w.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784323780299_lesd3w-b3efcf23.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784323854/grok_image_1784323781787_j8bwkl.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784323781787_j8bwkl-17982a09.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784368347/grok_image_1784368225944_zqlmx4.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784368225944_zqlmx4-e57fdaa3.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784368347/grok_image_1784368231258_qti4xe.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784368231258_qti4xe-599ff349.jpg",
+      "refs": [
+        "nowssb-nm.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784975674/grok_image_1784957219264_oulqx7.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1784957219264_oulqx7-dc0b804e.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785402429/grok_image_1785402330575_bbykvf.jpg",
+      "kind": "image",
+      "local": "image/grok_image_1785402330575_bbykvf-6302183f.jpg",
+      "refs": [
+        "app/js/part066.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg",
+      "kind": "image",
+      "local": "image/grok_video_2026-05-13-15-13-43_c1npax-68cf3931.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/image_dtmprf.jpg",
+      "kind": "image",
+      "local": "image/image_dtmprf-3dc534de.jpg",
+      "refs": [
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/image_qg7ro5.jpg",
+      "kind": "image",
+      "local": "image/image_qg7ro5-c67526e4.jpg",
+      "refs": [
+        "nowssb-social.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891248/image-101_pppzbn.jpg",
+      "kind": "image",
+      "local": "image/image-101_pppzbn-624fdb7d.jpg",
+      "refs": [
+        "app/js/part027.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401851/image-109_flaoqi.jpg",
+      "kind": "image",
+      "local": "image/image-109_flaoqi-73054360.jpg",
+      "refs": [
+        "app/js/part022.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-131_jyrnhx.jpg",
+      "kind": "image",
+      "local": "image/image-131_jyrnhx-a56d1a1e.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-135_hziacn.jpg",
+      "kind": "image",
+      "local": "image/image-135_hziacn-7e889dc1.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891277/image-143_pfuqmd.jpg",
+      "kind": "image",
+      "local": "image/image-143_pfuqmd-fa69235b.jpg",
+      "refs": [
+        "app/js/part027.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778848483/image-148_zfrtqg.jpg",
+      "kind": "image",
+      "local": "image/image-148_zfrtqg-458e8996.jpg",
+      "refs": [
+        "app/js/part027.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418327/image-156_awwho5.jpg",
+      "kind": "image",
+      "local": "image/image-156_awwho5-181a35b4.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418357/image-162_vl3unq.jpg",
+      "kind": "image",
+      "local": "image/image-162_vl3unq-71329ebf.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418383/image-167_qbyiji.jpg",
+      "kind": "image",
+      "local": "image/image-167_qbyiji-bb6bf305.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778153132/image-168_ej7sa8.jpg",
+      "kind": "image",
+      "local": "image/image-168_ej7sa8-946d6680.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778153132/image-169_c5i9mm.jpg",
+      "kind": "image",
+      "local": "image/image-169_c5i9mm-91c0504c.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778783800/image-181_pavuqo.jpg",
+      "kind": "image",
+      "local": "image/image-181_pavuqo-a7607630.jpg",
+      "refs": [
+        "app/app.css"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-190_jqulqk.jpg",
+      "kind": "image",
+      "local": "image/image-190_jqulqk-3e1a5caf.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcda8ed8e/image/upload/f_auto,q_auto/v1779455673/image-2_gv7pht.jpg",
+      "kind": "image",
+      "local": "image/image-2_gv7pht-dfd4c12f.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778662207/image-202_yktk8y.jpg",
+      "kind": "image",
+      "local": "image/image-202_yktk8y-12d3d573.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401905/image-206_mhgp5c.jpg",
+      "kind": "image",
+      "local": "image/image-206_mhgp5c-9bb84c2d.jpg",
+      "refs": [
+        "app/js/part022.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891320/image-213_sggc81.jpg",
+      "kind": "image",
+      "local": "image/image-213_sggc81-9403367f.jpg",
+      "refs": [
+        "app/js/part027.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783082388/image-22_ns2jhx.jpg",
+      "kind": "image",
+      "local": "image/image-22_ns2jhx-d05f1c19.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-240_wxgthb.jpg",
+      "kind": "image",
+      "local": "image/image-240_wxgthb-175e5493.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778153132/image-71_vamq5d.jpg",
+      "kind": "image",
+      "local": "image/image-71_vamq5d-10dd8b15.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778662189/image-84_bqpkid.jpg",
+      "kind": "image",
+      "local": "image/image-84_bqpkid-8cb79d09.jpg",
+      "refs": [
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-92_rfnjut.jpg",
+      "kind": "image",
+      "local": "image/image-92_rfnjut-9dcb6d34.jpg",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778153132/image-94_gokqx5.jpg",
+      "kind": "image",
+      "local": "image/image-94_gokqx5-9916138a.jpg",
+      "refs": [
+        "app/js/part014.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401874/image-96_wklfon.jpg",
+      "kind": "image",
+      "local": "image/image-96_wklfon-72c210da.jpg",
+      "refs": [
+        "app/js/part022.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778785369/image-98_xoizhn.jpg",
+      "kind": "image",
+      "local": "image/image-98_xoizhn-ca6468e1.jpg",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../purple-suit.jpg",
+      "kind": "image",
+      "local": "image/purple-suit-e4a70119.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../roman-emperor.jpg",
+      "kind": "image",
+      "local": "image/roman-emperor-adb0379a.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../scientist.jpg",
+      "kind": "image",
+      "local": "image/scientist-645db91d.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../tribal-warrior.jpg",
+      "kind": "image",
+      "local": "image/tribal-warrior-622fd770.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../viking-thor.jpg",
+      "kind": "image",
+      "local": "image/viking-thor-2270fe63.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../white-suit.jpg",
+      "kind": "image",
+      "local": "image/white-suit-b3aa8992.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../zeus-lightning.jpg",
+      "kind": "image",
+      "local": "image/zeus-lightning-9d6dc478.jpg",
+      "refs": [
+        "app/js/part030.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4",
+      "kind": "video",
+      "local": "video/1000002131_andxsu-17eab46f.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/",
+      "kind": "video",
+      "local": "video/asset-8d09c7b8.mp4",
+      "refs": [
+        "app/js/part067.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784958436/gemini_generated_video_4045e221_a4mza9.mp4",
+      "kind": "video",
+      "local": "video/gemini_generated_video_4045e221_a4mza9-535dd2f3.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784959261/gemini_generated_video_aa0d13e6_gzjzhw.mp4",
+      "kind": "video",
+      "local": "video/gemini_generated_video_aa0d13e6_gzjzhw-26d59884.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4",
+      "kind": "video",
+      "local": "video/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn-f12ac915.mp4",
+      "refs": [
+        "app/js/part006.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-05-05-16-46-09_dpauwg-e384f50e.mp4",
+      "refs": [
+        "app/js/part004.js",
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/v1778061531/grok_video_2026-05-06-15-27-23_zhylbe.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-05-06-15-27-23_zhylbe-ead7d93c.mp4",
+      "refs": [
+        "app/js/part004.js",
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/f_auto/v1778511160/grok_video_2026-05-11-19-06-52_e67kc6.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-05-11-19-06-52_e67kc6-e1881ad2.mp4",
+      "refs": [
+        "app/js/part004.js",
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-05-13-15-13-43_c1npax-b44c7041.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-05-13-17-16-28_e4m4vr-f70682f5.mp4",
+      "refs": [
+        "app/js/part004.js",
+        "app/js/part012.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-05-28-14-02-13_zaoxnl-93a2f880.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-05-29-04-36-47_cze9bz-3af80c8c.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656947/grok_video_2026-06-28-19-54-38_wrxkgr.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-28-19-54-38_wrxkgr-f1f87650.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656932/grok_video_2026-06-28-19-54-43_it2bur.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-28-19-54-43_it2bur-9306cbc3.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656923/grok_video_2026-06-28-19-55-02_of5fwh.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-28-19-55-02_of5fwh-ecb5518c.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656870/grok_video_2026-06-28-19-55-09_otgbxd.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-28-19-55-09_otgbxd-387a4053.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782795956/grok_video_2026-06-30-10-29-43_hzxyun.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-30-10-29-43_hzxyun-1f9c1ff6.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796770/grok_video_2026-06-30-10-45-34_pg2y2j.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-30-10-45-34_pg2y2j-254c5c01.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796761/grok_video_2026-06-30-10-45-45_dg2ohg.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-30-10-45-45_dg2ohg-c1360889.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796770/grok_video_2026-06-30-10-47-20_rljghs.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-30-10-47-20_rljghs-0218eb23.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782797027/grok_video_2026-06-30-10-52-07_gvffol.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-30-10-52-07_gvffol-544c2d4d.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796996/grok_video_2026-06-30-10-52-20_zk87yh.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-06-30-10-52-20_zk87yh-64609ac9.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991522/grok_video_2026-07-02-16-51-43_gilelq.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-02-16-51-43_gilelq-8068c683.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991522/grok_video_2026-07-02-16-51-54_zpffyf.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-02-16-51-54_zpffyf-6db7ef3b.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991521/grok_video_2026-07-02-16-52-19_mlfgei.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-02-16-52-19_mlfgei-5b084fb3.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991520/grok_video_2026-07-02-16-52-38_pehfcr.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-02-16-52-38_pehfcr-abb3fd89.mp4",
+      "refs": [
+        "nowssb-player.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-15-13-03-21_fs9ir3-924f5057.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-16-08-26-13_ipsk4u-43030665.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-41-24_x8z4mj.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-17-12-41-24_x8z4mj-bceeb55f.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-17-12-42-01_sz9agw-47e18364.mp4",
+      "refs": [
+        "app/js/part042.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-18-15-53-02_ubjx5b-9dfa2ddc.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784378125/grok_video_2026-07-18-18-04-01_zr8f4m.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-18-18-04-01_zr8f4m-56a0ed1a.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-19-08-55-10_omybbr-a3104fd2.mp4",
+      "refs": [
+        "app/js/part026.js",
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784892265/grok_video_2026-07-24-13-59-14_xsqgse.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-24-13-59-14_xsqgse-7d010267.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-24-15-42-55_lknomr-e0d34dce.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-24-17-46-41_vkxr4r-5bfff2a9.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-14-35-05_q3tyzk-756961ca.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1785402435/grok_video_2026-07-30-14-35-16_j5tr1g.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-14-35-16_j5tr1g-d871817d.mp4",
+      "refs": [
+        "app/js/part066.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1785402440/grok_video_2026-07-30-14-35-18_kucgwh.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-14-35-18_kucgwh-d432ba8c.mp4",
+      "refs": [
+        "app/js/part066.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-20_lju6u7.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-14-35-20_lju6u7-2014b975.mp4",
+      "refs": [
+        "app/js/part066.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1785403502/grok_video_2026-07-30-14-54-07_ddjmrr.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-14-54-07_ddjmrr-bdc10ddc.mp4",
+      "refs": [
+        "app/js/part066.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-14-57-37_tbzpox-3c94724e.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-15-35-40_xwm1ei-366a36cd.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785428189/grok_video_2026-07-30-21-45-01_egzgw2.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-21-45-01_egzgw2-f2817c42.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785428199/grok_video_2026-07-30-21-45-09_vbmf44.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-30-21-45-09_vbmf44-8c1bfcd1.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438343/grok_video_2026-07-31-00-34-06_c2fuko.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-00-34-06_c2fuko-5f490758.mp4",
+      "refs": [
+        "app/js/part067.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438349/grok_video_2026-07-31-00-34-23_ouxhic.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-00-34-23_ouxhic-41e04719.mp4",
+      "refs": [
+        "app/js/part067.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785491036/grok_video_2026-07-31-15-10-28_cenjdg.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-15-10-28_cenjdg-4c1cc336.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785491039/grok_video_2026-07-31-15-12-09_rixqre.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-15-12-09_rixqre-f3dcc736.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511425/grok_video_2026-07-31-15-36-41_blygoz.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-15-36-41_blygoz-c0aabbf4.mp4",
+      "refs": [
+        "app/js/part010.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-15-41-50_oxszei-d54e9fb0.mp4",
+      "refs": [
+        "app/js/part026.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511500/grok_video_2026-07-31-20-40-30_vxozmt.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-20-40-30_vxozmt-1448bada.mp4",
+      "refs": [
+        "app/js/part010.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511507/grok_video_2026-07-31-20-42-12_lcwctk.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-20-42-12_lcwctk-32296c6d.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-42-54_we5gke.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-20-42-54_we5gke-1931e592.mp4",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-43-13_qh2qjg.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-20-43-13_qh2qjg-4583aa09.mp4",
+      "refs": [
+        "app/js/part012.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-20-44-13_jlsimw-ea395ad3.mp4",
+      "refs": [
+        "app/js/part010.js",
+        "app/js/part066.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511503/grok_video_2026-07-31-20-44-17_ebayxd.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-20-44-17_ebayxd-3ea31a0d.mp4",
+      "refs": [
+        "app/js/part066.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511505/grok_video_2026-07-31-20-44-24_cgt3mc.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-20-44-24_cgt3mc-a9635766.mp4",
+      "refs": [
+        "app/js/part066.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/video/upload/v1785518003/grok_video_2026-07-31-22-26-26_xiytvf.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-22-26-26_xiytvf-dd6df26d.mp4",
+      "refs": [
+        "app/js/part067.js"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/video/upload/v1785517999/grok_video_2026-07-31-22-41-02_fy7mnv.mp4",
+      "kind": "video",
+      "local": "video/grok_video_2026-07-31-22-41-02_fy7mnv-0692b9ed.mp4",
+      "refs": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4",
+      "kind": "video",
+      "local": "video/InShot_20260422_000025290_xqdxey-e93b9603.mp4",
+      "refs": [
+        "app/js/part004.js",
+        "app/js/part012.js",
+        "index.html"
+      ]
+    }
+  ]
+}
