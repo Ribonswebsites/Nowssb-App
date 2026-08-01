@@ -35,10 +35,13 @@
 (function () {
   'use strict';
 
-  /* Paste the Web Push certificate's public key here — Firebase console →
-     Project settings → Cloud Messaging → Web Push certificates. Empty means
-     "no server yet": nothing subscribes and nothing breaks. */
-  var VAPID_PUBLIC_KEY = '';
+  /* The Web Push certificate's PUBLIC key, from Firebase console → Project
+     settings → Cloud Messaging → Web Push certificates. Public is the point
+     of it: a browser needs it to make a subscription, and it is worth
+     nothing on its own. The private half of the pair signs the sends and
+     belongs on a server — it must never appear in this file or any other
+     the app serves. */
+  var VAPID_PUBLIC_KEY = 'BKOj_da2V8ebcvZidlL94VdVKtsbNXos-f41Sd_sS9V918Ex3TH210NOMKndTb5FX6k9NGfa2X3U6fgjtBdVXK4';
 
   var ICON  = './assets/icons/app-icon-192.png';
   var BADGE = './assets/icons/notif-badge.png';
