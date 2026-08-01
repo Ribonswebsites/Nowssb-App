@@ -7061,12 +7061,111 @@ body:has(.sub-screen.open #sub-intro-page:not([style*="pointer-events: none"]):n
 }
 .cust-row-arrow svg { width: 14px; height: 14px; }
 
-/* The Normal home is a light neumorphic surface — the same glass over cream
-   would be unreadable, so it gets the dark card treatment the black banners
-   had, while the night skin keeps the glass. */
+/* ══════════════════════════════════════════════════════════════════
+   CUSTOMIZE, ON THE NORMAL HOME — neumorphic, like everything around it.
+
+   This was a dark navy card dropped into a light cream page: readable,
+   but plainly a visitor from the Fashion home. It is the same panel and
+   the same rows; only the surface changes. The head now reads exactly
+   like the greeting at the top of this page — a round raised orb, the
+   heavy name, the quiet line under it — because that is the type
+   hierarchy this home already uses to introduce a section.
+
+   The Fashion home and the night skin are untouched; both keep the glass.
+   ══════════════════════════════════════════════════════════════════ */
 #home-nm:not(.nm-dark) .nmh-cust-panel {
-  background: #14142a; border-color: rgba(255,255,255,0.08);
+  background: #f0f2f7; border: none;
   -webkit-backdrop-filter: none; backdrop-filter: none;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+  padding-bottom: 4px;
+  /* .cust-panel clips its children so the glass card's corners cut cleanly.
+     A neumorphic child casts its shadow OUTSIDE itself, so that clip would
+     shear every row's shadow into a straight edge and flatten the whole
+     thing — the same way overflow:hidden squared off the player wrapper.
+     Nothing here needs clipping: the scroller below does its own. */
+  overflow: visible;
+}
+
+/* ── The head ── */
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-panel-head {
+  background: transparent; border-bottom: none;
+  align-items: flex-start; gap: 14px; padding: 18px 18px 12px;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-panel-head:active { background: transparent; }
+
+/* Round, raised, the same disc the greeting orb is. */
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-panel-icon {
+  width: 54px; height: 54px; margin-top: 2px;
+  background: #f0f2f7; border: none;
+  border-radius: 50% !important;
+  box-shadow: 6px 6px 14px rgba(163,177,198,0.6), -5px -5px 12px #ffffff;
+}
+/* Inset a little so the artwork sits inside the disc rather than becoming
+   its edge — a photo bled to the rim loses the neumorphic lift entirely. */
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-panel-icon img {
+  width: 78%; height: 78%; margin: 11%; border-radius: 50%;
+}
+
+/* "Customize" takes the greeting's heavy name treatment, the line under it
+   the quiet one — the same pair as "Healer / Ready for today's practice?". */
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-panel-title {
+  font-size: 27px; font-weight: 800; color: #1a1a2e;
+  letter-spacing: -0.6px; line-height: 1.12;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-panel-sub {
+  font-size: 13px; font-weight: 400; color: rgba(26,26,46,0.55); margin-top: 6px;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-panel-more { margin-top: 16px; }
+/* The chevron's colour is an attribute on the path, so it has to be
+   overridden rather than inherited. */
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-panel-more svg path {
+  stroke: rgba(26,26,46,0.45);
+}
+
+/* ── The vertical scroll section below it ──
+   Padding wide enough to hold a row's shadow: the scroller clips at its
+   padding edge, and a 5px offset with a 12px blur reaches 17px out. */
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-scroll { padding: 6px 18px 18px; }
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-rows { gap: 14px; }
+
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row {
+  background: #f0f2f7; border: none; border-bottom: none;
+  border-radius: 18px !important; padding: 13px 14px;
+  box-shadow: 5px 5px 12px rgba(163,177,198,0.5), -4px -4px 10px #ffffff;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row:active {
+  background: #f0f2f7;
+  box-shadow: inset 3px 3px 8px rgba(163,177,198,0.55), inset -2px -2px 6px #ffffff;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row-icon {
+  width: 44px !important; height: 44px !important;
+  background: #f0f2f7; border: none; border-radius: 50% !important;
+  box-shadow: inset 3px 3px 7px rgba(163,177,198,0.55), inset -2px -2px 6px #ffffff;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row-icon img,
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row-icon svg {
+  width: 74%; height: 74%; border-radius: 50%;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row-divider { background: rgba(26,26,46,0.1); }
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row-title { color: #1a1a2e; font-weight: 700; }
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row-sub { color: rgba(26,26,46,0.5); }
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row-arrow {
+  width: 34px !important; height: 34px !important; min-height: 34px !important;
+  background: #f0f2f7; border: none;
+  box-shadow: 4px 4px 9px rgba(163,177,198,0.5), -3px -3px 8px #ffffff;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-row-arrow svg path { stroke: #1a1a2e; }
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-scrollbar { background: rgba(26,26,46,0.09); }
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-scrollthumb { background: rgba(200,169,110,0.85); }
+
+/* The switch rows (mode toggles) sit on the same cards. */
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-mode-sw {
+  background: #f0f2f7; border: none;
+  box-shadow: inset 3px 3px 7px rgba(163,177,198,0.6), inset -2px -2px 6px #ffffff;
+}
+#home-nm:not(.nm-dark) .nmh-cust-panel .cust-mode-sw.on {
+  background: rgba(200,169,110,0.9);
+  box-shadow: inset 2px 2px 5px rgba(140,110,60,0.45), inset -2px -2px 5px rgba(255,255,255,0.5);
 }
 
 /* ── Corners — one choice, every top-level section, both homes ──────

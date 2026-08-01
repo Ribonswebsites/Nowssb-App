@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=311">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=603">
+<link rel="stylesheet" href="nowssb-nm.css?v=604">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -758,12 +758,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </svg>
         <span class="nt-badge" id="nmhNotifBadge" style="display:none;">0</span>
       </button>
-      <button class="nmh-settings-btn" id="nmhCustomizeBtn" onclick="cuOpen()" title="Customize">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/>
-          <path d="M1.5 14h5M9.5 8h5M17.5 16h5"/>
-        </svg>
-      </button>
+      <!-- Customize used to be a fourth button here. Four buttons pushed
+           "NOWSBANSIU EDITION" under the group and clipped it, and the panel
+           further down this page already opens the same hub with room to say
+           what it is. So it lives there now, not up here. -->
       <button class="nmh-settings-btn" id="nmhSettingsBtn" onclick="openSub('social')" title="Settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="1.7">
           <circle cx="12" cy="12" r="3"/>
