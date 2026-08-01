@@ -1450,7 +1450,7 @@ function reqNotify(n) {
   navigator.serviceWorker?.ready.then(reg => {
     reg.showNotification('New request: ' + n.word, {
       body: (n.name || n.email || 'Someone') + ' asked for a ' + (n.kind || 'meaning') + '.',
-      icon: './assets/icons/app-icon-192.png',
+      icon: './assets/icons/notif-icon-192.png',
       badge: './assets/icons/notif-badge.png',
       tag: 'req-' + n.id, renotify: false,
       data: { url: './admin.html' },

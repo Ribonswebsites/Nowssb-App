@@ -20,7 +20,7 @@ self.addEventListener('push', (e) => {
   try { d = e.data ? e.data.json() : {}; } catch (err) {}
   e.waitUntil(self.registration.showNotification(d.title || 'NowssB Studio', {
     body: d.body || '',
-    icon: './assets/icons/app-icon-192.png',
+    icon: './assets/icons/notif-icon-192.png',
     badge: './assets/icons/notif-badge.png',
     tag: d.tag || 'studio',
     data: { url: './admin.html' },

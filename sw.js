@@ -1,4 +1,4 @@
-const CACHE = 'nowsbansiu-v789';
+const CACHE = 'nowsbansiu-v790';
 // Separate, stable-named bucket for background-prefetched videos (see
 // app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
 // routine JS/CSS deploy never wipes out videos the user already has warmed —
@@ -39,7 +39,7 @@ self.addEventListener('activate', e => {
    draws the small icon and the app name along the top and the title and
    body beneath. `icon` and `badge` are the two images we get to choose.
    ── */
-const NOTIF_ICON  = './assets/icons/app-icon-192.png';
+const NOTIF_ICON  = './assets/icons/notif-icon-192.png';
 const NOTIF_BADGE = './assets/icons/notif-badge.png';
 
 self.addEventListener('push', e => {

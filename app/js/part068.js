@@ -43,7 +43,14 @@
      the app serves. */
   var VAPID_PUBLIC_KEY = 'BKOj_da2V8ebcvZidlL94VdVKtsbNXos-f41Sd_sS9V918Ex3TH210NOMKndTb5FX6k9NGfa2X3U6fgjtBdVXK4';
 
-  var ICON  = './assets/icons/app-icon-192.png';
+  /* The two images Android lets us choose. ICON is the big one on the
+     right — the NowssB disc. BADGE is the small one beside the app name,
+     and Android builds it from the ALPHA CHANNEL ONLY: it throws the
+     colours away and paints the shape in a tint of its own choosing. So
+     the badge is authored as a full disc with the word knocked out of it,
+     which is the only way to get "solid circle, NowssB showing through" —
+     a coloured PNG would come back as a flat silhouette. */
+  var ICON  = './assets/icons/notif-icon-192.png';
   var BADGE = './assets/icons/notif-badge.png';
 
   var K_ASKED = 'nwsb_push_asked';
