@@ -10114,6 +10114,36 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
    own wordmark falls into the darkened zone instead of colliding with
    the page's headline.
    ══════════════════════════════════════════════════════════════════ */
+/* ── Pure black, so the band under the art is not a seam ──────────
+   Every one of these renders is black at its edges, and the intro pages
+   were #060c18 — navy. With `contain` leaving a band below the art, that
+   two-shade difference drew a hard horizontal line across the page. Black
+   meets black and there is nothing to see.
+
+   The art is width-limited by `contain`, so its bottom edge is always
+   `page width × the render's own aspect`. That is knowable, so the shadow
+   under it can be placed exactly rather than guessed: --art is h/w for
+   each render. ── */
+#nssIntroPage, #rmIntroPage, #msIntroPage, #ebIntroPage, #sigIntroPage {
+  background: #000 !important;
+}
+#nssIntroPage, #rmIntroPage, #msIntroPage, #ebIntroPage { --art: 1.7768; }
+#sigIntroPage { --art: 1.5; }
+
+/* The shadow the art casts onto the band below it. Sits across the seam,
+   so the last of the render fades out rather than stopping. */
+#nssIntroPage .nss-intro-img::after,
+#rmIntroPage .rm-intro-bg::after,
+#msIntroPage .ms-intro-bg::after,
+#ebIntroPage .ms-intro-bg::after,
+#sigIntroPage .sig-intro-bg::after {
+  content: ''; position: absolute; left: 0; right: 0; pointer-events: none;
+  top: calc(100vw * var(--art, 1.7768) - 120px);
+  height: 190px;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 42%, rgba(0,0,0,0.88) 66%, #000 100%);
+}
+
 #nssIntroPage .nss-intro-img,
 #rmIntroPage .rm-intro-bg,
 #msIntroPage .ms-intro-bg,
@@ -10129,7 +10159,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   background-position: center top !important;
   background-size: contain !important;
   background-repeat: no-repeat !important;
-  background-color: #060c18;
+  background-color: #000;
 }
 
 /* One wash, three pages. Transparent across the art, solid under the
