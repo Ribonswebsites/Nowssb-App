@@ -455,6 +455,39 @@ body::before {
     </div>
   </div>
 
+  <!-- ══ SEND A NOTIFICATION ══
+       Goes to every phone that has subscribed, whether or not the app is
+       open on it. The sending itself happens at /api/push, which holds the
+       private key; this only composes and hands over. ══ -->
+  <div class="sec-label" style="margin-top:40px;">SEND A NOTIFICATION</div>
+  <div class="form-wrap">
+    <div class="field">
+      <label>Title</label>
+      <input type="text" id="pnTitle" placeholder="e.g. Today's Offer">
+    </div>
+    <div class="field">
+      <label>Message</label>
+      <textarea id="pnBody" placeholder="e.g. Flat 30% off — today only" style="min-height:70px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Opens</label>
+      <select id="pnType">
+        <option value="">The app</option>
+        <option value="offers">Today's Offers</option>
+        <option value="arrivals">New Arrivals</option>
+        <option value="trending">Today's Trending</option>
+        <option value="routine">Daily Routine</option>
+        <option value="streak">Streak</option>
+        <option value="reader">Reader</option>
+        <option value="cart">Cart</option>
+        <option value="subscription">Subscription</option>
+      </select>
+    </div>
+    <div id="pnCount" style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:12px;"></div>
+    <button class="btn-primary" id="pnSend" onclick="pnSendPush()">Send to every phone</button>
+    <div id="pnResult" style="font-size:12px;line-height:1.6;color:rgba(200,232,245,0.8);margin-top:12px;"></div>
+  </div>
+
   <!-- ══ USER ACCESS CONTROL ══ -->
   <div class="sec-label" style="margin-top:40px;">USER ACCESS CONTROL</div>
   <div class="form-wrap">
@@ -895,7 +928,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <!-- ── FIREBASE SDK ── -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, where, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
 const _fbApp = initializeApp({
@@ -984,9 +1017,82 @@ window.adminSignOut = async function () {
 /* A reload should not mean signing in again, but it must not mean trusting
    the last session either — the list is re-checked every time. */
 onAuthStateChanged(_auth, async (user) => {
-  if (user && await isAdmin(user.uid)) openStudio();
+  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); }
   else closeStudio();
 });
+
+/* ══ SENDING A NOTIFICATION ══════════════════════════════════════════
+   Reading the subscriptions needs admin rights, which the rules enforce;
+   sending needs the private key, which only /api/push has. So this reads
+   the list, hands it over with the caller's own ID token, and reports what
+   came back. Anything the push service has retired is deleted, or the list
+   grows stale forever. ── */
+async function loadSubs() {
+  const snap = await getDocs(collection(_db, 'pushSubs'));
+  const out = [];
+  snap.forEach(d => {
+    const v = d.data();
+    if (v && v.endpoint && v.keys) out.push({ id: d.id, endpoint: v.endpoint, keys: v.keys });
+  });
+  return out;
+}
+
+async function countSubs() {
+  const el = document.getElementById('pnCount');
+  if (!el) return;
+  try {
+    const subs = await loadSubs();
+    el.textContent = subs.length
+      ? subs.length + (subs.length === 1 ? ' phone is subscribed.' : ' phones are subscribed.')
+      : 'No phones have subscribed yet — turn notifications on in the app first.';
+  } catch (e) { el.textContent = ''; }
+}
+
+window.pnSendPush = async function () {
+  const btn = document.getElementById('pnSend');
+  const out = document.getElementById('pnResult');
+  const title = (document.getElementById('pnTitle').value || '').trim();
+  const body  = (document.getElementById('pnBody').value || '').trim();
+  const type  = document.getElementById('pnType').value;
+  out.textContent = '';
+  if (!title) { out.textContent = 'A title is required.'; return; }
+
+  const user = _auth.currentUser;
+  if (!user) { out.textContent = 'Signed out — reload and sign in again.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const subs = await loadSubs();
+    if (!subs.length) { out.textContent = 'Nobody is subscribed yet.'; return; }
+
+    const res = await fetch('/api/push', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + (await user.getIdToken()),
+      },
+      body: JSON.stringify({ title, body, type, subscriptions: subs.map(s => ({ endpoint: s.endpoint, keys: s.keys })) }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { out.textContent = data.error || ('Send failed (' + res.status + ').'); return; }
+
+    /* Retired subscriptions are dead addresses — clear them out. */
+    let cleaned = 0;
+    for (const ep of (data.expired || [])) {
+      const hit = subs.find(s => s.endpoint === ep);
+      if (hit) { try { await deleteDoc(doc(_db, 'pushSubs', hit.id)); cleaned++; } catch (e) {} }
+    }
+    out.innerHTML = 'Sent to <b>' + data.sent + '</b> of ' + subs.length + '.' +
+      (data.failed ? ' ' + data.failed + ' failed.' : '') +
+      (cleaned ? ' Removed ' + cleaned + ' expired.' : '');
+    countSubs();
+    if (window.showToast) window.showToast('Notification sent');
+  } catch (e) {
+    out.textContent = 'Could not reach the sender. Is /api/push deployed?';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send to every phone';
+  }
+};
 
 // ── INSTAGRAM LINK ──
 window.updateIgLink = function(val) {

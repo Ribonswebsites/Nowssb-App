@@ -158,12 +158,53 @@
     }).then(function (sub) {
       if (!sub) return;
       window.nwsbPushSubscription = sub;
-      /* Whatever stores subscriptions can listen for this rather than this
-         file needing to know the endpoint. */
+      saveSubscription(sub);
+      /* Whatever else wants it can listen rather than this file needing to
+         know every consumer. */
       try {
         window.dispatchEvent(new CustomEvent('nwsb-push-subscription', { detail: sub.toJSON() }));
       } catch (e) {}
     }).catch(function () { /* blocked, or no push service — nothing to do */ });
+  }
+
+  /* ── Keeping the subscription ──────────────────────────────────────
+     A subscription is the only way to reach this phone, so it has to
+     outlive the tab. It goes in Firestore under pushSubs, keyed by a hash
+     of its own endpoint so the same phone re-registering overwrites rather
+     than piling up duplicates. Only an admin can read the collection back
+     (see firestore.rules); a person can only write their own.
+
+     The Firestore SDK is an ES module and this file is not, so it is
+     imported on demand — the same way part012.js reaches for it. */
+  function endpointId(endpoint) {
+    if (!(crypto && crypto.subtle)) return Promise.resolve(null);
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(endpoint))
+      .then(function (buf) {
+        var b = new Uint8Array(buf), s = '';
+        for (var i = 0; i < b.length; i++) s += b[i].toString(16).padStart(2, '0');
+        return s.slice(0, 40);
+      });
+  }
+
+  function saveSubscription(sub) {
+    var json;
+    try { json = sub.toJSON(); } catch (e) { return; }
+    if (!json || !json.endpoint || !json.keys) return;
+    endpointId(json.endpoint).then(function (id) {
+      if (!id) return;
+      return import('https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js')
+        .then(function (fs) {
+          var db = window._db;
+          if (!db) return;
+          return fs.setDoc(fs.doc(db, 'pushSubs', id), {
+            endpoint: json.endpoint,
+            keys: { p256dh: json.keys.p256dh, auth: json.keys.auth },
+            uid: window._currentUid || null,
+            ua: (navigator.userAgent || '').slice(0, 180),
+            updatedAt: Date.now()
+          }, { merge: true });
+        });
+    }).catch(function () { /* offline or not signed in — it retries next load */ });
   }
 
   /* ── Wrapping the app's own notifier ───────────────────────────────

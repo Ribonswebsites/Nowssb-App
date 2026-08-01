@@ -64,6 +64,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    /* ── Push subscriptions ──────────────────────────────────────────
+       A subscription is the address of somebody's phone, so the list is
+       never readable by the people in it — only an admin, who is the one
+       sending. Anyone signed in may write their own (the id is a hash of
+       their endpoint, so they cannot collide with anybody else's), and an
+       admin may delete the ones a push service has retired. */
+    match /pushSubs/{id} {
+      allow read, list, delete: if isAdmin();
+      allow create, update: if signedIn();
+    }
+
     /* ── Community ───────────────────────────────────────────────────
        Signed-in people post; an author edits their own; admins moderate
        anything. */
