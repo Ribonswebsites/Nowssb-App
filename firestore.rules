@@ -64,6 +64,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    /* ── Requests from the app ───────────────────────────────────────
+       Somebody asks for a meaning; the studio answers it. Anyone signed in
+       may raise one, and may read back their own to see where it got to.
+       Only an admin sees the whole queue or marks anything done — a
+       request carries the asker's email, so the list is not public. */
+    match /requests/{id} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow get: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow list, update, delete: if isAdmin();
+    }
+
     /* ── Push subscriptions ──────────────────────────────────────────
        A subscription is the address of somebody's phone, so the list is
        never readable by the people in it — only an admin, who is the one

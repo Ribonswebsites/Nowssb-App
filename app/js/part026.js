@@ -599,12 +599,68 @@ window.msConfirmMeaningRequest = function() {
   waiting.innerHTML = '<div style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(232,213,163,0.2);border-top-color:#e8d5a3;animation:wsSpinAnim 0.8s linear infinite;"></div>' +
     '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);letter-spacing:1px;">Decoding request…</div>';
   document.body.appendChild(waiting);
+  /* The request has to reach somebody. It goes to Firestore, where the
+     studio is watching — see admin.html — rather than dying in this tab
+     the way it used to. The spinner is not waiting on this: the write is
+     fire-and-forget, so a slow connection never holds up the sheet, and a
+     failed one is kept locally to be sent on the next attempt. */
+  nwsbSendRequest({ kind: 'meaning', word: word, price: 199 });
   setTimeout(function() {
     var w = document.getElementById('msReqWaiting');
     if (w) w.remove();
     if (typeof _wsShowSuccessSheet === 'function') _wsShowSuccessSheet(word);
   }, 1800);
 };
+
+/* ── Requests, on their way to the studio ──────────────────────────────
+   One door for every kind of request the app can raise, so the studio has
+   one collection to watch and one shape to render. Kept deliberately small:
+   who asked, for what, when, and whether it has been dealt with. ── */
+window.nwsbSendRequest = function (req) {
+  if (!req || !req.word) return Promise.resolve(false);
+  var row = {
+    kind: req.kind || 'meaning',
+    word: String(req.word).slice(0, 80),
+    price: Number(req.price) || 0,
+    uid: window._currentUid || null,
+    email: (window._currentUser && window._currentUser.email) || null,
+    name: window._userName || null,
+    status: 'new',
+    at: Date.now()
+  };
+  return import('https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js')
+    .then(function (fs) {
+      if (!window._db) throw new Error('no-db');
+      return fs.addDoc(fs.collection(window._db, 'requests'), row);
+    })
+    .then(function () { return true; })
+    .catch(function () {
+      /* Offline, or signed out. Park it and try again next launch rather
+         than losing something the person has paid for. */
+      try {
+        var q = JSON.parse(localStorage.getItem('nwsb_req_queue') || '[]');
+        q.push(row);
+        localStorage.setItem('nwsb_req_queue', JSON.stringify(q.slice(-30)));
+      } catch (e) {}
+      return false;
+    });
+};
+
+/* Anything parked earlier goes out once there is a connection again. */
+(function flushRequestQueue() {
+  function flush() {
+    var q;
+    try { q = JSON.parse(localStorage.getItem('nwsb_req_queue') || '[]'); } catch (e) { return; }
+    if (!q.length || !window._db) return;
+    try { localStorage.removeItem('nwsb_req_queue'); } catch (e) {}
+    import('https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js').then(function (fs) {
+      q.forEach(function (row) {
+        fs.addDoc(fs.collection(window._db, 'requests'), row).catch(function () {});
+      });
+    }).catch(function () {});
+  }
+  setTimeout(flush, 6000);
+})();
 
 // Parallax scroll on the 2:3 banner
 window.msInitParallax = function() {

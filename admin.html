@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>NowssB — CEO Admin</title>
+<link rel="manifest" href="./admin-manifest.json">
+<meta name="theme-color" content="#060c18">
+<link rel="apple-touch-icon" href="./assets/icons/app-icon-512.png">
+<meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════════════════════
@@ -263,6 +267,8 @@ body::before {
   <div class="topbar">
     <div class="topbar-brand">NowssB Studio</div>
     <div class="topbar-right">
+      <!-- Only shown once the browser says it can actually be installed. -->
+      <button class="rec-action-btn" id="installBtn" style="display:none;" onclick="studioInstall()">Install</button>
       <div class="notif-btn" onclick="openNotifPanel()">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 015 5v2.5l1.5 2H2.5L4 9.5V7a5 5 0 015-5z" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/><path d="M7 14.5a2 2 0 004 0" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/></svg>
         <div class="notif-badge" id="notifBadge"></div>
@@ -455,6 +461,15 @@ body::before {
     </div>
   </div>
 
+  <!-- ══ REQUESTS FROM THE APP ══
+       Live: anything somebody asks for appears here without reloading, and
+       raises a notification on this device even when the tab is behind
+       something else. ══ -->
+  <div class="sec-label" style="margin-top:40px;">REQUESTS FROM THE APP</div>
+  <div class="word-list-wrap" id="reqListWrap">
+    <div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">Waiting for requests…</div>
+  </div>
+
   <!-- ══ SEND A NOTIFICATION ══
        Goes to every phone that has subscribed, whether or not the app is
        open on it. The sending itself happens at /api/push, which holds the
@@ -578,6 +593,38 @@ body::before {
    printed in this file for anyone who opened View Source, and it guarded
    nothing anyway: typing initPanel() in the console walked straight past
    it, and this page writes real subscription grants. ── */
+/* ── Installing the studio ─────────────────────────────────────────
+   Its own manifest and its own service worker, scoped to admin.html, so
+   it installs as a separate app from NowssB itself and never disturbs the
+   app's worker. The worker is here because a notification has to be shown
+   from one. ── */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./admin-sw.js', { scope: './' })
+    .catch(function () { /* notifications simply stay off */ });
+}
+
+var _studioPrompt = null;
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault();
+  _studioPrompt = e;
+  var b = document.getElementById('installBtn');
+  if (b) b.style.display = 'inline-block';
+});
+window.addEventListener('appinstalled', function () {
+  _studioPrompt = null;
+  var b = document.getElementById('installBtn');
+  if (b) b.style.display = 'none';
+});
+window.studioInstall = function () {
+  if (!_studioPrompt) {
+    /* iOS never fires the event — there it is Share → Add to Home Screen. */
+    if (window.showToast) window.showToast('Use your browser menu → Add to Home Screen');
+    return;
+  }
+  _studioPrompt.prompt();
+  _studioPrompt = null;
+};
+
 function doLogin() {
   if (window.adminSignIn) return window.adminSignIn();
   /* The module below carries Firebase, and it is what signs anyone in. If
@@ -602,6 +649,9 @@ function initPanel() {
   renderWordList();
   updateStats();
   checkNotifs();
+  /* Now that somebody is actually in, ask to be allowed to tell them when
+     a request arrives. After the sign-in, never on the way to it. */
+  if (window.adminAskNotify) window.adminAskNotify();
 }
 
 // ── RECORDING ──
@@ -928,7 +978,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <!-- ── FIREBASE SDK ── -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, where, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, orderBy, onSnapshot, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
 const _fbApp = initializeApp({
@@ -1017,9 +1067,107 @@ window.adminSignOut = async function () {
 /* A reload should not mean signing in again, but it must not mean trusting
    the last session either — the list is re-checked every time. */
 onAuthStateChanged(_auth, async (user) => {
-  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); }
+  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); watchRequests(); }
   else closeStudio();
 });
+
+/* ══ REQUESTS, LIVE ══════════════════════════════════════════════════
+   Watched rather than polled, so something asked for in the app is on
+   this screen a moment later without anybody reloading. The first
+   snapshot is the backlog and must not set off a burst of notifications,
+   so only what arrives after it does. ── */
+let _reqSeeded = false;
+let _reqUnsub = null;
+
+function reqNotify(n) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  navigator.serviceWorker?.ready.then(reg => {
+    reg.showNotification('New request: ' + n.word, {
+      body: (n.name || n.email || 'Someone') + ' asked for a ' + (n.kind || 'meaning') + '.',
+      icon: './assets/icons/app-icon-192.png',
+      badge: './assets/icons/notif-badge.png',
+      tag: 'req-' + n.id, renotify: false,
+      data: { url: './admin.html' },
+    }).catch(() => {});
+  }).catch(() => {});
+}
+
+function renderRequests(rows) {
+  const wrap = document.getElementById('reqListWrap');
+  if (!wrap) return;
+  const open = rows.filter(r => r.status !== 'done');
+  if (!rows.length) {
+    wrap.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">No requests yet.</div>';
+    return;
+  }
+  wrap.innerHTML = rows.map(r => {
+    const when = new Date(r.at || Date.now()).toLocaleString();
+    const done = r.status === 'done';
+    return '<div class="wl-card">' +
+      '<span class="wl-status ' + (done ? 'approved' : 'pending') + '">' + (done ? 'Fulfilled' : 'New') + '</span>' +
+      '<div class="wl-name">' + esc(r.word) + '</div>' +
+      '<div class="wl-phonetic">' + esc(r.kind || 'meaning') + (r.price ? ' · ₹' + r.price : '') + '</div>' +
+      '<div class="wl-meta">' + esc(r.name || r.email || r.uid || 'unknown') + ' · ' + when + '</div>' +
+      (done ? '' :
+        '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
+          '<button class="rec-action-btn" onclick="reqFulfil(\'' + r.id + '\',\'' + esc(r.word).replace(/'/g, "\\'") + '\')">Mark fulfilled &amp; tell them</button>' +
+          '<button class="rec-action-btn" onclick="reqDelete(\'' + r.id + '\')">Delete</button>' +
+        '</div>') +
+    '</div>';
+  }).join('');
+  const badge = document.getElementById('notifBadge');
+  if (badge) { badge.textContent = open.length; badge.classList.toggle('show', open.length > 0); }
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+}
+
+function watchRequests() {
+  if (_reqUnsub) return;
+  try {
+    _reqUnsub = onSnapshot(query(collection(_db, 'requests'), orderBy('at', 'desc')), (snap) => {
+      const rows = [];
+      snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
+      renderRequests(rows);
+      if (_reqSeeded) {
+        snap.docChanges().forEach(c => {
+          if (c.type === 'added') reqNotify({ id: c.doc.id, ...c.doc.data() });
+        });
+      }
+      _reqSeeded = true;
+    }, () => {
+      const wrap = document.getElementById('reqListWrap');
+      if (wrap) wrap.innerHTML = '<div style="color:rgba(220,80,80,0.8);font-size:13px;padding:4px 2px;">Could not read requests — are the rules published?</div>';
+    });
+  } catch (e) {}
+}
+
+/* Fulfilling is two things at once: the queue is cleared, and the person
+   who asked is told — through the same push the studio sends anyone. */
+window.reqFulfil = async function (id, word) {
+  try {
+    await updateDoc(doc(_db, 'requests', id), { status: 'done', doneAt: Date.now() });
+    const t = document.getElementById('pnTitle'), b = document.getElementById('pnBody');
+    if (t && b) {
+      t.value = '“' + word + '” is ready';
+      b.value = 'The meaning you asked for is in your library now.';
+      document.getElementById('pnType').value = 'arrivals';
+      t.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (window.showToast) window.showToast('Marked fulfilled — message ready to send');
+  } catch (e) {
+    if (window.showToast) window.showToast('Could not update that request', true);
+  }
+};
+window.reqDelete = async function (id) {
+  try { await deleteDoc(doc(_db, 'requests', id)); } catch (e) {}
+};
+
+/* The studio wants permission too — it is the thing being notified here. */
+window.adminAskNotify = function () {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') Notification.requestPermission().catch(() => {});
+};
 
 /* ══ SENDING A NOTIFICATION ══════════════════════════════════════════
    Reading the subscriptions needs admin rights, which the rules enforce;
