@@ -6,7 +6,8 @@
 <title>NowssB — CEO Admin</title>
 <link rel="manifest" href="./admin-manifest.json">
 <meta name="theme-color" content="#060c18">
-<link rel="apple-touch-icon" href="./assets/icons/app-icon-512.png">
+<link rel="apple-touch-icon" href="./assets/icons/admin-icon-180.png">
+<link rel="icon" type="image/png" sizes="64x64" href="./assets/icons/admin-favicon.png">
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -175,6 +176,91 @@ body::before {
 .field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,0.28); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
+/* ══════════════════════════════════════════════════════════════════
+   SECTIONS — one at a time, behind a hamburger.
+
+   The studio was one continuous scroll: the catalogue, the requests, the
+   push composer, the people list and the access controls all stacked on
+   top of each other with nothing between them but a heading. Finding
+   anything meant scrolling past everything.
+
+   Now each heading is a section and only one is on screen. The list is
+   built from the headings themselves (stuBuildNav), so adding a section
+   is adding a heading — there is no menu to keep in step with the page.
+   ══════════════════════════════════════════════════════════════════ */
+.stu-burger {
+  width: 40px; height: 40px; flex-shrink: 0; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.10); border: 1px solid rgba(232,213,163,0.28);
+  border-radius: 12px;
+}
+.stu-burger:active { background: rgba(232,213,163,0.2); }
+.stu-burger svg { width: 20px; height: 20px; }
+
+.stu-nav-overlay {
+  position: fixed; inset: 0; z-index: 998;
+  background: rgba(3,8,20,0.62); opacity: 0; pointer-events: none;
+  transition: opacity .24s ease;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+.stu-nav-overlay.open { opacity: 1; pointer-events: auto; }
+.stu-nav {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 999;
+  width: min(300px, 84vw);
+  display: flex; flex-direction: column;
+  background: #0b1120; border-right: 1px solid rgba(232,213,163,0.18);
+  box-shadow: 18px 0 48px rgba(0,0,0,0.55);
+  transform: translateX(-102%); transition: transform .26s cubic-bezier(.22,1,.36,1);
+}
+.stu-nav.open { transform: translateX(0); }
+.stu-nav-head {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  padding: max(env(safe-area-inset-top, 16px), 16px) 16px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.stu-nav-title {
+  flex: 1; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800;
+  color: #f5e6c8; letter-spacing: .2px;
+}
+.stu-nav-x {
+  width: 36px; height: 36px; flex-shrink: 0; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+}
+.stu-nav-x svg { width: 18px; height: 18px; }
+.stu-nav-list { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 10px 16px; }
+.stu-nav-item {
+  display: flex; align-items: center; gap: 11px; cursor: pointer;
+  padding: 12px 12px; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+  color: rgba(255,255,255,0.72);
+}
+.stu-nav-item:active { background: rgba(255,255,255,0.06); }
+.stu-nav-item.on { background: rgba(232,213,163,0.13); color: #f5e6c8; }
+.stu-nav-ico {
+  width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+}
+.stu-nav-item.on .stu-nav-ico { border-color: rgba(232,213,163,0.4); }
+.stu-nav-sub {
+  font-size: 10.5px; font-weight: 300; color: rgba(255,255,255,0.4);
+  margin-top: 2px; line-height: 1.35;
+}
+.stu-nav-txt { min-width: 0; }
+.stu-nav-foot {
+  flex-shrink: 0; padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255,255,255,0.07);
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 300;
+  color: rgba(255,255,255,0.4); line-height: 1.6;
+}
+
+/* Only the chosen section is on screen. */
+.stu-sec { display: none; }
+.stu-sec.on { display: block; }
+
+
 /* Devanagari is taller than latin at the same size and its matras sit
    above and below the line, so it gets its own stack and room to breathe
    rather than inheriting DM Sans and being clipped. Android, iOS, Windows
@@ -302,10 +388,16 @@ input.nwsb-deva { font-size: 16px; }
 
   <!-- TOP BAR -->
   <div class="topbar">
-    <div class="topbar-brand">NowssB Studio</div>
+    <button class="stu-burger" onclick="stuMenu(1)" aria-label="Sections">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="topbar-brand" id="stuHere">NowssB Studio</div>
     <div class="topbar-right">
-      <!-- Only shown once the browser says it can actually be installed. -->
-      <button class="rec-action-btn" id="installBtn" style="display:none;" onclick="studioInstall()">Install</button>
+      <!-- Always here. beforeinstallprompt never fires on iOS and does not
+           fire again once dismissed, so a button that waits for it is a
+           button most people never see. It explains itself if the browser
+           will not do it for us. -->
+      <button class="rec-action-btn" id="installBtn" onclick="studioInstall()">Install</button>
       <div class="notif-btn" onclick="openNotifPanel()">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 015 5v2.5l1.5 2H2.5L4 9.5V7a5 5 0 015-5z" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/><path d="M7 14.5a2 2 0 004 0" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/></svg>
         <div class="notif-badge" id="notifBadge"></div>
@@ -314,170 +406,37 @@ input.nwsb-deva { font-size: 16px; }
     </div>
   </div>
 
-  <!-- GREETING -->
+  <!-- ══ SECTIONS ══
+       One thing at a time. Everything below is grouped from its own
+       heading by app/js — see stuBuildNav() — so a section is added by
+       adding a heading, not by editing a menu. ══ -->
+  <div class="stu-nav-overlay" id="stuNavOverlay" onclick="stuMenu(0)"></div>
+  <nav class="stu-nav" id="stuNav">
+    <div class="stu-nav-head">
+      <div class="stu-nav-title">Studio</div>
+      <button class="stu-nav-x" onclick="stuMenu(0)" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="stu-nav-list" id="stuNavList"></div>
+    <div class="stu-nav-foot" id="stuNavFoot"></div>
+  </nav>
+
+  <!-- WHO IS SIGNED IN — the real account, read from Firebase Auth. This
+       said "Welcome back, Sanjay Kumar Gadge" in hardcoded HTML to whoever
+       opened it, above three counters that read a localStorage list nothing
+       published from. Both are gone; what is here is what the server says. -->
   <div class="greeting-wrap">
     <div class="greeting-time" id="greetTime">Good morning</div>
-    <div class="greeting-name">Welcome back, <span>Sanjay Kumar Gadge</span></div>
-    <div class="greeting-title">CEO &amp; Owner · NowssB — Natural Origin Word Sound Science</div>
+    <div class="greeting-name">Signed in as <span id="whoName">…</span></div>
+    <div class="greeting-title" id="whoMail">&nbsp;</div>
     <div class="greeting-stats">
-      <div class="stat-chip"><div class="stat-num" id="statTotal">0</div><div class="stat-lbl">Words Added</div></div>
-      <div class="stat-chip"><div class="stat-num" id="statPending">0</div><div class="stat-lbl">Pending Review</div></div>
-      <div class="stat-chip"><div class="stat-num" id="statApproved">0</div><div class="stat-lbl">Approved</div></div>
+      <div class="stat-chip"><div class="stat-num" id="statPeople">—</div><div class="stat-lbl">Signed up</div></div>
+      <div class="stat-chip"><div class="stat-num" id="statLive">—</div><div class="stat-lbl">Here now</div></div>
+      <div class="stat-chip"><div class="stat-num" id="statReq">—</div><div class="stat-lbl">Open requests</div></div>
     </div>
   </div>
 
-  <!-- RECORD WORD -->
-  <div class="sec-label">Step 1 — Record the Word</div>
-  <div class="record-wrap">
-    <div class="record-card">
-      <div class="record-row">
-        <div class="rec-btn" id="recBtn" onclick="toggleRecording()">
-          <svg id="recIcon" width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="7" y="2" width="8" height="12" rx="4" stroke="rgba(220,80,80,0.9)" stroke-width="1.5"/><path d="M3 11a8 8 0 0016 0" stroke="rgba(220,80,80,0.9)" stroke-width="1.5" stroke-linecap="round"/><path d="M11 19v3" stroke="rgba(220,80,80,0.9)" stroke-width="1.5" stroke-linecap="round"/></svg>
-          <svg id="stopIcon" width="20" height="20" viewBox="0 0 20 20" fill="none" style="display:none"><rect x="4" y="4" width="12" height="12" rx="2" fill="rgba(220,80,80,0.9)"/></svg>
-        </div>
-        <div class="rec-info">
-          <div class="rec-status" id="recStatus">Tap mic to start recording</div>
-          <div class="rec-sub" id="recTimer">Speak the word clearly — multiple times if needed</div>
-        </div>
-      </div>
-      <div class="waveform-bars" id="waveformBars"></div>
-      <div class="rec-actions" id="recActions" style="margin-top:14px; display:none;">
-        <div class="rec-action-btn" onclick="playRecording()">▶ Play back</div>
-        <div class="rec-action-btn" onclick="clearRecording()">✕ Re-record</div>
-        <div class="rec-action-btn primary" onclick="useRecording()">✓ Use this</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- WORD DETAILS -->
-  <div class="sec-label">Step 2 — Word Details</div>
-  <div class="form-wrap">
-    <div class="field">
-      <label>Word Name *</label>
-      <input id="fWord" placeholder="e.g. AAROGYA" oninput="this.value=this.value.toUpperCase(); autoGeneratePronun()">
-    </div>
-    <div class="field">
-      <label>Phonetic Breakdown * (use hyphens between syllables)</label>
-      <input id="fPhonetic" placeholder="e.g. aa-ro-gyaa" oninput="autoGeneratePronun()">
-    </div>
-  </div>
-
-  <!-- PRONUNCIATION PREVIEW -->
-  <div style="padding:0 16px; margin-bottom:14px;">
-    <div class="pronun-card" id="pronunCard" style="display:none;">
-      <div class="pronun-title">ElevenLabs Pronunciation Notation</div>
-      <div class="pronun-notation" id="pronunNotation"></div>
-      <div class="pronun-title" style="margin-bottom:10px;">Breath &amp; Hold Guide</div>
-      <div class="breath-guide" id="breathGuide"></div>
-    </div>
-  </div>
-
-  <div class="form-wrap">
-    <div class="field">
-      <label>Organ / Body System *</label>
-      <input id="fOrgan" placeholder="e.g. Immune system, Heart, Lungs, Gut">
-    </div>
-    <div class="field">
-      <label>Healing Benefit for the Practitioner</label>
-      <input id="fBenefit" placeholder="e.g. Strengthens immunity, clears respiratory pathways">
-    </div>
-    <div class="field">
-      <label>Meaning &amp; Natural Origin Story</label>
-      <textarea id="fMeaning" placeholder="Describe the full meaning of this word and where it comes from naturally — not Sanskrit, not ancient scripture, but the natural origin..."></textarea>
-    </div>
-    <div class="field">
-      <label>How Long to Hold Each Part (in seconds)</label>
-      <input id="fHoldTime" placeholder="e.g. AA=3s · RO=1.5s · GYAA=3s" oninput="autoGeneratePronun()">
-    </div>
-  </div>
-
-  <div class="grid-2">
-    <div class="field">
-      <label>Category</label>
-      <select id="fCategory">
-        <option value="Mental Clarity">Mental Clarity</option>
-        <option value="Heart Health">Heart Health</option>
-        <option value="Immunity Boost">Immunity Boost</option>
-        <option value="Skin &amp; Glow">Skin &amp; Glow</option>
-        <option value="Gut Health">Gut Health</option>
-        <option value="Fitness &amp; Muscle">Fitness &amp; Muscle</option>
-        <option value="Liver Detox">Liver Detox</option>
-        <option value="Lung &amp; Breath">Lung &amp; Breath</option>
-        <option value="Hormones">Hormones</option>
-        <option value="Sleep &amp; Recovery">Sleep &amp; Recovery</option>
-        <option value="Hair Health">Hair Health</option>
-        <option value="Energy &amp; Vitality">Energy &amp; Vitality</option>
-        <option value="Confidence">Confidence</option>
-        <option value="Kidney &amp; Bladder">Kidney &amp; Bladder</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Gender</label>
-      <select id="fGender">
-        <option value="both">Both</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="grid-2">
-    <div class="field">
-      <label>Best Time</label>
-      <select id="fTime">
-        <option value="any">Any Time</option>
-        <option value="morning">Morning</option>
-        <option value="evening">Evening</option>
-        <option value="night">Night</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Price ($)</label>
-      <input id="fPrice" type="number" placeholder="e.g. 200" value="200">
-    </div>
-  </div>
-
-  <div class="form-wrap">
-    <div class="field">
-      <label>Mouth Position</label>
-      <input id="fMouth" placeholder="e.g. Lips slightly parted, tongue rests low, throat open">
-    </div>
-    <div class="field">
-      <label>Resonance Point</label>
-      <input id="fResonance" placeholder="e.g. Feel the vibration in the chest / throat / nasal cavity">
-    </div>
-    <div class="field">
-      <label>Common Mistake</label>
-      <input id="fMistake" placeholder="e.g. Cutting the first vowel short instead of extending it">
-    </div>
-    <div class="field">
-      <label>Practice Tip</label>
-      <input id="fTip" placeholder="e.g. Close your eyes, breathe in slowly, then begin the sound">
-    </div>
-    <div class="field">
-      <label>Audio URL — Male Voice (Cloudflare R2 · paste after uploading)</label>
-      <input id="fAudioM" placeholder="https://pub-xxxx.r2.dev/words/word-male.mp3">
-    </div>
-    <div class="field">
-      <label>Audio URL — Female Voice (Cloudflare R2)</label>
-      <input id="fAudioF" placeholder="https://pub-xxxx.r2.dev/words/word-female.mp3">
-    </div>
-    <div class="field">
-      <label>Additional Notes for Ribon (developer)</label>
-      <textarea id="fNotes" placeholder="Any special instructions for the developer — timing, UI treatment, special animations..."></textarea>
-    </div>
-  </div>
-
-  <div class="btn-wrap" style="margin-bottom:8px;">
-    <button class="btn-primary" onclick="submitWord()">Submit Word for Review</button>
-  </div>
-  <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.25);padding-bottom:8px;">Ribon will review and fine-tune before publishing</div>
-
-  <!-- MY SUBMITTED WORDS -->
-  <div class="sec-label" style="margin-top:32px;">My Submitted Words</div>
-  <div class="word-list-wrap" id="wordListWrap">
-    <div style="color:rgba(255,255,255,0.25);font-size:13px;text-align:center;padding:28px 0;">No words submitted yet.</div>
-  </div>
 
   <!-- ══ INSTAGRAM ══ -->
   <div class="sec-label" style="margin-top:40px;">SOCIAL</div>
@@ -816,13 +775,124 @@ window.addEventListener('appinstalled', function () {
   if (b) b.style.display = 'none';
 });
 window.studioInstall = function () {
+  if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+    if (window.showToast) window.showToast('Already installed — you are in it');
+    return;
+  }
   if (!_studioPrompt) {
-    /* iOS never fires the event — there it is Share → Add to Home Screen. */
-    if (window.showToast) window.showToast('Use your browser menu → Add to Home Screen');
+    /* Chrome fires beforeinstallprompt once and never again if it was
+       dismissed, and iOS never fires it at all. Rather than a button that
+       silently does nothing, say what to tap. */
+    var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    alert(ios
+      ? 'To install NowssB Admin:\n\nTap the Share button, then "Add to Home Screen".\n\nOnce installed it stays signed in — you will not have to log in again.'
+      : 'To install NowssB Admin:\n\nOpen your browser menu (⋮) and choose "Install app" or "Add to Home screen".\n\nOnce installed it stays signed in — you will not have to log in again.');
     return;
   }
   _studioPrompt.prompt();
   _studioPrompt = null;
+};
+
+/* ══ SECTIONS ══════════════════════════════════════════════════════
+   Built from the headings, so the menu can never list something the page
+   does not have or miss something it does. Everything from one .sec-label
+   up to the next becomes a section; the drawer shows one at a time and
+   remembers which, so a reload lands where you were. ══ */
+/* The order they appear in the drawer, and which one opens first. DOM
+   order is an accident of how the page was written — Instagram happens to
+   be first in the markup and is the last thing anybody comes here for. */
+var STU_ORDER = [
+  'WORD STUDIO', 'THE CATALOGUE', 'REQUESTS FROM THE APP', 'PEOPLE',
+  'SEND A NOTIFICATION', 'USER ACCESS CONTROL', 'SEND WORD TO USER', 'SOCIAL'
+];
+var STU_META = {
+  'WORD STUDIO':          { icon: '✎', sub: 'Add or edit any word the app teaches' },
+  'THE CATALOGUE':        { icon: '☰', sub: 'The shelves — words and meanings' },
+  'REQUESTS FROM THE APP':{ icon: '!', sub: 'What people have asked you for' },
+  'SEND A NOTIFICATION':  { icon: '◉', sub: 'Push to every phone' },
+  'PEOPLE':               { icon: '☺', sub: 'Everyone who has signed up' },
+  'USER ACCESS CONTROL':  { icon: '⚿', sub: 'Find one person and change their plan' },
+  'SEND WORD TO USER':    { icon: '→', sub: 'Give a word to one account' },
+  'SOCIAL':               { icon: '◈', sub: 'The Instagram link' }
+};
+var _stuSecs = [];
+
+window.stuBuildNav = stuBuildNav;
+function stuBuildNav() {
+  var wrap = document.getElementById('mainWrap');
+  var list = document.getElementById('stuNavList');
+  if (!wrap || !list || _stuSecs.length) return;
+
+  /* Only top-level headings start a section — the Word Studio's editor has
+     headings of its own inside it, and those belong to it, not to the menu. */
+  var kids = Array.prototype.slice.call(wrap.children);
+  var groups = [], cur = null;
+  kids.forEach(function (el) {
+    if (el.classList && el.classList.contains('sec-label')) {
+      cur = { name: el.textContent.trim(), els: [el] };
+      groups.push(cur);
+    } else if (cur) {
+      cur.els.push(el);
+    }
+  });
+  if (!groups.length) return;
+
+  groups.forEach(function (g, i) {
+    var sec = document.createElement('section');
+    sec.className = 'stu-sec';
+    sec.id = 'stusec-' + i;
+    g.els[0].parentNode.insertBefore(sec, g.els[0]);
+    g.els.forEach(function (e) { sec.appendChild(e); });
+    g.el = sec;
+    _stuSecs.push(g);
+  });
+
+  /* Anything not named in STU_ORDER keeps its place at the end rather than
+     disappearing — a section added later still shows up. */
+  _stuSecs.sort(function (x, y) {
+    var a = STU_ORDER.indexOf(x.name.toUpperCase());
+    var b = STU_ORDER.indexOf(y.name.toUpperCase());
+    return (a < 0 ? 99 : a) - (b < 0 ? 99 : b);
+  });
+
+  list.innerHTML = _stuSecs.map(function (g, i) {
+    var m = STU_META[g.name.toUpperCase()] || { icon: '•', sub: '' };
+    return '<div class="stu-nav-item" data-i="' + i + '" onclick="stuGo(' + i + ')">' +
+             '<div class="stu-nav-ico">' + m.icon + '</div>' +
+             '<div class="stu-nav-txt"><div>' + g.name + '</div>' +
+             (m.sub ? '<div class="stu-nav-sub">' + m.sub + '</div>' : '') + '</div>' +
+           '</div>';
+  }).join('');
+
+  var foot = document.getElementById('stuNavFoot');
+  if (foot) foot.textContent = 'NowssB Admin · every change here publishes to the live app.';
+
+  var want = 0;
+  try {
+    var saved = localStorage.getItem('nwsb_studio_section');
+    var at = _stuSecs.findIndex(function (g) { return g.name === saved; });
+    if (at >= 0) want = at;
+  } catch (e) {}
+  stuGo(want, true);
+}
+
+window.stuGo = function (i, quiet) {
+  if (!_stuSecs[i]) return;
+  _stuSecs.forEach(function (g, n) { g.el.classList.toggle('on', n === i); });
+  document.querySelectorAll('.stu-nav-item').forEach(function (el) {
+    el.classList.toggle('on', +el.getAttribute('data-i') === i);
+  });
+  var here = document.getElementById('stuHere');
+  if (here) here.textContent = _stuSecs[i].name;
+  try { localStorage.setItem('nwsb_studio_section', _stuSecs[i].name); } catch (e) {}
+  if (!quiet) { stuMenu(0); window.scrollTo(0, 0); }
+};
+
+window.stuMenu = function (open) {
+  var n = document.getElementById('stuNav');
+  var o = document.getElementById('stuNavOverlay');
+  if (n) n.classList.toggle('open', !!open);
+  if (o) o.classList.toggle('open', !!open);
 };
 
 function doLogin() {
@@ -862,6 +932,10 @@ var _animFrame = null;
 // Build waveform bars
 (function(){
   var c = document.getElementById('waveformBars');
+  /* The offline word form this belonged to is gone — the Word Studio
+     publishes for real. Everything below it is kept because the pronunciation
+     helpers are still worth having, but none of it has a page any more. */
+  if (!c) return;
   for (var i = 0; i < 28; i++) {
     var b = document.createElement('div');
     b.className = 'wb';
@@ -1108,6 +1182,7 @@ function getSubmissions() { try { return JSON.parse(localStorage.getItem('nwsb_s
 function saveSubmissions(arr) { localStorage.setItem('nwsb_submissions', JSON.stringify(arr)); }
 
 function updateStats() {
+  if (!document.getElementById('statTotal')) return;
   var words = getSubmissions();
   document.getElementById('statTotal').textContent = words.length;
   document.getElementById('statPending').textContent = words.filter(function(w){ return w.status === 'pending'; }).length;
@@ -1115,6 +1190,7 @@ function updateStats() {
 }
 
 function renderWordList() {
+  if (!document.getElementById('wordListWrap')) return;
   var words = getSubmissions();
   var el = document.getElementById('wordListWrap');
   if (!words.length) { el.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:13px;text-align:center;padding:28px 0;">No words submitted yet.</div>'; return; }
@@ -1179,7 +1255,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, orderBy, onSnapshot, getDocs, addDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, signOut, onAuthStateChanged,
          GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult
        } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
@@ -1194,6 +1270,11 @@ const _fbApp = initializeApp({
 
 const _db = getFirestore(_fbApp);
 const _auth = getAuth(_fbApp);
+/* Survive a closed tab and a closed app. Firebase defaults to local
+   persistence in a browser, but say it rather than rely on it — this is the
+   difference between opening the installed studio and being in, and opening
+   it and signing in again. */
+try { setPersistence(_auth, browserLocalPersistence); } catch (e) {}
 var _foundUid = null;
 
 /* ══ ADMIN GATE ══════════════════════════════════════════════════════
@@ -1299,7 +1380,16 @@ window.adminSignOut = async function () {
 /* A reload should not mean signing in again, but it must not mean trusting
    the last session either — the list is re-checked every time. */
 onAuthStateChanged(_auth, async (user) => {
-  if (user && await isAdmin(user.uid)) { openStudio(); countSubs(); watchRequests(); catLoad(); wsLoad(); pplLoad(); }
+  if (user && await isAdmin(user.uid)) {
+    openStudio();
+    /* Who is actually signed in — Firebase says, not the HTML. */
+    const wn = document.getElementById('whoName');
+    const wm = document.getElementById('whoMail');
+    if (wn) wn.textContent = user.displayName || (user.email || '').split('@')[0] || 'admin';
+    if (wm) wm.textContent = user.email || user.uid;
+    if (window.stuBuildNav) stuBuildNav();
+    countSubs(); watchRequests(); catLoad(); wsLoad(); pplLoad();
+  }
   else closeStudio();
 });
 
@@ -1349,6 +1439,8 @@ function renderRequests(rows) {
   }).join('');
   const badge = document.getElementById('notifBadge');
   if (badge) { badge.textContent = open.length; badge.classList.toggle('show', open.length > 0); }
+  const sr = document.getElementById('statReq');
+  if (sr) sr.textContent = open.length;
 }
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -1923,7 +2015,7 @@ let _ppl = [];
 let _pplLive = false, _pplPro = false;
 
 function ago(ts) {
-  if (!ts) return 'never seen';
+  if (!ts) return 'unknown';
   const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
   if (s < 60) return 'here now';
   const m = Math.floor(s / 60); if (m < 60) return m + 'm ago';
@@ -1932,20 +2024,83 @@ function ago(ts) {
 }
 const isLive = (u) => u.lastSeen && (Date.now() - u.lastSeen) < LIVE_WINDOW;
 
+/* ══ PEOPLE ════════════════════════════════════════════════════════
+   Two sources, and it matters which is which.
+
+   Firebase Auth is who signed up. It knows when the account was created,
+   when it last signed in and how — and a browser cannot read it, by
+   design, so /api/users reads it with the service account.
+
+   Firestore users/<uid> is what the APP knows about them: their plan,
+   whether they are blocked, when the app last had them on screen. That
+   document only exists if the app wrote one, which is why the list used to
+   miss people and why so many rows said "never seen".
+
+   Auth leads. Every account appears whether or not the app ever wrote a
+   document for it, and the document is merged on where there is one. */
 window.pplLoad = async function () {
   const wrap = document.getElementById('pplList');
+  if (wrap) wrap.innerHTML = '<div style="color:rgba(255,255,255,0.35);font-size:13px;padding:4px 2px;">Loading…</div>';
+
+  /* What the app knows — plans, blocks, last seen. Best effort: if the
+     rules are not published this still shows the accounts. */
+  const extra = {};
   try {
     const snap = await getDocs(collection(_db, 'users'));
-    _ppl = [];
-    snap.forEach(d => _ppl.push({ uid: d.id, ...d.data() }));
-    _ppl.sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
-    document.getElementById('pplTotal').textContent = _ppl.length;
-    document.getElementById('pplLive').textContent = _ppl.filter(isLive).length;
-    document.getElementById('pplPro').textContent = _ppl.filter(u => u.isPro).length;
-    pplRender();
-  } catch (e) {
-    if (wrap) wrap.innerHTML = '<div style="color:rgba(220,80,80,0.8);font-size:13px;padding:4px 2px;">Could not read people — are the rules published and is this account an admin?</div>';
+    snap.forEach(d => { extra[d.id] = d.data(); });
+  } catch (e) {}
+
+  let accounts = null, why = '';
+  try {
+    const user = _auth.currentUser;
+    const res = await fetch('/api/users', {
+      headers: { Authorization: 'Bearer ' + (await user.getIdToken()) },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && Array.isArray(data.users)) accounts = data.users;
+    else why = data.error || ('HTTP ' + res.status);
+  } catch (e) { why = 'Could not reach /api/users.'; }
+
+  if (accounts) {
+    _ppl = accounts.map(a => {
+      const e = extra[a.uid] || {};
+      return {
+        uid: a.uid,
+        name: a.name || e.name || e.displayName || null,
+        email: a.email || e.email || null,
+        createdAt: a.createdAt,
+        lastLoginAt: a.lastLoginAt,
+        /* lastSeen is the app's own presence stamp; lastLoginAt is Auth's.
+           Recency uses whichever is newer, so somebody who signed in on a
+           build without presence still reads as recent. */
+        lastSeen: Math.max(a.lastRefreshAt || 0, a.lastLoginAt || 0, e.lastSeen || 0) || null,
+        providers: a.providers || [],
+        disabled: a.disabled,
+        isPro: !!e.isPro, tier: e.tier || null, blocked: !!e.blocked,
+        lastPlatform: e.lastPlatform || null,
+        noDoc: !extra[a.uid],
+      };
+    });
+  } else {
+    /* No server list — fall back to what the app wrote, and say so, rather
+       than showing a short list as if it were everybody. */
+    _ppl = Object.keys(extra).map(uid => ({ uid, ...extra[uid], fallback: 1 }));
+    if (wrap) {
+      const note = document.createElement('div');
+      note.style.cssText = 'color:rgba(232,213,163,0.85);font-size:12px;line-height:1.6;padding:10px 12px;margin-bottom:10px;background:rgba(232,213,163,0.08);border:1px solid rgba(232,213,163,0.25);border-radius:12px;';
+      note.textContent = 'Showing only accounts the app has written a record for — the full sign-up list needs /api/users. ' + why;
+      wrap.innerHTML = '';
+      wrap.appendChild(note);
+    }
   }
+
+  _ppl.sort((a, b) => (b.lastSeen || b.createdAt || 0) - (a.lastSeen || a.createdAt || 0));
+  document.getElementById('pplTotal').textContent = _ppl.length;
+  document.getElementById('pplLive').textContent = _ppl.filter(isLive).length;
+  document.getElementById('pplPro').textContent = _ppl.filter(u => u.isPro).length;
+  const sp = document.getElementById('statPeople'); if (sp) sp.textContent = _ppl.length;
+  const sl = document.getElementById('statLive');   if (sl) sl.textContent = _ppl.filter(isLive).length;
+  pplRender(accounts ? null : true);
 };
 
 window.pplToggleLive = function () {
@@ -1978,14 +2133,26 @@ window.pplRender = function () {
   wrap.innerHTML = rows.slice(0, 200).map(u => {
     const live = isLive(u);
     const plan = u.isPro ? (u.tier || 'subscribed') : 'free';
+    /* How they signed up, in the words the buttons in the app use. */
+    const how = (u.providers || [])
+      .map(p => p === 'google.com' ? 'Google' : p === 'password' ? 'Email'
+               : p === 'phone' ? 'Phone' : p.replace(/\.com$/, ''))
+      .filter((v, i, a) => a.indexOf(v) === i).join(' + ');
     return '<div class="wl-card">' +
-      '<span class="wl-status ' + (u.blocked ? 'rejected' : live ? 'approved' : 'pending') + '">' +
-        (u.blocked ? 'Blocked' : live ? 'Here now' : plan) + '</span>' +
+      '<span class="wl-status ' + (u.disabled ? 'rejected' : u.blocked ? 'rejected' : live ? 'approved' : 'pending') + '">' +
+        (u.disabled ? 'Disabled' : u.blocked ? 'Blocked' : live ? 'Here now' : plan) + '</span>' +
       '<div class="wl-name" style="letter-spacing:0;">' + esc(u.name || u.displayName || u.email || 'Unnamed') + '</div>' +
-      '<div class="wl-phonetic">' + esc(u.email || '—') + '</div>' +
-      '<div class="wl-meta">' + esc(u.uid) + ' · ' + ago(u.lastSeen) +
+      '<div class="wl-phonetic">' + esc(u.email || u.phone || '—') + '</div>' +
+      /* Signed up, last seen, how — the three facts about an account that
+         actually answer "who is using this". */
+      '<div class="wl-meta">' +
+        (u.createdAt ? 'Signed up ' + ago(u.createdAt) : 'Sign-up date unknown') +
+        ' · last seen ' + ago(u.lastSeen) +
+        (how ? ' · ' + esc(how) : '') +
         (u.lastPlatform ? ' · ' + esc(u.lastPlatform) + (u.lastStandalone ? ' app' : ' browser') : '') +
         ' · ' + esc(plan) + '</div>' +
+      '<div class="wl-meta" style="opacity:.55;">' + esc(u.uid) +
+        (u.noDoc ? ' · never opened the app' : '') + '</div>' +
       '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
         (u.isPro
           ? '<button class="rec-action-btn" onclick="pplSub(\'' + u.uid + '\',false)">Revoke</button>'
