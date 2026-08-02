@@ -56,10 +56,41 @@
     { img: './assets/store/intro-signature.webp', t: ['The Signature', 'Still, today'] },
     { img: './assets/fashion/fp-intro.webp',      t: ['Fashion Plus', 'Still, today'] }
   ];
-  /* Add the next clip here and it joins the loop. Nothing else changes. */
+  /* The backgrounds you can choose between. Add one here and it appears in
+     the phone and in the picker on its own — nothing else to touch. */
   var FILMS = [
-    { vid: './assets/video/fashion-plus-bg.mp4', t: ['Fashion Plus', 'Playing — this is what you get'] }
+    { vid: './assets/video/fashion-plus-bg.mp4',   name: 'Shattered Glass' },
+    { vid: './assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
+    { vid: './assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
+    { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' }
   ];
+  FILMS.forEach(function (f, i) {
+    f.t = [f.name, 'Background ' + (i + 1) + ' of ' + FILMS.length];
+  });
+  /* Registered so the idle prefetcher can warm them; only the chosen one is
+     ever in the document, so without this each would download the moment
+     it was swiped to. */
+  window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || [])
+    .concat(FILMS.map(function (f) { return f.vid; }));
+
+  /* Which one is the app's background. The phone is the picker: whatever
+     film you swipe to becomes the choice, so there is no separate Apply to
+     forget to press. */
+  var BGKEY = 'nwsb_fp_bgvid';
+  function bgChoice() {
+    var i = 0;
+    try { i = parseInt(localStorage.getItem(BGKEY), 10) || 0; } catch (e) {}
+    return (i >= 0 && i < FILMS.length) ? i : 0;
+  }
+  function setBgChoice(i) {
+    if (i < 0 || i >= FILMS.length || i === bgChoice()) return;
+    try { localStorage.setItem(BGKEY, String(i)); } catch (e) {}
+    var v = document.getElementById('fpBgVideo');
+    if (v) { v.setAttribute('src', FILMS[i].vid); try { v.load(); } catch (e) {} playState(); }
+    paintPicker();
+  }
+  window.fpBgChoice = bgChoice;
+
   function slides() { return isOn() ? FILMS : STILLS; }
 
   function isOn() { return typeof window.fpOn === 'function' ? window.fpOn() : false; }
@@ -78,7 +109,7 @@
     v.muted = true; v.loop = true; v.playsInline = true;
     v.setAttribute('muted', ''); v.setAttribute('loop', '');
     v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
-    v.src = VID;
+    v.src = FILMS[bgChoice()].vid;
     document.body.insertBefore(v, document.body.firstChild);
     return v;
   }
@@ -249,7 +280,77 @@
 
   /* Flipping the switch changes which list is playing, so the phone has to
      be told to start again from the top of the other one. */
-  window.nwsbFpRestage = function () { idx = -1; useA = false; shift(1); };
+  window.nwsbFpRestage = function () {
+    idx = -1; useA = false;
+    if (isOn()) idx = bgChoice() - 1;   // open on the background actually in use
+    shift(1); paintPicker();
+  };
+
+  /* ── Swiping the phone ────────────────────────────────────────────
+     The phone is the picker. A drag moves it one slide, and while the mode
+     is on every slide is a background — so landing on one selects it. No
+     Apply button, because the thing you are looking at IS the choice. */
+  function bindSwipe() {
+    var stage = document.getElementById('fpStage');
+    if (!stage || stage._fpSwipe) return;
+    stage._fpSwipe = true;
+    var x0 = null, y0 = null;
+    stage.addEventListener('touchstart', function (e) {
+      var t = e.touches[0]; x0 = t.clientX; y0 = t.clientY;
+    }, { passive: true });
+    stage.addEventListener('touchend', function (e) {
+      if (x0 == null) return;
+      var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+      x0 = null;
+      /* Horizontal only — this sits in a vertical scroller and a swipe that
+         was meant to scroll the page must not change the background. */
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+      hold(); shift(dx < 0 ? 1 : -1); commit();
+    }, { passive: true });
+  }
+  /* A finger beats the timer: pause the rotation for a few seconds after a
+     swipe so the slide you chose does not slide away under you. */
+  var holdT = null;
+  function hold() {
+    if (spin) { clearInterval(spin); spin = null; }
+    clearTimeout(holdT);
+    holdT = setTimeout(function () { startSpin(); }, 6000);
+  }
+  function commit() {
+    if (isOn()) setBgChoice(idx);
+    paintPicker();
+  }
+  function startSpin() {
+    if (spin || reducedMotion()) return;
+    /* The rotation PREVIEWS; it must never select. Committing from the
+       timer meant the app's background quietly changed itself every 3.2
+       seconds — you would have picked one and watched it drift. Only a
+       swipe or a tap chooses. */
+    spin = setInterval(function () { shift(1); paintPicker(); }, 3200);
+  }
+
+  /* The caption under the phone: what it is, which one of how many, and —
+     while the mode is on — whether it is the background you are using. */
+  function paintPicker() {
+    var host = document.getElementById('fpPick');
+    if (!host) return;
+    var SL = slides(), w = SL[idx] || SL[0], film = isOn();
+    var dots = SL.map(function (_, i) {
+      return '<span class="fpp-dot' + (i === idx ? ' on' : '') + '"></span>';
+    }).join('');
+    host.innerHTML =
+      '<div class="fp-pick-name">' + (w && w.t ? w.t[0] : '') + '</div>' +
+      '<div class="fp-pick-dots">' + dots + '</div>' +
+      '<div class="fp-pick-sub">' +
+        (film
+          ? (idx === bgChoice()
+              ? '<span class="fp-pick-live">In use</span> · swipe to try another'
+              : 'Swipe to choose · tap to use this one')
+          : 'Swipe through the pages that change') +
+      '</div>';
+    host.onclick = film ? function () { setBgChoice(idx); } : null;
+  }
+  window.nwsbFpPaintPicker = paintPicker;
 
   /* Only while the section is actually on screen — a cross-fade nobody can
      see is the exact cost this mode is warning people about. */
@@ -259,11 +360,12 @@
     if (!document.getElementById('fpWallA').style.backgroundImage) {
       idx = -1; useA = false; shift(1);
     }
+    bindSwipe(); paintPicker();
     if (reducedMotion() || !window.IntersectionObserver) return;
     new IntersectionObserver(function (es) {
       var vis = es[0] && es[0].isIntersecting;
-      if (vis && !spin) spin = setInterval(function () { shift(1); }, 3200);
-      else if (!vis && spin) { clearInterval(spin); spin = null; }
+      if (vis) startSpin();
+      else if (spin) { clearInterval(spin); spin = null; }
     }, { threshold: 0.25 }).observe(stage);
   }
 

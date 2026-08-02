@@ -10984,3 +10984,37 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    the plus off its top-right corner. */
 .fps-mini-ic img, .fpp-hero-ic img { object-fit: contain !important; }
 .fpp-hero-ic { width: 64px; height: 64px; }
+
+/* ── The phone's caption, which is also the picker ─────────────────── */
+.fp-pick {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 14px 20px 0; text-align: center;
+}
+.fp-pick-name {
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  color: rgba(255,255,255,0.9); letter-spacing: 0.2px;
+}
+.fp-pick-dots { display: flex; align-items: center; gap: 5px; }
+.fp-pick-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.42); letter-spacing: 0.3px;
+}
+.fp-pick-live {
+  color: #06080f; background: rgba(240,192,90,0.92);
+  padding: 2px 8px; border-radius: 999px !important;
+  font-weight: 700; font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase;
+}
+
+/* ── The icon: a BLACK wrapper, not a glass one ── */
+.fps-mini-ic, .fpp-hero-ic {
+  border-radius: 14px !important; overflow: hidden;
+  background: #05070d !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+/* A little air inside the black, so the art sits in it rather than against
+   its edges — and `contain`, so the plus in the corner is never shaved. */
+.fps-mini-ic img, .fpp-hero-ic img {
+  object-fit: contain !important; padding: 3px; box-sizing: border-box;
+}
