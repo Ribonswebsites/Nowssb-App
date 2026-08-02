@@ -114,9 +114,18 @@
     var raw;
     try { raw = JSON.parse(localStorage.getItem(LSKEY(which)) || 'null'); } catch (e) { raw = null; }
     var order = (raw && Array.isArray(raw.order)) ? raw.order.filter(function (k) { return all.indexOf(k) >= 0; }) : [];
-    // Anything the saved order doesn't mention is new since it was written —
-    // append it in its shipped position rather than dropping it silently.
-    all.forEach(function (k) { if (order.indexOf(k) < 0) order.splice(all.indexOf(k), 0, k); });
+    /* Anything the saved order doesn't mention is new since it was written.
+       It goes in NEXT TO ITS SHIPPED NEIGHBOUR, not at its shipped index —
+       an index means nothing in somebody else's arrangement, so inserting
+       at one dropped the new section wherever that slot happened to be.
+       Finding the section it ships after and going in behind it puts it
+       where it was designed to sit, whatever order the rest are in. */
+    all.forEach(function (k) {
+      if (order.indexOf(k) >= 0) return;
+      var i = all.indexOf(k), at = -1;
+      for (var j = i - 1; j >= 0 && at < 0; j--) at = order.indexOf(all[j]);
+      order.splice(at < 0 ? 0 : at + 1, 0, k);
+    });
     // With nothing saved yet, entries flagged defOff start switched off —
     // they are opt-in additions rather than part of the shipped page.
     var off = (raw && Array.isArray(raw.off))

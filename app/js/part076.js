@@ -165,9 +165,12 @@
     /* The switch, the state line and the note exist twice — once in the
        section on the home and once on the page behind its Enter — so these
        are classes rather than ids and every copy is painted. */
-    document.querySelectorAll('.fp-switch').forEach(function (sw) {
+    /* The master switches only — the per-piece ones carry data-part and
+       are painted by paintParts() from their own keys. */
+    document.querySelectorAll('.fp-switch:not([data-part])').forEach(function (sw) {
       sw.classList.toggle('on', on);
     });
+    paintParts();
     document.querySelectorAll('.fp-state-line').forEach(function (line) {
       line.textContent = on
         ? 'On — the tiles, the practice card and every photo background are playing'
@@ -315,10 +318,43 @@
     }, { passive: true });
   }
 
+  /* The per-piece switches, built from part066.js's own table so the two
+     can never list different things. Each row is a switch, not a door. */
+  function fillParts() {
+    var host = document.getElementById('fpParts');
+    var parts = window.NWSB_FP_PARTS;
+    if (!host || !parts) return;
+    if (!host.children.length) {
+      host.innerHTML = parts.map(function (p) {
+        return '<div class="fpp-part" onclick="fpPartToggle(\'' + p.k + '\')" role="button">' +
+                 '<div class="fpp-part-txt">' +
+                   '<div class="fpp-part-t">' + p.label + '</div>' +
+                   '<div class="fpp-part-s">' + p.sub + '</div>' +
+                 '</div>' +
+                 '<div class="fp-switch fp-switch-sm" data-part="' + p.k + '"><span class="fp-switch-knob"></span></div>' +
+               '</div>';
+      }).join('');
+    }
+    paintParts();
+  }
+  function paintParts() {
+    if (typeof window.fpPartOn !== 'function') return;
+    var master = isOn();
+    document.querySelectorAll('.fpp-part').forEach(function (row) {
+      var sw = row.querySelector('[data-part]');
+      if (!sw) return;
+      var live = window.fpPartOn(sw.getAttribute('data-part'));
+      sw.classList.toggle('on', live);
+      /* Dimmed, not disabled: you can set these up before turning the mode
+         on, and they should look like settings rather than dead controls. */
+      row.classList.toggle('fpp-part-idle', !master);
+    });
+  }
+
   window.fpOpenPage = function () {
     var sc = document.getElementById('sub-fashion-plus');
     if (!sc) return;
-    fillList(); paint();
+    fillList(); fillParts(); paint();
     var intro = document.getElementById('fppIntro');
     if (intro) { intro.style.display = ''; intro.style.opacity = ''; intro.style.pointerEvents = ''; }
     sc.classList.add('open');

@@ -74,6 +74,42 @@
   }
 
   function on() { try { return localStorage.getItem(K) === '1'; } catch (e) { return false; } }
+
+  /* ── The pieces ────────────────────────────────────────────────────
+     The master switch turns the mode on; these say which parts of it you
+     actually want. All four ship ON, so switching Fashion Plus on without
+     touching anything gives you the whole thing — they exist for the phone
+     that can carry the tiles but not four backgrounds at once.
+
+     Each is its own key rather than one packed value, so a part added later
+     defaults to on for everybody instead of being absent from a saved blob. */
+  var PARTS = [
+    { k: 'tiles',    key: 'nwsb_fp_tiles',    label: 'The four home tiles',
+      sub: 'Sound Library, My Progress, Word Science and Profile play clips' },
+    { k: 'practice', key: 'nwsb_fp_practice', label: 'Today’s Practice',
+      sub: 'A clip behind the card, and its Enter on the right edge' },
+    { k: 'routines', key: 'nwsb_fp_routines', label: 'The routines clip',
+      sub: 'The banner above My Routines' },
+    { k: 'bg',       key: 'nwsb_fp_bg',       label: 'Page backgrounds',
+      sub: 'Every screen wearing a photograph plays the film instead' }
+  ];
+  window.NWSB_FP_PARTS = PARTS;
+
+  function partOn(k) {
+    var p = null;
+    PARTS.forEach(function (x) { if (x.k === k) p = x; });
+    if (!p) return true;
+    try { return localStorage.getItem(p.key) !== '0'; } catch (e) { return true; }
+  }
+  window.fpPartOn = partOn;
+  window.fpPartToggle = function (k) {
+    var p = null;
+    PARTS.forEach(function (x) { if (x.k === k) p = x; });
+    if (!p) return;
+    try { localStorage.setItem(p.key, partOn(k) ? '0' : '1'); } catch (e) {}
+    apply();
+    haptic(22);
+  };
   function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
 
   function mediaEl(spec) {
@@ -182,18 +218,45 @@
     mount();
     var isOn = on();
     document.body.classList.toggle('fashplus', isOn);
+
+    /* Every rule for a piece is written `body.fashplus #home .fp-tile …`,
+       so taking the marker class off the element reverts all of them at
+       once — the tile goes back to exactly what it ships as, with nothing
+       to unwind. That is why the switch-off is a class removal rather than
+       a pile of override rules. */
+    var home2 = document.getElementById('home');
+    if (home2) {
+      var wantTiles = isOn && partOn('tiles');
+      TILES.forEach(function (t) {
+        var tile = home2.querySelector('.home-tile[onclick*="' + t.open + '"]');
+        if (tile) tile.classList.toggle('fp-tile', wantTiles);
+      });
+      var c2 = document.getElementById('todayPracticeCard');
+      if (c2) c2.classList.toggle('fp-card', isOn && partOn('practice'));
+    }
+    document.body.classList.toggle('fpoff-routines', isOn && !partOn('routines'));
     /* Videos that are not on screen should not be decoding frames. */
     document.querySelectorAll('#home video.fp-media').forEach(function (v) {
-      if (isOn) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      /* A clip inside a piece that is switched off must not be decoding —
+         hidden is not the same as stopped, and stopped is the point. */
+      var live = isOn && v.parentElement &&
+                 (v.parentElement.classList.contains('fp-tile') ||
+                  v.parentElement.classList.contains('fp-card'));
+      if (live) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
       else { try { v.pause(); } catch (e) {} }
     });
+    var rtv = document.querySelector('#rtVidBanner video');
+    if (rtv) {
+      if (isOn && partOn('routines')) { var p2 = rtv.play(); if (p2 && p2.catch) p2.catch(function () {}); }
+      else { try { rtv.pause(); } catch (e) {} }
+    }
     /* The second half of the mode — the photographic backgrounds becoming
        the film — is app/js/part076.js, which registers itself here rather
        than owning a switch of its own. One key, one body class, one
        toggle: the Customize card, the banner below the player and the
        switch in the Fashion Plus section are all this same function. */
     if (typeof window.nwsbFpBackgrounds === 'function') {
-      try { window.nwsbFpBackgrounds(isOn); } catch (e) {}
+      try { window.nwsbFpBackgrounds(isOn && partOn('bg')); } catch (e) {}
     }
     if (window.cuPaintModes) window.cuPaintModes();
     if (typeof window.nwsbFpPaint === 'function') { try { window.nwsbFpPaint(); } catch (e) {} }

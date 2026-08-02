@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=635">
+<link rel="stylesheet" href="nowssb-nm.css?v=636">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -5071,6 +5071,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="fp-switch-note fp-note"></div>
     </div>
 
+    <!-- ── Choose what moves ──────────────────────────────────────
+         The master switch says yes to the mode; these say which parts of
+         it you want. Rendered by app/js/part076.js from the table in
+         part066.js, so a part added there appears here on its own. -->
+    <div class="fpp-parts-head">Choose what moves</div>
+    <div class="fpp-parts" id="fpParts"><!-- rendered by app/js/part076.js --></div>
+
     <!-- The caution is the full-screen sheet, not a card — it is the
          one thing here that has to be read, so it gets a whole screen. -->
     <div class="fpp-caution-row" onclick="fpCaution()" role="button" aria-label="Read the caution">
@@ -9988,11 +9995,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=23"></script>
+<script src="app/js/part062.js?v=24"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>
-<script src="app/js/part066.js?v=8"></script>
+<script src="app/js/part066.js?v=9"></script>
 <script src="app/js/part067.js?v=21"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
@@ -10001,7 +10008,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
 <script src="app/js/part074.js?v=8"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
-<script src="app/js/part076.js?v=5"></script><!-- ══ FASHION PLUS ══ -->
+<script src="app/js/part076.js?v=6"></script><!-- ══ FASHION PLUS ══ -->
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>

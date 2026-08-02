@@ -10937,3 +10937,50 @@ body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { backgroun
   color: rgba(255,255,255,0.42); letter-spacing: 0.4px;
 }
 .fpp-banner { margin: 26px 16px 0; }
+
+/* ── Fashion Plus: choose what moves ───────────────────────────────── */
+.fpp-parts-head {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.4);
+  padding: 24px 20px 0;
+}
+.fpp-parts { margin: 12px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+.fpp-part {
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  padding: 14px 16px; box-sizing: border-box; border-radius: 16px !important;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: opacity 0.22s;
+}
+.fpp-part:active { background: rgba(255,255,255,0.08); }
+.fpp-part-idle { opacity: 0.45; }
+.fpp-part-txt { flex: 1; min-width: 0; }
+.fpp-part-t {
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+  color: rgba(255,255,255,0.92); line-height: 1.3;
+}
+.fpp-part-s {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.46); line-height: 1.55; margin-top: 3px;
+}
+/* The smaller switch the piece rows wear. Same shape, 0.8 scale, and its
+   own travel — the knob must land inside this track, not the big one's. */
+.fp-switch-sm { width: 42px; height: 25px; }
+.fp-switch-sm .fp-switch-knob { top: 2.5px; left: 2.5px; width: 19px; height: 19px; }
+.fp-switch-sm.on .fp-switch-knob { transform: translateX(17px); }
+
+/* A piece switched off keeps its shipped look — the marker class comes off
+   the element (app/js/part066.js), which reverts every rule at once. The
+   routines clip has no marker of its own, so it is hidden by body class. */
+body.fpoff-routines #home .rt-vid-banner { display: none !important; }
+
+/* ── The icon: a rounded square, no wrapper, nothing cropped ── */
+.fps-mini-ic, .fpp-hero-ic {
+  border-radius: 14px !important; overflow: hidden;
+  background: none !important; border: none !important; box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+/* `contain`, not `cover`: the art is a square render and cover was shaving
+   the plus off its top-right corner. */
+.fps-mini-ic img, .fpp-hero-ic img { object-fit: contain !important; }
+.fpp-hero-ic { width: 64px; height: 64px; }
