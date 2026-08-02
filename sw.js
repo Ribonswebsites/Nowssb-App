@@ -1,4 +1,4 @@
-const CACHE = 'nowsbansiu-v792';
+const CACHE = 'nowsbansiu-v793';
 // Separate, stable-named bucket for background-prefetched videos (see
 // app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
 // routine JS/CSS deploy never wipes out videos the user already has warmed —
@@ -38,8 +38,19 @@ self.addEventListener('activate', e => {
    The layout of that notification belongs to the phone, not to us: Android
    draws the small icon and the app name along the top and the title and
    body beneath. `icon` and `badge` are the two images we get to choose.
+
+   NOTIF_ICON is a 192×192 PNG that is transparent in every pixel, and that
+   is deliberate. `icon` is the large image on the RIGHT of the notification
+   — the one that should not be there. Leaving it out does not remove it:
+   Chrome on Android, given a web notification with no icon, generates one
+   itself from the origin (NotificationBuilderBase.ensureNormalizedIcon —
+   a coloured circle with the first letter of nowssb.com in it) and sets
+   that as the large icon. The only way to have nothing on the right is to
+   supply an icon that is valid and invisible. The badge, which is the small
+   circle beside the app name on the LEFT, stays exactly as it was — that
+   part already reads the way it should.
    ── */
-const NOTIF_ICON  = './assets/icons/notif-icon-192.png';
+const NOTIF_ICON  = './assets/icons/notif-blank.png';
 const NOTIF_BADGE = './assets/icons/notif-badge.png';
 
 self.addEventListener('push', e => {

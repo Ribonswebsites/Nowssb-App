@@ -20,7 +20,10 @@ self.addEventListener('push', (e) => {
   try { d = e.data ? e.data.json() : {}; } catch (err) {}
   e.waitUntil(self.registration.showNotification(d.title || 'NowssB Studio', {
     body: d.body || '',
-    icon: './assets/icons/notif-icon-192.png',
+    /* Transparent on purpose — see NOTIF_ICON in sw.js. Omitting `icon`
+       makes Chrome generate an origin monogram for the right-hand side; a
+       blank one leaves it empty. */
+    icon: './assets/icons/notif-blank.png',
     badge: './assets/icons/notif-badge.png',
     tag: d.tag || 'studio',
     data: { url: './admin.html' },

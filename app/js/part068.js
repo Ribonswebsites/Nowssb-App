@@ -43,14 +43,24 @@
      the app serves. */
   var VAPID_PUBLIC_KEY = 'BKOj_da2V8ebcvZidlL94VdVKtsbNXos-f41Sd_sS9V918Ex3TH210NOMKndTb5FX6k9NGfa2X3U6fgjtBdVXK4';
 
-  /* The two images Android lets us choose. ICON is the big one on the
-     right — the NowssB disc. BADGE is the small one beside the app name,
-     and Android builds it from the ALPHA CHANNEL ONLY: it throws the
-     colours away and paints the shape in a tint of its own choosing. So
-     the badge is authored as a full disc with the word knocked out of it,
-     which is the only way to get "solid circle, NowssB showing through" —
-     a coloured PNG would come back as a flat silhouette. */
-  var ICON  = './assets/icons/notif-icon-192.png';
+  /* The two images Android lets us choose.
+
+     ICON is the big one on the RIGHT, and ours is a PNG that is transparent
+     in every pixel — the notification should read "NowssB · nowssb.com" and
+     the words, with nothing beside them, the way Grok's and ChatGPT's do.
+     Dropping the field does not achieve that: Chrome on Android answers a
+     missing icon by generating one from the origin (a coloured circle with
+     the first letter of nowssb.com) and hanging that on the right instead.
+     An icon that exists and paints nothing is the only way to end up with
+     an empty right-hand side.
+
+     BADGE is the small one beside the app name on the left, and Android
+     builds it from the ALPHA CHANNEL ONLY: it throws the colours away and
+     paints the shape in a tint of its own choosing. So the badge is
+     authored as a full disc with the word knocked out of it, which is the
+     only way to get "solid circle, NowssB showing through" — a coloured
+     PNG would come back as a flat silhouette. */
+  var ICON  = './assets/icons/notif-blank.png';
   var BADGE = './assets/icons/notif-badge.png';
 
   var K_ASKED = 'nwsb_push_asked';
