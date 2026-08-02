@@ -187,14 +187,33 @@
       if (isOn) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
       else { try { v.pause(); } catch (e) {} }
     });
+    /* The second half of the mode — the photographic backgrounds becoming
+       the film — is app/js/part076.js, which registers itself here rather
+       than owning a switch of its own. One key, one body class, one
+       toggle: the Customize card, the banner below the player and the
+       switch in the Fashion Plus section are all this same function. */
+    if (typeof window.nwsbFpBackgrounds === 'function') {
+      try { window.nwsbFpBackgrounds(isOn); } catch (e) {}
+    }
     if (window.cuPaintModes) window.cuPaintModes();
+    if (typeof window.nwsbFpPaint === 'function') { try { window.nwsbFpPaint(); } catch (e) {} }
   }
   window.fpApply = apply;
 
-  window.fpToggle = function () {
+  /* Turning it OFF is instant. Turning it ON goes through the caution
+     first, full screen, because that is the only moment a battery warning
+     is worth reading — part076.js puts it up and calls back here. The
+     fallback keeps the switch working if that file ever fails to load. */
+  function flip() {
     try { localStorage.setItem(K, on() ? '0' : '1'); } catch (e) {}
     apply();
     haptic(on() ? [30, 55, 30] : 28);
+  }
+  window.fpFlip = flip;
+
+  window.fpToggle = function () {
+    if (!on() && typeof window.fpCaution === 'function') { window.fpCaution(true); return; }
+    flip();
   };
   window.fpOn = on;
 
