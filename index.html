@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=627">
+<link rel="stylesheet" href="nowssb-nm.css?v=629">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -1602,6 +1602,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Full-bleed 16:9 video banner, above the streak section. -->
   <div class="hero-vid-banner fash-hero-vid">
     <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
+  </div>
+
+  <!-- The way in to Fashion Plus. Its own card rather than a row inside
+       something else, because it is the one switch in the app that costs
+       battery and it should be read before it is tapped. -->
+  <div class="fp-entry" id="fpEntry" onclick="fpOpen()" role="button" aria-label="Open Fashion Plus">
+    <div class="fp-entry-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6z" stroke="#f0c05a" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+    <div class="fp-entry-txt">
+      <div class="fp-entry-eyebrow">Experience</div>
+      <div class="fp-entry-name">Fashion Plus</div>
+      <div class="fp-entry-sub" id="fpEntrySub">Still photographs become film · uses more battery</div>
+    </div>
+    <div class="fp-entry-go"><svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/></svg></div>
   </div>
   <div class="nmh-streak-glass-section">
     <div class="nmh-streak-heading nmh-streak-heading-dark">Start Building Your Streak Today</div>
@@ -4916,6 +4929,155 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div><!-- /nss-body -->
 
 </div><!-- /sub-nowssb-store -->
+
+<!-- ══ SCREEN: FASHION PLUS ══
+     The switch that turns the app's still photographs into moving ones,
+     and the page that is honest about what that costs. Three things live
+     here: the phone, the warning and the list.
+
+     The phone is one frame that never moves — assets/fashion/phone-frame.png,
+     cut out of its grey studio backdrop so the page shows through it — with
+     the wallpaper changing behind the glass and the two side phones changing
+     with it. That is the whole idea of the mode in one picture: the frame
+     stays, the picture moves.
+
+     Everything the mode actually does is listed further down, and it is a
+     list of what the code does, not a list of adjectives. Driven by
+     app/js/part076.js. ══ -->
+<div class="sub-screen" id="sub-fashion-plus">
+
+  <!-- The page runs the clip whether or not the mode is on, because this is
+       the page that is selling it. preload="none" so opening the Fashion
+       home never pays for it. -->
+  <video class="fp-page-vid" id="fpPageVid" muted loop playsinline preload="none"
+         src="./assets/video/fashion-plus-bg.mp4"></video>
+  <div class="fp-page-scrim"></div>
+
+  <div class="sub-header nav-bar">
+    <div class="sub-back" onclick="fpClose()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div class="sub-title">Fashion Plus</div>
+    <div style="width:36px;flex-shrink:0;"></div>
+  </div>
+
+  <div class="sub-body" id="fpBody">
+
+    <div class="fp-eyebrow">Fashion · Plus</div>
+    <div class="fp-title">The still ones<br>start moving.</div>
+    <div class="fp-sub">Every page that was wearing a photograph wears the film instead. The frame never moves. What is inside it does.</div>
+
+    <!-- ── The stage ──────────────────────────────────────────────────
+         Two side phones and one framed phone. The frame is an image with
+         a transparent surround; the screen is a separate box positioned
+         over the frame's own glass, so the wallpaper sits inside the
+         bezel instead of on top of it. Both wallpaper layers are always
+         present and cross-fade — swapping one src would flash. ── -->
+    <div class="fp-stage" id="fpStage">
+      <div class="fp-side fp-side-l"><div class="fp-side-wall" id="fpSideL"></div><div class="fp-side-shade"></div></div>
+      <div class="fp-side fp-side-r"><div class="fp-side-wall" id="fpSideR"></div><div class="fp-side-shade"></div></div>
+
+      <div class="fp-phone">
+        <div class="fp-screen">
+          <div class="fp-wall on" id="fpWallA"></div>
+          <div class="fp-wall"    id="fpWallB"></div>
+          <div class="fp-screen-shade"></div>
+          <div class="fp-notch"></div>
+
+          <!-- The lockscreen furniture, over the wallpaper -->
+          <div class="fp-lock">
+            <div class="fp-status">
+              <span>12:30</span>
+              <span class="fp-status-r"><svg viewBox="0 0 20 10" fill="none"><path d="M1 9h3V5H1zM6 9h3V3H6zM11 9h3V1h-3z" fill="rgba(255,255,255,0.85)"/></svg><span class="fp-batt"></span></span>
+            </div>
+            <div class="fp-clock">12:23</div>
+            <div class="fp-date">Thu, Sep 23</div>
+
+            <div class="fp-lock-bottom">
+              <!-- ── The glass banner ──────────────────────────────
+                   The widget from the lockscreen you sent, rebuilt: the
+                   thin strip with the source on the left and the section
+                   on the right, the frosted card with a dotted label,
+                   headline, one grey line and a thumbnail, then the
+                   floating pill of shortcuts under it. ── -->
+              <div class="fp-glass-strip">
+                <span class="fp-glass-src">nowssb</span>
+                <span class="fp-glass-sec">Style <svg viewBox="0 0 12 8" fill="none"><path d="M1 6l5-4 5 4" stroke="rgba(255,255,255,0.75)" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              </div>
+
+              <div class="fp-glass">
+                <div class="fp-glass-txt">
+                  <div class="fp-glass-tag"><span class="fp-glass-dot"></span>Rate my look</div>
+                  <div class="fp-glass-head" id="fpGlassHead">Instant Style Check</div>
+                  <div class="fp-glass-sub" id="fpGlassSub">Get quick style tips</div>
+                </div>
+                <div class="fp-glass-thumb" id="fpGlassThumb"></div>
+              </div>
+
+              <div class="fp-dock">
+                <span class="fp-dock-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="5" width="19" height="14" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="1.7"/><path d="M3 7l9 6 9-6" stroke="rgba(255,255,255,0.9)" stroke-width="1.7"/></svg></span>
+                <span class="fp-dock-ic"><svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.9)"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5H17V3.6A21 21 0 0 0 14.6 3.5c-2.4 0-4.05 1.5-4.05 4.2v2.2H7.9V13h2.65v8z"/></svg></span>
+                <span class="fp-dock-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M5 9l7 7 7-7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="fp-dock-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M3 5.5l17 6.5-17 6.5V13l10-1-10-1z" fill="rgba(255,255,255,0.9)"/></svg></span>
+                <span class="fp-dock-dot"></span>
+              </div>
+
+              <div class="fp-lock-nav">
+                <span class="fp-lock-nav-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z" stroke="rgba(255,255,255,0.8)" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+                <span class="fp-lock-nav-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="rgba(255,255,255,0.8)" stroke-width="1.6"/><path d="M3 10h18" stroke="rgba(255,255,255,0.8)" stroke-width="1.6"/></svg></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <img class="fp-frame" src="./assets/fashion/phone-frame.png" alt="" decoding="async">
+      </div>
+    </div>
+
+    <!-- ── The switch ── -->
+    <div class="fp-switch-card">
+      <div class="fp-switch-row" onclick="fpToggle()" role="button" aria-label="Turn Fashion Plus on or off">
+        <div class="fp-switch-txt">
+          <div class="fp-switch-name">Fashion Plus</div>
+          <div class="fp-switch-state" id="fpStateLine">Off — pages keep their photographs</div>
+        </div>
+        <div class="fp-switch" id="fpSwitch"><span class="fp-switch-knob"></span></div>
+      </div>
+      <div class="fp-switch-note" id="fpNote"></div>
+    </div>
+
+    <!-- ── The warning ── -->
+    <div class="fp-warn" onclick="fpCaution()" role="button" aria-label="Read the caution in full">
+      <div class="fp-warn-head">
+        <span class="fp-warn-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.2 22 20H2z" stroke="#f0c05a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.5v5M12 17.2v.2" stroke="#f0c05a" stroke-width="1.9" stroke-linecap="round"/></svg></span>
+        <span>Caution — read this first</span>
+      </div>
+      <div class="fp-warn-body">
+        This mode keeps video decoding while you use the app. <b>It will drain your battery faster, and on a slower phone it can stutter or hang.</b> Turn it on only if your phone has a powerful processor. If anything feels heavy, switch it straight back off — nothing else in the app changes when you do.
+      </div>
+      <div class="fp-warn-chips">
+        <span class="fp-warn-chip">Higher battery use</span>
+        <span class="fp-warn-chip">More heat</span>
+        <span class="fp-warn-chip">More data on first play</span>
+        <span class="fp-warn-chip fp-warn-more">Read it in full →</span>
+      </div>
+    </div>
+
+    <!-- ── What actually changes ── -->
+    <div class="fp-list-head">What changes when it is on</div>
+    <div class="fp-list">
+      <div class="fp-item"><span class="fp-item-n">1</span><div><div class="fp-item-t">The app background becomes the film</div><div class="fp-item-s">Home, login, onboarding, analysis — every screen whose background is a still photograph plays the clip instead.</div></div></div>
+      <div class="fp-item"><span class="fp-item-n">2</span><div><div class="fp-item-t">Photo-backed pages move too</div><div class="fp-item-s">The inside pages that carry a photograph behind them — My Progress, Word Science, Health, Community and the rest — take the same clip.</div></div></div>
+      <div class="fp-item"><span class="fp-item-n">3</span><div><div class="fp-item-t">Pages that already run video are untouched</div><div class="fp-item-s">The Word Atelier, the Meaning Store, the Signature and every section with its own clip keep exactly what they have. Nothing is replaced twice.</div></div></div>
+      <div class="fp-item"><span class="fp-item-n">4</span><div><div class="fp-item-t">It stops when you are not looking</div><div class="fp-item-s">The film pauses the moment the app goes to the background or the screen locks, and starts again when you come back.</div></div></div>
+      <div class="fp-item"><span class="fp-item-n">5</span><div><div class="fp-item-t">It gets out of the way on low battery</div><div class="fp-item-s">Below 15% and not charging, the film pauses itself and the page goes back to being still until you plug in.</div></div></div>
+      <div class="fp-item"><span class="fp-item-n">6</span><div><div class="fp-item-t">It respects Reduce Motion</div><div class="fp-item-s">If your phone is set to reduce motion, Fashion Plus stays off however this switch is set.</div></div></div>
+      <div class="fp-item"><span class="fp-item-n">7</span><div><div class="fp-item-t">Nothing else moves</div><div class="fp-item-s">Your layout, your theme, your tiles, your words and every setting stay exactly as you left them. This switch only changes what is behind them.</div></div></div>
+    </div>
+
+    <div class="rm-footer" style="margin:26px 20px 30px;">
+      <div class="rm-footer-brand"><span class="b">Nowss</span><span class="t">B</span></div>
+      <div class="rm-footer-copy">Fashion Plus · one switch, seven changes</div>
+    </div>
+  </div>
+</div><!-- /sub-fashion-plus -->
 
 <!-- ══ SCREEN: NOWSSB SIGNATURE STORE ══
      Its own shop, not a filtered view of two others. Only signatures are
@@ -9809,6 +9971,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
 <script src="app/js/part074.js?v=7"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
+<script src="app/js/part076.js?v=1"></script><!-- ══ FASHION PLUS ══ -->
+<script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
 <script src="nowssb-player.js?v=294" defer></script>

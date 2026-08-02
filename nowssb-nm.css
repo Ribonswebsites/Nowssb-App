@@ -10285,3 +10285,514 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   text-transform: none; font-size: 11.5px; color: rgba(255,255,255,0.45);
 }
 #sigSections .sig-req-banner { margin: 0 20px; }
+
+/* ══════════════════════════════════════════════════════════════════
+   FASHION PLUS — the mode, its page, and the phone on that page.
+
+   Two halves. The first is the page (.fp-*), which exists whether or not
+   the mode is on. The second is `body.fashion-plus`, six rules at the end
+   that are the mode itself.
+
+   The phone is worth explaining. assets/fashion/phone-frame.png is a
+   photograph of a handset with its studio backdrop cut away, so what is
+   left is the metal and the black glass. The wallpaper does NOT go behind
+   it — the frame's own screen is opaque black and would hide it — it goes
+   in .fp-screen, a box positioned over exactly where that glass is:
+
+     left 5.12%   top 2.07%   width 89.6%   height 96.6%
+
+   measured off the file (the screen's black runs x 37→684 of 722 and
+   y 31→1477 of 1496). So the frame image sits underneath and only its
+   rails show, which is why the frame can stay perfectly still while
+   everything inside it changes.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── The way in, on the Fashion home ── */
+.fp-entry {
+  width: calc(100% - 32px); margin: 18px 16px 0; box-sizing: border-box;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  padding: 16px 18px; border-radius: 20px !important;
+  background: linear-gradient(135deg, rgba(240,192,90,0.10), rgba(10,16,32,0.55));
+  border: 1px solid rgba(240,192,90,0.28);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.45);
+}
+.fp-entry:active { transform: scale(0.993); }
+.fp-entry-ic {
+  width: 42px; height: 42px; flex-shrink: 0; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(240,192,90,0.12); border: 1px solid rgba(240,192,90,0.3);
+}
+.fp-entry-ic svg { width: 20px; height: 20px; }
+.fp-entry-txt { flex: 1; min-width: 0; }
+.fp-entry-eyebrow {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 2.4px; text-transform: uppercase; color: rgba(240,192,90,0.7);
+}
+.fp-entry-name {
+  font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700;
+  color: #fff; letter-spacing: 0.2px; margin-top: 3px;
+}
+.fp-entry-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.5); margin-top: 3px; line-height: 1.45;
+}
+.fp-entry-go {
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(232,213,163,0.1); border: 1px solid rgba(232,213,163,0.24);
+}
+.fp-entry-go svg { width: 13px; height: 13px; }
+
+/* ── The page ── */
+#sub-fashion-plus { background: #05070d; }
+.fp-page-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.fp-page-scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(5,7,13,0.72) 0%, rgba(5,7,13,0.55) 30%,
+    rgba(5,7,13,0.68) 70%, rgba(5,7,13,0.9) 100%);
+}
+#sub-fashion-plus .sub-header { position: relative; z-index: 3; }
+#fpBody { position: relative; z-index: 2; }
+
+.fp-eyebrow {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase; color: rgba(240,192,90,0.8);
+  padding: 22px 20px 0;
+}
+.fp-title {
+  font-family: 'DM Sans', sans-serif; font-size: 32px; font-weight: 800;
+  color: #fff; letter-spacing: -0.6px; line-height: 1.1; padding: 10px 20px 0;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+}
+.fp-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,0.55); line-height: 1.7; padding: 12px 20px 0;
+  max-width: 330px;
+}
+
+/* ── The stage ─────────────────────────────────────────────────────
+   The two side phones are absolutely placed and half off the edges, the
+   framed one is the flow. The whole stage is sized off the frame's own
+   aspect ratio (722 / 1496) so nothing has to be told a pixel height. */
+.fp-stage {
+  position: relative; margin: 24px auto 4px; width: 100%;
+  max-width: 420px; padding: 0 0 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.fp-phone {
+  position: relative; z-index: 3; width: 58%;
+  aspect-ratio: 722 / 1496;
+  filter: drop-shadow(0 26px 46px rgba(0,0,0,0.75));
+}
+.fp-frame {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%; display: block; pointer-events: none;
+}
+.fp-screen {
+  position: absolute; z-index: 2; overflow: hidden;
+  left: 5.12%; top: 2.07%; width: 89.6%; height: 96.6%;
+  border-radius: 8.5% / 4.1% !important;
+  background: #06080f;
+}
+.fp-wall {
+  position: absolute; inset: 0; opacity: 0;
+  background-size: cover; background-position: center center;
+  transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1);
+}
+.fp-wall.on { opacity: 1; }
+.fp-screen-shade {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.28) 0%,
+    rgba(0,0,0,0.02) 26%, rgba(0,0,0,0.06) 52%, rgba(0,0,0,0.62) 100%);
+}
+/* The frame has a notch of its own, but .fp-screen covers the glass it is
+   drawn on, so it is redrawn here — over the wallpaper, where a real one
+   sits. Speaker slot and camera dot included, same as the render. */
+.fp-notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 34%; height: 3.4%; z-index: 3;
+  background: #05070c; border-radius: 0 0 12px 12px !important;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.fp-notch::before {
+  content: ''; width: 22%; height: 13%; min-height: 2px;
+  border-radius: 999px !important; background: rgba(160,170,190,0.55);
+}
+.fp-notch::after {
+  content: ''; width: 5px; height: 5px; border-radius: 50% !important;
+  background: #1c4fd8; box-shadow: inset 0 0 2px rgba(0,0,0,0.6);
+}
+
+/* Side phones — no frame, just the glass, tilted away from the middle. */
+.fp-side {
+  position: absolute; top: 8%; width: 44%; aspect-ratio: 9 / 19;
+  border-radius: 22px !important; overflow: hidden; z-index: 1;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+.fp-side-l { left: -12%; transform: perspective(900px) rotateY(11deg) scale(0.92); }
+.fp-side-r { right: -12%; transform: perspective(900px) rotateY(-11deg) scale(0.92); }
+.fp-side-wall {
+  position: absolute; inset: 0; background-size: cover; background-position: center;
+  transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1);
+}
+.fp-side-shade {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.34), rgba(0,0,0,0.7));
+}
+
+/* ── The lockscreen inside the glass ── */
+.fp-lock {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  display: flex; flex-direction: column;
+  padding: 4.5% 5% 4%; box-sizing: border-box;
+  font-family: 'DM Sans', sans-serif;
+}
+.fp-status {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 7px; font-weight: 500; color: rgba(255,255,255,0.9);
+}
+.fp-status-r { display: flex; align-items: center; gap: 3px; }
+.fp-status-r svg { width: 11px; height: 6px; }
+.fp-batt {
+  width: 9px; height: 5px; border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 1px !important; display: inline-block;
+}
+.fp-clock {
+  font-size: 30px; font-weight: 400; color: #fff; letter-spacing: -1px;
+  line-height: 1.05; margin-top: 7%; text-shadow: 0 2px 14px rgba(0,0,0,0.55);
+}
+.fp-date {
+  font-size: 8px; font-weight: 400; color: rgba(255,255,255,0.88);
+  margin-top: 1px; text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+}
+.fp-lock-bottom { margin-top: auto; }
+
+/* The strip above the card: source on the left, section on the right. */
+.fp-glass-strip {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 4px 3px;
+  font-size: 6px; font-weight: 600; letter-spacing: 0.6px;
+  color: rgba(255,255,255,0.72);
+}
+.fp-glass-sec { display: inline-flex; align-items: center; gap: 3px; }
+.fp-glass-sec svg { width: 7px; height: 5px; }
+
+/* The card itself — this is the piece being copied. Frosted, hairline
+   bright edge, content left and a rounded thumbnail right. */
+.fp-glass {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 8px; border-radius: 10px !important;
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.18);
+  -webkit-backdrop-filter: blur(14px) saturate(1.35);
+  backdrop-filter: blur(14px) saturate(1.35);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.22);
+}
+.fp-glass-txt { flex: 1; min-width: 0; }
+.fp-glass-tag {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 5.5px; font-weight: 500; color: rgba(255,255,255,0.8);
+  letter-spacing: 0.2px;
+}
+.fp-glass-dot {
+  width: 6px; height: 6px; border-radius: 50% !important; flex-shrink: 0;
+  background: #e0483c; box-shadow: 0 0 0 1px rgba(255,255,255,0.35);
+}
+.fp-glass-head {
+  font-size: 8.5px; font-weight: 700; color: #fff; margin-top: 2px;
+  letter-spacing: -0.1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fp-glass-sub {
+  font-size: 6px; font-weight: 300; color: rgba(255,255,255,0.62); margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fp-glass-thumb {
+  width: 26px; height: 26px; flex-shrink: 0; border-radius: 7px !important;
+  background: linear-gradient(140deg, #f6d98f, #d9a13c);
+  background-size: cover; background-position: center;
+  border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+/* The floating pill of shortcuts, and the two corner icons under it. */
+.fp-dock {
+  margin: 7px auto 0; width: fit-content;
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 9px; border-radius: 999px !important;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.16);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.fp-dock-ic { width: 9px; height: 9px; display: block; }
+.fp-dock-ic svg { width: 100%; height: 100%; display: block; }
+.fp-dock-dot {
+  width: 3px; height: 3px; border-radius: 50% !important;
+  background: rgba(255,255,255,0.8);
+}
+.fp-lock-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 7px; padding: 0 2px;
+}
+.fp-lock-nav-ic { width: 11px; height: 11px; }
+.fp-lock-nav-ic svg { width: 100%; height: 100%; display: block; }
+
+/* ── The switch ── */
+.fp-switch-card {
+  margin: 22px 16px 0; padding: 16px 18px; box-sizing: border-box;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.13);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+}
+.fp-switch-row { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.fp-switch-txt { flex: 1; min-width: 0; }
+.fp-switch-name {
+  font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 700; color: #fff;
+}
+.fp-switch-state {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.5); margin-top: 3px; line-height: 1.45;
+}
+.fp-switch {
+  width: 52px; height: 30px; flex-shrink: 0; border-radius: 999px !important;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  position: relative; transition: background 0.25s ease, border-color 0.25s ease;
+}
+.fp-switch-knob {
+  position: absolute; top: 3px; left: 3px; width: 22px; height: 22px;
+  border-radius: 50% !important; background: #fff;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.fp-switch.on { background: rgba(240,192,90,0.9); border-color: rgba(240,192,90,0.9); }
+.fp-switch.on .fp-switch-knob { transform: translateX(22px); }
+.fp-switch-note {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(240,192,90,0.75); line-height: 1.5; margin-top: 12px; display: none;
+}
+.fp-switch-note.show { display: block; }
+
+/* ── The warning ── */
+.fp-warn {
+  margin: 16px 16px 0; padding: 16px 18px; box-sizing: border-box;
+  border-radius: 18px !important;
+  background: rgba(240,192,90,0.07);
+  border: 1px solid rgba(240,192,90,0.3);
+  border-left: 3px solid rgba(240,192,90,0.75);
+}
+.fp-warn-head {
+  display: flex; align-items: center; gap: 9px;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2.2px; text-transform: uppercase; color: #f0c05a;
+}
+.fp-warn-ic { width: 17px; height: 17px; flex-shrink: 0; }
+.fp-warn-ic svg { width: 100%; height: 100%; display: block; }
+.fp-warn-body {
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 300;
+  color: rgba(255,255,255,0.68); line-height: 1.75; margin-top: 11px;
+}
+.fp-warn-body b { font-weight: 700; color: rgba(255,235,190,0.95); }
+.fp-warn-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+.fp-warn-chip {
+  font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 700;
+  letter-spacing: 1.4px; text-transform: uppercase; color: rgba(240,192,90,0.85);
+  background: rgba(240,192,90,0.1); border: 1px solid rgba(240,192,90,0.3);
+  padding: 5px 10px; border-radius: 999px !important;
+}
+
+/* ── The list ── */
+.fp-list-head {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.4);
+  padding: 26px 20px 0;
+}
+.fp-list { margin: 12px 16px 0; display: flex; flex-direction: column; gap: 9px; }
+.fp-item {
+  display: flex; align-items: flex-start; gap: 13px;
+  padding: 14px 16px; box-sizing: border-box; border-radius: 16px !important;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.fp-item-n {
+  width: 22px; height: 22px; flex-shrink: 0; border-radius: 50% !important;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  color: #06080f; background: rgba(240,192,90,0.9); margin-top: 1px;
+}
+.fp-item-t {
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+  color: rgba(255,255,255,0.92); line-height: 1.35;
+}
+.fp-item-s {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.48); line-height: 1.65; margin-top: 4px;
+}
+
+/* ══ THE MODE ══════════════════════════════════════════════════════
+   #fpBgVideo is one fixed element created by app/js/part076.js, sitting
+   exactly where .app-bg sits. Everything below is what turning the mode
+   on does — and it is deliberately short, because the mode only touches
+   backgrounds.
+
+   Sub-screens are opaque (#060c18) and stack above the fixed video, so a
+   page can only show it if it is made transparent. part076.js tags the
+   ones that were carrying a photograph with data-fp-img, and ONLY those
+   are opened up. A page with a solid colour, and a page already running
+   its own clip, are never selected — which is the rule you asked for. */
+#fpBgVideo {
+  position: fixed; inset: 0; z-index: 0; display: none;
+  width: 100%; height: 100%; object-fit: cover;
+  transform: translateZ(0); backface-visibility: hidden;
+}
+body.fashion-plus #fpBgVideo { display: block; }
+body.fashion-plus #appBg { opacity: 0 !important; }
+body.fashion-plus #appBgLayer2 { opacity: 0 !important; }
+
+/* The tagged pages: let the fixed clip through, keep their own scrim. */
+body.fashion-plus .sub-screen[data-fp-img] { background: transparent; }
+body.fashion-plus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { background-image: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.fashion-plus #fpBgVideo { display: none; }
+  body.fashion-plus #appBg { opacity: 1 !important; }
+  .fp-wall, .fp-side-wall { transition: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   THE FULL-SCREEN SHEET (.nwsb-fs) — the interstitial shape.
+
+   A dark blurred field, one close cross alone in the top right, the
+   artwork, a heavy all-caps line, one grey line, and full-width white
+   pills stacked at the bottom. Everything scrolls between the cross and
+   the pills, because two of the three uses carry a research proposal and
+   a fixed-height card would have cut it in half.
+
+   Built by app/js/part077.js and used by the Fashion Plus caution and by
+   both stores' disclaimers.
+   ══════════════════════════════════════════════════════════════════ */
+.nwsb-fs {
+  position: fixed; inset: 0; z-index: 12000;
+  opacity: 0; transition: opacity 0.26s ease;
+  font-family: 'DM Sans', sans-serif;
+}
+.nwsb-fs.on { opacity: 1; }
+.nwsb-fs-back {
+  position: absolute; inset: 0;
+  background: rgba(8,8,10,0.96);
+  -webkit-backdrop-filter: blur(26px) saturate(0.9);
+  backdrop-filter: blur(26px) saturate(0.9);
+}
+/* Alone in the corner, white disc, dark cross — the only chrome. */
+.nwsb-fs-x {
+  position: absolute; z-index: 3;
+  top: max(env(safe-area-inset-top, 14px), 14px); right: 16px;
+  width: 42px; height: 42px; padding: 0; border: none; cursor: pointer;
+  border-radius: 50% !important; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+.nwsb-fs-x svg { width: 19px; height: 19px; display: block; }
+.nwsb-fs-x:active { transform: scale(0.93); }
+
+.nwsb-fs-scroll {
+  position: absolute; inset: 0; z-index: 2; overflow-y: auto;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  padding: calc(max(env(safe-area-inset-top, 14px), 14px) + 60px) 20px
+           calc(max(env(safe-area-inset-bottom, 20px), 20px) + 20px);
+  display: flex; flex-direction: column; align-items: center;
+}
+.nwsb-fs-scroll::-webkit-scrollbar { display: none; }
+
+.nwsb-fs-art {
+  width: 100%; max-width: 340px; aspect-ratio: 3 / 4;
+  overflow: hidden; border-radius: 4px !important; flex-shrink: 0;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+}
+.nwsb-fs-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.nwsb-fs-head {
+  font-size: 25px; font-weight: 800; letter-spacing: -0.2px;
+  text-transform: uppercase; color: #fff; text-align: center;
+  line-height: 1.12; margin-top: 26px; max-width: 420px;
+}
+.nwsb-fs-sub {
+  font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.55);
+  text-align: center; line-height: 1.55; margin-top: 14px; max-width: 380px;
+}
+
+/* The reading half — only present where there is something to read. */
+.nwsb-fs-body {
+  width: 100%; max-width: 460px; margin-top: 24px;
+  text-align: left; color: rgba(255,255,255,0.62);
+}
+.nwsb-fs-body p {
+  font-size: 13px; font-weight: 300; line-height: 1.8; margin: 0 0 12px;
+}
+.nwsb-fs-body b { font-weight: 700; color: rgba(255,255,255,0.9); }
+.nwsb-fs-kicker {
+  font-size: 9px; font-weight: 700; letter-spacing: 3.4px;
+  text-transform: uppercase; color: rgba(232,213,163,0.8); margin-bottom: 8px;
+}
+.nwsb-fs-lead {
+  font-size: 16px !important; font-weight: 600 !important;
+  color: rgba(255,255,255,0.92) !important; line-height: 1.45 !important;
+  margin-bottom: 20px !important;
+}
+.nwsb-fs-h {
+  font-size: 10px; font-weight: 700; letter-spacing: 2.6px;
+  text-transform: uppercase; color: rgba(255,255,255,0.42);
+  margin: 20px 0 9px; padding-bottom: 7px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.nwsb-fs-keys { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; }
+.nwsb-fs-key {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.4px;
+  color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  padding: 6px 11px; border-radius: 999px !important;
+}
+.nwsb-fs-rule {
+  height: 1px; margin: 22px 0 16px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.22), rgba(255,255,255,0));
+}
+.nwsb-fs-note {
+  font-size: 12px !important; color: rgba(255,255,255,0.45) !important;
+  line-height: 1.75 !important;
+}
+
+/* Full-width white pills, stacked, nothing between them. */
+.nwsb-fs-acts {
+  width: 100%; max-width: 460px; margin-top: 28px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.nwsb-fs-btn {
+  width: 100%; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 700; letter-spacing: 0.2px; color: #0b0b0b;
+  background: #fff; padding: 17px 20px; border-radius: 999px !important;
+  transition: background 0.16s, transform 0.12s;
+}
+.nwsb-fs-btn:active { background: #e6e6e6; transform: scale(0.988); }
+.nwsb-fs-btn.ghost {
+  background: transparent; color: rgba(255,255,255,0.72);
+  border: 1px solid rgba(255,255,255,0.24);
+}
+.nwsb-fs-btn.ghost:active { background: rgba(255,255,255,0.08); }
+
+@media (max-width: 360px) {
+  .nwsb-fs-head { font-size: 22px; }
+  .nwsb-fs-art { max-width: 280px; }
+}
+.fp-warn { cursor: pointer; }
+.fp-warn:active { transform: scale(0.995); }
+.fp-warn-chip.fp-warn-more {
+  background: rgba(240,192,90,0.9); color: #06080f; border-color: rgba(240,192,90,0.9);
+}
