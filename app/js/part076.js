@@ -35,24 +35,32 @@
 
   var VID = './assets/video/fashion-plus-bg.mp4';
 
-  /* What moves through the phone: the app's OWN background photographs —
-     the exact files setBg() puts behind the login, the signup, onboarding,
-     the analysis and the home — and then the clip. That is the whole mode
-     in one loop: these are the stills it replaces, and that is what it
-     replaces them with. A demo made of anything else would be a lie about
-     what the switch does. */
-  var CDN = 'https://res.cloudinary.com/';
-  var WALLS = [
-    { img: CDN + 'dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584943/grok_image_1777580530017_nftrrb.jpg', t: ['Sign In', 'The background you meet first'] },
-    { img: CDN + 'dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777591568/grok_image_1777591433417_rx2whb.jpg', t: ['Create Account', 'Still, today'] },
-    { img: CDN + 'ds6duqabl/image/upload/q_auto/f_auto,w_900/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png', t: ['Onboarding', 'One photograph per screen'] },
-    { img: CDN + 'dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777615898/grok_image_1777615621529_xdxfj6.jpg', t: ['Your Answers', 'Still, today'] },
-    { img: CDN + 'dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850607/1000033084-ezremove_ybzuzs.png', t: ['Analysis', 'Still, today'] },
-    { img: CDN + 'dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850550/1000033096-ezremove_eb2gnu.png', t: ['Your Home', 'Still, today'] },
-    /* The one that moves. Last in the loop on purpose — five stills, then
-       the answer. */
-    { vid: VID, t: ['Fashion Plus', 'This, behind all of them'] }
+  /* What moves through the phone.
+
+     OFF — the app's intro artwork, which is what those pages are wearing
+     right now: the Store, the Word Atelier, the Meaning Store, the eBooks,
+     the Signature and this page's own.
+
+     ON — the clips. One today; this is a list so adding the next one is a
+     line, not a rewrite, and the phone starts showing it the moment it is
+     here. That is the whole demonstration: the same phone, the same frame,
+     stills before the switch and film after it.
+
+     Both lists are walked by the same code, so they can never fall out of
+     step with each other. */
+  var STILLS = [
+    { img: './assets/store/intro-store.webp',     t: ['The NowssB Store', 'Still, today'] },
+    { img: './assets/store/intro-words.webp',     t: ['The Word Atelier', 'Still, today'] },
+    { img: './assets/store/intro-meanings.webp',  t: ['The Meaning Store', 'Still, today'] },
+    { img: './assets/store/intro-ebooks.webp',    t: ['NowssB eBooks', 'Still, today'] },
+    { img: './assets/store/intro-signature.webp', t: ['The Signature', 'Still, today'] },
+    { img: './assets/fashion/fp-intro.webp',      t: ['Fashion Plus', 'Still, today'] }
   ];
+  /* Add the next clip here and it joins the loop. Nothing else changes. */
+  var FILMS = [
+    { vid: './assets/video/fashion-plus-bg.mp4', t: ['Fashion Plus', 'Playing — this is what you get'] }
+  ];
+  function slides() { return isOn() ? FILMS : STILLS; }
 
   function isOn() { return typeof window.fpOn === 'function' ? window.fpOn() : false; }
   function reducedMotion() {
@@ -144,6 +152,11 @@
   window.nwsbFpBackgrounds = function (on) {
     if (on && !reducedMotion()) { bgVideo(true); markImageBacked(); }
     playState();
+    /* The phone shows the stills when the mode is off and the clips when it
+       is on, so the switch has to restage it. */
+    if (typeof window.nwsbFpRestage === 'function') {
+      try { window.nwsbFpRestage(); } catch (e) {}
+    }
   };
 
   /* ── The section's own copy ───────────────────────────────────────── */
@@ -189,8 +202,9 @@
     var A = document.getElementById('fpWallA'), B = document.getElementById('fpWallB'),
         V = document.getElementById('fpWallVid');
     if (!A || !B) return;
-    idx = ((idx + step) % WALLS.length + WALLS.length) % WALLS.length;
-    var w = WALLS[idx];
+    var SL = slides();
+    idx = ((idx + step) % SL.length + SL.length) % SL.length;
+    var w = SL[idx];
 
     /* The clip is its own layer rather than a background-image, so the
        cross-fade is the same fade either way and nothing has to be told
@@ -209,14 +223,13 @@
       next.classList.add('on'); cur.classList.remove('on');
       useA = !useA;
     } else {
-      /* A video slide: fade both stills out and let the clip stand alone. */
       A.classList.remove('on'); B.classList.remove('on');
     }
 
     function side(el, k) {
       if (!el) return;
-      var s2 = WALLS[((idx + k) % WALLS.length + WALLS.length) % WALLS.length];
-      el.style.backgroundImage = 'url("' + (s2.img || WALLS[0].img) + '")';
+      var s2 = SL[((idx + k) % SL.length + SL.length) % SL.length];
+      el.style.backgroundImage = 'url("' + (s2.img || STILLS[0].img) + '")';
     }
     side(document.getElementById('fpSideL'), -1);
     side(document.getElementById('fpSideR'), 1);
@@ -226,10 +239,14 @@
     if (h) h.textContent = w.t[0];
     if (sb) sb.textContent = w.t[1];
     if (t) {
-      var nx = WALLS[(idx + 2) % WALLS.length];
-      t.style.backgroundImage = 'url("' + (nx.img || WALLS[0].img) + '")';
+      var nx = SL[(idx + 2) % SL.length];
+      t.style.backgroundImage = 'url("' + (nx.img || STILLS[0].img) + '")';
     }
   }
+
+  /* Flipping the switch changes which list is playing, so the phone has to
+     be told to start again from the top of the other one. */
+  window.nwsbFpRestage = function () { idx = -1; useA = false; shift(1); };
 
   /* Only while the section is actually on screen — a cross-fade nobody can
      see is the exact cost this mode is warning people about. */
@@ -270,10 +287,32 @@
     var host = document.getElementById('fpPageList');
     if (!host || host.children.length) return;
     host.innerHTML = CHANGES.map(function (c, i) {
-      return '<div class="fp-item"><span class="fp-item-n">' + (i + 1) + '</span><div>' +
-               '<div class="fp-item-t">' + c[0] + '</div>' +
-               '<div class="fp-item-s">' + c[1] + '</div></div></div>';
+      return '<div class="fpp-card"><span class="fpp-card-n">' + (i + 1) + '</span>' +
+               '<div class="fpp-card-t">' + c[0] + '</div>' +
+               '<div class="fpp-card-s">' + c[1] + '</div></div>';
     }).join('');
+
+    var dots = document.getElementById('fpRailDots');
+    if (dots) {
+      dots.innerHTML = CHANGES.map(function (_, i) {
+        return '<span class="fpp-dot' + (i ? '' : ' on') + '"></span>';
+      }).join('');
+    }
+    /* The counter and the dots follow the rail rather than the rail
+       following them — it is a scroller, not a slideshow, so the finger is
+       in charge and this only reports where it got to. */
+    host.addEventListener('scroll', function () {
+      var card = host.querySelector('.fpp-card');
+      if (!card) return;
+      var step = card.getBoundingClientRect().width + 12;
+      var i = Math.round(host.scrollLeft / step);
+      i = Math.max(0, Math.min(CHANGES.length - 1, i));
+      var cnt = document.getElementById('fpRailCount');
+      if (cnt) cnt.textContent = (i + 1) + ' of ' + CHANGES.length;
+      if (dots) {
+        [].forEach.call(dots.children, function (d, k) { d.classList.toggle('on', k === i); });
+      }
+    }, { passive: true });
   }
 
   window.fpOpenPage = function () {

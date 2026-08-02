@@ -10887,3 +10887,53 @@ body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { backgroun
 .fpp-hero-ic { border: none !important; box-shadow: none !important; }
 .fps-mini-ic { box-shadow: none !important; border: none !important; }
 .spill-circle img, .nmh-sec-banner-icon img { box-shadow: none !important; }
+
+/* ── Fashion Plus: the changes, on a rail ──────────────────────────
+   Seven cards swiped rather than seven cards scrolled past — the same
+   shape the Fashion Background picker uses, snapping, with a counter and
+   dots underneath reporting where the finger got to. */
+.fpp-rail {
+  display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 12px 16px 4px; margin: 0;
+}
+.fpp-rail::-webkit-scrollbar { display: none; }
+.fpp-card {
+  flex: 0 0 78%; max-width: 320px; scroll-snap-align: center;
+  box-sizing: border-box; padding: 18px 18px 20px;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.42);
+}
+.fpp-card-n {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50% !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+  color: #06080f; background: rgba(240,192,90,0.92); margin-bottom: 12px;
+}
+.fpp-card-t {
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700;
+  color: rgba(255,255,255,0.94); line-height: 1.3;
+}
+.fpp-card-s {
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 300;
+  color: rgba(255,255,255,0.5); line-height: 1.7; margin-top: 8px;
+}
+.fpp-rail-foot {
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  padding: 12px 20px 0;
+}
+.fpp-dots { display: flex; align-items: center; gap: 5px; }
+.fpp-dot {
+  width: 5px; height: 5px; border-radius: 999px !important;
+  background: rgba(255,255,255,0.2); transition: width 0.22s, background 0.22s;
+}
+.fpp-dot.on { width: 18px; background: rgba(240,192,90,0.9); }
+.fpp-count {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 400;
+  color: rgba(255,255,255,0.42); letter-spacing: 0.4px;
+}
+.fpp-banner { margin: 26px 16px 0; }

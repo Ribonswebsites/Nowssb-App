@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=634">
+<link rel="stylesheet" href="nowssb-nm.css?v=635">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -4996,6 +4996,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <div class="sub-body" id="fpBody">
+    <div class="fpp-hero">
+      <div class="fpp-hero-ic"><img loading="lazy" decoding="async" src="./assets/fashion/fashion-icon.webp" alt=""></div>
+      <div class="fpp-hero-title">The still ones<br>start moving.</div>
+      <div class="fpp-hero-sub">Everything below is what this switch does, and what it takes to do it.</div>
+    </div>
 <div class="fpp-stage-wrap">
     <!-- The phone. One frame that never moves, the wallpaper changing
          behind its glass, and the two side phones changing with it. -->
@@ -5054,11 +5059,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     </div>
 
-    <div class="fpp-hero">
-      <div class="fpp-hero-ic"><img loading="lazy" decoding="async" src="./assets/fashion/fashion-icon.webp" alt=""></div>
-      <div class="fpp-hero-title">The still ones<br>start moving.</div>
-      <div class="fpp-hero-sub">Everything below is what this switch does, and what it takes to do it.</div>
-    </div>
 
     <div class="fp-switch-card">
       <div class="fp-switch-row" onclick="fpToggle()" role="button" aria-label="Turn Fashion Plus on or off">
@@ -5079,8 +5079,26 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <span class="fpp-caution-go">→</span>
     </div>
 
-    <div class="fpp-list-head">What changes when it is on</div>
-    <div class="fp-list" id="fpPageList"><!-- rendered by app/js/part076.js --></div>
+    <!-- The section's own black banner, the same one every other section
+         on the home carries, so this page is furnished like the rest. -->
+    <div class="nmh-sec-banner fpp-banner" onclick="fpCaution()">
+      <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="./assets/fashion/fashion-icon.webp" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+      <div class="nmh-sec-banner-divider"></div>
+      <div class="nmh-sec-banner-txt">
+        <div class="nmh-sec-banner-title">What changes when it is on</div>
+        <div class="nmh-sec-banner-sub">Seven of them — swipe through, or read the caution in full</div>
+      </div>
+      <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+
+    <!-- Swiped, not scrolled past: seven cards on a snapping rail with a
+         counter under them, the same shape the Fashion Background picker
+         uses. Rendered by app/js/part076.js. -->
+    <div class="fpp-rail" id="fpPageList"><!-- rendered by app/js/part076.js --></div>
+    <div class="fpp-rail-foot">
+      <div class="fpp-dots" id="fpRailDots"></div>
+      <div class="fpp-count" id="fpRailCount">1 of 7</div>
+    </div>
 
     <div class="rm-footer" style="margin:26px 20px 30px;">
       <div class="rm-footer-brand"><span class="b">Nowss</span><span class="t">B</span></div>
@@ -9983,7 +10001,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
 <script src="app/js/part074.js?v=8"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
-<script src="app/js/part076.js?v=4"></script><!-- ══ FASHION PLUS ══ -->
+<script src="app/js/part076.js?v=5"></script><!-- ══ FASHION PLUS ══ -->
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
