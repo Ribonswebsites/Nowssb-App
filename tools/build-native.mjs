@@ -122,5 +122,32 @@ if (/admin\.html/.test(html)) {
   process.exit(1);
 }
 
+/* Every <div> must have its </div>. This is here because it has now gone
+   wrong twice: an edit that cuts a block out of index.html and leaves one
+   stray closer behind does not throw, does not 404 and does not show up in
+   the console — the browser silently closes the home's wrapper early and
+   every section below it piles on top of the ones above. It is invisible
+   until you look at the page, and by then it has shipped. Counting is
+   crude (it does not know about comments or strings) but it is exact
+   enough to catch the only mistake that actually happens: a missing or
+   duplicated closer. */
+const divOpen = (html.match(/<div\b/g) || []).length;
+const divClose = (html.match(/<\/div>/g) || []).length;
+if (divOpen !== divClose) {
+  console.error('\nBUILD FAILED — index.html has unbalanced <div> tags: ' +
+                divOpen + ' opened, ' + divClose + ' closed (' +
+                (divClose > divOpen ? divClose - divOpen + ' too many closers'
+                                    : divOpen - divClose + ' never closed') + ').');
+  console.error('Sections below the break will render on top of each other.');
+  process.exit(1);
+}
+const cOpen = (html.match(/<!--/g) || []).length;
+const cClose = (html.match(/-->/g) || []).length;
+if (cOpen !== cClose) {
+  console.error('\nBUILD FAILED — index.html has unbalanced HTML comments: ' +
+                cOpen + ' <!--, ' + cClose + ' -->.');
+  process.exit(1);
+}
+
 console.log('www/ built — ' + copied + ' files, ' + (bytes / 1048576).toFixed(1) + ' MB.');
 console.log('Studio excluded and verified. Next: npx cap sync android');

@@ -79,6 +79,12 @@
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner' },
         { k:'custom',   sel:['.fash-cust-panel'],                                          t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
+        /* Registered so it lands where it is meant to. Anything NOT in this
+           table keeps its markup position while every registered section is
+           re-appended around it — which puts the stray one at the TOP of the
+           home no matter where it was written. That is exactly what happened
+           to this card. */
+        { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' },
         { k:'shopvid',  sel:['.fash-video-banner:not(.fash-vb-tall):not(.fash-video-banner-search)'], t:B, label:'Store Video', sub:'Shop Now video banner' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.vb-banner[data-vb="vb5"]', '.fash-connect-wrap'],                                             t:S, label:'NowssB Connect',        sub:'What the social space is' },
