@@ -35,22 +35,23 @@
 
   var VID = './assets/video/fashion-plus-bg.mp4';
 
-  /* The wallpapers that move through the phone. These are the app's own
-     photographs — the same files the still backgrounds use — so the
-     demonstration is literally what the mode replaces. */
+  /* What moves through the phone: the app's OWN background photographs —
+     the exact files setBg() puts behind the login, the signup, onboarding,
+     the analysis and the home — and then the clip. That is the whole mode
+     in one loop: these are the stills it replaces, and that is what it
+     replaces them with. A demo made of anything else would be a lie about
+     what the switch does. */
+  var CDN = 'https://res.cloudinary.com/';
   var WALLS = [
-    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584943/grok_image_1777580530017_nftrrb.jpg',
-    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777591568/grok_image_1777591433417_rx2whb.jpg',
-    'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778309102/grok_image_1778309033334_fza02n.jpg',
-    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777615898/grok_image_1777615621529_xdxfj6.jpg',
-    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777616006/grok_image_1777615631154_yddgyh.jpg'
-  ];
-  var LINES = [
-    ['Instant Style Check', 'Get quick style tips'],
-    ['Find Matching Looks', 'Spot it, snap it, shop it'],
-    ['Featured Picks',      'Curated for you, today only'],
-    ['Rate My Look',        'Ask the room before you leave'],
-    ['Tonight’s Fit',       'Built around what you own']
+    { img: CDN + 'dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584943/grok_image_1777580530017_nftrrb.jpg', t: ['Sign In', 'The background you meet first'] },
+    { img: CDN + 'dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777591568/grok_image_1777591433417_rx2whb.jpg', t: ['Create Account', 'Still, today'] },
+    { img: CDN + 'ds6duqabl/image/upload/q_auto/f_auto,w_900/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png', t: ['Onboarding', 'One photograph per screen'] },
+    { img: CDN + 'dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777615898/grok_image_1777615621529_xdxfj6.jpg', t: ['Your Answers', 'Still, today'] },
+    { img: CDN + 'dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850607/1000033084-ezremove_ybzuzs.png', t: ['Analysis', 'Still, today'] },
+    { img: CDN + 'dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850550/1000033096-ezremove_eb2gnu.png', t: ['Your Home', 'Still, today'] },
+    /* The one that moves. Last in the loop on purpose — five stills, then
+       the answer. */
+    { vid: VID, t: ['Fashion Plus', 'This, behind all of them'] }
   ];
 
   function isOn() { return typeof window.fpOn === 'function' ? window.fpOn() : false; }
@@ -151,6 +152,9 @@
     /* The switch, the state line and the note exist twice — once in the
        section on the home and once on the page behind its Enter — so these
        are classes rather than ids and every copy is painted. */
+    document.querySelectorAll('.fp-switch').forEach(function (sw) {
+      sw.classList.toggle('on', on);
+    });
     document.querySelectorAll('.fp-state-line').forEach(function (line) {
       line.textContent = on
         ? 'On — the tiles, the practice card and every photo background are playing'
@@ -182,23 +186,49 @@
   var idx = 0, spin = null, useA = true;
 
   function shift(step) {
-    var A = document.getElementById('fpWallA'), B = document.getElementById('fpWallB');
+    var A = document.getElementById('fpWallA'), B = document.getElementById('fpWallB'),
+        V = document.getElementById('fpWallVid');
     if (!A || !B) return;
     idx = ((idx + step) % WALLS.length + WALLS.length) % WALLS.length;
+    var w = WALLS[idx];
+
+    /* The clip is its own layer rather than a background-image, so the
+       cross-fade is the same fade either way and nothing has to be told
+       which kind of slide is arriving. */
+    if (V) {
+      var showVid = !!w.vid;
+      if (showVid && V.getAttribute('src') !== w.vid) V.setAttribute('src', w.vid);
+      V.classList.toggle('on', showVid);
+      if (showVid) { V.muted = true; V.play().catch(function () {}); }
+      else { try { V.pause(); } catch (e) {} }
+    }
+
     var next = useA ? B : A, cur = useA ? A : B;
-    next.style.backgroundImage = 'url("' + WALLS[idx] + '")';
-    next.classList.add('on'); cur.classList.remove('on');
-    useA = !useA;
+    if (w.img) {
+      next.style.backgroundImage = 'url("' + w.img + '")';
+      next.classList.add('on'); cur.classList.remove('on');
+      useA = !useA;
+    } else {
+      /* A video slide: fade both stills out and let the clip stand alone. */
+      A.classList.remove('on'); B.classList.remove('on');
+    }
 
-    var L = document.getElementById('fpSideL'), R = document.getElementById('fpSideR');
-    if (L) L.style.backgroundImage = 'url("' + WALLS[(idx - 1 + WALLS.length) % WALLS.length] + '")';
-    if (R) R.style.backgroundImage = 'url("' + WALLS[(idx + 1) % WALLS.length] + '")';
+    function side(el, k) {
+      if (!el) return;
+      var s2 = WALLS[((idx + k) % WALLS.length + WALLS.length) % WALLS.length];
+      el.style.backgroundImage = 'url("' + (s2.img || WALLS[0].img) + '")';
+    }
+    side(document.getElementById('fpSideL'), -1);
+    side(document.getElementById('fpSideR'), 1);
 
-    var h = document.getElementById('fpGlassHead'), s = document.getElementById('fpGlassSub'),
+    var h = document.getElementById('fpGlassHead'), sb = document.getElementById('fpGlassSub'),
         t = document.getElementById('fpGlassThumb');
-    if (h) h.textContent = LINES[idx][0];
-    if (s) s.textContent = LINES[idx][1];
-    if (t) t.style.backgroundImage = 'url("' + WALLS[(idx + 2) % WALLS.length] + '")';
+    if (h) h.textContent = w.t[0];
+    if (sb) sb.textContent = w.t[1];
+    if (t) {
+      var nx = WALLS[(idx + 2) % WALLS.length];
+      t.style.backgroundImage = 'url("' + (nx.img || WALLS[0].img) + '")';
+    }
   }
 
   /* Only while the section is actually on screen — a cross-fade nobody can
@@ -206,7 +236,7 @@
   function watchStage() {
     var stage = document.getElementById('fpStage');
     if (!stage) return;
-    if (!stage.style.backgroundImage && !document.getElementById('fpWallA').style.backgroundImage) {
+    if (!document.getElementById('fpWallA').style.backgroundImage) {
       idx = -1; useA = false; shift(1);
     }
     if (reducedMotion() || !window.IntersectionObserver) return;
