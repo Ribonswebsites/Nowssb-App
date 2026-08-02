@@ -38,8 +38,13 @@
   function money(n) {
     return (typeof window.nwsbFormatINR === 'function') ? window.nwsbFormatINR(n) : ('₹' + n);
   }
-  function wordImg() { return window.RM_SIGNATURE_IMG || ''; }
-  function meanImg() { return window.MS_SIGNATURE_IMG || ''; }
+  /* The two discs the black banners wear. Repo files, not the store's
+     product photography: these are the collection's own marks — the gold
+     frame for the words, the gold Meanings case for the meanings — and
+     they were previously reading whatever the store had set, which on a
+     cold load was an empty string and a broken-image glyph. */
+  function wordImg() { return './assets/signature/sig-words-icon.webp'; }
+  function meanImg() { return './assets/signature/sig-meanings-icon.webp'; }
   function price()   { return window.MS_SIGNATURE_PRICE || 299; }
 
   /* ── What is on the shelf ──────────────────────────────────────────

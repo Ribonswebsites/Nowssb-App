@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=630">
+<link rel="stylesheet" href="nowssb-nm.css?v=631">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -1618,9 +1618,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        and cuPaintModes() keeps them in step. ══ -->
   <div class="fps-wrap" id="fpSection">
     <div class="spill" onclick="fpCaution()">
-      <span class="spill-circle"><svg viewBox="0 0 22 22" fill="none"><path d="M5 5.5A1.4 1.4 0 0 1 6.4 4.1h9.2A1.4 1.4 0 0 1 17 5.5v11a1.4 1.4 0 0 1-1.4 1.4H6.4A1.4 1.4 0 0 1 5 16.5z" stroke="#fff" stroke-width="1.5"/><path d="M9.6 8.6 13.6 11l-4 2.4z" fill="#e8d5a3"/></svg></span>
+      <span class="spill-circle"><img loading="lazy" decoding="async" src="./assets/fashion/fashion-icon.webp" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"></span>
       <span class="spill-pill">
-        <span class="spill-pill-ic"><svg viewBox="0 0 22 22" fill="none"><path d="M5 5.5A1.4 1.4 0 0 1 6.4 4.1h9.2A1.4 1.4 0 0 1 17 5.5v11a1.4 1.4 0 0 1-1.4 1.4H6.4A1.4 1.4 0 0 1 5 16.5z" stroke="#fff" stroke-width="1.5"/><path d="M9.6 8.6 13.6 11l-4 2.4z" fill="#e8d5a3"/></svg></span>
+        <span class="spill-pill-ic"><img loading="lazy" decoding="async" src="./assets/fashion/fashion-icon.webp" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"></span>
         <span class="spill-pill-rule"></span>
         <span class="spill-pill-txt">The frame stays. The picture moves.</span>
       </span>
@@ -1688,15 +1688,23 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="fp-switch-row" onclick="fpToggle()" role="button" aria-label="Turn Fashion Plus on or off">
         <div class="fp-switch-txt">
           <div class="fp-switch-name">Fashion Plus</div>
-          <div class="fp-switch-state" id="fpStateLine">Off — pages keep their photographs</div>
+          <div class="fp-switch-state fp-state-line">Off — pages keep their photographs</div>
         </div>
         <div class="fp-switch cust-mode-sw" data-k="fashplus" id="fpSwitch"><span class="fp-switch-knob cust-mode-knob"></span></div>
       </div>
-      <div class="fp-switch-note" id="fpNote"></div>
+      <div class="fp-switch-note fp-note"></div>
+    </div>
+
+    <div class="fps-enter-row">
+      <span class="fps-enter-lbl">The full page</span>
+      <span class="tp-enter fps-enter" onclick="fpOpenPage()" role="button" aria-label="Enter Fashion Plus">
+        <span class="tp-enter-lbl">Enter</span>
+        <span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span>
+      </span>
     </div>
 
     <div class="nmh-sec-banner fps-banner" onclick="fpCaution()">
-      <div class="nmh-sec-banner-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M5 5.5A1.4 1.4 0 0 1 6.4 4.1h9.2A1.4 1.4 0 0 1 17 5.5v11a1.4 1.4 0 0 1-1.4 1.4H6.4A1.4 1.4 0 0 1 5 16.5z" stroke="#fff" stroke-width="1.5"/><path d="M9.6 8.6 13.6 11l-4 2.4z" fill="#e8d5a3"/></svg></div>
+      <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="./assets/fashion/fashion-icon.webp" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"></div>
       <div class="nmh-sec-banner-divider"></div>
       <div class="nmh-sec-banner-txt">
         <div class="nmh-sec-banner-title">What changes · and what it costs</div>
@@ -3806,7 +3814,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
 
       <div id="rm-word-sections-container"></div>
-      <script src="app/js/part010.js?v=171"></script>
+      <script src="app/js/part010.js?v=172"></script>
 
       <!-- Search any word CTA -->
       <div class="rm-search-any">
@@ -5020,6 +5028,109 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div><!-- /nss-body -->
 
 </div><!-- /sub-nowssb-store -->
+
+<!-- ══ SCREEN: FASHION PLUS ══
+     The section on the Fashion home is the pitch; this is the page behind
+     its Enter. Intro first — art, one line, one way in — the same shape
+     every other shop and hub in the app uses, then what the mode changes,
+     what it costs and the switch.
+
+     No phone here. That lives in the section, and two copies would mean
+     two elements with the same ids and one cross-fade running behind a
+     screen nobody is looking at. The switch, the state line and the note
+     are class-driven for exactly the same reason: app/js/part076.js paints
+     every copy of them, wherever they are. ══ -->
+<div class="sub-screen" id="sub-fashion-plus">
+
+  <!-- ── INTRO ── -->
+  <div class="fpp-intro" id="fppIntro">
+    <div class="fpp-intro-bg"></div>
+    <div class="fpp-intro-scrim"></div>
+    <div class="sl-intro-top">
+      <div class="sl-intro-back" onclick="fpClosePage()">
+        <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
+          <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="square"/>
+          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.75)" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="sl-intro-tag fpp-intro-tag">Fashion · Plus</div>
+      <div style="width:40px;flex-shrink:0;"></div>
+    </div>
+    <div class="sl-intro-bottom">
+      <div class="sl-intro-divider fpp-intro-divider"></div>
+      <div class="sl-intro-desc">The Fashion home in motion — the tiles, the practice card, and every page that was wearing a photograph. One switch, and the battery it costs.</div>
+      <div class="sl-intro-stats-row">
+        <div class="sl-intro-stat">7 changes</div>
+        <div class="sl-intro-stat-sep">·</div>
+        <div class="sl-intro-stat">Fashion home</div>
+        <div class="sl-intro-stat-sep">·</div>
+        <div class="sl-intro-stat">Off by default</div>
+      </div>
+      <div class="sl-intro-enter-btn fpp-enter" onclick="fpEnterPage()" style="margin-top:28px;">
+        <span class="sl-intro-enter-label">Enter Fashion Plus</span>
+        <span class="sl-intro-enter-icon">
+          <svg width="16" height="14" viewBox="0 0 18 14" fill="none">
+            <path d="M11 1L17 7L11 13" stroke="#060c18" stroke-width="1.6" stroke-linecap="square"/>
+            <line x1="1" y1="7" x2="17" y2="7" stroke="#060c18" stroke-width="1.6"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <video class="fp-page-vid" id="fpPageVid" muted loop playsinline preload="none"
+         src="./assets/video/fashion-plus-bg.mp4"></video>
+  <div class="fp-page-scrim"></div>
+
+  <div class="sub-header nav-bar">
+    <div class="sub-back" onclick="fpClosePage()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+    <div class="sub-title">Fashion Plus</div>
+    <div style="width:36px;flex-shrink:0;"></div>
+  </div>
+
+  <div class="sub-body" id="fpBody">
+    <div class="fpp-hero">
+      <div class="fpp-hero-ic"><img loading="lazy" decoding="async" src="./assets/fashion/fashion-icon.webp" alt=""></div>
+      <div class="fpp-hero-title">The still ones<br>start moving.</div>
+      <div class="fpp-hero-sub">Everything below is what this switch does, and what it takes to do it.</div>
+    </div>
+
+    <div class="fp-switch-card">
+      <div class="fp-switch-row" onclick="fpToggle()" role="button" aria-label="Turn Fashion Plus on or off">
+        <div class="fp-switch-txt">
+          <div class="fp-switch-name">Fashion Plus</div>
+          <div class="fp-switch-state fp-state-line">Off — pages keep their photographs</div>
+        </div>
+        <div class="fp-switch cust-mode-sw" data-k="fashplus"><span class="fp-switch-knob cust-mode-knob"></span></div>
+      </div>
+      <div class="fp-switch-note fp-note"></div>
+    </div>
+
+    <div class="fp-warn" onclick="fpCaution()" role="button" aria-label="Read the caution in full">
+      <div class="fp-warn-head">
+        <span class="fp-warn-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.2 22 20H2z" stroke="#f0c05a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.5v5M12 17.2v.2" stroke="#f0c05a" stroke-width="1.9" stroke-linecap="round"/></svg></span>
+        <span>Caution — read this first</span>
+      </div>
+      <div class="fp-warn-body">
+        This mode keeps video decoding while you use the app. <b>It will drain your battery faster, and on a slower phone it can stutter or hang.</b> Turn it on only if your phone has a powerful processor. If anything feels heavy, switch it straight back off — nothing else in the app changes when you do.
+      </div>
+      <div class="fp-warn-chips">
+        <span class="fp-warn-chip">Higher battery use</span>
+        <span class="fp-warn-chip">More heat</span>
+        <span class="fp-warn-chip">More data on first play</span>
+        <span class="fp-warn-chip fp-warn-more">Read it in full →</span>
+      </div>
+    </div>
+
+    <div class="fpp-list-head">What changes when it is on</div>
+    <div class="fp-list" id="fpPageList"><!-- rendered by app/js/part076.js --></div>
+
+    <div class="rm-footer" style="margin:26px 20px 30px;">
+      <div class="rm-footer-brand"><span class="b">Nowss</span><span class="t">B</span></div>
+      <div class="rm-footer-copy">Fashion Plus · one switch, seven changes</div>
+    </div>
+  </div>
+</div><!-- /sub-fashion-plus -->
 
 
 
@@ -9914,8 +10025,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part071.js?v=1"></script><!-- ══ PRESENCE ══ -->
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
-<script src="app/js/part074.js?v=7"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
-<script src="app/js/part076.js?v=2"></script><!-- ══ FASHION PLUS ══ -->
+<script src="app/js/part074.js?v=8"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
+<script src="app/js/part076.js?v=3"></script><!-- ══ FASHION PLUS ══ -->
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>

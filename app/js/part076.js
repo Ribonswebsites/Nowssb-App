@@ -147,15 +147,16 @@
 
   /* ── The section's own copy ───────────────────────────────────────── */
   function paint() {
-    var line = document.getElementById('fpStateLine');
-    var note = document.getElementById('fpNote');
     var on = isOn();
-    if (line) {
+    /* The switch, the state line and the note exist twice — once in the
+       section on the home and once on the page behind its Enter — so these
+       are classes rather than ids and every copy is painted. */
+    document.querySelectorAll('.fp-state-line').forEach(function (line) {
       line.textContent = on
         ? 'On — the tiles, the practice card and every photo background are playing'
         : 'Off — pages keep their photographs';
-    }
-    if (note) {
+    });
+    document.querySelectorAll('.fp-note').forEach(function (note) {
       var msg = '';
       if (reducedMotion()) {
         msg = 'Your phone is set to reduce motion, so the backgrounds stay still ' +
@@ -169,7 +170,7 @@
       }
       note.textContent = msg;
       note.classList.toggle('show', !!msg);
-    }
+    });
   }
   window.nwsbFpPaint = paint;
 
@@ -230,6 +231,44 @@
     ['It stops when you are not looking', 'Everything pauses the moment the app goes to the background or the screen locks, and starts again when you come back.'],
     ['It gets out of the way on low battery', 'Below 15% and not charging, the backgrounds pause themselves until you plug in — and Reduce Motion keeps them still however this switch is set.']
   ];
+
+  /* ── The page behind the section's Enter ──────────────────────────
+     Intro first, then the body — the same two-step every shop in the app
+     uses. The list is built from the same CHANGES table the caution sheet
+     uses, so the two can never drift apart. */
+  function fillList() {
+    var host = document.getElementById('fpPageList');
+    if (!host || host.children.length) return;
+    host.innerHTML = CHANGES.map(function (c, i) {
+      return '<div class="fp-item"><span class="fp-item-n">' + (i + 1) + '</span><div>' +
+               '<div class="fp-item-t">' + c[0] + '</div>' +
+               '<div class="fp-item-s">' + c[1] + '</div></div></div>';
+    }).join('');
+  }
+
+  window.fpOpenPage = function () {
+    var sc = document.getElementById('sub-fashion-plus');
+    if (!sc) return;
+    fillList(); paint();
+    var intro = document.getElementById('fppIntro');
+    if (intro) { intro.style.display = ''; intro.style.opacity = ''; intro.style.pointerEvents = ''; }
+    sc.classList.add('open');
+  };
+  window.fpEnterPage = function () {
+    var intro = document.getElementById('fppIntro');
+    if (intro) {
+      intro.style.opacity = '0'; intro.style.pointerEvents = 'none';
+      setTimeout(function () { intro.style.display = 'none'; }, 460);
+    }
+    var v = document.getElementById('fpPageVid');
+    if (v && !reducedMotion()) { v.muted = true; v.play().catch(function () {}); }
+  };
+  window.fpClosePage = function () {
+    var sc = document.getElementById('sub-fashion-plus');
+    if (sc) sc.classList.remove('open');
+    var v = document.getElementById('fpPageVid');
+    if (v) { try { v.pause(); } catch (e) {} }
+  };
 
   window.fpCaution = function (gate) {
     if (typeof window.nwsbSheet !== 'function') {

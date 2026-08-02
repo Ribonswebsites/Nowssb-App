@@ -10750,3 +10750,79 @@ body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { backgroun
 .fp-switch.on .fp-switch-knob, .fp-switch.cust-mode-sw.on .fp-switch-knob {
   transform: translateX(22px);
 }
+
+/* ── Fashion Plus, the page behind the section's Enter ─────────────── */
+#sub-fashion-plus { background: #05070d; }
+.fp-page-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.fp-page-scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(5,7,13,0.74) 0%, rgba(5,7,13,0.56) 30%,
+    rgba(5,7,13,0.70) 70%, rgba(5,7,13,0.92) 100%);
+}
+#sub-fashion-plus .sub-header { position: relative; z-index: 3; }
+#fpBody { position: relative; z-index: 2; }
+
+/* The intro. Same bones as every other intro in the app — art, a rule, a
+   blurb, the stats, one button — over the Fashion Plus key art. */
+.fpp-intro {
+  position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column;
+  background: #05070d; overflow: hidden;
+  transition: opacity 0.46s cubic-bezier(0.4,0,0.2,1);
+}
+.fpp-intro-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: url('./assets/fashion/fp-intro.webp');
+  background-size: cover; background-position: center center;
+  animation: slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);
+}
+.fpp-intro-scrim {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom,
+    rgba(5,7,13,0.42) 0%, rgba(5,7,13,0.04) 22%, rgba(5,7,13,0.00) 44%,
+    rgba(5,7,13,0.42) 68%, rgba(5,7,13,0.88) 86%, rgba(5,7,13,0.97) 100%);
+}
+.fpp-intro .sl-intro-top, .fpp-intro .sl-intro-bottom { position: relative; z-index: 10; }
+.fpp-intro-tag { color: #d9a3ff; border-color: rgba(190,120,255,0.4); }
+.fpp-intro-divider { background: linear-gradient(90deg, rgba(190,120,255,0.7), rgba(190,120,255,0.06)); }
+.fpp-enter { background: #fff; border-color: #fff; }
+
+/* The page's own head, under the intro. */
+.fpp-hero { padding: 24px 20px 0; }
+.fpp-hero-ic {
+  width: 58px; height: 58px; border-radius: 50% !important; overflow: hidden;
+  border: 1px solid rgba(240,192,90,0.35); box-shadow: 0 10px 26px rgba(0,0,0,0.5);
+}
+.fpp-hero-ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fpp-hero-title {
+  font-family: 'DM Sans', sans-serif; font-size: 30px; font-weight: 800;
+  color: #fff; letter-spacing: -0.6px; line-height: 1.12; margin-top: 16px;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+}
+.fpp-hero-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,0.55); line-height: 1.7; margin-top: 12px; max-width: 320px;
+}
+.fpp-list-head {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.4);
+  padding: 26px 20px 0;
+}
+#fpBody .fp-list { margin: 12px 16px 0; }
+#fpBody .fp-switch-card, #fpBody .fp-warn { margin-left: 16px; margin-right: 16px; }
+#fpBody .fp-switch-card { margin-top: 22px; }
+
+/* The section's Enter row — the label on the left, the app's own pill on
+   the right, matching the Reader and eBooks sections' Enter. */
+.fps-enter-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 14px; padding: 0 2px;
+}
+.fps-enter-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.42);
+}
+.fps-enter { flex-shrink: 0; cursor: pointer; }
