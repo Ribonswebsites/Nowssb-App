@@ -2525,12 +2525,17 @@ function rmConfirmWordRequest() {
   if (sheet) sheet.remove();
   // TODO: integrate payment $2.99 here — same placeholder pattern as
   // wsConfirmRequest() in part030.js until Razorpay is wired up.
-  var waiting = document.createElement('div');
-  waiting.id = 'rmReqWaiting';
-  waiting.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.95);font-family:\'DM Sans\',sans-serif;flex-direction:column;gap:16px;';
-  waiting.innerHTML = '<div style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(232,213,163,0.2);border-top-color:#e8d5a3;animation:wsSpinAnim 0.8s linear infinite;"></div>' +
-    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);letter-spacing:1px;">Processing request…</div>';
-  document.body.appendChild(waiting);
+  /* The request has to actually go somewhere. This sat behind a 1.8s
+     timer and a success sheet and wrote nothing, so every word anybody
+     asked for died in their tab and the studio's list stayed empty. It
+     goes to the `requests` collection now, the same one the Meaning Store
+     writes to and admin.html watches. Fire-and-forget on purpose: a slow
+     connection must not hold up the sheet, and nwsbSendRequest parks a
+     failed write in localStorage to retry on the next launch. */
+  if (typeof window.nwsbSendRequest === 'function') {
+    window.nwsbSendRequest({ kind: 'word', word: word, price: 2.99, currency: 'USD' });
+  }
+  var waiting = window.nwsbProcessingOverlay('rmReqWaiting', 'Processing request…');
   setTimeout(function() {
     var w = document.getElementById('rmReqWaiting');
     if (w) w.remove();

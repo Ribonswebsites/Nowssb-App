@@ -1472,7 +1472,8 @@ function renderRequests(rows) {
     return '<div class="wl-card">' +
       '<span class="wl-status ' + (done ? 'approved' : 'pending') + '">' + (done ? 'Fulfilled' : 'New') + '</span>' +
       '<div class="wl-name">' + esc(r.word) + '</div>' +
-      '<div class="wl-phonetic">' + esc(r.kind || 'meaning') + (r.price ? ' · ₹' + r.price : '') + '</div>' +
+      '<div class="wl-phonetic">' + esc(r.kind || 'meaning') +
+        (r.price ? ' · ' + (r.currency === 'USD' ? '$' : '₹') + r.price : '') + '</div>' +
       '<div class="wl-meta">' + esc(r.name || r.email || r.uid || 'unknown') + ' · ' + when + '</div>' +
       (done ? '' :
         '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +

@@ -593,23 +593,50 @@ window.msConfirmMeaningRequest = function() {
   if (sheet) sheet.remove();
   // TODO: integrate payment ₹199 here — same placeholder pattern as
   // rmConfirmWordRequest() in part012.js until Razorpay is wired up.
-  var waiting = document.createElement('div');
-  waiting.id = 'msReqWaiting';
-  waiting.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.95);font-family:\'DM Sans\',sans-serif;flex-direction:column;gap:16px;';
-  waiting.innerHTML = '<div style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(232,213,163,0.2);border-top-color:#e8d5a3;animation:wsSpinAnim 0.8s linear infinite;"></div>' +
-    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);letter-spacing:1px;">Decoding request…</div>';
+  var waiting = window.nwsbProcessingOverlay('msReqWaiting', 'Decoding request…');
   document.body.appendChild(waiting);
   /* The request has to reach somebody. It goes to Firestore, where the
      studio is watching — see admin.html — rather than dying in this tab
      the way it used to. The spinner is not waiting on this: the write is
      fire-and-forget, so a slow connection never holds up the sheet, and a
      failed one is kept locally to be sent on the next attempt. */
-  nwsbSendRequest({ kind: 'meaning', word: word, price: 199 });
+  nwsbSendRequest({ kind: 'meaning', word: word, price: 199, currency: 'INR' });
   setTimeout(function() {
     var w = document.getElementById('msReqWaiting');
     if (w) w.remove();
     if (typeof _wsShowSuccessSheet === 'function') _wsShowSuccessSheet(word);
   }, 1800);
+};
+
+/* ── The waiting screen every request shows ────────────────────────────
+   One overlay for all three request flows. It was three copies of a CSS
+   ring with `border-radius:50%` written inline, which the app's own
+   corner reset (`border-radius: 0 !important`) outranks — so the ring
+   rendered as a rotating SQUARE on the phone. This uses the app's loading
+   video instead, the same clip and the same class My Progress uses, so
+   there is no ring left to square off. ── */
+var NWSB_LOADING_VID =
+  'https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4';
+
+window.nwsbProcessingOverlay = function (id, label) {
+  var old = id && document.getElementById(id);
+  if (old) old.remove();
+  var el = document.createElement('div');
+  if (id) el.id = id;
+  el.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;' +
+    'justify-content:center;background:rgba(6,12,24,0.95);font-family:\'DM Sans\',sans-serif;' +
+    'flex-direction:column;gap:18px;';
+  el.innerHTML =
+    '<video class="mp-loading-video" muted loop playsinline autoplay preload="auto" src="' +
+      NWSB_LOADING_VID + '"></video>' +
+    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);letter-spacing:1px;">' +
+      String(label || 'Processing request…') + '</div>';
+  document.body.appendChild(el);
+  /* Autoplay needs muted set as a property too on some Android builds, and
+     the play() call is what starts it when the attribute alone is ignored. */
+  var v = el.querySelector('video');
+  if (v) { v.muted = true; v.play().catch(function () {}); }
+  return el;
 };
 
 /* ── Requests, on their way to the studio ──────────────────────────────
@@ -618,11 +645,20 @@ window.msConfirmMeaningRequest = function() {
    who asked, for what, when, and whether it has been dealt with. ── */
 window.nwsbSendRequest = function (req) {
   if (!req || !req.word) return Promise.resolve(false);
+  /* The rules only accept a request whose uid is the signed-in one
+     (firestore.rules → match /requests/{id}), so take it from whichever
+     global got set — _currentUid is assigned on auth state change,
+     _currentUser is the user object itself. */
+  var uid = window._currentUid || (window._currentUser && window._currentUser.uid) || null;
   var row = {
     kind: req.kind || 'meaning',
     word: String(req.word).slice(0, 80),
+    /* The price as the app showed it, plus the currency it was shown in —
+       words are priced in dollars and meanings in rupees, so a bare number
+       would have the studio printing ₹2.99 or $199. */
     price: Number(req.price) || 0,
-    uid: window._currentUid || null,
+    currency: req.currency || 'INR',
+    uid: uid,
     email: (window._currentUser && window._currentUser.email) || null,
     name: window._userName || null,
     status: 'new',
@@ -633,10 +669,14 @@ window.nwsbSendRequest = function (req) {
       if (!window._db) throw new Error('no-db');
       return fs.addDoc(fs.collection(window._db, 'requests'), row);
     })
-    .then(function () { return true; })
-    .catch(function () {
-      /* Offline, or signed out. Park it and try again next launch rather
-         than losing something the person has paid for. */
+    .then(function () { window.nwsbRequestLastError = null; return true; })
+    .catch(function (err) {
+      /* Offline, signed out, or refused by the security rules. Park it and
+         try again next launch rather than losing something the person has
+         paid for — and keep the reason, because a request that silently
+         never appears in the studio is impossible to diagnose otherwise. */
+      window.nwsbRequestLastError = (err && (err.code || err.message)) || String(err);
+      try { console.warn('[nowssb] request not sent:', window.nwsbRequestLastError); } catch (e) {}
       try {
         var q = JSON.parse(localStorage.getItem('nwsb_req_queue') || '[]');
         q.push(row);

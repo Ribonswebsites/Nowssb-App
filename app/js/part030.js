@@ -337,12 +337,13 @@ function wsConfirmRequest(word) {
   var sheet = document.getElementById('wsRequestSheet');
   if (sheet) sheet.remove();
   // TODO: integrate payment $2.99 here
-  // Show waiting state
-  var waiting = document.createElement('div');
-  waiting.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(6,12,24,0.95);font-family:\'DM Sans\',sans-serif;flex-direction:column;gap:16px;';
-  waiting.innerHTML = '<div style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(232,213,163,0.2);border-top-color:#e8d5a3;animation:wsSpinAnim 0.8s linear infinite;"></div>' +
-    '<div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);letter-spacing:1px;">Processing request…</div>';
-  document.body.appendChild(waiting);
+  /* Same fix as rmConfirmWordRequest() in part012.js: this is the button
+     on the word result — "Request · $2.99" — and it used to write nothing
+     at all, so the studio never heard about it. */
+  if (typeof window.nwsbSendRequest === 'function') {
+    window.nwsbSendRequest({ kind: 'word', word: word, price: 2.99, currency: 'USD' });
+  }
+  var waiting = window.nwsbProcessingOverlay('wsReqWaiting', 'Processing request…');
   setTimeout(function() {
     waiting.remove();
     _wsShowSuccessSheet(word);
