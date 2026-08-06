@@ -11092,3 +11092,37 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   font-family: 'DM Sans', sans-serif; font-size: 7.5px; font-weight: 300;
   color: rgba(255,255,255,0.42); text-align: center; line-height: 1.2;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   INACTIVE SCREENS ARE INERT — the login-button bug.
+
+   `.screen:not(.active)` is already opacity:0 and pointer-events:none, so
+   it should be untouchable. It was not. app/app.css line 3 sets a global
+   `img,video{pointer-events:auto}`, and pointer-events is NOT locked by an
+   ancestor — a descendant that declares `auto` becomes hit-testable again
+   however inert its parents are.
+
+   Every .screen shares z-index 10, and #home-nm comes after #login in the
+   document, so at equal z-index the invisible Normal home paints over the
+   visible login screen. Its hero video, re-enabled by that global rule,
+   sat exactly across "Continue with Google" and swallowed every tap: the
+   button could not be pressed and nothing happened, with no error to show
+   for it because the tap never reached any handler.
+
+   The same root cause was found once before and fixed for #authLoader
+   alone (see the top of this file). This is the general form of it.
+   ══════════════════════════════════════════════════════════════════ */
+.screen:not(.active),
+.screen:not(.active) * { pointer-events: none !important; }
+
+/* The line the auth guard shows while the SDK is still arriving, or when
+   it never does. Light surface — the login screen is #e4e6ed. */
+.nwsb-auth-note {
+  display: none; width: 100%; box-sizing: border-box;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  color: #4a4f5e; background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.08); border-radius: 12px !important;
+  padding: 11px 14px; margin-bottom: 12px; text-align: center; line-height: 1.5;
+}
+.nwsb-auth-note.show { display: block; }
+.nwsb-auth-note.bad { color: #8a2b2b; background: rgba(255,235,235,0.92); border-color: rgba(160,60,60,0.25); }

@@ -103,10 +103,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <link href="https://fonts.googleapis.com/css2?DM+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 
 <!-- Firebase -->
+<!-- Runs before the deferred module below, so the login buttons are never
+     dead while the Firebase SDK is still on its way. -->
+<script src="app/js/part079.js?v=1"></script><!-- ══ AUTH BUTTON GUARD ══ -->
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=638">
+<link rel="stylesheet" href="nowssb-nm.css?v=640">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
