@@ -11201,21 +11201,126 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 }
 #certPanelCard { margin-top: 14px; max-width: 300px; }
 
-/* ── The phone the login sits inside ──────────────────────────────
-   The login is a LIGHT screen — dark type on #e4e6ed — so the glass has to
-   stay light or every line on it disappears against the render's black.
-   The frame is the bezel and the rails; the screen behind it is the app's
-   own surface, not the photograph's. */
+/* ══════════════════════════════════════════════════════════════════
+   THE LOGIN — black, with the phone as the object on it.
+
+   Three rules decide this screen:
+
+     the screen is black, inside the phone and outside it both;
+     the words live OUTSIDE the glass, the buttons INSIDE it;
+     the render is never stretched.
+
+   That last one is why .lg-phone carries an aspect-ratio of 858 / 1467 —
+   the frame file's own. The box is the shape of the photograph, so the
+   bezel keeps its proportions no matter how much is inside it, and the
+   content scrolls within the glass rather than pushing the phone out of
+   shape. Opening the email or phone form makes .lg-glass scroll; it can
+   never make the bezel grow.
+   ══════════════════════════════════════════════════════════════════ */
+.lg-screen-black { background: #000 !important; }
+.lg-wrap {
+  width: 100%; max-width: 460px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center;
+  padding: max(env(safe-area-inset-top, 34px), 34px) 16px
+           max(env(safe-area-inset-bottom, 24px), 24px);
+  box-sizing: border-box;
+  /* app.css gives every .nm-wrap the light auth surface (#e4e6ed). This
+     screen is black behind the phone as well as inside it, so that one
+     declaration has to come off — otherwise a pale column sits behind the
+     words with black either side of it. */
+  background: transparent !important;
+  min-height: 100%; overflow-y: auto; scrollbar-width: none;
+}
+.lg-wrap::-webkit-scrollbar { display: none; }
+
+/* ── The words, on the black ── */
+.lg-head { text-align: center; padding: 4px 0 18px; }
+.lg-head .nm-brand {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 5px; text-transform: uppercase; color: #c8a96e;
+}
+.lg-head .nm-auth-title {
+  font-family: 'DM Sans', sans-serif; font-size: 34px; font-weight: 800;
+  color: #fff; letter-spacing: -0.6px; line-height: 1.1; margin-top: 10px;
+}
+.lg-head .nm-auth-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 300;
+  color: rgba(255,255,255,0.5); margin-top: 8px;
+}
+
+/* ── The phone ── */
+.lg-phone {
+  width: 100%; max-width: 330px;
+  aspect-ratio: 858 / 1467;      /* the frame file's own — never stretched */
+  flex: 0 0 auto;
+}
 .nwsb-inframe.dev-phone {
-  padding: 2.6% 5.6%;
-  background: #e4e6ed;
-  border-radius: 26px !important;
+  padding: 0;                    /* .lg-glass places itself; see below */
+  background: #000;
+  border-radius: 30px !important;
+  overflow: hidden;
 }
 .nwsb-inframe.dev-phone::after { background-image: url('./assets/frames/phone-login.webp'); }
-#login .nm-wrap.dev-phone {
-  max-width: 400px; margin: 0 auto;
-  /* Keeps the bezel from stretching to a shape no phone has. */
-  min-height: 78vh;
+
+/* The glass. Black, and the only thing that scrolls.
+
+   ABSOLUTELY positioned, which is the whole point: as a normal flow child
+   it could grow the phone, and opening the email form did exactly that —
+   the bezel went from its true 0.585 aspect to 0.542, stretching the
+   render, which is the one thing this must not do. Taken out of flow it
+   cannot report a height upward, so the phone keeps the file's proportions
+   whatever is inside and the content scrolls behind the bezel instead. */
+.lg-glass {
+  position: absolute; inset: 2.2% 5.4%;
+  box-sizing: border-box; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  background: #000; border-radius: 22px !important;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 18px 13px; gap: 0;
+}
+.lg-glass::-webkit-scrollbar { display: none; }
+
+/* ── The buttons, on black ── */
+#login .nm-btn-list { width: 100%; }
+#login .nm-auth-btn {
+  background: #101015; border: 1px solid rgba(255,255,255,0.12);
+  color: #fff; border-radius: 14px !important;
+  box-shadow: none; padding: 16px 18px; margin: 0;
+}
+#login .nm-auth-btn + .nm-auth-btn { margin-top: 10px; }
+#login .nm-auth-btn:active { background: #17171e; }
+#login .nm-divider { margin: 12px 0; }
+#login .nm-divider-line { background: rgba(255,255,255,0.12); }
+#login .nm-divider-text { color: rgba(255,255,255,0.35); }
+#login .nm-form-panel { background: none; border: none; padding: 12px 0 0; }
+#login .nm-field-label { color: rgba(255,255,255,0.55); }
+#login .nm-input-wrap {
+  background: #101015; border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px !important;
+}
+#login .nm-input { color: #fff; }
+#login .nm-input::placeholder { color: rgba(255,255,255,0.3); }
+#login .nm-input-icon svg [stroke], #login .nm-input-icon-r svg [stroke] { stroke: rgba(255,255,255,0.4); }
+#login .nm-submit-btn, #login .nm-primary-btn {
+  border-radius: 12px !important;
+}
+.lg-guest {
+  display: block; width: 100%; margin-top: 16px; padding: 12px;
+  background: transparent; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+  color: #c8a96e; letter-spacing: 0.3px; text-align: center;
+}
+/* The auth note sits on black here too. */
+#login .nwsb-auth-note {
+  background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.72);
+}
+#login .nwsb-auth-note.bad { background: rgba(120,30,30,0.4); color: #ffd9d9; border-color: rgba(200,80,80,0.4); }
+
+/* Short screens: let the phone shrink rather than crop the words above it. */
+@media (max-height: 720px) {
+  .lg-phone { max-width: 280px; }
+  .lg-head .nm-auth-title { font-size: 28px; }
 }
 
 /* ══ ONE SEARCH — the bar at the top of the Normal home ══
@@ -11229,8 +11334,11 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   background: #eaecf3;
   box-shadow: inset 5px 5px 11px rgba(0,0,0,0.10), inset -5px -5px 11px rgba(255,255,255,0.95);
 }
-.nmh-search-ic { width: 19px; height: 19px; flex-shrink: 0; color: rgba(30,36,56,0.42); }
-.nmh-search-ic svg { width: 100%; height: 100%; display: block; }
+/* The app's own search mark, the same file the Word Search bar uses —
+   an image rather than an inline glyph, so the two bars are the same
+   thing rather than two drawings of it. */
+.nmh-search-ic { width: 20px; height: 20px; flex-shrink: 0; opacity: 0.5; }
+.nmh-search-ic .nwsb-search-icon { width: 100%; height: 100%; object-fit: contain; display: block; }
 .nmh-search-in {
   flex: 1; min-width: 0; border: none; background: none; outline: none;
   font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 400;
@@ -11244,23 +11352,15 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   display: flex; align-items: center; justify-content: center;
   box-shadow: 4px 4px 10px rgba(0,0,0,0.18), -3px -3px 8px rgba(255,255,255,0.9);
 }
-.nmh-search-go svg { width: 17px; height: 17px; display: block; }
+.nmh-search-go .nwsb-search-icon { width: 18px; height: 18px; object-fit: contain; display: block; filter: brightness(0) invert(1); }
 .nmh-search-go:active { transform: scale(0.94); }
-.nmh-search-chips {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  width: calc(100% - 32px); margin: 10px 16px 0;
-}
-.nmh-search-chip {
-  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
-  letter-spacing: 1.4px; text-transform: uppercase; color: rgba(30,36,56,0.55);
-  background: #eef0f6; padding: 8px 15px; border-radius: 999px !important; cursor: pointer;
-  box-shadow: 3px 3px 8px rgba(0,0,0,0.09), -3px -3px 8px rgba(255,255,255,0.95);
-}
-.nmh-search-chip:active { box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -3px -3px 7px rgba(255,255,255,0.9); }
+
+
+
 /* The Normal home's dark mode keeps the same shapes, darker. */
 #home-nm.nm-dark .nmh-search { background: #141433; box-shadow: inset 5px 5px 12px rgba(0,0,0,0.75), inset -4px -4px 10px rgba(60,60,120,0.25); }
 #home-nm.nm-dark .nmh-search-in { color: #fff; }
 #home-nm.nm-dark .nmh-search-in::placeholder { color: rgba(255,255,255,0.38); }
 #home-nm.nm-dark .nmh-search-ic { color: rgba(255,255,255,0.45); }
-#home-nm.nm-dark .nmh-search-go { background: #e8d5a3; color: #06080f; }
-#home-nm.nm-dark .nmh-search-chip { background: #16163c; color: rgba(255,255,255,0.6); box-shadow: 4px 4px 10px rgba(0,0,0,0.7), -3px -3px 8px rgba(50,50,110,0.28); }
+#home-nm.nm-dark .nmh-search-go { background: #e8d5a3; }
+#home-nm.nm-dark .nmh-search-go .nwsb-search-icon { filter: none; opacity: 0.85; }

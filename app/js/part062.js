@@ -39,6 +39,12 @@
       wrap:  '#home-nm .nmh-wrap',
       items: [
         { k:'greet',    sel:['.nmh-greet-block'],                                          t:S, label:'Greeting',              sub:'Good morning · hero header', locked:1 },
+        /* Registered so the layout editor places it. Unregistered sections
+           are left where they are while every registered one is re-appended
+           around them, which strands them at the TOP of the home — this bar
+           was landing above the greeting for exactly that reason. It sits
+           after the greeting and before the hero clip and the streak. */
+        { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
         { k:'herovid',  sel:['.nmh-hero-vid'],                                             t:B, label:'Hero Video',            sub:'Video banner above the streak' },
         { k:'streak',   sel:['.nmh-streak-section'],                                       t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc' },

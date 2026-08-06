@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=644">
+<link rel="stylesheet" href="nowssb-nm.css?v=648">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -184,17 +184,23 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ══ SCREEN 2: LOGIN ══ -->
-<div class="screen" id="login" style="background:#e4e6ed;">
-  <div class="nm-wrap nwsb-inframe dev-phone">
+<div class="screen lg-screen-black" id="login">
+  <div class="nm-wrap lg-wrap">
 
-    <div class="nm-logo-area">
-      <div class="nm-logo-ring">
-        <img decoding="async" class="nm-logo-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB">
-      </div>
+    <!-- Outside the phone, on the black: the words. No logo — the phone is
+         the object on this screen and a disc above it competed with it. -->
+    <div class="nm-logo-area lg-head">
       <div class="nm-brand">Nowsbansiu</div>
       <div class="nm-auth-title">Welcome</div>
       <div class="nm-auth-sub">Sign in or create your account</div>
     </div>
+
+    <!-- The phone. Its aspect ratio is the frame file's own (858 x 1467),
+         so the render is never stretched to fit whatever is inside it —
+         the box is the shape of the photograph and the content scrolls
+         within the glass instead of pushing the bezel out of shape. -->
+    <div class="lg-phone nwsb-inframe dev-phone">
+      <div class="lg-glass">
 
     <div class="nm-btn-list">
 
@@ -279,10 +285,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     </div>
 
-    <button onclick="window._guestMode=true;goTo('home');" style="display:block;width:100%;margin-top:18px;padding:12px;background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:#c8a96e;letter-spacing:0.3px;text-align:center;opacity:0.8;">
+    <button class="lg-guest" onclick="window._guestMode=true;goTo('home');">
       Explore without account →
     </button>
 
+      </div><!-- /lg-glass -->
+    </div><!-- /lg-phone -->
   </div>
 </div>
 
@@ -806,22 +814,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          the top, that searches words and meanings together — typing goes to
          the Word Atelier, the mic and the two chips go where they say. -->
     <div class="nmh-search" role="search">
-      <span class="nmh-search-ic">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.9"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
-      </span>
+      <span class="nmh-search-ic"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" alt=""></span>
       <input class="nmh-search-in" id="nmhSearchInput" type="search" enterkeyhint="search"
              placeholder="Search any word or meaning…"
              onkeydown="if(event.key==='Enter'){event.preventDefault();nmhSearchGo();}">
       <button class="nmh-search-go" onclick="nmhSearchGo()" aria-label="Search">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" alt="">
       </button>
     </div>
-    <div class="nmh-search-chips">
-      <span class="nmh-search-chip" onclick="openSub('real-meaning')">Words</span>
-      <span class="nmh-search-chip" onclick="openSub('meaning-store')">Meanings</span>
-      <span class="nmh-search-chip" onclick="openSub('nowssb-store')">Store</span>
-    </div>
-
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <filter id="npcRippleBlue" x="-20%" y="-20%" width="140%" height="140%">
         <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="2" seed="11" result="turb">
@@ -9972,7 +9972,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=2"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=24"></script>
+<script src="app/js/part062.js?v=25"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>
