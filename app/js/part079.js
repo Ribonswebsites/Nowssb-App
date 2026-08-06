@@ -123,3 +123,21 @@
     return n || (fallback === undefined ? 'Practitioner' : fallback);
   };
 })();
+
+/* The one search bar on the Normal home. Words and meanings are the same
+   library from a reader's point of view, so one field serves both and the
+   Word Atelier — which searches every language — is where a typed query
+   goes. Empty just opens it. */
+window.nmhSearchGo = function () {
+  var el = document.getElementById('nmhSearchInput');
+  var q = el ? String(el.value || '').trim() : '';
+  try { if (typeof openSub === 'function') openSub('real-meaning'); } catch (e) {}
+  if (!q) return;
+  setTimeout(function () {
+    var box = document.getElementById('rmSearchInput');
+    if (box) {
+      box.value = q;
+      if (typeof window.rmSearch === 'function') { try { window.rmSearch(); } catch (e) {} }
+    }
+  }, 380);
+};

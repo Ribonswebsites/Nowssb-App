@@ -105,11 +105,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- Firebase -->
 <!-- Runs before the deferred module below, so the login buttons are never
      dead while the Firebase SDK is still on its way. -->
-<script src="app/js/part079.js?v=2"></script><!-- ══ AUTH BUTTON GUARD ══ -->
+<script src="app/js/part079.js?v=3"></script><!-- ══ AUTH BUTTON GUARD ══ -->
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=642">
+<link rel="stylesheet" href="nowssb-nm.css?v=644">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -185,7 +185,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ══ SCREEN 2: LOGIN ══ -->
 <div class="screen" id="login" style="background:#e4e6ed;">
-  <div class="nm-wrap">
+  <div class="nm-wrap nwsb-inframe dev-phone">
 
     <div class="nm-logo-area">
       <div class="nm-logo-ring">
@@ -800,6 +800,28 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 
+    <!-- ══ ONE SEARCH ══
+         The two separate search sections and the AI Prescription block are
+         gone from this home; this is what replaces all three. One bar, at
+         the top, that searches words and meanings together — typing goes to
+         the Word Atelier, the mic and the two chips go where they say. -->
+    <div class="nmh-search" role="search">
+      <span class="nmh-search-ic">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.9"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </span>
+      <input class="nmh-search-in" id="nmhSearchInput" type="search" enterkeyhint="search"
+             placeholder="Search any word or meaning…"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();nmhSearchGo();}">
+      <button class="nmh-search-go" onclick="nmhSearchGo()" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="nmh-search-chips">
+      <span class="nmh-search-chip" onclick="openSub('real-meaning')">Words</span>
+      <span class="nmh-search-chip" onclick="openSub('meaning-store')">Meanings</span>
+      <span class="nmh-search-chip" onclick="openSub('nowssb-store')">Store</span>
+    </div>
+
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <filter id="npcRippleBlue" x="-20%" y="-20%" width="140%" height="140%">
         <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="2" seed="11" result="turb">
@@ -1126,41 +1148,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- Heading above the AI Prescription section — icon + vertical divider
          + title/sub, no background/box, just a section label. -->
-    <div class="nmh-rx-heading">
-      <div class="nmh-rx-heading-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png" alt=""></div>
-      <div class="nmh-rx-heading-divider"></div>
-      <div class="nmh-rx-heading-txt">
-        <div class="nmh-rx-heading-title">AI Prescription</div>
-        <div class="nmh-rx-heading-sub">Your daily routine words recommendation</div>
-      </div>
-    </div>
+    <!-- AI Prescription heading removed from this home -->
 
     <!-- ══ AI PRESCRIPTION — AI Prescription banner, photo banner and video
          banner fitted edge-to-edge (no gaps) inside one square-cornered
          section, plus a disclaimer at the bottom. Icon reused from the
          Fashion Home rx card. ══ -->
-    <div class="nmh-offer-section nmh-rx-section">
-      <div class="nmh-video-banner nmh-rx-video" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
-        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784958436/gemini_generated_video_4045e221_a4mza9.mp4"></video>
-      </div>
-      <img class="nmh-rx-banner-img" loading="lazy" decoding="async" onclick="openSub('ai-prescription')" alt="AI Prescription" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png">
-      <!-- Icon is inset to line up with the logo baked into the video above.
-           The side arrow is gone; an Enter pill sits below the text instead,
-           which is what frees the horizontal room for that alignment. -->
-      <div class="nmh-sec-banner nmh-offer-banner nmh-rx-cta" onclick="openSub('ai-prescription')">
-        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-        <div class="nmh-sec-banner-divider"></div>
-        <div class="nmh-sec-banner-txt">
-          <div class="nmh-sec-banner-title">AI Prescription</div>
-          <div class="nmh-sec-banner-sub">Your personalized word ritual, built by AI — tap to see today's</div>
-          <div class="nmh-rx-enter">
-            <span class="nmh-rx-enter-lbl">Enter</span>
-            <span class="nmh-rx-enter-go"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </div>
-        </div>
-      </div>
-      <div class="nmh-rx-disclaimer">This is not a health prescription — just a personalized word recommendation.</div>
-    </div>
+    <!-- AI Prescription removed from this home -->
 
     <!-- 2x2 Grid -->
 
@@ -1312,43 +1306,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div><!-- /nmh-healing-wrap -->
 
     <!-- Word Search -->
-    <div class="word-search-section" onclick="openSub('word-search')" style="cursor:pointer;margin-top:16px;border-radius:22px;overflow:hidden;">
-      <video class="word-search-video" data-nwsb-auto muted loop playsinline preload="none">
-        <source src="https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4" type="video/mp4">
-      </video>
-      <div class="word-search-overlay"></div>
-      <div class="word-search-content">
-        <span class="word-search-label">Shabdapathy</span>
-        <div class="word-search-title">Word Search</div>
-        <div class="word-search-sub">Discover the natural origin and healing frequency of any word.</div>
-        <div class="word-search-input-wrap" onclick="event.stopPropagation()">
-          <input class="word-search-input" id="wordSearchInputNm" type="text" placeholder="Enter a word..." onkeydown="if(event.key==='Enter'){openSub('word-search');setTimeout(()=>{document.getElementById('wsPageInput').value=this.value;wsPageSearch();},220);}">
-          <button class="word-search-btn" onclick="openSub('word-search');setTimeout(()=>{var v=document.getElementById('wordSearchInputNm').value;if(v){document.getElementById('wsPageInput').value=v;wsPageSearch();}},220);">
-            <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="opacity:0.85;" alt="">
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Word Search removed from this home — the one search bar above covers it -->
 
     <!-- Meaning Search -->
-    <div class="krm-section w100" onclick="openSub('meaning-search')" style="cursor:pointer;margin-top:16px;border-radius:22px;overflow:hidden;">
-      <video class="krm-video" data-nwsb-auto muted loop playsinline preload="none">
-        <source src="https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4" type="video/mp4">
-      </video>
-      <div class="krm-overlay"></div>
-      <div class="krm-content" style="justify-content:flex-end;padding:0 16px 24px;">
-        <div class="krm-search-wrap" onclick="event.stopPropagation()">
-          <div class="krm-search-box">
-            <img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" class="nwsb-search-icon" style="width:16px;height:16px;opacity:0.55;" alt="">
-            <input class="krm-input" id="krmInputNm" type="text" placeholder="Type any word, name or country..." onkeydown="if(event.key==='Enter'){openSub('meaning-search');setTimeout(()=>{var v=document.getElementById('krmInputNm').value;if(v){document.getElementById('msPageInput').value=v;msPageSearch();}},220);}">
-            <button class="krm-btn" onclick="openSub('meaning-search');setTimeout(()=>{var v=document.getElementById('krmInputNm').value;if(v){document.getElementById('msPageInput').value=v;msPageSearch();}},220);">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="#07101f" stroke-width="1.6" stroke-linecap="square"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="krm-hint">Earth · Water · God · Your Name · Your Country</div>
-      </div>
-    </div>
+    <!-- Meaning Search removed from this home — the one search bar above covers it -->
 
     <!-- Store -->
     <!-- The store's video banner and the section it introduces, in one
@@ -1437,7 +1398,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
 
       <!-- Glass/Neumorphic/Skeuomorphic Brand Panel -->
-      <div class="footer-panel">
+      <div class="footer-panel nwsb-inframe dev-ftr">
         <div class="footer-brand"><span class="b">Nowsb</span><span class="t">ansiu</span></div>
         <div class="footer-tagline">Natural Origin of <strong style="color:rgba(200,232,245,0.75);">Word Science</strong></div>
         <div class="footer-divider"></div>
@@ -1488,7 +1449,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div style="width:100%;text-align:left;margin-bottom:36px;position:relative;z-index:30;padding-left:24px;">
           <div style="text-shadow:0 1px 12px rgba(0,0,0,0.8);"><span class="brand-tag" style="font-size:15px;">Natural Origin of <strong>Word Science</strong></span></div>
         </div>
-        <div class="hero-glass">
+        <div class="hero-glass nwsb-inframe dev-tv-p">
           <div class="hero-cards">
             <div class="hero-card active" id="hc0" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776753853585_luk2yh.jpg');"></div>
             <div class="hero-card"       id="hc1" style="background-image:url('https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776754047350_m02pef.jpg');"></div>
@@ -1524,7 +1485,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <span class="spill-pill-txt">Your daily word ritual</span>
       </span>
     </div>
-    <div class="home-card w100" id="todayPracticeCard" onclick="openPracticeIntro()" style="background-color:#060c18; backdrop-filter:none; -webkit-backdrop-filter:none;">
+    <div class="home-card w100 nwsb-inframe dev-tab" id="todayPracticeCard" onclick="openPracticeIntro()" style="background-color:#060c18; backdrop-filter:none; -webkit-backdrop-filter:none;">
       <div class="tile-img-bg" id="todayPracticeBg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg');"></div>
       <div class="tile-overlay"></div>
       <div class="home-card-top">
@@ -2203,7 +2164,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Glass/Neumorphic/Skeuomorphic Brand Panel -->
-    <div class="footer-panel">
+    <div class="footer-panel nwsb-inframe dev-ftr">
       <div class="footer-brand"><span class="b">Nowsb</span><span class="t">ansiu</span></div>
       <div class="footer-tagline">Natural Origin of <strong style="color:rgba(200,232,245,0.75);">Word Science</strong></div>
       <div class="footer-divider"></div>
@@ -6000,7 +5961,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- Body -->
-  <div class="cwp-body" id="cartPageBody">
+  <div class="cwp-body nwsb-inframe dev-tv-l" id="cartPageBody">
     <!-- rendered by JS -->
   </div>
 
@@ -6173,7 +6134,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Body -->
-    <div class="cwp-body" id="wishPageBody">
+    <div class="cwp-body nwsb-inframe dev-tv-l" id="wishPageBody">
       <!-- rendered by JS -->
     </div>
   </div>
@@ -6243,7 +6204,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- Body -->
-  <div class="cwp-body" id="ordersPageBody">
+  <div class="cwp-body nwsb-inframe dev-tv-l" id="ordersPageBody">
     <!-- rendered by JS -->
   </div>
   </div><!-- /ordersMainContent -->

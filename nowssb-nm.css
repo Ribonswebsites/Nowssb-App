@@ -11200,3 +11200,67 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   color: rgba(255,255,255,0.45); line-height: 1.65; padding: 6px 2px 0;
 }
 #certPanelCard { margin-top: 14px; max-width: 300px; }
+
+/* ── The phone the login sits inside ──────────────────────────────
+   The login is a LIGHT screen — dark type on #e4e6ed — so the glass has to
+   stay light or every line on it disappears against the render's black.
+   The frame is the bezel and the rails; the screen behind it is the app's
+   own surface, not the photograph's. */
+.nwsb-inframe.dev-phone {
+  padding: 2.6% 5.6%;
+  background: #e4e6ed;
+  border-radius: 26px !important;
+}
+.nwsb-inframe.dev-phone::after { background-image: url('./assets/frames/phone-login.webp'); }
+#login .nm-wrap.dev-phone {
+  max-width: 400px; margin: 0 auto;
+  /* Keeps the bezel from stretching to a shape no phone has. */
+  min-height: 78vh;
+}
+
+/* ══ ONE SEARCH — the bar at the top of the Normal home ══
+   Replaces the two search sections and the AI Prescription block. The
+   Normal home is a light neumorphic surface, so this is a pressed well
+   rather than a glass pill. */
+.nmh-search {
+  display: flex; align-items: center; gap: 10px;
+  width: calc(100% - 32px); margin: 16px 16px 0; box-sizing: border-box;
+  padding: 6px 6px 6px 16px; border-radius: 999px !important;
+  background: #eaecf3;
+  box-shadow: inset 5px 5px 11px rgba(0,0,0,0.10), inset -5px -5px 11px rgba(255,255,255,0.95);
+}
+.nmh-search-ic { width: 19px; height: 19px; flex-shrink: 0; color: rgba(30,36,56,0.42); }
+.nmh-search-ic svg { width: 100%; height: 100%; display: block; }
+.nmh-search-in {
+  flex: 1; min-width: 0; border: none; background: none; outline: none;
+  font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 400;
+  color: #1b2038; padding: 12px 0;
+}
+.nmh-search-in::placeholder { color: rgba(30,36,56,0.36); }
+.nmh-search-in::-webkit-search-cancel-button { display: none; }
+.nmh-search-go {
+  width: 42px; height: 42px; flex-shrink: 0; border: none; cursor: pointer;
+  border-radius: 50% !important; background: #1b2038; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.18), -3px -3px 8px rgba(255,255,255,0.9);
+}
+.nmh-search-go svg { width: 17px; height: 17px; display: block; }
+.nmh-search-go:active { transform: scale(0.94); }
+.nmh-search-chips {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  width: calc(100% - 32px); margin: 10px 16px 0;
+}
+.nmh-search-chip {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 1.4px; text-transform: uppercase; color: rgba(30,36,56,0.55);
+  background: #eef0f6; padding: 8px 15px; border-radius: 999px !important; cursor: pointer;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.09), -3px -3px 8px rgba(255,255,255,0.95);
+}
+.nmh-search-chip:active { box-shadow: inset 3px 3px 7px rgba(0,0,0,0.12), inset -3px -3px 7px rgba(255,255,255,0.9); }
+/* The Normal home's dark mode keeps the same shapes, darker. */
+#home-nm.nm-dark .nmh-search { background: #141433; box-shadow: inset 5px 5px 12px rgba(0,0,0,0.75), inset -4px -4px 10px rgba(60,60,120,0.25); }
+#home-nm.nm-dark .nmh-search-in { color: #fff; }
+#home-nm.nm-dark .nmh-search-in::placeholder { color: rgba(255,255,255,0.38); }
+#home-nm.nm-dark .nmh-search-ic { color: rgba(255,255,255,0.45); }
+#home-nm.nm-dark .nmh-search-go { background: #e8d5a3; color: #06080f; }
+#home-nm.nm-dark .nmh-search-chip { background: #16163c; color: rgba(255,255,255,0.6); box-shadow: 4px 4px 10px rgba(0,0,0,0.7), -3px -3px 8px rgba(50,50,110,0.28); }
