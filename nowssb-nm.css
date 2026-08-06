@@ -11215,18 +11215,29 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
      the words live OUTSIDE the glass, the buttons INSIDE it;
      the render is never stretched, cropped, zoomed or rounded.
 
-   That last one is why .lg-phone carries an aspect-ratio of 1024 / 1536 —
-   the frame file's own, exactly. The box is the shape of the photograph,
-   so background-size: 100% 100% lands pixel-for-pixel with no scaling
-   distortion and no zoom, and the bezel keeps its proportions no matter
-   how much is inside it. Opening the email or phone form makes .lg-glass
-   scroll; it can never make the bezel grow.
+   That last one is why .lg-phone carries an aspect-ratio of 941 / 1672 —
+   the render's own, exactly. The box is the shape of the photograph, so
+   background-size: 100% 100% lands with no scaling distortion and no
+   zoom, and the bezel keeps its proportions no matter how much is inside
+   it. Opening the email or phone form makes .lg-glass scroll; it can
+   never make the bezel grow.
+
+   It is sized by HEIGHT, not width. This render is 0.56 wide to tall and
+   carries a plinth of art below the phone, so a width that looked right
+   on a tall screen ran off the bottom of a short one. Driving it from the
+   viewport height and letting the aspect derive the width means it always
+   fits, on any screen, without a stack of breakpoints.
 
    NOTHING is drawn over the phone's own edge — no border-radius, no
-   border, no shadow. The render already carries its own corners and its
-   own background (black, which is the page's colour too, so the plate it
-   sits on disappears and only the phone reads). Adding a radius here cut
-   the corners off the photograph itself.
+   border, no shadow. The render carries its own corners and its own
+   background, and the page behind is black to match it, so there is no
+   plate around it — just the phone and the light coming off the plinth.
+
+   The file is used exactly as supplied: 941x1672, lossless WebP, every
+   pixel byte-identical to the PNG. It is 668kB, which is a lot for one
+   screen and is a deliberate call — at quality 95 more than 3% of pixels
+   still shifted by over 8 levels, all of it in the iridescent art, which
+   is precisely where banding would show.
    ══════════════════════════════════════════════════════════════════ */
 .lg-screen-black { background: #000 !important; }
 .lg-wrap {
@@ -11262,8 +11273,19 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 
 /* ── The phone ── */
 .lg-phone {
-  width: 100%; max-width: 340px;
-  aspect-ratio: 1024 / 1536;     /* the frame file's own — never stretched */
+  /* Height-driven, but expressed as a width — and that distinction is the
+     whole rule. Setting `height` and letting aspect-ratio derive the width
+     fails the moment the column is narrower than that width: max-width
+     clamps the width, the height stays whatever was declared, and
+     aspect-ratio cannot overrule an explicit height. The render came out
+     at 0.4517 instead of 0.5628 — stretched, which is the one thing this
+     must never be. So the WIDTH is the definite side and the height is
+     always derived from it. The middle term is the width at which the box
+     would stand 74vh tall, so the height cap is still honoured; whichever
+     of the three is smallest wins, and the aspect is never in question. */
+  width: min(100%, calc(74vh * 941 / 1672), 420px);
+  aspect-ratio: 941 / 1672;      /* the render's own — never stretched */
+  height: auto;
   flex: 0 0 auto;
 }
 .nwsb-inframe.dev-phone {
@@ -11297,18 +11319,18 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    whatever is inside and the content scrolls behind the bezel instead.
 
    The inset is measured off the render itself: the screen sits inside
-   x 114–907 of 1024 and y 82–1472 of 1536, and the camera pill runs down
-   to y 175 — so the top inset clears the pill rather than sitting under
+   x 179–765 of 941 and y 155–1520 of 1672, and the camera pill runs down
+   to y 241 — so the top inset clears the pill rather than sitting under
    it. No background and no radius, because the phone's screen is already
    black and anything painted here would show as a lighter panel with its
    own corners floating inside the render. */
 .lg-glass {
-  position: absolute; inset: 13% 12% 5%;
+  position: absolute; inset: 15.3% 18.6% 9.1% 19%;
   box-sizing: border-box; overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
   background: transparent; border-radius: 0 !important;
   display: flex; flex-direction: column; justify-content: flex-start;
-  padding: 8px 6px; gap: 0;
+  padding: 6px 4px; gap: 0;
 }
 /* Centred by auto margins rather than justify-content: center, and that is
    not a style preference. In a scroll container, centring with
@@ -11330,12 +11352,18 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    text and no per-icon rule is needed — except Google's, which is
    multicolour by mark and stays exactly as Google draws it. */
 #login .nm-btn-list { width: 100%; }
+/* This render's screen is 62.4% of the box against the last one's 76%, so
+   the pills have less room and the sizes come down to match. Sized so the
+   longest label — "Continue with Google" — holds one line: at 12.5px with
+   a 20px mark it wrapped, and one pill of two lines beside two of one
+   read as a mistake rather than a choice. */
 #login .nm-auth-btn {
   background: #fff; border: 1px solid rgba(0,0,0,0.06);
-  color: #0b0b0f; border-radius: 12px !important;
-  box-shadow: none; padding: 13px 14px; margin: 0;
-  font-size: 13.5px;
+  color: #0b0b0f; border-radius: 11px !important;
+  box-shadow: none; padding: 11px 9px; margin: 0;
+  font-size: 11.5px; gap: 7px; letter-spacing: -0.1px;
 }
+#login .nm-auth-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
 #login .nm-auth-btn + .nm-auth-btn { margin-top: 9px; }
 #login .nm-auth-btn:active { background: #e6e6ec; }
 #login .nm-divider { margin: 10px 0; }
@@ -11373,9 +11401,13 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 #login .nwsb-auth-note.bad { background: rgba(120,30,30,0.4); color: #ffd9d9; border-color: rgba(200,80,80,0.4); }
 
 /* Short screens: let the phone shrink rather than crop the words above it. */
+/* Short screens: the phone is height-driven now, so it shrinks on its own.
+   What still needs help is the words above it, which do not. */
 @media (max-height: 720px) {
-  .lg-phone { max-width: 280px; }
-  .lg-head .nm-auth-title { font-size: 28px; }
+  .lg-phone { width: min(100%, calc(70vh * 941 / 1672), 420px); }
+  .lg-head { padding: 0 0 10px; }
+  .lg-head .nm-auth-title { font-size: 26px; }
+  .lg-head .nm-auth-sub { font-size: 12px; margin-top: 5px; }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -11397,9 +11429,9 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    all is byte-identical to the PNG):
 
      file       1536 x 1024
-     aperture   x 145–1389  -> left  145/1536 = 9.4401%
+     aperture   x 145-1389  -> left  145/1536 = 9.4401%
                               right  146/1536 = 9.5052%
-                y 141–900   -> top   141/1024 = 13.7695%
+                y 141-900   -> top   141/1024 = 13.7695%
                               bottom 123/1024 = 12.0117%
 
    The wrapper carries the file's aspect so the render is never stretched,
@@ -11407,10 +11439,16 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    margins outside the tablet's silhouette, and anything painted on the
    wrapper would show through them as a rectangle behind the tablet.
 
-   The card is relaid for the shape it is now in. A landscape screen is a
-   wide, short box and the portrait stack did not fit it: the render goes
-   down the left as the visual, the words run beside it, and Enter closes
-   the row. Its neumorphic shell comes off — the tablet is the shell now.
+   THE CARD ITSELF IS UNCHANGED. An earlier pass relaid it for the landscape
+   shape — art down the left, words beside it, icon tile dropped — and that
+   was the wrong call: the ask was to put the section on the tablet, not to
+   redesign it. The arrangement here is exactly what it always was — the
+   eyebrow, the embossed icon tile, the word, the meaning, then Enter and
+   its arrow, straight down the box, with the art over the right-hand side.
+   Only the scale changes, because the screen is 184px tall and the section
+   was 277px and something has to give for it to fit at all. Every number
+   below is the original multiplied down; nothing moves and nothing is
+   dropped. Its neumorphic shell does come off — the tablet is the shell.
    ══════════════════════════════════════════════════════════════════ */
 .nmh-practice-tab {
   position: relative; width: 100%;
@@ -11432,55 +11470,39 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   width: auto !important; height: auto; margin: 0 !important;
   border-radius: 0 !important;    /* the render's aperture has the corners */
   box-shadow: none !important;    /* the tablet is the shell now */
-  padding: 12px 14px;
-  /* the landscape relay: art down the left, words beside it, Enter across */
-  display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  grid-template-rows: auto auto auto auto;
-  align-content: center;
-  column-gap: 10px; row-gap: 0;
+  overflow: hidden;
+  /* the original stack, in the original order */
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 14px 16px;                                    /* was 28px 26px 26px */
 }
 #home-nm .nmh-practice-tab > .nmh-practice:active { transform: none; box-shadow: none !important; }
 
-/* The art moves out of the corner and becomes the left column. It was
-   absolutely positioned at 28% on the right, where in a box this wide it
-   would have run straight through the word. */
+/* Where it always was — over the right-hand side, centred on the icon and
+   word. Only its cap changes: at the original 28% of a box this shape it
+   would stand taller than the screen. */
 #home-nm .nmh-practice-tab .nmh-practice-img {
-  position: static; grid-column: 1; grid-row: 2 / span 2;
-  width: 100%; max-width: none; align-self: center;
-  transform: none; top: auto; right: auto;
-  /* A hard height, not max-height: this image spans two auto rows, and an
-     auto row sizes to its content — so left to its intrinsic height it
-     would push the rows taller than the screen and clip the footer. A
-     percentage cap resolves against an indefinite row and does nothing.
-     object-fit keeps it undistorted inside the cap. */
-  height: 74px; object-fit: contain;
+  width: 30%; max-width: 96px; max-height: 74%;
+  right: 2px; top: 44%;
 }
-/* Two visuals in a screen this size is one too many; the art is the one
-   that carries, so the embossed icon tile stands down. */
-#home-nm .nmh-practice-tab .nmh-practice-icon { display: none; }
 
 #home-nm .nmh-practice-tab .nmh-practice-label {
-  grid-column: 1 / -1; grid-row: 1;
-  font-size: 9px; letter-spacing: 2.4px; margin-bottom: 8px;
+  font-size: 9px; letter-spacing: 2.4px; margin-bottom: 7px;   /* was 10 / 3 / 14 */
 }
-/* Both of these wrap in here rather than ellipsing. In the portrait card
-   they had the full 320px and one line was plenty; the words column in
-   here is 175px, and nowrap turned the title into "Afternoon Wor…" and
-   the line under it into "…add word…". Two lines each, clamped, so a long
-   word still cannot grow the row past the screen. */
+#home-nm .nmh-practice-tab .nmh-practice-icon {
+  width: 40px; height: 40px; border-radius: 13px !important;
+  margin-bottom: 9px;                                          /* was 60 / 18 / 18 */
+}
+#home-nm .nmh-practice-tab .nmh-practice-icon img { width: 23px; height: 23px; }
 #home-nm .nmh-practice-tab .nmh-practice-word {
-  grid-column: 2; grid-row: 2; align-self: end;
-  font-size: 19px; line-height: 1.14; margin-bottom: 4px;
-  white-space: normal; overflow: hidden; text-overflow: clip;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  font-size: 19px; margin-bottom: 4px;                         /* was 26 / 8 */
 }
 #home-nm .nmh-practice-tab .nmh-practice-meaning {
-  grid-column: 2; grid-row: 3; align-self: start;
-  font-size: 11.5px; line-height: 1.4; margin-bottom: 0;
-  white-space: normal; overflow: hidden; text-overflow: clip;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  font-size: 11px; margin-bottom: 11px;                        /* was 13 / 22 */
 }
+#home-nm .nmh-practice-tab .nmh-practice-cta { font-size: 12px; }
+#home-nm .nmh-practice-tab .nmh-practice-arrow { width: 30px; height: 30px; }
+#home-nm .nmh-practice-tab .nmh-practice-arrow svg { width: 13px; height: 13px; }
+
 /* The page behind is #f0f2f7 and so is the card, so through the aperture
    the screen read as a hole rather than a display. A shade of separation
    is all it needs. Dark mode already has it — #16163c against #0c0c20 —
@@ -11488,22 +11510,17 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 #home-nm:not(.nm-dark) .nmh-practice-tab > .nmh-practice {
   background: linear-gradient(158deg, #f6f8fc 0%, #e7eaf2 100%);
 }
-#home-nm .nmh-practice-tab .nmh-practice-footer {
-  grid-column: 1 / -1; grid-row: 4; margin-top: 10px;
-}
-#home-nm .nmh-practice-tab .nmh-practice-cta { font-size: 12px; }
-#home-nm .nmh-practice-tab .nmh-practice-arrow { width: 32px; height: 32px; }
-#home-nm .nmh-practice-tab .nmh-practice-arrow svg { width: 13px; height: 13px; }
 
 @media (max-width: 380px) {
-  #home-nm .nmh-practice-tab > .nmh-practice {
-    padding: 9px 11px;
-    grid-template-columns: 74px minmax(0, 1fr);
+  #home-nm .nmh-practice-tab > .nmh-practice { padding: 10px 12px; }
+  #home-nm .nmh-practice-tab .nmh-practice-label { margin-bottom: 5px; }
+  #home-nm .nmh-practice-tab .nmh-practice-icon {
+    width: 34px; height: 34px; margin-bottom: 6px;
   }
-  #home-nm .nmh-practice-tab .nmh-practice-img { height: 62px; }
-  #home-nm .nmh-practice-tab .nmh-practice-word { font-size: 18px; }
-  #home-nm .nmh-practice-tab .nmh-practice-meaning { font-size: 10.5px; }
-  #home-nm .nmh-practice-tab .nmh-practice-footer { margin-top: 6px; }
+  #home-nm .nmh-practice-tab .nmh-practice-icon img { width: 19px; height: 19px; }
+  #home-nm .nmh-practice-tab .nmh-practice-word { font-size: 16.5px; }
+  #home-nm .nmh-practice-tab .nmh-practice-meaning { font-size: 10px; margin-bottom: 8px; }
+  #home-nm .nmh-practice-tab .nmh-practice-arrow { width: 27px; height: 27px; }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -11604,3 +11621,105 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 #home-nm.nm-dark .nmh-search-ic { color: rgba(255,255,255,0.45); }
 #home-nm.nm-dark .nmh-search-go { background: #e8d5a3; }
 #home-nm.nm-dark .nmh-search-go .nwsb-search-icon { filter: none; opacity: 0.85; }
+
+/* ══════════════════════════════════════════════════════════════════
+   THE APP FRAME — tablet and desktop
+
+   This app is 117 elements deep and every one of them is a direct child
+   of <body>. There is no #app wrapper (app.css had rules for one, but no
+   such element has ever existed in the markup), and nearly every screen,
+   sheet, drawer, overlay and toast is position: fixed. On a phone that is
+   exactly right — fixed to the viewport IS fixed to the app. On a tablet
+   or a desktop it is the whole problem: the viewport is 820 or 1280 wide,
+   so every one of those elements stretches to 1280 no matter what any
+   container says, because a fixed element ignores its ancestors' widths.
+
+   What was here before clamped #app, #home and .sub-screen to 480px. It
+   could not have worked: #app does not exist, and the other two are two
+   screens out of a dozen — the rest, plus the bottom nav, the drawer and
+   every overlay, still ran the full width. The Normal home was the only
+   page that looked deliberate wide, and only because it is a fluid column
+   that happens to reflow.
+
+   ONE LEVER FIXES ALL OF IT. An element with a transform becomes the
+   containing block for its fixed-position descendants — so a transform on
+   <body>, plus a width, re-anchors every fixed element in the app to the
+   column instead of the viewport. Nothing else has to be enumerated, and
+   an overlay added next month is inside the column for free.
+
+   The column is a width, not a redesign: these layouts are drawn for a
+   ~400px phone, and stretching them to 1280 does not make them a desktop
+   app, it makes them a phone app with 900px of slack in every row. So the
+   app keeps its proportions and the space around it is given a surface of
+   its own, which is what every phone-first app does on a big screen.
+   ══════════════════════════════════════════════════════════════════ */
+:root {
+  /* Phones: the column IS the viewport, so every calc below is a no-op and
+     nothing about the phone layout changes. */
+  --app-w: 100vw;
+  --app-side: 0px;
+}
+
+@media (min-width: 600px) {
+  :root {
+    --app-w: min(96vw, 640px);
+    --app-side: calc((100vw - var(--app-w)) / 2);
+  }
+
+  /* The surround. html rather than body, because body IS the app now.
+
+     It follows the app's own theme instead of fighting it: the app writes
+     .nwsb-lightbg onto <html> as well as <body> when the light background
+     is picked (part012.js), with an !important flat #e4e6ed — so a plain
+     `html { background }` here never won, and a pale column on a pale
+     field had no edge at all. Each variant gets a surround a step away
+     from the app's surface rather than the same colour as it. */
+  html { background: radial-gradient(120% 90% at 50% 0%, #10141f 0%, #05070d 62%, #03040a 100%) !important; }
+  html.nwsb-lightbg { background: radial-gradient(120% 90% at 50% 0%, #d2d6e0 0%, #c3c8d4 70%, #b9bfcc 100%) !important; }
+
+  body {
+    width: var(--app-w) !important;
+    max-width: var(--app-w) !important;
+    margin: 0 auto !important;
+    /* The lever. Without this the width above changes nothing at all,
+       because every screen in the app is position: fixed and would go on
+       measuring itself against the viewport. */
+    transform: translateZ(0);
+    position: relative;
+    /* An edge, so the column reads as the app and not as a page that
+       failed to fill its window. */
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.07),
+                0 30px 90px rgba(0,0,0,0.55);
+  }
+
+  /* One casualty of the transform: a fixed element is now clipped to the
+     column, which is what we want everywhere except the splash art, which
+     was covering the viewport by covering the screen. It still covers the
+     column, so this is only here to say it was checked, not skipped. */
+}
+
+/* One column, one width, from 600px up. There was a narrower one for
+   >=1024 here — a laptop breakpoint — and it is gone on purpose: the
+   target is the tablet, and a laptop showing the tablet layout is a
+   laptop that works. A second width would have meant a second thing to
+   keep right for no one who asked for it.
+
+   Short and wide — a tablet on its side — is the one case the column
+   cannot fix by width, because there the app is height-bound. It gets a
+   little of its width back so the rows are not tall and starved. */
+@media (min-width: 900px) and (max-height: 640px) {
+  :root { --app-w: 560px; }
+}
+
+/* The one viewport-width calculation in the app that is a POSITION rather
+   than a cap. It places the shadow at the foot of an intro render whose
+   height is (column width x art aspect) — so with the column no longer
+   equal to the viewport it has to follow the column, or the shadow lands
+   hundreds of pixels below the art it belongs to. */
+#nssIntroPage .nss-intro-img::after,
+#rmIntroPage .rm-intro-bg::after,
+#msIntroPage .ms-intro-bg::after,
+#ebIntroPage .ms-intro-bg::after,
+#sigIntroPage .sig-intro-bg::after {
+  top: calc(var(--app-w) * var(--art, 1.7768) - 120px);
+}
