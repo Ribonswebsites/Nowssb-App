@@ -106,7 +106,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=637">
+<link rel="stylesheet" href="nowssb-nm.css?v=638">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -9032,6 +9032,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
+    <!-- The printed designs, filled from the profile. Rendered over the
+         artwork by app/js/part078.js — nothing is drawn into the image. -->
+    <div class="certd" id="certDesignCard" style="display:none;"></div>
+
+    <!-- Which one. Same rail shape the rest of the app uses. -->
+    <div class="certd-rail-head">Certificate design</div>
+    <div class="certd-rail" id="certDesignRail"></div>
+
     <!-- Actions -->
     <div class="cert-actions">
       <button class="cert-action-btn cert-btn-share" onclick="CERT.share()">
@@ -9044,6 +9052,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <script src="app/js/part036.js?v=163"></script>
+<script src="app/js/part078.js?v=1"></script><!-- ══ CERTIFICATE DESIGNS ══ -->
 
 <!-- ═══════════════════════════════════════════════════════════
      AI DAILY WORD PRESCRIPTION — #4
