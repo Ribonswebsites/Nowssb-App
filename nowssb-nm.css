@@ -11126,3 +11126,77 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 }
 .nwsb-auth-note.show { display: block; }
 .nwsb-auth-note.bad { color: #8a2b2b; background: rgba(255,235,235,0.92); border-color: rgba(160,60,60,0.25); }
+
+/* ══════════════════════════════════════════════════════════════════
+   DEVICE FRAMES — a section shown inside a screen.
+
+   assets/frames/*.webp are the renders you sent with two things done to
+   them: the studio backdrop cut away, and the screen KNOCKED OUT — the
+   glass area is alpha 0, not black. That second part is what makes this
+   simple. The frame is laid over the section as an ::after, the section's
+   own content shows through the hole, and the bezel draws over its edges.
+
+   Nothing is wrapped. app/js/part062.js reorders the *direct children* of
+   each home wrap, so putting a section inside a new element would take it
+   out of the layout editor's reach — the same trap the section-furniture
+   pass fell into. This is a class and a padding, so the section stays
+   exactly where it was in the tree.
+
+   The padding is the bezel: it keeps content from sliding under the frame.
+   Each device has its own, because each render's bezel is a different
+   thickness — the TVs carry a chin and a stand, the tablet does not.
+   ══════════════════════════════════════════════════════════════════ */
+.nwsb-inframe {
+  position: relative;
+  box-sizing: border-box;
+  background-clip: padding-box;
+}
+.nwsb-inframe::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 20;
+  pointer-events: none;                 /* the bezel is decoration, never a tap target */
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+}
+/* The content of a framed section sits above its own background but below
+   the bezel, so the hole shows it and the frame still overlaps its edges. */
+.nwsb-inframe > * { position: relative; z-index: 1; }
+
+/* ── The portrait TV — the Fashion hero ── */
+.nwsb-inframe.dev-tv-p {
+  padding: 3.4% 3.2% 8.4%;
+  background-color: #05070d;
+}
+.nwsb-inframe.dev-tv-p::after { background-image: url('./assets/frames/tv-portrait.webp'); }
+
+/* ── The landscape TV — Cart, Orders and Wishlist ── */
+.nwsb-inframe.dev-tv-l {
+  padding: 5.4% 3.2% 16%;
+  background-color: #05070d;
+}
+.nwsb-inframe.dev-tv-l::after { background-image: url('./assets/frames/tv-landscape.webp'); }
+
+/* ── The tablet — the Player ── */
+.nwsb-inframe.dev-tab {
+  padding: 8% 4.2% 7.2%;
+  background-color: #05070d;
+}
+.nwsb-inframe.dev-tab::after { background-image: url('./assets/frames/tablet.webp'); }
+
+/* ── The tall tablet — the footer ── */
+.nwsb-inframe.dev-ftr {
+  padding: 5.2% 6.4% 4.6%;
+  background-color: #05070d;
+}
+.nwsb-inframe.dev-ftr::after { background-image: url('./assets/frames/footer-frame.webp'); }
+
+/* The picker in My Certificates. It is there whether or not anything has
+   been earned — the designs were unreachable before, because the only way
+   to a certificate card was to master a word first. */
+#certPanelPick { margin-bottom: 22px; }
+.certd-panel-note {
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 300;
+  color: rgba(255,255,255,0.45); line-height: 1.65; padding: 6px 2px 0;
+}
+#certPanelCard { margin-top: 14px; max-width: 300px; }

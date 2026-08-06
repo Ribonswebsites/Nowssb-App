@@ -6,7 +6,12 @@
   var img = function(seed,w,h){ return 'https://picsum.photos/seed/'+seed+'/'+(w||500)+'/'+(h||500); };
   var av  = function(seed){ return 'https://i.pravatar.cc/150?img='+seed; };
 
-  // ── current user (self) ──
+  /* ── current user (self) ──
+     fullName starts as the profile's name rather than empty. Signing up for
+     Connect should not ask again for something the app already knows — it
+     is filled in, and still editable, so anyone who wants a different name
+     on the social side just types over it. Read through the one resolver
+     (app/js/part079.js) so it is the same name the greeting uses. ── */
   var ME = {
     username:'', fullName:'', verified:false,
     avatar:'', words:0, sessions:0, score:0,
@@ -14,6 +19,20 @@
     link:'', self:true,
     highlights:[], grid:[]
   };
+
+  /* Seeded late and once: the profile is not loaded at first paint, and a
+     name the reader has since changed here must never be overwritten. */
+  var _seeded = false;
+  function seedName() {
+    if (_seeded || ME.fullName) return;
+    var n = (typeof window.nwsbUserName === 'function') ? window.nwsbUserName('') : '';
+    if (!n) return;
+    ME.fullName = n;
+    _seeded = true;
+    try { if (typeof window.igRenderProfile === 'function') window.igRenderProfile(); } catch (e) {}
+  }
+  window.nwsbSeedConnectName = seedName;
+  [400, 1500, 4000].forEach(function (t) { setTimeout(seedName, t); });
 
   // ── people (extends the community concept) ──
   var PEOPLE = [

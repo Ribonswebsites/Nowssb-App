@@ -96,3 +96,30 @@
   }, 8000);
 
 })();
+
+/* ══════════════════════════════════════════════════════════
+   ONE NAME, EVERYWHERE.
+
+   The app kept asking four different objects for the reader's name and
+   each caller picked a different one, so the greeting could say "Healer"
+   while the profile clearly showed a name — they were not reading the same
+   field. This is the single answer: every field the name can land in, in
+   the order it should be trusted, with the profile's own saved value
+   first because that is the one the reader typed.
+   ══════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  window.nwsbUserName = function (fallback) {
+    var u = window._userDataCache || {};
+    var cu = window._currentUser || {};
+    var ls = '';
+    try { ls = localStorage.getItem('nb_display_name') || localStorage.getItem('nwsb_name') || ''; } catch (e) {}
+    var n = u.displayName || u.name || u.fullName || ls || window._userName ||
+            cu.displayName || '';
+    n = String(n || '').trim();
+    /* An email is a last resort and only its local part — "sanjay@gmail.com"
+       greeting somebody as sanjay@gmail.com reads like a bug. */
+    if (!n && cu.email) n = String(cu.email).split('@')[0];
+    return n || (fallback === undefined ? 'Practitioner' : fallback);
+  };
+})();

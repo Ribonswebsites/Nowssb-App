@@ -649,7 +649,14 @@ function nmhRefresh() {
   if (greetEl) {
     var _hr = new Date().getHours();
     var _g = _hr < 12 ? 'Good Morning' : (_hr < 17 ? 'Good Afternoon' : 'Good Evening');
-    var _nm = (d.displayName ? String(d.displayName).split(' ')[0] : '') || 'Healer';
+    /* One resolver for the whole app (app/js/part079.js). The greeting used
+       to read _userDataCache.displayName alone and fall back to 'Healer' —
+       which is what you saw, because that one field is not always the field
+       the name actually landed in. */
+    var _full = (typeof window.nwsbUserName === 'function')
+      ? window.nwsbUserName('')
+      : (d.displayName || '');
+    var _nm = _full ? String(_full).trim().split(' ')[0] : 'Healer';
     /* Greeting and name are two lines now, so the name is its own node
        rather than being glued on with a comma. */
     greetEl.textContent = _g;

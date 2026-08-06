@@ -81,10 +81,8 @@
   /* The name on every certificate is the profile's, not a typed-in one —
      it is the same person the app already knows. */
   function userName() {
-    var u = window._userDataCache;
-    return (u && (u.displayName || u.name)) || window._userName ||
-           (window._currentUser && (window._currentUser.displayName || window._currentUser.email)) ||
-           'Practitioner';
+    return (typeof window.nwsbUserName === 'function')
+      ? window.nwsbUserName('Practitioner') : 'Practitioner';
   }
 
   /* Stable per word so the same certificate keeps the same number, and
@@ -100,7 +98,10 @@
   var state = { word: '', meaning: '', date: '' };
 
   function fill(design) {
-    var host = document.getElementById('certDesignCard');
+    fillOne(document.getElementById('certDesignCard'), design);
+    fillOne(document.getElementById('certPanelCard'), design);
+  }
+  function fillOne(host, design) {
     if (!host) return;
     if (!design || design.built) { host.style.display = 'none'; return; }
     host.style.display = 'block';
@@ -182,9 +183,54 @@
     }).join('');
   }
 
+  /* ── The designs, visible without earning one first ────────────────
+     The rail lived only inside #cert-overlay, and that overlay only opens
+     from an earned certificate — so with nothing mastered yet there was no
+     way to reach the four designs at all. That is why you could not find
+     them. My Certificates now carries its own copy: the four, a live
+     preview filled with your name, and the same picker. ── */
+  function mountPanel() {
+    var box = document.getElementById('ss-cert-list');
+    if (!box || document.getElementById('certPanelPick')) return;
+    var host = document.createElement('div');
+    host.id = 'certPanelPick';
+    host.innerHTML =
+      '<div class="certd-rail-head">Certificate design</div>' +
+      '<div class="certd-panel-note">Pick the one your certificates are issued on. ' +
+      'Words and meanings from the store open on the ivory pair, requested ones on the onyx pair — ' +
+      'this overrides both.</div>' +
+      '<div class="certd-rail" id="certPanelRail"></div>' +
+      '<div class="certd" id="certPanelCard"></div>';
+    box.parentNode.insertBefore(host, box);
+
+    var rail = document.getElementById('certPanelRail');
+    rail.innerHTML = DESIGNS.map(function (d) {
+      return '<div class="certd-chip" data-k="' + d.k + '" onclick="nwsbCertPick(\'' + d.k + '\')">' +
+               (d.img ? '<img class="certd-chip-art" src="' + d.img + '" alt="" loading="lazy" decoding="async">'
+                      : '<span class="certd-chip-built"></span>') +
+               '<span class="certd-chip-name">' + d.name + '</span>' +
+               '<span class="certd-chip-sub">' + d.sub + '</span>' +
+             '</div>';
+    }).join('');
+    paint();
+  }
+  window.nwsbCertPanel = mountPanel;
+
   /* part036.js owns the overlay. Wrap its open so a certificate raised the
      old way still gets the rail and the chosen design. */
   function boot() {
+    /* Anything that renders My Certificates should also mount the picker. */
+    var pr = window.ssRenderCertificates;
+    if (typeof pr === 'function' && !pr._nwsbCert) {
+      var wrapped = function () {
+        var r = pr.apply(this, arguments);
+        setTimeout(mountPanel, 0);
+        return r;
+      };
+      wrapped._nwsbCert = 1;
+      window.ssRenderCertificates = wrapped;
+    }
+    setTimeout(mountPanel, 600);
     buildRail();
     var C = window.CERT;
     if (C && typeof C.open === 'function' && !C._nwsbWrapped) {
