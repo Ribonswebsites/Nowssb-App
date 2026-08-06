@@ -1,0 +1,131 @@
+# Builds the Flutter APK and hands it back as a download.
+#
+# This is the one that gets you a file to upload. flutter_app/android is
+# generated, not committed, so `flutter create --platforms=android .`
+# recreates it on the runner before building. Nothing has to be installed on
+# your machine: push, open the Actions tab, download the APK from the run's
+# Artifacts.
+#
+# The debug APK installs on any phone with "install unknown apps" enabled —
+# use it to see the app working. Play needs the signed release bundle, which
+# is the second job; it runs on demand and only when the keystore is in this
+# repository's secrets, because a release build cannot be signed without one.
+
+name: Flutter APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'flutter_app/**'
+      - '.github/workflows/flutter-apk.yml'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: flutter_app
+
+jobs:
+  debug-apk:
+    name: Debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # android/ is generated. This writes it without touching lib/ or
+      # pubspec.yaml, which flutter create leaves alone when they exist.
+      - name: Create the Android project
+        run: flutter create --platforms=android --org com.nowssb --project-name nowssb .
+
+      - name: Dependencies
+        run: flutter pub get
+
+      # A build that compiles but is full of analyzer errors is not worth
+      # downloading, so this runs first and the log says exactly what broke.
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Build
+        run: flutter build apk --debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nowssb-flutter-debug-apk
+          path: flutter_app/build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error
+
+  release-bundle:
+    name: Signed release bundle (Play)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Check the signing secrets are set
+        id: guard
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KS" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 is not set — skipping."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create the Android project
+        if: steps.guard.outputs.ok == 'true'
+        run: flutter create --platforms=android --org com.nowssb --project-name nowssb .
+
+      # Written into the runner for this run only. .gitignore already refuses
+      # *.keystore, *.jks and key.properties, so it cannot reach the repo.
+      - name: Write the signing material
+        if: steps.guard.outputs.ok == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/nowssb.keystore
+          cat > android/key.properties <<EOF
+          storeFile=nowssb.keystore
+          storePassword=$STORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+      - name: Dependencies
+        if: steps.guard.outputs.ok == 'true'
+        run: flutter pub get
+
+      - name: Build
+        if: steps.guard.outputs.ok == 'true'
+        run: flutter build appbundle --release
+
+      - uses: actions/upload-artifact@v4
+        if: steps.guard.outputs.ok == 'true'
+        with:
+          name: nowssb-flutter-release-aab
+          path: flutter_app/build/app/outputs/bundle/release/*.aab
+          if-no-files-found: error
