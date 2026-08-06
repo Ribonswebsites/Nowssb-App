@@ -11379,6 +11379,134 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   THE NORMAL HOME'S PLAYER SECTION, ON THE LANDSCAPE TABLET
+
+   The card IS the screen. It is not sitting in a padded box that happens
+   to have a bezel drawn round it — it is absolutely positioned onto the
+   render's own aperture, so its edges are the screen's edges.
+
+   Absolute percentages rather than padding, and that is the reason: CSS
+   resolves percentage padding against the containing block's WIDTH on all
+   four sides, so a vertical bezel inset written as a padding percentage is
+   only ever an approximation of the render. top/bottom on a positioned box
+   resolve against the height, which is what the render actually needs.
+
+   Measured out of assets/frames/tab-landscape.webp — the file arrived with
+   its background already gone and its screen already transparent, so it is
+   used exactly as supplied (lossless WebP; every pixel with any alpha at
+   all is byte-identical to the PNG):
+
+     file       1536 x 1024
+     aperture   x 145–1389  -> left  145/1536 = 9.4401%
+                              right  146/1536 = 9.5052%
+                y 141–900   -> top   141/1024 = 13.7695%
+                              bottom 123/1024 = 12.0117%
+
+   The wrapper carries the file's aspect so the render is never stretched,
+   and the wrapper's own background stays transparent — the file has clear
+   margins outside the tablet's silhouette, and anything painted on the
+   wrapper would show through them as a rectangle behind the tablet.
+
+   The card is relaid for the shape it is now in. A landscape screen is a
+   wide, short box and the portrait stack did not fit it: the render goes
+   down the left as the visual, the words run beside it, and Enter closes
+   the row. Its neumorphic shell comes off — the tablet is the shell now.
+   ══════════════════════════════════════════════════════════════════ */
+.nmh-practice-tab {
+  position: relative; width: 100%;
+  aspect-ratio: 1536 / 1024;      /* the file's own — never stretched */
+  background: transparent;
+}
+.nwsb-inframe.dev-tab-l { padding: 0; background: transparent; }
+.nwsb-inframe.dev-tab-l::after { background-image: url('./assets/frames/tab-landscape.webp'); }
+
+/* #home-nm on the front of every one of these is not decoration. The card's
+   neumorphic shell is set by #home-nm:not(.nm-dark) .nmh-practice and by
+   #home-nm.nm-dark .nmh-practice — both ID-anchored, so a plain
+   .nmh-practice-tab > .nmh-practice loses to them even with !important, and
+   the shadow stayed on. The background is left to those rules on purpose:
+   it is the screen's colour, and it should still follow dark mode. */
+#home-nm .nmh-practice-tab > .nmh-practice {
+  position: absolute;
+  left: 9.4401%; right: 9.5052%; top: 13.7695%; bottom: 12.0117%;
+  width: auto !important; height: auto; margin: 0 !important;
+  border-radius: 0 !important;    /* the render's aperture has the corners */
+  box-shadow: none !important;    /* the tablet is the shell now */
+  padding: 12px 14px;
+  /* the landscape relay: art down the left, words beside it, Enter across */
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto;
+  align-content: center;
+  column-gap: 10px; row-gap: 0;
+}
+#home-nm .nmh-practice-tab > .nmh-practice:active { transform: none; box-shadow: none !important; }
+
+/* The art moves out of the corner and becomes the left column. It was
+   absolutely positioned at 28% on the right, where in a box this wide it
+   would have run straight through the word. */
+#home-nm .nmh-practice-tab .nmh-practice-img {
+  position: static; grid-column: 1; grid-row: 2 / span 2;
+  width: 100%; max-width: none; align-self: center;
+  transform: none; top: auto; right: auto;
+  /* A hard height, not max-height: this image spans two auto rows, and an
+     auto row sizes to its content — so left to its intrinsic height it
+     would push the rows taller than the screen and clip the footer. A
+     percentage cap resolves against an indefinite row and does nothing.
+     object-fit keeps it undistorted inside the cap. */
+  height: 74px; object-fit: contain;
+}
+/* Two visuals in a screen this size is one too many; the art is the one
+   that carries, so the embossed icon tile stands down. */
+#home-nm .nmh-practice-tab .nmh-practice-icon { display: none; }
+
+#home-nm .nmh-practice-tab .nmh-practice-label {
+  grid-column: 1 / -1; grid-row: 1;
+  font-size: 9px; letter-spacing: 2.4px; margin-bottom: 8px;
+}
+/* Both of these wrap in here rather than ellipsing. In the portrait card
+   they had the full 320px and one line was plenty; the words column in
+   here is 175px, and nowrap turned the title into "Afternoon Wor…" and
+   the line under it into "…add word…". Two lines each, clamped, so a long
+   word still cannot grow the row past the screen. */
+#home-nm .nmh-practice-tab .nmh-practice-word {
+  grid-column: 2; grid-row: 2; align-self: end;
+  font-size: 19px; line-height: 1.14; margin-bottom: 4px;
+  white-space: normal; overflow: hidden; text-overflow: clip;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+#home-nm .nmh-practice-tab .nmh-practice-meaning {
+  grid-column: 2; grid-row: 3; align-self: start;
+  font-size: 11.5px; line-height: 1.4; margin-bottom: 0;
+  white-space: normal; overflow: hidden; text-overflow: clip;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+/* The page behind is #f0f2f7 and so is the card, so through the aperture
+   the screen read as a hole rather than a display. A shade of separation
+   is all it needs. Dark mode already has it — #16163c against #0c0c20 —
+   so this is the light surface only. */
+#home-nm:not(.nm-dark) .nmh-practice-tab > .nmh-practice {
+  background: linear-gradient(158deg, #f6f8fc 0%, #e7eaf2 100%);
+}
+#home-nm .nmh-practice-tab .nmh-practice-footer {
+  grid-column: 1 / -1; grid-row: 4; margin-top: 10px;
+}
+#home-nm .nmh-practice-tab .nmh-practice-cta { font-size: 12px; }
+#home-nm .nmh-practice-tab .nmh-practice-arrow { width: 32px; height: 32px; }
+#home-nm .nmh-practice-tab .nmh-practice-arrow svg { width: 13px; height: 13px; }
+
+@media (max-width: 380px) {
+  #home-nm .nmh-practice-tab > .nmh-practice {
+    padding: 9px 11px;
+    grid-template-columns: 74px minmax(0, 1fr);
+  }
+  #home-nm .nmh-practice-tab .nmh-practice-img { height: 62px; }
+  #home-nm .nmh-practice-tab .nmh-practice-word { font-size: 18px; }
+  #home-nm .nmh-practice-tab .nmh-practice-meaning { font-size: 10.5px; }
+  #home-nm .nmh-practice-tab .nmh-practice-footer { margin-top: 6px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
    THE FOOTER CAROUSEL, INSIDE THE TABLET
 
    The images already move — a coverflow that swings one card into the
