@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=312">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=648">
+<link rel="stylesheet" href="nowssb-nm.css?v=649">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -195,10 +195,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="nm-auth-sub">Sign in or create your account</div>
     </div>
 
-    <!-- The phone. Its aspect ratio is the frame file's own (858 x 1467),
-         so the render is never stretched to fit whatever is inside it —
-         the box is the shape of the photograph and the content scrolls
-         within the glass instead of pushing the bezel out of shape. -->
+    <!-- The phone. Its aspect ratio is the frame file's own (1024 x 1536),
+         so the render is never stretched, cropped or zoomed to fit
+         whatever is inside it — the box is the shape of the photograph
+         and the content scrolls within the glass instead of pushing the
+         bezel out of shape. The render carries its own corners and its
+         own black background; nothing here rounds or clips it. -->
     <div class="lg-phone nwsb-inframe dev-phone">
       <div class="lg-glass">
 

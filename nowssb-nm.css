@@ -11208,20 +11208,27 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 
      the screen is black, inside the phone and outside it both;
      the words live OUTSIDE the glass, the buttons INSIDE it;
-     the render is never stretched.
+     the render is never stretched, cropped, zoomed or rounded.
 
-   That last one is why .lg-phone carries an aspect-ratio of 858 / 1467 —
-   the frame file's own. The box is the shape of the photograph, so the
-   bezel keeps its proportions no matter how much is inside it, and the
-   content scrolls within the glass rather than pushing the phone out of
-   shape. Opening the email or phone form makes .lg-glass scroll; it can
-   never make the bezel grow.
+   That last one is why .lg-phone carries an aspect-ratio of 1024 / 1536 —
+   the frame file's own, exactly. The box is the shape of the photograph,
+   so background-size: 100% 100% lands pixel-for-pixel with no scaling
+   distortion and no zoom, and the bezel keeps its proportions no matter
+   how much is inside it. Opening the email or phone form makes .lg-glass
+   scroll; it can never make the bezel grow.
+
+   NOTHING is drawn over the phone's own edge — no border-radius, no
+   border, no shadow. The render already carries its own corners and its
+   own background (black, which is the page's colour too, so the plate it
+   sits on disappears and only the phone reads). Adding a radius here cut
+   the corners off the photograph itself.
    ══════════════════════════════════════════════════════════════════ */
 .lg-screen-black { background: #000 !important; }
 .lg-wrap {
   width: 100%; max-width: 460px; margin: 0 auto;
   display: flex; flex-direction: column; align-items: center;
-  padding: max(env(safe-area-inset-top, 34px), 34px) 16px
+  justify-content: center;       /* the stack sits on the middle of the black */
+  padding: max(env(safe-area-inset-top, 28px), 28px) 16px
            max(env(safe-area-inset-bottom, 24px), 24px);
   box-sizing: border-box;
   /* app.css gives every .nm-wrap the light auth surface (#e4e6ed). This
@@ -11250,17 +11257,30 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 
 /* ── The phone ── */
 .lg-phone {
-  width: 100%; max-width: 330px;
-  aspect-ratio: 858 / 1467;      /* the frame file's own — never stretched */
+  width: 100%; max-width: 340px;
+  aspect-ratio: 1024 / 1536;     /* the frame file's own — never stretched */
   flex: 0 0 auto;
 }
 .nwsb-inframe.dev-phone {
   padding: 0;                    /* .lg-glass places itself; see below */
-  background: #000;
-  border-radius: 30px !important;
-  overflow: hidden;
+  background: #000;              /* the render's own background colour */
+  border-radius: 0 !important;   /* see the note above — never round this */
+  border: none !important;
+  box-shadow: none !important;
+  overflow: hidden;              /* clips the glass's scroll, not the render */
 }
-.nwsb-inframe.dev-phone::after { background-image: url('./assets/frames/phone-login.webp'); }
+/* BEHIND the content, not over it — the one place this component differs.
+   The other four renders have a transparent hole cut where their screen
+   is, so their bezel can lie on top and overlap the edges of whatever is
+   inside. This one is a solid photograph with no hole, and cutting one
+   would mean altering the render. It doesn't need one: the phone's screen
+   is already black, the glass is inset well within it, and nothing has to
+   be overlapped. So the render drops to z-index 0 — above the element's
+   own background, below the buttons — and stays whole. */
+.nwsb-inframe.dev-phone::after {
+  background-image: url('./assets/frames/phone-login.webp');
+  z-index: 0;
+}
 
 /* The glass. Black, and the only thing that scrolls.
 
@@ -11269,43 +11289,73 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    the bezel went from its true 0.585 aspect to 0.542, stretching the
    render, which is the one thing this must not do. Taken out of flow it
    cannot report a height upward, so the phone keeps the file's proportions
-   whatever is inside and the content scrolls behind the bezel instead. */
+   whatever is inside and the content scrolls behind the bezel instead.
+
+   The inset is measured off the render itself: the screen sits inside
+   x 114–907 of 1024 and y 82–1472 of 1536, and the camera pill runs down
+   to y 175 — so the top inset clears the pill rather than sitting under
+   it. No background and no radius, because the phone's screen is already
+   black and anything painted here would show as a lighter panel with its
+   own corners floating inside the render. */
 .lg-glass {
-  position: absolute; inset: 2.2% 5.4%;
+  position: absolute; inset: 13% 12% 5%;
   box-sizing: border-box; overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  background: #000; border-radius: 22px !important;
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 18px 13px; gap: 0;
+  background: transparent; border-radius: 0 !important;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  padding: 8px 6px; gap: 0;
 }
+/* Centred by auto margins rather than justify-content: center, and that is
+   not a style preference. In a scroll container, centring with
+   justify-content pushes the overflow out of BOTH ends — the top of the
+   content ends up above scrollTop 0, where no amount of scrolling can
+   reach it. Opening a form or showing the auth note made exactly that
+   happen: the top line was cut off and unreachable. Auto margins collapse
+   to zero the moment the content is taller than the box, so it centres
+   when it fits and scrolls from the top when it doesn't. */
+.lg-glass > *:first-child { margin-top: auto; }
+.lg-glass > *:last-child  { margin-bottom: auto; }
 .lg-glass::-webkit-scrollbar { display: none; }
 
-/* ── The buttons, on black ── */
+/* ── The buttons, on the black screen ──
+   White. They are the only lit thing inside the phone, which is the
+   whole point of putting them there: the render is black, the page is
+   black, and three white pills read as a screen that is switched on.
+   The icons inside them are currentColor, so they turn dark with the
+   text and no per-icon rule is needed — except Google's, which is
+   multicolour by mark and stays exactly as Google draws it. */
 #login .nm-btn-list { width: 100%; }
 #login .nm-auth-btn {
-  background: #101015; border: 1px solid rgba(255,255,255,0.12);
-  color: #fff; border-radius: 14px !important;
-  box-shadow: none; padding: 16px 18px; margin: 0;
+  background: #fff; border: 1px solid rgba(0,0,0,0.06);
+  color: #0b0b0f; border-radius: 12px !important;
+  box-shadow: none; padding: 13px 14px; margin: 0;
+  font-size: 13.5px;
 }
-#login .nm-auth-btn + .nm-auth-btn { margin-top: 10px; }
-#login .nm-auth-btn:active { background: #17171e; }
-#login .nm-divider { margin: 12px 0; }
-#login .nm-divider-line { background: rgba(255,255,255,0.12); }
-#login .nm-divider-text { color: rgba(255,255,255,0.35); }
-#login .nm-form-panel { background: none; border: none; padding: 12px 0 0; }
+#login .nm-auth-btn + .nm-auth-btn { margin-top: 9px; }
+#login .nm-auth-btn:active { background: #e6e6ec; }
+#login .nm-divider { margin: 10px 0; }
+#login .nm-divider-line { background: rgba(255,255,255,0.14); }
+#login .nm-divider-text { color: rgba(255,255,255,0.38); }
+#login .nm-form-panel { background: none; border: none; padding: 10px 0 0; }
 #login .nm-field-label { color: rgba(255,255,255,0.55); }
+/* The wells match the pills — same white, same corner — so an opened form
+   still reads as one control stack rather than two different screens. */
 #login .nm-input-wrap {
-  background: #101015; border: 1px solid rgba(255,255,255,0.14);
+  background: #fff; border: 1px solid rgba(0,0,0,0.06);
   border-radius: 12px !important;
 }
-#login .nm-input { color: #fff; }
-#login .nm-input::placeholder { color: rgba(255,255,255,0.3); }
-#login .nm-input-icon svg [stroke], #login .nm-input-icon-r svg [stroke] { stroke: rgba(255,255,255,0.4); }
+#login .nm-input { color: #0b0b0f; }
+#login .nm-input::placeholder { color: rgba(0,0,0,0.34); }
+#login .nm-input-icon svg [stroke], #login .nm-input-icon-r svg [stroke] { stroke: rgba(0,0,0,0.38); }
+#login .nm-phone-select {
+  background: #fff; color: #0b0b0f;
+  border: 1px solid rgba(0,0,0,0.06); border-radius: 12px !important;
+}
 #login .nm-submit-btn, #login .nm-primary-btn {
   border-radius: 12px !important;
 }
 .lg-guest {
-  display: block; width: 100%; margin-top: 16px; padding: 12px;
+  display: block; width: 100%; margin-top: 12px; padding: 10px;
   background: transparent; border: none; cursor: pointer;
   font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
   color: #c8a96e; letter-spacing: 0.3px; text-align: center;
