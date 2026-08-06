@@ -1,8 +1,21 @@
-# NowssB on Google Play — the Android shell
+# NowssB as a real app — Google Play and the App Store
 
-Step 5. The app already runs everywhere a browser does; this puts the same
-app in the Play Store as an installable Android app, with notifications that
+The app already runs everywhere a browser does; this puts the same app in the
+Play Store and the App Store as an installable app, with notifications that
 reach the phone when it is fully closed.
+
+Android and iOS are both set up. `capacitor.config.json` carries a block for
+each, `package.json` has `android:*` and `ios:*` scripts, and
+`app/js/part072.js` — the native bridge — gates on `isNativePlatform()`
+rather than on Android, so it takes over the notification plumbing, the back
+button and the status bar on both platforms with no fork.
+
+**The one thing that is not symmetric:** an Android APK can be built on any
+machine, and CI builds one for you on every push (see "Getting a file you can
+install", below). An App Store build cannot be produced without an Apple
+Developer account — the signing certificate and provisioning profile are
+issued to you, not generated from the code. CI compiles the iOS app on every
+push to prove it builds, but the installable `.ipa` needs that account.
 
 Nothing here forks the code. The Android app is `index.html` and every file
 beside it, bundled into the APK, with one extra script — `app/js/part072.js`
@@ -202,3 +215,133 @@ around the live site rather than a self-contained bundle.
 Capacitor is what is set up here, as asked, and it works. If you would rather
 have the TWA, nothing above is wasted — `part072.js` no-ops off a native
 check, and the FCM branch in `push.js` sits idle when no FCM tokens exist.
+
+
+---
+
+# iOS — the App Store
+
+Everything above about `www/`, the studio exclusion and the one-codebase rule
+is identical on iOS. Only the toolchain and the store differ.
+
+## Before you start
+
+| | |
+|---|---|
+| A Mac | Xcode does not run on anything else. There is no way around this for the final build. |
+| Xcode | 15 or newer, with the iOS SDK and the command line tools |
+| CocoaPods | `sudo gem install cocoapods` |
+| An Apple Developer account | $99/year, and the thing that gates everything below |
+
+## 1. Create the iOS project
+
+```bash
+npm install
+npm run ios:add            # builds www/, then `npx cap add ios`
+```
+
+`ios/` is generated and git-ignored, exactly like `android/`. Rebuild it
+whenever you like; nothing of yours lives there.
+
+After any change to the web app:
+
+```bash
+npm run ios:sync           # rebuild www/ and copy it into ios/
+```
+
+## 2. Firebase, so notifications work
+
+iOS is reached through APNs, with Firebase Cloud Messaging in front of it —
+the same FCM the Android app uses, so `/api/push` and the studio's one
+notification screen serve all three platforms without changes.
+
+1. Firebase console → your project (`nowssb-34f1b`) → **Add app → iOS**.
+   - Bundle ID: **`com.nowssb.app`** (must match `capacitor.config.json`).
+   - Register, then download **`GoogleService-Info.plist`**.
+2. Drag it into `ios/App/App/` **in Xcode** (not in Finder — it has to be
+   added to the target, or it ships without being read).
+3. Apple Developer portal → **Certificates, Identifiers & Profiles → Keys**
+   → create an **APNs Auth Key** (`.p8`). Download it once; it cannot be
+   downloaded again.
+4. Firebase console → Project settings → **Cloud Messaging** → iOS app →
+   upload that `.p8` with its Key ID and your Team ID.
+5. In Xcode, select the App target → **Signing & Capabilities** → **+
+   Capability** → add **Push Notifications** and **Background Modes**, and
+   tick *Remote notifications* under Background Modes.
+
+`GoogleService-Info.plist` is not secret in the way a service account is, but
+it identifies your project — it is covered by the same rule as
+`google-services.json`: it lives in the generated `ios/` folder, which git
+never sees.
+
+## 3. Signing
+
+Xcode → App target → **Signing & Capabilities** → tick **Automatically manage
+signing** and pick your team. Xcode creates the certificate and profile for
+you the first time.
+
+## 4. Build and upload
+
+```bash
+npm run ios:sync
+npm run ios:open           # opens ios/App/App.xcworkspace in Xcode
+```
+
+In Xcode: choose **Any iOS Device (arm64)** as the destination, then
+**Product → Archive**. When the Organiser opens, **Distribute App → App Store
+Connect → Upload**.
+
+Then App Store Connect → your app → TestFlight for testers, or submit for
+review to go live.
+
+## What Apple will ask for that Google does not
+
+- **A privacy manifest.** `PrivacyInfo.xcprivacy` declaring what the app
+  collects. The app collects an account email, a display name and practice
+  data, and uses a push token.
+- **App Tracking Transparency** — only if you ever add tracking. Today the
+  app does not track across other companies' apps, so declare that and there
+  is no prompt to add.
+- **Sign in with Apple.** This is the one that catches people out: if an app
+  offers third-party sign-in — and this one offers Google — Apple requires
+  Sign in with Apple alongside it. Firebase Auth supports it
+  (`OAuthProvider('apple.com')`), and it has to be added to the login screen
+  before review, not after a rejection.
+- **A demo account** in App Review notes, or reviewers cannot get past login.
+
+---
+
+# Getting a file you can install, without a toolchain
+
+`android/` and `ios/` are generated, so building locally means installing
+Android Studio or Xcode. Two workflows in `.github/workflows/` do it on
+GitHub's runners instead.
+
+**`android-apk.yml`** — on every push to `main`, and on demand from the
+Actions tab. It builds a **debug APK** and attaches it to the run as an
+artifact: download it from the run page and sideload it on any phone with
+"install unknown apps" enabled. That is a real, installable Android app, with
+no toolchain on your machine.
+
+It has a second job for the **signed release bundle** Play needs. That one
+runs only when you trigger it by hand AND the signing secrets are set, because
+a release build cannot be signed without them:
+
+| Secret | What it is |
+|---|---|
+| `ANDROID_KEYSTORE_BASE64` | your `.keystore`, base64-encoded (`base64 -w0 nowssb.keystore`) |
+| `ANDROID_KEYSTORE_PASSWORD` | the store password |
+| `ANDROID_KEY_ALIAS` | the key alias |
+| `ANDROID_KEY_PASSWORD` | the key password |
+
+Add them in **Settings → Secrets and variables → Actions**. The keystore is
+written into the runner for that one run and never enters the repository —
+`.gitignore` refuses `*.keystore`, `*.jks` and `key.properties` so it cannot,
+even by accident. **Keep your own copy of the keystore somewhere safe: lose it
+and you can never update the app on Play again**, only publish a new listing.
+
+**`ios-build.yml`** — compiles the iOS app on a macOS runner on every push, so
+a broken iOS build is caught immediately. It builds **unsigned**, which means
+it proves the project is sound but does not hand you something installable.
+Turning it into a TestFlight upload needs your Apple certificate and profile
+in secrets; until the developer account exists there is nothing to put there.

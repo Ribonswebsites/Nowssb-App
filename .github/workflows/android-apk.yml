@@ -1,0 +1,143 @@
+# Builds the Android app from this repo and hands back an installable file.
+#
+# Why this exists: android/ is generated, not committed (see .gitignore), and
+# building it locally needs Android Studio, the SDK and a JDK. This runner has
+# all three, so a push — or a click on "Run workflow" — produces an APK you can
+# download from the run's Artifacts and sideload, with no toolchain on your
+# machine at all.
+#
+# It builds the DEBUG apk by default, which installs on any phone with
+# "install unknown apps" turned on. A Play Store upload needs the signed
+# release bundle instead — that is the second job, and it only runs when the
+# signing secrets are present, because a release build cannot be signed
+# without them and a keystore must never live in a repository.
+
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md']
+  workflow_dispatch:
+
+jobs:
+  debug-apk:
+    name: Debug APK (sideloadable)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'          # Android Gradle Plugin 8.7+ wants 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      # build-native.mjs assembles www/ and REFUSES to continue if any studio
+      # file (admin.html, admin-sw.js, admin-manifest.json, admin-dev.html,
+      # part070.js) would end up inside the bundle. That check is the reason
+      # this step can be trusted to ship.
+      - name: Build the web bundle
+        run: npm run build:native
+
+      - name: Create the Android project
+        run: npx cap add android
+
+      - name: Sync
+        run: npx cap sync android
+
+      - name: Assemble
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nowssb-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+  release-bundle:
+    name: Signed release bundle (Play Store)
+    runs-on: ubuntu-latest
+    # Only when the signing material is configured. Without it a release build
+    # produces an unsigned artifact Play will reject, so failing quietly here
+    # is better than shipping something that cannot be uploaded.
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Check the signing secrets are set
+        id: guard
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KS" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 is not set — skipping the release build."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.guard.outputs.ok == 'true'
+        run: npm install --no-audit --no-fund
+
+      - name: Build the web bundle
+        if: steps.guard.outputs.ok == 'true'
+        run: npm run build:native
+
+      - name: Create and sync the Android project
+        if: steps.guard.outputs.ok == 'true'
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      # The keystore is written into the runner's filesystem for this run only
+      # and never touches the repository. .gitignore refuses *.keystore, *.jks
+      # and key.properties precisely so this can only ever come from secrets.
+      - name: Write the signing material
+        if: steps.guard.outputs.ok == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/nowssb.keystore
+          cat > android/key.properties <<EOF
+          storeFile=nowssb.keystore
+          storePassword=$STORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+      - name: Bundle
+        if: steps.guard.outputs.ok == 'true'
+        working-directory: android
+        run: ./gradlew --no-daemon bundleRelease
+
+      - uses: actions/upload-artifact@v4
+        if: steps.guard.outputs.ok == 'true'
+        with:
+          name: nowssb-release-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error

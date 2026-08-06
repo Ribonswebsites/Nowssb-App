@@ -150,4 +150,4 @@ if (cOpen !== cClose) {
 }
 
 console.log('www/ built — ' + copied + ' files, ' + (bytes / 1048576).toFixed(1) + ' MB.');
-console.log('Studio excluded and verified. Next: npx cap sync android');
+console.log('Studio excluded and verified. Next: npx cap sync   (both platforms)');

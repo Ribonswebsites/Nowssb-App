@@ -59,7 +59,7 @@
         { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc' },
         { k:'connect',  sel:['.vb-banner[data-vb="vb4"]', '.nmh-connect-sec'],                                          t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'feed',     sel:['#ncbCarouselNm'],                                            t:S, label:'Community Carousel',    sub:'Swipeable feed cards' },
-        { k:'quickrow', sel:['.nmh-quick-row'],                                            t:S, label:'Quick Row',             sub:'Store · Health · Community' },
+        { k:'quickrow', sel:['.nmh-quick-row'],                                            t:S, label:'Quick Row',             sub:'Cart · Wishlist · Order' },
         { k:'trendshop',sel:['.nmh-trend-shop-wrap'],                                     t:S, label:'Trending Shop',         sub:'The clip and the Shop Now banner' },
         { k:'subvid',   sel:['.nmh-video-banner.nmh-vb-tall'],                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
         { k:'edition',  sel:['.nmh-fsec'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
