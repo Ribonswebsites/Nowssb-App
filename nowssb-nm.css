@@ -11184,7 +11184,12 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 }
 .nwsb-inframe.dev-tab::after { background-image: url('./assets/frames/tablet.webp'); }
 
-/* ── The tall tablet — the footer ── */
+/* ── The tall tablet — the footer ──
+   Kept as a variant of the component, but nothing wears it now: the
+   footer's tablet went onto the moving images instead of the brand panel
+   (see .fc-tab further down), which is where it was asked for. It stays
+   here because the render is the same file and the next section that
+   wants a tall tablet should use this rather than invent another. ── */
 .nwsb-inframe.dev-ftr {
   padding: 5.2% 6.4% 4.6%;
   background-color: #05070d;
@@ -11371,6 +11376,63 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 @media (max-height: 720px) {
   .lg-phone { max-width: 280px; }
   .lg-head .nm-auth-title { font-size: 28px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   THE FOOTER CAROUSEL, INSIDE THE TABLET
+
+   The images already move — a coverflow that swings one card into the
+   middle and pushes the rest out either side. What was missing is that
+   the middle one should read as being ON a screen. So the tablet is
+   fixed at the centre of the carousel and does not move at all; the
+   cards keep exactly the motion they had, and the one in the middle
+   lands inside the aperture.
+
+   The frame was on .footer-panel before, which was the wrong reading of
+   the ask — and it looked wrong too: the panel is a wide, short box and
+   background-size: 100% 100% squashed a 908x1408 tablet into it. It is
+   off the panel now and on the thing that was meant to be in it.
+
+   THE NUMBERS, all measured out of assets/frames/footer-frame.webp
+   rather than eyeballed:
+
+     file              908 x 1408
+     transparent hole  x 55–854  (800 wide)
+                       y 65–1350 (1286 tall)
+     hole centre       455/908 = 0.5011 across, 708/1408 = 0.5028 down
+
+   The card is sized to the hole's proportions — 162 x 260 rather than
+   162 x 228 — because the alternative was stretching the tablet by 14%
+   horizontally to meet the card's shape. The tablet keeps its own.
+
+   The card renders at its CSS size, not larger: the track is
+   transform-style: flat, so the perspective on .footer-carousel never
+   reaches the cards and their translateZ does no foreshortening.
+   Measured, not assumed — the centre card comes back exactly 162 wide.
+   That is why the frame below is sized off the card in plain pixels
+   with no perspective factor anywhere in it.
+   ══════════════════════════════════════════════════════════════════ */
+.footer-carousel { --fci-w: 162px; --fci-h: 260px; }
+.fci {
+  width: var(--fci-w); height: var(--fci-h);
+  margin-left: calc(var(--fci-w) / -2);
+  margin-top:  calc(var(--fci-h) / -2);
+}
+.fc-tab {
+  position: absolute; top: 50%; left: 50%;
+  /* full frame = aperture / aperture's share of the file */
+  width:  calc(var(--fci-w) * 908 / 800);
+  height: calc(var(--fci-h) * 1408 / 1286);
+  /* pulled back by where the hole's centre sits inside the file, so the
+     hole lands on the carousel's centre — which is where the card is */
+  margin-left: calc(var(--fci-w) * 908 / 800 * -0.5011);
+  margin-top:  calc(var(--fci-h) * 1408 / 1286 * -0.5028);
+  z-index: 22;                 /* over the centre card (20) and the rest */
+  pointer-events: none;        /* the cards underneath stay tappable */
+  background: url('./assets/frames/footer-frame.webp') no-repeat center / 100% 100%;
+}
+@media (max-width: 380px) {
+  .footer-carousel { --fci-w: 142px; --fci-h: 228px; }
 }
 
 /* ══ ONE SEARCH — the bar at the top of the Normal home ══
