@@ -11163,7 +11163,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    the bezel, so the hole shows it and the frame still overlaps its edges. */
 .nwsb-inframe > * { position: relative; z-index: 1; }
 
-/* ── The portrait TV — the Fashion hero ── */
+/* ── The portrait TV — was the Fashion hero, nothing wears it now ── */
 .nwsb-inframe.dev-tv-p {
   padding: 3.4% 3.2% 8.4%;
   background-color: #05070d;
@@ -11240,12 +11240,18 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    is precisely where banding would show.
    ══════════════════════════════════════════════════════════════════ */
 .lg-screen-black { background: #000 !important; }
+/* app.css gives #login `padding: 0 9%`, and that was what kept the phone
+   small: at 360 wide it took 65px off the column before the render had a
+   say, so a box asking for 100% could only ever be 295. The phone runs the
+   full width of the screen now and the words above it carry their own
+   inset instead. */
+#login.lg-screen-black { padding-left: 0 !important; padding-right: 0 !important; }
 .lg-wrap {
-  width: 100%; max-width: 460px; margin: 0 auto;
+  width: 100%; max-width: 560px; margin: 0 auto;
   display: flex; flex-direction: column; align-items: center;
   justify-content: center;       /* the stack sits on the middle of the black */
-  padding: max(env(safe-area-inset-top, 28px), 28px) 16px
-           max(env(safe-area-inset-bottom, 24px), 24px);
+  padding: max(env(safe-area-inset-top, 20px), 20px) 0
+           max(env(safe-area-inset-bottom, 14px), 14px);
   box-sizing: border-box;
   /* app.css gives every .nm-wrap the light auth surface (#e4e6ed). This
      screen is black behind the phone as well as inside it, so that one
@@ -11256,19 +11262,21 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 }
 .lg-wrap::-webkit-scrollbar { display: none; }
 
-/* ── The words, on the black ── */
-.lg-head { text-align: center; padding: 4px 0 18px; }
+/* ── The words, on the black ──
+   Tighter than they were, because every pixel they take is a pixel the
+   phone cannot have, and the phone is the screen. */
+.lg-head { text-align: center; padding: 0 16px 12px; }
 .lg-head .nm-brand {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
   letter-spacing: 5px; text-transform: uppercase; color: #c8a96e;
 }
 .lg-head .nm-auth-title {
-  font-family: 'DM Sans', sans-serif; font-size: 34px; font-weight: 800;
-  color: #fff; letter-spacing: -0.6px; line-height: 1.1; margin-top: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800;
+  color: #fff; letter-spacing: -0.5px; line-height: 1.1; margin-top: 6px;
 }
 .lg-head .nm-auth-sub {
-  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 300;
-  color: rgba(255,255,255,0.5); margin-top: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 300;
+  color: rgba(255,255,255,0.5); margin-top: 5px;
 }
 
 /* ── The phone ── */
@@ -11283,7 +11291,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
      always derived from it. The middle term is the width at which the box
      would stand 74vh tall, so the height cap is still honoured; whichever
      of the three is smallest wins, and the aspect is never in question. */
-  width: min(100%, calc(74vh * 941 / 1672), 420px);
+  width: min(100%, calc(86vh * 941 / 1672), 520px);
   aspect-ratio: 941 / 1672;      /* the render's own — never stretched */
   height: auto;
   flex: 0 0 auto;
@@ -11330,7 +11338,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
   background: transparent; border-radius: 0 !important;
   display: flex; flex-direction: column; justify-content: flex-start;
-  padding: 6px 4px; gap: 0;
+  padding: 6px 8px; gap: 0;
 }
 /* Centred by auto margins rather than justify-content: center, and that is
    not a style preference. In a scroll container, centring with
@@ -11360,11 +11368,22 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 #login .nm-auth-btn {
   background: #fff; border: 1px solid rgba(0,0,0,0.06);
   color: #0b0b0f; border-radius: 11px !important;
-  box-shadow: none; padding: 11px 9px; margin: 0;
-  font-size: 11.5px; gap: 7px; letter-spacing: -0.1px;
+  box-shadow: none; margin: 0;
+  /* app.css sets `height: 68px` on .nm-auth-btn — a hard height, not a
+     padding — so every padding written here was ignored and the pills
+     stood 68px tall no matter what. Height auto and a min-height of zero
+     are what actually shortens them; the padding then decides. The 44px
+     tap-target floor from app.css's `button, [onclick]` rule is what
+     min-height: 0 is overriding, and 38px is the deliberate trade. */
+  height: auto !important; min-height: 0 !important;
+  padding: 10px 12px;
+  font-size: 12.5px; gap: 9px; letter-spacing: -0.1px;
 }
-#login .nm-auth-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
-#login .nm-auth-btn + .nm-auth-btn { margin-top: 9px; }
+#login .nm-auth-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+/* .nm-btn-list is a flex column with gap:14px from app.css, so the gap is
+   what spaces these — a margin on the sibling would stack on top of it. */
+#login .nm-btn-list { gap: 9px; }
+#login .nm-auth-btn + .nm-auth-btn { margin-top: 0; }
 #login .nm-auth-btn:active { background: #e6e6ec; }
 #login .nm-divider { margin: 10px 0; }
 #login .nm-divider-line { background: rgba(255,255,255,0.14); }
@@ -11404,124 +11423,19 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 /* Short screens: the phone is height-driven now, so it shrinks on its own.
    What still needs help is the words above it, which do not. */
 @media (max-height: 720px) {
-  .lg-phone { width: min(100%, calc(70vh * 941 / 1672), 420px); }
-  .lg-head { padding: 0 0 10px; }
-  .lg-head .nm-auth-title { font-size: 26px; }
-  .lg-head .nm-auth-sub { font-size: 12px; margin-top: 5px; }
+  .lg-phone { width: min(100%, calc(78vh * 941 / 1672), 520px); }
+  .lg-head { padding: 0 16px 8px; }
+  .lg-head .nm-auth-title { font-size: 22px; margin-top: 4px; }
+  .lg-head .nm-auth-sub { font-size: 11.5px; margin-top: 3px; }
+  #login .nm-auth-btn { padding: 8px 11px; font-size: 11.5px; }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   THE NORMAL HOME'S PLAYER SECTION, ON THE LANDSCAPE TABLET
-
-   The card IS the screen. It is not sitting in a padded box that happens
-   to have a bezel drawn round it — it is absolutely positioned onto the
-   render's own aperture, so its edges are the screen's edges.
-
-   Absolute percentages rather than padding, and that is the reason: CSS
-   resolves percentage padding against the containing block's WIDTH on all
-   four sides, so a vertical bezel inset written as a padding percentage is
-   only ever an approximation of the render. top/bottom on a positioned box
-   resolve against the height, which is what the render actually needs.
-
-   Measured out of assets/frames/tab-landscape.webp — the file arrived with
-   its background already gone and its screen already transparent, so it is
-   used exactly as supplied (lossless WebP; every pixel with any alpha at
-   all is byte-identical to the PNG):
-
-     file       1536 x 1024
-     aperture   x 145-1389  -> left  145/1536 = 9.4401%
-                              right  146/1536 = 9.5052%
-                y 141-900   -> top   141/1024 = 13.7695%
-                              bottom 123/1024 = 12.0117%
-
-   The wrapper carries the file's aspect so the render is never stretched,
-   and the wrapper's own background stays transparent — the file has clear
-   margins outside the tablet's silhouette, and anything painted on the
-   wrapper would show through them as a rectangle behind the tablet.
-
-   THE CARD ITSELF IS UNCHANGED. An earlier pass relaid it for the landscape
-   shape — art down the left, words beside it, icon tile dropped — and that
-   was the wrong call: the ask was to put the section on the tablet, not to
-   redesign it. The arrangement here is exactly what it always was — the
-   eyebrow, the embossed icon tile, the word, the meaning, then Enter and
-   its arrow, straight down the box, with the art over the right-hand side.
-   Only the scale changes, because the screen is 184px tall and the section
-   was 277px and something has to give for it to fit at all. Every number
-   below is the original multiplied down; nothing moves and nothing is
-   dropped. Its neumorphic shell does come off — the tablet is the shell.
-   ══════════════════════════════════════════════════════════════════ */
-.nmh-practice-tab {
-  position: relative; width: 100%;
-  aspect-ratio: 1536 / 1024;      /* the file's own — never stretched */
-  background: transparent;
-}
+/* The landscape tablet that wrapped the Normal home's player section is
+   gone — the section is the plain card again, as it was. The render and
+   its .dev-tab-l variant are kept below with the other frames; nothing
+   wears it now. */
 .nwsb-inframe.dev-tab-l { padding: 0; background: transparent; }
 .nwsb-inframe.dev-tab-l::after { background-image: url('./assets/frames/tab-landscape.webp'); }
-
-/* #home-nm on the front of every one of these is not decoration. The card's
-   neumorphic shell is set by #home-nm:not(.nm-dark) .nmh-practice and by
-   #home-nm.nm-dark .nmh-practice — both ID-anchored, so a plain
-   .nmh-practice-tab > .nmh-practice loses to them even with !important, and
-   the shadow stayed on. The background is left to those rules on purpose:
-   it is the screen's colour, and it should still follow dark mode. */
-#home-nm .nmh-practice-tab > .nmh-practice {
-  position: absolute;
-  left: 9.4401%; right: 9.5052%; top: 13.7695%; bottom: 12.0117%;
-  width: auto !important; height: auto; margin: 0 !important;
-  border-radius: 0 !important;    /* the render's aperture has the corners */
-  box-shadow: none !important;    /* the tablet is the shell now */
-  overflow: hidden;
-  /* the original stack, in the original order */
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 14px 16px;                                    /* was 28px 26px 26px */
-}
-#home-nm .nmh-practice-tab > .nmh-practice:active { transform: none; box-shadow: none !important; }
-
-/* Where it always was — over the right-hand side, centred on the icon and
-   word. Only its cap changes: at the original 28% of a box this shape it
-   would stand taller than the screen. */
-#home-nm .nmh-practice-tab .nmh-practice-img {
-  width: 30%; max-width: 96px; max-height: 74%;
-  right: 2px; top: 44%;
-}
-
-#home-nm .nmh-practice-tab .nmh-practice-label {
-  font-size: 9px; letter-spacing: 2.4px; margin-bottom: 7px;   /* was 10 / 3 / 14 */
-}
-#home-nm .nmh-practice-tab .nmh-practice-icon {
-  width: 40px; height: 40px; border-radius: 13px !important;
-  margin-bottom: 9px;                                          /* was 60 / 18 / 18 */
-}
-#home-nm .nmh-practice-tab .nmh-practice-icon img { width: 23px; height: 23px; }
-#home-nm .nmh-practice-tab .nmh-practice-word {
-  font-size: 19px; margin-bottom: 4px;                         /* was 26 / 8 */
-}
-#home-nm .nmh-practice-tab .nmh-practice-meaning {
-  font-size: 11px; margin-bottom: 11px;                        /* was 13 / 22 */
-}
-#home-nm .nmh-practice-tab .nmh-practice-cta { font-size: 12px; }
-#home-nm .nmh-practice-tab .nmh-practice-arrow { width: 30px; height: 30px; }
-#home-nm .nmh-practice-tab .nmh-practice-arrow svg { width: 13px; height: 13px; }
-
-/* The page behind is #f0f2f7 and so is the card, so through the aperture
-   the screen read as a hole rather than a display. A shade of separation
-   is all it needs. Dark mode already has it — #16163c against #0c0c20 —
-   so this is the light surface only. */
-#home-nm:not(.nm-dark) .nmh-practice-tab > .nmh-practice {
-  background: linear-gradient(158deg, #f6f8fc 0%, #e7eaf2 100%);
-}
-
-@media (max-width: 380px) {
-  #home-nm .nmh-practice-tab > .nmh-practice { padding: 10px 12px; }
-  #home-nm .nmh-practice-tab .nmh-practice-label { margin-bottom: 5px; }
-  #home-nm .nmh-practice-tab .nmh-practice-icon {
-    width: 34px; height: 34px; margin-bottom: 6px;
-  }
-  #home-nm .nmh-practice-tab .nmh-practice-icon img { width: 19px; height: 19px; }
-  #home-nm .nmh-practice-tab .nmh-practice-word { font-size: 16.5px; }
-  #home-nm .nmh-practice-tab .nmh-practice-meaning { font-size: 10px; margin-bottom: 8px; }
-  #home-nm .nmh-practice-tab .nmh-practice-arrow { width: 27px; height: 27px; }
-}
 
 /* ══════════════════════════════════════════════════════════════════
    THE FOOTER CAROUSEL, INSIDE THE TABLET
