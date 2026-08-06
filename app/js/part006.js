@@ -94,7 +94,7 @@ async function mpLoad() {
   const body = document.getElementById('mpBody');
   if (!body) return;
 
-  body.innerHTML = '<div class="mp-loading"><video class="mp-loading-video" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4"></video><div class="mp-loading-text">Loading your journey…</div></div>';
+  body.innerHTML = '<div class="mp-loading"><video class="mp-loading-video" data-nwsb-auto muted loop playsinline preload="none" src="./assets/video/loading.mp4"></video><div class="mp-loading-text">Loading your journey…</div></div>';
 
   let userData = window._mpData;
   if (!userData && window._currentUid) {

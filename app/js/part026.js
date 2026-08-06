@@ -616,7 +616,7 @@ window.msConfirmMeaningRequest = function() {
    video instead, the same clip and the same class My Progress uses, so
    there is no ring left to square off. ── */
 var NWSB_LOADING_VID =
-  'https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4';
+  './assets/video/loading.mp4';
 
 window.nwsbProcessingOverlay = function (id, label) {
   var old = id && document.getElementById(id);
