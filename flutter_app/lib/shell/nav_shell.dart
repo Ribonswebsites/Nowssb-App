@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import '../screens/home_normal.dart';
+import '../screens/coming_soon.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
@@ -28,7 +29,19 @@ class _NavShellState extends State<NavShell> {
       backgroundColor: NwsbColors.surface,
       body: Stack(
         children: [
-          const HomeNormal(),
+          // IndexedStack rather than swapping the child: it keeps each tab's
+          // scroll position and state alive, which is what the website does
+          // (its screens are all in the DOM at once, one of them .active).
+          IndexedStack(
+            index: _i,
+            children: [
+              for (var i = 0; i < _tabs.length; i++)
+                if (i == 0)
+                  const HomeNormal()
+                else
+                  ComingSoon(title: _tabs[i].$1, icon: _tabs[i].$2),
+            ],
+          ),
           Positioned(
             left: 14,
             right: 14,

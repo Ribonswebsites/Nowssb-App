@@ -9,19 +9,24 @@ import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import '../widgets/neumorphic.dart';
 
+/// The website derives this from the hour in app/js/part026.js and the same
+/// three windows are used here, so the two never disagree.
+///
+/// Top-level, not a getter on HomeNormal. It was a getter, and _Greeting
+/// reached it by building its own `const HomeNormal()` — which also meant
+/// it read that throwaway's default name rather than the one passed in, so
+/// the greeting always said "Healer" no matter who was signed in.
+String nwsbGreeting([DateTime? at]) {
+  final h = (at ?? DateTime.now()).hour;
+  if (h < 12) return 'Good Morning';
+  if (h < 17) return 'Good Afternoon';
+  return 'Good Evening';
+}
+
 class HomeNormal extends StatelessWidget {
   const HomeNormal({super.key, this.name = 'Healer'});
 
   final String name;
-
-  /// The website derives this from the hour in app/js/part026.js and the
-  /// same three windows are used here, so the two never disagree.
-  String get _greeting {
-    final h = DateTime.now().hour;
-    if (h < 12) return 'Good Morning';
-    if (h < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,20 +40,20 @@ class HomeNormal extends StatelessWidget {
             NwsbSpace.pageX,
             96, // clear of the bottom nav
           ),
-          children: const [
-            _TopRow(),
-            SizedBox(height: 18),
-            _Greeting(),
-            SizedBox(height: NwsbSpace.gap),
-            _SearchBar(),
-            SizedBox(height: NwsbSpace.gap),
-            _StreakSection(),
-            SizedBox(height: NwsbSpace.gap),
-            _PracticeCard(),
-            SizedBox(height: NwsbSpace.gap),
-            _Tiles(),
-            SizedBox(height: NwsbSpace.gap),
-            _QuickRow(),
+          children: [
+            const _TopRow(),
+            const SizedBox(height: 18),
+            _Greeting(name: name),
+            const SizedBox(height: NwsbSpace.gap),
+            const _SearchBar(),
+            const SizedBox(height: NwsbSpace.gap),
+            const _StreakSection(),
+            const SizedBox(height: NwsbSpace.gap),
+            const _PracticeCard(),
+            const SizedBox(height: NwsbSpace.gap),
+            const _Tiles(),
+            const SizedBox(height: NwsbSpace.gap),
+            const _QuickRow(),
           ],
         ),
       ),
@@ -153,11 +158,12 @@ class _HeaderButton extends StatelessWidget {
 
 /// .nmh-greet-block — the orb, the hello, the name, the line under it.
 class _Greeting extends StatelessWidget {
-  const _Greeting();
+  const _Greeting({required this.name});
+
+  final String name;
 
   @override
   Widget build(BuildContext context) {
-    const home = HomeNormal();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -179,7 +185,7 @@ class _Greeting extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                home._greeting,
+                nwsbGreeting(),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
@@ -187,7 +193,7 @@ class _Greeting extends StatelessWidget {
                 ),
               ),
               Text(
-                home.name,
+                name,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: 4),

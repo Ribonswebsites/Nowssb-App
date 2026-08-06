@@ -36,5 +36,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/icons/
+  # No assets: block yet, and that is deliberate rather than an omission —
+  # a declared directory that does not exist fails `flutter pub get`
+  # outright. The 553 images and videos come in with the asset manifest
+  # (tools/asset-manifest.mjs), and this is where they get declared when
+  # they land.
