@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=658">
+<link rel="stylesheet" href="nowssb-nm.css?v=660">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -5930,7 +5930,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- ══ CART MAIN CONTENT ══ -->
-  <div id="cartMainContent" style="display:none; flex-direction:column; height:100%; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; position:relative;">
+  <div id="cartMainContent" class="nwsb-inframe dev-tv-l" style="display:none; flex-direction:column; height:100%; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; position:relative;">
 
   <!-- Top bar -->
   <div class="cwp-topbar">
@@ -5967,7 +5967,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- Body -->
-  <div class="cwp-body nwsb-inframe dev-tv-l" id="cartPageBody">
+  <div class="cwp-body" id="cartPageBody">
     <!-- rendered by JS -->
   </div>
 
@@ -6116,7 +6116,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- ══ WISHLIST FILTER VIEW (slides in from right) ══ -->
-  <div class="wish-filter-view" id="wishFilterView">
+  <div class="wish-filter-view nwsb-inframe dev-tv-l" id="wishFilterView">
     <!-- Top bar -->
     <div class="cwp-topbar">
       <div class="cwp-back" onclick="wishCloseFilter();closeSub('wishlist')">
@@ -6140,7 +6140,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Body -->
-    <div class="cwp-body nwsb-inframe dev-tv-l" id="wishPageBody">
+    <div class="cwp-body" id="wishPageBody">
       <!-- rendered by JS -->
     </div>
   </div>
@@ -6186,7 +6186,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- ══ ORDERS MAIN CONTENT ══ -->
-  <div id="ordersMainContent" style="display:none; flex-direction:column; height:100%; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; position:relative;">
+  <div id="ordersMainContent" class="nwsb-inframe dev-tv-l" style="display:none; flex-direction:column; height:100%; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; position:relative;">
   <!-- Top bar -->
   <div class="cwp-topbar">
     <div class="cwp-back" onclick="closeSub('orders')">
@@ -6210,7 +6210,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- Body -->
-  <div class="cwp-body nwsb-inframe dev-tv-l" id="ordersPageBody">
+  <div class="cwp-body" id="ordersPageBody">
     <!-- rendered by JS -->
   </div>
   </div><!-- /ordersMainContent -->

@@ -11170,12 +11170,59 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 }
 .nwsb-inframe.dev-tv-p::after { background-image: url('./assets/frames/tv-portrait.webp'); }
 
-/* ── The landscape TV — Cart, Orders and Wishlist ── */
+/* ── The landscape TV — Cart, Orders and Wishlist ──
+   Three slices, not one image, and that is the whole trick.
+
+   Every other frame in this file is one render stretched to its box with
+   background-size: 100% 100%. That works when the box is roughly the
+   render's shape. These are not: a cart page is 412 wide and as tall as
+   its list, and a TV is 1.78:1 — so the single stretched render squashed
+   to a 1.10 aspect, the bezel went thin and wide and the feet were
+   crushed flat. It was also only over .cwp-body, so the header and the
+   checkout bar sat outside the TV entirely.
+
+   The render is now cut into three along its own natural seams:
+
+   The cut render is first trimmed to the TV's own silhouette — x 65-1607,
+   y 128-894 of the 1672x941 original — because outside that it is all
+   transparent margin, and margin inside the box is dead space the page
+   pays for in every direction. Trimmed it is 1543x767, and the seams are:
+
+     tv-l-top     rows 0-30     the top bezel, with the wordmark on it
+     tv-l-mid     rows 172-179  one slice of the band that is identical
+                                all the way down — white rail, screen,
+                                white rail — repeated the height of the box
+     tv-l-bottom  rows 649-766  the bottom bezel and the feet
+
+   Caps at top and bottom, rail tiled between. Every slice is scaled by
+   the same factor (100% of the width), so the bezel keeps its true
+   thickness and the feet their true shape no matter how tall the page
+   gets. The rails repeat rather than stretch, which they can because that
+   band has no vertical detail — checked down its whole length.
+
+   The black is gone from the render: transparent outside the TV so the
+   page shows around it, and transparent across the screen so the content
+   shows through. Cut by flooding in from the border rather than by
+   threshold alone, so the black wordmark ON the white bezel survives —
+   a plain threshold would have punched it out.
+
+   The padding is the bezel, and every side is a fraction of the WIDTH —
+   which is what CSS percentage padding already means on all four sides,
+   so for once that quirk is exactly right. Off the trimmed render: the
+   screen sits at x 27-1516 and y 31-648 of 1543x767, so 31/1543,
+   26/1543, 118/1543, 27/1543. */
 .nwsb-inframe.dev-tv-l {
-  padding: 5.4% 3.2% 16%;
-  background-color: #05070d;
+  padding: 2.009% 1.685% 7.647% 1.750%;
+  background-color: transparent;
 }
-.nwsb-inframe.dev-tv-l::after { background-image: url('./assets/frames/tv-landscape.webp'); }
+.nwsb-inframe.dev-tv-l::after {
+  background-image: url('./assets/frames/tv-l-top.webp'),
+                    url('./assets/frames/tv-l-bottom.webp'),
+                    url('./assets/frames/tv-l-mid.webp');
+  background-position: top center, bottom center, top center;
+  background-size: 100% auto, 100% auto, 100% 8px;
+  background-repeat: no-repeat, no-repeat, repeat-y;
+}
 
 /* ── The tablet — the Player ── */
 .nwsb-inframe.dev-tab {
