@@ -13,12 +13,14 @@
 
 name: Flutter APK
 
+# No `paths:` filter. There was one — flutter_app/** — and the workflow was
+# registered but never fired on the push that added it, while android-apk.yml,
+# which has no such filter, ran from the same kind of push minutes earlier.
+# Rather than keep guessing at the filter, it runs on every push to main. A
+# few spare runner minutes is a cheaper problem than a build you cannot get.
 on:
   push:
     branches: [main]
-    paths:
-      - 'flutter_app/**'
-      - '.github/workflows/flutter-apk.yml'
   workflow_dispatch:
 
 defaults:
