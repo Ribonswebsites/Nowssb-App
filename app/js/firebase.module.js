@@ -161,8 +161,19 @@ onAuthStateChanged(auth, async user => {
         var _minWait = Math.max(0, (_resumeFresh ? 150 : 1500) - _elapsed);
         setTimeout(function() {
           if (currentScreen !== 'splash') return;
-          window._splashDone = true;
-          _doNavigate(window._splashRoute);
+          /* Wait for the start animation before leaving. This is the path a
+             SIGNED-IN user takes, and it used to navigate after _minWait
+             (1500ms) regardless — which is why the clip was cut off for
+             everyone with an account and played in full only for those
+             without one. nwsbSplashWait calls straight back when the start
+             animation is an image, so that case is unchanged. */
+          var go = function () {
+            if (currentScreen !== 'splash') return;
+            window._splashDone = true;
+            _doNavigate(window._splashRoute);
+          };
+          if (typeof window.nwsbSplashWait === 'function') window.nwsbSplashWait(go);
+          else go();
         }, _minWait);
       }
       return;

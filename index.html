@@ -106,10 +106,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- Runs before the deferred module below, so the login buttons are never
      dead while the Firebase SDK is still on its way. -->
 <script src="app/js/part079.js?v=3"></script><!-- ══ AUTH BUTTON GUARD ══ -->
-<script type="module" src="app/js/firebase.module.js?v=263"></script>
+<script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=680">
+<link rel="stylesheet" href="nowssb-nm.css?v=681">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -189,6 +189,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     var vid = document.getElementById('splashVid');
     var img = document.querySelector('#splash .splash-bg-image');
     if (mode === 'clip') {
+      /* A second of black before anything moves. The splash's own background
+         is #f5f5f5, so it needs saying rather than assuming. */
+      var splashEl = document.getElementById('splash');
+      if (splashEl) splashEl.classList.add('splash-clip');
       if (vid) {
         vid.src = VID;
         vid.classList.add('on');
@@ -204,7 +208,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         });
 
         /* The splash waits for this to finish rather than for a timer.
-           part012.js reads both of these. */
+           part012.js and firebase.module.js both wait on nwsbSplashWait(). */
         window._splashHoldForClip = true;
         vid.addEventListener('ended', function () { window._splashClipDone = true; });
         /* If the clip cannot play at all — no codec, a bad file — nothing
@@ -222,17 +226,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           document.removeEventListener('touchstart', unmuteOnGesture);
           document.removeEventListener('click', unmuteOnGesture);
         };
-        vid.muted = false;
-        var p = null;
-        try { p = vid.play(); } catch (e) {}
-        if (p && p.catch) {
-          p.catch(function () {
-            vid.muted = true;
-            try { vid.play().catch(function () { window._splashClipDone = true; }); } catch (e) {}
-            document.addEventListener('touchstart', unmuteOnGesture, { once: true, passive: true });
-            document.addEventListener('click', unmuteOnGesture, { once: true });
-          });
-        }
+        ['touchstart', 'pointerdown', 'click', 'keydown'].forEach(function (ev) {
+          document.addEventListener(ev, unmuteOnGesture, { once: true, passive: true });
+        });
+
+        var startIt = function () {
+          vid.classList.add('vis');
+          vid.muted = false;
+          var p = null;
+          try { p = vid.play(); } catch (e) {}
+          if (p && p.catch) {
+            p.catch(function () {
+              /* Refused because it is not muted — the usual policy. Muted
+                 always plays, and the listeners above turn the sound on the
+                 moment anything is touched. */
+              vid.muted = true;
+              try { vid.play().catch(function () { window._splashClipDone = true; }); }
+              catch (e) { window._splashClipDone = true; }
+            });
+          }
+        };
+        setTimeout(startIt, 1000);
       }
       if (img) img.style.backgroundImage = 'none';
     } else if (img) {
@@ -240,6 +254,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     }
     window.NWSB_SPLASH_ART = ART;
     window.NWSB_SPLASH_VIDEO = VID;
+
+    /* THE GATE. Every path that leaves the splash calls this instead of
+       navigating straight away, so there is one answer to "is the start
+       animation finished" rather than one per caller.
+
+       It was one per caller, and that is why the clip kept getting cut off:
+       part012.js's fallback waited, but firebase.module.js navigates a
+       signed-in user after 1500ms and knew nothing about the clip — so the
+       only people who saw the whole thing were the ones who were not logged
+       in. Both wait on this now.
+
+       When the start animation is an image, _splashHoldForClip is never set
+       and this calls back immediately, so nothing about that path changes. */
+    window.nwsbSplashWait = function (cb) {
+      var CEILING = 15000, t0 = Date.now();
+      (function tick() {
+        if (!window._splashHoldForClip || window._splashClipDone) return cb();
+        if (Date.now() - t0 > CEILING) return cb();
+        setTimeout(tick, 120);
+      })();
+    };
   })();
   </script>
   <div class="splash-bottom">
@@ -4334,7 +4369,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=249"></script>
+<script src="app/js/part012.js?v=250"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">

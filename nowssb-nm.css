@@ -12211,3 +12211,9 @@ body[class] #sub-sound-library .sl-upgrade-btn {
   display: none; background: #060c18;
 }
 .splash-bg-video.on { display: block; }
+
+/* The second of black before the start clip moves. app.css gives #splash a
+   #f5f5f5 ground, so this has to be said rather than assumed. */
+#splash.splash-clip { background: #000 !important; }
+.splash-bg-video { opacity: 0; transition: opacity 0.45s ease; }
+.splash-bg-video.vis { opacity: 1; }

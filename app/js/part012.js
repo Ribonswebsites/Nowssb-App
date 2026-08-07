@@ -264,16 +264,17 @@ function goTo(id) {
 // fires `ended`), and there is a hard ceiling below, so a clip that cannot
 // play cannot strand anyone on the start screen.
 setTimeout(function () {
-  var CEILING = 14000;   // from first paint; the clip is ~5s at 2x
-  var started = Date.now();
-  (function tick() {
+  var go = function () {
     if (currentScreen !== 'splash') return;
-    var holding = window._splashHoldForClip && !window._splashClipDone;
-    if (holding && Date.now() - started < CEILING) { setTimeout(tick, 200); return; }
     window._splashDone = true;
     if (typeof _doNavigate === 'function') _doNavigate(window._splashRoute || 'home');
     else goTo(window._splashRoute || 'login');
-  })();
+  };
+  if (currentScreen !== 'splash') return;
+  // The gate lives in index.html beside the splash and carries its own
+  // ceiling, so a clip that cannot play never strands anyone.
+  if (typeof window.nwsbSplashWait === 'function') window.nwsbSplashWait(go);
+  else go();
 }, 5000);
 
 // ══════════════════════════════════════════════════════════════════
