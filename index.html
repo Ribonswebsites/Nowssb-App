@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=687">
+<link rel="stylesheet" href="nowssb-nm.css?v=689">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -1360,41 +1360,70 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
 
 
-    <!-- Cart, Wishlist and Order, on the television.
-         .nmh-quick-tv IS the frame — the bezel is its padding and the black
-         screen is its content box — and the row inside it is what sits on
-         the screen.
-         The wrapper is what app/js/part062.js registers, NOT the row: that
-         registry matches ':scope > sel', a direct child of the home wrap,
-         so registering the row while it lives inside this frame would find
-         nothing and strand the whole section at the top of the page. That
-         is what happened the first time. -->
-    <div class="nmh-quick-tv nwsb-inframe dev-tv-l">
-    <div class="nmh-quick-row">
-      <div class="nmh-quick-btn" onclick="openSub('cart')">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <path d="M3 3h1.5l2.5 7h9l2-5H7" stroke="#c8a96e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="9" cy="18.5" r="1.5" fill="#c8a96e"/>
-          <circle cx="16" cy="18.5" r="1.5" fill="#c8a96e"/>
-        </svg>
-        <span>Cart</span>
+    <!-- Cart, Wishlist and Order — a heading, the television, a black banner.
+         .qa-tv-block is what app/js/part062.js registers, NOT anything
+         inside it: that registry matches ':scope > sel', a DIRECT child of
+         the home wrap, so registering a nested element would find nothing
+         and strand the whole section at the top of the page. -->
+    <div class="qa-tv-block">
+      <div class="qa-tv-head">
+        <span class="qa-tv-eyebrow">NowssB · Yours</span>
+        <div class="qa-tv-title">Everything You Own, On One Screen</div>
       </div>
-      <div class="nmh-quick-btn" onclick="openSub('wishlist')">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <path d="M11 18S4 13 4 8.5A4.5 4.5 0 0111 5a4.5 4.5 0 017 3.5C18 13 11 18 11 18z" stroke="#c8a96e" stroke-width="1.6" fill="rgba(200,169,110,0.1)"/>
-        </svg>
-        <span>Wishlist</span>
+      <!-- .nmh-quick-tv IS the frame: the bezel is its padding and the
+           aperture is its content box. .qa-tv-screen fills that content box
+           exactly, which is what puts the clip and the buttons inside the
+           glass with square corners and no gap. -->
+      <div class="nmh-quick-tv nwsb-inframe dev-tv-l">
+        <div class="qa-tv-screen">
+          <video class="qa-tv-vid" data-nwsb-auto muted loop playsinline
+                 preload="none" aria-hidden="true" tabindex="-1"
+                 poster="./assets/video/tv-screen-poster.webp?v=1"
+                 src="./assets/video/tv-screen.mp4?v=1"></video>
+          <div class="nmh-quick-row">
+            <div class="nmh-quick-btn" onclick="openSub('cart')">
+              <svg width="24" height="24" viewBox="0 0 22 22" fill="none">
+                <path d="M3 3h1.5l2.5 7h9l2-5H7" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="9" cy="18.5" r="1.5" fill="#fff"/>
+                <circle cx="16" cy="18.5" r="1.5" fill="#fff"/>
+              </svg>
+              <span>Cart</span>
+            </div>
+            <div class="nmh-quick-btn" onclick="openSub('wishlist')">
+              <svg width="24" height="24" viewBox="0 0 22 22" fill="none">
+                <path d="M11 18S4 13 4 8.5A4.5 4.5 0 0111 5a4.5 4.5 0 017 3.5C18 13 11 18 11 18z" stroke="#fff" stroke-width="1.6" fill="rgba(255,255,255,0.1)"/>
+              </svg>
+              <span>Wishlist</span>
+            </div>
+            <div class="nmh-quick-btn" onclick="openSub('orders')">
+              <svg width="24" height="24" viewBox="0 0 22 22" fill="none">
+                <path d="M4 6.5h14v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 17.5z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M7.5 6.5V5a3.5 3.5 0 0 1 7 0v1.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M8 11.5h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span>Order</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="nmh-quick-btn" onclick="openSub('orders')">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <path d="M4 6.5h14v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 17.5z" stroke="#c8a96e" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M7.5 6.5V5a3.5 3.5 0 0 1 7 0v1.5" stroke="#c8a96e" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M8 11.5h6" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        <span>Order</span>
+      <div class="qa-tv-banner" onclick="openSub('cart')">
+        <div class="qa-tv-banner-ico">
+          <svg viewBox="0 0 22 22" fill="none">
+            <path d="M3 3h1.5l2.5 7h9l2-5H7" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3"/>
+            <circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3"/>
+          </svg>
+        </div>
+        <div class="qa-tv-banner-divider"></div>
+        <div class="qa-tv-banner-txt">
+          <div class="qa-tv-banner-title">Your Cart &amp; Orders</div>
+          <div class="qa-tv-banner-sub">Everything saved, bought and on its way</div>
+        </div>
+        <div class="qa-tv-banner-arrow">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
       </div>
-    </div>
-    </div><!-- /nmh-quick-tv -->
+    </div><!-- /qa-tv-block -->
 
     <!-- Section label — black banner -->
     <!-- Today's Trending: its black banner, its clip and the Shop Now
@@ -2038,76 +2067,73 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- ══ STORE QUICK-ACCESS: LOGO + 2×2 GRID ══ -->
 
 
-  <div id="fashCubeSec" style="margin-top:28px;margin-bottom:20px;width:100%;">
-  <div class="home-cw-cube-wrap">
-
-    <img decoding="async" class="home-cw-cube-img" src="https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_1000/v1778922166/grok_image_1778922009415_qtoteo.jpg" alt="" loading="eager" draggable="false">
-    <div class="home-cw-logo-overlay">
-      <div class="home-cw-logo-box">
-        <img loading="eager" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt="NowssB Store">
-      </div>
-    </div>
-
-    <!-- Cycling caption in the white case interior (one line at a time) -->
-    <div class="cwc">
-      <div class="cwc-eyebrow">NOWSSB · YOURS</div>
-      <div class="cwc-line" id="cwcLine"><span class="cwc-b">Your fashion</span> <span class="cwc-g">drops</span></div>
-    </div>
-
-
-    <div class="home-cw-grid">
-
-        <!-- Row 1: Your Orders + Order History -->
-        <div class="home-cw-row">
-          <div class="home-cw-btn home-cw-orders" onclick="openSub('orders')">
-            <div class="home-cw-btn-bg"></div>
-            <div class="home-cw-btn-vignette"></div>
-            <div class="home-cw-btn-icon">
-              <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/c8ede950-56cf-11f1-8fad-095787cce754_lhp24x.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt="">
+  <!-- ══ STORE QUICK-ACCESS ══
+       The rotating cube and its 2x2 Order/History/Cart/Wishlist grid are
+       gone; this is the same television block the Normal home has. On this
+       home only it sits in a glass wrapper, like every other Fashion
+       section. #fashCubeSec keeps its id because that is what the layout
+       registry matches. -->
+  <div id="fashCubeSec" class="glass-wrap fash-qa-wrap">
+    <div class="qa-tv-block">
+        <div class="qa-tv-head">
+          <span class="qa-tv-eyebrow">NowssB · Yours</span>
+          <div class="qa-tv-title">Everything You Own, On One Screen</div>
+        </div>
+        <!-- .nmh-quick-tv IS the frame: the bezel is its padding and the
+             aperture is its content box. .qa-tv-screen fills that content box
+             exactly, which is what puts the clip and the buttons inside the
+             glass with square corners and no gap. -->
+        <div class="nmh-quick-tv nwsb-inframe dev-tv-l">
+          <div class="qa-tv-screen">
+            <video class="qa-tv-vid" data-nwsb-auto muted loop playsinline
+                   preload="none" aria-hidden="true" tabindex="-1"
+                   poster="./assets/video/tv-screen-poster.webp?v=1"
+                   src="./assets/video/tv-screen.mp4?v=1"></video>
+            <div class="nmh-quick-row">
+              <div class="nmh-quick-btn" onclick="openSub('cart')">
+                <svg width="24" height="24" viewBox="0 0 22 22" fill="none">
+                  <path d="M3 3h1.5l2.5 7h9l2-5H7" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="9" cy="18.5" r="1.5" fill="#fff"/>
+                  <circle cx="16" cy="18.5" r="1.5" fill="#fff"/>
+                </svg>
+                <span>Cart</span>
+              </div>
+              <div class="nmh-quick-btn" onclick="openSub('wishlist')">
+                <svg width="24" height="24" viewBox="0 0 22 22" fill="none">
+                  <path d="M11 18S4 13 4 8.5A4.5 4.5 0 0111 5a4.5 4.5 0 017 3.5C18 13 11 18 11 18z" stroke="#fff" stroke-width="1.6" fill="rgba(255,255,255,0.1)"/>
+                </svg>
+                <span>Wishlist</span>
+              </div>
+              <div class="nmh-quick-btn" onclick="openSub('orders')">
+                <svg width="24" height="24" viewBox="0 0 22 22" fill="none">
+                  <path d="M4 6.5h14v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 17.5z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+                  <path d="M7.5 6.5V5a3.5 3.5 0 0 1 7 0v1.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                  <path d="M8 11.5h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>Order</span>
+              </div>
             </div>
-            <div class="home-cw-btn-label">Order</div>
-            <div class="home-cw-btn-sub" id="homeCwOrdersSub">Purchases</div>
-          </div>
-          <div class="home-cw-btn home-cw-history" onclick="openSub('order-history')">
-            <div class="home-cw-btn-bg"></div>
-            <div class="home-cw-btn-vignette"></div>
-            <div class="home-cw-btn-icon">
-              <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/112b2180-56d8-11f1-8fad-095787cce754_c3lk6m.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt="">
-            </div>
-            <div class="home-cw-btn-label">History</div>
-            <div class="home-cw-btn-sub">All time</div>
           </div>
         </div>
-
-        <!-- Row 2: Cart + Wishlist -->
-        <div class="home-cw-row">
-          <div class="home-cw-btn home-cw-cart" onclick="openSub('cart')">
-            <div class="home-cw-btn-bg"></div>
-            <div class="home-cw-btn-vignette"></div>
-            <div class="home-cw-btn-icon">
-              <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt="">
-              <div class="home-cw-btn-badge" id="homeCwCartBadge">0</div>
-            </div>
-            <div class="home-cw-btn-label">Cart</div>
-            <div class="home-cw-btn-sub" id="homeCwCartSub">0 items</div>
+        <div class="qa-tv-banner" onclick="openSub('cart')">
+          <div class="qa-tv-banner-ico">
+            <svg viewBox="0 0 22 22" fill="none">
+              <path d="M3 3h1.5l2.5 7h9l2-5H7" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3"/>
+              <circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3"/>
+            </svg>
           </div>
-          <div class="home-cw-btn home-cw-wish" onclick="openSub('wishlist')">
-            <div class="home-cw-btn-bg"></div>
-            <div class="home-cw-btn-vignette"></div>
-            <div class="home-cw-btn-icon">
-              <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png" style="width:28px;height:28px;object-fit:contain;display:block;" alt="">
-              <div class="home-cw-btn-badge" id="homeCwWishBadge">0</div>
-            </div>
-            <div class="home-cw-btn-label">Wishlist</div>
-            <div class="home-cw-btn-sub" id="homeCwWishSub">0 saved</div>
+          <div class="qa-tv-banner-divider"></div>
+          <div class="qa-tv-banner-txt">
+            <div class="qa-tv-banner-title">Your Cart &amp; Orders</div>
+            <div class="qa-tv-banner-sub">Everything saved, bought and on its way</div>
+          </div>
+          <div class="qa-tv-banner-arrow">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </div>
-
-    </div><!-- /home-cw-grid -->
-
-  </div><!-- /home-cw-cube-wrap -->
-  </div><!-- /Store Quick-Access -->
-  <!-- /Store Quick-Access -->
+    </div><!-- /qa-tv-block -->
+  </div><!-- /fashCubeSec -->
 
   <!-- Shabdapathy Foundations and its black banner, in one wrapper. -->
   <div class="glass-wrap fash-shabda-wrap">
@@ -10166,7 +10192,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=293"></script>
+<script src="app/js/part049.js?v=294"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="app/js/part051.js?v=14" defer></script>
 <script src="app/js/part052.js?v=3"></script>
@@ -10177,7 +10203,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=12"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=31"></script>
+<script src="app/js/part062.js?v=32"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>

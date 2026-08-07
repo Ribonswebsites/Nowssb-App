@@ -62,12 +62,12 @@
         { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc' },
         { k:'connect',  sel:['.vb-banner[data-vb="vb4"]', '.nmh-connect-sec'],                                          t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'feed',     sel:['#ncbCarouselNm'],                                            t:S, label:'Community Carousel',    sub:'Swipeable feed cards' },
-        /* The FRAME, not the row. The row lives inside .nmh-quick-tv now,
-           and this registry matches ':scope > sel' — a direct child of the
-           wrap — so pointing it at the row would find nothing and strand
-           the section at the top of the page, which is exactly what
-           happened the first time the television went on. */
-        { k:'quickrow', sel:['.nmh-quick-tv'],                                             t:S, label:'Quick Row',             sub:'Cart · Wishlist · Order' },
+        /* The BLOCK, not the frame or the row inside it: this registry
+           matches ':scope > sel', a DIRECT child of the wrap. Pointing it
+           at anything nested finds nothing and strands the section at the
+           top of the page — which is what happened the first time the
+           television went on. */
+        { k:'quickrow', sel:['.qa-tv-block'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
         { k:'trendshop',sel:['.nmh-trend-shop-wrap'],                                     t:S, label:'Trending Shop',         sub:'The clip and the Shop Now banner' },
         { k:'subvid',   sel:['.nmh-video-banner.nmh-vb-tall'],                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
         { k:'edition',  sel:['.nmh-fsec'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
@@ -110,7 +110,7 @@
         { k:'edition',  sel:['#sub-promo-card'],                                           t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'routines', sel:['.fash-routines-wrap'],                                       t:S, label:'My Routines',          sub:'Daily practice system' },
         { k:'offer',    sel:['.fash-offer-wrap'],                                          t:S, label:"Today's Offer",         sub:'Coupon art and the offer banner' },
-        { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Your Fashion Drops',    sub:'The rotating cube section' },
+        { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science' },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },

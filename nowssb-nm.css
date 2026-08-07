@@ -11379,13 +11379,32 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
+/* The two caps only. The middle slice is NOT here any more — see ::before.
+   Tiled on this layer it repeated over the element's whole height, and
+   since the slice is "white rail, transparent, white rail", those rails
+   carried on down PAST the bottom bezel and boxed the stand in. Together
+   with the bezel bar above them that read as a rectangle drawn around the
+   feet, which is the line that was showing under the television. */
 .nwsb-inframe.dev-tv-l::after {
   background-image: url('./assets/frames/tv-l-top.webp'),
-                    url('./assets/frames/tv-l-bottom.webp'),
-                    url('./assets/frames/tv-l-mid.webp');
-  background-position: top center, bottom center, top center;
-  background-size: 100% auto, 100% auto, 100% 8px;
-  background-repeat: no-repeat, no-repeat, repeat-y;
+                    url('./assets/frames/tv-l-bottom.webp');
+  background-position: top center, bottom center;
+  background-size: 100% auto, 100% auto;
+  background-repeat: no-repeat, no-repeat;
+}
+/* The side rails, tiled — and stopped at the top of the bottom bezel.
+   14.922% is 124/831: the bottom slice's height as a fraction of the
+   trimmed render's height, which is this box's height because
+   .nmh-quick-tv carries that same aspect-ratio. A percentage `bottom` on a
+   positioned box resolves against HEIGHT, so a fraction of the height is
+   the one number that is exact here — the 8.540% used for the padding is a
+   fraction of the WIDTH, which is what percentage padding means, and the
+   two are only interchangeable because the aspect is fixed. */
+.nwsb-inframe.dev-tv-l::before {
+  content: '';
+  position: absolute; left: 0; right: 0; top: 0; bottom: 14.922%;
+  z-index: 19; pointer-events: none;
+  background: url('./assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
 }
 
 /* ── The tall tablet — the footer ──
@@ -12528,3 +12547,108 @@ body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] {
 #home-nm .nmh-quick-tv .nmh-quick-btn + .nmh-quick-btn {
   box-shadow: inset 1px 0 0 rgba(255,255,255,0.10) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   QUICK ACCESS — a heading, the television, a black banner
+   One block, .qa-tv-block, on both homes. On the Fashion home it sits in a
+   glass wrapper (#fashCubeSec.glass-wrap); the Normal home keeps its
+   sections loose in the column the way it always has.
+═══════════════════════════════════════════════════════════════ */
+.qa-tv-block { width: 100%; }
+
+/* ── The heading above ── */
+.qa-tv-head { padding: 0 2px 12px; }
+.qa-tv-eyebrow {
+  display: block;
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 800;
+  letter-spacing: 2.6px; text-transform: uppercase;
+  color: #c8a96e; margin-bottom: 6px;
+}
+.qa-tv-title {
+  font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800;
+  letter-spacing: -0.3px; line-height: 1.2; color: #1a1a2e;
+}
+#home .qa-tv-title { color: #fff; }
+#home .qa-tv-eyebrow { color: #e8d5a3; }
+body.nm-night .qa-tv-title { color: #fff; }
+
+/* ── The screen ──
+   .nmh-quick-tv's content box IS the aperture (its padding is the bezel),
+   so a child at 100%/100% fills the glass exactly — no inset numbers to
+   keep in step with the padding, and no rounded corners, because a
+   television screen does not have any. The clip sits under the buttons. */
+.qa-tv-screen {
+  position: relative; width: 100%; height: 100%;
+  overflow: hidden; border-radius: 0 !important;
+  background: #000;
+}
+.qa-tv-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  border-radius: 0 !important;
+}
+#home-nm .qa-tv-screen .nmh-quick-row,
+#home .qa-tv-screen .nmh-quick-row {
+  position: relative; z-index: 1;
+  height: 100%; gap: 0; margin: 0; padding: 0;
+  border-radius: 0 !important;
+  background: transparent !important; box-shadow: none !important; border: none !important;
+}
+
+/* ── The three buttons ── */
+#home-nm .qa-tv-screen .nmh-quick-btn,
+#home .qa-tv-screen .nmh-quick-btn {
+  flex: 1 1 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+}
+/* A real rule between them rather than an inset shadow, so it reads as a
+   line on the glass at any size. */
+#home-nm .qa-tv-screen .nmh-quick-btn + .nmh-quick-btn,
+#home .qa-tv-screen .nmh-quick-btn + .nmh-quick-btn {
+  border-left: 1px solid rgba(255,255,255,0.22) !important;
+}
+#home-nm .qa-tv-screen .nmh-quick-btn span,
+#home .qa-tv-screen .nmh-quick-btn span {
+  color: #fff !important;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: .2px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.55);
+}
+#home-nm .qa-tv-screen .nmh-quick-btn svg,
+#home .qa-tv-screen .nmh-quick-btn svg {
+  filter: drop-shadow(0 1px 6px rgba(0,0,0,0.6));
+}
+#home-nm .qa-tv-screen .nmh-quick-btn:active,
+#home .qa-tv-screen .nmh-quick-btn:active {
+  background: rgba(255,255,255,0.07) !important;
+  box-shadow: none !important; transform: none;
+}
+
+/* ── The black banner below ── */
+.qa-tv-banner {
+  display: flex; align-items: center; gap: 14px;
+  width: 100%; margin-top: 12px; padding: 14px 16px;
+  background: #000; border-radius: 16px !important;
+  cursor: pointer;
+}
+.qa-tv-banner:active { opacity: .88; }
+.qa-tv-banner-ico { width: 34px; height: 34px; flex-shrink: 0; }
+.qa-tv-banner-ico svg { width: 100%; height: 100%; display: block; }
+.qa-tv-banner-divider { width: 1px; height: 40px; flex-shrink: 0; background: rgba(255,255,255,0.15); }
+.qa-tv-banner-txt { flex: 1; min-width: 0; }
+.qa-tv-banner-title {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800;
+  color: #fff; letter-spacing: .2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.qa-tv-banner-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 400;
+  color: rgba(255,255,255,0.55); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.qa-tv-banner-arrow { width: 22px; height: 22px; flex-shrink: 0; }
+.qa-tv-banner-arrow svg { width: 100%; height: 100%; display: block; }
