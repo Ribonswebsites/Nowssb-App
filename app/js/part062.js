@@ -48,7 +48,7 @@
         { k:'herovid',  sel:['.nmh-hero-vid'],                                             t:B, label:'Hero Video',            sub:'Video banner above the streak' },
         { k:'streak',   sel:['.nmh-streak-section'],                                       t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc' },
-        { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1 },
+        { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
         { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner' },
@@ -183,6 +183,33 @@
       nodesOf(wrap, s.item).forEach(function (n) {
         n.classList.toggle('hl-off', !!s.hide);
         wrap.appendChild(n);
+      });
+    });
+
+    /* ── pinned pairs ──────────────────────────────────────────────
+       An item carrying `after` sits directly below that item's section
+       WHEREVER it ends up, rather than at a fixed slot in the registry.
+
+       The slot model above cannot express that. `locked` anchors an item
+       to an INDEX among the slots — so Today's Practice held position six
+       and whatever the reader's saved order happened to drop into slot
+       five landed between it and the streak. That is how the Reader ended
+       up sitting between them: not a bug in the order, a bug in what the
+       order can say.
+
+       This runs last, after everything is placed, so it only has to move
+       the pinned node — and it re-reads the anchor from the DOM rather
+       than from the sequence, which means it is correct even if something
+       else moved the anchor after the fact. */
+    reg.items.forEach(function (it) {
+      if (!it.after) return;
+      var anchors = nodesOf(wrap, itemOf(which, it.after));
+      if (!anchors.length) return;
+      var ref = anchors[anchors.length - 1];   // below the anchor's LAST node
+      nodesOf(wrap, it).forEach(function (n) {
+        if (n === ref || !ref.parentNode) return;
+        ref.parentNode.insertBefore(n, ref.nextSibling);
+        ref = n;   // keep a multi-node section in its own order
       });
     });
   }
