@@ -112,8 +112,7 @@
      sees and it should not be arriving over the network while they wait. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || [])
     .concat(['./assets/video/subscription-a.mp4',
-             './assets/video/login-phone.mp4',
-             './assets/video/words-science.mp4']);
+             './assets/video/login-phone.mp4']);
 
   var SWAP = [
     /* Two clips now, picked per launch — the banner that has always been

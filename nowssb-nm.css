@@ -5773,47 +5773,6 @@ body.fashtile-classic .home-tile-enter-go svg path { stroke: #e8d5a3 !important;
   display: none; position: absolute; inset: 0; z-index: 0;
   background-size: cover; background-repeat: no-repeat;
 }
-/* ── The one tile with a clip: Word Science ──
-   .nmh-tile-cover is the artwork layer every art tile draws, at z-index 0
-   under the scrim. This sits in the same place and does the same job, so
-   the title, the sub and the round icon over it need no special casing.
-
-   Its own scrim is turned back on beside it — .nmh-tile-photo-scrim ships
-   display:none because the photo layer it belongs to is dormant, and
-   without it white type would sit on the bright part of the footage. */
-.nmh-tile-vid {
-  position: absolute; inset: 0; z-index: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;            /* a 16:9 clip in a near-square tile */
-  display: block;
-  pointer-events: none;
-}
-/* .nmh-tile-vidart is a class on the tile, not :has() on the clip, and that
-   is deliberate. The type on this tile has to turn white to survive on top
-   of footage, and if the selector that does it ever failed the title would
-   be invisible rather than merely plain — dark ink on a dark clip. A class
-   in the markup cannot fail that way.
-
-   The scrim comes back on: .nmh-tile-photo-scrim ships display:none because
-   the photo layer it belongs to is dormant, and without it white type would
-   sit on the bright part of the footage. The brightness is the second half
-   of the same job — the clip has white highlights that a gradient alone
-   does not tame. */
-.nmh-tile-vidart > .nmh-tile-photo-scrim { display: block; z-index: 1; }
-.nmh-tile-vid { filter: brightness(0.6); }
-.nmh-tile-vidart .nmh-tile-txt,
-.nmh-tile-vidart .nmh-tile-rule,
-.nmh-tile-vidart .nmh-tile-icon,
-.nmh-tile-vidart .nmh-tile-enter { position: relative; z-index: 3; }
-.nmh-tile-vidart .nmh-tile-title {
-  color: #fff !important;
-  text-shadow: 0 1px 10px rgba(0,0,0,0.85);
-}
-.nmh-tile-vidart .nmh-tile-sub {
-  color: rgba(255,255,255,0.66) !important;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.8);
-}
-
 .nmh-tile-photo-scrim, .home-tile-photo-scrim {
   display: none; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(160deg, rgba(6,12,24,0.28) 0%, rgba(6,12,24,0.66) 100%);
@@ -11338,11 +11297,12 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    inset instead. */
 #login.lg-screen-black { padding-left: 0 !important; padding-right: 0 !important; }
 .lg-wrap {
-  width: 100%; max-width: 560px; margin: 0 auto;
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center;       /* the stack sits on the middle of the black */
-  padding: max(env(safe-area-inset-top, 20px), 20px) 0
-           max(env(safe-area-inset-bottom, 14px), 14px);
+  /* The stage. The phone is absolutely positioned to cover it, so this is
+     a positioning context and a clip, not a column any more. */
+  position: relative; overflow: hidden;
+  width: 100%; max-width: none; margin: 0;
+  min-height: 100%; height: 100%;
+  display: block; padding: 0;
   box-sizing: border-box;
   /* app.css gives every .nm-wrap the light auth surface (#e4e6ed). This
      screen is black behind the phone as well as inside it, so that one
@@ -11352,42 +11312,73 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   min-height: 100%; overflow-y: auto; scrollbar-width: none;
 }
 .lg-wrap::-webkit-scrollbar { display: none; }
+#login.lg-screen-black { overflow: hidden; padding: 0 !important; }
 
-/* ── The words, INSIDE the screen ──
-   They were on the black above the phone. On the screen they are part of
-   what the phone is showing, which is the point, so they sit at the top of
-   the glass and the pills sit low under them — see .nm-btn-list below,
-   where the auto margin is what actually pushes them down. */
-.lg-head { text-align: center; padding: 4px 2px 0; }
+/* ── The words, INSIDE the screen and low in it ──
+   Written the way the home's greeting is written, because that is the
+   app's voice for this: the round mark on the left, then a quiet line, a
+   big name and a small line under it. The sizes below are lifted from
+   .nmh-greet-hello / -name / -line so the two actually match rather than
+   merely resemble each other — 20px at weight 400 for the quiet line,
+   27px at 800 for the name, 13px for the sub.
+
+   margin-top: auto is on the HEAD, not on the button list. That is what
+   puts the words BELOW: the spare space collects above this block, so the
+   words and the pills travel down together as one group and the words end
+   up just over the pills instead of at the top of the screen. */
+.lg-head {
+  margin-top: auto;
+  display: flex; align-items: flex-start; gap: 14px;
+  text-align: left; padding: 0 2px 16px;
+}
+/* No ring, no plate, no border. The mark is already a disc on black, and
+   the screen behind it is black, so anything drawn round it would be a
+   second circle outside the first one. It is trimmed to the disc itself so
+   the 54px is the mark rather than the mark plus its margin. */
+.lg-head-orb {
+  width: 54px; height: 54px; flex-shrink: 0; margin-top: 2px;
+  border-radius: 50%; overflow: hidden;
+}
+.lg-head-orb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lg-head-txt { flex: 1; min-width: 0; }
 .lg-head .nm-brand {
-  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
-  letter-spacing: 5px; text-transform: uppercase; color: #c8a96e;
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 400;
+  letter-spacing: -0.2px; text-transform: none;
+  color: rgba(255,255,255,0.62); line-height: 1.12;
 }
 .lg-head .nm-auth-title {
-  font-family: 'DM Sans', sans-serif; font-size: 25px; font-weight: 800;
-  color: #fff; letter-spacing: -0.5px; line-height: 1.1; margin-top: 5px;
+  font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800;
+  color: #fff; letter-spacing: -0.6px; line-height: 1.12; margin-top: 1px;
 }
 .lg-head .nm-auth-sub {
-  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 300;
-  color: rgba(255,255,255,0.5); margin-top: 5px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+  color: rgba(255,255,255,0.55); margin-top: 6px;
 }
 
 /* ── The phone ── */
+/* The clip FILLS the screen — no black band above it or below it.
+   This is `cover`, done with a box rather than object-fit, because the
+   glass is positioned by percentages OF THIS BOX and object-fit would have
+   moved the picture inside a box that stayed put, sliding the buttons off
+   the screen they are supposed to sit on.
+
+   max() of the two is the whole trick: at least as wide as the viewport,
+   and — since height is derived from width by the aspect — at least as
+   tall as it too. Whichever dimension is the binding one, the other
+   overflows and is cropped, and the aspect is never in question. The
+   render's side bezels lose a few pixels on a narrow screen; the screen
+   itself never does, because the aperture sits between 18.9% and 81.7%
+   across and there is far more crop than that available.
+
+   Centred by transform rather than by margins because the box is
+   deliberately larger than its container, and auto margins do not centre
+   an overflowing box — they pin it to the start edge. */
 .lg-phone {
-  /* Height-driven, but expressed as a width — and that distinction is the
-     whole rule. Setting `height` and letting aspect-ratio derive the width
-     fails the moment the column is narrower than that width: max-width
-     clamps the width, the height stays whatever was declared, and
-     aspect-ratio cannot overrule an explicit height. The render came out
-     at 0.4517 instead of 0.5628 — stretched, which is the one thing this
-     must never be. So the WIDTH is the definite side and the height is
-     always derived from it. The middle term is the width at which the box
-     would stand 74vh tall, so the height cap is still honoured; whichever
-     of the three is smallest wins, and the aspect is never in question. */
-  width: min(100%, calc(86vh * 720 / 1264), 520px);
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, calc(100vh * 720 / 1264));
   aspect-ratio: 720 / 1264;      /* the clip's own — never stretched */
   height: auto;
-  flex: 0 0 auto;
 }
 .nwsb-inframe.dev-phone {
   padding: 0;                    /* .lg-glass places itself; see below */
@@ -11464,8 +11455,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    the top, which is the behaviour justify-content: center could not give:
    centring in a scroller pushes the first line above scrollTop 0 where
    nothing can reach it. */
-#login .nm-btn-list { margin-top: auto; }
-.lg-glass > *:last-child { margin-bottom: 9%; }
+.lg-glass > *:last-child { margin-bottom: 7%; }
 .lg-glass::-webkit-scrollbar { display: none; }
 
 /* ── The buttons, on the black screen ──
@@ -11539,10 +11529,12 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 /* Short screens: the phone is height-driven now, so it shrinks on its own.
    What still needs help is the words above it, which do not. */
 @media (max-height: 720px) {
-  .lg-phone { width: min(100%, calc(78vh * 720 / 1264), 520px); }
-  .lg-head { padding: 0 16px 8px; }
-  .lg-head .nm-auth-title { font-size: 22px; margin-top: 4px; }
-  .lg-head .nm-auth-sub { font-size: 11.5px; margin-top: 3px; }
+  .lg-phone { width: max(100%, calc(100vh * 720 / 1264)); }
+  .lg-head { padding: 0 2px 12px; gap: 11px; }
+  .lg-head-orb { width: 44px; height: 44px; }
+  .lg-head .nm-brand { font-size: 17px; }
+  .lg-head .nm-auth-title { font-size: 22px; }
+  .lg-head .nm-auth-sub { font-size: 11.5px; margin-top: 4px; }
   #login .nm-auth-btn { padding: 8px 11px; font-size: 11.5px; }
 }
 

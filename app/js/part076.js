@@ -62,7 +62,8 @@
     { vid: './assets/video/fashion-plus-bg.mp4',   name: 'Shattered Glass' },
     { vid: './assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
     { vid: './assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
-    { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' }
+    { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
+    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Words Science' }
   ];
   FILMS.forEach(function (f, i) {
     f.t = [f.name, 'Background ' + (i + 1) + ' of ' + FILMS.length];

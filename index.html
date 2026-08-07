@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=666">
+<link rel="stylesheet" href="nowssb-nm.css?v=668">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -204,11 +204,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
              src="./assets/video/login-phone.mp4"></video>
       <div class="lg-glass">
 
-    <!-- Inside the screen now, not on the black above it. -->
-    <div class="nm-logo-area lg-head">
-      <div class="nm-brand">Nowsbansiu</div>
-      <div class="nm-auth-title">Welcome</div>
-      <div class="nm-auth-sub">Sign in or create your account</div>
+    <!-- Below now, not at the top of the screen — and written the way the
+         home's greeting is written: the round mark on the left, the small
+         line, the big name and the sub stacked beside it. -->
+    <div class="lg-head">
+      <div class="lg-head-orb">
+        <img loading="eager" decoding="async" alt="NowssB"
+             src="./assets/icons/logo-disc.webp">
+      </div>
+      <div class="lg-head-txt">
+        <div class="nm-brand">Nowsbansiu</div>
+        <div class="nm-auth-title">Welcome</div>
+        <div class="nm-auth-sub">Sign in or create your account</div>
+      </div>
     </div>
 
     <div class="nm-btn-list">
@@ -1019,16 +1027,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
         <div class="nmh-tile-enter"><span class="nmh-tile-enter-lbl">Enter</span><span class="nmh-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
       </div>
-      <div class="nmh-tile nmh-tile-art nmh-tile-vidart" onclick="openSub('word-science')">
+      <div class="nmh-tile nmh-tile-art" onclick="openSub('word-science')">
         <div class="nmh-tile-cover" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png');"></div>
         <div class="nmh-tile-cover-scrim"></div>
-        <!-- Word Science is the one tile with a clip of its own. It sits
-             where .nmh-tile-cover's artwork would be, under the same scrim,
-             so the title and the sub read exactly as they do on the others. -->
-        <video class="nmh-tile-vid" data-nwsb-auto muted loop playsinline
-               preload="none" poster="./assets/video/words-science-poster.webp"
-               aria-hidden="true" tabindex="-1"
-               src="./assets/video/words-science.mp4"></video>
+        <div class="nmh-tile-photo" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_700/v1784130175/grok_image_1784120203500_t6zwrf.jpg');background-position:center;"></div>
         <div class="nmh-tile-photo-scrim"></div>
         <img class="nmh-tile-articon" loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_0000000015b071f48397d34be0129b36_bx9cur.png" alt="">
         <div class="nmh-tile-icon">
@@ -10003,7 +10005,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
 <script src="app/js/part074.js?v=8"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
-<script src="app/js/part076.js?v=8"></script><!-- ══ FASHION PLUS ══ -->
+<script src="app/js/part076.js?v=99"></script><!-- ══ FASHION PLUS ══ -->
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
