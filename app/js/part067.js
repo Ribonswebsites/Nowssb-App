@@ -23,10 +23,15 @@
     { top:    '#home-nm .nmh-store-wrap',          vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
     { before: '#home .nss-store-trigger',          vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
 
-    // Above Personalised Healing — the clip's subject sits left, so the
-    // copy and the arrow go right, the same way the Reader section reads.
-    { bottom: '#home-nm .nmh-healing-wrap',        vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
-    { bottom: '#home .fash-healing-wrap',          vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
+    /* Choose Your Path, on the laptop, in a section of its own.
+       It used to be appended INSIDE the Personalised Healing wrapper, which
+       made it part of that section — `after` puts it beside it instead, and
+       `wrap` gives it a wrapper of its own. Both are registered in
+       app/js/part062.js as 'genderpath'; a direct child of the home wrap
+       that the registry does not know about gets stranded at the top of the
+       page while everything registered is re-appended around it. */
+    { after: '#home-nm .nmh-healing-wrap',         vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap' },
+    { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap' },
 
     // Above NowssB Connect — the banner that introduces the section, not the
     // section's own background clip (.nmh-connect-vid, which is untouched).
@@ -244,11 +249,15 @@
             '<path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/>' +
           '</svg></span>' +
         '</span>';
-      html +=
+      var gbtns =
         '<button class="vb-g vb-g-f" onclick="event.stopPropagation();vbGender(\'female\')">' +
           '<span class="vb-g-lbl">Female</span>' + go + '</button>' +
         '<button class="vb-g vb-g-m" onclick="event.stopPropagation();vbGender(\'male\')">' +
           '<span class="vb-g-lbl">Male</span>' + go + '</button>';
+      /* Inside the screen when there is one, so they sit on the glass and
+         not over the lid or the keyboard. */
+      if (spec.frame) html = html.replace('</div>', gbtns + '</div>');
+      else html += gbtns;
     } else if (spec.player) {
       /* Just the mark, at the middle of the right edge — the clip's own
          artwork already carries "NowssB Player" burned in, so a second,
@@ -369,9 +378,21 @@
       if (!host) return;
       /* One banner per target, however many times this runs. */
       var scope = (spec.before || spec.after) ? host.parentNode : host;
-      if (!scope || scope.querySelector(':scope > .vb-banner[data-vb="' + key + '"]')) return;
+      if (!scope) return;
+      if (scope.querySelector(':scope > .vb-banner[data-vb="' + key + '"]')) return;
+      if (scope.querySelector(':scope > [data-vbwrap="' + key + '"]')) return;
       var el = makeBanner(spec);
       el.setAttribute('data-vb', key);
+      /* A wrapper of its own, when asked for. The banner keeps its data-vb
+         so nothing that looks it up has to change; it is the WRAPPER that
+         goes into the page and that the registry matches. */
+      if (spec.wrap) {
+        var w = document.createElement('div');
+        w.className = spec.wrap;
+        w.setAttribute('data-vbwrap', key);
+        w.appendChild(el);
+        el = w;
+      }
       if (spec.before) host.parentNode.insertBefore(el, host);
       else if (spec.bottom) host.appendChild(el);
       else if (spec.after) host.parentNode.insertBefore(el, host.nextSibling);

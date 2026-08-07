@@ -12977,3 +12977,64 @@ body.nm-night #home-nm .qa-tv-block {
 .dev-tabs-p .fsec-screen > video {
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   THE LAPTOP — Choose Your Path
+   Trimmed to its own silhouette (1443x915) and its screen measured off
+   that: x 172-1268, y 44-673. A laptop's screen is only its upper half, so
+   the bottom padding is the lid's chin PLUS the whole keyboard base —
+   16.701% against 3.049% at the top. Every value is a fraction of the
+   WIDTH, because that is what percentage padding means on all four sides.
+═══════════════════════════════════════════════════════════════ */
+.nwsb-inframe.dev-laptop {
+  padding: 3.049% 12.058% 16.701% 11.920% !important;
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+}
+.nwsb-inframe.dev-laptop::after { background-image: url('./assets/frames/laptop.webp'); }
+
+/* The banner wears the frame itself — .vb-banner[data-vb] is what the
+   layout registry matches, so a wrapper around it would strand the
+   section. .vb-banner's own overflow:hidden and 22px radius are reset for
+   the same reason they were on the Connect banner: they crop the render. */
+.vb-banner.dev-laptop {
+  aspect-ratio: 1443 / 915;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  background-image: none !important;
+  background-color: #000 !important;
+  background-clip: content-box !important;
+  -webkit-background-clip: content-box !important;
+}
+.vb-banner.dev-laptop .vbf-screen {
+  position: relative;
+  width: 100%; height: auto; aspect-ratio: 1097 / 630;   /* the aperture's own */
+  overflow: hidden; border-radius: 0 !important; background: #000;
+}
+.vb-banner.dev-laptop .vbf-screen > video {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  border-radius: 0 !important;
+}
+/* Female / Male and their Enter pills sit ON the screen, not over the lid. */
+.vb-banner.dev-laptop .vbf-screen > .vb-g { z-index: 2; }
+
+/* ── Its own wrapper ──
+   The banner used to be appended INSIDE the Personalised Healing wrapper,
+   so it was part of that section. It is a sibling now with a wrapper of its
+   own: glass on the Fashion home, the raised neumorphic card on the Normal
+   one, matching what each home does with every other section. */
+#home-nm .nwsb-vbwrap {
+  width: 100%; box-sizing: border-box;
+  border-radius: 22px !important;
+  background: #f0f2f7;
+  padding: 14px;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+  margin: 16px 0;
+}
+#home-nm.nm-dark .nwsb-vbwrap {
+  background: #16163c;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
+}
+#home .nwsb-vbwrap { /* .glass-wrap supplies the look on this home */ }

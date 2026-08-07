@@ -77,6 +77,11 @@
            keeps it off until someone turns it on. The Fashion home's own
            healing entry is untouched. */
         { k:'healing',  sel:['.nmh-healing-wrap'],                                        t:S, label:'Personalised Healing',  sub:'Choose your health journey', defOff:1 },
+        /* Choose Your Path is its own section now — it used to live inside
+           the wrapper above. A direct child of the home wrap that this
+           registry does not know about gets stranded at the top of the page
+           while every registered one is re-appended around it. */
+        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop' },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', always:1 },
         { k:'msearch',  sel:['.vb-banner[data-vb="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name' },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
@@ -114,6 +119,7 @@
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science' },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
+        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop' },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', always:1 },
         { k:'msearch',  sel:['.vb-banner[data-vb="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' },
