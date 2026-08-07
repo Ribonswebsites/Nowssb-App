@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=704">
+<link rel="stylesheet" href="nowssb-nm.css?v=707">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -2622,62 +2622,47 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <div class="sl-screen">
+  <div class="sl-screen slm">
     <div class="sl-bg"></div>
     <div class="sl-bg-overlay"></div>
-    <!-- Banner header -->
-    <div class="sl-banner">
-      <div class="sl-banner-img"></div>
+
+    <!-- ── Header: brand row and the filter chips, both pinned ──
+         The hero clip lives behind them now rather than in a banner of its
+         own — the layout below it is a feed, and a feed starts at the top. -->
+    <div class="slm-head">
       <!-- The hero clip. Muted and looped because it is wallpaper, not
            something anyone pressed play on; the poster covers the moment
            before the first frame decodes. app/js/part018.js starts and
            pauses it with the screen so it is not decoding in the
            background. -->
-      <video class="sl-banner-vid" id="slBannerVid" data-nwsb-auto muted loop playsinline
+      <video class="sl-banner-vid slm-head-vid" id="slBannerVid" data-nwsb-auto muted loop playsinline
              preload="none" aria-hidden="true" tabindex="-1"
              poster="./assets/video/sound-library-banner-poster.webp?v=1"
              src="./assets/video/sound-library-banner.mp4?v=1"></video>
-      <div class="sl-banner-fade"></div>
-      <div class="sl-banner-inner">
-        <button class="sl-back-btn" onclick="closeSub('sound-library')">
-          <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-            <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="square"/>
-            <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
-          </svg>
+      <div class="slm-head-fade"></div>
+
+      <div class="slm-top">
+        <button class="slm-back sl-back-btn" onclick="closeSub('sound-library')" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <div class="sl-banner-bottom">
-          <div class="sl-eyebrow">Personal Collection</div>
-          <div class="sl-banner-title">Sound Library</div>
-          <div class="sl-stats-row">
-            <span class="sl-stat"><strong id="slStatSentences">0</strong> sentences</span>
-            <span class="sl-stat-sep">·</span>
-            <span class="sl-stat"><strong id="slStatWords">0</strong> words</span>
-            <span class="sl-stat-sep">·</span>
-            <span class="sl-stat"><strong id="slStatPurchased">0</strong> purchased</span>
-          </div>
+        <span class="slm-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="var(--accent)"/><path d="M10 8.2l6 3.8-6 3.8z" fill="#060c18"/></svg>
+        </span>
+        <span class="slm-word">Sound Library</span>
+        <div class="slm-actions">
+          <button class="slm-icon-btn" id="slmBell" onclick="slmOpenSaved()" aria-label="Saved sentences">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 9a6 6 0 1112 0c0 4 1.4 5.4 2 6H4c.6-.6 2-2 2-6z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 19a2 2 0 004 0" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span class="slm-badge" id="slmBellCount">0</span>
+          </button>
+          <button class="slm-avatar" onclick="slmOpenProfile()" aria-label="Profile"><span id="slmAvatarLetter">N</span></button>
         </div>
       </div>
+
+      <div class="slm-chips" id="slmChips"></div>
     </div>
-    <!-- Tab bar -->
-    <div class="sl-tabs">
-      <button id="slTab-sentences" class="sl-tab active" onclick="slSetTab('sentences')">
-        <svg width="12" height="10" viewBox="0 0 14 12" fill="none"><path d="M1 2H13M1 6H10M1 10H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="square"/></svg>
-        Sentences
-        <span class="sl-tab-badge" id="slBadgeSentences">0</span>
-      </button>
-      <button id="slTab-words" class="sl-tab" onclick="slSetTab('words')">
-        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7H7M7 7V4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="square"/></svg>
-        My Words
-        <span class="sl-tab-badge" id="slBadgeWords">0</span>
-      </button>
-      <button id="slTab-purchased" class="sl-tab" onclick="slSetTab('purchased')">
-        <svg width="11" height="12" viewBox="0 0 12 14" fill="none"><path d="M2 2.5H3.5L5 9.5H9.5L11 5H4" stroke="currentColor" stroke-width="1.3" stroke-linecap="square"/><circle cx="5.5" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/></svg>
-        Purchased
-        <span class="sl-tab-badge" id="slBadgePurchased">0</span>
-      </button>
-    </div>
-    <!-- Content — rendered by JS -->
-    <div class="sl-content" id="slContent"></div>
+
+    <!-- The feed — rendered by app/js/part080.js -->
+    <div class="sl-content slm-feed" id="slContent"></div>
   </div>
 </div>
 <!-- Sound Library intro button wiring — isolated script so JS errors elsewhere can't break it -->
@@ -5473,7 +5458,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- intro rendered inline -->
 
-<script src="app/js/part018.js?v=77"></script>
+<script src="app/js/part018.js?v=78"></script>
+<!-- Must load after part018.js — it takes over window.slRender/slSetTab. -->
+<script src="app/js/part080.js?v=1"></script><!-- ══ SOUND LIBRARY FEED ══ -->
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -5725,7 +5712,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part021.js?v=260"></script>
+<script src="app/js/part021.js?v=261"></script>
 
 <!-- ══════════════════════════════════════════
      PAGE FIRST-ENTRY GUIDES — Part 1
@@ -6145,7 +6132,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      PAGE FIRST-ENTRY GUIDES — Part 2
      Screens: health-male, health-female, health-category, sound-library, my-progress
 ══════════════════════════════════════════ -->
-<script src="app/js/part024.js?v=163"></script>
+<script src="app/js/part024.js?v=164"></script>
 
 
 

@@ -19,6 +19,13 @@ try {
     { id:5, name:'Night',   time:'Night',   color:RT_COLORS[4], words:[],                  reps:7, lastPracticed:null }
   ];
 }
+/* The five routines only reach localStorage once something has been saved,
+   so on a fresh install `nwsb_routines` is absent while these defaults are
+   very much on screen. app/js/part080.js needs the same list, and a
+   top-level `let` in a classic script is not a window property. Both
+   assignments above are the only ones — everything after mutates this same
+   array — so one export here stays correct. */
+window._routines = _routines;
 let _rtActiveId   = null;
 let _rtDetailTab  = 'words';
 let _rtLibFilter  = 'All';

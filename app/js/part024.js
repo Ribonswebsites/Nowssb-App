@@ -54,11 +54,12 @@ waitForPg(function() {
   PG['sound-library'] = {
     eye:   'Sound Library',
     title: 'Your Personal Collection',
-    body:  'Every word and sentence you own lives here. Three tabs, one archive.',
+    body:  'Every word and sentence you own lives here, laid out as a feed.',
     tips: [
-      ['Sentences tab', 'Healing sentences built from the words you own. Tap any to play.'],
-      ['My Words tab', 'Your full word library with phonetic breakdown and organ tag. Tap any to open in the player.'],
-      ['Purchased tab', 'Words you have bought from the Word Store — permanently yours, playable anytime.'],
+      ['Chips along the top', 'All, Sentences, My Words, Purchased, then every category your words belong to. Tap one to filter the whole page.'],
+      ['Speed dial', 'Your words as tiles, nine at a time. Swipe sideways for more, tap any to open it in the player.'],
+      ['Quick picks', 'The same words as rows, with the phonetic breakdown, the organ they target and how many sessions you have done.'],
+      ['Your sentences', 'Healing sentences built from the words you own. Tap any to play, the dots to remove it.'],
       ['More words = more sentences', 'The more words you own, the more sentence combinations unlock automatically.']
     ]
   };

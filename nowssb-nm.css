@@ -13200,3 +13200,287 @@ body.nm-mode #sub-health-journey .sub-back.gsel-back > svg path,
 body.nm-night #sub-health-journey .sub-back.gsel-back > svg path,
 body.nm-glass #sub-health-journey .sub-back.gsel-back > svg path { stroke: #0a0a12 !important; }
 body[class] #sub-health-journey .sub-back.gsel-back > svg circle { fill: #ffffff !important; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   SOUND LIBRARY — a music app's home feed
+   Markup in index.html (#sub-sound-library), built by app/js/part080.js.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.sl-screen.slm { background: #000 !important; }
+.slm .sl-bg, .slm .sl-bg-overlay { display: none !important; }
+
+/* ── Header: brand row + chips, pinned, with the hero clip behind ── */
+.slm-head {
+  position: relative; z-index: 12; flex-shrink: 0;
+  padding-top: max(env(safe-area-inset-top, 10px), 10px);
+  background: #000;
+}
+.slm-head-vid {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block; opacity: .38;
+  border-radius: 0 !important; z-index: 0;
+}
+.slm-head-fade {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(180deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.78) 55%, #000 100%);
+}
+/* The clip runs behind the brand row, and some of its frames are bright
+   enough to swallow a white chevron whole — measured: the back button was
+   present, sized and clickable, and simply could not be seen. These do not
+   move anything, they just keep the controls legible on every frame. */
+.slm-top svg { filter: drop-shadow(0 1px 3px rgba(0,0,0,.9)); }
+.slm-word { text-shadow: 0 1px 4px rgba(0,0,0,.9); }
+.slm-top {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px 10px;
+}
+.slm-back.sl-back-btn {
+  width: 32px !important; height: 32px !important;
+  min-width: 32px !important; min-height: 32px !important;
+  background: transparent !important; border: none !important;
+  box-shadow: none !important; padding: 0 !important;
+  display: flex !important; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer;
+}
+/* app/app.css hides the inner markup of every back button and injects a
+   glass-sphere PNG through ::before. Both off here — this one is a plain
+   chevron, the way a music app's back arrow is. */
+.slm-back.sl-back-btn::before, .slm-back.sl-back-btn::after {
+  content: none !important; display: none !important; background: none !important;
+}
+.slm-back.sl-back-btn > svg { display: block !important; width: 22px !important; height: 22px !important; }
+.slm-logo { width: 26px; height: 26px; flex-shrink: 0; display: block; }
+.slm-logo svg { width: 100%; height: 100%; display: block; }
+.slm-word {
+  font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800;
+  color: #fff; letter-spacing: -.4px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.slm-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.slm-icon-btn {
+  position: relative; width: 36px; height: 36px; flex-shrink: 0;
+  background: none; border: none; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.slm-icon-btn svg { width: 22px; height: 22px; display: block; }
+.slm-badge {
+  position: absolute; top: 1px; right: 0;
+  min-width: 15px; height: 15px; padding: 0 4px;
+  border-radius: 999px !important; background: #e5342a; color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  line-height: 15px; text-align: center;
+}
+.slm-avatar {
+  width: 30px; height: 30px; flex-shrink: 0; cursor: pointer;
+  border-radius: 50% !important; border: none;
+  background: var(--accent); color: #060c18;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Chips ── */
+.slm-chips {
+  position: relative; z-index: 2;
+  display: flex; gap: 8px; padding: 2px 14px 12px;
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.slm-chips::-webkit-scrollbar { display: none; }
+.slm-chip {
+  flex: 0 0 auto; cursor: pointer;
+  padding: 9px 16px; border: none;
+  border-radius: 8px !important;
+  background: rgba(255,255,255,.11); color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  white-space: nowrap;
+}
+.slm-chip.on { background: #fff; color: #000; }
+
+/* ── The feed ── */
+.slm-feed {
+  background: #000 !important;
+  /* The app's own bottom navigation is fixed over this screen — the feed
+     has to end above it, not under it. */
+  padding: 0 0 calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+}
+.slm-sec { padding: 18px 0 6px; }
+.slm-sec-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 14px 12px;
+}
+.slm-sec-title {
+  margin: 0; flex: 1; min-width: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 21px; font-weight: 700;
+  color: #fff; letter-spacing: -.3px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slm-pill {
+  flex-shrink: 0; cursor: pointer;
+  padding: 8px 16px; border: 1px solid rgba(255,255,255,.28);
+  border-radius: 999px !important; background: transparent; color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  white-space: nowrap;
+}
+.slm-chev {
+  flex-shrink: 0; width: 30px; height: 30px; padding: 0; cursor: pointer;
+  background: none; border: none; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.slm-chev svg { width: 20px; height: 20px; }
+
+/* Artwork is always a square that fills its slot — the store's images are
+   a mix of shapes and this is the one thing that has to look uniform. */
+.slm-art {
+  display: block; width: 100%; height: 100%;
+  background: #1a1a1a center / cover no-repeat;
+  border-radius: 0 !important;
+}
+
+/* ── Speed dial ── */
+.slm-sd-head { display: flex; align-items: center; gap: 12px; padding: 0 14px 12px; }
+.slm-sd-ava { width: 42px; height: 42px; flex-shrink: 0; border-radius: 50% !important; overflow: hidden; }
+.slm-sd-ava .slm-art { border-radius: 50% !important; }
+.slm-sd-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.slm-sd-eye {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+  letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,.62);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slm-sd-t { font-family: 'DM Sans', sans-serif; font-size: 21px; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+/* One page of nine at a time, snapped, so it swipes rather than scrolls. */
+.slm-sd-pages {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.slm-sd-pages::-webkit-scrollbar { display: none; }
+.slm-sd-page {
+  flex: 0 0 100%; scroll-snap-align: start;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  padding: 0 14px;
+}
+.slm-sq { position: relative; aspect-ratio: 1 / 1; overflow: hidden; cursor: pointer; }
+.slm-sq::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.82) 100%);
+}
+.slm-sq-t {
+  position: absolute; left: 8px; right: 8px; bottom: 7px; z-index: 2;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.slm-dots { display: flex; justify-content: center; gap: 6px; padding: 14px 0 2px; }
+.slm-dot { width: 6px; height: 6px; border-radius: 50% !important; background: rgba(255,255,255,.28); }
+.slm-dot.on { background: #fff; }
+
+/* ── Paged row lists ── */
+.slm-hpages {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.slm-hpages::-webkit-scrollbar { display: none; }
+/* Not 100% — the sliver of the next page is what says "there is more
+   sideways", which is the whole reason this is paged and not a column. */
+.slm-hpage { flex: 0 0 94%; scroll-snap-align: start; padding: 0 4px 0 14px; }
+.slm-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 6px 0; cursor: pointer;
+}
+.slm-row > .slm-art { width: 48px; height: 48px; flex-shrink: 0; }
+.slm-row-txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.slm-row-t {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; color: #fff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slm-row-s {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; color: rgba(255,255,255,.58);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slm-more {
+  flex-shrink: 0; width: 30px; height: 40px; padding: 0; cursor: pointer;
+  background: none; border: none; color: rgba(255,255,255,.75);
+  display: flex; align-items: center; justify-content: center;
+}
+.slm-more svg { width: 4px; height: 16px; }
+
+/* ── Horizontal card rails ── */
+.slm-hscroll {
+  display: flex; gap: 12px; padding: 0 14px;
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.slm-hscroll::-webkit-scrollbar { display: none; }
+
+/* The wide 16:9 card */
+.slm-big { flex: 0 0 88%; display: flex; flex-direction: column; gap: 6px; cursor: pointer; }
+.slm-big-art {
+  display: block; width: 100%; aspect-ratio: 16 / 9;
+  background: #1a1a1a center / cover no-repeat; border-radius: 0 !important;
+}
+.slm-big-t {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; color: #fff;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.slm-big-s { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,.58); }
+
+/* The 2x2 mosaic */
+.slm-mo { flex: 0 0 46%; display: flex; flex-direction: column; gap: 6px; cursor: pointer; }
+.slm-mo-grid {
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  width: 100%; aspect-ratio: 1 / 1; overflow: hidden;
+}
+.slm-mo-q { display: block; background: #1a1a1a center / cover no-repeat; }
+.slm-mo-t {
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: #fff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slm-mo-s { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,.58); }
+
+/* Square covers */
+.slm-alb { flex: 0 0 46%; display: flex; flex-direction: column; gap: 6px; cursor: pointer; }
+.slm-alb-art {
+  display: block; width: 100%; aspect-ratio: 1 / 1;
+  background: #1a1a1a center / cover no-repeat;
+}
+.slm-alb-t {
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: #fff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slm-alb-s { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,.58); }
+
+/* ── The wide promo card ── */
+.slm-promo {
+  display: flex; margin: 0 14px; overflow: hidden; cursor: pointer;
+  border-radius: 12px !important; background: #7fdff2; min-height: 152px;
+}
+.slm-promo-l { flex: 1 1 58%; min-width: 0; padding: 16px 14px; display: flex; flex-direction: column; }
+.slm-promo-t { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 600; color: #06121a; line-height: 1.25; }
+.slm-promo-s { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(6,18,26,.68); margin-top: 6px; }
+.slm-promo-go { margin-top: auto; color: #06121a; display: block; }
+.slm-promo-go svg { width: 26px; height: 26px; display: block; }
+.slm-promo-r { flex: 0 0 42%; background: #06121a center / cover no-repeat; }
+
+/* ── Empty state ── */
+.slm-empty {
+  margin: 6px 14px; padding: 26px 18px; text-align: center;
+  background: rgba(255,255,255,.05);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,.6);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.slm-empty-cta { border-color: rgba(255,255,255,.4); }
+
+/* The neumorphic and glass sheets repaint most panels by mode. This screen
+   is one design in every mode — it is a black feed, on purpose. */
+body[class] #sub-sound-library .sl-screen.slm,
+body[class] #sub-sound-library .slm-feed { background: #000 !important; }
+body[class] #sub-sound-library .slm-sec-title,
+body[class] #sub-sound-library .slm-row-t,
+body[class] #sub-sound-library .slm-word { color: #fff !important; }
+
+/* This sheet recolours the back arrow on this screen by mode —
+   `body.nm-mode #sub-sound-library .sl-back-btn svg path { stroke:#1a1a2e }`
+   and a gold one at night. Measured against the header clip that navy
+   chevron was invisible: present, 32x32, clickable, and unreadable. The
+   header is dark in every mode now, so the arrow is white in every mode. */
+body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
+  stroke: #ffffff !important;
+}
