@@ -1,4 +1,4 @@
-const CACHE = 'nowsbansiu-v847';
+const CACHE = 'nowsbansiu-v848';
 // Separate, stable-named bucket for background-prefetched videos (see
 // app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
 // routine JS/CSS deploy never wipes out videos the user already has warmed —
@@ -11,8 +11,31 @@ const CACHE = 'nowsbansiu-v847';
 // is exactly what happened to the start animation.
 const VIDEO_CACHE = 'nowssb-media-precache-v2';
 
-self.addEventListener('install', () => {
+/* The start animation is not like the other clips. Every one of those is
+   decorative and warmed at idle time by app/js/part051.js, four to eight
+   seconds after boot — which is fine for a banner nobody has scrolled to
+   yet, and useless for this one, because it starts playing one second into
+   the launch. Left to the idle warmer it streamed from the network on every
+   open, which is what made it stutter.
+   So it is fetched here, at install, and from then on the fetch handler
+   below answers it from cache instantly. Keep the ?v= in step with
+   index.html — a different query is a different cache entry. */
+const BOOT_MEDIA = ['./assets/video/start-animation.mp4?v=2'];
+
+self.addEventListener('install', e => {
   self.skipWaiting();
+  e.waitUntil((async () => {
+    try {
+      const c = await caches.open(VIDEO_CACHE);
+      await Promise.all(BOOT_MEDIA.map(async u => {
+        try {
+          if (await c.match(u)) return;                 // already have it
+          const res = await fetch(u, { cache: 'reload' });
+          if (res && res.ok) await c.put(u, res);
+        } catch (err) { /* offline at install — the idle warmer retries */ }
+      }));
+    } catch (err) {}
+  })());
 });
 
 self.addEventListener('activate', e => {

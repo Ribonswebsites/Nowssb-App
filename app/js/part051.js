@@ -14,7 +14,12 @@
 (function () {
   if (typeof caches === 'undefined') return;
 
-  var VIDEO_CACHE = 'nowssb-media-precache-v1';
+  /* MUST match VIDEO_CACHE in sw.js. The service worker deletes every
+     nowssb-media-precache-* bucket that is not the current one, so if this
+     name lags behind, everything warmed here is wiped on the next
+     activation and nothing is ever cached — which is exactly what happened
+     when sw.js went to v2 and this stayed on v1. */
+  var VIDEO_CACHE = 'nowssb-media-precache-v2';
 
   function shouldSkip() {
     var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -44,7 +49,20 @@
     // part012.js, meaning pages in part026.js, routines in part066.js).
     if (window.NWSB_EXTRA_VIDEO_URLS) urls = urls.concat(window.NWSB_EXTRA_VIDEO_URLS);
     // de-dupe — several screens intentionally reuse the same background video
-    return urls.filter(function (u, i) { return u && urls.indexOf(u) === i; });
+    urls = urls.filter(function (u, i) { return u && urls.indexOf(u) === i; });
+    /* The start animation goes first, ahead of thirty decorative loops. It
+       is the one clip that plays on every single launch, so it is the one
+       worth having before any of them — the queue is staggered 800ms apart
+       and DOM order would have put it behind whatever else is on the page.
+       sw.js also grabs it at install; this is the retry path for when that
+       failed (offline at install, or a browser that never installed one). */
+    var splash = window.NWSB_SPLASH_VIDEO;
+    if (splash) {
+      var at = urls.indexOf(splash);
+      if (at > 0) urls.splice(at, 1);
+      if (at !== 0) urls.unshift(splash);
+    }
+    return urls;
   }
 
   function warmOne(cache, url) {
