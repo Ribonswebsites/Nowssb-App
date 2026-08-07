@@ -28,9 +28,10 @@
     { bottom: '#home-nm .nmh-healing-wrap',        vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
     { bottom: '#home .fash-healing-wrap',          vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1 },
 
-    // Above NowssB Connect
-    { before: '#home-nm .nmh-connect-sec',         vid: V + 'v1785402935/grok_video_2026-07-30-14-43-48_lfrvok.mp4' },
-    { before: '#home .fash-connect-wrap',          vid: V + 'v1785402935/grok_video_2026-07-30-14-43-48_lfrvok.mp4' },
+    // Above NowssB Connect — the banner that introduces the section, not the
+    // section's own background clip (.nmh-connect-vid, which is untouched).
+    { before: '#home-nm .nmh-connect-sec',         vid: './assets/video/connect-banner.mp4?v=1' },
+    { before: '#home .fash-connect-wrap',          vid: './assets/video/connect-banner.mp4?v=1' },
 
     // Trending
     { top:    '#home-nm .nmh-trend-shop-wrap',     vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
