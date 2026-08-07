@@ -11327,7 +11327,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    words and the pills travel down together as one group and the words end
    up just over the pills instead of at the top of the screen. */
 .lg-head {
-  margin-top: auto;
+  margin-top: auto;   /* with the auto below, this centres the group */
   display: flex; align-items: flex-start; gap: 14px;
   text-align: left; padding: 0 2px 16px;
 }
@@ -11436,7 +11436,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
   background: transparent; border-radius: 0 !important;
   display: flex; flex-direction: column; justify-content: flex-start;
-  padding: 6px 8px; gap: 0;
+  padding: 10px 20px; gap: 0;
 }
 /* Centred by auto margins rather than justify-content: center, and that is
    not a style preference. In a scroll container, centring with
@@ -11455,68 +11455,131 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    the top, which is the behaviour justify-content: center could not give:
    centring in a scroller pushes the first line above scrollTop 0 where
    nothing can reach it. */
-.lg-glass > *:last-child { margin-bottom: 7%; }
+/* Both autos, so the block sits in the MIDDLE of the screen rather than on
+   its chin. It was margin-top: auto alone, which pushed everything to the
+   bottom and left the top two thirds of the screen empty — the void that
+   made the whole thing look unfinished. When a form opens and the content
+   outgrows the glass both collapse to zero and it scrolls from the top. */
+.lg-glass > *:last-child { margin-bottom: auto; }
 .lg-glass::-webkit-scrollbar { display: none; }
 
-/* ── The buttons, on the black screen ──
-   White. They are the only lit thing inside the phone, which is the
-   whole point of putting them there: the render is black, the page is
-   black, and three white pills read as a screen that is switched on.
-   The icons inside them are currentColor, so they turn dark with the
-   text and no per-icon rule is needed — except Google's, which is
-   multicolour by mark and stays exactly as Google draws it. */
-#login .nm-btn-list { width: 100%; }
-/* This render's screen is 62.4% of the box against the last one's 76%, so
-   the pills have less room and the sizes come down to match. Sized so the
-   longest label — "Continue with Google" — holds one line: at 12.5px with
-   a 20px mark it wrapped, and one pill of two lines beside two of one
-   read as a mistake rather than a choice. */
+/* ══════════════════════════════════════════════════════════════════
+   THE CONTROLS ON THE SCREEN
+
+   Everything below exists because app.css draws this whole auth stack for
+   the LIGHT surface it was designed on: .nm-auth-btn is 68px tall with a
+   neumorphic pair, .nm-input is #e8eaf0 with inset shadows, .nm-form-panel
+   is a #dcdee6 pressed well, .nm-btn-gold carries a white highlight. Drop
+   any of that on black and it reads as a light-mode form pasted onto a
+   dark screen — which is exactly what it looked like: white slabs with
+   black gaps between them, and a flat gold bar under.
+
+   So the screen gets its own system, and it is one system rather than a
+   pile of patches:
+
+     one radius        14px on everything the finger touches
+     one height        52px for every control, so the stack has a rhythm
+     one fill          rgba(255,255,255,0.06) for anything you type into
+     one hairline      rgba(255,255,255,0.14)
+     one gap           10px
+
+   The three sign-in pills are white because they are the primary action
+   and the only lit thing on the screen. Everything you type into is dark
+   glass, because a white field on a black screen is a hole.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── The three pills ── */
+#login .nm-btn-list { width: 100%; gap: 10px; }
 #login .nm-auth-btn {
-  background: #fff; border: 1px solid rgba(0,0,0,0.06);
-  color: #0b0b0f; border-radius: 11px !important;
-  box-shadow: none; margin: 0;
-  /* app.css sets `height: 68px` on .nm-auth-btn — a hard height, not a
-     padding — so every padding written here was ignored and the pills
-     stood 68px tall no matter what. Height auto and a min-height of zero
-     are what actually shortens them; the padding then decides. The 44px
-     tap-target floor from app.css's `button, [onclick]` rule is what
-     min-height: 0 is overriding, and 38px is the deliberate trade. */
-  height: auto !important; min-height: 0 !important;
-  padding: 10px 12px;
-  font-size: 12.5px; gap: 9px; letter-spacing: -0.1px;
+  background: #fff; border: none;
+  color: #0b0b0f; border-radius: 14px !important;
+  box-shadow: none;
+  height: 52px !important; min-height: 0 !important;
+  padding: 0 18px; margin: 0;
+  font-size: 13.5px; font-weight: 600; gap: 12px; letter-spacing: 0;
 }
-#login .nm-auth-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
-/* .nm-btn-list is a flex column with gap:14px from app.css, so the gap is
-   what spaces these — a margin on the sibling would stack on top of it. */
-#login .nm-btn-list { gap: 9px; }
+#login .nm-auth-btn svg { width: 19px; height: 19px; flex-shrink: 0; }
+#login .nm-auth-btn:active { background: #e9e9ef; transform: scale(0.985); }
 #login .nm-auth-btn + .nm-auth-btn { margin-top: 0; }
-#login .nm-auth-btn:active { background: #e6e6ec; }
-#login .nm-divider { margin: 10px 0; }
-#login .nm-divider-line { background: rgba(255,255,255,0.14); }
-#login .nm-divider-text { color: rgba(255,255,255,0.38); }
-#login .nm-form-panel { background: none; border: none; padding: 10px 0 0; }
-#login .nm-field-label { color: rgba(255,255,255,0.55); }
-/* The wells match the pills — same white, same corner — so an opened form
-   still reads as one control stack rather than two different screens. */
-#login .nm-input-wrap {
-  background: #fff; border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 12px !important;
+
+/* ── The divider. Short rules and a small word, not a full-width line ── */
+#login .nm-divider { margin: 14px 0; gap: 14px; }
+#login .nm-divider-line { background: rgba(255,255,255,0.13); height: 1px; }
+#login .nm-divider-text {
+  color: rgba(255,255,255,0.3); font-size: 10px;
+  letter-spacing: 2.5px; font-weight: 500;
 }
-#login .nm-input { color: #0b0b0f; }
-#login .nm-input::placeholder { color: rgba(0,0,0,0.34); }
-#login .nm-input-icon svg [stroke], #login .nm-input-icon-r svg [stroke] { stroke: rgba(0,0,0,0.38); }
+
+/* ── The forms ──
+   No panel, no well, no plate. The fields sit straight on the screen, so
+   opening one reads as the screen continuing rather than as a card being
+   dealt onto it. */
+#login .nm-form-panel {
+  background: none !important; border: none !important;
+  box-shadow: none !important; padding: 12px 0 2px !important;
+  gap: 12px;
+}
+#login .nm-field-label {
+  color: rgba(255,255,255,0.42);
+  font-size: 9.5px; font-weight: 600; letter-spacing: 1.8px;
+  margin-bottom: 7px;
+}
+
+/* Dark glass, and the radius is on the INPUT rather than only on its
+   wrapper. It was on the wrapper alone, and .nm-input brings its own
+   square light-mode background — so the corners the wrapper rounded were
+   painted straight back over, which is why the fields rendered as square
+   white slabs. */
+#login .nm-input-wrap { background: none; border: none; border-radius: 0 !important; }
+#login .nm-input,
 #login .nm-phone-select {
-  background: #fff; color: #0b0b0f;
-  border: 1px solid rgba(0,0,0,0.06); border-radius: 12px !important;
+  height: 52px !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-size: 14px; font-weight: 400;
+  transition: border-color 0.18s, background 0.18s;
 }
-#login .nm-submit-btn, #login .nm-primary-btn {
-  border-radius: 12px !important;
+#login .nm-input:focus,
+#login .nm-phone-select:focus {
+  background: rgba(255,255,255,0.10) !important;
+  border-color: rgba(232,213,163,0.55) !important;
 }
+#login .nm-input::placeholder { color: rgba(255,255,255,0.3); letter-spacing: 0.2px; }
+/* The OTP box carries letter-spacing:6px inline so the digits sit apart.
+   That is right for the digits and wrong for the words — "Enter OTP" came
+   out as "E n t e r  O T P". A placeholder takes its own spacing. */
+#login #otpInput::placeholder { letter-spacing: 0.4px !important; }
+#login .nm-input-icon svg [stroke],
+#login .nm-input-icon-r svg [stroke] { stroke: rgba(255,255,255,0.42); }
+#login .nm-phone-select { padding: 0 10px; min-width: 92px; }
+#login .nm-phone-row { gap: 10px; }
+
+/* ── The submit ──
+   Gold, but not the light surface's gold: app.css gives it a white
+   neumorphic highlight that only makes sense on a pale plate. Here it
+   carries its own glow instead, which is what an accent does on black. */
+#login .nm-btn-gold {
+  height: 52px; border-radius: 14px !important;
+  background: linear-gradient(135deg, #e8d5a3 0%, #c8a96e 100%);
+  color: #11111a; font-size: 13.5px; font-weight: 700; letter-spacing: 0.4px;
+  box-shadow: 0 10px 26px rgba(200,169,110,0.28) !important;
+  margin-top: 2px;
+}
+#login .nm-btn-gold:active { transform: scale(0.985); box-shadow: none !important; }
+#login .nm-submit-btn, #login .nm-primary-btn { border-radius: 14px !important; }
+#login .nm-link-sm {
+  color: rgba(255,255,255,0.34); font-size: 11px; padding: 8px 6px 2px;
+}
+
+/* ── The way out ── */
 .lg-guest {
-  display: block; width: 100%; margin-top: 12px; padding: 10px;
+  display: block; width: 100%; margin-top: 16px; padding: 10px;
   background: transparent; border: none; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
-  color: #c8a96e; letter-spacing: 0.3px; text-align: center;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500;
+  color: rgba(232,213,163,0.85); letter-spacing: 0.3px; text-align: center;
 }
 /* The auth note sits on black here too. */
 #login .nwsb-auth-note {
