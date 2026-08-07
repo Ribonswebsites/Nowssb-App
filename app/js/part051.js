@@ -250,7 +250,7 @@
        moment, and was paused again, which looks exactly like a still. Those
        sort first and therefore always get a slot while they are on screen.
        Still at most MAX_PLAYING — this changes which four, not how many. */
-    var PRIORITY = '.qa-tv-vid';
+    var PRIORITY = '.qa-tv-vid, .fpv-video';
     function prio(v) { return v.matches && v.matches(PRIORITY) ? 0 : 1; }
     if (live.length > MAX_PLAYING) {
       var mid = (window.innerHeight || 800) / 2;

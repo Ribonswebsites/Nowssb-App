@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=690">
+<link rel="stylesheet" href="nowssb-nm.css?v=691">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -2190,11 +2190,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div><!-- /fash-healing-wrap -->
 
   <!-- STANDALONE BANNER ABOVE WORD SEARCH SECTION -->
-  <div id="fashPromoVid" style="padding: 0 16px 16px; background: transparent;">
-    <div style="position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.18); box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12); background: linear-gradient(135deg,rgba(6,12,24,0.95) 0%,rgba(12,20,40,0.92) 100%); aspect-ratio:16/9;">
-      <video data-nwsb-auto muted loop playsinline preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" poster="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg">
-        <source src="https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.mp4" type="video/mp4">
-      </video>
+  <!-- The promo clip, on the tablet, in a glass wrapper.
+       It used to be a bare 16:9 box whose wrapper was literally
+       background: transparent — which is why it had nothing behind it.
+       .dev-tab-l IS the frame: its padding is the bezel and its content box
+       is the screen, so .fpv-screen at 100%/100% fills the glass exactly. -->
+  <div id="fashPromoVid" class="glass-wrap fash-promovid-wrap">
+    <div class="fpv-tab nwsb-inframe dev-tab-l">
+      <div class="fpv-screen">
+        <video class="fpv-video" data-nwsb-auto muted loop playsinline preload="none"
+               aria-hidden="true" tabindex="-1"
+               poster="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg">
+          <source src="https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.mp4" type="video/mp4">
+        </video>
+      </div>
     </div>
   </div>
 
@@ -10198,9 +10207,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=295"></script>
+<script src="app/js/part049.js?v=296"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="app/js/part051.js?v=15" defer></script>
+<script src="app/js/part051.js?v=16" defer></script>
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=15"></script>
 <script src="app/js/part056.js?v=5"></script>

@@ -11854,7 +11854,26 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    gone — the section is the plain card again, as it was. The render and
    its .dev-tab-l variant are kept below with the other frames; nothing
    wears it now. */
-.nwsb-inframe.dev-tab-l { padding: 0; background: transparent; }
+/* ── The landscape tablet ──
+   The render is trimmed to its own silhouette (x 98-1436, y 76-950 of the
+   1536x1024 original) because outside that it is all transparent margin,
+   and margin inside the box is dead space the section pays for on every
+   side. Trimmed it is 1339x875, and its screen sits at x 47-1291,
+   y 65-824 — which is where these four numbers come from.
+
+   Every one is a fraction of the WIDTH, because that is what percentage
+   padding means on all four sides. The screen is black painted in CSS and
+   clipped to the content box, not baked into the file: the render's screen
+   is transparent and its bezel layer sits ABOVE the content, so black in
+   the file would have covered the clip. The content box IS the aperture,
+   because the padding IS the bezel — so clipping to it is exact at any
+   size, with no second set of numbers to keep in step. */
+.nwsb-inframe.dev-tab-l {
+  padding: 4.854% 3.510% 3.734%;
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+}
 .nwsb-inframe.dev-tab-l::after { background-image: url('./assets/frames/tab-landscape.webp'); }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -12679,4 +12698,46 @@ body.nm-night .qa-tv-name  { color: #fff; }
 .qa-tv-banner-icon.dash-in, .qa-tv-banner-title.dash-in,
 .qa-tv-banner-sub.dash-in, .qa-tv-orb.dash-in {
   animation: nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THE PROMO CLIP, ON THE TABLET
+   Its wrapper used to be `background: transparent`, which is why it had
+   nothing behind it. It carries the render's own aspect so the bezel keeps
+   its true thickness at any width.
+═══════════════════════════════════════════════════════════════ */
+.fpv-tab {
+  width: 100%; position: relative;
+  aspect-ratio: 1339 / 875;      /* the trimmed render's own */
+}
+.fpv-screen {
+  position: relative; width: 100%; height: 100%;
+  overflow: hidden; border-radius: 0 !important;
+  background: #000;
+}
+.fpv-video {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  border-radius: 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   QUICK ACCESS — the wrapper
+   Neumorphic on the Normal home, glass on the Fashion home (that one comes
+   from #fashCubeSec.glass-wrap). The card is .qa-tv-block ITSELF rather
+   than a new element around it, because .qa-tv-block is what the layout
+   registry matches — wrapping it would make it a grandchild of the home
+   wrap and strand the section at the top of the page.
+═══════════════════════════════════════════════════════════════ */
+#home-nm .qa-tv-block {
+  border-radius: 22px !important;
+  background: #f0f2f7;
+  padding: 18px;
+  box-sizing: border-box;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+}
+#home-nm.nm-dark .qa-tv-block,
+body.nm-night #home-nm .qa-tv-block {
+  background: #16163c;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
 }
