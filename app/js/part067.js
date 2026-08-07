@@ -105,8 +105,15 @@
      page and the Edition cards each get their own. */
   /* Alternates that are not in the DOM until they are chosen — same reason
      as the coupon list above. */
+  /* Two more that live in the repo rather than on Cloudinary: the login
+     phone, and the Word Science tile's clip. Listed here so part051.js
+     warms them into VIDEO_CACHE during idle time like every other clip —
+     the login one especially, because it is the first thing a new reader
+     sees and it should not be arriving over the network while they wait. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || [])
-    .concat(['./assets/video/subscription-a.mp4']);
+    .concat(['./assets/video/subscription-a.mp4',
+             './assets/video/login-phone.mp4',
+             './assets/video/words-science.mp4']);
 
   var SWAP = [
     /* Two clips now, picked per launch — the banner that has always been

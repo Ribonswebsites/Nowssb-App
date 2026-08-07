@@ -5773,6 +5773,47 @@ body.fashtile-classic .home-tile-enter-go svg path { stroke: #e8d5a3 !important;
   display: none; position: absolute; inset: 0; z-index: 0;
   background-size: cover; background-repeat: no-repeat;
 }
+/* ── The one tile with a clip: Word Science ──
+   .nmh-tile-cover is the artwork layer every art tile draws, at z-index 0
+   under the scrim. This sits in the same place and does the same job, so
+   the title, the sub and the round icon over it need no special casing.
+
+   Its own scrim is turned back on beside it — .nmh-tile-photo-scrim ships
+   display:none because the photo layer it belongs to is dormant, and
+   without it white type would sit on the bright part of the footage. */
+.nmh-tile-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;            /* a 16:9 clip in a near-square tile */
+  display: block;
+  pointer-events: none;
+}
+/* .nmh-tile-vidart is a class on the tile, not :has() on the clip, and that
+   is deliberate. The type on this tile has to turn white to survive on top
+   of footage, and if the selector that does it ever failed the title would
+   be invisible rather than merely plain — dark ink on a dark clip. A class
+   in the markup cannot fail that way.
+
+   The scrim comes back on: .nmh-tile-photo-scrim ships display:none because
+   the photo layer it belongs to is dormant, and without it white type would
+   sit on the bright part of the footage. The brightness is the second half
+   of the same job — the clip has white highlights that a gradient alone
+   does not tame. */
+.nmh-tile-vidart > .nmh-tile-photo-scrim { display: block; z-index: 1; }
+.nmh-tile-vid { filter: brightness(0.6); }
+.nmh-tile-vidart .nmh-tile-txt,
+.nmh-tile-vidart .nmh-tile-rule,
+.nmh-tile-vidart .nmh-tile-icon,
+.nmh-tile-vidart .nmh-tile-enter { position: relative; z-index: 3; }
+.nmh-tile-vidart .nmh-tile-title {
+  color: #fff !important;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.85);
+}
+.nmh-tile-vidart .nmh-tile-sub {
+  color: rgba(255,255,255,0.66) !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+}
+
 .nmh-tile-photo-scrim, .home-tile-photo-scrim {
   display: none; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(160deg, rgba(6,12,24,0.28) 0%, rgba(6,12,24,0.66) 100%);
@@ -11312,17 +11353,19 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 }
 .lg-wrap::-webkit-scrollbar { display: none; }
 
-/* ── The words, on the black ──
-   Tighter than they were, because every pixel they take is a pixel the
-   phone cannot have, and the phone is the screen. */
-.lg-head { text-align: center; padding: 0 16px 12px; }
+/* ── The words, INSIDE the screen ──
+   They were on the black above the phone. On the screen they are part of
+   what the phone is showing, which is the point, so they sit at the top of
+   the glass and the pills sit low under them — see .nm-btn-list below,
+   where the auto margin is what actually pushes them down. */
+.lg-head { text-align: center; padding: 4px 2px 0; }
 .lg-head .nm-brand {
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
   letter-spacing: 5px; text-transform: uppercase; color: #c8a96e;
 }
 .lg-head .nm-auth-title {
-  font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800;
-  color: #fff; letter-spacing: -0.5px; line-height: 1.1; margin-top: 6px;
+  font-family: 'DM Sans', sans-serif; font-size: 25px; font-weight: 800;
+  color: #fff; letter-spacing: -0.5px; line-height: 1.1; margin-top: 5px;
 }
 .lg-head .nm-auth-sub {
   font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 300;
@@ -11341,8 +11384,8 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
      always derived from it. The middle term is the width at which the box
      would stand 74vh tall, so the height cap is still honoured; whichever
      of the three is smallest wins, and the aspect is never in question. */
-  width: min(100%, calc(86vh * 941 / 1672), 520px);
-  aspect-ratio: 941 / 1672;      /* the render's own — never stretched */
+  width: min(100%, calc(86vh * 720 / 1264), 520px);
+  aspect-ratio: 720 / 1264;      /* the clip's own — never stretched */
   height: auto;
   flex: 0 0 auto;
 }
@@ -11362,9 +11405,23 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    is already black, the glass is inset well within it, and nothing has to
    be overlapped. So the render drops to z-index 0 — above the element's
    own background, below the buttons — and stays whole. */
-.nwsb-inframe.dev-phone::after {
-  background-image: url('./assets/frames/phone-login.webp');
-  z-index: 0;
+/* The render is a <video> in the markup rather than a background here, so
+   this layer has nothing to draw. It stays declared and empty because
+   .nwsb-inframe::after paints a bezel for every other frame in the app and
+   leaving the rule out would be read as an oversight rather than a choice. */
+.nwsb-inframe.dev-phone::after { background-image: none; }
+
+/* The clip IS the phone. Behind the glass, at the element's own size, and
+   object-fit: contain rather than cover — the box already carries the
+   file's aspect, so contain and cover agree, and contain is the one that
+   still cannot crop if that aspect is ever changed by accident. */
+.lg-phone-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;         /* the buttons above it stay tappable */
+  background: #000;             /* the clip's own ground, before first paint */
 }
 
 /* The glass. Black, and the only thing that scrolls.
@@ -11376,14 +11433,14 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    cannot report a height upward, so the phone keeps the file's proportions
    whatever is inside and the content scrolls behind the bezel instead.
 
-   The inset is measured off the render itself: the screen sits inside
-   x 179–765 of 941 and y 155–1520 of 1672, and the camera pill runs down
-   to y 241 — so the top inset clears the pill rather than sitting under
+   The inset is measured off the clip's own frame: the screen sits inside
+   x 136–587 of 720 and y 110–1165 of 1264, and the camera pill runs down
+   to y 177 — so the top inset clears the pill rather than sitting under
    it. No background and no radius, because the phone's screen is already
    black and anything painted here would show as a lighter panel with its
    own corners floating inside the render. */
 .lg-glass {
-  position: absolute; inset: 15.3% 18.6% 9.1% 19%;
+  position: absolute; inset: 15.03% 18.333% 7.753% 18.889%;
   box-sizing: border-box; overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
   background: transparent; border-radius: 0 !important;
@@ -11398,8 +11455,17 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    happen: the top line was cut off and unreachable. Auto margins collapse
    to zero the moment the content is taller than the box, so it centres
    when it fits and scrolls from the top when it doesn't. */
-.lg-glass > *:first-child { margin-top: auto; }
-.lg-glass > *:last-child  { margin-bottom: auto; }
+/* The words at the top of the screen, the pills low under them.
+   margin-top: auto on the button list is what does it — it takes every
+   spare pixel between the words and the pills, so the pills sit as low as
+   the glass allows, and the margin-bottom below lifts them back off the
+   chin so they are low rather than jammed. When the content is taller than
+   the screen (a form open) both autos collapse to zero and it scrolls from
+   the top, which is the behaviour justify-content: center could not give:
+   centring in a scroller pushes the first line above scrollTop 0 where
+   nothing can reach it. */
+#login .nm-btn-list { margin-top: auto; }
+.lg-glass > *:last-child { margin-bottom: 9%; }
 .lg-glass::-webkit-scrollbar { display: none; }
 
 /* ── The buttons, on the black screen ──
@@ -11473,7 +11539,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 /* Short screens: the phone is height-driven now, so it shrinks on its own.
    What still needs help is the words above it, which do not. */
 @media (max-height: 720px) {
-  .lg-phone { width: min(100%, calc(78vh * 941 / 1672), 520px); }
+  .lg-phone { width: min(100%, calc(78vh * 720 / 1264), 520px); }
   .lg-head { padding: 0 16px 8px; }
   .lg-head .nm-auth-title { font-size: 22px; margin-top: 4px; }
   .lg-head .nm-auth-sub { font-size: 11.5px; margin-top: 3px; }

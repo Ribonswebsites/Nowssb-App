@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=664">
+<link rel="stylesheet" href="nowssb-nm.css?v=666">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -187,22 +187,29 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="screen lg-screen-black" id="login">
   <div class="nm-wrap lg-wrap">
 
-    <!-- Outside the phone, on the black: the words. No logo — the phone is
-         the object on this screen and a disc above it competed with it. -->
+
+    <!-- The phone. It is a clip now, not a still: the same render, moving.
+         Its aspect ratio is the file's own (720 x 1264), so nothing is
+         stretched, cropped or zoomed — the box is the shape of the footage
+         and the content scrolls within the glass instead of pushing the
+         bezel out of shape. The poster is the clip's OWN first frame, so
+         there is nothing to see between paint and play.
+
+         Muted, looped and inline, which is what lets it autoplay without a
+         tap on every browser that has a policy about it. -->
+    <div class="lg-phone nwsb-inframe dev-phone">
+      <video class="lg-phone-vid" autoplay muted loop playsinline
+             preload="auto" poster="./assets/video/login-phone-poster.webp"
+             aria-hidden="true" tabindex="-1"
+             src="./assets/video/login-phone.mp4"></video>
+      <div class="lg-glass">
+
+    <!-- Inside the screen now, not on the black above it. -->
     <div class="nm-logo-area lg-head">
       <div class="nm-brand">Nowsbansiu</div>
       <div class="nm-auth-title">Welcome</div>
       <div class="nm-auth-sub">Sign in or create your account</div>
     </div>
-
-    <!-- The phone. Its aspect ratio is the frame file's own (1024 x 1536),
-         so the render is never stretched, cropped or zoomed to fit
-         whatever is inside it — the box is the shape of the photograph
-         and the content scrolls within the glass instead of pushing the
-         bezel out of shape. The render carries its own corners and its
-         own black background; nothing here rounds or clips it. -->
-    <div class="lg-phone nwsb-inframe dev-phone">
-      <div class="lg-glass">
 
     <div class="nm-btn-list">
 
@@ -1012,10 +1019,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
         <div class="nmh-tile-enter"><span class="nmh-tile-enter-lbl">Enter</span><span class="nmh-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
       </div>
-      <div class="nmh-tile nmh-tile-art" onclick="openSub('word-science')">
+      <div class="nmh-tile nmh-tile-art nmh-tile-vidart" onclick="openSub('word-science')">
         <div class="nmh-tile-cover" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png');"></div>
         <div class="nmh-tile-cover-scrim"></div>
-        <div class="nmh-tile-photo" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_700/v1784130175/grok_image_1784120203500_t6zwrf.jpg');background-position:center;"></div>
+        <!-- Word Science is the one tile with a clip of its own. It sits
+             where .nmh-tile-cover's artwork would be, under the same scrim,
+             so the title and the sub read exactly as they do on the others. -->
+        <video class="nmh-tile-vid" data-nwsb-auto muted loop playsinline
+               preload="none" poster="./assets/video/words-science-poster.webp"
+               aria-hidden="true" tabindex="-1"
+               src="./assets/video/words-science.mp4"></video>
         <div class="nmh-tile-photo-scrim"></div>
         <img class="nmh-tile-articon" loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_0000000015b071f48397d34be0129b36_bx9cur.png" alt="">
         <div class="nmh-tile-icon">
@@ -9982,7 +9995,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=9"></script>
-<script src="app/js/part067.js?v=21"></script>
+<script src="app/js/part067.js?v=22"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
