@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=673">
+<link rel="stylesheet" href="nowssb-nm.css?v=674">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -4842,7 +4842,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
            Both clips crossfade behind it, because the collection is both
            the Word Atelier's and the Meaning Store's. ══ -->
       <div class="sig-store-section" id="sigStoreSection" onclick="sigOpenStore()">
-        <img class="sig-store-art" src="./assets/signature/nowssb-signature.webp" alt="NowssB Signature" loading="lazy" decoding="async">
+        <!-- The clip, wearing .sig-store-art so the frame, the crop anchor
+             and the gold overlay above it are unchanged — object-fit: cover
+             on an absolute layer reads the same for a video as for an image.
+             The poster is the clip's own first frame, so the section is
+             never blank while it loads. -->
+        <video class="sig-store-art" data-nwsb-auto muted loop playsinline
+               preload="none" poster="./assets/video/signature-store-poster.webp"
+               aria-hidden="true" tabindex="-1"
+               src="./assets/video/signature-store.mp4"></video>
         <div class="sig-store-overlay"></div>
         <div class="sig-store-shine" aria-hidden="true"></div>
 
@@ -10003,7 +10011,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>
-<script src="app/js/part066.js?v=9"></script>
+<script src="app/js/part066.js?v=41"></script>
 <script src="app/js/part067.js?v=22"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->

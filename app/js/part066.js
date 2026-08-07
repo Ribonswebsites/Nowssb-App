@@ -23,7 +23,13 @@
   var TILES = [
     { open: 'sound-library', vid: 'https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-20_lju6u7.mp4' },
     { open: 'my-progress',   vid: 'https://res.cloudinary.com/eenvubod/video/upload/v1785402440/grok_video_2026-07-30-14-35-18_kucgwh.mp4' },
-    { open: 'word-science',  img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785402429/grok_image_1785402330575_bbykvf.jpg' },
+    /* Word Science was the one tile still showing a still while the other
+       three played — so with Fashion Plus on, three tiles moved and one
+       sat there. Its clip lives in the repo rather than on Cloudinary
+       because it was supplied as a file; mediaEl() already builds a
+       <video> for `vid` and an <img> for `img`, so this is the only line
+       that had to change. */
+    { open: 'word-science',  vid: './assets/video/fp-word-science.mp4' },
     { open: 'profile',       vid: 'https://res.cloudinary.com/eenvubod/video/upload/v1785402435/grok_video_2026-07-30-14-35-16_j5tr1g.mp4' }
   ];
   var PRACTICE_VID = 'https://res.cloudinary.com/eenvubod/video/upload/v1785403502/grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
@@ -46,7 +52,10 @@
   /* Only whichever one is playing is ever in the document, so the other two
      have to be registered or they would each be downloaded on the spot the
      moment their turn came. */
-  window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(RT_VIDS);
+  window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || [])
+    .concat(RT_VIDS)
+    .concat(TILES.filter(function (t) { return t.vid && t.vid.charAt(0) === '.'; })
+                 .map(function (t) { return t.vid; }));
 
   var rtIdx = 0;
   try { rtIdx = (parseInt(localStorage.getItem(RT_KEY), 10) || 0) % RT_VIDS.length; } catch (e) {}
