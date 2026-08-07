@@ -609,3 +609,74 @@ window.pwCloseMeaning = function() {
 })();
 window.wsCloseResult = function () { var p = document.getElementById('wsResultPage'); if (p) p.classList.remove('show'); };
 window.msCloseResult = function () { var p = document.getElementById('msResultPage'); if (p) p.classList.remove('show'); };
+
+/* ── Quick Access — one rotation, two places ──────────────────────────────
+   The television's black banner cycles through Cart, Wishlist and Order,
+   and the disc in the heading above it changes to the same mark at the same
+   moment, so the two read as one thing rather than two.
+
+   Both homes carry the block, so everything here is per-element: each
+   .qa-tv-block keeps its own index. The banner is the app's own
+   .nmh-sec-banner, so it inherits that component's height, icon tile and
+   round enter button rather than reinventing them.
+   ── */
+(function () {
+  var ITEMS = [
+    { key: 'cart', open: 'cart', title: 'Your Cart',
+      sub: 'Everything you’re ready to buy',
+      svg: '<svg viewBox="0 0 22 22" fill="none">' +
+             '<path d="M3 3h1.5l2.5 7h9l2-5H7" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+             '<circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3"/><circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3"/></svg>' },
+    { key: 'wishlist', open: 'wishlist', title: 'Your Wishlist',
+      sub: 'The words you saved for later',
+      svg: '<svg viewBox="0 0 22 22" fill="none">' +
+             '<path d="M11 18S4 13 4 8.5A4.5 4.5 0 0111 5a4.5 4.5 0 017 3.5C18 13 11 18 11 18z" stroke="#e8d5a3" stroke-width="1.6" fill="rgba(232,213,163,0.12)"/></svg>' },
+    { key: 'orders', open: 'orders', title: 'Your Orders',
+      sub: 'Bought, paid and on its way',
+      svg: '<svg viewBox="0 0 22 22" fill="none">' +
+             '<path d="M4 6.5h14v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 17.5z" stroke="#e8d5a3" stroke-width="1.6" stroke-linejoin="round"/>' +
+             '<path d="M7.5 6.5V5a3.5 3.5 0 0 1 7 0v1.5" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round"/>' +
+             '<path d="M8 11.5h6" stroke="#e8d5a3" stroke-width="1.5" stroke-linecap="round"/></svg>' }
+  ];
+
+  function paint(block, i) {
+    var it  = ITEMS[i % ITEMS.length];
+    var orb = block.querySelector('.qa-tv-orb');
+    var ban = block.querySelector('.qa-tv-banner');
+    if (!ban) return;
+    var ico = ban.querySelector('.qa-tv-banner-icon');
+    var ttl = ban.querySelector('.qa-tv-banner-title');
+    var sub = ban.querySelector('.qa-tv-banner-sub');
+    if (ico) ico.innerHTML = it.svg;
+    if (orb) orb.innerHTML = it.svg;
+    if (ttl) ttl.textContent = it.title;
+    if (sub) sub.textContent = it.sub;
+    ban.setAttribute('onclick', "openSub('" + it.open + "')");
+    /* The same dash the trending word and the store pills already make, so
+       the change reads as a change rather than a flicker. */
+    [ico, orb, ttl, sub].forEach(function (el) {
+      if (!el) return;
+      el.classList.remove('dash-in');
+      void el.offsetWidth;
+      el.classList.add('dash-in');
+    });
+  }
+
+  function init() {
+    var blocks = document.querySelectorAll('.qa-tv-block');
+    if (!blocks.length) return setTimeout(init, 500);
+    blocks.forEach(function (b) { b._qaIdx = 0; paint(b, 0); });
+    setInterval(function () {
+      if (document.hidden) return;
+      document.querySelectorAll('.qa-tv-block').forEach(function (b) {
+        /* Only the home that is actually on screen — no point animating a
+           block on the home nobody is looking at. */
+        var screen = b.closest('.screen');
+        if (screen && !screen.classList.contains('active')) return;
+        b._qaIdx = ((b._qaIdx || 0) + 1) % ITEMS.length;
+        paint(b, b._qaIdx);
+      });
+    }, 3200);
+  }
+  init();
+})();

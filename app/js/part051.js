@@ -242,10 +242,21 @@
       if (!v.isConnected) { tracked.splice(i, 1); continue; }
       if ((io ? onScreen.has(v) : true) && shown(v)) live.push(v);
     }
-    /* Nearest the middle of the screen wins the decoders. */
+    /* Nearest the middle of the screen wins the decoders — except for a clip
+       that IS its section rather than decoration behind one. The television
+       screen is the whole point of the section it sits in, and on a home
+       with a dozen background loops it kept losing the budget to whichever
+       four happened to be nearer the middle: the clip loaded, played for a
+       moment, and was paused again, which looks exactly like a still. Those
+       sort first and therefore always get a slot while they are on screen.
+       Still at most MAX_PLAYING — this changes which four, not how many. */
+    var PRIORITY = '.qa-tv-vid';
+    function prio(v) { return v.matches && v.matches(PRIORITY) ? 0 : 1; }
     if (live.length > MAX_PLAYING) {
       var mid = (window.innerHeight || 800) / 2;
       live.sort(function (a, b) {
+        var pa = prio(a), pb = prio(b);
+        if (pa !== pb) return pa - pb;
         var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
         return Math.abs((ra.top + ra.bottom) / 2 - mid) - Math.abs((rb.top + rb.bottom) / 2 - mid);
       });

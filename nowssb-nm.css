@@ -12556,21 +12556,48 @@ body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] {
 ═══════════════════════════════════════════════════════════════ */
 .qa-tv-block { width: 100%; }
 
-/* ── The heading above ── */
-.qa-tv-head { padding: 0 2px 12px; }
-.qa-tv-eyebrow {
-  display: block;
-  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 800;
-  letter-spacing: 2.6px; text-transform: uppercase;
-  color: #c8a96e; margin-bottom: 6px;
+/* ── The heading above ──
+   The same shape as the home's own greeting: a disc on the left holding a
+   mark, a light line and a heavy one under it. The disc is neumorphic on
+   the Normal home and glass on the Fashion home — the two skins of the
+   same component. app/js/part049.js swaps the mark in step with the
+   banner below. */
+.qa-tv-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 2px 14px;
 }
-.qa-tv-title {
-  font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800;
-  letter-spacing: -0.3px; line-height: 1.2; color: #1a1a2e;
+.qa-tv-orb {
+  width: 54px; height: 54px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50% !important;
+  background: #f0f2f7; color: #c8a96e;
+  box-shadow: 6px 6px 14px rgba(163,177,198,0.6), -5px -5px 12px #ffffff;
 }
-#home .qa-tv-title { color: #fff; }
-#home .qa-tv-eyebrow { color: #e8d5a3; }
-body.nm-night .qa-tv-title { color: #fff; }
+.qa-tv-orb svg { width: 26px; height: 26px; display: block; }
+/* Fashion: the same disc in glass. */
+#home .qa-tv-orb {
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.22);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.28);
+}
+body.nm-night .qa-tv-orb {
+  background: #16163c;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.85), -4px -4px 12px rgba(50,50,110,0.32);
+}
+.qa-tv-head-txt { flex: 1; min-width: 0; }
+.qa-tv-hello {
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 400;
+  color: rgba(26,26,46,0.62); letter-spacing: -0.2px; line-height: 1.2;
+}
+.qa-tv-name {
+  font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800;
+  color: #1a1a2e; letter-spacing: -0.6px; line-height: 1.12;
+}
+#home .qa-tv-hello { color: rgba(255,255,255,0.66); }
+#home .qa-tv-name  { color: #fff; }
+body.nm-night .qa-tv-hello { color: rgba(255,255,255,0.6); }
+body.nm-night .qa-tv-name  { color: #fff; }
 
 /* ── The screen ──
    .nmh-quick-tv's content box IS the aperture (its padding is the bezel),
@@ -12606,11 +12633,22 @@ body.nm-night .qa-tv-title { color: #fff; }
   padding: 6px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
 }
-/* A real rule between them rather than an inset shadow, so it reads as a
-   line on the glass at any size. */
+/* A short, thicker rule between them — drawn as a pseudo-element rather
+   than a border, because a border runs the full height of the button and
+   a divider that tall reads as three separate panels rather than one
+   screen split three ways. 44% of the height, centred, 2px wide. */
 #home-nm .qa-tv-screen .nmh-quick-btn + .nmh-quick-btn,
 #home .qa-tv-screen .nmh-quick-btn + .nmh-quick-btn {
-  border-left: 1px solid rgba(255,255,255,0.22) !important;
+  border-left: none !important;
+  position: relative;
+}
+#home-nm .qa-tv-screen .nmh-quick-btn + .nmh-quick-btn::before,
+#home .qa-tv-screen .nmh-quick-btn + .nmh-quick-btn::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  width: 2px; height: 44%; transform: translateY(-50%);
+  background: rgba(255,255,255,0.34);
+  border-radius: 2px !important;
+  pointer-events: none;
 }
 #home-nm .qa-tv-screen .nmh-quick-btn span,
 #home .qa-tv-screen .nmh-quick-btn span {
@@ -12628,27 +12666,17 @@ body.nm-night .qa-tv-title { color: #fff; }
   box-shadow: none !important; transform: none;
 }
 
-/* ── The black banner below ── */
-.qa-tv-banner {
-  display: flex; align-items: center; gap: 14px;
-  width: 100%; margin-top: 12px; padding: 14px 16px;
-  background: #000; border-radius: 16px !important;
-  cursor: pointer;
+/* ── The black banner below ──
+   It IS .nmh-sec-banner, the component Today's Offer and Daily Streak use,
+   so the height, the icon tile and the round enter button are the app's
+   own rather than a second set of numbers. Only the margins are this
+   block's business. */
+.qa-tv-banner.nmh-sec-banner { margin: 12px 0 0 !important; }
+.qa-tv-banner .nmh-sec-banner-icon svg,
+.qa-tv-orb svg { display: block; }
+/* The dash the trending word and the store pills already make, so a swap
+   reads as a change rather than a flicker. */
+.qa-tv-banner-icon.dash-in, .qa-tv-banner-title.dash-in,
+.qa-tv-banner-sub.dash-in, .qa-tv-orb.dash-in {
+  animation: nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both;
 }
-.qa-tv-banner:active { opacity: .88; }
-.qa-tv-banner-ico { width: 34px; height: 34px; flex-shrink: 0; }
-.qa-tv-banner-ico svg { width: 100%; height: 100%; display: block; }
-.qa-tv-banner-divider { width: 1px; height: 40px; flex-shrink: 0; background: rgba(255,255,255,0.15); }
-.qa-tv-banner-txt { flex: 1; min-width: 0; }
-.qa-tv-banner-title {
-  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800;
-  color: #fff; letter-spacing: .2px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.qa-tv-banner-sub {
-  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 400;
-  color: rgba(255,255,255,0.55); margin-top: 2px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.qa-tv-banner-arrow { width: 22px; height: 22px; flex-shrink: 0; }
-.qa-tv-banner-arrow svg { width: 100%; height: 100%; display: block; }

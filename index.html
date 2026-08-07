@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=689">
+<link rel="stylesheet" href="nowssb-nm.css?v=690">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -1366,9 +1366,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          the home wrap, so registering a nested element would find nothing
          and strand the whole section at the top of the page. -->
     <div class="qa-tv-block">
+      <!-- The same shape as the home's greeting: a disc on the left with a
+           mark in it, a light line and a heavy one. The disc's mark and the
+           banner below change together — app/js/part049.js drives both. -->
       <div class="qa-tv-head">
-        <span class="qa-tv-eyebrow">NowssB · Yours</span>
-        <div class="qa-tv-title">Everything You Own, On One Screen</div>
+        <div class="qa-tv-orb" aria-hidden="true"></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Everything You Own</div>
+          <div class="qa-tv-name">On One Screen</div>
+        </div>
       </div>
       <!-- .nmh-quick-tv IS the frame: the bezel is its padding and the
            aperture is its content box. .qa-tv-screen fills that content box
@@ -1406,21 +1412,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           </div>
         </div>
       </div>
-      <div class="qa-tv-banner" onclick="openSub('cart')">
-        <div class="qa-tv-banner-ico">
-          <svg viewBox="0 0 22 22" fill="none">
-            <path d="M3 3h1.5l2.5 7h9l2-5H7" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3"/>
-            <circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3"/>
-          </svg>
+      <!-- The app's own black banner, same component as Today's Offer and
+           Daily Streak — same height, same icon tile, same round enter
+           button. Its contents cycle through Cart, Wishlist and Order. -->
+      <div class="nmh-sec-banner qa-tv-banner" onclick="openSub('cart')">
+        <div class="nmh-sec-banner-icon qa-tv-banner-icon"></div>
+        <div class="nmh-sec-banner-divider"></div>
+        <div class="nmh-sec-banner-txt">
+          <div class="nmh-sec-banner-title qa-tv-banner-title">Your Cart</div>
+          <div class="nmh-sec-banner-sub qa-tv-banner-sub">Everything you&#39;re ready to buy</div>
         </div>
-        <div class="qa-tv-banner-divider"></div>
-        <div class="qa-tv-banner-txt">
-          <div class="qa-tv-banner-title">Your Cart &amp; Orders</div>
-          <div class="qa-tv-banner-sub">Everything saved, bought and on its way</div>
-        </div>
-        <div class="qa-tv-banner-arrow">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="nmh-sec-banner-arrow">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.92)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
       </div>
     </div><!-- /qa-tv-block -->
@@ -2075,9 +2078,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        registry matches. -->
   <div id="fashCubeSec" class="glass-wrap fash-qa-wrap">
     <div class="qa-tv-block">
+        <!-- The same shape as the home's greeting: a disc on the left with a
+             mark in it, a light line and a heavy one. The disc's mark and the
+             banner below change together — app/js/part049.js drives both. -->
         <div class="qa-tv-head">
-          <span class="qa-tv-eyebrow">NowssB · Yours</span>
-          <div class="qa-tv-title">Everything You Own, On One Screen</div>
+          <div class="qa-tv-orb" aria-hidden="true"></div>
+          <div class="qa-tv-head-txt">
+            <div class="qa-tv-hello">Everything You Own</div>
+            <div class="qa-tv-name">On One Screen</div>
+          </div>
         </div>
         <!-- .nmh-quick-tv IS the frame: the bezel is its padding and the
              aperture is its content box. .qa-tv-screen fills that content box
@@ -2115,21 +2124,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             </div>
           </div>
         </div>
-        <div class="qa-tv-banner" onclick="openSub('cart')">
-          <div class="qa-tv-banner-ico">
-            <svg viewBox="0 0 22 22" fill="none">
-              <path d="M3 3h1.5l2.5 7h9l2-5H7" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="9" cy="18.5" r="1.5" fill="#e8d5a3"/>
-              <circle cx="16" cy="18.5" r="1.5" fill="#e8d5a3"/>
-            </svg>
+        <!-- The app's own black banner, same component as Today's Offer and
+             Daily Streak — same height, same icon tile, same round enter
+             button. Its contents cycle through Cart, Wishlist and Order. -->
+        <div class="nmh-sec-banner qa-tv-banner" onclick="openSub('cart')">
+          <div class="nmh-sec-banner-icon qa-tv-banner-icon"></div>
+          <div class="nmh-sec-banner-divider"></div>
+          <div class="nmh-sec-banner-txt">
+            <div class="nmh-sec-banner-title qa-tv-banner-title">Your Cart</div>
+            <div class="nmh-sec-banner-sub qa-tv-banner-sub">Everything you&#39;re ready to buy</div>
           </div>
-          <div class="qa-tv-banner-divider"></div>
-          <div class="qa-tv-banner-txt">
-            <div class="qa-tv-banner-title">Your Cart &amp; Orders</div>
-            <div class="qa-tv-banner-sub">Everything saved, bought and on its way</div>
-          </div>
-          <div class="qa-tv-banner-arrow">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="nmh-sec-banner-arrow">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.92)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </div>
     </div><!-- /qa-tv-block -->
@@ -10192,9 +10198,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=294"></script>
+<script src="app/js/part049.js?v=295"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="app/js/part051.js?v=14" defer></script>
+<script src="app/js/part051.js?v=15" defer></script>
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=15"></script>
 <script src="app/js/part056.js?v=5"></script>
