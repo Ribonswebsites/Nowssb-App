@@ -150,11 +150,6 @@
     ['words',   'Words',    'Own the sounds that heal'],
     ['ebooks',  'eBooks',   'Deep-dive guides, yours to keep']
   ];
-  var CONNECT_CHIPS = [
-    ['connect', 'Community', 'See what others are practising'],
-    ['chat',    'Chat',      'Your conversations, in one place'],
-    ['profile', 'Profile',   'Your space on NowssB']
-  ];
   var TREND_CHIPS = [
     ['words',   'Trending Word', 'What is healing the most today'],
     ['meaning', 'Meanings',      'The origin behind any word'],
@@ -167,7 +162,8 @@
 
   var CHIPS = [
     { sel: '#home-nm .vb-banner[data-vb="vb0"], #home .vb-banner[data-vb="vb1"]', items: STORE_CHIPS },
-    { sel: '#home-nm .vb-banner[data-vb="vb4"], #home .vb-banner[data-vb="vb5"]', items: CONNECT_CHIPS },
+    /* The Connect banner takes no chips — Community / Chat / Profile sat
+       over the right of the clip, and that clip carries its own wordmark. */
     { sel: '#home-nm .vb-banner[data-vb="vb6"], #home .vb-banner[data-vb="vb7"]', items: TREND_CHIPS },
     { sel: '#home-nm .nmh-rdsec-wrap .reader-sec, #home .fash-rdsec-wrap .reader-sec', items: READER_CHIPS }
   ];
