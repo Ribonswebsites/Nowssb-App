@@ -12496,3 +12496,35 @@ body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] {
   background-image: none !important;
   background-color: #0a0e1a !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   CART · WISHLIST · ORDER, ON THE TELEVISION
+   The .dev-tv-l render above has been in this file, worn by nothing, since
+   the frame came off the quick row. It is back on it.
+
+   The frame carries the render's own aspect. Left to the row's natural
+   height the box came out 372x107 — 3.5 against the television's 1.75 —
+   and three buttons in a letterbox do not read as a television.
+═══════════════════════════════════════════════════════════════ */
+.nmh-quick-tv {
+  width: 100%; position: relative;
+  aspect-ratio: 1452 / 831;      /* the trimmed render's own */
+}
+#home-nm .nmh-quick-tv .nmh-quick-row { gap: 0; height: 100%; }
+#home-nm .nmh-quick-tv .nmh-quick-btn {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 6px;
+  justify-content: center;       /* centred on the screen, not the top of it */
+}
+#home-nm .nmh-quick-tv .nmh-quick-btn:active {
+  background: rgba(255,255,255,0.06) !important;
+  box-shadow: none !important; transform: none;
+}
+#home-nm .nmh-quick-tv .nmh-quick-btn span { color: rgba(255,255,255,0.72); }
+/* Hairlines between them, so three buttons on one black screen still read
+   as three buttons. */
+#home-nm .nmh-quick-tv .nmh-quick-btn + .nmh-quick-btn {
+  box-shadow: inset 1px 0 0 rgba(255,255,255,0.10) !important;
+}
