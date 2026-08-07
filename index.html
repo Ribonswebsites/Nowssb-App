@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=702">
+<link rel="stylesheet" href="nowssb-nm.css?v=703">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -4501,7 +4501,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
-  <div class="sub-screen-bg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777635201/grok_image_1777634717809_jbqvaq.jpg');background-position:50% 30%;"></div>
+  <div class="sub-screen-bg gsel-bg">
+    <video class="gsel-bg-vid" muted loop playsinline autoplay preload="none"
+           poster="./assets/video/healing-path-bg-poster.webp"
+           src="./assets/video/healing-path-bg.mp4?v=1"></video>
+  </div>
   <div class="sub-header nav-bar" style="background-color:transparent;">
     <div class="sub-back" onclick="closeSub('health-journey')">
       <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="square"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/></svg>
@@ -4521,7 +4525,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <span class="brand-name" style="font-size:24px;"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
       </div>
       <div class="gsel-cards">
-        <div class="gsel-card" id="gsel-card-male" onclick="openHealthGender('male')">
+        <div class="gsel-card dev-tabn-p" id="gsel-card-male" onclick="openHealthGender('male')">
           <div class="gsel-foryou-badge">For You</div>
           <div class="gsel-card-img" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777635128/grok_image_1777632687913_2_t4jezy.jpg');"></div>
           <div class="gsel-card-info">
@@ -4529,7 +4533,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
             <span class="gsel-card-tag">Strength · Vitality</span>
           </div>
         </div>
-        <div class="gsel-card" id="gsel-card-female" onclick="openHealthGender('female')">
+        <div class="gsel-card dev-tabn-p" id="gsel-card-female" onclick="openHealthGender('female')">
           <div class="gsel-foryou-badge">For You</div>
           <div class="gsel-card-img" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777635115/grok_image_1777632677047_2_rnnm0k.jpg');"></div>
           <div class="gsel-card-info">
@@ -10247,9 +10251,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=296"></script>
+<script src="app/js/part049.js?v=297"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="app/js/part051.js?v=16" defer></script>
+<script src="app/js/part051.js?v=17" defer></script>
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=15"></script>
 <script src="app/js/part056.js?v=5"></script>

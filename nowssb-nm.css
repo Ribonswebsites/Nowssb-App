@@ -13075,3 +13075,98 @@ body.nm-night #home-nm .qa-tv-block {
 }
 /* Same on the Normal home, where the carousel is a plain sibling. */
 #home-nm .nmh-connect-sec.dev-tabs-p + .ncb-carousel { margin-top: 0 !important; }
+
+/* ══════════════════════════════════════════════════════════════════
+   HEALING PATH — the clip behind it, and Male / Female each on a tablet
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── The backdrop ──
+   The section used to be a still. It is the clip now, sitting inside the
+   same .sub-screen-bg box, so the ::after scrim that sheet already draws
+   over the background falls on it unchanged — the pseudo-element is the
+   last child in paint order, so it covers the video without any z-index
+   of its own. */
+.gsel-bg-vid {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 30%;
+  display: block; border-radius: 0 !important;
+  background: #060c18;
+}
+/* The neumorphic sheet hides most sub-screen backgrounds and then re-shows
+   this one further down; the clip has to follow the box either way. */
+body.nm-mode #sub-health-journey .gsel-bg,
+body.nm-night #sub-health-journey .gsel-bg,
+body.nm-glass #sub-health-journey .gsel-bg { display: block !important; }
+
+/* ── Male / Female, each on its own tablet ──
+   Same pattern as every other frame in this file: the card IS the tablet.
+   Its padding is the bezel, its content box is the aperture, the render
+   goes on a pseudo-element above everything, and the black screen is
+   painted by background-clip: content-box.
+   Trimmed 850x1309, screen at x 25-823, y 46-1271.
+   The bezel is NOT padding here, which every other frame in this file uses.
+   Percentage padding resolves against the CONTAINING BLOCK's width, not the
+   element's own — everywhere else the framed element spans its container so
+   the two are the same number, but these two cards are half-width flex
+   items, and 5.4118% of the row measured 19.0px where the aperture wanted
+   9.25px. So the aperture is described by offsets on the children instead,
+   which resolve against this element's own box.
+   The attribute selector is there for weight — body.nm-mode
+   #sub-health-journey .gsel-card is (1,2,1) with !important on the border,
+   radius and shadow, and this has to outrank it in every mode. */
+body[class] #sub-health-journey .gsel-card.dev-tabn-p {
+  aspect-ratio: 850 / 1309 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;   /* the render must not be clipped */
+}
+body[class] #sub-health-journey .gsel-card.dev-tabn-p::before {
+  content: ''; position: absolute; inset: 0; z-index: 20;
+  pointer-events: none;
+  background: url('./assets/frames/tab-nowss8-portrait.webp') center / 100% 100% no-repeat;
+}
+/* The photo and the ::after gradient are inset:0, which resolves against
+   the PADDING box — that is the whole tablet, bezel included. Pinning the
+   aspect-ratio above makes the height known, so the four offsets can be
+   given as percentages and land on the aperture instead: left/right of the
+   width, top/bottom of the height. Unlike padding, offsets on an
+   absolutely-positioned child resolve against THIS element's box, which is
+   the whole reason the bezel is expressed here. */
+body[class] #sub-health-journey .gsel-card.dev-tabn-p .gsel-card-img,
+body[class] #sub-health-journey .gsel-card.dev-tabn-p::after {
+  top: 3.5142% !important; bottom: 2.8266% !important;
+  left: 2.9412% !important; right: 3.0588% !important;
+  border-radius: 0 !important;
+}
+/* The photo is also the screen's black backing — it covers the aperture
+   exactly, so nothing shows through the glass if the art never loads. */
+body[class] #sub-health-journey .gsel-card.dev-tabn-p .gsel-card-img {
+  background-color: #000;
+}
+/* Male / Female and their tag were laid out by justify-content:flex-end
+   against the bottom of the card, which is now the bottom of the tablet —
+   below the screen. Pinned to the aperture's own bottom corner instead. */
+body[class] #sub-health-journey .gsel-card.dev-tabn-p .gsel-card-info {
+  position: absolute; z-index: 3;
+  left: 2.9412%; right: 3.0588%; bottom: 2.8266%;
+}
+/* "For You" is the one thing that should stay pinned to the screen's own
+   corner rather than the tablet's. */
+body[class] #sub-health-journey .gsel-card.dev-tabn-p .gsel-foryou-badge {
+  top: 5.5%; right: 7%; z-index: 21;
+}
+/* The highlight was a border glow and a box-shadow pulse, and neither
+   reads on a frame whose edges are a picture. Drop-shadow on the render
+   traces the tablet's actual silhouette instead. */
+body[class] #sub-health-journey .gsel-card.dev-tabn-p.for-you {
+  animation: none !important;
+}
+body[class] #sub-health-journey .gsel-card.dev-tabn-p.for-you::before {
+  filter: drop-shadow(0 0 9px rgba(212,175,55,0.62));
+}
+/* Two tablets side by side are taller than two 2:3 cards were, so the
+   panel gives back the room the old padding was taking. */
+#sub-health-journey .gsel-cards:has(> .dev-tabn-p) { gap: 10px; }
