@@ -13038,3 +13038,40 @@ body.nm-night #home-nm .qa-tv-block {
   box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
 }
 #home .nwsb-vbwrap { /* .glass-wrap supplies the look on this home */ }
+
+/* ── Nothing gets cut ──
+   The clips are 16:9 (1.778) and the apertures are not. object-fit:cover
+   fills the hole by cropping the source's sides, and measured against each
+   aperture that costs: 18.2% off each side of the subscription banner
+   (1.453) — which is what sliced through "NowssB Subscription" — 7.9% off
+   the promo (1.638), 2.1% off the laptop (1.741) and 1.0% off the Connect
+   banner (1.760).
+   `contain` fits the whole frame instead. The screen behind is already
+   black, so the letterboxing is invisible — which is also what a real
+   tablet does with a 16:9 film. */
+.dev-tabs-l .vbs-screen > video,
+.dev-tabc-l .vbf-screen > video,
+.dev-laptop .vbf-screen > video,
+.fpv-video {
+  object-fit: contain !important;
+  background: #000;
+}
+
+/* ── The tablet and the banner under it are two things now ──
+   The Connect section and its carousel were built to butt together as one
+   block: `#home .fash-connect-wrap > .nmh-connect-sec { margin-bottom: 0
+   !important }` with the carousel taking the bottom two corners. Now that
+   the section is a tablet, the bezel and its feet ran straight into the
+   black banner. These are the same two rules one class more specific, so
+   they win: a gap between them, and the banner gets all four of its own
+   corners back. */
+.nmh-connect-sec.dev-tabs-p { margin-bottom: 14px !important; }
+#home .fash-connect-wrap > .nmh-connect-sec.dev-tabs-p {
+  margin-bottom: 14px !important;
+  border-radius: 0 !important;
+}
+#home .fash-connect-wrap:has(> .nmh-connect-sec.dev-tabs-p) > .ncb-carousel {
+  border-radius: 18px !important;
+}
+/* Same on the Normal home, where the carousel is a plain sibling. */
+#home-nm .nmh-connect-sec.dev-tabs-p + .ncb-carousel { margin-top: 0 !important; }
