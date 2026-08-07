@@ -1280,22 +1280,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), right
          below Today's Practice, combined into one padded section. ══ -->
-    <div class="nmh-offer-section">
-      <div class="nmh-banner-wrap">
-        <img class="nmh-greet-img" id="nmhGreetImg" alt="NowssB Store coupons" draggable="false"
-             onclick="openSub('offers')" />
-        <button class="nmh-banner-cta nmh-banner-cta-tc" id="nmhCouponCta" onclick="event.stopPropagation();openSub('offers')"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
-      </div>
-      <div class="nmh-sec-banner nmh-offer-banner" onclick="openSub('offers')">
-        <div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-        <div class="nmh-sec-banner-divider"></div>
-        <div class="nmh-sec-banner-txt">
-          <div class="nmh-sec-banner-title">Today's Offer</div>
-          <div class="nmh-sec-banner-sub">Rotating store coupons — tap to redeem today's deal</div>
-        </div>
-        <div class="nmh-sec-banner-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-    </div>
+    <!-- The Today's Offer / Shop Now coupon banner that sat here is gone. -->
 
     <!-- Heading above the AI Prescription section — icon + vertical divider
          + title/sub, no background/box, just a section label. -->
@@ -1893,11 +1878,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </span>
   </div>
 
-  <!-- Video banner — below Today's Practice / streak -->
-  <div class="fash-video-banner" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="cursor:pointer;">
-    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4"></video>
-    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
-  </div>
+  <!-- The Shop Now video banner that sat here is gone. -->
 
   <!-- AI Prescription Card -->
   <div id="rxCardWrap" style="width:100%;"></div>
@@ -10160,7 +10141,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=12"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=28"></script>
+<script src="app/js/part062.js?v=29"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>

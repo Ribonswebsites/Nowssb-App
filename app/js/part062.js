@@ -53,7 +53,10 @@
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
         { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner' },
         { k:'custom',   sel:['.nmh-cust-panel'],                                           t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
-        { k:'offer',    sel:['.nmh-offer-section:not(.nmh-rx-section)'],                   t:S, label:"Today's Offer",         sub:'Rotating store coupons' },
+        /* 'offer' and 'shopvid' are gone — the two Shop Now banners they
+           pointed at were removed from the homes, and a registry row with
+           nothing behind it shows up in Customize as a switch that does
+           nothing. */
         { k:'rx',       sel:['.nmh-rx-heading', '.nmh-rx-section'],                        t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'routines', sel:['.home-card.home-card-static.w100'],                          t:S, label:'My Routines',           sub:'Daily practice system' },
         { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc' },
@@ -91,7 +94,6 @@
            home no matter where it was written. That is exactly what happened
            to this card. */
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' },
-        { k:'shopvid',  sel:['.fash-video-banner:not(.fash-vb-tall):not(.fash-video-banner-search)'], t:B, label:'Store Video', sub:'Shop Now video banner' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.vb-banner[data-vb="vb5"]', '.fash-connect-wrap'],                                             t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner' },
