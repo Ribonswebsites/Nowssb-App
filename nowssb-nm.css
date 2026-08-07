@@ -12200,3 +12200,14 @@ body[class] #sub-sound-library .sl-upgrade-btn {
   border: none !important; box-shadow: none !important; border-radius: 999px !important;
   font-weight: 700;
 }
+
+/* ── The start animation's clip ──
+   Same layer as .splash-bg-image and the same job, so it sits exactly where
+   that does. It is only shown when the clip is the chosen start animation —
+   without .on it is not there at all, so the images are never behind it. */
+.splash-bg-video {
+  position: fixed; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  display: none; background: #060c18;
+}
+.splash-bg-video.on { display: block; }

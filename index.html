@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=679">
+<link rel="stylesheet" href="nowssb-nm.css?v=680">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -141,37 +141,66 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- ══ SCREEN 1: SPLASH ══ -->
 <div class="screen active" id="splash">
   <div class="splash-bg-image"></div>
+  <!-- The start animation. A clip by default; the images below are what the
+       Start Page picker offers instead. Muted, looped and inline so it plays
+       without a gesture, and hidden unless it is the one chosen. -->
+  <video class="splash-bg-video" id="splashVid" muted loop playsinline autoplay
+         preload="auto" aria-hidden="true" tabindex="-1"
+         poster="./assets/video/start-animation-poster.webp"></video>
   <script>
-  /* Start animation art — a different one on every launch. Inline and right
-     after the element on purpose: the splash is the first thing painted, so
-     waiting for a partNNN.js file would flash app.css's default first. The
-     index ROTATES rather than picking at random, so two launches in a row can
-     never land on the same image. */
+  /* Start animation. Inline and right after the elements on purpose: the
+     splash is the first thing painted, so waiting for a partNNN.js file
+     would flash app.css's default first.
+
+     Four modes. `clip` is the default and what a fresh install gets — the
+     others are what the Start Page picker (app/js/part060.js) can set
+     instead: `auto` rotates the images (the index rotates rather than
+     picking at random, so two launches in a row can never repeat), `default`
+     is always the original art, `fixed` is one image chosen from the
+     carousel. */
   (function () {
+    var VID = './assets/video/start-animation.mp4';
     var ART = [
       'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717857/9ba2b940-5840-11f1-bb0c-71720609fd8f_hpizfv.png',
       'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000317/file_00000000115482309d295f43cfcf0b67_karuh8.png',
       'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000316/file_00000000d05c820794c1f45a6f51869c_fpasjy.png',
       'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000316/file_00000000786c82079f31ed572d4ad3f4_gdyf0r.png'
     ];
-    var i = 0;
+    var i = 0, mode = 'clip';
     try {
-      // Settings → Appearance → Start Page Image writes these.
-      var mode = localStorage.getItem('nwsb_splash_mode') || 'auto';
+      // Settings → Appearance → Start Page Image writes these. Nothing
+      // stored means a fresh install, and a fresh install gets the clip.
+      mode = localStorage.getItem('nwsb_splash_mode') || 'clip';
       if (mode === 'default') {
         i = 0;
       } else if (mode === 'fixed') {
         i = parseInt(localStorage.getItem('nwsb_splash_pick'), 10);
         if (!(i >= 0 && i < ART.length)) i = 0;
-      } else {
+      } else if (mode === 'auto') {
         i = (parseInt(localStorage.getItem('nwsb_splash_i'), 10) + 1) || 0;
         if (!(i >= 0 && i < ART.length)) i = 0;
         localStorage.setItem('nwsb_splash_i', String(i));
       }
-    } catch (e) { i = Math.floor(Math.random() * ART.length); }
-    var el = document.currentScript.previousElementSibling;
-    if (el) el.style.backgroundImage = "url('" + ART[i] + "')";
+    } catch (e) { mode = 'clip'; }
+
+    var vid = document.getElementById('splashVid');
+    var img = document.querySelector('#splash .splash-bg-image');
+    if (mode === 'clip') {
+      if (vid) {
+        vid.src = VID;
+        vid.classList.add('on');
+        /* Autoplay can still be refused. If it is, the poster is already
+           showing, so there is a picture either way — but try once more
+           after the first paint, which is when a WebView usually allows it. */
+        var go = function () { try { vid.play().catch(function () {}); } catch (e) {} };
+        go(); setTimeout(go, 60);
+      }
+      if (img) img.style.backgroundImage = 'none';
+    } else if (img) {
+      img.style.backgroundImage = "url('" + ART[i] + "')";
+    }
     window.NWSB_SPLASH_ART = ART;
+    window.NWSB_SPLASH_VIDEO = VID;
   })();
   </script>
   <div class="splash-words brand-tag">Words without a <strong>dictionary</strong></div>
@@ -9711,6 +9740,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
       <div id="sbgModeCards" class="fbg-mode-cards">
+        <div id="sbgModeCardClip" class="fbg-mode-card fbg-mode-card-black" onclick="sbgSelectMode('clip')">
+          <div class="fbg-mode-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.5l5 2.5-5 2.5z" fill="#e8d5a3" stroke="none"/></svg></div>
+          <div class="fbg-mode-card-label">Start Clip</div>
+          <div class="fbg-mode-card-sub">The animation, and the default</div>
+        </div>
         <div id="sbgModeCardAuto" class="fbg-mode-card fbg-mode-card-default" onclick="sbgSelectMode('auto')">
           <div class="fbg-mode-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg></div>
           <div class="fbg-mode-card-label">Auto Rotate</div>
@@ -10011,7 +10045,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part057.js?v=10"></script>
 <script src="app/js/part058.js?v=1"></script>
 <script src="app/js/part059.js?v=8"></script>
-<script src="app/js/part060.js?v=2"></script>
+<script src="app/js/part060.js?v=12"></script>
 <script src="app/js/part061.js?v=8"></script>
 <script src="app/js/part062.js?v=28"></script>
 <script src="app/js/part063.js?v=4"></script>

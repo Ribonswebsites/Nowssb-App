@@ -24,8 +24,10 @@
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
   function savedMode() {
-    var m = ls('nwsb_splash_mode', 'auto');
-    return (m === 'default' || m === 'fixed') ? m : 'auto';
+    /* No stored value means a fresh install, and a fresh install starts on
+       the clip — the same default the inline splash script applies. */
+    var m = ls('nwsb_splash_mode', 'clip');
+    return (m === 'default' || m === 'fixed' || m === 'auto') ? m : 'clip';
   }
   function savedPick() {
     var i = parseInt(ls('nwsb_splash_pick', '0'), 10);
@@ -58,7 +60,8 @@
     if (sbgDotEls) sbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === sbgActive); });
     var label = document.getElementById('sbgSelectedLabel');
     if (label) {
-      label.textContent = sbgStagedMode === 'auto' ? 'Auto Rotate — a different image every launch'
+      label.textContent = sbgStagedMode === 'clip' ? 'Start Clip — the animation NowssB opens with'
+                        : sbgStagedMode === 'auto' ? 'Auto Rotate — a different image every launch'
                         : sbgStagedMode === 'default' ? 'Default — always the original art'
                         : 'Start image ' + (sbgActive + 1) + ' of ' + SBG_N;
     }
@@ -72,8 +75,10 @@
   function go(n) { sbgActive = ((n % SBG_N) + SBG_N) % SBG_N; paint(); }
 
   function syncModeCards() {
+    var c = document.getElementById('sbgModeCardClip');
     var a = document.getElementById('sbgModeCardAuto');
     var d = document.getElementById('sbgModeCardDefault');
+    if (c) c.classList.toggle('on', sbgStagedMode === 'clip');
     if (a) a.classList.toggle('on', sbgStagedMode === 'auto');
     if (d) d.classList.toggle('on', sbgStagedMode === 'default');
   }
@@ -97,7 +102,7 @@
 
     // Seed from what's actually committed, so reopening shows the truth.
     var mode = savedMode();
-    sbgStagedMode = (mode === 'fixed') ? null : mode;
+    sbgStagedMode = (mode === 'fixed') ? null : mode;   // 'clip' | 'auto' | 'default'
     sbgActive = savedPick();
 
     sbgItems.forEach(function (el) {
@@ -144,13 +149,14 @@
   };
 
   window.sbgSelectMode = function (mode) {
-    sbgStagedMode = (mode === 'default') ? 'default' : 'auto';
+    sbgStagedMode = (mode === 'clip' || mode === 'default') ? mode : 'auto';
     syncModeCards();
     paint();
   };
 
   window.sbgApply = function () {
-    if (sbgStagedMode === 'auto') { lsSet('nwsb_splash_mode', 'auto'); }
+    if (sbgStagedMode === 'clip') { lsSet('nwsb_splash_mode', 'clip'); }
+    else if (sbgStagedMode === 'auto') { lsSet('nwsb_splash_mode', 'auto'); }
     else if (sbgStagedMode === 'default') { lsSet('nwsb_splash_mode', 'default'); }
     else { lsSet('nwsb_splash_mode', 'fixed'); lsSet('nwsb_splash_pick', String(sbgActive)); }
     syncModeCards();
