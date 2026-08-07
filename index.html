@@ -5193,7 +5193,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          landscape gold render, which is the shape this slot actually is —
          the clip that was here has moved below the last row. -->
     <div class="rm-banner-wrap sig-banner-wrap">
-      <img class="rm-banner-img" src="./assets/signature/signature-banner.webp" alt="NowssB Signature" loading="lazy" decoding="async">
+      <!-- The clip, wearing .rm-banner-img so the slot's cover-fit and its
+           caption above are untouched. Poster is the clip's own first
+           frame, so the banner is never blank while it loads. -->
+      <video class="rm-banner-img" data-nwsb-auto muted loop playsinline
+             preload="none" poster="./assets/video/signature-banner-poster.webp"
+             aria-hidden="true" tabindex="-1"
+             src="./assets/video/signature-banner.mp4"></video>
       <!-- One line, top-left, over the empty half of the render. -->
       <div class="sig-banner-line">Get Your NowssB<br>Signature Today</div>
     </div>
