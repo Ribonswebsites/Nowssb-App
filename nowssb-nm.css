@@ -13170,3 +13170,33 @@ body[class] #sub-health-journey .gsel-card.dev-tabn-p.for-you::before {
 /* Two tablets side by side are taller than two 2:3 cards were, so the
    panel gives back the room the old padding was taking. */
 #sub-health-journey .gsel-cards:has(> .dev-tabn-p) { gap: 10px; }
+
+/* ── Healing Path's back button ──
+   app/app.css does two app-wide things to every .sub-back: it hides the
+   inner markup (`.sub-back > * { display:none !important }`) and injects a
+   glass-sphere PNG through ::before. That sphere is what was sitting in
+   this header. Both are switched off here so the button is nothing but the
+   SVG in the markup — a white circle with a left arrow in it — and every
+   selector carries the screen's id so it outranks the app-wide ones. */
+#sub-health-journey .sub-back.gsel-back {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+#sub-health-journey .sub-back.gsel-back::before,
+#sub-health-journey .sub-back.gsel-back::after {
+  content: none !important; display: none !important; background: none !important;
+}
+#sub-health-journey .sub-back.gsel-back > svg {
+  display: block !important;
+  width: 100% !important; height: 100% !important;
+}
+#sub-health-journey .sub-back.gsel-back:active { transform: scale(.94); }
+/* The neumorphic sheet recolours arrows on this screen by mode — navy in
+   light, gold at night. Neither belongs on a white disc. */
+body.nm-mode #sub-health-journey .sub-back.gsel-back > svg path,
+body.nm-night #sub-health-journey .sub-back.gsel-back > svg path,
+body.nm-glass #sub-health-journey .sub-back.gsel-back > svg path { stroke: #0a0a12 !important; }
+body[class] #sub-health-journey .sub-back.gsel-back > svg circle { fill: #ffffff !important; }
