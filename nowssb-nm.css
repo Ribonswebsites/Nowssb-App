@@ -11889,3 +11889,277 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 #sigIntroPage .sig-intro-bg::after {
   top: calc(var(--app-w) * var(--art, 1.7768) - 120px);
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   THE SOUND LIBRARY — the list, not the wallpaper
+
+   It was a light page (#f0f2f7) with a photograph behind the content and
+   a second photograph in the banner, and the list sat on top of both as a
+   stack of cards. Two images competing behind text is why nothing on it
+   read cleanly: every row needed its own plate to stay legible, and the
+   plates are what made it look like a settings screen rather than a
+   library.
+
+   So: the wallpaper goes, the page is black, and the rows sit straight on
+   it. That is the whole idea — a row is a thumbnail, a title, a line under
+   it, and an action on the right, with nothing drawn behind it. The only
+   surface left is the hero at the top, which keeps its artwork because a
+   library should open with something to look at, and it fades to black so
+   there is no seam between it and the list.
+
+   Every rule carries `body[class] #sub-sound-library`. That prefix is not
+   decoration and it is not superstition: this page already has a full
+   neumorphic skin further up this file, gated on body.nm-mode /
+   body.nm-night / body.nm-glass, and those selectors weigh (1,2,1). A bare
+   `#sub-sound-library .sl-screen` is (1,1,0) and loses to them even
+   carrying !important — which is exactly what happened on the first pass,
+   where none of this applied and the page stayed light.
+
+   `body[class]` matches whatever theme is set, weighs the same as
+   `body.nm-mode`, and sits later in the file, so it wins on order rather
+   than on an escalation. The Library reads the same in every theme, which
+   is the point — this is the page's design, not a skin of it.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── The surface ── */
+body[class] #sub-sound-library .sl-screen {
+  background: #000 !important;
+  display: flex; flex-direction: column;
+}
+/* The wallpaper and its scrim. This is the "remove the background images"
+   part: one photograph behind the whole list, plus a gradient to stop it
+   drowning the text. Both gone — the page is black and needs neither. */
+body[class] #sub-sound-library .sl-bg,
+body[class] #sub-sound-library .sl-bg-overlay { display: none !important; }
+
+/* ── The hero ──
+   Taller than it was (196 -> 300) so the artwork is a picture rather than
+   a strip, and it fades into the page instead of ending at a hard edge. */
+body[class] #sub-sound-library .sl-banner {
+  height: 300px !important; position: relative; flex-shrink: 0;
+  background: #000;
+}
+body[class] #sub-sound-library .sl-banner-img {
+  background-position: center 28% !important;
+}
+/* The fade. It was display:none, which is why the artwork used to stop
+   dead against the content. Four stops rather than two: transparent for
+   the top half so the picture is untouched, then a fast run to solid so
+   the title has something to sit on. */
+body[class] #sub-sound-library .sl-banner-fade {
+  display: block !important;
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.10) 0%,
+    rgba(0,0,0,0.10) 42%,
+    rgba(0,0,0,0.72) 74%,
+    #000 100%);
+}
+body[class] #sub-sound-library .sl-banner-inner {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: max(env(safe-area-inset-top, 14px), 14px) 20px 18px;
+}
+body[class] #sub-sound-library .sl-back-btn {
+  width: 40px; height: 40px; padding: 0; flex-shrink: 0;
+  background: none !important; border: none !important; box-shadow: none !important;
+  display: flex; align-items: center; justify-content: flex-start;
+}
+body[class] #sub-sound-library .sl-banner-bottom { padding: 0; }
+body[class] #sub-sound-library .sl-eyebrow {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2.6px; text-transform: uppercase;
+  color: rgba(255,255,255,0.5) !important; margin-bottom: 8px;
+}
+body[class] #sub-sound-library .sl-banner-title {
+  font-family: 'DM Sans', sans-serif; font-size: 34px; font-weight: 800;
+  color: #fff !important; letter-spacing: -0.8px; line-height: 1.05;
+}
+body[class] #sub-sound-library .sl-stats-row {
+  margin-top: 9px; font-size: 13px;
+  color: rgba(255,255,255,0.62) !important;
+}
+body[class] #sub-sound-library .sl-stat,
+body[class] #sub-sound-library .sl-stat-sep { color: rgba(255,255,255,0.62) !important; }
+body[class] #sub-sound-library .sl-stat strong { color: #fff !important; font-weight: 700; }
+
+/* ── The tabs, as chips ──
+   Filled white when chosen, a faint fill when not. The badge rides inside
+   the chip rather than beside it, which is what keeps three of them on one
+   line at 360px wide. */
+body[class] #sub-sound-library .sl-tabs {
+  display: flex; gap: 8px; flex-shrink: 0;
+  padding: 4px 20px 16px; background: #000 !important;
+  border: none !important; box-shadow: none !important;
+  overflow-x: auto; scrollbar-width: none;
+}
+body[class] #sub-sound-library .sl-tabs::-webkit-scrollbar { display: none; }
+body[class] #sub-sound-library .sl-tab {
+  display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto;
+  height: 34px; padding: 0 14px; border-radius: 999px !important;
+  background: rgba(255,255,255,0.09) !important;
+  border: none !important; box-shadow: none !important;
+  color: rgba(255,255,255,0.82) !important;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500;
+  /* The base rule uppercases these with 1.8px of tracking, which is what
+     pushed the third chip off the right edge at 360px. Sentence case, no
+     tracking: the same three words fit with room to spare. */
+  text-transform: none !important; letter-spacing: 0 !important;
+  white-space: nowrap; transition: background 0.16s, color 0.16s;
+}
+body[class] #sub-sound-library .sl-tab svg { display: none; }   /* the word is the label */
+body[class] #sub-sound-library .sl-tab.active {
+  background: #fff !important; color: #0b0b0f !important; font-weight: 700;
+}
+body[class] #sub-sound-library .sl-tab-badge {
+  background: rgba(255,255,255,0.16) !important; color: inherit !important;
+  border-radius: 999px !important; padding: 1px 7px;
+  font-size: 10.5px; font-weight: 700; min-width: 0;
+}
+body[class] #sub-sound-library .sl-tab.active .sl-tab-badge {
+  background: rgba(0,0,0,0.12) !important;
+}
+
+/* ── The content column ── */
+body[class] #sub-sound-library .sl-content {
+  background: #000 !important;
+  padding: 0 0 calc(var(--nav-height, 58px) + 40px);
+  flex: 1; overflow-y: auto;
+}
+
+/* ── The section head: a heading on the left, a small pill on the right ── */
+body[class] #sub-sound-library .sl-sort-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 20px 12px; background: none !important; border: none !important;
+}
+body[class] #sub-sound-library .sl-sort-label {
+  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 700;
+  color: #fff !important; letter-spacing: -0.3px; text-transform: none;
+}
+body[class] #sub-sound-library .sl-sort-btns { display: flex; gap: 8px; }
+body[class] #sub-sound-library .sl-sort-btn,
+body[class] #sub-sound-library .sl-filter-chip {
+  height: 32px; padding: 0 14px; border-radius: 999px !important;
+  background: none !important;
+  border: 1px solid rgba(255,255,255,0.26) !important;
+  box-shadow: none !important;
+  color: rgba(255,255,255,0.9) !important;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500;
+}
+body[class] #sub-sound-library .sl-sort-btn.active,
+body[class] #sub-sound-library .sl-filter-chip.active {
+  background: #fff !important; color: #0b0b0f !important;
+  border-color: #fff !important; font-weight: 700;
+}
+body[class] #sub-sound-library .sl-filter-row {
+  display: flex; gap: 8px; padding: 0 20px 14px; overflow-x: auto;
+  scrollbar-width: none; background: none !important;
+}
+body[class] #sub-sound-library .sl-filter-row::-webkit-scrollbar { display: none; }
+
+/* ── The rows ──
+   No card, no plate, no border. A row is its content: the mark, the words,
+   the action. This is the change that carries the whole page. */
+body[class] #sub-sound-library .sl-word-card,
+body[class] #sub-sound-library .sl-sentence-card {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  margin: 0 !important;
+  padding: 9px 20px !important;
+}
+body[class] #sub-sound-library .sl-word-card:active,
+body[class] #sub-sound-library .sl-sentence-card:active {
+  background: rgba(255,255,255,0.05) !important; transform: none !important;
+}
+/* The mark. Square with a small radius, the way a piece of cover art sits
+   in a list — not the round disc it was, which read as an avatar. */
+body[class] #sub-sound-library .sl-word-disc {
+  width: 56px !important; height: 56px !important; flex-shrink: 0;
+  border-radius: 5px !important;
+  background: linear-gradient(150deg, #1c1c26 0%, #101018 100%) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: none !important;
+}
+body[class] #sub-sound-library .sl-word-disc-letter {
+  font-family: 'DM Sans', sans-serif; font-size: 21px; font-weight: 800;
+  color: rgba(255,255,255,0.85) !important;
+}
+body[class] #sub-sound-library .sl-word-name {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+  color: #fff !important; letter-spacing: 0;
+}
+body[class] #sub-sound-library .sl-word-phonetic,
+body[class] #sub-sound-library .sl-word-organ,
+body[class] #sub-sound-library .sl-purchased-date,
+body[class] #sub-sound-library .sl-word-count-label {
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 400;
+  color: rgba(255,255,255,0.6) !important;
+}
+body[class] #sub-sound-library .sl-word-badge,
+body[class] #sub-sound-library .sl-badge-sub,
+body[class] #sub-sound-library .sl-badge-buy {
+  background: rgba(255,255,255,0.1) !important;
+  border: none !important; box-shadow: none !important;
+  color: rgba(255,255,255,0.72) !important;
+  border-radius: 999px !important; padding: 3px 9px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.4px;
+}
+
+/* ── The sentence rows ── */
+body[class] #sub-sound-library .sl-sentence-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.8px;
+  text-transform: uppercase; color: rgba(255,255,255,0.38) !important;
+}
+body[class] #sub-sound-library .sl-sentence-date { color: rgba(255,255,255,0.38) !important; }
+body[class] #sub-sound-library .sl-sentence-text {
+  font-size: 15px; font-weight: 500; color: #fff !important; line-height: 1.45;
+}
+body[class] #sub-sound-library .sl-word-hl { color: #e8d5a3 !important; font-weight: 700; }
+body[class] #sub-sound-library .sl-sentence-chip {
+  background: rgba(255,255,255,0.09) !important; border: none !important;
+  color: rgba(255,255,255,0.72) !important; border-radius: 999px !important;
+  font-size: 11px; padding: 4px 10px;
+}
+body[class] #sub-sound-library .sl-sentence-meta { color: rgba(255,255,255,0.45) !important; font-size: 11.5px; }
+body[class] #sub-sound-library .sl-sentence-footer { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 10px; margin-top: 10px; }
+body[class] #sub-sound-library .sl-sentence-play-btn,
+body[class] #sub-sound-library .sl-sentence-delete-btn {
+  background: rgba(255,255,255,0.09) !important; border: none !important;
+  box-shadow: none !important; border-radius: 999px !important;
+  color: rgba(255,255,255,0.8) !important;
+}
+
+/* ── Empty, and the upgrade note ── */
+body[class] #sub-sound-library .sl-empty {
+  background: none !important; border: none !important; box-shadow: none !important;
+  padding: 56px 32px !important; text-align: center;
+}
+body[class] #sub-sound-library .sl-empty-title {
+  font-size: 19px; font-weight: 700; color: #fff !important; margin-top: 16px;
+}
+body[class] #sub-sound-library .sl-empty-text {
+  font-size: 13.5px; color: rgba(255,255,255,0.55) !important; line-height: 1.6; margin-top: 8px;
+}
+body[class] #sub-sound-library .sl-empty-cta {
+  margin-top: 22px; height: 46px; padding: 0 26px;
+  border-radius: 999px !important; background: #fff !important;
+  color: #0b0b0f !important; border: none !important; box-shadow: none !important;
+  font-size: 13.5px; font-weight: 700; letter-spacing: 0.3px;
+}
+body[class] #sub-sound-library .sl-upgrade-banner {
+  background: rgba(255,255,255,0.06) !important;
+  border: none !important; box-shadow: none !important;
+  border-radius: 14px !important; margin: 8px 20px 18px !important;
+}
+body[class] #sub-sound-library .sl-upgrade-label { color: rgba(255,255,255,0.42) !important; }
+body[class] #sub-sound-library .sl-upgrade-title { color: #fff !important; }
+body[class] #sub-sound-library .sl-upgrade-text { color: rgba(255,255,255,0.6) !important; }
+body[class] #sub-sound-library .sl-upgrade-btn {
+  background: #fff !important; color: #0b0b0f !important;
+  border: none !important; box-shadow: none !important; border-radius: 999px !important;
+  font-weight: 700;
+}
