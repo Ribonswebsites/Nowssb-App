@@ -142,10 +142,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="screen active" id="splash">
   <div class="splash-bg-image"></div>
   <!-- The start animation. A clip by default; the images below are what the
-       Start Page picker offers instead. Muted, looped and inline so it plays
-       without a gesture, and hidden unless it is the one chosen. -->
-  <!-- No `loop`, deliberately: the splash now waits for this clip to finish,
-       and a looping video never fires `ended`, so looping would hold the app
+       Start Page picker offers instead. Inline, and hidden unless it is the
+       one chosen.
+
+       It plays ONCE. There is no `loop` here and `loop` is set to false in
+       script below as well — this is a start animation, not a wallpaper, and
+       a looping video never fires `ended`, so a loop would also hold the app
        on the start screen forever. -->
   <video class="splash-bg-video" id="splashVid" playsinline autoplay
          preload="auto" aria-hidden="true" tabindex="-1"
@@ -203,14 +205,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
            back. */
         vid.defaultPlaybackRate = 2;
         vid.playbackRate = 2;
+        /* Faster, not higher — without this the sound is chipmunked at 2x. */
+        vid.preservesPitch = true;
+        vid.mozPreservesPitch = true;
+        vid.webkitPreservesPitch = true;
+        /* Once. Said here as well as in the markup so nothing can put it back. */
+        vid.loop = false;
         ['loadedmetadata', 'canplay', 'play'].forEach(function (ev) {
-          vid.addEventListener(ev, function () { vid.playbackRate = 2; });
+          vid.addEventListener(ev, function () {
+            vid.playbackRate = 2;
+            vid.loop = false;
+          });
         });
 
         /* The splash waits for this to finish rather than for a timer.
            part012.js and firebase.module.js both wait on nwsbSplashWait(). */
         window._splashHoldForClip = true;
-        vid.addEventListener('ended', function () { window._splashClipDone = true; });
+        vid.addEventListener('ended', function () {
+          /* hold the last frame — the clip ends on the wordmark */
+          try { vid.pause(); } catch (e) {}
+          window._splashClipDone = true;
+        });
         /* If the clip cannot play at all — no codec, a bad file — nothing
            would ever end and the app would sit here. Any error releases the
            hold immediately. */
@@ -222,9 +237,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
            the first touch. That is the most sound anyone can get here; a
            silent-but-playing start beats a start that does not play. */
         var unmuteOnGesture = function () {
-          try { vid.muted = false; vid.volume = 1; } catch (e) {}
-          document.removeEventListener('touchstart', unmuteOnGesture);
-          document.removeEventListener('click', unmuteOnGesture);
+          try {
+            vid.muted = false;
+            vid.volume = 1;
+            /* a gesture also lifts the block on playing at all, so if the
+               muted fallback never got going either, this starts it */
+            if (vid.paused && !window._splashClipDone) vid.play().catch(function () {});
+          } catch (e) {}
         };
         ['touchstart', 'pointerdown', 'click', 'keydown'].forEach(function (ev) {
           document.addEventListener(ev, unmuteOnGesture, { once: true, passive: true });
@@ -233,13 +252,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         var startIt = function () {
           vid.classList.add('vis');
           vid.muted = false;
+          try { vid.volume = 1; } catch (e) {}
           var p = null;
           try { p = vid.play(); } catch (e) {}
           if (p && p.catch) {
             p.catch(function () {
               /* Refused because it is not muted — the usual policy. Muted
                  always plays, and the listeners above turn the sound on the
-                 moment anything is touched. */
+                 moment anything is touched. In the packaged app the WebView
+                 has no such policy, so there it starts with sound. */
               vid.muted = true;
               try { vid.play().catch(function () { window._splashClipDone = true; }); }
               catch (e) { window._splashClipDone = true; }
