@@ -110,7 +110,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
 <link rel="stylesheet" href="nowssb-nm.css?v=681">
-<link rel="stylesheet" href="nowssb-player.css?v=202">
+<link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -151,7 +151,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        on the start screen forever. -->
   <video class="splash-bg-video" id="splashVid" playsinline autoplay
          preload="auto" aria-hidden="true" tabindex="-1"
-         poster="./assets/video/start-animation-poster.webp"></video>
+         poster="./assets/video/start-animation-poster.webp?v=2"></video>
   <script>
   /* Start animation. Inline and right after the elements on purpose: the
      splash is the first thing painted, so waiting for a partNNN.js file
@@ -164,7 +164,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      is always the original art, `fixed` is one image chosen from the
      carousel. */
   (function () {
-    var VID = './assets/video/start-animation.mp4';
+    /* ?v= is not decoration. Every .mp4 is answered from Cache Storage
+       first, and the media bucket outlives ordinary deploys — so swapping the
+       file on disk under an unchanged URL keeps serving the old clip. Bump
+       this whenever the file changes. */
+    var VID = './assets/video/start-animation.mp4?v=2';
     var ART = [
       'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717857/9ba2b940-5840-11f1-bb0c-71720609fd8f_hpizfv.png',
       'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1785000317/file_00000000115482309d295f43cfcf0b67_karuh8.png',
@@ -10158,7 +10162,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=179" defer></script>
-<script src="nowssb-player.js?v=295" defer></script>
+<script src="nowssb-player.js?v=296" defer></script>
 
 </body>
 </html>

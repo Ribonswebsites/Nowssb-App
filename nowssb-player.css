@@ -52,6 +52,39 @@
   box-shadow:0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
   display:flex; align-items:center; justify-content:center;
 }
+.lgp .lgp-top-right { display:flex; align-items:center; gap:10px; }
+/* ── Like ──
+   In the screen's top bar rather than on the panel: the panel's top row is
+   the ritual and the bars, and a heart that shifts about with them is a
+   heart nobody finds twice. */
+.lgp .lgp-like {
+  width:42px; height:42px; flex-shrink:0; padding:0; cursor:pointer;
+  border-radius:50% !important; border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+  display:flex; align-items:center; justify-content:center;
+  color:rgba(255,255,255,.92);
+}
+.lgp .lgp-like svg {
+  width:21px; height:21px; display:block;
+  fill:none; stroke:currentColor; stroke-width:1.7; stroke-linejoin:round;
+  transition:fill .18s ease, stroke .18s ease;
+}
+.lgp .lgp-like:active { transform:scale(.92); }
+.lgp .lgp-like.liked { color:var(--lg-accent,#8fe6ff); }
+.lgp .lgp-like.liked svg {
+  fill:var(--lg-accent,#8fe6ff);
+  filter:drop-shadow(0 0 9px var(--lg-accent,#8fe6ff));
+}
+/* one-shot on the tap that likes it — never a loop, nothing to compete with */
+.lgp .lgp-like.pop svg { animation:lgpLikePop .42s cubic-bezier(.34,1.56,.64,1) 1; }
+@keyframes lgpLikePop {
+  0%   { transform:scale(1); }
+  38%  { transform:scale(1.32); }
+  100% { transform:scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .lgp .lgp-like.pop svg { animation:none; } }
+
 .lgp .lgp-brand {
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
   display:flex; align-items:center; gap:8px; white-space:nowrap;
@@ -219,15 +252,42 @@
 .lgp .lgp-organ::after { background:linear-gradient(90deg, rgba(255,255,255,.45), transparent); }
 
 /* progress */
+/* ── the session bar ──
+   It shows how far through the ritual you are. It used to show reps, which
+   are zero for most of the time anyone is looking at it, so it read as a
+   line that was there doing nothing.
+   overflow is visible, not hidden, because the head rides ON the end of the
+   fill — at the very start of a session the fill is a sliver, and the head
+   is what makes the bar legible as a position rather than as an empty line. */
 .lgp .lgp-progress {
+  position:relative;
   width:100%; max-width:280px; height:5px; margin:7px 0 0; border-radius:999px !important;
-  background:rgba(255,255,255,.2); overflow:hidden; flex-shrink:0;
+  background:rgba(255,255,255,.2); overflow:visible; flex-shrink:0;
 }
 .lgp .lgp-progress-fill {
-  height:100%; border-radius:999px !important;
+  position:relative; height:100%; border-radius:999px !important;
   background:linear-gradient(90deg, var(--lg-accent), #fff);
-  box-shadow:0 0 14px var(--lg-accent); transition:width .3s ease;
+  box-shadow:0 0 14px var(--lg-accent); transition:width .45s cubic-bezier(.4,0,.2,1);
 }
+.lgp .lgp-progress-fill::after {
+  content:''; position:absolute; right:-4px; top:50%; margin-top:-5px;
+  width:10px; height:10px; border-radius:50% !important;
+  background:#fff; box-shadow:0 0 12px var(--lg-accent), 0 1px 4px rgba(0,0,0,.5);
+}
+/* While the word is being spoken a light runs along the remaining track, so
+   the bar is doing something during the one moment it is being watched. */
+.lgp .lgp-progress.running::before {
+  content:''; position:absolute; inset:0; border-radius:999px !important;
+  overflow:hidden; pointer-events:none;
+  background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.55) 50%, transparent 100%);
+  background-size:40% 100%; background-repeat:no-repeat;
+  animation:lgpBarSweep 1.6s linear infinite;
+}
+@keyframes lgpBarSweep {
+  0%   { background-position:-45% 0; }
+  100% { background-position:145% 0; }
+}
+@media (prefers-reduced-motion: reduce) { .lgp .lgp-progress.running::before { animation:none; } }
 
 /* phase / controls */
 .lgp .lgp-phase { width:100%; flex:1 1 auto; margin-top:6px; padding-top:0; display:flex; flex-direction:column; align-items:center; }
@@ -400,13 +460,21 @@
   width:64px; height:64px; object-fit:contain; display:block; position:relative; z-index:1;
   filter:drop-shadow(0 8px 20px rgba(0,0,0,.5)) drop-shadow(0 0 22px var(--lg-accent));
 }
+/* These two rings used to pulse `infinite`, outside the one-at-a-time
+   sequence entirely — so no matter how neatly the travelling lights took
+   their turns, this was always going underneath them and the player read as
+   everything moving at once. They run only during this button's turn now
+   (.lgp-practice is in _LGP_SEQ_ORDER in nowssb-player.js). */
 .lgp .lgp-practice-ring {
   position:absolute; left:50%; top:50%; width:62px; height:62px; margin:-31px 0 0 -31px;
   border-radius:50% !important; border:2px solid var(--lg-accent);
   box-shadow:0 0 14px var(--lg-accent); opacity:0;
-  animation:lgpPulse 2.6s ease-out infinite;
 }
-.lgp .lgp-practice-ring:nth-child(2) { animation-delay:1.3s; }
+/* 1.5s + a .45s stagger fits inside the sequencer's 2s turn, so the pulse
+   finishes rather than being cut off when the turn passes on. */
+.lgp .lgp-practice.lgp-anim .lgp-practice-ring { animation:lgpPulse 1.5s ease-out 1; }
+.lgp .lgp-practice.lgp-anim .lgp-practice-ring:nth-child(2) { animation-delay:.45s; }
+.lgp.playing .lgp-practice-ring { animation:none !important; }
 .lgp .lgp-practice-lbl {
   font-size:8.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.92);
   text-shadow:0 1px 8px rgba(0,0,0,.4);
@@ -627,22 +695,46 @@
    settings arc — .sub-screen's stacking context would clip it otherwise).
 ═══════════════════════════════════════════════════════════════ */
 /* info icon + one-shot hint pill cluster, top-right of the video */
+/* A flex item in .lgp-visual-top now, NOT pinned to the corner. While it was
+   still position:absolute it sat outside the row, so the ritual opposite had
+   nothing to shrink against and simply ran underneath it — which is exactly
+   what the overlap was. */
 .lgp .lgp-info-cluster {
-  position:absolute; top:9px; right:9px; z-index:4;
+  position:relative; z-index:4;
   display:flex; align-items:center; gap:8px; flex-direction:row;
+  flex:0 1 auto; min-width:0;    /* the pill inside is what gives, not the panel */
 }
-/* the ritual this session belongs to, top left of the panel */
+/* The hint pill is a one-shot that runs for about four seconds when the
+   player opens, and while it is open it is the widest thing on the row. It
+   yields rather than pushing the cluster off the panel; the ritual opposite
+   steps out of the way for those few seconds instead of being crushed to
+   two letters (lgp-hinting is put on the row by nowssb-player.js). */
+.lgp .lgp-visual-top .lgp-info-pill { min-width:0; flex:0 1 auto; }
+.lgp .lgp-visual-tag { transition:opacity .28s ease, max-width .28s ease; }
+.lgp .lgp-visual-top.lgp-hinting .lgp-visual-tag { opacity:0; max-width:0; padding:0; border-width:0; }
+/* ── the panel's top row ──
+   One flex row, not two boxes pinned to opposite corners. Pinned, they
+   overlapped as soon as either side grew — "Afternoon" on the left and
+   "Learn your score" on the right was already too much for a 342px panel.
+   Here the ritual is the only thing allowed to shrink, and it ellipsises. */
+.lgp .lgp-visual-top {
+  position:absolute; top:9px; left:9px; right:9px; z-index:4;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  pointer-events:none;                    /* the panel stays tappable between them */
+}
+.lgp .lgp-visual-top > * { pointer-events:auto; }
+
+/* the ritual this session belongs to */
 .lgp .lgp-visual-tag {
-  /* 16px, not 9px: the cluster opposite is 48px tall (the info sphere), so
-     its centre line sits at 33px — this puts the two chips on it. */
-  position:absolute; top:16px; left:9px; z-index:4;
   display:flex; align-items:center; gap:7px; height:34px; padding:0 13px;
-  border-radius:999px !important; max-width:52%;
+  border-radius:999px !important;
+  flex:0 1 auto; min-width:0;             /* shrinks before the bars do */
   font-size:9px; font-weight:800; letter-spacing:1.8px; text-transform:uppercase;
-  color:rgba(255,255,255,.9); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  color:rgba(255,255,255,.9);
   background:rgba(8,14,28,.42); border:1px solid rgba(255,255,255,.22);
   box-shadow:0 5px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.26);
 }
+.lgp .lgp-visual-tag-txt { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .lgp .lgp-visual-tag-dot {
   width:5px; height:5px; border-radius:50% !important; flex-shrink:0;
   background:var(--lg-accent,#8fe6ff); box-shadow:0 0 9px var(--lg-accent,#8fe6ff);

@@ -1,10 +1,15 @@
-const CACHE = 'nowsbansiu-v845';
+const CACHE = 'nowsbansiu-v846';
 // Separate, stable-named bucket for background-prefetched videos (see
 // app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
 // routine JS/CSS deploy never wipes out videos the user already has warmed —
 // it's purged only by its own explicit version number when the prefetch
 // list itself changes.
-const VIDEO_CACHE = 'nowssb-media-precache-v1';
+// Bump this whenever a video FILE changes behind a URL that stays the same.
+// The fetch handler answers every .mp4 from cache first, and this bucket
+// survives ordinary deploys — so without a bump here, replacing a clip on
+// disk changes nothing for anyone who already had the old one warmed. That
+// is exactly what happened to the start animation.
+const VIDEO_CACHE = 'nowssb-media-precache-v2';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -17,6 +22,12 @@ self.addEventListener('activate', e => {
     const keys = await caches.keys();
     await Promise.all(
       keys.filter(k => k !== CACHE && k !== VIDEO_CACHE && k.startsWith('nowsbansiu-')).map(k => caches.delete(k))
+    );
+    // Superseded media buckets go too. Same rule, its own prefix: anything
+    // named nowssb-media-precache-* that isn't the current one is holding
+    // videos that have since been replaced on disk.
+    await Promise.all(
+      keys.filter(k => k !== VIDEO_CACHE && k.startsWith('nowssb-media-precache-')).map(k => caches.delete(k))
     );
     await clients.claim();
   })());

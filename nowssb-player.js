@@ -107,6 +107,59 @@
   }
   function active() { return ONLY_SUBSCRIBERS ? isSubscribed() : true; }
 
+  /* ── Liked words ───────────────────────────────────────────────────────
+     localStorage is the source of truth so the heart is right the instant
+     the player opens, with no round trip and nothing to wait for. When
+     someone is signed in the same list is mirrored to their user document,
+     so it follows them to another phone. A failed write must never lose the
+     tap — the local list is already saved by then. */
+  var LIKES_KEY = 'nwsb_liked_words';
+  function lgpLikes() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(LIKES_KEY) || '[]');
+      return Array.isArray(raw) ? raw : [];
+    } catch (e) { return []; }
+  }
+  function lgpIsLiked(word) {
+    if (!word) return false;
+    return lgpLikes().indexOf(word) !== -1;
+  }
+  window.lgpIsLiked = lgpIsLiked;
+  window.lgpLikedWords = lgpLikes;
+
+  window.lgpToggleLike = function () {
+    var words = (typeof PRACTICE_WORDS !== 'undefined') ? PRACTICE_WORDS : [];
+    var idx = (typeof _pwIdx !== 'undefined') ? _pwIdx : 0;
+    var w = words[idx];
+    if (!w || !w.word) return;
+
+    var list = lgpLikes();
+    var at = list.indexOf(w.word);
+    var nowLiked = at === -1;
+    if (nowLiked) list.push(w.word); else list.splice(at, 1);
+    try { localStorage.setItem(LIKES_KEY, JSON.stringify(list)); } catch (e) {}
+
+    /* Repaint the one button rather than re-rendering the player: a full
+       render rebuilds the video element and restarts the animation
+       sequence, which is a lot of churn for a heart. */
+    var btn = document.getElementById('lgpLikeBtn');
+    if (btn) {
+      btn.classList.toggle('liked', nowLiked);
+      btn.setAttribute('aria-pressed', nowLiked ? 'true' : 'false');
+      if (nowLiked) {
+        btn.classList.remove('pop');
+        void btn.offsetWidth;              // restart the pop cleanly
+        btn.classList.add('pop');
+        setTimeout(function () { if (btn) btn.classList.remove('pop'); }, 420);
+      }
+    }
+
+    if (window._userDataCache) window._userDataCache.likedWords = list;
+    if (window._currentUid && window._fbSetDoc) {
+      window._fbSetDoc(window._currentUid, { likedWords: list }).catch(function () {});
+    }
+  };
+
   function renderLiquidPlayer() {
     var body = document.getElementById('practiceBody');
     if (!body) return;
@@ -121,6 +174,12 @@
     var repTarget = ((typeof _pwRepTarget !== 'undefined') ? _pwRepTarget : 7) || 7;
     var repCount = (typeof _pwRepCount !== 'undefined') ? _pwRepCount : 0;
     var repPct = Math.min(100, Math.round((repCount / repTarget) * 100));
+    /* The thin bar under the panel used to be rep progress, which is 0 for
+       most of the time anyone is looking at it — a line that sat there doing
+       nothing. It is the SESSION now: how far through the ritual you are,
+       with the current word's reps filling that word's own slice. */
+    var _repFrac = repTarget ? Math.min(1, repCount / repTarget) : 0;
+    var sessionPct = total ? Math.min(100, ((idx + _repFrac) / total) * 100) : 0;
     var voice = (typeof _pwVoice !== 'undefined') ? _pwVoice : 'F';
     var loop = (typeof _pwLoop !== 'undefined') ? !!_pwLoop : false;
     /* Per-word theme (= per-word video) — each word gets its own video,
@@ -394,9 +453,19 @@
             '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
           '</button>' +
           '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
-          '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
-            '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
-          '</button>' +
+          '<div class="lgp-top-right">' +
+            /* Like. Kept out of the panel deliberately — the panel's top row
+               is already the ritual and the bars, and a heart that moves
+               about with them is a heart nobody can find twice. */
+            '<button class="lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
+              ' onclick="window.lgpToggleLike&&window.lgpToggleLike()"' +
+              ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
+            '</button>' +
+            '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
+              '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
         '<div class="lgp-info-banner">' +
           '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
@@ -404,10 +473,14 @@
           '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
         '</div>' +
         '<div class="lgp-visual">' + visual +
-          /* the panel's other top corner — which ritual this session is,
-             so the two corners read as a pair instead of one loaded side */
-          '<div class="lgp-visual-tag"><span class="lgp-visual-tag-dot"></span>' + _e(ritual) + '</div>' +
-          '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
+          /* ONE row across the top of the panel, not two islands pinned to
+             the corners. Pinned, they overlapped the moment either side got
+             long — "Afternoon" plus "Learn your score" was enough. In a row
+             the ritual is the only thing that can shrink, and it ellipsises
+             instead of running under the bars. */
+          '<div class="lgp-visual-top">' +
+            '<div class="lgp-visual-tag"><span class="lgp-visual-tag-dot"></span><span class="lgp-visual-tag-txt">' + _e(ritual) + '</span></div>' +
+            '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
             /* the sound, shown rather than described — the bars idle slowly
                and run at full tilt while the word is playing (.lgp.playing) */
             '<span class="lgp-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' +
@@ -415,6 +488,7 @@
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
               '<span class="lgp-bgico" style="background-image:url(\'' + IC.info + '\')"></span>' +
             '</button>' +
+            '</div>' +
           '</div>' +
           '<div class="lgp-visual-overlay">' +
             '<div class="lgp-title">' + (w.word || '') + '</div>' +
@@ -426,7 +500,11 @@
           '</div>' +
         '</div>' +
         '<div class="lgp-ticker"><span>Listen</span><span>Learn</span><span>Practice</span><span>Heal</span></div>' +
-        '<div class="lgp-progress"><div class="lgp-progress-fill" style="width:' + repPct + '%"></div></div>' +
+        '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
+          ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(sessionPct) + '"' +
+          ' aria-label="Session progress">' +
+          '<div class="lgp-progress-fill" style="width:' + sessionPct + '%"></div>' +
+        '</div>' +
         center +
       '</div>';
 
@@ -568,9 +646,14 @@
         cluster.classList.remove('hint-run');
         void cluster.offsetWidth;              // restart the animation cleanly
         cluster.classList.add('hint-run');
+        /* the ritual opposite steps aside while the pill is out — on a 360px
+           column the two together are wider than the panel */
+        var topRow = cluster.parentNode;
+        if (topRow && topRow.classList) topRow.classList.add('lgp-hinting');
         setTimeout(function () { var t = document.getElementById('lgpInfoPillTxt'); if (t) t.textContent = 'Learn your score'; }, 2100);
         setTimeout(function () {
           var c = document.getElementById('lgpInfoCluster'); if (c) c.classList.remove('hint-run');
+          if (c && c.parentNode && c.parentNode.classList) c.parentNode.classList.remove('lgp-hinting');
           /* once the pill has retracted, the icon itself gets a light tracing round it */
           var b = c && c.querySelector('.lgp-info-btn');
           if (b) {
@@ -593,7 +676,12 @@
      Now a single light animates at a time: it plays ONE sweep, then the next
      element does, cycling round. While the word is PLAYING the whole sequence
      stops (CSS also freezes every other animation) so the video gets the GPU. */
-  var _LGP_SEQ_ORDER = ['.lgp-tube', '.lgp-replay-orb', '.lgp-cta', '.lgp-info-btn'];
+  /* .lgp-practice is in here now. Its two rings were pulsing `infinite`,
+     outside the rotation entirely — so however well the lights took their
+     turns, the Practice orb was always going underneath them and the whole
+     thing read as everything at once. The rings are gated on .lgp-anim in
+     CSS, so being in this list is what makes them run at all. */
+  var _LGP_SEQ_ORDER = ['.lgp-tube', '.lgp-practice', '.lgp-replay-orb', '.lgp-cta', '.lgp-info-btn'];
   /* One sweep, then a full 1s pause where NOTHING animates — the video gets the
      GPU to itself between lights, so playback stays smooth and glitch-free. */
   var _LGP_SEQ_DUR = 2000, _LGP_SEQ_GAP = 1000;
