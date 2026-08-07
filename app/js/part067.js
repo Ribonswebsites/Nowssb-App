@@ -30,8 +30,9 @@
 
     // Above NowssB Connect — the banner that introduces the section, not the
     // section's own background clip (.nmh-connect-vid, which is untouched).
-    { before: '#home-nm .nmh-connect-sec',         vid: './assets/video/connect-banner.mp4?v=1' },
-    { before: '#home .fash-connect-wrap',          vid: './assets/video/connect-banner.mp4?v=1' },
+    // On the landscape tablet, wordmark on the bottom bezel.
+    { before: '#home-nm .nmh-connect-sec',         vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
+    { before: '#home .fash-connect-wrap',          vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
 
     // Trending
     { top:    '#home-nm .nmh-trend-shop-wrap',     vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
@@ -222,8 +223,16 @@
 
   function makeBanner(spec) {
     var d = document.createElement('div');
-    d.className = 'vb-banner' + (spec.player ? ' vb-banner-player' : '');
-    var html = '<video data-nwsb-auto muted loop playsinline preload="none" src="' + spec.vid + '"></video>';
+    /* `frame` puts a device render round the clip. The classes go ON the
+       banner rather than in a wrapper around it, because .vb-banner[data-vb]
+       is what app/js/part062.js matches — a wrapper would make the banner a
+       grandchild of the home wrap and strand the whole section at the top of
+       the page. The frame's padding is its bezel and its content box is the
+       aperture, so .vbf-screen at 100%/100% fills the glass exactly. */
+    d.className = 'vb-banner' + (spec.player ? ' vb-banner-player' : '')
+                + (spec.frame ? ' nwsb-inframe ' + spec.frame : '');
+    var vid = '<video data-nwsb-auto muted loop playsinline preload="none" src="' + spec.vid + '"></video>';
+    var html = spec.frame ? '<div class="vbf-screen">' + vid + '</div>' : vid;
     if (spec.gender) {
       /* Two words over their own halves of the clip, each with its own
          Enter to the right of it — no panel behind any of it, so the video

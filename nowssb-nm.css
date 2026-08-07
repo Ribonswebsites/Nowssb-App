@@ -12741,3 +12741,90 @@ body.nm-night #home-nm .qa-tv-block {
   background: #16163c;
   box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   TWO MORE TABLETS — the ones NowssB Connect wears
+   Both renders arrived with transparent margin all round, so both are
+   trimmed to their own silhouette; margin inside the box is dead space the
+   section pays for on every side. The padding below is each render's own
+   bezel, measured off the trimmed file, and every value is a fraction of
+   the WIDTH because that is what percentage padding means on all four
+   sides. The screen is black painted in CSS and clipped to the content
+   box — the renders' screens are transparent and their bezel layer sits
+   ABOVE the content, so black in the file would cover what is inside.
+═══════════════════════════════════════════════════════════════ */
+/* Landscape, wordmark on the bottom bezel — the Connect banner.
+   Trimmed 1313x807, screen at x 19-1292, y 23-746. */
+.nwsb-inframe.dev-tabc-l {
+  padding: 1.752% 1.523% 4.570% 1.447%;
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+}
+.nwsb-inframe.dev-tabc-l::after { background-image: url('./assets/frames/tab2-landscape.webp'); }
+
+/* Portrait, wordmark on the bottom bezel — the Connect section.
+   Trimmed 907x1307, screen at x 22-884, y 35-1257. */
+.nwsb-inframe.dev-tabc-p {
+  padding: 3.859% 2.426% 5.402%;
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+}
+.nwsb-inframe.dev-tabc-p::after { background-image: url('./assets/frames/tab2-portrait.webp'); }
+
+/* ── The Connect BANNER, on the landscape tablet ──
+   app/js/part067.js puts the frame classes on the .vb-banner itself rather
+   than wrapping it, so the element the layout registry matches
+   (.vb-banner[data-vb=vb4] / vb5) is still the same element in the same
+   place. .vbf-screen fills the content box, which IS the aperture. */
+.vb-banner.dev-tabc-l { aspect-ratio: 1313 / 807; }
+.vb-banner.dev-tabc-l .vbf-screen {
+  position: relative; width: 100%; height: 100%;
+  overflow: hidden; border-radius: 0 !important; background: #000;
+}
+.vb-banner.dev-tabc-l .vbf-screen > video {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  border-radius: 0 !important;
+}
+
+/* ── The Connect SECTION, on the portrait tablet ──
+   Same trick, and for the same reason: .nmh-connect-sec is what the
+   registry matches on the Normal home, so the frame goes ON it rather
+   than around it. Everything the section had — the clip, the scrim, the
+   mark, the copy, the button — moves inside .ncs-screen, which is the
+   aperture. */
+.nmh-connect-sec.dev-tabc-p {
+  aspect-ratio: 907 / 1307;
+  /* background-COLOR, not the `background` shorthand: the shorthand resets
+     background-clip to border-box, which would spread the black across the
+     bezel as well and put a black rectangle behind the whole render. The
+     clip stays content-box, so the black is exactly the aperture. */
+  background-color: #000 !important;
+  background-image: none !important;
+  background-clip: content-box !important;
+  -webkit-background-clip: content-box !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  display: block !important;
+}
+.nmh-connect-sec.dev-tabc-p .ncs-screen {
+  position: relative; width: 100%; height: 100%;
+  overflow: hidden; border-radius: 0 !important; background: #000;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 22px 20px 24px; box-sizing: border-box;
+}
+.nmh-connect-sec.dev-tabc-p .nmh-connect-vid,
+.nmh-connect-sec.dev-tabc-p .nmh-connect-scrim {
+  position: absolute; inset: 0; z-index: 0; border-radius: 0 !important;
+}
+.nmh-connect-sec.dev-tabc-p .nmh-connect-vid {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.nmh-connect-sec.dev-tabc-p .nmh-connect-scrim { z-index: 1; }
+.nmh-connect-sec.dev-tabc-p .nmh-connect-logo,
+.nmh-connect-sec.dev-tabc-p .nmh-connect-title,
+.nmh-connect-sec.dev-tabc-p .nmh-connect-desc,
+.nmh-connect-sec.dev-tabc-p .nmh-connect-enter { position: relative; z-index: 2; }
