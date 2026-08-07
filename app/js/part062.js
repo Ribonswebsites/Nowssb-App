@@ -67,7 +67,11 @@
         { k:'subvid',   sel:['.nmh-video-banner.nmh-vb-tall'],                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
         { k:'edition',  sel:['.nmh-fsec'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
-        { k:'healing',  sel:['.nmh-healing-wrap'],                                        t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
+        /* Off on the shipped Normal home, and opt-in from this editor —
+           `always` is gone precisely so it CAN be switched off, and defOff
+           keeps it off until someone turns it on. The Fashion home's own
+           healing entry is untouched. */
+        { k:'healing',  sel:['.nmh-healing-wrap'],                                        t:S, label:'Personalised Healing',  sub:'Choose your health journey', defOff:1 },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', always:1 },
         { k:'msearch',  sel:['.vb-banner[data-vb="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name' },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
@@ -117,6 +121,11 @@
 
   function LSKEY(which) { return 'nwsb_home_layout_' + which; }
 
+  /* Bump when a section becomes defOff after it has already shipped switched
+     on, so saved layouts get the change once. See the migration in load().
+       1 — Personalised Healing leaves the Normal home. */
+  var LAYOUT_V = 1;
+
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
     var raw;
@@ -139,13 +148,29 @@
     var off = (raw && Array.isArray(raw.off))
       ? raw.off.filter(function (k) { return all.indexOf(k) >= 0; })
       : reg.items.filter(function (i) { return i.defOff; }).map(function (i) { return i.k; });
+    /* defOff only decides a FRESH install. A section that becomes defOff
+       after someone already has a saved layout would sit on their page
+       forever, because their saved `off` list simply doesn't mention it —
+       so the change would land for new readers and nobody else. This runs
+       the difference in once, marks the layout with the version it has
+       been brought up to, and never touches it again. Turning the section
+       back on therefore sticks: save() writes the version too, so there is
+       nothing left for a later load to migrate. */
+    if (raw && (raw.v || 0) < LAYOUT_V) {
+      reg.items.forEach(function (i) {
+        if (i.defOff && off.indexOf(i.k) < 0) off.push(i.k);
+      });
+      try {
+        localStorage.setItem(LSKEY(which), JSON.stringify({ order: order, off: off, v: LAYOUT_V }));
+      } catch (e) {}
+    }
     // Entries flagged `always` can be reordered but never switched off, so the
     // user can't hide the only on-page way back into this editor.
     off = off.filter(function (k) { return !itemOf(which, k).always; });
     return { order: order, off: off };
   }
   function save(which, st) {
-    try { localStorage.setItem(LSKEY(which), JSON.stringify({ order: st.order, off: st.off })); } catch (e) {}
+    try { localStorage.setItem(LSKEY(which), JSON.stringify({ order: st.order, off: st.off, v: LAYOUT_V })); } catch (e) {}
   }
   function itemOf(which, k) {
     var a = REG[which].items;
