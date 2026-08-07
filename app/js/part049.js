@@ -175,7 +175,7 @@ window.fashionHomeIntroEnter = function() {
    alone can be deferred (esp. the fashion home which isn't always reached via
    goTo), so observe each one and play it whenever it's on screen. */
 (function () {
-  var SEL = '.nmh-connect-vid, .sl-banner-vid, .nss-verify-banner-vid';
+  var SEL = '.nmh-connect-vid, .sl-banner-vid, .nss-verify-banner-vid, .nss-trigger-vid';
   function init() {
     var vids = document.querySelectorAll(SEL);
     if (!vids.length) { return setTimeout(init, 400); }

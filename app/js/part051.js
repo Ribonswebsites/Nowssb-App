@@ -102,7 +102,20 @@
   }
 
   var idle = window.requestIdleCallback || function (cb) { setTimeout(cb, 4000); };
-  idle(start, { timeout: 8000 });
+  /* Not while the start animation is playing. requestIdleCallback fires as
+     soon as the main thread quietens, which during the splash it does — so
+     this was queueing thirty video downloads underneath the one clip that
+     is actually on screen, and the clip is what paid for it.
+     nwsbSplashWait (index.html) is the callback form; window._nwsbSplashOver
+     is the same answer read synchronously. Read the flag rather than latching
+     a copy of it, so every file that defers work to it agrees. */
+  function splashOver() { return window._nwsbSplashOver !== false; }
+  function startAfterSplash() {
+    var go = function () { idle(start, { timeout: 8000 }); };
+    if (typeof window.nwsbSplashWait === 'function') window.nwsbSplashWait(go);
+    else go();
+  }
+  startAfterSplash();
 
   // Screens/banners built dynamically after the initial scan (e.g. a store's
   // buy-page video banner, injected via innerHTML only once the user opens
@@ -111,6 +124,12 @@
   // and warm it too, same rules (Data Saver still respected).
   if ('MutationObserver' in window) {
     var mo = new MutationObserver(function () {
+      /* Same reason as above, and this one matters more: the app rewrites
+         a great deal of DOM while it boots, so this callback ran over and
+         over — each time doing a querySelectorAll('video') across the whole
+         document — during the exact seconds the start animation is on
+         screen. Nothing is warmed before the clip is done anyway. */
+      if (!splashOver()) return;
       if (shouldSkip()) return;
       var urls = collectVideoUrls();
       if (urls.length) warmAll(urls);
@@ -202,8 +221,21 @@
     });
   }
 
+  /* Nothing decodes underneath the start animation.
+     This controller runs up to MAX_PLAYING videos at once, and while the
+     splash is up the screens behind it still look "shown" to it — so the
+     start animation was competing with four other decoders for the exact
+     five seconds it is the only thing anyone can see. It waits now, the
+     same way the pre-warmer above does. */
+  (function () {
+    var go = function () { queue(); };
+    if (typeof window.nwsbSplashWait === 'function') window.nwsbSplashWait(go);
+    else go();
+  })();
+
   function apply() {
     if (document.hidden) return;
+    if (window._nwsbSplashOver === false) return;
     var live = [];
     for (var i = tracked.length - 1; i >= 0; i--) {
       var v = tracked[i];

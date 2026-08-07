@@ -398,7 +398,13 @@
         if (v.tagName !== 'VIDEO') return;
         if (v.getAttribute('src') === src) return;
         v.setAttribute('src', src);
-        try { v.load(); } catch (e) {}
+        /* load() starts a fetch there and then, which during the start
+           animation means three more downloads under the one clip on
+           screen. Every element here is preload="none" and is played by
+           the controller in app/js/part051.js when it comes into view, so
+           setting the source is enough — except before that controller
+           exists, where the old behaviour is kept. */
+        if (window._nwsbSplashOver !== false) { try { v.load(); } catch (e) {} }
       });
     });
   }

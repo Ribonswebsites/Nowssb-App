@@ -12454,3 +12454,15 @@ body.nm-mode #sub-social .sr-val { color: #1a1a2e !important; }
 body.nm-mode #sub-social .sr-val.gold { color: #9a7c3f !important; }
 body.nm-night #sub-social .sr-val { color: rgba(255,255,255,0.82) !important; }
 body.nm-night #sub-social .sr-val.gold { color: #e8d5a3 !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   THE NOWSSB STORE DOOR
+   The three crossfading stills are a clip now. The slot is 9/16 and the
+   film is 768x1168, so cover crops a little top and bottom rather than
+   letterboxing — the wordmark is centred, which is what has to survive.
+═══════════════════════════════════════════════════════════════ */
+body[class] .nss-store-trigger .nss-trigger-vid {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  background: #05070c;
+}

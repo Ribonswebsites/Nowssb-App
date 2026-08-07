@@ -248,6 +248,12 @@
    the many open()/openSub() wrappers individually. */
 (function(){
   function kick(){
+    /* Not while the start animation is on screen. This walks every
+       autoplay video in the document and load()s + play()s the ones that
+       are laid out — during the splash that is several clips decoding
+       behind a screen nobody can see through, and the start animation is
+       what pays for it. The splash sets this flag; see index.html. */
+    if (window._nwsbSplashOver === false) return;
     document.querySelectorAll('video[autoplay]').forEach(function(v){
       if (!v.paused || v.offsetParent === null) return;
       /* A video whose ancestor was display:none when the tag was parsed can be

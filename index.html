@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=684">
+<link rel="stylesheet" href="nowssb-nm.css?v=685">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -215,11 +215,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         vid.webkitPreservesPitch = true;
         /* Once. Said here as well as in the markup so nothing can put it back. */
         vid.loop = false;
-        ['loadedmetadata', 'canplay', 'play'].forEach(function (ev) {
-          vid.addEventListener(ev, function () {
-            vid.playbackRate = 2;
-            vid.loop = false;
-          });
+        /* Set the rate ONCE, when the source has loaded — that is the only
+           moment it gets reset to defaultPlaybackRate, so that is the only
+           moment it needs saying again.
+           It used to be re-set on `canplay` and `play` as well. `canplay`
+           fires again every time playback recovers from a stall, and
+           assigning playbackRate mid-playback makes the media pipeline
+           re-rate, which is itself a hitch — so a clip that stuttered once
+           was being made to stutter again by the code watching for it. */
+        var _rated = false;
+        vid.addEventListener('loadedmetadata', function () {
+          if (_rated) return;
+          _rated = true;
+          vid.playbackRate = 2;
+          vid.loop = false;
         });
 
         /* The splash waits for this to finish rather than for a timer.
@@ -280,6 +289,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     window.NWSB_SPLASH_ART = ART;
     window.NWSB_SPLASH_VIDEO = VID;
 
+    /* One flag the rest of the app can read synchronously: false while the
+       start animation is on screen, true from the moment it is done.
+       nwsbSplashWait below is the callback form; this is for the places
+       that are already inside a loop over elements and just need to know
+       whether now is a good time to start decoding something else.
+       Only the clip sets it — an image start page never blocks anything. */
+    window._nwsbSplashOver = (mode === 'clip' && vid) ? false : true;
+
     /* THE GATE. Every path that leaves the splash calls this instead of
        navigating straight away, so there is one answer to "is the start
        animation finished" rather than one per caller.
@@ -295,11 +312,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     window.nwsbSplashWait = function (cb) {
       var CEILING = 15000, t0 = Date.now();
       (function tick() {
-        if (!window._splashHoldForClip || window._splashClipDone) return cb();
-        if (Date.now() - t0 > CEILING) return cb();
+        if (!window._splashHoldForClip || window._splashClipDone) {
+          window._nwsbSplashOver = true;
+          return cb();
+        }
+        if (Date.now() - t0 > CEILING) { window._nwsbSplashOver = true; return cb(); }
         setTimeout(tick, 120);
       })();
     };
+    /* The flag must clear even if nobody ever calls the gate. */
+    if (window._nwsbSplashOver === false) window.nwsbSplashWait(function () {});
   })();
   </script>
   <div class="splash-bottom">
@@ -1452,9 +1474,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-sec-wrap nmh-store-wrap">
     <div class="nss-store-trigger" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="margin-top:16px;">
       <div class="nss-trigger-slides">
-        <div class="nss-trigger-slide" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581670/grok_image_1778581463094_eucw6p.jpg');"></div>
-        <div class="nss-trigger-slide" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581668/grok_image_1778575335848_zvteyg.jpg');"></div>
-        <div class="nss-trigger-slide" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581669/grok_image_1778575348155_zfummr.jpg');"></div>
+        <!-- The clip replaces the three crossfading stills that were here. -->
+        <video class="nss-trigger-vid" data-nwsb-auto muted loop playsinline
+               preload="none" aria-hidden="true" tabindex="-1"
+               poster="./assets/video/store-trigger-poster.webp?v=1"
+               src="./assets/video/store-trigger.mp4?v=1"></video>
       </div>
       <div class="nss-trigger-content">
         <div class="nss-trigger-top">
@@ -2206,9 +2230,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <div class="nss-store-trigger" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
     <div class="nss-trigger-slides">
-      <div class="nss-trigger-slide" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581670/grok_image_1778581463094_eucw6p.jpg');"></div>
-      <div class="nss-trigger-slide" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581668/grok_image_1778575335848_zvteyg.jpg');"></div>
-      <div class="nss-trigger-slide" style="background-image:url('https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581669/grok_image_1778575348155_zfummr.jpg');"></div>
+      <!-- The clip replaces the three crossfading stills that were here. -->
+      <video class="nss-trigger-vid" data-nwsb-auto muted loop playsinline
+             preload="none" aria-hidden="true" tabindex="-1"
+             poster="./assets/video/store-trigger-poster.webp?v=1"
+             src="./assets/video/store-trigger.mp4?v=1"></video>
     </div>
 
     <div class="nss-trigger-content">
@@ -9991,7 +10017,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-panel-intro-settings -->
 
 
-<script src="app/js/part042.js?v=230"></script>
+<script src="app/js/part042.js?v=231"></script>
 
 
 
@@ -10130,9 +10156,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=292"></script>
+<script src="app/js/part049.js?v=293"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="app/js/part051.js?v=12" defer></script>
+<script src="app/js/part051.js?v=14" defer></script>
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=15"></script>
 <script src="app/js/part056.js?v=5"></script>
@@ -10146,7 +10172,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part064.js?v=6"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=41"></script>
-<script src="app/js/part067.js?v=24"></script>
+<script src="app/js/part067.js?v=25"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
