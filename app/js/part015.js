@@ -17,6 +17,15 @@ let _wlActiveTab    = 'playlist';
 let _wlActiveGenre  = 'all';
 let _wlMood         = 'healing';
 let _wlSelected     = new Set();
+/* The live wlBuildSentence (app/js/part019.js) replaces the one below and
+   reads window._wlSelected and window._wlMood. These are `let` at module
+   scope, which never become properties of window — so that override saw
+   undefined, returned on its first line, and the Build Sentence button did
+   nothing at all, every time. The Set is shared by reference, so add/delete
+   here is visible there; the mood is a string and has to be re-published on
+   every change (see wlSetMood). */
+window._wlSelected  = _wlSelected;
+window._wlMood      = _wlMood;
 let _wlSentenceData = null;
 let _wlSpeaking     = false;
 
@@ -55,10 +64,12 @@ function openWalkmanLib() {
   ov.classList.add('open');
   _wlStartBanner();
   // Apply current genre bg image immediately on open
+  /* No photograph behind the list. The genre images were full-bleed under
+     the words and the checkboxes, which is what made this page unreadable —
+     the sheet carries a solid background from CSS now. */
   const sheet = document.getElementById('wlSheet');
   if (sheet) {
-    const img = _wlGenreImages[_wlActiveGenre] || _wlGenreImages['all'];
-    sheet.style.backgroundImage = `url('${img}')`;
+    sheet.style.backgroundImage = 'none';
     sheet.style.opacity = '1';
   }
   wlRenderPlaylist();
@@ -111,16 +122,10 @@ function wlFilterGenre(genre) {
     p.classList.toggle('active', p.dataset.genre === genre);
   });
 
-  // Fade out → swap bg image on entire sheet → fade in
+  /* The genre no longer changes a background photograph — see
+     openWalkmanLib. The pills still filter the list, which is their job. */
   const sheet = document.getElementById('wlSheet');
-  if (sheet) {
-    sheet.style.opacity = '0';
-    setTimeout(() => {
-      const img = _wlGenreImages[genre] || _wlGenreImages['all'];
-      sheet.style.backgroundImage = `url('${img}')`;
-      sheet.style.opacity = '1';
-    }, 220);
-  }
+  if (sheet) sheet.style.backgroundImage = 'none';
 
   wlRenderPlaylist();
 }
@@ -170,6 +175,7 @@ function wlJumpToWord(idx) {
 // ── BUILD ──
 function wlSetMood(mood) {
   _wlMood = mood;
+  window._wlMood = mood;   /* the builder reads this one */
   document.querySelectorAll('.wl-mood-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.mood === mood);
   });

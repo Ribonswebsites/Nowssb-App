@@ -12466,3 +12466,33 @@ body[class] .nss-store-trigger .nss-trigger-vid {
   width: 100%; height: 100%; object-fit: cover; display: block;
   background: #05070c;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   FASHION PLUS — pages keep a background
+   body.fashplus opens the tagged pages up so the fixed film behind can
+   show. #fpBgVideo sits at z-index 0, behind everything, and the top-level
+   screens sit above it — so what actually came through a transparent page
+   was the home, not the film. The pages are black instead. Nothing else
+   about the mode changes: the home still wears the film.
+═══════════════════════════════════════════════════════════════ */
+body.fashplus .sub-screen[data-fp-img] { background: #000 !important; }
+body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] {
+  background-image: none !important;
+  background-color: #000 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THE WORD LIBRARY
+   A full-bleed photograph used to sit under the word list, the checkboxes
+   and the mood buttons, which is what made them unreadable. The sheet has
+   a background of its own now (app/js/part015.js no longer paints the
+   genre image).
+═══════════════════════════════════════════════════════════════ */
+/* Dark in both homes, deliberately: the list, the genre tags and the mood
+   buttons are all written white-on-dark and there is no light skin for this
+   overlay anywhere, so a light sheet would only trade one unreadable page
+   for another. */
+#wlSheet {
+  background-image: none !important;
+  background-color: #0a0e1a !important;
+}
