@@ -11314,6 +11314,44 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 .lg-wrap::-webkit-scrollbar { display: none; }
 #login.lg-screen-black { overflow: hidden; padding: 0 !important; }
 
+/* ── The mark, at the TOP of the screen ──
+   Logo, a hairline, then the name — set in the header's own two weights
+   (.brand-name .b at 800 and .t at 200) rather than a single weight, so it
+   is the same wordmark the rest of the app uses and not a lookalike. The
+   header's classes are not reused directly because nowssb-nm.css repaints
+   .brand-name dark for the light home, and this screen is black.
+
+   It pins to the top: everything after it carries the auto margins that
+   centre the rest, so this block stays put while Welcome and the pills sit
+   in the middle. */
+.lg-top {
+  display: flex; align-items: center; gap: 13px;
+  padding: 2px 2px 0; flex-shrink: 0;
+}
+.lg-top-logo {
+  width: 46px; height: 46px; flex-shrink: 0;
+  border-radius: 50%; overflow: hidden;
+}
+.lg-top-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lg-top-rule {
+  width: 1px; height: 34px; flex-shrink: 0;
+  background: rgba(255,255,255,0.2);
+}
+.lg-top-txt { min-width: 0; }
+.lg-top-name {
+  font-family: 'DM Sans', sans-serif; font-size: 21px; line-height: 1.05;
+  letter-spacing: -0.2px;
+}
+.lg-top-name .b { font-weight: 800; color: #fff; }
+.lg-top-name .t { font-weight: 200; color: rgba(255,255,255,0.88); }
+.lg-top-by {
+  font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 300;
+  letter-spacing: 2.2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.42); margin-top: 5px;
+}
+.lg-top-by .b { font-weight: 700; color: rgba(255,255,255,0.6); }
+.lg-top-by .t { font-weight: 300; }
+
 /* ── The words, INSIDE the screen and low in it ──
    Written the way the home's greeting is written, because that is the
    app's voice for this: the round mark on the left, then a quiet line, a
@@ -11328,8 +11366,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    up just over the pills instead of at the top of the screen. */
 .lg-head {
   margin-top: auto;   /* with the auto below, this centres the group */
-  display: flex; align-items: flex-start; gap: 14px;
-  text-align: left; padding: 0 2px 16px;
+  display: block; text-align: left; padding: 0 2px 16px;
 }
 /* No ring, no plate, no border. The mark is already a disc on black, and
    the screen behind it is black, so anything drawn round it would be a
@@ -11436,7 +11473,7 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
   background: transparent; border-radius: 0 !important;
   display: flex; flex-direction: column; justify-content: flex-start;
-  padding: 10px 20px; gap: 0;
+  padding: 10px 20px 14px; gap: 0;
 }
 /* Centred by auto margins rather than justify-content: center, and that is
    not a style preference. In a scroll container, centring with
@@ -11573,6 +11610,45 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
 #login .nm-link-sm {
   color: rgba(255,255,255,0.34); font-size: 11px; padding: 8px 6px 2px;
 }
+
+/* ══ WHEN A FORM IS OPEN ══
+   The screen is 707px of glass and the stack with the email form open came
+   to about 757 — so the last line, "Explore without account", sat cut in
+   half against the bottom of the aperture. It did scroll, but a control
+   sliced through at rest reads as broken rather than as scrollable, which
+   is the wrong first impression on a sign-in screen.
+
+   The fix is to make it fit rather than to make it scroll better: with a
+   form open the greeting stands down a size, the tagline goes (you are
+   filling in a form, you have read it), the control height steps 52 -> 48
+   for EVERY control at once rather than for whichever ones were in the
+   way, and the gaps tighten.
+
+   Every selector here is #login-prefixed, and that is not decoration. The
+   base rules above are #login .nm-auth-btn, #login .nm-btn-list and so on
+   — one ID and one class. A plain .lg-glass:has(...) .nm-auth-btn is two
+   classes, which loses to an ID even carrying !important, and the first
+   version of this block silently did nothing at all for that reason.
+
+   :has() is safe to lean on here in a way it would not be for text colour:
+   unsupported, the screen falls back to scrolling — what it does today —
+   rather than to something unreadable. The glass's bottom padding is the
+   belt regardless: the last control is never flush against the clip. */
+#login .lg-glass:has(.nm-form-panel.open) .lg-head { padding-bottom: 10px; gap: 11px; }
+#login .lg-glass:has(.nm-form-panel.open) .lg-head-orb { width: 42px; height: 42px; }
+#login .lg-glass:has(.nm-form-panel.open) .lg-head .nm-brand { font-size: 16px; }
+#login .lg-glass:has(.nm-form-panel.open) .lg-head .nm-auth-title { font-size: 22px; }
+#login .lg-glass:has(.nm-form-panel.open) .lg-head .nm-auth-sub { display: none; }
+#login .lg-glass:has(.nm-form-panel.open) .nm-btn-list { gap: 8px; }
+#login .lg-glass:has(.nm-form-panel.open) .nm-divider { margin: 9px 0; }
+#login .lg-glass:has(.nm-form-panel.open) .lg-guest { margin-top: 4px; }
+#login .lg-glass:has(.nm-form-panel.open) .nm-auth-btn,
+#login .lg-glass:has(.nm-form-panel.open) .nm-input,
+#login .lg-glass:has(.nm-form-panel.open) .nm-phone-select,
+#login .lg-glass:has(.nm-form-panel.open) .nm-btn-gold { height: 48px !important; }
+#login .lg-glass:has(.nm-form-panel.open) .nm-field-label { margin-bottom: 5px; }
+#login .lg-glass:has(.nm-form-panel.open) .nm-link-sm { padding: 4px 6px 0; }
+#login .nm-form-panel.open { padding-top: 8px !important; gap: 10px; }
 
 /* ── The way out ── */
 .lg-guest {

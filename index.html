@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=263"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=669">
+<link rel="stylesheet" href="nowssb-nm.css?v=673">
 <link rel="stylesheet" href="nowssb-player.css?v=201">
 </head>
 <body>
@@ -204,16 +204,23 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
              src="./assets/video/login-phone.mp4"></video>
       <div class="lg-glass">
 
-    <!-- Below now, not at the top of the screen — and written the way the
-         home's greeting is written: the round mark on the left, the small
-         line, the big name and the sub stacked beside it. -->
-    <div class="lg-head">
-      <div class="lg-head-orb">
+    <!-- The mark, at the top of the screen: logo, a hairline, then the
+         name in the header's two weights with "By Nowsbansiu" under it. -->
+    <div class="lg-top">
+      <div class="lg-top-logo">
         <img loading="eager" decoding="async" alt="NowssB"
              src="./assets/icons/logo-disc.webp">
       </div>
+      <span class="lg-top-rule" aria-hidden="true"></span>
+      <div class="lg-top-txt">
+        <div class="lg-top-name"><span class="b">Nowss</span><span class="t">B</span></div>
+        <div class="lg-top-by">By <span class="b">Nowsb</span><span class="t">ansiu</span></div>
+      </div>
+    </div>
+
+    <!-- Welcome stays where it is, in the middle with the pills. -->
+    <div class="lg-head">
       <div class="lg-head-txt">
-        <div class="nm-brand">Nowsbansiu</div>
         <div class="nm-auth-title">Welcome</div>
         <div class="nm-auth-sub">Sign in or create your account</div>
       </div>
