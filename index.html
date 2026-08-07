@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=693">
+<link rel="stylesheet" href="nowssb-nm.css?v=699">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -1354,7 +1354,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          would make it a grandchild of the home wrap and strand the section at
          the top of the page. Its padding is the bezel and .ncs-screen is the
          aperture; the clip, the scrim and the copy all live in there. -->
-    <div class="nmh-connect-sec nwsb-inframe dev-tabc-p" onclick="window.IG&&IG.nav('profile')">
+    <div class="nmh-connect-sec nwsb-inframe dev-tabs-p" onclick="window.IG&&IG.nav('profile')">
       <div class="ncs-screen">
         <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
         <div class="nmh-connect-scrim"></div>
@@ -1463,31 +1463,43 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- ══ FASHION SECTIONS ON NORMAL HOME (Word Search · Meaning · Store · Subscription) ══ -->
 
     <!-- Video banner — above the subscription section -->
-    <div class="nmh-video-banner nmh-vb-tall" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
-      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
-      <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+    <!-- On the landscape tablet. The frame classes go ON the banner rather
+         than in a wrapper around it, because this is the element the layout
+         registry matches — a wrapper would make it a grandchild of the home
+         wrap and strand the section at the top of the page. -->
+    <div class="nmh-video-banner nmh-vb-tall nwsb-inframe dev-tabs-l" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
+      <div class="vbs-screen">
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
+        <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+      </div>
     </div>
 
     <!-- Subscription — auto-rotating crossfade background (3 images), no
          dots. Exact same structure/styling as the Fashion Home version
          (#sub-promo-card) — top labels row, image, then pushed-down text. -->
-    <div class="nmh-fsec" onclick="if(window.SS)SS.open('subscription')">
-      <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4"></video>
-      <div class="nmh-fsec-fade"></div>
-      <!-- Labels pinned to top of card -->
-      <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
-      </div>
-      <!-- Title + description sit directly above the Upgrade button -->
-      <div style="position:absolute;bottom:88px;left:20px;right:20px;z-index:2;">
-        <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.7);">Unlock your full<br>healing potential</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.82);line-height:1.6;max-width:280px;text-shadow:0 1px 8px rgba(0,0,0,0.7);">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
-      </div>
-      <!-- Upgrade button pinned to the bottom -->
-      <div style="position:absolute;bottom:24px;left:20px;right:20px;z-index:2;display:flex;align-items:center;gap:12px;">
-        <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.85);letter-spacing:0.5px;">from $4.99/mo</div>
+    <!-- On the portrait tablet. Same reasoning as the banner above, and
+         .fsec-screen being position:relative is what makes the card's
+         absolutely-placed labels, copy and Upgrade button resolve against
+         the aperture rather than against the bezel. -->
+    <div class="nmh-fsec nwsb-inframe dev-tabs-p" onclick="if(window.SS)SS.open('subscription')">
+      <div class="fsec-screen">
+        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4"></video>
+        <div class="nmh-fsec-fade"></div>
+        <!-- Labels pinned to top of card -->
+        <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
+        </div>
+        <!-- Title + description sit directly above the Upgrade button -->
+        <div style="position:absolute;bottom:88px;left:20px;right:20px;z-index:2;">
+          <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.7);">Unlock your full<br>healing potential</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.82);line-height:1.6;max-width:280px;text-shadow:0 1px 8px rgba(0,0,0,0.7);">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
+        </div>
+        <!-- Upgrade button pinned to the bottom -->
+        <div style="position:absolute;bottom:24px;left:20px;right:20px;z-index:2;display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.85);letter-spacing:0.5px;">from $4.99/mo</div>
+        </div>
       </div>
     </div>
 
@@ -1968,7 +1980,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        would make it a grandchild of the home wrap and strand the section at
        the top of the page. Its padding is the bezel and .ncs-screen is the
        aperture; the clip, the scrim and the copy all live in there. -->
-  <div class="nmh-connect-sec fash-connect nwsb-inframe dev-tabc-p" onclick="openConnectIntro()">
+  <div class="nmh-connect-sec fash-connect nwsb-inframe dev-tabs-p" onclick="openConnectIntro()">
     <div class="ncs-screen">
       <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
       <div class="nmh-connect-scrim"></div>
@@ -2004,32 +2016,44 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <!-- Video banner — above the subscription promo -->
-  <div class="fash-video-banner fash-vb-tall" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
-    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
-    <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+  <!-- On the landscape tablet. The frame classes go ON the banner rather
+       than in a wrapper around it, because this is the element the layout
+       registry matches — a wrapper would make it a grandchild of the home
+       wrap and strand the section at the top of the page. -->
+  <div class="fash-video-banner fash-vb-tall nwsb-inframe dev-tabs-l" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
+    <div class="vbs-screen">
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
+      <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+    </div>
   </div>
 
   <!-- Subscription promo — shown to free users only — auto-rotating
        crossfade background (3 images), no dots, taller than the old
        fixed image. -->
-  <div id="sub-promo-card" style="display:none;width:calc(100% - 32px);min-height:560px;margin:0 16px 16px;position:relative;overflow:hidden;border-radius:16px;background:#060c18;border:1px solid rgba(232,213,163,0.2);padding:0;" onclick="SS&&SS.open('subscription')">
-    <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4"></video>
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(6,12,24,0.0) 0%, rgba(6,12,24,0.15) 40%, rgba(6,12,24,0.72) 100%);"></div>
-    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(232,213,163,0.4),transparent);"></div>
-    <!-- Labels pinned to top of card -->
-    <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
-    </div>
-    <!-- Title + description sit directly above the Upgrade button -->
-    <div style="position:absolute;bottom:88px;left:20px;right:20px;z-index:2;">
-      <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.7);">Unlock your full<br>healing potential</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.82);line-height:1.6;max-width:280px;text-shadow:0 1px 8px rgba(0,0,0,0.7);">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
-    </div>
-    <!-- Upgrade button pinned to the bottom -->
-    <div style="position:absolute;bottom:24px;left:20px;right:20px;z-index:2;display:flex;align-items:center;gap:12px;">
-      <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.85);letter-spacing:0.5px;">from $4.99/mo</div>
+  <!-- On the portrait tablet. Same reasoning as the banner above, and
+       .fsec-screen being position:relative is what makes the card's
+       absolutely-placed labels, copy and Upgrade button resolve against
+       the aperture rather than against the bezel. -->
+  <div id="sub-promo-card" class="nwsb-inframe dev-tabs-p" style="display:none;width:calc(100% - 32px);min-height:560px;margin:0 16px 16px;position:relative;overflow:hidden;border-radius:16px;background:#060c18;border:1px solid rgba(232,213,163,0.2);padding:0;" onclick="SS&&SS.open('subscription')">
+    <div class="fsec-screen">
+      <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4"></video>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(6,12,24,0.0) 0%, rgba(6,12,24,0.15) 40%, rgba(6,12,24,0.72) 100%);"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(232,213,163,0.4),transparent);"></div>
+      <!-- Labels pinned to top of card -->
+      <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
+      </div>
+      <!-- Title + description sit directly above the Upgrade button -->
+      <div style="position:absolute;bottom:88px;left:20px;right:20px;z-index:2;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.7);">Unlock your full<br>healing potential</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.82);line-height:1.6;max-width:280px;text-shadow:0 1px 8px rgba(0,0,0,0.7);">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
+      </div>
+      <!-- Upgrade button pinned to the bottom -->
+      <div style="position:absolute;bottom:24px;left:20px;right:20px;z-index:2;display:flex;align-items:center;gap:12px;">
+        <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.85);letter-spacing:0.5px;">from $4.99/mo</div>
+      </div>
     </div>
   </div>
 

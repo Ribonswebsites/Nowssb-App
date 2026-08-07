@@ -11869,7 +11869,10 @@ body.fpoff-routines #home .rt-vid-banner { display: none !important; }
    because the padding IS the bezel — so clipping to it is exact at any
    size, with no second set of numbers to keep in step. */
 .nwsb-inframe.dev-tab-l {
-  padding: 4.854% 3.510% 3.734%;
+  /* !important: #sub-promo-card carries an inline padding:0, and an
+     inline declaration beats a plain stylesheet one — the bezel simply
+     never applied there. */
+  padding: 4.854% 3.510% 3.734% !important;
   background-color: #000;
   background-clip: content-box;
   -webkit-background-clip: content-box;
@@ -12756,7 +12759,10 @@ body.nm-night #home-nm .qa-tv-block {
 /* Landscape, wordmark on the bottom bezel — the Connect banner.
    Trimmed 1313x807, screen at x 19-1292, y 23-746. */
 .nwsb-inframe.dev-tabc-l {
-  padding: 1.752% 1.523% 4.570% 1.447%;
+  /* !important: #sub-promo-card carries an inline padding:0, and an
+     inline declaration beats a plain stylesheet one — the bezel simply
+     never applied there. */
+  padding: 1.752% 1.523% 4.570% 1.447% !important;
   background-color: #000;
   background-clip: content-box;
   -webkit-background-clip: content-box;
@@ -12778,7 +12784,20 @@ body.nm-night #home-nm .qa-tv-block {
    than wrapping it, so the element the layout registry matches
    (.vb-banner[data-vb=vb4] / vb5) is still the same element in the same
    place. .vbf-screen fills the content box, which IS the aperture. */
-.vb-banner.dev-tabc-l { aspect-ratio: 1313 / 807; }
+/* .vb-banner brings overflow:hidden and a 22px radius of its own, and both
+   of those CUT THE RENDER: the rounded corners crop the tablet's own
+   corners and the clip eats its outer edge. Reset here, with the black
+   moved to a content-box-clipped background-color so it still only paints
+   the aperture. */
+.vb-banner.dev-tabc-l {
+  aspect-ratio: 1313 / 807;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  background-image: none !important;
+  background-color: #000 !important;
+  background-clip: content-box !important;
+  -webkit-background-clip: content-box !important;
+}
 .vb-banner.dev-tabc-l .vbf-screen {
   position: relative; width: 100%; height: 100%;
   overflow: hidden; border-radius: 0 !important; background: #000;
@@ -12795,8 +12814,8 @@ body.nm-night #home-nm .qa-tv-block {
    than around it. Everything the section had — the clip, the scrim, the
    mark, the copy, the button — moves inside .ncs-screen, which is the
    aperture. */
-.nmh-connect-sec.dev-tabc-p {
-  aspect-ratio: 907 / 1307;
+.nmh-connect-sec.dev-tabs-p {
+  aspect-ratio: 847 / 1299;
   /* background-COLOR, not the `background` shorthand: the shorthand resets
      background-clip to border-box, which would spread the black across the
      bezel as well and put a black rectangle behind the whole render. The
@@ -12810,21 +12829,151 @@ body.nm-night #home-nm .qa-tv-block {
   overflow: visible !important;
   display: block !important;
 }
-.nmh-connect-sec.dev-tabc-p .ncs-screen {
-  position: relative; width: 100%; height: 100%;
-  overflow: hidden; border-radius: 0 !important; background: #000;
+.nmh-connect-sec.dev-tabs-p .ncs-screen {
   display: flex; flex-direction: column; justify-content: flex-end;
   padding: 22px 20px 24px; box-sizing: border-box;
 }
-.nmh-connect-sec.dev-tabc-p .nmh-connect-vid,
-.nmh-connect-sec.dev-tabc-p .nmh-connect-scrim {
+.nmh-connect-sec.dev-tabs-p .nmh-connect-vid,
+.nmh-connect-sec.dev-tabs-p .nmh-connect-scrim {
   position: absolute; inset: 0; z-index: 0; border-radius: 0 !important;
 }
-.nmh-connect-sec.dev-tabc-p .nmh-connect-vid {
+.nmh-connect-sec.dev-tabs-p .nmh-connect-vid {
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
-.nmh-connect-sec.dev-tabc-p .nmh-connect-scrim { z-index: 1; }
-.nmh-connect-sec.dev-tabc-p .nmh-connect-logo,
-.nmh-connect-sec.dev-tabc-p .nmh-connect-title,
-.nmh-connect-sec.dev-tabc-p .nmh-connect-desc,
-.nmh-connect-sec.dev-tabc-p .nmh-connect-enter { position: relative; z-index: 2; }
+.nmh-connect-sec.dev-tabs-p .nmh-connect-scrim { z-index: 1; }
+.nmh-connect-sec.dev-tabs-p .nmh-connect-logo,
+.nmh-connect-sec.dev-tabs-p .nmh-connect-title,
+.nmh-connect-sec.dev-tabs-p .nmh-connect-desc,
+.nmh-connect-sec.dev-tabs-p .nmh-connect-enter { position: relative; z-index: 2; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TWO MORE TABLETS — the ones Subscription wears
+   Measured off the files the same way as the rest: trimmed to their own
+   silhouette (transparent margin inside the box is dead space the section
+   pays for on every side), then the padding taken from where the screen
+   actually sits in the trimmed render. Every value is a fraction of the
+   WIDTH, because that is what percentage padding means on all four sides.
+═══════════════════════════════════════════════════════════════ */
+/* Portrait, speaker slot top-left — the subscription section.
+   Trimmed 847x1299, screen at x 28-817, y 44-1264. */
+.nwsb-inframe.dev-tabs-p {
+  /* !important: #sub-promo-card carries an inline padding:0, and an
+     inline declaration beats a plain stylesheet one — the bezel simply
+     never applied there. */
+  padding: 5.195% 3.424% 4.014% 3.306% !important;
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+}
+.nwsb-inframe.dev-tabs-p::after { background-image: url('./assets/frames/tab3-portrait.webp'); }
+
+/* Landscape, home button on the bottom bezel — its video banner.
+   Trimmed 1157x863, screen at x 25-1133, y 32-794. */
+.nwsb-inframe.dev-tabs-l {
+  /* !important: #sub-promo-card carries an inline padding:0, and an
+     inline declaration beats a plain stylesheet one — the bezel simply
+     never applied there. */
+  padding: 2.766% 1.988% 5.877% 2.161% !important;
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+}
+.nwsb-inframe.dev-tabs-l::after { background-image: url('./assets/frames/tab3-landscape.webp'); }
+
+/* ── The subscription VIDEO BANNER, on the landscape tablet ──
+   The frame classes go ON the banner rather than in a wrapper around it:
+   .nmh-video-banner.nmh-vb-tall and .fash-vb-tall are what the layout
+   registry matches, and a wrapper would make them grandchildren of the
+   home wrap and strand the section at the top of the page. */
+.nmh-vb-tall.dev-tabs-l,
+.fash-vb-tall.dev-tabs-l {
+  aspect-ratio: 1157 / 863 !important;
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  background-color: #000 !important;
+  background-clip: content-box !important;
+  -webkit-background-clip: content-box !important;
+}
+.dev-tabs-l .vbs-screen {
+  position: relative; width: 100%; height: 100%;
+  overflow: hidden; border-radius: 0 !important; background: #000;
+}
+.dev-tabs-l .vbs-screen > video {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  border-radius: 0 !important;
+}
+/* Subscribe Today stays on the screen, not over the bezel. */
+.dev-tabs-l .vbs-screen > .nmh-banner-cta,
+.dev-tabs-l .vbs-screen > .fash-banner-cta { z-index: 2; }
+
+/* ── The subscription SECTION, on the portrait tablet ──
+   Same reasoning. Everything the card had moves inside .fsec-screen, which
+   is the aperture — and because that screen is position:relative, the
+   card's absolutely-placed labels, copy and Upgrade button resolve against
+   it rather than against the bezel. */
+.nmh-fsec.dev-tabs-p,
+#sub-promo-card.dev-tabs-p {
+  aspect-ratio: 847 / 1299 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  background-image: none !important;
+  background-color: #000 !important;
+  background-clip: content-box !important;
+  -webkit-background-clip: content-box !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+/* THE SCREEN IS PINNED, not sized.
+   height:100% came back 24px short here, and flex:1 could be beaten by an
+   inline display (the Fashion card is shown with style.display, which
+   would have cancelled a flex container outright). So the screen is
+   absolutely positioned to the aperture instead — that cannot be argued
+   with by anything else on the box.
+
+   left/right are the render's own bezel percentages, because a percentage
+   inset resolves against WIDTH on those sides. top/bottom are the SAME
+   bezel converted to a fraction of HEIGHT — 5.195% x 847/1299 = 3.387%,
+   4.014% x 847/1299 = 2.617% — because on those two sides a percentage
+   resolves against height. The conversion is exact as long as the box
+   carries the render's aspect, which it does, right above. */
+/* THE SCREEN CARRIES THE APERTURE'S OWN ASPECT.
+   Three ways were tried before this one and all three were wrong:
+   height:100% came back 24px short (a percentage height against a box whose
+   own height comes from aspect-ratio is not dependable once other rules
+   touch height and min-height), flex:1 could be cancelled outright by the
+   inline `display` the Fashion card is shown with, and percentage insets
+   measured right but landed 11px low.
+   A block at width:100% of the content box with the APERTURE's aspect needs
+   none of that: 790x1221 is the hole in the trimmed render (x 28-817,
+   y 44-1264), so the height follows from the width and nothing else. */
+/* The Normal home wraps several of its sections in a raised neumorphic
+   plate — `#home-nm .nmh-fsec { border: 12px solid #f0f2f7 !important }`.
+   That selector is (1,1,0) with !important and beat the frame's own reset
+   at (0,2,0), so the card kept a 12px border on every side: the bezel
+   render drew over it and the content box came out 24px narrower than the
+   frame's arithmetic assumed. This is the same rule one step more
+   specific. The plate is the wrong idea here anyway — the tablet IS the
+   frame now. */
+#home-nm .nmh-fsec.dev-tabs-p {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.dev-tabs-p .fsec-screen,
+.dev-tabs-p .ncs-screen {
+  position: relative;
+  width: 100%; height: auto; aspect-ratio: 790 / 1221;
+  overflow: hidden; border-radius: 0 !important; background: #000;
+}
+.dev-tabs-p .fsec-screen > video,
+.dev-tabs-p .fsec-screen > .nmh-fsec-fade {
+  position: absolute; inset: 0; z-index: 0; border-radius: 0 !important;
+}
+.dev-tabs-p .fsec-screen > video {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
