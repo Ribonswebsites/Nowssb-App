@@ -13484,3 +13484,17 @@ body[class] #sub-sound-library .slm-word { color: #fff !important; }
 body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   stroke: #ffffff !important;
 }
+
+/* ── Store clips, in the 16:9 card ──
+   The card is .slm-big like the rest of that rail; only the picture is a
+   <video> instead of a background. preload="none" and a poster, so nothing
+   downloads until app/js/part051.js hands it one of its four decoder slots
+   — which it does for whichever cards are actually on screen. */
+.slm-vidbox {
+  display: block; position: relative; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; background: #1a1a1a;
+}
+.slm-vid {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block; border-radius: 0 !important;
+}

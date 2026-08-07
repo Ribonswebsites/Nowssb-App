@@ -1,10 +1,13 @@
 /* ── Sound Library, laid out the way a music app lays out a home feed ─────
-   Everything on this screen is real: the words come from
-   MASTER_WORD_LIBRARY, the artwork from MS_BASE_MEANINGS (the Meaning
-   Store already ships one image per word — no new art was added for this),
-   the sentences and purchases from the same localStorage keys part018.js
-   reads, and the session counts from window._mpData when My Progress has
-   loaded it. Nothing here invents a number.
+   Everything on this screen is real and everything on it comes from the
+   Store. The artwork is the Word Atelier's fifteen collection renders and
+   the Meaning Store's per-word product shots; the clips are the Store's own
+   — the door, Signature, subscription, the coupon reel — with the Sound
+   Library's banner clip at the head of the rail. The words come from
+   MASTER_WORD_LIBRARY, the sentences and purchases from the same
+   localStorage keys part018.js reads, and the session counts from
+   window._mpData when My Progress has loaded it. Nothing here invents a
+   number.
 
    This file loads AFTER part018.js and takes over window.slRender, which is
    what part005.js and part018.js's own openSub hook both call. The old tab
@@ -39,17 +42,58 @@
     return out;
   }
 
-  /* ── Artwork ──────────────────────────────────────────────────────────
-     Exact match on the word first; otherwise a stable pick out of the
-     store's own images, so a word keeps the same tile every render. */
-  var _pool = null;
-  function pool() {
-    if (_pool) return _pool;
-    var seen = {}, out = [];
-    meanings().forEach(function (m) { if (m.img && !seen[m.img]) { seen[m.img] = 1; out.push(m.img); } });
-    if (window.MS_CAT_LOGO && !seen[window.MS_CAT_LOGO]) out.push(window.MS_CAT_LOGO);
-    _pool = out;
-    return out;
+  /* ── Artwork — the Store's own ─────────────────────────────────────────
+     The Word Atelier ships fifteen collections and one banner render each
+     (assets/banners, 2560x1440, previously unreferenced since the store
+     moved to a text banner). Those renders are this feed's artwork,
+     re-cut to a clean 16:9 at 720 wide in assets/store/collections — 650KB
+     for the set, against 71MB of source.
+
+     A word gets the banner of the collection it actually belongs to; a
+     word the Atelier does not carry gets a stable pick, so its tile never
+     changes between renders. */
+  var COL = './assets/store/collections/';
+  var COLS = [
+    { id: 'off50',    file: 'sale',     label: '50% OFF',               sub: 'Limited time — best words at half price' },
+    { id: 'elements', file: 'elements', label: 'Elements',              sub: 'The original sounds of the natural world' },
+    { id: 'sacred',   file: 'sacred',   label: 'Sacred & Divine',       sub: 'Words that carry consciousness itself' },
+    { id: 'identity', file: 'identity', label: 'Identity & Mind',       sub: 'The sounds of self — who you are' },
+    { id: 'cosmos',   file: 'cosmos',   label: 'Time & Cosmos',         sub: 'Words born from the infinite' },
+    { id: 'nature',   file: 'nature',   label: 'Nature',                sub: 'The living world around you' },
+    { id: 'family',   file: 'family',   label: 'Family & Being',        sub: 'The words we are made of' },
+    { id: 'elite',    file: 'elite',    label: 'Elite Words',           sub: 'The rarest words in existence' },
+    { id: 'premium',  file: 'premium',  label: 'Premium',               sub: 'Exclusive — limited release words' },
+    { id: 'mythical', file: 'mythical', label: 'Mythical Edition',      sub: 'Gods, beasts & ancient forces' },
+    { id: 'warriors', file: 'warriors', label: 'Warriors',              sub: 'Born in blood, forged in fire' },
+    { id: 'ancient',  file: 'ancient',  label: 'Ancient Civilizations', sub: 'Words from the dawn of history' },
+    { id: 'peace',    file: 'peace',    label: 'Peace Edition',         sub: 'Words of stillness and surrender' },
+    { id: 'white',    file: 'white',    label: 'White Edition',         sub: 'Minimal. Pure. Eternal.' },
+    { id: 'black',    file: 'black',    label: 'Black Edition',         sub: 'Dark. Rare. Unstoppable.' }
+  ];
+  function colImg(c) { return COL + c.file + '.webp'; }
+  /* The live catalogue when part010.js has it (the studio can republish it),
+     the table above otherwise — labels and subs stay in step either way. */
+  function collections() {
+    var live = window.NWSB_DEFAULT_WORD_CATS;
+    if (!live || !live.length) return COLS;
+    return live.map(function (c) {
+      var seed = COLS.find(function (x) { return x.id === c.id; }) || COLS[0];
+      return { id: c.id, file: seed.file, label: c.label || seed.label, sub: c.sub || seed.sub, words: c.words };
+    });
+  }
+
+  /* word -> the collection that carries it */
+  var _byWord = null;
+  function wordToCol() {
+    if (_byWord) return _byWord;
+    _byWord = {};
+    collections().forEach(function (c) {
+      (c.words || []).forEach(function (w) {
+        var k = String(w[0] || w).toLowerCase();
+        if (!_byWord[k]) _byWord[k] = c;
+      });
+    });
+    return _byWord;
   }
   function hash(s) {
     var h = 0, i;
@@ -58,11 +102,13 @@
   }
   function art(name) {
     var n = String(name || '').toLowerCase();
-    var hit = meanings().find(function (m) { return (m.word || '').toLowerCase() === n; });
-    if (hit && hit.img) return hit.img;
-    var p = pool();
-    return p.length ? p[hash(n) % p.length] : '';
+    var c = wordToCol()[n];
+    if (c) return colImg(c);
+    var cs = collections();
+    return colImg(cs[hash(n) % cs.length]);
   }
+  /* The Meaning Store has a real product shot per word — those stay theirs. */
+  function meaningArt(m) { return m.img || art(m.word); }
 
   /* ── HTML helpers ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -170,9 +216,23 @@
     var id = 'slmSd';
     var grid = '<div class="slm-sd-pages" id="' + id + '" onscroll="slmDots(\'' + id + '\')">' +
       pages.map(function (p) {
+        /* Nine tiles from fifteen collections will otherwise repeat, and two
+           identical squares side by side read as a bug rather than as art.
+           A word that collides steps to the next collection — deterministic,
+           because the word order on a page is. */
+        var used = {};
         return '<div class="slm-sd-page">' + p.map(function (w) {
+          var src = art(w.word);
+          if (used[src]) {
+            var cs = collections();
+            for (var k = 1; k <= cs.length; k++) {
+              var alt = colImg(cs[(hash(w.word) + k) % cs.length]);
+              if (!used[alt]) { src = alt; break; }
+            }
+          }
+          used[src] = 1;
           return '<div class="slm-sq" onclick="slmPlay(\'' + jsArg(w.word) + '\')">' +
-            tile(art(w.word)) + '<span class="slm-sq-t">' + esc(w.word) + '</span></div>';
+            tile(src) + '<span class="slm-sq-t">' + esc(w.word) + '</span></div>';
         }).join('') + '</div>';
       }).join('') + '</div>';
     var dots = pages.length > 1
@@ -183,7 +243,7 @@
     var name = (localStorage.getItem('nwsb_name') || 'Your practice');
     return '<section class="slm-sec">' +
       '<div class="slm-sd-head">' +
-        '<span class="slm-sd-ava">' + tile(pool()[0] || '') + '</span>' +
+        '<span class="slm-sd-ava">' + tile('./assets/store/intro-store.webp') + '</span>' +
         '<span class="slm-sd-txt"><span class="slm-sd-eye">' + esc(String(name).toUpperCase()) + '</span>' +
         '<span class="slm-sd-t">Speed dial</span></span>' +
       '</div>' + grid + dots + '</section>';
@@ -206,7 +266,7 @@
         '<div class="slm-promo-s">' + (owned ? owned + ' meaning' + (owned === 1 ? '' : 's') + ' unlocked' : 'The Meaning Store') + '</div>' +
         '<span class="slm-promo-go">' + ARROW_SVG + '</span>' +
       '</div>' +
-      '<div class="slm-promo-r" style="background-image:url(\'' + esc(window.MS_SIGNATURE_IMG || pool()[1] || '') + '\');"></div>' +
+      '<div class="slm-promo-r" style="background-image:url(\'./assets/store/intro-meanings.webp\');"></div>' +
       '</div></section>';
   }
 
@@ -252,6 +312,48 @@
       }).join('') + '</div></section>';
   }
 
+  /* ── The Store's own clips, as video cards ────────────────────────────
+     Every one of these already ships with the app — the Sound Library's
+     banner clip first, then the store door, Signature, subscription and
+     the coupon reel. preload="none" and no poster-less card, so nothing
+     downloads until app/js/part051.js gives it a decoder slot, which it
+     does for whichever cards are actually on screen. */
+  var STORE_VIDS = [
+    { v: 'sound-library-banner', t: 'Sound Library',    s: 'Every word and sentence you own', go: 'practice' },
+    { v: 'store-trigger',        t: 'The NowssB Store', s: 'Two libraries. One destination.', go: 'store' },
+    { v: 'signature-store',      t: 'NowssB Signature', s: 'The rarest words and meanings',   go: 'store' },
+    { v: 'subscription-a',       t: 'Subscription',     s: 'Unlock the full word library',    go: 'subscription' },
+    { v: 'coupon-a',             t: 'Offers & bundles', s: 'Coupons on words and meanings',   go: 'store' }
+  ];
+  function storeVideos() {
+    return '<section class="slm-sec">' + head('From the Store', chevron("slmStore()")) +
+      '<div class="slm-hscroll">' + STORE_VIDS.map(function (x) {
+        var base = './assets/video/' + x.v;
+        return '<div class="slm-big" onclick="slmVidGo(\'' + jsArg(x.go) + '\')">' +
+          '<span class="slm-vidbox">' +
+            '<video class="slm-vid" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"' +
+            ' poster="' + base + '-poster.webp" src="' + base + '.mp4"></video>' +
+          '</span>' +
+          '<span class="slm-big-t">' + esc(x.t) + '</span>' +
+          '<span class="slm-big-s">' + esc(x.s) + '</span>' +
+          '</div>';
+      }).join('') + '</div></section>';
+  }
+
+  /* ── The Atelier's fifteen collections, on their own banners ─────────── */
+  function collectionCards() {
+    var cs = collections();
+    if (!cs.length) return '';
+    return '<section class="slm-sec">' + head('Collections', chevron("slmStore()")) +
+      '<div class="slm-hscroll">' + cs.map(function (c) {
+        return '<div class="slm-big" onclick="slmStore()">' +
+          '<span class="slm-big-art" style="background-image:url(\'' + esc(colImg(c)) + '\');"></span>' +
+          '<span class="slm-big-t">' + esc(c.label) + '</span>' +
+          '<span class="slm-big-s">' + esc(c.sub) + '</span>' +
+          '</div>';
+      }).join('') + '</div></section>';
+  }
+
   /* ── 2x2 mosaics, one per category ────────────────────────────────── */
   function mosaics() {
     var cats = [];
@@ -262,9 +364,13 @@
     return '<section class="slm-sec">' + head('Browse by category') +
       '<div class="slm-hscroll">' + cats.slice(0, 10).map(function (c) {
         var ws = allWords().filter(function (w) { return (w.categories || []).indexOf(c) !== -1; });
+        /* Four DIFFERENT collections in the four quadrants — the same
+           banner cropped four ways is a smear, not a mosaic. Seeded by the
+           category name so each one is its own arrangement and keeps it. */
+        var cs = collections();
         var four = [0, 1, 2, 3].map(function (i) {
-          var w = ws[i % Math.max(1, ws.length)];
-          return '<span class="slm-mo-q" style="background-image:url(\'' + esc(art(w ? w.word : c)) + '\');"></span>';
+          return '<span class="slm-mo-q" style="background-image:url(\'' +
+            esc(colImg(cs[(hash(c) + i * 4) % cs.length])) + '\');"></span>';
         }).join('');
         return '<div class="slm-mo" onclick="slmChip(\'' + jsArg(c) + '\')">' +
           '<span class="slm-mo-grid">' + four + '</span>' +
@@ -296,7 +402,7 @@
     var rows = ms.slice(0, 12).map(function (m) {
       var has = owned.indexOf((m.word || '').toLowerCase()) !== -1;
       return '<div class="slm-row" onclick="slmMeaning(\'' + jsArg(m.key) + '\',\'' + jsArg(m.word) + '\')">' +
-        tile(m.img) +
+        tile(meaningArt(m)) +
         '<span class="slm-row-txt"><span class="slm-row-t">' + esc(m.word) + '</span>' +
         '<span class="slm-row-s">' + esc(m.root) + (has ? ' · Owned' : '') + '</span></span>' +
         '<button class="slm-more" aria-label="Open ' + esc(m.word) + '"' +
@@ -318,15 +424,17 @@
     var html = '';
 
     if (_chip === 'Sentences') {
-      html = sentenceSec() + promo() + meaningRows();
+      html = sentenceSec() + storeVideos() + promo() + meaningRows();
     } else if (!ws.length) {
       html = '<div class="slm-empty">Nothing in this filter yet.' +
         '<button class="slm-pill slm-empty-cta" onclick="slmChip(\'All\')">Show everything</button></div>' + promo();
     } else {
       html = speedDial(ws) +
         '<section class="slm-sec">' + head('Quick picks', playAll(ws)) + rowPages(ws.slice(0, 12), counts) + '</section>' +
+        storeVideos() +
         promo() +
         sentenceSec() +
+        collectionCards() +
         bigCards(ws, counts) +
         mosaics() +
         albums() +
@@ -357,6 +465,23 @@
   };
   window.slmOpenSaved = function () {
     window.slmChip('Sentences');
+  };
+  /* The store is opened by hand everywhere else in the app — it has no
+     openSub id, it is a screen that gets .open added and its intro clip
+     started. Same three lines here rather than a fourth way of doing it. */
+  window.slmStore = function () {
+    var s = document.getElementById('sub-nowssb-store');
+    if (s) s.classList.add('open');
+    var iv = document.getElementById('nssIntroVid');
+    if (iv) { iv.muted = true; iv.play().catch(function () {}); }
+  };
+  window.slmVidGo = function (go) {
+    if (go === 'store') return window.slmStore();
+    if (go === 'subscription') {
+      if (window.SS && window.SS.open) return window.SS.open('subscription');
+      return window.slmStore();
+    }
+    slmGo(go);
   };
   window.slmOpenProfile = function () { slmGo('profile'); };
 
