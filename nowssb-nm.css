@@ -13386,7 +13386,6 @@ body[class] #sub-health-journey .sub-back.gsel-back > svg circle { fill: #ffffff
   display: flex; align-items: center; gap: 12px;
   padding: 6px 0; cursor: pointer;
 }
-.slm-row > .slm-art { width: 48px; height: 48px; flex-shrink: 0; }
 .slm-row-txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .slm-row-t {
   font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; color: #fff;
@@ -13498,3 +13497,114 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; display: block; border-radius: 0 !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   SOUND LIBRARY — every picture on a tablet
+   Three renders, three roles. The wrapper IS the frame: its padding is the
+   bezel, its content box is the aperture, the render sits on ::after above
+   everything and the screen is painted black by background-clip.
+
+   Percentage padding resolves against the CONTAINING BLOCK's width — the
+   thing that caught the Healing Path cards. It is safe here because
+   .slm-fr always spans its parent, so the two widths are the same number.
+   Keep it that way: if one of these ever stops being width:100% of its
+   card, the bezel goes wrong and nothing will look obviously broken.
+   ══════════════════════════════════════════════════════════════════════ */
+.slm-fr {
+  position: relative; display: block; width: 100%;
+  box-sizing: border-box;
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+  overflow: visible;
+}
+.slm-fr::after {
+  content: ''; position: absolute; inset: 0; z-index: 20;
+  pointer-events: none;
+  background-position: center; background-size: 100% 100%; background-repeat: no-repeat;
+}
+/* The picture fills the aperture — which, with padding on a border-box
+   element, is exactly the content box. */
+.slm-fr > .slm-art,
+.slm-fr > .slm-vidbox,
+.slm-fr > .slm-mo-grid {
+  width: 100%; height: 100%;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+}
+.slm-fr > .slm-art, .slm-fr > .slm-vidbox { display: block; }
+/* NOT display:block — the mosaic is a 2x2 grid, and blockifying it stacked
+   four empty spans and painted nothing. */
+.slm-fr > .slm-mo-grid { display: grid; }
+
+/* Wordmark top-left, home slot on the bottom bezel — the 16:9 rails.
+   Trimmed 1338x875, screen at x 46-1291, y 65-812; aperture 1.6352. */
+.slm-fr.dev-tab4-l {
+  aspect-ratio: 1338 / 875;
+  padding: 4.8580% 3.4380% 3.5874% 3.4380%;
+}
+.slm-fr.dev-tab4-l::after { background-image: url('./assets/frames/tab4-landscape.webp'); }
+
+/* NOWSSB top-right, round home button — the mosaics and the covers.
+   Trimmed 1214x891, screen at x 30-1182, y 46-819; aperture 1.4897. */
+.slm-fr.dev-tab5-l {
+  aspect-ratio: 1214 / 891;
+  padding: 3.7891% 2.5535% 5.8484% 2.4712%;
+}
+.slm-fr.dev-tab5-l::after { background-image: url('./assets/frames/tab5-landscape.webp'); }
+
+/* Hairline bezel, label on the chin — the speed-dial tiles, because at a
+   third of the screen's width it is the only one of the three whose bezel
+   still reads as a bezel rather than as a white border.
+   Trimmed 1315x807, screen at x 19-1295, y 22-747; aperture 1.7590, which
+   is 16:9 to within half a percent — so a collection banner drops into it
+   with nothing cropped. */
+.slm-fr.dev-tab6-l {
+  aspect-ratio: 1315 / 807;
+  padding: 1.6730% 1.4449% 4.4867% 1.4449%;
+}
+.slm-fr.dev-tab6-l::after { background-image: url('./assets/frames/tab6-landscape.webp'); }
+
+/* The cards hold a tablet now, not a picture, so the shapes that were
+   pinned square or 16:9 hand that job to the frame. */
+.slm-sq:has(> .slm-fr),
+.slm-big-art.slm-fr, .slm-mo:has(> .slm-fr) .slm-mo-grid { aspect-ratio: auto; }
+.slm-sq:has(> .slm-fr) { aspect-ratio: 1315 / 807; overflow: visible; }
+.slm-alb:has(> .slm-fr) .slm-alb-art { aspect-ratio: auto; }
+/* The 16:9 clips are wider than tab4's aperture; letterbox rather than
+   crop, the same call as every other framed clip in this file. The screen
+   behind is already black. */
+.slm-fr.dev-tab4-l .slm-vid { object-fit: contain; background: #000; }
+
+/* The speed-dial label and its scrim were drawn over the whole card, which
+   is now the whole tablet — so both ran across the white chin. Scoped to
+   the screen: the scrim onto the picture inside the aperture, the label
+   above the chin (59/807 of the render's height) and inside the side
+   bezels. */
+.slm-sq:has(> .slm-fr)::after { content: none; }
+.slm-sq > .slm-fr > .slm-art { position: relative; }
+.slm-sq > .slm-fr > .slm-art::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(0,0,0,0.85) 100%);
+}
+.slm-sq:has(> .slm-fr) .slm-sq-t {
+  left: 4.4%; right: 4.4%;
+  bottom: calc(7.31% + 4px);
+}
+
+/* The row thumbnails are tablets too. They have to grow to be one: at the
+   48px square they were, the hairline bezel works out under a pixel and the
+   frame reads as a smudge rather than as a device. 76 wide gives the bezel
+   a little over a pixel and the chin three, which is the least that still
+   looks deliberate. */
+.slm-row > .slm-fr { width: 76px; flex-shrink: 0; }
+/* And the bezel has to be pixels here, not percentages. Percentage padding
+   resolves against the CONTAINING BLOCK's width — every other frame on this
+   screen spans its card so the two agree, but this one is 76px inside a
+   ~350px row, and the percentages came out 13px wide. Measured, not
+   guessed: 76 x 807/1315 = 46.65 tall, and the render's 19/22/19/59 bezel
+   scaled to that is 1.10 / 1.27 / 1.10 / 3.41. */
+.slm-row > .slm-fr.dev-tab6-l {
+  padding: 1.27px 1.10px 3.41px 1.10px;
+}
+.slm-row > .slm-art { width: 48px; height: 48px; flex-shrink: 0; }

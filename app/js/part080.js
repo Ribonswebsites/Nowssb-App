@@ -118,6 +118,17 @@
   }
   function jsArg(s) { return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
   function tile(src) { return '<span class="slm-art" style="background-image:url(\'' + esc(src) + '\');"></span>'; }
+  /* Every picture on this screen that is a card rather than a thumbnail sits
+     on a tablet. The wrapper IS the frame (see .slm-fr in nowssb-nm.css) and
+     must span its card, because its bezel is percentage padding and that
+     resolves against the parent's width, not its own.
+       tab4 — wordmark top-left, home slot on the chin: the 16:9 rails
+       tab5 — NOWSSB top-right, round home button: mosaics and covers
+       tab6 — hairline bezel: the speed-dial tiles, the only one whose bezel
+              still reads as one at a third of the screen's width */
+  function frame(kind, inner) {
+    return '<span class="slm-fr dev-' + kind + '">' + inner + '</span>';
+  }
 
   var MORE_SVG = '<svg viewBox="0 0 4 16" fill="none" aria-hidden="true">' +
     '<circle cx="2" cy="2" r="1.7" fill="currentColor"/><circle cx="2" cy="8" r="1.7" fill="currentColor"/>' +
@@ -189,7 +200,7 @@
   }
   function row(w, counts) {
     return '<div class="slm-row" onclick="slmPlay(\'' + jsArg(w.word) + '\')">' +
-      tile(art(w.word)) +
+      frame('tab6-l', tile(art(w.word))) +
       '<span class="slm-row-txt"><span class="slm-row-t">' + esc(w.word) + '</span>' +
       '<span class="slm-row-s">' + esc(wordSub(w, counts)) + '</span></span>' +
       '<button class="slm-more" aria-label="Open ' + esc(w.word) + '"' +
@@ -232,7 +243,7 @@
           }
           used[src] = 1;
           return '<div class="slm-sq" onclick="slmPlay(\'' + jsArg(w.word) + '\')">' +
-            tile(src) + '<span class="slm-sq-t">' + esc(w.word) + '</span></div>';
+            frame('tab6-l', tile(src)) + '<span class="slm-sq-t">' + esc(w.word) + '</span></div>';
         }).join('') + '</div>';
       }).join('') + '</div>';
     var dots = pages.length > 1
@@ -282,7 +293,7 @@
       var meta = [s.routineName || 'Practice', s.playCount ? s.playCount + ' play' + (s.playCount === 1 ? '' : 's') : '']
         .filter(Boolean).join(' · ');
       return '<div class="slm-row" onclick="slPlaySentence(\'' + jsArg(s.id) + '\')">' +
-        tile(art((s.words && s.words[0]) || s.text)) +
+        frame('tab6-l', tile(art((s.words && s.words[0]) || s.text))) +
         '<span class="slm-row-txt"><span class="slm-row-t">' + esc(s.text) + '</span>' +
         '<span class="slm-row-s">' + esc(meta) + '</span></span>' +
         '<button class="slm-more" aria-label="Remove sentence"' +
@@ -305,7 +316,7 @@
     return '<section class="slm-sec">' + head('Not practised yet') +
       '<div class="slm-hscroll">' + use.map(function (w) {
         return '<div class="slm-big" onclick="slmPlay(\'' + jsArg(w.word) + '\')">' +
-          '<span class="slm-big-art" style="background-image:url(\'' + esc(art(w.word)) + '\');"></span>' +
+          frame('tab4-l', tile(art(w.word))) +
           '<span class="slm-big-t">' + esc(w.word) + ' — ' + esc(w.benefit || w.meaning || '') + '</span>' +
           '<span class="slm-big-s">' + esc([w.organ, w.origin].filter(Boolean).join(' · ')) + '</span>' +
           '</div>';
@@ -330,10 +341,11 @@
       '<div class="slm-hscroll">' + STORE_VIDS.map(function (x) {
         var base = './assets/video/' + x.v;
         return '<div class="slm-big" onclick="slmVidGo(\'' + jsArg(x.go) + '\')">' +
-          '<span class="slm-vidbox">' +
-            '<video class="slm-vid" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"' +
-            ' poster="' + base + '-poster.webp" src="' + base + '.mp4"></video>' +
-          '</span>' +
+          frame('tab4-l',
+            '<span class="slm-vidbox">' +
+              '<video class="slm-vid" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"' +
+              ' poster="' + base + '-poster.webp" src="' + base + '.mp4"></video>' +
+            '</span>') +
           '<span class="slm-big-t">' + esc(x.t) + '</span>' +
           '<span class="slm-big-s">' + esc(x.s) + '</span>' +
           '</div>';
@@ -347,7 +359,7 @@
     return '<section class="slm-sec">' + head('Collections', chevron("slmStore()")) +
       '<div class="slm-hscroll">' + cs.map(function (c) {
         return '<div class="slm-big" onclick="slmStore()">' +
-          '<span class="slm-big-art" style="background-image:url(\'' + esc(colImg(c)) + '\');"></span>' +
+          frame('tab4-l', tile(colImg(c))) +
           '<span class="slm-big-t">' + esc(c.label) + '</span>' +
           '<span class="slm-big-s">' + esc(c.sub) + '</span>' +
           '</div>';
@@ -373,7 +385,7 @@
             esc(colImg(cs[(hash(c) + i * 4) % cs.length])) + '\');"></span>';
         }).join('');
         return '<div class="slm-mo" onclick="slmChip(\'' + jsArg(c) + '\')">' +
-          '<span class="slm-mo-grid">' + four + '</span>' +
+          frame('tab5-l', '<span class="slm-mo-grid">' + four + '</span>') +
           '<span class="slm-mo-t">' + esc(c) + '</span>' +
           '<span class="slm-mo-s">' + ws.length + ' word' + (ws.length === 1 ? '' : 's') + '</span>' +
           '</div>';
@@ -387,7 +399,7 @@
     return '<section class="slm-sec">' + head('Your routines', chevron("slmGo('routines')")) +
       '<div class="slm-hscroll">' + rs.map(function (r) {
         return '<div class="slm-alb" onclick="slmGo(\'routines\')">' +
-          '<span class="slm-alb-art" style="background-image:url(\'' + esc(art(r.words[0])) + '\');"></span>' +
+          frame('tab5-l', tile(art(r.words[0]))) +
           '<span class="slm-alb-t">' + esc(r.name) + '</span>' +
           '<span class="slm-alb-s">Routine · ' + r.words.length + ' word' + (r.words.length === 1 ? '' : 's') + '</span>' +
           '</div>';
@@ -402,7 +414,7 @@
     var rows = ms.slice(0, 12).map(function (m) {
       var has = owned.indexOf((m.word || '').toLowerCase()) !== -1;
       return '<div class="slm-row" onclick="slmMeaning(\'' + jsArg(m.key) + '\',\'' + jsArg(m.word) + '\')">' +
-        tile(meaningArt(m)) +
+        frame('tab6-l', tile(meaningArt(m))) +
         '<span class="slm-row-txt"><span class="slm-row-t">' + esc(m.word) + '</span>' +
         '<span class="slm-row-s">' + esc(m.root) + (has ? ' · Owned' : '') + '</span></span>' +
         '<button class="slm-more" aria-label="Open ' + esc(m.word) + '"' +
