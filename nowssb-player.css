@@ -78,7 +78,10 @@
 }
 .lgp .lgp-info-banner-text.dash-in { animation:nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both; }
 /* rotating word ticker — Listen · Learn · Practice · Heal */
-.lgp .lgp-ticker { position:relative; height:18px; width:200px; margin-top:4px; }
+/* Both of these are a handful of pixels tall, and both are flex items in a
+   column that overflows — without flex-shrink:0 they are the first things
+   the layout squashes to nothing. */
+.lgp .lgp-ticker { position:relative; height:18px; width:200px; margin-top:4px; flex-shrink:0; }
 .lgp .lgp-ticker span {
   position:absolute; left:0; right:0; top:0; text-align:center;
   font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase;
@@ -99,7 +102,10 @@
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
-  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/1.12; flex-shrink:0;
+  /* Was 1/1.12. The panel was tall enough that its top half sat empty above
+     the word, and the height it spent there is what the strip under the
+     transport now uses. */
+  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/1.02; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(10,16,30,.35);
   /* NO backdrop-filter here — the video fills this panel opaquely, so the
@@ -145,12 +151,12 @@
 /* word + syllables + organ overlaid INSIDE the video panel */
 .lgp .lgp-visual-overlay {
   position:absolute; left:0; right:0; bottom:0; z-index:3;
-  padding:16px 12px 13px; display:flex; flex-direction:column; align-items:center;
-  background:linear-gradient(180deg, rgba(6,10,22,0) 0%, rgba(6,10,22,.5) 42%, rgba(6,10,22,.85) 100%);
+  padding:28px 14px 22px; display:flex; flex-direction:column; align-items:center;
+  background:linear-gradient(180deg, rgba(6,10,22,0) 0%, rgba(6,10,22,.36) 34%, rgba(6,10,22,.76) 68%, rgba(6,10,22,.93) 100%);
 }
 /* title / syllables / organ */
 .lgp .lgp-title {
-  margin-top:0; font-size:30px; font-weight:800; letter-spacing:.5px; text-align:center; line-height:1.05;
+  margin-top:0; font-size:34px; font-weight:800; letter-spacing:1.6px; text-align:center; line-height:1.02;
   text-shadow:0 2px 26px rgba(0,0,0,.6), 0 0 32px var(--lg-accent);
 }
 /* The word as it is actually written. Devanagari is taller than latin at
@@ -166,9 +172,9 @@
   text-shadow:0 2px 20px rgba(0,0,0,.6), 0 0 26px var(--lg-accent);
 }
 
-.lgp .lgp-syls { margin-top:7px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; }
+.lgp .lgp-syls { margin-top:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; }
 .lgp .lgp-syl {
-  padding:6px 13px; border-radius:12px !important; font-size:14px; font-weight:600;
+  padding:8px 16px; border-radius:12px !important; font-size:14px; font-weight:600;
   background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.34);
   -webkit-backdrop-filter:none; backdrop-filter:none;
   box-shadow:0 5px 16px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.45);
@@ -176,14 +182,14 @@
      is optional, so a box with only a roman spelling looks exactly as it
      did before this existed. */
   display:inline-flex; flex-direction:column; align-items:center; gap:1px;
-  min-width:46px; line-height:1.25;
+  min-width:54px; line-height:1.25;
 }
 .lgp .lgp-syl-deva {
   font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Kohinoor Devanagari',
                'Mangal', 'Noto Serif Devanagari', sans-serif;
   font-size:17px; font-weight:600; line-height:1.5;
 }
-.lgp .lgp-syl-rom { font-size:13px; font-weight:700; letter-spacing:.4px; }
+.lgp .lgp-syl-rom { font-size:14px; font-weight:700; letter-spacing:.6px; }
 .lgp .lgp-syl-hold {
   font-size:8.5px; font-weight:700; letter-spacing:1px; opacity:.6; text-transform:uppercase;
 }
@@ -196,15 +202,26 @@
 .lgp .lgp-syl-say:active { transform:scale(.95); }
 .lgp .lgp-syl.active { background:rgba(255,255,255,.5); color:#10202e; box-shadow:0 0 22px var(--lg-accent); }
 .lgp .lgp-syl-dot { opacity:.55; }
+/* The organ closes the block, set between two hairlines so the word, the
+   syllables and the organ read as three steps rather than one clump. The
+   rules would show as two stray dashes on a word with no organ, so an
+   empty line draws nothing at all. */
 .lgp .lgp-organ {
-  margin-top:5px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
-  color:rgba(255,255,255,.72);
+  margin-top:15px; font-size:9.5px; font-weight:700; letter-spacing:2.6px; text-transform:uppercase;
+  color:rgba(255,255,255,.74);
+  display:flex; align-items:center; justify-content:center; gap:11px; max-width:100%;
 }
+.lgp .lgp-organ:empty { display:none; }
+.lgp .lgp-organ::before, .lgp .lgp-organ::after {
+  content:''; height:1px; width:28px; flex-shrink:0;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.45));
+}
+.lgp .lgp-organ::after { background:linear-gradient(90deg, rgba(255,255,255,.45), transparent); }
 
 /* progress */
 .lgp .lgp-progress {
   width:100%; max-width:280px; height:5px; margin:7px 0 0; border-radius:999px !important;
-  background:rgba(255,255,255,.2); overflow:hidden;
+  background:rgba(255,255,255,.2); overflow:hidden; flex-shrink:0;
 }
 .lgp .lgp-progress-fill {
   height:100%; border-radius:999px !important;
@@ -312,6 +329,31 @@
   box-shadow:0 10px 28px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
 }
 .lgp .lgp-mic-ico { width:34px; height:34px; object-fit:contain; display:block; flex-shrink:0; filter:drop-shadow(0 3px 8px rgba(0,0,0,.4)); }
+
+/* ── the strip under the transport ──
+   The band between the capsule and the bottom row was empty. Three numbers
+   the player already knew — reps, where you are in the session, and which
+   voice is speaking — now live there instead of only inside the settings
+   dial. Same look as the rest of the glass. */
+.lgp .lgp-meter {
+  width:100%; max-width:352px; margin-top:14px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:11px 16px; border-radius:18px !important;
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 10px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.2);
+}
+.lgp .lgp-meter-cell {
+  flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+.lgp .lgp-meter-cell b {
+  font-size:14px; font-weight:800; letter-spacing:.2px; color:#fff; line-height:1;
+  white-space:nowrap; text-shadow:0 1px 10px rgba(0,0,0,.4);
+}
+.lgp .lgp-meter-cell span {
+  font-size:8.5px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase;
+  color:rgba(255,255,255,.55); line-height:1;
+}
+.lgp .lgp-meter-sep { width:1px; height:26px; flex-shrink:0; background:rgba(255,255,255,.15); }
 
 /* Practice (centred) with the Store button on its right */
 .lgp .lgp-practice-row {
@@ -588,6 +630,47 @@
 .lgp .lgp-info-cluster {
   position:absolute; top:9px; right:9px; z-index:4;
   display:flex; align-items:center; gap:8px; flex-direction:row;
+}
+/* the ritual this session belongs to, top left of the panel */
+.lgp .lgp-visual-tag {
+  /* 16px, not 9px: the cluster opposite is 48px tall (the info sphere), so
+     its centre line sits at 33px — this puts the two chips on it. */
+  position:absolute; top:16px; left:9px; z-index:4;
+  display:flex; align-items:center; gap:7px; height:34px; padding:0 13px;
+  border-radius:999px !important; max-width:52%;
+  font-size:9px; font-weight:800; letter-spacing:1.8px; text-transform:uppercase;
+  color:rgba(255,255,255,.9); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  background:rgba(8,14,28,.42); border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 5px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.26);
+}
+.lgp .lgp-visual-tag-dot {
+  width:5px; height:5px; border-radius:50% !important; flex-shrink:0;
+  background:var(--lg-accent,#8fe6ff); box-shadow:0 0 9px var(--lg-accent,#8fe6ff);
+}
+
+/* ── the little equalizer that sits with it, top right of the panel ──
+   Four bars on their own delays, so they never move as a block. They
+   breathe while the player is idle and run at full tilt once the word is
+   playing — the only moving thing in the panel that isn't the video. */
+.lgp .lgp-eq {
+  display:flex; align-items:flex-end; gap:3px; height:34px; padding:0 11px 9px;
+  border-radius:999px !important; flex-shrink:0;
+  background:rgba(8,14,28,.42); border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 5px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.26);
+}
+.lgp .lgp-eq i {
+  display:block; width:3px; border-radius:2px; transform-origin:bottom;
+  background:var(--lg-accent,#8fe6ff); box-shadow:0 0 8px var(--lg-accent,#8fe6ff);
+  animation:lgpEq 1.9s ease-in-out infinite;
+}
+.lgp .lgp-eq i:nth-child(1) { height:11px; animation-delay:0s;   }
+.lgp .lgp-eq i:nth-child(2) { height:18px; animation-delay:.28s; }
+.lgp .lgp-eq i:nth-child(3) { height:8px;  animation-delay:.56s; }
+.lgp .lgp-eq i:nth-child(4) { height:15px; animation-delay:.84s; }
+.lgp.playing .lgp-eq i { animation-duration:.62s; }
+@keyframes lgpEq { 0%,100% { transform:scaleY(.32); } 50% { transform:scaleY(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .lgp .lgp-eq i { animation:none; transform:scaleY(.7); }
 }
 /* bare glass-sphere image button (bigger now) — the icon PNG IS the button */
 .lgp .lgp-info-btn {

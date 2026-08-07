@@ -235,6 +235,17 @@
               replayBtn +
             '</div>' +
           '</div>' +
+          /* The band between the transport and the bottom row used to be
+             empty. These three numbers already existed — reps was only on
+             the thin bar, and the word position and the voice were buried
+             in the settings dial. */
+          '<div class="lgp-meter">' +
+            '<div class="lgp-meter-cell"><b>' + repCount + ' / ' + repTarget + '</b><span>Reps</span></div>' +
+            '<div class="lgp-meter-sep"></div>' +
+            '<div class="lgp-meter-cell"><b>' + (idx + 1) + ' of ' + total + '</b><span>Word</span></div>' +
+            '<div class="lgp-meter-sep"></div>' +
+            '<div class="lgp-meter-cell"><b>' + (voice === 'F' ? 'Female' : 'Male') + '</b><span>Voice</span></div>' +
+          '</div>' +
           '<div class="lgp-practice-row">' +
             '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
               '<span class="lgp-sentence-orb"><span class="lgp-sentence-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png\')"></span></span>' +
@@ -393,7 +404,13 @@
           '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
         '</div>' +
         '<div class="lgp-visual">' + visual +
+          /* the panel's other top corner — which ritual this session is,
+             so the two corners read as a pair instead of one loaded side */
+          '<div class="lgp-visual-tag"><span class="lgp-visual-tag-dot"></span>' + _e(ritual) + '</div>' +
           '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
+            /* the sound, shown rather than described — the bars idle slowly
+               and run at full tilt while the word is playing (.lgp.playing) */
+            '<span class="lgp-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
               '<span class="lgp-bgico" style="background-image:url(\'' + IC.info + '\')"></span>' +
