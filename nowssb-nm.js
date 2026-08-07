@@ -41,11 +41,17 @@
     var soc = 'neu';
     try { soc = localStorage.getItem('nwsb_social_theme') || 'neu'; } catch (e) {}
     document.body.classList.toggle('nwsb-soc-glass', soc === 'glass');
-    /* Settings view-switch — JS-driven so it can't be beaten by CSS/cache */
+    /* ONE settings page, both homes.
+       The Normal home used to swap the whole screen for #nm-settings-view —
+       a second, separately written settings page with its own rows and its
+       own handlers. Two pages meant every setting added to one was missing
+       from the other, and the rows that were never wired did nothing when
+       tapped. Normal mode now shows the same #ss-main-view the Fashion home
+       shows, wearing neumorphism (see nowssb-nm.css). */
     var main = document.getElementById('ss-main-view');
     var nv   = document.getElementById('nm-settings-view');
-    if (nm) { if (main) main.style.display = 'none'; if (nv) nv.style.display = 'block'; }
-    else    { if (main) main.style.display = 'flex'; if (nv) nv.style.display = 'none'; }  /* restore flex so Fashion settings scrolls */
+    if (main) main.style.display = 'flex';   /* flex, so the list scrolls */
+    if (nv)   nv.style.display = 'none';
   }
   window.nwsbSyncNmBody = syncNmBody;
   syncNmBody();
@@ -383,6 +389,18 @@
   function sec(label, rows) { return '<div class="nmset-sec-label">' + label + '</div><div class="nmset-card">' + rows + '</div>'; }
 
   window.nwsbRenderSettings = function () {
+    /* Retired. Both homes share #ss-main-view now — see syncNmBody above.
+       Everything below this return is the page it used to draw; it is left
+       in place rather than deleted because several of the row helpers it
+       declares (ssCycleVoice and friends) are reachable from elsewhere, and
+       cutting them out is a separate job from making the two homes agree. */
+    var _shared = document.getElementById('ss-main-view');
+    var _own    = document.getElementById('nm-settings-view');
+    if (_shared) _shared.style.display = 'flex';
+    if (_own)    { _own.style.display = 'none'; _own.innerHTML = ''; }
+    return;
+
+    /* eslint-disable no-unreachable */
     var v = document.getElementById('nm-settings-view');
     if (!v) return;
     var name  = pv('ss-prof-name')  || 'Practitioner';
@@ -783,11 +801,13 @@
       panel.style.transform = 'translateX(100%)';
       setTimeout(function () { panel.style.display = 'none'; panel.style.transform = ''; panel.style.transition = ''; }, 320);
     }
-    /* restore the settings views that editProfile hid */
+    /* restore the settings view that editProfile hid. 'flex' explicitly, not
+       '' — clearing the inline property drops it to the stylesheet's block,
+       and the list needs the column flex to scroll. */
     var main = document.getElementById('ss-main-view');
     var nv   = document.getElementById('nm-settings-view');
-    if (main) main.style.display = '';
-    if (nv)   nv.style.display = '';
+    if (main) main.style.display = 'flex';
+    if (nv)   nv.style.display = 'none';
     if (window._nwsbEditFromSocial) {
       window._nwsbEditFromSocial = false;
       if (typeof closeSub === 'function') closeSub('social');
@@ -882,9 +902,8 @@
       }
       var main = document.getElementById('ss-main-view');
       var nv   = document.getElementById('nm-settings-view');
-      if (main) main.style.display = 'none';
-      if (nv)   nv.style.display = 'block';
-      if (window.nwsbRenderSettings) window.nwsbRenderSettings();
+      if (main) main.style.display = 'flex';
+      if (nv)   nv.style.display = 'none';
     }
     new MutationObserver(apply).observe(el, { attributes: true, attributeFilter: ['class'] });
     apply();

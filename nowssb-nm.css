@@ -449,10 +449,26 @@ body.nm-night #sub-social { background: #0c0c20 !important; }
 body.nm-mode #sub-social .ss-wrap,
 body.nm-mode #sub-social .ss-tab-content { background: transparent !important; }
 
-/* Kill the cinematic banner, setting-row icons + the search glyph image */
+/* The Fashion settings page is the page — same rows, same icons, same order.
+   The row icons used to be hidden here, which is most of why the two looked
+   like different apps. They are shown, and set into the surface the way
+   every other icon on a neumorphic screen is. */
 body.nm-mode #sub-social .menu-banner { display: none !important; }
-body.nm-mode #sub-social .sr-icon { display: none !important; }
 body.nm-mode #sub-social .ss-search-ico { display: none !important; }
+body.nm-mode #sub-social .sr-icon {
+  display: flex !important;
+  background: #eef1f7 !important; border: none !important;
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 6px rgba(255,255,255,1) !important;
+}
+body.nm-night #sub-social .sr-icon {
+  background: #12122e !important; border: none !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.85), inset -2px -2px 6px rgba(50,50,110,0.3) !important;
+}
+/* The rows keep the Fashion page's own side padding rather than being
+   flattened to the screen edge. */
+body[class] #sub-social #ss-main-view .sr {
+  padding-left: 20px !important; padding-right: 20px !important;
+}
 
 /* Back button → neumorphic pill */
 body.nm-mode #sub-social .sub-back {
@@ -670,14 +686,13 @@ body.nm-mode #sub-social #ss-panel-fashionbg button[style*="background:#e8d5a3"]
    Replaces the reskinned fashion list in normal-home mode.
 ═══════════════════════════════════════════════════════════════ */
 
-/* View switch */
-#nm-settings-view { display: none; }
-body.nm-mode #sub-social #ss-main-view { display: none !important; }
-body.nm-mode #sub-social #nm-settings-view {
-  display: block; position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  background: #f0f2f7; padding: 0 18px calc(var(--nav-height,58px) + max(env(safe-area-inset-bottom,28px),28px));
-}
-body.nm-night #sub-social #nm-settings-view { background: #0c0c20; }
+/* View switch — retired. Both homes show #ss-main-view now.
+   The rule that used to sit here, `body.nm-mode #sub-social #ss-main-view
+   { display: none !important }`, is the reason turning the swap off in
+   nowssb-nm.js was not enough on its own: an !important declaration in a
+   stylesheet beats a plain inline style, so the JS said flex and the page
+   stayed hidden. Both it and the panel it revealed are gone. */
+#nm-settings-view { display: none !important; }
 #nm-settings-view::-webkit-scrollbar { display: none; }
 
 /* Header */
@@ -12337,3 +12352,52 @@ body[class] #sub-nowssb-store .nss-verify-banner-vid {
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS — the pieces the neumorphic skin never reached
+   The skin above was written against .sg and .slbl. The settings page
+   does not use those class names — app/js/part042.js writes
+   .ss-section and .ss-section-title — so those two were left wearing the
+   Fashion page's dark values on a light background: section headings at
+   rgba(255,255,255,0.3) and cards with a white hairline border. Measured,
+   not guessed. Same for the plan badge, which was white on near-white.
+═══════════════════════════════════════════════════════════════ */
+body.nm-mode #sub-social .ss-section-title {
+  color: #c8a96e !important;
+}
+body.nm-night #sub-social .ss-section-title { color: #e8d5a3 !important; }
+
+body.nm-mode #sub-social .ss-section {
+  background: #f0f2f7 !important;
+  border: none !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.14), -5px -5px 14px rgba(255,255,255,0.97) !important;
+}
+body.nm-night #sub-social .ss-section {
+  background: #16163c !important;
+  border: none !important;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32) !important;
+}
+/* The last row in a card has the card's own edge under it already. */
+body[class] #sub-social .ss-section .sr:last-child { border-bottom: none !important; }
+
+/* The plan badge — white text on 6%-white, i.e. nothing, over a light page. */
+body.nm-mode #sub-social .sub-badge,
+body.nm-mode #sub-social #ss-prof-badge {
+  color: #6b5a33 !important;
+  background: rgba(200,169,110,0.18) !important;
+  border: 1px solid rgba(200,169,110,0.45) !important;
+}
+body.nm-night #sub-social .sub-badge,
+body.nm-night #sub-social #ss-prof-badge {
+  color: #e8d5a3 !important;
+  background: rgba(232,213,163,0.14) !important;
+  border: 1px solid rgba(232,213,163,0.34) !important;
+}
+/* A few values are written inline as white in the markup (the AI Persona
+   label is one), so they need this weight to be legible on a light page. */
+body.nm-mode #sub-social .sr-val { color: #1a1a2e !important; }
+body.nm-mode #sub-social .sr-val.gold { color: #9a7c3f !important; }
+body.nm-night #sub-social .sr-val { color: rgba(255,255,255,0.82) !important; }
+body.nm-night #sub-social .sr-val.gold { color: #e8d5a3 !important; }
