@@ -11951,8 +11951,9 @@ body[class] #sub-sound-library .sl-banner-fade {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background: linear-gradient(
     to bottom,
-    rgba(0,0,0,0.10) 0%,
-    rgba(0,0,0,0.10) 42%,
+    rgba(0,0,0,0.46) 0%,
+    rgba(0,0,0,0.16) 30%,
+    rgba(0,0,0,0.22) 50%,
     rgba(0,0,0,0.72) 74%,
     #000 100%);
 }
@@ -12046,6 +12047,13 @@ body[class] #sub-sound-library .sl-filter-chip {
   box-shadow: none !important;
   color: rgba(255,255,255,0.9) !important;
   font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500;
+  /* The base rules uppercase these with 1.5px of tracking. The heights and
+     colours here landed on the first pass and these two did not, which is
+     why the row of categories still read as a row of shouted labels wide
+     enough to run off the screen. Measured, not guessed: the chip came
+     back text-transform: uppercase, letter-spacing: 1.5px. */
+  text-transform: none !important; letter-spacing: 0 !important;
+  white-space: nowrap; flex-shrink: 0;
 }
 body[class] #sub-sound-library .sl-sort-btn.active,
 body[class] #sub-sound-library .sl-filter-chip.active {
@@ -12069,7 +12077,8 @@ body[class] #sub-sound-library .sl-sentence-card {
   box-shadow: none !important;
   backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
   margin: 0 !important;
-  padding: 9px 20px !important;
+  padding: 7px 20px !important;
+  gap: 13px;
 }
 body[class] #sub-sound-library .sl-word-card:active,
 body[class] #sub-sound-library .sl-sentence-card:active {
@@ -12089,13 +12098,41 @@ body[class] #sub-sound-library .sl-word-disc-letter {
   color: rgba(255,255,255,0.85) !important;
 }
 body[class] #sub-sound-library .sl-word-name {
-  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
-  color: #fff !important; letter-spacing: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 15.5px; font-weight: 500;
+  color: #fff !important; letter-spacing: 0 !important;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+/* The overflow control. Quiet until touched, and it opens the word — the
+   row's own action — so it is never a control that does nothing. */
+body[class] #sub-sound-library .sl-row-more {
+  width: 34px; height: 34px; flex-shrink: 0; margin-left: 4px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: rgba(255,255,255,0.62);
+  border-radius: 50%;
+}
+body[class] #sub-sound-library .sl-row-more svg { width: 4px; height: 16px; }
+body[class] #sub-sound-library .sl-row-more:active { background: rgba(255,255,255,0.1); }
+/* The old right-hand column. Nothing renders it in the words tab now — the
+   organ moved into the line under the title — but the purchased tab still
+   uses it, so it is styled rather than hidden. */
+body[class] #sub-sound-library .sl-word-right {
+  align-items: flex-end; gap: 3px; flex-shrink: 0;
+}
+/* The section head. The words tab writes its count into
+   .sl-word-count-label rather than .sl-sort-label, so styling only the
+   latter left this row as a dim grey line where the reference has a
+   heading. Both are the heading now. */
+body[class] #sub-sound-library .sl-word-count-label {
+  font-family: 'DM Sans', sans-serif; font-size: 20px !important;
+  font-weight: 700 !important; color: #fff !important;
+  letter-spacing: -0.3px !important; margin: 0 !important; display: block;
+}
+body[class] #sub-sound-library .sl-word-count-label span { color: #fff !important; font-weight: 700; }
+
 body[class] #sub-sound-library .sl-word-phonetic,
 body[class] #sub-sound-library .sl-word-organ,
-body[class] #sub-sound-library .sl-purchased-date,
-body[class] #sub-sound-library .sl-word-count-label {
+body[class] #sub-sound-library .sl-purchased-date {
   font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 400;
   color: rgba(255,255,255,0.6) !important;
 }

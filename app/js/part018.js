@@ -953,12 +953,25 @@ function slRenderWords(words) {
       '<div class="sl-word-disc"><div class="sl-word-disc-letter">' + w.word.charAt(0) + '</div></div>' +
       '<div class="sl-word-info">' +
         '<div class="sl-word-name">' + w.word + '</div>' +
-        '<div class="sl-word-phonetic">' + (w.phonetic || '') + '</div>' +
+        /* One line under the title carrying both facts, the way a track row
+           reads "artist · plays" — rather than a badge and a second column
+           on the right, which is what made these rows look like a table.
+           "Subscription" is not repeated here: the section head above
+           already says every word in this tab is one. */
+        '<div class="sl-word-phonetic">' +
+          [w.phonetic || '', w.organ || ''].filter(Boolean).join(' · ') +
+        '</div>' +
       '</div>' +
-      '<div class="sl-word-right">' +
-        '<span class="sl-word-badge sl-badge-sub">Subscription</span>' +
-        '<span class="sl-word-organ">' + (w.organ || '') + '</span>' +
-      '</div>' +
+      /* The overflow. It opens the word, the same as the row — a control
+         that looks tappable and does nothing is worse than no control. */
+      '<button class="sl-row-more" aria-label="Open ' + w.word + '"' +
+        ' onclick="event.stopPropagation();slOpenWord(\'' + w.word + '\')">' +
+        '<svg viewBox="0 0 4 16" fill="none" aria-hidden="true">' +
+          '<circle cx="2" cy="2" r="1.6" fill="currentColor"/>' +
+          '<circle cx="2" cy="8" r="1.6" fill="currentColor"/>' +
+          '<circle cx="2" cy="14" r="1.6" fill="currentColor"/>' +
+        '</svg>' +
+      '</button>' +
     '</div>';
   });
 
