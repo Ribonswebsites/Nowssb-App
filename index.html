@@ -144,7 +144,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- The start animation. A clip by default; the images below are what the
        Start Page picker offers instead. Muted, looped and inline so it plays
        without a gesture, and hidden unless it is the one chosen. -->
-  <video class="splash-bg-video" id="splashVid" muted loop playsinline autoplay
+  <!-- No `loop`, deliberately: the splash now waits for this clip to finish,
+       and a looping video never fires `ended`, so looping would hold the app
+       on the start screen forever. -->
+  <video class="splash-bg-video" id="splashVid" playsinline autoplay
          preload="auto" aria-hidden="true" tabindex="-1"
          poster="./assets/video/start-animation-poster.webp"></video>
   <script>
@@ -189,11 +192,47 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       if (vid) {
         vid.src = VID;
         vid.classList.add('on');
-        /* Autoplay can still be refused. If it is, the poster is already
-           showing, so there is a picture either way — but try once more
-           after the first paint, which is when a WebView usually allows it. */
-        var go = function () { try { vid.play().catch(function () {}); } catch (e) {} };
-        go(); setTimeout(go, 60);
+        /* 2x. defaultPlaybackRate is the one that matters: playbackRate is
+           reset TO it whenever the source loads, so setting playbackRate
+           alone came back as 1 — measured, not assumed. Both are set, and
+           again on the events that follow a load, so nothing can walk it
+           back. */
+        vid.defaultPlaybackRate = 2;
+        vid.playbackRate = 2;
+        ['loadedmetadata', 'canplay', 'play'].forEach(function (ev) {
+          vid.addEventListener(ev, function () { vid.playbackRate = 2; });
+        });
+
+        /* The splash waits for this to finish rather than for a timer.
+           part012.js reads both of these. */
+        window._splashHoldForClip = true;
+        vid.addEventListener('ended', function () { window._splashClipDone = true; });
+        /* If the clip cannot play at all — no codec, a bad file — nothing
+           would ever end and the app would sit here. Any error releases the
+           hold immediately. */
+        vid.addEventListener('error', function () { window._splashClipDone = true; });
+
+        /* SOUND. A browser will not autoplay an unmuted video without a
+           gesture; it rejects play() instead. So: try with sound, and if it
+           is refused fall back to muted — which always plays — and unmute on
+           the first touch. That is the most sound anyone can get here; a
+           silent-but-playing start beats a start that does not play. */
+        var unmuteOnGesture = function () {
+          try { vid.muted = false; vid.volume = 1; } catch (e) {}
+          document.removeEventListener('touchstart', unmuteOnGesture);
+          document.removeEventListener('click', unmuteOnGesture);
+        };
+        vid.muted = false;
+        var p = null;
+        try { p = vid.play(); } catch (e) {}
+        if (p && p.catch) {
+          p.catch(function () {
+            vid.muted = true;
+            try { vid.play().catch(function () { window._splashClipDone = true; }); } catch (e) {}
+            document.addEventListener('touchstart', unmuteOnGesture, { once: true, passive: true });
+            document.addEventListener('click', unmuteOnGesture, { once: true });
+          });
+        }
       }
       if (img) img.style.backgroundImage = 'none';
     } else if (img) {
@@ -203,7 +242,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     window.NWSB_SPLASH_VIDEO = VID;
   })();
   </script>
-  <div class="splash-words brand-tag">Words without a <strong>dictionary</strong></div>
   <div class="splash-bottom">
     <div class="splash-subtitle brand-tag">Natural Origin of <strong>Word Science</strong></div>
     <div class="splash-progress">
@@ -4296,7 +4334,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=342"></script>
+<script src="app/js/part012.js?v=249"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
