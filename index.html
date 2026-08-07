@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=681">
+<link rel="stylesheet" href="nowssb-nm.css?v=682">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -1342,7 +1342,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- NowssB Connect — what it is (video bg) -->
     <div class="nmh-connect-sec" onclick="window.IG&&IG.nav('profile')">
-      <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
+      <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="./assets/video/connect-banner-poster.webp?v=1" src="./assets/video/connect-banner.mp4?v=1"></video>
       <div class="nmh-connect-scrim"></div>
       <img class="nmh-connect-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="NowssB Connect">
       <div class="nmh-connect-title">NowssB <span class="accent">Connect</span></div>
@@ -1908,7 +1908,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- NowssB Connect and its community carousel share one glass wrapper. -->
   <div class="glass-wrap connect-wrap fash-connect-wrap">
   <div class="nmh-connect-sec fash-connect" onclick="openConnectIntro()">
-    <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
+    <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="./assets/video/connect-banner-poster.webp?v=1" src="./assets/video/connect-banner.mp4?v=1"></video>
     <div class="nmh-connect-scrim"></div>
     <img class="nmh-connect-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="NowssB Connect">
     <div class="nmh-connect-title">NowssB <span class="accent">Connect</span></div>
@@ -2351,12 +2351,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
-  <!-- Video banner — below the header. Flex-column parent (menu-drawer) doesn't
-       resolve aspect-ratio-only sizing on a flex item reliably, so height is
-       pinned explicitly via the padding-top trick instead. -->
-  <div style="position:relative;width:calc(100% - 32px);height:0;padding-top:calc((100% - 32px) * 0.3806);margin:16px 16px 6px;flex-shrink:0;overflow:hidden;background:#0a0a12;box-shadow:0 14px 36px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);">
-    <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-41-24_x8z4mj.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;"></video>
-  </div>
+  <!-- The video banner that used to sit here is gone: the menu is a list of
+       places to go, and a film above it was only pushing the list down. -->
 
   <div style="padding: 0 0 40px;">
 
@@ -2534,6 +2530,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Banner header -->
     <div class="sl-banner">
       <div class="sl-banner-img"></div>
+      <!-- The hero clip. Muted and looped because it is wallpaper, not
+           something anyone pressed play on; the poster covers the moment
+           before the first frame decodes. app/js/part018.js starts and
+           pauses it with the screen so it is not decoding in the
+           background. -->
+      <video class="sl-banner-vid" id="slBannerVid" data-nwsb-auto muted loop playsinline
+             preload="none" aria-hidden="true" tabindex="-1"
+             poster="./assets/video/sound-library-banner-poster.webp?v=1"
+             src="./assets/video/sound-library-banner.mp4?v=1"></video>
       <div class="sl-banner-fade"></div>
       <div class="sl-banner-inner">
         <button class="sl-back-btn" onclick="closeSub('sound-library')">
@@ -5002,6 +5007,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div><!-- /NowssB Signature doorway -->
 
       <!-- ══ MORE TO EXPLORE — Verification, Ebooks, Subscription ══ -->
+      <!-- The banner that opens the block. Same treatment as every other
+           loop in the app: muted, looped, its own first frame as the poster
+           so the slot is never blank, and preload="none" so a 15s film is
+           not fetched until this part of the store is actually reached. -->
+      <div class="nss-verify-banner">
+        <video class="nss-verify-banner-vid" data-nwsb-auto muted loop playsinline
+               preload="none" aria-hidden="true" tabindex="-1"
+               poster="./assets/video/store-verify-banner-poster.webp?v=1"
+               src="./assets/video/store-verify-banner.mp4?v=1"></video>
+      </div>
       <div style="padding:24px 20px 4px;">
         <span class="sub-section-label">Everything Else, In One Place</span>
       </div>
@@ -10134,7 +10149,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part049.js?v=291"></script>
+<script src="app/js/part049.js?v=292"></script>
 <script src="app/js/part050.js?v=241"></script>
 <script src="app/js/part051.js?v=11" defer></script>
 <script src="app/js/part052.js?v=3"></script>

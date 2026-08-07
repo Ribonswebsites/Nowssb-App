@@ -4036,6 +4036,87 @@ body:not(.nm-mode) #menuDrawer .menu-footer-note {
   padding-left: 24px !important; padding-right: 24px !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   THE NORMAL HOME'S MENU
+   Same page as the Fashion menu — floating section groups inset from the
+   edge, the same label and footer padding — wearing neumorphism instead of
+   dark glass. Before this it was full-bleed rows on a 72%-opaque panel, so
+   the home page underneath showed straight through the list.
+═══════════════════════════════════════════════════════════════ */
+/* Opaque, so nothing behind it reads through. */
+body.nm-mode #menuDrawer.menu-drawer {
+  background: #eef1f7 !important;
+}
+body.nm-night #menuDrawer.menu-drawer {
+  background: #0c0c20 !important;
+}
+/* The sticky header row carries its dark colour as an inline style, which
+   only a rule this specific can reach. */
+body.nm-mode #menuDrawer > div[style*="sticky"] {
+  background: #eef1f7 !important;
+  border-bottom: 1px solid rgba(0,0,0,0.07) !important;
+}
+body.nm-night #menuDrawer > div[style*="sticky"] {
+  background: #0c0c20 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+}
+body.nm-mode #menuDrawer > div[style*="sticky"] span:last-child { color: #1a1a2e !important; }
+body.nm-mode #menuDrawer .nwsb-back-ico { filter: invert(1) brightness(0.35); }
+
+/* The same floating groups as Fashion, raised rather than outlined. */
+body.nm-mode #menuDrawer .menu-section-group {
+  margin-left: 24px !important; margin-right: 24px !important;
+  border-radius: 20px !important; overflow: hidden !important;
+  border: none !important;
+  background: #f0f2f7 !important;
+  box-shadow: 7px 7px 18px rgba(0,0,0,0.14), -5px -5px 14px rgba(255,255,255,0.97) !important;
+}
+body.nm-night #menuDrawer .menu-section-group {
+  background: #16163c !important;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32) !important;
+}
+body.nm-mode #menuDrawer .menu-section-label { padding-left: 32px !important; color: #c8a96e !important; }
+body.nm-night #menuDrawer .menu-section-label { color: #e8d5a3 !important; }
+body.nm-mode #menuDrawer .menu-footer-note {
+  padding-left: 24px !important; padding-right: 24px !important;
+}
+
+/* The rows themselves: on a raised card the row needs no fill of its own,
+   and the divider is a hairline in the surface rather than a light seam. */
+body.nm-mode #menuDrawer .menu-nav-item {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+}
+body.nm-night #menuDrawer .menu-nav-item {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+body[class] #menuDrawer .menu-section-group .menu-nav-item:last-child { border-bottom: none !important; }
+body.nm-mode #menuDrawer .menu-nav-item:active {
+  box-shadow: inset 5px 5px 12px rgba(0,0,0,0.10), inset -4px -4px 10px rgba(255,255,255,0.95) !important;
+}
+body.nm-night #menuDrawer .menu-nav-item:active {
+  box-shadow: inset 6px 6px 14px rgba(0,0,0,0.85), inset -3px -3px 10px rgba(50,50,110,0.3) !important;
+}
+body.nm-mode #menuDrawer .menu-nav-label { color: #1a1a2e !important; }
+body.nm-mode #menuDrawer .menu-nav-sub   { color: rgba(0,0,0,0.45) !important; }
+body.nm-mode #menuDrawer .menu-nav-chev  { color: rgba(0,0,0,0.28) !important; }
+body.nm-night #menuDrawer .menu-nav-label { color: #fff !important; }
+body.nm-night #menuDrawer .menu-nav-sub   { color: rgba(255,255,255,0.5) !important; }
+body.nm-night #menuDrawer .menu-nav-chev  { color: rgba(255,255,255,0.3) !important; }
+body.nm-mode #menuDrawer .menu-footer-note { color: rgba(0,0,0,0.4) !important; }
+body.nm-night #menuDrawer .menu-footer-note { color: rgba(255,255,255,0.4) !important; }
+/* The icon tiles read as pressed-in wells, the way every other icon on the
+   neumorphic home does. */
+body.nm-mode #menuDrawer .menu-nav-icon {
+  background: #eef1f7 !important; border: none !important;
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.13), inset -2px -2px 6px rgba(255,255,255,1) !important;
+}
+body.nm-night #menuDrawer .menu-nav-icon {
+  background: #12122e !important; border: none !important;
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.85), inset -2px -2px 6px rgba(50,50,110,0.3) !important;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    WORD / MEANING SEARCH — glassmorphism reskin matching the reference EXACTLY:
    black + floating-crystal page bg, one transparent frosted glass panel with
@@ -11935,12 +12016,25 @@ body[class] #sub-sound-library .sl-bg-overlay { display: none !important; }
 /* ── The hero ──
    Taller than it was (196 -> 300) so the artwork is a picture rather than
    a strip, and it fades into the page instead of ending at a hard edge. */
+/* 16/9, which is the shape the film is. At a fixed 300px on a 390px screen
+   the slot was 1.3:1 and object-fit:cover threw away a third of the width —
+   including the wordmark the clip is built around. A minimum keeps the
+   title and stats from crowding on a narrow phone. */
 body[class] #sub-sound-library .sl-banner {
-  height: 300px !important; position: relative; flex-shrink: 0;
+  aspect-ratio: 16 / 9; height: auto !important; min-height: 218px;
+  position: relative; flex-shrink: 0;
   background: #000;
 }
 body[class] #sub-sound-library .sl-banner-img {
   background-position: center 28% !important;
+}
+/* The clip sits over the still. object-fit:cover so a 16:9 film fills a
+   taller-than-16:9 hero without letterboxing, and z-index 0 so the fade,
+   the back button and the title all stay above it. */
+body[class] #sub-sound-library .sl-banner-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  background: #000;
 }
 /* The fade. It was display:none, which is why the artwork used to stop
    dead against the content. Four stops rather than two: transparent for
@@ -12060,11 +12154,20 @@ body[class] #sub-sound-library .sl-filter-chip.active {
   background: #fff !important; color: #0b0b0f !important;
   border-color: #fff !important; font-weight: 700;
 }
+/* ── The categories ──
+   There are fourteen of them and they came to 1755px on a 390px screen, so
+   as a single scrolling row the right-hand one was always sliced through
+   the middle of a word and there was nothing to say it scrolled. They wrap
+   now: every category is visible, nothing is cut, and the row is as tall as
+   it needs to be instead of hiding two thirds of itself. */
 body[class] #sub-sound-library .sl-filter-row {
-  display: flex; gap: 8px; padding: 0 20px 14px; overflow-x: auto;
-  scrollbar-width: none; background: none !important;
+  display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 14px;
+  overflow-x: visible; background: none !important;
 }
 body[class] #sub-sound-library .sl-filter-row::-webkit-scrollbar { display: none; }
+/* nowrap on the chip keeps a two-word category on one line; it is the ROW
+   that wraps, not the label inside a chip. */
+body[class] #sub-sound-library .sl-filter-chip { flex: 0 0 auto; white-space: nowrap; }
 
 /* ── The rows ──
    No card, no plate, no border. A row is its content: the mark, the words,
@@ -12217,3 +12320,20 @@ body[class] #sub-sound-library .sl-upgrade-btn {
 #splash.splash-clip { background: #000 !important; }
 .splash-bg-video { opacity: 0; transition: opacity 0.45s ease; }
 .splash-bg-video.vis { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════════
+   THE STORE'S VERIFICATION BANNER
+   Opens the "Everything Else, In One Place" block. 16:9, the shape the
+   film is, so nothing is cropped away.
+═══════════════════════════════════════════════════════════════ */
+body[class] #sub-nowssb-store .nss-verify-banner {
+  position: relative; margin: 22px 20px 2px; overflow: hidden;
+  border-radius: 20px !important; background: #06070d;
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+body[class] #sub-nowssb-store .nss-verify-banner-vid {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}

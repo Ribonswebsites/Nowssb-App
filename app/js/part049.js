@@ -170,12 +170,14 @@ window.fashionHomeIntroEnter = function() {
   }, 4000);
 })();
 
-/* ── NowssB Connect background video — reliably autoplay on BOTH homes. autoplay
+/* ── Background loops that must reliably autoplay — the Connect banner on BOTH
+   homes, the Sound Library hero and the store's verification banner. autoplay
    alone can be deferred (esp. the fashion home which isn't always reached via
-   goTo), so observe each .nmh-connect-vid and play it whenever it's on screen. */
+   goTo), so observe each one and play it whenever it's on screen. */
 (function () {
+  var SEL = '.nmh-connect-vid, .sl-banner-vid, .nss-verify-banner-vid';
   function init() {
-    var vids = document.querySelectorAll('.nmh-connect-vid');
+    var vids = document.querySelectorAll(SEL);
     if (!vids.length) { return setTimeout(init, 400); }
     function playAll() { vids.forEach(function (v) { v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); }); }
     if (!('IntersectionObserver' in window)) { playAll(); document.addEventListener('click', playAll, { once: true }); return; }
