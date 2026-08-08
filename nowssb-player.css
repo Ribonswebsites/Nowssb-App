@@ -126,7 +126,7 @@
      max-height is what keeps a short phone honest: the ratio sets the
      shape, and on a 640px-tall screen the panel gives up height rather
      than pushing the transport off the bottom. */
-  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/1.02; max-height:42vh; flex-shrink:0;
+  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/0.95; max-height:40vh; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(10,16,30,.35);
   /* NO backdrop-filter here — the video fills this panel opaquely, so the
@@ -1133,24 +1133,55 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Replay · Notes · Like — a black pill under the picture
-   Same black as the banner across the top of the screen, so the three
-   white circles read as one control rather than three loose buttons
-   floating on the video.
+   Replay · Notes · Like — inside the lit tab
+   The ELEMENT IS THE FRAME: the render is its background, stretched to
+   the element (the render is a lit rectangle floating in its own glow,
+   so stretching it stretches the glow, which is the one thing that does
+   not mind). The screen is placed against the element's own box with
+   percentage offsets — NOT padding, because percentage padding resolves
+   against the CONTAINING BLOCK's width, and this element's containing
+   block is wider than it is.
+
+   The render is cropped to just outside its outer stroke — the glow it
+   was floating in reached the edge of its own canvas, so keeping it meant
+   a hard bright line down both sides of the element. The glow is a CSS
+   box-shadow instead, which costs nothing, follows the element at any
+   size, and cannot be cut off.
+
+   Aperture in assets/frames/word-acts-tab.webp (1371x317):
+     x 25..1344  ->  1.823% from the left, 1.969% from the right
+     y 19..296   ->  5.994% from the top,  6.625% from the bottom
    ══════════════════════════════════════════════════════════════════ */
 .lgp .lgp-word-acts {
-  width:100%; max-width:360px; margin:12px auto 0; padding:10px 18px;
-  background:#000; border-radius:18px !important;
-  box-shadow:0 10px 26px rgba(0,0,0,.4);
-  display:flex; align-items:center; justify-content:center; gap:20px;
-  flex-shrink:0;
+  position:relative; width:100%; max-width:360px; margin:12px auto 0;
+  aspect-ratio:1371/317; flex-shrink:0;
+  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
+  border-radius:9px !important;              /* the shadow follows this */
+  box-shadow:0 0 34px 6px rgba(255,255,255,.42), 0 0 90px 18px rgba(255,255,255,.16);
+}
+.lgp .lgp-wa-screen {
+  position:absolute; left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
+  overflow:hidden; border-radius:5px !important;
+  background:#000;                 /* behind the clip while it loads */
+}
+.lgp .lgp-wa-vid {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; display:block; pointer-events:none;
+  /* its own compositor layer — it plays under three live buttons */
+  transform:translateZ(0); backface-visibility:hidden;
+}
+/* the three, over the clip */
+.lgp .lgp-wa-row {
+  position:absolute; inset:0; z-index:2;
+  display:flex; align-items:center; justify-content:center; gap:min(7vw,30px);
 }
 
 /* A line between each pair, the same white hairline as the one between
-   Sentence and Practice. */
+   Sentence and Practice — over the clip, so it carries a shadow too. */
 .lgp .lgp-word-acts .lgp-wa-sep {
-  width:1px; flex:0 0 1px; align-self:center; height:30px;
-  background:rgba(255,255,255,.55);
+  width:1px; flex:0 0 1px; align-self:center; height:56%;
+  background:rgba(255,255,255,.7);
+  box-shadow:0 0 4px rgba(0,0,0,.6);
   border-radius:1px !important;
 }
 
@@ -1159,7 +1190,6 @@
    height — a 34 or 42px button therefore came out 34x44 and drew as an
    oval. Everything round in here is 44 square, so the radius has a circle
    to work on. */
-.lgp .lgp-wa,
 .lgp .lgp-white-btn,
 .pn-close {
   width:44px !important; height:44px !important;
@@ -1173,16 +1203,36 @@
   color:#0a0a12 !important;
   display:flex !important; align-items:center; justify-content:center;
 }
-.lgp .lgp-wa:active,
 .lgp .lgp-white-btn:active,
 .pn-close:active { transform:scale(.93); }
-.lgp .lgp-wa svg,
 .lgp .lgp-white-btn svg,
 .pn-close svg { width:21px; height:21px; display:block; }
 
-/* The heart: outline on white, filled when liked. */
-.lgp .lgp-word-acts .lgp-like svg { fill:none; stroke:#0a0a12; stroke-width:1.8; }
-.lgp .lgp-word-acts .lgp-like.liked svg { fill:#e5342a; stroke:#e5342a; filter:none; }
+/* ── The three in the tab: no wrapper at all ──
+   They lost their white discs — the tab is the surface now, and a disc
+   inside it would be a button drawn on top of a button. The tap target
+   stays 44 square (invisible); only the glyph shows, white with a shadow
+   so it survives a bright frame of the clip underneath. */
+.lgp .lgp-wa {
+  width:44px !important; height:44px !important;
+  min-width:44px !important; min-height:44px !important;
+  flex-shrink:0; padding:0; cursor:pointer;
+  border:none !important; border-radius:0 !important;
+  background:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  box-shadow:none !important;
+  color:#ffffff !important;
+  display:flex !important; align-items:center; justify-content:center;
+}
+.lgp .lgp-wa:active { transform:scale(.9); }
+.lgp .lgp-wa svg {
+  width:23px; height:23px; display:block;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.75));
+}
+
+/* The heart: white outline, filled red when liked. */
+.lgp .lgp-word-acts .lgp-like svg { fill:none; stroke:#ffffff; stroke-width:1.8; }
+.lgp .lgp-word-acts .lgp-like.liked svg { fill:#e5342a; stroke:#e5342a; }
 
 /* The settings sphere on the right keeps its own look — it was not part of
    this, and it is an image rather than a glass circle. */

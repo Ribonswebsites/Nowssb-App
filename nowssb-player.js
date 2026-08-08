@@ -273,6 +273,16 @@
         if (cur.parentNode) cur.parentNode.removeChild(cur); // survive the innerHTML wipe
       }
     })();
+    /* Same trick for the clip inside the tab under the picture. Its source
+       never changes, so after the first render it is always carried across
+       — otherwise every phase change reloaded it and it stuttered back to
+       frame one while you were looking at it. */
+    var _keepWaVid = null;
+    (function () {
+      var ex = document.getElementById('practiceBody');
+      var cur = ex ? ex.querySelector('.lgp-wa-vid') : null;
+      if (cur) { _keepWaVid = cur; if (cur.parentNode) cur.parentNode.removeChild(cur); }
+    })();
     var visual = th.video
       ? (_keepVid ? '<span class="lgp-video-slot"></span>'
                   : '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + _newVidSrc + '"></video>')
@@ -486,9 +496,16 @@
         '</div>' +
         '</div>' +   /* end .lgp-visual-overlay */
         '</div>' +   /* end .lgp-visual */
-        /* Replay · Notes · Like — under the picture, in a black pill of
-           their own, the same black as the banner up top. */
+        /* Replay · Notes · Like — under the picture, inside the lit tab.
+           The tab is the element itself (background image); the clip and
+           the buttons sit in its aperture. */
         '<div class="lgp-word-acts">' +
+        '<div class="lgp-wa-screen">' +
+          (_keepWaVid
+            ? '<span class="lgp-wa-vid-slot"></span>'
+            : '<video class="lgp-wa-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
+              ' src="./assets/video/word-acts.mp4"></video>') +
+        '<div class="lgp-wa-row">' +
           '<button class="lgp-wa lgp-wa-replay" type="button"' +
             ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
             '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
@@ -511,6 +528,8 @@
             ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
             '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
           '</button>' +
+        '</div>' +   /* end .lgp-wa-row */
+        '</div>' +   /* end .lgp-wa-screen */
         '</div>' +   /* end .lgp-word-acts */
         /* The Listen · Learn · Practice · Heal ticker used to sit here. */
         '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
@@ -567,8 +586,28 @@
       else { var _vw = body.querySelector('.lgp-visual'); if (_vw) _vw.insertBefore(_keepVid, _vw.firstChild); }
     }
 
-    /* Keep the background video playing. Bind the resume listeners ONCE per
-       element (not every render — that leaked handlers and caused jank). */
+    /* Re-insert the preserved tab clip the same way. */
+    if (_keepWaVid) {
+      var _wslot = body.querySelector('.lgp-wa-vid-slot');
+      if (_wslot && _wslot.parentNode) _wslot.parentNode.replaceChild(_keepWaVid, _wslot);
+      else { var _ws = body.querySelector('.lgp-wa-screen'); if (_ws) _ws.insertBefore(_keepWaVid, _ws.firstChild); }
+    }
+
+    /* Keep both clips playing. Bind the resume listeners ONCE per element
+       (not every render — that leaked handlers and caused jank). */
+    (function () {
+      var v = body.querySelector('.lgp-wa-vid');
+      if (!v) return;
+      v.muted = true; v.setAttribute('muted', ''); v.playsInline = true; v.loop = true;
+      function go() { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+      if (!v._lgpBound) {
+        v._lgpBound = true;
+        v.addEventListener('loadeddata', go);
+        v.addEventListener('canplay', go);
+        v.addEventListener('stalled', go);
+      }
+      if (v.paused) go();
+    })();
     (function () {
       var v = body.querySelector('.lgp-video');
       if (!v) return;
