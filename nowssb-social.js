@@ -1222,14 +1222,6 @@
   var ncbgActive = 0, ncbgItems = null, ncbgDotEls = null;
   var NCBG_N = NWSB_CONNECT_BGS.length;
 
-  /* Five phones at fixed slots — see app/js/part047.js. The phone holds
-     still and the picture inside it changes. */
-  function ncbgSlots() {
-    var n = Math.min(5, NCBG_N), half = Math.floor(n / 2), out = [];
-    for (var sl = -half; out.length < n; sl++) out.push(sl);
-    return out;
-  }
-
   function ncbgCfg(s) {
     var a = Math.abs(s), d = s < 0 ? -1 : 1;
     if (a === 0) return {tx: 0,     tz: 200,  ry: 0,     sc: 1.00, op: 1.00, zi: 20};
@@ -1240,19 +1232,14 @@
 
   function ncbgPaint() {
     if (!ncbgItems) return;
-    var SL = ncbgSlots();
     ncbgItems.forEach(function (el, i) {
-      var s = SL[i];
+      var off = ((i - ncbgActive) % NCBG_N + NCBG_N) % NCBG_N;
+      var s = off > Math.floor(NCBG_N / 2) ? off - NCBG_N : off;
       var c = ncbgCfg(s);
       el.style.transform     = 'translateX('+c.tx+'px) translateZ('+c.tz+'px) rotateY('+c.ry+'deg) scale('+c.sc+')';
       el.style.opacity       = String(c.op);
       el.style.zIndex        = String(c.zi);
       el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
-      var wall = el.querySelector('.fbgci-wall');
-      if (wall) {
-        var url = NWSB_CONNECT_BGS[((ncbgActive + s) % NCBG_N + NCBG_N) % NCBG_N];
-        if (wall.dataset.url !== url) { wall.style.backgroundImage = "url('" + url + "')"; wall.dataset.url = url; }
-      }
     });
     if (ncbgDotEls) ncbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === ncbgActive); });
     var label = document.getElementById('ncbgSelectedLabel');
@@ -1271,8 +1258,9 @@
 
     if (!inner.dataset.built) {
       inner.dataset.built = '1';
-      inner.innerHTML = ncbgSlots().map(function () {
-        return '<div class="fbgci"><span class="fbgci-wall"></span></div>';
+      /* One phone per picture — the phones are what move. */
+      inner.innerHTML = NWSB_CONNECT_BGS.map(function (url) {
+        return '<div class="fbgci"><span class="fbgci-wall" style="background-image:url(\'' + url + '\')"></span></div>';
       }).join('');
       dotsEl.innerHTML = NWSB_CONNECT_BGS.map(function () { return '<div class="becd"></div>'; }).join('');
     }
@@ -1310,13 +1298,10 @@
       if (Math.abs(dx) > 40) ncbgGo(ncbgActive + (dx < 0 ? 1 : -1));
     }, {passive: true});
 
-    var tapSlots = ncbgSlots();
     ncbgItems.forEach(function (el, i) {
       el.onclick = function (e) {
         e.stopPropagation();
-        /* The element is a slot, so a tap means "move this far". */
-        var sl = tapSlots[i];
-        if (sl !== 0) ncbgGo(ncbgActive + sl);
+        if (i !== ncbgActive) ncbgGo(i);
         else ncbgApply();
       };
     });

@@ -239,15 +239,6 @@
   // the live background until fbgApply() runs (APPLY THIS BACKGROUND).
   var fbgStagedMode = null;
 
-  /* At most five on screen: the centre, and two either side. Fewer than
-     five pictures means fewer phones — a slot with nothing behind it would
-     repeat a picture already showing. */
-  function fbgSlots() {
-    var n = Math.min(5, FBG_N), half = Math.floor(n / 2), out = [];
-    for (var s = -half; out.length < n; s++) out.push(s);
-    return out;
-  }
-
   function fbgCfg(s) {
     var a = Math.abs(s), d = s < 0 ? -1 : 1;
     if (a === 0) return {tx: 0,     tz: 200,  ry: 0,     sc: 1.00, op: 1.00, zi: 20};
@@ -258,22 +249,14 @@
 
   function fbgPaint() {
     if (!fbgItems) return;
-    var slots = fbgSlots();
     fbgItems.forEach(function (el, i) {
-      var s = slots[i];
+      var off = ((i - fbgActive) % FBG_N + FBG_N) % FBG_N;
+      var s = off > Math.floor(FBG_N / 2) ? off - FBG_N : off;
       var c = fbgCfg(s);
-      /* Constant for the life of the picker — this is what keeps the phone
-         still while the picture changes under it. */
       el.style.transform     = 'translateX('+c.tx+'px) translateZ('+c.tz+'px) rotateY('+c.ry+'deg) scale('+c.sc+')';
       el.style.opacity       = String(c.op);
       el.style.zIndex        = String(c.zi);
       el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
-      var wall = el.querySelector('.fbgci-wall');
-      if (wall) {
-        var url = NWSB_FASHION_BGS[((fbgActive + s) % FBG_N + FBG_N) % FBG_N];
-        var want = "url('" + url + "')";
-        if (wall.dataset.url !== url) { wall.style.backgroundImage = want; wall.dataset.url = url; }
-      }
     });
     if (fbgDotEls) fbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === fbgActive); });
     var label = document.getElementById('fbgSelectedLabel');
@@ -321,12 +304,11 @@
 
     if (!inner.dataset.built) {
       inner.dataset.built = '1';
-      /* Five phones that never move, not one per image. The phone stays
-         where it is and the wallpaper inside it changes as you swipe —
-         which is what the Fashion Plus stage does, and the whole reason
-         this is a phone. Each element owns a SLOT (-2..2), not a picture. */
-      inner.innerHTML = fbgSlots().map(function () {
-        return '<div class="fbgci"><span class="fbgci-wall"></span></div>';
+      /* One phone per picture, and the phones are what move — the 3D
+         switch this picker has always had, with the picture riding inside
+         the phone instead of being a bare card. */
+      inner.innerHTML = NWSB_FASHION_BGS.map(function (url) {
+        return '<div class="fbgci"><span class="fbgci-wall" style="background-image:url(\'' + url + '\')"></span></div>';
       }).join('');
       dotsEl.innerHTML = NWSB_FASHION_BGS.map(function () { return '<div class="becd"></div>'; }).join('');
     }
@@ -387,16 +369,12 @@
       }
     }, {passive: true});
 
-    var tapSlots = fbgSlots();
     fbgItems.forEach(function (el, i) {
       el.onclick = function (e) {
         e.stopPropagation();
         fbgStagedMode = null;
         fbgSyncModeButtons();
-        /* The element is a slot, so a tap means "move this far", not "pick
-           picture i". */
-        var s = tapSlots[i];
-        if (s !== 0) fbgGo(fbgActive + s);
+        if (i !== fbgActive) fbgGo(i);
         else fbgApply();
       };
     });
