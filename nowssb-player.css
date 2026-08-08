@@ -1118,3 +1118,74 @@
   margin-top:14px;
   font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; color:#fff;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   Replay · Notes · Like — under the word
+   They were in the banner above it, which is a ticker and no place for
+   controls. This row sits with the word it acts on.
+   ══════════════════════════════════════════════════════════════════ */
+.lgp .lgp-word-acts {
+  width:100%; max-width:352px; margin:12px auto 0;
+  display:flex; align-items:center; justify-content:center; gap:26px;
+}
+
+/* ── Circles, not ovals ──
+   app/app.css gives every <button> a 44px min-height, and min-height beats
+   height — a 34 or 42px button therefore came out 34x44 and drew as an
+   oval. Everything round in here is 44 square, so the radius has a circle
+   to work on. */
+.lgp .lgp-wa,
+.lgp .lgp-white-btn,
+.pn-close {
+  width:44px !important; height:44px !important;
+  min-width:44px !important; min-height:44px !important;
+  flex-shrink:0; padding:0; cursor:pointer;
+  border-radius:50% !important;
+  border:none !important;
+  background:#ffffff !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.34), 0 2px 6px rgba(0,0,0,.22) !important;
+  color:#0a0a12 !important;
+  display:flex !important; align-items:center; justify-content:center;
+}
+.lgp .lgp-wa:active,
+.lgp .lgp-white-btn:active,
+.pn-close:active { transform:scale(.93); }
+.lgp .lgp-wa svg,
+.lgp .lgp-white-btn svg,
+.pn-close svg { width:21px; height:21px; display:block; }
+
+/* The heart: outline on white, filled when liked. */
+.lgp .lgp-word-acts .lgp-like svg { fill:none; stroke:#0a0a12; stroke-width:1.8; }
+.lgp .lgp-word-acts .lgp-like.liked svg { fill:#e5342a; stroke:#e5342a; filter:none; }
+
+/* The settings sphere on the right keeps its own look — it was not part of
+   this, and it is an image rather than a glass circle. */
+
+/* ── The line between Sentence, Practice and Store ──
+   It was a gradient that faded out at both ends, which at 1px is a line
+   nobody can see. Solid, centred on the row, and tall enough to read. */
+.lgp .lgp-practice-sep {
+  width:1px; flex:0 0 1px; align-self:center; height:38px;
+  background:rgba(255,255,255,.55);
+  border-radius:1px !important;
+}
+
+/* The model's half of the notes. */
+.pn-coach-txt {
+  font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.6;
+  color:rgba(255,255,255,.88);
+}
+.pn-coach-wait {
+  display:flex; align-items:center; gap:10px;
+  font-family:'DM Sans',sans-serif; font-size:13px; color:rgba(255,255,255,.45);
+}
+.pn-dots { display:inline-flex; gap:4px; }
+.pn-dots i {
+  width:5px; height:5px; border-radius:50% !important;
+  background:rgba(255,255,255,.5);
+  animation:pnDot 1.1s ease-in-out infinite;
+}
+.pn-dots i:nth-child(2) { animation-delay:.16s; }
+.pn-dots i:nth-child(3) { animation-delay:.32s; }
+@keyframes pnDot { 0%,100% { opacity:.25; } 50% { opacity:1; } }

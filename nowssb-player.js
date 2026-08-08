@@ -444,8 +444,11 @@
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
-          '<button class="lgp-back lgp-imgbtn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
-            '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
+          /* A white disc with a plain arrow, not the glass sphere. */
+          '<button class="lgp-back lgp-white-btn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
+            '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+              '<path d="M15 5l-7 7 7 7" stroke="#0a0a12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '</svg>' +
           '</button>' +
           '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
           '<div class="lgp-top-right">' +
@@ -461,26 +464,6 @@
           '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
           '<div class="lgp-info-banner-divider"></div>' +
           '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
-          /* The two things you reach for while a word is playing, in the
-             band that was carrying nothing but a divider. */
-          '<div class="lgp-band-acts">' +
-            '<button class="lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
-              ' onclick="event.stopPropagation();window.lgpToggleLike&&window.lgpToggleLike()"' +
-              ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
-              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
-            '</button>' +
-            '<span class="lgp-band-sep" aria-hidden="true"></span>' +
-            '<button class="lgp-notes-btn" id="lgpNotesBtn" type="button"' +
-              ' onclick="event.stopPropagation();window.lgpOpenNotes&&window.lgpOpenNotes()"' +
-              ' aria-label="Pronunciation notes">' +
-              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-                '<path d="M6 3.5h8.5L19 8v12.5H6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
-                '<path d="M14 3.5V8h4.6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
-                '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
-              '</svg>' +
-              '<span class="lgp-notes-lbl">Notes</span>' +
-            '</button>' +
-          '</div>' +
         '</div>' +
         '<div class="lgp-visual">' + visual +
           /* ONE row across the top of the panel, not two islands pinned to
@@ -508,6 +491,30 @@
             '<div class="lgp-syls">' + syl + '</div>' +
             '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
           '</div>' +
+        '</div>' +
+        /* Replay, Notes and Like — under the word, which is what they are
+           about. They were in the banner above it, which is a ticker. */
+        '<div class="lgp-word-acts">' +
+          '<button class="lgp-wa lgp-wa-replay" type="button"' +
+            ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
+            '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+              '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+              '<path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '</svg>' +
+          '</button>' +
+          '<button class="lgp-wa lgp-wa-notes" id="lgpNotesBtn" type="button"' +
+            ' onclick="window.lgpOpenNotes&&window.lgpOpenNotes()"' + ' aria-label="Pronunciation notes">' +
+            '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+              '<path d="M6 3.5h8.5L19 8v12.5H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+              '<path d="M14 3.5V8h4.6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+              '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
+            '</svg>' +
+          '</button>' +
+          '<button class="lgp-wa lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
+            ' onclick="window.lgpToggleLike&&window.lgpToggleLike()"' +
+            ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
+          '</button>' +
         '</div>' +
         '<div class="lgp-ticker"><span>Listen</span><span>Learn</span><span>Practice</span><span>Heal</span></div>' +
         '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +

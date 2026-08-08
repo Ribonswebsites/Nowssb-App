@@ -137,6 +137,14 @@
               '<span class="pn-fix-note">Slow down on the marked part and hold it a beat longer than feels natural.</span>' +
               '</div>'
             : '<div class="pn-fix"><span class="pn-fix-note">Nothing to correct on that attempt — keep the same pace and breath.</span></div>') +
+        '</div>' +
+        /* What went wrong, in words. Filled by the API — see coach() — with
+           the syllable comparison above as its brief, so it is talking
+           about the same attempt the marks are. */
+        '<div class="pn-sec-title">What to change</div>' +
+        '<div class="pn-card pn-coach" id="pnCoach">' +
+          '<div class="pn-coach-wait"><span class="pn-dots"><i></i><i></i><i></i></span>' +
+          'Reading your attempt…</div>' +
         '</div>';
     } else {
       html +=
@@ -194,6 +202,54 @@
     return el;
   }
 
+  /* ── The spoken-word half, written by the model ──────────────────────
+     The page is useful without it — the marks, the corrected line and the
+     word's own coaching are all local — so this fills in after and never
+     blocks the open. It is given the attempt and told to answer only from
+     it, so it cannot invent a fault the comparison did not find.
+     callAI is part019.js's helper (Claude, falling back to Groq). If it is
+     missing or the call fails, the card says the local notes stand rather
+     than showing an error. */
+  function coach(w, a, cmp) {
+    var box = document.getElementById('pnCoach');
+    if (!box) return;
+    var missed = cmp.filter(function (c) { return !c.ok; }).map(function (c) { return c.syl; });
+    if (typeof window.callAI !== 'function') {
+      box.innerHTML = '<div class="pn-coach-txt">' +
+        (missed.length
+          ? 'The ' + (missed.length === 1 ? 'syllable' : 'syllables') + ' marked above ' +
+            (missed.length === 1 ? 'is' : 'are') + ' where it slipped. Use the notes below for the shape of the mouth and the breath.'
+          : 'Nothing came out wrong on that attempt. Use the notes below to keep it there.') +
+        '</div>';
+      return;
+    }
+    var sys = 'You are a pronunciation coach for the NowssB sound-healing app. ' +
+      'You are given one recorded attempt at a word. Say what went wrong and what to change. ' +
+      'Be specific about the sounds. Two or three short sentences, plain English, no emojis, ' +
+      'no praise padding. Only use what you are given — do not invent errors that are not in the data. ' +
+      'If nothing was missed, say what to keep doing instead.';
+    var msg = 'Word: "' + w.word + '". Target pronunciation: "' + (w.phonetic || '') + '". ' +
+      'The microphone heard: "' + (a.transcript || '(nothing clear)') + '". ' +
+      'Match score: ' + a.score + '/100. ' +
+      (missed.length ? 'Syllables that did not land: ' + missed.join(', ') + '. '
+                     : 'Every syllable landed. ') +
+      (w.mouthPos ? 'Mouth position for this word: ' + w.mouthPos + '. ' : '') +
+      (w.mistake ? 'The usual mistake with this word: ' + w.mistake + '. ' : '');
+    window.callAI([{ role: 'user', content: msg }], { model: 'claude-haiku-4-5', max_tokens: 180, system: sys })
+      .then(function (txt) {
+        txt = String(txt || '').trim();
+        var live = document.getElementById('pnCoach');
+        if (!live) return;
+        live.innerHTML = txt
+          ? '<div class="pn-coach-txt">' + esc(txt) + '</div>'
+          : '<div class="pn-coach-txt">The notes below are the ones to work from for this word.</div>';
+      })
+      .catch(function () {
+        var live = document.getElementById('pnCoach');
+        if (live) live.innerHTML = '<div class="pn-coach-txt">Could not reach the coach just now — the notes below still stand.</div>';
+      });
+  }
+
   window.lgpOpenNotes = function () {
     var w = word();
     if (!w) return;
@@ -202,6 +258,8 @@
     if (body) body.innerHTML = render(w);
     requestAnimationFrame(function () { el.classList.add('open'); });
     try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
+    var a = window.lgpLastAttempt(w.word);
+    if (a) coach(w, a, compare(a.transcript, a.phonetic || w.phonetic));
   };
   window.lgpCloseNotes = function () {
     var el = document.getElementById('lgpNotesOverlay');
