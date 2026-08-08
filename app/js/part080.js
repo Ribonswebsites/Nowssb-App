@@ -331,22 +331,39 @@
      the coupon reel. preload="none" and no poster-less card, so nothing
      downloads until app/js/part051.js gives it a decoder slot, which it
      does for whichever cards are actually on screen. */
+  /* Every clip in this rail has to be 16:9, because the tablet's aperture
+     is 1.6352 and anything portrait letterboxes into a stripe with black
+     down both sides. Two of them were: store-trigger and signature-store
+     are both 768x1168 (0.6575) — they are the store DOOR and the Signature
+     door, shot upright for a full-screen trigger, not banners.
+     Replaced with the Store's actual 16:9 banners. The store card takes the
+     clip that heads every meaning's page in the Meaning Store, which
+     .ms-meaning-vid pins to 16/9; Signature takes signature-banner.mp4,
+     1280x720, which already ships here. The other three were fine:
+     1.7778, 1.7734, 1.7734. */
   var STORE_VIDS = [
     { v: 'sound-library-banner', t: 'Sound Library',    s: 'Every word and sentence you own', go: 'practice' },
-    { v: 'store-trigger',        t: 'The NowssB Store', s: 'Two libraries. One destination.', go: 'store' },
-    { v: 'signature-store',      t: 'NowssB Signature', s: 'The rarest words and meanings',   go: 'store' },
+    { meaning: 1,                t: 'The NowssB Store', s: 'Two libraries. One destination.', go: 'store' },
+    { v: 'signature-banner',     t: 'NowssB Signature', s: 'The rarest words and meanings',   go: 'store' },
     { v: 'subscription-a',       t: 'Subscription',     s: 'Unlock the full word library',    go: 'subscription' },
     { v: 'coupon-a',             t: 'Offers & bundles', s: 'Coupons on words and meanings',   go: 'store' }
   ];
+  var MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4';
   function storeVideos() {
     return '<section class="slm-sec">' + head('From the Store', chevron("slmStore()")) +
       '<div class="slm-hscroll">' + STORE_VIDS.map(function (x) {
-        var base = './assets/video/' + x.v;
+        /* The meaning clip lives on Cloudinary and part026.js owns it — read
+           it from there so there is one URL, with the literal as a fallback
+           for the case where that file has not run yet. It has no local
+           poster; the screen behind it is already black, which is what a
+           poster would be for. */
+        var src = x.meaning ? (window.MS_MEANING_VID || MEANING_VID) : './assets/video/' + x.v + '.mp4';
+        var poster = x.meaning ? '' : ' poster="./assets/video/' + x.v + '-poster.webp"';
         return '<div class="slm-big" onclick="slmVidGo(\'' + jsArg(x.go) + '\')">' +
           frame('tab4-l',
             '<span class="slm-vidbox">' +
               '<video class="slm-vid" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"' +
-              ' poster="' + base + '-poster.webp" src="' + base + '.mp4"></video>' +
+              poster + ' src="' + src + '"></video>' +
             '</span>') +
           '<span class="slm-big-t">' + esc(x.t) + '</span>' +
           '<span class="slm-big-s">' + esc(x.s) + '</span>' +
@@ -456,8 +473,10 @@
     }
     feed.innerHTML = html;
 
-    var b = document.getElementById('slmBellCount');
-    if (b) { var n = sentences().length; b.textContent = n; b.style.display = n ? '' : 'none'; }
+    /* The bell is the app's notification bell, not a sentence counter — its
+       badge is one of the three app/js/part064.js paints, so ask that file
+       to repaint rather than writing a different number into it here. */
+    if (typeof window.nwsbNotifBadge === 'function') window.nwsbNotifBadge();
     var av = document.getElementById('slmAvatarLetter');
     if (av) av.textContent = (localStorage.getItem('nwsb_name') || 'N').trim().charAt(0).toUpperCase() || 'N';
   }
@@ -476,9 +495,6 @@
     if (typeof window.msOpenDetailFromPlayer === 'function') return window.msOpenDetailFromPlayer(key, word);
     if (typeof window.msShowDetail === 'function') return window.msShowDetail(key, word);
     slmGo('real-meaning');
-  };
-  window.slmOpenSaved = function () {
-    window.slmChip('Sentences');
   };
   /* The store is opened by hand everywhere else in the app — it has no
      openSub id, it is a screen that gets .open added and its intro clip

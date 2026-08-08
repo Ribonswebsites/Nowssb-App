@@ -118,9 +118,9 @@
   function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
 
   /* ── Badge on the header bells ─────────────────────────────────────
-     There is a bell on each home now, so paint every badge rather than the
-     Fashion one alone. */
-  var BADGES = ['homeNotifBadge', 'nmhNotifBadge'];
+     There is a bell on each home and one on the Sound Library, so paint
+     every badge rather than the Fashion one alone. */
+  var BADGES = ['homeNotifBadge', 'nmhNotifBadge', 'slmNotifBadge'];
   function paintBadge() {
     var n = feed().filter(function (x) { return !x.read; }).length;
     BADGES.forEach(function (id) {

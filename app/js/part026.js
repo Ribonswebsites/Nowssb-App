@@ -111,6 +111,10 @@ var MS_MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v17855114
 /* The page is built only when a meaning is opened, so this has to be
    registered for warming rather than left to be discovered in the DOM. */
 window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat([MS_MEANING_VID]);
+/* The clip that heads every meaning's page. It is 16:9 — .ms-meaning-vid
+   pins that aspect — which is why the Sound Library's Store rail uses it
+   too (app/js/part080.js). Exposed so there is one URL, not two. */
+window.MS_MEANING_VID = MS_MEANING_VID;
 
 /* ── BUY FLOW ─ a real product page inside the same full-page detail panel
    purchased words open into (#msDetailPanel): hero image, description,
