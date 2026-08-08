@@ -96,17 +96,22 @@
 }
 /* banner under the top bar — icon + divider + looping text, replaces the
    old two separate static lines (tagline + ritual counter) */
+/* The ticker banner lives INSIDE the picture now — it was a black bar
+   sitting above the panel, taking a band of the screen for one line of
+   text. It reads across the top of the panel, under the ritual row, and
+   the picture keeps the height the bar was spending. */
 .lgp .lgp-info-banner {
-  display:flex; align-items:center; gap:14px; margin-top:10px; width:100%;
-  background:#000; border-radius:16px !important; padding:14px 16px;
+  position:absolute; left:9px; right:9px; top:56px; z-index:4;
+  display:flex; align-items:center; gap:12px; width:auto;
+  background:rgba(0,0,0,.82); border-radius:14px !important; padding:9px 13px;
 }
 .lgp .lgp-info-banner-icon {
-  width:40px; height:40px; min-width:0 !important; min-height:0 !important;
+  width:30px; height:30px; min-width:0 !important; min-height:0 !important;
   background-size:contain; background-repeat:no-repeat; background-position:center; flex-shrink:0;
 }
-.lgp .lgp-info-banner-divider { width:1px; height:48px; background:rgba(255,255,255,.15); flex-shrink:0; }
+.lgp .lgp-info-banner-divider { width:1px; height:32px; background:rgba(255,255,255,.15); flex-shrink:0; }
 .lgp .lgp-info-banner-text {
-  font-size:15px; font-weight:800; letter-spacing:.2px; color:#fff;
+  font-size:13px; font-weight:800; letter-spacing:.2px; color:#fff;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .lgp .lgp-info-banner-text.dash-in { animation:nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both; }
@@ -126,7 +131,7 @@
      max-height is what keeps a short phone honest: the ratio sets the
      shape, and on a 640px-tall screen the panel gives up height rather
      than pushing the transport off the bottom. */
-  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/0.83; max-height:35vh; flex-shrink:0;
+  width:100%; max-width:360px; margin:10px 0 0; aspect-ratio:1/1.02; max-height:44vh; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(10,16,30,.35);
   /* NO backdrop-filter here — the video fills this panel opaquely, so the
@@ -401,25 +406,43 @@
    stay concentric at every screen size.
    ══════════════════════════════════════════════════════════════════ */
 .lgp .lgp-practice-row {
-  position:relative; width:100%; max-width:352px; margin-top:auto;
-  /* the label band under the strip */
-  padding-bottom:15px;
+  /* First thing under the top bar now, in the slot the ticker banner
+     used to hold. margin-top:auto is gone with it — nothing pushes this
+     to the bottom any more. */
+  position:relative; width:100%; max-width:360px; margin:8px auto 0;
+  padding-bottom:15px;                    /* the label band under the tab */
+  flex-shrink:0;
 }
+/* The same lit tab as the row under the picture, stretched taller so the
+   rings fit whole: the aperture is 87.4% of the frame's height, and a
+   ring is 27.6% of the ROW's width across, so the frame runs at 2.82:1
+   to leave the ring about 12% of clear air. */
 .lgp .lgp-pr-glass {
-  position:relative; width:100%; aspect-ratio:3.11; overflow:hidden;
-  border-radius:20px !important;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.3);
-  box-shadow:0 10px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.4);
+  position:relative; width:100%; aspect-ratio:2.82;
+  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
+  border-radius:9px !important;
+  box-shadow:0 0 34px 6px rgba(255,255,255,.42), 0 0 90px 18px rgba(255,255,255,.16);
 }
+/* the aperture — black behind the clip, same offsets as the other tab */
+.lgp .lgp-pr-vid,
+.lgp .lgp-pr-sheen {
+  position:absolute; left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
+  border-radius:5px !important;
+}
+/* A <video> is a REPLACED element: with width:auto it takes its intrinsic
+   size (300x150 before any metadata arrives) and the `right`/`bottom`
+   offsets are dropped, so it spilled out of the frame as a 300px black
+   box. The aperture is given to it as an explicit width and height —
+   100% - 1.823% - 1.969% across, 100% - 5.994% - 6.625% down. */
 .lgp .lgp-pr-vid {
-  position:absolute; inset:0; width:100%; height:100%;
+  right:auto; bottom:auto;
+  width:96.208%; height:87.381%; background:#000;
   object-fit:cover; object-position:center; display:block; pointer-events:none;
   transform:translateZ(0); backface-visibility:hidden;
 }
-/* the sheen that makes it glass rather than a window */
+/* the sheen that reads as glass over the clip */
 .lgp .lgp-pr-sheen {
-  position:absolute; inset:0; pointer-events:none;
+  pointer-events:none; overflow:hidden;
   background:linear-gradient(160deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.03) 34%, rgba(255,255,255,0) 55%);
 }
 
@@ -434,9 +457,9 @@
   display:flex; align-items:center; justify-content:center;
   min-height:0 !important; min-width:0 !important;
 }
-.lgp .lgp-practice-row > .lgp-sentence { left:19%; }
-.lgp .lgp-practice-row > .lgp-practice { left:50%; }
-.lgp .lgp-practice-row > .lgp-store    { left:81%; }
+.lgp .lgp-practice-row > .lgp-sentence { left:20.103%; }
+.lgp .lgp-practice-row > .lgp-practice { left:49.927%; }
+.lgp .lgp-practice-row > .lgp-store    { left:79.752%; }
 .lgp .lgp-practice-row > .lgp-sentence:active,
 .lgp .lgp-practice-row > .lgp-practice:active,
 .lgp .lgp-practice-row > .lgp-store:active { transform:translateX(-50%) scale(.92); }
@@ -456,8 +479,8 @@
 .lgp .lgp-practice-row .lgp-store-orb,
 .lgp .lgp-practice-row .lgp-practice-orb,
 .lgp .lgp-practice-row .lgp-practice-ico {
-  width:clamp(30px, 11.4vw, 45px) !important;
-  height:clamp(30px, 11.4vw, 45px) !important;
+  width:clamp(29px, 11.0vw, 44px) !important;
+  height:clamp(29px, 11.0vw, 44px) !important;
 }
 /* the pulsing rings would fight the ring they are sitting inside */
 .lgp .lgp-practice-row .lgp-practice-ring { display:none !important; }
@@ -1025,8 +1048,6 @@
 /* The word and everything under it move up by the height the Reps band was
    taking, so the page reads from the word rather than from the gap above
    it. */
-.lgp .lgp-info-banner { margin-top:10px; }
-.lgp .lgp-visual { margin-top:10px; }
 
 /* ══════════════════════════════════════════════════════════════════
    PRONUNCIATION NOTES (app/js/part081.js)
@@ -1228,7 +1249,10 @@
 }
 .lgp .lgp-wa-vid {
   position:absolute; inset:0; width:100%; height:100%;
-  object-fit:cover; display:block; pointer-events:none;
+  /* The waves live in the lower part of the frame and the aperture is a
+     thin strip, so centring it showed the black above them. Anchored to
+     the bottom of the source instead — the same crop, lifted. */
+  object-fit:cover; object-position:center 88%; display:block; pointer-events:none;
   /* its own compositor layer — it plays under three live buttons */
   transform:translateZ(0); backface-visibility:hidden;
 }
@@ -1309,8 +1333,8 @@
   box-shadow:0 0 4px rgba(0,0,0,.6);
   border-radius:1px !important;
 }
-.lgp .lgp-practice-sep:nth-of-type(1) { left:34.5%; }
-.lgp .lgp-practice-sep:nth-of-type(2) { left:65.5%; }
+.lgp .lgp-practice-sep:nth-of-type(1) { left:35.015%; }
+.lgp .lgp-practice-sep:nth-of-type(2) { left:64.840%; }
 
 /* The model's half of the notes. */
 .pn-coach-txt {

@@ -318,36 +318,6 @@
               replayBtn +
             '</div>' +
           '</div>' +
-          /* The Reps / Word / Voice band used to sit here. All three numbers
-             are still reachable — reps and voice from the settings dial,
-             the word position from the panel — and the row was costing the
-             page the height the word itself wanted. */
-          '<div class="lgp-practice-row">' +
-            /* The three rings, in glass. Each button sits in the hole of
-               its own ring — see .lgp-pr-glass in nowssb-player.css for
-               where the 19/50/81% come from. */
-            '<div class="lgp-pr-glass">' +
-              (_keepPrVid
-                ? '<span class="lgp-pr-vid-slot"></span>'
-                : '<video class="lgp-pr-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
-                  ' src="./assets/video/practice-row.mp4"></video>') +
-              '<span class="lgp-pr-sheen" aria-hidden="true"></span>' +
-            '</div>' +
-            '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
-              '<span class="lgp-sentence-orb"><span class="lgp-sentence-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png\')"></span></span>' +
-              '<span class="lgp-sentence-lbl">Sentence</span>' +
-            '</button>' +
-            '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
-            '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
-              '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><span class="lgp-practice-ico" style="background-image:url(\'' + IC.mic + '\')"></span></span>' +
-              '<span class="lgp-practice-lbl">Practice</span>' +
-            '</button>' +
-            '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
-            '<button class="lgp-store" onclick="lgpOpenStore&&lgpOpenStore()" aria-label="Store">' +
-              '<span class="lgp-store-orb"><span class="lgp-store-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png\')"></span></span>' +
-              '<span class="lgp-store-lbl">Store</span>' +
-            '</button>' +
-          '</div>' +
         '</div>' +
         /* The "Word played · your turn" page used to sit here — a whole
            screen that replaced the transport the moment playback ended,
@@ -464,6 +434,39 @@
         '</div>' +
       '</div>';
 
+    /* ── Sentence · Practice · Store, at the TOP ──
+       It was the last thing on the screen, under the transport. It is
+       the first thing now, in the slot the ticker banner used to hold —
+       and it is built out of the same lit tab as the row under the
+       picture, with the black screen and the ring clip inside it. */
+    var prow =
+      '<div class="lgp-practice-row">' +
+        /* The three rings, in glass. Each button sits in the hole of
+           its own ring — see .lgp-pr-glass in nowssb-player.css for
+           where the 19/50/81% come from. */
+        '<div class="lgp-pr-glass">' +
+          (_keepPrVid
+            ? '<span class="lgp-pr-vid-slot"></span>'
+            : '<video class="lgp-pr-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
+              ' src="./assets/video/practice-row.mp4"></video>') +
+          '<span class="lgp-pr-sheen" aria-hidden="true"></span>' +
+        '</div>' +
+        '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
+          '<span class="lgp-sentence-orb"><span class="lgp-sentence-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png\')"></span></span>' +
+          '<span class="lgp-sentence-lbl">Sentence</span>' +
+        '</button>' +
+        '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
+        '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
+          '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><span class="lgp-practice-ico" style="background-image:url(\'' + IC.mic + '\')"></span></span>' +
+          '<span class="lgp-practice-lbl">Practice</span>' +
+        '</button>' +
+        '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
+        '<button class="lgp-store" onclick="lgpOpenStore&&lgpOpenStore()" aria-label="Store">' +
+          '<span class="lgp-store-orb"><span class="lgp-store-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png\')"></span></span>' +
+          '<span class="lgp-store-lbl">Store</span>' +
+        '</button>' +
+      '</div>';
+
     body.innerHTML =
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
@@ -484,12 +487,18 @@
             '</button>' +
           '</div>' +
         '</div>' +
-        '<div class="lgp-info-banner">' +
-          '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
-          '<div class="lgp-info-banner-divider"></div>' +
-          '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
-        '</div>' +
+        /* Sentence · Practice · Store take the slot the banner used to
+           hold, directly under the top bar. */
+        prow +
         '<div class="lgp-visual">' + visual +
+          /* The ticker banner, now INSIDE the picture rather than a black
+             bar above it. It reads across the top of the panel, under the
+             ritual row. */
+          '<div class="lgp-info-banner">' +
+            '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
+            '<div class="lgp-info-banner-divider"></div>' +
+            '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
+          '</div>' +
           /* ONE row across the top of the panel, not two islands pinned to
              the corners. Pinned, they overlapped the moment either side got
              long — "Afternoon" plus "Learn your score" was enough. In a row
