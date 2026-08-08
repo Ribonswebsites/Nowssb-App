@@ -96,20 +96,31 @@
 }
 /* banner under the top bar — icon + divider + looping text, replaces the
    old two separate static lines (tagline + ritual counter) */
-/* The ticker banner is out of the layout. Its rules stay, unused, so
-   putting it back is one line of markup rather than a rebuild. */
+/* ══════════════════════════════════════════════════════════════════
+   The ticker banner, in a tab of its own above the picture
+   The black bar IS the tab's aperture — same frame, same size and the
+   same aperture offsets as the two rows below, so the three read as one
+   family rather than a bar and two tabs.
+   ══════════════════════════════════════════════════════════════════ */
+.lgp .lgp-banner-tab {
+  position:relative; width:100%; max-width:360px; margin:8px auto 0;
+  aspect-ratio:1371/317; flex-shrink:0;
+  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
+  border-radius:9px !important;
+}
 .lgp .lgp-info-banner {
-  position:absolute; left:9px; right:9px; top:56px; z-index:4;
+  position:absolute; left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
   display:flex; align-items:center; gap:12px; width:auto;
-  background:rgba(0,0,0,.82); border-radius:14px !important; padding:9px 13px;
+  background:#000; border-radius:5px !important; padding:0 14px;
+  overflow:hidden;
 }
 .lgp .lgp-info-banner-icon {
-  width:30px; height:30px; min-width:0 !important; min-height:0 !important;
+  width:34px; height:34px; min-width:0 !important; min-height:0 !important;
   background-size:contain; background-repeat:no-repeat; background-position:center; flex-shrink:0;
 }
-.lgp .lgp-info-banner-divider { width:1px; height:32px; background:rgba(255,255,255,.15); flex-shrink:0; }
+.lgp .lgp-info-banner-divider { width:1px; height:60%; background:rgba(255,255,255,.15); flex-shrink:0; }
 .lgp .lgp-info-banner-text {
-  font-size:13px; font-weight:800; letter-spacing:.2px; color:#fff;
+  font-size:14px; font-weight:800; letter-spacing:.2px; color:#fff;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .lgp .lgp-info-banner-text.dash-in { animation:nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both; }
@@ -416,7 +427,8 @@
   position:relative; width:100%; aspect-ratio:1371/317;
   background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
   border-radius:9px !important;
-  box-shadow:0 0 34px 6px rgba(255,255,255,.42), 0 0 90px 18px rgba(255,255,255,.16);
+  /* No outer glow. The render's own lit border is the light; a white
+     box-shadow on top of it read as a smear around the box. */
 }
 .lgp .lgp-pr-glass::before {
   content:''; position:absolute;
@@ -450,18 +462,18 @@
   margin-top:4px; white-space:nowrap;
 }
 
-/* The orbs shrink to fit the hole — 14.6% of the strip's width, which is
-   about 50px on a 390 screen. */
-.lgp .lgp-practice-row .lgp-sentence-orb,
-.lgp .lgp-practice-row .lgp-sentence-ico,
-.lgp .lgp-practice-row .lgp-store-orb,
-.lgp .lgp-practice-row .lgp-practice-orb,
-.lgp .lgp-practice-row .lgp-practice-ico {
-  width:clamp(26px, 9.4vw, 38px) !important;
-  height:clamp(26px, 9.4vw, 38px) !important;
+/* Drawn, not photographed. The three were Cloudinary pictures of metal
+   spheres — a different visual language from every other control in the
+   player, and three network fetches for three icons. */
+.lgp .lgp-pr-ico {
+  display:flex; align-items:center; justify-content:center;
+  width:clamp(24px, 8.4vw, 32px); height:clamp(24px, 8.4vw, 32px);
+  color:#fff; pointer-events:none;
 }
-/* the pulsing rings would fight the ring they are sitting inside */
-.lgp .lgp-practice-row .lgp-practice-ring { display:none !important; }
+.lgp .lgp-pr-ico svg {
+  width:100%; height:100%; display:block;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.75));
+}
 .lgp .lgp-store {
   border:none; background:none; cursor:pointer; padding:0;
   display:flex; flex-direction:column; align-items:center; gap:5px;
@@ -1218,7 +1230,8 @@
   aspect-ratio:1371/317; flex-shrink:0;
   background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
   border-radius:9px !important;              /* the shadow follows this */
-  box-shadow:0 0 34px 6px rgba(255,255,255,.42), 0 0 90px 18px rgba(255,255,255,.16);
+  /* No outer glow. The render's own lit border is the light; a white
+     box-shadow on top of it read as a smear around the box. */
 }
 .lgp .lgp-wa-screen {
   position:absolute; left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;

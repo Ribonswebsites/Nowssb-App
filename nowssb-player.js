@@ -444,17 +444,17 @@
            where the 19/50/81% come from. */
         '<div class="lgp-pr-glass"></div>' +
         '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
-          '<span class="lgp-sentence-orb"><span class="lgp-sentence-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png\')"></span></span>' +
+          '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7.5 9.5h9M7.5 12.6h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
           '<span class="lgp-sentence-lbl">Sentence</span>' +
         '</button>' +
         '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
         '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
-          '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><span class="lgp-practice-ico" style="background-image:url(\'' + IC.mic + '\')"></span></span>' +
+          '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="2.6" width="6" height="11.2" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 11.4a6.5 6.5 0 0 0 13 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 17.9v3.5M8.6 21.4h6.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
           '<span class="lgp-practice-lbl">Practice</span>' +
         '</button>' +
         '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
         '<button class="lgp-store" onclick="lgpOpenStore&&lgpOpenStore()" aria-label="Store">' +
-          '<span class="lgp-store-orb"><span class="lgp-store-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png\')"></span></span>' +
+          '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.6 1.6 0 0 1-1.6 1.4H7.1a1.6 1.6 0 0 1-1.6-1.4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.8 10V6.4a3.2 3.2 0 0 1 6.4 0V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
           '<span class="lgp-store-lbl">Store</span>' +
         '</button>' +
       '</div>';
@@ -479,10 +479,17 @@
             '</button>' +
           '</div>' +
         '</div>' +
+        /* The ticker banner, back above the picture — and the black bar
+           IS the tab's aperture now, so it reads as the same object as
+           the two rows below it. */
+        '<div class="lgp-banner-tab">' +
+          '<div class="lgp-info-banner">' +
+            '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
+            '<div class="lgp-info-banner-divider"></div>' +
+            '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
+          '</div>' +
+        '</div>' +
         '<div class="lgp-visual">' + visual +
-          /* The ticker banner used to sit here, and above the picture
-             before that. Gone — it was a black bar over the artwork
-             saying one line of text. */
           /* ONE row across the top of the panel, not two islands pinned to
              the corners. Pinned, they overlapped the moment either side got
              long — "Afternoon" plus "Learn your score" was enough. In a row
