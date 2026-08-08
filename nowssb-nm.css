@@ -13608,3 +13608,45 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   padding: 1.27px 1.10px 3.41px 1.10px;
 }
 .slm-row > .slm-art { width: 48px; height: 48px; flex-shrink: 0; }
+
+/* The last two pictures on the screen. Both need the frame to be a CHILD
+   that spans its box, for the containing-block reason above — a frame that
+   is itself a fraction of its parent gets the bezel wrong. */
+
+/* The speed-dial avatar was a 42px circle. A tablet cannot read at 42px, so
+   it grows to 64 wide (47 tall on tab5's aspect), which is exactly the
+   height of the two lines of type beside it. */
+.slm-sd-ava {
+  width: 64px; height: auto; flex-shrink: 0;
+  border-radius: 0 !important; overflow: visible;
+}
+.slm-sd-ava > .slm-fr { width: 100%; }
+.slm-sd-ava .slm-art { border-radius: 0 !important; }
+
+/* The promo card's picture used to bleed to the card's edge. It is a
+   tablet standing on the panel now, so the panel gets a little room
+   around it and centres it. */
+.slm-promo-r {
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px 12px 12px 0;
+  background: #06121a;
+}
+.slm-promo-r > .slm-fr { width: 100%; }
+
+/* ── The frame renders must not escape their own frame ──
+   Every device render sits on a pseudo-element at z-index 20, which is only
+   ever meant to be "above this frame's own screen". It was competing with
+   the page instead: .nmh-toprow is position:sticky at z-index 10 in the
+   same stacking context, so scrolling any framed section under the Normal
+   home's header painted the tablet's bezel straight over it. Measured: 6 of
+   6 framed sections on that home did it.
+
+   isolate gives each frame a stacking context of its own, so the 20 is
+   scoped to the frame and the frame itself sits in ordinary document order
+   — underneath the header, where it belongs. Nothing inside a frame moves
+   relative to anything else inside it. */
+.nwsb-inframe,
+.slm-fr,
+body[class] #sub-health-journey .gsel-card.dev-tabn-p {
+  isolation: isolate;
+}

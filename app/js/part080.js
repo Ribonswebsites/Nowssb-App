@@ -254,7 +254,7 @@
     var name = (localStorage.getItem('nwsb_name') || 'Your practice');
     return '<section class="slm-sec">' +
       '<div class="slm-sd-head">' +
-        '<span class="slm-sd-ava">' + tile('./assets/store/intro-store.webp') + '</span>' +
+        '<span class="slm-sd-ava">' + frame('tab5-l', tile('./assets/store/intro-store.webp')) + '</span>' +
         '<span class="slm-sd-txt"><span class="slm-sd-eye">' + esc(String(name).toUpperCase()) + '</span>' +
         '<span class="slm-sd-t">Speed dial</span></span>' +
       '</div>' + grid + dots + '</section>';
@@ -277,7 +277,9 @@
         '<div class="slm-promo-s">' + (owned ? owned + ' meaning' + (owned === 1 ? '' : 's') + ' unlocked' : 'The Meaning Store') + '</div>' +
         '<span class="slm-promo-go">' + ARROW_SVG + '</span>' +
       '</div>' +
-      '<div class="slm-promo-r" style="background-image:url(\'./assets/store/intro-meanings.webp\');"></div>' +
+      '<div class="slm-promo-r">' +
+        frame('tab6-l', tile('./assets/store/intro-meanings.webp')) +
+      '</div>' +
       '</div></section>';
   }
 
