@@ -490,20 +490,34 @@ Every word that appears in the sentence must be in highlights with exact case ma
     const data  = JSON.parse(clean);
     window._wlSentenceData = data;
 
-    if (typeof closeWalkmanLib === 'function') closeWalkmanLib();
-    if (!document.getElementById('sub-practice').classList.contains('active')) {
-      if (typeof openSub === 'function') openSub('practice');
+    /* The sentence goes to the middle of the screen, over a blurred
+       library, and the reader decides what happens next. It used to yank
+       the library shut and drop straight into the player — and when it
+       failed it wrote into a box under the Build button, off the bottom
+       of the pane, where it read as a form error. Both land in the same
+       card now. */
+    if (typeof window.wlShowSentence === 'function') {
+      window.wlShowSentence(data, mood);
+    } else {
+      if (typeof closeWalkmanLib === 'function') closeWalkmanLib();
+      if (!document.getElementById('sub-practice').classList.contains('active')) {
+        if (typeof openSub === 'function') openSub('practice');
+      }
+      setTimeout(() => {
+        if (typeof launchSentencePlayer === 'function') launchSentencePlayer(data, mood.charAt(0).toUpperCase() + mood.slice(1));
+      }, 80);
     }
-    setTimeout(() => {
-      if (typeof launchSentencePlayer === 'function') launchSentencePlayer(data, mood.charAt(0).toUpperCase() + mood.slice(1));
-    }, 80);
 
   } catch(e) {
     console.error('WL sentence error:', e);
-    const resultBox  = document.getElementById('wlResultBox');
-    const resultText = document.getElementById('wlResultText');
-    if (resultText) resultText.textContent = 'Could not generate sentence. Check your connection.';
-    if (resultBox)  resultBox.classList.add('show');
+    if (typeof window.wlShowSentence === 'function') {
+      window.wlShowSentence(null, mood, 'Could not build the sentence. Check your connection and try again.');
+    } else {
+      const resultBox  = document.getElementById('wlResultBox');
+      const resultText = document.getElementById('wlResultText');
+      if (resultText) resultText.textContent = 'Could not generate sentence. Check your connection.';
+      if (resultBox)  resultBox.classList.add('show');
+    }
   }
 
   if (btn) {

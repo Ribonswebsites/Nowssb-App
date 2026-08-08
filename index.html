@@ -107,10 +107,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      dead while the Firebase SDK is still on its way. -->
 <script src="app/js/part079.js?v=3"></script><!-- ══ AUTH BUTTON GUARD ══ -->
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
-<link rel="stylesheet" href="app/app.css?v=313">
+<link rel="stylesheet" href="app/app.css?v=314">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=727">
-<link rel="stylesheet" href="nowssb-player.css?v=207">
+<link rel="stylesheet" href="nowssb-nm.css?v=728">
+<link rel="stylesheet" href="nowssb-player.css?v=208">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -2619,7 +2619,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div id="practiceBody" style="display:flex;flex-direction:column;height:100%;overflow:hidden;"></div>
 </div>
 
-<script src="app/js/part004.js?v=287"></script>
+<script src="app/js/part004.js?v=288"></script>
 
 <!-- ══ SUB-SCREEN: SOUND LIBRARY ══ -->
 <!-- ══ SOUND LIBRARY — STYLES ══ -->
@@ -4754,7 +4754,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <span class="wl-eyebrow" style="display:block;margin-bottom:3px;">Shabdapathy</span>
         <div class="wl-title">Word Library</div>
       </div>
-      <button class="wl-close-btn" onclick="closeWalkmanLib()" style="position:absolute;top:12px;right:14px;z-index:2;">
+      <button class="wl-close-btn" onclick="closeWalkmanLib()" style="position:absolute;top:12px;left:14px;z-index:2;">
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
           <path d="M1 1L13 13M13 1L1 13" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="square"/>
         </svg>
@@ -4845,7 +4845,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part015.js?v=164"></script>
+<!-- ══ BUILT SENTENCE — centred card over a blurred page ══
+     The sentence used to appear in a box appended under the Build button,
+     below the fold, looking like a form error. It is the result of the
+     whole flow, so it comes to the middle of the screen and everything
+     behind it goes soft. -->
+<div class="wls-modal" id="wlSentModal" onclick="wlSentBackdrop(event)" role="dialog" aria-modal="true" aria-labelledby="wlSentEyebrow">
+  <div class="wls-card">
+    <div class="wls-head">
+      <span class="wls-eyebrow" id="wlSentEyebrow">Your Sentence</span>
+      <button class="wls-x" onclick="wlCloseSentence()" aria-label="Close">
+        <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1L13 13M13 1L1 13" stroke="#0a0a12" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="wls-text" id="wlSentText"></div>
+    <div class="wls-mean" id="wlSentMean"></div>
+    <div class="wls-actions" id="wlSentActions"></div>
+    <div class="wls-hint" id="wlSentHint">Tap a highlighted word for its meaning</div>
+  </div>
+</div>
+
+<script src="app/js/part015.js?v=165"></script>
 
 <!-- ── GSAP ── -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -5509,7 +5529,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <!-- intro rendered inline -->
 
-<script src="app/js/part018.js?v=79"></script>
+<script src="app/js/part018.js?v=80"></script>
 <!-- Must load after part018.js — it takes over window.slRender/slSetTab. -->
 <script src="app/js/part080.js?v=8"></script><!-- ══ SOUND LIBRARY FEED ══ -->
 <script src="app/js/part081.js?v=3"></script><!-- ══ PRONUNCIATION NOTES ══ -->
@@ -5520,7 +5540,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      When you have your Groq key, paste it below and it works.
      Get key: console.groq.com → API Keys → Create key
      ═══════════════════════════════════════════════════════════ -->
-<script src="app/js/part019.js?v=165"></script>
+<script src="app/js/part019.js?v=166"></script>
 
 <!-- ══════════════════════════════════════════
      EXPLORE OVERLAY
@@ -10313,7 +10333,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>
-<script src="nowssb-player.js?v=299" defer></script>
+<script src="nowssb-player.js?v=300" defer></script>
 
 </body>
 </html>

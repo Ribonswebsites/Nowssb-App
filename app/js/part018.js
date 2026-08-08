@@ -210,7 +210,7 @@ function renderRoutineIntro() {
       // TOP ROW
       '<div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:4px;">' +
         '<div id="rtIntroBackBtn" style="width:42px;height:42px;cursor:pointer;border-radius:50% !important;' +
-          'background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);backdrop-filter:none;-webkit-backdrop-filter:none;' +
+          'background:#fff url(\'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\'%3E%3Cpath d=\'M15 5l-7 7 7 7\' stroke=\'%230a0a12\' stroke-width=\'2.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E\') center/21px no-repeat;border:none;box-shadow:0 8px 20px rgba(0,0,0,.34),0 2px 6px rgba(0,0,0,.22);backdrop-filter:none;-webkit-backdrop-filter:none;' +
           'display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:8px;">' +
@@ -371,7 +371,7 @@ function renderRoutineDetail_inline() {
         '<div class="rt-banner-img" style="background-image:url(\'' + inlineBannerUrl + '\');"></div>' +
         '<div class="rt-banner-fade"></div>' +
         '<div class="rtd-header" style="position:absolute;top:0;left:0;right:0;">' +
-          '<button class="rtd-inline-back" style="width:42px;height:42px;cursor:pointer;padding:0;border-radius:50% !important;background:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\') center/28px no-repeat,rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+          '<button class="rtd-inline-back" style="width:42px;height:42px;cursor:pointer;padding:0;border-radius:50% !important;background:#fff url(\'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\'%3E%3Cpath d=\'M15 5l-7 7 7 7\' stroke=\'%230a0a12\' stroke-width=\'2.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E\') center/21px no-repeat;border:none;box-shadow:0 8px 20px rgba(0,0,0,.34),0 2px 6px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
           '</button>' +
           '<button class="rtd-myroutines-btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:100px;cursor:pointer;padding:6px 14px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.65);">' +
             '<img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:16px;height:16px;object-fit:contain;display:block;">' +

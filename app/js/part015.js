@@ -309,3 +309,117 @@ function wlPlaySentence() {
   _wlSpeaking = true;
   window.speechSynthesis.speak(utt);
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE BUILT SENTENCE — a card in the middle, over a blurred page
+   It used to land in #wlResultBox, appended under the Build button and
+   below the fold: the one thing the whole flow exists to produce, shown
+   like a validation message. It comes to the centre now, the library
+   behind it goes soft, and the sentence is the only thing on screen.
+
+   Every path lands here — a sentence, or a failure. A failure is a
+   result too, and it was the case that looked most like a broken form.
+   ══════════════════════════════════════════════════════════════════════ */
+(function () {
+  var _mood = '';
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+  }
+
+  /* Wrap every highlighted word in the sentence so it can be tapped for
+     its meaning. Longest first, so PRANAYAMA is not eaten by PRANA. */
+  function mark(sentence, highlights) {
+    var out = esc(sentence);
+    var hs = (highlights || []).slice().sort(function (a, b) {
+      return String(b.word || '').length - String(a.word || '').length;
+    });
+    hs.forEach(function (h, i) {
+      var w = String(h.word || '').trim();
+      if (!w) return;
+      var re = new RegExp('(^|[^A-Za-z\\u0900-\\u097F])(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')(?![A-Za-z\\u0900-\\u097F])', 'g');
+      out = out.replace(re, function (m, pre, hit) {
+        return pre + '<span class="wls-w" data-h="' + i + '">' + hit + '</span>';
+      });
+    });
+    return { html: out, list: hs };
+  }
+
+  /* text: the sentence, or an error line. ok=false styles it as a
+     failure and offers Try again rather than Practice. */
+  window.wlShowSentence = function (data, mood, errText) {
+    var m  = document.getElementById('wlSentModal');
+    if (!m) return;
+    var tx = document.getElementById('wlSentText');
+    var mn = document.getElementById('wlSentMean');
+    var ac = document.getElementById('wlSentActions');
+    var eb = document.getElementById('wlSentEyebrow');
+    var hn = document.getElementById('wlSentHint');
+    _mood = mood || '';
+    if (mn) { mn.innerHTML = ''; mn.classList.remove('show'); }
+
+    if (errText) {
+      if (eb) eb.textContent = 'Could not build it';
+      if (tx) { tx.className = 'wls-text wls-err'; tx.textContent = errText; }
+      if (hn) hn.style.display = 'none';
+      if (ac) ac.innerHTML =
+        '<button class="wls-btn wls-btn-go" onclick="wlCloseSentence();setTimeout(function(){window.wlBuildSentence&&wlBuildSentence()},240)">Try again</button>';
+    } else {
+      var res = mark(data.sentence || '', data.highlights);
+      if (eb) eb.textContent = _mood ? ('Your ' + _mood + ' sentence') : 'Your Sentence';
+      if (tx) { tx.className = 'wls-text'; tx.innerHTML = res.html; }
+      if (hn) hn.style.display = '';
+      /* bind the taps here rather than inlining the meaning into every
+         span — the meanings are AI text and belong nowhere near an
+         onclick attribute */
+      if (tx) {
+        tx.querySelectorAll('.wls-w').forEach(function (el) {
+          el.onclick = function () {
+            var h = res.list[+el.getAttribute('data-h')] || {};
+            if (!mn) return;
+            mn.innerHTML = '<strong>' + esc(h.word || '') + '</strong>' +
+              (h.genre ? '<span class="wls-genre">' + esc(h.genre) + '</span>' : '') +
+              '<br><span class="wls-mean-txt">' + esc(h.meaning || '') + '</span>';
+            mn.classList.add('show');
+          };
+        });
+      }
+      if (ac) ac.innerHTML =
+        '<button class="wls-btn" onclick="wlPlaySentence()">' +
+          '<svg viewBox="0 0 12 14" fill="none" aria-hidden="true"><path d="M1 1L11 7L1 13V1Z" fill="currentColor"/></svg>Listen</button>' +
+        '<button class="wls-btn" onclick="wlCloseSentence();setTimeout(function(){window.wlBuildSentence&&wlBuildSentence()},240)">New</button>' +
+        '<button class="wls-btn wls-btn-go" onclick="wlSentencePractice()">Practice it</button>';
+    }
+    m.classList.add('open');
+  };
+
+  window.wlCloseSentence = function () {
+    var m = document.getElementById('wlSentModal');
+    if (m) m.classList.remove('open');
+    if (window.speechSynthesis) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+    window._wlSpeaking = false;
+  };
+
+  /* Tapping the blurred area behind the card closes it; tapping the card
+     does not. */
+  window.wlSentBackdrop = function (ev) {
+    if (ev && ev.target && ev.target.id === 'wlSentModal') window.wlCloseSentence();
+  };
+
+  /* Into the player with it — the old success path, now behind a button
+     the reader presses rather than something that happens to them. */
+  window.wlSentencePractice = function () {
+    var data = window._wlSentenceData;
+    window.wlCloseSentence();
+    if (typeof closeWalkmanLib === 'function') closeWalkmanLib();
+    var sub = document.getElementById('sub-practice');
+    if (sub && !sub.classList.contains('active') && typeof openSub === 'function') openSub('practice');
+    setTimeout(function () {
+      if (typeof launchSentencePlayer === 'function' && data) {
+        launchSentencePlayer(data, _mood ? (_mood.charAt(0).toUpperCase() + _mood.slice(1)) : '');
+      }
+    }, 120);
+  };
+})();

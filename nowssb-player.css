@@ -114,25 +114,9 @@
 /* Both of these are a handful of pixels tall, and both are flex items in a
    column that overflows — without flex-shrink:0 they are the first things
    the layout squashes to nothing. */
-/* All four at once, always. This was one word at a time — each faded in,
-   stopped, and handed over to the next, and after one 8s pass the whole
-   line was simply gone. Now the four words stand together and share one
-   breathing glow that runs on all of them at the same time and never
-   stops. */
-.lgp .lgp-ticker {
-  position:relative; height:auto; width:auto; max-width:100%; margin-top:6px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; gap:12px;
-}
-.lgp .lgp-ticker span {
-  position:static; text-align:center; white-space:nowrap;
-  font-size:11px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase;
-  color:var(--lg-accent); text-shadow:0 0 16px var(--lg-accent);
-  opacity:1; animation:lgpTick 3.2s ease-in-out infinite;
-}
-@keyframes lgpTick {
-  0%,100% { opacity:.62; text-shadow:0 0 10px var(--lg-accent); }
-  50%     { opacity:1;   text-shadow:0 0 20px var(--lg-accent); }
-}
+/* The Listen · Learn · Practice · Heal ticker lived here. Gone — it was a
+   line of decoration in the one place the eye is trying to find the
+   transport. */
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
@@ -188,7 +172,10 @@
 /* word + syllables + organ overlaid INSIDE the video panel */
 .lgp .lgp-visual-overlay {
   position:absolute; left:0; right:0; bottom:0; z-index:3;
-  padding:28px 14px 16px; display:flex; flex-direction:column; align-items:center;
+  /* the deep bottom padding is what holds the word UP off the edge of the
+     picture — the button row used to do it, and the button row has moved
+     out into its own pill below the box */
+  padding:28px 14px 40px; display:flex; flex-direction:column; align-items:center;
   background:linear-gradient(180deg, rgba(6,10,22,0) 0%, rgba(6,10,22,.36) 34%, rgba(6,10,22,.76) 68%, rgba(6,10,22,.93) 100%);
   /* The gradient is scenery — only what's drawn on it takes taps. */
   pointer-events:none;
@@ -398,18 +385,26 @@
 .lgp .lgp-mic-ico { width:34px; height:34px; object-fit:contain; display:block; flex-shrink:0; filter:drop-shadow(0 3px 8px rgba(0,0,0,.4)); }
 
 
-/* Practice (centred) with the Store button on its right */
+/* ── Sentence · Practice · Store ──
+   Three EQUAL cells with a hairline on each boundary. Sentence and Store
+   used to be absolutely positioned against the row's edges with Practice
+   centred between them, which left the two separators — ordinary flex
+   items — with nothing but Practice to sit beside: both ended up hugging
+   the mic instead of dividing the row. Equal cells put each line exactly
+   halfway between the buttons on either side of it. */
 .lgp .lgp-practice-row {
-  position:relative; width:100%; max-width:312px; margin-top:auto;
-  display:flex; align-items:center; justify-content:center;
+  position:relative; width:100%; max-width:340px; margin-top:auto;
+  display:flex; align-items:center; justify-content:space-between;
 }
+.lgp .lgp-practice-row > .lgp-sentence,
+.lgp .lgp-practice-row > .lgp-practice,
+.lgp .lgp-practice-row > .lgp-store { flex:1 1 0; min-width:0; }
 .lgp .lgp-store {
-  position:absolute; right:4px; top:50%; transform:translateY(-50%);
   border:none; background:none; cursor:pointer; padding:0;
   display:flex; flex-direction:column; align-items:center; gap:5px;
   font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#fff; opacity:.96;
 }
-.lgp .lgp-store:active { transform:translateY(-50%) scale(.92); }
+.lgp .lgp-store:active { transform:scale(.92); }
 .lgp .lgp-store-orb {
   width:60px; height:60px; border-radius:50% !important; box-sizing:border-box; overflow:hidden;
   display:flex; align-items:center; justify-content:center; background:#000;
@@ -420,12 +415,11 @@
 
 /* Build-your-sentence button — sphere icon, left of the Practice mic */
 .lgp .lgp-sentence {
-  position:absolute; left:4px; top:50%; transform:translateY(-50%);
   border:none; background:none; cursor:pointer; padding:0;
   display:flex; flex-direction:column; align-items:center; gap:5px;
   font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#fff; opacity:.96;
 }
-.lgp .lgp-sentence:active { transform:translateY(-50%) scale(.92); }
+.lgp .lgp-sentence:active { transform:scale(.92); }
 .lgp .lgp-sentence-orb { width:56px; height:56px; display:flex; align-items:center; justify-content:center; }
 .lgp .lgp-sentence-ico { width:56px; height:56px; object-fit:contain; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
 .lgp .lgp-sentence-lbl { text-shadow:0 1px 8px rgba(0,0,0,.4); }
@@ -1130,12 +1124,8 @@
   font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; color:#fff;
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   The word, and the buttons under it — both inside the picture
-   The word sits where it always did, over the bottom of the panel, but
-   it rides UP now: Replay · Notes · Like are stacked beneath it inside
-   the same box, and their row is what lifts it clear of the edge.
-   ══════════════════════════════════════════════════════════════════ */
+/* The word, over the bottom of the picture — lifted clear of the edge by
+   the overlay's own bottom padding rather than by anything under it. */
 .lgp .lgp-wordblock {
   position:relative; width:100%;
   display:flex; flex-direction:column; align-items:center;
@@ -1143,13 +1133,17 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Replay · Notes · Like — INSIDE the picture, under the word
-   They started in the banner above the word (a ticker, no place for
-   controls), then sat under the panel. They belong in the box.
+   Replay · Notes · Like — a black pill under the picture
+   Same black as the banner across the top of the screen, so the three
+   white circles read as one control rather than three loose buttons
+   floating on the video.
    ══════════════════════════════════════════════════════════════════ */
 .lgp .lgp-word-acts {
-  width:100%; margin:14px 0 0;
+  width:100%; max-width:360px; margin:12px auto 0; padding:10px 18px;
+  background:#000; border-radius:18px !important;
+  box-shadow:0 10px 26px rgba(0,0,0,.4);
   display:flex; align-items:center; justify-content:center; gap:20px;
+  flex-shrink:0;
 }
 
 /* A line between each pair, the same white hairline as the one between

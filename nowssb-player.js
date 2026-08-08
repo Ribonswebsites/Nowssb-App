@@ -473,10 +473,8 @@
             '</button>' +
             '</div>' +
           '</div>' +
-        /* The bottom of the picture: the word, then Replay · Notes · Like
-           under it. Both inside the box — the word rides UP by the height
-           of the button row rather than leaving the picture, and the
-           buttons take the space it vacates. */
+        /* The bottom of the picture: the word. The buttons sit in their own
+           black pill under the box — see .lgp-word-acts below. */
         '<div class="lgp-visual-overlay">' +
         '<div class="lgp-wordblock">' +
           '<div class="lgp-title">' + (w.word || '') + '</div>' +
@@ -486,6 +484,10 @@
           '<div class="lgp-syls">' + syl + '</div>' +
           '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
         '</div>' +
+        '</div>' +   /* end .lgp-visual-overlay */
+        '</div>' +   /* end .lgp-visual */
+        /* Replay · Notes · Like — under the picture, in a black pill of
+           their own, the same black as the banner up top. */
         '<div class="lgp-word-acts">' +
           '<button class="lgp-wa lgp-wa-replay" type="button"' +
             ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
@@ -510,9 +512,7 @@
             '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
           '</button>' +
         '</div>' +   /* end .lgp-word-acts */
-        '</div>' +   /* end .lgp-visual-overlay */
-        '</div>' +   /* end .lgp-visual */
-        '<div class="lgp-ticker"><span>Listen</span><span>Learn</span><span>Practice</span><span>Heal</span></div>' +
+        /* The Listen · Learn · Practice · Heal ticker used to sit here. */
         '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
           ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(sessionPct) + '"' +
           ' aria-label="Session progress">' +
