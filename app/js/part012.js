@@ -1740,6 +1740,16 @@ function openSub(id) {
     window._rtManualLaunch = false;
     // Reset state on each open
     _pwIdx = 0; _pwRepCount = 0; _pwRepTarget = 7;
+    /* …except the word to start ON. A caller that opens the player at a
+       particular word — tap a word in a category and the session is the
+       whole category, positioned on the one you tapped — says so with
+       _rtStartIdx. Without it the reset above dragged every open back to
+       word 1, whichever word had been tapped. Consumed here, once. */
+    if (typeof window._rtStartIdx === 'number' && window._rtStartIdx > 0 &&
+        window._rtStartIdx < (typeof PRACTICE_WORDS !== 'undefined' ? PRACTICE_WORDS.length : 0)) {
+      _pwIdx = window._rtStartIdx;
+    }
+    window._rtStartIdx = null;
     _pwSteps = new Set(); _pwPlaying = false; _pwDone = false; _pwMode = 'listen';
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     const _pwShowIntroNext = window._pwShowIntro && (typeof shouldShowIntro !== 'function' || shouldShowIntro('practice'));

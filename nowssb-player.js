@@ -315,22 +315,12 @@
             '</button>' +
           '</div>' +
         '</div>' +
-        '<div id="spPhasePost" style="display:' + (phase === 'post-play' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:12px;width:100%;">' +
-          '<div class="lgp-status">Word played · your turn</div>' +
-          '<div class="lgp-cta-row">' +
-            '<button class="lgp-replay-orb" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay"><span class="lgp-bgico" style="background-image:url(\'' + IC.replay + '\')"></span></button>' +
-            '<button class="lgp-cta" onclick="pwPracticeNow&&pwPracticeNow()"><span class="lgp-mic-ico" style="background-image:url(\'' + IC.mic + '\')"></span><span class="lgp-cta-lbl">Practice Now</span></button>' +
-          '</div>' +
-          '<div class="lgp-tube" style="margin-top:4px;">' +
-            '<div class="lgp-controls">' +
-              '<div class="lgp-transport">' +
-                '<button class="lgp-ctrl" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-                '<button class="lgp-play" onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()"><span class="lgp-img" style="background-image:url(\'' + IC.play + '\')"></span></button>' +
-                '<button class="lgp-ctrl" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
+        /* The "Word played · your turn" page used to sit here — a whole
+           screen that replaced the transport the moment playback ended,
+           with its own Replay, its own Practice Now and its own second set
+           of prev/play/next. Everything on it is on the main screen
+           already. pwStop() lands on 'idle' now, so the player simply goes
+           back to being the player when the word finishes. */
         '<div id="spPhaseRec" style="display:' + (phase === 'recording' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:10px;width:100%;">' +
           '<div class="lgp-status recording">● Recording</div>' +
           '<div class="sp-rec-waveform" id="spRecWaveform">' + recBars + '</div>' +
@@ -483,17 +473,19 @@
             '</button>' +
             '</div>' +
           '</div>' +
-          '<div class="lgp-visual-overlay">' +
-            '<div class="lgp-title">' + (w.word || '') + '</div>' +
+        /* The bottom of the picture: the word, then Replay · Notes · Like
+           under it. Both inside the box — the word rides UP by the height
+           of the button row rather than leaving the picture, and the
+           buttons take the space it vacates. */
+        '<div class="lgp-visual-overlay">' +
+        '<div class="lgp-wordblock">' +
+          '<div class="lgp-title">' + (w.word || '') + '</div>' +
             /* The word as it is actually written. The roman title above is
                the reading aid, not the word. */
-            (w.deva ? '<div class="lgp-deva nwsb-deva">' + _e(w.deva) + '</div>' : '') +
-            '<div class="lgp-syls">' + syl + '</div>' +
-            '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
-          '</div>' +
+          (w.deva ? '<div class="lgp-deva nwsb-deva">' + _e(w.deva) + '</div>' : '') +
+          '<div class="lgp-syls">' + syl + '</div>' +
+          '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
         '</div>' +
-        /* Replay, Notes and Like — under the word, which is what they are
-           about. They were in the banner above it, which is a ticker. */
         '<div class="lgp-word-acts">' +
           '<button class="lgp-wa lgp-wa-replay" type="button"' +
             ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
@@ -502,6 +494,7 @@
               '<path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
             '</svg>' +
           '</button>' +
+          '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
           '<button class="lgp-wa lgp-wa-notes" id="lgpNotesBtn" type="button"' +
             ' onclick="window.lgpOpenNotes&&window.lgpOpenNotes()"' + ' aria-label="Pronunciation notes">' +
             '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
@@ -510,12 +503,15 @@
               '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
             '</svg>' +
           '</button>' +
+          '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
           '<button class="lgp-wa lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
             ' onclick="window.lgpToggleLike&&window.lgpToggleLike()"' +
             ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
             '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
           '</button>' +
-        '</div>' +
+        '</div>' +   /* end .lgp-word-acts */
+        '</div>' +   /* end .lgp-visual-overlay */
+        '</div>' +   /* end .lgp-visual */
         '<div class="lgp-ticker"><span>Listen</span><span>Learn</span><span>Practice</span><span>Heal</span></div>' +
         '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
           ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(sessionPct) + '"' +
@@ -588,6 +584,51 @@
         v.addEventListener('ended', function () { try { v.currentTime = 0; } catch (e) {} tryPlay(); });
       }
       if (v.paused) tryPlay();
+    })();
+
+    /* ── The dot has to move ──────────────────────────────────────────
+       The bar was the session: word index over word count, plus reps. The
+       reps band is gone and a one-word ritual is index 0 of 1, so the fill
+       sat at 0% and the head never travelled — a progress bar showing no
+       progress. It rides the playback now. While the word is being spoken
+       the fill sweeps across that word's slice of the session; when it is
+       not, it rests on the word boundary.
+       There is no media element to read a currentTime from — the word is
+       spoken by speechSynthesis, which gives no reliable position — so the
+       sweep is timed off the same ~750ms-a-syllable clock pwPlay() uses to
+       light the syllable boxes. ── */
+    (function () {
+      if (window._lgpProgRaf) { cancelAnimationFrame(window._lgpProgRaf); window._lgpProgRaf = 0; }
+      var fill = body.querySelector('.lgp-progress-fill');
+      if (!fill) return;
+      var base = total ? (idx / total) * 100 : 0;
+      var slice = total ? (100 / total) : 100;
+      if (!playing) {
+        window._lgpPlayT0 = 0;
+        fill.style.transition = '';
+        fill.style.width = base + '%';
+        return;
+      }
+      var syls = (w.syllables && w.syllables.length) || 3;
+      var pass = syls * 750 + 480;               /* one spoken run + the gap */
+      var looping = (typeof _pwLoop !== 'undefined') && !!_pwLoop;
+      var runMs = pass * (looping ? 1 : 3);      /* pwPlay speaks it 3x, or forever */
+      var now = function () { return (window.performance && performance.now) ? performance.now() : Date.now(); };
+      /* Set once per playback, not once per render — this panel is rebuilt
+         on every phase change and the sweep must not restart with it. */
+      if (!window._lgpPlayT0) window._lgpPlayT0 = now();
+      var t0 = window._lgpPlayT0;
+      fill.style.transition = 'none';            /* the width is animated by us */
+      function step() {
+        var el = document.querySelector('.lgp-progress-fill');
+        var stillPlaying = (typeof _pwPlaying !== 'undefined') && !!_pwPlaying;
+        if (!el || !stillPlaying) { window._lgpProgRaf = 0; return; }
+        var f = (now() - t0) / runMs;
+        f = looping ? (f % 1) : Math.min(1, f);  /* on loop the head keeps travelling */
+        el.style.width = (base + slice * f) + '%';
+        window._lgpProgRaf = requestAnimationFrame(step);
+      }
+      window._lgpProgRaf = requestAnimationFrame(step);
     })();
 
     /* The settings arc must NOT live inside .sub-screen — that screen creates its
@@ -667,7 +708,7 @@
            column the two together are wider than the panel */
         var topRow = cluster.parentNode;
         if (topRow && topRow.classList) topRow.classList.add('lgp-hinting');
-        setTimeout(function () { var t = document.getElementById('lgpInfoPillTxt'); if (t) t.textContent = 'Learn your score'; }, 2100);
+        setTimeout(function () { var t = document.getElementById('lgpInfoPillTxt'); if (t) t.textContent = 'Learn your score'; }, 5200);
         setTimeout(function () {
           var c = document.getElementById('lgpInfoCluster'); if (c) c.classList.remove('hint-run');
           if (c && c.parentNode && c.parentNode.classList) c.parentNode.classList.remove('lgp-hinting');
@@ -675,9 +716,9 @@
           var b = c && c.querySelector('.lgp-info-btn');
           if (b) {
             b.classList.remove('trace-run'); void b.offsetWidth; b.classList.add('trace-run');
-            setTimeout(function () { if (b) b.classList.remove('trace-run'); }, 2700);
+            setTimeout(function () { if (b) b.classList.remove('trace-run'); }, 5400);
           }
-        }, 4600);
+        }, 10400);
       }, 900);
     }
 

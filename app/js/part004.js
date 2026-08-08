@@ -814,7 +814,12 @@ function pwPlay() {
 
 function pwStop(autoEnd) {
   _pwPlaying = false;
-  _pwPhase = autoEnd ? 'post-play' : 'idle';
+  /* Finishing a word used to push the player onto a 'post-play' screen —
+     "Word played · your turn" with a second copy of Replay, Practice and
+     the transport. That screen is gone; the player goes back to idle and
+     stays the player. autoEnd is kept in the signature because callers
+     pass it and it still says WHY we stopped. */
+  _pwPhase = 'idle';
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   document.querySelectorAll('.sp-syl-chip').forEach(el => el.classList.remove('lit'));
   const vid = document.getElementById('pwBgVideo');

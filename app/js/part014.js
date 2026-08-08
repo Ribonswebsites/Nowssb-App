@@ -206,12 +206,25 @@ function hcpRenderTab() {
 }
 
 function hcpOpenWord(wordName) {
-  // Open the word in the player as a single-word session
-  var wordObj = (typeof MASTER_WORD_LIBRARY !== 'undefined' ? MASTER_WORD_LIBRARY : []).find(function(w) { return w.word === wordName; });
+  // Open the word in the player AT its place in this category's list — not
+  // as a session of one. One word is "1 of 1" and Next stays greyed out
+  // forever, which reads as a broken button; the rest of the category is
+  // right here, so the session is the category and Next walks it.
+  var lib = (typeof MASTER_WORD_LIBRARY !== 'undefined' ? MASTER_WORD_LIBRARY : []);
+  var wordObj = lib.find(function(w) { return w.word === wordName; });
   if (!wordObj) return;
-  PRACTICE_WORDS = [wordObj];
+  var list = (typeof getWordsForCategory === 'function' && _hcpCategory) ? getWordsForCategory(_hcpCategory) : [];
+  // No category in hand (the word was reached some other way)? Fall back to
+  // the word's own first category, the same family rxStartWord uses.
+  if (!list || list.indexOf(wordObj) < 0) {
+    var cat = (wordObj.categories && wordObj.categories[0]) || '';
+    list = cat ? lib.filter(function(x) { return x.categories && x.categories.indexOf(cat) !== -1; }) : [];
+    if (!list || list.indexOf(wordObj) < 0) list = [wordObj];
+  }
+  PRACTICE_WORDS = list;
   window._rtManualLaunch = true;
-  _pwIdx = 0; _pwRepCount = 0; _pwDone = false; _pwMode = 'listen';
+  _pwIdx = Math.max(0, list.indexOf(wordObj)); _pwRepCount = 0; _pwDone = false; _pwMode = 'listen';
+  window._rtStartIdx = _pwIdx;   /* openSub('practice') resets _pwIdx — this survives it */
   _pwAutoPlayOnce = false;
   closeSub('health-category');
   closeSub('hcp-intro');

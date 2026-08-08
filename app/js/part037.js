@@ -169,7 +169,20 @@
     var lib = (typeof MASTER_WORD_LIBRARY !== "undefined" && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
     var w = lib.find(function(x){ return x.word === wordName; });
     if (!w) return;
-    PRACTICE_WORDS = [w];
+    /* The session is the word's own family, opened AT the tapped word —
+       not the tapped word alone. A one-word session is "1 of 1", which
+       leaves Next permanently greyed out: the player looked broken when it
+       was only being honest about having nowhere to go. Next now walks the
+       words that share this one's first category, which is the same set
+       the category page would have started. */
+    var cat = (w.categories && w.categories[0]) || '';
+    var fam = cat ? lib.filter(function(x){ return x.categories && x.categories.indexOf(cat) !== -1; }) : [];
+    if (fam.length < 2) fam = lib.slice();
+    var at = fam.indexOf(w);
+    if (at < 0) { fam = [w].concat(fam); at = 0; }
+    PRACTICE_WORDS = fam;
+    _pwIdx = at; _pwRepCount = 0; _pwDone = false;
+    window._rtStartIdx = at;      /* openSub('practice') resets _pwIdx — this survives it */
     window._rtManualLaunch = true;
     if (typeof openSub === 'function') openSub('practice');
   };

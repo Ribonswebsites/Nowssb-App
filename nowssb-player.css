@@ -114,31 +114,35 @@
 /* Both of these are a handful of pixels tall, and both are flex items in a
    column that overflows — without flex-shrink:0 they are the first things
    the layout squashes to nothing. */
-.lgp .lgp-ticker { position:relative; height:18px; width:200px; margin-top:4px; flex-shrink:0; }
-.lgp .lgp-ticker span {
-  position:absolute; left:0; right:0; top:0; text-align:center;
-  font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase;
-  color:var(--lg-accent); text-shadow:0 0 16px var(--lg-accent);
-  opacity:0; animation:lgpTick 8s 1;   /* play through the 4 words ONCE, then the text is gone */
+/* All four at once, always. This was one word at a time — each faded in,
+   stopped, and handed over to the next, and after one 8s pass the whole
+   line was simply gone. Now the four words stand together and share one
+   breathing glow that runs on all of them at the same time and never
+   stops. */
+.lgp .lgp-ticker {
+  position:relative; height:auto; width:auto; max-width:100%; margin-top:6px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; gap:12px;
 }
-.lgp .lgp-ticker span:nth-child(1) { animation-delay:0s; }
-.lgp .lgp-ticker span:nth-child(2) { animation-delay:2s; }
-.lgp .lgp-ticker span:nth-child(3) { animation-delay:4s; }
-.lgp .lgp-ticker span:nth-child(4) { animation-delay:6s; }
+.lgp .lgp-ticker span {
+  position:static; text-align:center; white-space:nowrap;
+  font-size:11px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase;
+  color:var(--lg-accent); text-shadow:0 0 16px var(--lg-accent);
+  opacity:1; animation:lgpTick 3.2s ease-in-out infinite;
+}
 @keyframes lgpTick {
-  0%   { opacity:0; transform:translateY(10px) scale(.96); }
-  4%   { opacity:1; transform:translateY(0) scale(1); }
-  21%  { opacity:1; transform:translateY(0) scale(1); }
-  25%  { opacity:0; transform:translateY(-10px) scale(.96); }
-  100% { opacity:0; }
+  0%,100% { opacity:.62; text-shadow:0 0 10px var(--lg-accent); }
+  50%     { opacity:1;   text-shadow:0 0 20px var(--lg-accent); }
 }
 
 /* central glass waveform panel */
 .lgp .lgp-visual {
   /* Was 1/1.12. The panel was tall enough that its top half sat empty above
      the word, and the height it spent there is what the strip under the
-     transport now uses. */
-  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/1.02; flex-shrink:0;
+     transport now uses.
+     max-height is what keeps a short phone honest: the ratio sets the
+     shape, and on a 640px-tall screen the panel gives up height rather
+     than pushing the transport off the bottom. */
+  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/1.02; max-height:42vh; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(10,16,30,.35);
   /* NO backdrop-filter here — the video fills this panel opaquely, so the
@@ -184,9 +188,12 @@
 /* word + syllables + organ overlaid INSIDE the video panel */
 .lgp .lgp-visual-overlay {
   position:absolute; left:0; right:0; bottom:0; z-index:3;
-  padding:28px 14px 22px; display:flex; flex-direction:column; align-items:center;
+  padding:28px 14px 16px; display:flex; flex-direction:column; align-items:center;
   background:linear-gradient(180deg, rgba(6,10,22,0) 0%, rgba(6,10,22,.36) 34%, rgba(6,10,22,.76) 68%, rgba(6,10,22,.93) 100%);
+  /* The gradient is scenery — only what's drawn on it takes taps. */
+  pointer-events:none;
 }
+.lgp .lgp-visual-overlay > * { pointer-events:auto; }
 /* title / syllables / organ */
 .lgp .lgp-title {
   margin-top:0; font-size:34px; font-weight:800; letter-spacing:1.6px; text-align:center; line-height:1.02;
@@ -786,7 +793,9 @@
 .lgp .lgp-info-pill {
   position:relative; order:0; max-width:0; opacity:0; overflow:hidden; white-space:nowrap;
   height:34px; display:flex; align-items:center; border-radius:999px !important;
-  background:rgba(8,14,28,.6); -webkit-backdrop-filter:none; backdrop-filter:none;
+  /* Solid black. It was a translucent slate that picked up whatever was
+     behind it, which on a bright frame of the video read as grey glass. */
+  background:#000000; -webkit-backdrop-filter:none; backdrop-filter:none;
   border:1px solid rgba(255,255,255,.22);
   box-shadow:0 6px 20px rgba(0,0,0,.35);
 }
@@ -807,10 +816,10 @@
 }
 
 /* ── one-shot run (added by JS ~800ms after the player opens; NOT looping) ── */
-.lgp .lgp-info-cluster.hint-run .lgp-info-pill      { animation:lgpInfoPill 4.4s cubic-bezier(.2,1,.3,1) forwards; }
-.lgp .lgp-info-cluster.hint-run .lgp-info-pill-txt  { animation:lgpInfoTxt  4.4s ease forwards; }
-.lgp .lgp-info-cluster.hint-run .lgp-info-pill::before { animation:lgpInfoTrace 4.4s linear forwards; }
-.lgp .lgp-info-cluster.hint-run .lgp-info-btn       { animation:lgpInfoPulse 4.4s ease forwards; }
+.lgp .lgp-info-cluster.hint-run .lgp-info-pill      { animation:lgpInfoPill 10.2s cubic-bezier(.2,1,.3,1) forwards; }
+.lgp .lgp-info-cluster.hint-run .lgp-info-pill-txt  { animation:lgpInfoTxt  10.2s ease forwards; }
+.lgp .lgp-info-cluster.hint-run .lgp-info-pill::before { animation:lgpInfoTrace 10.2s linear forwards; }
+.lgp .lgp-info-cluster.hint-run .lgp-info-btn       { animation:lgpInfoPulse 10.2s ease forwards; }
 @keyframes lgpInfoPill {
   0%   { max-width:0; opacity:0; }
   9%   { max-width:190px; opacity:1; }
@@ -851,7 +860,9 @@
   width:100%; max-width:none; height:100%; max-height:none; overflow-y:auto; -webkit-overflow-scrolling:touch;
   padding:max(env(safe-area-inset-top,16px),16px) 20px calc(env(safe-area-inset-bottom,24px) + 24px); color:#fff;
   border-radius:0 !important;
-  background:rgba(14,20,38,.86);
+  /* Black, not a see-through slate — the player behind it was showing
+     through the page and the text sat on moving video. */
+  background:#000000;
   -webkit-backdrop-filter:none; backdrop-filter:none;
   border:none;
   transition:transform .4s cubic-bezier(.2,1,.3,1), opacity .3s;
@@ -1120,13 +1131,33 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Replay · Notes · Like — under the word
-   They were in the banner above it, which is a ticker and no place for
-   controls. This row sits with the word it acts on.
+   The word, and the buttons under it — both inside the picture
+   The word sits where it always did, over the bottom of the panel, but
+   it rides UP now: Replay · Notes · Like are stacked beneath it inside
+   the same box, and their row is what lifts it clear of the edge.
+   ══════════════════════════════════════════════════════════════════ */
+.lgp .lgp-wordblock {
+  position:relative; width:100%;
+  display:flex; flex-direction:column; align-items:center;
+  flex-shrink:0; background:none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Replay · Notes · Like — INSIDE the picture, under the word
+   They started in the banner above the word (a ticker, no place for
+   controls), then sat under the panel. They belong in the box.
    ══════════════════════════════════════════════════════════════════ */
 .lgp .lgp-word-acts {
-  width:100%; max-width:352px; margin:12px auto 0;
-  display:flex; align-items:center; justify-content:center; gap:26px;
+  width:100%; margin:14px 0 0;
+  display:flex; align-items:center; justify-content:center; gap:20px;
+}
+
+/* A line between each pair, the same white hairline as the one between
+   Sentence and Practice. */
+.lgp .lgp-word-acts .lgp-wa-sep {
+  width:1px; flex:0 0 1px; align-self:center; height:30px;
+  background:rgba(255,255,255,.55);
+  border-radius:1px !important;
 }
 
 /* ── Circles, not ovals ──
