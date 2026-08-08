@@ -45,7 +45,7 @@
            was landing above the greeting for exactly that reason. It sits
            after the greeting and before the hero clip and the streak. */
         { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
-        { k:'herovid',  sel:['.nmh-hero-vid'],                                             t:B, label:'Hero Video',            sub:'Video banner above the streak' },
+        { k:'herovid',  sel:['.nsvb-blk'],                                                   t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet' },
         { k:'streak',   sel:['.nmh-streak-section'],                                       t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc' },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
@@ -70,7 +70,7 @@
         { k:'quickrow', sel:['.qa-tv-block'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
         { k:'trendshop',sel:['.nmh-trend-shop-wrap'],                                     t:S, label:'Trending Shop',         sub:'The clip and the Shop Now banner' },
         { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner' },
-        { k:'edition',  sel:['.nmh-fsec'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
+        { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers' },
         /* Off on the shipped Normal home, and opt-in from this editor —
@@ -84,7 +84,7 @@
            while every registered one is re-appended around it. */
         { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop' },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', always:1 },
-        { k:'msearch',  sel:['.vb-banner[data-vb="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name' },
+        { k:'msearch',  sel:['[data-vbwrap="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name' },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'fashsw',   sel:['#nmhFashSwitch'],                                            t:S, label:'Fashion Mode',          sub:'Switch to the Fashion home' },
         { k:'footer',   sel:['#homeFooterNm'],                                             t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
@@ -98,7 +98,7 @@
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
         { k:'reader',   sel:['.fash-rdsec-wrap'],                                        t:S, label:'Reader',                sub:'Meanings and eBooks' },
-        { k:'herovid',  sel:['.fash-hero-vid'],                                            t:B, label:'Hero Video',            sub:'Video banner above the streak' },
+        { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet' },
         { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner' },
@@ -113,7 +113,7 @@
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner' },
         { k:'subvid',   sel:['.nsub-blk'],                                                t:S, label:'Subscription',          sub:'The clip, the heading and its banner' },
-        { k:'edition',  sel:['#sub-promo-card'],                                           t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
+        { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'routines', sel:['.fash-routines-wrap'],                                       t:S, label:'My Routines',          sub:'Daily practice system' },
         { k:'offer',    sel:['.fash-offer-wrap'],                                          t:S, label:"Today's Offer",         sub:'Coupon art and the offer banner' },
         { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
@@ -124,7 +124,7 @@
         { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop' },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', always:1 },
-        { k:'msearch',  sel:['.vb-banner[data-vb="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' },
+        { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' },
         { k:'store',    sel:['.vb-banner[data-vb="vb1"]', '.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer' },
         { k:'footer',   sel:['#homeFooter'],                                               t:S, label:'Footer',                sub:'Across Every Language', locked:1 }

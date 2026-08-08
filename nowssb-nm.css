@@ -13933,6 +13933,9 @@ body[class] #sub-health-journey .gsel-card.dev-tabn-p {
    home would make Connect's entry match two elements and move both.
    ══════════════════════════════════════════════════════════════════════ */
 #home-nm .nsub-blk,
+#home-nm .nedi-blk,
+#home-nm .nvb-blk,
+#home-nm .nsvb-blk,
 #home-nm .nwsb-vbwrap[data-vbwrap] {
   width: 100%; box-sizing: border-box;
   border-radius: 22px !important;
@@ -13942,15 +13945,23 @@ body[class] #sub-health-journey .gsel-card.dev-tabn-p {
   margin: 16px 0;
 }
 body.nm-night #home-nm .nsub-blk,
+body.nm-night #home-nm .nedi-blk,
+body.nm-night #home-nm .nvb-blk,
+body.nm-night #home-nm .nsvb-blk,
+#home-nm .nsvb-blk,
 body.nm-night #home-nm .nwsb-vbwrap[data-vbwrap] {
   background: #16163c;
   box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
 }
-#home .nsub-blk { margin-top: 16px; margin-bottom: 16px; }
+#home .nsub-blk, #home .nedi-blk, #home .nvb-blk, #home .nsvb-blk { margin-top: 16px; margin-bottom: 16px; }
 
 /* the framed clip inside a block fills it and clears the banner below */
 .nsub-blk .nmh-video-banner,
 .nsub-blk .fash-video-banner,
+.nsvb-blk > .hero-vid-banner,
+.nedi-blk > .nmh-fsec,
+.nedi-blk > #sub-promo-card,
+.nvb-blk > .vb-banner,
 .nwsb-vbwrap[data-vbwrap] > .vb-banner {
   width: 100% !important;
   margin: 0 0 12px !important;
