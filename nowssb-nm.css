@@ -13983,8 +13983,17 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 #home .hero-section.hero-tv {
   height: auto !important;
   aspect-ratio: 727 / 1409;
-  background: url('./assets/frames/tv-hero-portrait.webp') center / 100% 100% no-repeat;
+  /* The render carries an alpha channel — it was exported on black and the
+     black is transparent now, so the page shows through around the set and
+     between its legs instead of a black slab sitting under it. */
+  background: url('./assets/frames/tv-hero-portrait.webp?v=2') center / 100% 100% no-repeat;
   overflow: visible;
+  /* Start BELOW the fixed header. #homeHeader is position:fixed, so the
+     set's top bezel — and the wordmark and buttons drawn on it — were
+     scrolling underneath it. The old hero cleared the header with 160px of
+     content padding, which is gone. --home-header-h is measured in
+     index.html; the fallback covers the first paint before it is set. */
+  margin-top: var(--home-header-h, calc(env(safe-area-inset-top, 14px) + 62px));
   margin-bottom: 8px;
 }
 /* the crossfading photographs and the content share the screen */
@@ -14009,4 +14018,13 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 #home .hero-tv .hero-btns { margin-top: 10px; }
 #home .hero-tv .hero-bottom > div:first-child {
   margin-bottom: 16px !important; padding-left: 8px !important;
+}
+
+/* The black banner in these blocks was carrying .ncb-carousel's neumorphic
+   shadow — 8px 8px 20px rgba(163,177,198,0.5) and a WHITE -6px -6px 14px,
+   which is light-home furniture. On the Fashion home's dark glass that
+   white read as a halo around the bar. It gets a plain drop shadow there. */
+#home .nsub-blk .ncb-carousel,
+#home .nwsb-vbwrap[data-vbwrap] .ncb-carousel {
+  box-shadow: 0 10px 26px rgba(0,0,0,0.45) !important;
 }

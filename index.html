@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=314">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=730">
+<link rel="stylesheet" href="nowssb-nm.css?v=731">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
 <body>
@@ -1499,7 +1499,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          of the page. -->
     <div class="nsub-blk">
       <div class="qa-tv-head">
-        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         <div class="qa-tv-head-txt">
           <div class="qa-tv-hello">The Full Library</div>
           <div class="qa-tv-name">NowssB Subscription</div>
@@ -2094,7 +2094,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        and not the banner is what part062.js registers. -->
   <div class="nsub-blk glass-wrap">
     <div class="qa-tv-head">
-      <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div class="qa-tv-head-txt">
         <div class="qa-tv-hello">The Full Library</div>
         <div class="qa-tv-name">NowssB Subscription</div>
@@ -10358,7 +10358,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part064.js?v=7"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=41"></script>
-<script src="app/js/part067.js?v=29"></script>
+<script src="app/js/part067.js?v=30"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
@@ -10372,5 +10372,38 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="nowssb-nm.js?v=180" defer></script>
 <script src="nowssb-player.js?v=309" defer></script>
 
+<script>
+/* ── How tall the fixed home header is, as a CSS variable ──
+   #homeHeader is position:fixed, so anything at the top of a home scrolls
+   under it. The hero used to clear it with 160px of its own top padding;
+   now that the hero is a TV, the set itself has to start below the header
+   or its top bezel — and the wordmark and buttons drawn on it — are cut
+   off. Padding cannot do it (a background with background-size:100% 100%
+   fills the padding box, so it would not move), so the section takes a
+   margin, and the margin needs a real number.
+   Measured rather than guessed: the header's height is a safe-area inset
+   plus its padding plus whatever its buttons come out at, and all three
+   differ by device. */
+(function () {
+  function set() {
+    var h = document.getElementById('homeHeader');
+    if (!h) return;
+    var px = h.getBoundingClientRect().height;
+    /* display:none while a home is closed — keep the last real number
+       rather than collapsing the hero up under the header. */
+    if (px > 0) document.documentElement.style.setProperty('--home-header-h', px + 'px');
+  }
+  set();
+  window.addEventListener('load', set);
+  window.addEventListener('resize', set);
+  window.addEventListener('orientationchange', function () { setTimeout(set, 250); });
+  /* The header is shown/hidden as the app moves between screens, so watch
+     for that rather than only measuring once. */
+  if (window.MutationObserver) {
+    var h = document.getElementById('homeHeader');
+    if (h) new MutationObserver(set).observe(h, { attributes: true, attributeFilter: ['style', 'class'] });
+  }
+})();
+</script>
 </body>
 </html>

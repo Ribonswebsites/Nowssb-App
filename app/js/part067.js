@@ -391,7 +391,12 @@
     var d = document.createElement('div');
     d.className = 'qa-tv-head';
     d.innerHTML =
-      '<div class="qa-tv-orb nsub-blk-orb" aria-hidden="true">' + h.icon + '</div>' +
+      /* The orb sits on a LIGHT disc on the Normal home, so the glyph takes
+         the orb's colour instead of the hard white it wears on the black
+         banner below — white on #f0f2f7 is an icon nobody can see. */
+      '<div class="qa-tv-orb nsub-blk-orb" aria-hidden="true">' +
+        h.icon.replace(/stroke="#fff"/g, 'stroke="currentColor"') +
+      '</div>' +
       '<div class="qa-tv-head-txt">' +
         '<div class="qa-tv-hello">' + h.hello + '</div>' +
         '<div class="qa-tv-name">' + h.name + '</div>' +
