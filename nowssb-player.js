@@ -51,6 +51,14 @@
   /* ── Style pairs (image background + waveform video). One per word, rotating.
      Add each pair as you send it; the player cycles through them by word index. ── */
   var LGP_THEMES = [
+    /* Liquid splash goes FIRST — it is what the first word of a session
+       opens on. The only look that ships WITH the app rather than coming
+       from Cloudinary, which is also why it is the one worth having
+       before anything else: cldVid() leaves a path with no
+       /video/upload/ in it alone, so it reaches the <video> untouched. */
+    { img:'./assets/player/liquid-splash.webp',
+      video:'./assets/video/player-liquid-splash.mp4',
+      accent:'#ffcf4d' },
     { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656918/grok_image_1782656676834_rzp2cz.jpg',
       video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656947/grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
       accent:'#7fe9da' },
@@ -81,12 +89,6 @@
     { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796933792_qwzfgx.jpg',
       video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796996/grok_video_2026-06-30-10-52-20_zk87yh.mp4',
       accent:'#8fe6ff' },
-    /* Liquid splash. The first look in here that ships WITH the app rather
-       than coming from Cloudinary — cldVid() leaves a path that has no
-       /video/upload/ in it alone, so it goes to the <video> untouched. */
-    { img:'./assets/player/liquid-splash.webp',
-      video:'./assets/video/player-liquid-splash.mp4',
-      accent:'#ffcf4d' }
   ];
 
   /* Exposed so app/js/part051.js's background video pre-warmer (Cache
@@ -97,14 +99,18 @@
      cldVid() at the exact same widths the player actually requests
      (720 for theme videos, 640 for organ videos), so the cached entry's
      URL is byte-for-byte what the <video src> will ask for. */
+  /* Every theme video, local ones included. The first look ships inside
+     the app and is the one every session opens on, so it goes at the head
+     of the queue — the pre-warmer (app/js/part051.js) walks this list in
+     order into Cache Storage, and a cached entry means the panel is not
+     waiting on the network when the player opens. */
   window.NWSB_PLAYER_VIDEO_URLS = LGP_THEMES
-    /* Cloudinary only. A theme video that ships inside the app is already
-       on the device for the native build and is a 20MB download for the
-       web one — pre-warming it would spend that on a look the reader may
-       never reach. It streams when a word lands on it, like any video. */
-    .filter(function (t) { return t.video && t.video.indexOf('/video/upload/') >= 0; })
     .map(function (t) { return cldVid(t.video, 720); })
     .concat(Object.keys(ORGAN_VIDEOS).map(function (k) { return ORGAN_VIDEOS[k]; }).filter(Boolean).map(function (v) { return cldVid(v, 640); }));
+  /* The pictures behind the player go into the same cache. They are what
+     shows while a clip is still opening, so an uncached one is a visible
+     blank on the first word. */
+  window.NWSB_PLAYER_IMAGE_URLS = LGP_THEMES.map(function (t) { return t.img; }).filter(Boolean);
 
   function isSubscribed() {
     try {
@@ -304,7 +310,10 @@
     var center =
       '<div class="lgp-phase">' +
         '<div id="spPhaseIdlePlay" style="display:' + ((phase === 'idle' || phase === 'playing') ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:10px;width:100%;">' +
-          '<div class="lgp-status" id="spAutoStatus">' + (phase === 'playing' ? 'Listening…' : 'Tap ▸ to listen') + '</div>' +
+          /* "Tap ▸ to listen" used to sit here. The play button says that
+             already, and the bars beside the bar say when it is playing.
+             The id stays on a hidden node — other code writes to it. */
+          '<div class="lgp-status" id="spAutoStatus" hidden></div>' +
           '<div class="lgp-tube">' +
             '<div class="lgp-controls">' +
               libBtn +
@@ -540,19 +549,27 @@
               '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
             '</button>' +
           '</div>' +
-          '<div class="lgp-rail lgp-rail-r">' +
-            '<span class="lgp-vol-val" id="lgpVolVal">' + Math.round(lgpVolume() * 100) + '</span>' +
-            '<div class="lgp-vol" id="lgpVol" role="slider" tabindex="0"' +
-              ' aria-label="Volume" aria-valuemin="0" aria-valuemax="100"' +
-              ' aria-valuenow="' + Math.round(lgpVolume() * 100) + '">' +
-              '<span class="lgp-vol-fill" id="lgpVolFill" style="height:' + (lgpVolume() * 100) + '%"></span>' +
+          /* The volume is a speaker until you press it. The slider is what
+             it opens into, and it stays open until you press it again. */
+          '<div class="lgp-rail lgp-rail-r' + (lgpVolOpen() ? ' vol-open' : '') + '" id="lgpVolRail">' +
+            '<div class="lgp-vol-wrap">' +
+              '<span class="lgp-vol-val" id="lgpVolVal">' + Math.round(lgpVolume() * 100) + '</span>' +
+              '<div class="lgp-vol" id="lgpVol" role="slider" tabindex="0"' +
+                ' aria-label="Volume" aria-valuemin="0" aria-valuemax="100"' +
+                ' aria-valuenow="' + Math.round(lgpVolume() * 100) + '">' +
+                '<span class="lgp-vol-fill" id="lgpVolFill" style="height:' + (lgpVolume() * 100) + '%"></span>' +
+              '</div>' +
             '</div>' +
-            '<span class="lgp-vol-ico" aria-hidden="true">' +
-              '<svg viewBox="0 0 24 24" fill="none">' +
+            '<button class="lgp-vol-btn" id="lgpVolBtn" type="button"' +
+              ' onclick="window.lgpToggleVol&&window.lgpToggleVol()"' +
+              ' aria-expanded="' + (lgpVolOpen() ? 'true' : 'false') + '" aria-label="Volume">' +
+              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
                 '<path d="M4 9.2h3.4L12 5.2v13.6L7.4 14.8H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
-                '<path d="M15.6 9.4a3.6 3.6 0 0 1 0 5.2M18.2 7a7.2 7.2 0 0 1 0 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+                '<path class="lgp-vol-w1" d="M15.6 9.4a3.6 3.6 0 0 1 0 5.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+                '<path class="lgp-vol-w2" d="M18.2 7a7.2 7.2 0 0 1 0 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+                '<path class="lgp-vol-mute" d="M16 9.5l5 5M21 9.5l-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
               '</svg>' +
-            '</span>' +
+            '</button>' +
           '</div>' +
           /* Fold both away. The picture is the thing; some of the time you
              want to see it with nothing on top of it. */
@@ -581,10 +598,15 @@
            into the Sentence · Practice · Store tab at the bottom, and the
            three buttons went into the picture. */
         /* The Listen · Learn · Practice · Heal ticker used to sit here. */
-        '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
-          ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(sessionPct) + '"' +
-          ' aria-label="Session progress">' +
-          '<div class="lgp-progress-fill" style="width:' + sessionPct + '%"></div>' +
+        /* The bar, in a wrapper with room around it, and the four bars on
+           its left that move while the word is being spoken. */
+        '<div class="lgp-barwrap">' +
+          '<span class="lgp-bar-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' +
+          '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
+            ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"' +
+            ' aria-label="Playback">' +
+            '<div class="lgp-progress-fill" style="width:0%"></div>' +
+          '</div>' +
         '</div>' +
         center +
         /* Sentence · Practice · Store — back at the bottom. */
@@ -681,46 +703,48 @@
       if (v.paused) tryPlay();
     })();
 
-    /* ── The dot has to move ──────────────────────────────────────────
-       The bar was the session: word index over word count, plus reps. The
-       reps band is gone and a one-word ritual is index 0 of 1, so the fill
-       sat at 0% and the head never travelled — a progress bar showing no
-       progress. It rides the playback now. While the word is being spoken
-       the fill sweeps across that word's slice of the session; when it is
-       not, it rests on the word boundary.
-       There is no media element to read a currentTime from — the word is
-       spoken by speechSynthesis, which gives no reliable position — so the
-       sweep is timed off the same ~750ms-a-syllable clock pwPlay() uses to
-       light the syllable boxes. ── */
+    /* ── The bar follows the SOUND ──────────────────────────────────
+       It was the session: word index over word count. Reps are gone and a
+       one-word ritual is 0 of 1, so it sat at 0% and never moved.
+
+       It is the spoken word now — 0% when it starts, full when it ends.
+       speechSynthesis reports no position, but pwPlay() records the end of
+       each repetition into window._lgpSound, so the run is known a
+       repetition at a time and this interpolates inside the current one
+       using the measured length of the last. The first repetition uses
+       pwPlay's estimate (~750ms a syllable, the same clock that lights the
+       syllable boxes); every one after it is measured, so a word whose
+       real speed differs from the estimate self-corrects after one pass
+       and still lands exactly on full. ── */
     (function () {
       if (window._lgpProgRaf) { cancelAnimationFrame(window._lgpProgRaf); window._lgpProgRaf = 0; }
       var fill = body.querySelector('.lgp-progress-fill');
       if (!fill) return;
-      var base = total ? (idx / total) * 100 : 0;
-      var slice = total ? (100 / total) : 100;
+      var now = function () { return (window.performance && performance.now) ? performance.now() : Date.now(); };
+      function pct() {
+        var S = window._lgpSound;
+        if (!S) return 0;
+        if (S.done) return 100;
+        var dur = S.dur || S.est || 2000;
+        var within = Math.min(1, (now() - S.t0) / dur);
+        if (!S.total) return ((S.loop + within) % 1) * 100;   /* looping forever */
+        return Math.min(100, ((S.loop + within) / S.total) * 100);
+      }
       if (!playing) {
-        window._lgpPlayT0 = 0;
         fill.style.transition = '';
-        fill.style.width = base + '%';
+        fill.style.width = pct() + '%';
         return;
       }
-      var syls = (w.syllables && w.syllables.length) || 3;
-      var pass = syls * 750 + 480;               /* one spoken run + the gap */
-      var looping = (typeof _pwLoop !== 'undefined') && !!_pwLoop;
-      var runMs = pass * (looping ? 1 : 3);      /* pwPlay speaks it 3x, or forever */
-      var now = function () { return (window.performance && performance.now) ? performance.now() : Date.now(); };
-      /* Set once per playback, not once per render — this panel is rebuilt
-         on every phase change and the sweep must not restart with it. */
-      if (!window._lgpPlayT0) window._lgpPlayT0 = now();
-      var t0 = window._lgpPlayT0;
-      fill.style.transition = 'none';            /* the width is animated by us */
+      fill.style.transition = 'none';
       function step() {
         var el = document.querySelector('.lgp-progress-fill');
         var stillPlaying = (typeof _pwPlaying !== 'undefined') && !!_pwPlaying;
-        if (!el || !stillPlaying) { window._lgpProgRaf = 0; return; }
-        var f = (now() - t0) / runMs;
-        f = looping ? (f % 1) : Math.min(1, f);  /* on loop the head keeps travelling */
-        el.style.width = (base + slice * f) + '%';
+        if (!el) { window._lgpProgRaf = 0; return; }
+        var p = pct();
+        el.style.width = p + '%';
+        var bar = el.parentNode;
+        if (bar && bar.setAttribute) bar.setAttribute('aria-valuenow', Math.round(p));
+        if (!stillPlaying) { window._lgpProgRaf = 0; return; }
         window._lgpProgRaf = requestAnimationFrame(step);
       }
       window._lgpProgRaf = requestAnimationFrame(step);
@@ -1060,10 +1084,31 @@
     if (fill) fill.style.height = (v * 100) + '%';
     if (val) val.textContent = Math.round(v * 100);
     if (rail) rail.setAttribute('aria-valuenow', Math.round(v * 100));
+    /* The speaker itself reads the level, so the folded rail still says
+       what the volume is: two waves, one wave, or crossed out. */
+    var vr = document.getElementById('lgpVolRail');
+    if (vr) {
+      vr.classList.toggle('vol-0', v <= 0.001);
+      vr.classList.toggle('vol-1', v > 0.001 && v < 0.55);
+    }
     /* A word already being spoken keeps the volume it started with —
        speechSynthesis has no live volume — so the change is heard from
        the next word or the next replay. */
     return v;
+  };
+
+  /* The slider is folded behind the speaker by default — the picture is
+     the thing, and most of the time the volume is already right. */
+  var OKEY = 'nwsb_lgp_vol_open';
+  window.lgpVolOpen = function () { return localStorage.getItem(OKEY) === 'on'; };
+  window.lgpToggleVol = function () {
+    var open = !window.lgpVolOpen();
+    try { localStorage.setItem(OKEY, open ? 'on' : 'off'); } catch (e) {}
+    var rail = document.getElementById('lgpVolRail');
+    var btn  = document.getElementById('lgpVolBtn');
+    if (rail) rail.classList.toggle('vol-open', open);
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (navigator.vibrate) navigator.vibrate(10);
   };
 
   function railsHidden() { return localStorage.getItem(RKEY) === 'off'; }
@@ -1083,6 +1128,7 @@
      change, so the element the handlers were on is gone by then. */
   window._lgpBindRails = function () {
     applyRails();
+    window.lgpSetVolume(window.lgpVolume());   /* paint the level classes */
     var rail = document.getElementById('lgpVol');
     if (!rail || rail._lgpBound) return;
     rail._lgpBound = true;

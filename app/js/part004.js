@@ -788,6 +788,22 @@ function pwPlay() {
     /* The volume rail in the picture. speechSynthesis has no live volume
        control, so it is read here, at the moment the word is spoken. */
     _pwUtt.volume = (typeof window.lgpVolume === 'function') ? window.lgpVolume() : 1;
+    /* ── What the bar under the picture is following ──
+       The bar shows the SOUND: it fills as the word is spoken and is full
+       when the word finishes. speechSynthesis reports no position, but it
+       does report the end of each repetition — so the run is measured a
+       repetition at a time and the bar interpolates inside the current one
+       using the length of the last one. First repetition uses the estimate
+       below; every one after that is measured. */
+    const _now = () => (window.performance && performance.now) ? performance.now() : Date.now();
+    window._lgpSound = {
+      t0: _now(),
+      loop: 0,
+      total: _pwLoop ? 0 : 3,          /* 0 = repeating for as long as you let it */
+      dur: 0,                          /* measured length of the last repetition */
+      est: (w.syllables ? w.syllables.length : 3) * 750 + 480,
+      done: false
+    };
     const dur = 750;
     const animSyls = () => {
       w.syllables.forEach((s, i) => {
@@ -803,10 +819,15 @@ function pwPlay() {
     const loopPlay = () => {
       _pwUtt.onend = () => {
         loops++;
+        const S = window._lgpSound;
+        if (S) { S.dur = _now() - S.t0; S.t0 = _now(); S.loop = loops; }
         const shouldLoop = _pwLoop ? true : loops < 3;
         if (shouldLoop && _pwPlaying) {
           setTimeout(() => { animSyls(); loopPlay(); }, 480);
-        } else { pwStop(true); }
+        } else {
+          if (S) { S.done = true; S.loop = S.total || loops; }
+          pwStop(true);
+        }
       };
       window.speechSynthesis.speak(_pwUtt);
     };

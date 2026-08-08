@@ -40,6 +40,9 @@
     // none of them exist in the DOM yet at this point — nowssb-player.js
     // exposes the full pre-transformed list separately for exactly this.
     if (window.NWSB_PLAYER_VIDEO_URLS) urls = urls.concat(window.NWSB_PLAYER_VIDEO_URLS);
+    // and the pictures those clips sit behind — an uncached one is a
+    // visible blank on the first word while the clip is still opening
+    if (window.NWSB_PLAYER_IMAGE_URLS) urls = urls.concat(window.NWSB_PLAYER_IMAGE_URLS);
     // Same problem, everywhere else it happens: a clip that is only built
     // when a screen opens cannot be found by scanning the DOM before the
     // user goes there, which is precisely when warming it would have helped.

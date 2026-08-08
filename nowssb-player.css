@@ -269,15 +269,42 @@
    overflow is visible, not hidden, because the head rides ON the end of the
    fill — at the very start of a session the fill is a sliver, and the head
    is what makes the bar legible as a position rather than as an empty line. */
+/* ── The bar and its wrapper ──
+   It used to be a bare 5px line sitting 7px under the picture with
+   nothing around it. It has a box now, with air inside it, and the four
+   bars on its left move while the word is being spoken. */
+.lgp .lgp-barwrap {
+  width:100%; max-width:340px; margin:14px auto 0; padding:12px 16px;
+  display:flex; align-items:center; gap:12px; flex-shrink:0;
+  border-radius:16px !important;
+  background:rgba(6,10,22,.5);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 8px 22px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.lgp .lgp-bar-eq {
+  display:flex; align-items:flex-end; gap:2.5px; height:16px; flex-shrink:0;
+}
+.lgp .lgp-bar-eq i {
+  display:block; width:2.5px; height:5px; border-radius:2px !important;
+  background:var(--lg-accent); box-shadow:0 0 8px var(--lg-accent);
+  transform-origin:bottom;
+}
+/* still when nothing is playing — four short marks, not a fake meter */
+.lgp.playing .lgp-bar-eq i { animation:lgpBarEq .62s ease-in-out infinite alternate; }
+.lgp.playing .lgp-bar-eq i:nth-child(2) { animation-delay:.14s; animation-duration:.5s; }
+.lgp.playing .lgp-bar-eq i:nth-child(3) { animation-delay:.07s; animation-duration:.72s; }
+.lgp.playing .lgp-bar-eq i:nth-child(4) { animation-delay:.21s; animation-duration:.56s; }
+@keyframes lgpBarEq { from { height:4px; } to { height:16px; } }
+
 .lgp .lgp-progress {
   position:relative;
-  width:100%; max-width:280px; height:5px; margin:7px 0 0; border-radius:999px !important;
-  background:rgba(255,255,255,.2); overflow:visible; flex-shrink:0;
+  width:100%; flex:1 1 auto; height:5px; margin:0; border-radius:999px !important;
+  background:rgba(255,255,255,.2); overflow:visible; flex-shrink:1;
 }
 .lgp .lgp-progress-fill {
   position:relative; height:100%; border-radius:999px !important;
   background:linear-gradient(90deg, var(--lg-accent), #fff);
-  box-shadow:0 0 14px var(--lg-accent); transition:width .45s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 14px var(--lg-accent);
 }
 .lgp .lgp-progress-fill::after {
   content:''; position:absolute; right:-4px; top:50%; margin-top:-5px;
@@ -1224,7 +1251,8 @@
   transition:opacity .28s ease, transform .32s cubic-bezier(.2,1,.3,1);
 }
 .lgp .lgp-rail-l { left:10px; }
-.lgp .lgp-rail-r { right:10px; padding:10px 6px 12px; gap:8px; }
+.lgp .lgp-rail-r { right:10px; padding:6px 5px; gap:0; }
+.lgp .lgp-rail-r.vol-open { padding:10px 5px 8px; }
 
 /* folded away — they slide out sideways and stop taking taps */
 .lgp .lgp-visual.rails-off .lgp-rail { opacity:0; pointer-events:none; }
@@ -1266,9 +1294,32 @@
   letter-spacing:.4px; color:rgba(255,255,255,.9);
   text-shadow:0 1px 5px rgba(0,0,0,.7);
 }
-.lgp .lgp-vol-ico { display:block; width:18px; height:18px; color:#fff; }
-.lgp .lgp-vol-ico svg { width:100%; height:100%; display:block;
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+/* ── the speaker, and what it folds open ── */
+.lgp .lgp-vol-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  max-height:0; opacity:0; overflow:hidden;
+  transition:max-height .32s cubic-bezier(.2,1,.3,1), opacity .24s ease, margin .32s ease;
+}
+.lgp .lgp-rail-r.vol-open .lgp-vol-wrap { max-height:200px; opacity:1; margin-bottom:2px; }
+.lgp .lgp-vol-btn {
+  width:34px !important; height:34px !important;
+  min-width:34px !important; min-height:34px !important;
+  padding:0; cursor:pointer; flex-shrink:0;
+  border:none !important; background:none !important; box-shadow:none !important;
+  color:#fff;
+  display:flex !important; align-items:center; justify-content:center;
+}
+.lgp .lgp-vol-btn svg {
+  width:20px; height:20px; display:block;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
+}
+.lgp .lgp-vol-btn:active { transform:scale(.9); }
+/* the glyph reads the level, so the folded rail still says what it is */
+.lgp .lgp-vol-mute { opacity:0; }
+.lgp .lgp-rail-r.vol-1 .lgp-vol-w2 { opacity:0; }
+.lgp .lgp-rail-r.vol-0 .lgp-vol-w1,
+.lgp .lgp-rail-r.vol-0 .lgp-vol-w2 { opacity:0; }
+.lgp .lgp-rail-r.vol-0 .lgp-vol-mute { opacity:1; }
 
 /* ── fold/unfold ──
    Stays put when the rails go, because it is the way back. */
