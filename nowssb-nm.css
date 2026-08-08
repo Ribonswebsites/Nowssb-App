@@ -5413,21 +5413,18 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
    (body.fashion-home-active.<class> #appBg) as those theme overrides, and
    this file loads after app.css, so source order lets a chosen photo win
    over the current theme's own background without touching app.css. ── */
-/* The card IS a phone — the same one Fashion Plus shows, from the same
-   render and on the same numbers. All three pickers (Fashion Background,
-   Start Page Image and the Connect theme) build this identical card, so
-   they all get it from here.
-
-   The render is opaque all the way across, including where the glass is —
-   which is why Fashion Plus paints its screen ON TOP of the frame rather
-   than the frame on top of the screen. Same order here: the frame on
-   ::before underneath, the wallpaper in .fbgci-wall above it, inset to the
-   glass with .fp-screen's own percentages. */
+/* The card IS a phone. A different render from the one Fashion Plus's big
+   phone wears: this one's screen is genuinely transparent — 1.47M of its
+   1.57M pixels are, against a bezel of 16k — so the frame goes ON TOP and
+   the wallpaper sits under it, which is the right way round and also lets
+   the render draw its own camera pill over the picture.
+   Trimmed to its silhouette at 681x1461 (the side buttons are part of it);
+   screen at x 30-650, y 20-1436. */
 .fbgci {
   position: absolute;
-  width: 170px; height: 352px;          /* 170 / (722/1496) */
+  width: 170px; height: 365px;          /* 170 / (681/1461) */
   top: 50%; left: 50%;
-  margin-left: -85px; margin-top: -176px;
+  margin-left: -85px; margin-top: -182px;
   overflow: visible;
   border: none;
   border-radius: 0 !important;
@@ -5436,36 +5433,28 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
   will-change: transform, opacity;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   opacity: 0;
-  /* No glow and no drop-shadow. The centre phone never moves now, so there
-     is nothing for a highlight to disambiguate — the dots and the caption
-     already say which picture is showing, and a halo behind a phone that
-     holds still just reads as fuzz. */
+  /* No glow and no drop-shadow — the phone is the object, a halo behind it
+     just reads as fuzz. */
 }
 .fbgci::before {
-  content: ''; position: absolute; inset: 0; z-index: 0;
-  background: url('./assets/fashion/phone-frame.png') center / 100% 100% no-repeat;
+  content: ''; position: absolute; inset: 0; z-index: 3;
+  background: url('./assets/fashion/phone-frame-2.webp') center / 100% 100% no-repeat;
   pointer-events: none;
 }
+/* The picture, in the glass. Offsets rather than padding: left and right
+   against the box's width, top and bottom against its height. */
 .fbgci-wall {
   position: absolute; z-index: 1;
-  left: 5.12%; top: 2.07%; width: 89.6%; height: 96.6%;
-  border-radius: 8.5% / 4.1% !important;
+  left: 4.4053%; right: 4.4053%; top: 1.3689%; bottom: 1.6427%;
+  border-radius: 5.5% / 2.6% !important;
   overflow: hidden;
   background: #06080f center / cover no-repeat;
-}
-/* The frame draws a notch, but the glass covers the part it sits on — so
-   the screen redraws it, exactly as .fp-notch does on the big phone. */
-.fbgci-wall::before {
-  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 34%; height: 3.4%; z-index: 2;
-  background: #05070c;
-  border-radius: 0 0 6px 6px !important;
 }
 /* The same fall of light down the glass the big phone has. */
 .fbgci-wall::after {
   content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.28) 0%,
-    rgba(0,0,0,0.02) 26%, rgba(0,0,0,0.06) 52%, rgba(0,0,0,0.55) 100%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.24) 0%,
+    rgba(0,0,0,0.02) 26%, rgba(0,0,0,0.06) 52%, rgba(0,0,0,0.5) 100%);
 }
 
 body.fashion-home-active.nwsb-custom-fashion-bg #appBg {
