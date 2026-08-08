@@ -12847,12 +12847,39 @@ body.nm-night #home-nm .nc-blk {
    empty box between a heading and a banner is a visible gap. */
 .nc-blk-vid { display: block; width: 100%; }
 .nc-blk-vid:empty { display: none; }
-.nc-blk .vb-banner { margin: 0 0 12px !important; }
+/* .vb-banner is normally a top-level section on the Fashion home and
+   carries its own inset for that — `width: calc(100% - 32px); margin: 18px
+   16px`. Inside this wrapper the wrapper owns the inset, so the clip gives
+   it up: my first pass reset only the margin, which left the tablet 32px
+   narrow AND shoved to the left, which is exactly how it looked. */
+.nc-blk .vb-banner {
+  width: 100% !important;
+  margin: 0 0 12px !important;
+  box-sizing: border-box;
+}
 .nc-blk .ncb-carousel { margin: 0 !important; border-radius: 18px !important; }
 /* Nothing rotates through this orb, so it carries its own glyph rather than
    the one part049.js swaps into the television's. */
 .nc-blk-orb { color: #c8a96e; }
-#home .nc-blk-orb, body.nm-night .nc-blk-orb { color: #e8d5a3; }
+body.nm-night .nc-blk-orb { color: #e8d5a3; }
+
+/* ── The heading disc on the Fashion home ──
+   It was glass, which on a photographic background reads as a smudge more
+   than a disc. A solid white circle instead, on both sections that use this
+   heading — Quick Access and the Connect block. The Normal home's is
+   already an all-but-white neumorphic disc and is left alone. */
+#home .qa-tv-orb {
+  background: #ffffff !important;
+  border: none !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.34), 0 2px 6px rgba(0,0,0,0.22) !important;
+  color: #0a0a12 !important;
+}
+/* The television's mark is injected by part049.js with gold baked into the
+   markup, and the same markup goes into the black banner's tile where gold
+   is right — so it is repainted here rather than there, and only here. */
+#home .qa-tv-orb svg [stroke]:not([stroke="none"]) { stroke: #0a0a12 !important; }
+#home .qa-tv-orb svg [fill]:not([fill="none"]) { fill: #0a0a12 !important; }
 
 /* ═══════════════════════════════════════════════════════════════
    TWO MORE TABLETS — the ones NowssB Connect wears
