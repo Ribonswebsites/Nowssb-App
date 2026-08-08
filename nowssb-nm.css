@@ -13966,3 +13966,47 @@ body.nm-night #home-nm .nwsb-vbwrap[data-vbwrap] {
 .nsub-ban .ncb-slide { padding: 20px; }
 .nsub-blk-orb { color: #c8a96e; }
 body.nm-night .nsub-blk-orb { color: #e8d5a3; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE FASHION HOME'S HERO, INSIDE THE TV
+   The element IS the frame: assets/frames/tv-hero-portrait.webp is the
+   section's background, stretched to it, and everything the hero draws is
+   inset to the aperture. The section stops being 100dvh and takes the
+   render's own ratio instead, so the TV is never squashed to fit a
+   viewport it does not match — on a 390-wide screen that makes it 756px
+   tall against the 844 it used to be.
+
+   Aperture in the render (727x1409): x 25..708, y 30..1307
+     3.439% from the left, 2.476% from the right,
+     2.129% from the top,  7.168% from the bottom (the stand).
+   ══════════════════════════════════════════════════════════════════════ */
+#home .hero-section.hero-tv {
+  height: auto !important;
+  aspect-ratio: 727 / 1409;
+  background: url('./assets/frames/tv-hero-portrait.webp') center / 100% 100% no-repeat;
+  overflow: visible;
+  margin-bottom: 8px;
+}
+/* the crossfading photographs and the content share the screen */
+#home .hero-tv .hero-bg,
+#home .hero-tv .hero-content {
+  inset: auto;
+  left: 3.439%; right: 2.476%; top: 2.129%; bottom: 7.168%;
+}
+#home .hero-tv .hero-bg { background-color: #000; }
+/* The content was padded for a full viewport. Inside the screen it has
+   about 367x686 to work with on a 390-wide phone, so the padding comes
+   down to match — the 160px top alone was a quarter of it. */
+#home .hero-tv .hero-content {
+  padding: 26px 16px 22px;
+}
+#home .hero-tv .hero-content > div:first-child {
+  margin-left: 4px !important; margin-right: 4px !important;
+}
+#home .hero-tv .brand-name { font-size: clamp(24px, 7vw, 38px) !important; }
+#home .hero-tv .hero-glass { height: 118px; }
+#home .hero-tv .hero-word-wrap { margin-top: 8px; height: 40px; }
+#home .hero-tv .hero-btns { margin-top: 10px; }
+#home .hero-tv .hero-bottom > div:first-child {
+  margin-bottom: 16px !important; padding-left: 8px !important;
+}

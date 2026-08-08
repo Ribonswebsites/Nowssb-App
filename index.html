@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=314">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=729">
+<link rel="stylesheet" href="nowssb-nm.css?v=730">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
 <body>
@@ -1691,7 +1691,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="screen" id="home">
 
   <!-- ══ HERO HEADER ══ -->
-  <div class="hero-section">
+  <!-- Inside the portrait TV. The SECTION is the frame: the render is its
+       background and everything the hero draws — the crossfading photos and
+       all of the content — is inset to the aperture. -->
+  <div class="hero-section hero-tv">
     <div class="hero-bg on" id="hb0"></div>
     <div class="hero-bg"    id="hb1"></div>
     <div class="hero-bg"    id="hb2"></div>
