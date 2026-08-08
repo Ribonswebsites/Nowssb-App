@@ -12773,6 +12773,43 @@ body.nm-night #home-nm .qa-tv-block {
   box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   NOWSSB CONNECT — the banner clip and the features banner, one block
+   Built the same way Quick Access is: a heading, the framed clip, the black
+   banner, in one wrapper. It reuses .qa-tv-head and its parts for the
+   heading — deliberate, that is the shape being matched, and safe because
+   part049.js's rotator scopes every query to .qa-tv-block, which this is
+   not. Only the wrapper needs rules of its own.
+   ══════════════════════════════════════════════════════════════════ */
+#home-nm .nc-blk {
+  width: 100%; box-sizing: border-box;
+  border-radius: 22px !important;
+  background: #f0f2f7;
+  padding: 18px;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+  margin: 16px 0;
+}
+#home-nm.nm-dark .nc-blk,
+body.nm-night #home-nm .nc-blk {
+  background: #16163c;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
+}
+/* On the Fashion home .glass-wrap supplies the look; this only sets the
+   rhythm between it and its neighbours. */
+#home .nc-blk { margin: 16px 0; }
+
+/* The clip sits between the heading and the banner. part067.js injects a
+   .vb-banner into .nc-blk-vid, so that box is empty until it runs — and an
+   empty box between a heading and a banner is a visible gap. */
+.nc-blk-vid { display: block; width: 100%; }
+.nc-blk-vid:empty { display: none; }
+.nc-blk .vb-banner { margin: 0 0 12px !important; }
+.nc-blk .ncb-carousel { margin: 0 !important; border-radius: 18px !important; }
+/* Nothing rotates through this orb, so it carries its own glyph rather than
+   the one part049.js swaps into the television's. */
+.nc-blk-orb { color: #c8a96e; }
+#home .nc-blk-orb, body.nm-night .nc-blk-orb { color: #e8d5a3; }
+
 /* ═══════════════════════════════════════════════════════════════
    TWO MORE TABLETS — the ones NowssB Connect wears
    Both renders arrived with transparent margin all round, so both are
@@ -13690,4 +13727,27 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
 .slm-fr,
 body[class] #sub-health-journey .gsel-card.dev-tabn-p {
   isolation: isolate;
+}
+
+/* ── The background picker's Apply button ──
+   A swipe previews now; this is what chooses. Same pill the mode's other
+   actions use, full width under the caption so it reads as the step after
+   swiping rather than as decoration beside it. */
+.fp-pick-apply {
+  display: block; width: 100%; max-width: 320px;
+  margin: 14px auto 0; padding: 13px 18px;
+  border: 1px solid rgba(232,213,163,0.55);
+  border-radius: 999px !important;
+  background: rgba(232,213,163,0.14);
+  color: #e8d5a3;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 0.3px; cursor: pointer;
+  transition: transform .14s, background .2s;
+}
+.fp-pick-apply:active { transform: scale(.97); background: rgba(232,213,163,0.24); }
+/* Already the one in use: still there so the row does not jump, but plainly
+   not a thing to press. */
+.fp-pick-apply.on {
+  background: transparent; border-color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.42); cursor: default;
 }

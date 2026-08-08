@@ -60,7 +60,7 @@
         { k:'rx',       sel:['.nmh-rx-heading', '.nmh-rx-section'],                        t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'routines', sel:['.home-card.home-card-static.w100'],                          t:S, label:'My Routines',           sub:'Daily practice system' },
         { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc' },
-        { k:'connect',  sel:['.vb-banner[data-vb="vb4"]', '.nmh-connect-sec'],                                          t:S, label:'NowssB Connect',        sub:'What the social space is' },
+        { k:'connect',  sel:['.nmh-connect-sec'],                                        t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'feed',     sel:['#ncbCarouselNm'],                                            t:S, label:'Community Carousel',    sub:'Swipeable feed cards' },
         /* The BLOCK, not the frame or the row inside it: this registry
            matches ':scope > sel', a DIRECT child of the wrap. Pointing it
@@ -72,6 +72,7 @@
         { k:'subvid',   sel:['.nmh-video-banner.nmh-vb-tall'],                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
         { k:'edition',  sel:['.nmh-fsec'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
+        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers' },
         /* Off on the shipped Normal home, and opt-in from this editor —
            `always` is gone precisely so it CAN be switched off, and defOff
            keeps it off until someone turns it on. The Fashion home's own
@@ -109,7 +110,7 @@
            to this card. */
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
-        { k:'connect',  sel:['.vb-banner[data-vb="vb5"]', '.fash-connect-wrap'],                                             t:S, label:'NowssB Connect',        sub:'What the social space is' },
+        { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner' },
         { k:'subvid',   sel:['.fash-vb-tall'],                                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
         { k:'edition',  sel:['#sub-promo-card'],                                           t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
@@ -118,6 +119,7 @@
         { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science' },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
+        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers' },
         { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
         { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop' },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search' },

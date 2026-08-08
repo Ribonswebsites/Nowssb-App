@@ -33,11 +33,14 @@
     { after: '#home-nm .nmh-healing-wrap',         vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap' },
     { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap' },
 
-    // Above NowssB Connect — the banner that introduces the section, not the
-    // section's own background clip (.nmh-connect-vid, which is untouched).
-    // On the landscape tablet, wordmark on the bottom bezel.
-    { before: '#home-nm .nmh-connect-sec',         vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
-    { before: '#home .fash-connect-wrap',          vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
+    /* The Connect banner — the clip that introduces the section, not the
+       section's own background clip (.nmh-connect-vid, which is untouched).
+       On the landscape tablet, wordmark on the bottom bezel.
+       It goes INTO .nc-blk-vid rather than before the section: the banner
+       and the features carousel are one block with a heading now, built the
+       way Quick Access is, and .nc-blk is what part062.js registers. */
+    { top:    '#home-nm .nc-blk-vid',              vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
+    { top:    '#home .nc-blk-vid',                 vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
 
     // Trending
     { top:    '#home-nm .nmh-trend-shop-wrap',     vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },

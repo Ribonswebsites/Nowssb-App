@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=313">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=719">
+<link rel="stylesheet" href="nowssb-nm.css?v=721">
 <link rel="stylesheet" href="nowssb-player.css?v=203">
 </head>
 <body>
@@ -1120,6 +1120,38 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 
+    <!-- NowssB Connect — the banner clip and the features banner, one block.
+         Built like Quick Access: a heading, the framed clip, the black
+         banner, all in one wrapper. The heading reuses .qa-tv-head and its
+         parts on purpose — that is the shape being matched — and it is safe
+         to do so because app/js/part049.js's rotator scopes every query to
+         .qa-tv-block, which this is not.
+         .nc-blk is what app/js/part062.js registers, NOT anything inside
+         it: that registry matches ':scope > sel', a DIRECT child of the
+         home wrap, so registering a nested element would find nothing and
+         strand the block at the top of the page. -->
+    <div class="nc-blk">
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nc-blk-orb" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="6.5" cy="8" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="17.5" cy="8" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M2.5 19v-1.2a4 4 0 014-4h0a4 4 0 014 4V19M13.5 19v-1.2a4 4 0 014-4h0a4 4 0 014 4V19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M9.6 8.4c.9-.9 1.6-.9 2.4 0s1.5.9 2.4 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">The Social Space</div>
+          <div class="qa-tv-name">NowssB Connect</div>
+        </div>
+      </div>
+      <!-- app/js/part067.js drops the framed banner clip in here. -->
+      <div class="nc-blk-vid"></div>
+      <!-- Connect features carousel — slides through what NowssB Connect
+           offers. It used to sit under the section further down the page. -->
+      <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
+    </div>
+
     <!-- The four home buttons + their tip rail, directly below Today's
          Practice. The Quick Access banner is a separate thing and stays
          where it is, further down. -->
@@ -1364,8 +1396,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <button class="nmh-connect-enter" onclick="event.stopPropagation();window.IG&&IG.nav('profile')">Enter Connect<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
-    <!-- Connect features carousel — slides through what NowssB Connect offers -->
-    <div class="ncb-carousel" id="ncbCarouselNm"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
 
 
     <!-- Cart, Wishlist and Order — a heading, the television, a black banner.
@@ -1783,6 +1813,29 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
 
+  <!-- NowssB Connect — the banner clip and the features banner, one block.
+       The Normal home's twin, in glass. See the note on that one for why
+       .nc-blk is the registered element and nothing inside it is. -->
+  <div class="nc-blk glass-wrap">
+    <div class="qa-tv-head">
+      <div class="qa-tv-orb nc-blk-orb" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="6.5" cy="8" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+          <circle cx="17.5" cy="8" r="2.6" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M2.5 19v-1.2a4 4 0 014-4h0a4 4 0 014 4V19M13.5 19v-1.2a4 4 0 014-4h0a4 4 0 014 4V19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M9.6 8.4c.9-.9 1.6-.9 2.4 0s1.5.9 2.4 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="qa-tv-head-txt">
+        <div class="qa-tv-hello">The Social Space</div>
+        <div class="qa-tv-name">NowssB Connect</div>
+      </div>
+    </div>
+    <!-- app/js/part067.js drops the framed banner clip in here. -->
+    <div class="nc-blk-vid"></div>
+    <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
+  </div>
+
   <!-- Glassmorphism streak section — heading + real 3-cube glass visual,
        then the "Daily Streak" black banner itself as the entry point,
        all inside one glass card. -->
@@ -1990,8 +2043,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <button class="nmh-connect-enter" onclick="event.stopPropagation();openConnectIntro()">Enter Connect<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
-  <!-- Connect features carousel (fashion) -->
-  <div class="ncb-carousel fash-ncb" id="ncbCarouselFash"><div class="ncb-track"></div><div class="ncb-dots"></div></div>
   </div>
 
 
@@ -10244,12 +10295,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=12"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=33"></script>
+<script src="app/js/part062.js?v=34"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=7"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=41"></script>
-<script src="app/js/part067.js?v=27"></script>
+<script src="app/js/part067.js?v=28"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
@@ -10257,7 +10308,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
 <script src="app/js/part074.js?v=8"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
-<script src="app/js/part076.js?v=101"></script><!-- ══ FASHION PLUS ══ -->
+<script src="app/js/part076.js?v=102"></script><!-- ══ FASHION PLUS ══ -->
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=182" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>

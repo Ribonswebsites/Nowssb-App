@@ -69,7 +69,8 @@
        worst case for a low bitrate — fine specular highlights over flat
        shadow is exactly what a starved encoder throws away first — so this
        one got the bits it needs rather than the bits the others got. */
-    { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Falling Diamonds' }
+    { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Falling Diamonds' },
+    { vid: './assets/video/fashion-plus-bg-6.mp4', name: 'Violet Silk' }
   ];
   FILMS.forEach(function (f, i) {
     f.t = [f.name, 'Background ' + (i + 1) + ' of ' + FILMS.length];
@@ -346,8 +347,11 @@
     clearTimeout(holdT);
     holdT = setTimeout(function () { startSpin(); }, 6000);
   }
+  /* A swipe PREVIEWS, it does not choose. It used to call setBgChoice here,
+     which meant the app's background changed the moment your finger left
+     the phone — you could not look through them without wearing each one on
+     the way past. The Apply button under the picker is what chooses. */
   function commit() {
-    if (isOn()) setBgChoice(idx);
     paintPicker();
   }
   function startSpin() {
@@ -368,17 +372,29 @@
     var dots = SL.map(function (_, i) {
       return '<span class="fpp-dot' + (i === idx ? ' on' : '') + '"></span>';
     }).join('');
+    /* slides() returns FILMS or STILLS, never both — so with the mode on,
+       the slide index IS the index into FILMS, and with it off there are no
+       films on the phone at all and nothing to apply. */
+    var isFilm = film;
+    var applied = isFilm && idx === bgChoice();
     host.innerHTML =
       '<div class="fp-pick-name">' + (w && w.t ? w.t[0] : '') + '</div>' +
       '<div class="fp-pick-dots">' + dots + '</div>' +
       '<div class="fp-pick-sub">' +
         (film
-          ? (idx === bgChoice()
+          ? (applied
               ? '<span class="fp-pick-live">In use</span> · swipe to try another'
-              : 'Swipe to choose · tap to use this one')
+              : 'Swipe to preview · Apply to use it')
           : 'Swipe through the pages that change') +
-      '</div>';
-    host.onclick = film ? function () { setBgChoice(idx); } : null;
+      '</div>' +
+      (isFilm
+        ? '<button class="fp-pick-apply' + (applied ? ' on' : '') + '" id="fpApplyBtn"' +
+          (applied ? ' disabled' : '') + '>' +
+          (applied ? 'In use' : 'Apply this background') + '</button>'
+        : '');
+    host.onclick = null;
+    var btn = document.getElementById('fpApplyBtn');
+    if (btn && !applied) btn.onclick = function () { setBgChoice(idx); paintPicker(); };
   }
   window.nwsbFpPaintPicker = paintPicker;
 
