@@ -148,6 +148,12 @@ async function pwScoreRecording() {
     const transcript = await groqWhisper(_pwRecordingBlob);
     const score      = phoneticSimilarity(transcript, w.phonetic);
     const color      = scoreColor(score);
+    /* Keep the attempt. The Notes page reads it back to say which syllables
+       landed and which did not — the same comparison the score is made of,
+       so the two can never disagree. */
+    if (typeof window.lgpSaveAttempt === 'function') {
+      window.lgpSaveAttempt(w.word, score, transcript, w.phonetic);
+    }
 
     if (scoreNum) {
       scoreNum.textContent      = score;

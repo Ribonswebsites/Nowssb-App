@@ -294,26 +294,21 @@
               replayBtn +
             '</div>' +
           '</div>' +
-          /* The band between the transport and the bottom row used to be
-             empty. These three numbers already existed — reps was only on
-             the thin bar, and the word position and the voice were buried
-             in the settings dial. */
-          '<div class="lgp-meter">' +
-            '<div class="lgp-meter-cell"><b>' + repCount + ' / ' + repTarget + '</b><span>Reps</span></div>' +
-            '<div class="lgp-meter-sep"></div>' +
-            '<div class="lgp-meter-cell"><b>' + (idx + 1) + ' of ' + total + '</b><span>Word</span></div>' +
-            '<div class="lgp-meter-sep"></div>' +
-            '<div class="lgp-meter-cell"><b>' + (voice === 'F' ? 'Female' : 'Male') + '</b><span>Voice</span></div>' +
-          '</div>' +
+          /* The Reps / Word / Voice band used to sit here. All three numbers
+             are still reachable — reps and voice from the settings dial,
+             the word position from the panel — and the row was costing the
+             page the height the word itself wanted. */
           '<div class="lgp-practice-row">' +
             '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
               '<span class="lgp-sentence-orb"><span class="lgp-sentence-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png\')"></span></span>' +
               '<span class="lgp-sentence-lbl">Sentence</span>' +
             '</button>' +
+            '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
             '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
               '<span class="lgp-practice-orb"><span class="lgp-practice-ring"></span><span class="lgp-practice-ring"></span><span class="lgp-practice-ico" style="background-image:url(\'' + IC.mic + '\')"></span></span>' +
               '<span class="lgp-practice-lbl">Practice</span>' +
             '</button>' +
+            '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
             '<button class="lgp-store" onclick="lgpOpenStore&&lgpOpenStore()" aria-label="Store">' +
               '<span class="lgp-store-orb"><span class="lgp-store-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png\')"></span></span>' +
               '<span class="lgp-store-lbl">Store</span>' +
@@ -454,14 +449,9 @@
           '</button>' +
           '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
           '<div class="lgp-top-right">' +
-            /* Like. Kept out of the panel deliberately — the panel's top row
-               is already the ritual and the bars, and a heart that moves
-               about with them is a heart nobody can find twice. */
-            '<button class="lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
-              ' onclick="window.lgpToggleLike&&window.lgpToggleLike()"' +
-              ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
-              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
-            '</button>' +
+            /* The heart used to live here. It sits in the band below now,
+               beside Notes, because that band was carrying nothing and
+               this row was already full. */
             '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
               '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
             '</button>' +
@@ -471,6 +461,26 @@
           '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
           '<div class="lgp-info-banner-divider"></div>' +
           '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
+          /* The two things you reach for while a word is playing, in the
+             band that was carrying nothing but a divider. */
+          '<div class="lgp-band-acts">' +
+            '<button class="lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
+              ' onclick="event.stopPropagation();window.lgpToggleLike&&window.lgpToggleLike()"' +
+              ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
+            '</button>' +
+            '<span class="lgp-band-sep" aria-hidden="true"></span>' +
+            '<button class="lgp-notes-btn" id="lgpNotesBtn" type="button"' +
+              ' onclick="event.stopPropagation();window.lgpOpenNotes&&window.lgpOpenNotes()"' +
+              ' aria-label="Pronunciation notes">' +
+              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+                '<path d="M6 3.5h8.5L19 8v12.5H6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
+                '<path d="M14 3.5V8h4.6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
+                '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+              '</svg>' +
+              '<span class="lgp-notes-lbl">Notes</span>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
         '<div class="lgp-visual">' + visual +
           /* ONE row across the top of the panel, not two islands pinned to
