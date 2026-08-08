@@ -10753,12 +10753,21 @@ body.fashplus #fpBgVideo { display: block; }
       rgba(0,0,0,0.26) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 76%, rgba(0,0,0,0.34) 100%);
 }
 body.fashplus #fpBgVeil { display: block; }
+
+/* Page backgrounds is a part switch of its own. With it off the film is not
+   just paused — a paused <video> is still a frame covering the page — so
+   both layers go, and the rules below hand the tagged pages their
+   photographs back. app/js/part076.js sets the class. */
+body.fashplus.fp-bg-off #fpBgVideo,
+body.fashplus.fp-bg-off #fpBgVeil { display: none !important; }
 body.fashplus #appBg { opacity: 0 !important; }
 body.fashplus #appBgLayer2 { opacity: 0 !important; }
 
-/* The tagged pages: let the fixed clip through, keep their own scrim. */
-body.fashplus .sub-screen[data-fp-img] { background: transparent; }
-body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { background-image: none !important; }
+/* The tagged pages: let the fixed clip through, keep their own scrim.
+   Only while Page backgrounds is on — with it off these pages are meant to
+   be wearing their photographs again. */
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] { background: transparent; }
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { background-image: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   body.fashplus #fpBgVideo { display: none; }
@@ -12535,8 +12544,8 @@ body[class] .nss-store-trigger .nss-trigger-vid {
    was the home, not the film. The pages are black instead. Nothing else
    about the mode changes: the home still wears the film.
 ═══════════════════════════════════════════════════════════════ */
-body.fashplus .sub-screen[data-fp-img] { background: #000 !important; }
-body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] {
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] { background: #000 !important; }
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] {
   background-image: none !important;
   background-color: #000 !important;
 }

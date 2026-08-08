@@ -101,6 +101,11 @@
   function slides() { return isOn() ? FILMS : STILLS; }
 
   function isOn() { return typeof window.fpOn === 'function' ? window.fpOn() : false; }
+  /* The mode has a master switch and four part switches, and Page
+     backgrounds is one of the parts. playState() only ever asked the master
+     one, so turning Page backgrounds off left the film playing — the switch
+     said off and the phone kept running the clip. */
+  function bgPartOn() { return typeof window.fpPartOn === 'function' ? window.fpPartOn('bg') : true; }
   function reducedMotion() {
     try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   }
@@ -192,7 +197,7 @@
   function playState() {
     var v = bgVideo(false);
     if (!v) return;
-    var want = isOn() && !reducedMotion() && !batteryLow &&
+    var want = isOn() && bgPartOn() && !reducedMotion() && !batteryLow &&
                document.visibilityState === 'visible';
     if (want) { v.play().catch(function () {}); }
     else { try { v.pause(); } catch (e) {} }
@@ -200,6 +205,12 @@
 
   /* Called by part066.js's apply(), which is the single source of truth. */
   window.nwsbFpBackgrounds = function (on) {
+    /* part066.js passes `isOn && partOn('bg')`, so this covers both the
+       master being off and Page backgrounds being off on its own. The class
+       is what lets the sheet hide the film and the vignette, and give the
+       tagged pages their photographs back — pausing alone left a frozen
+       frame covering them. */
+    document.body.classList.toggle('fp-bg-off', !on);
     if (on && !reducedMotion()) { bgVideo(true); markImageBacked(); }
     playState();
     /* The phone shows the stills when the mode is off and the clips when it
