@@ -80,7 +80,13 @@
       accent:'#f0d9a8' },
     { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796933792_qwzfgx.jpg',
       video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796996/grok_video_2026-06-30-10-52-20_zk87yh.mp4',
-      accent:'#8fe6ff' }
+      accent:'#8fe6ff' },
+    /* Liquid splash. The first look in here that ships WITH the app rather
+       than coming from Cloudinary — cldVid() leaves a path that has no
+       /video/upload/ in it alone, so it goes to the <video> untouched. */
+    { img:'./assets/player/liquid-splash.webp',
+      video:'./assets/video/player-liquid-splash.mp4',
+      accent:'#ffcf4d' }
   ];
 
   /* Exposed so app/js/part051.js's background video pre-warmer (Cache
@@ -91,7 +97,13 @@
      cldVid() at the exact same widths the player actually requests
      (720 for theme videos, 640 for organ videos), so the cached entry's
      URL is byte-for-byte what the <video src> will ask for. */
-  window.NWSB_PLAYER_VIDEO_URLS = LGP_THEMES.map(function (t) { return cldVid(t.video, 720); })
+  window.NWSB_PLAYER_VIDEO_URLS = LGP_THEMES
+    /* Cloudinary only. A theme video that ships inside the app is already
+       on the device for the native build and is a 20MB download for the
+       web one — pre-warming it would spend that on a look the reader may
+       never reach. It streams when a word lands on it, like any video. */
+    .filter(function (t) { return t.video && t.video.indexOf('/video/upload/') >= 0; })
+    .map(function (t) { return cldVid(t.video, 720); })
     .concat(Object.keys(ORGAN_VIDEOS).map(function (k) { return ORGAN_VIDEOS[k]; }).filter(Boolean).map(function (v) { return cldVid(v, 640); }));
 
   function isSubscribed() {
