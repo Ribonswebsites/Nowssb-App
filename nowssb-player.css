@@ -96,10 +96,8 @@
 }
 /* banner under the top bar — icon + divider + looping text, replaces the
    old two separate static lines (tagline + ritual counter) */
-/* The ticker banner lives INSIDE the picture now — it was a black bar
-   sitting above the panel, taking a band of the screen for one line of
-   text. It reads across the top of the panel, under the ritual row, and
-   the picture keeps the height the bar was spending. */
+/* The ticker banner is out of the layout. Its rules stay, unused, so
+   putting it back is one line of markup rather than a rebuild. */
 .lgp .lgp-info-banner {
   position:absolute; left:9px; right:9px; top:56px; z-index:4;
   display:flex; align-items:center; gap:12px; width:auto;
@@ -406,44 +404,24 @@
    stay concentric at every screen size.
    ══════════════════════════════════════════════════════════════════ */
 .lgp .lgp-practice-row {
-  /* First thing under the top bar now, in the slot the ticker banner
-     used to hold. margin-top:auto is gone with it — nothing pushes this
-     to the bottom any more. */
-  position:relative; width:100%; max-width:360px; margin:8px auto 0;
+  /* Back at the bottom, where it was. */
+  position:relative; width:100%; max-width:360px; margin:12px auto 0;
+  margin-top:auto;
   padding-bottom:15px;                    /* the label band under the tab */
   flex-shrink:0;
 }
-/* The same lit tab as the row under the picture, stretched taller so the
-   rings fit whole: the aperture is 87.4% of the frame's height, and a
-   ring is 27.6% of the ROW's width across, so the frame runs at 2.82:1
-   to leave the ring about 12% of clear air. */
+/* The same lit tab as the row under the picture, at the same size —
+   1371/317, no clip inside it, just the black aperture. */
 .lgp .lgp-pr-glass {
-  position:relative; width:100%; aspect-ratio:2.82;
+  position:relative; width:100%; aspect-ratio:1371/317;
   background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
   border-radius:9px !important;
   box-shadow:0 0 34px 6px rgba(255,255,255,.42), 0 0 90px 18px rgba(255,255,255,.16);
 }
-/* the aperture — black behind the clip, same offsets as the other tab */
-.lgp .lgp-pr-vid,
-.lgp .lgp-pr-sheen {
-  position:absolute; left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
-  border-radius:5px !important;
-}
-/* A <video> is a REPLACED element: with width:auto it takes its intrinsic
-   size (300x150 before any metadata arrives) and the `right`/`bottom`
-   offsets are dropped, so it spilled out of the frame as a 300px black
-   box. The aperture is given to it as an explicit width and height —
-   100% - 1.823% - 1.969% across, 100% - 5.994% - 6.625% down. */
-.lgp .lgp-pr-vid {
-  right:auto; bottom:auto;
-  width:96.208%; height:87.381%; background:#000;
-  object-fit:cover; object-position:center; display:block; pointer-events:none;
-  transform:translateZ(0); backface-visibility:hidden;
-}
-/* the sheen that reads as glass over the clip */
-.lgp .lgp-pr-sheen {
-  pointer-events:none; overflow:hidden;
-  background:linear-gradient(160deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.03) 34%, rgba(255,255,255,0) 55%);
+.lgp .lgp-pr-glass::before {
+  content:''; position:absolute;
+  left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
+  background:#000; border-radius:5px !important;
 }
 
 /* Each button is a column pinned to its ring's centre line: the orb is
@@ -457,9 +435,9 @@
   display:flex; align-items:center; justify-content:center;
   min-height:0 !important; min-width:0 !important;
 }
-.lgp .lgp-practice-row > .lgp-sentence { left:20.103%; }
+.lgp .lgp-practice-row > .lgp-sentence { left:17.858%; }
 .lgp .lgp-practice-row > .lgp-practice { left:49.927%; }
-.lgp .lgp-practice-row > .lgp-store    { left:79.752%; }
+.lgp .lgp-practice-row > .lgp-store    { left:81.996%; }
 .lgp .lgp-practice-row > .lgp-sentence:active,
 .lgp .lgp-practice-row > .lgp-practice:active,
 .lgp .lgp-practice-row > .lgp-store:active { transform:translateX(-50%) scale(.92); }
@@ -479,8 +457,8 @@
 .lgp .lgp-practice-row .lgp-store-orb,
 .lgp .lgp-practice-row .lgp-practice-orb,
 .lgp .lgp-practice-row .lgp-practice-ico {
-  width:clamp(29px, 11.0vw, 44px) !important;
-  height:clamp(29px, 11.0vw, 44px) !important;
+  width:clamp(26px, 9.4vw, 38px) !important;
+  height:clamp(26px, 9.4vw, 38px) !important;
 }
 /* the pulsing rings would fight the ring they are sitting inside */
 .lgp .lgp-practice-row .lgp-practice-ring { display:none !important; }
@@ -1328,13 +1306,15 @@
    nobody can see. Solid, and now placed at the midpoint between two ring
    centres — 34.5% and 65.5% — which is the gap between the rings. */
 .lgp .lgp-practice-sep {
-  position:absolute; top:14%; height:calc(72% - 15px); width:1px;
+  /* `left` places the left EDGE, so a 1px line sits half a pixel right of
+     the boundary it is meant to be on. */
+  position:absolute; top:14%; height:calc(72% - 15px); width:1px; margin-left:-0.5px;
   background:rgba(255,255,255,.55);
   box-shadow:0 0 4px rgba(0,0,0,.6);
   border-radius:1px !important;
 }
-.lgp .lgp-practice-sep:nth-of-type(1) { left:35.015%; }
-.lgp .lgp-practice-sep:nth-of-type(2) { left:64.840%; }
+.lgp .lgp-practice-sep:nth-of-type(1) { left:33.893%; }
+.lgp .lgp-practice-sep:nth-of-type(2) { left:65.962%; }
 
 /* The model's half of the notes. */
 .pn-coach-txt {

@@ -289,13 +289,11 @@
        never changes, so after the first render it is always carried across
        — otherwise every phase change reloaded it and it stuttered back to
        frame one while you were looking at it. */
-    var _keepWaVid = null, _keepPrVid = null;
+    var _keepWaVid = null;
     (function () {
       var ex = document.getElementById('practiceBody');
       var cur = ex ? ex.querySelector('.lgp-wa-vid') : null;
       if (cur) { _keepWaVid = cur; if (cur.parentNode) cur.parentNode.removeChild(cur); }
-      var pr = ex ? ex.querySelector('.lgp-pr-vid') : null;
-      if (pr) { _keepPrVid = pr; if (pr.parentNode) pr.parentNode.removeChild(pr); }
     })();
     var visual = th.video
       ? (_keepVid ? '<span class="lgp-video-slot"></span>'
@@ -444,13 +442,7 @@
         /* The three rings, in glass. Each button sits in the hole of
            its own ring — see .lgp-pr-glass in nowssb-player.css for
            where the 19/50/81% come from. */
-        '<div class="lgp-pr-glass">' +
-          (_keepPrVid
-            ? '<span class="lgp-pr-vid-slot"></span>'
-            : '<video class="lgp-pr-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
-              ' src="./assets/video/practice-row.mp4"></video>') +
-          '<span class="lgp-pr-sheen" aria-hidden="true"></span>' +
-        '</div>' +
+        '<div class="lgp-pr-glass"></div>' +
         '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
           '<span class="lgp-sentence-orb"><span class="lgp-sentence-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png\')"></span></span>' +
           '<span class="lgp-sentence-lbl">Sentence</span>' +
@@ -487,18 +479,10 @@
             '</button>' +
           '</div>' +
         '</div>' +
-        /* Sentence · Practice · Store take the slot the banner used to
-           hold, directly under the top bar. */
-        prow +
         '<div class="lgp-visual">' + visual +
-          /* The ticker banner, now INSIDE the picture rather than a black
-             bar above it. It reads across the top of the panel, under the
-             ritual row. */
-          '<div class="lgp-info-banner">' +
-            '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
-            '<div class="lgp-info-banner-divider"></div>' +
-            '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
-          '</div>' +
+          /* The ticker banner used to sit here, and above the picture
+             before that. Gone — it was a black bar over the artwork
+             saying one line of text. */
           /* ONE row across the top of the panel, not two islands pinned to
              the corners. Pinned, they overlapped the moment either side got
              long — "Afternoon" plus "Learn your score" was enough. In a row
@@ -571,6 +555,8 @@
           '<div class="lgp-progress-fill" style="width:' + sessionPct + '%"></div>' +
         '</div>' +
         center +
+        /* Sentence · Practice · Store — back at the bottom. */
+        prow +
       '</div>';
 
     /* Banner under the top bar — icon + divider + looping text (was two
@@ -580,7 +566,10 @@
        rebuilt on every word/phase change. */
     (function () {
       var el = document.getElementById('lgpBannerText');
-      if (!el) return;
+      /* The banner is gone from the layout. This stays because the element
+         may come back, and because a timer left running would keep
+         painting into a detached node. */
+      if (!el) { if (window._lgpBannerTimer) { clearInterval(window._lgpBannerTimer); window._lgpBannerTimer = 0; } return; }
       var lines = ['The new fashion trend of meditation', ritual + ' Ritual · ' + (idx + 1) + ' of ' + total];
       var i = 0;
       /* animate=false forces the line to full opacity via inline style —
@@ -626,15 +615,9 @@
       else { var _ws = body.querySelector('.lgp-wa-screen'); if (_ws) _ws.insertBefore(_keepWaVid, _ws.firstChild); }
     }
 
-    if (_keepPrVid) {
-      var _pslot = body.querySelector('.lgp-pr-vid-slot');
-      if (_pslot && _pslot.parentNode) _pslot.parentNode.replaceChild(_keepPrVid, _pslot);
-      else { var _pg = body.querySelector('.lgp-pr-glass'); if (_pg) _pg.insertBefore(_keepPrVid, _pg.firstChild); }
-    }
-
     /* Keep the small clips playing. Bind the resume listeners ONCE per
        element (not every render — that leaked handlers and caused jank). */
-    ['.lgp-wa-vid', '.lgp-pr-vid'].forEach(function (sel) {
+    ['.lgp-wa-vid'].forEach(function (sel) {
       var v = body.querySelector(sel);
       if (!v) return;
       v.muted = true; v.setAttribute('muted', ''); v.playsInline = true; v.loop = true;
