@@ -126,7 +126,7 @@
      max-height is what keeps a short phone honest: the ratio sets the
      shape, and on a 640px-tall screen the panel gives up height rather
      than pushing the transport off the bottom. */
-  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/0.95; max-height:40vh; flex-shrink:0;
+  width:100%; max-width:360px; margin:7px 0 0; aspect-ratio:1/0.83; max-height:35vh; flex-shrink:0;
   border-radius:30px !important; overflow:hidden; position:relative;
   background:rgba(10,16,30,.35);
   /* NO backdrop-filter here — the video fills this panel opaquely, so the
@@ -385,20 +385,82 @@
 .lgp .lgp-mic-ico { width:34px; height:34px; object-fit:contain; display:block; flex-shrink:0; filter:drop-shadow(0 3px 8px rgba(0,0,0,.4)); }
 
 
-/* ── Sentence · Practice · Store ──
-   Three EQUAL cells with a hairline on each boundary. Sentence and Store
-   used to be absolutely positioned against the row's edges with Practice
-   centred between them, which left the two separators — ordinary flex
-   items — with nothing but Practice to sit beside: both ended up hugging
-   the mic instead of dividing the row. Equal cells put each line exactly
-   halfway between the buttons on either side of it. */
+/* ══════════════════════════════════════════════════════════════════
+   Sentence · Practice · Store — one in each glass ring
+   The row is a strip of glass with the ring clip playing inside it, and
+   each button sits in the hole of its own ring.
+
+   assets/video/practice-row.mp4 is 1456x624. Measured off the frame, the
+   three ring centres sit at 19%, 50% and 81% of the WIDTH, vertically
+   centred, each ring 28.7% of the width across with a 14.6% hole. The
+   strip is shown at 3.11:1 with object-fit:cover, which is shorter than
+   the clip's own 2.33:1 — it crops black off the top and bottom and
+   leaves the rings whole (28.7% across vs 32.2% of height available).
+
+   Everything positions off the WIDTH, so the ring and the button in it
+   stay concentric at every screen size.
+   ══════════════════════════════════════════════════════════════════ */
 .lgp .lgp-practice-row {
-  position:relative; width:100%; max-width:340px; margin-top:auto;
-  display:flex; align-items:center; justify-content:space-between;
+  position:relative; width:100%; max-width:352px; margin-top:auto;
+  /* the label band under the strip */
+  padding-bottom:15px;
 }
+.lgp .lgp-pr-glass {
+  position:relative; width:100%; aspect-ratio:3.11; overflow:hidden;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.3);
+  box-shadow:0 10px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.4);
+}
+.lgp .lgp-pr-vid {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; object-position:center; display:block; pointer-events:none;
+  transform:translateZ(0); backface-visibility:hidden;
+}
+/* the sheen that makes it glass rather than a window */
+.lgp .lgp-pr-sheen {
+  position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(160deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.03) 34%, rgba(255,255,255,0) 55%);
+}
+
+/* Each button is a column pinned to its ring's centre line: the orb is
+   centred on the strip (so it lands in the hole) and the label hangs
+   just below the glass. */
 .lgp .lgp-practice-row > .lgp-sentence,
 .lgp .lgp-practice-row > .lgp-practice,
-.lgp .lgp-practice-row > .lgp-store { flex:1 1 0; min-width:0; }
+.lgp .lgp-practice-row > .lgp-store {
+  position:absolute; top:0; height:calc(100% - 15px);
+  transform:translateX(-50%);
+  display:flex; align-items:center; justify-content:center;
+  min-height:0 !important; min-width:0 !important;
+}
+.lgp .lgp-practice-row > .lgp-sentence { left:19%; }
+.lgp .lgp-practice-row > .lgp-practice { left:50%; }
+.lgp .lgp-practice-row > .lgp-store    { left:81%; }
+.lgp .lgp-practice-row > .lgp-sentence:active,
+.lgp .lgp-practice-row > .lgp-practice:active,
+.lgp .lgp-practice-row > .lgp-store:active { transform:translateX(-50%) scale(.92); }
+
+/* The labels drop out of the ring and sit under the glass. */
+.lgp .lgp-practice-row .lgp-sentence-lbl,
+.lgp .lgp-practice-row .lgp-practice-lbl,
+.lgp .lgp-practice-row .lgp-store-lbl {
+  position:absolute; top:100%; left:50%; transform:translateX(-50%);
+  margin-top:4px; white-space:nowrap;
+}
+
+/* The orbs shrink to fit the hole — 14.6% of the strip's width, which is
+   about 50px on a 390 screen. */
+.lgp .lgp-practice-row .lgp-sentence-orb,
+.lgp .lgp-practice-row .lgp-sentence-ico,
+.lgp .lgp-practice-row .lgp-store-orb,
+.lgp .lgp-practice-row .lgp-practice-orb,
+.lgp .lgp-practice-row .lgp-practice-ico {
+  width:clamp(30px, 11.4vw, 45px) !important;
+  height:clamp(30px, 11.4vw, 45px) !important;
+}
+/* the pulsing rings would fight the ring they are sitting inside */
+.lgp .lgp-practice-row .lgp-practice-ring { display:none !important; }
 .lgp .lgp-store {
   border:none; background:none; cursor:pointer; padding:0;
   display:flex; flex-direction:column; align-items:center; gap:5px;
@@ -1239,12 +1301,16 @@
 
 /* ── The line between Sentence, Practice and Store ──
    It was a gradient that faded out at both ends, which at 1px is a line
-   nobody can see. Solid, centred on the row, and tall enough to read. */
+   nobody can see. Solid, and now placed at the midpoint between two ring
+   centres — 34.5% and 65.5% — which is the gap between the rings. */
 .lgp .lgp-practice-sep {
-  width:1px; flex:0 0 1px; align-self:center; height:38px;
+  position:absolute; top:14%; height:calc(72% - 15px); width:1px;
   background:rgba(255,255,255,.55);
+  box-shadow:0 0 4px rgba(0,0,0,.6);
   border-radius:1px !important;
 }
+.lgp .lgp-practice-sep:nth-of-type(1) { left:34.5%; }
+.lgp .lgp-practice-sep:nth-of-type(2) { left:65.5%; }
 
 /* The model's half of the notes. */
 .pn-coach-txt {

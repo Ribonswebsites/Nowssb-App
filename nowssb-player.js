@@ -277,11 +277,13 @@
        never changes, so after the first render it is always carried across
        — otherwise every phase change reloaded it and it stuttered back to
        frame one while you were looking at it. */
-    var _keepWaVid = null;
+    var _keepWaVid = null, _keepPrVid = null;
     (function () {
       var ex = document.getElementById('practiceBody');
       var cur = ex ? ex.querySelector('.lgp-wa-vid') : null;
       if (cur) { _keepWaVid = cur; if (cur.parentNode) cur.parentNode.removeChild(cur); }
+      var pr = ex ? ex.querySelector('.lgp-pr-vid') : null;
+      if (pr) { _keepPrVid = pr; if (pr.parentNode) pr.parentNode.removeChild(pr); }
     })();
     var visual = th.video
       ? (_keepVid ? '<span class="lgp-video-slot"></span>'
@@ -309,6 +311,16 @@
              the word position from the panel — and the row was costing the
              page the height the word itself wanted. */
           '<div class="lgp-practice-row">' +
+            /* The three rings, in glass. Each button sits in the hole of
+               its own ring — see .lgp-pr-glass in nowssb-player.css for
+               where the 19/50/81% come from. */
+            '<div class="lgp-pr-glass">' +
+              (_keepPrVid
+                ? '<span class="lgp-pr-vid-slot"></span>'
+                : '<video class="lgp-pr-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
+                  ' src="./assets/video/practice-row.mp4"></video>') +
+              '<span class="lgp-pr-sheen" aria-hidden="true"></span>' +
+            '</div>' +
             '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
               '<span class="lgp-sentence-orb"><span class="lgp-sentence-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png\')"></span></span>' +
               '<span class="lgp-sentence-lbl">Sentence</span>' +
@@ -593,10 +605,16 @@
       else { var _ws = body.querySelector('.lgp-wa-screen'); if (_ws) _ws.insertBefore(_keepWaVid, _ws.firstChild); }
     }
 
-    /* Keep both clips playing. Bind the resume listeners ONCE per element
-       (not every render — that leaked handlers and caused jank). */
-    (function () {
-      var v = body.querySelector('.lgp-wa-vid');
+    if (_keepPrVid) {
+      var _pslot = body.querySelector('.lgp-pr-vid-slot');
+      if (_pslot && _pslot.parentNode) _pslot.parentNode.replaceChild(_keepPrVid, _pslot);
+      else { var _pg = body.querySelector('.lgp-pr-glass'); if (_pg) _pg.insertBefore(_keepPrVid, _pg.firstChild); }
+    }
+
+    /* Keep the small clips playing. Bind the resume listeners ONCE per
+       element (not every render — that leaked handlers and caused jank). */
+    ['.lgp-wa-vid', '.lgp-pr-vid'].forEach(function (sel) {
+      var v = body.querySelector(sel);
       if (!v) return;
       v.muted = true; v.setAttribute('muted', ''); v.playsInline = true; v.loop = true;
       function go() { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
@@ -607,7 +625,7 @@
         v.addEventListener('stalled', go);
       }
       if (v.paused) go();
-    })();
+    });
     (function () {
       var v = body.querySelector('.lgp-video');
       if (!v) return;
