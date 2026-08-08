@@ -5436,7 +5436,10 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
   will-change: transform, opacity;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   opacity: 0;
-  filter: drop-shadow(0 22px 40px rgba(0,0,0,0.72));
+  /* No glow and no drop-shadow. The centre phone never moves now, so there
+     is nothing for a highlight to disambiguate — the dots and the caption
+     already say which picture is showing, and a halo behind a phone that
+     holds still just reads as fuzz. */
 }
 .fbgci::before {
   content: ''; position: absolute; inset: 0; z-index: 0;
@@ -5457,13 +5460,6 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
   width: 34%; height: 3.4%; z-index: 2;
   background: #05070c;
   border-radius: 0 0 6px 6px !important;
-}
-/* The selected one. There is no border to colour any more, so this traces
-   the phone's actual outline — drop-shadow follows the render's alpha, the
-   way the Healing Path card's highlight does. */
-.fbgci.on {
-  filter: drop-shadow(0 22px 40px rgba(0,0,0,0.72))
-          drop-shadow(0 0 9px rgba(232,213,163,0.9));
 }
 /* The same fall of light down the glass the big phone has. */
 .fbgci-wall::after {
@@ -12838,9 +12834,12 @@ body.nm-night #home-nm .nc-blk {
   background: #16163c;
   box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
 }
-/* On the Fashion home .glass-wrap supplies the look; this only sets the
-   rhythm between it and its neighbours. */
-#home .nc-blk { margin: 16px 0; }
+/* On the Fashion home .glass-wrap supplies both the look AND the inset —
+   `width: calc(100% - 32px); margin: 18px 16px`. Only the vertical rhythm
+   is set here: a `margin` shorthand wipes those 16px side margins while
+   leaving the width, which put the whole block hard against the left edge,
+   16px out of line with all thirteen of its neighbours. */
+#home .nc-blk { margin-top: 16px; margin-bottom: 16px; }
 
 /* The clip sits between the heading and the banner. part067.js injects a
    .vb-banner into .nc-blk-vid, so that box is empty until it runs — and an

@@ -37,6 +37,14 @@
   var sbgActive = 0, sbgItems = null, sbgDotEls = null, SBG_N = 0;
   var sbgStagedMode = null;   // 'auto' | 'default' | null (= the centred photo)
 
+  /* Five phones at fixed slots — see app/js/part047.js. The phone holds
+     still and the picture inside it changes. */
+  function slots() {
+    var n = Math.min(5, SBG_N), half = Math.floor(n / 2), out = [];
+    for (var s = -half; out.length < n; s++) out.push(s);
+    return out;
+  }
+
   function cfg(s) {
     var a = Math.abs(s), d = s < 0 ? -1 : 1;
     if (a === 0) return { tx: 0,      tz: 200,  ry: 0,      sc: 1.00, op: 1.00, zi: 20 };
@@ -47,16 +55,19 @@
 
   function paint() {
     if (!sbgItems) return;
+    var SL = slots(), urls = art();
     sbgItems.forEach(function (el, i) {
-      var off = ((i - sbgActive) % SBG_N + SBG_N) % SBG_N;
-      var s = off > Math.floor(SBG_N / 2) ? off - SBG_N : off;
+      var s = SL[i];
       var c = cfg(s);
       el.style.transform     = 'translateX(' + c.tx + 'px) translateZ(' + c.tz + 'px) rotateY(' + c.ry + 'deg) scale(' + c.sc + ')';
       el.style.opacity       = String(c.op);
       el.style.zIndex        = String(c.zi);
       el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
-      /* See part047.js — the phone has no border to colour. */
-      el.classList.toggle('on', !sbgStagedMode && i === sbgActive);
+      var wall = el.querySelector('.fbgci-wall');
+      if (wall) {
+        var url = urls[((sbgActive + s) % SBG_N + SBG_N) % SBG_N];
+        if (wall.dataset.url !== url) { wall.style.backgroundImage = "url('" + url + "')"; wall.dataset.url = url; }
+      }
     });
     if (sbgDotEls) sbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === sbgActive); });
     var label = document.getElementById('sbgSelectedLabel');
@@ -92,16 +103,17 @@
 
     if (!inner.dataset.built) {
       inner.dataset.built = '1';
-      inner.innerHTML = art().map(function (url) {
-        /* The card is a phone now — the wallpaper goes on an inner element so
-           the frame render can sit under it (see .fbgci in nowssb-nm.css). */
-        return '<div class="fbgci"><span class="fbgci-wall" style="background-image:url(\'' + url + '\')"></span></div>';
+      SBG_N = art().length;
+      inner.innerHTML = slots().map(function () {
+        return '<div class="fbgci"><span class="fbgci-wall"></span></div>';
       }).join('');
       dotsEl.innerHTML = art().map(function () { return '<div class="becd"></div>'; }).join('');
     }
     sbgItems  = Array.from(inner.querySelectorAll('.fbgci'));
     sbgDotEls = Array.from(dotsEl.querySelectorAll('.becd'));
-    SBG_N = sbgItems.length;
+    /* The pictures, not the phones — there are five of those however many
+       pictures there are. */
+    SBG_N = art().length;
 
     // Seed from what's actually committed, so reopening shows the truth.
     var mode = savedMode();
@@ -139,12 +151,15 @@
       }, { passive: true });
     }
 
+    var tapSlots = slots();
     sbgItems.forEach(function (el, i) {
       el.onclick = function (e) {
         e.stopPropagation();
         sbgStagedMode = null;
         syncModeCards();
-        if (i !== sbgActive) go(i);
+        /* The element is a slot, so a tap means "move this far". */
+        var sl = tapSlots[i];
+        if (sl !== 0) go(sbgActive + sl);
         else window.sbgApply();
       };
     });

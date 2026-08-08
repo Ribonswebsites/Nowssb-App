@@ -63,15 +63,24 @@
     { vid: './assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
     { vid: './assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
     { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
-    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Words Science' },
-    /* Encoded at 720x1280 / 0.19 bits per pixel, against 0.08-0.11 for the
-       five above and 0.03 for Words Science. Falling stones on black is the
-       worst case for a low bitrate — fine specular highlights over flat
-       shadow is exactly what a starved encoder throws away first — so this
-       one got the bits it needs rather than the bits the others got. */
+    /* Words Science used to sit here. It is the clip that belongs to the
+       Word Science button, not a wallpaper, and at 0.03 bits per pixel it
+       was the worst-looking thing in the list as well. Removing it shifts
+       the indices after it by one, so anyone who had it saved lands on
+       Falling Diamonds — which is the point.
+       These two are encoded at 720x1280 / ~0.19 bits per pixel, against
+       0.08-0.11 for the four above. */
     { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Falling Diamonds' },
     { vid: './assets/video/fashion-plus-bg-6.mp4', name: 'Violet Silk' }
   ];
+  /* What a first-time reader gets. Not index 0 — Violet Silk is the one
+     that should introduce the mode, and it is one of the two encoded for
+     it. Kept as a name rather than a number so it survives the list
+     changing again. */
+  var BG_DEFAULT = (function () {
+    for (var i = 0; i < FILMS.length; i++) if (FILMS[i].name === 'Violet Silk') return i;
+    return 0;
+  })();
   FILMS.forEach(function (f, i) {
     f.t = [f.name, 'Background ' + (i + 1) + ' of ' + FILMS.length];
   });
@@ -86,9 +95,11 @@
      forget to press. */
   var BGKEY = 'nwsb_fp_bgvid';
   function bgChoice() {
-    var i = 0;
-    try { i = parseInt(localStorage.getItem(BGKEY), 10) || 0; } catch (e) {}
-    return (i >= 0 && i < FILMS.length) ? i : 0;
+    var raw = null;
+    try { raw = localStorage.getItem(BGKEY); } catch (e) {}
+    if (raw === null || raw === '') return BG_DEFAULT;   // never chosen
+    var i = parseInt(raw, 10);
+    return (isFinite(i) && i >= 0 && i < FILMS.length) ? i : BG_DEFAULT;
   }
   function setBgChoice(i) {
     if (i < 0 || i >= FILMS.length || i === bgChoice()) return;

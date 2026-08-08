@@ -239,6 +239,15 @@
   // the live background until fbgApply() runs (APPLY THIS BACKGROUND).
   var fbgStagedMode = null;
 
+  /* At most five on screen: the centre, and two either side. Fewer than
+     five pictures means fewer phones — a slot with nothing behind it would
+     repeat a picture already showing. */
+  function fbgSlots() {
+    var n = Math.min(5, FBG_N), half = Math.floor(n / 2), out = [];
+    for (var s = -half; out.length < n; s++) out.push(s);
+    return out;
+  }
+
   function fbgCfg(s) {
     var a = Math.abs(s), d = s < 0 ? -1 : 1;
     if (a === 0) return {tx: 0,     tz: 200,  ry: 0,     sc: 1.00, op: 1.00, zi: 20};
@@ -249,18 +258,22 @@
 
   function fbgPaint() {
     if (!fbgItems) return;
+    var slots = fbgSlots();
     fbgItems.forEach(function (el, i) {
-      var off = ((i - fbgActive) % FBG_N + FBG_N) % FBG_N;
-      var s = off > Math.floor(FBG_N / 2) ? off - FBG_N : off;
+      var s = slots[i];
       var c = fbgCfg(s);
+      /* Constant for the life of the picker — this is what keeps the phone
+         still while the picture changes under it. */
       el.style.transform     = 'translateX('+c.tx+'px) translateZ('+c.tz+'px) rotateY('+c.ry+'deg) scale('+c.sc+')';
       el.style.opacity       = String(c.op);
       el.style.zIndex        = String(c.zi);
       el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
-      /* The card is a phone now and has no border to colour, so the
-         selected one is marked with a class the sheet turns into a gold
-         glow that traces the phone's own silhouette. */
-      el.classList.toggle('on', !fbgStagedMode && i === fbgActive);
+      var wall = el.querySelector('.fbgci-wall');
+      if (wall) {
+        var url = NWSB_FASHION_BGS[((fbgActive + s) % FBG_N + FBG_N) % FBG_N];
+        var want = "url('" + url + "')";
+        if (wall.dataset.url !== url) { wall.style.backgroundImage = want; wall.dataset.url = url; }
+      }
     });
     if (fbgDotEls) fbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === fbgActive); });
     var label = document.getElementById('fbgSelectedLabel');
@@ -308,17 +321,22 @@
 
     if (!inner.dataset.built) {
       inner.dataset.built = '1';
-      inner.innerHTML = NWSB_FASHION_BGS.map(function (url) {
-        /* The card is a phone now — the wallpaper goes on an inner element so
-           the frame render can sit under it (see .fbgci in nowssb-nm.css). */
-        return '<div class="fbgci"><span class="fbgci-wall" style="background-image:url(\'' + url + '\')"></span></div>';
+      /* Five phones that never move, not one per image. The phone stays
+         where it is and the wallpaper inside it changes as you swipe —
+         which is what the Fashion Plus stage does, and the whole reason
+         this is a phone. Each element owns a SLOT (-2..2), not a picture. */
+      inner.innerHTML = fbgSlots().map(function () {
+        return '<div class="fbgci"><span class="fbgci-wall"></span></div>';
       }).join('');
       dotsEl.innerHTML = NWSB_FASHION_BGS.map(function () { return '<div class="becd"></div>'; }).join('');
     }
 
     fbgItems  = Array.from(inner.querySelectorAll('.fbgci'));
     fbgDotEls = Array.from(dotsEl.querySelectorAll('.becd'));
-    FBG_N = fbgItems.length;
+    /* The pictures, not the phones. There are five phones now however many
+       pictures there are, and this count drives the dots, the label and
+       every modulo in here. */
+    FBG_N = NWSB_FASHION_BGS.length;
 
     // Start from whichever photo is currently applied, if any — and seed
     // the staged mode from the currently COMMITTED state (not just left
@@ -369,12 +387,16 @@
       }
     }, {passive: true});
 
+    var tapSlots = fbgSlots();
     fbgItems.forEach(function (el, i) {
       el.onclick = function (e) {
         e.stopPropagation();
         fbgStagedMode = null;
         fbgSyncModeButtons();
-        if (i !== fbgActive) fbgGo(i);
+        /* The element is a slot, so a tap means "move this far", not "pick
+           picture i". */
+        var s = tapSlots[i];
+        if (s !== 0) fbgGo(fbgActive + s);
         else fbgApply();
       };
     });
