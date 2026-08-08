@@ -13995,6 +13995,20 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
      index.html; the fallback covers the first paint before it is set. */
   margin-top: var(--home-header-h, calc(env(safe-area-inset-top, 14px) + 62px));
   margin-bottom: 8px;
+  /* ── Sized to fit between the header and the nav ──
+     Full width made the set 756px tall on a 390 screen, and with the
+     header above it and the bottom nav over it there is only about 675px
+     of clear glass — so the stand fell off the bottom. The WIDTH is
+     capped by the height that is actually free, and the ratio does the
+     rest: nothing about the set changes except its size. */
+  /* max() on the nav because --nav-height reads 0 while the nav is hidden,
+     and the set must not size itself for a bar that is about to come back.
+     The 44px covers the screen's own top offset above this margin plus a
+     gap over the nav, so the stand always clears it. */
+  --tv-free-h: calc(100dvh - var(--home-header-h, 91px) - max(58px, var(--nav-height, 58px)) - env(safe-area-inset-bottom, 0px) - 44px);
+  width: min(100%, calc(var(--tv-free-h) * 727 / 1409));
+  margin-left: auto;
+  margin-right: auto;
 }
 /* the crossfading photographs and the content share the screen */
 #home .hero-tv .hero-bg,
@@ -14027,4 +14041,22 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 #home .nsub-blk .ncb-carousel,
 #home .nwsb-vbwrap[data-vbwrap] .ncb-carousel {
   box-shadow: 0 10px 26px rgba(0,0,0,0.45) !important;
+}
+
+/* On a short screen the free height is small, so the set is small, so the
+   screen inside it is small — 217x405 on a 360x640 phone. The hero's
+   furniture was sized for a full viewport and pushed out through the
+   bezel there. It comes down to match. */
+@media (max-height: 740px) {
+  #home .hero-tv .hero-content { padding: 14px 10px 12px; }
+  #home .hero-tv .brand-name { font-size: 21px !important; }
+  #home .hero-tv .hero-cust-btn,
+  #home .hero-tv .hero-feat-btn { width: 34px !important; height: 34px !important; }
+  #home .hero-tv .hero-glass { height: 84px; }
+  #home .hero-tv .hero-word-wrap { margin-top: 4px; height: 30px; }
+  #home .hero-tv .hero-word { font-size: 26px !important; }
+  #home .hero-tv .hero-btns { margin-top: 7px; gap: 7px; }
+  #home .hero-tv .hero-btn { padding: 8px 12px !important; font-size: 10px !important; }
+  #home .hero-tv .hero-bottom > div:first-child { margin-bottom: 8px !important; }
+  #home .hero-tv .hero-bottom > div:first-child .brand-tag { font-size: 11px !important; }
 }
