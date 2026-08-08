@@ -13920,3 +13920,49 @@ body[class] #sub-health-journey .gsel-card.dev-tabn-p {
   font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: .6px;
   color: rgba(255,255,255,.38);
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   SUBSCRIPTION and CHOOSE YOUR PATH, as blocks
+   Both were a bare framed clip sitting on the page with nothing saying
+   what they were. They are built like Quick Access and Connect now: an
+   orb and two lines of heading, the clip, and one black banner under it
+   saying where it goes.
+
+   They get their own class rather than reusing .nc-blk, because the
+   layout registry matches ':scope > sel' — a second .nc-blk on the same
+   home would make Connect's entry match two elements and move both.
+   ══════════════════════════════════════════════════════════════════════ */
+#home-nm .nsub-blk,
+#home-nm .nwsb-vbwrap[data-vbwrap] {
+  width: 100%; box-sizing: border-box;
+  border-radius: 22px !important;
+  background: #f0f2f7;
+  padding: 18px;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+  margin: 16px 0;
+}
+body.nm-night #home-nm .nsub-blk,
+body.nm-night #home-nm .nwsb-vbwrap[data-vbwrap] {
+  background: #16163c;
+  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
+}
+#home .nsub-blk { margin-top: 16px; margin-bottom: 16px; }
+
+/* the framed clip inside a block fills it and clears the banner below */
+.nsub-blk .nmh-video-banner,
+.nsub-blk .fash-video-banner,
+.nwsb-vbwrap[data-vbwrap] > .vb-banner {
+  width: 100% !important;
+  margin: 0 0 12px !important;
+  box-sizing: border-box;
+}
+/* the black banner at the foot of a block */
+.nsub-blk .ncb-carousel,
+.nwsb-vbwrap[data-vbwrap] .ncb-carousel {
+  margin: 0 !important;
+  border-radius: 18px !important;
+  cursor: pointer;
+}
+.nsub-ban .ncb-slide { padding: 20px; }
+.nsub-blk-orb { color: #c8a96e; }
+body.nm-night .nsub-blk-orb { color: #e8d5a3; }

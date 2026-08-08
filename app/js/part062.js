@@ -69,7 +69,7 @@
            television went on. */
         { k:'quickrow', sel:['.qa-tv-block'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
         { k:'trendshop',sel:['.nmh-trend-shop-wrap'],                                     t:S, label:'Trending Shop',         sub:'The clip and the Shop Now banner' },
-        { k:'subvid',   sel:['.nmh-video-banner.nmh-vb-tall'],                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
+        { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner' },
         { k:'edition',  sel:['.nmh-fsec'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers' },
@@ -112,7 +112,7 @@
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner' },
-        { k:'subvid',   sel:['.fash-vb-tall'],                                             t:B, label:'Subscribe Video',       sub:'Subscription video banner' },
+        { k:'subvid',   sel:['.nsub-blk'],                                                t:S, label:'Subscription',          sub:'The clip, the heading and its banner' },
         { k:'edition',  sel:['#sub-promo-card'],                                           t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'routines', sel:['.fash-routines-wrap'],                                       t:S, label:'My Routines',          sub:'Daily practice system' },
         { k:'offer',    sel:['.fash-offer-wrap'],                                          t:S, label:"Today's Offer",         sub:'Coupon art and the offer banner' },

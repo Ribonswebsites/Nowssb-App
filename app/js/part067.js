@@ -30,8 +30,18 @@
        app/js/part062.js as 'genderpath'; a direct child of the home wrap
        that the registry does not know about gets stranded at the top of the
        page while everything registered is re-appended around it. */
-    { after: '#home-nm .nmh-healing-wrap',         vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap' },
-    { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap' },
+    { after: '#home-nm .nmh-healing-wrap',         vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
+      head: { hello:'Body, organ and mind', name:'Choose Your Path',
+              icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
+              banName:'Female or Male', banSub:'Your wellness, decoded for your body',
+              banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
+                                   else if (typeof openSub === 'function') openSub('health-category'); } } },
+    { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
+      head: { hello:'Body, organ and mind', name:'Choose Your Path',
+              icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
+              banName:'Female or Male', banSub:'Your wellness, decoded for your body',
+              banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
+                                   else if (typeof openSub === 'function') openSub('health-category'); } } },
 
     /* The Connect banner — the clip that introduces the section, not the
        section's own background clip (.nmh-connect-vid, which is untouched).
@@ -372,6 +382,39 @@
     try { if (navigator.vibrate) navigator.vibrate(28); } catch (e) {}
   };
 
+  /* ── A heading above and a black banner below ──
+     Quick Access, Connect and Subscription all read the same way: an orb
+     and two lines of heading, the framed clip, then one black row saying
+     where it goes. A wrapped banner can ask for the same. ── */
+  var VB_ARROW = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function vbHead(h) {
+    var d = document.createElement('div');
+    d.className = 'qa-tv-head';
+    d.innerHTML =
+      '<div class="qa-tv-orb nsub-blk-orb" aria-hidden="true">' + h.icon + '</div>' +
+      '<div class="qa-tv-head-txt">' +
+        '<div class="qa-tv-hello">' + h.hello + '</div>' +
+        '<div class="qa-tv-name">' + h.name + '</div>' +
+      '</div>';
+    return d;
+  }
+  function vbBanner(h) {
+    var d = document.createElement('div');
+    d.className = 'ncb-carousel nsub-ban';
+    d.setAttribute('role', 'button');
+    d.innerHTML =
+      '<div class="ncb-slide">' +
+        '<span class="ncb-ico">' + h.icon + '</span>' +
+        '<span class="ncb-txt">' +
+          '<span class="ncb-name">' + h.banName + '</span>' +
+          '<span class="ncb-sub">' + h.banSub + '</span>' +
+        '</span>' +
+        '<span class="ncb-btn">' + VB_ARROW + '</span>' +
+      '</div>';
+    if (h.banGo) d.onclick = function () { try { h.banGo(); } catch (e) {} };
+    return d;
+  }
+
   function place() {
     var added = false;
     PLACE.forEach(function (spec, i) {
@@ -393,7 +436,9 @@
         var w = document.createElement('div');
         w.className = spec.wrap;
         w.setAttribute('data-vbwrap', key);
+        if (spec.head) w.appendChild(vbHead(spec.head));
         w.appendChild(el);
+        if (spec.head) w.appendChild(vbBanner(spec.head));
         el = w;
       }
       if (spec.before) host.parentNode.insertBefore(el, host);

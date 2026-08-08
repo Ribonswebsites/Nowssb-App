@@ -102,23 +102,23 @@
    same aperture offsets as the two rows below, so the three read as one
    family rather than a bar and two tabs.
    ══════════════════════════════════════════════════════════════════ */
+/* No frame here. It was the same lit tab as the rows below, which put
+   three of them on one screen — the banner is just the black bar. */
 .lgp .lgp-banner-tab {
-  position:relative; width:100%; max-width:360px; margin:8px auto 0;
-  aspect-ratio:1371/317; flex-shrink:0;
-  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
-  border-radius:9px !important;
+  position:relative; width:100%; max-width:360px; margin:10px auto 0;
+  flex-shrink:0;
 }
 .lgp .lgp-info-banner {
-  position:absolute; left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
-  display:flex; align-items:center; gap:12px; width:auto;
-  background:#000; border-radius:5px !important; padding:0 14px;
+  position:relative; width:100%;
+  display:flex; align-items:center; gap:13px;
+  background:#000; border-radius:16px !important; padding:13px 16px;
   overflow:hidden;
 }
 .lgp .lgp-info-banner-icon {
   width:34px; height:34px; min-width:0 !important; min-height:0 !important;
   background-size:contain; background-repeat:no-repeat; background-position:center; flex-shrink:0;
 }
-.lgp .lgp-info-banner-divider { width:1px; height:60%; background:rgba(255,255,255,.15); flex-shrink:0; }
+.lgp .lgp-info-banner-divider { width:1px; height:34px; background:rgba(255,255,255,.15); flex-shrink:0; }
 .lgp .lgp-info-banner-text {
   font-size:14px; font-weight:800; letter-spacing:.2px; color:#fff;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -274,27 +274,60 @@
    nothing around it. It has a box now, with air inside it, and the four
    bars on its left move while the word is being spoken. */
 .lgp .lgp-barwrap {
-  width:100%; max-width:340px; margin:14px auto 0; padding:12px 16px;
-  display:flex; align-items:center; gap:12px; flex-shrink:0;
+  width:100%; max-width:340px; margin:14px auto 0; padding:16px;
+  display:flex; align-items:center; gap:11px; flex-shrink:0;
   border-radius:16px !important;
   background:rgba(6,10,22,.5);
   border:1px solid rgba(255,255,255,.16);
   box-shadow:0 8px 22px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16);
 }
-.lgp .lgp-bar-eq {
-  display:flex; align-items:flex-end; gap:2.5px; height:16px; flex-shrink:0;
+
+/* ── The waveform ──
+   Four sticks bouncing at random read as a generic "audio" badge. This is
+   a WAVE: nine bars whose resting heights already draw one, centred on the
+   line rather than standing on the floor, so it looks like a sound even
+   when nothing is playing. While the word is spoken every bar runs the
+   same swell on a staggered delay, which makes the crest travel across it
+   instead of the whole thing flashing at once. */
+.lgp .lgp-bar-wave {
+  display:flex; align-items:center; gap:2px; height:20px; flex-shrink:0;
 }
-.lgp .lgp-bar-eq i {
-  display:block; width:2.5px; height:5px; border-radius:2px !important;
-  background:var(--lg-accent); box-shadow:0 0 8px var(--lg-accent);
-  transform-origin:bottom;
+.lgp .lgp-bar-wave i {
+  display:block; width:2.5px; border-radius:2px !important;
+  background:var(--lg-accent); box-shadow:0 0 7px var(--lg-accent);
+  opacity:.85;
 }
-/* still when nothing is playing — four short marks, not a fake meter */
-.lgp.playing .lgp-bar-eq i { animation:lgpBarEq .62s ease-in-out infinite alternate; }
-.lgp.playing .lgp-bar-eq i:nth-child(2) { animation-delay:.14s; animation-duration:.5s; }
-.lgp.playing .lgp-bar-eq i:nth-child(3) { animation-delay:.07s; animation-duration:.72s; }
-.lgp.playing .lgp-bar-eq i:nth-child(4) { animation-delay:.21s; animation-duration:.56s; }
-@keyframes lgpBarEq { from { height:4px; } to { height:16px; } }
+/* the resting shape — a wave, read left to right */
+.lgp .lgp-bar-wave i:nth-child(1) { height:26%; }
+.lgp .lgp-bar-wave i:nth-child(2) { height:48%; }
+.lgp .lgp-bar-wave i:nth-child(3) { height:76%; }
+.lgp .lgp-bar-wave i:nth-child(4) { height:100%; }
+.lgp .lgp-bar-wave i:nth-child(5) { height:76%; }
+.lgp .lgp-bar-wave i:nth-child(6) { height:48%; }
+.lgp .lgp-bar-wave i:nth-child(7) { height:70%; }
+.lgp .lgp-bar-wave i:nth-child(8) { height:42%; }
+.lgp .lgp-bar-wave i:nth-child(9) { height:22%; }
+.lgp.playing .lgp-bar-wave i { animation:lgpWaveBar .78s ease-in-out infinite; }
+.lgp.playing .lgp-bar-wave i:nth-child(1) { animation-delay:0s; }
+.lgp.playing .lgp-bar-wave i:nth-child(2) { animation-delay:.07s; }
+.lgp.playing .lgp-bar-wave i:nth-child(3) { animation-delay:.14s; }
+.lgp.playing .lgp-bar-wave i:nth-child(4) { animation-delay:.21s; }
+.lgp.playing .lgp-bar-wave i:nth-child(5) { animation-delay:.28s; }
+.lgp.playing .lgp-bar-wave i:nth-child(6) { animation-delay:.35s; }
+.lgp.playing .lgp-bar-wave i:nth-child(7) { animation-delay:.42s; }
+.lgp.playing .lgp-bar-wave i:nth-child(8) { animation-delay:.49s; }
+.lgp.playing .lgp-bar-wave i:nth-child(9) { animation-delay:.56s; }
+@keyframes lgpWaveBar {
+  0%, 100% { height:22%; opacity:.6; }
+  50%      { height:100%; opacity:1; }
+}
+
+/* the line between the wave and the bar */
+.lgp .lgp-bar-sep {
+  width:1px; height:20px; flex:0 0 1px;
+  background:rgba(255,255,255,.4);
+  border-radius:1px !important;
+}
 
 .lgp .lgp-progress {
   position:relative;
@@ -444,10 +477,10 @@
    stay concentric at every screen size.
    ══════════════════════════════════════════════════════════════════ */
 .lgp .lgp-practice-row {
-  /* Back at the bottom, where it was. */
+  /* Back at the bottom, where it was — lifted off the very edge, and with
+     no label band under it any more: the labels went inside the tab. */
   position:relative; width:100%; max-width:360px; margin:12px auto 0;
-  margin-top:auto;
-  padding-bottom:15px;                    /* the label band under the tab */
+  margin-top:auto; margin-bottom:16px;
   flex-shrink:0;
 }
 /* The same lit tab as the row under the picture, at the same size —
@@ -476,9 +509,10 @@
 .lgp .lgp-practice-row > .lgp-sentence,
 .lgp .lgp-practice-row > .lgp-practice,
 .lgp .lgp-practice-row > .lgp-store {
-  position:absolute; top:0; height:calc(100% - 15px);
+  position:absolute; top:0; bottom:0;
   transform:translateX(-50%);
-  display:flex; align-items:center; justify-content:center;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px;
   min-height:0 !important; min-width:0 !important;
 }
 .lgp .lgp-practice-row > .lgp-sentence { left:17.858%; }
@@ -488,12 +522,12 @@
 .lgp .lgp-practice-row > .lgp-practice:active,
 .lgp .lgp-practice-row > .lgp-store:active { transform:translateX(-50%) scale(.92); }
 
-/* The labels drop out of the ring and sit under the glass. */
-.lgp .lgp-practice-row .lgp-sentence-lbl,
-.lgp .lgp-practice-row .lgp-practice-lbl,
-.lgp .lgp-practice-row .lgp-store-lbl {
-  position:absolute; top:100%; left:50%; transform:translateX(-50%);
-  margin-top:4px; white-space:nowrap;
+/* The labels are INSIDE the tab, under their icon. They hung below the
+   frame before, which put text outside the only box on the row. */
+.lgp .lgp-practice-row .lgp-pr-lbl {
+  font-family:'DM Sans',sans-serif; font-size:8.5px; font-weight:800;
+  letter-spacing:1.4px; text-transform:uppercase; color:#fff;
+  white-space:nowrap; text-shadow:0 1px 5px rgba(0,0,0,.8);
 }
 
 /* Drawn, not photographed. The three were Cloudinary pictures of metal
@@ -501,7 +535,7 @@
    player, and three network fetches for three icons. */
 .lgp .lgp-pr-ico {
   display:flex; align-items:center; justify-content:center;
-  width:clamp(24px, 8.4vw, 32px); height:clamp(24px, 8.4vw, 32px);
+  width:clamp(21px, 7.2vw, 27px); height:clamp(21px, 7.2vw, 27px);
   color:#fff; pointer-events:none;
 }
 .lgp .lgp-pr-ico svg {
@@ -1251,13 +1285,19 @@
   transition:opacity .28s ease, transform .32s cubic-bezier(.2,1,.3,1);
 }
 .lgp .lgp-rail-l { left:10px; }
-.lgp .lgp-rail-r { right:10px; padding:6px 5px; gap:0; }
+/* The speaker lives in the bottom-right corner of the picture, not
+   halfway down the side — and because it is anchored at the BOTTOM, the
+   slider opens upward out of it and the speaker itself never moves. */
+.lgp .lgp-rail-r {
+  right:10px; bottom:10px; top:auto; transform:none;
+  padding:6px 5px; gap:0;
+}
 .lgp .lgp-rail-r.vol-open { padding:10px 5px 8px; }
 
 /* folded away — they slide out sideways and stop taking taps */
 .lgp .lgp-visual.rails-off .lgp-rail { opacity:0; pointer-events:none; }
 .lgp .lgp-visual.rails-off .lgp-rail-l { transform:translate(-130%, -50%); }
-.lgp .lgp-visual.rails-off .lgp-rail-r { transform:translate(130%, -50%); }
+.lgp .lgp-visual.rails-off .lgp-rail-r { transform:translateX(130%); }
 
 /* the buttons in the left rail: 40 square, bare, white */
 .lgp .lgp-rail .lgp-wa {
@@ -1323,8 +1363,9 @@
 
 /* ── fold/unfold ──
    Stays put when the rails go, because it is the way back. */
+/* …which is why the fold toggle moved to the other corner. */
 .lgp .lgp-rail-toggle {
-  position:absolute; right:10px; bottom:10px; z-index:6;
+  position:absolute; left:10px; bottom:10px; z-index:6;
   width:36px !important; height:36px !important;
   min-width:36px !important; min-height:36px !important;
   padding:0; cursor:pointer;

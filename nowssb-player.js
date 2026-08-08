@@ -459,17 +459,17 @@
         '</div>' +
         '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
           '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7.5 9.5h9M7.5 12.6h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
-          '<span class="lgp-sentence-lbl">Sentence</span>' +
+          '<span class="lgp-pr-lbl">Sentence</span>' +
         '</button>' +
         '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
         '<button class="lgp-practice" onclick="pwPracticeNow&&pwPracticeNow()" aria-label="Practice this word">' +
           '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="2.6" width="6" height="11.2" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 11.4a6.5 6.5 0 0 0 13 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 17.9v3.5M8.6 21.4h6.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
-          '<span class="lgp-practice-lbl">Practice</span>' +
+          '<span class="lgp-pr-lbl">Practice</span>' +
         '</button>' +
         '<span class="lgp-practice-sep" aria-hidden="true"></span>' +
         '<button class="lgp-store" onclick="lgpOpenStore&&lgpOpenStore()" aria-label="Store">' +
           '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.6 1.6 0 0 1-1.6 1.4H7.1a1.6 1.6 0 0 1-1.6-1.4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.8 10V6.4a3.2 3.2 0 0 1 6.4 0V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
-          '<span class="lgp-store-lbl">Store</span>' +
+          '<span class="lgp-pr-lbl">Store</span>' +
         '</button>' +
       '</div>';
 
@@ -601,7 +601,13 @@
         /* The bar, in a wrapper with room around it, and the four bars on
            its left that move while the word is being spoken. */
         '<div class="lgp-barwrap">' +
-          '<span class="lgp-bar-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' +
+          /* A waveform, not four bouncing sticks: nine bars whose resting
+             heights already draw a wave, and a travelling phase while the
+             word is being spoken. */
+          '<span class="lgp-bar-wave" aria-hidden="true">' +
+            '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>' +
+          '</span>' +
+          '<span class="lgp-bar-sep" aria-hidden="true"></span>' +
           '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
             ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"' +
             ' aria-label="Playback">' +

@@ -109,8 +109,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=314">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=728">
-<link rel="stylesheet" href="nowssb-player.css?v=215">
+<link rel="stylesheet" href="nowssb-nm.css?v=729">
+<link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -1492,15 +1492,31 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- ══ FASHION SECTIONS ON NORMAL HOME (Word Search · Meaning · Store · Subscription) ══ -->
 
-    <!-- Video banner — above the subscription section -->
-    <!-- On the landscape tablet. The frame classes go ON the banner rather
-         than in a wrapper around it, because this is the element the layout
-         registry matches — a wrapper would make it a grandchild of the home
-         wrap and strand the section at the top of the page. -->
-    <div class="nmh-video-banner nmh-vb-tall nwsb-inframe dev-tabs-l" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
-      <div class="vbs-screen">
-        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
-        <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+    <!-- Subscription, as a block: a heading, the framed clip, and a black
+         banner under it — the same shape as Quick Access and Connect.
+         .nsub-blk is what app/js/part062.js registers now; a wrapper the
+         registry does not know about would strand the section at the top
+         of the page. -->
+    <div class="nsub-blk">
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">The Full Library</div>
+          <div class="qa-tv-name">NowssB Subscription</div>
+        </div>
+      </div>
+      <div class="nmh-video-banner nmh-vb-tall nwsb-inframe dev-tabs-l" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
+        <div class="vbs-screen">
+          <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
+          <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+        </div>
+      </div>
+      <div class="ncb-carousel nsub-ban" onclick="if(window.SS)SS.open('subscription')" role="button">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Subscribe Today</span><span class="ncb-sub">Every word and every frequency, unlocked</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
       </div>
     </div>
 
@@ -2071,10 +2087,28 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        than in a wrapper around it, because this is the element the layout
        registry matches — a wrapper would make it a grandchild of the home
        wrap and strand the section at the top of the page. -->
-  <div class="fash-video-banner fash-vb-tall nwsb-inframe dev-tabs-l" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
-    <div class="vbs-screen">
-      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
-      <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+  <!-- Subscription, as a block — see the Normal home for why the wrapper
+       and not the banner is what part062.js registers. -->
+  <div class="nsub-blk glass-wrap">
+    <div class="qa-tv-head">
+      <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="qa-tv-head-txt">
+        <div class="qa-tv-hello">The Full Library</div>
+        <div class="qa-tv-name">NowssB Subscription</div>
+      </div>
+    </div>
+    <div class="fash-video-banner fash-vb-tall nwsb-inframe dev-tabs-l" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
+      <div class="vbs-screen">
+        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4"></video>
+        <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
+      </div>
+    </div>
+    <div class="ncb-carousel nsub-ban" onclick="SS&&SS.open('subscription')" role="button">
+      <div class="ncb-slide">
+        <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <span class="ncb-txt"><span class="ncb-name">Subscribe Today</span><span class="ncb-sub">Every word and every frequency, unlocked</span></span>
+        <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
     </div>
   </div>
 
@@ -10316,12 +10350,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=15"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=34"></script>
+<script src="app/js/part062.js?v=35"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=7"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=41"></script>
-<script src="app/js/part067.js?v=28"></script>
+<script src="app/js/part067.js?v=29"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
@@ -10333,7 +10367,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>
-<script src="nowssb-player.js?v=308" defer></script>
+<script src="nowssb-player.js?v=309" defer></script>
 
 </body>
 </html>
