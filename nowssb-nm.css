@@ -14172,16 +14172,16 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   min-width: 38px !important; min-height: 38px !important;
   flex-shrink: 0; padding: 0; cursor: pointer;
   border: none !important; border-radius: 50% !important;
-  background: #ffffff !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,.34), 0 2px 6px rgba(0,0,0,.22);
+  background: #000000 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.3);
   display: flex !important; align-items: center; justify-content: center;
 }
-/* The app's own search icon image, not a drawn one. app/app.css renders
-   .nwsb-search-icon as pure white (brightness(0) invert(1)) because it
-   normally sits on a dark field — on this white disc it has to go the
-   other way, to pure black. */
+/* The app's own search icon image, not a drawn one. The disc is black, so
+   the glyph keeps the pure white app/app.css gives .nwsb-search-icon
+   (brightness(0) invert(1)) — stated here rather than inherited, because
+   the disc's colour and the glyph's have to be read together. */
 #home .hero-search-ic {
   width: 19px !important; height: 19px !important;
-  filter: brightness(0) !important;
+  filter: brightness(0) invert(1) !important;
 }
 #home .hero-search-btn:active { transform: scale(.92); }
