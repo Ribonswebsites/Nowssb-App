@@ -14078,7 +14078,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   #home .hero-tv .hero-feat-btn,
   #home .hero-tv .hero-search-btn { width: 32px !important; height: 32px !important;
     min-width: 32px !important; min-height: 32px !important; }
-  #home .hero-tv .hero-search-btn svg { width: 16px; height: 16px; }
+  #home .hero-tv .hero-search-ic { width: 16px !important; height: 16px !important; }
   #home .hero-tv .hero-glass { height: 84px; }
   #home .hero-tv .hero-word-wrap { margin-top: 4px; height: 30px; }
   #home .hero-tv .hero-word { font-size: 26px !important; }
@@ -14160,7 +14160,9 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 
 /* The search took Explore's place, so it carries a glyph as well as a word. */
 #home .hero-btn-search { display: inline-flex; align-items: center; gap: 7px; }
-#home .hero-btn-search svg { width: 14px; height: 14px; display: block; flex-shrink: 0; }
+/* the bottom one sits on a dark button, so it keeps the white it
+   comes with */
+#home .hero-btn-search .nwsb-search-icon { width: 14px; height: 14px; }
 
 /* The search, in the corner the two image buttons left. A white disc with
    a drawn glyph — the same button the whole app uses now — rather than a
@@ -14174,5 +14176,12 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   box-shadow: 0 8px 20px rgba(0,0,0,.34), 0 2px 6px rgba(0,0,0,.22);
   display: flex !important; align-items: center; justify-content: center;
 }
-#home .hero-search-btn svg { width: 19px; height: 19px; display: block; }
+/* The app's own search icon image, not a drawn one. app/app.css renders
+   .nwsb-search-icon as pure white (brightness(0) invert(1)) because it
+   normally sits on a dark field — on this white disc it has to go the
+   other way, to pure black. */
+#home .hero-search-ic {
+  width: 19px !important; height: 19px !important;
+  filter: brightness(0) !important;
+}
 #home .hero-search-btn:active { transform: scale(.92); }
