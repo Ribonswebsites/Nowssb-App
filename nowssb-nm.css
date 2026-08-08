@@ -5413,19 +5413,63 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
    (body.fashion-home-active.<class> #appBg) as those theme overrides, and
    this file loads after app.css, so source order lets a chosen photo win
    over the current theme's own background without touching app.css. ── */
+/* The card IS a phone — the same one Fashion Plus shows, from the same
+   render and on the same numbers. All three pickers (Fashion Background,
+   Start Page Image and the Connect theme) build this identical card, so
+   they all get it from here.
+
+   The render is opaque all the way across, including where the glass is —
+   which is why Fashion Plus paints its screen ON TOP of the frame rather
+   than the frame on top of the screen. Same order here: the frame on
+   ::before underneath, the wallpaper in .fbgci-wall above it, inset to the
+   glass with .fp-screen's own percentages. */
 .fbgci {
   position: absolute;
-  width: 170px; height: 302px;
+  width: 170px; height: 352px;          /* 170 / (722/1496) */
   top: 50%; left: 50%;
-  margin-left: -85px; margin-top: -151px;
-  overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.08);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5);
+  margin-left: -85px; margin-top: -176px;
+  overflow: visible;
+  border: none;
+  border-radius: 0 !important;
+  background: none;
   cursor: pointer;
   will-change: transform, opacity;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   opacity: 0;
-  background-size: cover; background-position: center; background-repeat: no-repeat;
+  filter: drop-shadow(0 22px 40px rgba(0,0,0,0.72));
+}
+.fbgci::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background: url('./assets/fashion/phone-frame.png') center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.fbgci-wall {
+  position: absolute; z-index: 1;
+  left: 5.12%; top: 2.07%; width: 89.6%; height: 96.6%;
+  border-radius: 8.5% / 4.1% !important;
+  overflow: hidden;
+  background: #06080f center / cover no-repeat;
+}
+/* The frame draws a notch, but the glass covers the part it sits on — so
+   the screen redraws it, exactly as .fp-notch does on the big phone. */
+.fbgci-wall::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 34%; height: 3.4%; z-index: 2;
+  background: #05070c;
+  border-radius: 0 0 6px 6px !important;
+}
+/* The selected one. There is no border to colour any more, so this traces
+   the phone's actual outline — drop-shadow follows the render's alpha, the
+   way the Healing Path card's highlight does. */
+.fbgci.on {
+  filter: drop-shadow(0 22px 40px rgba(0,0,0,0.72))
+          drop-shadow(0 0 9px rgba(232,213,163,0.9));
+}
+/* The same fall of light down the glass the big phone has. */
+.fbgci-wall::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.28) 0%,
+    rgba(0,0,0,0.02) 26%, rgba(0,0,0,0.06) 52%, rgba(0,0,0,0.55) 100%);
 }
 
 body.fashion-home-active.nwsb-custom-fashion-bg #appBg {

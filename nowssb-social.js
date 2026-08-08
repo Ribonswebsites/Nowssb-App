@@ -1240,7 +1240,8 @@
       el.style.opacity       = String(c.op);
       el.style.zIndex        = String(c.zi);
       el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
-      el.style.borderColor   = (i === ncbgActive) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
+      /* See app/js/part047.js — the phone has no border to colour. */
+      el.classList.toggle('on', i === ncbgActive);
     });
     if (ncbgDotEls) ncbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === ncbgActive); });
     var label = document.getElementById('ncbgSelectedLabel');
@@ -1260,7 +1261,9 @@
     if (!inner.dataset.built) {
       inner.dataset.built = '1';
       inner.innerHTML = NWSB_CONNECT_BGS.map(function (url) {
-        return '<div class="fbgci" style="background-image:url(\'' + url + '\')"></div>';
+        /* The card is a phone now — the wallpaper goes on an inner element so
+           the frame render can sit under it (see .fbgci in nowssb-nm.css). */
+        return '<div class="fbgci"><span class="fbgci-wall" style="background-image:url(\'' + url + '\')"></span></div>';
       }).join('');
       dotsEl.innerHTML = NWSB_CONNECT_BGS.map(function () { return '<div class="becd"></div>'; }).join('');
     }

@@ -257,7 +257,10 @@
       el.style.opacity       = String(c.op);
       el.style.zIndex        = String(c.zi);
       el.style.pointerEvents = c.op > 0.05 ? 'auto' : 'none';
-      el.style.borderColor   = (!fbgStagedMode && i === fbgActive) ? '#e8d5a3' : 'rgba(255,255,255,0.08)';
+      /* The card is a phone now and has no border to colour, so the
+         selected one is marked with a class the sheet turns into a gold
+         glow that traces the phone's own silhouette. */
+      el.classList.toggle('on', !fbgStagedMode && i === fbgActive);
     });
     if (fbgDotEls) fbgDotEls.forEach(function (d, i) { d.classList.toggle('active', i === fbgActive); });
     var label = document.getElementById('fbgSelectedLabel');
@@ -306,7 +309,9 @@
     if (!inner.dataset.built) {
       inner.dataset.built = '1';
       inner.innerHTML = NWSB_FASHION_BGS.map(function (url) {
-        return '<div class="fbgci" style="background-image:url(\'' + url + '\')"></div>';
+        /* The card is a phone now — the wallpaper goes on an inner element so
+           the frame render can sit under it (see .fbgci in nowssb-nm.css). */
+        return '<div class="fbgci"><span class="fbgci-wall" style="background-image:url(\'' + url + '\')"></span></div>';
       }).join('');
       dotsEl.innerHTML = NWSB_FASHION_BGS.map(function () { return '<div class="becd"></div>'; }).join('');
     }
