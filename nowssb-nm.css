@@ -10736,6 +10736,23 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   transform: translateZ(0); backface-visibility: hidden;
 }
 body.fashplus #fpBgVideo { display: block; }
+
+/* ── The vignette ──
+   Created next to the clip by app/js/part076.js. The clip is z-index 0 and
+   every .screen is z-index 10, so this sits between them and darkens the
+   frame's edges only — nothing the app draws on top is touched. Two layers:
+   a radial that pulls the corners down, and a light top-and-bottom weight
+   so the header and the tab bar have something to sit on. */
+#fpBgVeil {
+  position: fixed; inset: 0; z-index: 1; display: none;
+  pointer-events: none;
+  background:
+    radial-gradient(88% 62% at 50% 45%,
+      rgba(0,0,0,0) 30%, rgba(0,0,0,0.14) 58%, rgba(0,0,0,0.34) 80%, rgba(0,0,0,0.58) 100%),
+    linear-gradient(180deg,
+      rgba(0,0,0,0.26) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 76%, rgba(0,0,0,0.34) 100%);
+}
+body.fashplus #fpBgVeil { display: block; }
 body.fashplus #appBg { opacity: 0 !important; }
 body.fashplus #appBgLayer2 { opacity: 0 !important; }
 
@@ -10745,6 +10762,8 @@ body.fashplus .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { backgroun
 
 @media (prefers-reduced-motion: reduce) {
   body.fashplus #fpBgVideo { display: none; }
+  /* No clip, no vignette — the still background underneath has its own. */
+  body.fashplus #fpBgVeil { display: none; }
   body.fashplus #appBg { opacity: 1 !important; }
   .fp-wall, .fp-side-wall { transition: none; }
 }

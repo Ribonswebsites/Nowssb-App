@@ -63,7 +63,13 @@
     { vid: './assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
     { vid: './assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
     { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
-    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Words Science' }
+    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Words Science' },
+    /* Encoded at 720x1280 / 0.19 bits per pixel, against 0.08-0.11 for the
+       five above and 0.03 for Words Science. Falling stones on black is the
+       worst case for a low bitrate — fine specular highlights over flat
+       shadow is exactly what a starved encoder throws away first — so this
+       one got the bits it needs rather than the bits the others got. */
+    { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Falling Diamonds' }
   ];
   FILMS.forEach(function (f, i) {
     f.t = [f.name, 'Background ' + (i + 1) + ' of ' + FILMS.length];
@@ -112,6 +118,18 @@
     v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
     v.src = FILMS[bgChoice()].vid;
     document.body.insertBefore(v, document.body.firstChild);
+    /* The vignette. A fixed veil immediately after the clip — the clip is at
+       z-index 0 and every .screen is at 10, so this sits between them at 1
+       and darkens the frame's edges without touching anything on top of it.
+       It also earns its keep on the older backgrounds: those are 0.03-0.11
+       bits per pixel and it is the edges of the frame where that shows. */
+    var veil = document.getElementById('fpBgVeil');
+    if (!veil) {
+      veil = document.createElement('div');
+      veil.id = 'fpBgVeil';
+      veil.setAttribute('aria-hidden', 'true');
+      v.parentNode.insertBefore(veil, v.nextSibling);
+    }
     return v;
   }
 
