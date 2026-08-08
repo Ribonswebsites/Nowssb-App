@@ -442,7 +442,12 @@
         /* The three rings, in glass. Each button sits in the hole of
            its own ring — see .lgp-pr-glass in nowssb-player.css for
            where the 19/50/81% come from. */
-        '<div class="lgp-pr-glass"></div>' +
+        '<div class="lgp-pr-glass">' +
+          (_keepWaVid
+            ? '<span class="lgp-wa-vid-slot"></span>'
+            : '<video class="lgp-wa-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
+              ' src="./assets/video/word-acts.mp4"></video>') +
+        '</div>' +
         '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
           '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7.5 9.5h9M7.5 12.6h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
           '<span class="lgp-sentence-lbl">Sentence</span>' +
@@ -507,8 +512,60 @@
             '</button>' +
             '</div>' +
           '</div>' +
-        /* The bottom of the picture: the word. The buttons sit in their own
-           black pill under the box — see .lgp-word-acts below. */
+          /* ── The two rails, inside the picture ──
+             Replay · Notes · Like stand in a vertical pill down the left;
+             the volume runs down the right. Both fold away behind the
+             toggle under the volume, and that choice is remembered. */
+          '<div class="lgp-rail lgp-rail-l">' +
+            '<button class="lgp-wa lgp-wa-replay" type="button"' +
+              ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
+              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+                '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+                '<path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+              '</svg>' +
+            '</button>' +
+            '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
+            '<button class="lgp-wa lgp-wa-notes" id="lgpNotesBtn" type="button"' +
+              ' onclick="window.lgpOpenNotes&&window.lgpOpenNotes()" aria-label="Pronunciation notes">' +
+              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+                '<path d="M6 3.5h8.5L19 8v12.5H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+                '<path d="M14 3.5V8h4.6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+                '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
+              '</svg>' +
+            '</button>' +
+            '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
+            '<button class="lgp-wa lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
+              ' onclick="window.lgpToggleLike&&window.lgpToggleLike()"' +
+              ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
+            '</button>' +
+          '</div>' +
+          '<div class="lgp-rail lgp-rail-r">' +
+            '<span class="lgp-vol-val" id="lgpVolVal">' + Math.round(lgpVolume() * 100) + '</span>' +
+            '<div class="lgp-vol" id="lgpVol" role="slider" tabindex="0"' +
+              ' aria-label="Volume" aria-valuemin="0" aria-valuemax="100"' +
+              ' aria-valuenow="' + Math.round(lgpVolume() * 100) + '">' +
+              '<span class="lgp-vol-fill" id="lgpVolFill" style="height:' + (lgpVolume() * 100) + '%"></span>' +
+            '</div>' +
+            '<span class="lgp-vol-ico" aria-hidden="true">' +
+              '<svg viewBox="0 0 24 24" fill="none">' +
+                '<path d="M4 9.2h3.4L12 5.2v13.6L7.4 14.8H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
+                '<path d="M15.6 9.4a3.6 3.6 0 0 1 0 5.2M18.2 7a7.2 7.2 0 0 1 0 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+              '</svg>' +
+            '</span>' +
+          '</div>' +
+          /* Fold both away. The picture is the thing; some of the time you
+             want to see it with nothing on top of it. */
+          '<button class="lgp-rail-toggle" id="lgpRailToggle" type="button"' +
+            ' onclick="window.lgpToggleRails&&window.lgpToggleRails()"' +
+            ' aria-label="Hide the controls">' +
+            '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+              '<path d="M4 8h10M18 8h2M4 16h4M12 16h8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>' +
+              '<circle cx="16" cy="8" r="2.1" stroke="currentColor" stroke-width="1.9"/>' +
+              '<circle cx="10" cy="16" r="2.1" stroke="currentColor" stroke-width="1.9"/>' +
+            '</svg>' +
+          '</button>' +
+        /* The bottom of the picture: the word. */
         '<div class="lgp-visual-overlay">' +
         '<div class="lgp-wordblock">' +
           '<div class="lgp-title">' + (w.word || '') + '</div>' +
@@ -520,41 +577,9 @@
         '</div>' +
         '</div>' +   /* end .lgp-visual-overlay */
         '</div>' +   /* end .lgp-visual */
-        /* Replay · Notes · Like — under the picture, inside the lit tab.
-           The tab is the element itself (background image); the clip and
-           the buttons sit in its aperture. */
-        '<div class="lgp-word-acts">' +
-        '<div class="lgp-wa-screen">' +
-          (_keepWaVid
-            ? '<span class="lgp-wa-vid-slot"></span>'
-            : '<video class="lgp-wa-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
-              ' src="./assets/video/word-acts.mp4"></video>') +
-        '<div class="lgp-wa-row">' +
-          '<button class="lgp-wa lgp-wa-replay" type="button"' +
-            ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
-            '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-              '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
-              '<path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-            '</svg>' +
-          '</button>' +
-          '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
-          '<button class="lgp-wa lgp-wa-notes" id="lgpNotesBtn" type="button"' +
-            ' onclick="window.lgpOpenNotes&&window.lgpOpenNotes()"' + ' aria-label="Pronunciation notes">' +
-            '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-              '<path d="M6 3.5h8.5L19 8v12.5H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
-              '<path d="M14 3.5V8h4.6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
-              '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
-            '</svg>' +
-          '</button>' +
-          '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
-          '<button class="lgp-wa lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
-            ' onclick="window.lgpToggleLike&&window.lgpToggleLike()"' +
-            ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
-            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
-          '</button>' +
-        '</div>' +   /* end .lgp-wa-row */
-        '</div>' +   /* end .lgp-wa-screen */
-        '</div>' +   /* end .lgp-word-acts */
+        /* The Replay/Notes/Like tab used to sit here. Its clip moved
+           into the Sentence · Practice · Store tab at the bottom, and the
+           three buttons went into the picture. */
         /* The Listen · Learn · Practice · Heal ticker used to sit here. */
         '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
           ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(sessionPct) + '"' +
@@ -615,11 +640,13 @@
       else { var _vw = body.querySelector('.lgp-visual'); if (_vw) _vw.insertBefore(_keepVid, _vw.firstChild); }
     }
 
+    if (window._lgpBindRails) window._lgpBindRails();
+
     /* Re-insert the preserved tab clip the same way. */
     if (_keepWaVid) {
       var _wslot = body.querySelector('.lgp-wa-vid-slot');
       if (_wslot && _wslot.parentNode) _wslot.parentNode.replaceChild(_keepWaVid, _wslot);
-      else { var _ws = body.querySelector('.lgp-wa-screen'); if (_ws) _ws.insertBefore(_keepWaVid, _ws.firstChild); }
+      else { var _ws = body.querySelector('.lgp-pr-glass'); if (_ws) _ws.insertBefore(_keepWaVid, _ws.firstChild); }
     }
 
     /* Keep the small clips playing. Bind the resume listeners ONCE per
@@ -1004,6 +1031,87 @@
   })();
 })();
 
+/* ── The two rails inside the picture ─────────────────────────────────
+   Replay · Notes · Like down the left, the volume down the right, and a
+   toggle that folds both away so the artwork is on its own.
+
+   The volume is a real setting, not a decoration: it is what the spoken
+   word and the syllable recordings play at, and it survives the app being
+   closed. speechSynthesis takes it per-utterance, so it is read at the
+   moment pwPlay() speaks rather than pushed anywhere.
+
+   The slider is hand-built rather than an <input type="range">. A vertical
+   range needs either the deprecated -webkit-appearance:slider-vertical or
+   a writing-mode that browsers disagree about, and both fight the styling.
+   A track, a fill and three pointer handlers behave the same everywhere. ── */
+(function () {
+  var VKEY = 'nwsb_pw_volume', RKEY = 'nwsb_lgp_rails';
+
+  window.lgpVolume = function () {
+    var v = parseFloat(localStorage.getItem(VKEY));
+    return (isFinite(v) && v >= 0 && v <= 1) ? v : 1;
+  };
+  window.lgpSetVolume = function (v) {
+    v = Math.max(0, Math.min(1, v));
+    try { localStorage.setItem(VKEY, String(v)); } catch (e) {}
+    var fill = document.getElementById('lgpVolFill');
+    var val  = document.getElementById('lgpVolVal');
+    var rail = document.getElementById('lgpVol');
+    if (fill) fill.style.height = (v * 100) + '%';
+    if (val) val.textContent = Math.round(v * 100);
+    if (rail) rail.setAttribute('aria-valuenow', Math.round(v * 100));
+    /* A word already being spoken keeps the volume it started with —
+       speechSynthesis has no live volume — so the change is heard from
+       the next word or the next replay. */
+    return v;
+  };
+
+  function railsHidden() { return localStorage.getItem(RKEY) === 'off'; }
+  function applyRails() {
+    var v = document.querySelector('.lgp-visual');
+    if (v) v.classList.toggle('rails-off', railsHidden());
+    var b = document.getElementById('lgpRailToggle');
+    if (b) b.setAttribute('aria-label', railsHidden() ? 'Show the controls' : 'Hide the controls');
+  }
+  window.lgpToggleRails = function () {
+    try { localStorage.setItem(RKEY, railsHidden() ? 'on' : 'off'); } catch (e) {}
+    applyRails();
+    if (navigator.vibrate) navigator.vibrate(12);
+  };
+
+  /* Bind after every render — the panel is rebuilt on each word and phase
+     change, so the element the handlers were on is gone by then. */
+  window._lgpBindRails = function () {
+    applyRails();
+    var rail = document.getElementById('lgpVol');
+    if (!rail || rail._lgpBound) return;
+    rail._lgpBound = true;
+    var dragging = false;
+    function fromY(clientY) {
+      var r = rail.getBoundingClientRect();
+      if (!r.height) return;
+      /* the track fills from the BOTTOM, so 0 is at r.bottom */
+      window.lgpSetVolume((r.bottom - clientY) / r.height);
+    }
+    rail.addEventListener('pointerdown', function (e) {
+      dragging = true;
+      try { rail.setPointerCapture(e.pointerId); } catch (err) {}
+      fromY(e.clientY); e.preventDefault();
+    });
+    rail.addEventListener('pointermove', function (e) { if (dragging) { fromY(e.clientY); e.preventDefault(); } });
+    function end() { dragging = false; }
+    rail.addEventListener('pointerup', end);
+    rail.addEventListener('pointercancel', end);
+    rail.addEventListener('keydown', function (e) {
+      var step = (e.key === 'ArrowUp' || e.key === 'ArrowRight') ? 0.05
+               : (e.key === 'ArrowDown' || e.key === 'ArrowLeft') ? -0.05 : 0;
+      if (!step) return;
+      window.lgpSetVolume(window.lgpVolume() + step);
+      e.preventDefault();
+    });
+  };
+})();
+
 /* ── Hearing one syllable ──────────────────────────────────────────────
    The boxes under the word are the pronunciation guide, and a box that has
    a recording behind it plays it when tapped. That recording is the only
@@ -1024,6 +1132,7 @@
       el.pause();
       if (el.src !== p.audio) el.src = p.audio;
       el.currentTime = 0;
+      el.volume = (typeof window.lgpVolume === 'function') ? window.lgpVolume() : 1;
       el.play().catch(function () {});
       if (navigator.vibrate) navigator.vibrate(18);
     } catch (e) {}

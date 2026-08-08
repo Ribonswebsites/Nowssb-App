@@ -785,7 +785,9 @@ function pwPlay() {
     _pwUtt = new SpeechSynthesisUtterance(w.word.toLowerCase());
     _pwUtt.rate  = 0.48;
     _pwUtt.pitch = _pwVoice === 'F' ? 1.35 : 0.72;
-    _pwUtt.volume = 1;
+    /* The volume rail in the picture. speechSynthesis has no live volume
+       control, so it is read here, at the moment the word is spoken. */
+    _pwUtt.volume = (typeof window.lgpVolume === 'function') ? window.lgpVolume() : 1;
     const dur = 750;
     const animSyls = () => {
       w.syllables.forEach((s, i) => {

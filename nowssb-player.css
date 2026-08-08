@@ -186,10 +186,12 @@
 /* word + syllables + organ overlaid INSIDE the video panel */
 .lgp .lgp-visual-overlay {
   position:absolute; left:0; right:0; bottom:0; z-index:3;
-  /* the deep bottom padding is what holds the word UP off the edge of the
-     picture — the button row used to do it, and the button row has moved
-     out into its own pill below the box */
-  padding:28px 14px 40px; display:flex; flex-direction:column; align-items:center;
+  /* The deep bottom padding is what holds the word UP off the edge of the
+     picture. The side padding is the rails' lane: a rail is 48px wide and
+     sits 10px in, so anything past 60px would be under one of them — on a
+     360-wide screen the first syllable chip was, by 2px. When the rails
+     are folded away the word takes the whole width back. */
+  padding:28px 58px 40px; display:flex; flex-direction:column; align-items:center;
   background:linear-gradient(180deg, rgba(6,10,22,0) 0%, rgba(6,10,22,.36) 34%, rgba(6,10,22,.76) 68%, rgba(6,10,22,.93) 100%);
   /* The gradient is scenery — only what's drawn on it takes taps. */
   pointer-events:none;
@@ -435,6 +437,11 @@
   left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
   background:#000; border-radius:5px !important;
 }
+/* the three sit over the clip */
+.lgp .lgp-practice-row > .lgp-sentence,
+.lgp .lgp-practice-row > .lgp-practice,
+.lgp .lgp-practice-row > .lgp-store,
+.lgp .lgp-practice-sep { z-index:2; }
 
 /* Each button is a column pinned to its ring's centre line: the orb is
    centred on the strip (so it lands in the hole) and the label hangs
@@ -1197,6 +1204,98 @@
   font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; color:#fff;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   The two rails inside the picture
+   Replay · Notes · Like stand in a vertical pill down the left; the
+   volume runs down the right, with its toggle beneath it. Both fold away
+   so the artwork can be seen on its own, and that choice is remembered.
+
+   They sit ABOVE the word's gradient overlay (z-index 5 against its 3)
+   but are vertically centred on the panel, so they never cross the word.
+   ══════════════════════════════════════════════════════════════════ */
+.lgp .lgp-rail {
+  position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+  display:flex; flex-direction:column; align-items:center;
+  padding:8px 3px; gap:6px;
+  border-radius:999px !important;
+  background:rgba(6,10,22,.55);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 10px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.24);
+  transition:opacity .28s ease, transform .32s cubic-bezier(.2,1,.3,1);
+}
+.lgp .lgp-rail-l { left:10px; }
+.lgp .lgp-rail-r { right:10px; padding:10px 6px 12px; gap:8px; }
+
+/* folded away — they slide out sideways and stop taking taps */
+.lgp .lgp-visual.rails-off .lgp-rail { opacity:0; pointer-events:none; }
+.lgp .lgp-visual.rails-off .lgp-rail-l { transform:translate(-130%, -50%); }
+.lgp .lgp-visual.rails-off .lgp-rail-r { transform:translate(130%, -50%); }
+
+/* the buttons in the left rail: 40 square, bare, white */
+.lgp .lgp-rail .lgp-wa {
+  width:40px !important; height:40px !important;
+  min-width:40px !important; min-height:40px !important;
+}
+.lgp .lgp-rail .lgp-wa svg { width:21px; height:21px; }
+/* the hairline between them runs ACROSS the pill, not down it */
+.lgp .lgp-rail .lgp-wa-sep {
+  width:20px; height:1px; flex:0 0 1px; align-self:center;
+  background:rgba(255,255,255,.5);
+  box-shadow:none;
+}
+
+/* ── the volume ──
+   Hand-built rather than <input type="range">: a vertical range needs the
+   deprecated -webkit-appearance:slider-vertical or a writing-mode
+   browsers disagree about, and both fight the styling. */
+.lgp .lgp-vol {
+  position:relative; width:8px; height:clamp(74px, 17vh, 128px);
+  border-radius:999px !important; cursor:pointer; touch-action:none;
+  background:rgba(255,255,255,.2);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.5);
+  overflow:hidden;
+}
+.lgp .lgp-vol-fill {
+  position:absolute; left:0; right:0; bottom:0;
+  border-radius:999px !important;
+  background:linear-gradient(180deg, #fff, var(--lg-accent));
+  box-shadow:0 0 12px var(--lg-accent);
+}
+.lgp .lgp-vol-val {
+  font-family:'DM Sans',sans-serif; font-size:9.5px; font-weight:800;
+  letter-spacing:.4px; color:rgba(255,255,255,.9);
+  text-shadow:0 1px 5px rgba(0,0,0,.7);
+}
+.lgp .lgp-vol-ico { display:block; width:18px; height:18px; color:#fff; }
+.lgp .lgp-vol-ico svg { width:100%; height:100%; display:block;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+
+/* ── fold/unfold ──
+   Stays put when the rails go, because it is the way back. */
+.lgp .lgp-rail-toggle {
+  position:absolute; right:10px; bottom:10px; z-index:6;
+  width:36px !important; height:36px !important;
+  min-width:36px !important; min-height:36px !important;
+  padding:0; cursor:pointer;
+  border-radius:50% !important; border:1px solid rgba(255,255,255,.22) !important;
+  background:rgba(6,10,22,.6) !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.4);
+  color:#fff;
+  display:flex !important; align-items:center; justify-content:center;
+  transition:opacity .25s ease;
+}
+.lgp .lgp-rail-toggle svg { width:18px; height:18px; display:block; }
+.lgp .lgp-rail-toggle:active { transform:scale(.92); }
+.lgp .lgp-visual.rails-off .lgp-rail-toggle { opacity:.55; }
+/* nothing to make room for any more */
+.lgp .lgp-visual.rails-off .lgp-visual-overlay { padding-left:14px; padding-right:14px; }
+
+/* The syllable boxes lost 24px of lane to the rails, so they give back a
+   little padding rather than wrapping onto a second line — three of them
+   have to fit across a 360-wide screen. */
+.lgp .lgp-visual-overlay .lgp-syls { gap:6px; }
+.lgp .lgp-visual-overlay .lgp-syl { padding:8px 13px; min-width:48px; }
+
 /* The word, over the bottom of the picture — lifted clear of the edge by
    the overlay's own bottom padding rather than by anything under it. */
 .lgp .lgp-wordblock {
@@ -1225,40 +1324,27 @@
      x 25..1344  ->  1.823% from the left, 1.969% from the right
      y 19..296   ->  5.994% from the top,  6.625% from the bottom
    ══════════════════════════════════════════════════════════════════ */
-.lgp .lgp-word-acts {
-  position:relative; width:100%; max-width:360px; margin:12px auto 0;
-  aspect-ratio:1371/317; flex-shrink:0;
-  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
-  border-radius:9px !important;              /* the shadow follows this */
-  /* No outer glow. The render's own lit border is the light; a white
-     box-shadow on top of it read as a smear around the box. */
-}
-.lgp .lgp-wa-screen {
-  position:absolute; left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
-  overflow:hidden; border-radius:5px !important;
-  background:#000;                 /* behind the clip while it loads */
-}
+/* The Replay/Notes/Like tab used to be defined here. The three buttons
+   moved into the picture and the clip moved into the Sentence · Practice
+   · Store tab, which is where this rule now puts it. A <video> is a
+   REPLACED element — width:auto takes its intrinsic size and drops the
+   `right` offset — so the aperture is an explicit width and height. */
 .lgp .lgp-wa-vid {
-  position:absolute; inset:0; width:100%; height:100%;
+  position:absolute; left:1.823%; top:5.994%;
+  width:96.208%; height:87.381%;
+  border-radius:5px !important; background:#000;
   /* The waves live in the lower part of the frame and the aperture is a
-     thin strip, so centring it showed the black above them. Anchored to
+     thin strip, so centring it showed the black above them. Anchored near
      the bottom of the source instead — the same crop, lifted. */
   object-fit:cover; object-position:center 88%; display:block; pointer-events:none;
-  /* its own compositor layer — it plays under three live buttons */
   transform:translateZ(0); backface-visibility:hidden;
 }
-/* the three, over the clip */
-.lgp .lgp-wa-row {
-  position:absolute; inset:0; z-index:2;
-  display:flex; align-items:center; justify-content:center; gap:min(7vw,30px);
-}
 
-/* A line between each pair, the same white hairline as the one between
-   Sentence and Practice — over the clip, so it carries a shadow too. */
-.lgp .lgp-word-acts .lgp-wa-sep {
-  width:1px; flex:0 0 1px; align-self:center; height:56%;
+/* The hairline between the three. In the vertical rail it runs across
+   the pill — see .lgp-rail .lgp-wa-sep above. */
+.lgp .lgp-wa-sep {
+  flex:0 0 1px; align-self:center;
   background:rgba(255,255,255,.7);
-  box-shadow:0 0 4px rgba(0,0,0,.6);
   border-radius:1px !important;
 }
 
@@ -1308,8 +1394,8 @@
 }
 
 /* The heart: white outline, filled red when liked. */
-.lgp .lgp-word-acts .lgp-like svg { fill:none; stroke:#ffffff; stroke-width:1.8; }
-.lgp .lgp-word-acts .lgp-like.liked svg { fill:#e5342a; stroke:#e5342a; }
+.lgp .lgp-like svg { fill:none; stroke:#ffffff; stroke-width:1.8; }
+.lgp .lgp-like.liked svg { fill:#e5342a; stroke:#e5342a; }
 
 /* The settings sphere on the right keeps its own look — it was not part of
    this, and it is an image rather than a glass circle. */
