@@ -57,8 +57,8 @@
     { top:    '#home .fash-storevid-wrap',         vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
 
     // Meaning — a different clip in each place it appears
-    { before: '#home-nm .krm-section',             vid: V + 'v1785402917/grok_video_2026-07-30-14-44-14_cqj4qc.mp4', frame: 'dev-tabc-l', wrap: 'nvb-blk' },
-    { before: '#home #fashMeaningSearchWrap',      vid: V + 'v1785406062/grok_video_2026-07-30-15-36-37_mrnmll.mp4', frame: 'dev-tabc-l', wrap: 'nvb-blk glass-wrap' },
+    { before: '#home-nm .krm-section',             vid: V + 'v1785402917/grok_video_2026-07-30-14-44-14_cqj4qc.mp4', frame: 'dev-tab-l', wrap: 'nvb-blk' },
+    { before: '#home #fashMeaningSearchWrap',      vid: V + 'v1785406062/grok_video_2026-07-30-15-36-37_mrnmll.mp4', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap' },
     /* Below the store's own cinematic hero (#msBanner), not above it — a
        `top` placement into #msMeaningBody had been landing it before the
        hero as that host's first child instead. */

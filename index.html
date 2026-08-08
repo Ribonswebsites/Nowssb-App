@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=314">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=733">
+<link rel="stylesheet" href="nowssb-nm.css?v=734">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
 <body>
@@ -1021,7 +1021,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          registry matches ':scope > sel', so leaving it on the banner would
          make it a grandchild and strand the section at the top. -->
     <div class="nsvb-blk">
-      <div class="hero-vid-banner nmh-hero-vid nwsb-inframe dev-tabc-l">
+      <div class="hero-vid-banner nmh-hero-vid nwsb-inframe dev-tab-l">
         <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
       </div>
     </div>
@@ -1871,7 +1871,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Full-bleed 16:9 video banner, above the streak section. -->
   <!-- Same, on the Fashion home, in its glass wrapper. -->
   <div class="nsvb-blk glass-wrap">
-    <div class="hero-vid-banner fash-hero-vid nwsb-inframe dev-tabc-l">
+    <div class="hero-vid-banner fash-hero-vid nwsb-inframe dev-tab-l">
       <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
     </div>
   </div>
@@ -2461,6 +2461,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- ══ VIDEO BANNER — 16:9 — above footer ══ -->
   <div class="hvb-glass-wrap">
+  <!-- On the wordmark tablet. The FRAME wraps the banner rather than
+       being the banner: dev-tab-l builds its bezel out of percentage
+       padding, and this banner already gets its height from a
+       padding-bottom of its own — the two cannot share one box. -->
+  <div class="hvb-frame nwsb-inframe dev-tab-l">
   <div class="home-video-banner">
     <video class="hvb-video" data-nwsb-auto muted loop playsinline preload="none">
       <source src="https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/v1778061531/grok_video_2026-05-06-15-27-23_zhylbe.mp4" type="video/mp4">
@@ -2476,6 +2481,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <span class="hvb-meta">Natural Origin of Word Science</span>
     </div>
     <span class="hvb-label">Nowsbansiu</span>
+  </div>
   </div>
   </div>
 
@@ -10374,7 +10380,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part064.js?v=7"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=41"></script>
-<script src="app/js/part067.js?v=31"></script>
+<script src="app/js/part067.js?v=32"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->

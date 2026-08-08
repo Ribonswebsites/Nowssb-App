@@ -2374,7 +2374,20 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 .cwp-back svg, .oh-cat-back svg, .wish-cat-back svg, .cart-intro-back svg { display: none !important; }
 
 /* ── Shabdapathy video banner: give the tall text room so the eyebrow isn't clipped ── */
-.home-video-banner { padding-bottom: 64% !important; }
+/* ── The Shabdapathy clip, on the wordmark tablet ──
+   The frame WRAPS the banner instead of being it. dev-tab-l builds its
+   bezel out of percentage padding and sets no ratio, and app/app.css
+   gives this banner height:0 with padding-bottom — the old padding-box
+   ratio trick, which a height of zero makes immovable. Two ratio
+   mechanisms cannot share one box, so they get one each.
+
+   The inner padding-bottom is the aperture's height as a fraction of the
+   aperture's WIDTH, not the frame's: the render is 1339x875, its bezel
+   takes 3.510% each side and 4.854%/3.734% top and bottom, so the screen
+   is 0.5675 of the frame's width tall and 0.9298 of it wide —
+   0.5675 / 0.9298 = 61.03%. */
+.hvb-frame { width: 100%; box-sizing: border-box; }
+.home-video-banner { padding-bottom: 61.03% !important; }
 .hvb-text { top: 50% !important; }
 
 /* ── Hide the bottom nav while inside the full-screen store/archive flows
