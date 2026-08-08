@@ -192,7 +192,7 @@
     <div class="ss-section-title">PRIVACY & SOCIAL</div>
     <div class="ss-section">
       <div class="sr" onclick="SS.toggle('visible')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="./assets/icons/search.webp" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Appear in Discover</div><div class="sr-sub">Others can find your profile</div></div>
         <div class="stgl" id="sstgl-visible" style="background:#e8d5a3;"><div class="stgl-knob" style="left:24px;background:#060c18;"></div></div>
       </div>

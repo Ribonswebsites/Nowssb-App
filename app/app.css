@@ -16,7 +16,7 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text;-webk
 /* ===== css block 1 ===== */
 
 /* ── Universal search icon ── */
-:root{--nwsb-search-icon:url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png');}
+:root{--nwsb-search-icon:url('./assets/icons/search.webp');}
 .nwsb-search-icon{width:18px;height:18px;object-fit:contain;display:block;filter:brightness(0) invert(1);flex-shrink:0;pointer-events:none;}
 /* Any search bar wrapper that uses position:relative + padding-left for the icon */
 .nwsb-search-wrap{position:relative;}

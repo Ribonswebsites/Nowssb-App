@@ -14176,12 +14176,21 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   box-shadow: 0 8px 20px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.3);
   display: flex !important; align-items: center; justify-content: center;
 }
-/* The app's own search icon image, not a drawn one. The disc is black, so
-   the glyph keeps the pure white app/app.css gives .nwsb-search-icon
-   (brightness(0) invert(1)) — stated here rather than inherited, because
-   the disc's colour and the glyph's have to be read together. */
-#home .hero-search-ic {
-  width: 19px !important; height: 19px !important;
-  filter: brightness(0) invert(1) !important;
-}
+#home .hero-search-ic { width: 19px !important; height: 19px !important; }
+
+/* ── The search icon is artwork now, not a silhouette ──
+   assets/icons/search.webp — headphones around a magnifier, white body,
+   black lens — ships in the repo instead of coming from Cloudinary.
+   Every place that used the old glyph put it through a filter, because
+   the old one was a flat shape that had to be recoloured for whatever it
+   sat on: brightness(0) invert(1) for white, brightness(0) for black.
+   Run this image through either of those and the lens, the highlight and
+   the shading all collapse into one solid blob. The filters come off,
+   listed by their own selectors so each is beaten on its own terms. */
+.nwsb-search-icon,
+.nmh-search-go .nwsb-search-icon,
+#home-nm.nm-dark .nmh-search-go .nwsb-search-icon,
+body.nm-mode #sub-people .nwsb-search-icon,
+html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
+#home .hero-search-ic { filter: none !important; }
 #home .hero-search-btn:active { transform: scale(.92); }
