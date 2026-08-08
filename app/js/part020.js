@@ -112,3 +112,12 @@
   window.explShowIntro       = explShowIntro;
   window.exploreOpen         = exploreOpen;
 })();
+
+/* ── NowssB Earn ──
+   The third slot on the hero row is held for it. Until it exists, saying
+   so is better than a button that appears to do nothing when pressed. */
+window.nwsbEarnSoon = function () {
+  /* nssShowToast is the app's own toast (app/js/part017.js). */
+  if (typeof nssShowToast === 'function') nssShowToast('NowssB Earn is coming soon');
+  else if (window.nssShowToast) window.nssShowToast('NowssB Earn is coming soon');
+};

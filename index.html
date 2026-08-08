@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=314">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=734">
+<link rel="stylesheet" href="nowssb-nm.css?v=735">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
 <body>
@@ -1714,14 +1714,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div style="margin-left:18px;margin-right:18px;align-self:stretch;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
           <span class="brand-name" style="font-size:clamp(32px,9vw,52px);"><span class="b">Nowss</span><span class="t">B</span></span>
-          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-            <button class="hero-cust-btn" onclick="cuOpen()" aria-label="Customize">
-              <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt="">
-            </button>
-            <button class="hero-feat-btn" onclick="openSub('features')" aria-label="All features">
-              <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png" alt="">
-            </button>
-          </div>
+          <!-- Customize and All Features used to sit here. They are in the
+               tab under the hero now — two image buttons crowding the
+               wordmark inside a screen that is already small. -->
         </div>
         <div style="margin-top:6px;overflow:hidden;">
           <span id="heroTagline" style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;display:inline-block;animation:taglineReveal 1.4s 0.6s both cubic-bezier(0.16,1,0.3,1);"><span style="font-weight:700;color:#fff;" id="tagWord">VIBRATION</span></span>
@@ -1744,10 +1739,43 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <span class="hero-word" id="hwd">VIBRATION</span>
         </div>
         <div class="hero-btns">
-          <button class="hero-btn hero-btn-p" onclick="openExploreOverlay()">Explore</button>
+          <!-- Explore's place, taken by the search. -->
+          <button class="hero-btn hero-btn-p hero-btn-search" onclick="openSub('word-search')" aria-label="Search any word">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.4" stroke="currentColor" stroke-width="2"/>
+              <path d="M15.4 15.4L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>Search</span>
+          </button>
           <button class="hero-btn hero-btn-s" onclick="openAppGuide()">App Guide</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ══ THE HERO ROW ══
+       Customize and All Features, out of the hero and onto the lit
+       tab — the same frame and the same clip as the player's
+       Sentence · Practice · Store row, so the two read as the same
+       kind of control. The third slot is held for NowssB Earn. -->
+  <div class="hhr-tab">
+    <video class="hhr-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"
+           src="./assets/video/word-acts.mp4"></video>
+    <div class="hhr-row">
+      <button class="hhr-btn hhr-cust" onclick="cuOpen()" aria-label="Customize the home">
+        <span class="hhr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="15" cy="7" r="2.2" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="17" r="2.2" stroke="currentColor" stroke-width="1.8"/></svg></span>
+        <span class="hhr-lbl">Customize</span>
+      </button>
+      <span class="hhr-sep" aria-hidden="true"></span>
+      <button class="hhr-btn hhr-feat" onclick="openSub('features')" aria-label="All features">
+        <span class="hhr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="7.4" height="7.4" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13.4" y="3.2" width="7.4" height="7.4" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="3.2" y="13.4" width="7.4" height="7.4" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13.4" y="13.4" width="7.4" height="7.4" rx="2" stroke="currentColor" stroke-width="1.8"/></svg></span>
+        <span class="hhr-lbl">Features</span>
+      </button>
+      <span class="hhr-sep" aria-hidden="true"></span>
+      <button class="hhr-btn hhr-earn" onclick="window.nwsbEarnSoon&&window.nwsbEarnSoon()" aria-label="NowssB Earn — coming soon">
+        <span class="hhr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.8"/><path d="M14.6 9.3c-.5-.9-1.5-1.4-2.6-1.4-1.6 0-2.7.8-2.7 2 0 2.7 5.4 1.3 5.4 4.1 0 1.2-1.1 2.1-2.7 2.1-1.2 0-2.2-.5-2.7-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 5.6v1.9M12 16.5v1.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        <span class="hhr-lbl">Earn</span>
+      </button>
     </div>
   </div>
 
@@ -5771,7 +5799,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part020.js?v=163"></script>
+<script src="app/js/part020.js?v=164"></script>
 
 <!-- NOWSSB COACH MARKS v6 — REAL POINTING ARROWS -->
 

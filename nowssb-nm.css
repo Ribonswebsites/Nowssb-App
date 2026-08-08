@@ -14084,3 +14084,77 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   #home .hero-tv .hero-bottom > div:first-child { margin-bottom: 8px !important; }
   #home .hero-tv .hero-bottom > div:first-child .brand-tag { font-size: 11px !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE HERO ROW — Customize · Features · Earn
+   Customize and All Features came out of the hero: two image buttons
+   crowding the wordmark inside a screen that is already small now the
+   hero is a TV. They sit on the lit tab under it — the same frame and
+   the same clip as the player's Sentence · Practice · Store row, so the
+   two read as the same kind of control.
+
+   The element IS the frame. Aperture in word-acts-tab.webp (1371x317):
+   1.823% from the left, 1.969% from the right, 5.994% from the top,
+   6.625% from the bottom.
+   ══════════════════════════════════════════════════════════════════════ */
+#home .hhr-tab {
+  position: relative;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  margin: 0 auto 16px;
+  aspect-ratio: 1371 / 317;
+  background: url('./assets/frames/word-acts-tab.webp') center / 100% 100% no-repeat;
+  border-radius: 9px !important;
+  flex-shrink: 0;
+}
+/* A <video> is a REPLACED element — width:auto takes its intrinsic size
+   and drops the `right` offset — so the aperture is an explicit size. */
+#home .hhr-vid {
+  position: absolute; left: 1.823%; top: 5.994%;
+  width: 96.208%; height: 87.381%;
+  border-radius: 5px !important; background: #000;
+  object-fit: cover; object-position: center 88%;
+  display: block; pointer-events: none;
+  transform: translateZ(0); backface-visibility: hidden;
+}
+#home .hhr-row {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#home .hhr-row > .hhr-btn {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px;
+  background: none !important; border: none !important; box-shadow: none !important;
+  padding: 0; cursor: pointer;
+  min-height: 0 !important;
+  color: #fff;
+}
+#home .hhr-row > .hhr-btn:active { transform: scale(.94); }
+#home .hhr-ico {
+  display: flex; align-items: center; justify-content: center;
+  width: clamp(20px, 6.6vw, 26px); height: clamp(20px, 6.6vw, 26px);
+  color: #fff; pointer-events: none;
+}
+#home .hhr-ico svg {
+  width: 100%; height: 100%; display: block;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,.75));
+}
+#home .hhr-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 8.5px; font-weight: 800;
+  letter-spacing: 1.4px; text-transform: uppercase; color: #fff;
+  white-space: nowrap; text-shadow: 0 1px 5px rgba(0,0,0,.8);
+}
+/* the hairline between each pair, on the boundary between equal thirds */
+#home .hhr-sep {
+  width: 1px; flex: 0 0 1px; align-self: center; height: 56%;
+  background: rgba(255,255,255,.55);
+  box-shadow: 0 0 4px rgba(0,0,0,.6);
+  border-radius: 1px !important;
+}
+/* Earn is a placeholder — it reads as one rather than pretending to work */
+#home .hhr-earn { opacity: .58; }
+
+/* The search took Explore's place, so it carries a glyph as well as a word. */
+#home .hero-btn-search { display: inline-flex; align-items: center; gap: 7px; }
+#home .hero-btn-search svg { width: 14px; height: 14px; display: block; flex-shrink: 0; }
