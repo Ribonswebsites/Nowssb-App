@@ -52,7 +52,8 @@
     word:    '<path d="M4 19.4 11 5h2l7 14.4"/><path d="M7.1 14.6h9.8"/>',
     meaning: '<path d="M4.6 6.4h14.8M4.6 12h14.8M4.6 17.6h9"/>',
     book:    '<path d="M4 5.4h6.4a2 2 0 0 1 2 2v11.2a2.4 2.4 0 0 0-2-1H4z"/><path d="M20 5.4h-6.4a2 2 0 0 0-2 2v11.2a2.4 2.4 0 0 1 2-1H20z"/>',
-    sound:   '<path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/>'
+    sound:   '<path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/>',
+    sig:     '<path d="M3.6 16.6c3-.4 5-2.2 6.6-5.4 1.2-2.4 2-4.6 3.2-4.6 1 0 1.4 1 1 2.4-.5 1.8-2 3-3.4 3.6-1.4.6-2 1.4-1.6 2.2.4.8 1.8.9 3.2.4 1.6-.6 2.8-1.6 4-3"/><path d="M4 20h16"/>'
   };
   function ico(k) {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
@@ -62,24 +63,47 @@
   /* Every banner carries the heading its own block wears on the page — the
      disc with a mark, a light line and a heavy one. Same shape as the
      Subscription and Choose Your Path blocks, because it IS that shape. */
+  /* Six banners, and every one of them is the clip that heads its OWN
+     page — not something chosen for here. That is the whole rule, and it
+     is why these are the URLs they are:
+       Subscription   the gold clip its block carries
+       Word Store     the clip a word page opens with (app/js/part012.js)
+       Meaning Store  the clip every meaning's page opens with (part026.js)
+       Signature      the Signature page's own banner clip
+       eBooks         the eBooks banner clip (part067.js)
+       Sound Library  the Sound Library's banner clip
+     Where another file owns the URL it is READ from that file at build
+     time rather than copied, so the two can never drift. */
+  function vidOf(owner, fallback) {
+    try { var v = window[owner]; if (typeof v === 'string' && v) return v;
+          if (v && v.length) return v[0]; } catch (e) {}
+    return fallback;
+  }
+
   var RAIL = [
-    { i: 'crown',   h: 'The Full Library',        t: 'NowssB Subscription',
+    { i: 'crown',   h: 'The Full Library',       t: 'NowssB Subscription',
       s: 'Every word and every frequency',
       v: 'https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
       go: function () { if (window.SS && SS.open) SS.open('subscription'); } },
-    { i: 'word',    h: 'Where a word begins',     t: 'NowssB Word Store',
+    { i: 'word',    h: 'Where a word begins',    t: 'NowssB Word Store',
       s: 'Every root, every origin',
-      v: 'https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4',
+      v: vidOf('NWSB_WORD_BANNER_VID',
+               'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-43-13_qh2qjg.mp4'),
       go: function () { openStore(''); } },
-    { i: 'meaning', h: 'What a word truly means',  t: 'NowssB Meaning Store',
+    { i: 'meaning', h: 'What a word truly means', t: 'NowssB Meaning Store',
       s: 'Earth, water, god, your name',
-      v: 'https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4',
+      v: vidOf('MS_MEANING_VID',
+               'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4'),
       go: function () { openStore('meaning-store'); } },
-    { i: 'book',    h: 'Page by page',             t: 'NowssB eBooks',
+    { i: 'sig',     h: 'The rarest word',        t: 'The Signature',
+      s: 'One per collection, the most exclusive',
+      v: './assets/video/signature-banner.mp4',
+      go: function () { openStore('signature-store'); } },
+    { i: 'book',    h: 'Page by page',           t: 'NowssB eBooks',
       s: 'Deep-dive guides, yours to keep',
       v: 'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
       go: function () { if (typeof window.ebSecOpen === 'function') ebSecOpen(); } },
-    { i: 'sound',   h: 'Every word you own',       t: 'Sound Library',
+    { i: 'sound',   h: 'Every word you own',     t: 'Sound Library',
       s: 'Root frequencies to practice with',
       v: './assets/video/sound-library-banner.mp4?v=1',
       go: function () { if (typeof openSub === 'function') openSub('sound-library'); } }

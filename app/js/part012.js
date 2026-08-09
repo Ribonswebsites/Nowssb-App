@@ -2313,6 +2313,10 @@ var _rmdVidIdx = -1;
    would never be found at all. Registered the same way nowssb-player.js
    registers its per-word clips. */
 window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(RMD_VIDS);
+/* The plain hero's Word Store banner is this same clip — the store and the
+   words in it open with the same footage. Exposed so there is one URL
+   rather than a copy in app/js/part083.js that could drift from this one. */
+window.NWSB_WORD_BANNER_VID = RMD_VIDS[0];
 
 function rmdBuildSlider() {
   _rmdSlideIdx = 0;

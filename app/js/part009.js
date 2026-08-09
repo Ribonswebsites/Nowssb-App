@@ -1,7 +1,12 @@
 
       (function(){
-        var slides = [0,1,2,3].map(function(i){ return document.getElementById('rmSlide'+i); });
+        /* The Atelier's banner is one clip now, not four stills, so there
+           is nothing here to cross-fade. Every id comes back null and this
+           stands down rather than throwing on the first one. */
+        var slides = [0,1,2,3].map(function(i){ return document.getElementById('rmSlide'+i); })
+                              .filter(function(s){ return !!s; });
         var cur = 0;
+        if (!slides.length) { window.rmBannerReset = function () {}; return; }
 
         function rmBannerReset() {
           // Stop existing interval

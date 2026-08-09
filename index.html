@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=761">
+<link rel="stylesheet" href="nowssb-nm.css?v=762">
 <link rel="stylesheet" href="app/widgets.css?v=4">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
@@ -3896,13 +3896,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
       <!-- Banner -->
       <div class="rm-banner-wrap" id="rmHeroBanner" style="position:relative;">
-        <!-- Slideshow images -->
-        <img loading="lazy" decoding="async" class="rm-banner-img rm-slide-img" id="rmSlide0" src="https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019430/684ef220-516f-11f1-9b86-d16f5852128e_cjx9y8.png" alt="Word Origins 1" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;transition:opacity 0.9s ease;opacity:1;">
-        <img loading="lazy" decoding="async" class="rm-banner-img rm-slide-img" id="rmSlide1" src="https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/c7813730-516f-11f1-9b86-d16f5852128e_sb2bje.png" alt="Word Origins 2" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;transition:opacity 0.9s ease;opacity:0;">
-        <img loading="lazy" decoding="async" class="rm-banner-img rm-slide-img" id="rmSlide2" src="https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/b9dbe540-51e6-11f1-b02a-df809877b0f5_tt0cfk.png" alt="Word Origins 3" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;transition:opacity 0.9s ease;opacity:0;">
-        <img loading="lazy" decoding="async" class="rm-banner-img rm-slide-img" id="rmSlide3" src="https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/b9ebc3c0-51e6-11f1-b02a-df809877b0f5_drg3ft.png" alt="Word Origins 4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;transition:opacity 0.9s ease;opacity:0;">
+        <!-- The clip, in place of the four stills that used to cross-fade here.
+             It is the same one the word pages open with — the Atelier and the
+             words in it now begin with the same footage, which is the point of
+             a store having a face. .rm-banner-img keeps the slot's cover-fit,
+             exactly as the Signature page's clip does.
+
+             The four #rmSlideN ids are gone, so app/js/part009.js has nothing
+             to cross-fade; it checks for them and stands down rather than
+             throwing on a null. -->
+        <video class="rm-banner-img" data-nwsb-auto muted loop playsinline preload="none"
+               aria-hidden="true" tabindex="-1"
+               src="https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-43-13_qh2qjg.mp4"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;"></video>
       </div>
-      <script src="app/js/part009.js?v=163"></script>
+      <script src="app/js/part009.js?v=164"></script>
 
       <!-- Search bar -->
       <div class="rm-search-wrap">
@@ -4622,7 +4630,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=251"></script>
+<script src="app/js/part012.js?v=252"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -5623,7 +5631,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part080.js?v=8"></script><!-- ══ SOUND LIBRARY FEED ══ -->
 <script src="app/js/part081.js?v=3"></script>
 <script src="app/js/part082.js?v=17"></script>
-<script src="app/js/part083.js?v=8"></script><!-- ══ THE PLAIN HERO ══ --><!-- ══ PRONUNCIATION NOTES ══ -->
+<script src="app/js/part083.js?v=9"></script><!-- ══ THE PLAIN HERO ══ --><!-- ══ PRONUNCIATION NOTES ══ -->
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -10439,7 +10447,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
 <script src="app/js/part074.js?v=8"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
-<script src="app/js/part076.js?v=105"></script><!-- ══ FASHION PLUS ══ -->
+<script src="app/js/part076.js?v=106"></script><!-- ══ FASHION PLUS ══ -->
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>

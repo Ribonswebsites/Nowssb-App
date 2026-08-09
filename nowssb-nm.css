@@ -10884,13 +10884,24 @@ body.fashplus #appBgLayer2 { opacity: 0 !important; }
 body.fashplus:not(.fp-bg-off).nwsb-sub-open #fpSubFilm,
 body.fashplus:not(.fp-bg-off).nwsb-sub-open #fpSubVeil { display: block; }
 
-/* !important because a page may set its own background by id, which beats
+/* Every page, with no exception. There used to be one — a page running a
+   clip where its background sits kept it — and that exception was exactly
+   the Word Atelier, the Meaning store, the Signature and the eBooks: the
+   pages the mode most obviously should have reached. It is gone.
+
+   !important because a page may set its own background by id, which beats
    any class selector this file could write. */
-body.fashplus:not(.fp-bg-off) .sub-screen:not([data-fp-keep]) {
+body.fashplus:not(.fp-bg-off) .sub-screen {
   background: transparent !important;
 }
-body.fashplus:not(.fp-bg-off) .sub-screen:not([data-fp-keep]) > .sub-screen-bg {
+body.fashplus:not(.fp-bg-off) .sub-screen > .sub-screen-bg {
   background-image: none !important;
+}
+/* A page whose background IS a clip of its own hands over to the film
+   rather than covering it — one moving background, not two fighting. */
+body.fashplus:not(.fp-bg-off) .sub-screen > video,
+body.fashplus:not(.fp-bg-off) .sub-screen > .sub-screen-bg > video {
+  display: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
   #fpSubFilm, #fpSubVeil { display: none !important; }

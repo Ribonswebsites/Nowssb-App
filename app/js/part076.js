@@ -183,13 +183,15 @@
     return v;
   }
 
-  /* A page that runs its own clip where its background sits keeps it —
-     the Store's intro, say. Tagged rather than listed, so a page that
-     grows one later is covered without this file being touched. */
+  /* There is no exception any more. Pages used to be tagged out of this
+     for running a clip where their background sits, and those turned out
+     to be precisely the pages the mode should have reached — the Word
+     Atelier, the Meaning store, the Signature, the eBooks. Any tag left
+     over from an earlier version is cleared, or a reader who has one
+     stored on an element would keep the old behaviour. */
   function markOwnFilm() {
-    document.querySelectorAll('.sub-screen').forEach(function (s) {
-      if (s.hasAttribute('data-fp-keep')) return;
-      if (s.querySelector(':scope > video, :scope > .sub-screen-bg video')) s.setAttribute('data-fp-keep', '1');
+    document.querySelectorAll('.sub-screen[data-fp-keep]').forEach(function (s) {
+      s.removeAttribute('data-fp-keep');
     });
   }
 
