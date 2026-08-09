@@ -96,10 +96,10 @@
       wrap:  '#home .home-body',
       items: [
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
-        { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' },
+        { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' , kind:'tab' },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
         { k:'reader',   sel:['.fash-rdsec-wrap'],                                        t:S, label:'Reader',                sub:'Meanings and eBooks' },
-        { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 },
+        { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 , kind:'blk' },
         { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
@@ -109,25 +109,25 @@
            re-appended around it — which puts the stray one at the TOP of the
            home no matter where it was written. That is exactly what happened
            to this card. */
-        { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' },
+        { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' , kind:'tab' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
-        { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' },
+        { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'blk' },
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner', vb:1 },
-        { k:'subvid',   sel:['.nsub-blk'],                                                t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 },
-        { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
+        { k:'subvid',   sel:['.nsub-blk'],                                                t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 , kind:'blk' },
+        { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 , kind:'blk' },
         { k:'routines', sel:['.fash-routines-wrap'],                                       t:S, label:'My Routines',          sub:'Daily practice system' },
         { k:'offer',    sel:['.fash-offer-wrap'],                                          t:S, label:"Today's Offer",         sub:'Coupon art and the offer banner', vb:1 },
-        { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
+        { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' , kind:'blk' },
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science', vb:1 },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
-        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 },
+        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 , kind:'blk' },
         { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
-        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 },
-        { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 },
+        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 , kind:'blk' },
+        { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 , kind:'blk' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', always:1 },
-        { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' },
+        { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' , kind:'blk' },
         { k:'store',    sel:['.vb-banner[data-vb="vb1"]', '.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
-        { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer', vb:1 },
+        { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer', vb:1 , kind:'blk' },
         { k:'footer',   sel:['#homeFooter'],                                               t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
     }
@@ -381,8 +381,15 @@
          Widgets page shows the two on separate rails, because choosing
          between banners and choosing between sections are different
          decisions and one long rail of both was neither. */
+      /* `kind` is what SHAPE the unit is, which decides how the Widgets
+         page shows it: 'sec' a section, 'ban' a bare clip, 'blk' a block
+         that already carries its own device frame — a tablet, a laptop, a
+         television — and 'tab' a row of buttons rather than a section at
+         all. Unmarked units fall back to the vb flag, so a registry row
+         that says nothing still lands somewhere sensible. */
       return it ? { k: k, label: it.label, sub: it.sub, on: st.off.indexOf(k) < 0,
-                    always: !!it.always, locked: !!it.locked, vb: !!it.vb } : null;
+                    always: !!it.always, locked: !!it.locked, vb: !!it.vb,
+                    kind: it.kind || (it.vb ? 'ban' : 'sec') } : null;
     }).filter(Boolean);
   };
   /* The live nodes of a section, so the Widgets page can clone the real

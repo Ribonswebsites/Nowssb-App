@@ -14390,30 +14390,18 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
   display: flex; overflow: hidden;
   background: #070a12;
 }
-/* ── every section and banner preview is on the television ──
-   The set is the one the Quick Access row wears (.dev-tv-l), and it is
-   built the way that one is: a top bezel, a bottom bezel with the stand,
-   and side rails tiled between them. That construction is the whole point
-   here — a set with a fixed aspect has a fixed screen, so a short banner
-   sits in a tall black window with nothing above or below it, and a long
-   section is shrunk to nothing to fit the same window. Tiled rails let the
-   screen be exactly as tall as what is on it.
-
-   The three slices are backgrounds rather than pseudo-elements so they can
-   layer in one paint: top and bottom drawn over the tiled rails, both at
-   100% width so their rendered heights are the same fraction of the width
-   that the padding is — which is what makes the padding the bezel.
-   Slices of the 1452x831 render: top 2.410%, bottom 8.540%, rails
-   1.928% and 1.791% of the width. */
-.stw-prev.stw-tv {
+/* ── a plain preview ──
+   No device around it: this shape is used only for the blocks that arrive
+   with a frame of their own — a tablet, a laptop, a set — and for the rows
+   of buttons, which are not sections and have never been on anything. The
+   screen's height is set per card by the script, so the card is exactly as
+   tall as what is in it. */
+.stw-prev.stw-plain {
   height: auto;
-  padding: 2.410% 1.791% 8.540% 1.928%;
-  overflow: visible;
-  background:
-    url('./assets/frames/tv-l-top.webp')    top center    / 100% auto no-repeat,
-    url('./assets/frames/tv-l-bottom.webp') bottom center / 100% auto no-repeat,
-    url('./assets/frames/tv-l-mid.webp')    top center    / 100% 8px  repeat-y;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255,255,255,0.08);
 }
+.stw-prev.stw-plain .stw-screen { border-radius: 13px !important; }
 /* the screen: one flex child, so it fills the content box in both
    directions without a percentage height to resolve */
 .stw-screen {
@@ -14424,7 +14412,7 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 /* Cards in these two rails no longer have to agree on a height — each set
    is as tall as the section it is showing. The shortcut rails are left
    stretching, because those cards are a grid of equals. */
-#stwSections, #stwBanners { align-items: flex-start; }
+#stwBlocks, #stwTabs { align-items: flex-start; }
 .stw-prev-stage {
   position: absolute; top: 0; left: 0;
   width: 358px;                     /* the width a section is laid out at */
@@ -14500,6 +14488,164 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 
 /* The hero previews are taller — a hero is a tall thing, and at the
    section cards' height you would see only its top bezel. */
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE DECK — one device, and the sections passing through it
+
+   Every card used to carry its own television. That was wrong twice: a set
+   drawn around a block that already has a tablet inside it is a device in
+   a device, and twenty-six sets is twenty-six bezels to look past. There is
+   one set now. It stands still in the middle and does not move at all; the
+   sections swing through it, the one in the middle landing on the screen
+   and the ones either side standing back at an angle, half behind its edge.
+   The footer carousel has worked this way for a while — this is that shape,
+   with the app's own furniture in it.
+
+   The device carries its bezel as PADDING, so its content box IS the
+   aperture. The script measures that one box and every slide is placed
+   from it, which means the numbers here can never drift out of step with
+   where the slides land.
+   ══════════════════════════════════════════════════════════════════════ */
+.stw-deck {
+  --dw: min(82vw, 312px);      /* how wide the device stands */
+  --ah: 300px;                 /* and how tall its screen is, where free */
+  position: relative;
+}
+/* The tablet cannot choose its own height — it is one render, so it keeps
+   its shape — and the only way to a screen worth reading is to stand it
+   wider. */
+.stw-deck-tab { --dw: min(94vw, 358px); }
+.stw-dstage {
+  position: relative; width: 100%;
+  overflow: hidden;
+  /* the angle the slides either side are seen at */
+  perspective: 1100px;
+  perspective-origin: 50% 50%;
+}
+/* The television's screen height is ours to choose — the render is a top
+   bezel, a bottom bezel and side rails that tile, so the set stretches to
+   whatever it is given without any of it distorting. 10.95% is the two
+   bezels (2.410 + 8.540) as a fraction of the width. */
+.stw-deck-tv .stw-dstage { height: calc(var(--ah) + var(--dw) * 0.1095); }
+/* The tablet is one image, so it keeps its own shape: 1339x875. */
+.stw-deck-tab .stw-dstage { height: calc(var(--dw) * 875 / 1339); }
+
+.stw-dev {
+  position: absolute; top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: var(--dw); height: 100%;
+  box-sizing: border-box;
+  z-index: 5;                  /* over the slides: they pass BEHIND its edge */
+  pointer-events: none;
+}
+.stw-dev-tv {
+  /* calc off --dw, NOT percentages. Percentage padding resolves against the
+     containing block's width — the stage, 390 wide — while the slices are
+     sized to the device's own width, 312. The bezel and the artwork drawn
+     in it would sit at different scales, so the aperture would not be where
+     the screen is. */
+  padding: calc(var(--dw) * 0.02410) calc(var(--dw) * 0.01791)
+           calc(var(--dw) * 0.08540) calc(var(--dw) * 0.01928);
+  background:
+    url('./assets/frames/tv-l-top.webp')    top center    / 100% auto no-repeat,
+    url('./assets/frames/tv-l-bottom.webp') bottom center / 100% auto no-repeat;
+}
+/* The rails, tiled — and STOPPED at the top of the bottom bezel. Run to the
+   foot of the box and they carry on down either side of the stand and close
+   a rectangle around its feet, which is the white line that was showing
+   under every set. The stop is a fraction of the WIDTH, because that is
+   what the slice's rendered height is, and `bottom` resolves against
+   height — so it is written as a calc off --dw rather than a percentage. */
+.stw-dev-tv::before {
+  content: '';
+  position: absolute; left: 0; right: 0; top: 0;
+  bottom: calc(var(--dw) * 0.0854);
+  background: url('./assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
+}
+.stw-dev-tab {
+  padding: calc(var(--dw) * 0.04854) calc(var(--dw) * 0.03510) calc(var(--dw) * 0.03734);
+  background: url('./assets/frames/tab-landscape.webp') center / 100% 100% no-repeat;
+}
+/* The aperture must stay EMPTY. The device is drawn over the slides — that
+   is what lets them pass behind its edge — so anything painted in its
+   content box would cover the very thing it is framing. Both renders are
+   transparent through the screen, and the dark behind the slides is a
+   layer of the stage, under them, instead. */
+.stw-dstage::before {
+  content: '';
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: var(--dw);
+  background: #05070d;
+  z-index: 0;
+}
+
+.stw-slide {
+  position: absolute;
+  overflow: hidden;
+  background: #060c18;
+  transform-origin: 50% 50%;
+  transition: transform .42s cubic-bezier(.22,1,.3,1), opacity .32s ease;
+  cursor: pointer;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+}
+.stw-slide.on { cursor: default; box-shadow: none; }
+.stw-slide.off { filter: grayscale(1) brightness(.55); }
+
+/* the bar under the deck: which one you are on, and its switch */
+.stw-dbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px 0;
+}
+.stw-dnav {
+  flex-shrink: 0; width: 34px !important; height: 34px !important;
+  min-width: 34px !important; min-height: 34px !important;
+  padding: 0 !important; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50% !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  background: rgba(255,255,255,0.07) !important;
+  color: #fff;
+}
+.stw-dnav:active { transform: scale(.92); }
+.stw-dnav svg { width: 17px; height: 17px; display: block; }
+.stw-dtxt { flex: 1; min-width: 0; text-align: center; }
+.stw-dtxt .stw-t,
+.stw-dtxt .stw-s { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stw-dsw { flex-shrink: 0; display: flex; align-items: center; }
+.stw-pill.on {
+  background: rgba(232,213,163,0.24) !important;
+  border-color: rgba(232,213,163,0.6) !important;
+}
+.stw-pill.on .stw-knob { transform: translateX(17px); background: #e8d5a3; }
+
+.stw-dots {
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 6px;
+  padding: 12px 20px 0;
+}
+.stw-dots i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  transition: background .2s ease, width .2s ease;
+}
+.stw-dots i.on { width: 18px; border-radius: 3px; background: #e8d5a3; }
+.stw-dots i.off { background: rgba(255,255,255,0.1); }
+
+/* ── Fashion Plus reaches this page too ──
+   The mode's film is one fixed clip behind everything (#fpBgVideo); a
+   sub-screen is opaque and z-index 600, so it covers it. The pages that
+   let it through are the ones tagged for carrying a photograph of their
+   own — this one carries none, so it is named here instead. Only while
+   Page backgrounds is on, which is the mode's own part switch. */
+body.fashplus:not(.fp-bg-off) #sub-settings { background: transparent !important; }
+body.fashplus:not(.fp-bg-off) #sub-settings .st-page {
+  /* the film is busy and this page is all small type — a scrim keeps it
+     readable without hiding what is behind it */
+  background: linear-gradient(180deg, rgba(6,12,24,0.82), rgba(6,12,24,0.68));
+  -webkit-backdrop-filter: blur(10px) saturate(1.1); backdrop-filter: blur(10px) saturate(1.1);
+}
+
 /* The hero cards keep a plain screen rather than a television — one of the
    three things they are offering IS the television, and a set inside a set
    says nothing. */

@@ -4,21 +4,30 @@
    Quick Access, Connect — and every one of them is really a widget: a
    thing that can be there or not. This page says so out loud.
 
-   Rails, each scrolling sideways:
+   It shows the FASHION home. It used to follow whichever home was in use,
+   which meant opening it from the Normal home quietly edited the Normal
+   home's layout; these sections are the Fashion home's and the page stays
+   on it.
+
+   Nothing here keeps its own list or its own storage. The layout registry
+   (app/js/part062.js) already decides what a home is made of, remembers
+   what is switched off, and says what SHAPE each unit is — and the
+   arrange-editor reads the same thing. A second copy would drift the first
+   time a section was added.
+
+   The rows, and why they are not one row:
      1. Hero header — the three ways the top of the home can look.
-     2. Home sections — every section the home is made of, on or off.
-        It does NOT keep its own list or its own storage. The layout
-        registry (app/js/part062.js) already decides what a home is made
-        of and remembers what is switched off, and the arrange-editor
-        reads the same thing — a second copy would drift the first time
-        a section was added.
-     3. Video banners — the clips, discs and artwork bars, on their own
-        rail. They come from the same registry and the same storage; they
-        are separated because keeping a banner and keeping a section are
-        different decisions, and one rail of thirty mixed cards was
-        neither of them.
-     4. Jump to — the places the app can take you, one tap each.
-     5. Make it yours — the editors and switches that change how the app
+     2. Home sections — on the television. One set, standing still, with
+        the sections swinging through it.
+     3. Video banners — the same, on the tablet. A bare clip is a
+        different decision from a section you use.
+     4. Clips and their banners — a plain row, no device. These blocks
+        arrive with a frame of their own; lending them another would be a
+        device inside a device.
+     5. Buttons and tabs — the two rows of buttons. Not sections at all,
+        so not among them.
+     6. Jump to — the places the app can take you, one tap each.
+     7. Make it yours — the editors and switches that change how the app
         looks, gathered instead of scattered.
    ══════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -336,11 +345,151 @@
     document.querySelectorAll('.stw-prev').forEach(function (w) { io.observe(w); });
   }
 
-  /* `kind` is 'sec' or 'ban' — the registry says which of the two a unit
-     is, so the split cannot drift from what the home is actually made of */
+  /* The registry says what shape each unit is, so these four groups cannot
+     drift from what the home is actually made of. */
   function listOf(kind) {
     var list = (typeof window.hlList === 'function') ? window.hlList(HOME) : [];
-    return list.filter(function (it) { return kind === 'ban' ? it.vb : !it.vb; });
+    return list.filter(function (it) { return it.kind === kind; });
+  }
+
+  /* ══ THE DECK ═══════════════════════════════════════════════════════
+     One device, standing still in the middle, and the sections passing
+     through it — the shape the footer carousel already uses on this app.
+     Giving every card its own television was the wrong reading twice
+     over: a set around a block that already has a tablet inside it is a
+     device in a device, and twenty-six sets is twenty-six bezels to look
+     past. There is one set. The section you are on is inside it; the ones
+     either side stand back at an angle and are half behind its edge.
+
+     Two decks: the sections are on the television, the bare clips are on
+     the tablet. Blocks that arrive with a frame of their own get neither
+     — they are a plain row, because they already have the thing a deck
+     would be lending them.
+
+     The device element carries the bezel as PADDING, so its content box
+     IS the aperture: one measurement puts every slide exactly on the
+     screen, and the numbers cannot drift from the artwork.
+     ══════════════════════════════════════════════════════════════════ */
+  var DECKS = {};
+
+  function chev(dir) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M' +
+      (dir === 'l' ? '15 5 8 12l7 7' : '9 5 16 12l-7 7') + '"/></svg>';
+  }
+
+  function deckHtml(id, kind, dev) {
+    var list = listOf(kind);
+    if (!list.length) return '<div class="stw-empty">Open the Fashion home first — these load with it.</div>';
+    DECKS[id] = { kind: kind, i: 0 };
+    var slides = list.map(function (it, i) {
+      /* data-fixed: the slide IS the aperture, a box this file sets the size
+         of. Without it fit() would resize its own container to the clone —
+         which is right for a card that grows to what is in it, and wrong
+         for a screen that has to stay the size of the screen. */
+      return '<div class="stw-slide" data-fixed="1" data-i="' + i + '" onclick="window._stGo(\'' + id + '\',' + i + ')">' +
+               '<div class="stw-prev-stage" data-k="' + esc(it.k) + '"></div>' +
+             '</div>';
+    }).join('');
+    return '<div class="stw-deck stw-deck-' + dev + '" id="' + id + '">' +
+        '<div class="stw-dstage">' + slides +
+          '<div class="stw-dev stw-dev-' + dev + '" aria-hidden="true"></div>' +
+        '</div>' +
+        '<div class="stw-dbar">' +
+          '<button class="stw-dnav" onclick="window._stStep(\'' + id + '\',-1)" aria-label="Previous">' + chev('l') + '</button>' +
+          '<div class="stw-dtxt"><div class="stw-t"></div><div class="stw-s"></div></div>' +
+          '<span class="stw-dsw"></span>' +
+          '<button class="stw-dnav" onclick="window._stStep(\'' + id + '\',1)" aria-label="Next">' + chev('r') + '</button>' +
+        '</div>' +
+        '<div class="stw-dots"></div>' +
+      '</div>';
+  }
+
+  function layoutDeck(id) {
+    var deck = document.getElementById(id), d = DECKS[id];
+    if (!deck || !d) return;
+    var stage = deck.querySelector('.stw-dstage'), dev = deck.querySelector('.stw-dev');
+    if (!stage || !dev) return;
+    var sr = stage.getBoundingClientRect(), dr = dev.getBoundingClientRect();
+    if (!dr.width || !dr.height) return;
+    var cs = getComputedStyle(dev);
+    var pl = parseFloat(cs.paddingLeft)  || 0, pr = parseFloat(cs.paddingRight)  || 0,
+        pt = parseFloat(cs.paddingTop)   || 0, pb = parseFloat(cs.paddingBottom) || 0;
+    /* the device's content box, in the stage's own coordinates */
+    var apL = dr.left - sr.left + pl, apT = dr.top - sr.top + pt;
+    var apW = dr.width - pl - pr,     apH = dr.height - pt - pb;
+    var list = listOf(d.kind);
+    if (d.i >= list.length) d.i = list.length - 1;
+    if (d.i < 0) d.i = 0;
+    deck.querySelectorAll('.stw-slide').forEach(function (sl) {
+      var i = +sl.getAttribute('data-i'), k = i - d.i, a = Math.abs(k);
+      sl.style.left = apL.toFixed(2) + 'px'; sl.style.top = apT.toFixed(2) + 'px';
+      sl.style.width = apW.toFixed(2) + 'px'; sl.style.height = apH.toFixed(2) + 'px';
+      if (a > 2) { sl.style.display = 'none'; return; }
+      sl.style.display = '';
+      var tx = 0, ry = 0, sc = 1, op = 1, z = 4;
+      if (a === 1)      { tx = k * apW * 0.70; ry = -k * 38; sc = 0.84; op = 0.92; z = 3; }
+      else if (a === 2) { tx = k * apW * 1.14; ry = -k * 46; sc = 0.68; op = 0.42; z = 2; }
+      sl.style.transform = 'translateX(' + tx.toFixed(1) + 'px) rotateY(' + ry + 'deg) scale(' + sc + ')';
+      sl.style.opacity = op; sl.style.zIndex = z;
+      sl.classList.toggle('on', a === 0);
+      sl.classList.toggle('off', !!(list[i] && !list[i].on));
+    });
+    /* build only what can be seen — the centre and the two either side */
+    for (var j = d.i - 2; j <= d.i + 2; j++) {
+      if (j < 0 || j >= list.length) continue;
+      var st = deck.querySelector('.stw-slide[data-i="' + j + '"] .stw-prev-stage');
+      if (st) { fillPreview(st); fit(st); }
+    }
+    paintDeckBar(id);
+  }
+
+  function paintDeckBar(id) {
+    var deck = document.getElementById(id), d = DECKS[id];
+    if (!deck || !d) return;
+    var list = listOf(d.kind), it = list[d.i];
+    if (!it) return;
+    deck.querySelector('.stw-dtxt .stw-t').textContent = it.label;
+    deck.querySelector('.stw-dtxt .stw-s').textContent = it.sub || '';
+    var fixed = it.always || it.locked;
+    deck.querySelector('.stw-dsw').innerHTML = fixed
+      ? '<span class="stw-pill fixed">Always</span>'
+      : '<button class="stw-pill' + (it.on ? ' on' : '') + '" onclick="window._stToggle(\'' + esc(it.k) + '\')"' +
+        ' aria-pressed="' + (it.on ? 'true' : 'false') + '"><span class="stw-knob"></span></button>';
+    deck.querySelector('.stw-dots').innerHTML = list.map(function (x, i) {
+      return '<i class="' + (i === d.i ? 'on' : '') + (x.on ? '' : ' off') + '"></i>';
+    }).join('');
+  }
+
+  window._stGo = function (id, i) {
+    var d = DECKS[id]; if (!d || d.i === i) return;
+    d.i = i; haptic(14); layoutDeck(id);
+  };
+  window._stStep = function (id, dir) {
+    var d = DECKS[id]; if (!d) return;
+    var n = listOf(d.kind).length;
+    var i = d.i + dir;
+    if (i < 0 || i >= n) return;
+    d.i = i; haptic(16); layoutDeck(id);
+  };
+
+  /* a swipe moves the deck — the arrows are there for anyone who does not
+     think to try, not instead of it */
+  function bindSwipe(id) {
+    var deck = document.getElementById(id); if (!deck) return;
+    var stage = deck.querySelector('.stw-dstage'); if (!stage) return;
+    var x0 = null, y0 = null, done = false;
+    stage.addEventListener('touchstart', function (e) {
+      var t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; done = false;
+    }, { passive: true });
+    stage.addEventListener('touchmove', function (e) {
+      if (x0 === null || done) return;
+      var t = e.touches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+      if (Math.abs(dx) < 34 || Math.abs(dx) < Math.abs(dy)) return;
+      done = true;
+      window._stStep(id, dx < 0 ? 1 : -1);
+    }, { passive: true });
+    stage.addEventListener('touchend', function () { x0 = null; }, { passive: true });
   }
   function sectionsHtml(kind) {
     var list = listOf(kind);
@@ -350,7 +499,7 @@
     return list.map(function (it) {
       var fixed = it.always || it.locked;
       return '<div class="stw-wcard' + (it.on ? ' on' : '') + (fixed ? ' fixed' : '') + '">' +
-          '<div class="stw-wrap"><div class="stw-prev stw-tv"><div class="stw-screen">' +
+          '<div class="stw-wrap"><div class="stw-prev stw-plain"><div class="stw-screen">' +
             '<div class="stw-prev-stage" data-k="' + esc(it.k) + '"></div>' +
           '</div></div></div>' +
           '<div class="stw-wfoot">' +
@@ -374,10 +523,16 @@
     if (!cur) return;
     window.hlSet(HOME, k, !cur.on);
     haptic(cur.on ? 18 : 30);
-    /* repaint the one card rather than the rail — rebuilding would throw
-       away every preview that has already been cloned */
-    var card = document.querySelector('.stw-prev-stage[data-k="' + k + '"]');
-    card = card && card.closest ? card.closest('.stw-wcard') : null;
+    /* repaint the one thing that changed rather than the rail — rebuilding
+       would throw away every preview that has already been cloned */
+    var st = document.querySelector('.stw-prev-stage[data-k="' + k + '"]');
+    var slide = st && st.closest ? st.closest('.stw-slide') : null;
+    if (slide) {
+      slide.classList.toggle('off', cur.on);
+      var deck = slide.closest('.stw-deck');
+      if (deck) paintDeckBar(deck.id);
+    }
+    var card = st && st.closest ? st.closest('.stw-wcard') : null;
     if (card) {
       card.classList.toggle('on', !cur.on);
       var pill = card.querySelector('.stw-pill');
@@ -386,7 +541,8 @@
     paintCount();
   };
   function paintCount() {
-    [['stwSecCount', 'sec'], ['stwBanCount', 'ban']].forEach(function (p) {
+    [['stwSecCount', 'sec'], ['stwBanCount', 'ban'],
+     ['stwBlkCount', 'blk'], ['stwTabCount', 'tab']].forEach(function (p) {
       var n = document.getElementById(p[0]);
       if (!n || typeof window.hlList !== 'function') return;
       var l = listOf(p[1]);
@@ -394,10 +550,10 @@
     });
   }
   function paintSections() {
-    var a = document.getElementById('stwSections');
-    if (a) a.innerHTML = sectionsHtml('sec');
-    var b = document.getElementById('stwBanners');
-    if (b) b.innerHTML = sectionsHtml('ban');
+    var a = document.getElementById('stwBlocks');
+    if (a) a.innerHTML = sectionsHtml('blk');
+    var b = document.getElementById('stwTabs');
+    if (b) b.innerHTML = sectionsHtml('tab');
     if (a || b) observe();
     paintCount();
   }
@@ -431,15 +587,84 @@
         '<div class="stw-intro-s">Your home is built out of sections. Turn off what you do not use — the rest moves up to fill the space.</div>' +
       '</div>' +
       rail('stwHero', 'Hero header', 'Three ways the top of your home can look', heroHtml()) +
-      rail('stwSections', 'Home sections', '', sectionsHtml('sec'), 'stwSecCount') +
-      rail('stwBanners', 'Video banners', '', sectionsHtml('ban'), 'stwBanCount') +
+      deckRail('deckSec', 'sec', 'tv',  'Home sections', 'stwSecCount') +
+      deckRail('deckBan', 'ban', 'tab', 'Video banners', 'stwBanCount') +
+      rail('stwBlocks', 'Clips and their banners', '', sectionsHtml('blk'), 'stwBlkCount') +
+      rail('stwTabs', 'Buttons and tabs', '', sectionsHtml('tab'), 'stwTabCount') +
       rail('', 'Jump to', 'The places the app can take you', cardsHtml('jump', JUMP)) +
       rail('', 'Make it yours', 'Every editor, in one place', cardsHtml('make', MAKE));
     paintSections();
     paintHero();
+    ['deckSec', 'deckBan'].forEach(function (id) {
+      if (!DECKS[id]) return;
+      bindSwipe(id);
+      layoutDeck(id);
+      /* the deck is measured while the screen is still opening, so ask
+         again once it has arrived */
+      setTimeout(function () { layoutDeck(id); }, 360);
+      setTimeout(function () { layoutDeck(id); }, 900);
+    });
+  }
+  window.addEventListener('resize', function () {
+    ['deckSec', 'deckBan'].forEach(function (id) { if (DECKS[id]) layoutDeck(id); });
+  });
+
+  /* a deck sits in the same rail shell as every other row */
+  function deckRail(id, kind, dev, title, countId) {
+    return '<div class="stw-rail">' +
+      '<div class="stw-head"><div class="stw-head-txt">' +
+        '<div class="stw-title">' + title + '</div>' +
+        '<div class="stw-sub" id="' + countId + '"></div>' +
+      '</div></div>' +
+      deckHtml(id, kind, dev) +
+    '</div>';
   }
 
+  /* ── Warm what this page is made of ───────────────────────────────
+     The clips are the home's own, so app/js/part051.js already warms them
+     at idle — they are in the document whether or not this page is open.
+     What it cannot warm is the artwork this page introduces: the two
+     devices. They are backgrounds, not <video> and not <img>, so nothing
+     scans them, and the first open of the page drew a set with no bezel
+     while they came down. Fetching them puts them in the same cache
+     sw.js answers from, so the second open — and every offline one — has
+     them already. Idle, once, and silent if it fails. */
+  var FRAMES = [
+    './assets/frames/tv-l-top.webp',
+    './assets/frames/tv-l-mid.webp',
+    './assets/frames/tv-l-bottom.webp',
+    './assets/frames/tab-landscape.webp',
+    './assets/frames/tv-hero-portrait.webp?v=2'
+  ];
+  var warmed = false;
+  function warm() {
+    if (warmed) return;
+    warmed = true;
+    var go = function () {
+      FRAMES.forEach(function (u) {
+        try { fetch(u, { cache: 'force-cache' }).catch(function () {}); } catch (e) {}
+      });
+      /* and the clips of whatever this page is about to show, ahead of the
+         idle warmer reaching them in DOM order */
+      try {
+        var urls = [];
+        ['sec', 'ban', 'blk'].forEach(function (kind) {
+          listOf(kind).forEach(function (it) {
+            (window.hlNodes(HOME, it.k) || []).forEach(function (n) {
+              n.querySelectorAll('video[src]').forEach(function (v) { urls.push(v.getAttribute('src')); });
+            });
+          });
+        });
+        window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(urls);
+      } catch (e) {}
+    };
+    (window.requestIdleCallback || function (cb) { setTimeout(cb, 1200); })(go, { timeout: 3000 });
+  }
+  /* the page's own artwork is worth having before the page is ever opened */
+  setTimeout(warm, 6000);
+
   window.stOpen = function () {
+    warm();
     render();
     var s = document.getElementById('sub-settings');
     if (s && typeof openSub === 'function') openSub('settings');
@@ -461,6 +686,8 @@
   /* The sections rail has to be right every time it is looked at — the
      arrange-editor can change the same state from the other side. */
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) paintSections();
+    if (document.hidden) return;
+    paintSections();
+    ['deckSec', 'deckBan'].forEach(function (id) { if (DECKS[id]) paintDeckBar(id); });
   });
 })();
