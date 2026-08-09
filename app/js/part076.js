@@ -195,6 +195,61 @@
     });
   }
 
+  /* ── The film, INSIDE whichever page is open ───────────────────────
+     A fixed layer behind the pages was never going to work: every one of
+     them paints its own opaque background, and stripping those is what
+     turned the store's entry screens black. This goes the other way. One
+     element is moved into the top full-bleed container of the page that is
+     open — its entry screen if it has one, the page itself otherwise — at
+     a z-index above that container's artwork and below its content. The
+     page keeps every rule it has; the film covers it while the mode is on
+     and is taken out the moment it is off.
+
+     It is the same file the mode plays everywhere else, and only one page
+     is ever on top, so there is one of these, moved, not one per page. */
+  function pageHost(sub) {
+    /* the entry screen if it is showing, else the page */
+    var intro = sub.querySelector('[class*="intro-page"]');
+    if (intro) {
+      var cs = getComputedStyle(intro);
+      if (cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity) > 0.02) return intro;
+    }
+    return sub;
+  }
+  function pageFilm(sub) {
+    var v = document.getElementById('fpPageFilm');
+    var veil = document.getElementById('fpPageVeil');
+    if (!sub) {
+      if (v) { try { v.pause(); } catch (e) {} v.remove(); }
+      if (veil) veil.remove();
+      return;
+    }
+    var src = FILMS[bgChoice()].vid;
+    if (!v) {
+      v = document.createElement('video');
+      v.id = 'fpPageFilm';
+      v.muted = true; v.loop = true; v.playsInline = true;
+      v.setAttribute('muted', ''); v.setAttribute('loop', '');
+      v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
+      v.setAttribute('aria-hidden', 'true');
+      /* out of the shared video controller's queue: this one is a page
+         background and must never wait its turn behind a card */
+      v.setAttribute('data-nwsb-vis', '1');
+    }
+    if (v.getAttribute('src') !== src) { v.setAttribute('src', src); try { v.load(); } catch (e) {} }
+    if (!veil) {
+      veil = document.createElement('div');
+      veil.id = 'fpPageVeil';
+      veil.setAttribute('aria-hidden', 'true');
+    }
+    var host = pageHost(sub);
+    /* a static host cannot hold an absolutely positioned child */
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    if (v.parentNode !== host) host.appendChild(v);
+    if (veil.parentNode !== host) host.appendChild(veil);
+    if (v.paused) { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+  }
+
   /* Is any page open? The body carries the answer so the CSS can show the
      layer, and the two clips can trade places. Class changes on the pages
      themselves are what to watch — there is no event for this. */
@@ -216,6 +271,9 @@
         else if (live && main.paused) { try { var q = main.play(); if (q && q.catch) q.catch(function () {}); } catch (e) {} }
       }
       if (open) markOwnFilm();
+      /* the topmost open page is the one that gets the film */
+      var subs = document.querySelectorAll('.sub-screen.open');
+      pageFilm(live && subs.length ? subs[subs.length - 1] : null);
     };
     /* The body observer below fires for anything the app appends, so the
        work is coalesced to once a frame rather than run per mutation. */
@@ -225,6 +283,13 @@
       requestAnimationFrame(function () { subPend = false; run(); });
     };
     run();
+    /* Pressing Enter on a store's entry screen hides it and shows the page
+       behind it without touching a class on the .sub-screen, so the film
+       has to be asked where it belongs again rather than told. Once every
+       second and a half, and only while something is open. */
+    if (!watchSubs._tick) watchSubs._tick = setInterval(function () {
+      if (document.querySelector('.sub-screen.open')) run();
+    }, 1500);
     if (subMo) subMo.disconnect();
     if (!('MutationObserver' in window)) return;
     subMo = new MutationObserver(apply);

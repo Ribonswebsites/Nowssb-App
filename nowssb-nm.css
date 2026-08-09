@@ -10903,13 +10903,32 @@ body.fashplus:not(.fp-bg-off) .sub-screen > video,
 body.fashplus:not(.fp-bg-off) .sub-screen > .sub-screen-bg > video {
   display: none !important;
 }
-/* An earlier version of this blanked every layer whose class contained
-   "intro-bg" or "intro-img" so the film could show through the store
-   pages. It did the first half and not the second: the artwork went and
-   the film did not arrive, because those pages paint an opaque body over
-   it as well — so the entry screens went black. The artwork is theirs
-   again. The film reaching those pages is a separate problem and is not
-   worth a black intro while it is solved. */
+/* ── The store pages ──
+   Stripping these was the wrong approach twice. Each entry screen is two
+   opaque layers — the page and the artwork over it — and blanking one left
+   the other, which is how they ended up black. Rather than chase whatever
+   paints them, the film is put INSIDE the page and simply covers it:
+   app/js/part076.js drops #fpPageFilm into the top full-bleed container of
+   whichever page is open, above its background and below its content. The
+   page keeps every rule it had; the mode covers it while it is on and
+   uncovers it the moment it is off. */
+#fpPageFilm {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; pointer-events: none;
+  transform: translateZ(0); backface-visibility: hidden;
+}
+#fpPageVeil {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    radial-gradient(96% 64% at 50% 42%,
+      rgba(0,0,0,0.26) 0%, rgba(0,0,0,0.44) 62%, rgba(0,0,0,0.64) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.20) 24%,
+      rgba(0,0,0,0.20) 72%, rgba(0,0,0,0.50) 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  #fpPageFilm, #fpPageVeil { display: none !important; }
+}
 @media (prefers-reduced-motion: reduce) {
   #fpSubFilm, #fpSubVeil { display: none !important; }
 }
