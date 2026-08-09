@@ -145,6 +145,12 @@
     var v = window.heroStyle();
     h.classList.toggle('hero-tv', v === 'tv');
     h.classList.toggle('hero-simple', v === 'plain');
+    /* The plain look has furniture of its own — a greeting above the card
+       and the banner rail inside it (app/js/part083.js). It is built and
+       taken away from here so there is one owner of which look is on. */
+    if (typeof window.nwsbPlainHero === 'function') {
+      try { window.nwsbPlainHero(v === 'plain'); } catch (e) {}
+    }
     return true;
   }
   window.setHeroStyle = function (v) {
