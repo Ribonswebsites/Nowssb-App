@@ -58,7 +58,11 @@
 
     // Meaning — a different clip in each place it appears
     { before: '#home-nm .krm-section',             vid: V + 'v1785402917/grok_video_2026-07-30-14-44-14_cqj4qc.mp4', frame: 'dev-tab-l', wrap: 'nvb-blk' },
-    { before: '#home #fashMeaningSearchWrap',      vid: V + 'v1785406062/grok_video_2026-07-30-15-36-37_mrnmll.mp4', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap' },
+    /* The clip this tablet used to carry never arrived — the tablet above
+       Meaning Search on the Fashion home was a black screen. It ships in
+       the repo now rather than coming from a CDN, which is also why it
+       cannot silently stop working again. */
+    { before: '#home #fashMeaningSearchWrap',      vid: './assets/video/meaning-orb.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap' },
     /* Below the store's own cinematic hero (#msBanner), not above it — a
        `top` placement into #msMeaningBody had been landing it before the
        hero as that host's first child instead. */

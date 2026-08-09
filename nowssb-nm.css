@@ -8062,6 +8062,20 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   width: 100% !important; height: 100% !important;
   object-fit: cover; display: block;
 }
+/* ── …but not when the banner is a device ──
+   `inset: 0` on an absolutely positioned child resolves against the
+   PADDING box, and on a framed banner the padding IS the bezel. So the
+   clip was filling the whole tablet, not its screen: the render is
+   transparent outside its rounded outer corners, and four square corners
+   of video showed through them.
+
+   In flow instead, so it fills the CONTENT box — which is the screen, to
+   the pixel, because that is what the padding is measured to be. The small
+   radius matches the glass's own corners. */
+.hero-vid-banner.nwsb-inframe > video {
+  position: relative; inset: auto;
+  border-radius: 7px !important;
+}
 #home-nm .nmh-hero-vid { margin: 4px 0 16px; }
 /* Square and inset to the same 16px the rest of the Fashion home uses. */
 :is(#home, .stw-prev-stage) .fash-hero-vid {
@@ -9046,8 +9060,34 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-tile .home-tile-enter {
   background: #000; border: 1px solid rgba(255,255,255,0.1);
   border-radius: 999px !important; box-sizing: border-box; overflow: hidden;
 }
-.spill-circle svg { width: 19px; height: 19px; display: block; }
+.spill-circle svg { width: 19px; height: 19px; display: block; position: relative; z-index: 2; }
 .spill-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ── The clip inside the circle ──
+   The disc was flat black behind its glyph. It carries the film now, on
+   the player, the Reader and the eBooks rail — the three sections that
+   wear this component. The circle already clips (overflow hidden, a full
+   radius), so the clip needs nothing but to fill it.
+
+   Layers, and why: the film at the bottom, a scrim over it so a white
+   glyph stays legible on a bright frame, the glyph above that, and the
+   travelling gold ring above all of them at the very edge. */
+.spill-circle .spill-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  border-radius: 999px !important;
+  pointer-events: none;
+}
+/* Unconditional rather than :has(.spill-vid) — every circle in the app
+   carries the clip, and over a black disc with no film this scrim is
+   invisible anyway. One less selector the older WebKits cannot read. */
+.spill-circle::after {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  border-radius: 999px; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.44) 58%, rgba(0,0,0,0.22) 100%);
+}
 /* The same travelling gold light the tip rail's settings pill carries. */
 .spill-circle::before {
   content: ''; position: absolute; inset: -1px; border-radius: 999px; padding: 1.6px;
