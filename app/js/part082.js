@@ -160,9 +160,9 @@
     var cur = window.heroStyle();
     return HEROES.map(function (h) {
       return '<div class="stw-wcard stw-hero' + (cur === h.v ? ' on' : '') + '">' +
-          '<div class="stw-prev stw-prev-tall">' +
-            '<div class="stw-prev-stage" data-hero="' + h.v + '"></div>' +
-          '</div>' +
+          '<div class="stw-wrap"><div class="stw-prev stw-prev-tall">' +
+            '<div class="stw-screen" data-fixed="1"><div class="stw-prev-stage" data-hero="' + h.v + '"></div></div>' +
+          '</div></div>' +
           '<div class="stw-wfoot">' +
             '<div class="stw-wtxt"><div class="stw-t">' + h.t + '</div>' +
             '<div class="stw-s">' + h.s + '</div></div>' +
@@ -200,6 +200,14 @@
   var PREV_W = 358;          /* the width a section is laid out at */
   var io = null;
 
+  /* ── This page is the Fashion home's ──────────────────────────────
+     It used to follow whichever home was in use, so opening it from the
+     Normal home showed the Normal home's sections and edited the Normal
+     home's layout. The Fashion home is the one these sections belong to;
+     the page names one home and stays on it, whichever home you came
+     from, and the registry is asked for that one by name. ── */
+  var HOME = 'fash';
+
   function stripIds(node) {
     if (node.removeAttribute) node.removeAttribute('id');
     var kids = node.querySelectorAll ? node.querySelectorAll('[id]') : [];
@@ -215,13 +223,34 @@
      the tighter one, and the section is centred in what is left over.
      Clips and artwork settle after the clone is built, so this is asked
      again whenever the stage changes size. ── */
+  var MIN_H = 170, MAX_H = 500;   /* how tall a screen is allowed to get */
   function fit(stage) {
     var box = stage.parentNode;
     if (!box) return;
-    var bw = box.clientWidth, bh = box.clientHeight;
+    /* the rect, not clientWidth — clientWidth is rounded to a whole pixel
+       and rounding UP makes the scaled stage a fraction wider than the
+       screen it is meant to sit inside */
+    var bw = box.getBoundingClientRect().width;
     var ch = stage.scrollHeight || stage.offsetHeight || 1;
-    if (!bw || !bh) return;
-    var s = Math.min(bw / PREV_W, bh / ch);
+    if (!bw) return;
+    /* a clone with nothing in it — a section the home has not built yet —
+       says so rather than showing an empty set */
+    stage.classList.toggle('empty', ch < 12);
+    var s, bh;
+    if (box.getAttribute('data-fixed') === '1') {
+      /* the hero cards keep one window height — three looks of the same
+         thing are only comparable at the same size */
+      bh = box.getBoundingClientRect().height;
+      if (!bh) return;
+      s = Math.min(bw / PREV_W, bh / ch);
+    } else {
+      /* the set is stretchable, so the screen is exactly as tall as the
+         section on it: scaled to the width unless that would make it
+         taller than a card should be, and never taller than the content */
+      s = Math.min(bw / PREV_W, MAX_H / ch);
+      bh = Math.max(MIN_H, Math.min(MAX_H, ch * s));
+      box.style.height = bh.toFixed(2) + 'px';
+    }
     stage.style.transform =
       'translate(' + ((bw - PREV_W * s) / 2).toFixed(2) + 'px,' +
                      ((bh - ch * s) / 2).toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
@@ -253,7 +282,7 @@
       nodes = h ? [h] : [];
     } else {
       var k = stage.getAttribute('data-k');
-      nodes = (typeof window.hlNodes === 'function') ? window.hlNodes(null, k) : [];
+      nodes = (typeof window.hlNodes === 'function') ? window.hlNodes(HOME, k) : [];
     }
     if (!nodes.length) { stage.classList.add('empty'); return; }
     nodes.forEach(function (n) {
@@ -310,7 +339,7 @@
   /* `kind` is 'sec' or 'ban' — the registry says which of the two a unit
      is, so the split cannot drift from what the home is actually made of */
   function listOf(kind) {
-    var list = (typeof window.hlList === 'function') ? window.hlList() : [];
+    var list = (typeof window.hlList === 'function') ? window.hlList(HOME) : [];
     return list.filter(function (it) { return kind === 'ban' ? it.vb : !it.vb; });
   }
   function sectionsHtml(kind) {
@@ -321,7 +350,9 @@
     return list.map(function (it) {
       var fixed = it.always || it.locked;
       return '<div class="stw-wcard' + (it.on ? ' on' : '') + (fixed ? ' fixed' : '') + '">' +
-          '<div class="stw-prev"><div class="stw-prev-stage" data-k="' + esc(it.k) + '"></div></div>' +
+          '<div class="stw-wrap"><div class="stw-prev stw-tv"><div class="stw-screen">' +
+            '<div class="stw-prev-stage" data-k="' + esc(it.k) + '"></div>' +
+          '</div></div></div>' +
           '<div class="stw-wfoot">' +
             '<div class="stw-wtxt">' +
               '<div class="stw-t">' + esc(it.label) + '</div>' +
@@ -338,10 +369,10 @@
   }
   window._stToggle = function (k) {
     if (typeof window.hlSet !== 'function') return;
-    var list = window.hlList(), cur = null;
+    var list = window.hlList(HOME), cur = null;
     for (var i = 0; i < list.length; i++) if (list[i].k === k) cur = list[i];
     if (!cur) return;
-    window.hlSet(null, k, !cur.on);
+    window.hlSet(HOME, k, !cur.on);
     haptic(cur.on ? 18 : 30);
     /* repaint the one card rather than the rail — rebuilding would throw
        away every preview that has already been cloned */

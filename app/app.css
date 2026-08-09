@@ -427,15 +427,15 @@ body.be-neo #ig-bottomnav {
   box-shadow:0 -4px 14px #000,0 -1px 5px #1a1a1a !important;
 }
 /* Home cards */
-body.be-neo #home .home-card,
-body.be-neo #home .home-tile {
+body.be-neo :is(#home, .stw-prev-stage) .home-card,
+body.be-neo :is(#home, .stw-prev-stage) .home-tile {
   background:#161616 !important;
   border:none !important;
   box-shadow:5px 5px 12px #000,-3px -3px 9px #222 !important;
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
 }
-body.be-neo #home .hero-glass {
+body.be-neo :is(#home, .stw-prev-stage) .hero-glass {
   background:#161616 !important;
   border:none !important;
   box-shadow:4px 4px 10px #000,-2px -2px 7px #1e1e1e !important;
@@ -552,15 +552,15 @@ body.be-neo .ig-mini-follow.following {
 /* ─────────────────────────────────────────── */
 
 /* Glass Black — intensified glassmorphism */
-body.be-glass #home .home-card,
-body.be-glass #home .home-tile {
+body.be-glass :is(#home, .stw-prev-stage) .home-card,
+body.be-glass :is(#home, .stw-prev-stage) .home-tile {
   background:rgba(255,255,255,0.04) !important;
   border:1px solid rgba(255,255,255,0.16) !important;
   box-shadow:0 12px 40px rgba(0,0,0,0.95),inset 0 1px 0 rgba(255,255,255,0.08) !important;
   backdrop-filter:none;
   -webkit-backdrop-filter:none;
 }
-body.be-glass #home .hero-glass {
+body.be-glass :is(#home, .stw-prev-stage) .hero-glass {
   background:rgba(255,255,255,0.06) !important;
   border:1px solid rgba(255,255,255,0.20) !important;
   box-shadow:0 16px 48px rgba(0,0,0,0.98),inset 0 1px 0 rgba(255,255,255,0.12) !important;
@@ -999,8 +999,8 @@ body.fashion-home-active.nwsb-theme-neo .menu-nav-icon {
 }
 
 /* ── Home cards + tiles — raised surfaces ── */
-body.fashion-home-active.nwsb-theme-neo #home .home-card,
-body.fashion-home-active.nwsb-theme-neo #home .home-tile {
+body.fashion-home-active.nwsb-theme-neo :is(#home, .stw-prev-stage) .home-card,
+body.fashion-home-active.nwsb-theme-neo :is(#home, .stw-prev-stage) .home-tile {
   background:#1a1a1a !important;
   border:none !important;
   backdrop-filter:none !important;
@@ -1010,15 +1010,15 @@ body.fashion-home-active.nwsb-theme-neo #home .home-tile {
     -4px -4px 12px rgba(30,30,30,0.65),
     inset 0 1px 0 rgba(255,255,255,0.045) !important;
 }
-body.fashion-home-active.nwsb-theme-neo #home .home-card:active,
-body.fashion-home-active.nwsb-theme-neo #home .home-tile:active {
+body.fashion-home-active.nwsb-theme-neo :is(#home, .stw-prev-stage) .home-card:active,
+body.fashion-home-active.nwsb-theme-neo :is(#home, .stw-prev-stage) .home-tile:active {
   box-shadow:
     inset 4px 4px 12px rgba(0,0,0,0.98),
     inset -2px -2px 8px rgba(28,28,28,0.5) !important;
 }
 
 /* ── Hero glass card ── */
-body.fashion-home-active.nwsb-theme-neo #home .hero-glass {
+body.fashion-home-active.nwsb-theme-neo :is(#home, .stw-prev-stage) .hero-glass {
   background:#1a1a1a !important;
   border:none !important;
   backdrop-filter:none !important;
