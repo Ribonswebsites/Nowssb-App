@@ -319,6 +319,10 @@
       if (heroMode) {
         c.classList.toggle('hero-tv', heroMode === 'tv');
         c.classList.toggle('hero-simple', heroMode === 'plain');
+        /* On the plain look the real hero is a cell of the deck — absolutely
+           positioned and translated off to the side. A preview is not in a
+           deck, so the copy sheds that. */
+        c.classList.remove('hs-cell', 'hs-hero-cell', 'on', 'out');
       }
       stage.appendChild(c);
     });

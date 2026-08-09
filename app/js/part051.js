@@ -173,7 +173,12 @@
    ── */
 (function () {
   var MARK = 'data-nwsb-vis';
-  var MAX_PLAYING = 4;
+  /* 4 was leaving the smallest clips out. The section discs beside the
+     player, the Reader and the eBooks rail are 40px and cost almost
+     nothing to decode, but they queued behind full-width banners on the
+     same screen and never got a slot — so they sat black. Six covers a
+     screen's worth of banners AND the discs on it. */
+  var MAX_PLAYING = 6;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();
   var shownCache = new WeakMap();   // element -> boolean, cleared on class changes

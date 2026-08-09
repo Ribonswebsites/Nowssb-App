@@ -47,23 +47,40 @@
     }, 300);
   }
 
+  var I = {
+    crown:   '<path d="M4 8.4l3.6 3.2L12 5.4l4.4 6.2L20 8.4l-1.6 9.2H5.6z"/><path d="M5.6 19.6h12.8"/>',
+    word:    '<path d="M4 19.4 11 5h2l7 14.4"/><path d="M7.1 14.6h9.8"/>',
+    meaning: '<path d="M4.6 6.4h14.8M4.6 12h14.8M4.6 17.6h9"/>',
+    book:    '<path d="M4 5.4h6.4a2 2 0 0 1 2 2v11.2a2.4 2.4 0 0 0-2-1H4z"/><path d="M20 5.4h-6.4a2 2 0 0 0-2 2v11.2a2.4 2.4 0 0 1 2-1H20z"/>',
+    sound:   '<path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/>'
+  };
+  function ico(k) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (I[k] || '') + '</svg>';
+  }
+
+  /* Every banner carries the heading its own block wears on the page — the
+     disc with a mark, a light line and a heavy one. Same shape as the
+     Subscription and Choose Your Path blocks, because it IS that shape. */
   var RAIL = [
-    { t: 'The Player',     s: 'Your daily word ritual',
-      v: 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438349/grok_video_2026-07-31-00-34-23_ouxhic.mp4',
-      go: function () { if (typeof openPracticeIntro === 'function') openPracticeIntro(); } },
-    { t: 'Subscription',   s: 'Every word and every frequency',
+    { i: 'crown',   h: 'The Full Library',        t: 'NowssB Subscription',
+      s: 'Every word and every frequency',
       v: 'https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
       go: function () { if (window.SS && SS.open) SS.open('subscription'); } },
-    { t: 'Word Store',     s: 'Where a word begins',
+    { i: 'word',    h: 'Where a word begins',     t: 'NowssB Word Store',
+      s: 'Every root, every origin',
       v: 'https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4',
       go: function () { openStore(''); } },
-    { t: 'Meaning Store',  s: 'What a word truly means',
+    { i: 'meaning', h: 'What a word truly means',  t: 'NowssB Meaning Store',
+      s: 'Earth, water, god, your name',
       v: 'https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4',
       go: function () { openStore('meaning-store'); } },
-    { t: 'NowssB eBooks',  s: 'Every guide, page by page',
+    { i: 'book',    h: 'Page by page',             t: 'NowssB eBooks',
+      s: 'Deep-dive guides, yours to keep',
       v: 'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
       go: function () { if (typeof window.ebSecOpen === 'function') ebSecOpen(); } },
-    { t: 'Sound Library',  s: 'Every word you own',
+    { i: 'sound',   h: 'Every word you own',       t: 'Sound Library',
+      s: 'Root frequencies to practice with',
       v: './assets/video/sound-library-banner.mp4?v=1',
       go: function () { if (typeof openSub === 'function') openSub('sound-library'); } }
   ];
@@ -104,36 +121,66 @@
     return n || 'NowssB';
   }
 
-  /* ── The rail ─────────────────────────────────────────────────────── */
-  var cur = 0, timer = null, running = false, shownAt = 0;
-  /* No banner leaves before it has been readable. `ended` is the handover,
-     but a clip that cannot decode — no codec, a source that fails — ends
-     the instant it starts, and the rail would then flick through all four
-     in half a second. Nothing moves on before this long, whatever the
-     reason it finished. */
-  var MIN_DWELL = 2600;
+  /* The disc's mark reads the clock, the way the Normal home's does: the
+     sun climbing, the sun high, the sun setting, the moon. */
+  function timeMark() {
+    var h = new Date().getHours();
+    var sun = '<circle cx="12" cy="12" r="4.4"/>' +
+      '<path d="M12 2.6v2.4M12 19v2.4M21.4 12H19M5 12H2.6M18.6 5.4 17 7M7 17l-1.6 1.6M18.6 18.6 17 17M7 7 5.4 5.4"/>';
+    var dawn = '<path d="M3.4 18.4h17.2"/><circle cx="12" cy="13.6" r="4"/>' +
+      '<path d="M12 4.6v2.2M19.2 7.6l-1.6 1.6M4.8 7.6l1.6 1.6"/>';
+    var moon = '<path d="M20.4 14.6A8.6 8.6 0 0 1 9.4 3.6a8.6 8.6 0 1 0 11 11z"/>';
+    var d = (h < 5 || h >= 21) ? moon : (h < 9 ? dawn : (h < 17 ? sun : dawn));
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  }
 
-  function slides() { return document.querySelectorAll('#hsRail .hs-slide'); }
+  /* ── The deck ──────────────────────────────────────────────────────
+     One place, one thing in it at a time. The hero card is the first cell;
+     the five banners follow. Each arrives FROM THE RIGHT and the one it
+     replaces leaves to the LEFT, so the deck only ever travels one way and
+     comes back round to the hero. It runs itself — no dots, no arrows,
+     nothing to press but the banner you are looking at.
+
+     The deck's height follows whatever is in it, animated, because a hero
+     card and a tablet are not the same height and a box that jumps is the
+     difference between an app and a page. */
+  var cur = 0, timer = null, running = false, shownAt = 0;
+  var HERO_HOLD = 6000;      /* how long the hero card holds the deck */
+  var MIN_DWELL = 2600;      /* nothing leaves before it has been readable */
+
+  function deck()  { return document.getElementById('hsDeck'); }
+  function cells() { return document.querySelectorAll('#hsDeck .hs-cell'); }
+
+  function fitHeight() {
+    var d = deck();
+    if (!d) return;
+    var on = d.querySelector('.hs-cell.on');
+    if (!on) return;
+    var h = on.offsetHeight;
+    if (h > 0) d.style.height = h + 'px';
+  }
 
   function stop() {
     running = false;
     if (timer) { clearTimeout(timer); timer = null; }
-    slides().forEach(function (sl) {
-      var v = sl.querySelector('video');
+    cells().forEach(function (c) {
+      var v = c.querySelector('video');
       if (v && !v.paused) { try { v.pause(); } catch (e) {} }
     });
   }
 
   /* A clip is given its source only when it is about to be seen, and the
-     NEXT one is given its source at the same time so it is decoded and
-     ready to move rather than starting from nothing. */
+     NEXT one at the same time so it is ready to move rather than starting
+     from nothing. Cell 0 is the hero and has no clip. */
   function arm(i) {
-    var sl = slides()[i];
-    if (!sl) return null;
-    var v = sl.querySelector('video');
+    if (i < 1) return null;
+    var c = cells()[i];
+    if (!c) return null;
+    var v = c.querySelector('video');
     if (!v) return null;
     if (!v.getAttribute('src')) {
-      v.setAttribute('src', RAIL[i].v);
+      v.setAttribute('src', RAIL[i - 1].v);
       v.preload = 'auto';
       try { v.load(); } catch (e) {}
     }
@@ -141,42 +188,41 @@
   }
 
   function show(i, why) {
-    var all = slides();
+    var all = cells();
     if (!all.length) return;
-    i = ((i % all.length) + all.length) % all.length;
+    var n = all.length;
+    i = ((i % n) + n) % n;
+    var from = cur;
     cur = i;
-    all.forEach(function (sl, j) {
-      /* `prev` leaves to the LEFT, everything unseen waits on the RIGHT —
-         so the rail always travels one way and never rewinds past you. */
-      var back = (why === 'back');
-      sl.classList.toggle('on', j === i);
-      sl.classList.toggle('out',  !back && why !== 'first' && j === (i - 1 + all.length) % all.length);
-      sl.classList.toggle('outr',  back && j === (i + 1) % all.length);
-      var v = sl.querySelector('video');
+    all.forEach(function (c, j) {
+      c.classList.toggle('on', j === i);
+      c.classList.toggle('out', why !== 'first' && j === from && j !== i);
+      var v = c.querySelector('video');
       if (v && j !== i && !v.paused) { try { v.pause(); } catch (e) {} }
     });
-    var dots = document.querySelectorAll('#hsRail .hs-dots i');
-    dots.forEach(function (d, j) { d.classList.toggle('on', j === i); });
-    var lt = document.querySelector('#hsRail .hs-lbl-t'),
-        ls = document.querySelector('#hsRail .hs-lbl-s');
-    if (lt) lt.textContent = RAIL[i].t;
-    if (ls) ls.textContent = RAIL[i].s;
-
     shownAt = Date.now();
+    /* the box takes the new cell's height as the new cell arrives */
+    requestAnimationFrame(fitHeight);
+    setTimeout(fitHeight, 60);
+
     var v = arm(i);
-    arm((i + 1) % all.length);          /* the next one, ready to move */
-    if (!running || !v) return;
+    arm(i + 1 >= n ? 0 : i + 1);
+    if (!running) return;
+
+    if (timer) clearTimeout(timer);
+    if (!v) {                                   /* the hero card */
+      timer = setTimeout(function () { if (running) show(cur + 1); }, HERO_HOLD);
+      return;
+    }
     try { v.currentTime = 0; } catch (e) {}
     var p = v.play();
     if (p && p.catch) p.catch(function () {});
 
-    /* `ended` is the handover, and this is the net under it: a clip that
-       never starts — no codec, autoplay refused, a source that 404s —
-       would otherwise stop the rail dead on its first slide. */
-    if (timer) clearTimeout(timer);
+    /* `ended` is the handover; this is the net under it — a clip that never
+       starts would otherwise stop the deck dead. */
     var wait = 9000;
-    if (v.duration && isFinite(v.duration) && v.duration > 0.4) wait = (v.duration * 1000) + 900;
-    wait = Math.max(MIN_DWELL, Math.min(wait, 14000));
+    if (v.duration && isFinite(v.duration) && v.duration > 0.4) wait = (v.duration * 1000) + 700;
+    wait = Math.max(MIN_DWELL, Math.min(wait, 13000));
     timer = setTimeout(function () { if (running) show(cur + 1); }, wait);
   }
 
@@ -192,74 +238,66 @@
     haptic(18);
     try { r.go(); } catch (e) {}
   };
-  window._hsDot = function (i) { haptic(12); show(i); };
-  /* The arrows step it by hand. Stepping backwards is the one time the
-     rail runs the other way, so the leaving slide has to go RIGHT — a
-     banner must never appear to come back from the side it just left. */
-  window._hsStep = function (d) { haptic(14); show(cur + d, d < 0 ? 'back' : undefined); };
 
-  function chev(dir) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" ' +
-      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M' +
-      (dir === 'l' ? '15 5 8 12l7 7' : '9 5 16 12l-7 7') + '"/></svg>';
+  /* Each banner is a rounded glass wrapper with a tablet in it — the app's
+     own landscape render, its padding the bezel and its content box the
+     screen. No dots and no arrows: this runs itself. */
+  function cellsHtml() {
+    return RAIL.map(function (r, i) {
+      return '<button class="hs-cell hs-ban" data-i="' + (i + 1) + '" ' +
+               'onclick="window._hsGo(' + i + ')" aria-label="' + esc(r.t) + ' — ' + esc(r.s) + '">' +
+               '<span class="hs-head">' +
+                 '<span class="hs-orb">' + ico(r.i) + '</span>' +
+                 '<span class="hs-head-txt">' +
+                   '<span class="hs-head-h">' + esc(r.h) + '</span>' +
+                   '<span class="hs-head-t">' + esc(r.t) + '</span>' +
+                 '</span>' +
+               '</span>' +
+               '<span class="hs-tab nwsb-inframe dev-tab-l">' +
+                 '<video class="hs-vid" muted playsinline preload="none" ' +
+                        'data-nwsb-vis="1" aria-hidden="true" tabindex="-1"></video>' +
+               '</span>' +
+             '</button>';
+    }).join('');
   }
 
-  /* Each banner is ON A TABLET — .nwsb-inframe.dev-tab-l, the app's own
-     landscape render, its padding the bezel and its content box the screen
-     — and the tablets sit in one rounded glass wrapper. This block is a
-     SIBLING of the hero, under it. It was inside the hero card before and
-     it should not have been: the hero says what the app is, and this shows
-     you what is in it. */
-  function railHtml() {
-    return '<div class="hs-block" id="hsRail">' +
-        '<div class="hs-stage">' +
-          RAIL.map(function (r, i) {
-            return '<button class="hs-slide' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" ' +
-                     'onclick="window._hsGo(' + i + ')" aria-label="' + esc(r.t) + ' — ' + esc(r.s) + '">' +
-                     '<span class="hs-tab nwsb-inframe dev-tab-l">' +
-                       '<video class="hs-vid" muted playsinline preload="none" ' +
-                              'data-nwsb-vis="1" aria-hidden="true" tabindex="-1"></video>' +
-                     '</span>' +
-                   '</button>';
-          }).join('') +
-        '</div>' +
-        '<div class="hs-bar">' +
-          '<button class="hs-nav" onclick="window._hsStep(-1)" aria-label="Previous">' + chev('l') + '</button>' +
-          '<span class="hs-lbl"><span class="hs-lbl-t"></span><span class="hs-lbl-s"></span></span>' +
-          '<button class="hs-nav" onclick="window._hsStep(1)" aria-label="Next">' + chev('r') + '</button>' +
-        '</div>' +
-        '<div class="hs-dots">' +
-          RAIL.map(function (r, i) {
-            return '<i class="' + (i === 0 ? 'on' : '') + '" onclick="window._hsDot(' + i + ')"></i>';
-          }).join('') +
-        '</div>' +
-      '</div>';
-  }
-
-  /* ── Putting it in and taking it out ──────────────────────────────── */
+  /* ── Putting it in and taking it out ──────────────────────────────
+     The hero card is MOVED into the deck rather than copied — it is the
+     app's real header, with the search that opens the explore sheet and
+     the word that changes on a timer, and a copy of it would be a second
+     one of those. Taking the look away moves it back where it was. */
   function build(hero) {
     if (!hero) return;
     var home = hero.parentNode;
     if (!home) return;
 
-    /* the greeting, immediately before the card */
     var g = document.getElementById('hsGreet');
     if (!g) {
       g = document.createElement('div');
       g.id = 'hsGreet';
       g.className = 'hs-greet';
-      g.innerHTML = '<div class="hs-hello"></div><div class="hs-name"></div>' +
-                    '<div class="hs-line">Ready for today\'s healing practice?</div>';
+      g.innerHTML = '<div class="hs-orb hs-greet-orb"></div>' +
+                    '<div class="hs-greet-txt">' +
+                      '<div class="hs-hello"></div><div class="hs-name"></div>' +
+                      '<div class="hs-line">Ready for today\'s healing practice?</div>' +
+                    '</div>';
       home.insertBefore(g, hero);
     }
     g.querySelector('.hs-hello').textContent = hello() + ',';
     g.querySelector('.hs-name').textContent = who();
+    var orb = g.querySelector('.hs-greet-orb');
+    if (orb) orb.innerHTML = timeMark();
 
-    /* the rail, straight AFTER the hero — a sibling, not a passenger */
-    if (!document.getElementById('hsRail')) {
-      var box = document.createElement('div');
-      box.innerHTML = railHtml();
-      home.insertBefore(box.firstChild, hero.nextSibling);
+    var d = document.getElementById('hsDeck');
+    if (!d) {
+      d = document.createElement('div');
+      d.id = 'hsDeck';
+      d.className = 'hs-deck';
+      home.insertBefore(d, hero);
+      hero.classList.add('hs-cell', 'hs-hero-cell', 'on');
+      hero.setAttribute('data-i', '0');
+      d.appendChild(hero);                       /* moved, not copied */
+      d.insertAdjacentHTML('beforeend', cellsHtml());
     }
     cur = 0;
     show(0, 'first');
@@ -269,19 +307,24 @@
     stop();
     var g = document.getElementById('hsGreet');
     if (g) g.remove();
-    var r = document.getElementById('hsRail');
-    if (r) {
-      /* let go of the clips rather than leaving four decoders parked
-         behind a look nobody is using */
-      r.querySelectorAll('video').forEach(function (v) {
-        try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
-      });
-      r.remove();
+    var d = document.getElementById('hsDeck');
+    if (!d) return;
+    var hero = d.querySelector('.hero-section');
+    if (hero) {
+      hero.classList.remove('hs-cell', 'hs-hero-cell', 'on', 'out');
+      hero.removeAttribute('data-i');
+      d.parentNode.insertBefore(hero, d);        /* put it back */
     }
+    d.querySelectorAll('video').forEach(function (v) {
+      try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
+    });
+    d.remove();
   }
 
   /* Called by app/js/part082.js every time the hero's look is applied, so
-     there is one owner of which look is on and this file only answers. */
+     there is one owner of which look is on and this file only answers. It
+     was lost in a rewrite of this section, which is why the deck stopped
+     being built at all. */
   window.nwsbPlainHero = function (on) {
     var hero = document.querySelector('#home .hero-section');
     if (!hero) return;
@@ -289,6 +332,8 @@
     build(hero);
     pump();
   };
+
+  window.addEventListener('resize', fitHeight);
 
   /* ── When it is allowed to run ────────────────────────────────────── */
   function visible() {
@@ -308,7 +353,7 @@
     pending = true;
     requestAnimationFrame(function () {
       pending = false;
-      if (!document.getElementById('hsRail')) return;
+      if (!document.getElementById('hsDeck')) return;
       if (visible()) start(); else stop();
     });
   }
@@ -321,12 +366,12 @@
      whether this should be running — the home becoming the active screen,
      a page closing over it — do not all announce themselves. It reads a
      class and a rectangle; it is cheaper than being wrong. */
-  setInterval(function () { if (document.getElementById('hsRail')) pump(); }, 1200);
+  setInterval(function () { if (document.getElementById('hsDeck')) { pump(); fitHeight(); } }, 1200);
 
   /* The clip that ends is the one that hands over. Delegated, because the
      rail is built and thrown away as the look is switched. */
   document.addEventListener('ended', function (e) {
-    var sl = e.target && e.target.closest ? e.target.closest('.hs-slide') : null;
+    var sl = e.target && e.target.closest ? e.target.closest('.hs-cell') : null;
     if (!sl || !running) return;
     if (!sl.classList.contains('on')) return;
     var left = MIN_DWELL - (Date.now() - shownAt);

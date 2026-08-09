@@ -14196,25 +14196,42 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    --home-header-h measures — and the card follows it rather than carrying
    the offset itself. */
 .hs-greet {
-  margin: calc(var(--home-header-h, 92px) + 6px) 20px 12px;
+  /* Real room above and below it — it is the first thing on the page and
+     it was sitting on the header's shoulder. */
+  margin: calc(var(--home-header-h, 92px) + 22px) 20px 22px;
+  display: flex; align-items: flex-start; gap: 14px;
 }
+.hs-greet-txt { flex: 1; min-width: 0; }
+/* The disc the Normal home's greeting wears — the same size, the same mark
+   reading the same clock — but flat. No neumorphism, no white, no shadow:
+   a thin ring and the app's gold, which is all this needs on glass. */
+.hs-orb {
+  width: 58px; height: 58px; flex-shrink: 0; margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.20);
+  box-shadow: none !important;
+  color: #e8d5a3;
+}
+.hs-orb svg { width: 27px; height: 27px; display: block; }
 /* The Normal home's greeting exactly — 20/400 at 62%, then 27/800, then
    the line under it — and nothing else it wears: no neumorphic disc, no
    white, no shadow. Type only. */
 .hs-hello {
-  font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 400;
-  letter-spacing: -0.2px; color: rgba(255,255,255,0.62); line-height: 1.12;
+  font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 400;
+  letter-spacing: -0.2px; color: rgba(255,255,255,0.62); line-height: 1.14;
   text-shadow: none;
 }
 .hs-name {
   margin-top: 1px;
-  font-family: 'DM Sans', sans-serif; font-size: 27px; font-weight: 800;
-  letter-spacing: -0.6px; color: #fff; line-height: 1.12;
+  font-family: 'DM Sans', sans-serif; font-size: 31px; font-weight: 800;
+  letter-spacing: -0.7px; color: #fff; line-height: 1.1;
   text-shadow: none;
 }
 .hs-line {
-  margin-top: 6px;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+  margin-top: 7px;
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 400;
   color: rgba(255,255,255,0.6); text-shadow: none;
 }
 
@@ -14285,55 +14302,91 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   THE BANNER RAIL — under the hero, not inside it
+   THE DECK — one place, one thing in it
 
-   Six banners, each the clip its own section already carries, each ON A
-   TABLET: .nwsb-inframe.dev-tab-l, the app's landscape render, its padding
-   the bezel and its content box the screen. The tablets sit in one rounded
-   glass wrapper.
+   The hero card does not sit above the banners; it IS the first of them.
+   It holds the deck for a few seconds, leaves to the LEFT, and the five
+   banners come through FROM THE RIGHT one after another before it comes
+   back round. Nothing to press but the banner you are looking at — no
+   dots, no arrows, it runs itself.
 
-   One at a time. It arrives FROM THE RIGHT, plays ONCE, and leaves to the
-   LEFT as the next arrives — and only the arrows can run it backwards, in
-   which case the leaving one goes right, because a banner must never look
-   like it is coming back from the side it just left.
+   The box takes the height of whatever is in it, animated, because a hero
+   card and a tablet are not the same height and a box that jumps between
+   them is the difference between an app and a page.
    ══════════════════════════════════════════════════════════════════ */
-.hs-block {
+.hs-deck {
+  position: relative;
   margin: 0 16px 18px;
-  padding: 12px;
+  height: 320px;                     /* replaced from the live cell */
+  transition: height .58s cubic-bezier(.22,1,.28,1);
+}
+.hs-cell {
+  position: absolute; top: 0; left: 0; width: 100%;
+  display: block; padding: 0 !important; margin: 0 !important;
+  min-height: 0 !important;
+  text-align: left; color: inherit;
+  /* everything unseen waits off to the right */
+  transform: translateX(106%);
+  opacity: 0;
+  /* a touch of overshoot as it lands — the small wobble that tells you a
+     thing arrived rather than appeared */
+  transition: transform .72s cubic-bezier(.22,1.16,.32,1), opacity .34s ease;
+  will-change: transform;
+  pointer-events: none;
+}
+.hs-cell.on  { transform: translateX(0);      opacity: 1; z-index: 2; pointer-events: auto; }
+.hs-cell.out { transform: translateX(-106%);  opacity: 0; z-index: 1; }
+
+/* the hero card, as the deck's first cell: it keeps its glass and loses
+   the margins it had when it stood on its own */
+.hs-deck > .hero-section.hero-simple {
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* a banner: a rounded glass wrapper with a tablet in it */
+.hs-ban {
   box-sizing: border-box;
-  /* !important: the home squares off its direct children by theme class,
-     and this block is one of them. Its corners are the point. */
+  padding: 12px !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
   border-radius: 26px !important;
   background:
     linear-gradient(158deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 44%, rgba(255,255,255,0.02) 100%),
-    linear-gradient(180deg, rgba(6,12,24,0.48) 0%, rgba(6,12,24,0.60) 100%);
-  border: 1px solid rgba(255,255,255,0.16);
+    linear-gradient(180deg, rgba(6,12,24,0.48) 0%, rgba(6,12,24,0.60) 100%) !important;
   -webkit-backdrop-filter: blur(22px) saturate(1.4);
           backdrop-filter: blur(22px) saturate(1.4);
   box-shadow: 0 18px 44px rgba(0,0,0,0.44), inset 0 1px 0 rgba(255,255,255,0.26);
+  cursor: pointer;
 }
-.hs-stage {
-  position: relative; width: 100%;
-  aspect-ratio: 1339 / 875;          /* the tablet render's own */
-  overflow: hidden;
-  border-radius: 18px !important;
+.hs-ban:active { transform: translateX(0) scale(.985); }
+/* The heading every one of these blocks wears on the page: a disc with a
+   mark, a light line and a heavy one. Here the disc is white with a dark
+   glyph, the way it reads on Subscription and Choose Your Path. */
+.hs-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 2px 2px 14px;
 }
-.hs-slide {
-  position: absolute; inset: 0;
-  display: block; padding: 0 !important; margin: 0 !important;
-  min-height: 0 !important;
-  border: none !important; border-radius: 0 !important;
-  background: transparent; cursor: pointer;
-  transform: translateX(104%); opacity: 0;
-  transition: transform .68s cubic-bezier(.22,1,.28,1), opacity .38s ease;
-  will-change: transform;
+.hs-ban .hs-orb {
+  width: 54px; height: 54px; margin-top: 0;
+  background: #f4f6fb; border: none; color: #0a1224;
 }
-.hs-slide.on   { transform: translateX(0);     opacity: 1; z-index: 2; }
-.hs-slide.out  { transform: translateX(-104%); opacity: 0; z-index: 1; }
-.hs-slide.outr { transform: translateX(104%);  opacity: 0; z-index: 1; }
-/* the tablet */
+.hs-ban .hs-orb svg { width: 26px; height: 26px; }
+.hs-head-txt { flex: 1; min-width: 0; display: block; text-align: left; }
+.hs-head-h {
+  display: block;
+  font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 400;
+  letter-spacing: -0.2px; color: rgba(255,255,255,0.66); line-height: 1.14;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hs-head-t {
+  display: block; margin-top: 1px;
+  font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 800;
+  letter-spacing: -0.6px; color: #fff; line-height: 1.12;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .hs-tab {
-  position: absolute; inset: 0; display: block;
+  display: block; position: relative; width: 100%;
+  aspect-ratio: 1339 / 875;          /* the tablet render's own */
   background-color: #000;
 }
 .hs-vid {
@@ -14343,47 +14396,10 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   border-radius: 7px;
 }
 
-.hs-bar {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 2px 0;
-}
-.hs-nav {
-  flex-shrink: 0; width: 34px !important; height: 34px !important;
-  min-width: 34px !important; min-height: 34px !important;
-  padding: 0 !important; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50% !important;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  background: rgba(255,255,255,0.08) !important;
-  color: #fff;
-}
-.hs-nav:active { transform: scale(.92); }
-.hs-nav svg { width: 16px; height: 16px; display: block; }
-.hs-lbl { flex: 1; min-width: 0; text-align: center; display: block; }
-.hs-lbl-t {
-  display: block;
-  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800;
-  letter-spacing: -0.1px; color: #fff;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.hs-lbl-s {
-  display: block; margin-top: 2px;
-  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 400;
-  color: rgba(255,255,255,0.6);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-.hs-dots { display: flex; justify-content: center; gap: 6px; padding: 10px 0 2px; }
-.hs-dots i {
-  width: 6px; height: 6px; border-radius: 50%; cursor: pointer;
-  background: rgba(255,255,255,0.26);
-  transition: width .26s ease, background .26s ease;
-}
-.hs-dots i.on { width: 20px; border-radius: 3px; background: #e8d5a3; }
-
 @media (prefers-reduced-motion: reduce) {
-  .hs-slide { transition: opacity .3s ease; transform: none !important; }
-  .hs-slide:not(.on) { opacity: 0; pointer-events: none; }
+  .hs-cell { transition: opacity .3s ease; transform: none !important; }
+  .hs-cell:not(.on) { opacity: 0; }
+  .hs-deck { transition: none; }
 }
 
 
