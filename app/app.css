@@ -16,7 +16,7 @@ input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text;-webk
 /* ===== css block 1 ===== */
 
 /* ── Universal search icon ── */
-:root{--nwsb-search-icon:url('./assets/icons/search.webp');}
+:root{--nwsb-search-icon:url('./assets/icons/search.webp?v=2');}
 .nwsb-search-icon{width:18px;height:18px;object-fit:contain;display:block;filter:brightness(0) invert(1);flex-shrink:0;pointer-events:none;}
 /* Any search bar wrapper that uses position:relative + padding-left for the icon */
 .nwsb-search-wrap{position:relative;}

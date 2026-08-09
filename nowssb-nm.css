@@ -14100,11 +14100,14 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    1.823% from the left, 1.969% from the right, 5.994% from the top,
    6.625% from the bottom.
    ══════════════════════════════════════════════════════════════════════ */
+/* It sits in a wrapper now, so the wrapper carries the page inset and the
+   tab simply fills it. */
+#home .hhr-blk { margin-top: 14px; margin-bottom: 16px; }
 #home .hhr-tab {
   position: relative;
-  width: calc(100% - 32px);
-  max-width: 420px;
-  margin: 0 auto 16px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   aspect-ratio: 1371 / 317;
   background: url('./assets/frames/word-acts-tab.webp') center / 100% 100% no-repeat;
   border-radius: 9px !important;
