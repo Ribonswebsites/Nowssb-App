@@ -100,7 +100,81 @@
     if (c) jumpTo(c);
   };
 
-  /* ── Rail 1 · the home's own sections ───────────────────────────── */
+  /* ── Rail 1 · the home's own sections ─────────────────────────────
+     Each card is the SECTION ITSELF, cloned out of the home and scaled
+     down — its clip, its artwork, its heading, whatever it is made of.
+     A name and a one-line description could never tell you what "Connect
+     Banner" or "Trending Shop" looks like, and choosing what your home is
+     made of is a visual decision.
+
+     Three things make cloning safe:
+       · ids are stripped from the clone, or the copy would answer to
+         getElementById ahead of the real section and every script that
+         looks one up would find the preview instead;
+       · the clone is inert — pointer-events off, so nothing inside it can
+         be pressed by accident;
+       · it is built only when the card comes into view. Twenty-six live
+         copies, several carrying video, is not something to construct at
+         once for a rail most of which is off-screen.
+     ── */
+  var PREV_W = 358;          /* the width a section is laid out at */
+  var io = null;
+
+  function stripIds(node) {
+    if (node.removeAttribute) node.removeAttribute('id');
+    var kids = node.querySelectorAll ? node.querySelectorAll('[id]') : [];
+    for (var i = 0; i < kids.length; i++) kids[i].removeAttribute('id');
+  }
+
+  function fillPreview(stage) {
+    if (stage._filled) return;
+    stage._filled = true;
+    var k = stage.getAttribute('data-k');
+    var nodes = (typeof window.hlNodes === 'function') ? window.hlNodes(null, k) : [];
+    if (!nodes.length) { stage.classList.add('empty'); return; }
+    nodes.forEach(function (n) {
+      var c = n.cloneNode(true);
+      stripIds(c);
+      c.classList.remove('hl-off');          /* a hidden section still previews */
+      c.style.display = '';
+      stage.appendChild(c);
+    });
+    /* clips in a preview are decoration: muted, looping, and never a
+       reason to hold up the page */
+    stage.querySelectorAll('video').forEach(function (v) {
+      v.muted = true; v.setAttribute('muted', ''); v.playsInline = true;
+      v.loop = true; v.removeAttribute('controls');
+      try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+    });
+    /* scale it to the card once we know how tall the real thing is */
+    var card = stage.parentNode;
+    if (!card) return;
+    var scale = card.clientWidth / PREV_W;
+    stage.style.transform = 'scale(' + scale + ')';
+  }
+
+  function observe() {
+    if (io) io.disconnect();
+    var fillIn = function (win) {
+      var st = win.querySelector('.stw-prev-stage');
+      if (st) fillPreview(st);
+    };
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.stw-prev').forEach(fillIn);
+      return;
+    }
+    /* Observe the WINDOW, not the stage. An unfilled stage is absolutely
+       positioned with nothing in it — zero height — and a target with no
+       area never reports as intersecting, so nothing would ever be built.
+       .stw-prev has a real 190px box from the moment it exists. */
+    io = new IntersectionObserver(function (ents) {
+      ents.forEach(function (e) {
+        if (e.isIntersecting) { fillIn(e.target); io.unobserve(e.target); }
+      });
+    }, { root: document.getElementById('stwSections'), rootMargin: '250px' });
+    document.querySelectorAll('.stw-prev').forEach(function (w) { io.observe(w); });
+  }
+
   function sectionsHtml() {
     var list = (typeof window.hlList === 'function') ? window.hlList() : [];
     if (!list.length) {
@@ -108,14 +182,20 @@
     }
     return list.map(function (it) {
       var fixed = it.always || it.locked;
-      return '<button class="stw-card stw-sec' + (it.on ? ' on' : '') + (fixed ? ' fixed' : '') + '"' +
-        (fixed ? ' disabled aria-disabled="true"' : ' onclick="window._stToggle(\'' + esc(it.k) + '\')"') +
-        ' aria-pressed="' + (it.on ? 'true' : 'false') + '">' +
-          '<span class="stw-dot" aria-hidden="true"></span>' +
-          '<span class="stw-t">' + esc(it.label) + '</span>' +
-          '<span class="stw-s">' + esc(it.sub || '') + '</span>' +
-          '<span class="stw-state">' + (fixed ? 'Always on' : (it.on ? 'On' : 'Off')) + '</span>' +
-        '</button>';
+      return '<div class="stw-wcard' + (it.on ? ' on' : '') + (fixed ? ' fixed' : '') + '">' +
+          '<div class="stw-prev"><div class="stw-prev-stage" data-k="' + esc(it.k) + '"></div></div>' +
+          '<div class="stw-wfoot">' +
+            '<div class="stw-wtxt">' +
+              '<div class="stw-t">' + esc(it.label) + '</div>' +
+              '<div class="stw-s">' + esc(it.sub || '') + '</div>' +
+            '</div>' +
+            (fixed
+              ? '<span class="stw-pill fixed">Always</span>'
+              : '<button class="stw-pill" onclick="window._stToggle(\'' + esc(it.k) + '\')"' +
+                ' aria-pressed="' + (it.on ? 'true' : 'false') + '">' +
+                '<span class="stw-knob"></span></button>') +
+          '</div>' +
+        '</div>';
     }).join('');
   }
   window._stToggle = function (k) {
@@ -125,16 +205,28 @@
     if (!cur) return;
     window.hlSet(null, k, !cur.on);
     haptic(cur.on ? 18 : 30);
-    paintSections();
+    /* repaint the one card rather than the rail — rebuilding would throw
+       away every preview that has already been cloned */
+    var card = document.querySelector('.stw-prev-stage[data-k="' + k + '"]');
+    card = card && card.closest ? card.closest('.stw-wcard') : null;
+    if (card) {
+      card.classList.toggle('on', !cur.on);
+      var pill = card.querySelector('.stw-pill');
+      if (pill) pill.setAttribute('aria-pressed', (!cur.on) ? 'true' : 'false');
+    }
+    paintCount();
   };
-  function paintSections() {
-    var el = document.getElementById('stwSections');
-    if (el) el.innerHTML = sectionsHtml();
+  function paintCount() {
     var n = document.getElementById('stwSecCount');
     if (n && typeof window.hlList === 'function') {
       var l = window.hlList();
       n.textContent = l.filter(function (x) { return x.on; }).length + ' of ' + l.length + ' showing';
     }
+  }
+  function paintSections() {
+    var el = document.getElementById('stwSections');
+    if (el) { el.innerHTML = sectionsHtml(); observe(); }
+    paintCount();
   }
 
   function cardsHtml(kind, arr) {
@@ -176,6 +268,17 @@
     var s = document.getElementById('sub-settings');
     if (s && typeof openSub === 'function') openSub('settings');
     haptic(24);
+    /* The rail is measured for the first time while the screen is still
+       opening. Look again once it has arrived, and fill the first few
+       outright so the page is never blank while the observer decides. */
+    setTimeout(function () {
+      var wins = document.querySelectorAll('.stw-prev');
+      for (var i = 0; i < Math.min(3, wins.length); i++) {
+        var st = wins[i].querySelector('.stw-prev-stage');
+        if (st) fillPreview(st);
+      }
+      observe();
+    }, 420);
   };
   window.stClose = function () { if (typeof closeSub === 'function') closeSub('settings'); };
 

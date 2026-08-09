@@ -380,6 +380,18 @@
                     always: !!it.always, locked: !!it.locked } : null;
     }).filter(Boolean);
   };
+  /* The live nodes of a section, so the Widgets page can clone the real
+     thing rather than describe it. Returns them whether the section is
+     showing or hidden — a hidden one still has to be previewable, which
+     is the whole point of a page for turning them back on. */
+  window.hlNodes = function (which, k) {
+    var w = whichNow(which), reg = REG[w];
+    var wrap = document.querySelector(reg.wrap);
+    var it = itemOf(w, k);
+    if (!wrap || !it) return [];
+    return nodesOf(wrap, it);
+  };
+
   window.hlSet = function (which, k, on) {
     var w = whichNow(which), it = itemOf(w, k);
     if (!it || it.always || it.locked) return false;
