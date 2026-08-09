@@ -507,3 +507,19 @@ body.fashplus:not(.fp-bg-off) #sub-settings .st-page {
 /* A card paints inside itself and nowhere else, so a change in one never
    asks the page to repaint the rest of the row. */
 .stw-wcard, .stw-slide { contain: layout paint style; }
+
+/* ── A clip in a preview is a still ──
+   .stw-still stands in for a <video> the clone did not keep. It takes the
+   class and the inline style the video had, so every rule that sized or
+   positioned the clip still finds something to size and position — it is
+   the same box, without the decoder. */
+.stw-still {
+  display: block;
+  background-color: #05070d;
+  background-size: cover;
+  background-position: center;
+}
+.stw-prev-stage video.stw-live {
+  display: block;
+  object-fit: cover;
+}

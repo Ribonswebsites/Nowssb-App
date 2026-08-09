@@ -243,6 +243,10 @@
       veil.setAttribute('aria-hidden', 'true');
     }
     var host = pageHost(sub);
+    /* The menu drawer scrolls; a background that scrolls with it is not a
+       background. Fixed there, absolute everywhere else. */
+    v.style.position = (host.id === 'menuDrawer') ? 'fixed' : '';
+    if (veil) veil.style.position = v.style.position;
     /* a static host cannot hold an absolutely positioned child */
     if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
     if (v.parentNode !== host) host.appendChild(v);
@@ -271,9 +275,19 @@
         else if (live && main.paused) { try { var q = main.play(); if (q && q.catch) q.catch(function () {}); } catch (e) {} }
       }
       if (open) markOwnFilm();
-      /* the topmost open page is the one that gets the film */
+      /* the topmost open page is the one that gets the film — and the
+         hamburger menu counts as a page. It is not a .sub-screen (it is a
+         drawer at z-index 500) but it covers the screen the same way and
+         had nothing behind its glass. */
       var subs = document.querySelectorAll('.sub-screen.open');
-      pageFilm(live && subs.length ? subs[subs.length - 1] : null);
+      var drawer = document.getElementById('menuDrawer');
+      var host = null;
+      if (live) {
+        if (drawer && drawer.classList.contains('open')) host = drawer;
+        else if (subs.length) host = subs[subs.length - 1];
+      }
+      pageFilm(host);
+      document.body.classList.toggle('nwsb-sub-open', open || !!(drawer && drawer.classList.contains('open')));
     };
     /* The body observer below fires for anything the app appends, so the
        work is coalesced to once a frame rather than run per mutation. */
@@ -296,6 +310,8 @@
     document.querySelectorAll('.sub-screen').forEach(function (s) {
       subMo.observe(s, { attributes: true, attributeFilter: ['class'] });
     });
+    var drawer = document.getElementById('menuDrawer');
+    if (drawer) subMo.observe(drawer, { attributes: true, attributeFilter: ['class'] });
     /* Pages built by their own file arrive after this runs, and an
        observer cannot watch an element that did not exist yet. */
     subMo.observe(document.body, { childList: true });

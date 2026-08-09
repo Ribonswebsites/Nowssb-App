@@ -331,15 +331,35 @@
       }
       stage.appendChild(c);
     });
-    /* Clips in a preview are decoration. They are built STOPPED — twenty-six
-       clones each starting a decoder is what made this page hang — and
-       pump() below starts only the ones you are actually looking at. */
+    /* ── Clips in a preview are STILLS ────────────────────────────────
+       A stopped <video> is not free. It is a decoder, a texture and a frame
+       buffer the moment it has a source, and this page can hold thirty of
+       them across four rows — which is what was taking the renderer out.
+       Chrome does not warn first: the page dims and then the tab is gone.
+
+       So a clone does not keep its clips. Each one is replaced by a still —
+       its own poster where it has one, its first frame where the file is
+       already in the media cache, a flat fill otherwise — which is a
+       picture, and pictures do not hold decoders.
+
+       The centred slide of a deck is the exception, and the only one: that
+       is the thing you are actually looking at, and it is at most two on
+       the whole page. markLive() below re-hydrates it. */
     stage.querySelectorAll('video').forEach(function (v) {
-      v.muted = true; v.setAttribute('muted', ''); v.playsInline = true;
-      v.loop = true; v.removeAttribute('controls');
-      v.removeAttribute('autoplay'); v.autoplay = false;
-      v.preload = 'none';
-      try { v.pause(); } catch (e) {}
+      var poster = v.getAttribute('poster') || '';
+      var d = document.createElement('div');
+      d.className = 'stw-still' + (v.className ? ' ' + v.className : '');
+      d.setAttribute('data-src', v.getAttribute('src') ||
+        ((v.querySelector('source') || {}).getAttribute ? v.querySelector('source').getAttribute('src') : '') || '');
+      if (poster) d.setAttribute('data-poster', poster);
+      var st = v.getAttribute('style');
+      if (st) d.setAttribute('style', st);
+      if (poster) {
+        d.style.backgroundImage = 'url(' + poster + ')';
+        d.style.backgroundSize = 'cover';
+        d.style.backgroundPosition = 'center';
+      }
+      if (v.parentNode) v.parentNode.replaceChild(d, v);
     });
     /* size it to the window once we know how tall the real thing is */
     watch(stage);
@@ -396,6 +416,22 @@
      report for free. It also re-measures a deck the first time it is
      scrolled to — the rails are `content-visibility: auto`, so a rail
      below the fold has no geometry to measure until then. */
+  /* ── Clones do not live forever ───────────────────────────────────
+     Even as stills, twenty-eight cloned sections is a large document. A
+     card that has been off screen for a while gives its clone back; it is
+     rebuilt from the registry the next time it is scrolled to, which is
+     what building it lazily meant in the first place. */
+  function recycle(el) {
+    var st = el.querySelector ? el.querySelector('.stw-prev-stage') : null;
+    if (!st || !st._filled || st.closest('.stw-slide')) return;   /* decks keep theirs */
+    markLive(st, false);
+    st.innerHTML = '';
+    st._filled = false;
+    st._queued = false;
+    st.classList.remove('empty');
+    if (io) { var w = el.querySelector('.stw-prev'); if (w) io.observe(w); }
+  }
+
   var vio = null;
   function visObserve() {
     if (vio) vio.disconnect();
@@ -409,7 +445,17 @@
       var decks = {};
       ents.forEach(function (e) {
         e.target._vis = e.isIntersecting;
-        if (!e.isIntersecting) return;
+        if (!e.isIntersecting) {
+          /* not straight away — a card the scroll passed over is often
+             about to come back, and rebuilding it then would be the cost
+             this is meant to avoid */
+          if (e.target._recycle) clearTimeout(e.target._recycle);
+          e.target._recycle = setTimeout(function () {
+            if (e.target._vis === false) recycle(e.target);
+          }, 6000);
+          return;
+        }
+        if (e.target._recycle) { clearTimeout(e.target._recycle); e.target._recycle = null; }
         var d = e.target.closest ? e.target.closest('.stw-deck') : null;
         if (d && !d._laid) { d._laid = 1; decks[d.id] = 1; }
       });
@@ -454,6 +500,44 @@
       pump();
       if (queue.length) drain();
     }, { timeout: 900 });
+  }
+
+  /* ── The one live clip ────────────────────────────────────────────
+     A still carries the source it replaced, so the centred slide can be
+     given a real <video> back and lose it again when it moves on. One per
+     deck, two on the page, and nothing else on it holds a decoder. */
+  function markLive(stage, on) {
+    if (!stage) return;
+    if (on) {
+      if (stage._live) return;
+      stage._live = 1;
+      stage.querySelectorAll('.stw-still[data-src]').forEach(function (d) {
+        var src = d.getAttribute('data-src');
+        if (!src) return;
+        var v = document.createElement('video');
+        v.className = 'stw-live ' + (d.className || '').replace('stw-still', '').trim();
+        v.muted = true; v.loop = true; v.playsInline = true;
+        v.setAttribute('muted', ''); v.setAttribute('loop', ''); v.setAttribute('playsinline', '');
+        v.setAttribute('data-nwsb-vis', '1');       /* not the app controller's business */
+        if (d.getAttribute('data-poster')) v.setAttribute('poster', d.getAttribute('data-poster'));
+        var st = d.getAttribute('style');
+        if (st) v.setAttribute('style', st);
+        v.setAttribute('src', src);
+        v.setAttribute('data-was', src);
+        d.style.display = 'none';
+        d.parentNode.insertBefore(v, d);
+        try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+      });
+    } else {
+      if (!stage._live) return;
+      stage._live = 0;
+      stage.querySelectorAll('video.stw-live').forEach(function (v) {
+        try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
+        var d = v.nextElementSibling;
+        if (d && d.classList.contains('stw-still')) d.style.display = '';
+        v.remove();
+      });
+    }
   }
 
   function observe() {
@@ -577,8 +661,8 @@
       if (j < 0 || j >= list.length) continue;
       var st = deck.querySelector('.stw-slide[data-i="' + j + '"] .stw-prev-stage');
       if (!st) continue;
-      if (j === d.i) { fillPreview(st); fit(st); }
-      else fillLater(st);
+      if (j === d.i) { fillPreview(st); fit(st); markLive(st, true); }
+      else { fillLater(st); markLive(st, false); }
     }
     paintDeckBar(id);
     pump();
@@ -800,8 +884,16 @@
     };
     (window.requestIdleCallback || function (cb) { setTimeout(cb, 1200); })(go, { timeout: 3000 });
   }
-  /* the page's own artwork is worth having before the page is ever opened */
-  setTimeout(warm, 6000);
+  /* The page's own artwork is worth having before the page is ever opened —
+     but not while the start animation is playing. That clip runs once, at
+     the front of the launch, and a handful of fetches across it is exactly
+     the kind of thing that makes it stutter. */
+  if (typeof window.nwsbSplashWait === 'function') {
+    try { window.nwsbSplashWait(function () { setTimeout(warm, 2500); }); }
+    catch (e) { setTimeout(warm, 6000); }
+  } else {
+    setTimeout(warm, 6000);
+  }
 
   /* ── The mode's film, on this page ────────────────────────────────
      Fashion Plus plays one fixed clip behind the whole app, and a

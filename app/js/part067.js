@@ -372,7 +372,14 @@
         } else if (!v.paused) { try { v.pause(); } catch (err) {} }
       });
     }, { rootMargin: '20% 0px' });
+    /* Nothing decodes underneath the start animation. That clip plays once,
+       at the very front of the launch, and anything else starting a decoder
+       while it runs is what makes it stutter — the app's own warmer waits
+       for the same reason. */
+    var splashDone = (typeof window.nwsbSplashWait !== 'function');
+    if (!splashDone) { try { window.nwsbSplashWait(function () { splashDone = true; }); } catch (e) { splashDone = true; } }
     var scan = function () {
+      if (!splashDone) return;
       /* [data-nwsb-own], not [data-nwsb-vis] — the plain hero's deck marks
          its cells with the latter to stay out of the shared controller too,
          and it runs exactly one of them at a time. Starting all six here
