@@ -254,7 +254,7 @@
     if (!body) return;
     body.innerHTML =
       '<div class="stw-intro">' +
-        '<div class="stw-intro-t">Widgets</div>' +
+        '<div class="stw-intro-t">Your home, in parts</div>' +
         '<div class="stw-intro-s">Your home is built out of sections. Turn off what you do not use — the rest moves up to fill the space.</div>' +
       '</div>' +
       rail('stwSections', 'Home sections', '', sectionsHtml(), 'stwSecCount') +

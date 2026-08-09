@@ -14372,3 +14372,18 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
   padding: 0 20px; font-family: 'DM Sans', sans-serif; font-size: 12px;
   color: rgba(255,255,255,0.5);
 }
+
+/* A mode card in Customize shows a switch; when it also has a page behind
+   it, the way in sits beside the switch instead of being unreachable. */
+.cu-mode-row { display: flex; align-items: center; gap: 8px; }
+.cu-card-in {
+  padding: 5px 11px; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.08) !important;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  min-height: 0 !important;
+}
+.cu-card-in:active { transform: scale(.94); }

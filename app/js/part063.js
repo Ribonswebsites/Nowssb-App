@@ -46,7 +46,11 @@
             '</svg>' },
     /* A mode, not a destination — it toggles rather than opening anything,
        so it carries a switch instead of an Enter pill. Fashion home only. */
+    /* A mode card renders a switch and nothing else, which left Fashion
+       Plus with a toggle and no door — the page behind it was unreachable
+       from here. `enter` puts a way in next to the switch. */
     { k: 'fashplus', label: 'Fashion Plus', sub: 'Motion on the Fashion home', run: 'fpToggle()', mode: 1,
+      enter: "openSub('fashion-plus')",
       icon: '<svg viewBox="0 0 24 24" fill="none">' +
               '<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5z" stroke="#fff" stroke-width="1.5"/>' +
               '<path d="M10.4 9.3 15 12l-4.6 2.7z" fill="#e8d5a3"/>' +
@@ -74,7 +78,12 @@
                      '<div class="cu-card-label">' + c.label + '</div>' +
                      '<div class="cu-card-sub">' + c.sub + '</div>' +
                      (c.mode
-                       ? '<div class="cu-mode-sw" data-k="' + c.k + '"><div class="cu-mode-knob"></div></div>'
+                       ? '<div class="cu-mode-row">' +
+                           (c.enter
+                             ? '<button class="cu-card-in" onclick="event.stopPropagation();' + c.enter + '">Open</button>'
+                             : '') +
+                           '<div class="cu-mode-sw" data-k="' + c.k + '"><div class="cu-mode-knob"></div></div>' +
+                         '</div>'
                        : '<div class="tp-enter cu-card-enter">' +
                            '<span class="tp-enter-lbl">Enter</span>' +
                            '<span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none">' +
