@@ -14204,6 +14204,13 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
    grid of twelve shortcuts is a wall to read; a rail says "there is more
    this way" and costs one gesture.
    ══════════════════════════════════════════════════════════════════════ */
+/* ── Above the Settings screen ──
+   Every .sub-screen shares z-index 600, so among open ones the LAST in
+   the document paints on top. The Widgets page is written before the
+   Settings screen, so opening it from Settings put it underneath — it
+   was opening, you just could not see it. */
+#sub-settings.open { z-index: 900; }
+
 #sub-settings .st-page {
   position: relative; z-index: 2;
   display: flex; flex-direction: column; height: 100%; overflow: hidden;
@@ -14387,3 +14394,20 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
   min-height: 0 !important;
 }
 .cu-card-in:active { transform: scale(.94); }
+
+/* The hero previews are taller — a hero is a tall thing, and at the
+   section cards' height you would see only its top bezel. */
+.stw-prev-tall { height: 250px; }
+.stw-hero { width: 200px; }
+.stw-use {
+  flex-shrink: 0; padding: 6px 13px; cursor: pointer;
+  border: 1px solid rgba(232,213,163,0.5) !important;
+  border-radius: 999px !important;
+  background: rgba(232,213,163,0.16) !important;
+  color: #e8d5a3;
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  min-height: 0 !important;
+}
+.stw-use:active { transform: scale(.94); }
+.stw-pill.fixed.on { color: #e8d5a3; }

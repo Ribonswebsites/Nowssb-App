@@ -100,6 +100,62 @@
     if (c) jumpTo(c);
   };
 
+  /* ── The hero header has two looks ────────────────────────────────
+     On the television, which is what it ships as, or plain — the way it
+     was before the set, filling the screen edge to edge. Everything that
+     makes it a television hangs off one class, so the switch is that
+     class and a remembered string. ── */
+  var HKEY = 'nwsb_hero_style';
+  window.heroStyle = function () {
+    return localStorage.getItem(HKEY) === 'plain' ? 'plain' : 'tv';   /* the set is the default */
+  };
+  function applyHero() {
+    var h = document.querySelector('#home .hero-section');
+    if (!h) return false;
+    h.classList.toggle('hero-tv', window.heroStyle() === 'tv');
+    return true;
+  }
+  window.setHeroStyle = function (v) {
+    try { localStorage.setItem(HKEY, v === 'plain' ? 'plain' : 'tv'); } catch (e) {}
+    applyHero();
+    haptic(26);
+    paintHero();
+  };
+  /* The hero is static markup, so this only has to happen once — but the
+     screen it lives on may not be parsed yet when this file runs. */
+  (function waitForHero(n) {
+    if (applyHero() || n > 40) return;
+    setTimeout(function () { waitForHero(n + 1); }, 150);
+  })(0);
+
+  var HEROES = [
+    { v: 'tv',    t: 'On the television', s: 'The set, on the page' },
+    { v: 'plain', t: 'Full screen',       s: 'Edge to edge, no frame' }
+  ];
+  function heroHtml() {
+    var cur = window.heroStyle();
+    return HEROES.map(function (h) {
+      return '<div class="stw-wcard stw-hero' + (cur === h.v ? ' on' : '') + '">' +
+          '<div class="stw-prev stw-prev-tall">' +
+            '<div class="stw-prev-stage" data-hero="' + h.v + '"></div>' +
+          '</div>' +
+          '<div class="stw-wfoot">' +
+            '<div class="stw-wtxt"><div class="stw-t">' + h.t + '</div>' +
+            '<div class="stw-s">' + h.s + '</div></div>' +
+            (cur === h.v
+              ? '<span class="stw-pill fixed on">Using</span>'
+              : '<button class="stw-use" onclick="window.setHeroStyle(\'' + h.v + '\')">Use</button>') +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
+  function paintHero() {
+    var el = document.getElementById('stwHero');
+    if (!el) return;
+    el.innerHTML = heroHtml();
+    el.querySelectorAll('.stw-prev-stage').forEach(fillPreview);
+  }
+
   /* ── Rail 1 · the home's own sections ─────────────────────────────
      Each card is the SECTION ITSELF, cloned out of the home and scaled
      down — its clip, its artwork, its heading, whatever it is made of.
@@ -129,14 +185,24 @@
   function fillPreview(stage) {
     if (stage._filled) return;
     stage._filled = true;
-    var k = stage.getAttribute('data-k');
-    var nodes = (typeof window.hlNodes === 'function') ? window.hlNodes(null, k) : [];
+    var nodes;
+    var heroMode = stage.getAttribute('data-hero');
+    if (heroMode) {
+      var h = document.querySelector('#home .hero-section');
+      nodes = h ? [h] : [];
+    } else {
+      var k = stage.getAttribute('data-k');
+      nodes = (typeof window.hlNodes === 'function') ? window.hlNodes(null, k) : [];
+    }
     if (!nodes.length) { stage.classList.add('empty'); return; }
     nodes.forEach(function (n) {
       var c = n.cloneNode(true);
       stripIds(c);
       c.classList.remove('hl-off');          /* a hidden section still previews */
       c.style.display = '';
+      /* the hero previews are one clone shown BOTH ways, so the class is
+         forced on the copy rather than read off the original */
+      if (heroMode) c.classList.toggle('hero-tv', heroMode === 'tv');
       stage.appendChild(c);
     });
     /* clips in a preview are decoration: muted, looping, and never a
@@ -257,10 +323,12 @@
         '<div class="stw-intro-t">Your home, in parts</div>' +
         '<div class="stw-intro-s">Your home is built out of sections. Turn off what you do not use — the rest moves up to fill the space.</div>' +
       '</div>' +
+      rail('stwHero', 'Hero header', 'How the top of your home looks', heroHtml()) +
       rail('stwSections', 'Home sections', '', sectionsHtml(), 'stwSecCount') +
       rail('', 'Jump to', 'The places the app can take you', cardsHtml('jump', JUMP)) +
       rail('', 'Make it yours', 'Every editor, in one place', cardsHtml('make', MAKE));
     paintSections();
+    paintHero();
   }
 
   window.stOpen = function () {

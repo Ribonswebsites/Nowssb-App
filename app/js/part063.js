@@ -46,11 +46,19 @@
             '</svg>' },
     /* A mode, not a destination — it toggles rather than opening anything,
        so it carries a switch instead of an Enter pill. Fashion home only. */
-    /* A mode card renders a switch and nothing else, which left Fashion
-       Plus with a toggle and no door — the page behind it was unreachable
-       from here. `enter` puts a way in next to the switch. */
-    { k: 'fashplus', label: 'Fashion Plus', sub: 'Motion on the Fashion home', run: 'fpToggle()', mode: 1,
-      enter: "openSub('fashion-plus')",
+    /* Fashion Plus was a `mode` card: a switch and nothing else, so the
+       page behind it could not be reached from either the hub or the
+       panel on the home. It is an ordinary card now and it opens that
+       page, where the mode is switched — a door beats a switch when the
+       room behind it is where everything else lives. */
+    { k: 'widgets', label: 'Widgets', sub: 'Choose what your home shows', run: 'stOpen()',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round">' +
+              '<rect x="3.4" y="3.4" width="7.2" height="7.2" rx="2"/>' +
+              '<rect x="13.4" y="3.4" width="7.2" height="7.2" rx="2" stroke="#e8d5a3"/>' +
+              '<rect x="3.4" y="13.4" width="7.2" height="7.2" rx="2"/>' +
+              '<rect x="13.4" y="13.4" width="7.2" height="7.2" rx="2"/>' +
+            '</svg>' },
+    { k: 'fashplus', label: 'Fashion Plus', sub: 'Open the motion mode', run: "openSub('fashion-plus')",
       icon: '<svg viewBox="0 0 24 24" fill="none">' +
               '<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5z" stroke="#fff" stroke-width="1.5"/>' +
               '<path d="M10.4 9.3 15 12l-4.6 2.7z" fill="#e8d5a3"/>' +
