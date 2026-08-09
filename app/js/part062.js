@@ -361,6 +361,36 @@
     requestAnimationFrame(function () { if (ov) ov.classList.add('open'); });
     haptic(28);
   };
+  /* ── A public read/write for the section list ──────────────────────
+     The Widgets page (app/js/part082.js) shows the same sections as this
+     editor and has to agree with it exactly — same storage, same rules
+     about `always` and `locked`. It asks here rather than keeping a copy:
+     one place decides what a home is made of.
+     `which` is 'nm' or 'fash'; omitted, it follows the home in use. ── */
+  function whichNow(which) {
+    return (which === 'fash' || which === 'nm') ? which
+      : (localStorage.getItem('nwsb_home_mode') === 'home' ? 'fash' : 'nm');
+  }
+  window.hlWhich = whichNow;
+  window.hlList = function (which) {
+    var w = whichNow(which), st = load(w), reg = REG[w];
+    return st.order.map(function (k) {
+      var it = itemOf(w, k);
+      return it ? { k: k, label: it.label, sub: it.sub, on: st.off.indexOf(k) < 0,
+                    always: !!it.always, locked: !!it.locked } : null;
+    }).filter(Boolean);
+  };
+  window.hlSet = function (which, k, on) {
+    var w = whichNow(which), it = itemOf(w, k);
+    if (!it || it.always || it.locked) return false;
+    var st = load(w), i = st.off.indexOf(k);
+    if (on && i >= 0) st.off.splice(i, 1);
+    else if (!on && i < 0) st.off.push(k);
+    else return true;                       /* already where it was asked to be */
+    save(w, st); apply(w);
+    return true;
+  };
+
   window.hlClose = function () {
     hlPickerClose();
     var ov = document.getElementById('hlOverlay');

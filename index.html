@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=316">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=740">
+<link rel="stylesheet" href="nowssb-nm.css?v=741">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
 <body>
@@ -5620,7 +5620,8 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part018.js?v=80"></script>
 <!-- Must load after part018.js — it takes over window.slRender/slSetTab. -->
 <script src="app/js/part080.js?v=8"></script><!-- ══ SOUND LIBRARY FEED ══ -->
-<script src="app/js/part081.js?v=3"></script><!-- ══ PRONUNCIATION NOTES ══ -->
+<script src="app/js/part081.js?v=3"></script>
+<script src="app/js/part082.js?v=1"></script><!-- ══ PRONUNCIATION NOTES ══ -->
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -7772,6 +7773,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 
 <!-- ══ ALL FEATURES MENU (Fashion hero icon) ══ -->
+<!-- ══ SETTINGS ══
+     One page for the things that shape the app. Its body is built by
+     app/js/part082.js on every open, because the first rail mirrors the
+     home's live section list. -->
+<div class="sub-screen" id="sub-settings">
+  <div class="st-page">
+    <div class="st-header">
+      <button class="sub-back" onclick="closeSub('settings')" aria-label="Back"></button>
+      <span class="st-title">Settings</span>
+    </div>
+    <div class="st-body" id="stBody"></div>
+  </div>
+</div>
+
 <div class="sub-screen" id="sub-features">
   <video class="feat-bgvid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/yvi3d7ov/video/upload/v1785491036/grok_video_2026-07-31-15-10-28_cenjdg.mp4"></video>
   <div class="feat-bgvid-scrim"></div>
@@ -7786,6 +7801,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <div class="feat-banner-carousel" id="featBannerCarousel"><div class="feat-banner-track"></div><div class="feat-banner-dots"></div></div>
     <div class="feat-grid">
+      <button class="feat-card" onclick="navFromSub('features',function(){window.stOpen&&stOpen();});">
+        <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="3.4" width="7.2" height="7.2" rx="2"/><rect x="13.4" y="3.4" width="7.2" height="7.2" rx="2"/><rect x="3.4" y="13.4" width="7.2" height="7.2" rx="2"/><rect x="13.4" y="13.4" width="7.2" height="7.2" rx="2"/></svg></div>
+        <div class="feat-card-divider"></div>
+        <div class="feat-name">Settings</div><div class="feat-sub">Widgets and shortcuts</div>
+      </button>
       <button class="feat-card" onclick="navFromSub('features',function(){window.IG&&IG.nav('library');});">
         <div class="feat-ico feat-ico-img"><img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png" alt=""></div>
         <div class="feat-card-divider"></div>
@@ -10404,7 +10424,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=15"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=37"></script>
+<script src="app/js/part062.js?v=38"></script>
 <script src="app/js/part063.js?v=4"></script>
 <script src="app/js/part064.js?v=7"></script>
 <script src="app/js/part065.js?v=13"></script>
