@@ -33,21 +33,37 @@
 
   /* Each banner is the clip its own page opens with, so the rail is a
      window onto the app rather than a set of adverts made for it. */
+  /* The six banners, each the clip that section already carries — the one
+     at the top of its own page, not something made for here. Naming them
+     by where they live is the point: this rail is the app introducing
+     itself with its own footage. */
+  function openStore(sec) {
+    var s = document.getElementById('sub-nowssb-store');
+    if (s) s.classList.add('open');
+    var iv = document.getElementById('nssIntroVid');
+    if (iv) { iv.muted = true; try { iv.play().catch(function () {}); } catch (e) {} }
+    if (sec) setTimeout(function () {
+      if (typeof window.nssOpenSub === 'function') { try { nssOpenSub(sec); } catch (e) {} }
+    }, 300);
+  }
+
   var RAIL = [
-    { k: 'player',
-      t: 'The Player',      s: 'Your daily word ritual',
-      v: 'https://res.cloudinary.com/eenvubod/video/upload/v1785403502/grok_video_2026-07-30-14-54-07_ddjmrr.mp4',
+    { t: 'The Player',     s: 'Your daily word ritual',
+      v: 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438349/grok_video_2026-07-31-00-34-23_ouxhic.mp4',
       go: function () { if (typeof openPracticeIntro === 'function') openPracticeIntro(); } },
-    { k: 'meaning',
-      t: 'Meaning Store',   s: 'What a word truly means',
-      v: 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785428189/grok_video_2026-07-30-21-45-01_egzgw2.mp4',
-      go: function () { if (typeof openSub === 'function') openSub('meaning-search'); } },
-    { k: 'word',
-      t: 'Word Store',      s: 'Where a word begins',
-      v: 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785428199/grok_video_2026-07-30-21-45-09_vbmf44.mp4',
-      go: function () { if (typeof openSub === 'function') openSub('word-search'); } },
-    { k: 'library',
-      t: 'Sound Library',   s: 'Every word you own',
+    { t: 'Subscription',   s: 'Every word and every frequency',
+      v: 'https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
+      go: function () { if (window.SS && SS.open) SS.open('subscription'); } },
+    { t: 'Word Store',     s: 'Where a word begins',
+      v: 'https://res.cloudinary.com/ds6duqabl/video/upload/v1779957220/grok_video_2026-05-28-14-02-13_zaoxnl.mp4',
+      go: function () { openStore(''); } },
+    { t: 'Meaning Store',  s: 'What a word truly means',
+      v: 'https://res.cloudinary.com/ds6duqabl/video/upload/v1780042918/grok_video_2026-05-29-04-36-47_cze9bz.mp4',
+      go: function () { openStore('meaning-store'); } },
+    { t: 'NowssB eBooks',  s: 'Every guide, page by page',
+      v: 'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+      go: function () { if (typeof window.ebSecOpen === 'function') ebSecOpen(); } },
+    { t: 'Sound Library',  s: 'Every word you own',
       v: './assets/video/sound-library-banner.mp4?v=1',
       go: function () { if (typeof openSub === 'function') openSub('sound-library'); } }
   ];
@@ -132,13 +148,19 @@
     all.forEach(function (sl, j) {
       /* `prev` leaves to the LEFT, everything unseen waits on the RIGHT —
          so the rail always travels one way and never rewinds past you. */
+      var back = (why === 'back');
       sl.classList.toggle('on', j === i);
-      sl.classList.toggle('out', j === (i - 1 + all.length) % all.length && why !== 'first');
+      sl.classList.toggle('out',  !back && why !== 'first' && j === (i - 1 + all.length) % all.length);
+      sl.classList.toggle('outr',  back && j === (i + 1) % all.length);
       var v = sl.querySelector('video');
       if (v && j !== i && !v.paused) { try { v.pause(); } catch (e) {} }
     });
     var dots = document.querySelectorAll('#hsRail .hs-dots i');
     dots.forEach(function (d, j) { d.classList.toggle('on', j === i); });
+    var lt = document.querySelector('#hsRail .hs-lbl-t'),
+        ls = document.querySelector('#hsRail .hs-lbl-s');
+    if (lt) lt.textContent = RAIL[i].t;
+    if (ls) ls.textContent = RAIL[i].s;
 
     shownAt = Date.now();
     var v = arm(i);
@@ -171,35 +193,40 @@
     try { r.go(); } catch (e) {}
   };
   window._hsDot = function (i) { haptic(12); show(i); };
+  /* The arrows step it by hand. Stepping backwards is the one time the
+     rail runs the other way, so the leaving slide has to go RIGHT — a
+     banner must never appear to come back from the side it just left. */
+  window._hsStep = function (d) { haptic(14); show(cur + d, d < 0 ? 'back' : undefined); };
 
+  function chev(dir) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M' +
+      (dir === 'l' ? '15 5 8 12l7 7' : '9 5 16 12l-7 7') + '"/></svg>';
+  }
+
+  /* Each banner is ON A TABLET — .nwsb-inframe.dev-tab-l, the app's own
+     landscape render, its padding the bezel and its content box the screen
+     — and the tablets sit in one rounded glass wrapper. This block is a
+     SIBLING of the hero, under it. It was inside the hero card before and
+     it should not have been: the hero says what the app is, and this shows
+     you what is in it. */
   function railHtml() {
-    return '<div class="hs-rail" id="hsRail">' +
-        '<div class="hs-track">' +
+    return '<div class="hs-block" id="hsRail">' +
+        '<div class="hs-stage">' +
           RAIL.map(function (r, i) {
-            /* the first one is on from the moment the rail is built, so the
-               box is never a blank rectangle waiting for a frame */
-            return '<button class="hs-slide' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" onclick="window._hsGo(' + i + ')" ' +
-                     'aria-label="' + esc(r.t) + ' — ' + esc(r.s) + '">' +
-                     /* data-nwsb-vis: the app's global video controller
-                        (app/js/part051.js) skips anything already marked,
-                        and this rail must not be one of its up-to-N
-                        players — three of these four are off to the right
-                        at any moment and it would start them there. The
-                        rail decides what runs. */
-                     '<video class="hs-vid" muted playsinline preload="none" ' +
-                            'data-nwsb-vis="1" aria-hidden="true" tabindex="-1"></video>' +
-                     '<span class="hs-shade"></span>' +
-                     '<span class="hs-cap">' +
-                       '<span class="hs-cap-t">' + esc(r.t) + '</span>' +
-                       '<span class="hs-cap-s">' + esc(r.s) + '</span>' +
-                     '</span>' +
-                     '<span class="hs-open">' +
-                       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
-                       'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-                       '<path d="M5 12h13M12 5l7 7-7 7"/></svg>' +
+            return '<button class="hs-slide' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" ' +
+                     'onclick="window._hsGo(' + i + ')" aria-label="' + esc(r.t) + ' — ' + esc(r.s) + '">' +
+                     '<span class="hs-tab nwsb-inframe dev-tab-l">' +
+                       '<video class="hs-vid" muted playsinline preload="none" ' +
+                              'data-nwsb-vis="1" aria-hidden="true" tabindex="-1"></video>' +
                      '</span>' +
                    '</button>';
           }).join('') +
+        '</div>' +
+        '<div class="hs-bar">' +
+          '<button class="hs-nav" onclick="window._hsStep(-1)" aria-label="Previous">' + chev('l') + '</button>' +
+          '<span class="hs-lbl"><span class="hs-lbl-t"></span><span class="hs-lbl-s"></span></span>' +
+          '<button class="hs-nav" onclick="window._hsStep(1)" aria-label="Next">' + chev('r') + '</button>' +
         '</div>' +
         '<div class="hs-dots">' +
           RAIL.map(function (r, i) {
@@ -221,25 +248,21 @@
       g = document.createElement('div');
       g.id = 'hsGreet';
       g.className = 'hs-greet';
-      g.innerHTML = '<div class="hs-hello"></div><div class="hs-name"></div>';
+      g.innerHTML = '<div class="hs-hello"></div><div class="hs-name"></div>' +
+                    '<div class="hs-line">Ready for today\'s healing practice?</div>';
       home.insertBefore(g, hero);
     }
     g.querySelector('.hs-hello').textContent = hello() + ',';
     g.querySelector('.hs-name').textContent = who();
 
-    /* the rail, where the five photographs used to be */
+    /* the rail, straight AFTER the hero — a sibling, not a passenger */
     if (!document.getElementById('hsRail')) {
-      var bottom = hero.querySelector('.hero-bottom');
-      var glass = hero.querySelector('.hero-glass');
-      if (bottom) {
-        var box = document.createElement('div');
-        box.innerHTML = railHtml();
-        var rail = box.firstChild;
-        if (glass && glass.parentNode === bottom) bottom.insertBefore(rail, glass);
-        else bottom.insertBefore(rail, bottom.firstChild);
-      }
+      var box = document.createElement('div');
+      box.innerHTML = railHtml();
+      home.insertBefore(box.firstChild, hero.nextSibling);
     }
     cur = 0;
+    show(0, 'first');
   }
 
   function tearDown() {
