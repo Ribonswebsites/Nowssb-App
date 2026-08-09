@@ -4,15 +4,21 @@
    Quick Access, Connect — and every one of them is really a widget: a
    thing that can be there or not. This page says so out loud.
 
-   Three rails, each scrolling sideways:
-     1. Home sections — every section the home is made of, on or off.
+   Rails, each scrolling sideways:
+     1. Hero header — the three ways the top of the home can look.
+     2. Home sections — every section the home is made of, on or off.
         It does NOT keep its own list or its own storage. The layout
         registry (app/js/part062.js) already decides what a home is made
         of and remembers what is switched off, and the arrange-editor
         reads the same thing — a second copy would drift the first time
         a section was added.
-     2. Jump to — the places the app can take you, one tap each.
-     3. Make it yours — the editors and switches that change how the app
+     3. Video banners — the clips, discs and artwork bars, on their own
+        rail. They come from the same registry and the same storage; they
+        are separated because keeping a banner and keeping a section are
+        different decisions, and one rail of thirty mixed cards was
+        neither of them.
+     4. Jump to — the places the app can take you, one tap each.
+     5. Make it yours — the editors and switches that change how the app
         looks, gathered instead of scattered.
    ══════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -100,23 +106,40 @@
     if (c) jumpTo(c);
   };
 
-  /* ── The hero header has two looks ────────────────────────────────
-     On the television, which is what it ships as, or plain — the way it
-     was before the set, filling the screen edge to edge. Everything that
-     makes it a television hangs off one class, so the switch is that
-     class and a remembered string. ── */
+  /* ── The hero header has three looks ──────────────────────────────
+     'tv'     — inside the television, which is what it ships as;
+     'full'   — the way it was before the set: the five photographs
+                crossfading behind it, edge to edge, a screenful tall;
+     'plain'  — an ordinary app header. No photographs, no picture rail,
+                no set: the wordmark, the word and the buttons on a card
+                that is as tall as what is in it.
+     All three are the same markup — each look is one class — so switching
+     is a class and a remembered string, and nothing is rebuilt.
+     'plain' used to be the name of the full-screen look, so a value saved
+     under the old meaning is read forward as 'full'. ── */
   var HKEY = 'nwsb_hero_style';
+  var HVER = 'nwsb_hero_style_v';
+  (function migrate() {
+    try {
+      if (localStorage.getItem(HVER)) return;
+      if (localStorage.getItem(HKEY) === 'plain') localStorage.setItem(HKEY, 'full');
+      localStorage.setItem(HVER, '2');
+    } catch (e) {}
+  })();
   window.heroStyle = function () {
-    return localStorage.getItem(HKEY) === 'plain' ? 'plain' : 'tv';   /* the set is the default */
+    var v = localStorage.getItem(HKEY);
+    return (v === 'full' || v === 'plain') ? v : 'tv';   /* the set is the default */
   };
   function applyHero() {
     var h = document.querySelector('#home .hero-section');
     if (!h) return false;
-    h.classList.toggle('hero-tv', window.heroStyle() === 'tv');
+    var v = window.heroStyle();
+    h.classList.toggle('hero-tv', v === 'tv');
+    h.classList.toggle('hero-simple', v === 'plain');
     return true;
   }
   window.setHeroStyle = function (v) {
-    try { localStorage.setItem(HKEY, v === 'plain' ? 'plain' : 'tv'); } catch (e) {}
+    try { localStorage.setItem(HKEY, (v === 'full' || v === 'plain') ? v : 'tv'); } catch (e) {}
     applyHero();
     haptic(26);
     paintHero();
@@ -130,7 +153,8 @@
 
   var HEROES = [
     { v: 'tv',    t: 'On the television', s: 'The set, on the page' },
-    { v: 'plain', t: 'Full screen',       s: 'Edge to edge, no frame' }
+    { v: 'full',  t: 'Full screen',       s: 'The photographs, edge to edge' },
+    { v: 'plain', t: 'Plain header',      s: 'No pictures, no set' }
   ];
   function heroHtml() {
     var cur = window.heroStyle();
@@ -182,6 +206,43 @@
     for (var i = 0; i < kids.length; i++) kids[i].removeAttribute('id');
   }
 
+  /* ── fit the whole section in the window ──────────────────────────
+     The scale used to be the card's width over the layout width, full
+     stop, and whatever fell past the bottom of the window was simply
+     cut off — most sections are taller than they are wide, so most cards
+     showed a section's top third and nothing else. The scale is the
+     smaller of the two fits now, so height decides it whenever height is
+     the tighter one, and the section is centred in what is left over.
+     Clips and artwork settle after the clone is built, so this is asked
+     again whenever the stage changes size. ── */
+  function fit(stage) {
+    var box = stage.parentNode;
+    if (!box) return;
+    var bw = box.clientWidth, bh = box.clientHeight;
+    var ch = stage.scrollHeight || stage.offsetHeight || 1;
+    if (!bw || !bh) return;
+    var s = Math.min(bw / PREV_W, bh / ch);
+    stage.style.transform =
+      'translate(' + ((bw - PREV_W * s) / 2).toFixed(2) + 'px,' +
+                     ((bh - ch * s) / 2).toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
+  }
+  function watch(stage) {
+    fit(stage);
+    requestAnimationFrame(function () { fit(stage); });
+    setTimeout(function () { fit(stage); }, 500);
+    if (!('ResizeObserver' in window)) return;
+    /* the observer reads the stage while the transform it sets changes
+       the stage's rendered box — measure off scrollHeight, which is the
+       untransformed content, and guard against the loop anyway */
+    var busy = false;
+    var ro = new ResizeObserver(function () {
+      if (busy) return;
+      busy = true;
+      requestAnimationFrame(function () { fit(stage); busy = false; });
+    });
+    ro.observe(stage);
+  }
+
   function fillPreview(stage) {
     if (stage._filled) return;
     stage._filled = true;
@@ -200,9 +261,13 @@
       stripIds(c);
       c.classList.remove('hl-off');          /* a hidden section still previews */
       c.style.display = '';
-      /* the hero previews are one clone shown BOTH ways, so the class is
-         forced on the copy rather than read off the original */
-      if (heroMode) c.classList.toggle('hero-tv', heroMode === 'tv');
+      /* the hero previews are one clone shown three ways, so BOTH look
+         classes are set on the copy rather than read off the original —
+         the original is only ever wearing one of them */
+      if (heroMode) {
+        c.classList.toggle('hero-tv', heroMode === 'tv');
+        c.classList.toggle('hero-simple', heroMode === 'plain');
+      }
       stage.appendChild(c);
     });
     /* clips in a preview are decoration: muted, looping, and never a
@@ -212,11 +277,8 @@
       v.loop = true; v.removeAttribute('controls');
       try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
     });
-    /* scale it to the card once we know how tall the real thing is */
-    var card = stage.parentNode;
-    if (!card) return;
-    var scale = card.clientWidth / PREV_W;
-    stage.style.transform = 'scale(' + scale + ')';
+    /* size it to the window once we know how tall the real thing is */
+    watch(stage);
   }
 
   function observe() {
@@ -232,17 +294,27 @@
     /* Observe the WINDOW, not the stage. An unfilled stage is absolutely
        positioned with nothing in it — zero height — and a target with no
        area never reports as intersecting, so nothing would ever be built.
-       .stw-prev has a real 190px box from the moment it exists. */
+       .stw-prev has a real box from the moment it exists.
+
+       The root is the viewport, not one rail — there is more than one rail
+       of section cards now, and a root that is one of them reports every
+       card in the other as permanently outside itself. */
     io = new IntersectionObserver(function (ents) {
       ents.forEach(function (e) {
         if (e.isIntersecting) { fillIn(e.target); io.unobserve(e.target); }
       });
-    }, { root: document.getElementById('stwSections'), rootMargin: '250px' });
+    }, { rootMargin: '250px' });
     document.querySelectorAll('.stw-prev').forEach(function (w) { io.observe(w); });
   }
 
-  function sectionsHtml() {
+  /* `kind` is 'sec' or 'ban' — the registry says which of the two a unit
+     is, so the split cannot drift from what the home is actually made of */
+  function listOf(kind) {
     var list = (typeof window.hlList === 'function') ? window.hlList() : [];
+    return list.filter(function (it) { return kind === 'ban' ? it.vb : !it.vb; });
+  }
+  function sectionsHtml(kind) {
+    var list = listOf(kind);
     if (!list.length) {
       return '<div class="stw-empty">Open a home first — the sections load with it.</div>';
     }
@@ -283,15 +355,19 @@
     paintCount();
   };
   function paintCount() {
-    var n = document.getElementById('stwSecCount');
-    if (n && typeof window.hlList === 'function') {
-      var l = window.hlList();
+    [['stwSecCount', 'sec'], ['stwBanCount', 'ban']].forEach(function (p) {
+      var n = document.getElementById(p[0]);
+      if (!n || typeof window.hlList !== 'function') return;
+      var l = listOf(p[1]);
       n.textContent = l.filter(function (x) { return x.on; }).length + ' of ' + l.length + ' showing';
-    }
+    });
   }
   function paintSections() {
-    var el = document.getElementById('stwSections');
-    if (el) { el.innerHTML = sectionsHtml(); observe(); }
+    var a = document.getElementById('stwSections');
+    if (a) a.innerHTML = sectionsHtml('sec');
+    var b = document.getElementById('stwBanners');
+    if (b) b.innerHTML = sectionsHtml('ban');
+    if (a || b) observe();
     paintCount();
   }
 
@@ -323,8 +399,9 @@
         '<div class="stw-intro-t">Your home, in parts</div>' +
         '<div class="stw-intro-s">Your home is built out of sections. Turn off what you do not use — the rest moves up to fill the space.</div>' +
       '</div>' +
-      rail('stwHero', 'Hero header', 'How the top of your home looks', heroHtml()) +
-      rail('stwSections', 'Home sections', '', sectionsHtml(), 'stwSecCount') +
+      rail('stwHero', 'Hero header', 'Three ways the top of your home can look', heroHtml()) +
+      rail('stwSections', 'Home sections', '', sectionsHtml('sec'), 'stwSecCount') +
+      rail('stwBanners', 'Video banners', '', sectionsHtml('ban'), 'stwBanCount') +
       rail('', 'Jump to', 'The places the app can take you', cardsHtml('jump', JUMP)) +
       rail('', 'Make it yours', 'Every editor, in one place', cardsHtml('make', MAKE));
     paintSections();

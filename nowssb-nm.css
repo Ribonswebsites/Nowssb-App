@@ -14004,7 +14004,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
      3.439% from the left, 2.476% from the right,
      2.129% from the top,  7.168% from the bottom (the stand).
    ══════════════════════════════════════════════════════════════════════ */
-#home .hero-section.hero-tv {
+.hero-section.hero-tv {
   height: auto !important;
   aspect-ratio: 727 / 1409;
   /* The render carries an alpha channel — it was exported on black and the
@@ -14035,26 +14035,26 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   margin-right: auto;
 }
 /* the crossfading photographs and the content share the screen */
-#home .hero-tv .hero-bg,
-#home .hero-tv .hero-content {
+.hero-tv .hero-bg,
+.hero-tv .hero-content {
   inset: auto;
   left: 3.439%; right: 2.476%; top: 2.129%; bottom: 7.168%;
 }
-#home .hero-tv .hero-bg { background-color: #000; }
+.hero-tv .hero-bg { background-color: #000; }
 /* The content was padded for a full viewport. Inside the screen it has
    about 367x686 to work with on a 390-wide phone, so the padding comes
    down to match — the 160px top alone was a quarter of it. */
-#home .hero-tv .hero-content {
+.hero-tv .hero-content {
   padding: 26px 16px 22px;
 }
-#home .hero-tv .hero-content > div:first-child {
+.hero-tv .hero-content > div:first-child {
   margin-left: 4px !important; margin-right: 4px !important;
 }
-#home .hero-tv .brand-name { font-size: clamp(24px, 7vw, 38px) !important; }
-#home .hero-tv .hero-glass { height: 118px; }
-#home .hero-tv .hero-word-wrap { margin-top: 8px; height: 40px; }
-#home .hero-tv .hero-btns { margin-top: 10px; }
-#home .hero-tv .hero-bottom > div:first-child {
+.hero-tv .brand-name { font-size: clamp(24px, 7vw, 38px) !important; }
+.hero-tv .hero-glass { height: 118px; }
+.hero-tv .hero-word-wrap { margin-top: 8px; height: 40px; }
+.hero-tv .hero-btns { margin-top: 10px; }
+.hero-tv .hero-bottom > div:first-child {
   margin-bottom: 16px !important; padding-left: 8px !important;
 }
 
@@ -14072,21 +14072,67 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    furniture was sized for a full viewport and pushed out through the
    bezel there. It comes down to match. */
 @media (max-height: 740px) {
-  #home .hero-tv .hero-content { padding: 14px 10px 12px; }
-  #home .hero-tv .brand-name { font-size: 21px !important; }
-  #home .hero-tv .hero-cust-btn,
-  #home .hero-tv .hero-feat-btn,
-  #home .hero-tv .hero-search-btn { width: 32px !important; height: 32px !important;
+  .hero-tv .hero-content { padding: 14px 10px 12px; }
+  .hero-tv .brand-name { font-size: 21px !important; }
+  .hero-tv .hero-cust-btn,
+  .hero-tv .hero-feat-btn,
+  .hero-tv .hero-search-btn { width: 32px !important; height: 32px !important;
     min-width: 32px !important; min-height: 32px !important; }
-  #home .hero-tv .hero-search-ic { width: 16px !important; height: 16px !important; }
-  #home .hero-tv .hero-glass { height: 84px; }
-  #home .hero-tv .hero-word-wrap { margin-top: 4px; height: 30px; }
-  #home .hero-tv .hero-word { font-size: 26px !important; }
-  #home .hero-tv .hero-btns { margin-top: 7px; gap: 7px; }
-  #home .hero-tv .hero-btn { padding: 8px 12px !important; font-size: 10px !important; }
-  #home .hero-tv .hero-bottom > div:first-child { margin-bottom: 8px !important; }
-  #home .hero-tv .hero-bottom > div:first-child .brand-tag { font-size: 11px !important; }
+  .hero-tv .hero-search-ic { width: 16px !important; height: 16px !important; }
+  .hero-tv .hero-glass { height: 84px; }
+  .hero-tv .hero-word-wrap { margin-top: 4px; height: 30px; }
+  .hero-tv .hero-word { font-size: 26px !important; }
+  .hero-tv .hero-btns { margin-top: 7px; gap: 7px; }
+  .hero-tv .hero-btn { padding: 8px 12px !important; font-size: 10px !important; }
+  .hero-tv .hero-bottom > div:first-child { margin-bottom: 8px !important; }
+  .hero-tv .hero-bottom > div:first-child .brand-tag { font-size: 11px !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   THE PLAIN HEADER — the third way the hero can look
+   Neither the set nor the full-bleed photographs: an ordinary app header.
+   No rotating artwork behind it, no rail of five pictures inside it — the
+   wordmark, the tagline, the search, today's word and the two buttons on
+   the app's own dark card, sized to its content instead of to the screen.
+
+   It is the same markup as the other two. What makes a hero a television
+   is a class, and what makes it plain is this one: the photographs and the
+   picture rail are hidden rather than removed, so switching back brings
+   them straight back with no rebuild.
+   ══════════════════════════════════════════════════════════════════════ */
+.hero-section.hero-simple {
+  height: auto !important;
+  aspect-ratio: auto;
+  background: linear-gradient(158deg, #12203c 0%, #0a1224 46%, #060c18 100%);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.42);
+  /* clears the fixed header, exactly as the television does */
+  margin: var(--home-header-h, calc(env(safe-area-inset-top, 14px) + 62px)) 16px 14px;
+  width: auto;
+}
+/* the five crossfading photographs and the five-picture rail are what
+   this look is defined by NOT having */
+.hero-simple .hero-bg,
+.hero-simple .hero-glass { display: none !important; }
+/* the content stops being an overlay and becomes the card itself */
+.hero-simple .hero-content {
+  position: relative; inset: auto;
+  padding: 20px 4px 22px;
+  gap: 18px;
+}
+.hero-simple .hero-content > div:first-child {
+  margin-left: 14px !important; margin-right: 14px !important;
+}
+.hero-simple .brand-name { font-size: clamp(26px, 8vw, 40px) !important; }
+.hero-simple .hero-bottom { padding: 0 14px; }
+.hero-simple .hero-bottom > div:first-child {
+  margin-bottom: 14px !important; padding-left: 0 !important;
+}
+.hero-simple .hero-word-wrap { margin-top: 0; height: 42px; }
+.hero-simple .hero-word { font-size: 30px !important; }
+.hero-simple .hero-btns { margin-top: 14px; }
 
 /* ══════════════════════════════════════════════════════════════════════
    THE HERO ROW — Customize · Features · Earn
@@ -14162,15 +14208,15 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 #home .hhr-earn { opacity: .58; }
 
 /* The search took Explore's place, so it carries a glyph as well as a word. */
-#home .hero-btn-search { display: inline-flex; align-items: center; gap: 7px; }
+.hero-btn-search { display: inline-flex; align-items: center; gap: 7px; }
 /* the bottom one sits on a dark button, so it keeps the white it
    comes with */
-#home .hero-btn-search .nwsb-search-icon { width: 14px; height: 14px; }
+.hero-btn-search .nwsb-search-icon { width: 14px; height: 14px; }
 
 /* The search, in the corner the two image buttons left. A white disc with
    a drawn glyph — the same button the whole app uses now — rather than a
    third photograph on top of the artwork. */
-#home .hero-search-btn {
+.hero-search-btn {
   width: 38px !important; height: 38px !important;
   min-width: 38px !important; min-height: 38px !important;
   flex-shrink: 0; padding: 0; cursor: pointer;
@@ -14179,7 +14225,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   box-shadow: 0 8px 20px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.3);
   display: flex !important; align-items: center; justify-content: center;
 }
-#home .hero-search-ic { width: 19px !important; height: 19px !important; }
+.hero-search-ic { width: 19px !important; height: 19px !important; }
 
 /* ── The search icon is artwork now, not a silhouette ──
    assets/icons/search.webp — headphones around a magnifier, white body,
@@ -14195,8 +14241,8 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 #home-nm.nm-dark .nmh-search-go .nwsb-search-icon,
 body.nm-mode #sub-people .nwsb-search-icon,
 html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
-#home .hero-search-ic { filter: none !important; }
-#home .hero-search-btn:active { transform: scale(.92); }
+.hero-search-ic { filter: none !important; }
+.hero-search-btn:active { transform: scale(.92); }
 
 /* ══════════════════════════════════════════════════════════════════════
    SETTINGS → WIDGETS  (markup shell in index.html, body in part082.js)
@@ -14309,7 +14355,11 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
    section at its real 358px width with a transform bringing it down. */
 .stw-wcard {
   flex: 0 0 auto; scroll-snap-align: start;
-  width: 214px;
+  /* 214px showed a section at 0.6 scale through a 190px window, which cut
+     most of them in half — you were choosing between the top thirds of
+     things. The card is most of the screen wide now and the whole section
+     is scaled to fit inside it, never cropped. */
+  width: min(82vw, 320px);
   border-radius: 18px !important; overflow: hidden;
   background: rgba(255,255,255,0.045);
   border: 1px solid rgba(255,255,255,0.1);
@@ -14321,14 +14371,16 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 .stw-wcard.fixed { opacity: .8; }
 
 .stw-prev {
-  position: relative; width: 100%; height: 190px; overflow: hidden;
+  position: relative; width: 100%; height: 300px; overflow: hidden;
   background: #070a12;
 }
 .stw-prev-stage {
   position: absolute; top: 0; left: 0;
   width: 358px;                     /* the width a section is laid out at */
   transform-origin: top left;
-  transform: scale(0.598);          /* 214/358 — replaced once measured */
+  /* replaced the moment the clone is measured: the scale that fits the
+     WHOLE section in the window, and a translate that centres it */
+  transform: scale(0.6);
   pointer-events: none;             /* nothing in a preview is pressable */
 }
 .stw-prev-stage.empty::after {
@@ -14397,8 +14449,25 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 
 /* The hero previews are taller — a hero is a tall thing, and at the
    section cards' height you would see only its top bezel. */
-.stw-prev-tall { height: 250px; }
-.stw-hero { width: 200px; }
+.stw-prev-tall { height: 360px; }
+
+/* ── what a hero preview has to survive ──
+   The clone is not on the home page, so anything the hero does relative to
+   the page has to be undone: it must not push itself down past a fixed
+   header that is not there, and it must not cap its own width against a
+   viewport it is not filling. The plain and television looks then differ
+   inside the window exactly as they will on the page — which is the whole
+   point of showing them side by side. */
+.stw-prev-stage .hero-section {
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+.stw-prev-stage .hero-section.hero-tv,
+.stw-prev-stage .hero-section.hero-simple { width: 100% !important; }
+/* the full-screen look is a screenful; dvh is the settings screen's height
+   here, which is the same thing, but pin it so the card is deterministic */
+.stw-prev-stage .hero-section:not(.hero-tv):not(.hero-simple) { height: 680px !important; }
+.stw-prev-stage .hero-section:not(.hero-tv) .hero-content { padding-bottom: 34px !important; }
 .stw-use {
   flex-shrink: 0; padding: 6px 13px; cursor: pointer;
   border: 1px solid rgba(232,213,163,0.5) !important;

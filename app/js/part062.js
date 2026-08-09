@@ -45,13 +45,13 @@
            was landing above the greeting for exactly that reason. It sits
            after the greeting and before the hero clip and the streak. */
         { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
-        { k:'herovid',  sel:['.nsvb-blk'],                                                   t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet' },
+        { k:'herovid',  sel:['.nsvb-blk'],                                                   t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 },
         { k:'streak',   sel:['.nmh-streak-section'],                                       t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
-        { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc' },
+        { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
-        { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner' },
+        { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
         { k:'custom',   sel:['.nmh-cust-panel'],                                           t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
         /* 'offer' and 'shopvid' are gone — the two Shop Now banners they
            pointed at were removed from the homes, and a registry row with
@@ -59,7 +59,7 @@
            nothing. */
         { k:'rx',       sel:['.nmh-rx-heading', '.nmh-rx-section'],                        t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'routines', sel:['.home-card.home-card-static.w100'],                          t:S, label:'My Routines',           sub:'Daily practice system' },
-        { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc' },
+        { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc', vb:1 },
         { k:'connect',  sel:['.nmh-connect-sec'],                                        t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'feed',     sel:['#ncbCarouselNm'],                                            t:S, label:'Community Carousel',    sub:'Swipeable feed cards' },
         /* The BLOCK, not the frame or the row inside it: this registry
@@ -68,11 +68,11 @@
            top of the page — which is what happened the first time the
            television went on. */
         { k:'quickrow', sel:['.qa-tv-block'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
-        { k:'trendshop',sel:['.nmh-trend-shop-wrap'],                                     t:S, label:'Trending Shop',         sub:'The clip and the Shop Now banner' },
-        { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner' },
+        { k:'trendshop',sel:['.nmh-trend-shop-wrap'],                                     t:S, label:'Trending Shop',         sub:'The clip and the Shop Now banner', vb:1 },
+        { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 },
         { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
-        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers' },
+        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 },
         /* Off on the shipped Normal home, and opt-in from this editor —
            `always` is gone precisely so it CAN be switched off, and defOff
            keeps it off until someone turns it on. The Fashion home's own
@@ -82,7 +82,7 @@
            the wrapper above. A direct child of the home wrap that this
            registry does not know about gets stranded at the top of the page
            while every registered one is re-appended around it. */
-        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop' },
+        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', always:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name' },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
@@ -99,10 +99,10 @@
         { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
         { k:'reader',   sel:['.fash-rdsec-wrap'],                                        t:S, label:'Reader',                sub:'Meanings and eBooks' },
-        { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet' },
+        { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 },
         { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
-        { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner' },
+        { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
         { k:'custom',   sel:['.fash-cust-panel'],                                          t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
         /* Registered so it lands where it is meant to. Anything NOT in this
            table keeps its markup position while every registered section is
@@ -112,22 +112,22 @@
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' },
-        { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner' },
-        { k:'subvid',   sel:['.nsub-blk'],                                                t:S, label:'Subscription',          sub:'The clip, the heading and its banner' },
+        { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner', vb:1 },
+        { k:'subvid',   sel:['.nsub-blk'],                                                t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 },
         { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'routines', sel:['.fash-routines-wrap'],                                       t:S, label:'My Routines',          sub:'Daily practice system' },
-        { k:'offer',    sel:['.fash-offer-wrap'],                                          t:S, label:"Today's Offer",         sub:'Coupon art and the offer banner' },
+        { k:'offer',    sel:['.fash-offer-wrap'],                                          t:S, label:"Today's Offer",         sub:'Coupon art and the offer banner', vb:1 },
         { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
-        { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science' },
+        { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science', vb:1 },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
-        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers' },
+        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 },
         { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
-        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop' },
-        { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search' },
+        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 },
+        { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', always:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' },
         { k:'store',    sel:['.vb-banner[data-vb="vb1"]', '.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
-        { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer' },
+        { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer', vb:1 },
         { k:'footer',   sel:['#homeFooter'],                                               t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
     }
@@ -376,8 +376,13 @@
     var w = whichNow(which), st = load(w), reg = REG[w];
     return st.order.map(function (k) {
       var it = itemOf(w, k);
+      /* `vb` says this unit is a banner block — a clip, a disc, artwork
+         with a black bar under it — rather than a section you use. The
+         Widgets page shows the two on separate rails, because choosing
+         between banners and choosing between sections are different
+         decisions and one long rail of both was neither. */
       return it ? { k: k, label: it.label, sub: it.sub, on: st.off.indexOf(k) < 0,
-                    always: !!it.always, locked: !!it.locked } : null;
+                    always: !!it.always, locked: !!it.locked, vb: !!it.vb } : null;
     }).filter(Boolean);
   };
   /* The live nodes of a section, so the Widgets page can clone the real
