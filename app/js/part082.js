@@ -176,8 +176,8 @@
             '<div class="stw-wtxt"><div class="stw-t">' + h.t + '</div>' +
             '<div class="stw-s">' + h.s + '</div></div>' +
             (cur === h.v
-              ? '<span class="stw-pill fixed on">Using</span>'
-              : '<button class="stw-use" onclick="window.setHeroStyle(\'' + h.v + '\')">Use</button>') +
+              ? '<span class="stw-pill fixed on">In use</span>'
+              : '<button class="stw-use" onclick="window.setHeroStyle(\'' + h.v + '\')">Apply now</button>') +
           '</div>' +
         '</div>';
     }).join('');
@@ -238,10 +238,18 @@
     if (!box) return;
     /* the rect, not clientWidth — clientWidth is rounded to a whole pixel
        and rounding UP makes the scaled stage a fraction wider than the
-       screen it is meant to sit inside */
-    var bw = box.getBoundingClientRect().width;
+       screen it is meant to sit inside. The padding comes off it: a slide
+       is inset from the bezel on all four sides, and the clone is fitted
+       to what is left rather than to the whole box. The stage is absolutely
+       positioned, so its 0,0 is the PADDING edge — the inset has to be
+       added back into the translate or the whole thing sits high and left. */
+    var cs = getComputedStyle(box);
+    var padL = parseFloat(cs.paddingLeft) || 0, padR = parseFloat(cs.paddingRight)  || 0,
+        padT = parseFloat(cs.paddingTop)  || 0, padB = parseFloat(cs.paddingBottom) || 0;
+    var br = box.getBoundingClientRect();
+    var bw = br.width - padL - padR;
     var ch = stage.scrollHeight || stage.offsetHeight || 1;
-    if (!bw) return;
+    if (bw <= 0) return;
     /* a clone with nothing in it — a section the home has not built yet —
        says so rather than showing an empty set */
     stage.classList.toggle('empty', ch < 12);
@@ -249,8 +257,8 @@
     if (box.getAttribute('data-fixed') === '1') {
       /* the hero cards keep one window height — three looks of the same
          thing are only comparable at the same size */
-      bh = box.getBoundingClientRect().height;
-      if (!bh) return;
+      bh = br.height - padT - padB;
+      if (bh <= 0) return;
       s = Math.min(bw / PREV_W, bh / ch);
     } else {
       /* the set is stretchable, so the screen is exactly as tall as the
@@ -258,11 +266,11 @@
          taller than a card should be, and never taller than the content */
       s = Math.min(bw / PREV_W, MAX_H / ch);
       bh = Math.max(MIN_H, Math.min(MAX_H, ch * s));
-      box.style.height = bh.toFixed(2) + 'px';
+      box.style.height = (bh + padT + padB).toFixed(2) + 'px';
     }
     stage.style.transform =
-      'translate(' + ((bw - PREV_W * s) / 2).toFixed(2) + 'px,' +
-                     ((bh - ch * s) / 2).toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
+      'translate(' + (padL + (bw - PREV_W * s) / 2).toFixed(2) + 'px,' +
+                     (padT + (bh - ch * s) / 2).toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
   }
   function watch(stage) {
     fit(stage);
@@ -308,22 +316,135 @@
       }
       stage.appendChild(c);
     });
-    /* clips in a preview are decoration: muted, looping, and never a
-       reason to hold up the page */
+    /* Clips in a preview are decoration. They are built STOPPED — twenty-six
+       clones each starting a decoder is what made this page hang — and
+       pump() below starts only the ones you are actually looking at. */
     stage.querySelectorAll('video').forEach(function (v) {
       v.muted = true; v.setAttribute('muted', ''); v.playsInline = true;
       v.loop = true; v.removeAttribute('controls');
-      try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+      v.removeAttribute('autoplay'); v.autoplay = false;
+      v.preload = 'none';
+      try { v.pause(); } catch (e) {}
     });
     /* size it to the window once we know how tall the real thing is */
     watch(stage);
   }
 
+  /* ── Which clips are allowed to run ───────────────────────────────
+     A decoding video is the most expensive thing on a page, and this one
+     can hold thirty of them. The rule is simple and absolute: in a deck,
+     only the clip on the screen you are looking at; in a plain row, only
+     the cards actually in the viewport. Everything else is paused — and a
+     paused clip costs nothing but the frame it is showing.
+
+     Called after every deck move and, rate-limited to one frame, on every
+     scroll. Nothing else starts a clip. */
+  /* Idempotent on purpose. A clip that cannot start — no codec, no data
+     yet — stays paused however often it is asked, so testing `paused` to
+     decide would call play() again on every pass forever. The intent is
+     recorded on the element and only a CHANGE of intent does anything. */
+  function setPlay(v, on) {
+    if (v._stOn === on) return;
+    v._stOn = on;
+    if (on) {
+      if (v.preload === 'none') v.preload = 'auto';
+      try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+    } else {
+      try { v.pause(); } catch (e) {}
+    }
+  }
+
+  var pumping = false;
+  function pump() {
+    if (pumping) return;
+    pumping = true;
+    requestAnimationFrame(function () {
+      pumping = false;
+      var open = document.getElementById('sub-settings');
+      var live = !!(open && open.classList.contains('open'));
+      /* `_vis` is written by the observer below — reading a flag costs
+         nothing, while asking each card for its rectangle would force a
+         layout of the whole page on every pass. */
+      document.querySelectorAll('#stBody .stw-slide, #stBody .stw-wcard').forEach(function (el) {
+        var on = live && el._vis !== false && el._vis !== undefined;
+        if (on && el.classList.contains('stw-slide')) on = el.classList.contains('on');
+        el.querySelectorAll('video').forEach(function (v) { setPlay(v, on); });
+      });
+    });
+  }
+  window._stPump = pump;
+
+  /* ── Who is on screen ─────────────────────────────────────────────
+     One observer for the whole page rather than a scroll handler: a
+     listener that measured every card each frame was asking the browser
+     to lay the page out sixty times a second to answer a question it can
+     report for free. It also re-measures a deck the first time it is
+     scrolled to — the rails are `content-visibility: auto`, so a rail
+     below the fold has no geometry to measure until then. */
+  var vio = null;
+  function visObserve() {
+    if (vio) vio.disconnect();
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('#stBody .stw-slide, #stBody .stw-wcard')
+        .forEach(function (el) { el._vis = true; });
+      pump();
+      return;
+    }
+    vio = new IntersectionObserver(function (ents) {
+      var decks = {};
+      ents.forEach(function (e) {
+        e.target._vis = e.isIntersecting;
+        if (!e.isIntersecting) return;
+        var d = e.target.closest ? e.target.closest('.stw-deck') : null;
+        if (d && !d._laid) { d._laid = 1; decks[d.id] = 1; }
+      });
+      Object.keys(decks).forEach(layoutDeck);
+      pump();
+    }, { root: document.getElementById('stBody'), rootMargin: '80px' });
+    document.querySelectorAll('#stBody .stw-slide, #stBody .stw-wcard')
+      .forEach(function (el) { vio.observe(el); });
+  }
+
+  /* ── Building a clone, between frames ─────────────────────────────
+     Cloning a whole section is the single most expensive thing this page
+     does, and doing it inside the observer's callback meant it happened
+     mid-scroll: the frame that brought a card into view was the frame that
+     built it, and it showed. The work is queued instead and drained when
+     the browser has time going spare, two at a time, so a scroll never
+     waits for one. The one you are looking at — the middle of a deck — is
+     still built at once, because that one you would notice missing. */
+  var queue = [], draining = false;
+  var idle = window.requestIdleCallback || function (cb) {
+    return setTimeout(function () { cb({ timeRemaining: function () { return 8; } }); }, 30);
+  };
+  function fillLater(stage) {
+    if (!stage || stage._filled || stage._queued) return;
+    stage._queued = true;
+    queue.push(stage);
+    drain();
+  }
+  function drain() {
+    if (draining || !queue.length) return;
+    draining = true;
+    idle(function (dl) {
+      draining = false;
+      var n = 0;
+      while (queue.length && n < 2) {
+        var st = queue.shift();
+        st._queued = false;
+        fillPreview(st); fit(st);
+        n++;
+        if (dl && dl.timeRemaining && dl.timeRemaining() < 5) break;
+      }
+      pump();
+      if (queue.length) drain();
+    }, { timeout: 900 });
+  }
+
   function observe() {
     if (io) io.disconnect();
     var fillIn = function (win) {
-      var st = win.querySelector('.stw-prev-stage');
-      if (st) fillPreview(st);
+      fillLater(win.querySelector('.stw-prev-stage'));
     };
     if (!('IntersectionObserver' in window)) {
       document.querySelectorAll('.stw-prev').forEach(fillIn);
@@ -370,7 +491,7 @@
      IS the aperture: one measurement puts every slide exactly on the
      screen, and the numbers cannot drift from the artwork.
      ══════════════════════════════════════════════════════════════════ */
-  var DECKS = {};
+  var DECKS = {};   /* emptied when the page closes */
 
   function chev(dir) {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -435,13 +556,17 @@
       sl.classList.toggle('on', a === 0);
       sl.classList.toggle('off', !!(list[i] && !list[i].on));
     });
-    /* build only what can be seen — the centre and the two either side */
+    /* build only what can be seen — the centre and the two either side.
+       The centre at once, its neighbours when there is time. */
     for (var j = d.i - 2; j <= d.i + 2; j++) {
       if (j < 0 || j >= list.length) continue;
       var st = deck.querySelector('.stw-slide[data-i="' + j + '"] .stw-prev-stage');
-      if (st) { fillPreview(st); fit(st); }
+      if (!st) continue;
+      if (j === d.i) { fillPreview(st); fit(st); }
+      else fillLater(st);
     }
     paintDeckBar(id);
+    pump();
   }
 
   function paintDeckBar(id) {
@@ -554,7 +679,7 @@
     if (a) a.innerHTML = sectionsHtml('blk');
     var b = document.getElementById('stwTabs');
     if (b) b.innerHTML = sectionsHtml('tab');
-    if (a || b) observe();
+    if (a || b) { observe(); visObserve(); }
     paintCount();
   }
 
@@ -663,9 +788,42 @@
   /* the page's own artwork is worth having before the page is ever opened */
   setTimeout(warm, 6000);
 
+  /* ── The mode's film, on this page ────────────────────────────────
+     Fashion Plus plays one fixed clip behind the whole app, and a
+     sub-screen covers it. Rather than punching a hole through this page —
+     which shows the home screen, not the film, because a screen sits above
+     the clip — the page plays the same file itself, at the layer its own
+     background would have been. Whatever the mode is showing is what this
+     shows: the src is read off the mode's own element, so choosing a
+     different background changes this one too with nothing to keep in
+     step. */
+  function film() {
+    var page = document.getElementById('sub-settings');
+    if (!page) return;
+    var had = page.querySelector('.stw-film');
+    var b = document.body;
+    var on = b.classList.contains('fashplus') && !b.classList.contains('fp-bg-off');
+    var bg = document.getElementById('fpBgVideo');
+    var src = (on && bg) ? (bg.getAttribute('src') || '') : '';
+    if (!src) { if (had) had.remove(); return; }
+    if (had && had.getAttribute('src') === src) {
+      try { var q = had.play(); if (q && q.catch) q.catch(function () {}); } catch (e) {}
+      return;
+    }
+    if (had) had.remove();
+    var v = document.createElement('video');
+    v.className = 'stw-film';
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('muted', ''); v.setAttribute('loop', ''); v.setAttribute('playsinline', '');
+    v.setAttribute('src', src);
+    page.insertBefore(v, page.firstChild);
+    try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+  }
+
   window.stOpen = function () {
     warm();
     render();
+    film();
     var s = document.getElementById('sub-settings');
     if (s && typeof openSub === 'function') openSub('settings');
     haptic(24);
@@ -679,9 +837,39 @@
         if (st) fillPreview(st);
       }
       observe();
+      visObserve();
+      pump();
     }, 420);
   };
-  window.stClose = function () { if (typeof closeSub === 'function') closeSub('settings'); };
+  window.stClose = function () {
+    if (typeof closeSub === 'function') closeSub('settings');
+    /* Everything on this page is a copy of something else, so nothing is
+       lost by letting it go — and holding twenty-six cloned sections, their
+       clips and their observers behind a closed screen is a cost the rest
+       of the app pays for a page nobody is looking at. It is rebuilt from
+       the registry the next time it opens, which is what render() does
+       anyway. The wait is the close animation's length, so the page is
+       never seen emptying. */
+    setTimeout(function () {
+      var open = document.getElementById('sub-settings');
+      if (open && open.classList.contains('open')) return;   /* reopened meanwhile */
+      var body = document.getElementById('stBody');
+      if (!body) return;
+      body.querySelectorAll('video').forEach(function (v) {
+        try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
+      });
+      if (io) { io.disconnect(); io = null; }
+      if (vio) { vio.disconnect(); vio = null; }
+      queue.length = 0;
+      DECKS = {};
+      var page = document.getElementById('sub-settings');
+      var fv = page && page.querySelector('.stw-film');
+      if (fv) { try { fv.pause(); } catch (e) {} fv.remove(); }
+      body.innerHTML = '';
+    }, 420);
+  };
+
+
 
   /* The sections rail has to be right every time it is looked at — the
      arrange-editor can change the same state from the other side. */
