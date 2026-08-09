@@ -252,8 +252,13 @@
     var cs = getComputedStyle(box);
     var padL = parseFloat(cs.paddingLeft) || 0, padR = parseFloat(cs.paddingRight)  || 0,
         padT = parseFloat(cs.paddingTop)  || 0, padB = parseFloat(cs.paddingBottom) || 0;
-    var br = box.getBoundingClientRect();
-    var bw = br.width - padL - padR;
+    /* offsetWidth/Height, NOT the rectangle. A deck slide that is not the
+       centred one is scaled and rotated, and getBoundingClientRect reports
+       the TRANSFORMED box — so a card built while it stood off to the side
+       was fitted to 0.84 of the screen it would later occupy, and burst out
+       of the set the moment it came to the middle. That is what came apart
+       the first time the deck was swiped. The layout box does not move. */
+    var bw = box.offsetWidth - padL - padR;
     var ch = stage.scrollHeight || stage.offsetHeight || 1;
     if (bw <= 0) return;
     /* a clone with nothing in it — a section the home has not built yet —
@@ -263,7 +268,7 @@
     if (box.getAttribute('data-fixed') === '1') {
       /* the hero cards keep one window height — three looks of the same
          thing are only comparable at the same size */
-      bh = br.height - padT - padB;
+      bh = box.offsetHeight - padT - padB;
       if (bh <= 0) return;
       s = Math.min(bw / PREV_W, bh / ch);
     } else {

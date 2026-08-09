@@ -10903,19 +10903,13 @@ body.fashplus:not(.fp-bg-off) .sub-screen > video,
 body.fashplus:not(.fp-bg-off) .sub-screen > .sub-screen-bg > video {
   display: none !important;
 }
-/* The store pages do not use .sub-screen-bg. Each one paints its own
-   full-bleed entry artwork on a layer of its own — .nss-intro-img on the
-   Store, .rm-intro-bg on the Word Atelier, .sig-intro-bg on the Signature
-   — with the image set inline, which is why making the PAGE transparent
-   changed nothing there: the art was never the page's background. Matched
-   by the family rather than one by one, so the next page built to the same
-   pattern is covered without another line here. */
-body.fashplus:not(.fp-bg-off) .sub-screen [class*="intro-bg"],
-body.fashplus:not(.fp-bg-off) .sub-screen [class*="intro-img"],
-body.fashplus:not(.fp-bg-off) .sub-screen [class*="page-bg"] {
-  background-image: none !important;
-  background-color: transparent !important;
-}
+/* An earlier version of this blanked every layer whose class contained
+   "intro-bg" or "intro-img" so the film could show through the store
+   pages. It did the first half and not the second: the artwork went and
+   the film did not arrive, because those pages paint an opaque body over
+   it as well — so the entry screens went black. The artwork is theirs
+   again. The film reaching those pages is a separate problem and is not
+   worth a black intro while it is solved. */
 @media (prefers-reduced-motion: reduce) {
   #fpSubFilm, #fpSubVeil { display: none !important; }
 }

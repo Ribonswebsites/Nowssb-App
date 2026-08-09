@@ -62,7 +62,7 @@
        Meaning Search on the Fashion home was a black screen. It ships in
        the repo now rather than coming from a CDN, which is also why it
        cannot silently stop working again. */
-    { before: '#home #fashMeaningSearchWrap',      vid: './assets/video/orb-loop.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap' },
+    { before: '#home #fashMeaningSearchWrap',      vid: './assets/video/orb-loop.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap', own: 1 },
     /* Below the store's own cinematic hero (#msBanner), not above it — a
        `top` placement into #msMeaningBody had been landing it before the
        hero as that host's first child instead. */
@@ -253,7 +253,14 @@
        aperture, so .vbf-screen at 100%/100% fills the glass exactly. */
     d.className = 'vb-banner' + (spec.player ? ' vb-banner-player' : '')
                 + (spec.frame ? ' nwsb-inframe ' + spec.frame : '');
-    var vid = '<video data-nwsb-auto muted loop playsinline preload="none" src="' + spec.vid + '"></video>';
+    /* `own` takes a banner out of the shared video controller and gives it
+       its own observer below. The controller decodes the four clips nearest
+       the viewport, and on a page with as many as this home has, a banner
+       that is not among them shows a black rectangle instead of a clip —
+       which is exactly what the Meaning Search tablet had been doing. A
+       banner marked `own` is never in that queue and never black. */
+    var vid = '<video ' + (spec.own ? 'data-nwsb-own="1" data-nwsb-vis="1" preload="auto"' : 'data-nwsb-auto preload="none"') +
+              ' muted loop playsinline src="' + spec.vid + '"></video>';
     var html = spec.frame ? '<div class="vbf-screen">' + vid + '</div>' : vid;
     if (spec.gender) {
       /* Two words over their own halves of the clip, each with its own
@@ -353,6 +360,33 @@
 
   /* The home eBook sections open the store the long way round, through
      openSub — that is the call that renders the shelf. */
+  /* The clips that run themselves. One observer, play when seen, pause when
+     not — no queue to lose a place in. */
+  (function ownDriver() {
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        var v = e.target;
+        if (e.isIntersecting) {
+          if (v.paused) { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (err) {} }
+        } else if (!v.paused) { try { v.pause(); } catch (err) {} }
+      });
+    }, { rootMargin: '20% 0px' });
+    var scan = function () {
+      /* [data-nwsb-own], not [data-nwsb-vis] — the plain hero's deck marks
+         its cells with the latter to stay out of the shared controller too,
+         and it runs exactly one of them at a time. Starting all six here
+         would undo that. */
+      document.querySelectorAll('video[data-nwsb-own="1"][src]').forEach(function (v) {
+        if (v._ownSeen) return;
+        v._ownSeen = 1;
+        io.observe(v);
+      });
+    };
+    scan();
+    setInterval(scan, 2000);
+  })();
+
   window.ebSecOpen = function () {
     if (window.openSub) window.openSub('ebooks-store');
     else if (window.nssOpenSub) window.nssOpenSub('ebooks-store');
