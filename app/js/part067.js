@@ -62,7 +62,7 @@
        Meaning Search on the Fashion home was a black screen. It ships in
        the repo now rather than coming from a CDN, which is also why it
        cannot silently stop working again. */
-    { before: '#home #fashMeaningSearchWrap',      vid: './assets/video/meaning-orb.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap' },
+    { before: '#home #fashMeaningSearchWrap',      vid: './assets/video/orb-loop.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap' },
     /* Below the store's own cinematic hero (#msBanner), not above it — a
        `top` placement into #msMeaningBody had been landing it before the
        hero as that host's first child instead. */

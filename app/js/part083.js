@@ -49,8 +49,15 @@
 
   var I = {
     crown:   '<path d="M4 8.4l3.6 3.2L12 5.4l4.4 6.2L20 8.4l-1.6 9.2H5.6z"/><path d="M5.6 19.6h12.8"/>',
-    word:    '<path d="M4 19.4 11 5h2l7 14.4"/><path d="M7.1 14.6h9.8"/>',
-    meaning: '<path d="M4.6 6.4h14.8M4.6 12h14.8M4.6 17.6h9"/>',
+    /* Both stores wear a store mark — a bag — rather than a letter or a
+       list. The Word Store's carries a sound wave, the Meaning Store's a
+       line of text: the same shop, two things sold in it. */
+    word:    '<path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/>' +
+             '<path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/>' +
+             '<path d="M8.4 15.6v1.6M10.8 13.8v5.2M13.2 12.8v6.2M15.6 15.2v2.4"/>',
+    meaning: '<path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/>' +
+             '<path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/>' +
+             '<path d="M8.6 14.4h6.8M8.6 17.4h4.4"/>',
     book:    '<path d="M4 5.4h6.4a2 2 0 0 1 2 2v11.2a2.4 2.4 0 0 0-2-1H4z"/><path d="M20 5.4h-6.4a2 2 0 0 0-2 2v11.2a2.4 2.4 0 0 1 2-1H20z"/>',
     sound:   '<path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/>',
     sig:     '<path d="M3.6 16.6c3-.4 5-2.2 6.6-5.4 1.2-2.4 2-4.6 3.2-4.6 1 0 1.4 1 1 2.4-.5 1.8-2 3-3.4 3.6-1.4.6-2 1.4-1.6 2.2.4.8 1.8.9 3.2.4 1.6-.6 2.8-1.6 4-3"/><path d="M4 20h16"/>'
@@ -79,10 +86,25 @@
           if (v && v.length) return v[0]; } catch (e) {}
     return fallback;
   }
+  /* Read the clip off the block ITSELF where the block is on the page.
+     Naming a URL twice is how the hero ended up showing one Subscription
+     film while the section under it showed another — this cannot: it is
+     the same element's src or nothing. Asked for at build time, when the
+     home is already parsed. */
+  function vidFrom(sel, fallback) {
+    try {
+      var el = document.querySelector(sel);
+      var v = el && (el.matches('video') ? el : el.querySelector('video'));
+      var src = v && (v.getAttribute('src') || (v.querySelector('source') || {}).src);
+      if (src) return src;
+    } catch (e) {}
+    return fallback;
+  }
 
   var RAIL = [
     { i: 'crown',   h: 'The Full Library',       t: 'NowssB Subscription',
       s: 'Every word and every frequency',
+      sel: '#home .nsub-blk video',
       v: 'https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
       go: function () { if (window.SS && SS.open) SS.open('subscription'); } },
     { i: 'word',    h: 'Where a word begins',    t: 'NowssB Word Store',
@@ -101,6 +123,7 @@
       go: function () { openStore('signature-store'); } },
     { i: 'book',    h: 'Page by page',           t: 'NowssB eBooks',
       s: 'Deep-dive guides, yours to keep',
+      sel: '#home .fash-ebsec-wrap video',
       v: 'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
       go: function () { if (typeof window.ebSecOpen === 'function') ebSecOpen(); } },
     { i: 'sound',   h: 'Every word you own',     t: 'Sound Library',
@@ -204,7 +227,10 @@
     var v = c.querySelector('video');
     if (!v) return null;
     if (!v.getAttribute('src')) {
-      v.setAttribute('src', RAIL[i - 1].v);
+      /* resolved here, not at parse time: a block whose clip is injected
+         by another file after this one runs still wins */
+      var r = RAIL[i - 1];
+      v.setAttribute('src', r.sel ? vidFrom(r.sel, r.v) : r.v);
       v.preload = 'auto';
       try { v.load(); } catch (e) {}
     }
@@ -237,6 +263,18 @@
     if (!v) {                                   /* the hero card */
       timer = setTimeout(function () { if (running) show(cur + 1); }, HERO_HOLD);
       return;
+    }
+    /* A block whose clip is swapped in by another file after this cell was
+       first armed would otherwise keep whatever the markup shipped with.
+       Asked again every time the cell comes round: the hero and the block
+       under it show the same film, always. */
+    var r0 = RAIL[i - 1];
+    if (r0 && r0.sel) {
+      var live = vidFrom(r0.sel, r0.v);
+      if (live && live !== v.getAttribute('src')) {
+        v.setAttribute('src', live);
+        try { v.load(); } catch (e) {}
+      }
     }
     try { v.currentTime = 0; } catch (e) {}
     var p = v.play();
