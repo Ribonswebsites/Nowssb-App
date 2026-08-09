@@ -106,6 +106,9 @@
     try { localStorage.setItem(BGKEY, String(i)); } catch (e) {}
     var v = document.getElementById('fpBgVideo');
     if (v) { v.setAttribute('src', FILMS[i].vid); try { v.load(); } catch (e) {} playState(); }
+    var sv = document.getElementById('fpSubFilm');
+    if (sv) { sv.setAttribute('src', FILMS[i].vid); try { sv.load(); } catch (e) {} }
+    if (typeof watchSubs === 'function') watchSubs();
     paintPicker();
   }
   window.fpBgChoice = bgChoice;
@@ -149,6 +152,88 @@
     }
     return v;
   }
+
+  /* ── The film on EVERY page ────────────────────────────────────────
+     markImageBacked() below only ever reached the handful of pages that
+     carried a photograph of their own; everywhere else the mode stopped at
+     the home and the page you opened was flat #060c18. It reaches all of
+     them now, and the way it has to is different: a sub-screen is fixed at
+     z-index 600 and the home sits at 10, so a transparent page shows the
+     HOME, not the clip at z-index 0. There is a second copy of the film
+     between them.
+
+     It is the same file, and only ever one of the two is decoding: the one
+     behind the home pauses while a page is open, and this one pauses when
+     the last page closes. */
+  function subFilm(make) {
+    var v = document.getElementById('fpSubFilm');
+    if (v || !make) return v;
+    v = document.createElement('video');
+    v.id = 'fpSubFilm';
+    v.muted = true; v.loop = true; v.playsInline = true;
+    v.setAttribute('muted', ''); v.setAttribute('loop', '');
+    v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
+    v.setAttribute('aria-hidden', 'true');
+    v.src = FILMS[bgChoice()].vid;
+    document.body.appendChild(v);
+    var veil = document.createElement('div');
+    veil.id = 'fpSubVeil';
+    veil.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(veil);
+    return v;
+  }
+
+  /* A page that runs its own clip where its background sits keeps it —
+     the Store's intro, say. Tagged rather than listed, so a page that
+     grows one later is covered without this file being touched. */
+  function markOwnFilm() {
+    document.querySelectorAll('.sub-screen').forEach(function (s) {
+      if (s.hasAttribute('data-fp-keep')) return;
+      if (s.querySelector(':scope > video, :scope > .sub-screen-bg video')) s.setAttribute('data-fp-keep', '1');
+    });
+  }
+
+  /* Is any page open? The body carries the answer so the CSS can show the
+     layer, and the two clips can trade places. Class changes on the pages
+     themselves are what to watch — there is no event for this. */
+  var subMo = null, subPend = false;
+  function watchSubs() {
+    var run = function () {
+      var open = !!document.querySelector('.sub-screen.open');
+      document.body.classList.toggle('nwsb-sub-open', open);
+      var live = isOn() && bgPartOn() && !reducedMotion() && !batteryLow;
+      var sub = subFilm(open && live);
+      var main = document.getElementById('fpBgVideo');
+      if (sub) {
+        if (open && live) { if (sub.paused) { try { var p = sub.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} } }
+        else if (!sub.paused) { try { sub.pause(); } catch (e) {} }
+      }
+      /* one decoder, not two: whichever is covered stops */
+      if (main) {
+        if (open && live) { if (!main.paused) { try { main.pause(); } catch (e) {} } }
+        else if (live && main.paused) { try { var q = main.play(); if (q && q.catch) q.catch(function () {}); } catch (e) {} }
+      }
+      if (open) markOwnFilm();
+    };
+    /* The body observer below fires for anything the app appends, so the
+       work is coalesced to once a frame rather than run per mutation. */
+    var apply = function () {
+      if (subPend) return;
+      subPend = true;
+      requestAnimationFrame(function () { subPend = false; run(); });
+    };
+    run();
+    if (subMo) subMo.disconnect();
+    if (!('MutationObserver' in window)) return;
+    subMo = new MutationObserver(apply);
+    document.querySelectorAll('.sub-screen').forEach(function (s) {
+      subMo.observe(s, { attributes: true, attributeFilter: ['class'] });
+    });
+    /* Pages built by their own file arrive after this runs, and an
+       observer cannot watch an element that did not exist yet. */
+    subMo.observe(document.body, { childList: true });
+  }
+  window.nwsbFpSubs = watchSubs;
 
   function markImageBacked() {
     var subs = document.querySelectorAll('.sub-screen');
@@ -223,7 +308,8 @@
        tagged pages their photographs back — pausing alone left a frozen
        frame covering them. */
     document.body.classList.toggle('fp-bg-off', !on);
-    if (on && !reducedMotion()) { bgVideo(true); markImageBacked(); }
+    if (on && !reducedMotion()) { bgVideo(true); markImageBacked(); markOwnFilm(); }
+    watchSubs();
     playState();
     /* The phone shows the stills when the mode is off and the clips when it
        is on, so the switch has to restage it. */

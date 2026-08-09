@@ -10846,6 +10846,47 @@ body.fashplus.fp-bg-off #fpBgVeil { display: none !important; }
 body.fashplus #appBg { opacity: 0 !important; }
 body.fashplus #appBgLayer2 { opacity: 0 !important; }
 
+/* ══════════════════════════════════════════════════════════════════
+   THE FILM ON EVERY PAGE
+
+   The mode reached the home and stopped. Open anything and you were on
+   flat #060c18 — because a .sub-screen is fixed at z-index 600 and the
+   clip behind everything is at 0, with the home at 10 in between: making a
+   page transparent shows the HOME, not the film. So there is a second copy
+   of the film between them, at 595, shown only while a page is open.
+   app/js/part076.js keeps exactly one of the two decoding.
+
+   A page that runs its own clip where its background sits — the Store's
+   intro — is tagged data-fp-keep and left alone.
+   ══════════════════════════════════════════════════════════════════ */
+#fpSubFilm {
+  position: fixed; inset: 0; z-index: 595; display: none;
+  width: 100%; height: 100%; object-fit: cover; pointer-events: none;
+  transform: translateZ(0); backface-visibility: hidden;
+}
+#fpSubVeil {
+  position: fixed; inset: 0; z-index: 596; display: none; pointer-events: none;
+  background:
+    radial-gradient(94% 62% at 50% 42%,
+      rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.46) 60%, rgba(0,0,0,0.66) 100%),
+    linear-gradient(180deg,
+      rgba(0,0,0,0.44) 0%, rgba(0,0,0,0.24) 22%, rgba(0,0,0,0.24) 74%, rgba(0,0,0,0.52) 100%);
+}
+body.fashplus:not(.fp-bg-off).nwsb-sub-open #fpSubFilm,
+body.fashplus:not(.fp-bg-off).nwsb-sub-open #fpSubVeil { display: block; }
+
+/* !important because a page may set its own background by id, which beats
+   any class selector this file could write. */
+body.fashplus:not(.fp-bg-off) .sub-screen:not([data-fp-keep]) {
+  background: transparent !important;
+}
+body.fashplus:not(.fp-bg-off) .sub-screen:not([data-fp-keep]) > .sub-screen-bg {
+  background-image: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #fpSubFilm, #fpSubVeil { display: none !important; }
+}
+
 /* The tagged pages: let the fixed clip through, keep their own scrim.
    Only while Page backgrounds is on — with it off these pages are meant to
    be wearing their photographs again. */

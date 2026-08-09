@@ -82,7 +82,16 @@
     });
   }
 
-  function on() { try { return localStorage.getItem(K) === '1'; } catch (e) { return false; } }
+  /* ── Fashion Plus ships ON ─────────────────────────────────────────
+     It used to be opt-in, and almost nobody found it: the mode is what the
+     app looks like, not an extra. So an unset key now means ON, and only
+     an explicit '0' — someone actually turning it off — means off. Every
+     switch already writes '1' or '0', so a reader who has chosen either way
+     keeps their choice; the change only reaches people who never touched
+     it. Which is the whole point. */
+  function on() {
+    try { return localStorage.getItem(K) !== '0'; } catch (e) { return true; }
+  }
 
   /* ── The pieces ────────────────────────────────────────────────────
      The master switch turns the mode on; these say which parts of it you
