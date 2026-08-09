@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=766">
+<link rel="stylesheet" href="nowssb-nm.css?v=767">
 <link rel="stylesheet" href="app/widgets.css?v=4">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
@@ -538,127 +538,26 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ══ SCREEN 2b: ONBOARDING INTRO ══ -->
-<div class="screen" id="ob-intro" style="justify-content:flex-start;padding:0;">
+<!-- THE PICK-YOUR-PATH SCREEN was here. The questionnaire after login is gone:
+     one page now asks your name, what to call you and your
+     pictures, and it can be skipped. -->
 
-  <!-- Full-bleed background image -->
-  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:url('https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png');background-size:cover;background-position:center top;z-index:0;"></div>
-  <!-- Very light overlay — top only for text readability, transparent at bottom so cube shows -->
-  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(to bottom,rgba(6,12,24,0.45) 0%,rgba(6,12,24,0.2) 45%,rgba(6,12,24,0.05) 70%,rgba(6,12,24,0.0) 100%);z-index:1;"></div>
+<!-- THE FIVE-STEP QUESTIONNAIRE was here. The questionnaire after login is gone:
+     one page now asks your name, what to call you and your
+     pictures, and it can be skipped. -->
 
-  <!-- Logo + brand at top -->
-  <div style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:9%;right:9%;z-index:10;display:flex;align-items:center;justify-content:center;gap:12px;">
-    <img decoding="async" class="logo-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB" style="width:48px;height:48px;" loading="lazy">
-    <span class="brand-name" style="font-size:24px;text-shadow:0 2px 12px rgba(0,0,0,0.9);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
-  </div>
+<!-- THE ONBOARDING QUESTIONS was here. The questionnaire after login is gone:
+     one page now asks your name, what to call you and your
+     pictures, and it can be skipped. -->
 
-  <!-- Content panel — sits over the glass cube, transparent so cube shows through -->
-  <div style="position:absolute;bottom:0;left:0;right:0;padding:20px 7% max(env(safe-area-inset-bottom,10px),10px);z-index:10;">
-    <div style="margin-bottom:6px;">
-      <span style="font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 8px rgba(0,0,0,0.6);">Personalise Your Journey</span>
-    </div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,0.7);">Pick your path</div>
-    <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:34px;text-shadow:0 1px 6px rgba(0,0,0,0.6);">5 quick questions to personalise your healing practice.</div>
-    <!-- Two path cards inside the glass cube -->
-    <div style="display:flex;gap:10px;margin-bottom:16px;">
-      <div class="ob-path-card ob-path-dark" onclick="goIntroYes()">
-        <div class="ob-path-tag">The Fashion Way</div>
-        <div class="ob-path-title">Cinematic</div>
-        <div class="ob-path-sub">Immersive · Dark · Editorial</div>
-      </div>
-      <div class="ob-path-card ob-path-light" onclick="goIntroNormal()">
-        <div class="ob-path-tag">The Simple Way</div>
-        <div class="ob-path-title" style="color:#1a1a2e;">Clean</div>
-        <div class="ob-path-sub" style="color:rgba(0,0,0,0.4);">Bright · Clear · Neumorphic</div>
-      </div>
-    </div>
-    <div style="text-align:center;padding:10px 0 2px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.82);cursor:pointer;text-shadow:0 1px 8px rgba(0,0,0,0.7);" onclick="goIntroSkip()">Skip for now</div>
-  </div>
-
-</div>
-
-<!-- ══ SCREEN: ONBOARDING NORMAL (NEUMORPHIC) ══ -->
-<div class="screen" id="ob-normal">
-  <div class="obn-wrap">
-    <div class="obn-toprow">
-      <button class="obn-back" onclick="obnBack()">
-        <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
-          <path d="M7 1L1 7L7 13" stroke="rgba(0,0,0,0.5)" stroke-width="1.5" stroke-linecap="square"/>
-          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/>
-        </svg>
-      </button>
-      <div class="obn-step" id="obnStepText">Step 1 of 5</div>
-      <button class="obn-skip" onclick="obnSkip()">Skip</button>
-    </div>
-    <div class="obn-progress"><div class="obn-progress-fill" id="obnProgressFill" style="width:20%;"></div></div>
-    <div class="obn-qlabel" id="obnLabel">About You</div>
-    <div class="obn-qtext" id="obnQText">What brings you to NowssB?</div>
-    <div id="obnOptions"></div>
-    <div style="flex:1;"></div>
-    <button class="obn-cta" id="obnCta" onclick="obnNext()">Continue</button>
-    <div style="height:12px;"></div>
-  </div>
-</div>
-
-<!-- ══ SCREEN 3: ONBOARDING ══ -->
-<div class="screen" id="onboarding" style="justify-content:flex-start;padding:0;">
-
-  <!-- TOP NAV — fixed -->
-  <div style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:9%;right:9%;z-index:30;display:flex;align-items:center;justify-content:space-between;">
-    <div class="btn-back" onclick="prevQuestion()">
-      <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
-        <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="square"/>
-        <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
-      </svg>
-    </div>
-    <span class="ob-step-text" id="stepText">Step 1 of 4</span>
-    <button class="btn-skip" onclick="skipOnboarding()">Skip</button>
-  </div>
-
-  <!-- QUESTION AREA — floats over characters, no glass -->
-  <div style="position:absolute;left:9%;right:9%;z-index:20;top:max(calc(env(safe-area-inset-top,16px) + 60px), 76px);">
-    <!-- Progress bar -->
-    <div class="ob-progress-bar w100" style="margin-bottom:20px;">
-      <div class="ob-progress-fill" id="obProgress" style="width:33%"></div>
-      <div class="ob-progress-ticks">
-        <div class="ob-tick done" id="tick0"></div>
-        <div class="ob-tick" id="tick1"></div>
-        <div class="ob-tick" id="tick2"></div>
-        <div class="ob-tick" id="tick3"></div>
-        <div class="ob-tick" id="tick4"></div>
-      </div>
-    </div>
-    <!-- Question label + text -->
-    <div id="obQuestion">
-      <span class="ob-q-label">Personalise Your Journey</span>
-      <div class="ob-q-text" id="obQText">What brings you to Shabdapathy?</div>
-    </div>
-  </div>
-
-  <!-- GLASS PANEL AREA — options + button at bottom -->
-  <div style="position:absolute;bottom:0;left:0;right:0;padding:24px 9% max(env(safe-area-inset-bottom,20px),20px);">
-    <!-- Logo + brand in dead space -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;padding-left:40px;">
-      <img decoding="async" class="logo-img" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowsBansiu" style="width:46px;height:46px;" loading="lazy">
-      <span class="brand-name" style="font-size:24px;text-shadow:0 2px 12px rgba(0,0,0,0.9);"><span class="b">Nowsb</span><span class="t">ansiu</span></span>
-    </div>
-    <div id="obOptions" style="margin-bottom:18px;width:100%;"></div>
-    <button class="btn-primary" id="obNext" onclick="nextQuestion()" style="width:100%;margin-top:0;margin-bottom:0;">CONTINUE</button>
-  </div>
-
-</div>
-
-<!-- ══ SCREEN 5: PROFILE SETUP ══ -->
 <div class="screen" id="profile-setup" style="justify-content:flex-start;padding:0;">
 
   <!-- TOP NAV — fixed, same as onboarding -->
   <div style="position:absolute;top:max(env(safe-area-inset-top,16px),16px);left:9%;right:9%;z-index:30;display:flex;flex-direction:column;gap:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div class="btn-back" onclick="goTo('onboarding')">
-        <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
-          <path d="M7 1L1 7L7 13" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="square"/>
-          <line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
-        </svg>
-      </div>
+      <!-- Nothing comes before this page now, so there is nowhere to go
+           back to. The spacer keeps Skip where it has always been. -->
+      <div style="width:44px;height:44px;flex-shrink:0;"></div>
       <span style="flex:1;min-width:0;text-align:center;padding:0 8px;font-family:'DM Sans',sans-serif;font-size:7px;font-weight:400;letter-spacing:1.1px;white-space:nowrap;text-transform:uppercase;color:rgba(255,255,255,0.55);text-shadow:0 1px 8px rgba(0,0,0,0.8);">Natural Origin of Word Science</span>
       <button class="btn-skip" onclick="psSkip()">Skip</button>
     </div>
@@ -715,7 +614,22 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
            placeholder="Your name…"
            autocomplete="given-name"
            enterkeyhint="done"
-           style="width:100%;font-size:30px;margin-bottom:32px;">
+           style="width:100%;font-size:30px;margin-bottom:14px;">
+
+    <!-- What the app should call you. Separate from the name on purpose:
+         one is who you are, the other is what the greeting says every
+         morning, and they are not always the same. Left empty it follows
+         the name. -->
+    <input class="ps-name-input" type="text" id="psCallInput"
+           placeholder="What should we call you?"
+           autocomplete="nickname"
+           enterkeyhint="done"
+           style="width:100%;font-size:17px;margin-bottom:20px;">
+
+    <!-- The banner behind your profile. Its pictures and the function that
+         applies one are the app's own (nowssb-nm.js), so what is chosen
+         here is the same thing the Profile page changes later. -->
+    <div class="ps-ban-row" id="psBanRow"></div>
 
     <!-- Continue button -->
     <button class="btn-primary" id="psContinueBtn" onclick="psContinue()" style="width:100%;margin-bottom:0;">
@@ -4630,7 +4544,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 </div>
 
-<script src="app/js/part012.js?v=252"></script>
+<script src="app/js/part012.js?v=254"></script>
 
 <!-- ══ HEALTH JOURNEY — GENDER SELECT ══ -->
 <div class="sub-screen" id="sub-health-journey">
@@ -9036,7 +8950,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div><!-- /ss-wrap -->
 </div><!-- /sub-social -->
 
-<script src="app/js/part032.js?v=226"></script>
+<script src="app/js/part032.js?v=227"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      NOWSSB SOCIAL — People / Explore / Search / Profile / Social Home

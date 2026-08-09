@@ -14549,3 +14549,36 @@ body.nm-mode #sub-people .nwsb-search-icon,
 html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 .hero-search-ic { filter: none !important; }
 .hero-search-btn:active { transform: scale(.92); }
+
+/* ══════════════════════════════════════════════════════════════════
+   THE PROFILE PAGE'S BANNER ROW
+   One page stands between login and the home now, and it asks for four
+   things: your name, what to call you, a picture, and the banner behind
+   it. This is the last of them — a short sideways row rather than a grid,
+   because it sits under two inputs and a button has to stay reachable
+   without the page scrolling.
+   ══════════════════════════════════════════════════════════════════ */
+.ps-ban-row {
+  display: flex; gap: 8px; width: 100%;
+  overflow-x: auto; overflow-y: hidden;
+  padding: 2px 0 14px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.ps-ban-row::-webkit-scrollbar { display: none; }
+.ps-ban {
+  flex: 0 0 auto;
+  width: 74px !important; height: 46px !important;
+  min-width: 74px !important; min-height: 46px !important;
+  padding: 0 !important; cursor: pointer;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  background-size: cover; background-position: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  transition: border-color .18s ease, transform .18s ease;
+}
+.ps-ban:active { transform: scale(.95); }
+.ps-ban.on {
+  border-color: #e8d5a3 !important;
+  box-shadow: 0 0 0 2px rgba(232,213,163,0.42), 0 6px 16px rgba(0,0,0,0.4);
+}

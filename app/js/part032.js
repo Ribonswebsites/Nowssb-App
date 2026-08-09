@@ -412,7 +412,9 @@ window.ssSignOut = function() {
     currentQ = 0;
     selectedOpts = [null,null,null,null,null];
     if (typeof closeSub === 'function') closeSub('settings');
-    setTimeout(function() { goTo('onboarding'); }, 320);
+    /* the questionnaire is gone; this lands on the profile page, which is
+       the only thing between login and the home now */
+    setTimeout(function() { if (window.psStart) psStart(); else goTo('profile-setup'); }, 320);
   };
 
 // ── Settings search filter ─────────────────────────────────

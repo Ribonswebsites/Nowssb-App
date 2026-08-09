@@ -425,9 +425,31 @@ async function psHandlePhoto(file) {
 }
 window.psHandlePhoto = psHandlePhoto;
 
+/* finishOnboarding lives in the Firebase module, which loads on its own
+   schedule. This used to be a rare branch — only someone who skipped every
+   question reached it — and it is the only way home now, so it cannot
+   depend on that file having arrived. */
+function psHome() {
+  if (typeof window.finishOnboarding === 'function') { window.finishOnboarding(); return; }
+  try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch (e) {}
+  document.querySelectorAll('.sub-screen.open').forEach(function (el) {
+    el.style.transition = 'none';
+    el.classList.remove('open');
+    requestAnimationFrame(function () { el.style.transition = ''; });
+  });
+  goTo('home');
+}
+window.psHome = psHome;
+
 async function psContinue() {
   const name     = (document.getElementById('psNameInput').value || '').trim();
+  const callEl   = document.getElementById('psCallInput');
+  /* what the app calls you — the name if you did not give a second one */
+  const callName = ((callEl && callEl.value) || '').trim() || name;
   const photoURL = _psUploadedPhotoUrl || _psSelectedAvatarUrl || null;
+  try {
+    if (callName) localStorage.setItem('nwsb_profile_name', callName);
+  } catch (e) {}
 
   const btn = document.getElementById('psContinueBtn');
   if (btn) { btn.textContent = 'Saving…'; btn.disabled = true; }
@@ -436,6 +458,7 @@ async function psContinue() {
     if (window._currentUid && window._fbSetDoc) {
       const update = { profileStepDone: true };
       if (name)     update.displayName = name;
+      if (callName) update.callName    = callName;
       if (photoURL) update.photoURL    = photoURL;
       await window._fbSetDoc(window._currentUid, update);
       if (!window._userDataCache) window._userDataCache = {};
@@ -448,28 +471,59 @@ async function psContinue() {
 
   if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
   try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
-  // If user skipped all onboarding, skip the fake analysis screen — go straight home
-  if (window._obSkipped) {
-    window._obSkipped = false;
-    finishOnboarding();
-  } else {
-    goTo('analysis');
-  }
+  /* Straight home. The analysis screen read back answers to a
+     questionnaire that no longer exists. */
+  window._obSkipped = false;
+  psHome();
 }
 window.psContinue = psContinue;
+
+/* ── The banner row on the profile page ───────────────────────────────
+   The pictures and the function that applies one are the app's own
+   (nowssb-nm.js): NWSB_BANNERS is the same list the Profile page offers
+   and nwsbApplyBanner is the same call it makes, so what is chosen here
+   is not a second banner feature — it is the one that already exists,
+   asked earlier. Built when the page is first shown, because that file
+   loads after this one. */
+function psBanners() {
+  var row = document.getElementById('psBanRow');
+  if (!row || row._built) return;
+  var list = window.NWSB_BANNERS;
+  if (!list || !list.length) return;              /* not loaded yet — try again */
+  row._built = true;
+  row.innerHTML = list.map(function (u, i) {
+    return '<button class="ps-ban" data-i="' + i + '" aria-label="Banner ' + (i + 1) + '" ' +
+           'style="background-image:url(' + JSON.stringify(u).slice(1, -1) + ')"></button>';
+  }).join('');
+  row.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.ps-ban') : null;
+    if (!b) return;
+    row.querySelectorAll('.ps-ban').forEach(function (x) { x.classList.toggle('on', x === b); });
+    var url = list[+b.getAttribute('data-i')];
+    if (window.nwsbApplyBanner) { try { nwsbApplyBanner(url); } catch (err) {} }
+    else { try { localStorage.setItem('nwsb_local_banner', url); } catch (err) {} }
+    try { if (navigator.vibrate) navigator.vibrate(14); } catch (err) {}
+  });
+}
+window.psBanners = psBanners;
+/* The row is filled when the page opens, and retried while the file that
+   owns the pictures is still on its way. */
+(function watchPs() {
+  var n = 0;
+  var t = setInterval(function () {
+    var scr = document.getElementById('profile-setup');
+    if (scr && scr.classList.contains('active')) psBanners();
+    if (++n > 400) clearInterval(t);
+  }, 300);
+})();
 
 function psSkip() {
   if (window._currentUid && window._fbSetDoc) {
     window._fbSetDoc(window._currentUid, { profileStepDone: true }).catch(() => {});
   }
   try { localStorage.setItem('nwsb_onboarding_done', '1'); } catch(e){}
-  // If user skipped all onboarding, skip the fake analysis screen — go straight home
-  if (window._obSkipped) {
-    window._obSkipped = false;
-    finishOnboarding();
-  } else {
-    goTo('analysis');
-  }
+  window._obSkipped = false;
+  psHome();
 }
 window.psSkip = psSkip;
 
@@ -925,8 +979,7 @@ function signup2Skip() {
   if (window._currentUid && window._fbSetDoc) {
     window._fbSetDoc(window._currentUid, { profileStepDone: true }).catch(() => {});
   }
-  currentQ = 0; selectedOpts = [null, null, null, null, null];
-  goTo('ob-intro');
+  psStart();
 }
 
 // ── TERMS CHECKBOX ──
@@ -973,8 +1026,7 @@ async function createAccountFinal() {
         lastLogin: window._fbServerTimestamp()
       });
       _reset();
-      currentQ = 0; selectedOpts = [null, null, null, null, null];
-      goTo('ob-intro');
+      psStart();
     } catch(e) {
       _reset();
       alert('Could not save your profile: ' + e.message);
@@ -1090,23 +1142,28 @@ let selectedOpts = [null, null, null, null, null];
 let obnQ = 0;
 let obnSelected = [null, null, null, null, null];
 
-// ── OB-INTRO SCREEN HANDLERS ──
-function goIntroYes() {
-  renderQuestion();
-  goTo('onboarding');
-}
-function goIntroNormal() {
-  obnQ = 0;
-  obnSelected = [null, null, null, null, null];
-  obnRender();
-  goTo('ob-normal');
-}
-function goIntroSkip() {
+/* ── After login there is one page ────────────────────────────────────
+   The questionnaire is gone — the pick-your-path screen, the five-step
+   version and the full-screen one. Everything that used to open any of
+   them opens the profile page instead, and it can be skipped.
+
+   `_obSkipped` is set on the way in because it is what tells psContinue
+   and psSkip to go straight home rather than to the analysis screen, and
+   an analysis of answers nobody was asked for is not a thing to show. */
+function psStart() {
   window._obSkipped = true;
-  localStorage.setItem('nwsb_ob_skipped', 'true');
-  if (window.saveOnboardingAnswers) window.saveOnboardingAnswers([], true);
+  try { localStorage.setItem('nwsb_ob_skipped', 'true'); } catch (e) {}
+  if (window.saveOnboardingAnswers) { try { window.saveOnboardingAnswers([], true); } catch (e) {} }
   goTo('profile-setup');
 }
+window.psStart = psStart;
+/* The old entry points, kept as the same door. Several files and a few
+   inline handlers still call these by name; making them aliases is safer
+   than hunting every caller and leaves nothing that can land on a screen
+   that no longer exists. */
+function goIntroYes()    { psStart(); }
+function goIntroNormal() { psStart(); }
+function goIntroSkip()   { psStart(); }
 
 function renderQuestion() {
   const q = questions[currentQ];
@@ -1296,7 +1353,7 @@ function obnBack() {
     obnQ--;
     obnRender();
   } else {
-    goTo('ob-intro');
+    psStart();
   }
 }
 function obnSkip() {
