@@ -7995,6 +7995,12 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
   display: flex; align-items: center; justify-content: center;
 }
 .hdr-ico img { width: 100%; height: 100%; object-fit: contain; display: block; }
+/* The drawn set. It takes the colour of the header rather than carrying
+   one baked into a picture, so the same three marks read on the Fashion
+   home's dark glass and on the Normal home's light one. */
+.hdr-svg { width: 68%; height: 68%; display: block; color: #fff; }
+#home-nm .hdr-svg { color: #1a1a2e; }
+#home-nm.nm-dark .hdr-svg { color: #fff; }
 .hdr-ico:active { opacity: 0.65; }
 .hdr-rule {
   width: 1px; height: 22px; flex-shrink: 0;
@@ -14582,3 +14588,36 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
   border-color: #e8d5a3 !important;
   box-shadow: 0 0 0 2px rgba(232,213,163,0.42), 0 6px 16px rgba(0,0,0,0.4);
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   THE STORE SECTION, SMALLER AND IN A WRAPPER
+
+   It was a 3:4 panel running most of a screen — the tallest thing on
+   either home, for a card whose whole job is "the store is this way".
+   It comes down to 4:3 and takes the glass wrapper every other block on
+   the Fashion home wears.
+
+   Wrapper by styling, not by a new element: app/js/part062.js reorders
+   the DIRECT children of the home wrap, so putting this inside a div
+   would take it out of the layout editor's reach — the same trap the
+   television fell into. It is the wrapper.
+   ══════════════════════════════════════════════════════════════════ */
+:is(#home, .stw-prev-stage) .nss-store-trigger {
+  aspect-ratio: 4 / 3 !important;
+  width: calc(100% - 32px) !important;
+  margin: 0 16px 18px !important;
+  box-sizing: border-box;
+  padding: 10px !important;
+  border-radius: 0 !important;
+  background: rgba(255,255,255,0.055) !important;
+  border: 1px solid rgba(255,255,255,0.13) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.34) !important;
+}
+/* the padding is the wrapper, so what is inside stops at its edge */
+:is(#home, .stw-prev-stage) .nss-store-trigger > .nss-trigger-slides,
+:is(#home, .stw-prev-stage) .nss-store-trigger > .nss-trigger-content {
+  inset: 10px !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+#home-nm .nss-store-trigger { aspect-ratio: 4 / 3 !important; }

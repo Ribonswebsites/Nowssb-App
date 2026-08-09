@@ -19,9 +19,11 @@
      bottom: the banner is appended as the element's last child.
      after:  the banner is inserted as the element's next sibling. */
   var PLACE = [
-    // Above the NowssB Store section, on both homes
-    { top:    '#home-nm .nmh-store-wrap',          vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
-    { before: '#home .nss-store-trigger',          vid: V + 'v1785402930/grok_video_2026-07-30-14-43-38_olejrw.mp4' },
+    /* Above the NowssB Store section, on both homes. In the repo rather
+       than on a CDN — the store is the thing the app sells from, and its
+       banner should not be one network hop away from not being there. */
+    { top:    '#home-nm .nmh-store-wrap',          vid: './assets/video/store-banner.mp4?v=1' },
+    { before: '#home .nss-store-trigger',          vid: './assets/video/store-banner.mp4?v=1' },
 
     /* Choose Your Path, on the laptop, in a section of its own.
        It used to be appended INSIDE the Personalised Healing wrapper, which
