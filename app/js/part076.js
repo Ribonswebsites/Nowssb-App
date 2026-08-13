@@ -165,7 +165,10 @@
 
       /* A page that already has a moving background keeps it: a video where
          the background sits, not a clip inside a card further down. */
-      if (s.querySelector(':scope > video, :scope > .sub-screen-bg video')) continue;
+      if (s.querySelector(':scope > video, :scope > .sub-screen-bg video')) {
+        s.removeAttribute('data-fp-solid');
+        continue;
+      }
 
       /* Re-read each pass, because several of these layers are filled by
          their own page's code the first time it opens (rmBg, msBg, ebBg…)
@@ -178,8 +181,22 @@
         if (bg && bg !== 'none' && bg.indexOf('url(') === 0) { hit = layers[j]; break; }
       }
       if (hit) {
+        s.removeAttribute('data-fp-solid');
         s.setAttribute('data-fp-img', '1');
         hit.setAttribute('data-fp-img', '1');
+        n++;
+      } else {
+        /* No photograph of its own — a solid page. These are the ones the
+           mode used to stop at: opaque #060c18 at z-index 600, so the fixed
+           clip never reached them. They are opened up too now, and their own
+           colour was also their contrast, so the CSS hands them a scrim.
+
+           Deliberately NOT permanent, unlike the tag above. That one has to
+           be, because its own CSS answer erases the evidence it was read
+           from; this one reads nothing and removes nothing, so a page whose
+           background is filled by its own code the first time it opens is
+           still seen on a later pass and upgraded to a photograph page. */
+        s.setAttribute('data-fp-solid', '1');
         n++;
       }
     }

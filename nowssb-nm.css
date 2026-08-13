@@ -10874,6 +10874,30 @@ body.fashplus #appBgLayer2 { opacity: 0 !important; }
 body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] { background: transparent; }
 body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { background-image: none !important; }
 
+/* ── The solid pages ──
+   The pages with no photograph of their own — Word Science, My Progress,
+   Daily Streak, Profile, the two stores — used to stop the film dead, by
+   the rule stated above. They show it now too.
+
+   Their own #060c18 was not only their background, it was the contrast
+   under their type, so taking it away has to put something back: a scrim,
+   at the same 0.72 the app already uses for exactly this
+   (body.nwsb-custom-fashion-bg .qa-page-bg::after).
+
+   z-index -1 is what makes the scrim safe on pages nobody rewrote for it.
+   A positioned pseudo-element at 0 or above paints over every static child,
+   which would have veiled the page's own content instead of the film behind
+   it; below zero it sits above the transparent background and under
+   everything the page draws. .sub-screen already carries `contain: paint`
+   and a z-index, so it is its own stacking context and the -1 cannot escape
+   it — and the film is outside that context, which is why it still shows. */
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid] { background: transparent; }
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid]::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  pointer-events: none;
+  background: rgba(6,12,24,0.72);
+}
+
 @media (prefers-reduced-motion: reduce) {
   body.fashplus #fpBgVideo { display: none; }
   /* No clip, no vignette — the still background underneath has its own. */
