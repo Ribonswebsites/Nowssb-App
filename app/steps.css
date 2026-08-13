@@ -161,14 +161,32 @@
    ══════════════════════════════════════════════════════════════════ */
 /* In the strip under the set, so it is one row wide and no taller than the
    row it replaces. The buttons that live there are hidden while it is up. */
+/* One row, on every card, laid out the same on all of them. Inside a step
+   card it is pinned to the foot so it lands in the same place whatever the
+   card above it is; on the title card it is in flow under the heading. */
 .fst-nav {
   display: flex; align-items: center; gap: 8px;
-  flex: 1 1 auto; min-width: 0;
-  margin: 0;
+  min-width: 0; margin: 0;
 }
-.hs-foot.fst-nav-on > .hero-btns,
-.hs-foot.fst-nav-on > .hs-sep,
-.hs-foot.fst-nav-on > .hs-learn { display: none !important; }
+/* In flow, not pinned. The card is a three-part column — head, body,
+   row — so the row cannot land on top of the Enter pill however long the
+   body is, and the body scrolls between the two instead of under one of
+   them. Pinning it absolutely and padding the body away from it was the
+   version that overlapped: the padding is inside the scroller, so at rest
+   it put nothing between them at all. */
+.fst-cell > .fst-nav {
+  flex-shrink: 0; margin-top: 10px;
+}
+.fst-title > .fst-nav { margin-top: auto; pointer-events: auto; }
+/* The strip under the set keeps Explore and App Guide the whole time. The
+   guide's row is on the cards now — it has to be, because the strip belongs
+   to the hero and the hero is cell 0, which slides out of the deck the
+   moment a step is on.
+
+   Learn is the exception: its disc goes up into the set while the guide is
+   running, and a label with nothing beside it is not a control. */
+.hero-simple.fst-title-on .hs-foot > .hs-learn,
+.hero-simple.fst-title-on .hs-foot > .hs-sep:last-of-type { display: none !important; }
 /* Inside the set, bottom right of the screen. */
 .hero-content > .fst-btn {
   position: absolute !important; right: 12px; bottom: 12px;
@@ -263,14 +281,18 @@
 .fst-title {
   position: absolute; inset: 0; z-index: 5;
   display: flex; flex-direction: column;
-  align-items: flex-start; justify-content: center;
-  padding: 0 26px;
+  align-items: stretch;
+  /* Up, not centred. Centred, the heading sat where the row now goes and
+     there was nowhere for it — the guide's own row has to fit under the
+     wordmark on this card the same way it fits on every other one. */
+  justify-content: flex-start;
+  padding: 20px 26px 16px;
   text-align: left;
   pointer-events: none;
 }
 .fst-title-b {
   font-family: 'DM Sans', sans-serif;
-  font-size: clamp(34px, 10vw, 54px);
+  font-size: clamp(30px, 8.6vw, 46px);
   line-height: 1; letter-spacing: -1px;
   color: #e8d5a3;
   text-shadow: 0 2px 18px rgba(0,0,0,0.7);
@@ -280,11 +302,15 @@
 .fst-title-b .t { font-weight: 300; opacity: .85; }
 .fst-title-row {
   margin-top: 12px;
-  display: flex; align-items: center; gap: 12px;
+  /* tighter than it was: the arrow was drifting off to the right of its
+     own label instead of sitting with it */
+  display: flex; align-items: center; gap: 8px;
   pointer-events: auto;
 }
 .fst-title-sep { flex: 0 0 1px !important; height: 30px; }
-.fst-title-back { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+/* and a little more air between the arrow and the word under it, so the
+   two read as one control rather than a disc with a caption stuck to it */
+.fst-title-back { display: flex; flex-direction: column; align-items: center; gap: 7px; }
 .fst-back-slot { display: flex; }
 .fst-back-lbl {
   font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 800;
@@ -302,6 +328,7 @@
   position: relative !important; right: auto !important; bottom: auto !important;
   width: 36px !important; height: 36px !important;
   min-width: 36px !important; min-height: 36px !important;
+  border-radius: 50% !important;
 }
 
 /* The banners' head is sized for a banner. On a step card it is competing

@@ -459,15 +459,18 @@
     });
     /* The search says what it is, and the ring around it turns — the one
        control on this card that is a live invitation rather than a label. */
+    var pill = document.createElement('span');
+    pill.className = 'hs-searchpill';
     var slbl = document.createElement('span');
     slbl.className = 'hs-slbl';
     slbl.textContent = 'Search';
-    top.appendChild(slbl);
+    pill.appendChild(slbl);
     var sw = document.createElement('span');
     sw.className = 'hs-searchwrap';
     sw.innerHTML = '<svg class="hs-trace" viewBox="0 0 44 44" aria-hidden="true">' +
       '<circle cx="22" cy="22" r="20.5"/></svg>';
-    top.appendChild(sw);
+    pill.appendChild(sw);
+    top.appendChild(pill);
     park(hero.querySelector('.hero-search-btn'), sw);
 
     var foot = document.createElement('div');

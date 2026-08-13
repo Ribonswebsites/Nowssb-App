@@ -261,6 +261,13 @@
                        '</button>'
                      : '') +
              '</div>' +
+             /* ── the row, on the card ──
+                It used to live in the strip under the set, and the strip
+                belongs to the hero — which is cell 0, and cell 0 slides out
+                of the deck the moment a step is on. So from step one there
+                was no way forward, back or out. Every card carries its own
+                now. */
+             navHtml('') +
            '</div>';
   }
   function cellsHtml() { return STEPS.map(cellHtml).join(''); }
@@ -282,21 +289,22 @@
                'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
            '</svg>';
   }
-  function navHtml() {
-    return '<button class="fst-x" onclick="window.fstClose()" aria-label="Close the steps">' +
-             '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" ' +
-               'stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
-           '</button>' +
-           '<div class="fst-count"><b id="fstNow">Start</b><span id="fstOf">' + STEPS.length + ' steps</span></div>' +
-           '<div class="fst-bar"><i id="fstFill"></i></div>' +
-           '<div class="fst-lbl" id="fstLbl">Follow the steps</div>' +
-           '<button class="fst-arrow" id="fstPrev" onclick="window.fstStep(-1)" aria-label="Previous step">' + arrow(-1) + '</button>' +
-           '<button class="fst-arrow fst-arrow-n" id="fstNext" onclick="window.fstStep(1)" aria-label="Next step">' + arrow(1) + '</button>';
+  function navHtml(id) {
+    return '<div class="fst-nav" id="' + id + '">' +
+             '<button class="fst-x" onclick="window.fstClose()" aria-label="Close the steps">' +
+               '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" ' +
+                 'stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
+             '</button>' +
+             '<div class="fst-count"><b>' + '' + '</b><span></span></div>' +
+             '<div class="fst-bar"><i></i></div>' +
+             '<button class="fst-arrow fst-prev" onclick="window.fstStep(-1)" aria-label="Previous step">' + arrow(-1) + '</button>' +
+             '<button class="fst-arrow fst-arrow-n fst-next" onclick="window.fstStep(1)" aria-label="Next step">' + arrow(1) + '</button>' +
+           '</div>';
   }
 
   function deck() { return document.getElementById('hsDeck'); }
   function heroCell() { return document.querySelector('#hsDeck .hs-hero-cell'); }
-  function on() { return !!document.getElementById('fstNav'); }
+  function on() { var d = deck(); return !!(d && d.classList.contains('fst-on')); }
 
   /* Cell 0 is the hero and is never one of the steps, so the deck's index
      and the step number differ by one. Everything the reader is shown is
@@ -304,40 +312,38 @@
   function paint() {
     if (!on()) return;
     var i = typeof window.nwsbHeroAt === 'function' ? window.nwsbHeroAt() : 0;
-    var now = document.getElementById('fstNow'), lbl = document.getElementById('fstOf');
-    /* Cell 0 is the title card, so it is not step one — it is what comes
-       before step one, and the counter says so rather than lying. */
-    if (now) now.textContent = i < 1 ? 'Start' : String(i);
-    if (lbl) lbl.textContent = i < 1 ? STEPS.length + ' steps' : 'of ' + STEPS.length;
-    var fill = document.getElementById('fstFill');
-    if (fill) fill.style.width = ((i / STEPS.length) * 100) + '%';
-    /* The name of what you are looking at, right where your thumb is about
-       to press. On the title card it is what the guide is; from there on it
-       is the step you are on. */
-    var lbl = document.getElementById('fstLbl');
-    if (lbl) lbl.textContent = i < 1 ? 'Follow the steps' : STEPS[i - 1].t;
-    var p = document.getElementById('fstPrev'), n = document.getElementById('fstNext');
-    if (p) p.disabled = i <= 0;
-    if (n) n.disabled = i >= STEPS.length;
+    /* Every card carries its own row, so this paints all of them rather
+       than one element by id — the card you are looking at has to be right,
+       and the one arriving behind it has to be right before it lands. */
+    document.querySelectorAll('#hsDeck .fst-nav, .fst-title .fst-nav').forEach(function (nav) {
+      var b = nav.querySelector('.fst-count b'), sp = nav.querySelector('.fst-count span');
+      /* Cell 0 is the title card, so it is not step one — it is what comes
+         before step one, and the counter says so rather than lying. */
+      if (b)  b.textContent  = i < 1 ? 'Start' : String(i);
+      if (sp) sp.textContent = i < 1 ? STEPS.length + ' steps' : 'of ' + STEPS.length;
+      var fill = nav.querySelector('.fst-bar i');
+      if (fill) fill.style.width = ((i / STEPS.length) * 100) + '%';
+      var p = nav.querySelector('.fst-prev'), n = nav.querySelector('.fst-next');
+      if (p) p.disabled = i <= 0;
+      if (n) n.disabled = i >= STEPS.length;
+    });
   }
 
   /* ── It runs itself ───────────────────────────────────────────────
      The rail auto-advances, so the guide does too — a card you have to
      press through is a slideshow, and this is meant to introduce the app
      while you look at it. Not part083's timer: that one is driven by a
-     clip ending, and a step card has no clip. This one is its own, it
-     wraps from the last step back to the title, and it gets out of the way
-     for a while whenever a finger touches it — the point of pressing
-     forward is to go at your own speed, and a card that then slid away
-     under you would be the rail arguing. */
+     clip ending, and a step card has no clip. This one is its own, it wraps
+     from the last step back to the title, and it stands down for a while
+     whenever a finger touches it — the point of pressing forward is to go
+     at your own speed, and a card that then slid away under you would be
+     the rail arguing. */
   var ROTATE = 7000, HOLD = 14000, spin = null, held = 0;
 
   function tick() {
     if (!on()) return;
     if (Date.now() < held) return;
     if (document.hidden) return;
-    /* not while the home is not the screen you are on, and not while
-       something is open over it */
     var home = document.getElementById('home');
     if (!home || !home.classList.contains('active')) return;
     if (document.querySelector('.sub-screen.open')) return;
@@ -396,7 +402,8 @@
                       '<span class="hs-sep fst-title-sep"></span>' +
                       '<span class="fst-title-back"><span class="fst-back-slot"></span>' +
                         '<span class="fst-back-lbl">Back</span></span>' +
-                    '</div>';
+                    '</div>' +
+                    navHtml('');
       screen.appendChild(t);
     } else if (!on && t) {
       t.remove();
@@ -425,23 +432,15 @@
     if (!d) return;
     syncHeight();
     window.nwsbHeroAuto(false);
-    if (!window.nwsbHeroCells(cellsHtml())) return;
+    /* set before the cells are built: on() reads this flag, and both the
+       title and the disc's home are decided by it */
     d.classList.add('fst-on');
+    if (!window.nwsbHeroCells(cellsHtml())) { d.classList.remove('fst-on'); return; }
 
-    var nav = document.getElementById('fstNav');
-    if (!nav) {
-      nav = document.createElement('div');
-      nav.id = 'fstNav';
-      nav.className = 'fst-nav';
-      nav.innerHTML = navHtml();
-    }
     /* Inside the wrapper, in the strip the two buttons were using — the
        guide's row and the card's own row are the same row, one at a time.
        Falls back to under the deck if the strip is not there yet. */
-    var hero = document.querySelector('#home .hero-section.hero-simple');
-    var foot = hero && hero.querySelector(':scope > .hs-foot');
-    if (foot) { if (nav.parentNode !== foot) foot.appendChild(nav); foot.classList.add('fst-nav-on'); }
-    else if (nav.parentNode !== d.parentNode) d.parentNode.insertBefore(nav, d.nextSibling);
+
     /* It stays on cell 0 — the set, now carrying the title. That IS the
        first thing the guide has to say, and forward is what starts it. */
     title(true);
@@ -460,11 +459,6 @@
     var d = deck();
     if (d) d.classList.remove('fst-on');
     title(false);
-    var nav = document.getElementById('fstNav');
-    if (nav) {
-      if (nav.parentNode) nav.parentNode.classList.remove('fst-nav-on');
-      nav.remove();
-    }
     mountBtn();                       /* and back out to the strip */
     if (typeof window.nwsbHeroCells === 'function') {
       window.nwsbHeroCells(null);                 /* the banners come back */
@@ -490,7 +484,6 @@
     var btn = document.getElementById('fstBtn');
     if (!hero) {
       if (btn) btn.remove();
-      if (on()) { var nav = document.getElementById('fstNav'); if (nav) nav.remove(); }
       return false;
     }
     if (!btn) {
@@ -525,6 +518,7 @@
      and the two discs follow it rather than only following themselves. */
   setInterval(function () {
     mountBtn();
+    watchRail();
     if (on()) { paint(); syncHeight(); }
   }, 900);
 
@@ -535,6 +529,31 @@
     var d = deck();
     if (d && e.target && d.contains(e.target)) hold();
   }, { passive: true, capture: true });
+
+  /* ── It opens itself when the rail has finished ───────────────────
+     The banners run once through — six of them, each playing its own clip
+     — and when the rail comes back round to the hero the guide takes over.
+     That is the sequence: watch the app introduce itself in film, then read
+     what it was showing you.
+
+     Only once. Closing it is an answer, and a guide that reopened every
+     time the rail wrapped would be the app not listening. */
+  var sawLast = false, autoDone = false;
+  function watchRail() {
+    if (on() || autoDone || typeof window.nwsbHeroAt !== 'function') return;
+    if (!deck()) return;
+    var n = typeof window.nwsbHeroCount === 'function' ? window.nwsbHeroCount() : 0;
+    if (n < 2) return;
+    var i = window.nwsbHeroAt();
+    if (i >= n - 1) { sawLast = true; return; }
+    if (sawLast && i === 0) {
+      autoDone = true;
+      window.fstOpen();
+    }
+  }
+  window.fstClose = (function (prev) {
+    return function () { autoDone = true; return prev.apply(this, arguments); };
+  })(window.fstClose);
 
   (function boot(n) {
     if (mountBtn()) return;

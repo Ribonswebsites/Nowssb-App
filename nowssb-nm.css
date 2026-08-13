@@ -14820,15 +14820,19 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 }
 /* Every mark on this card is the same thing: a white disc with a drawing
    in it. The blonde-tinted square was one more style to remember. */
-.hs-disc {
+/* A CIRCLE. app.css carries a global *{border-radius:0!important} reset —
+   it is why this was drawing as a square however many times the radius was
+   set — so every rounded thing in this app has to say !important and mean
+   it. Same reason the pill below does. */
+.hs-top .hs-shop .hs-disc {
   width: 32px; height: 32px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 50%;
+  border-radius: 50% !important;
   background: #fff;
   color: #060c18;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
-.hs-disc svg { width: 16px; height: 16px; display: block; }
+.hs-top .hs-shop .hs-disc svg { width: 16px; height: 16px; display: block; }
 /* a rule that divides rather than spaces — the stretching one is for
    pushing things apart, this one just separates two that are together */
 .hs-sep-sm { flex: 0 0 1px !important; height: 20px; }
@@ -14846,18 +14850,30 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 
 /* the search comes out of the screen and sits at the top right of the
    glass, which is where it was reaching for anyway */
+/* ── The search, as one white pill ──
+   The word and the button were two loose objects at the end of the row.
+   One pill makes them one control, and white makes it the brightest thing
+   on the card — which is right, because it is the only place on this card
+   you can type. */
+.hs-top .hs-searchpill {
+  flex-shrink: 0; display: flex; align-items: center; gap: 9px;
+  padding: 4px 4px 4px 15px;
+  border-radius: 999px !important;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
 .hs-slbl {
   flex-shrink: 0;
   font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800;
   letter-spacing: 1.6px; text-transform: uppercase;
-  color: rgba(255,255,255,0.75);
+  color: #060c18;
 }
 /* The ring is a live invitation rather than a label, so it moves: one arc
    turning round the button, forever, at a speed that reads as breathing
    rather than loading. Transform on an SVG child only — nothing reflows. */
 .hs-searchwrap {
   position: relative; flex-shrink: 0;
-  width: 44px; height: 44px;
+  width: 38px; height: 38px;
   display: flex; align-items: center; justify-content: center;
 }
 .hs-trace {
@@ -14878,11 +14894,12 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 .hs-searchwrap .hero-search-btn {
   flex-shrink: 0; margin: 0 !important;
   position: static !important;
-  width: 36px !important; height: 36px !important;
-  min-width: 36px !important; min-height: 36px !important;
+  width: 32px !important; height: 32px !important;
+  min-width: 32px !important; min-height: 32px !important;
+  border-radius: 50% !important;
 }
 .hs-searchwrap .hero-search-ic,
-.hs-searchwrap .nwsb-search-icon { width: 17px !important; height: 17px !important; }
+.hs-searchwrap .nwsb-search-icon { width: 15px !important; height: 15px !important; }
 
 /* ── Explore and App Guide, below the set ── */
 .hs-foot .hero-btns {
