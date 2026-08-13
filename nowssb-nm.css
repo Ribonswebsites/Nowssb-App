@@ -10871,7 +10871,15 @@ body.fashplus #appBgLayer2 { opacity: 0 !important; }
 /* The tagged pages: let the fixed clip through, keep their own scrim.
    Only while Page backgrounds is on — with it off these pages are meant to
    be wearing their photographs again. */
-body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] { background: transparent; }
+/* !important, and colour and image stated apart rather than as `background`.
+   A page is free to set its own surface with an id and an !important of its
+   own — several do — and an id beats every class in this file, so without
+   this the tag was set, the page stayed opaque, and the film never arrived.
+   Splitting the two also leaves any gradient overlay a page draws alone. */
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
 body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { background-image: none !important; }
 
 /* ── The solid pages ──
@@ -10891,7 +10899,21 @@ body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-
    everything the page draws. .sub-screen already carries `contain: paint`
    and a z-index, so it is its own stacking context and the -1 cannot escape
    it — and the film is outside that context, which is why it still shows. */
-body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid] { background: transparent; }
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+/* A page whose own scroller or shell carries the surface instead of the
+   screen itself — the film stops at an opaque child just as surely as at an
+   opaque parent, and several pages are built that way. Only the full-bleed
+   shells are listed; cards and rows keep their fills, which is what makes
+   the page still readable over a moving picture. */
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid] > .sub-body,
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid] > .bgp-content,
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid] > .sub-screen-bg {
+  background-color: transparent !important;
+  background-image: none !important;
+}
 body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid]::before {
   content: ''; position: absolute; inset: 0; z-index: -1;
   pointer-events: none;
