@@ -14319,7 +14319,10 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
        bright frame of it; this keeps the contrast without closing it. */
     linear-gradient(180deg, rgba(6,12,24,0.52) 0%, rgba(6,12,24,0.64) 100%);
   border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 26px !important;
+  /* Pointy. A 26px radius on a card whose whole content is a rectangular
+     television fought the thing inside it — the glass rounded off corners
+     the set squares up. Square corners, and the two agree. */
+  border-radius: 0 !important;
   overflow: hidden;
   -webkit-backdrop-filter: blur(26px) saturate(1.5);
           backdrop-filter: blur(26px) saturate(1.5);
@@ -14334,7 +14337,12 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
      this the card's border traces the television's own outline and the
      wrapper stops reading as a wrapper. The render's feet and its
      transparent corners show the glass through them, which is the join. */
-  padding: 11px;
+  /* ── Room below the set ──
+     The sides come in so the television itself is bigger, and the foot
+     opens up so there is somewhere INSIDE the glass and OUTSIDE the set
+     for the guide's disc to stand. It used to hang over the bezel, which
+     is the one place on this card that already has something drawn on it. */
+  padding: 8px 8px 62px;
   box-sizing: border-box;
 }
 /* Without the greeting — the look applied before its furniture is built —
@@ -14522,9 +14530,12 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   width: 100% !important;
   /* .hs-cell zeroes every cell's padding with an !important of its own, and
      that took the glass wrapper's inset with it — the set then sat flush to
-     the card, where the card's own 26px radius and overflow:hidden cut its
-     corners and its feet off. The same 12px the banner cells carry. */
-  padding: 12px !important;
+     the card, where the card's overflow:hidden cut its feet off. This is
+     the padding that actually applies to the hero in the deck, so it is the
+     one carrying the geometry: tight at the sides so the television is as
+     big as the card allows, and open at the foot so the guide's disc has
+     somewhere to stand that is inside the glass and outside the set. */
+  padding: 8px 8px 72px !important;
   box-sizing: border-box;
 }
 
@@ -14533,7 +14544,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   box-sizing: border-box;
   padding: 12px !important;
   border: 1px solid rgba(255,255,255,0.16) !important;
-  border-radius: 26px !important;
+  border-radius: 0 !important;   /* square, like the hero card it follows */
   background:
     linear-gradient(158deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 44%, rgba(255,255,255,0.02) 100%),
     linear-gradient(180deg, rgba(6,12,24,0.48) 0%, rgba(6,12,24,0.60) 100%) !important;

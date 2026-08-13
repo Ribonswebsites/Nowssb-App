@@ -278,6 +278,7 @@
            '</button>' +
            '<div class="fst-count"><b id="fstNow">Start</b><span id="fstOf">' + STEPS.length + ' steps</span></div>' +
            '<div class="fst-bar"><i id="fstFill"></i></div>' +
+           '<div class="fst-lbl" id="fstLbl">Follow the steps</div>' +
            '<button class="fst-arrow" id="fstPrev" onclick="window.fstStep(-1)" aria-label="Previous step">' + arrow(-1) + '</button>' +
            '<button class="fst-arrow fst-arrow-n" id="fstNext" onclick="window.fstStep(1)" aria-label="Next step">' + arrow(1) + '</button>';
   }
@@ -299,16 +300,54 @@
     if (lbl) lbl.textContent = i < 1 ? STEPS.length + ' steps' : 'of ' + STEPS.length;
     var fill = document.getElementById('fstFill');
     if (fill) fill.style.width = ((i / STEPS.length) * 100) + '%';
+    /* The name of what you are looking at, right where your thumb is about
+       to press. On the title card it is what the guide is; from there on it
+       is the step you are on. */
+    var lbl = document.getElementById('fstLbl');
+    if (lbl) lbl.textContent = i < 1 ? 'Follow the steps' : STEPS[i - 1].t;
     var p = document.getElementById('fstPrev'), n = document.getElementById('fstNext');
     if (p) p.disabled = i <= 0;
     if (n) n.disabled = i >= STEPS.length;
   }
+
+  /* ── It runs itself ───────────────────────────────────────────────
+     The rail auto-advances, so the guide does too — a card you have to
+     press through is a slideshow, and this is meant to introduce the app
+     while you look at it. Not part083's timer: that one is driven by a
+     clip ending, and a step card has no clip. This one is its own, it
+     wraps from the last step back to the title, and it gets out of the way
+     for a while whenever a finger touches it — the point of pressing
+     forward is to go at your own speed, and a card that then slid away
+     under you would be the rail arguing. */
+  var ROTATE = 7000, HOLD = 14000, spin = null, held = 0;
+
+  function tick() {
+    if (!on()) return;
+    if (Date.now() < held) return;
+    if (document.hidden) return;
+    /* not while the home is not the screen you are on, and not while
+       something is open over it */
+    var home = document.getElementById('home');
+    if (!home || !home.classList.contains('active')) return;
+    if (document.querySelector('.sub-screen.open')) return;
+    var d = deck();
+    if (!d) return;
+    var r = d.getBoundingClientRect();
+    if (r.bottom < 40 || r.top > (window.innerHeight || 800) - 40) return;
+    var i = window.nwsbHeroAt();
+    window.nwsbHeroGo(i >= STEPS.length ? -STEPS.length : 1);   /* wraps to the title */
+    paint();
+  }
+  function spinOn()  { if (!spin) spin = setInterval(tick, ROTATE); }
+  function spinOff() { if (spin) { clearInterval(spin); spin = null; } }
+  function hold()    { held = Date.now() + HOLD; }
 
   window.fstStep = function (d) {
     if (typeof window.nwsbHeroGo !== 'function') return;
     var i = window.nwsbHeroAt();
     if (i + d < 0 || i + d > STEPS.length) return;
     haptic(14);
+    hold();
     window.nwsbHeroGo(d);
     paint();
     syncHeight();
@@ -351,43 +390,12 @@
 
      offsetHeight, not the rectangle: a cell mid-slide is transformed, and
      getBoundingClientRect would hand back the scaled number. */
-  function bMid(el) { var r = el.getBoundingClientRect(); return r.top + r.height / 2; }
-
   function syncHeight() {
     var d = deck(), h = heroCell();
     if (!d || !h) return;
     var n = h.offsetHeight;
     if (n > 120) d.style.setProperty('--fst-h', n + 'px');
 
-    /* The disc sits on the line the two buttons are on — outside the set,
-       at the height of Explore and App Guide inside it. Measured, because
-       that line moves with the set, and the set is sized from whatever
-       space is left between the header and the nav. */
-    var hero = document.querySelector('#home .hero-section.hero-simple');
-    var btns = hero && hero.querySelector('.hero-btns');
-    var disc = document.getElementById('fstBtn');
-    if (hero && btns && disc && btns.offsetParent !== null && !hero.classList.contains('out')) {
-      /* Corrected against where the disc actually landed rather than
-         derived from the hero's box. The hero is a framed element inside a
-         wrapper inside an absolutely placed cell, and which of those boxes
-         `bottom` resolves against is not worth deriving — one measurement
-         of the error is exact.
-
-         Clamped, and that is not belt-and-braces: this runs on a heartbeat,
-         and a measurement taken while the deck is mid-slide reports an
-         error that is really just the transform. Unclamped, two bad reads
-         in a row walk the disc off the card. */
-      var err = bMid(disc) - bMid(btns);
-      if (Math.abs(err) > 1 && Math.abs(err) < 400) {
-        var cur = parseFloat(hero.style.getPropertyValue('--fst-btn-b'));
-        if (!isFinite(cur)) cur = 14;
-        var next = cur + err;
-        var lim = Math.max(40, hero.offsetHeight - 52);
-        if (next < 4) next = 4;
-        if (next > lim) next = lim;
-        hero.style.setProperty('--fst-btn-b', Math.round(next) + 'px');
-      }
-    }
   }
 
   window.fstOpen = function () {
@@ -411,6 +419,8 @@
        first thing the guide has to say, and forward is what starts it. */
     title(true);
     paint();
+    hold();
+    spinOn();
     syncHeight();
     haptic(24);
     var btn = document.getElementById('fstBtn');
@@ -418,6 +428,7 @@
   };
 
   window.fstClose = function () {
+    spinOff();
     var d = deck();
     if (d) d.classList.remove('fst-on');
     title(false);
@@ -478,6 +489,14 @@
     mountBtn();
     if (on()) { paint(); syncHeight(); }
   }, 900);
+
+  /* part083's own swipe moves the rail without coming through fstStep, and
+     a finger on it means the same thing there as it does on an arrow. */
+  document.addEventListener('touchend', function (e) {
+    if (!on()) return;
+    var d = deck();
+    if (d && e.target && d.contains(e.target)) hold();
+  }, { passive: true, capture: true });
 
   (function boot(n) {
     if (mountBtn()) return;

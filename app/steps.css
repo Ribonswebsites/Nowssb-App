@@ -20,11 +20,11 @@
    ══════════════════════════════════════════════════════════════════ */
 .fst-btn {
   position: absolute; z-index: 40;
-  /* Outside the set, on the line the two buttons inside it are on.
-     --fst-btn-b is measured off .hero-btns by the script, because that
-     line moves with the set and the set is sized from whatever space is
-     left between the fixed header and the nav. */
-  right: 10px; bottom: var(--fst-btn-b, 14px);
+  /* BELOW the set and INSIDE the glass. The card carries 62px of padding
+     at its foot for exactly this, so the disc stands on the wrapper rather
+     than hanging over the television's bottom bezel — the one part of that
+     card that already has something drawn on it. Nothing to measure. */
+  right: 16px; bottom: 11px;
   width: 40px !important; height: 40px !important;
   min-width: 40px !important; min-height: 40px !important;
   padding: 0 !important; margin: 0 !important;
@@ -65,7 +65,7 @@
   /* the banners' own wrapper geometry, so the two are the same rectangle
      as they pass each other */
   padding: 14px !important;
-  border-radius: 26px !important;
+  border-radius: 0 !important;      /* square, like the wrapper it replaces */
   /* Black, and only black. The rail either side of this is footage inside
      glass; the one thing here that has to be READ earns its silence by
      having nothing in it that moves or refracts. */
@@ -107,7 +107,7 @@
    stays put while the words move under it. */
 .hs-cell.fst-cell::after {
   content: ''; position: absolute; left: 14px; right: 14px; bottom: 14px;
-  height: 34px; pointer-events: none; border-radius: 0 0 12px 12px;
+  height: 34px; pointer-events: none;
   background: linear-gradient(180deg, rgba(5,7,13,0) 0%, rgba(5,7,13,0.96) 82%);
 }
 
@@ -158,8 +158,8 @@
    rail that runs itself should not look like one that needs driving.
    ══════════════════════════════════════════════════════════════════ */
 .fst-nav {
-  display: flex; align-items: center; gap: 12px;
-  margin: -6px 16px 18px;
+  display: flex; align-items: center; gap: 9px;
+  margin: -4px 16px 18px;
 }
 /* The disc that opened the guide rides on the hero card, and the hero card
    is cell 0 — it slides out of the deck the moment a step is on. So the way
@@ -186,8 +186,19 @@
 .fst-count b { font-size: 15px; font-weight: 800; color: #fff; }
 .fst-count span { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.42); }
 .fst-bar {
-  flex: 1; min-width: 0; height: 2px; border-radius: 2px;
+  flex: 1 1 auto; min-width: 16px; height: 2px; border-radius: 2px;
   background: rgba(255,255,255,0.14); overflow: hidden;
+}
+/* The name of the card, immediately left of the two discs — where the eye
+   already is on the way to pressing one. It takes what the bar does not
+   need, and truncates rather than wrapping: this row is one line high and
+   has to stay one line high. */
+.fst-lbl {
+  flex: 0 1 auto; min-width: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 700;
+  letter-spacing: .2px; color: rgba(255,255,255,0.8);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-align: right;
 }
 .fst-bar i {
   display: block; height: 100%; width: 6.6%;
