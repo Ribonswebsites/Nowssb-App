@@ -14361,24 +14361,29 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    fixed rather than content-driven: the rails stop at `bottom: 14.922%`,
    which is the bottom cap's height as a fraction of the render's HEIGHT,
    and that number is only correct while the box keeps the render's shape. */
-.hero-simple .hero-content {
-  position: relative; inset: auto;
-  aspect-ratio: 1452 / 831;
-  /* the padding IS the bezel — every side a fraction of the WIDTH, which is
-     what percentage padding means on all four sides */
+/* Out of the layout everywhere but here, so the television and full-screen
+   looks are untouched and .hero-content stays their direct child. */
+.hero-tvbox { display: contents; }
+
+/* ── The set ──
+   Built the way .nmh-quick-tv is, because that one is right and this one
+   was not: the frame carries the render's own aspect ratio and its padding
+   is the bezel, and that is the whole of it. */
+.hero-simple .hero-tvbox {
+  display: block;
+  position: relative; width: 100%;
+  aspect-ratio: 1452 / 831;      /* the trimmed render's own */
   padding: 2.410% 1.791% 8.540% 1.928%;
+  box-sizing: border-box;
   /* the screen, clipped to the aperture: the render's own screen is
      transparent and its bezel sits ABOVE the content, so black in the file
      would have covered everything inside */
   background-color: #000;
   background-clip: content-box;
   -webkit-background-clip: content-box;
-  gap: 0;
-  justify-content: center;
-  overflow: hidden;
 }
 /* the two caps */
-.hero-simple .hero-content::after {
+.hero-simple .hero-tvbox::after {
   content: ''; position: absolute; inset: 0; z-index: 20; pointer-events: none;
   background-image: url('./assets/frames/tv-l-top.webp'),
                     url('./assets/frames/tv-l-bottom.webp');
@@ -14386,28 +14391,36 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   background-size: 100% auto, 100% auto;
   background-repeat: no-repeat, no-repeat;
 }
-/* the side rails, tiled, stopped at the top of the bottom bezel */
-.hero-simple .hero-content::before {
+/* the side rails, tiled, stopped at the top of the bottom bezel. 14.922% is
+   124/831 — the bottom cap's height as a fraction of the render's HEIGHT,
+   which is this box's height because the aspect above is fixed. */
+.hero-simple .hero-tvbox::before {
   content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: 14.922%;
   z-index: 19; pointer-events: none;
   background: url('./assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
 }
-/* ── The film, inset to the aperture ──
-   An absolutely positioned box resolves left/right against WIDTH but
-   top/bottom against HEIGHT, while the padding above is a fraction of the
-   width on all four sides — so the padding's own numbers cannot be reused
-   here. With the aspect fixed the conversion is exact: the render is
-   1452/831 = 1.7473 wide for its height, so 2.410% and 8.540% of the width
-   are 4.211% and 14.922% of the height. That is where 14.922% comes from
-   above too, which is why the rails and the clip end on the same line. */
-.hero-simple .hero-bg-vid {
-  inset: auto;
-  top: 4.211%; bottom: 14.922%; left: 1.928%; right: 1.791%;
-  width: auto; height: auto;
-  border-radius: 0;
-  z-index: 0;
+/* ── The screen ──
+   A plain 100%/100% child of the frame, exactly like .qa-tv-screen. The
+   frame's content box IS the aperture, so this fills the glass with no
+   inset numbers to keep in step with the padding — which is what the last
+   attempt got wrong by insetting the clip against the frame's PADDING box
+   and pushing the whole set out of its card. */
+.hero-simple .hero-content {
+  position: relative; inset: auto;
+  width: 100%; height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0 !important;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 0;
+  z-index: 1;
 }
-/* everything the header draws sits on the screen, over the film */
+/* the film fills the screen, under everything the header draws */
+.hero-simple .hero-bg-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  border-radius: 0;
+}
 .hero-simple .hero-content > *:not(.hero-bg-vid) { position: relative; z-index: 2; }
 /* ── Sized to the screen, not to the page ──
    The aperture of a landscape set inside a 16px-inset card is about 296
@@ -14492,12 +14505,27 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 }
 .hs-cell.on  { transform: translateX(0);      opacity: 1; z-index: 2; pointer-events: auto; }
 .hs-cell.out { transform: translateX(-106%);  opacity: 0; z-index: 1; }
+/* ── Going back ──
+   Swiping the other way has to look like the other way: the deck's whole
+   sense of direction is mirrored while this class is on it, so the cell
+   being left goes out to the RIGHT and the one arriving comes in from the
+   LEFT. Without it a backward swipe played the forward animation and read
+   as another step onward. app/js/part083.js sets it per move. */
+.hs-deck.hs-back .hs-cell     { transform: translateX(-106%); }
+.hs-deck.hs-back .hs-cell.on  { transform: translateX(0); }
+.hs-deck.hs-back .hs-cell.out { transform: translateX(106%); }
 
 /* the hero card, as the deck's first cell: it keeps its glass and loses
    the margins it had when it stood on its own */
 .hs-deck > .hero-section.hero-simple {
   margin: 0 !important;
   width: 100% !important;
+  /* .hs-cell zeroes every cell's padding with an !important of its own, and
+     that took the glass wrapper's inset with it — the set then sat flush to
+     the card, where the card's own 26px radius and overflow:hidden cut its
+     corners and its feet off. The same 12px the banner cells carry. */
+  padding: 12px !important;
+  box-sizing: border-box;
 }
 
 /* a banner: a rounded glass wrapper with a tablet in it */

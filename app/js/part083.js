@@ -193,7 +193,10 @@
      card and a tablet are not the same height and a box that jumps is the
      difference between an app and a page. */
   var cur = 0, timer = null, running = false, shownAt = 0;
-  var HERO_HOLD = 6000;      /* how long the hero card holds the deck */
+  /* The hero is the app's own header, not a banner passing through, and six
+     seconds was not long enough to read it before it left. It also has the
+     film in it now, which wants time to be watched rather than glimpsed. */
+  var HERO_HOLD = 12000;     /* how long the hero card holds the deck */
   var MIN_DWELL = 2600;      /* nothing leaves before it has been readable */
 
   function deck()  { return document.getElementById('hsDeck'); }
@@ -237,6 +240,56 @@
     return v;
   }
 
+  /* ── Swipe ────────────────────────────────────────────────────────
+     The deck ran itself and that was the only way through it: to reach the
+     fourth banner you waited out the three before it, and a clip you wanted
+     to look at left on its own schedule. A drag moves it by hand — left for
+     the next, right for the one before — and it wraps at both ends.
+
+     Nothing is drawn to say so. The deck was built with no dots and no
+     arrows on purpose and that does not change; the gesture is its own
+     affordance, and the auto-advance still runs underneath, restarted from
+     each move because show() re-arms the timer every time it is called. */
+  function armSwipe(d) {
+    if (!d || d._hsSwipe) return;
+    d._hsSwipe = 1;
+    var x0 = 0, y0 = 0, t0 = 0, tracking = false, swiped = false;
+
+    d.addEventListener('touchstart', function (e) {
+      if (!e.touches || e.touches.length !== 1) return;
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+      t0 = Date.now(); tracking = true;
+    }, { passive: true });
+
+    d.addEventListener('touchend', function (e) {
+      if (!tracking) return;
+      tracking = false;
+      var t = e.changedTouches && e.changedTouches[0];
+      if (!t) return;
+      var dx = t.clientX - x0, dy = t.clientY - y0;
+      /* A swipe, and not the two things it sits between: a tap on the card
+         (too short to count) and the page scrolling under the finger (more
+         vertical than horizontal). The time bound rejects a slow drag that
+         changed its mind halfway. */
+      if (Math.abs(dx) < 45) return;
+      if (Math.abs(dx) < Math.abs(dy) * 1.6) return;
+      if (Date.now() - t0 > 800) return;
+      haptic(14);
+      /* Every cell is a button or holds them, and a touchend inside one
+         still fires a click. Swallowed for a moment so a swipe that ends
+         over Explore does not also open it. */
+      swiped = true;
+      setTimeout(function () { swiped = false; }, 420);
+      show(cur + (dx < 0 ? 1 : -1), dx < 0 ? 'swipe' : 'back');
+    }, { passive: true });
+
+    d.addEventListener('click', function (e) {
+      if (!swiped) return;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+  }
+
   function show(i, why) {
     var all = cells();
     if (!all.length) return;
@@ -244,6 +297,9 @@
     i = ((i % n) + n) % n;
     var from = cur;
     cur = i;
+    /* mirrors the deck's direction for a backward move — see .hs-back */
+    var d0 = document.getElementById('hsDeck');
+    if (d0) d0.classList.toggle('hs-back', why === 'back');
     all.forEach(function (c, j) {
       c.classList.toggle('on', j === i);
       c.classList.toggle('out', why !== 'first' && j === from && j !== i);
@@ -361,6 +417,7 @@
       d.appendChild(hero);                       /* moved, not copied */
       d.insertAdjacentHTML('beforeend', cellsHtml());
     }
+    armSwipe(d);
     cur = 0;
     show(0, 'first');
   }

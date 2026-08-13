@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=775">
+<link rel="stylesheet" href="nowssb-nm.css?v=776">
 <link rel="stylesheet" href="app/widgets.css?v=6">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
@@ -1643,6 +1643,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="hero-bg"    id="hb2"></div>
     <div class="hero-bg"    id="hb3"></div>
     <div class="hero-bg"    id="hb4"></div>
+    <!-- The set. It is built exactly the way the Quick Access television is
+         (.nmh-quick-tv, index.html above): the frame carries the render's
+         own aspect ratio and its padding is the bezel, and the screen inside
+         is a plain 100%/100% child of it — the content box IS the aperture,
+         so there are no inset numbers to keep in step with the padding.
+         `display: contents` by default, so in the television and full-screen
+         looks this element is not in the layout at all and .hero-content
+         behaves exactly as it always did. -->
+    <div class="hero-tvbox">
     <div class="hero-content">
       <!-- The hero's film. It lives INSIDE .hero-content rather than beside
            it because .hero-content is the television's screen in the plain
@@ -1690,6 +1699,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
+    </div><!-- /hero-tvbox -->
   </div>
 
 
@@ -5571,7 +5581,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part080.js?v=8"></script><!-- ══ SOUND LIBRARY FEED ══ -->
 <script src="app/js/part081.js?v=3"></script>
 <script src="app/js/part082.js?v=23"></script>
-<script src="app/js/part083.js?v=11"></script><!-- ══ THE PLAIN HERO ══ --><!-- ══ PRONUNCIATION NOTES ══ -->
+<script src="app/js/part083.js?v=12"></script><!-- ══ THE PLAIN HERO ══ --><!-- ══ PRONUNCIATION NOTES ══ -->
 
 
 <!-- ═══════════════════════════════════════════════════════════
