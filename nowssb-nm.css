@@ -14929,15 +14929,23 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
    They come in off the edge and they get bigger. This is the set's only
    job now, so it may as well be read from across the room.
    ══════════════════════════════════════════════════════════════════ */
-.hero-simple .hero-content { padding: 18px 20px 16px !important; }
-.hero-simple .hero-content > div:first-child {
-  margin-left: 12px !important; margin-right: 12px !important;
-}
+/* ── One left edge for all four lines ──
+   They were landing on two: the wordmark and the tagline on the screen's
+   own padding, and "Natural Origin" and the word 12px further in. The
+   indent that did it was on the two bottom blocks — and the rule meant to
+   match the top one matched nothing at all, because the first child of
+   .hero-content is the film now, not the text.
+
+   So the indent comes off the blocks entirely and the screen's own padding
+   is the only thing setting it. One number, four lines, and moving them
+   right is now moving one number. */
+.hero-simple .hero-content { padding: 18px 26px 16px !important; }
+.hero-simple .hero-bottom { padding: 0 !important; }
 .hero-simple .brand-name { font-size: clamp(30px, 8.6vw, 46px) !important; }
 .hero-simple #heroTagline { font-size: 12.5px !important; letter-spacing: 3px !important; }
 .hero-simple .hero-bottom > div:first-child {
-  margin-bottom: 12px !important; padding-left: 12px !important;
+  margin-bottom: 12px !important; padding-left: 0 !important;
 }
 .hero-simple .hero-bottom .brand-tag { font-size: 16px !important; }
-.hero-simple .hero-word-wrap { margin-top: 4px; height: auto; padding-left: 12px; }
+.hero-simple .hero-word-wrap { margin-top: 4px; height: auto; padding-left: 0; }
 .hero-simple .hero-word { font-size: clamp(26px, 7.4vw, 38px) !important; }
