@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=773">
+<link rel="stylesheet" href="nowssb-nm.css?v=774">
 <link rel="stylesheet" href="app/widgets.css?v=6">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
@@ -1638,19 +1638,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        background and everything the hero draws — the crossfading photos and
        all of the content — is inset to the aperture. -->
   <div class="hero-section hero-tv">
-    <!-- The hero's film. It is what the five crossfading photographs below
-         used to be: the picture behind the header, in every one of the three
-         looks (app/js/part082.js). In the television look it is inset to the
-         set's aperture, so the clip plays IN the screen and the wordmark,
-         the word, the search and both buttons sit on top of it — everything
-         the header draws is inside the television. -->
-    <video class="hero-bg-vid" muted loop playsinline preload="none" src="./assets/video/hero-bg.mp4" aria-hidden="true" tabindex="-1"></video>
     <div class="hero-bg on" id="hb0"></div>
     <div class="hero-bg"    id="hb1"></div>
     <div class="hero-bg"    id="hb2"></div>
     <div class="hero-bg"    id="hb3"></div>
     <div class="hero-bg"    id="hb4"></div>
     <div class="hero-content">
+      <!-- The hero's film. It lives INSIDE .hero-content rather than beside
+           it because .hero-content is the television's screen in the plain
+           look: an absolutely positioned box resolves against its parent's
+           PADDING box, and on a framed element the padding IS the bezel, so
+           a clip that was a sibling of the frame could never be inset to the
+           aperture correctly. Inside the screen it fills exactly that, and
+           the wordmark, the word, the search and both buttons sit on top. -->
+      <video class="hero-bg-vid" muted loop playsinline preload="none" src="./assets/video/hero-bg.mp4" aria-hidden="true" tabindex="-1"></video>
       <div style="margin-left:18px;margin-right:18px;align-self:stretch;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
           <span class="brand-name" style="font-size:clamp(32px,9vw,52px);"><span class="b">Nowss</span><span class="t">B</span></span>

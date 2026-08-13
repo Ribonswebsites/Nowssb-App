@@ -14138,9 +14138,10 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   margin-left: auto;
   margin-right: auto;
 }
-/* the film, the crossfading photographs and the content share the screen */
+/* the crossfading photographs and the content share the screen. The film is
+   NOT here: it sits inside .hero-content now, so it is already inset to the
+   aperture by its parent and a second inset would apply the bezel twice. */
 .hero-tv .hero-bg,
-.hero-tv .hero-bg-vid,
 .hero-tv .hero-content {
   inset: auto;
   left: 3.439%; right: 2.476%; top: 2.129%; bottom: 7.168%;
@@ -14167,11 +14168,13 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   object-fit: cover; display: block;
   background: #000;
   border-radius: inherit;
+  /* The film is the point of the header, so it is dimmed only as far as the
+     type above it needs and no further. A 0.52-0.64 scrim was covering it
+     almost completely — this is one even step down instead, and the copy
+     carries its own shadow for the rest. */
+  filter: brightness(0.82);
 }
-.hero-tv .hero-bg-vid {
-  width: auto; height: auto;
-  border-radius: 0;
-}
+.hero-tv .hero-bg-vid { border-radius: 0; }
 /* one picture, not two: the photographs are what the film replaces */
 .hero-section .hero-bg { display: none !important; }
 /* The content was padded for a full viewport. Inside the screen it has
@@ -14180,7 +14183,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 .hero-tv .hero-content {
   padding: 26px 16px 22px;
 }
-.hero-tv .hero-content > div:first-child {
+.hero-tv .hero-content > div:first-of-type {
   margin-left: 4px !important; margin-right: 4px !important;
 }
 .hero-tv .brand-name { font-size: clamp(24px, 7vw, 38px) !important; }
@@ -14305,6 +14308,12 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   /* the greeting above carries the header offset now */
   margin: 0 16px 16px;
   width: auto;
+  /* The set sits INSIDE the glass rather than flush to its edge — without
+     this the card's border traces the television's own outline and the
+     wrapper stops reading as a wrapper. The render's feet and its
+     transparent corners show the glass through them, which is the join. */
+  padding: 11px;
+  box-sizing: border-box;
 }
 /* Without the greeting — the look applied before its furniture is built —
    the card still has to clear the header on its own. */
@@ -14315,31 +14324,105 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    this look is defined by NOT having */
 .hero-simple .hero-bg,
 .hero-simple .hero-glass { display: none !important; }
-/* the content stops being an overlay and becomes the card itself */
+/* ══ THE PLAIN HERO IS A TELEVISION, IN GLASS ══
+   The section stays the glass wrapper — that is the card you see around it.
+   .hero-content becomes the set itself: the same landscape render
+   .nwsb-inframe.dev-tv-l wears (assets/frames/tv-l-*), built the same way,
+   caps top and bottom with the side rails tiled between.
+
+   It is stated here rather than by putting `nwsb-inframe dev-tv-l` in the
+   markup, because those classes on the hero would paint the set in all
+   THREE looks — the television look already has a portrait set of its own,
+   and the full-screen look is meant to have none.
+
+   The aspect ratio is the render's own (1452x831 trimmed). It has to be
+   fixed rather than content-driven: the rails stop at `bottom: 14.922%`,
+   which is the bottom cap's height as a fraction of the render's HEIGHT,
+   and that number is only correct while the box keeps the render's shape. */
 .hero-simple .hero-content {
   position: relative; inset: auto;
-  padding: 20px 4px 22px;
-  gap: 18px;
-  /* The glass, repeated from .hero-section.hero-simple above. A background
-     paints behind every child, so the film — a child at z-index 0 — covered
-     the section's own gradient and with it the dark base that keeps white
-     type legible. The content layer is above the film, so the same glass
-     stated here lands back on top of it and the look is unchanged. */
-  background:
-    linear-gradient(158deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 100%),
-    linear-gradient(180deg, rgba(6,12,24,0.52) 0%, rgba(6,12,24,0.64) 100%);
+  aspect-ratio: 1452 / 831;
+  /* the padding IS the bezel — every side a fraction of the WIDTH, which is
+     what percentage padding means on all four sides */
+  padding: 2.410% 1.791% 8.540% 1.928%;
+  /* the screen, clipped to the aperture: the render's own screen is
+     transparent and its bezel sits ABOVE the content, so black in the file
+     would have covered everything inside */
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+  gap: 0;
+  justify-content: center;
+  overflow: hidden;
 }
-.hero-simple .hero-content > div:first-child {
-  margin-left: 14px !important; margin-right: 14px !important;
+/* the two caps */
+.hero-simple .hero-content::after {
+  content: ''; position: absolute; inset: 0; z-index: 20; pointer-events: none;
+  background-image: url('./assets/frames/tv-l-top.webp'),
+                    url('./assets/frames/tv-l-bottom.webp');
+  background-position: top center, bottom center;
+  background-size: 100% auto, 100% auto;
+  background-repeat: no-repeat, no-repeat;
 }
-.hero-simple .brand-name { font-size: clamp(26px, 8vw, 40px) !important; }
-.hero-simple .hero-bottom { padding: 0 14px; }
+/* the side rails, tiled, stopped at the top of the bottom bezel */
+.hero-simple .hero-content::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: 14.922%;
+  z-index: 19; pointer-events: none;
+  background: url('./assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
+}
+/* ── The film, inset to the aperture ──
+   An absolutely positioned box resolves left/right against WIDTH but
+   top/bottom against HEIGHT, while the padding above is a fraction of the
+   width on all four sides — so the padding's own numbers cannot be reused
+   here. With the aspect fixed the conversion is exact: the render is
+   1452/831 = 1.7473 wide for its height, so 2.410% and 8.540% of the width
+   are 4.211% and 14.922% of the height. That is where 14.922% comes from
+   above too, which is why the rails and the clip end on the same line. */
+.hero-simple .hero-bg-vid {
+  inset: auto;
+  top: 4.211%; bottom: 14.922%; left: 1.928%; right: 1.791%;
+  width: auto; height: auto;
+  border-radius: 0;
+  z-index: 0;
+}
+/* everything the header draws sits on the screen, over the film */
+.hero-simple .hero-content > *:not(.hero-bg-vid) { position: relative; z-index: 2; }
+/* ── Sized to the screen, not to the page ──
+   The aperture of a landscape set inside a 16px-inset card is about 296
+   wide and 142 tall on a 360 phone, and what has to go in it is the
+   wordmark, the search, two lines of copy, the rotating word and both
+   buttons. Everything below is that, and only that: the same furniture at
+   the size the screen actually has room for. In vw so it holds its
+   proportions on a wider phone, since the set scales with the card. */
+.hero-simple .hero-content > div:first-of-type {
+  margin-left: 0 !important; margin-right: 0 !important;
+}
+.hero-simple .brand-name { font-size: clamp(17px, 5.4vw, 26px) !important; }
+.hero-simple .hero-bottom { padding: 0; }
 .hero-simple .hero-bottom > div:first-child {
-  margin-bottom: 14px !important; padding-left: 0 !important;
+  margin-bottom: clamp(3px, 1.1vw, 6px) !important; padding-left: 0 !important;
 }
-.hero-simple .hero-word-wrap { margin-top: 0; height: 42px; }
-.hero-simple .hero-word { font-size: 30px !important; }
-.hero-simple .hero-btns { margin-top: 14px; }
+.hero-simple .hero-bottom > div:first-child .brand-tag {
+  font-size: clamp(8px, 2.5vw, 11px) !important;
+}
+.hero-simple #heroTagline { font-size: clamp(6.5px, 2vw, 9px) !important; letter-spacing: 1.4px; }
+.hero-simple .hero-word-wrap { margin-top: 0; height: auto; }
+.hero-simple .hero-word { font-size: clamp(15px, 4.8vw, 24px) !important; }
+.hero-simple .hero-btns { margin-top: clamp(5px, 1.8vw, 9px); gap: 6px; }
+.hero-simple .hero-btn {
+  padding: clamp(5px, 1.6vw, 8px) clamp(8px, 2.6vw, 13px) !important;
+  font-size: clamp(7px, 2.1vw, 10px) !important;
+}
+.hero-simple .hero-search-btn {
+  width: clamp(26px, 7.6vw, 36px) !important; height: clamp(26px, 7.6vw, 36px) !important;
+}
+.hero-simple .hero-search-ic { width: clamp(13px, 3.8vw, 18px) !important; height: clamp(13px, 3.8vw, 18px) !important; }
+/* the copy carries its own contrast now that the scrim over the film is
+   only a single even step of brightness */
+.hero-simple .hero-content .brand-name,
+.hero-simple .hero-content .brand-tag,
+.hero-simple .hero-content .hero-word,
+.hero-simple .hero-content #heroTagline { text-shadow: 0 2px 10px rgba(0,0,0,0.85); }
 /* App Guide says where it goes. A chevron drawn from two borders rather
    than a glyph, so it takes the button's own colour and needs no asset. */
 .hero-simple .hero-btn-s { display: inline-flex !important; align-items: center; gap: 9px; }
