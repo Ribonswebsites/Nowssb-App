@@ -382,6 +382,24 @@
      app's real header, with a search that opens the explore sheet and a
      word on a timer, and taking it apart to put it back is how you lose
      one of them. */
+  /* ── The row in the strip ─────────────────────────────────────────
+     A step card carries its own row — it is black, it is 370px, and there
+     is room. The TITLE card is the television, and its screen is 230px
+     with a wordmark already in it; three controls in there is what made it
+     unreadable. So the title card's row goes in the strip under the set,
+     which is the card's own bottom edge and is present exactly when the
+     title card is the cell on show. Explore and App Guide stand down for
+     as long as it is up, and come back the moment the guide closes. */
+  function footNav(on) {
+    var hero = document.querySelector('#home .hero-section.hero-simple');
+    var foot = hero && hero.querySelector(':scope > .hs-foot');
+    if (!foot) return;
+    var nav = foot.querySelector(':scope > .fst-nav');
+    if (on && !nav) foot.insertAdjacentHTML('beforeend', navHtml(''));
+    else if (!on && nav) nav.remove();
+    foot.classList.toggle('fst-nav-on', !!on);
+  }
+
   function title(on) {
     var hero = document.querySelector('#home .hero-section.hero-simple');
     if (!hero) return;
@@ -399,11 +417,7 @@
       t.innerHTML = '<div class="fst-title-b"><span class="b">Nowss</span><span class="t">B</span></div>' +
                     '<div class="fst-title-row">' +
                       '<span class="fst-title-s">Follow the steps</span>' +
-                      '<span class="hs-sep fst-title-sep"></span>' +
-                      '<span class="fst-title-back"><span class="fst-back-slot"></span>' +
-                        '<span class="fst-back-lbl">Back</span></span>' +
-                    '</div>' +
-                    navHtml('');
+                    '</div>';
       screen.appendChild(t);
     } else if (!on && t) {
       t.remove();
@@ -450,6 +464,7 @@
     spinOn();
     syncHeight();
     haptic(24);
+    footNav(true);
     var btn = document.getElementById('fstBtn');
     if (btn) btn.classList.add('on');
   };
@@ -459,6 +474,7 @@
     var d = deck();
     if (d) d.classList.remove('fst-on');
     title(false);
+    footNav(false);
     mountBtn();                       /* and back out to the strip */
     if (typeof window.nwsbHeroCells === 'function') {
       window.nwsbHeroCells(null);                 /* the banners come back */
@@ -503,8 +519,7 @@
     /* Closed, the disc stands in the strip under the set, beside the word
        that says what it is. Open, it moves INSIDE the set — the strip is
        carrying the guide's own row by then and there is no room for both. */
-    var host = on() ? hero.querySelector('.fst-back-slot')
-                    : hero.querySelector(':scope > .hs-foot');
+    var host = hero.querySelector(':scope > .hs-foot');
     if (host && btn.parentNode !== host) host.appendChild(btn);
     else if (!host && btn.parentNode !== hero) hero.appendChild(btn);
     btn.classList.toggle('on', on());

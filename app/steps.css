@@ -178,15 +178,19 @@
   flex-shrink: 0; margin-top: 10px;
 }
 .fst-title > .fst-nav { margin-top: auto; pointer-events: auto; }
-/* The strip under the set keeps Explore and App Guide the whole time. The
-   guide's row is on the cards now — it has to be, because the strip belongs
-   to the hero and the hero is cell 0, which slides out of the deck the
-   moment a step is on.
+/* ── The strip, in two states ──
+   Closed it is the card's own row: Explore, App Guide, Learn and the disc.
+   Open it is the guide's row for the TITLE card — and only that card, which
+   is the hero, which is exactly when this strip is the cell on show. Every
+   step card carries its own row inside itself, where there is room for it.
 
-   Learn is the exception: its disc goes up into the set while the guide is
-   running, and a label with nothing beside it is not a control. */
-.hero-simple.fst-title-on .hs-foot > .hs-learn,
-.hero-simple.fst-title-on .hs-foot > .hs-sep:last-of-type { display: none !important; }
+   Nothing overlaps because nothing shares: whichever row is up, the other
+   one's pieces are out. */
+.hs-foot.fst-nav-on > .hero-btns,
+.hs-foot.fst-nav-on > .hs-sep,
+.hs-foot.fst-nav-on > .hs-learn,
+.hs-foot.fst-nav-on > .fst-btn { display: none !important; }
+.hs-foot > .fst-nav { flex: 1 1 auto; min-width: 0; }
 /* Inside the set, bottom right of the screen. */
 .hero-content > .fst-btn {
   position: absolute !important; right: 12px; bottom: 12px;
@@ -282,11 +286,12 @@
   position: absolute; inset: 0; z-index: 5;
   display: flex; flex-direction: column;
   align-items: stretch;
-  /* Up, not centred. Centred, the heading sat where the row now goes and
-     there was nowhere for it — the guide's own row has to fit under the
-     wordmark on this card the same way it fits on every other one. */
-  justify-content: flex-start;
-  padding: 20px 26px 16px;
+  /* Centred, and carrying two lines and nothing else. A title, a back disc
+     and a full row inside a 230px screen with a wordmark already in it is
+     what made this unreadable — the row moved out to the strip under the
+     set, which is this card's own bottom edge. */
+  justify-content: center;
+  padding: 0 26px;
   text-align: left;
   pointer-events: none;
 }
@@ -302,10 +307,7 @@
 .fst-title-b .t { font-weight: 300; opacity: .85; }
 .fst-title-row {
   margin-top: 12px;
-  /* tighter than it was: the arrow was drifting off to the right of its
-     own label instead of sitting with it */
   display: flex; align-items: center; gap: 8px;
-  pointer-events: auto;
 }
 .fst-title-sep { flex: 0 0 1px !important; height: 30px; }
 /* and a little more air between the arrow and the word under it, so the
