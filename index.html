@@ -109,8 +109,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=776">
-<link rel="stylesheet" href="app/widgets.css?v=6">
+<link rel="stylesheet" href="nowssb-nm.css?v=777">
+<link rel="stylesheet" href="app/widgets.css?v=8">
+<link rel="stylesheet" href="app/steps.css?v=2">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
 <body>
@@ -5580,8 +5581,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <!-- Must load after part018.js — it takes over window.slRender/slSetTab. -->
 <script src="app/js/part080.js?v=8"></script><!-- ══ SOUND LIBRARY FEED ══ -->
 <script src="app/js/part081.js?v=3"></script>
-<script src="app/js/part082.js?v=23"></script>
-<script src="app/js/part083.js?v=12"></script><!-- ══ THE PLAIN HERO ══ --><!-- ══ PRONUNCIATION NOTES ══ -->
+<script src="app/js/part082.js?v=25"></script>
+<script src="app/js/part083.js?v=13"></script>
+<script src="app/js/part084.js?v=2"></script><!-- ══ FOLLOW THE STEPS ══ --><!-- ══ THE PLAIN HERO ══ --><!-- ══ PRONUNCIATION NOTES ══ -->
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -7738,6 +7740,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      app/js/part082.js on every open, because the first rail mirrors the
      home's live section list. -->
 <div class="sub-screen" id="sub-settings">
+  <!-- The page's own backdrop, filled by app/js/part082.js on open: the
+       Fashion Plus film while that mode is on, and the picture the app is
+       wearing when it is not. It is BELOW .st-page (z-index 2), never over
+       it — a layer above the page is what dimmed this screen before. -->
+  <div class="st-bg" id="stBg" aria-hidden="true"></div>
   <div class="st-page">
     <div class="st-header">
       <button class="sub-back" onclick="closeSub('settings')" aria-label="Back"></button>
@@ -10397,7 +10404,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part072.js?v=1"></script><!-- ══ ANDROID SHELL (no-op in a browser) ══ -->
 <script src="app/js/part073.js?v=1"></script><!-- ══ WORD LIBRARY, EBOOKS, INBOX ══ -->
 <script src="app/js/part074.js?v=8"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
-<script src="app/js/part076.js?v=111"></script><!-- ══ FASHION PLUS ══ -->
+<script src="app/js/part076.js?v=112"></script><!-- ══ FASHION PLUS ══ -->
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>

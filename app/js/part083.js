@@ -104,7 +104,7 @@
   var RAIL = [
     { i: 'crown',   h: 'The Full Library',       t: 'NowssB Subscription',
       s: 'Every word and every frequency',
-      sel: '#home .nsub-blk video',
+      sel: '#home .nsub-blk .vbs-screen video',
       v: 'https://res.cloudinary.com/eenvubod/video/upload/v1784895544/grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
       go: function () { if (window.SS && SS.open) SS.open('subscription'); } },
     { i: 'word',    h: 'Where a word begins',    t: 'NowssB Word Store',
@@ -123,7 +123,11 @@
       go: function () { openStore('signature-store'); } },
     { i: 'book',    h: 'Page by page',           t: 'NowssB eBooks',
       s: 'Deep-dive guides, yours to keep',
-      sel: '#home .fash-ebsec-wrap video',
+      /* .fash-ebsec-wrap video matched the FIRST video in the block, which
+         is the little clip spinning inside the spill disc — so the eBooks
+         banner played the gold rings instead of its own film. The banner is
+         the one in .ebsec-vid; name it. */
+      sel: '#home .fash-ebsec-wrap .ebsec-vid video',
       v: 'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
       go: function () { if (typeof window.ebSecOpen === 'function') ebSecOpen(); } },
     { i: 'sound',   h: 'Every word you own',     t: 'Sound Library',
@@ -193,6 +197,10 @@
      card and a tablet are not the same height and a box that jumps is the
      difference between an app and a page. */
   var cur = 0, timer = null, running = false, shownAt = 0;
+  /* The rail advances itself — unless something else has taken it over.
+     app/js/part084.js swaps the banners for the guide's step cards, and a
+     step you are reading must not slide away on a timer. */
+  var AUTO = true;
   /* The hero is the app's own header, not a banner passing through, and six
      seconds was not long enough to read it before it left. It also has the
      film in it now, which wants time to be watched rather than glimpsed. */
@@ -227,12 +235,13 @@
     if (i < 1) return null;
     var c = cells()[i];
     if (!c) return null;
-    var v = c.querySelector('video');
+    var v = c.querySelector('.hs-vid');
     if (!v) return null;
+    var r = RAIL[i - 1];
+    if (!r) return null;                       /* not a banner — a step card */
     if (!v.getAttribute('src')) {
       /* resolved here, not at parse time: a block whose clip is injected
          by another file after this one runs still wins */
-      var r = RAIL[i - 1];
       v.setAttribute('src', r.sel ? vidFrom(r.sel, r.v) : r.v);
       v.preload = 'auto';
       try { v.load(); } catch (e) {}
@@ -316,6 +325,7 @@
     if (!running) return;
 
     if (timer) clearTimeout(timer);
+    if (!AUTO) return;
     if (!v) {                                   /* the hero card */
       timer = setTimeout(function () { if (running) show(cur + 1); }, HERO_HOLD);
       return;
@@ -444,6 +454,46 @@
      there is one owner of which look is on and this file only answers. It
      was lost in a rewrite of this section, which is why the deck stopped
      being built at all. */
+  /* ── Lending the rail out ─────────────────────────────────────────
+     The deck is this file's, and it stays this file's — the cells, the
+     slide, the height and the swipe are all here. What another file can do
+     is say WHAT is passing through it: app/js/part084.js swaps the six
+     banners for the guide's fifteen step cards and swaps them back, and
+     never touches how any of it moves.
+
+     Cell 0 is left alone in both directions. It is the hero itself, moved
+     into the deck rather than copied, and taking it out would take the
+     app's real header out with it. */
+  window.nwsbHeroCells = function (html) {
+    var d = deck();
+    if (!d) return false;
+    d.querySelectorAll('.hs-cell:not(.hs-hero-cell)').forEach(function (c) {
+      var v = c.querySelector('video');
+      if (v) { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {} }
+      c.remove();
+    });
+    d.insertAdjacentHTML('beforeend', html == null ? cellsHtml() : html);
+    cur = 0;
+    show(0, 'first');
+    return true;
+  };
+  /* Off while something else is reading; on when the rail is its own again.
+     Turning it off also cancels the timer already ticking, or the cell that
+     was in flight when it was called would still leave. */
+  window.nwsbHeroAuto = function (on) {
+    AUTO = on !== false;
+    if (!AUTO && timer) { clearTimeout(timer); timer = null; }
+    else if (AUTO) pump();
+  };
+  /* Move by hand — the same call the swipe makes, so a button and a finger
+     land in exactly the same place. */
+  window.nwsbHeroGo = function (step) {
+    show(cur + step, step < 0 ? 'back' : 'swipe');
+    return cur;
+  };
+  window.nwsbHeroAt = function () { return cur; };
+  window.nwsbHeroCount = function () { return cells().length; };
+
   window.nwsbPlainHero = function (on) {
     var hero = document.querySelector('#home .hero-section');
     if (!hero) return;

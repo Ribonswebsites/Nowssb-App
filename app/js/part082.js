@@ -116,11 +116,11 @@
   };
 
   /* ── The hero header has three looks ──────────────────────────────
-     'tv'     — inside the television, which is what it ships as;
+     'tv'     — inside the television, on the page itself;
      'full'   — the way it was before the set: the five photographs
                 crossfading behind it, edge to edge, a screenful tall;
      'plain'  — an ordinary app header. No photographs, no picture rail,
-                no set: the wordmark, the word and the buttons on a card
+                no set of its own: the wordmark, the word and the buttons on a card
                 that is as tall as what is in it.
      All three are the same markup — each look is one class — so switching
      is a class and a remembered string, and nothing is rebuilt.
@@ -137,7 +137,12 @@
   })();
   window.heroStyle = function () {
     var v = localStorage.getItem(HKEY);
-    return (v === 'full' || v === 'plain') ? v : 'tv';   /* the set is the default */
+    /* 'plain' is what the app ships as now — the set in glass, with the
+       greeting over it and the rail running through it. The key is only
+       ever written when someone picks a look for themselves, so anyone who
+       chose the television still has 'tv' saved and still gets it; this
+       only decides for a reader who has never chosen. */
+    return (v === 'full' || v === 'tv') ? v : 'plain';
   };
   function applyHero() {
     var h = document.querySelector('#home .hero-section');
@@ -820,9 +825,80 @@
     paintHero();
   }
 
+  /* ── The page's backdrop ──────────────────────────────────────────
+     Two states, one layer, and the layer is BELOW the page rather than over
+     it. That direction is the whole lesson from the last attempt: a film
+     laid on top of .st-page at the same z-index painted over the cards and
+     read as the page being dimmed.
+
+       Fashion Plus on   the film the mode is playing right now, asked for
+                         by fpBgVid() so choosing a different background
+                         moves this page too
+       Fashion Plus off  a picture — the one the reader has set as their
+                         own background if they have set one, and the
+                         mode's own artwork if they have not
+
+     Reduce Motion, the mode's Page-backgrounds part switch and a paused
+     app all fall back to the picture, which costs nothing to keep. */
+  var BG_STILL = './assets/fashion/fp-intro.webp';
+
+  function filmOn() {
+    /* Normal mode is neumorphism — a light page, no photograph and no film
+       behind it. Every inner page in the app answers body.nm-mode that way;
+       this one was the exception, which is why it read as a glass page in a
+       neumorphic app. */
+    if (document.body.classList.contains('nm-mode')) return false;
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    } catch (e) {}
+    if (typeof window.fpOn !== 'function' || !window.fpOn()) return false;
+    if (typeof window.fpPartOn === 'function' && !window.fpPartOn('bg')) return false;
+    return typeof window.fpBgVid === 'function';
+  }
+
+  function paintBg() {
+    var host = document.getElementById('stBg');
+    if (!host) return;
+    var v = host.querySelector('video');
+
+    if (!filmOn()) {
+      if (v) { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {} v.remove(); }
+      if (document.body.classList.contains('nm-mode')) { host.style.backgroundImage = ''; return; }
+      /* Their picture if they chose one. The custom background is held as a
+         CSS variable on <body>, so read it from there rather than from the
+         key — that is the value actually in force. */
+      var url = '';
+      if (document.body.classList.contains('nwsb-custom-fashion-bg')) {
+        try { url = getComputedStyle(document.body).getPropertyValue('--nwsb-custom-bg-url').trim(); } catch (e) {}
+      }
+      if (!url || url === 'none') url = "url('" + BG_STILL + "')";
+      host.style.backgroundImage = url;
+      return;
+    }
+
+    host.style.backgroundImage = '';
+    var src = window.fpBgVid();
+    if (!v) {
+      v = document.createElement('video');
+      v.className = 'stw-film';
+      v.muted = true; v.loop = true; v.playsInline = true;
+      v.setAttribute('muted', ''); v.setAttribute('loop', '');
+      v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
+      /* out of the app-wide play controller: this one is started and
+         stopped by the page opening and closing, which it knows about and
+         the controller does not */
+      v.setAttribute('data-nwsb-vis', '1');
+      v.setAttribute('aria-hidden', 'true');
+      host.appendChild(v);
+    }
+    if (v.getAttribute('src') !== src) { v.setAttribute('src', src); try { v.load(); } catch (e) {} }
+    var p = v.play();
+    if (p && p.catch) p.catch(function () {});
+  }
+
   window.stOpen = function () {
-    /* nothing to pre-fetch and no film to place — the page is three cards */
     render();
+    paintBg();
     var s = document.getElementById('sub-settings');
     if (s && typeof openSub === 'function') openSub('settings');
     haptic(24);
@@ -861,9 +937,12 @@
       if (vio) { vio.disconnect(); vio = null; }
       queue.length = 0;
       DECKS = {};
-      var page = document.getElementById('sub-settings');
-      var fv = page && page.querySelector('.stw-film');
-      if (fv) { try { fv.pause(); } catch (e) {} fv.remove(); }
+      /* The backdrop goes with the page. A clip left decoding behind a
+         closed screen is exactly the cost this page was cut down to avoid;
+         the picture stays, because a background-image is free. */
+      var host = document.getElementById('stBg');
+      var fv = host && host.querySelector('video');
+      if (fv) { try { fv.pause(); fv.removeAttribute('src'); fv.load(); } catch (e) {} fv.remove(); }
       body.innerHTML = '';
     }, 420);
   };

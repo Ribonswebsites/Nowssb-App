@@ -109,6 +109,10 @@
     paintPicker();
   }
   window.fpBgChoice = bgChoice;
+  /* Which file the mode is actually playing. A page that wants the same
+     film behind its own content asks for it here rather than naming a URL
+     of its own — pick a different background and that page follows. */
+  window.fpBgVid = function () { return FILMS[bgChoice()].vid; };
 
   function slides() { return isOn() ? FILMS : STILLS; }
 

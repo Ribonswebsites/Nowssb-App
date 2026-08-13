@@ -1,0 +1,209 @@
+/* ══════════════════════════════════════════════════════════════════════
+   FOLLOW THE STEPS — its own stylesheet
+   Markup and copy are in app/js/part084.js.
+
+   Everything here is either the disc that opens the guide or a card that
+   runs through the hero's rail. The rail itself — .hs-deck, .hs-cell, the
+   slide, the direction, the height — is nowssb-nm.css and belongs to
+   app/js/part083.js; a step card is a .hs-cell like any other and inherits
+   all of it. That is the point: the guide moves exactly the way the video
+   banners move, because it is moving through the same deck.
+
+   url() paths resolve against THIS FILE, which sits in app/ — one level
+   below the page. There are none; if one is added it is ../assets/.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════
+   THE DISC ON THE HERO
+   Bottom right of the hero card, over its own corner. Only this look
+   has one — the script mounts it on .hero-simple and nowhere else.
+   ══════════════════════════════════════════════════════════════════ */
+.fst-btn {
+  position: absolute; z-index: 40;
+  right: 14px; bottom: 14px;
+  width: 40px !important; height: 40px !important;
+  min-width: 40px !important; min-height: 40px !important;
+  padding: 0 !important; margin: 0 !important;
+  display: flex; align-items: center; justify-content: center;
+  border: none !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  color: #060c18;
+  cursor: pointer;
+  /* A dark ring, not a light one: the disc sits over the set's white
+     bezel, and a white halo disappeared into it. */
+  box-shadow: 0 8px 22px rgba(0,0,0,0.55), 0 0 0 2px rgba(6,12,24,0.6);
+  transition: transform .24s cubic-bezier(.2,1,.3,1), box-shadow .2s ease;
+}
+.fst-btn svg { width: 18px; height: 18px; display: block; }
+.fst-btn:active { transform: scale(.9); }
+/* open: the arrow turns back on itself, and the ring goes blonde */
+.fst-btn.on {
+  transform: rotate(-90deg);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.55), 0 0 0 3px rgba(232,213,163,0.8);
+}
+.fst-btn.on:active { transform: rotate(-90deg) scale(.9); }
+
+/* a preview of a hero is a photograph of it — nothing in one is pressable */
+.stw-prev-stage .fst-btn { display: none !important; }
+
+/* ══════════════════════════════════════════════════════════════════
+   A STEP CARD
+
+   It is a cell of the hero's deck, so it is already absolutely placed,
+   already sliding in from the right and already leaving to the left —
+   .hs-cell does all of that. What is left to say is what it looks like,
+   and the answer is: the banner's shape, in black, with words where the
+   tablet was.
+   ══════════════════════════════════════════════════════════════════ */
+.hs-cell.fst-cell {
+  box-sizing: border-box;
+  /* the banners' own wrapper geometry, so the two are the same rectangle
+     as they pass each other */
+  padding: 14px !important;
+  border-radius: 26px !important;
+  /* Black, and only black. The rail either side of this is footage inside
+     glass; the one thing here that has to be READ earns its silence by
+     having nothing in it that moves or refracts. */
+  background: #05070d !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.5);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  display: flex; flex-direction: column;
+  /* ── One length, for all fifteen ──
+     The deck takes the height of whatever cell is on it, so this number is
+     the guide's whole shape. It is NOT the hero's: on this look the hero is
+     a landscape set about 230px tall, and a step card that size is four
+     lines and a scrollbar.
+
+     It is the rail's own length — the banner cells these are standing in
+     for, handed down as --fst-ban by the script — floored at what a step
+     actually needs to be read and ceilinged so it never runs past the fold
+     on a small phone. One value for all fifteen, so the deck does not
+     resize under you as you step through them. */
+  height: clamp(340px, max(var(--fst-ban, 0px), 52dvh), 470px);
+  min-height: 0;
+  text-align: left;
+  overflow: hidden;
+}
+
+/* The head is the banners' head — .hs-head, .hs-orb, .hs-head-h,
+   .hs-head-t, all from nowssb-nm.css — so a step announces itself in the
+   same voice a banner does. Only the rule under it is ours. */
+.fst-cell .hs-head { flex-shrink: 0; }
+.fst-cell .fst-body {
+  flex: 1; min-height: 0;
+  margin-top: 14px; padding: 0 4px 2px;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.fst-cell .fst-body::-webkit-scrollbar { display: none; }
+
+.fst-lead {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+  line-height: 1.58; color: rgba(255,255,255,0.68);
+}
+
+/* ── The points ──
+   A key and a line about it, with a rule down the left rather than a
+   bullet glyph — a wrapped line still reads as belonging to its key
+   instead of floating loose underneath it. */
+.fst-pts { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+.fst-pt {
+  padding-left: 12px;
+  border-left: 2px solid rgba(232,213,163,0.36);
+}
+.fst-pt-k {
+  display: block;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 800;
+  letter-spacing: .2px; color: #fff;
+}
+.fst-pt-v {
+  display: block; margin-top: 3px;
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 400;
+  line-height: 1.55; color: rgba(255,255,255,0.56);
+}
+
+.fst-go {
+  margin-top: 18px; margin-bottom: 4px;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 10px 16px !important; min-height: 0 !important;
+  border: none !important; border-radius: 999px !important;
+  background: #fff !important; color: #060c18 !important;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: .6px; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+}
+.fst-go svg { width: 15px; height: 15px; display: block; }
+.fst-go:active { transform: scale(.95); }
+
+/* ══════════════════════════════════════════════════════════════════
+   THE TWO DISCS
+
+   Under the deck, hard right. They exist only while the guide is running:
+   the banners have no dots and no arrows and that does not change — a
+   rail that runs itself should not look like one that needs driving.
+   ══════════════════════════════════════════════════════════════════ */
+.fst-nav {
+  display: flex; align-items: center; gap: 12px;
+  margin: -6px 16px 18px;
+}
+/* The disc that opened the guide rides on the hero card, and the hero card
+   is cell 0 — it slides out of the deck the moment a step is on. So the way
+   out lives here, with the two discs, which is the only part of the guide
+   that is always on screen. */
+.fst-x {
+  flex-shrink: 0;
+  width: 34px !important; height: 34px !important;
+  min-width: 34px !important; min-height: 34px !important;
+  padding: 0 !important;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,0.07) !important;
+  color: rgba(255,255,255,0.75); cursor: pointer;
+}
+.fst-x svg { width: 15px; height: 15px; display: block; }
+.fst-x:active { transform: scale(.92); }
+
+.fst-count {
+  flex-shrink: 0; display: flex; align-items: baseline; gap: 5px;
+  font-family: 'DM Sans', sans-serif;
+}
+.fst-count b { font-size: 15px; font-weight: 800; color: #fff; }
+.fst-count span { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.42); }
+.fst-bar {
+  flex: 1; min-width: 0; height: 2px; border-radius: 2px;
+  background: rgba(255,255,255,0.14); overflow: hidden;
+}
+.fst-bar i {
+  display: block; height: 100%; width: 6.6%;
+  background: #e8d5a3;
+  transition: width .4s cubic-bezier(.22,1,.28,1);
+}
+.fst-arrow {
+  flex-shrink: 0;
+  width: 40px !important; height: 40px !important;
+  min-width: 40px !important; min-height: 40px !important;
+  padding: 0 !important;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,0.08) !important;
+  color: #fff; cursor: pointer;
+  transition: opacity .2s ease, background .2s ease, transform .16s ease;
+}
+.fst-arrow svg { width: 17px; height: 17px; display: block; }
+.fst-arrow:active { transform: scale(.9); }
+/* forward is the one you are meant to press, so it is the filled one */
+.fst-arrow.fst-arrow-n {
+  background: #fff !important;
+  border-color: #fff !important;
+  color: #060c18;
+}
+.fst-arrow:disabled { opacity: .28; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fst-btn, .fst-bar i { transition: none !important; }
+}

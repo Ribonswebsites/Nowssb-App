@@ -29,10 +29,30 @@
    was opening, you just could not see it. */
 #sub-settings.open { z-index: 900; }
 
+/* ── The page's backdrop ──
+   #stBg is the layer, .st-page is what sits on it. The page's own opaque
+   fill has to go, or there is nothing to see — but only its fill: the
+   scrim below is what keeps the type legible, and it is part of the PAGE,
+   never a lid laid over it. */
+#sub-settings .st-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+  background-color: #05070e;
+  pointer-events: none; overflow: hidden;
+}
+#sub-settings .st-bg video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transform: translateZ(0); backface-visibility: hidden;
+}
 #sub-settings .st-page {
   position: relative; z-index: 2;
   display: flex; flex-direction: column; height: 100%; overflow: hidden;
-  background: #05070e;
+  /* A scrim, not a lid. Dark enough for 11px type between the cards, open
+     enough that the picture behind is plainly a picture. No backdrop-filter
+     — a full-screen blur every frame is the one thing this page cannot
+     afford. */
+  background: linear-gradient(180deg, rgba(5,7,14,0.62) 0%, rgba(5,7,14,0.5) 46%, rgba(5,7,14,0.7) 100%);
 }
 #sub-settings .st-header {
   display: flex; align-items: center; gap: 14px; flex-shrink: 0;
@@ -427,32 +447,63 @@
    let it through are the ones tagged for carrying a photograph of their
    own — this one carries none, so it is named here instead. Only while
    Page backgrounds is on, which is the mode's own part switch. */
-/* The page keeps its own dark. Making it transparent showed whatever was
-   behind it — which is the HOME screen, not the film: #fpBgVideo is fixed
-   at z-index 0 and every top-level screen sits at 10, above it. So the
-   film is put ON this page instead, playing the same file the mode is
-   playing, at the layer the page's own background would have been. */
-#sub-settings .stw-film {
-  position: absolute; inset: 0; z-index: 0;
-  width: 100%; height: 100%; object-fit: cover;
-  display: block; pointer-events: none;
-  transform: translateZ(0); backface-visibility: hidden;
-}
+/* The clip inside #stBg. Everything about where it sits is on .st-bg
+   above; this is only the reduce-motion answer, which the script already
+   agrees with — it never builds the video at all in that case. */
 @media (prefers-reduced-motion: reduce) { #sub-settings .stw-film { display: none; } }
-body.fashplus:not(.fp-bg-off) #sub-settings .st-page {
-  /* A scrim, not a lid. At 0.82 over a 10px blur the film was there and
-     you could not tell — it read as a still. This is dark enough for the
-     small type between the cards and light enough to see the clip move.
-     No backdrop-filter: blurring a full screen every frame, over a page
-     that is already compositing two decks of clones, is the single most
-     expensive thing this page could ask for. */
-  background: linear-gradient(180deg, rgba(6,12,24,0.46), rgba(6,12,24,0.34));
-}
 
 /* The hero cards keep a plain screen rather than a television — one of the
    three things they are offering IS the television, and a set inside a set
    says nothing. */
 .stw-prev-tall { height: 380px; }
+
+/* ── A hero card you can actually see ──
+   These three are not switches — they are three pictures of the same
+   screen, and the whole decision is made by looking at them. Built on the
+   rail's own 4.5%-white fill they were three dark rectangles on a dark
+   page: the card was invisible, and the preview inside it lost its edges
+   against the page it was sitting on.
+
+   So the hero cards leave the rail's palette. A pale surface, a white
+   border and a lit rim, with the preview window given its own dark so the
+   screen inside reads as a screen. Nothing here is translucent and nothing
+   blurs — three cards, three frames, no cost. */
+.stw-wcard.stw-hero {
+  background: rgba(255,255,255,0.28);
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow:
+    0 16px 38px rgba(0,0,0,0.46),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  opacity: 1;
+}
+/* the one in use is named by its own edge, not by dimming the other two */
+.stw-wcard.stw-hero.on {
+  background: rgba(255,255,255,0.38);
+  border-color: #fff;
+  box-shadow:
+    0 18px 44px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 0 0 1px rgba(255,255,255,0.35);
+}
+/* the window round a hero preview: a hard dark screen so the look inside it
+   is judged against black, the way it will be on the page */
+.stw-wcard.stw-hero .stw-prev,
+.stw-wcard.stw-hero .stw-screen { background: #05070e; }
+.stw-wcard.stw-hero .stw-prev {
+  border-radius: 12px !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+}
+/* the foot reads on the pale card */
+.stw-wcard.stw-hero .stw-t { color: #fff; }
+.stw-wcard.stw-hero .stw-s { color: rgba(255,255,255,0.78); }
+.stw-wcard.stw-hero .stw-pill.fixed,
+.stw-wcard.stw-hero .stw-pill.fixed.on {
+  color: #060c18;
+  background: rgba(255,255,255,0.86) !important;
+  border-color: rgba(255,255,255,0.9) !important;
+  padding: 8px 13px !important;
+  border-radius: 999px !important;
+}
 
 /* ── what a hero preview has to survive ──
    The clone is not on the home page, so anything the hero does relative to
@@ -471,17 +522,21 @@ body.fashplus:not(.fp-bg-off) #sub-settings .st-page {
    here, which is the same thing, but pin it so the card is deterministic */
 .stw-prev-stage .hero-section:not(.hero-tv):not(.hero-simple) { height: 680px !important; }
 .stw-prev-stage .hero-section:not(.hero-tv) .hero-content { padding-bottom: 34px !important; }
+/* Apply now — solid white. A gold tint at 16% over a dark card is a hint,
+   not a button; this is the one thing on the card you are meant to press,
+   so it is the one thing that is filled in. */
 .stw-use {
-  flex-shrink: 0; padding: 6px 13px; cursor: pointer;
-  border: 1px solid rgba(232,213,163,0.5) !important;
+  flex-shrink: 0; padding: 8px 15px; cursor: pointer;
+  border: 1px solid #fff !important;
   border-radius: 999px !important;
-  background: rgba(232,213,163,0.16) !important;
-  color: #e8d5a3;
+  background: #fff !important;
+  color: #060c18 !important;
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
   letter-spacing: 1px; text-transform: uppercase;
   min-height: 0 !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
-.stw-use:active { transform: scale(.94); }
+.stw-use:active { transform: scale(.94); background: #eef1f7 !important; }
 .stw-pill.fixed.on { color: #e8d5a3; }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -528,4 +583,82 @@ body.fashplus:not(.fp-bg-off) #sub-settings .st-page {
 .stw-prev-stage video.stw-live {
   display: block;
   object-fit: cover;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   NORMAL MODE — the page in neumorphism
+
+   The app has two homes and the inner pages follow whichever one you are
+   in: body.nm-mode means Normal, and under it every screen in
+   nowssb-nm.css turns light — #f0f2f7, ink type, and the raised-card
+   shadow instead of glass. This page was written for the Fashion home and
+   only ever knew the dark half, so opening it from the Normal home gave a
+   glass screen in a neumorphic app.
+
+   Everything below is that one translation. No backdrop, no film, no
+   translucency: a light page, cards standing off it, and the preview
+   window keeping its own black because a preview of a dark header has to
+   be dark to be a preview of anything.
+   ══════════════════════════════════════════════════════════════════════ */
+body.nm-mode #sub-settings { background: #f0f2f7 !important; }
+body.nm-mode #sub-settings .st-bg { display: none; }
+body.nm-mode #sub-settings .st-page { background: #f0f2f7; }
+
+body.nm-mode #sub-settings .st-title { color: #1a1a2e; }
+body.nm-mode #sub-settings .st-header .sub-back {
+  background: #f0f2f7 !important;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.13), -4px -4px 10px rgba(255,255,255,0.95) !important;
+  border: none !important;
+}
+body.nm-mode #sub-settings .st-header .sub-back svg path,
+body.nm-mode #sub-settings .st-header .sub-back svg line,
+body.nm-mode #sub-settings .st-header .sub-back svg polyline {
+  stroke: #1a1a2e !important;
+}
+body.nm-mode .stw-intro-t { color: #1a1a2e; }
+body.nm-mode .stw-intro-s { color: rgba(26,26,46,0.6); }
+body.nm-mode .stw-title { color: #1a1a2e; }
+body.nm-mode .stw-sub { color: rgba(26,26,46,0.55); }
+
+/* a card: raised off the page rather than cut out of it */
+body.nm-mode .stw-wcard,
+body.nm-mode .stw-wcard.stw-hero {
+  background: #f0f2f7;
+  border: none;
+  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97);
+  opacity: 1;
+}
+/* the one in use is pressed IN — the neumorphic way of saying selected,
+   which needs no colour and no second border */
+body.nm-mode .stw-wcard.stw-hero.on {
+  background: #eaedf4;
+  box-shadow: inset 5px 5px 12px rgba(0,0,0,0.15), inset -4px -4px 10px rgba(255,255,255,0.95);
+}
+body.nm-mode .stw-wcard.stw-hero .stw-t,
+body.nm-mode .stw-t { color: #1a1a2e; }
+body.nm-mode .stw-wcard.stw-hero .stw-s,
+body.nm-mode .stw-s { color: rgba(26,26,46,0.58); }
+
+/* The preview window keeps its black. These three cards are photographs of
+   the Fashion home's header, and a header rendered on white would be a
+   picture of something that does not exist. */
+body.nm-mode .stw-wcard.stw-hero .stw-prev {
+  box-shadow: inset 4px 4px 10px rgba(0,0,0,0.22);
+}
+
+/* Apply now stays the filled button — ink on white here, because white on
+   white is not a button */
+body.nm-mode .stw-use {
+  background: #1a1a2e !important;
+  border-color: #1a1a2e !important;
+  color: #fff !important;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.16), -4px -4px 10px rgba(255,255,255,0.9);
+}
+body.nm-mode .stw-use:active { background: #262645 !important; }
+body.nm-mode .stw-wcard.stw-hero .stw-pill.fixed,
+body.nm-mode .stw-wcard.stw-hero .stw-pill.fixed.on {
+  background: #f0f2f7 !important;
+  border: none !important;
+  color: rgba(26,26,46,0.55);
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.14), inset -2px -2px 6px rgba(255,255,255,0.95);
 }
