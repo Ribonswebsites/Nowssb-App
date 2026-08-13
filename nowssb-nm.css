@@ -14321,7 +14321,8 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   border: 1px solid rgba(255,255,255,0.18);
   /* Pointy. A 26px radius on a card whose whole content is a rectangular
      television fought the thing inside it — the glass rounded off corners
-     the set squares up. Square corners, and the two agree. */
+     the set squares up. Square corners, and the two agree — unless
+     Customize says round, which is the rule at the foot of this file. */
   border-radius: 0 !important;
   overflow: hidden;
   -webkit-backdrop-filter: blur(26px) saturate(1.5);
@@ -14817,15 +14818,20 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
   background: none !important; border: none !important;
   cursor: pointer; text-align: left;
 }
-.hs-shop-ic {
-  width: 30px; height: 30px; flex-shrink: 0;
+/* Every mark on this card is the same thing: a white disc with a drawing
+   in it. The blonde-tinted square was one more style to remember. */
+.hs-disc {
+  width: 32px; height: 32px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 9px;
-  background: rgba(232,213,163,0.12);
-  border: 1px solid rgba(232,213,163,0.28);
-  color: #e8d5a3;
+  border-radius: 50%;
+  background: #fff;
+  color: #060c18;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
-.hs-shop-ic svg { width: 16px; height: 16px; display: block; }
+.hs-disc svg { width: 16px; height: 16px; display: block; }
+/* a rule that divides rather than spaces — the stretching one is for
+   pushing things apart, this one just separates two that are together */
+.hs-sep-sm { flex: 0 0 1px !important; height: 20px; }
 .hs-shop-txt { display: flex; flex-direction: column; min-width: 0; }
 .hs-shop-h {
   font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
@@ -14840,10 +14846,43 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 
 /* the search comes out of the screen and sits at the top right of the
    glass, which is where it was reaching for anyway */
-.hs-top .hero-search-btn {
+.hs-slbl {
+  flex-shrink: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+}
+/* The ring is a live invitation rather than a label, so it moves: one arc
+   turning round the button, forever, at a speed that reads as breathing
+   rather than loading. Transform on an SVG child only — nothing reflows. */
+.hs-searchwrap {
+  position: relative; flex-shrink: 0;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+.hs-trace {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; overflow: visible;
+  animation: hsTrace 2.6s linear infinite;
+}
+.hs-trace circle {
+  fill: none; stroke: rgba(232,213,163,0.9); stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 34 95;
+}
+@keyframes hsTrace { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .hs-trace { animation: none; } }
+/* The button has to fit the ring, not the other way round: it ships at
+   whatever size the screen wanted it and was overflowing the 44px box, so
+   the arc was drawn round something it was not concentric with. */
+.hs-searchwrap .hero-search-btn {
   flex-shrink: 0; margin: 0 !important;
   position: static !important;
+  width: 36px !important; height: 36px !important;
+  min-width: 36px !important; min-height: 36px !important;
 }
+.hs-searchwrap .hero-search-ic,
+.hs-searchwrap .nwsb-search-icon { width: 17px !important; height: 17px !important; }
 
 /* ── Explore and App Guide, below the set ── */
 .hs-foot .hero-btns {
@@ -14869,3 +14908,36 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
   letter-spacing: 1.6px; text-transform: uppercase;
   color: rgba(255,255,255,0.75);
 }
+
+
+/* Customize owns the corners. Its Corners option is unset until someone
+   picks one, so square stays the default and this only answers a reader
+   who asked for round. */
+body.homecorner-round .hero-section.hero-simple { border-radius: 22px !important; }
+body.homecorner-round .hs-ban { border-radius: 22px !important; }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   THE TEXT ON THE SCREEN
+
+   With the search and both buttons gone out onto the glass, the screen is
+   carrying four lines and nothing else — and they were still laid out for
+   a box that had a button row at the foot and a search in the corner. So
+   they were hard against the left edge with most of the picture empty
+   beside them.
+
+   They come in off the edge and they get bigger. This is the set's only
+   job now, so it may as well be read from across the room.
+   ══════════════════════════════════════════════════════════════════ */
+.hero-simple .hero-content { padding: 18px 20px 16px !important; }
+.hero-simple .hero-content > div:first-child {
+  margin-left: 12px !important; margin-right: 12px !important;
+}
+.hero-simple .brand-name { font-size: clamp(30px, 8.6vw, 46px) !important; }
+.hero-simple #heroTagline { font-size: 12.5px !important; letter-spacing: 3px !important; }
+.hero-simple .hero-bottom > div:first-child {
+  margin-bottom: 12px !important; padding-left: 12px !important;
+}
+.hero-simple .hero-bottom .brand-tag { font-size: 16px !important; }
+.hero-simple .hero-word-wrap { margin-top: 4px; height: auto; padding-left: 12px; }
+.hero-simple .hero-word { font-size: clamp(26px, 7.4vw, 38px) !important; }

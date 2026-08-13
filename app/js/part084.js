@@ -89,6 +89,7 @@
      it is describing something you are already looking at, it does not. */
   var STEPS = [
     { i: 'play', t: 'The Word Player',
+      go: ['Find a word', function () { if (typeof openSub === 'function') openSub('explore-choice'); }],
       lead: 'Every word opens the same way — one screen, five tabs, no scrolling.',
       pts: [
         ['Listen', 'The word plays, each syllable lighting as it sounds.'],
@@ -99,6 +100,7 @@
       ] },
 
     { i: 'sun', t: "Today's Practice",
+      go: ['Open practice', function () { if (typeof openSub === 'function') openSub('practice'); }],
       lead: 'The card at the top of your home already knows the hour.',
       pts: [
         ['Five windows', 'Morning, midday, afternoon, evening, night.'],
@@ -107,6 +109,7 @@
       ] },
 
     { i: 'clock', t: 'My Routines',
+      go: ['Open routines', function () { if (typeof openSub === 'function') openSub('routines'); }],
       lead: 'Five slots you own — rename any of them, set any time.',
       pts: [
         ['The NOW badge', 'Marks whichever routine matches this hour.'],
@@ -115,6 +118,7 @@
       ] },
 
     { i: 'book', t: 'The Reader',
+      go: ['Open the Reader', function () { if (typeof openSub === 'function') openSub('reader'); }],
       lead: 'Meanings and eBooks in one place — the word science, read.',
       pts: [
         ['Any meaning', 'Origin, organ and frequency, laid out as a page.'],
@@ -144,6 +148,7 @@
       go: ['Open eBooks', function () { if (typeof window.ebSecOpen === 'function') window.ebSecOpen(); }] },
 
     { i: 'sig', t: 'The Signature',
+      go: ['See the Signature', function () { if (typeof openSub === 'function') openSub('signature-store'); }],
       lead: 'Your name, in sound — the word science turned on the one word you answer to.',
       pts: [
         ['Your own frequency', 'What your name activates, and where it lands.'],
@@ -151,6 +156,7 @@
       ] },
 
     { i: 'sound', t: 'Sound Library',
+      go: ['Open the library', function () { if (typeof openSub === 'function') openSub('sound-library'); }],
       lead: 'Everything you own, arranged to be listened to.',
       pts: [
         ['Sentences', 'Healing sentences built from your words. Tap to play.'],
@@ -159,6 +165,7 @@
       ] },
 
     { i: 'atom', t: 'Word Science',
+      go: ['Open Word Science', function () { if (typeof openSub === 'function') openSub('word-science'); }],
       lead: 'The system underneath all of it. Ten letters, ten organs.',
       pts: [
         ['N O W S B A N S I U', 'Every letter maps to a target in the body.'],
@@ -166,6 +173,7 @@
       ] },
 
     { i: 'search', t: 'Real Meaning',
+      go: ['Search a word', function () { if (typeof openSub === 'function') openSub('real-meaning'); }],
       lead: 'Any word, any language — its origin as a sound, before any dictionary.',
       pts: [
         ['Before the dictionary', 'What it meant as a sound, not as a definition.'],
@@ -174,6 +182,7 @@
       ] },
 
     { i: 'heart', t: 'Personalised Healing',
+      go: ['Choose your path', function () { if (typeof openSub === 'function') openSub('health-journey'); }],
       lead: 'Words chosen for a body, not for a vocabulary.',
       pts: [
         ['Choose your path', 'Female or male, ten health categories each.'],
@@ -181,6 +190,7 @@
       ] },
 
     { i: 'chart', t: 'My Progress',
+      go: ['See your progress', function () { if (typeof openSub === 'function') openSub('my-progress'); }],
       lead: 'What the practice has added up to.',
       pts: [
         ['Streak and sessions', 'Days in a row, and everything you finished.'],
@@ -189,6 +199,7 @@
       ] },
 
     { i: 'people', t: 'NowssB Connect',
+      go: ['Open Connect', function () { if (typeof openSub === 'function') openSub('social'); }],
       lead: 'The social side — share the practice, find the people doing the same work.',
       pts: [
         ['Follow and react', 'Creators and practitioners further along.'],
@@ -374,8 +385,18 @@
     if (on && !t) {
       t = document.createElement('div');
       t.className = 'fst-title';
+      /* The line under the wordmark carries the way back as well: the
+         label, a rule, and the disc — which is where the disc lands when
+         the guide is on, because the strip under the set is busy by then.
+         "Back" sits under it so a circle with an arrow in it is not the
+         only thing saying what it does. */
       t.innerHTML = '<div class="fst-title-b"><span class="b">Nowss</span><span class="t">B</span></div>' +
-                    '<div class="fst-title-s">Follow the steps</div>';
+                    '<div class="fst-title-row">' +
+                      '<span class="fst-title-s">Follow the steps</span>' +
+                      '<span class="hs-sep fst-title-sep"></span>' +
+                      '<span class="fst-title-back"><span class="fst-back-slot"></span>' +
+                        '<span class="fst-back-lbl">Back</span></span>' +
+                    '</div>';
       screen.appendChild(t);
     } else if (!on && t) {
       t.remove();
@@ -489,7 +510,7 @@
     /* Closed, the disc stands in the strip under the set, beside the word
        that says what it is. Open, it moves INSIDE the set — the strip is
        carrying the guide's own row by then and there is no room for both. */
-    var host = on() ? hero.querySelector('.hero-content')
+    var host = on() ? hero.querySelector('.fst-back-slot')
                     : hero.querySelector(':scope > .hs-foot');
     if (host && btn.parentNode !== host) host.appendChild(btn);
     else if (!host && btn.parentNode !== hero) hero.appendChild(btn);

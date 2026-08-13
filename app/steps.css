@@ -94,6 +94,14 @@
    .hs-head-t, all from nowssb-nm.css — so a step announces itself in the
    same voice a banner does. Only the rule under it is ours. */
 .fst-cell .hs-head { flex-shrink: 0; }
+/* the same white disc the store mark wears, so every drawing on this card
+   is the same object */
+.fst-cell .hs-orb {
+  background: #fff !important;
+  border: none !important;
+  color: #060c18 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
 .fst-cell .fst-body {
   flex: 1; min-height: 0;
   margin-top: 10px; padding: 0 4px 2px;
@@ -101,16 +109,9 @@
   overscroll-behavior: contain;
 }
 .fst-cell .fst-body::-webkit-scrollbar { display: none; }
-/* The card is the hero's rectangle and some steps have more in them than
-   that, so the body scrolls. A fade at the foot is what makes that legible:
-   without it a step ends mid-sentence and reads as broken rather than as
-   "there is more here". It is drawn on the CARD, not the scroller, so it
-   stays put while the words move under it. */
-.hs-cell.fst-cell::after {
-  content: ''; position: absolute; left: 14px; right: 14px; bottom: 14px;
-  height: 34px; pointer-events: none;
-  background: linear-gradient(180deg, rgba(5,7,13,0) 0%, rgba(5,7,13,0.96) 82%);
-}
+/* No fade at the foot. It was there to say "there is more below", and with
+   every card now short enough to be whole it was only ever greying out the
+   last line of the ones that are not. */
 
 .fst-lead {
   margin: 0;
@@ -277,12 +278,30 @@
 /* the wordmark's own two weights, in blonde rather than white */
 .fst-title-b .b { font-weight: 800; }
 .fst-title-b .t { font-weight: 300; opacity: .85; }
-.fst-title-s {
+.fst-title-row {
   margin-top: 12px;
+  display: flex; align-items: center; gap: 12px;
+  pointer-events: auto;
+}
+.fst-title-sep { flex: 0 0 1px !important; height: 30px; }
+.fst-title-back { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.fst-back-slot { display: flex; }
+.fst-back-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 800;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+}
+.fst-title-s {
   font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
   letter-spacing: 3px; text-transform: uppercase;
   color: rgba(255,255,255,0.72);
   text-shadow: 0 1px 10px rgba(0,0,0,0.8);
+}
+/* in the title row the disc is in flow, not pinned to a corner */
+.fst-back-slot > .fst-btn {
+  position: relative !important; right: auto !important; bottom: auto !important;
+  width: 36px !important; height: 36px !important;
+  min-width: 36px !important; min-height: 36px !important;
 }
 
 /* The banners' head is sized for a banner. On a step card it is competing
@@ -293,3 +312,12 @@
 .fst-cell .hs-orb svg { width: 17px !important; height: 17px !important; }
 .fst-cell .hs-head-h { font-size: 10px !important; letter-spacing: 1.6px !important; }
 .fst-cell .hs-head-t { font-size: 15px !important; line-height: 1.15 !important; }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   CORNERS
+   Square is what this card is, and Customize can say otherwise. The
+   Corners option is unset until someone picks one (app/js/part063.js), so
+   this only rounds a card for a reader who asked for round corners.
+   ══════════════════════════════════════════════════════════════════ */
+body.homecorner-round .hs-cell.fst-cell { border-radius: 22px !important; }

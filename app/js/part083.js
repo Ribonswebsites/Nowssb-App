@@ -440,10 +440,11 @@
     top.className = 'hs-top';
     top.innerHTML =
       '<button class="hs-shop" type="button" aria-label="Today\u2019s words and meanings">' +
-        '<span class="hs-shop-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        '<span class="hs-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
           'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
           '<path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/>' +
           '<path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>' +
+        '<span class="hs-sep hs-sep-sm"></span>' +
         '<span class="hs-shop-txt"><span class="hs-shop-h">Today\u2019s</span>' +
         '<span class="hs-shop-t">Words &amp; meanings</span></span>' +
       '</button>';
@@ -456,7 +457,18 @@
       var iv = document.getElementById('nssIntroVid');
       if (iv) { iv.muted = true; try { iv.play().catch(function () {}); } catch (e2) {} }
     });
-    park(hero.querySelector('.hero-search-btn'), top);
+    /* The search says what it is, and the ring around it turns — the one
+       control on this card that is a live invitation rather than a label. */
+    var slbl = document.createElement('span');
+    slbl.className = 'hs-slbl';
+    slbl.textContent = 'Search';
+    top.appendChild(slbl);
+    var sw = document.createElement('span');
+    sw.className = 'hs-searchwrap';
+    sw.innerHTML = '<svg class="hs-trace" viewBox="0 0 44 44" aria-hidden="true">' +
+      '<circle cx="22" cy="22" r="20.5"/></svg>';
+    top.appendChild(sw);
+    park(hero.querySelector('.hero-search-btn'), sw);
 
     var foot = document.createElement('div');
     foot.className = 'hs-foot';
