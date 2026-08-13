@@ -20,11 +20,12 @@
    ══════════════════════════════════════════════════════════════════ */
 .fst-btn {
   position: absolute; z-index: 40;
-  /* BELOW the set and INSIDE the glass. The card carries 62px of padding
-     at its foot for exactly this, so the disc stands on the wrapper rather
-     than hanging over the television's bottom bezel — the one part of that
-     card that already has something drawn on it. Nothing to measure. */
-  right: 16px; bottom: 11px;
+  /* Two homes, and the script moves it between them. Closed it is a child
+     of .hs-foot, in flow, standing beside the word Learn. Open it is a
+     child of .hero-content — inside the set — because the strip is
+     carrying the guide's own row by then. */
+  position: relative; right: auto; bottom: auto;
+  flex-shrink: 0;
   width: 40px !important; height: 40px !important;
   min-width: 40px !important; min-height: 40px !important;
   padding: 0 !important; margin: 0 !important;
@@ -157,9 +158,21 @@
    the banners have no dots and no arrows and that does not change — a
    rail that runs itself should not look like one that needs driving.
    ══════════════════════════════════════════════════════════════════ */
+/* In the strip under the set, so it is one row wide and no taller than the
+   row it replaces. The buttons that live there are hidden while it is up. */
 .fst-nav {
-  display: flex; align-items: center; gap: 9px;
-  margin: -4px 16px 18px;
+  display: flex; align-items: center; gap: 8px;
+  flex: 1 1 auto; min-width: 0;
+  margin: 0;
+}
+.hs-foot.fst-nav-on > .hero-btns,
+.hs-foot.fst-nav-on > .hs-sep,
+.hs-foot.fst-nav-on > .hs-learn { display: none !important; }
+/* Inside the set, bottom right of the screen. */
+.hero-content > .fst-btn {
+  position: absolute !important; right: 12px; bottom: 12px;
+  width: 38px !important; height: 38px !important;
+  min-width: 38px !important; min-height: 38px !important;
 }
 /* The disc that opened the guide rides on the hero card, and the hero card
    is cell 0 — it slides out of the deck the moment a step is on. So the way
@@ -243,7 +256,7 @@
    The film behind stays. It is the only thing in the set that should keep
    moving while the title is up.
    ══════════════════════════════════════════════════════════════════ */
-.hero-simple.fst-title-on .hero-content > *:not(.fst-title):not(.hero-bg-vid) {
+.hero-simple.fst-title-on .hero-content > *:not(.fst-title):not(.hero-bg-vid):not(.fst-btn) {
   display: none !important;
 }
 .fst-title {

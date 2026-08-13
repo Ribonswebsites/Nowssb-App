@@ -394,6 +394,87 @@
      app's real header, with the search that opens the explore sheet and
      the word that changes on a timer, and a copy of it would be a second
      one of those. Taking the look away moves it back where it was. */
+  /* ── The wrapper's own furniture ──────────────────────────────────
+     Everything that is not the picture comes OUT of the television and
+     onto the glass around it. The set is a screen; a screen with an
+     Explore button drawn on it is a screen with a button drawn on it, and
+     the two were fighting for the same 230px.
+
+     So the wrapper gets a strip above the set and a strip below it:
+
+       above   the store, on the left, and the search on the right
+       below   Explore and App Guide, and the way into the guide
+
+     The elements are MOVED, not copied. The search opens the explore
+     sheet and the two buttons are the app's real doors — a second copy of
+     any of them is a second thing to keep in step. Each remembers where it
+     came from, and tearDown puts it back, because this look is one of
+     three and the other two want them on the screen where they were.
+
+     Small vertical rules between the pieces, the same ones the app header
+     uses between its own three marks. ── */
+  function sep() {
+    var s = document.createElement('span');
+    s.className = 'hs-sep';
+    return s;
+  }
+  var moved = [];
+  function park(el, host) {
+    if (!el || !host || el.parentNode === host) return;
+    moved.push({ el: el, from: el.parentNode, next: el.nextSibling });
+    host.appendChild(el);
+  }
+  function unpark() {
+    moved.forEach(function (m) {
+      try { m.from.insertBefore(m.el, m.next); } catch (e) {}
+    });
+    moved = [];
+  }
+
+  function furniture(hero) {
+    if (!hero || hero.querySelector(':scope > .hs-top')) return;
+    var box = hero.querySelector(':scope > .hero-tvbox');
+    if (!box) return;
+
+    var top = document.createElement('div');
+    top.className = 'hs-top';
+    top.innerHTML =
+      '<button class="hs-shop" type="button" aria-label="Today\u2019s words and meanings">' +
+        '<span class="hs-shop-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+          'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/>' +
+          '<path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>' +
+        '<span class="hs-shop-txt"><span class="hs-shop-h">Today\u2019s</span>' +
+        '<span class="hs-shop-t">Words &amp; meanings</span></span>' +
+      '</button>';
+    top.appendChild(sep());
+    hero.insertBefore(top, box);
+    top.querySelector('.hs-shop').addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      var sc = document.getElementById('sub-nowssb-store');
+      if (sc) sc.classList.add('open');
+      var iv = document.getElementById('nssIntroVid');
+      if (iv) { iv.muted = true; try { iv.play().catch(function () {}); } catch (e2) {} }
+    });
+    park(hero.querySelector('.hero-search-btn'), top);
+
+    var foot = document.createElement('div');
+    foot.className = 'hs-foot';
+    hero.appendChild(foot);
+    var btns = hero.querySelector('.hero-btns');
+    park(btns, foot);
+    /* a rule between the two of them as well — "each thing" means each */
+    if (btns && btns.children.length > 1) btns.insertBefore(sep(), btns.children[1]);
+    foot.appendChild(sep());
+    /* The word beside the disc. It is the only thing on this card that
+       says what the disc is for, and a circle with an arrow in it does not
+       say it on its own. */
+    var learn = document.createElement('span');
+    learn.className = 'hs-learn';
+    learn.textContent = 'Learn';
+    foot.appendChild(learn);
+  }
+
   function build(hero) {
     if (!hero) return;
     var home = hero.parentNode;
@@ -427,6 +508,7 @@
       d.appendChild(hero);                       /* moved, not copied */
       d.insertAdjacentHTML('beforeend', cellsHtml());
     }
+    furniture(hero);
     armSwipe(d);
     cur = 0;
     show(0, 'first');
@@ -442,6 +524,10 @@
     if (hero) {
       hero.classList.remove('hs-cell', 'hs-hero-cell', 'on', 'out');
       hero.removeAttribute('data-i');
+      /* the strips go, and everything they borrowed goes home */
+      unpark();
+      var t = hero.querySelector(':scope > .hs-top'); if (t) t.remove();
+      var f = hero.querySelector(':scope > .hs-foot'); if (f) f.remove();
       d.parentNode.insertBefore(hero, d);        /* put it back */
     }
     d.querySelectorAll('video').forEach(function (v) {

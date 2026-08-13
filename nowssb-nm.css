@@ -14535,7 +14535,10 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
      one carrying the geometry: tight at the sides so the television is as
      big as the card allows, and open at the foot so the guide's disc has
      somewhere to stand that is inside the glass and outside the set. */
-  padding: 8px 8px 72px !important;
+  /* The strips above and below the set are real children now, so they take
+     their own height — the card only has to hold them apart from its edge. */
+  padding: 8px !important;
+  display: flex !important; flex-direction: column;
   box-sizing: border-box;
 }
 
@@ -14770,4 +14773,99 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
   inset: 10px !important;
   border-radius: 0 !important;
   overflow: hidden;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   THE STRIPS ON THE GLASS
+
+   Everything that is not the picture lives out here, on the wrapper,
+   OUTSIDE the set. A screen with an Explore button drawn on it is a
+   screen with a button drawn on it — the set and the furniture were
+   fighting for the same 230px, and the furniture lost every time.
+
+     above the set   the store on the left, the search on the right
+     below the set   Explore and App Guide, and the way into the guide
+
+   The pieces are moved here by app/js/part083.js and moved back when the
+   look changes, because this is one look of three and the other two want
+   them on the screen where they were.
+   ══════════════════════════════════════════════════════════════════ */
+.hs-top, .hs-foot {
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0; box-sizing: border-box;
+  padding: 4px 4px;
+}
+.hs-top { padding-bottom: 9px; }
+.hs-foot { padding-top: 11px; }
+
+/* the small upright rule between one thing and the next — the same one
+   the app header draws between its own three marks */
+.hs-sep {
+  flex: 1 1 auto;
+  height: 15px; min-width: 1px;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%,
+              rgba(255,255,255,0.22) 50%, rgba(255,255,255,0) 100%);
+  background-size: 1px 100%; background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ── the store, top left ── */
+.hs-shop {
+  flex-shrink: 0; display: flex; align-items: center; gap: 9px;
+  padding: 0 !important; min-height: 0 !important;
+  background: none !important; border: none !important;
+  cursor: pointer; text-align: left;
+}
+.hs-shop-ic {
+  width: 30px; height: 30px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9px;
+  background: rgba(232,213,163,0.12);
+  border: 1px solid rgba(232,213,163,0.28);
+  color: #e8d5a3;
+}
+.hs-shop-ic svg { width: 16px; height: 16px; display: block; }
+.hs-shop-txt { display: flex; flex-direction: column; min-width: 0; }
+.hs-shop-h {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: rgba(232,213,163,0.8);
+}
+.hs-shop-t {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: .1px; color: #fff; white-space: nowrap;
+}
+.hs-shop:active { transform: scale(.97); }
+
+/* the search comes out of the screen and sits at the top right of the
+   glass, which is where it was reaching for anyway */
+.hs-top .hero-search-btn {
+  flex-shrink: 0; margin: 0 !important;
+  position: static !important;
+}
+
+/* ── Explore and App Guide, below the set ── */
+.hs-foot .hero-btns {
+  flex-shrink: 0; margin: 0 !important; padding: 0 !important;
+  display: flex !important; align-items: center; gap: 9px;
+}
+/* the rule between Explore and App Guide does not stretch — inside this
+   row it is a divider, not a spacer */
+.hs-foot .hero-btns > .hs-sep { flex: 0 0 1px; }
+.hs-foot .hero-btn {
+  margin: 0 !important;
+  padding: 9px 15px !important;
+  min-height: 0 !important;
+  font-size: 10.5px !important;
+  letter-spacing: 1.4px !important;
+  white-space: nowrap;
+}
+/* the word beside the disc — a circle with an arrow in it does not say
+   what it is for on its own */
+.hs-learn {
+  flex-shrink: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
 }

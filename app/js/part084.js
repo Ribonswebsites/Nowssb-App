@@ -413,11 +413,18 @@
       nav.id = 'fstNav';
       nav.className = 'fst-nav';
       nav.innerHTML = navHtml();
-      d.parentNode.insertBefore(nav, d.nextSibling);
     }
+    /* Inside the wrapper, in the strip the two buttons were using — the
+       guide's row and the card's own row are the same row, one at a time.
+       Falls back to under the deck if the strip is not there yet. */
+    var hero = document.querySelector('#home .hero-section.hero-simple');
+    var foot = hero && hero.querySelector(':scope > .hs-foot');
+    if (foot) { if (nav.parentNode !== foot) foot.appendChild(nav); foot.classList.add('fst-nav-on'); }
+    else if (nav.parentNode !== d.parentNode) d.parentNode.insertBefore(nav, d.nextSibling);
     /* It stays on cell 0 — the set, now carrying the title. That IS the
        first thing the guide has to say, and forward is what starts it. */
     title(true);
+    mountBtn();                       /* the disc moves into the set */
     paint();
     hold();
     spinOn();
@@ -433,7 +440,11 @@
     if (d) d.classList.remove('fst-on');
     title(false);
     var nav = document.getElementById('fstNav');
-    if (nav) nav.remove();
+    if (nav) {
+      if (nav.parentNode) nav.parentNode.classList.remove('fst-nav-on');
+      nav.remove();
+    }
+    mountBtn();                       /* and back out to the strip */
     if (typeof window.nwsbHeroCells === 'function') {
       window.nwsbHeroCells(null);                 /* the banners come back */
       window.nwsbHeroAuto(true);
@@ -475,7 +486,13 @@
         window.fstToggle();
       });
     }
-    if (btn.parentNode !== hero) hero.appendChild(btn);
+    /* Closed, the disc stands in the strip under the set, beside the word
+       that says what it is. Open, it moves INSIDE the set — the strip is
+       carrying the guide's own row by then and there is no room for both. */
+    var host = on() ? hero.querySelector('.hero-content')
+                    : hero.querySelector(':scope > .hs-foot');
+    if (host && btn.parentNode !== host) host.appendChild(btn);
+    else if (!host && btn.parentNode !== hero) hero.appendChild(btn);
     btn.classList.toggle('on', on());
     return true;
   }
