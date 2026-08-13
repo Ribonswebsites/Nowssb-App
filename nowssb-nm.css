@@ -14966,3 +14966,71 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
 .hero-simple .hero-bottom .brand-tag { font-size: 16px !important; }
 .hero-simple .hero-word-wrap { margin-top: 4px; height: auto; padding-left: 0; }
 .hero-simple .hero-word { font-size: clamp(26px, 7.4vw, 38px) !important; }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   A SECTION'S OWN HEAD, AND ITS OWN WAY OUT
+
+   The shape Choose Your Path already uses on this home: a disc with a
+   drawing in it, a light line and a heavy one, above whatever the section
+   is made of. Written here rather than in the injector because this one is
+   in the markup — the clip, the streak and the black banner were three
+   loose blocks and are one card now.
+   ══════════════════════════════════════════════════════════════════ */
+#home-nm .nmh-sec-wrap { position: relative; }
+#home-nm .nmh-wrap-head {
+  display: flex; align-items: center; gap: 12px;
+  margin: 2px 0 14px !important;
+  padding-right: 40px;                 /* clear of the cross */
+}
+#home-nm .nmh-wrap-head-ic {
+  width: 42px; height: 42px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50% !important;
+  background: #f0f2f7;
+  color: #b39a5e;
+  /* raised, like every other disc on this home */
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.13), -4px -4px 10px rgba(255,255,255,0.96);
+}
+#home-nm .nmh-wrap-head-ic svg { width: 21px; height: 21px; display: block; }
+#home-nm .nmh-wrap-head-txt { min-width: 0; }
+#home-nm .nmh-wrap-hello {
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 400;
+  letter-spacing: .1px; color: rgba(26,26,46,0.5); line-height: 1.2;
+}
+#home-nm .nmh-wrap-name {
+  margin-top: 1px;
+  font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 800;
+  letter-spacing: -0.5px; color: #1a1a2e; line-height: 1.15;
+}
+
+/* The cross, inside the wrapper at its top right. Pressed IN rather than
+   raised: it takes something away, and every raised control on this home
+   adds something. */
+#home-nm .nmh-wrap-x {
+  position: absolute; top: 12px; right: 12px; z-index: 6;
+  width: 30px !important; height: 30px !important;
+  min-width: 30px !important; min-height: 30px !important;
+  padding: 0 !important; margin: 0 !important;
+  display: flex; align-items: center; justify-content: center;
+  border: none !important;
+  border-radius: 50% !important;
+  background: #f0f2f7 !important;
+  color: rgba(26,26,46,0.45);
+  cursor: pointer;
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.14), inset -2px -2px 6px rgba(255,255,255,0.95);
+}
+#home-nm .nmh-wrap-x svg { width: 13px; height: 13px; display: block; }
+#home-nm .nmh-wrap-x:active { transform: scale(.9); }
+
+/* The streak block's three pieces sit flush inside the one card: the
+   wrapper's padding is the spacing, so the section inside it drops its own
+   card entirely. */
+#home-nm .nmh-streak-wrap .nmh-streak-section {
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 12px 0 0 !important;
+  border-radius: 0 !important;
+}
+#home-nm .nmh-streak-wrap .nmh-hero-vid { margin: 0 !important; }

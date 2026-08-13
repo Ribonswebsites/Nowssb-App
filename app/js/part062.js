@@ -45,8 +45,13 @@
            was landing above the greeting for exactly that reason. It sits
            after the greeting and before the hero clip and the streak. */
         { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
-        { k:'herovid',  sel:['.nsvb-blk'],                                                   t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 },
-        { k:'streak',   sel:['.nmh-streak-section'],                                       t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
+        /* The clip and the streak are ONE block now — a heading, the
+           render and the black banner in a single neumorphic wrapper — so
+           there is one entry for it rather than two, and it points at the
+           wrapper because that is what is a direct child of the home.
+           'always' is gone: the wrapper carries a cross, and a switch that
+           refuses to switch off is not a cross. */
+        { k:'streak',   sel:['.nmh-streak-wrap'],                                          t:S, label:'Streak',                sub:'The clip, your streak and its banner' },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
@@ -426,6 +431,26 @@
     var it = itemOf(w, k);
     if (!wrap || !it) return [];
     return nodesOf(wrap, it);
+  };
+
+  /* ── The cross on a wrapper ───────────────────────────────────────
+     A section carries its own way out. It goes through the layout registry
+     rather than hiding the element, so it is the same off that the layout
+     editor sets — remembered, and reversible from there rather than being a
+     one-way door. The card is faded out first so the page does not jump
+     while you are still looking at where it was. */
+  window.nmhDropSection = function (k, btn) {
+    var wrap = btn && btn.closest ? btn.closest('.nmh-sec-wrap') : null;
+    try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
+    if (wrap) {
+      wrap.style.transition = 'opacity .26s ease, transform .3s ease';
+      wrap.style.opacity = '0';
+      wrap.style.transform = 'scale(.97)';
+    }
+    setTimeout(function () {
+      if (wrap) { wrap.style.opacity = ''; wrap.style.transform = ''; wrap.style.transition = ''; }
+      window.hlSet(null, k, false);
+    }, 280);
   };
 
   window.hlSet = function (which, k, on) {
