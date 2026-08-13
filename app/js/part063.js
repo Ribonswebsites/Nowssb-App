@@ -51,7 +51,7 @@
        panel on the home. It is an ordinary card now and it opens that
        page, where the mode is switched — a door beats a switch when the
        room behind it is where everything else lives. */
-    { k: 'widgets', label: 'Widgets', sub: 'Choose what your home shows', run: 'stOpen()',
+    { k: 'widgets', label: 'Hero header', sub: 'Three ways the top can look', run: 'stOpen()',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round">' +
               '<rect x="3.4" y="3.4" width="7.2" height="7.2" rx="2"/>' +
               '<rect x="13.4" y="3.4" width="7.2" height="7.2" rx="2" stroke="#e8d5a3"/>' +

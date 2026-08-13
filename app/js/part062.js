@@ -50,6 +50,7 @@
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
+        { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
         { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
         { k:'custom',   sel:['.nmh-cust-panel'],                                           t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
@@ -85,7 +86,6 @@
         { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name', defOff:1 },
-        { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'fashsw',   sel:['#nmhFashSwitch'],                                            t:S, label:'Fashion Mode',          sub:'Switch to the Fashion home' },
         { k:'footer',   sel:['#homeFooterNm'],                                             t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
@@ -102,6 +102,7 @@
         { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 , kind:'blk' },
         { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
+        { k:'store',    sel:['.vb-banner[data-vb="vb1"]', '.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
         { k:'custom',   sel:['.fash-cust-panel'],                                          t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
         /* Registered so it lands where it is meant to. Anything NOT in this
@@ -126,7 +127,6 @@
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 , kind:'blk' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' , kind:'blk', defOff:1 },
-        { k:'store',    sel:['.vb-banner[data-vb="vb1"]', '.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer', vb:1 , kind:'blk' },
         { k:'footer',   sel:['#homeFooter'],                                               t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
@@ -138,6 +138,11 @@
   /* Bump when a section becomes defOff after it has already shipped switched
      on, so saved layouts get the change once. See the migration in load().
        1 — Personalised Healing leaves the Normal home.
+       3 — The store moves up to sit under the four home buttons on both
+           homes, banner and all, so it is on the first screen instead of
+           near the foot of the page. A shipped order only decides a fresh
+           install, so this is carried into saved arrangements by the
+           migration below rather than left to reach new readers alone.
        2 — Word Search, Meaning Search, My Routines and (on the Fashion
            home) Shabdapathy Foundations leave both homes. They are not
            gone: they are off by default and go back on from the Widgets
@@ -145,7 +150,7 @@
            because each registry row covers the block and not a piece of
            it. Word Search also stops being `always`, or it could not be
            switched off at all. */
-  var LAYOUT_V = 2;
+  var LAYOUT_V = 3;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -181,6 +186,18 @@
       reg.items.forEach(function (i) {
         if (i.defOff && off.indexOf(i.k) < 0) off.push(i.k);
       });
+      /* v3: the store goes under the four buttons. Moving it in the table
+         above only changes a FRESH install — everyone with a saved order
+         keeps the position they had, which for this one is most of a page
+         further down. It is moved here for them, once. */
+      if ((raw.v || 0) < 3) {
+        var si = order.indexOf('store'), ti = order.indexOf('tiles');
+        if (si >= 0 && ti >= 0) {
+          order.splice(si, 1);
+          ti = order.indexOf('tiles');
+          order.splice(ti + 1, 0, 'store');
+        }
+      }
       try {
         localStorage.setItem(LSKEY(which), JSON.stringify({ order: order, off: off, v: LAYOUT_V }));
       } catch (e) {}

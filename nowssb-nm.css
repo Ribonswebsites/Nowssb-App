@@ -10861,83 +10861,12 @@ body.fashplus.fp-bg-off #fpBgVeil { display: none !important; }
 body.fashplus #appBg { opacity: 0 !important; }
 body.fashplus #appBgLayer2 { opacity: 0 !important; }
 
-/* ══════════════════════════════════════════════════════════════════
-   THE FILM ON EVERY PAGE
-
-   The mode reached the home and stopped. Open anything and you were on
-   flat #060c18 — because a .sub-screen is fixed at z-index 600 and the
-   clip behind everything is at 0, with the home at 10 in between: making a
-   page transparent shows the HOME, not the film. So there is a second copy
-   of the film between them, at 595, shown only while a page is open.
-   app/js/part076.js keeps exactly one of the two decoding.
-
-   A page that runs its own clip where its background sits — the Store's
-   intro — is tagged data-fp-keep and left alone.
-   ══════════════════════════════════════════════════════════════════ */
-#fpSubFilm {
-  position: fixed; inset: 0; z-index: 595; display: none;
-  width: 100%; height: 100%; object-fit: cover; pointer-events: none;
-  transform: translateZ(0); backface-visibility: hidden;
-}
-#fpSubVeil {
-  position: fixed; inset: 0; z-index: 596; display: none; pointer-events: none;
-  background:
-    radial-gradient(94% 62% at 50% 42%,
-      rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.46) 60%, rgba(0,0,0,0.66) 100%),
-    linear-gradient(180deg,
-      rgba(0,0,0,0.44) 0%, rgba(0,0,0,0.24) 22%, rgba(0,0,0,0.24) 74%, rgba(0,0,0,0.52) 100%);
-}
-body.fashplus:not(.fp-bg-off).nwsb-sub-open #fpSubFilm,
-body.fashplus:not(.fp-bg-off).nwsb-sub-open #fpSubVeil { display: block; }
-
-/* Every page, with no exception. There used to be one — a page running a
-   clip where its background sits kept it — and that exception was exactly
-   the Word Atelier, the Meaning store, the Signature and the eBooks: the
-   pages the mode most obviously should have reached. It is gone.
-
-   !important because a page may set its own background by id, which beats
-   any class selector this file could write. */
-body.fashplus:not(.fp-bg-off) .sub-screen {
-  background: transparent !important;
-}
-body.fashplus:not(.fp-bg-off) .sub-screen > .sub-screen-bg {
-  background-image: none !important;
-}
-/* A page whose background IS a clip of its own hands over to the film
-   rather than covering it — one moving background, not two fighting. */
-body.fashplus:not(.fp-bg-off) .sub-screen > video,
-body.fashplus:not(.fp-bg-off) .sub-screen > .sub-screen-bg > video {
-  display: none !important;
-}
-/* ── The store pages ──
-   Stripping these was the wrong approach twice. Each entry screen is two
-   opaque layers — the page and the artwork over it — and blanking one left
-   the other, which is how they ended up black. Rather than chase whatever
-   paints them, the film is put INSIDE the page and simply covers it:
-   app/js/part076.js drops #fpPageFilm into the top full-bleed container of
-   whichever page is open, above its background and below its content. The
-   page keeps every rule it had; the mode covers it while it is on and
-   uncovers it the moment it is off. */
-#fpPageFilm {
-  position: absolute; inset: 0; z-index: 1;
-  width: 100%; height: 100%; object-fit: cover;
-  display: block; pointer-events: none;
-  transform: translateZ(0); backface-visibility: hidden;
-}
-#fpPageVeil {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  background:
-    radial-gradient(96% 64% at 50% 42%,
-      rgba(0,0,0,0.26) 0%, rgba(0,0,0,0.44) 62%, rgba(0,0,0,0.64) 100%),
-    linear-gradient(180deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.20) 24%,
-      rgba(0,0,0,0.20) 72%, rgba(0,0,0,0.50) 100%);
-}
-@media (prefers-reduced-motion: reduce) {
-  #fpPageFilm, #fpPageVeil { display: none !important; }
-}
-@media (prefers-reduced-motion: reduce) {
-  #fpSubFilm, #fpSubVeil { display: none !important; }
-}
+/* The film on every page was tried three ways and every one of them cost
+   more than it gave: pages went dark, entry screens lost their artwork,
+   and the extra clip made the app heavy. It is gone. Fashion Plus keeps
+   what it always had — the fixed clip behind the home, and the pages that
+   carry a photograph of their own showing it through, which is the rule
+   directly below. */
 
 /* The tagged pages: let the fixed clip through, keep their own scrim.
    Only while Page backgrounds is on — with it off these pages are meant to
@@ -14590,20 +14519,19 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   THE STORE SECTION, SMALLER AND IN A WRAPPER
+   THE STORE SECTION ON THE FASHION HOME
 
-   It was a 3:4 panel running most of a screen — the tallest thing on
-   either home, for a card whose whole job is "the store is this way".
-   It comes down to 4:3 and takes the glass wrapper every other block on
-   the Fashion home wears.
+   4:3 was too far — the artwork inside it is a portrait composition and a
+   landscape box crops it to nothing. It takes the NORMAL home's shape
+   instead, 3:4, which is the one that was right, and keeps the wrapper.
 
-   Wrapper by styling, not by a new element: app/js/part062.js reorders
-   the DIRECT children of the home wrap, so putting this inside a div
-   would take it out of the layout editor's reach — the same trap the
-   television fell into. It is the wrapper.
+   Wrapper by styling, not by a new element: app/js/part062.js reorders the
+   DIRECT children of the home wrap, so putting this inside a div would
+   take it out of the layout editor's reach — the same trap the television
+   fell into. It IS the wrapper.
    ══════════════════════════════════════════════════════════════════ */
 :is(#home, .stw-prev-stage) .nss-store-trigger {
-  aspect-ratio: 4 / 3 !important;
+  aspect-ratio: 3 / 4 !important;
   width: calc(100% - 32px) !important;
   margin: 0 16px 18px !important;
   box-sizing: border-box;
@@ -14620,4 +14548,3 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
   border-radius: 0 !important;
   overflow: hidden;
 }
-#home-nm .nss-store-trigger { aspect-ratio: 4 / 3 !important; }

@@ -149,12 +149,18 @@
    The same glass card the Fashion home wraps its own sections in, with the
    same 12px on all four sides, so the television is never flush against
    the edge of the card it sits in. */
+/* ── One wrapper, not four ──
+   A card was: this glass box, then the preview's own border, then the
+   section's glass wrapper inside the clone, then whatever frame the
+   section itself wears. Four boxes around one thing. The card's own
+   chrome is gone — it is padding and nothing else — so what you see is
+   the section wearing what the section wears. */
 .stw-wrap {
   margin: 12px 12px 0;
   padding: 12px;
   box-sizing: border-box;
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.13);
+  background: none;
+  border: none;
   border-radius: 0 !important;
   /* No backdrop-filter. Twelve cards each blurring what is behind them is
      twelve full-size blurs a frame, and this row scrolls — it was the
@@ -177,7 +183,7 @@
 .stw-prev.stw-plain {
   height: auto;
   border-radius: 14px !important;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
 }
 .stw-prev.stw-plain .stw-screen { border-radius: 13px !important; }
 /* the screen: one flex child, so it fills the content box in both
@@ -369,7 +375,7 @@
   padding: 12px;
   background: #060c18;
   transform-origin: 50% 50%;
-  transition: transform .42s cubic-bezier(.22,1,.3,1), opacity .32s ease;
+  transition: transform .30s cubic-bezier(.22,1,.3,1), opacity .20s ease;
   cursor: pointer;
   box-shadow: 0 18px 40px rgba(0,0,0,0.5);
 }

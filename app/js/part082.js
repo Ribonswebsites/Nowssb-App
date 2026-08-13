@@ -805,132 +805,24 @@
   function render() {
     var body = document.getElementById('stBody');
     if (!body) return;
+    /* ── Only the hero header ─────────────────────────────────────────
+       This page used to be four rows of live clones of every home
+       section. It was the heaviest thing in the app by a wide margin —
+       enough to take the renderer out — and it is gone. What is left is
+       the one choice it was actually useful for: which of the three ways
+       the top of the home looks. No clones, no decks, no clips. */
     body.innerHTML =
       '<div class="stw-intro">' +
-        '<div class="stw-intro-t">Your home, in parts</div>' +
-        '<div class="stw-intro-s">Your home is built out of sections. Turn off what you do not use — the rest moves up to fill the space.</div>' +
+        '<div class="stw-intro-t">Your hero header</div>' +
+        '<div class="stw-intro-s">Three ways the top of your home can look. Pick one — it changes straight away.</div>' +
       '</div>' +
-      rail('stwHero', 'Hero header', 'Three ways the top of your home can look', heroHtml()) +
-      deckRail('deckSec', 'sec', 'tv',  'Home sections', 'stwSecCount') +
-      deckRail('deckBan', 'ban', 'tab', 'Video banners', 'stwBanCount') +
-      rail('stwBlocks', 'Clips and their banners', '', sectionsHtml('blk'), 'stwBlkCount') +
-      rail('stwTabs', 'Buttons and tabs', '', sectionsHtml('tab'), 'stwTabCount') +
-      rail('', 'Jump to', 'The places the app can take you', cardsHtml('jump', JUMP)) +
-      rail('', 'Make it yours', 'Every editor, in one place', cardsHtml('make', MAKE));
-    paintSections();
+      rail('stwHero', 'Hero header', '', heroHtml());
     paintHero();
-    ['deckSec', 'deckBan'].forEach(function (id) {
-      if (!DECKS[id]) return;
-      bindSwipe(id);
-      layoutDeck(id);
-      /* the deck is measured while the screen is still opening, so ask
-         again once it has arrived */
-      setTimeout(function () { layoutDeck(id); }, 360);
-      setTimeout(function () { layoutDeck(id); }, 900);
-    });
-  }
-  window.addEventListener('resize', function () {
-    ['deckSec', 'deckBan'].forEach(function (id) { if (DECKS[id]) layoutDeck(id); });
-  });
-
-  /* a deck sits in the same rail shell as every other row */
-  function deckRail(id, kind, dev, title, countId) {
-    return '<div class="stw-rail">' +
-      '<div class="stw-head"><div class="stw-head-txt">' +
-        '<div class="stw-title">' + title + '</div>' +
-        '<div class="stw-sub" id="' + countId + '"></div>' +
-      '</div></div>' +
-      deckHtml(id, kind, dev) +
-    '</div>';
-  }
-
-  /* ── Warm what this page is made of ───────────────────────────────
-     The clips are the home's own, so app/js/part051.js already warms them
-     at idle — they are in the document whether or not this page is open.
-     What it cannot warm is the artwork this page introduces: the two
-     devices. They are backgrounds, not <video> and not <img>, so nothing
-     scans them, and the first open of the page drew a set with no bezel
-     while they came down. Fetching them puts them in the same cache
-     sw.js answers from, so the second open — and every offline one — has
-     them already. Idle, once, and silent if it fails. */
-  var FRAMES = [
-    './assets/frames/tv-l-top.webp',
-    './assets/frames/tv-l-mid.webp',
-    './assets/frames/tv-l-bottom.webp',
-    './assets/frames/tab-landscape.webp',
-    './assets/frames/tv-hero-portrait.webp?v=2'
-  ];
-  var warmed = false;
-  function warm() {
-    if (warmed) return;
-    warmed = true;
-    var go = function () {
-      FRAMES.forEach(function (u) {
-        try { fetch(u, { cache: 'force-cache' }).catch(function () {}); } catch (e) {}
-      });
-      /* and the clips of whatever this page is about to show, ahead of the
-         idle warmer reaching them in DOM order */
-      try {
-        var urls = [];
-        ['sec', 'ban', 'blk'].forEach(function (kind) {
-          listOf(kind).forEach(function (it) {
-            (window.hlNodes(HOME, it.k) || []).forEach(function (n) {
-              n.querySelectorAll('video[src]').forEach(function (v) { urls.push(v.getAttribute('src')); });
-            });
-          });
-        });
-        window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(urls);
-      } catch (e) {}
-    };
-    (window.requestIdleCallback || function (cb) { setTimeout(cb, 1200); })(go, { timeout: 3000 });
-  }
-  /* The page's own artwork is worth having before the page is ever opened —
-     but not while the start animation is playing. That clip runs once, at
-     the front of the launch, and a handful of fetches across it is exactly
-     the kind of thing that makes it stutter. */
-  if (typeof window.nwsbSplashWait === 'function') {
-    try { window.nwsbSplashWait(function () { setTimeout(warm, 2500); }); }
-    catch (e) { setTimeout(warm, 6000); }
-  } else {
-    setTimeout(warm, 6000);
-  }
-
-  /* ── The mode's film, on this page ────────────────────────────────
-     Fashion Plus plays one fixed clip behind the whole app, and a
-     sub-screen covers it. Rather than punching a hole through this page —
-     which shows the home screen, not the film, because a screen sits above
-     the clip — the page plays the same file itself, at the layer its own
-     background would have been. Whatever the mode is showing is what this
-     shows: the src is read off the mode's own element, so choosing a
-     different background changes this one too with nothing to keep in
-     step. */
-  function film() {
-    var page = document.getElementById('sub-settings');
-    if (!page) return;
-    var had = page.querySelector('.stw-film');
-    var b = document.body;
-    var on = b.classList.contains('fashplus') && !b.classList.contains('fp-bg-off');
-    var bg = document.getElementById('fpBgVideo');
-    var src = (on && bg) ? (bg.getAttribute('src') || '') : '';
-    if (!src) { if (had) had.remove(); return; }
-    if (had && had.getAttribute('src') === src) {
-      try { var q = had.play(); if (q && q.catch) q.catch(function () {}); } catch (e) {}
-      return;
-    }
-    if (had) had.remove();
-    var v = document.createElement('video');
-    v.className = 'stw-film';
-    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
-    v.setAttribute('muted', ''); v.setAttribute('loop', ''); v.setAttribute('playsinline', '');
-    v.setAttribute('src', src);
-    page.insertBefore(v, page.firstChild);
-    try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
   }
 
   window.stOpen = function () {
-    warm();
+    /* nothing to pre-fetch and no film to place — the page is three cards */
     render();
-    film();
     var s = document.getElementById('sub-settings');
     if (s && typeof openSub === 'function') openSub('settings');
     haptic(24);

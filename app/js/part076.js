@@ -106,9 +106,6 @@
     try { localStorage.setItem(BGKEY, String(i)); } catch (e) {}
     var v = document.getElementById('fpBgVideo');
     if (v) { v.setAttribute('src', FILMS[i].vid); try { v.load(); } catch (e) {} playState(); }
-    var sv = document.getElementById('fpSubFilm');
-    if (sv) { sv.setAttribute('src', FILMS[i].vid); try { sv.load(); } catch (e) {} }
-    if (typeof watchSubs === 'function') watchSubs();
     paintPicker();
   }
   window.fpBgChoice = bgChoice;
@@ -152,171 +149,6 @@
     }
     return v;
   }
-
-  /* ── The film on EVERY page ────────────────────────────────────────
-     markImageBacked() below only ever reached the handful of pages that
-     carried a photograph of their own; everywhere else the mode stopped at
-     the home and the page you opened was flat #060c18. It reaches all of
-     them now, and the way it has to is different: a sub-screen is fixed at
-     z-index 600 and the home sits at 10, so a transparent page shows the
-     HOME, not the clip at z-index 0. There is a second copy of the film
-     between them.
-
-     It is the same file, and only ever one of the two is decoding: the one
-     behind the home pauses while a page is open, and this one pauses when
-     the last page closes. */
-  function subFilm(make) {
-    var v = document.getElementById('fpSubFilm');
-    if (v || !make) return v;
-    v = document.createElement('video');
-    v.id = 'fpSubFilm';
-    v.muted = true; v.loop = true; v.playsInline = true;
-    v.setAttribute('muted', ''); v.setAttribute('loop', '');
-    v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
-    v.setAttribute('aria-hidden', 'true');
-    v.src = FILMS[bgChoice()].vid;
-    document.body.appendChild(v);
-    var veil = document.createElement('div');
-    veil.id = 'fpSubVeil';
-    veil.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(veil);
-    return v;
-  }
-
-  /* There is no exception any more. Pages used to be tagged out of this
-     for running a clip where their background sits, and those turned out
-     to be precisely the pages the mode should have reached — the Word
-     Atelier, the Meaning store, the Signature, the eBooks. Any tag left
-     over from an earlier version is cleared, or a reader who has one
-     stored on an element would keep the old behaviour. */
-  function markOwnFilm() {
-    document.querySelectorAll('.sub-screen[data-fp-keep]').forEach(function (s) {
-      s.removeAttribute('data-fp-keep');
-    });
-  }
-
-  /* ── The film, INSIDE whichever page is open ───────────────────────
-     A fixed layer behind the pages was never going to work: every one of
-     them paints its own opaque background, and stripping those is what
-     turned the store's entry screens black. This goes the other way. One
-     element is moved into the top full-bleed container of the page that is
-     open — its entry screen if it has one, the page itself otherwise — at
-     a z-index above that container's artwork and below its content. The
-     page keeps every rule it has; the film covers it while the mode is on
-     and is taken out the moment it is off.
-
-     It is the same file the mode plays everywhere else, and only one page
-     is ever on top, so there is one of these, moved, not one per page. */
-  function pageHost(sub) {
-    /* the entry screen if it is showing, else the page */
-    var intro = sub.querySelector('[class*="intro-page"]');
-    if (intro) {
-      var cs = getComputedStyle(intro);
-      if (cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity) > 0.02) return intro;
-    }
-    return sub;
-  }
-  function pageFilm(sub) {
-    var v = document.getElementById('fpPageFilm');
-    var veil = document.getElementById('fpPageVeil');
-    if (!sub) {
-      if (v) { try { v.pause(); } catch (e) {} v.remove(); }
-      if (veil) veil.remove();
-      return;
-    }
-    var src = FILMS[bgChoice()].vid;
-    if (!v) {
-      v = document.createElement('video');
-      v.id = 'fpPageFilm';
-      v.muted = true; v.loop = true; v.playsInline = true;
-      v.setAttribute('muted', ''); v.setAttribute('loop', '');
-      v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
-      v.setAttribute('aria-hidden', 'true');
-      /* out of the shared video controller's queue: this one is a page
-         background and must never wait its turn behind a card */
-      v.setAttribute('data-nwsb-vis', '1');
-    }
-    if (v.getAttribute('src') !== src) { v.setAttribute('src', src); try { v.load(); } catch (e) {} }
-    if (!veil) {
-      veil = document.createElement('div');
-      veil.id = 'fpPageVeil';
-      veil.setAttribute('aria-hidden', 'true');
-    }
-    var host = pageHost(sub);
-    /* The menu drawer scrolls; a background that scrolls with it is not a
-       background. Fixed there, absolute everywhere else. */
-    v.style.position = (host.id === 'menuDrawer') ? 'fixed' : '';
-    if (veil) veil.style.position = v.style.position;
-    /* a static host cannot hold an absolutely positioned child */
-    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
-    if (v.parentNode !== host) host.appendChild(v);
-    if (veil.parentNode !== host) host.appendChild(veil);
-    if (v.paused) { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
-  }
-
-  /* Is any page open? The body carries the answer so the CSS can show the
-     layer, and the two clips can trade places. Class changes on the pages
-     themselves are what to watch — there is no event for this. */
-  var subMo = null, subPend = false;
-  function watchSubs() {
-    var run = function () {
-      var open = !!document.querySelector('.sub-screen.open');
-      document.body.classList.toggle('nwsb-sub-open', open);
-      var live = isOn() && bgPartOn() && !reducedMotion() && !batteryLow;
-      var sub = subFilm(open && live);
-      var main = document.getElementById('fpBgVideo');
-      if (sub) {
-        if (open && live) { if (sub.paused) { try { var p = sub.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} } }
-        else if (!sub.paused) { try { sub.pause(); } catch (e) {} }
-      }
-      /* one decoder, not two: whichever is covered stops */
-      if (main) {
-        if (open && live) { if (!main.paused) { try { main.pause(); } catch (e) {} } }
-        else if (live && main.paused) { try { var q = main.play(); if (q && q.catch) q.catch(function () {}); } catch (e) {} }
-      }
-      if (open) markOwnFilm();
-      /* the topmost open page is the one that gets the film — and the
-         hamburger menu counts as a page. It is not a .sub-screen (it is a
-         drawer at z-index 500) but it covers the screen the same way and
-         had nothing behind its glass. */
-      var subs = document.querySelectorAll('.sub-screen.open');
-      var drawer = document.getElementById('menuDrawer');
-      var host = null;
-      if (live) {
-        if (drawer && drawer.classList.contains('open')) host = drawer;
-        else if (subs.length) host = subs[subs.length - 1];
-      }
-      pageFilm(host);
-      document.body.classList.toggle('nwsb-sub-open', open || !!(drawer && drawer.classList.contains('open')));
-    };
-    /* The body observer below fires for anything the app appends, so the
-       work is coalesced to once a frame rather than run per mutation. */
-    var apply = function () {
-      if (subPend) return;
-      subPend = true;
-      requestAnimationFrame(function () { subPend = false; run(); });
-    };
-    run();
-    /* Pressing Enter on a store's entry screen hides it and shows the page
-       behind it without touching a class on the .sub-screen, so the film
-       has to be asked where it belongs again rather than told. Once every
-       second and a half, and only while something is open. */
-    if (!watchSubs._tick) watchSubs._tick = setInterval(function () {
-      if (document.querySelector('.sub-screen.open')) run();
-    }, 1500);
-    if (subMo) subMo.disconnect();
-    if (!('MutationObserver' in window)) return;
-    subMo = new MutationObserver(apply);
-    document.querySelectorAll('.sub-screen').forEach(function (s) {
-      subMo.observe(s, { attributes: true, attributeFilter: ['class'] });
-    });
-    var drawer = document.getElementById('menuDrawer');
-    if (drawer) subMo.observe(drawer, { attributes: true, attributeFilter: ['class'] });
-    /* Pages built by their own file arrive after this runs, and an
-       observer cannot watch an element that did not exist yet. */
-    subMo.observe(document.body, { childList: true });
-  }
-  window.nwsbFpSubs = watchSubs;
 
   function markImageBacked() {
     var subs = document.querySelectorAll('.sub-screen');
@@ -391,8 +223,7 @@
        tagged pages their photographs back — pausing alone left a frozen
        frame covering them. */
     document.body.classList.toggle('fp-bg-off', !on);
-    if (on && !reducedMotion()) { bgVideo(true); markImageBacked(); markOwnFilm(); }
-    watchSubs();
+    if (on && !reducedMotion()) { bgVideo(true); markImageBacked(); }
     playState();
     /* The phone shows the stills when the mode is off and the clips when it
        is on, so the switch has to restage it. */

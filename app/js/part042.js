@@ -164,7 +164,7 @@
         <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"><rect x="3.4" y="3.4" width="7.2" height="7.2" rx="2"/><rect x="13.4" y="3.4" width="7.2" height="7.2" rx="2"/><rect x="3.4" y="13.4" width="7.2" height="7.2" rx="2"/><rect x="13.4" y="13.4" width="7.2" height="7.2" rx="2"/></svg>
         </div>
-        <div class="sr-body"><div class="sr-label">Widgets</div><div class="sr-sub">See every section and choose what your home shows</div></div>
+        <div class="sr-body"><div class="sr-label">Hero header</div><div class="sr-sub">Three ways the top of your home can look</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="openSub('fashion-plus')">
