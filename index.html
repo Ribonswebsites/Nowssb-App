@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=770">
+<link rel="stylesheet" href="nowssb-nm.css?v=771">
 <link rel="stylesheet" href="app/widgets.css?v=6">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
@@ -1636,6 +1636,11 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        background and everything the hero draws — the crossfading photos and
        all of the content — is inset to the aperture. -->
   <div class="hero-section hero-tv">
+    <!-- The plain look (app/js/part082.js: heroStyle 'plain') ships with no
+         picture at all — this is the only video behind the card in that
+         look, and it belongs to this card alone. Hidden outside .hero-simple
+         so the tv/full looks and their own photos are untouched. -->
+    <video class="hero-plain-vid" muted loop playsinline preload="none" src="./assets/video/hero-plain-bg.mp4" aria-hidden="true" tabindex="-1"></video>
     <div class="hero-bg on" id="hb0"></div>
     <div class="hero-bg"    id="hb1"></div>
     <div class="hero-bg"    id="hb2"></div>

@@ -14243,6 +14243,21 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    this look is defined by NOT having */
 .hero-simple .hero-bg,
 .hero-simple .hero-glass { display: none !important; }
+/* This look's own clip, behind the glass card and nothing else — the tv
+   and full looks keep their photographs untouched, and the rail cells
+   below (app/js/part083.js) keep their own clips untouched. Hidden outside
+   .hero-simple so the video controller (app/js/part051.js) never plays it
+   off-screen; visible here it fills the card behind .hero-content, which
+   is what the glass gradient in .hero-section.hero-simple is designed to
+   sit over. */
+.hero-plain-vid { display: none; }
+.hero-simple .hero-plain-vid {
+  display: block;
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
 /* the content stops being an overlay and becomes the card itself */
 .hero-simple .hero-content {
   position: relative; inset: auto;
