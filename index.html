@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=771">
+<link rel="stylesheet" href="nowssb-nm.css?v=772">
 <link rel="stylesheet" href="app/widgets.css?v=6">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
@@ -951,10 +951,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          WRAPPER is what app/js/part062.js registers as 'herovid' — the
          registry matches ':scope > sel', so leaving it on the banner would
          make it a grandchild and strand the section at the top. -->
-    <div class="nsvb-blk">
-      <div class="hero-vid-banner nmh-hero-vid nwsb-inframe dev-tab-l">
-        <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
-      </div>
+    <!-- No wrapper card: the tablet IS the section. .nsvb-blk stays ON the
+         frame because app/js/part062.js matches ':scope > .nsvb-blk' — as a
+         separate parent it was a raised card drawn around a render that
+         already has its own bezel, a frame around a frame. -->
+    <div class="nsvb-blk hero-vid-banner nmh-hero-vid nwsb-inframe dev-tab-l">
+      <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
     </div>
     <div class="nmh-streak-section">
       <div class="nmh-streak-heading">Start Building Your Streak Today</div>
@@ -1636,11 +1638,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        background and everything the hero draws — the crossfading photos and
        all of the content — is inset to the aperture. -->
   <div class="hero-section hero-tv">
-    <!-- The plain look (app/js/part082.js: heroStyle 'plain') ships with no
-         picture at all — this is the only video behind the card in that
-         look, and it belongs to this card alone. Hidden outside .hero-simple
-         so the tv/full looks and their own photos are untouched. -->
-    <video class="hero-plain-vid" muted loop playsinline preload="none" src="./assets/video/hero-plain-bg.mp4" aria-hidden="true" tabindex="-1"></video>
+    <!-- The hero's film. It is what the five crossfading photographs below
+         used to be: the picture behind the header, in every one of the three
+         looks (app/js/part082.js). In the television look it is inset to the
+         set's aperture, so the clip plays IN the screen and the wordmark,
+         the word, the search and both buttons sit on top of it — everything
+         the header draws is inside the television. -->
+    <video class="hero-bg-vid" muted loop playsinline preload="none" src="./assets/video/hero-bg.mp4" aria-hidden="true" tabindex="-1"></video>
     <div class="hero-bg on" id="hb0"></div>
     <div class="hero-bg"    id="hb1"></div>
     <div class="hero-bg"    id="hb2"></div>
@@ -10360,7 +10364,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <script src="app/js/part049.js?v=297"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="app/js/part051.js?v=20" defer></script>
+<script src="app/js/part051.js?v=21" defer></script>
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=15"></script>
 <script src="app/js/part056.js?v=5"></script>

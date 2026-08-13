@@ -14010,7 +14010,6 @@ body[class] #sub-health-journey .gsel-card.dev-tabn-p {
 #home-nm .nsub-blk,
 #home-nm .nedi-blk,
 #home-nm .nvb-blk,
-#home-nm .nsvb-blk,
 #home-nm .nwsb-vbwrap[data-vbwrap] {
   width: 100%; box-sizing: border-box;
   border-radius: 22px !important;
@@ -14022,10 +14021,30 @@ body[class] #sub-health-journey .gsel-card.dev-tabn-p {
 body.nm-night #home-nm .nsub-blk,
 body.nm-night #home-nm .nedi-blk,
 body.nm-night #home-nm .nvb-blk,
-body.nm-night #home-nm .nsvb-blk,
 body.nm-night #home-nm .nwsb-vbwrap[data-vbwrap] {
   background: #16163c;
   box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32);
+}
+/* ── The streak clip is the tablet and nothing else ──
+   .nsvb-blk is on the render itself now, so it carries no card of its own:
+   no fill, no raised shadow, no padding but the bezel that .dev-tab-l
+   measures. Only the rhythm between it and its neighbours is stated here.
+   The black is the aperture — background-clip:content-box keeps it off the
+   bezel, so it never paints a rectangle behind the render's own corners. */
+#home-nm .nsvb-blk {
+  width: 100%; box-sizing: border-box;
+  background: none;
+  background-color: #000;
+  background-clip: content-box;
+  -webkit-background-clip: content-box;
+  border: none;
+  box-shadow: none;
+  margin: 16px 0;
+  /* .hero-vid-banner brings overflow:hidden and a 22px radius, and both cut
+     the render: the rounded corners crop the tablet's own corners and the
+     clip eats its outer edge — the same reset .vb-banner.dev-tabc-l needs. */
+  overflow: visible !important;
+  border-radius: 0 !important;
 }
 :is(#home, .stw-prev-stage) .nsub-blk, :is(#home, .stw-prev-stage) .nedi-blk, :is(#home, .stw-prev-stage) .nvb-blk, :is(#home, .stw-prev-stage) .nsvb-blk { margin-top: 16px; margin-bottom: 16px; }
 
@@ -14095,13 +14114,42 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   margin-left: auto;
   margin-right: auto;
 }
-/* the crossfading photographs and the content share the screen */
+/* the film, the crossfading photographs and the content share the screen */
 .hero-tv .hero-bg,
+.hero-tv .hero-bg-vid,
 .hero-tv .hero-content {
   inset: auto;
   left: 3.439%; right: 2.476%; top: 2.129%; bottom: 7.168%;
 }
 .hero-tv .hero-bg { background-color: #000; }
+
+/* ══ THE HERO'S FILM ══
+   The picture behind the header, in all three looks. It replaces the five
+   crossfading photographs rather than joining them — they are hidden
+   wherever it plays, so there is one picture, not two stacked.
+
+   z-index 0 puts it under .hero-content (z-index 5), which is the whole
+   point: in the television look the geometry above insets it to the set's
+   aperture, so the clip plays IN the screen and the wordmark, the rotating
+   word, the search button and Explore / App Guide all sit on top of it —
+   everything the header draws is inside the television.
+
+   `width/height: auto` matters in the television look: the inset above
+   positions all four edges, and a 100% width against that would size it to
+   the SECTION and push it out of the aperture on the right. */
+.hero-bg-vid {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  background: #000;
+  border-radius: inherit;
+}
+.hero-tv .hero-bg-vid {
+  width: auto; height: auto;
+  border-radius: 0;
+}
+/* one picture, not two: the photographs are what the film replaces */
+.hero-section .hero-bg { display: none !important; }
 /* The content was padded for a full viewport. Inside the screen it has
    about 367x686 to work with on a 390-wide phone, so the padding comes
    down to match — the 160px top alone was a quarter of it. */
@@ -14243,26 +14291,19 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    this look is defined by NOT having */
 .hero-simple .hero-bg,
 .hero-simple .hero-glass { display: none !important; }
-/* This look's own clip, behind the glass card and nothing else — the tv
-   and full looks keep their photographs untouched, and the rail cells
-   below (app/js/part083.js) keep their own clips untouched. Hidden outside
-   .hero-simple so the video controller (app/js/part051.js) never plays it
-   off-screen; visible here it fills the card behind .hero-content, which
-   is what the glass gradient in .hero-section.hero-simple is designed to
-   sit over. */
-.hero-plain-vid { display: none; }
-.hero-simple .hero-plain-vid {
-  display: block;
-  position: absolute; inset: 0; z-index: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
-}
 /* the content stops being an overlay and becomes the card itself */
 .hero-simple .hero-content {
   position: relative; inset: auto;
   padding: 20px 4px 22px;
   gap: 18px;
+  /* The glass, repeated from .hero-section.hero-simple above. A background
+     paints behind every child, so the film — a child at z-index 0 — covered
+     the section's own gradient and with it the dark base that keeps white
+     type legible. The content layer is above the film, so the same glass
+     stated here lands back on top of it and the look is unchanged. */
+  background:
+    linear-gradient(158deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 100%),
+    linear-gradient(180deg, rgba(6,12,24,0.52) 0%, rgba(6,12,24,0.64) 100%);
 }
 .hero-simple .hero-content > div:first-child {
   margin-left: 14px !important; margin-right: 14px !important;
