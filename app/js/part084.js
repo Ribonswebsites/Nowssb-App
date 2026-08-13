@@ -77,47 +77,56 @@
      `go` is optional. Where a step has a door, the card carries it; where
      it is describing something you are already looking at, it does not,
      because a button that scrolls you three inches is noise. */
+  /* ── The steps ────────────────────────────────────────────────────
+     Player first, then outward. Written SHORT on purpose: a card is the
+     hero's own rectangle, which on this look is a landscape television
+     about 230px tall, so a step is a lead of one line and three points of
+     one line each. That is the constraint the length sets, and it is a
+     good one — a step you can take in at a glance beats a step you have to
+     scroll.
+
+     `go` is optional. Where a step has a door the card carries it; where
+     it is describing something you are already looking at, it does not. */
   var STEPS = [
     { i: 'play', t: 'The Word Player',
-      lead: 'Every word in NowssB opens the same way: one screen, a spinning disc, and five tabs across the bottom. No scrolling — everything is one tap.',
+      lead: 'Every word opens the same way — one screen, five tabs, no scrolling.',
       pts: [
-        ['Listen', 'The word plays. Each phonetic syllable lights up as its sound arrives. Male or female voice, top right.'],
-        ['Record', 'Speak it back. Your pronunciation is scored 0–100, and you can play your own recording against the original.'],
-        ['Repeat', 'Count your reps — 3, 7 or 21. Every tap registers one, and the bar fills to the end.'],
-        ['Meaning', 'The organ this word targets, the healing benefit, the full meaning and where the sound comes from.'],
-        ['Guide', 'Mouth position, where it should resonate in the body, the mistake most people make, and your tip.']
+        ['Listen', 'The word plays, each syllable lighting as it sounds.'],
+        ['Record', 'Speak it back and it is scored 0–100.'],
+        ['Repeat', 'Count your reps — 3, 7 or 21.'],
+        ['Meaning', 'The organ it targets and where the sound comes from.'],
+        ['Guide', 'Mouth position, resonance, and the common mistake.']
       ] },
 
     { i: 'sun', t: "Today's Practice",
-      lead: 'The card at the top of your home already knows what time it is. It loads the routine that matches the hour and waits for one tap.',
+      lead: 'The card at the top of your home already knows the hour.',
       pts: [
-        ['Morning · Midday · Afternoon · Evening · Night', 'Five windows through the day, and the card is always showing the one you are in.'],
-        ['One tap starts it', 'The words for that routine queue up in the player, in order, and the session runs itself.'],
-        ['It closes itself', 'When the last word finishes, a healing sentence built from everything you just practised plays automatically.']
+        ['Five windows', 'Morning, midday, afternoon, evening, night.'],
+        ['One tap starts it', 'The words queue up and the session runs itself.'],
+        ['It closes itself', 'A healing sentence from everything you practised.']
       ] },
 
     { i: 'clock', t: 'My Routines',
-      lead: 'Five slots you own. Rename any of them, set any time, and fill each with the words you want to practise in it.',
+      lead: 'Five slots you own — rename any of them, set any time.',
       pts: [
-        ['The NOW badge', 'Marks whichever routine matches the current hour, so you never have to remember which one you are on.'],
-        ['Words', 'The practice list for that routine — reorder it, cut it, grow it.'],
-        ['Library', 'Everything you own. Tap + on any word to drop it into this routine.'],
-        ['History', 'Every past session with its word count and how much of it you finished.']
+        ['The NOW badge', 'Marks whichever routine matches this hour.'],
+        ['Words and Library', 'Build the list, tap + to add from what you own.'],
+        ['History', 'Every session, its word count and how much you finished.']
       ] },
 
     { i: 'book', t: 'The Reader',
-      lead: 'Meanings and eBooks in one place. Where the player is for your mouth, the Reader is for your eye — the same word science, read rather than spoken.',
+      lead: 'Meanings and eBooks in one place — the word science, read.',
       pts: [
-        ['Open any meaning', 'Full origin, organ target and frequency, laid out as a page rather than a card.'],
-        ['Read anywhere', 'It keeps your place, so a long piece survives being put down.']
+        ['Any meaning', 'Origin, organ and frequency, laid out as a page.'],
+        ['It keeps your place', 'So a long piece survives being put down.']
       ] },
 
     { i: 'bag', t: 'The NowssB Store',
-      lead: 'Two libraries under one roof. This is where words and meanings actually come from — you own what you buy, and owned words work everywhere else in the app.',
+      lead: 'Two libraries under one roof. You own what you buy.',
       pts: [
-        ['Word Library', 'Sounds that heal, each with its organ target and its frequency.'],
-        ['Meaning Library', 'Origins that were hidden — the natural meaning underneath the dictionary one.'],
-        ['Organ targeting', 'Shop by the part of the body you are working on rather than by the word.']
+        ['Word Library', 'Sounds that heal, each with its organ and frequency.'],
+        ['Meaning Library', 'The natural meaning under the dictionary one.'],
+        ['Organ targeting', 'Shop by the part of the body, not by the word.']
       ],
       go: ['Enter the store', function () {
         var s = document.getElementById('sub-nowssb-store');
@@ -127,85 +136,82 @@
       }] },
 
     { i: 'pages', t: 'eBooks',
-      lead: 'The long form. Where a meaning card gives you the answer, an eBook gives you the working — word science and sound healing at the length they actually need.',
+      lead: 'Where a meaning card gives the answer, an eBook gives the working.',
       pts: [
-        ['Yours to keep', 'Bought once, readable offline, and they stay in your library.'],
-        ['Built on what you own', 'The words in them link straight through to the player.']
+        ['Yours to keep', 'Bought once, read offline, kept in your library.'],
+        ['Linked through', 'Every word in them opens in the player.']
       ],
       go: ['Open eBooks', function () { if (typeof window.ebSecOpen === 'function') window.ebSecOpen(); }] },
 
     { i: 'sig', t: 'The Signature',
-      lead: 'Your name, in sound. The Signature takes the word science and turns it on the one word you answer to.',
+      lead: 'Your name, in sound — the word science turned on the one word you answer to.',
       pts: [
-        ['Your own frequency', 'What your name activates, and where it lands in the body.'],
-        ['Made once', 'It is generated for you and then it is yours — it does not change under you.']
+        ['Your own frequency', 'What your name activates, and where it lands.'],
+        ['Made once', 'Generated for you, and then it is yours.']
       ] },
 
     { i: 'sound', t: 'Sound Library',
-      lead: 'Everything you own, arranged to be listened to rather than studied.',
+      lead: 'Everything you own, arranged to be listened to.',
       pts: [
-        ['Sentences', 'Healing sentences assembled from the words in your library. Tap to play.'],
-        ['Words', 'Your full library with the phonetic breakdown and the organ tag on every one.'],
-        ['Straight to the player', 'Tap any word here and it opens where you practise it.']
+        ['Sentences', 'Healing sentences built from your words. Tap to play.'],
+        ['Words', 'The phonetic breakdown and organ tag on every one.'],
+        ['Straight through', 'Tap any word and it opens where you practise it.']
       ] },
 
     { i: 'atom', t: 'Word Science',
-      lead: 'The system underneath all of it. N O W S B A N S I U — ten letters, and each one is an organ.',
+      lead: 'The system underneath all of it. Ten letters, ten organs.',
       pts: [
-        ['Tap a letter', 'Its organ target, the phonetic science behind it, and the words that demonstrate it.'],
-        ['Why a word works', 'This is the part that explains the rest of the app rather than adding to it.']
+        ['N O W S B A N S I U', 'Every letter maps to a target in the body.'],
+        ['Tap a letter', 'Its organ, the science, and the words that show it.']
       ] },
 
     { i: 'search', t: 'Real Meaning',
-      lead: 'Type any word, from any language, and get its natural phonetic origin — what it meant as a sound, before a dictionary was written down.',
+      lead: 'Any word, any language — its origin as a sound, before any dictionary.',
       pts: [
-        ['Before the dictionary', 'The origin the word had as a sound rather than as a definition.'],
-        ['What it activates', 'The organ it reaches and the healing frequency it carries.'],
-        ['How to say it', 'The correct pronunciation, in the same player everything else uses.']
+        ['Before the dictionary', 'What it meant as a sound, not as a definition.'],
+        ['What it activates', 'The organ it reaches and the frequency it carries.'],
+        ['How to say it', 'The correct pronunciation, in the same player.']
       ] },
 
     { i: 'heart', t: 'Personalised Healing',
-      lead: 'Words chosen for a body rather than for a vocabulary. Pick your path and the app works backwards from the organ.',
+      lead: 'Words chosen for a body, not for a vocabulary.',
       pts: [
-        ['Choose your path', 'Female or male, each with ten targeted health categories.'],
-        ['Every category is a set', 'The words in it were chosen for that organ system, not gathered by topic.']
+        ['Choose your path', 'Female or male, ten health categories each.'],
+        ['Every category is a set', 'Chosen for that organ system, not by topic.']
       ] },
 
     { i: 'chart', t: 'My Progress',
-      lead: 'What the practice has actually added up to. Five numbers and a body.',
+      lead: 'What the practice has added up to.',
       pts: [
-        ['Streak', 'Consecutive days with at least one finished session.'],
-        ['Sessions', 'Everything you have completed, not everything you have opened.'],
+        ['Streak and sessions', 'Days in a row, and everything you finished.'],
         ['Mastered words', 'Scored 90 or above three sessions running.'],
-        ['Body map', 'Organs light up as you practise the words that reach them.'],
-        ['Weekly grid', 'The last seven days, at a glance.']
+        ['Body map', 'Organs light as you practise the words that reach them.']
       ] },
 
     { i: 'people', t: 'NowssB Connect',
-      lead: 'The social side. Share the practice, post the journey, and find the people doing the same work.',
+      lead: 'The social side — share the practice, find the people doing the same work.',
       pts: [
-        ['Follow and react', 'Creators, practitioners, and anyone further along the same path.'],
-        ['Your own space', 'A profile that is about the practice rather than about you.']
+        ['Follow and react', 'Creators and practitioners further along.'],
+        ['Your own space', 'A profile about the practice rather than about you.']
       ] },
 
     { i: 'crown', t: 'Subscription',
-      lead: 'Every word and every frequency, unlocked at once — the alternative to buying the library a piece at a time.',
+      lead: 'Every word and every frequency at once, instead of a piece at a time.',
       pts: [
-        ['The full library', 'Both stores open, with nothing held back behind a price.'],
-        ['Your Edition', 'The card on your home always shows the plan you are actually on.']
+        ['The full library', 'Both stores open, nothing held back.'],
+        ['Your Edition', 'The card on your home shows the plan you are on.']
       ],
       go: ['See the plans', function () { if (window.SS && SS.open) SS.open('subscription'); }] },
 
     { i: 'spark', t: 'Make it yours',
-      lead: 'The last step is the app itself. Almost nothing on this home is fixed — the order, the look and the top of the page are all yours.',
+      lead: 'The last step is the app itself. Almost nothing here is fixed.',
       pts: [
-        ['Hero header', 'Three ways the top can look: inside the television, full screen, or plain.'],
-        ['Fashion Plus', 'Turns the app to film — the tiles, the practice card and every photographic background start moving.'],
-        ['Your layout', 'Sections go on and off and change order, and the home remembers it.']
+        ['Hero header', 'Three ways the top can look — this is one of them.'],
+        ['Fashion Plus', 'Turns the app to film. The tiles and cards start moving.'],
+        ['Your layout', 'Sections go on and off, and the home remembers it.']
       ],
       go: ['Change the hero header', function () { if (typeof window.stOpen === 'function') window.stOpen(); }] }
   ];
-
 
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -270,7 +276,7 @@
              '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" ' +
                'stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
            '</button>' +
-           '<div class="fst-count"><b id="fstNow">1</b><span>of ' + STEPS.length + '</span></div>' +
+           '<div class="fst-count"><b id="fstNow">Start</b><span id="fstOf">' + STEPS.length + ' steps</span></div>' +
            '<div class="fst-bar"><i id="fstFill"></i></div>' +
            '<button class="fst-arrow" id="fstPrev" onclick="window.fstStep(-1)" aria-label="Previous step">' + arrow(-1) + '</button>' +
            '<button class="fst-arrow fst-arrow-n" id="fstNext" onclick="window.fstStep(1)" aria-label="Next step">' + arrow(1) + '</button>';
@@ -286,49 +292,103 @@
   function paint() {
     if (!on()) return;
     var i = typeof window.nwsbHeroAt === 'function' ? window.nwsbHeroAt() : 0;
-    var step = i < 1 ? 0 : i - 1;
-    var now = document.getElementById('fstNow');
-    if (now) now.textContent = String(step + 1);
+    var now = document.getElementById('fstNow'), lbl = document.getElementById('fstOf');
+    /* Cell 0 is the title card, so it is not step one — it is what comes
+       before step one, and the counter says so rather than lying. */
+    if (now) now.textContent = i < 1 ? 'Start' : String(i);
+    if (lbl) lbl.textContent = i < 1 ? STEPS.length + ' steps' : 'of ' + STEPS.length;
     var fill = document.getElementById('fstFill');
-    if (fill) fill.style.width = (((step + 1) / STEPS.length) * 100) + '%';
+    if (fill) fill.style.width = ((i / STEPS.length) * 100) + '%';
     var p = document.getElementById('fstPrev'), n = document.getElementById('fstNext');
-    /* Previous is disabled on the first step rather than walking back onto
-       the hero card — the hero is not step zero, it is the thing the guide
-       is about. */
-    if (p) p.disabled = i <= 1;
+    if (p) p.disabled = i <= 0;
     if (n) n.disabled = i >= STEPS.length;
   }
 
   window.fstStep = function (d) {
     if (typeof window.nwsbHeroGo !== 'function') return;
     var i = window.nwsbHeroAt();
-    if (i + d < 1 || i + d > STEPS.length) return;
+    if (i + d < 0 || i + d > STEPS.length) return;
     haptic(14);
     window.nwsbHeroGo(d);
     paint();
     syncHeight();
   };
 
-  /* ── One length for all fifteen ────────────────────────────────────
-     Not measured off the hero. On this look the hero is a landscape
-     television 229px tall and a step card of that height would be four
-     lines and a scrollbar. It takes the rail's own length instead — the
-     banner cells it is standing in for — and where that is shorter than
-     the words need, the words win. A single number for all fifteen, so
-     the deck does not resize under you as you step through it, which is
-     what "the cards should be the same length" is actually asking for.
+  /* ── The set becomes the title card ───────────────────────────────
+     Tapping the disc does not jump straight to step one. The television's
+     own screen changes first: the wordmark goes blonde, "Follow the steps"
+     comes up under it, and the tagline, the word, the picture rail and the
+     two buttons go. THAT is the guide's first card, and it is the hero
+     itself — so the thing you tapped is the thing that answers.
 
-     The floor and the ceiling are in the stylesheet as a clamp; this only
-     raises it when the banners themselves are taller, which is a thing
-     only the live page knows. */
-  function syncHeight() {
-    var d = deck();
-    if (!d) return;
-    var ban = d.querySelector('.hs-ban');
-    if (ban && ban.offsetHeight > 120) BAN_H = ban.offsetHeight;
-    if (BAN_H) d.style.setProperty('--fst-ban', BAN_H + 'px');
+     Injected into .hero-content, which is the screen inside the set. The
+     hero's own furniture is hidden by CSS rather than removed: it is the
+     app's real header, with a search that opens the explore sheet and a
+     word on a timer, and taking it apart to put it back is how you lose
+     one of them. */
+  function title(on) {
+    var hero = document.querySelector('#home .hero-section.hero-simple');
+    if (!hero) return;
+    var screen = hero.querySelector('.hero-content');
+    if (!screen) return;
+    var t = screen.querySelector(':scope > .fst-title');
+    if (on && !t) {
+      t = document.createElement('div');
+      t.className = 'fst-title';
+      t.innerHTML = '<div class="fst-title-b"><span class="b">Nowss</span><span class="t">B</span></div>' +
+                    '<div class="fst-title-s">Follow the steps</div>';
+      screen.appendChild(t);
+    } else if (!on && t) {
+      t.remove();
+    }
+    hero.classList.toggle('fst-title-on', !!on);
   }
-  var BAN_H = 0;
+
+  /* ── One length, and it is the hero's ─────────────────────────────
+     A step card is exactly as tall as the hero card, because the hero card
+     is the first card of the same guide — the two have to be one
+     rectangle or the deck resizes the moment you press forward.
+
+     offsetHeight, not the rectangle: a cell mid-slide is transformed, and
+     getBoundingClientRect would hand back the scaled number. */
+  function bMid(el) { var r = el.getBoundingClientRect(); return r.top + r.height / 2; }
+
+  function syncHeight() {
+    var d = deck(), h = heroCell();
+    if (!d || !h) return;
+    var n = h.offsetHeight;
+    if (n > 120) d.style.setProperty('--fst-h', n + 'px');
+
+    /* The disc sits on the line the two buttons are on — outside the set,
+       at the height of Explore and App Guide inside it. Measured, because
+       that line moves with the set, and the set is sized from whatever
+       space is left between the header and the nav. */
+    var hero = document.querySelector('#home .hero-section.hero-simple');
+    var btns = hero && hero.querySelector('.hero-btns');
+    var disc = document.getElementById('fstBtn');
+    if (hero && btns && disc && btns.offsetParent !== null && !hero.classList.contains('out')) {
+      /* Corrected against where the disc actually landed rather than
+         derived from the hero's box. The hero is a framed element inside a
+         wrapper inside an absolutely placed cell, and which of those boxes
+         `bottom` resolves against is not worth deriving — one measurement
+         of the error is exact.
+
+         Clamped, and that is not belt-and-braces: this runs on a heartbeat,
+         and a measurement taken while the deck is mid-slide reports an
+         error that is really just the transform. Unclamped, two bad reads
+         in a row walk the disc off the card. */
+      var err = bMid(disc) - bMid(btns);
+      if (Math.abs(err) > 1 && Math.abs(err) < 400) {
+        var cur = parseFloat(hero.style.getPropertyValue('--fst-btn-b'));
+        if (!isFinite(cur)) cur = 14;
+        var next = cur + err;
+        var lim = Math.max(40, hero.offsetHeight - 52);
+        if (next < 4) next = 4;
+        if (next > lim) next = lim;
+        hero.style.setProperty('--fst-btn-b', Math.round(next) + 'px');
+      }
+    }
+  }
 
   window.fstOpen = function () {
     if (typeof window.nwsbHeroCells !== 'function') return;
@@ -347,9 +407,9 @@
       nav.innerHTML = navHtml();
       d.parentNode.insertBefore(nav, d.nextSibling);
     }
-    /* Straight to the first step. Leaving it on cell 0 would mean tapping
-       the disc appeared to do nothing — the hero is what was already there. */
-    window.nwsbHeroGo(1);
+    /* It stays on cell 0 — the set, now carrying the title. That IS the
+       first thing the guide has to say, and forward is what starts it. */
+    title(true);
     paint();
     syncHeight();
     haptic(24);
@@ -360,6 +420,7 @@
   window.fstClose = function () {
     var d = deck();
     if (d) d.classList.remove('fst-on');
+    title(false);
     var nav = document.getElementById('fstNav');
     if (nav) nav.remove();
     if (typeof window.nwsbHeroCells === 'function') {

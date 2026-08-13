@@ -20,7 +20,11 @@
    ══════════════════════════════════════════════════════════════════ */
 .fst-btn {
   position: absolute; z-index: 40;
-  right: 14px; bottom: 14px;
+  /* Outside the set, on the line the two buttons inside it are on.
+     --fst-btn-b is measured off .hero-btns by the script, because that
+     line moves with the set and the set is sized from whatever space is
+     left between the fixed header and the nav. */
+  right: 10px; bottom: var(--fst-btn-b, 14px);
   width: 40px !important; height: 40px !important;
   min-width: 40px !important; min-height: 40px !important;
   padding: 0 !important; margin: 0 !important;
@@ -70,18 +74,16 @@
   box-shadow: 0 18px 44px rgba(0,0,0,0.5);
   -webkit-backdrop-filter: none; backdrop-filter: none;
   display: flex; flex-direction: column;
-  /* ── One length, for all fifteen ──
-     The deck takes the height of whatever cell is on it, so this number is
-     the guide's whole shape. It is NOT the hero's: on this look the hero is
-     a landscape set about 230px tall, and a step card that size is four
-     lines and a scrollbar.
+  /* ── One length, and it is the hero's ──
+     The hero card is the first card of this same guide — it carries the
+     title — so a step card has to be the same rectangle or the deck
+     resizes the moment you press forward. --fst-h is the hero cell's own
+     layout height, measured by the script.
 
-     It is the rail's own length — the banner cells these are standing in
-     for, handed down as --fst-ban by the script — floored at what a step
-     actually needs to be read and ceilinged so it never runs past the fold
-     on a small phone. One value for all fifteen, so the deck does not
-     resize under you as you step through them. */
-  height: clamp(340px, max(var(--fst-ban, 0px), 52dvh), 470px);
+     This is the constraint the copy is written to: a lead of one line and
+     three points of one line each. A step you take in at a glance beats a
+     step you scroll. */
+  height: var(--fst-h, 300px);
   min-height: 0;
   text-align: left;
   overflow: hidden;
@@ -93,40 +95,50 @@
 .fst-cell .hs-head { flex-shrink: 0; }
 .fst-cell .fst-body {
   flex: 1; min-height: 0;
-  margin-top: 14px; padding: 0 4px 2px;
+  margin-top: 10px; padding: 0 4px 2px;
   overflow-y: auto; -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
 .fst-cell .fst-body::-webkit-scrollbar { display: none; }
+/* The card is the hero's rectangle and some steps have more in them than
+   that, so the body scrolls. A fade at the foot is what makes that legible:
+   without it a step ends mid-sentence and reads as broken rather than as
+   "there is more here". It is drawn on the CARD, not the scroller, so it
+   stays put while the words move under it. */
+.hs-cell.fst-cell::after {
+  content: ''; position: absolute; left: 14px; right: 14px; bottom: 14px;
+  height: 34px; pointer-events: none; border-radius: 0 0 12px 12px;
+  background: linear-gradient(180deg, rgba(5,7,13,0) 0%, rgba(5,7,13,0.96) 82%);
+}
 
 .fst-lead {
   margin: 0;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
-  line-height: 1.58; color: rgba(255,255,255,0.68);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+  line-height: 1.48; color: rgba(255,255,255,0.68);
 }
 
 /* ── The points ──
    A key and a line about it, with a rule down the left rather than a
    bullet glyph — a wrapped line still reads as belonging to its key
    instead of floating loose underneath it. */
-.fst-pts { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+.fst-pts { margin-top: 12px; display: flex; flex-direction: column; gap: 9px; }
 .fst-pt {
   padding-left: 12px;
   border-left: 2px solid rgba(232,213,163,0.36);
 }
 .fst-pt-k {
   display: block;
-  font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 800;
+  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 800;
   letter-spacing: .2px; color: #fff;
 }
 .fst-pt-v {
-  display: block; margin-top: 3px;
-  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 400;
-  line-height: 1.55; color: rgba(255,255,255,0.56);
+  display: block; margin-top: 2px;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 400;
+  line-height: 1.42; color: rgba(255,255,255,0.56);
 }
 
 .fst-go {
-  margin-top: 18px; margin-bottom: 4px;
+  margin-top: 13px; margin-bottom: 4px;
   display: inline-flex; align-items: center; gap: 9px;
   padding: 10px 16px !important; min-height: 0 !important;
   border: none !important; border-radius: 999px !important;
@@ -207,3 +219,53 @@
 @media (prefers-reduced-motion: reduce) {
   .fst-btn, .fst-bar i { transition: none !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   THE SET AS THE TITLE CARD
+
+   While the guide is running, the television's own screen carries it: the
+   wordmark in blonde and one line under it. The hero's own furniture —
+   the tagline, the word on its timer, the picture rail, Explore and App
+   Guide — is hidden rather than removed, because it is the app's real
+   header and taking it apart to put it back is how you lose a piece of it.
+
+   The film behind stays. It is the only thing in the set that should keep
+   moving while the title is up.
+   ══════════════════════════════════════════════════════════════════ */
+.hero-simple.fst-title-on .hero-content > *:not(.fst-title):not(.hero-bg-vid) {
+  display: none !important;
+}
+.fst-title {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: center;
+  padding: 0 26px;
+  text-align: left;
+  pointer-events: none;
+}
+.fst-title-b {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(34px, 10vw, 54px);
+  line-height: 1; letter-spacing: -1px;
+  color: #e8d5a3;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.7);
+}
+/* the wordmark's own two weights, in blonde rather than white */
+.fst-title-b .b { font-weight: 800; }
+.fst-title-b .t { font-weight: 300; opacity: .85; }
+.fst-title-s {
+  margin-top: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
+  text-shadow: 0 1px 10px rgba(0,0,0,0.8);
+}
+
+/* The banners' head is sized for a banner. On a step card it is competing
+   with the words for a 229px box, so it comes down — same shape, less of
+   the height. */
+.fst-cell .hs-head { margin-bottom: 0 !important; }
+.fst-cell .hs-orb { width: 34px !important; height: 34px !important; }
+.fst-cell .hs-orb svg { width: 17px !important; height: 17px !important; }
+.fst-cell .hs-head-h { font-size: 10px !important; letter-spacing: 1.6px !important; }
+.fst-cell .hs-head-t { font-size: 15px !important; line-height: 1.15 !important; }
