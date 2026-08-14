@@ -178,6 +178,33 @@
      nothing to decode, but they queued behind full-width banners on the
      same screen and never got a slot — so they sat black. Six covers a
      screen's worth of banners AND the discs on it. */
+  /* ── Nothing decorative claims the media notification ─────────────
+     Thirteen of the clips in this app carry an audio track, and Android
+     treats any video playing with sound as media: the app turns up in the
+     notification shade next to a music player, with a play button on the
+     lock screen. Every one of these clips is decoration — a banner, a
+     background, a set — and the app is not a video player.
+
+     So two things on every play: the clip is muted whatever its markup
+     said, and the media session is cleared. The video call is the one
+     exception, because that one IS meant to be heard, and the guard steps
+     aside entirely if an <audio> element is actually playing — the word
+     player's sound is the app's real audio and it keeps its own session. */
+  document.addEventListener('play', function (e) {
+    var v = e.target;
+    if (!v || v.tagName !== 'VIDEO') return;
+    if (v.id === 'chatCallRemoteVideo' || v.id === 'chatCallLocalVideo') return;
+    if (!v.muted) { try { v.muted = true; v.volume = 0; } catch (err) {} }
+    try {
+      var a = document.querySelector('audio');
+      if (a && !a.paused && !a.ended) return;      /* real audio is playing */
+      if (navigator.mediaSession) {
+        navigator.mediaSession.metadata = null;
+        navigator.mediaSession.playbackState = 'none';
+      }
+    } catch (err) {}
+  }, true);
+
   var MAX_PLAYING = 6;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();

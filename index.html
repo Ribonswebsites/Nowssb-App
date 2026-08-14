@@ -151,7 +151,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        script below as well — this is a start animation, not a wallpaper, and
        a looping video never fires `ended`, so a loop would also hold the app
        on the start screen forever. -->
-  <video class="splash-bg-video" id="splashVid" playsinline autoplay
+  <!-- muted, and it matters more than it looks. start-animation.mp4 carries
+       an AAC track, and a video that plays with sound makes Android put the
+       app in the notification shade next to Spotify — "NowssB, playing". The
+       clip is decoration; nobody is meant to hear it, and nobody should be
+       told it is a video. -->
+  <video class="splash-bg-video" id="splashVid" playsinline autoplay muted
          preload="auto" aria-hidden="true" tabindex="-1"
          poster="./assets/video/start-animation-poster.webp?v=2"></video>
   <script>
@@ -10438,7 +10443,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
 <script src="app/js/part049.js?v=297"></script>
 <script src="app/js/part050.js?v=241"></script>
-<script src="app/js/part051.js?v=21" defer></script>
+<script src="app/js/part051.js?v=22" defer></script>
 <script src="app/js/part052.js?v=3"></script>
 <script src="app/js/part054.js?v=15"></script>
 <script src="app/js/part056.js?v=5"></script>
