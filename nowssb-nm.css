@@ -15104,56 +15104,27 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
    and both of them are page-sized, so on those pages the switch appeared to
    do nothing at all:
 
-     · THE INTRO PAGES. Nine of them, one per store — the Word Atelier, the
-       Meaning Store, the cart, the wishlist and the rest. Each is an opaque
-       black panel at z-index 30 with its own artwork inside at 0.75, which
-       is a picture ON a page rather than the page's own background, so
-       markImageBacked never saw it. The film was playing underneath the
-       whole time with a black sheet over it.
-
      · THE MENU. .menu-drawer is not a .sub-screen at all, so it was never a
        candidate. It also carried a Cloudinary photograph of its own, which
        is the image being taken out here.
 
-   The rule these follow is the one part076 already states: stills before
-   the switch, film after it. Off, the artwork stays exactly as it is. On,
-   the artwork steps aside and the same clip the home is playing runs behind
-   the page — and the vignette each of these already owns is what keeps the
-   type legible over it.
+   The intro pages are NOT in that list, and the note below says why.
 ═══════════════════════════════════════════════════════════════ */
 
-/* The panel itself: transparent, so the fixed clip at z-index 0 is what is
-   behind the words. */
-/* By id for the five that have one, because they are already claimed by
-   `#nssIntroPage, #rmIntroPage, … { background:#000 !important }` further up,
-   and an id with !important is not something a class selector can answer.
-   The rest carry no id and the class is enough. */
-body.fashplus :is(#nssIntroPage, #rmIntroPage, #msIntroPage, #ebIntroPage,
-                  #sigIntroPage,
-                  .rm-intro-page, .ms-intro-page, .nss-intro-page,
-                  .sl-intro-page, .sig-intro-page, .cart-intro-page,
-                  .wish-intro-page, .orders-intro-page, .oh-intro-page) {
-  background: transparent !important;
-}
+/* ── THE INTRO PAGES KEEP THEIR ARTWORK ──────────────────────────
+   Three rules used to live here: they made each intro panel transparent,
+   blanked the still it wears, and deepened its vignette to compensate — so
+   that the home's film showed through the page instead.
 
-/* The still it was wearing. Hidden rather than removed, because turning the
-   mode off has to put it straight back. */
-body.fashplus :is(.rm-intro-bg, .ms-intro-bg, .nss-intro-bg, .sl-intro-bg,
-                  .sig-intro-bg, .cart-intro-bg, .wish-intro-bg,
-                  .orders-intro-bg, .oh-intro-bg, .fpp-intro-bg) {
-  background-image: none !important;
-  background-color: transparent !important;
-}
+   That was the wrong reading of the ask. What was wanted was the page
+   BACKGROUNDS carrying the film, not the intro pages being emptied out.
+   Each of those panels is a designed thing — its own artwork, its own
+   title over it — and taking the artwork away did not reveal something
+   better underneath, it just removed the picture someone chose.
 
-/* A film is busier than a still, so the vignette that was enough over
-   artwork is deepened a little over moving pictures. Same gradient, more of
-   it — the page keeps its shape and the title keeps its contrast. */
-body.fashplus :is(.rm-intro-vignette, .ms-intro-vignette, .nss-intro-vignette,
-                  .sl-intro-vignette, .sig-intro-vignette) {
-  background: linear-gradient(rgba(6,12,24,0.52) 0%,
-                              rgba(6,12,24,0.62) 45%,
-                              rgba(4,9,18,0.86) 100%) !important;
-}
+   So they are left exactly as they are, in both modes. The rules are gone
+   rather than commented out; this note is here so the idea is not had a
+   second time. */
 
 /* ── The menu ────────────────────────────────────────────────────
    No photograph, in either mode. It was a Cloudinary jpg behind a 58–70%
@@ -15204,4 +15175,16 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open) .sub-screen.open[data-fp-img
 body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   .sub-screen.open[data-fp-img] > .sub-screen-bg[data-fp-img] {
   background-color: transparent !important;
+}
+
+/* ── The AI Prescription card gets its gap ────────────────────────
+   #rxCardWrap is injected empty and filled by app/js/part037.js, so it had
+   no margin of its own — every other block on this home carries its gap in
+   its own wrapper, and this one had no wrapper to carry it. The Fashion
+   Plus card directly above it ended up touching the prescription banner,
+   which read as one block with a seam through it rather than two.
+   The same 16px the sections either side of it use. */
+:is(#home, .stw-prev-stage) #rxCardWrap:not(:empty) {
+  margin-top: 16px !important;
+  margin-bottom: 16px !important;
 }

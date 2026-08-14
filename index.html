@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=789">
+<link rel="stylesheet" href="nowssb-nm.css?v=790">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
@@ -1572,11 +1572,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nmh-sec-wrap nmh-store-wrap">
     <div class="nss-store-trigger" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" style="margin-top:16px;">
       <div class="nss-trigger-slides">
-        <!-- The clip replaces the three crossfading stills that were here. -->
+        <!-- The same tall render the Fashion home's store card carries. Both
+             cards are the same portrait shape and both are the same section,
+             so they show the same film; store-trigger.mp4 was the old
+             colourful one and only this card was still on it. -->
         <video class="nss-trigger-vid" data-nwsb-auto muted loop playsinline
                preload="none" aria-hidden="true" tabindex="-1"
-               poster="./assets/video/store-trigger-poster.webp?v=1"
-               src="./assets/video/store-trigger.mp4?v=1"></video>
+               poster="./assets/video/store-section-poster.webp?v=2"
+               src="./assets/video/store-section.mp4?v=2"></video>
       </div>
       <div class="nss-trigger-content">
         <div class="nss-trigger-top">

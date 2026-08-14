@@ -1,9 +1,9 @@
 {
-  "generated": "2026-08-01T11:45:26.677Z",
+  "generated": "2026-08-14T13:15:03.500Z",
   "counts": {
-    "audio": 5,
-    "image": 485,
-    "video": 61
+    "audio": 3,
+    "image": 461,
+    "video": 56
   },
   "assets": [
     {
@@ -28,22 +28,6 @@
       "local": "audio/mixkit-sea-waves-loop-1196-1684d49c.mp3",
       "refs": [
         "app/js/part032.js"
-      ]
-    },
-    {
-      "url": "https://pub-xxxx.r2.dev/words/word-female.mp3",
-      "kind": "audio",
-      "local": "audio/word-female-68da69c5.mp3",
-      "refs": [
-        "admin.html"
-      ]
-    },
-    {
-      "url": "https://pub-xxxx.r2.dev/words/word-male.mp3",
-      "kind": "audio",
-      "local": "audio/word-male-d3a6415a.mp3",
-      "refs": [
-        "admin.html"
       ]
     },
     {
@@ -187,14 +171,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png",
-      "kind": "image",
-      "local": "image/1000038291_no_bg-1778521337465_slhlrx-2c2e2de6.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778761450/1000038628-ezremove_rtkvji.png",
       "kind": "image",
       "local": "image/1000038628-ezremove_rtkvji-4e92f6f6.png",
@@ -267,31 +243,6 @@
       "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779558984/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png",
       "kind": "image",
       "local": "image/20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq-daa82ba7.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png",
-      "kind": "image",
-      "local": "image/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu-0cfd4b7a.png",
-      "refs": [
-        "app/js/part042.js"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png",
-      "kind": "image",
-      "local": "image/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu-3946f7d5.png",
-      "refs": [
-        "app/app.css",
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_60/v1779563281/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu.png",
-      "kind": "image",
-      "local": "image/246883f0-56d8-11f1-8fad-095787cce754_m4vnqu-e59f5e72.png",
       "refs": [
         "index.html"
       ]
@@ -408,14 +359,6 @@
       "local": "image/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me-e1c03910.png",
       "refs": [
         "app/js/part012.js"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png",
-      "kind": "image",
-      "local": "image/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me-e9b3c801.png",
-      "refs": [
-        "index.html"
       ]
     },
     {
@@ -580,14 +523,6 @@
       "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779657309/669d7570-57ad-11f1-ae7e-3f26811e4481_cetrs1.png",
       "kind": "image",
       "local": "image/669d7570-57ad-11f1-ae7e-3f26811e4481_cetrs1-8cb975e5.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019430/684ef220-516f-11f1-9b86-d16f5852128e_cjx9y8.png",
-      "kind": "image",
-      "local": "image/684ef220-516f-11f1-9b86-d16f5852128e_cjx9y8-8c229c4e.png",
       "refs": [
         "index.html"
       ]
@@ -789,22 +724,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/b9dbe540-51e6-11f1-b02a-df809877b0f5_tt0cfk.png",
-      "kind": "image",
-      "local": "image/b9dbe540-51e6-11f1-b02a-df809877b0f5_tt0cfk-4103e09f.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/b9ebc3c0-51e6-11f1-b02a-df809877b0f5_drg3ft.png",
-      "kind": "image",
-      "local": "image/b9ebc3c0-51e6-11f1-b02a-df809877b0f5_drg3ft-1139e75a.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../buddha.jpg",
       "kind": "image",
       "local": "image/buddha-56bd80b3.jpg",
@@ -846,22 +765,6 @@
       "local": "image/c5576970-7389-11f1-8c74-0593c060acc9_c4epec-5faf8c22.png",
       "refs": [
         "nowssb-player.js"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/f_auto,q_auto/v1779019438/c7813730-516f-11f1-9b86-d16f5852128e_sb2bje.png",
-      "kind": "image",
-      "local": "image/c7813730-516f-11f1-9b86-d16f5852128e_sb2bje-60b908e9.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/c8ede950-56cf-11f1-8fad-095787cce754_lhp24x.png",
-      "kind": "image",
-      "local": "image/c8ede950-56cf-11f1-8fad-095787cce754_lhp24x-3ab0831c.png",
-      "refs": [
-        "index.html"
       ]
     },
     {
@@ -1312,14 +1215,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_000000002d8481fa9065a82d78dfc023_ayk5gv.png",
-      "kind": "image",
-      "local": "image/file_000000002d8481fa9065a82d78dfc023_ayk5gv-fec3a9f1.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/v1785008158/file_000000003178820eaf8ce3c5585ae040_odmnce.png",
       "kind": "image",
       "local": "image/file_000000003178820eaf8ce3c5585ae040_odmnce-208b73bf.png",
@@ -1406,14 +1301,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png",
-      "kind": "image",
-      "local": "image/file_000000003a70820783900e4c58acea82_nlzav4-03065b0a.png",
-      "refs": [
-        "app/js/part010.js"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png",
       "kind": "image",
       "local": "image/file_000000003a70820783900e4c58acea82_nlzav4-7018aa78.png",
@@ -1483,14 +1370,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_0000000054ac81fa9e379e63228aba3a_h5alpl.png",
-      "kind": "image",
-      "local": "image/file_0000000054ac81fa9e379e63228aba3a_h5alpl-d8b05f3e.png",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png",
       "kind": "image",
       "local": "image/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab-6f94fbbb.png",
@@ -1525,14 +1404,6 @@
         "app/js/part057.js",
         "app/js/part061.js",
         "app/js/part064.js",
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dnjtwhhi8/image/upload/v1785089054/file_00000000639c82078e3623f3dab8d1af_dvw8yx.png",
-      "kind": "image",
-      "local": "image/file_00000000639c82078e3623f3dab8d1af_dvw8yx-6399eeb8.png",
-      "refs": [
         "index.html"
       ]
     },
@@ -1719,14 +1590,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782722895/file_00000000a23c71f49581cfa65c26e6d2_bnwstr.png",
-      "kind": "image",
-      "local": "image/file_00000000a23c71f49581cfa65c26e6d2_bnwstr-0d4e5d79.png",
-      "refs": [
-        "nowssb-player.js"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png",
       "kind": "image",
       "local": "image/file_00000000a24081fa83eeab9164647db8_w2fzuq-53baa3a7.png",
@@ -1762,15 +1625,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png",
-      "kind": "image",
-      "local": "image/file_00000000acd482469da31656911599dd_kany9z-0b8ff35c.png",
-      "refs": [
-        "app/js/part037.js",
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png",
       "kind": "image",
       "local": "image/file_00000000ae5882089bc97a56b7368777_l4cq7e-2d04e075.png",
@@ -1784,29 +1638,7 @@
       "kind": "image",
       "local": "image/file_00000000ae6071fa982c6eec401328c6_uvgfjs-1efdccf1.png",
       "refs": [
-        "app/app.css",
-        "app/js/part004.js",
-        "app/js/part018.js",
-        "index.html",
-        "nowssb-nm.css",
         "nowssb-player.js"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png",
-      "kind": "image",
-      "local": "image/file_00000000ae6071fa982c6eec401328c6_uvgfjs-43be5b07.png",
-      "refs": [
-        "nowssb-nm.css"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_120/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png",
-      "kind": "image",
-      "local": "image/file_00000000ae6071fa982c6eec401328c6_uvgfjs-d1a65a04.png",
-      "refs": [
-        "index.html",
-        "nowssb-nm.css"
       ]
     },
     {
@@ -1872,14 +1704,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782729222/file_00000000b86c7207988c04376fd0529c_dunq9l.png",
-      "kind": "image",
-      "local": "image/file_00000000b86c7207988c04376fd0529c_dunq9l-1297b974.png",
-      "refs": [
-        "nowssb-player.js"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785069871/file_00000000bc3481fba068b600e71ed418_xt5arr.png",
       "kind": "image",
       "local": "image/file_00000000bc3481fba068b600e71ed418_xt5arr-49c4b612.png",
@@ -1894,8 +1718,7 @@
       "refs": [
         "app/js/part057.js",
         "app/js/part061.js",
-        "app/js/part064.js",
-        "index.html"
+        "app/js/part064.js"
       ]
     },
     {
@@ -2312,14 +2135,6 @@
       "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777635128/grok_image_1777632687913_2_t4jezy.jpg",
       "kind": "image",
       "local": "image/grok_image_1777632687913_2_t4jezy-5496e48d.jpg",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777635201/grok_image_1777634717809_jbqvaq.jpg",
-      "kind": "image",
-      "local": "image/grok_image_1777634717809_jbqvaq-538b351f.jpg",
       "refs": [
         "index.html"
       ]
@@ -2984,22 +2799,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581668/grok_image_1778575335848_zvteyg.jpg",
-      "kind": "image",
-      "local": "image/grok_image_1778575335848_zvteyg-e049c5e5.jpg",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581669/grok_image_1778575348155_zfummr.jpg",
-      "kind": "image",
-      "local": "image/grok_image_1778575348155_zfummr-0532898c.jpg",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581669/grok_image_1778576394414_vdi2on.jpg",
       "kind": "image",
       "local": "image/grok_image_1778576394414_vdi2on-a8ac4e25.jpg",
@@ -3011,14 +2810,6 @@
       "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581670/grok_image_1778576400577_mnxqkd.jpg",
       "kind": "image",
       "local": "image/grok_image_1778576400577_mnxqkd-d875ed19.jpg",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778581670/grok_image_1778581463094_eucw6p.jpg",
-      "kind": "image",
-      "local": "image/grok_image_1778581463094_eucw6p-c33fe37e.jpg",
       "refs": [
         "index.html"
       ]
@@ -3141,8 +2932,7 @@
       "kind": "image",
       "local": "image/grok_image_1778922009415_qtoteo-9ca8d462.jpg",
       "refs": [
-        "app/app.css",
-        "index.html"
+        "app/app.css"
       ]
     },
     {
@@ -3827,14 +3617,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1785402429/grok_image_1785402330575_bbykvf.jpg",
-      "kind": "image",
-      "local": "image/grok_image_1785402330575_bbykvf-6302183f.jpg",
-      "refs": [
-        "app/js/part066.js"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg",
       "kind": "image",
       "local": "image/grok_video_2026-05-13-15-13-43_c1npax-68cf3931.jpg",
@@ -4133,31 +3915,6 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784958436/gemini_generated_video_4045e221_a4mza9.mp4",
-      "kind": "video",
-      "local": "video/gemini_generated_video_4045e221_a4mza9-535dd2f3.mp4",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784959261/gemini_generated_video_aa0d13e6_gzjzhw.mp4",
-      "kind": "video",
-      "local": "video/gemini_generated_video_aa0d13e6_gzjzhw-26d59884.mp4",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/eenvubod/video/upload/v1784959262/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn.mp4",
-      "kind": "video",
-      "local": "video/generation_mZDWzopcKf0mBbhrpF4C_2_iu7ovn-f12ac915.mp4",
-      "refs": [
-        "app/js/part006.js",
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4",
       "kind": "video",
       "local": "video/grok_video_2026-05-05-16-46-09_dpauwg-e384f50e.mp4",
@@ -4332,25 +4089,9 @@
       ]
     },
     {
-      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784100852/grok_video_2026-07-15-13-03-21_fs9ir3.mp4",
-      "kind": "video",
-      "local": "video/grok_video_2026-07-15-13-03-21_fs9ir3-924f5057.mp4",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
       "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4",
       "kind": "video",
       "local": "video/grok_video_2026-07-16-08-26-13_ipsk4u-43030665.mp4",
-      "refs": [
-        "index.html"
-      ]
-    },
-    {
-      "url": "https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-41-24_x8z4mj.mp4",
-      "kind": "video",
-      "local": "video/grok_video_2026-07-17-12-41-24_x8z4mj-bceeb55f.mp4",
       "refs": [
         "index.html"
       ]
@@ -4410,6 +4151,7 @@
       "kind": "video",
       "local": "video/grok_video_2026-07-24-17-46-41_vkxr4r-5bfff2a9.mp4",
       "refs": [
+        "app/js/part083.js",
         "index.html"
       ]
     },
@@ -4466,6 +4208,7 @@
       "kind": "video",
       "local": "video/grok_video_2026-07-30-15-35-40_xwm1ei-366a36cd.mp4",
       "refs": [
+        "app/js/part083.js",
         "index.html"
       ]
     },
@@ -4530,7 +4273,9 @@
       "kind": "video",
       "local": "video/grok_video_2026-07-31-15-41-50_oxszei-d54e9fb0.mp4",
       "refs": [
-        "app/js/part026.js"
+        "app/js/part026.js",
+        "app/js/part080.js",
+        "app/js/part083.js"
       ]
     },
     {
@@ -4562,7 +4307,9 @@
       "kind": "video",
       "local": "video/grok_video_2026-07-31-20-43-13_qh2qjg-4583aa09.mp4",
       "refs": [
-        "app/js/part012.js"
+        "app/js/part012.js",
+        "app/js/part083.js",
+        "index.html"
       ]
     },
     {
