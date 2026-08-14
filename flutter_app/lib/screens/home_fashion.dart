@@ -1,13 +1,25 @@
-/// The Fashion home — #home, the dark one.
+/// The Fashion home — `#home`, the dark one.
 ///
 /// The app has two homes and they are not skins of each other. The Normal
 /// home is a pale neumorphic surface where every card is raised out of the
-/// page by a shadow pair. This one is the opposite: a dark page with the
-/// film running behind it and every block sitting on it as a pane of glass.
-/// Same sections, same order, different language — which is why this is its
-/// own file rather than a flag on the other one.
+/// page by a shadow pair. This one is the opposite: a dark page with the film
+/// running behind it and every block sitting on it as a pane of glass.
 ///
-/// The film behind it is the point. On the website that is #fpBgVideo, one
+/// WHAT THIS PAGE IS, EXACTLY
+///
+/// `REG.fash.items` in app/js/part062.js:105-149 is the list of sections this
+/// home is made of — thirty of them, in that order. This file is that list,
+/// in that order, and nothing else: every section is a widget in
+/// lib/screens/fashion/, each carrying the index.html line it was
+/// transcribed from. Read the two side by side and they say the same thing.
+///
+/// Four entries are `defOff` — My Routines, Shabdapathy Foundations, Word
+/// Search, Meaning Search. They are built like any other section and hidden
+/// on a fresh install, which is what a fresh install shows. 26 of 30 are
+/// visible. Reordering and hiding at runtime (the web's `hlApplyLayout`) is
+/// not ported; [_defOff] is a constant, not a stored list.
+///
+/// The film behind it is the point. On the website that is `#fpBgVideo`, one
 /// fixed element under every screen; here it is one [NwsbVideo] behind the
 /// list, marked as a feature so it keeps its decoder while the banners
 /// further down come and go.
@@ -18,12 +30,58 @@ import 'package:flutter/material.dart';
 import '../data/content.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
-import '../theme/tokens.dart';
-import 'home_normal.dart' show nwsbGreeting;
 import '../shell/nav_shell.dart';
-import '../widgets/tv_frame.dart';
-import 'sections.dart';
+import '../theme/tokens.dart';
+import 'fashion/hero.dart';
+import 'fashion/sections_bottom.dart';
+import 'fashion/sections_mid.dart';
+import 'fashion/sections_top.dart';
+import 'fashion_plus.dart';
+import 'sound_library.dart';
 import 'widgets_page.dart';
+import 'word_detail.dart';
+
+/// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
+///
+/// Stated separately from the widgets so a test can hold the two against
+/// each other: a section quietly dropped from the page is otherwise
+/// invisible until someone scrolls the whole home on a device looking for
+/// something they cannot name.
+const kFashionSectionOrder = <String>[
+  'greet',
+  'herorow',
+  'practice',
+  'reader',
+  'herovid',
+  'streak',
+  'tiles',
+  'store',
+  'trendwd',
+  'custom',
+  'fashplus',
+  'rx',
+  'connect',
+  'trendvid',
+  'storeban',
+  'subvid',
+  'edition',
+  'routines',
+  'offer',
+  'cube',
+  'shabda',
+  'ebooks',
+  'connectban',
+  'healing',
+  'genderpath',
+  'promovid',
+  'wsearch',
+  'msearch',
+  'shabvid',
+  'footer',
+];
+
+/// The four `defOff` entries. Built, not placed.
+const kFashionDefOff = <String>{'routines', 'shabda', 'wsearch', 'msearch'};
 
 class HomeFashion extends StatefulWidget {
   const HomeFashion({super.key, this.name = 'Healer'});
@@ -51,9 +109,111 @@ class _HomeFashionState extends State<HomeFashion> {
     if (mounted) setState(() {});
   }
 
+  void _go(int tab) => NavScope.goTo(context, tab);
+
+  void _push(Widget page) => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => page),
+      );
+
+  /// The prescription's word pills open the word itself, the way tapping one
+  /// on the web does.
+  void _openWord(int i) {
+    final all = ContentStore.instance.library;
+    if (i < 0 || i >= all.length) return;
+    _push(WordDetail(word: all[i]));
+  }
+
+  void _footerLink(String key) {
+    switch (key) {
+      case 'about':
+      case 'word-science':
+        _go(2);
+      case 'sound-library':
+        _push(const SoundLibraryScreen());
+      case 'meaning-store':
+        _go(3);
+      case 'practice':
+        _go(1);
+      case 'profile':
+        _go(4);
+    }
+  }
+
+  /// The thirty, in `REG.fash.items` order. Keyed by the registry's own `k`
+  /// so the two lists can be diffed by eye.
+  List<(String, Widget)> _sections() => [
+        ('greet', const FashGreeting()),
+        (
+          'herorow',
+          FashHeroRow(
+            onCustomize: () => _push(const WidgetsPage()),
+            onFeatures: () => _push(const WidgetsPage()),
+            onEarn: () => _go(4),
+          )
+        ),
+        ('practice', FashPractice(onTap: () => _go(1))),
+        ('reader', FashReader(onTap: () => _go(2))),
+        ('herovid', FashStreakVideo(onTap: () => _go(1))),
+        ('streak', FashStreak(onTap: () => _go(1))),
+        ('tiles', FashTiles(onTile: _go)),
+        ('store', FashStore(onTap: () => _go(3))),
+        ('trendwd', FashTrending(onTap: () => _go(2))),
+        ('custom', FashCustomize(onTap: () => _push(const WidgetsPage()))),
+        (
+          'fashplus',
+          FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
+        ),
+        (
+          'rx',
+          FashPrescription(onTap: () => _go(1), onWord: _openWord),
+        ),
+        ('connect', FashConnect(onTap: () => _go(0))),
+        ('trendvid', FashShopNow(onTap: () => _go(3))),
+        ('storeban', FashStoreBanner(onTap: () => _go(3))),
+        ('subvid', FashSubscription(onTap: () => _go(3))),
+        ('edition', FashEdition(onTap: () => _go(3))),
+        ('routines', FashRoutines(onTap: () => _go(1))),
+        ('offer', FashOffer(onTap: () => _go(3))),
+        (
+          'cube',
+          FashQuickAccess(
+            onCart: () => _go(3),
+            onWishlist: () => _go(3),
+            onOrders: () => _go(4),
+          )
+        ),
+        ('shabda', FashShabdapathy(onTap: () => _go(2))),
+        ('ebooks', FashEbooks(onTap: () => _go(2))),
+        ('connectban', FashConnectBanner(onTap: () => _go(0))),
+        ('healing', FashHealing(onTap: () => _go(2))),
+        (
+          'genderpath',
+          FashGenderPath(
+            onFemale: () => _go(2),
+            onMale: () => _go(2),
+            onTap: () => _go(2),
+          )
+        ),
+        ('promovid', FashPromoVideo(onTap: () => _go(2))),
+        ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
+        ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),
+        ('shabvid', FashShabdaVideo(onTap: () => _go(2))),
+        ('footer', FashFooter(onLink: _footerLink)),
+      ];
+
   @override
   Widget build(BuildContext context) {
-    final words = ContentStore.instance.library;
+    final built = _sections();
+    assert(
+      built.map((e) => e.$1).toList().toString() ==
+          kFashionSectionOrder.toString(),
+      'the page and the registry have drifted apart',
+    );
+
+    final shown = [
+      for (final (k, w) in built)
+        if (!kFashionDefOff.contains(k)) w,
+    ];
 
     return Scaffold(
       backgroundColor: NwsbColors.deep,
@@ -85,481 +245,25 @@ class _HomeFashionState extends State<HomeFashion> {
             ),
           ),
 
-          SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 108),
-              children: [
-                const _FashTopRow(),
-                const SizedBox(height: 18),
-                _FashGreeting(name: widget.name),
-                const SizedBox(height: 16),
-                const _FashSearch(),
-                const SizedBox(height: 18),
-
-                // Every block below is a glass pane over the film.
-                const GlassWrap(child: HeroSection()),
-                const SizedBox(height: 16),
-
-                GlassWrap(
-                  child: TvSection(
-                    eyebrow: 'Today, on film',
-                    title: 'Streak',
-                    onTap: () => NavScope.goTo(context, 1),
-                    icon: Icons.local_fire_department_outlined,
-                    asset: 'assets/video/tv-screen.mp4',
-                    dark: true,
-                    bannerTitle: 'Daily Streak',
-                    bannerSub: 'Practice daily to keep your healing streak alive',
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                _FashWordOfDay(words: words),
-                const SizedBox(height: 16),
-
-                GlassWrap(
-                  child: TvSection(
-                    eyebrow: 'Words and meanings',
-                    title: 'The NowssB Store',
-                    onTap: () => NavScope.goTo(context, 3),
-                    icon: Icons.storefront_outlined,
-                    asset: 'assets/video/store-section.mp4',
-                    frame: DeviceFrame.tabletPortrait,
-                    dark: true,
-                    bannerTitle: 'Enter the Store',
-                    bannerSub: 'Word Library & Meaning Library, in one place',
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                const _FashTiles(),
-                const SizedBox(height: 16),
-
-                GlassWrap(
-                  child: BannerSection(
-                    eyebrow: 'Own the sounds that heal',
-                    title: 'Inside the Store',
-                    onTap: () => NavScope.goTo(context, 3),
-                    icon: Icons.shopping_bag_outlined,
-                    asset: 'assets/video/store-banner-fash.mp4',
-                    aspect: 16 / 10,
-                    dark: true,
-                    bannerTitle: 'Shop the Library',
-                    bannerSub: 'Words, meanings and the origins behind them',
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                GlassWrap(
-                  child: TvSection(
-                    eyebrow: 'The full library',
-                    title: 'NowssB Subscription',
-                    onTap: () => NavScope.goTo(context, 3),
-                    icon: Icons.workspace_premium_outlined,
-                    asset: 'assets/video/subscription-a.mp4',
-                    frame: DeviceFrame.tabletSlim,
-                    dark: true,
-                    bannerTitle: 'Every word, every meaning',
-                    bannerSub: 'See what a subscription opens',
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                GlassWrap(
-                  child: BannerSection(
-                    eyebrow: 'The rarest word',
-                    title: 'The Signature',
-                    onTap: () => NavScope.goTo(context, 3),
-                    icon: Icons.auto_awesome_outlined,
-                    asset: 'assets/video/signature-banner.mp4',
-                    dark: true,
-                    bannerTitle: 'One word, made only for you',
-                    bannerSub: 'See the Signature',
-                  ),
-                ),
-              ],
-            ),
+          // No horizontal padding on the list: the wrappers carry their own
+          // `margin: 18px 16px`, and the hero is full-bleed to the edges of
+          // the phone the way `#home`'s is.
+          ListView.builder(
+            padding: const EdgeInsets.only(bottom: 108),
+            itemCount: shown.length + 1,
+            itemBuilder: (context, i) {
+              if (i == 0) {
+                return FashionHero(
+                  onExplore: () => _go(2),
+                  onGuide: () => _push(const WidgetsPage()),
+                  onSearch: () => _go(2),
+                );
+              }
+              return shown[i - 1];
+            },
           ),
         ],
       ),
-    );
-  }
-}
-
-/// The glass pane every Fashion block sits on — .glass-wrap.
-class GlassWrap extends StatelessWidget {
-  const GlassWrap({super.key, required this.child, this.padding});
-
-  final Widget child;
-  final EdgeInsets? padding;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: padding ?? const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0x2E0E1524),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x1FFFFFFF)),
-      ),
-      child: child,
-    );
-  }
-}
-
-class _FashTopRow extends StatelessWidget {
-  const _FashTopRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            color: const Color(0x1FFFFFFF),
-            shape: BoxShape.circle,
-            border: Border.all(color: const Color(0x33FFFFFF)),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Image.asset(
-            'assets/icons/logo-disc.webp',
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const Icon(Icons.headphones,
-                size: 22, color: Colors.white),
-          ),
-        ),
-        const SizedBox(width: 12),
-        const Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'NowssB',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              Text(
-                'NOWSBANSIU',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 9,
-                  letterSpacing: 2,
-                  fontWeight: FontWeight.w600,
-                  color: NwsbColors.goldLight,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Spacer(),
-        const _FashHeaderBtn(icon: Icons.notifications_none, badge: 3),
-        const SizedBox(width: 8),
-        const _FashHeaderBtn(icon: Icons.home_outlined),
-        const SizedBox(width: 8),
-        _FashHeaderBtn(
-          icon: Icons.menu,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const WidgetsPage()),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _FashHeaderBtn extends StatelessWidget {
-  const _FashHeaderBtn({required this.icon, this.badge, this.onTap});
-  final IconData icon;
-  final int? badge;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        SizedBox(
-          width: 38,
-          height: 38,
-          child: Icon(icon, size: 22, color: Colors.white),
-        ),
-        if (badge != null && badge! > 0)
-          Positioned(
-            top: -2,
-            right: -2,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE0342B),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                '$badge',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
-      ],
-      ),
-    );
-  }
-}
-
-class _FashGreeting extends StatelessWidget {
-  const _FashGreeting({required this.name});
-  final String name;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 58,
-          height: 58,
-          decoration: BoxDecoration(
-            color: const Color(0x14FFFFFF),
-            shape: BoxShape.circle,
-            border: Border.all(color: const Color(0x2EFFFFFF)),
-          ),
-          child: const Icon(Icons.wb_twilight,
-              size: 26, color: NwsbColors.goldLight),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                nwsbGreeting(),
-                style: const TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w300,
-                  color: Color(0xB3FFFFFF),
-                ),
-              ),
-              Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _FashSearch extends StatelessWidget {
-  const _FashSearch();
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => NavScope.goTo(context, 2),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-      height: 54,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-      decoration: BoxDecoration(
-        color: const Color(0x1AFFFFFF),
-        borderRadius: BorderRadius.circular(27),
-        border: Border.all(color: const Color(0x24FFFFFF)),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 10),
-          const Icon(Icons.search, size: 20, color: Color(0x99FFFFFF)),
-          const SizedBox(width: 10),
-          const Expanded(
-            child: Text(
-              'Search any word or meaning…',
-              style: TextStyle(fontSize: 14, color: Color(0x8CFFFFFF)),
-            ),
-          ),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_forward,
-                size: 18, color: NwsbColors.ink),
-          ),
-        ],
-      ),
-      ),
-    );
-  }
-}
-
-/// The word of the day, read from the same Firestore library the website
-/// reads. Proof the content layer is wired all the way to a screen.
-class _FashWordOfDay extends StatelessWidget {
-  const _FashWordOfDay({required this.words});
-  final List<dynamic> words;
-
-  @override
-  Widget build(BuildContext context) {
-    if (words.isEmpty) return const SizedBox.shrink();
-    // Same word all day, and a different one tomorrow — the day number
-    // rather than a random pick, so it does not change as you scroll.
-    final w = words[DateTime.now().day % words.length];
-
-    return GlassWrap(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "TODAY'S WORD",
-            style: TextStyle(
-              fontSize: 10,
-              letterSpacing: 3,
-              fontWeight: FontWeight.w700,
-              color: NwsbColors.gold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            w.word as String,
-            style: const TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              height: 1.05,
-            ),
-          ),
-          if ((w.phonetic as String).isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              w.phonetic as String,
-              style: const TextStyle(
-                fontSize: 13,
-                color: NwsbColors.goldLight,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ],
-          if ((w.meaning as String).isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(
-              w.meaning as String,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xB3FFFFFF),
-                height: 1.5,
-              ),
-            ),
-          ],
-          if ((w.organ as String).isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                const Icon(Icons.favorite_border,
-                    size: 15, color: NwsbColors.goldLight),
-                const SizedBox(width: 7),
-                Expanded(
-                  child: Text(
-                    w.organ as String,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      letterSpacing: 1.4,
-                      color: Color(0x99FFFFFF),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _FashTiles extends StatelessWidget {
-  const _FashTiles();
-
-  // (title, sub, icon, destination) — 1 Practice · 2 Library · 3 Store ·
-  // 4 Profile. A tile that goes nowhere is a tile that is not finished.
-  static const _items = [
-    ('Word Science', 'The system', Icons.science_outlined, 2),
-    ('NowssB Profile', 'You, so far', Icons.person_outline, 4),
-    ('Sound Library', 'Root frequencies', Icons.graphic_eq, 2),
-    ('My Routines', '5 routine slots', Icons.repeat_rounded, 1),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.35,
-      children: [
-        for (final (title, sub, icon, dest) in _items)
-          GestureDetector(
-            onTap: () => NavScope.goTo(context, dest),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0x14FFFFFF)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(icon, size: 22, color: NwsbColors.goldLight),
-                const Spacer(),
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  sub,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontSize: 11, color: Color(0x8CFFFFFF)),
-                ),
-              ],
-            ),
-            ),
-          ),
-      ],
     );
   }
 }
