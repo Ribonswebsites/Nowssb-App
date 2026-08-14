@@ -21,6 +21,7 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import 'home_normal.dart' show nwsbGreeting;
 import '../shell/nav_shell.dart';
+import '../widgets/tv_frame.dart';
 import 'sections.dart';
 import 'widgets_page.dart';
 
@@ -117,13 +118,13 @@ class _HomeFashionState extends State<HomeFashion> {
                 const SizedBox(height: 16),
 
                 GlassWrap(
-                  child: BannerSection(
+                  child: TvSection(
                     eyebrow: 'Words and meanings',
                     title: 'The NowssB Store',
                     onTap: () => NavScope.goTo(context, 3),
                     icon: Icons.storefront_outlined,
                     asset: 'assets/video/store-section.mp4',
-                    aspect: 4 / 5,
+                    frame: DeviceFrame.tabletPortrait,
                     dark: true,
                     bannerTitle: 'Enter the Store',
                     bannerSub: 'Word Library & Meaning Library, in one place',
@@ -156,6 +157,7 @@ class _HomeFashionState extends State<HomeFashion> {
                     onTap: () => NavScope.goTo(context, 3),
                     icon: Icons.workspace_premium_outlined,
                     asset: 'assets/video/subscription-a.mp4',
+                    frame: DeviceFrame.tabletSlim,
                     dark: true,
                     bannerTitle: 'Every word, every meaning',
                     bannerSub: 'See what a subscription opens',
@@ -220,7 +222,13 @@ class _FashTopRow extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: const Color(0x33FFFFFF)),
           ),
-          child: const Icon(Icons.headphones, size: 22, color: Colors.white),
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(
+            'assets/icons/logo-disc.webp',
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const Icon(Icons.headphones,
+                size: 22, color: Colors.white),
+          ),
         ),
         const SizedBox(width: 12),
         const Flexible(

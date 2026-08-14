@@ -69,7 +69,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
         'Fashion home',
         on ? 'On' : 'Off by default',
       ],
-      film: 'assets/video/fashion-plus-bg.mp4',
+      art: 'assets/fashion/fp-intro.webp',
       enterLabel: 'ENTER FASHION PLUS',
       child: PageShell(
         eyebrow: 'Experience',

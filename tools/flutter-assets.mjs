@@ -21,45 +21,57 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const from = join(root, 'assets', 'video');
-const to = join(root, 'flutter_app', 'assets', 'video');
+/* The folders that go into the bundle. Not only the clips: the app's own
+   artwork lives here too and is what makes it look like NowssB rather than
+   like a Material demo — the device bezels the televisions are drawn from,
+   the intro-page paintings, the logo disc, the collection banners. All of
+   it is already in this repository; none of it needed downloading. */
+const FOLDERS = [
+  'video',        // the clips and their posters
+  'frames',       // the device bezels — see lib/widgets/tv_frame.dart
+  'icons',        // the logo disc, the search mark
+  'store',        // the intro-page artwork, and the collection covers
+  'fashion',      // the Fashion Plus intro and its icon
+  'player',       // the player's own artwork
+  'signature',    // the Signature's marks
+  'certificates',
+  'banners',      // the collection banners
+];
 
-if (!existsSync(from)) {
-  console.error(`missing ${from} — nothing to bundle`);
-  process.exit(1);
-}
-
-mkdirSync(to, { recursive: true });
+const KEEP = /\.(mp4|webp|png|jpe?g|svg)$/i;
 
 let copied = 0, skipped = 0, bytes = 0;
-for (const name of readdirSync(from)) {
-  // The clips and the posters, and nothing else. A poster is as required as
-  // its clip: at most four videos decode at once, so most of what is on
-  // screen at any moment IS the poster.
-  if (!/\.(mp4|webp)$/i.test(name)) continue;
 
-  const src = join(from, name);
-  const dst = join(to, name);
-  const s = statSync(src);
+function copyDir(rel) {
+  const from = join(root, 'assets', rel);
+  const to = join(root, 'flutter_app', 'assets', rel);
+  if (!existsSync(from)) return;
+  mkdirSync(to, { recursive: true });
 
-  // Same size and not older: already there. Makes a re-run cheap, which
-  // matters when the folder is 136 MB.
-  if (existsSync(dst)) {
-    const d = statSync(dst);
-    if (d.size === s.size && d.mtimeMs >= s.mtimeMs) {
-      skipped++;
-      bytes += s.size;
-      continue;
+  for (const name of readdirSync(from)) {
+    const src = join(from, name);
+    const s = statSync(src);
+    if (s.isDirectory()) { copyDir(join(rel, name)); continue; }
+    if (!KEEP.test(name)) continue;
+
+    const dst = join(to, name);
+    // Same size and not older: already there. Makes a re-run cheap, which
+    // matters when this is 200 MB.
+    if (existsSync(dst)) {
+      const d = statSync(dst);
+      if (d.size === s.size && d.mtimeMs >= s.mtimeMs) {
+        skipped++; bytes += s.size; continue;
+      }
     }
+    copyFileSync(src, dst);
+    copied++; bytes += s.size;
   }
-
-  copyFileSync(src, dst);
-  copied++;
-  bytes += s.size;
 }
 
+for (const f of FOLDERS) copyDir(f);
+
 console.log(
-  `flutter_app/assets/video/  ${copied} copied, ${skipped} already current, ` +
+  `flutter_app/assets/  ${copied} copied, ${skipped} already current, ` +
   `${(bytes / 1024 / 1024).toFixed(1)} MB total`
 );
 

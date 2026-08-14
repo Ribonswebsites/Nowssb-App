@@ -34,3 +34,11 @@ flutter_app/pubspec.lock
 # that tool before `flutter pub get`; pub get fails on a declared asset
 # directory that does not exist.
 flutter_app/assets/video/
+flutter_app/assets/frames/
+flutter_app/assets/icons/
+flutter_app/assets/store/
+flutter_app/assets/fashion/
+flutter_app/assets/player/
+flutter_app/assets/signature/
+flutter_app/assets/certificates/
+flutter_app/assets/banners/

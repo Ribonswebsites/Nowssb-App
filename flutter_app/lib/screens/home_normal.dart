@@ -10,6 +10,7 @@ import '../data/settings.dart';
 import '../theme/tokens.dart';
 import '../widgets/neumorphic.dart';
 import '../shell/nav_shell.dart';
+import '../widgets/tv_frame.dart';
 import 'sections.dart';
 import 'widgets_page.dart';
 
@@ -113,11 +114,7 @@ class HomeNormal extends StatelessWidget {
               onTap: () => NavScope.goTo(context, 3),
               icon: Icons.storefront_outlined,
               asset: 'assets/video/store-section.mp4',
-              // The tall render in the tall card — this one IS meant to be
-              // portrait, the way the store card is on the website. Kept
-              // shorter than the film itself so the block does not run past
-              // a screen.
-              aspect: 4 / 5,
+              frame: DeviceFrame.tabletPortrait,
               bannerTitle: 'Everything the practice needs',
               bannerSub: 'Open the store',
             ),
@@ -148,6 +145,8 @@ class _TopRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // The app's own mark, out of assets/icons. This was an empty
+        // neumorphic disc — the logo has been in the repository all along.
         Container(
           width: 46,
           height: 46,
@@ -155,6 +154,12 @@ class _TopRow extends StatelessWidget {
             color: NwsbColors.surface,
             shape: BoxShape.circle,
             boxShadow: NwsbShadows.raisedXs,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(
+            'assets/icons/logo-disc.webp',
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
           ),
         ),
         const SizedBox(width: 12),

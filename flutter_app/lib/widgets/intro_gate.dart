@@ -30,9 +30,10 @@ class IntroGate extends StatefulWidget {
     required this.eyebrow,
     required this.title,
     required this.body,
-    required this.film,
     required this.enterLabel,
     required this.child,
+    this.art,
+    this.film,
     this.stats = const [],
     this.onBack,
   });
@@ -48,8 +49,14 @@ class IntroGate extends StatefulWidget {
   final String body;
   final List<String> stats;
 
-  /// The page's own film, behind the words.
-  final String film;
+  /// The page's own painting — assets/store/intro-*.webp and the rest. This
+  /// is what the website puts behind these titles, and it is in the
+  /// repository; it was a video frame standing in for it before.
+  final String? art;
+
+  /// A film instead, for the pages whose backdrop genuinely moves. Ignored
+  /// when [art] is given.
+  final String? film;
 
   final String enterLabel;
 
@@ -94,6 +101,7 @@ class _IntroGateState extends State<IntroGate> {
               title: widget.title,
               body: widget.body,
               stats: widget.stats,
+              art: widget.art,
               film: widget.film,
               enterLabel: widget.enterLabel,
               onBack: widget.onBack,
@@ -112,13 +120,16 @@ class _Intro extends StatelessWidget {
     required this.title,
     required this.body,
     required this.stats,
+    required this.art,
     required this.film,
     required this.enterLabel,
     required this.onEnter,
     this.onBack,
   });
 
-  final String tag, eyebrow, title, body, film, enterLabel;
+  final String tag, eyebrow, title, body, enterLabel;
+  final String? art;
+  final String? film;
   final List<String> stats;
   final VoidCallback onEnter;
   final VoidCallback? onBack;
@@ -134,11 +145,22 @@ class _Intro extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          NwsbVideo(
-            asset: film,
-            autoplay: moving,
-            priority: ClipPriority.feature,
-          ),
+          if (art != null)
+            Image.asset(
+              art!,
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: NwsbColors.deep),
+            )
+          else if (film != null)
+            NwsbVideo(
+              asset: film!,
+              autoplay: moving,
+              priority: ClipPriority.feature,
+            )
+          else
+            const ColoredBox(color: NwsbColors.deep),
           // The vignette. Deep enough at the foot that a title and a
           // paragraph hold their contrast over any frame of any clip.
           const DecoratedBox(

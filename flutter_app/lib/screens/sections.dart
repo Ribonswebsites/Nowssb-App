@@ -92,7 +92,7 @@ class TvSection extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.asset,
-    this.aspect = 1452 / 831,
+    this.frame = DeviceFrame.tabletLandscape,
     this.bannerTitle,
     this.bannerSub,
     this.onTap,
@@ -103,7 +103,11 @@ class TvSection extends StatelessWidget {
   final String title;
   final IconData icon;
   final String asset;
-  final double aspect;
+
+  /// Which device the clip is shown in — a real bezel out of assets/frames,
+  /// with its own aperture. See lib/widgets/tv_frame.dart.
+  final DeviceFrame frame;
+
   final String? bannerTitle;
   final String? bannerSub;
   final VoidCallback? onTap;
@@ -119,7 +123,7 @@ class TvSection extends StatelessWidget {
       children: [
         SectionHead(eyebrow: eyebrow, title: title, icon: icon, dark: dark),
         const SizedBox(height: 16),
-        TvFrame(asset: asset, aspect: aspect, label: 'NowssB', onTap: onTap),
+        TvFrame(asset: asset, frame: frame, onTap: onTap),
         if (bannerTitle != null) ...[
           const SizedBox(height: 18),
           NwsbBanner(

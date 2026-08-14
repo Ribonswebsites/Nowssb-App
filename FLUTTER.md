@@ -50,8 +50,27 @@ frame.
 | `lib/widgets/` | `NeuCard`, `NwsbBanner`, `TvFrame`, and a debug-only decoder readout. |
 | `lib/screens/splash.dart` | The start animation. Plays once, three ways out, and the pool is held to zero underneath it. |
 | `lib/screens/` | Both homes, all five destinations, and the word page. |
-| `lib/widgets/page_shell.dart` | The film-backed shell the four non-home destinations share. |
+| `lib/widgets/page_shell.dart` | The film-backed shell the non-home destinations share. |
+| `lib/widgets/tv_frame.dart` | The real device bezels out of `assets/frames/`, with the aperture percentages lifted verbatim from `.nwsb-inframe.dev-*`. |
+| `lib/widgets/intro_gate.dart` | The intro page every store and library wears. Nine hand-built copies on the web, one widget here. |
+| `lib/data/settings.dart` | Fashion Plus and which home, remembered between launches. |
 | `test/` | 17 tests. The important ones count *players actually asked of the platform*, not the pool's opinion of itself. |
+
+### The artwork is the repository's own
+
+Nothing here is drawn by hand or stood in for. `assets/frames/*.webp` are the
+device renders the website uses, and they work the way they do there: the
+bezel is a TRANSPARENT-APERTURE PICTURE OVER the content, and the clip is
+inset behind it by the exact percentages the artwork occupies — so it lands
+correctly at any size with no second set of numbers to keep in step.
+
+`assets/store/intro-*.webp` are the intro-page paintings,
+`assets/icons/logo-disc.webp` is the mark in both headers,
+`assets/player/liquid-splash.webp` sits behind a word, and
+`assets/banners/` and `assets/store/collections/` are ready for the shelves.
+`tools/flutter-assets.mjs` copies all of it in; `test/assets_test.dart`
+fails if the code ever names a file that is not there — a wrong asset path
+does not throw, it just shows nothing, which is how a typo ships.
 
 ### The screens
 
@@ -158,12 +177,13 @@ moment it reaches the website, with no Play release.
 
 ## What is still to do
 
-**The icons.** Every icon is currently a Material one. The app's own artwork
-is ~487 images on Cloudinary; `tools/asset-manifest.mjs --download` fetches
-them and `tools/localise-media.mjs` rewrites the web app to match, but
-nothing has yet mapped them into the Flutter bundle. It is mechanical work
-and it cannot be half-done — a screen with some real icons and some Material
-ones looks worse than one with none.
+**The remaining icons.** The app's own marks — the logo disc, the device
+bezels, the intro paintings, the collection banners — were in this
+repository all along and are bundled now. What is still Material is the
+small furniture: the section head marks, the tile icons, the nav. Those come
+from the ~446 Cloudinary images, which `tools/asset-manifest.mjs --download`
+fetches and `tools/localise-media.mjs` rewrites the web app to match; that
+download cannot run from a sandbox with no route to Cloudinary.
 
 **Audio.** A word carries `audioMale`, `audioFemale` and a recording per
 part, and none of it plays yet. That is the practice player's heart and it is

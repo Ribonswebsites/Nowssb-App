@@ -65,7 +65,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
         '${all.length} words',
         '${withAudio.length} with a recording',
       ],
-      film: 'assets/video/sound-library-banner.mp4',
+      art: 'assets/store/intro-words.webp',
       enterLabel: 'OPEN LIBRARY',
       child: PageShell(
         eyebrow: 'Sound Archive',
