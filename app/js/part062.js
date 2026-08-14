@@ -158,8 +158,13 @@
            page, whole — the section, its banner and its clip together,
            because each registry row covers the block and not a piece of
            it. Word Search also stops being `always`, or it could not be
-           switched off at all. */
-  var LAYOUT_V = 3;
+           switched off at all.
+       4 — The cross on a section stops being permanent. It used to write
+           the section into `off`, which is the same off the layout editor
+           sets: gone, and gone across launches. That is not what a cross
+           on a card means — it means "not now". Anyone whose streak was
+           taken away by the old behaviour gets it back here, once. */
+  var LAYOUT_V = 4;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -199,6 +204,14 @@
          above only changes a FRESH install — everyone with a saved order
          keeps the position they had, which for this one is most of a page
          further down. It is moved here for them, once. */
+      /* v4: undo a permanent dismissal. The cross wrote 'streak' into the
+         off list and there is no switch anywhere to put it back — the
+         sections rail it would have lived on is not on the settings page.
+         So it is lifted here rather than left stranded. */
+      if ((raw.v || 0) < 4) {
+        var xi = off.indexOf('streak');
+        if (xi >= 0) off.splice(xi, 1);
+      }
       if ((raw.v || 0) < 3) {
         var si = order.indexOf('store'), ti = order.indexOf('tiles');
         if (si >= 0 && ti >= 0) {
@@ -438,23 +451,25 @@
   };
 
   /* ── The cross on a wrapper ───────────────────────────────────────
-     A section carries its own way out. It goes through the layout registry
-     rather than hiding the element, so it is the same off that the layout
-     editor sets — remembered, and reversible from there rather than being a
-     one-way door. The card is faded out first so the page does not jump
-     while you are still looking at where it was. */
+     "Not now", not "never". It takes the card off THIS launch and the page
+     brings it back on the next one.
+
+     It used to go through the layout registry, which is the same off the
+     layout editor sets — permanent, and with the sections rail gone from
+     the settings page there was nothing anywhere to switch it back on. A
+     cross on a card is a dismissal; a switch is a setting; they are not
+     the same control and this one is the first.
+
+     Faded out before it is taken, so the page does not jump while you are
+     still looking at where it was. */
   window.nmhDropSection = function (k, btn) {
     var wrap = btn && btn.closest ? btn.closest('.nmh-sec-wrap') : null;
+    if (!wrap) return;
     try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
-    if (wrap) {
-      wrap.style.transition = 'opacity .26s ease, transform .3s ease';
-      wrap.style.opacity = '0';
-      wrap.style.transform = 'scale(.97)';
-    }
-    setTimeout(function () {
-      if (wrap) { wrap.style.opacity = ''; wrap.style.transform = ''; wrap.style.transition = ''; }
-      window.hlSet(null, k, false);
-    }, 280);
+    wrap.style.transition = 'opacity .26s ease, transform .3s ease';
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'scale(.97)';
+    setTimeout(function () { wrap.style.display = 'none'; }, 280);
   };
 
   window.hlSet = function (which, k, on) {
