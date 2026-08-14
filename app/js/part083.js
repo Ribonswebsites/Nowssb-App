@@ -244,6 +244,9 @@
          by another file after this one runs still wins */
       v.setAttribute('src', r.sel ? vidFrom(r.sel, r.v) : r.v);
       v.preload = 'auto';
+      /* the clip's own first frame, so a cell that has not decoded yet
+         shows its picture rather than a black rectangle */
+      if (window.nwsbVideoPoster) try { window.nwsbVideoPoster(v); } catch (e) {}
       try { v.load(); } catch (e) {}
     }
     return v;
@@ -339,6 +342,7 @@
       var live = vidFrom(r0.sel, r0.v);
       if (live && live !== v.getAttribute('src')) {
         v.setAttribute('src', live);
+        if (window.nwsbVideoPoster) try { window.nwsbVideoPoster(v); } catch (e) {}
         try { v.load(); } catch (e) {}
       }
     }

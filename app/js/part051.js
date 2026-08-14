@@ -243,13 +243,174 @@
     queue();
   }, { rootMargin: '15% 0px 15% 0px', threshold: 0.01 }) : null;
 
+  /* ══════════════════════════════════════════════════════════════════
+     MOUNTING — a <video> with no src is not a decoder
+
+     The cap above decides how many clips PLAY. It never decided how many
+     exist, and that was the real cost: 112 video elements on one home,
+     every one of them holding a source, a demuxer and a frame buffer from
+     the moment the page parsed. Six were playing. The other hundred and
+     six were paying rent.
+
+     So a clip's src is stashed the moment it is tracked and taken straight
+     off the element. A second observer with a ONE SCREEN margin puts it
+     back when the clip comes near, and takes it off again when it leaves.
+     load() after removing the attribute is what actually releases the
+     decoder — without it the element keeps what it had.
+
+     Coming back is not a download: these files are in the app. Re-mounting
+     is a seek in a local file, and the poster covers the frame or two it
+     takes. That is the whole trade — a hundred idle decoders for one
+     poster and a few milliseconds.
+
+     What is exempt: the splash (it is the first thing painted and its own
+     script owns it), the live call streams, and anything another file
+     drives by hand — the hero rail sets and clears its own sources and is
+     marked data-nwsb-vis to say so. */
+  var STASH = 'data-nwsb-src';
+  var near = new WeakSet();     // clip is within a screen of the viewport
+  var mine = false;             // this file is the one writing src right now
+
+  function mount(v) {
+    var src = v.getAttribute(STASH);
+    if (!src || v.getAttribute('src') === src) return;
+    mine = true;
+    v.setAttribute('src', src);
+    mine = false;
+    try { v.load(); } catch (e) {}
+  }
+
+  function unmount(v) {
+    var cur = v.getAttribute('src');
+    if (!cur) return;
+    v.setAttribute(STASH, cur);
+    try { v.pause(); } catch (e) {}
+    mine = true;
+    v.removeAttribute('src');
+    mine = false;
+    /* the release. Without this the element holds its buffers. */
+    try { v.load(); } catch (e) {}
+  }
+
+  /* One viewport of margin on each side: by the time a section is scrolled
+     to, its clip has been mounted for a screen's worth of travel. */
+  var mountIo = ('IntersectionObserver' in window) ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { near.add(e.target); mount(e.target); }
+      else { near.delete(e.target); unmount(e.target); }
+    });
+    queue();
+  }, { rootMargin: '100% 0px 100% 0px', threshold: 0 }) : null;
+
+  /* ── The stash stays authoritative ────────────────────────────────
+     A dozen other files in this app set a clip's src by hand: the video
+     banners re-run their placement pass three times after load, the
+     coupon strip picks a new clip, the reader swaps the film behind it.
+     Every one of those writes would put a source back on an element that
+     is nowhere near the screen, and the observer would not undo it —
+     an IntersectionObserver only speaks when something crosses, and
+     nothing crossed.
+
+     So the writes are watched. Off screen, an external src is taken as
+     the new stashed value and lifted straight back off: the element is
+     still empty, and what it will mount later is what that file asked
+     for. On screen, the write is simply let through and recorded. No
+     other file needs to know this is happening. */
+  var srcWatch = ('MutationObserver' in window) ? new MutationObserver(function (muts) {
+    if (mine) return;
+    muts.forEach(function (m) {
+      var v = m.target;
+      var cur = v.getAttribute('src');
+      if (!cur) return;
+      if (near.has(v)) { v.setAttribute(STASH, cur); poster(v); return; }
+      v.setAttribute(STASH, cur);
+      poster(v);                       /* the new clip's frame, not the old one's */
+      try { v.pause(); } catch (e) {}
+      mine = true;
+      v.removeAttribute('src');
+      mine = false;
+      try { v.load(); } catch (e) {}
+    });
+  }) : null;
+
+  function manageable(v) {
+    if (v.id === 'splashVid') return false;
+    if (v.id === 'chatCallRemoteVideo' || v.id === 'chatCallLocalVideo') return false;
+    if (v.querySelector('source')) return false;   /* <source> children: not ours to move */
+    /* The practice player and the word player are driven by a person, not
+       by scrolling — a clip someone pressed play on is not decoration. */
+    if (v.classList.contains('lgp-video')) return false;
+    return true;
+  }
+
+  /* ── A poster is what unmounting costs ───────────────────────────
+     Taking the source off an idle clip means the element has nothing to
+     paint until it comes back, and a video with nothing to paint is a
+     hole in the page. The poster is what fills it — the clip's own first
+     frame, so what is on screen while it is unmounted is what would have
+     been on screen anyway.
+
+     Rather than write a poster on to a hundred tags across a dozen files
+     — half of which are template strings built at runtime — the frame is
+     worked out from the source, which is the only thing that decides
+     which frame it is:
+
+       ./assets/video/NAME.mp4?v=2  →  ./assets/video/NAME-poster.webp
+       cloudinary /video/upload/…/NAME.mp4  →  /image/upload/…/f_auto/…/NAME.jpg
+
+     Every local clip has a -poster.webp beside it. Cloudinary renders the
+     first frame of any video it holds at the image URL for it, which is
+     where the handful of posters already in the markup point. If either
+     ever misses, the element paints nothing — which is exactly what it
+     did before there were posters at all. */
+  function posterFor(src) {
+    if (!src) return '';
+    var clean = src.split('#')[0].split('?')[0];
+    if (/assets\/video\/[^/]+\.mp4$/i.test(clean)) return clean.replace(/\.mp4$/i, '-poster.webp');
+    if (clean.indexOf('res.cloudinary.com') >= 0 && clean.indexOf('/video/upload/') >= 0) {
+      return clean.replace('/video/upload/', '/image/upload/f_auto/').replace(/\.(mp4|webm|mov)$/i, '.jpg');
+    }
+    return '';
+  }
+
+  var POSMARK = 'data-nwsb-pos';
+
+  function poster(v) {
+    /* A poster written here is marked, so that when another file swaps the
+       clip — the coupon strip picks a new one, the reader changes the film
+       — the frame under it can be swapped too. A poster that came with the
+       markup is left alone: someone chose that one. */
+    if (v.getAttribute('poster') && !v.getAttribute(POSMARK)) return;
+    var p = posterFor(v.getAttribute('src') || v.getAttribute(STASH) ||
+                      (v.querySelector('source[src]') || {}).src || '');
+    if (!p) return;
+    if (v.getAttribute('poster') === p) return;
+    v.setAttribute('poster', p);
+    v.setAttribute(POSMARK, '1');
+  }
+
   function track() {
     document.querySelectorAll('video').forEach(function (v) {
+      /* The frame goes on FIRST, and on every clip — including the ones
+         this file does not otherwise manage. The hero rail owns its own
+         cells and fills them in later, from a file that may well have run
+         before this one; asking on each pass costs an attribute read and
+         means a cell gets its picture whenever its clip turns up, rather
+         than only if the load order happened to work out. */
+      poster(v);
       if (v.getAttribute(MARK)) return;
       if (!hasStaticSource(v)) return;          // live call stream — never touch
       v.setAttribute(MARK, '1');
       tracked.push(v);
       if (io) io.observe(v);
+      /* Off the moment it is seen, and back on only when it comes near.
+         A page that starts with every source attached is a page that has
+         already paid for every decoder before anyone has scrolled. */
+      if (mountIo && manageable(v)) {
+        unmount(v);
+        mountIo.observe(v);
+        if (srcWatch) srcWatch.observe(v, { attributes: true, attributeFilter: ['src'] });
+      }
       /* The browser's own autoplay attribute is a standing instruction that
          survives a JS pause, so it is stripped and playback is driven here. */
       v.removeAttribute('autoplay');
@@ -318,6 +479,10 @@
     requestAnimationFrame(function () { queued = false; track(); apply(); });
   }
   window.nwsbVideoRefresh = queue;
+  /* For the files that own their own clips and are therefore never tracked
+     here — the hero rail sets and clears its cells by hand. They still want
+     the frame under the clip while it has none. */
+  window.nwsbVideoPoster = poster;
 
   if ('MutationObserver' in window) {
     /* A class change can change what is shown, so the cache is dropped and

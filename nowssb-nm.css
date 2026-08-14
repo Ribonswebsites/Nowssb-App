@@ -9078,6 +9078,9 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-tile .home-tile-enter {
    Layers, and why: the film at the bottom, a scrim over it so a white
    glyph stays legible on a bright frame, the glyph above that, and the
    travelling gold ring above all of them at the very edge. */
+/* Dead as of the clip being taken out from behind the mark — the six
+   .spill-vid elements are gone from index.html. Kept because the layering
+   above describes the rest of the stack, which is still there. */
 .spill-circle .spill-vid {
   position: absolute; inset: 0; z-index: 0;
   width: 100%; height: 100%;
