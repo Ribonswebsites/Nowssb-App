@@ -197,6 +197,12 @@ class _HeroCard extends StatelessWidget {
             frame: DeviceFrame.tvLandscape,
             autoplay: live,
             onTap: onExplore,
+            // `.hero-content` IS the screen — index.html:1705. The wordmark,
+            // the tagline, the strapline and the big word sit ON it, and
+            // only the search button and the two buttons are moved off it
+            // onto the glass. This was empty, which is why the set read as
+            // a television showing nothing.
+            overlay: _Screen(live: live),
           ),
           const SizedBox(height: 10),
           // `.hs-foot` — Explore, App Guide, then the way into the guide.
@@ -480,6 +486,193 @@ class _FootButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// What is ON the television — index.html:1713-1750.
+///
+/// The wordmark at the top left, the tagline word under it, then at the foot
+/// the strapline and the big word. Both words rotate: HERO_WORDS and
+/// TAG_WORDS from app/js/part012.js:1372 and :1429, the word every 4s and
+/// the tagline every 2.5s.
+///
+/// `.hero-cards` — the five-photograph strip — is NOT here. In the plain
+/// look the rail replaces it (app/js/part083.js:20), and the five pictures
+/// are remote anyway.
+class _Screen extends StatefulWidget {
+  const _Screen({required this.live});
+  final bool live;
+
+  @override
+  State<_Screen> createState() => _ScreenState();
+}
+
+class _ScreenState extends State<_Screen> {
+  /// HERO_WORDS — app/js/part012.js:1372.
+  static const _words = [
+    'VIBRATION',
+    'FREQUENCIES',
+    'MIND',
+    'NEURONS',
+    'RESONANCE',
+  ];
+
+  /// TAG_WORDS — :1429.
+  static const _tags = [
+    'VIBRATION',
+    'FREQUENCY',
+    'RESONANCE',
+    'AWAKENING',
+    'SOUND BIRTH',
+  ];
+
+  Timer? _wt;
+  Timer? _tt;
+  int _w = 0;
+  int _t = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _wt = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      setState(() => _w = (_w + 1) % _words.length);
+    });
+    _tt = Timer.periodic(const Duration(milliseconds: 2500), (_) {
+      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      setState(() => _t = (_t + 1) % _tags.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    _wt?.cancel();
+    _tt?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, c) {
+        // The screen is small and the type on it is sized against the
+        // television, not against the phone — so everything scales off the
+        // aperture's own width rather than carrying fixed points.
+        final u = c.maxWidth / 100;
+        // Placed, not stacked in a Flex. The aperture is a FIXED box and
+        // a Column inside one overflows the moment the type is a line
+        // taller than expected — which is exactly what `.hero-content`
+        // avoids on the web by pinning its two groups to the top and the
+        // bottom of the screen.
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5 * u, vertical: 4 * u),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // `clamp(32px, 9vw, 52px)` — against the SCREEN, not
+                    // the phone, because the screen is what it is on.
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(
+                          fontSize: 13 * u,
+                          color: Colors.white,
+                          height: 1.05,
+                          shadows: const [
+                            Shadow(color: Color(0xCC000000), blurRadius: 10),
+                          ],
+                        ),
+                        children: const [
+                          TextSpan(
+                            text: 'Nowss',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          TextSpan(
+                            text: 'B',
+                            style: TextStyle(fontWeight: FontWeight.w200),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 1.5 * u),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      child: Text(
+                        _tags[_t],
+                        key: ValueKey(_t),
+                        style: TextStyle(
+                          fontSize: 3.4 * u,
+                          letterSpacing: 2,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          shadows: const [
+                            Shadow(color: Color(0xCC000000), blurRadius: 8),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(
+                          fontSize: 3.9 * u,
+                          color: const Color(0xE6FFFFFF),
+                          shadows: const [
+                            Shadow(color: Color(0xCC000000), blurRadius: 12),
+                          ],
+                        ),
+                        children: const [
+                          TextSpan(text: 'Natural Origin of '),
+                          TextSpan(
+                            text: 'Word Science',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 1.5 * u),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: Text(
+                        _words[_w],
+                        key: ValueKey(_w),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 9.5 * u,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: 3,
+                          height: 1.05,
+                          shadows: const [
+                            Shadow(color: Color(0xCC000000), blurRadius: 14),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
