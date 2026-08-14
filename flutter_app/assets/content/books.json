@@ -1,0 +1,49 @@
+{
+ "items": [
+  {
+   "key": "shabdapathy-codex",
+   "title": "The Shabdapathy Codex",
+   "sub": "The complete origin science, in one volume.",
+   "price": 499,
+   "cover": "https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007fec81f4b097aaae4e7ac297_ohtqy9.png",
+   "about": "The foundational text of Shabdapathy — how sound carried meaning long before dictionaries existed, and why the human body still responds to the original vibration of a word rather than its spelling.",
+   "contents": [
+    "What Shabdapathy is, and what it is not",
+    "The natural origin of sound, before written language",
+    "Why the body reacts to vibration, not definition",
+    "Reading a word back to its first sound",
+    "Daily practice: building your own routine"
+   ]
+  },
+  {
+   "key": "phonetic-field-guide",
+   "title": "Phonetic Origins: A Field Guide",
+   "sub": "Trace any word back to its first sound.",
+   "price": 399,
+   "cover": "https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007af081f49748cd0a1b77c566_f8qslq.png",
+   "about": "A practical companion for tracing any word back through its phonetic ancestry. Built as a working field guide rather than a theory book — open it mid-practice and follow the method on whatever word you are holding.",
+   "contents": [
+    "The tracing method, step by step",
+    "Root syllables and how to isolate them",
+    "Common false trails and how to spot them",
+    "Cross-language sound families",
+    "Worked examples you can follow along with"
+   ]
+  },
+  {
+   "key": "sound-healing-atlas",
+   "title": "The Sound Healing Atlas",
+   "sub": "Which sounds reach which parts of the body.",
+   "price": 599,
+   "cover": "https://res.cloudinary.com/eenvubod/image/upload/v1784975675/file_00000000ee688208950f4126ed15d9b3_esohnw.png",
+   "about": "A mapped reference of sound to the body — which syllables carry to which regions, why speaking aloud lands differently than thinking a word, and how to build a session around the area you actually want to work on.",
+   "contents": [
+    "The body map: sound to region",
+    "Why aloud differs from silent",
+    "Breath, pitch and placement",
+    "Building a session around one area",
+    "Sequencing and how long to hold"
+   ]
+  }
+ ]
+}

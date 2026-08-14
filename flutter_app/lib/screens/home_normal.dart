@@ -8,6 +8,7 @@ library;
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import '../widgets/neumorphic.dart';
+import 'sections.dart';
 
 /// The website derives this from the hour in app/js/part026.js and the same
 /// three windows are used here, so the two never disagree.
@@ -47,11 +48,72 @@ class HomeNormal extends StatelessWidget {
             const SizedBox(height: NwsbSpace.gap),
             const _SearchBar(),
             const SizedBox(height: NwsbSpace.gap),
+
+            // Every block below carries a clip, and every clip goes through
+            // NwsbVideo — so this whole page costs at most four decoders no
+            // matter how far it runs.
+            const HeroSection(),
+            const SizedBox(height: NwsbSpace.gap),
             const _StreakSection(),
+            const SizedBox(height: NwsbSpace.gap),
+            const TvSection(
+              eyebrow: 'Today, on film',
+              title: 'Streak',
+              icon: Icons.local_fire_department_outlined,
+              asset: 'assets/video/tv-screen.mp4',
+            ),
             const SizedBox(height: NwsbSpace.gap),
             const _PracticeCard(),
             const SizedBox(height: NwsbSpace.gap),
+            const BannerSection(
+              eyebrow: 'Today words meaning',
+              title: 'The Meaning Store',
+              icon: Icons.auto_stories_outlined,
+              asset: 'assets/video/store-banner.mp4',
+              overlay: 'Every word,\nexplained',
+              bannerTitle: 'Meanings and eBooks, in one place',
+              bannerSub: 'Open the store',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
             const _Tiles(),
+            const SizedBox(height: NwsbSpace.gap),
+            const TvSection(
+              eyebrow: 'The rarest word',
+              title: 'The Signature',
+              icon: Icons.workspace_premium_outlined,
+              asset: 'assets/video/signature-banner.mp4',
+              bannerTitle: 'One word, made only for you',
+              bannerSub: 'See the Signature',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            const BannerSection(
+              eyebrow: 'Your daily word ritual',
+              title: 'The Player',
+              icon: Icons.play_circle_outline,
+              asset: 'assets/video/player-liquid-splash.mp4',
+              aspect: 9 / 16,
+              bannerTitle: 'Practice daily to keep your streak alive',
+              bannerSub: 'Open the player',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            const TvSection(
+              eyebrow: 'The shelf',
+              title: 'NowssB Store',
+              icon: Icons.storefront_outlined,
+              asset: 'assets/video/store-section.mp4',
+              aspect: 768 / 1168,
+              bannerTitle: 'Everything the practice needs',
+              bannerSub: 'Open the store',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            const BannerSection(
+              eyebrow: 'Deep-dive guides',
+              title: 'eBooks',
+              icon: Icons.menu_book_outlined,
+              asset: 'assets/video/word-acts.mp4',
+              bannerTitle: 'Word science and sound healing',
+              bannerSub: 'Browse the library',
+            ),
             const SizedBox(height: NwsbSpace.gap),
             const _QuickRow(),
           ],
@@ -79,7 +141,11 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Column(
+        // Flexible, not a bare Column: 'NOWSBANSIU EDITION' at 2pt of letter
+        // spacing is wider than it looks, and on a 412pt screen it pushed
+        // the three header buttons clean off the right edge.
+        Flexible(
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -93,12 +159,15 @@ class _TopRow extends StatelessWidget {
             ),
             Text(
               'NOWSBANSIU EDITION',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.labelSmall!.copyWith(
                     fontSize: 9,
                     letterSpacing: 2,
                   ),
             ),
           ],
+        ),
         ),
         const Spacer(),
         const _HeaderButton(icon: Icons.notifications_none, badge: 0),
@@ -295,7 +364,8 @@ class _StreakSection extends StatelessWidget {
                       color: NwsbColors.gold),
                 ),
                 const SizedBox(width: 12),
-                const Column(
+                const Expanded(
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -317,7 +387,7 @@ class _StreakSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Spacer(),
+                ),
                 const Text(
                   'KEEP GOING',
                   style: TextStyle(
@@ -438,7 +508,11 @@ class _Tiles extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
-      childAspectRatio: 1.05,
+      // 1.05 was a tile 12pt shorter than its own contents once the disc,
+      // the title and the caption were laid out at the system text size.
+      // Taller, and the text is allowed to ellipsize rather than overflow —
+      // a tile has to survive a reader who has turned their font up.
+      childAspectRatio: 0.92,
       children: [
         for (final (title, sub, icon) in _items)
           NeuCard(
@@ -459,10 +533,17 @@ class _Tiles extends StatelessWidget {
                   child: Icon(icon, size: 24, color: NwsbColors.ink),
                 ),
                 const Spacer(),
-                Text(title, style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 5),
                 Text(
                   sub,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                       fontSize: 11, color: NwsbColors.inkFaint),
                 ),

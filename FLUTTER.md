@@ -1,179 +1,142 @@
-# NowssB in Flutter — how this repository is set up for the port
+# NowssB in Flutter
 
-You asked for a Flutter app on the Play Store that looks **exactly** like
-this one, with every image and every video already on the phone after the
-download. This is the preparation for that. The Dart is not written yet, on
-purpose — everything here is the work that has to exist first, and it is
-done.
+Real widgets. No WebView, no HTML, no service worker. The app draws itself.
+
+This document is the state of the port and how to work on it.
 
 ---
 
-## One thing worth saying before you pick
+## Why the app was slow, and what actually fixes it
 
-There are two ways to get a Flutter app that looks like this, and the
-difference is not a detail.
+Worth being exact about, because the fix is the architecture.
 
-**A — bundle this HTML inside a Flutter app.** `flutter_inappwebview`
-renders `assets/www/index.html`, Flutter owns everything native around it:
-FCM notifications, splash, the back button, in-app purchases, the Play
-release. It is a real Flutter app — Dart, `pubspec.yaml`, a signed `.aab` —
-and it looks *exactly* like this app because it **is** this app. Nine
-thousand lines of HTML and eight thousand of CSS carry over on day one.
+A phone has a **fixed, small number of hardware video decoders** — on most
+Android devices somewhere between four and sixteen. The website had 106
+`<video>` elements alive on one home screen. When you ask for more decoders
+than the chip has, the request does not politely queue: playback stutters,
+frames arrive late, surfaces come back black, and eventually the media server
+gives up and takes the app down. **That is the lag, the black banners and the
+crashes, all of them.**
 
-**B — rebuild every screen as Flutter widgets.** Genuinely native
-rendering, genuinely faster scrolling. It is also re-drawing every screen
-in this repository by hand, and "exactly the same" will not survive it:
-neumorphic shadows, backdrop blurs, the glass wrappers, the word player's
-layered video and arc, the reader's rail — each is a fresh approximation
-with its own drift.
+Rebuilding in Flutter does not make a decoder faster. The same chip decodes
+the same H.264 at the same speed whether the frame goes to a WebView or to an
+ExoPlayer texture. What Flutter gives is the thing a browser never would:
+**exact control over how many exist.** A `VideoPlayerController` is a real
+ExoPlayer instance, created and destroyed when `lib/media/video_pool.dart`
+says so — not when a garbage collector decides the page has moved on.
 
-I would ship **A**, and treat **B** as something to move screen by screen
-later if the app ever needs it. But this is your product, and the
-preparation below serves both — the assets, the content model and the
-notification seam are needed either way.
+So the rule the whole app is built around:
+
+> **At most four decoders exist at any moment.** Not "are playing" — exist.
+
+Everything else shows its poster, which is a picture and costs nothing. This
+is why every mp4 in `assets/video/` has a `-poster.webp` beside it, generated
+from the clip itself: most clips are showing their poster most of the time,
+and the app only looks right because that poster is the clip's own first
+frame.
 
 ---
 
-## What is already done for the port
-
-### 1. Every image and video, as a list
-
-`tools/asset-manifest.mjs` scans the whole repository — `index.html`, all
-seventy JS files, the three stylesheets — and finds every media URL,
-however it is written. Right now that is:
+## What exists
 
 | | |
 |---|---|
-| images | 487 |
-| videos | 61 |
-| audio | 5 |
-| **total** | **553** |
+| `lib/media/video_pool.dart` | The ceiling. Leases, eviction by distance from the middle of the screen, priority for clips that *are* their section. |
+| `lib/media/nwsb_video.dart` | The one widget every clip goes through. Poster, then a crossfade to the moving picture if the pool grants a decoder. |
+| `lib/data/models.dart` | `Word`, `WordPart`, `Book`, `Meaning`, `Shelf` — ported field for field from `nwsbNormWord` in `app/js/part073.js`. |
+| `lib/data/content.dart` | The three-stage content contract: what ships → last copy seen → Firestore, watched. |
+| `lib/data/firebase.dart` | Firebase, made optional. No `google-services.json` means bundled content, not a crash. |
+| `lib/theme/` | Tokens lifted from the stylesheets, and the two surfaces as `ThemeData`. |
+| `lib/widgets/` | `NeuCard`, `NwsbBanner`, `TvFrame`, and a debug-only decoder readout. |
+| `lib/screens/` | The Normal home and the sections that carry a clip. |
+| `test/` | 11 tests. The important ones count *players actually asked of the platform*, not the pool's opinion of itself. |
 
-```bash
-node tools/asset-manifest.mjs              # write assets/media-manifest.json
-node tools/asset-manifest.mjs --download   # fetch every file into assets/media/
-node tools/asset-manifest.mjs --dart       # write assets/media_assets.dart
-```
+### The tests are the specification
 
-The download is sequential and resumable — stop it and run it again and it
-picks up where it left off, because names are derived from the URL rather
-than a counter. Run it on your machine, not in a sandbox; this environment
-cannot reach Cloudinary.
+`test/video_pool_test.dart` runs the real pool against a fake platform
+standing in for ExoPlayer, so what it counts is how many players were created
+and disposed. Among them:
 
-`assets/media_assets.dart` is the map the port uses:
+- a hundred off-screen clips ask the phone for nothing at all
+- a hundred clips on screen at once still only ask for four
+- **scrolling a thirty-clip page never exceeds the ceiling at any point**
+- scrolling past a clip gives its decoder back — disposed, not paused
+- backgrounding hands every decoder back; returning takes them again
 
-```dart
-final local = nowssbAsset(url);      // 'assets/media/video/…mp4', or null
-```
+Three real bugs were found by these rather than by reading the code:
 
-A URL that is in the map is read from the bundle. One that is not falls
-through to the network, which is the right behaviour for anything added
-after the last build rather than a crash.
-
-**On size.** 553 files is a large app. Play's limit is 200 MB for an AAB's
-base module, and Play Asset Delivery carries the rest as install-time
-packs. Before you bundle, put the videos through Cloudinary's own
-transforms — `f_auto,q_auto,vc_h264,w_720` is what the player already asks
-for — so what you download is what the app actually shows, not the
-originals. `assets/banners/` (71 MB) is not in the manifest at all, because
-nothing in the app references it.
-
-### 2. The content is already out of the code
-
-This is the part that would otherwise sink the port. Words, meanings, the
-teaching library and the eBooks are **not** hardcoded any more — they live
-in Firestore and the app watches them:
-
-| Firestore | What it holds | Read by |
-|---|---|---|
-| `content/words` | the Word Atelier's shelves | `app/js/part069.js` |
-| `content/meanings` | the Meaning Store catalogue | `app/js/part069.js` |
-| `content/library` | every word the app teaches, in full | `app/js/part073.js` |
-| `content/books` | the eBooks | `app/js/part073.js` |
-
-So the Dart port does not need a catalogue, a seed file or a migration. It
-needs `cloud_firestore` and the same four documents. And an edit published
-from the studio reaches the Flutter app the same moment it reaches the
-website — no Play release.
-
-The shape of a library word is defined in one place,
-`nwsbNormWord` in `app/js/part073.js`. Port that function and you have the
-model.
-
-### 3. The notification seam
-
-`app/js/part072.js` no longer knows what is hosting it. It asks, and
-whoever is hosting answers. A Flutter host implements three methods:
-
-```dart
-// Registered as a JavaScript handler named NowssBHost
-NowssBHost.permission()        // 'granted' | 'denied' | 'default'
-NowssBHost.requestPermission() // the same, after asking
-NowssBHost.token()             // the FCM token, or ''
-```
-
-and pushes things back in through one door:
-
-```js
-window.nwsbHostEvent({ kind: 'token',      token: '…' });
-window.nwsbHostEvent({ kind: 'permission', value: 'granted' });
-window.nwsbHostEvent({ kind: 'received',   type: 'offers', title: '…', body: '…' });
-window.nwsbHostEvent({ kind: 'tapped',     type: 'offers' });
-window.nwsbHostBack();   // returns true if the app consumed the back press
-```
-
-That is the whole contract. Implement it and the notifications page, the
-master switch, all sixteen per-kind switches, the deep links and the
-subscription record in `pushSubs` work unchanged — the same code that
-already serves Capacitor. It is injected either before the page loads or
-within ten seconds of it; both are handled.
-
-The sending side needs nothing new: `functions/api/push.js` already sends
-to FCM tokens as well as Web Push endpoints (see `CAPACITOR.md` §4 for
-`FCM_SERVICE_ACCOUNT`).
-
-### 4. Devanagari
-
-Handled in the data, not in the port. A word carries four things at once —
-`deva` (the word as it is actually written), `word` (a roman spelling to
-read), `parts[]` (three to five pronunciation boxes, each with its own
-Devanagari, roman, hold time, plain-English "how to make this sound" and
-optional recording) and `audioMale` / `audioFemale`. Rendering is
-system-font Devanagari via the `.nwsb-deva` stack; Android, iOS, Windows
-and macOS all ship one, nothing is downloaded. In Flutter the equivalent is
-a `TextStyle(fontFamily: 'Noto Sans Devanagari')` or a bundled font if you
-want it identical across devices.
+1. **Teardown is asynchronous.** Disposing a controller releases the Dart
+   object immediately and the ExoPlayer a moment later. Handing back four and
+   creating four in the same breath meant the phone briefly held eight. The
+   pass now waits for the platform before it creates anything.
+2. **A disposed widget's release was not counted.** `dispose()` cannot be
+   awaited, so a widget scrolled out of a list started a teardown nobody
+   waited for. Those are parked in `_draining` and waited on too.
+3. **The measure/notify loop never settled.** The widget measures itself in a
+   post-frame callback; reporting unconditionally notified it, which rebuilt
+   it, which measured again. On a device that is a flat battery.
 
 ---
 
-## The port, in order
+## Working on it
 
-1. `flutter create nowssb --org com.nowssb`
-2. `node tools/asset-manifest.mjs --download --dart`
-3. `node tools/build-native.mjs` → copy `www/` to `assets/www/` (the studio
-   is excluded and the build fails if it is not — see `tools/build-native.mjs`)
-4. Declare `assets/www/` and `assets/media/` in `pubspec.yaml`
-5. `flutter_inappwebview` pointed at `assets/www/index.html`, with a
-   request interceptor that swaps any URL in `kNowssbMedia` for its bundled
-   file
-6. `firebase_messaging` + the `NowssBHost` handler above
-7. `flutter build appbundle` → Play Console
+```bash
+node tools/flutter-assets.mjs     # REQUIRED before pub get — see below
+cd flutter_app
+flutter pub get
+flutter analyze --no-fatal-infos
+flutter test
+flutter build apk --debug
+```
 
-Step 5 is the one that makes "downloaded once, on the phone forever" true:
-the interceptor is where a Cloudinary URL becomes a local file, so nothing
-in the HTML has to be rewritten and the same files still work on the
-website.
+`tools/flutter-assets.mjs` copies `assets/video/` into the Flutter bundle and
+writes the shipped content JSON. **It has to run before `flutter pub get`**:
+`pubspec.yaml` declares `assets/video/`, and a declared asset directory that
+does not exist fails pub get outright.
+
+`flutter_app/assets/video/` is **not committed**. The clips are in this
+repository once, at `assets/video/`, because the website and the app show the
+same films and a second copy is a second copy to keep in step.
+
+### Content
+
+`tools/export-content.mjs` writes `flutter_app/assets/content/*.json` by
+**evaluating the declarations out of the web app** — `MASTER_WORD_LIBRARY` in
+`app/js/part004.js`, `EB_BOOKS` in `app/js/part017.js`. There is one list of
+words in this repository and that is it. Re-run the tool after changing them.
+
+At runtime Firestore overrides all of it, live, from the same four documents
+the website reads: `content/library`, `content/books`, `content/words`,
+`content/meanings`. A word published from the studio reaches this app the
+moment it reaches the website, with no Play release.
+
+---
+
+## What is still to do
+
+**Firebase on Android.** The config in `app/js/firebase.module.js` is for a
+*web* app. An Android build needs its own app registered in the same project
+(`nowssb-34f1b`) and its own `google-services.json`, which comes out of the
+Firebase console and cannot be written from here. Until it lands the app runs
+on bundled content — `lib/data/firebase.dart` makes that a fallback rather
+than a crash. Drop the file at `flutter_app/android/app/google-services.json`
+and follow the FlutterFire Android setup to switch live content, auth and
+push on.
+
+**The rest of the screens.** The Normal home is real. The other four
+destinations are placeholders. Each screen ported from here on should follow
+the same rule: any clip goes through `NwsbVideo`, never a raw `VideoPlayer` —
+a controller the pool has never heard of is exactly the hole the website had,
+and `test/home_test.dart` checks for it.
+
+**The word player, the reader, the store, chat.** These are the big ones and
+they carry the most behaviour. The content model they need is already here.
 
 ---
 
 ## What stays where it is
 
-- **The studio** (`admin.html`) is not in the app and cannot be. It is a
-  browser page at `https://<your-domain>/admin.html`, installable as its
-  own PWA. `tools/build-native.mjs` verifies it did not leak into the
-  bundle and fails the build if it did.
-- **The service worker** does nothing useful inside a WebView — the files
-  are already local. `app/js/part012.js` catches the failed registration
-  and the app carries on.
-- **`functions/api/push.js`** stays on Cloudflare. The Flutter app talks to
-  Firestore and to that endpoint, exactly as the website does.
+- **The studio** (`admin.html`) is a browser page and cannot be in the app.
+- **`functions/api/push.js`** stays on Cloudflare. It already sends to FCM
+  tokens as well as Web Push endpoints.
+- **The website** is unaffected by any of this and keeps shipping.

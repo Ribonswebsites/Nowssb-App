@@ -44,6 +44,14 @@ jobs:
           channel: stable
           cache: true
 
+      # The clips are in this repository once, at assets/video/. This copies
+      # them into the Flutter bundle and writes the shipped content JSON.
+      # It has to run BEFORE pub get: pubspec.yaml declares assets/video/ and
+      # a declared asset directory that does not exist fails pub get outright.
+      - name: Bundle the clips and the shipped content
+        working-directory: .
+        run: node tools/flutter-assets.mjs
+
       # android/ is generated. This writes it without touching lib/ or
       # pubspec.yaml, which flutter create leaves alone when they exist.
       - name: Create the Android project
@@ -56,6 +64,11 @@ jobs:
       # downloading, so this runs first and the log says exactly what broke.
       - name: Analyze
         run: flutter analyze --no-fatal-infos
+
+      # The video pool's ceiling is the whole point of the port, and it is
+      # cheap to check. A build that broke it should not produce an APK.
+      - name: Test
+        run: flutter test
 
       - name: Build
         run: flutter build apk --debug
@@ -94,6 +107,13 @@ jobs:
           else
             echo "ok=true" >> "$GITHUB_OUTPUT"
           fi
+
+      # Same as the debug job: before pub get, or pub get fails on the
+      # declared-but-missing assets/video/.
+      - name: Bundle the clips and the shipped content
+        if: steps.guard.outputs.ok == 'true'
+        working-directory: .
+        run: node tools/flutter-assets.mjs
 
       - name: Create the Android project
         if: steps.guard.outputs.ok == 'true'

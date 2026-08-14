@@ -27,3 +27,10 @@ flutter_app/ios/
 flutter_app/.flutter-plugins
 flutter_app/.flutter-plugins-dependencies
 flutter_app/pubspec.lock
+
+# The clips inside the Flutter bundle. They are a COPY of assets/video/, put
+# there by tools/flutter-assets.mjs on the way into a build — 136 MB that is
+# already in this repository once and does not need to be in it twice. Run
+# that tool before `flutter pub get`; pub get fails on a declared asset
+# directory that does not exist.
+flutter_app/assets/video/

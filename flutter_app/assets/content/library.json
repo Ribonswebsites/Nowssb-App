@@ -1,0 +1,563 @@
+{
+ "items": [
+  {
+   "key": "aarogya",
+   "word": "AAROGYA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "aa · ro · gyaa",
+   "parts": [
+    {
+     "roman": "aa",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "ro",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "gyaa",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "aa",
+    "ro",
+    "gyaa"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Immune System",
+   "origin": "Natural Origin",
+   "benefit": "Activates cellular immunity and vital life force",
+   "meaning": "Perfect health — freedom from all disease",
+   "mouthPos": "Open jaw, tongue flat, breath from belly",
+   "resonance": "Feel vibration in chest and upper throat",
+   "mistake": "Don't rush the final syllable — hold it 1 second",
+   "tip": "Say 3 times on exhale, eyes closed, hand on chest",
+   "categories": [
+    "Immunity Boost",
+    "Heart Health"
+   ],
+   "gender": "both",
+   "time": "morning",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "prana",
+   "word": "PRANA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "praa · naa",
+   "parts": [
+    {
+     "roman": "praa",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "naa",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "praa",
+    "naa"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Lungs · Heart",
+   "origin": "Natural Origin",
+   "benefit": "Expands breath capacity and vital life energy",
+   "meaning": "Life force, breath — the pulse of all living",
+   "mouthPos": "Lips parted, tongue on upper palate for 'pr'",
+   "resonance": "Feel the chest open and expand on the 'aa' vowel",
+   "mistake": "Don't separate P from R — one continuous breath flow",
+   "tip": "Inhale fully before, then exhale the word completely",
+   "categories": [
+    "Heart Health",
+    "Lung & Breath",
+    "Fitness & Muscle"
+   ],
+   "gender": "both",
+   "time": "morning",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "shakti",
+   "word": "SHAKTI",
+   "deva": "",
+   "translit": "",
+   "phonetic": "shak · ti",
+   "parts": [
+    {
+     "roman": "shak",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "ti",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "shak",
+    "ti"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Solar Plexus",
+   "origin": "Natural Origin",
+   "benefit": "Builds core vitality, willpower and primal energy",
+   "meaning": "Power, primal energy — the divine creative force",
+   "mouthPos": "Lips firm, push the sound from the diaphragm",
+   "resonance": "Feel vibration in the mid-abdomen region",
+   "mistake": "The 'sh' is soft, not harsh — breathe gently into it",
+   "tip": "Stand tall — upright posture amplifies this word's effect",
+   "categories": [
+    "Fitness & Muscle",
+    "Testosterone & Hormones",
+    "Fitness & Tone"
+   ],
+   "gender": "both",
+   "time": "morning",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "ananda",
+   "word": "ANANDA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "aa · nan · da",
+   "parts": [
+    {
+     "roman": "aa",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "nan",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "da",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "aa",
+    "nan",
+    "da"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Nervous System",
+   "origin": "Natural Origin",
+   "benefit": "Calms the nervous system and unlocks deep joy",
+   "meaning": "Pure bliss, inner happiness",
+   "mouthPos": "Soft open mouth, tongue relaxed",
+   "resonance": "Feel warmth spreading through the chest",
+   "mistake": "Don't clip the final 'da' — let it trail softly",
+   "tip": "Close your eyes and let the sound dissolve into silence",
+   "categories": [
+    "Mental Clarity",
+    "Hormonal Balance"
+   ],
+   "gender": "both",
+   "time": "evening",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "soma",
+   "word": "SOMA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "so · ma",
+   "parts": [
+    {
+     "roman": "so",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "ma",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "so",
+    "ma"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Brain",
+   "origin": "Natural Origin",
+   "benefit": "Stimulates mental clarity and fluid intelligence",
+   "meaning": "Nectar of consciousness",
+   "mouthPos": "Round lips for 'so', open wide for 'ma'",
+   "resonance": "Feel vibration behind the eyes and forehead",
+   "mistake": "The 'o' is long — don't rush it",
+   "tip": "Say it slowly like a moon rising",
+   "categories": [
+    "Mental Clarity",
+    "Skin & Glow"
+   ],
+   "gender": "both",
+   "time": "any",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "tejas",
+   "word": "TEJAS",
+   "deva": "",
+   "translit": "",
+   "phonetic": "te · jas",
+   "parts": [
+    {
+     "roman": "te",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "jas",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "te",
+    "jas"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Eyes · Skin",
+   "origin": "Natural Origin",
+   "benefit": "Enhances radiance, clarity and inner fire",
+   "meaning": "Luminous fire, brilliance",
+   "mouthPos": "Tongue touches upper teeth for 'te'",
+   "resonance": "Feel heat in the center of the chest",
+   "mistake": "The 'j' is a soft 'dj' not hard",
+   "tip": "Visualize a flame at your heart as you speak",
+   "categories": [
+    "Skin & Glow",
+    "Hair Health"
+   ],
+   "gender": "F",
+   "time": "morning",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "ojas",
+   "word": "OJAS",
+   "deva": "",
+   "translit": "",
+   "phonetic": "o · jas",
+   "parts": [
+    {
+     "roman": "o",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "jas",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "o",
+    "jas"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Immune · Vitality",
+   "origin": "Natural Origin",
+   "benefit": "Builds deep immunity and radiant vitality",
+   "meaning": "Essential vigor, life essence",
+   "mouthPos": "Open throat, let the O resonate fully",
+   "resonance": "Feel deep warmth in the core of the body",
+   "mistake": "Do not shorten the O — full resonance is the key",
+   "tip": "Practice at dawn for maximum absorption",
+   "categories": [
+    "Immunity Boost",
+    "Fitness & Muscle"
+   ],
+   "gender": "both",
+   "time": "morning",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "vata",
+   "word": "VATA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "vaa · ta",
+   "parts": [
+    {
+     "roman": "vaa",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "ta",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "vaa",
+    "ta"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Nervous System",
+   "origin": "Natural Origin",
+   "benefit": "Balances nervous energy and reduces anxiety",
+   "meaning": "Wind, movement — the force of motion",
+   "mouthPos": "Long open A, let breath carry the word",
+   "resonance": "Feel movement in the chest and throat",
+   "mistake": "Do not clip the A — it must be long",
+   "tip": "Say it with a slow exhale, like releasing wind",
+   "categories": [
+    "Mental Clarity",
+    "Lung & Breath"
+   ],
+   "gender": "both",
+   "time": "evening",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "pitta",
+   "word": "PITTA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "pit · ta",
+   "parts": [
+    {
+     "roman": "pit",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "ta",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "pit",
+    "ta"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Liver · Digestion",
+   "origin": "Natural Origin",
+   "benefit": "Activates digestive fire and metabolic strength",
+   "meaning": "Fire, transformation — the force of digestion",
+   "mouthPos": "Short sharp P, then open for TA",
+   "resonance": "Feel heat in the upper abdomen",
+   "mistake": "Both T sounds are soft, not explosive",
+   "tip": "Say after meals to activate digestive energy",
+   "categories": [
+    "Gut Health",
+    "Liver Detox"
+   ],
+   "gender": "both",
+   "time": "any",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "kapha",
+   "word": "KAPHA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "kaa · pha",
+   "parts": [
+    {
+     "roman": "kaa",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "pha",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "kaa",
+    "pha"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Lungs · Joints",
+   "origin": "Natural Origin",
+   "benefit": "Strengthens joints, lungs and ground energy",
+   "meaning": "Water, earth — the force of stability",
+   "mouthPos": "Long K, then PH as in phone not p+h",
+   "resonance": "Feel heaviness and groundedness in the lower body",
+   "mistake": "PH is aspirated — breathe through it",
+   "tip": "Say slowly to build stillness and stability",
+   "categories": [
+    "Lung & Breath",
+    "Fitness & Muscle"
+   ],
+   "gender": "both",
+   "time": "night",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "surya",
+   "word": "SURYA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "sur · ya",
+   "parts": [
+    {
+     "roman": "sur",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "ya",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "sur",
+    "ya"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Heart · Energy",
+   "origin": "Natural Origin",
+   "benefit": "Energizes the heart and ignites solar vitality",
+   "meaning": "The sun — source of all light and life",
+   "mouthPos": "R is rolled gently, YA is open",
+   "resonance": "Feel warmth and expansion in the chest",
+   "mistake": "Do not harden the R — it is gentle",
+   "tip": "Face sunlight when you say this word if possible",
+   "categories": [
+    "Heart Health",
+    "Fitness & Tone"
+   ],
+   "gender": "both",
+   "time": "morning",
+   "price": 0,
+   "img": ""
+  },
+  {
+   "key": "chandra",
+   "word": "CHANDRA",
+   "deva": "",
+   "translit": "",
+   "phonetic": "chan · dra",
+   "parts": [
+    {
+     "roman": "chan",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    },
+    {
+     "roman": "dra",
+     "deva": "",
+     "hold": 1.5,
+     "say": "",
+     "audio": ""
+    }
+   ],
+   "syllables": [
+    "chan",
+    "dra"
+   ],
+   "audioMale": "",
+   "audioFemale": "",
+   "organ": "Mind · Emotions",
+   "origin": "Natural Origin",
+   "benefit": "Soothes the emotional mind and enhances intuition",
+   "meaning": "The moon — ruler of mind and emotions",
+   "mouthPos": "CH is soft like church, DRA flows together",
+   "resonance": "Feel coolness in the forehead and crown",
+   "mistake": "Do not separate D from R in DRA",
+   "tip": "Say this at night or under moonlight",
+   "categories": [
+    "Mental Clarity",
+    "Hormonal Balance",
+    "Reproductive Wellness"
+   ],
+   "gender": "F",
+   "time": "night",
+   "price": 0,
+   "img": ""
+  }
+ ]
+}

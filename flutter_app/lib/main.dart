@@ -1,29 +1,87 @@
 /// NowssB — Shabdapathy.
 ///
 /// This is the Flutter app: real widgets, no WebView and no HTML. It reads
-/// the same Firestore content the website reads (content/words,
-/// content/meanings, content/library, content/books), so a word published
-/// from the studio appears here without a Play release — see FLUTTER.md.
+/// the same Firestore content the website reads (content/library,
+/// content/books, content/words, content/meanings), so a word published from
+/// the studio appears here without a Play release — see FLUTTER.md.
+///
+/// Two things are true at once and both matter:
+///
+///   · The clips are all on the phone. Nothing streams, nothing buffers,
+///     nothing depends on Cloudinary being up or the signal being good.
+///   · At most four of them decode at any moment. A phone has a handful of
+///     hardware decoders and the website was asking for a hundred, which is
+///     what the lag, the black banners and the crashes actually were.
+///     lib/media/video_pool.dart is where that ceiling is enforced.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'data/content.dart';
+import 'data/firebase.dart';
+import 'media/video_pool.dart';
+import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
-import 'shell/nav_shell.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,
   ));
+
+  // Firebase first, but it is allowed to fail: an Android build has no
+  // Firebase until google-services.json lands, and that must be an app that
+  // shows the words it shipped with, not a crash on launch.
+  await NwsbFirebase.start();
+
+  // Stages one and two of the content contract — what ships, and the last
+  // copy seen — are local, so the first screen has something real to draw
+  // whether or not the network ever answers. This sets those up and leaves
+  // the Firestore watch running behind them when there is one.
+  await ContentStore.instance.start();
+
   runApp(const NowssbApp());
 }
 
-class NowssbApp extends StatelessWidget {
+class NowssbApp extends StatefulWidget {
   const NowssbApp({super.key});
+
+  @override
+  State<NowssbApp> createState() => _NowssbAppState();
+}
+
+class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Every decoder goes back when the app leaves the foreground. Android
+  /// reclaims them from a background app anyway, and a controller still
+  /// holding one when that happens comes back to a dead surface — which on
+  /// the website was the black-banner-after-switching-apps bug.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      VideoPool.instance.resume();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      VideoPool.instance.releaseAll();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

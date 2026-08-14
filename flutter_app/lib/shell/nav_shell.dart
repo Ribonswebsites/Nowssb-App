@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import '../screens/home_normal.dart';
 import '../screens/coming_soon.dart';
+import '../widgets/pool_hud.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
@@ -42,6 +43,10 @@ class _NavShellState extends State<NavShell> {
                   ComingSoon(title: _tabs[i].$1, icon: _tabs[i].$2),
             ],
           ),
+          // Debug only, and compiled out of a release build: the decoder
+          // count, live, so the ceiling is something you can watch rather
+          // than something you have to take on trust.
+          const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
           Positioned(
             left: 14,
             right: 14,
