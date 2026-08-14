@@ -57,6 +57,14 @@ jobs:
       - name: Create the Android project
         run: flutter create --platforms=android --org com.nowssb --project-name nowssb .
 
+      # android/ as generated does not build this app: the application id has
+      # to be the one Firebase issued the config for, flutter_local_notifications
+      # needs core library desugaring, firebase_auth needs minSdk 23, and the
+      # google-services plugin is not applied by the FlutterFire packages.
+      - name: Configure the Android project
+        working-directory: .
+        run: node tools/flutter-android.mjs
+
       - name: Dependencies
         run: flutter pub get
 
@@ -118,6 +126,11 @@ jobs:
       - name: Create the Android project
         if: steps.guard.outputs.ok == 'true'
         run: flutter create --platforms=android --org com.nowssb --project-name nowssb .
+
+      - name: Configure the Android project
+        if: steps.guard.outputs.ok == 'true'
+        working-directory: .
+        run: node tools/flutter-android.mjs
 
       # Written into the runner for this run only. .gitignore already refuses
       # *.keystore, *.jks and key.properties, so it cannot reach the repo.
