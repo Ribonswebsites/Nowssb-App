@@ -1,0 +1,45 @@
+# ══════════════════════════════════════════════════════════════════════
+# CACHE HEADERS — Cloudflare Pages
+#
+# Why this file exists: without it, Pages serves sw.js with its default
+# caching, and that is enough to freeze an installed PWA on an old build
+# forever.
+#
+# The chain is: the browser only picks up a new build when it fetches a new
+# sw.js. The new sw.js is what carries the new CACHE name, which is what
+# purges the old bucket on activate. index.html is what carries the new ?v=
+# on every script and stylesheet. So if sw.js is served from cache, none of
+# the rest of it matters — the version bumps are correct, the assets are
+# deployed, and the phone still runs last week's shell because it never
+# asked for the file that would have told it otherwise.
+#
+# sw.js and the shell are therefore always revalidated. Everything else is
+# left to the platform's defaults, because every script, stylesheet and
+# asset the shell references already carries its own ?v= — a changed
+# version is a changed URL, and a changed URL cannot be served stale.
+# ══════════════════════════════════════════════════════════════════════
+
+# The service worker. no-store as well as no-cache: some intermediaries
+# honour one and not the other, and this is the single file that must never
+# come from anywhere but the origin.
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/admin-sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# The shell. no-cache is not "do not cache" — it is "revalidate before you
+# use it", which is exactly right here: a 304 costs nothing and a stale
+# index.html costs every version bump in it.
+/
+  Cache-Control: no-cache
+
+/index.html
+  Cache-Control: no-cache
+
+/admin.html
+  Cache-Control: no-cache
+
+# The manifest decides the installed app's name, icons and start URL.
+/manifest.json
+  Cache-Control: no-cache
