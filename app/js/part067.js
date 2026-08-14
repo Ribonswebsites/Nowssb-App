@@ -27,7 +27,11 @@
        lands INSIDE .fash-store-wrap because `before` inserts into the
        trigger's parent, which is that wrapper now — between the head and
        the card, which is where a section's banner goes. */
-    { before: '#home .nss-store-trigger',          vid: './assets/video/store-section.mp4?v=1' },
+    /* The banner has a block of its own now, further down the page, and its
+       own landscape clip. It used to be injected on top of the store card
+       carrying the TALL render — a portrait film in a landscape banner,
+       which is what made both of them look wrong. */
+    { before: '#home .fash-storeban-slot',        vid: './assets/video/store-banner-fash.mp4?v=1' },
 
     /* Choose Your Path, on the laptop, in a section of its own.
        It used to be appended INSIDE the Personalised Healing wrapper, which

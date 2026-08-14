@@ -15070,7 +15070,9 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
   width: 100% !important;
   margin: 12px 0 0 !important;
 }
-#home .fash-store-wrap > .vb-banner {
+/* the banner block's three parts sit flush inside their own wrapper */
+#home .fash-storeban-wrap > .vb-banner,
+#home .fash-storeban-wrap > .nss-storeban-ban {
   width: 100% !important;
   margin: 12px 0 0 !important;
 }

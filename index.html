@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=786">
+<link rel="stylesheet" href="nowssb-nm.css?v=787">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
@@ -2136,6 +2136,34 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        wrap and strand the section at the top of the page. -->
   <!-- Subscription, as a block — see the Normal home for why the wrapper
        and not the banner is what part062.js registers. -->
+  <!-- ── The store's video banner, in a block of its own ──
+       A banner and a section are different things, so they are two blocks
+       and they sit apart: the section is up under the four buttons, this is
+       down here. Head, clip, black banner — the same three parts, its own
+       wrapper, its own registry entry ('storeban').
+
+       .fash-storeban-slot is where app/js/part067.js drops the clip:
+       `before` inserts into the marker's PARENT, so it lands between the
+       head and the black bar without the injector knowing anything about
+       this markup. -->
+  <div class="glass-wrap fash-storeban-wrap">
+    <div class="qa-tv-head">
+      <div class="qa-tv-orb qa-orb-white" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></div>
+      <div class="qa-tv-head-txt">
+        <div class="qa-tv-hello">Own the sounds that heal</div>
+        <div class="qa-tv-name">Inside the Store</div>
+      </div>
+    </div>
+    <span class="fash-storeban-slot" hidden></span>
+    <div class="ncb-carousel nss-storeban-ban" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" role="button">
+      <div class="ncb-slide">
+        <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>
+        <span class="ncb-txt"><span class="ncb-name">Shop the Library</span><span class="ncb-sub">Words, meanings and the origins behind them</span></span>
+        <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </div>
+  </div><!-- /fash-storeban-wrap -->
+
   <div class="nsub-blk glass-wrap">
     <div class="qa-tv-head">
       <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
@@ -2478,11 +2506,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   <div class="nss-store-trigger" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
     <div class="nss-trigger-slides">
-      <!-- The clip replaces the three crossfading stills that were here. -->
+      <!-- The SECTION's clip: the tall render, in the tall card. The banner
+           above used to carry it, which is the wrong way round — a portrait
+           film in a landscape banner and a landscape one in this card. -->
       <video class="nss-trigger-vid" data-nwsb-auto muted loop playsinline
              preload="none" aria-hidden="true" tabindex="-1"
              poster="./assets/video/store-trigger-poster.webp?v=1"
-             src="./assets/video/store-trigger.mp4?v=1"></video>
+             src="./assets/video/store-section.mp4?v=1"></video>
     </div>
 
     <div class="nss-trigger-content">
@@ -10471,12 +10501,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=15"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=48"></script>
+<script src="app/js/part062.js?v=49"></script>
 <script src="app/js/part063.js?v=7"></script>
 <script src="app/js/part064.js?v=7"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=42"></script>
-<script src="app/js/part067.js?v=38"></script>
+<script src="app/js/part067.js?v=39"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
