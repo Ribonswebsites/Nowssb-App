@@ -40,11 +40,13 @@ void main() {
   // drained before the next test — otherwise a lease left in flight counts
   // against the next test's ceiling.
   setUp(() async {
+    VideoPool.instance.unhold();
     await VideoPool.instance.debugReset();
     platform.reset();
   });
 
   tearDown(() async {
+    VideoPool.instance.unhold();
     await VideoPool.instance.debugReset();
   });
 
@@ -183,6 +185,30 @@ void main() {
     expect(platform.alive, 0,
         reason: 'Android reclaims decoders from a background app; a '
             'controller still holding one comes back to a dead surface');
+  });
+
+  test('nothing decodes while the pool is held', () async {
+    // The start animation is the only thing on screen for its whole length,
+    // and the app is built behind it. Without the hold, the home would be
+    // taking four decoders while the splash holds a fifth — on the devices
+    // that struggle most, the launch would be the worst moment of the
+    // session.
+    VideoPool.instance.hold();
+    for (var i = 0; i < 6; i++) {
+      VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
+    }
+    await pumpPool();
+
+    expect(VideoPool.instance.liveCount, 0);
+    expect(platform.created, isEmpty,
+        reason: 'a held pool must not ask the phone for anything');
+
+    VideoPool.instance.unhold();
+    await pumpPool();
+
+    expect(platform.alive, VideoPool.maxLive,
+        reason: 'and everything on screen takes its slot the moment the '
+            'splash ends');
   });
 
   test('coming back to the foreground takes them again', () async {

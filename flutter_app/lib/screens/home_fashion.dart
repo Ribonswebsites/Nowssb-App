@@ -20,6 +20,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import 'home_normal.dart' show nwsbGreeting;
+import '../shell/nav_shell.dart';
 import 'sections.dart';
 
 class HomeFashion extends StatefulWidget {
@@ -97,10 +98,11 @@ class _HomeFashionState extends State<HomeFashion> {
                 const GlassWrap(child: HeroSection()),
                 const SizedBox(height: 16),
 
-                const GlassWrap(
+                GlassWrap(
                   child: TvSection(
                     eyebrow: 'Today, on film',
                     title: 'Streak',
+                    onTap: () => NavScope.goTo(context, 1),
                     icon: Icons.local_fire_department_outlined,
                     asset: 'assets/video/tv-screen.mp4',
                     dark: true,
@@ -113,10 +115,11 @@ class _HomeFashionState extends State<HomeFashion> {
                 _FashWordOfDay(words: words),
                 const SizedBox(height: 16),
 
-                const GlassWrap(
+                GlassWrap(
                   child: BannerSection(
                     eyebrow: 'Words and meanings',
                     title: 'The NowssB Store',
+                    onTap: () => NavScope.goTo(context, 3),
                     icon: Icons.storefront_outlined,
                     asset: 'assets/video/store-section.mp4',
                     aspect: 768 / 1168,
@@ -130,10 +133,11 @@ class _HomeFashionState extends State<HomeFashion> {
                 const _FashTiles(),
                 const SizedBox(height: 16),
 
-                const GlassWrap(
+                GlassWrap(
                   child: BannerSection(
                     eyebrow: 'Own the sounds that heal',
                     title: 'Inside the Store',
+                    onTap: () => NavScope.goTo(context, 3),
                     icon: Icons.shopping_bag_outlined,
                     asset: 'assets/video/store-banner-fash.mp4',
                     aspect: 1136 / 800,
@@ -144,10 +148,11 @@ class _HomeFashionState extends State<HomeFashion> {
                 ),
                 const SizedBox(height: 16),
 
-                const GlassWrap(
+                GlassWrap(
                   child: TvSection(
                     eyebrow: 'The full library',
                     title: 'NowssB Subscription',
+                    onTap: () => NavScope.goTo(context, 3),
                     icon: Icons.workspace_premium_outlined,
                     asset: 'assets/video/subscription-a.mp4',
                     dark: true,
@@ -157,10 +162,11 @@ class _HomeFashionState extends State<HomeFashion> {
                 ),
                 const SizedBox(height: 16),
 
-                const GlassWrap(
+                GlassWrap(
                   child: BannerSection(
                     eyebrow: 'The rarest word',
                     title: 'The Signature',
+                    onTap: () => NavScope.goTo(context, 3),
                     icon: Icons.auto_awesome_outlined,
                     asset: 'assets/video/signature-banner.mp4',
                     dark: true,
@@ -350,7 +356,10 @@ class _FashSearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () => NavScope.goTo(context, 2),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
       height: 54,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
       decoration: BoxDecoration(
@@ -380,6 +389,7 @@ class _FashSearch extends StatelessWidget {
                 size: 18, color: NwsbColors.ink),
           ),
         ],
+      ),
       ),
     );
   }
@@ -473,11 +483,13 @@ class _FashWordOfDay extends StatelessWidget {
 class _FashTiles extends StatelessWidget {
   const _FashTiles();
 
+  // (title, sub, icon, destination) — 1 Practice · 2 Library · 3 Store ·
+  // 4 Profile. A tile that goes nowhere is a tile that is not finished.
   static const _items = [
-    ('Word Science', 'The system', Icons.science_outlined),
-    ('NowssB Profile', 'You, so far', Icons.person_outline),
-    ('Sound Library', 'Root frequencies', Icons.graphic_eq),
-    ('My Routines', '5 routine slots', Icons.repeat_rounded),
+    ('Word Science', 'The system', Icons.science_outlined, 2),
+    ('NowssB Profile', 'You, so far', Icons.person_outline, 4),
+    ('Sound Library', 'Root frequencies', Icons.graphic_eq, 2),
+    ('My Routines', '5 routine slots', Icons.repeat_rounded, 1),
   ];
 
   @override
@@ -490,8 +502,11 @@ class _FashTiles extends StatelessWidget {
       crossAxisSpacing: 12,
       childAspectRatio: 1.35,
       children: [
-        for (final (title, sub, icon) in _items)
-          Container(
+        for (final (title, sub, icon, dest) in _items)
+          GestureDetector(
+            onTap: () => NavScope.goTo(context, dest),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.black,
@@ -522,6 +537,7 @@ class _FashTiles extends StatelessWidget {
                       fontSize: 11, color: Color(0x8CFFFFFF)),
                 ),
               ],
+            ),
             ),
           ),
       ],

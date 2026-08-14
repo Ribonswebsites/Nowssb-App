@@ -165,6 +165,29 @@ class VideoPool {
   final Set<VideoLease> _live = {};
   bool _scheduled = false;
 
+  /// While this is true the pool grants nothing at all.
+  ///
+  /// The start animation is the one clip that plays on every launch and it is
+  /// the only thing anyone can see for its whole length — but the app is
+  /// built behind it, so without this the home would be quietly taking four
+  /// decoders while the splash holds a fifth. On the devices that struggle
+  /// most, the launch would be the worst moment of the session. Nothing
+  /// decodes underneath the splash; everything on screen takes its slot the
+  /// moment it ends. Same rule the website states in app/js/part051.js.
+  bool _held = false;
+  bool get held => _held;
+
+  void hold() {
+    _held = true;
+    releaseAll();
+  }
+
+  void unhold() {
+    if (!_held) return;
+    _held = false;
+    _rebalanceSoon();
+  }
+
   /// Diagnostics, for the debug overlay and for tests.
   int get liveCount => _live.length;
   int get leaseCount => _leases.length;
@@ -348,7 +371,8 @@ class VideoPool {
             return a._distance.compareTo(b._distance);
           });
 
-        final keep = want.take(maxLive).toSet();
+        // Held: nothing is kept, so the pass becomes a pure give-back.
+        final keep = _held ? <VideoLease>{} : want.take(maxLive).toSet();
 
         // GIVE BACK FIRST, AND WAIT FOR IT.
         //

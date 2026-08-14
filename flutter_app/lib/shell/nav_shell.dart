@@ -5,13 +5,33 @@ import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import '../screens/home_fashion.dart';
 import '../screens/home_normal.dart';
-import '../screens/coming_soon.dart';
+import '../screens/library.dart';
+import '../screens/practice.dart';
+import '../screens/profile.dart';
+import '../screens/store.dart';
 import '../widgets/pool_hud.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
   @override
   State<NavShell> createState() => _NavShellState();
+}
+
+/// Lets any screen move the shell to another destination without knowing how
+/// the shell is built. The home's sections use it: pressing "Enter the Store"
+/// goes to the Store tab rather than nowhere.
+class NavScope extends InheritedWidget {
+  const NavScope({super.key, required this.go, required super.child});
+
+  /// 0 Connect · 1 Practice · 2 Library · 3 Store · 4 Profile
+  final void Function(int) go;
+
+  static void goTo(BuildContext context, int i) {
+    context.dependOnInheritedWidgetOfExactType<NavScope>()?.go(i);
+  }
+
+  @override
+  bool updateShouldNotify(NavScope old) => false;
 }
 
 class _NavShellState extends State<NavShell> {
@@ -32,6 +52,13 @@ class _NavShellState extends State<NavShell> {
 
   @override
   Widget build(BuildContext context) {
+    return NavScope(
+      go: (i) => setState(() => _i = i),
+      child: _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
     return Scaffold(
       backgroundColor: NwsbColors.surface,
       body: Stack(
@@ -42,11 +69,11 @@ class _NavShellState extends State<NavShell> {
           IndexedStack(
             index: _i,
             children: [
-              for (var i = 0; i < _tabs.length; i++)
-                if (i == 0)
-                  (_fashion ? const HomeFashion() : const HomeNormal())
-                else
-                  ComingSoon(title: _tabs[i].$1, icon: _tabs[i].$2),
+              _fashion ? const HomeFashion() : const HomeNormal(),
+              const PracticeScreen(),
+              const LibraryScreen(),
+              const StoreScreen(),
+              const ProfileScreen(),
             ],
           ),
           // The switch between the two homes. On the website this lives in

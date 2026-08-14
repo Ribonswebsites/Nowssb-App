@@ -21,6 +21,7 @@ import 'package:flutter/services.dart';
 import 'data/content.dart';
 import 'data/firebase.dart';
 import 'media/video_pool.dart';
+import 'screens/splash.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
@@ -45,6 +46,9 @@ Future<void> main() async {
   // the Firestore watch running behind them when there is one.
   await ContentStore.instance.start();
 
+  // Nothing decodes underneath the start animation. Released by the splash
+  // when it finishes, and by the eight-second ceiling if it never does.
+  VideoPool.instance.hold();
   VideoPool.instance.startHeartbeat();
 
   runApp(const NowssbApp());
@@ -85,6 +89,11 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     }
   }
 
+  /// The start animation plays once per launch, and the app is built behind
+  /// it rather than after it — so by the time the clip ends the first screen
+  /// is already laid out and there is no second wait.
+  bool _splashDone = false;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -94,7 +103,16 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
       darkTheme: NwsbTheme.dark,
       themeMode: ThemeMode.light,
       color: NwsbColors.deep,
-      home: const NavShell(),
+      home: Stack(
+        children: [
+          const NavShell(),
+          if (!_splashDone)
+            Splash(onDone: () {
+              VideoPool.instance.unhold();
+              setState(() => _splashDone = true);
+            }),
+        ],
+      ),
     );
   }
 }

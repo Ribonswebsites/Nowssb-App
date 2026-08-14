@@ -48,8 +48,25 @@ frame.
 | `lib/data/firebase.dart` | Firebase, made optional. No `google-services.json` means bundled content, not a crash. |
 | `lib/theme/` | Tokens lifted from the stylesheets, and the two surfaces as `ThemeData`. |
 | `lib/widgets/` | `NeuCard`, `NwsbBanner`, `TvFrame`, and a debug-only decoder readout. |
-| `lib/screens/` | The Normal home and the sections that carry a clip. |
-| `test/` | 12 tests. The important ones count *players actually asked of the platform*, not the pool's opinion of itself. |
+| `lib/screens/splash.dart` | The start animation. Plays once, three ways out, and the pool is held to zero underneath it. |
+| `lib/screens/` | Both homes, all five destinations, and the word page. |
+| `lib/widgets/page_shell.dart` | The film-backed shell the four non-home destinations share. |
+| `test/` | 17 tests. The important ones count *players actually asked of the platform*, not the pool's opinion of itself. |
+
+### The screens
+
+| | |
+|---|---|
+| **Splash** | `start-animation.mp4`, once per launch. The app is built behind it so there is no second wait, and the pool grants nothing while it runs. |
+| **Connect** | Both homes. A switch above the nav moves between the pale neumorphic one and the dark Fashion one. |
+| **Practice** | Today's session, chosen by the hour the same way `getTimeSlot` does on the web, filtered on each word's own `time` field. |
+| **Library** | Every word, searchable across roman spelling, Devanagari, meaning and organ. The category filters are built FROM the data — add one in the studio and it appears here. |
+| **Store** | Words, Meanings and eBooks as three tabs over the three documents. |
+| **Profile** | Says plainly whether content is live or bundled, how many words are loaded, and how many decoders are in use. |
+| **Word** | The screen the content model was built for — Devanagari, roman, the pronunciation boxes with hold times, and every fact the record carries. |
+
+Every section on both homes is wired to a destination, and a test asserts
+that no black bar exists without one.
 
 ### The tests are the specification
 
@@ -141,14 +158,24 @@ moment it reaches the website, with no Play release.
 
 ## What is still to do
 
-**The rest of the screens.** The Normal home is real. The other four
-destinations are placeholders. Each screen ported from here on should follow
-the same rule: any clip goes through `NwsbVideo`, never a raw `VideoPlayer` —
-a controller the pool has never heard of is exactly the hole the website had,
-and `test/home_test.dart` checks for it.
+**The icons.** Every icon is currently a Material one. The app's own artwork
+is ~487 images on Cloudinary; `tools/asset-manifest.mjs --download` fetches
+them and `tools/localise-media.mjs` rewrites the web app to match, but
+nothing has yet mapped them into the Flutter bundle. It is mechanical work
+and it cannot be half-done — a screen with some real icons and some Material
+ones looks worse than one with none.
 
-**The word player, the reader, the store, chat.** These are the big ones and
-they carry the most behaviour. The content model they need is already here.
+**Audio.** A word carries `audioMale`, `audioFemale` and a recording per
+part, and none of it plays yet. That is the practice player's heart and it is
+the next thing worth building.
+
+**Sign-in, routines, cart, chat, notifications.** Listed on the Profile
+screen so the app is honest about its own edges rather than showing dead
+buttons.
+
+Any screen added from here follows one rule: a clip goes through `NwsbVideo`,
+never a raw `VideoPlayer` — a controller the pool has never heard of is
+exactly the hole the website had, and `test/home_test.dart` checks for it.
 
 ---
 

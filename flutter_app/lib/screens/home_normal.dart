@@ -8,6 +8,7 @@ library;
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import '../widgets/neumorphic.dart';
+import '../shell/nav_shell.dart';
 import 'sections.dart';
 
 /// The website derives this from the hour in app/js/part026.js and the same
@@ -56,18 +57,20 @@ class HomeNormal extends StatelessWidget {
             const SizedBox(height: NwsbSpace.gap),
             const _StreakSection(),
             const SizedBox(height: NwsbSpace.gap),
-            const TvSection(
+            TvSection(
               eyebrow: 'Today, on film',
               title: 'Streak',
+              onTap: () => NavScope.goTo(context, 1),
               icon: Icons.local_fire_department_outlined,
               asset: 'assets/video/tv-screen.mp4',
             ),
             const SizedBox(height: NwsbSpace.gap),
             const _PracticeCard(),
             const SizedBox(height: NwsbSpace.gap),
-            const BannerSection(
+            BannerSection(
               eyebrow: 'Today words meaning',
               title: 'The Meaning Store',
+              onTap: () => NavScope.goTo(context, 3),
               icon: Icons.auto_stories_outlined,
               asset: 'assets/video/store-banner.mp4',
               overlay: 'Every word,\nexplained',
@@ -77,18 +80,20 @@ class HomeNormal extends StatelessWidget {
             const SizedBox(height: NwsbSpace.gap),
             const _Tiles(),
             const SizedBox(height: NwsbSpace.gap),
-            const TvSection(
+            TvSection(
               eyebrow: 'The rarest word',
               title: 'The Signature',
+              onTap: () => NavScope.goTo(context, 3),
               icon: Icons.workspace_premium_outlined,
               asset: 'assets/video/signature-banner.mp4',
               bannerTitle: 'One word, made only for you',
               bannerSub: 'See the Signature',
             ),
             const SizedBox(height: NwsbSpace.gap),
-            const BannerSection(
+            BannerSection(
               eyebrow: 'Your daily word ritual',
               title: 'The Player',
+              onTap: () => NavScope.goTo(context, 1),
               icon: Icons.play_circle_outline,
               asset: 'assets/video/player-liquid-splash.mp4',
               aspect: 9 / 16,
@@ -96,9 +101,10 @@ class HomeNormal extends StatelessWidget {
               bannerSub: 'Open the player',
             ),
             const SizedBox(height: NwsbSpace.gap),
-            const TvSection(
+            TvSection(
               eyebrow: 'The shelf',
               title: 'NowssB Store',
+              onTap: () => NavScope.goTo(context, 3),
               icon: Icons.storefront_outlined,
               asset: 'assets/video/store-section.mp4',
               aspect: 768 / 1168,
@@ -106,9 +112,10 @@ class HomeNormal extends StatelessWidget {
               bannerSub: 'Open the store',
             ),
             const SizedBox(height: NwsbSpace.gap),
-            const BannerSection(
+            BannerSection(
               eyebrow: 'Deep-dive guides',
               title: 'eBooks',
+              onTap: () => NavScope.goTo(context, 3),
               icon: Icons.menu_book_outlined,
               asset: 'assets/video/word-acts.mp4',
               bannerTitle: 'Word science and sound healing',
@@ -401,10 +408,11 @@ class _StreakSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const NwsbBanner(
+          NwsbBanner(
             title: 'Daily Streak',
             sub: 'Practice daily to keep your healing streak alive',
             icon: Icons.local_fire_department_outlined,
+            onTap: () => NavScope.goTo(context, 1),
           ),
         ],
       ),
