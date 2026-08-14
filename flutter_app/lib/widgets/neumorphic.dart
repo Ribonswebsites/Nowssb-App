@@ -65,12 +65,19 @@ class NwsbBanner extends StatelessWidget {
     required this.sub,
     required this.icon,
     this.onTap,
+    this.dark = false,
   });
 
   final String title;
   final String sub;
   final IconData icon;
   final VoidCallback? onTap;
+
+  /// On the Fashion home this bar sits on glass rather than on the pale
+  /// page, so it loses the raised shadow — on the website that white
+  /// half-shadow read as a halo around the bar, and it reads the same way
+  /// here.
+  final bool dark;
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +89,16 @@ class NwsbBanner extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.black,
           borderRadius: BorderRadius.circular(NwsbRadius.bar),
+          border: dark ? Border.all(color: const Color(0x14FFFFFF)) : null,
+          boxShadow: dark
+              ? null
+              : const [
+                  BoxShadow(
+                    color: Color(0x1F000000),
+                    offset: Offset(0, 8),
+                    blurRadius: 20,
+                  ),
+                ],
         ),
         child: Row(
           children: [

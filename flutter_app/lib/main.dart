@@ -45,6 +45,8 @@ Future<void> main() async {
   // the Firestore watch running behind them when there is one.
   await ContentStore.instance.start();
 
+  VideoPool.instance.startHeartbeat();
+
   runApp(const NowssbApp());
 }
 

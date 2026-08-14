@@ -24,11 +24,18 @@ class SectionHead extends StatelessWidget {
     required this.eyebrow,
     required this.title,
     required this.icon,
+    this.dark = false,
   });
 
   final String eyebrow;
   final String title;
   final IconData icon;
+
+  /// The Fashion home. The disc stays white — it is the app's mark and it is
+  /// white on both homes — but the type over the film has to be white too,
+  /// and the raised shadow is light-home furniture that would read as a halo
+  /// here. Same head, the other surface.
+  final bool dark;
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +44,10 @@ class SectionHead extends StatelessWidget {
         Container(
           width: 52,
           height: 52,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
-            boxShadow: NwsbShadows.raisedXs,
+            boxShadow: dark ? null : NwsbShadows.raisedXs,
           ),
           child: Icon(icon, size: 22, color: NwsbColors.ink),
         ),
@@ -52,18 +59,18 @@ class SectionHead extends StatelessWidget {
             children: [
               Text(
                 eyebrow,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
-                  color: Color(0x8C000000),
+                  color: dark ? const Color(0xA6FFFFFF) : const Color(0x8C000000),
                 ),
               ),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 21,
                   fontWeight: FontWeight.w800,
-                  color: NwsbColors.ink,
+                  color: dark ? Colors.white : NwsbColors.ink,
                   height: 1.15,
                 ),
               ),
@@ -89,6 +96,7 @@ class TvSection extends StatelessWidget {
     this.bannerTitle,
     this.bannerSub,
     this.onTap,
+    this.dark = false,
   });
 
   final String eyebrow;
@@ -100,28 +108,32 @@ class TvSection extends StatelessWidget {
   final String? bannerSub;
   final VoidCallback? onTap;
 
+  /// On the Fashion home the block already sits on a glass pane, so it does
+  /// not bring a card of its own.
+  final bool dark;
+
   @override
   Widget build(BuildContext context) {
-    return NeuCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SectionHead(eyebrow: eyebrow, title: title, icon: icon),
-          const SizedBox(height: 16),
-          TvFrame(asset: asset, aspect: aspect, label: 'NowssB', onTap: onTap),
-          if (bannerTitle != null) ...[
-            const SizedBox(height: 18),
-            NwsbBanner(
-              title: bannerTitle!,
-              sub: bannerSub ?? '',
-              icon: icon,
-              onTap: onTap,
-            ),
-          ],
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHead(eyebrow: eyebrow, title: title, icon: icon, dark: dark),
+        const SizedBox(height: 16),
+        TvFrame(asset: asset, aspect: aspect, label: 'NowssB', onTap: onTap),
+        if (bannerTitle != null) ...[
+          const SizedBox(height: 18),
+          NwsbBanner(
+            title: bannerTitle!,
+            sub: bannerSub ?? '',
+            icon: icon,
+            onTap: onTap,
+            dark: dark,
+          ),
         ],
-      ),
+      ],
     );
+    if (dark) return body;
+    return NeuCard(padding: const EdgeInsets.all(16), child: body);
   }
 }
 
@@ -139,6 +151,7 @@ class BannerSection extends StatelessWidget {
     this.bannerTitle,
     this.bannerSub,
     this.onTap,
+    this.dark = false,
   });
 
   final String eyebrow;
@@ -154,14 +167,15 @@ class BannerSection extends StatelessWidget {
   final String? bannerSub;
   final VoidCallback? onTap;
 
+  /// See TvSection.dark.
+  final bool dark;
+
   @override
   Widget build(BuildContext context) {
-    return NeuCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SectionHead(eyebrow: eyebrow, title: title, icon: icon),
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+          SectionHead(eyebrow: eyebrow, title: title, icon: icon, dark: dark),
           const SizedBox(height: 16),
           GestureDetector(
             onTap: onTap,
@@ -214,11 +228,13 @@ class BannerSection extends StatelessWidget {
               sub: bannerSub ?? '',
               icon: icon,
               onTap: onTap,
+              dark: dark,
             ),
           ],
-        ],
-      ),
+      ],
     );
+    if (dark) return body;
+    return NeuCard(padding: const EdgeInsets.all(16), child: body);
   }
 }
 

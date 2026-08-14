@@ -64,6 +64,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     );
     if (widget.autoplay) _lease.play();
     _lease.addListener(_onLease);
+    _pump();
   }
 
   /// Only what changes the picture causes a rebuild.
@@ -115,6 +116,27 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  /// Measure after every frame, for as long as this widget is alive.
+  ///
+  /// This used to be registered inside build(), which looked equivalent and
+  /// was not: a post-frame callback fires ONCE, and a ListView does not
+  /// rebuild the children that are merely scrolling past. So the clip
+  /// measured itself on its first frame and never again — and because the
+  /// widget only rebuilds when the pool grants it a decoder, a clip that
+  /// failed to get one on that single measurement could never ask for
+  /// another. Nothing on screen played, ever, and the readout said 0/4.
+  ///
+  /// Re-registering does NOT schedule a frame of its own, so an idle app
+  /// stays idle — the callback simply runs on whatever frames the app was
+  /// producing anyway, which is exactly when a clip can have moved.
+  void _pump() {
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measure();
+      _pump();
+    });
+  }
+
   /// Where this clip is relative to the middle of the screen, measured from
   /// the render object rather than from a scroll offset — which means it
   /// works the same inside a list, a page view, a nested scroller or none of
@@ -123,7 +145,9 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     if (!mounted) return;
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize || !box.attached) {
-      _lease.reportDistance(double.infinity);
+      // Not laid out YET is not the same as off screen. Saying "infinity"
+      // here would hand the decoder away on the one frame before the first
+      // layout, so this simply waits for the next.
       return;
     }
     final screen = MediaQuery.maybeOf(context)?.size;
@@ -142,8 +166,6 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
-
     final c = _lease.controller;
     final ready = _lease.isReady && c != null;
 

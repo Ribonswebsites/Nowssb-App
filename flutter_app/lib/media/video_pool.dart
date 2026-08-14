@@ -68,6 +68,9 @@ class VideoLease extends ChangeNotifier {
   VideoPlayerController? _controller;
   bool _wantsPlay = false;
   bool _disposed = false;
+  /// How many times this clip has refused to open. Kept so a broken file
+  /// cannot be retried on every single pass forever.
+  int _failures = 0;
   double _distance = double.infinity;
 
   /// Non-null only while this lease holds one of the pool's decoders.
@@ -166,6 +169,22 @@ class VideoPool {
   int get liveCount => _live.length;
   int get leaseCount => _leases.length;
 
+  /// How many leases currently say they are on screen. If this is zero while
+  /// clips are plainly visible, the measuring is wrong; if it is healthy and
+  /// liveCount is zero, the opening is. Two very different bugs that look
+  /// identical from the outside, which is why both numbers are on the HUD.
+  int get nearCount {
+    var n = 0;
+    for (final l in _leases) {
+      if (l._distance != double.infinity) n++;
+    }
+    return n;
+  }
+
+  /// The last clip that would not open, and what the platform said about it.
+  /// Null while nothing has failed.
+  String? lastError;
+
   @visibleForTesting
   Set<VideoLease> get debugLive => Set.unmodifiable(_live);
 
@@ -203,6 +222,13 @@ class VideoPool {
     _live.clear();
     _draining.clear();
     _again = false;
+    // The in-flight flags too. A pass abandoned mid-await leaves _rebalancing
+    // true, and a true _rebalancing is permanent: every later request just
+    // sets _again and returns, so the pool never grants another decoder as
+    // long as the app runs. Not only a test concern — it is the one state
+    // this object has that can wedge.
+    _rebalancing = false;
+    _scheduled = false;
   }
 
   @visibleForTesting
@@ -313,7 +339,7 @@ class VideoPool {
         // is the whole point, and it is why a hundred idle clips now cost a
         // hundred pictures instead of a hundred ExoPlayers.
         final want = _leases
-            .where((l) => l._distance != double.infinity)
+            .where((l) => l._distance != double.infinity && l._failures < 3)
             .toList()
           ..sort((a, b) {
             if (a.priority != b.priority) {
@@ -381,11 +407,15 @@ class VideoPool {
       await c.initialize();
     } catch (e) {
       // A clip that will not open is not worth taking the app down for. The
-      // poster is already on screen and stays there.
+      // poster is already on screen and stays there — and now the reason is
+      // recorded rather than only printed, because a debugPrint cannot be
+      // read from a phone in someone's hand.
+      lastError = '${l.assetPath.split('/').last}: $e';
       debugPrint('NowssB video: could not open ${l.assetPath} — $e');
+      l._failures++;
       l._controller = null;
       _live.remove(l);
-      await c.dispose();
+      try { await c.dispose(); } catch (_) {}
       l._changed();
       return;
     }
@@ -443,4 +473,15 @@ class VideoPool {
   /// After a return to the foreground, whoever is on screen takes theirs
   /// back.
   void resume() => _rebalanceSoon();
+
+  /// A slow heartbeat, as a backstop for anything the per-frame measuring
+  /// misses — a screen that is completely static produces no frames, so it
+  /// reports nothing, so a clip that arrived during the quiet would wait
+  /// forever. Two seconds costs nothing and cannot deadlock.
+  Timer? _beat;
+  void startHeartbeat() {
+    _beat ??= Timer.periodic(const Duration(seconds: 2), (_) {
+      if (_leases.isNotEmpty) _rebalanceSoon();
+    });
+  }
 }

@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
+import '../screens/home_fashion.dart';
 import '../screens/home_normal.dart';
 import '../screens/coming_soon.dart';
 import '../widgets/pool_hud.dart';
@@ -15,6 +16,11 @@ class NavShell extends StatefulWidget {
 
 class _NavShellState extends State<NavShell> {
   int _i = 0;
+
+  /// Which home. The website keeps both in the DOM and switches a class;
+  /// here it is one flag, because they are two different screens rather
+  /// than two skins — see lib/screens/home_fashion.dart.
+  bool _fashion = false;
 
   static const _tabs = [
     ('Connect', Icons.groups_outlined),
@@ -38,11 +44,60 @@ class _NavShellState extends State<NavShell> {
             children: [
               for (var i = 0; i < _tabs.length; i++)
                 if (i == 0)
-                  const HomeNormal()
+                  (_fashion ? const HomeFashion() : const HomeNormal())
                 else
                   ComingSoon(title: _tabs[i].$1, icon: _tabs[i].$2),
             ],
           ),
+          // The switch between the two homes. On the website this lives in
+          // Customize; until that screen is ported it is here, because a
+          // home you cannot reach may as well not be built.
+          if (_i == 0)
+            Positioned(
+              left: 14,
+              bottom: 92,
+              child: SafeArea(
+                top: false,
+                child: GestureDetector(
+                  onTap: () => setState(() => _fashion = !_fashion),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                    decoration: BoxDecoration(
+                      color: _fashion ? Colors.white : Colors.black,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x33000000),
+                          blurRadius: 14,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _fashion ? Icons.light_mode : Icons.dark_mode,
+                          size: 15,
+                          color: _fashion ? Colors.black : Colors.white,
+                        ),
+                        const SizedBox(width: 7),
+                        Text(
+                          _fashion ? 'Normal home' : 'Fashion home',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: _fashion ? Colors.black : Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
           // Debug only, and compiled out of a release build: the decoder
           // count, live, so the ceiling is something you can watch rather
           // than something you have to take on trust.
