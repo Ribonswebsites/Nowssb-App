@@ -27,6 +27,11 @@ dependencies:
   shared_preferences: ^2.3.2
   cached_network_image: ^3.4.1
   video_player: ^2.9.2
+
+  # The app's marks are DRAWN — every icon in index.html is an inline SVG
+  # path, not a picture. This is what lets those paths be pasted in verbatim
+  # instead of a Material glyph being picked to look roughly like one.
+  flutter_svg: ^2.0.10
   google_fonts: ^6.2.1
 
 dev_dependencies:

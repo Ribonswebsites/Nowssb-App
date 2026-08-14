@@ -35,6 +35,7 @@ import 'package:flutter/material.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
 
 /// One banner on the rail — RAIL, app/js/part083.js:106.
@@ -43,8 +44,10 @@ import '../../widgets/tv_frame.dart';
 /// of the six are already local files on the web too; the other two fall
 /// back to the clip nearest in meaning until the download runs.
 class _Rail {
-  const _Rail(this.icon, this.hello, this.title, this.asset, this.dest);
-  final IconData icon;
+  const _Rail(this.mark, this.hello, this.title, this.asset, this.dest);
+
+  /// The block's own mark — the SVG path, from `I` at part083.js:50.
+  final String mark;
   final String hello;
   final String title;
   final String asset;
@@ -54,17 +57,17 @@ class _Rail {
 }
 
 const _rail = [
-  _Rail(Icons.workspace_premium_outlined, 'The Full Library',
-      'NowssB Subscription', 'assets/video/subscription-a.mp4', 3),
-  _Rail(Icons.shopping_bag_outlined, 'Where a word begins',
-      'NowssB Word Store', 'assets/video/store-section.mp4', 3),
-  _Rail(Icons.shopping_bag_outlined, 'What a word truly means',
-      'NowssB Meaning Store', 'assets/video/store-banner.mp4', 3),
-  _Rail(Icons.auto_awesome_outlined, 'The rarest word', 'The Signature',
+  _Rail(NwsbMarks.crown, 'The Full Library', 'NowssB Subscription',
+      'assets/video/subscription-a.mp4', 3),
+  _Rail(NwsbMarks.word, 'Where a word begins', 'NowssB Word Store',
+      'assets/video/store-section.mp4', 3),
+  _Rail(NwsbMarks.meaning, 'What a word truly means', 'NowssB Meaning Store',
+      'assets/video/store-banner.mp4', 3),
+  _Rail(NwsbMarks.signature, 'The rarest word', 'The Signature',
       'assets/video/signature-banner.mp4', 3),
-  _Rail(Icons.menu_book_outlined, 'Page by page', 'NowssB eBooks',
+  _Rail(NwsbMarks.book, 'Page by page', 'NowssB eBooks',
       'assets/video/word-acts.mp4', 2),
-  _Rail(Icons.graphic_eq, 'Every word you own', 'Sound Library',
+  _Rail(NwsbMarks.sound, 'Every word you own', 'Sound Library',
       'assets/video/sound-library-banner.mp4', 2),
 ];
 
@@ -280,7 +283,7 @@ class _RailCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: const Color(0x2EFFFFFF)),
                 ),
-                child: Icon(rail.icon, size: 21, color: Colors.white),
+                child: Center(child: NwsbIcon(rail.mark, size: 21)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -361,8 +364,9 @@ class _ShopChip extends StatelessWidget {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.shopping_bag_outlined,
-                size: 20, color: NwsbColors.ink),
+            child: const Center(
+              child: NwsbIcon(NwsbMarks.bag, size: 20, color: NwsbColors.ink),
+            ),
           ),
           const SizedBox(width: 10),
           const Flexible(
@@ -436,7 +440,15 @@ class _SearchPill extends StatelessWidget {
                 color: Color(0xFF14141C),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.search, size: 19, color: Colors.white),
+              // `.hero-search-btn` carries assets/icons/search.webp, which
+              // is in the repository — the one mark on this card that is a
+              // picture rather than a path.
+              padding: const EdgeInsets.all(11),
+              child: Image.asset(
+                'assets/icons/search.webp',
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.search, size: 19, color: Colors.white),
+              ),
             ),
           ],
         ),

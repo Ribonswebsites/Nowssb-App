@@ -9,9 +9,12 @@
 /// drawn here for the same reason.
 library;
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
+import '../../widgets/nwsb_icon.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
@@ -29,9 +32,21 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      color: const Color(0xF00A0A12),
+    // `background: rgba(255,255,255,0.08)` with `blur(20px)` — WHITE glass
+    // over the film, not a dark bar laid on top of it. This was an opaque
+    // near-black slab, which is why it read as a night bar bolted to the
+    // page instead of the page showing through it.
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+      decoration: const BoxDecoration(
+        color: Color(0x14FFFFFF),
+        border: Border(
+          bottom: BorderSide(color: Color(0x1AFFFFFF)),
+        ),
+      ),
       child: Row(
         children: [
           Container(
@@ -79,15 +94,17 @@ class HomeHeader extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           _HdrIcon(
-            icon: Icons.notifications_none,
+            mark: NwsbMarks.bell,
             badge: notifications,
             onTap: onNotifications,
           ),
           const _HdrRule(),
-          _HdrIcon(icon: Icons.home_outlined, onTap: onNormalHome),
+          _HdrIcon(mark: NwsbMarks.house, onTap: onNormalHome),
           const _HdrRule(),
-          _HdrIcon(icon: Icons.menu, onTap: onMenu),
+          _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
         ],
+      ),
+        ),
       ),
     );
   }
@@ -105,9 +122,16 @@ class _HdrRule extends StatelessWidget {
 }
 
 class _HdrIcon extends StatelessWidget {
-  const _HdrIcon({required this.icon, this.badge = 0, this.onTap});
-  final IconData icon;
+  const _HdrIcon({
+    required this.mark,
+    this.badge = 0,
+    this.stroke = 1.7,
+    this.onTap,
+  });
+
+  final String mark;
   final int badge;
+  final double stroke;
   final VoidCallback? onTap;
 
   @override
@@ -119,27 +143,35 @@ class _HdrIcon extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           SizedBox(
-            width: 28,
-            height: 34,
-            child: Icon(icon, size: 24, color: Colors.white),
+            width: 38,
+            height: 38,
+            child: Center(
+              // `.hdr-svg { width: 68%; height: 68% }` of a 38px button.
+              child: NwsbIcon(mark, size: 38 * 0.68, strokeWidth: stroke),
+            ),
           ),
           if (badge > 0)
             Positioned(
-              top: -3,
-              right: -8,
+              top: -6,
+              right: -6,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                constraints: const BoxConstraints(minWidth: 18),
+                height: 18,
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE0342B),
-                  borderRadius: BorderRadius.circular(10),
+                  color: const Color(0xFFE8434F),
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: NwsbColors.deep, width: 1.5),
                 ),
                 child: Text(
                   '$badge',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
                   ),
                 ),
               ),
@@ -168,14 +200,9 @@ class HeroGreeting extends StatelessWidget {
   }
 
   /// timeMark() — :177. The sun climbing, the sun high, the sun setting,
-  /// the moon.
-  static IconData mark([DateTime? at]) {
-    final h = (at ?? DateTime.now()).hour;
-    if (h < 5 || h >= 21) return Icons.nightlight_round;
-    if (h < 9) return Icons.wb_twilight;
-    if (h < 17) return Icons.wb_sunny_outlined;
-    return Icons.wb_twilight;
-  }
+  /// the moon. The paths are the app's own; see [NwsbMarks.forHour].
+  static String mark([DateTime? at]) =>
+      NwsbMarks.forHour((at ?? DateTime.now()).hour);
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +218,9 @@ class HeroGreeting extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: const Color(0x24FFFFFF)),
             ),
-            child: Icon(mark(), size: 27, color: NwsbColors.goldLight),
+            child: Center(
+              child: NwsbIcon(mark(), size: 27, color: NwsbColors.goldLight),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(

@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/widgets/home_parts.dart';
+import 'package:nowssb/widgets/nwsb_icon.dart';
 import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 
@@ -126,6 +127,25 @@ void main() {
     }
 
     expect(seen, greaterThan(0), reason: 'no bars were ever built');
+  });
+
+  testWidgets('the header and the hero wear the app\'s own marks',
+      (tester) async {
+    // The whole point of nwsb_icon.dart. Every mark in index.html is a
+    // drawn path, and picking the Material glyph that looks nearest is what
+    // made the top of this app read as a different app. If someone reaches
+    // for Icons.* up here again, this fails.
+    await pump(tester);
+
+    final marks = tester.widgetList<NwsbIcon>(find.byType(NwsbIcon));
+    expect(marks.length, greaterThanOrEqualTo(4),
+        reason: 'the bell, the house, the menu and the greeting orb are all '
+            "the app's own paths");
+
+    for (final m in marks) {
+      expect(m.body.trim(), startsWith('<'),
+          reason: 'a mark must be SVG path data, not a name');
+    }
   });
 
   testWidgets('the pool ceiling holds while the page scrolls', (tester) async {
