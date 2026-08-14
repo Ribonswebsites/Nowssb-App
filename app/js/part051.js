@@ -216,11 +216,41 @@
     return !!v.querySelector('source[src]');
   }
 
+  /* What is in front of everything else right now, or null.
+     A .sub-screen is a full-screen fixed page and the menu is a full-screen
+     drawer; when one is open, the home is still there, still .active, and
+     completely invisible. The last one in the document is the top of the
+     stack, because that is the order they are laid out in. */
+  function topLayer() {
+    var open = document.querySelectorAll('.sub-screen.open, .menu-drawer.open');
+    return open.length ? open[open.length - 1] : null;
+  }
+
   /* Is every ancestor of this video actually being shown? The screens use
      .open / .active classes, so this only changes when a class changes —
      which is why the answer is cached rather than recomputed per frame. */
   function shown(el) {
     if (shownCache.has(el)) return shownCache.get(el);
+
+    /* ── A page over the top means everything under it is not being looked at
+       ──────────────────────────────────────────────────────────────────
+       This was the bug behind "the background video on that page stopped
+       working". Opening a sub-screen does not take .active off the home, so
+       every clip on the home still answered "yes, I am shown" and the
+       observer still called them on screen — the page is over them, not
+       instead of them. Six decoders is the whole budget, the home was
+       holding all six, and the page you had actually opened got none. Its
+       background film sat on its poster looking broken.
+
+       Nothing under the top layer is shown. It is that simple, and it is
+       true of every screen in the app rather than of the two that were
+       noticed. */
+    var top = topLayer();
+    if (top && !top.contains(el)) {
+      shownCache.set(el, false);
+      return false;
+    }
+
     var ok = true, node = el;
     while (node && node !== document.documentElement) {
       if (node.classList) {
@@ -446,7 +476,12 @@
        moment, and was paused again, which looks exactly like a still. Those
        sort first and therefore always get a slot while they are on screen.
        Still at most MAX_PLAYING — this changes which four, not how many. */
-    var PRIORITY = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .gsel-bg-vid, .slm-head-vid';
+    /* .feat-bgvid and .rd-hub-bgvid are the same kind of thing as the rest of
+       this list — the film IS the page, not decoration on it — and were
+       missing from it. */
+    var PRIORITY = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .gsel-bg-vid, ' +
+                   '.slm-head-vid, .feat-bgvid, .rd-hub-bgvid, .fp-page-vid, ' +
+                   '.wsg-bgvid, .lgp-info-video';
     function prio(v) { return v.matches && v.matches(PRIORITY) ? 0 : 1; }
     if (live.length > MAX_PLAYING) {
       var mid = (window.innerHeight || 800) / 2;
