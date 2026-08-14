@@ -101,6 +101,14 @@
     } catch(e){ return null; }
   }
 
+  /* The banner at the top of the card is a clip, not a still. .rx-banner
+     in app/app.css is width/height/object-fit:cover, which a <video>
+     answers exactly as an <img> does, so the box did not change — only
+     what is in it.
+
+     data-nwsb-auto hands it to the play controller in app/js/part051.js:
+     preload="none" until it is scrolled to, played only while it is on
+     screen, and counted against the cap on how many clips run at once. */
   // Render the card into #rxCardWrap
   function render(data){
     var wrap = document.getElementById('rxCardWrap');
@@ -110,7 +118,9 @@
 
     wrap.innerHTML =
       '<div class="rx-card">'+
-        '<img class="rx-banner" loading="lazy" decoding="async" onclick="openSub(\'ai-prescription\')" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png" alt="AI Prescription">'+
+        '<video class="rx-banner" data-nwsb-auto muted loop playsinline preload="none" '+
+          'aria-hidden="true" tabindex="-1" onclick="openSub(\'ai-prescription\')" '+
+          'src="./assets/video/rx-banner.mp4?v=1"></video>'+
         '<div class="rx-header" onclick="openSub(\'ai-prescription\')" style="cursor:pointer;">'+
           '<div class="rx-header-left">'+
             '<div class="rx-ai-dot"></div>'+
@@ -143,7 +153,9 @@
     if (!wrap) return;
     wrap.innerHTML =
       '<div class="rx-card">'+
-        '<img class="rx-banner" loading="lazy" decoding="async" onclick="openSub(\'ai-prescription\')" src="https://res.cloudinary.com/eenvubod/image/upload/v1784890179/file_00000000acd482469da31656911599dd_kany9z.png" alt="AI Prescription">'+
+        '<video class="rx-banner" data-nwsb-auto muted loop playsinline preload="none" '+
+          'aria-hidden="true" tabindex="-1" onclick="openSub(\'ai-prescription\')" '+
+          'src="./assets/video/rx-banner.mp4?v=1"></video>'+
         '<div class="rx-header">'+
           '<div class="rx-header-left"><div class="rx-ai-dot"></div><span class="rx-label">AI Prescription</span></div>'+
           '<span class="rx-time-badge">Building your ritual…</span>'+
