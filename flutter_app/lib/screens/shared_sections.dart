@@ -19,6 +19,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../widgets/nwsb_icon.dart';
+
 import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
@@ -42,7 +44,7 @@ class SubscriptionSection extends StatelessWidget {
           const PaneHead(
             eyebrow: 'The Full Library',
             title: 'NowssB Subscription',
-            icon: Icons.workspace_premium_outlined,
+            mark: NwsbMarks.crown,
           ),
           TvFrame(
             asset: 'assets/video/subscription-a.mp4',
@@ -61,7 +63,7 @@ class SubscriptionSection extends StatelessWidget {
             onTap: onTap,
             slides: const [
               (
-                Icons.workspace_premium_outlined,
+                NwsbMarks.crown,
                 'Subscribe Today',
                 'Every word and every frequency, unlocked',
               ),
@@ -223,7 +225,7 @@ class RoutinesSection extends StatelessWidget {
           SecBanner(
             title: 'My Routines',
             sub: 'Five routines — build your healing schedule',
-            icon: Icons.checklist_rtl,
+            mark: NwsbMarks.play, markViewBox: 22,
             onTap: onTap,
           ),
         ],
@@ -254,7 +256,7 @@ class QuickAccessSection extends StatelessWidget {
           const PaneHead(
             eyebrow: 'Everything You Own',
             title: 'On One Screen',
-            icon: Icons.grid_view_rounded,
+            mark: NwsbMarks.order, markViewBox: 22,
           ),
           TvFrame(
             asset: 'assets/video/tv-screen.mp4',
@@ -263,7 +265,7 @@ class QuickAccessSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: _QuickButton(
-                    icon: Icons.shopping_cart_outlined,
+                    mark: NwsbMarks.cart, markViewBox: 22,
                     label: 'Cart',
                     onTap: onCart,
                   ),
@@ -271,7 +273,7 @@ class QuickAccessSection extends StatelessWidget {
                 const _QuickRule(),
                 Expanded(
                   child: _QuickButton(
-                    icon: Icons.favorite_border,
+                    mark: NwsbMarks.wishlist, markViewBox: 22,
                     label: 'Wishlist',
                     onTap: onWishlist,
                   ),
@@ -279,7 +281,7 @@ class QuickAccessSection extends StatelessWidget {
                 const _QuickRule(),
                 Expanded(
                   child: _QuickButton(
-                    icon: Icons.work_outline,
+                    mark: NwsbMarks.order, markViewBox: 22,
                     label: 'Order',
                     onTap: onOrders,
                   ),
@@ -294,17 +296,17 @@ class QuickAccessSection extends StatelessWidget {
             onTap: onCart,
             slides: const [
               (
-                Icons.shopping_cart_outlined,
+                NwsbMarks.cart,
                 'Your Cart',
                 "Everything you're ready to buy",
               ),
               (
-                Icons.favorite_border,
+                NwsbMarks.wishlist,
                 'Your Wishlist',
                 'The words you are saving for later',
               ),
               (
-                Icons.work_outline,
+                NwsbMarks.order,
                 'Your Orders',
                 'Everything you have unlocked so far',
               ),
@@ -324,8 +326,14 @@ class _QuickRule extends StatelessWidget {
 }
 
 class _QuickButton extends StatelessWidget {
-  const _QuickButton({required this.icon, required this.label, this.onTap});
-  final IconData icon;
+  const _QuickButton({
+    required this.mark,
+    this.markViewBox = 22,
+    required this.label,
+    this.onTap,
+  });
+  final String mark;
+  final double markViewBox;
   final String label;
   final VoidCallback? onTap;
 
@@ -337,7 +345,7 @@ class _QuickButton extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 22, color: Colors.white),
+          NwsbIcon(mark, size: 22, viewBox: markViewBox),
           const SizedBox(height: 8),
           Text(
             label,
@@ -364,7 +372,7 @@ class EbooksSection extends StatelessWidget {
         children: [
           Spill(
             label: 'Deep-dive guides, yours to keep',
-            icon: Icons.menu_book_outlined,
+            mark: NwsbMarks.ebook, markViewBox: 22,
             onTap: onTap,
           ),
           GestureDetector(
@@ -414,7 +422,7 @@ class EbooksSection extends StatelessWidget {
           SecBanner(
             title: 'eBooks',
             sub: 'Deep-dive guides, yours to keep',
-            icon: Icons.menu_book_outlined,
+            mark: NwsbMarks.ebook, markViewBox: 22,
             onTap: onTap,
           ),
         ],
@@ -432,18 +440,18 @@ class ConnectBannerSection extends StatelessWidget {
   /// FEATURES — app/js/part049.js:200. Connect's own five.
   static const _features = [
     (
-      Icons.dynamic_feed_outlined,
+      NwsbMarks.feed,
       'Community Feed',
       'Share your daily practice with the world',
     ),
-    (Icons.circle_outlined, 'Stories', 'Drop 24-hour frequency moments'),
+    (NwsbMarks.stories, 'Stories', 'Drop 24-hour frequency moments'),
     (
-      Icons.video_library_outlined,
+      NwsbMarks.reels,
       'Reels',
       'Watch & post short healing reels',
     ),
-    (Icons.explore_outlined, 'Discover Creators', 'Find people worth following'),
-    (Icons.verified_outlined, 'Verified', 'Earn your NowssB check-mark'),
+    (NwsbMarks.discover, 'Discover Creators', 'Find people worth following'),
+    (NwsbMarks.verified, 'Verified', 'Earn your NowssB check-mark'),
   ];
 
   @override
@@ -455,7 +463,7 @@ class ConnectBannerSection extends StatelessWidget {
           const PaneHead(
             eyebrow: 'The Social Space',
             title: 'NowssB Connect',
-            icon: Icons.people_outline,
+            mark: NwsbMarks.people,
           ),
           TvFrame(
             asset: 'assets/video/connect-banner.mp4',
@@ -602,7 +610,7 @@ class GenderPathSection extends StatelessWidget {
           const PaneHead(
             eyebrow: 'Body, organ and mind',
             title: 'Choose Your Path',
-            icon: Icons.transgender,
+            mark: NwsbMarks.gender,
           ),
           TvFrame(
             asset: 'assets/video/healing-path-bg.mp4',
@@ -619,7 +627,7 @@ class GenderPathSection extends StatelessWidget {
           SecBanner(
             title: 'Female or Male',
             sub: 'Your wellness, decoded for your body',
-            icon: Icons.transgender,
+            mark: NwsbMarks.gender,
             onTap: onTap,
           ),
         ],

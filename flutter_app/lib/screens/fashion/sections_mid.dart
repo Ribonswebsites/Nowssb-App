@@ -6,6 +6,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/nwsb_icon.dart';
+
 import '../../data/content.dart';
 import '../../data/settings.dart';
 import '../../media/nwsb_image.dart';
@@ -219,7 +221,7 @@ class FashStore extends StatelessWidget {
           const PaneHead(
             eyebrow: 'Words and meanings',
             title: 'The NowssB Store',
-            icon: Icons.shopping_bag_outlined,
+            mark: NwsbMarks.bag,
           ),
           GestureDetector(
             onTap: onTap,
@@ -331,8 +333,7 @@ class FashStore extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                Icon(Icons.arrow_forward,
-                                    size: 14, color: NwsbColors.ink),
+                                NwsbIcon(NwsbMarks.arrow, size: 14, color: NwsbColors.ink),
                               ],
                             ),
                           ),
@@ -348,7 +349,7 @@ class FashStore extends StatelessWidget {
           SecBanner(
             title: 'Enter the Store',
             sub: 'Word Library & Meaning Library, in one place',
-            icon: Icons.shopping_bag_outlined,
+            mark: NwsbMarks.bag,
             onTap: onTap,
           ),
         ],
@@ -422,7 +423,7 @@ class FashTrending extends StatelessWidget {
           SecBanner(
             title: "Today's Trending",
             sub: 'See which words are healing the most people right now',
-            icon: Icons.trending_up,
+            mark: NwsbMarks.trending, markViewBox: 22,
             onTap: onTap,
           ),
         ],
@@ -961,7 +962,7 @@ class FashStoreBanner extends StatelessWidget {
           const PaneHead(
             eyebrow: 'Own the sounds that heal',
             title: 'Inside the Store',
-            icon: Icons.shopping_bag_outlined,
+            mark: NwsbMarks.bag,
           ),
           GestureDetector(
             onTap: onTap,
@@ -979,7 +980,7 @@ class FashStoreBanner extends StatelessWidget {
           SecBanner(
             title: 'Shop the Library',
             sub: 'Words, meanings and the origins behind them',
-            icon: Icons.shopping_bag_outlined,
+            mark: NwsbMarks.bag,
             onTap: onTap,
           ),
         ],

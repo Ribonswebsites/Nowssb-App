@@ -23,25 +23,33 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../media/nwsb_image.dart';
 import '../theme/tokens.dart';
+import 'nwsb_icon.dart';
 
 /// The mark-and-pill that introduces a section.
 class Spill extends StatelessWidget {
   const Spill({
     super.key,
     required this.label,
-    required this.icon,
-    this.pillIcon,
+    required this.mark,
+    this.markViewBox = 22,
+    this.pillArt,
     this.onTap,
   });
 
   final String label;
 
-  /// What goes in the round mark.
-  final IconData icon;
+  /// The SVG path in the round mark — one of [NwsbMarks].
+  final String mark;
 
-  /// What goes in the pill's little disc. Falls back to [icon].
-  final Widget? pillIcon;
+  /// The box that path was drawn in. The spill marks are 22, not 24.
+  final double markViewBox;
+
+  /// The picture in the pill's little disc, as index.html names it. Where a
+  /// spill has no picture the mark is repeated, which is what the Reader's
+  /// and eBooks' markup does.
+  final String? pillArt;
 
   final VoidCallback? onTap;
 
@@ -58,34 +66,54 @@ class Spill extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0x14FFFFFF),
+                color: Colors.black,
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0x33FFFFFF)),
+                border: Border.all(color: const Color(0x1AFFFFFF)),
               ),
-              child: Icon(icon, size: 19, color: Colors.white),
+              // `.spill-circle` — flat black with a hairline, 40px, and the
+              // mark at 19.
+              child: Center(
+                child: NwsbIcon(mark, size: 19, viewBox: markViewBox,
+                    strokeWidth: 1.6),
+              ),
             ),
             const SizedBox(width: 10),
             Flexible(
               child: Container(
-                padding: const EdgeInsets.fromLTRB(6, 6, 16, 6),
+                padding: const EdgeInsets.fromLTRB(5, 5, 14, 5),
                 decoration: BoxDecoration(
-                  color: const Color(0x0FFFFFFF),
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: const Color(0x1FFFFFFF)),
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0x1AFFFFFF)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 30,
-                      height: 30,
+                      width: 24,
+                      height: 24,
                       clipBehavior: Clip.antiAlias,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF14141C),
+                      decoration: BoxDecoration(
+                        color: const Color(0x1AE8D5A3),
                         shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0x3DE8D5A3)),
                       ),
-                      child: pillIcon ??
-                          Icon(icon, size: 15, color: NwsbColors.goldLight),
+                      child: pillArt == null
+                          ? Center(
+                              child: NwsbIcon(mark,
+                                  size: 13,
+                                  viewBox: markViewBox,
+                                  color: NwsbColors.goldLight),
+                            )
+                          : NwsbImage(
+                              url: pillArt!,
+                              fallback: Center(
+                                child: NwsbIcon(mark,
+                                    size: 13,
+                                    viewBox: markViewBox,
+                                    color: NwsbColors.goldLight),
+                              ),
+                            ),
                     ),
                     const SizedBox(width: 10),
                     Container(
@@ -123,13 +151,23 @@ class SecBanner extends StatelessWidget {
     super.key,
     required this.title,
     required this.sub,
-    required this.icon,
+    required this.mark,
+    this.markViewBox = 24,
+    this.art,
     this.onTap,
   });
 
   final String title;
   final String sub;
-  final IconData icon;
+
+  /// The SVG path in the round tile — one of [NwsbMarks].
+  final String mark;
+  final double markViewBox;
+
+  /// Some bars carry a picture in the tile instead of a path, and where
+  /// index.html names one this is that URL.
+  final String? art;
+
   final VoidCallback? onTap;
 
   @override
@@ -148,11 +186,27 @@ class SecBanner extends StatelessWidget {
             Container(
               width: 44,
               height: 44,
+              clipBehavior: Clip.antiAlias,
               decoration: const BoxDecoration(
                 color: Color(0xFF14141C),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 19, color: NwsbColors.goldLight),
+              child: art == null
+                  ? Center(
+                      child: NwsbIcon(mark,
+                          size: 19,
+                          viewBox: markViewBox,
+                          color: NwsbColors.goldLight),
+                    )
+                  : NwsbImage(
+                      url: art!,
+                      fallback: Center(
+                        child: NwsbIcon(mark,
+                            size: 19,
+                            viewBox: markViewBox,
+                            color: NwsbColors.goldLight),
+                      ),
+                    ),
             ),
             const SizedBox(width: 12),
             Container(width: 1, height: 34, color: const Color(0x1FFFFFFF)),
@@ -182,7 +236,7 @@ class SecBanner extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward, size: 18, color: Color(0xE6FFFFFF)),
+            const NwsbIcon(NwsbMarks.arrow, size: 18, color: Color(0xE6FFFFFF)),
           ],
         ),
       ),
@@ -199,8 +253,8 @@ class SecBanner extends StatelessWidget {
 class NcbCarousel extends StatefulWidget {
   const NcbCarousel({super.key, required this.slides, this.onTap});
 
-  /// (icon, name, sub) — the three things a slide carries.
-  final List<(IconData, String, String)> slides;
+  /// (mark, name, sub) — the three things a slide carries.
+  final List<(String, String, String)> slides;
   final VoidCallback? onTap;
 
   @override
@@ -232,7 +286,7 @@ class _NcbCarouselState extends State<NcbCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    final (icon, name, sub) = widget.slides[_i];
+    final (mark, name, sub) = widget.slides[_i];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -242,7 +296,7 @@ class _NcbCarouselState extends State<NcbCarousel> {
             key: ValueKey(_i),
             title: name,
             sub: sub,
-            icon: icon,
+            mark: mark,
             onTap: widget.onTap,
           ),
         ),
@@ -304,8 +358,11 @@ class EnterPill extends StatelessWidget {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.arrow_forward,
-                size: 15, color: NwsbColors.ink),
+            child: const Center(
+              child: NwsbIcon(NwsbMarks.enterArrow,
+                  size: 13, viewBox: 12, strokeWidth: 1.9,
+                  color: NwsbColors.ink),
+            ),
           ),
         ],
       ),

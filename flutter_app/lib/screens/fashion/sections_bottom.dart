@@ -14,6 +14,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/nwsb_icon.dart';
+
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -64,7 +66,7 @@ class FashOffer extends StatelessWidget {
           SecBanner(
             title: "Today's Offer",
             sub: "Rotating store coupons — tap to redeem today's deal",
-            icon: Icons.local_offer_outlined,
+            mark: NwsbMarks.bag,
             onTap: onTap,
           ),
         ],
@@ -101,7 +103,7 @@ class FashShabdapathy extends StatelessWidget {
           SecBanner(
             title: 'Shabdapathy Foundations',
             sub: 'Ancient word science, meets modern wellness',
-            icon: Icons.auto_stories_outlined,
+            mark: NwsbMarks.book,
             onTap: onTap,
           ),
         ],
@@ -331,8 +333,7 @@ class _SearchPanelState extends State<_SearchPanel> {
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               color: Colors.white,
-                              child: const Icon(Icons.arrow_forward,
-                                  size: 16, color: NwsbColors.ink),
+                              child: const NwsbIcon(NwsbMarks.arrow, size: 16, color: NwsbColors.ink),
                             ),
                           ),
                         ],

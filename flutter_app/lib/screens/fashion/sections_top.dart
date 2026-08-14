@@ -8,6 +8,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/nwsb_icon.dart';
+
 import '../../data/content.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
@@ -275,7 +277,7 @@ class FashPractice extends StatelessWidget {
         children: [
           Spill(
             label: 'Your daily word ritual',
-            icon: Icons.play_arrow,
+            mark: NwsbMarks.play, markViewBox: 22,
             onTap: onTap,
           ),
           PhotoCard(
@@ -313,7 +315,7 @@ class FashReader extends StatelessWidget {
         children: [
           Spill(
             label: 'Meanings and eBooks, in one place',
-            icon: Icons.menu_book_outlined,
+            mark: NwsbMarks.reader, markViewBox: 22,
             onTap: onTap,
           ),
           GestureDetector(
@@ -362,7 +364,7 @@ class FashReader extends StatelessWidget {
           SecBanner(
             title: 'Reader',
             sub: 'Meanings and eBooks, in one place',
-            icon: Icons.menu_book_outlined,
+            mark: NwsbMarks.reader, markViewBox: 22,
             onTap: onTap,
           ),
         ],
@@ -428,7 +430,7 @@ class FashStreak extends StatelessWidget {
           SecBanner(
             title: 'Daily Streak',
             sub: 'Practice daily to keep your healing streak alive',
-            icon: Icons.local_fire_department_outlined,
+            mark: NwsbMarks.flame,
             onTap: onTap,
           ),
         ],

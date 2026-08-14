@@ -79,22 +79,34 @@ class PaneHead extends StatelessWidget {
     super.key,
     required this.eyebrow,
     required this.title,
-    this.icon,
     this.mark,
+    this.markViewBox = 24,
+    this.art,
   });
 
   final String eyebrow;
   final String title;
-  final IconData? icon;
-  final Widget? mark;
+  final String? mark;
+  final double markViewBox;
+  final Widget? art;
 
   @override
   Widget build(BuildContext context) {
     return switch (HomeSkinScope.of(context)) {
-      HomeSkin.fashion =>
-        SectionHead(eyebrow: eyebrow, title: title, icon: icon, mark: mark),
-      HomeSkin.normal =>
-        WrapHead(eyebrow: eyebrow, title: title, icon: icon, mark: mark),
+      HomeSkin.fashion => SectionHead(
+          eyebrow: eyebrow,
+          title: title,
+          mark: mark,
+          markViewBox: markViewBox,
+          art: art,
+        ),
+      HomeSkin.normal => WrapHead(
+          eyebrow: eyebrow,
+          title: title,
+          mark: mark,
+          markViewBox: markViewBox,
+          art: art,
+        ),
     };
   }
 }

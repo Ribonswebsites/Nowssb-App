@@ -15,6 +15,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/nwsb_icon.dart';
+
 import '../../data/content.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
@@ -206,7 +208,7 @@ class NmStreakVideo extends StatelessWidget {
         const WrapHead(
           eyebrow: 'Today, on film',
           title: 'Streak',
-          icon: Icons.local_fire_department_outlined,
+          mark: NwsbMarks.flame,
         ),
         TvFrame(
           asset: 'assets/video/tv-screen.mp4',
@@ -232,7 +234,7 @@ class NmStreak extends StatelessWidget {
         const WrapHead(
           eyebrow: 'One day at a time',
           title: 'Your Streak',
-          icon: Icons.local_fire_department_outlined,
+          mark: NwsbMarks.flame,
         ),
         const Text(
           'Start Building Your Streak Today',
@@ -316,7 +318,7 @@ class NmStreak extends StatelessWidget {
         SecBanner(
           title: 'Daily Streak',
           sub: 'Practice daily to keep your healing streak alive',
-          icon: Icons.local_fire_department_outlined,
+          mark: NwsbMarks.flame,
           onTap: onTap,
         ),
       ],
@@ -573,7 +575,7 @@ class NmPractice extends StatelessWidget {
         children: [
           Spill(
             label: 'Your daily word ritual',
-            icon: Icons.play_arrow,
+            mark: NwsbMarks.play,
             onTap: onTap,
           ),
           NeuCard(
@@ -649,8 +651,7 @@ class NmPractice extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: NwsbShadows.raisedXs,
                       ),
-                      child: const Icon(Icons.arrow_forward,
-                          size: 16, color: NwsbColors.ink),
+                      child: const NwsbIcon(NwsbMarks.arrow, size: 16, color: NwsbColors.ink),
                     ),
                   ],
                 ),
@@ -995,8 +996,7 @@ class NmStore extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(width: 8),
-                              Icon(Icons.arrow_forward,
-                                  size: 14, color: NwsbColors.ink),
+                              NwsbIcon(NwsbMarks.arrow, size: 14, color: NwsbColors.ink),
                             ],
                           ),
                         ),
@@ -1028,7 +1028,7 @@ class NmReader extends StatelessWidget {
         children: [
           Spill(
             label: 'Meanings and eBooks, in one place',
-            icon: Icons.menu_book_outlined,
+            mark: NwsbMarks.reader,
             onTap: onTap,
           ),
           GestureDetector(
@@ -1075,7 +1075,7 @@ class NmReader extends StatelessWidget {
           SecBanner(
             title: 'Reader',
             sub: 'Meanings and eBooks, in one place',
-            icon: Icons.menu_book_outlined,
+            mark: NwsbMarks.reader,
             onTap: onTap,
           ),
         ],
@@ -1150,7 +1150,7 @@ class NmTrending extends StatelessWidget {
         SecBanner(
           title: "Today's Trending",
           sub: 'See which words are healing the most people right now',
-          icon: Icons.trending_up,
+          mark: NwsbMarks.trending, markViewBox: 22,
           onTap: onTap,
         ),
       ],

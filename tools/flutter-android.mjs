@@ -22,6 +22,13 @@
 //      packages do not apply this for you — without it the json is inert and
 //      Firebase.initializeApp() fails at runtime with no default options.
 //
+//   5. THE INTERNET PERMISSION.  flutter create writes it into the debug and
+//      profile manifests ONLY, so everything this app does over a network
+//      works while you develop and is dead in the APK you ship: Firestore,
+//      sign-in, notifications, and the Cloudinary artwork the pages are drawn
+//      from. It has to be in the main manifest, and the main manifest is
+//      generated, so it has to be added here.
+//
 // Run it AFTER `flutter create` and BEFORE `flutter build`. It is idempotent:
 // running twice is a no-op, so a local android/ that is already configured is
 // left alone.
@@ -147,6 +154,34 @@ if (a.includes('coreLibraryDesugaring(')) {
 }
 
 writeFileSync(appGradle, a);
+
+// ── the manifest ───────────────────────────────────────────────────────
+// See note 4 at the head of this file. Without INTERNET in the MAIN manifest
+// a release build has no network at all, and the failure looks like empty
+// pages rather than like a permission.
+const manifest = join(android, 'app', 'src', 'main', 'AndroidManifest.xml');
+if (!existsSync(manifest)) {
+  console.error(`missing ${manifest}`);
+  process.exit(1);
+}
+let m = readFileSync(manifest, 'utf8');
+if (m.includes('android.permission.INTERNET')) {
+  already.push('INTERNET permission present');
+} else {
+  const open = m.match(/<manifest[^>]*>\s*/);
+  if (!open) throw new Error('AndroidManifest.xml: no <manifest> element');
+  m = m.replace(
+    open[0],
+    open[0] +
+      '    <!-- flutter create puts these in the debug and profile manifests\n' +
+      '         only. Without them a release build has no network: no\n' +
+      '         Firestore, no sign-in, no notifications, and no artwork. -->\n' +
+      '    <uses-permission android:name="android.permission.INTERNET"/>\n' +
+      '    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n\n',
+  );
+  writeFileSync(manifest, m);
+  done.push('added INTERNET and ACCESS_NETWORK_STATE');
+}
 
 // ── the config itself ──────────────────────────────────────────────────
 // Not a secret: google-services.json ships inside every copy of the APK and

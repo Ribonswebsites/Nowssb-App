@@ -14,6 +14,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/nwsb_icon.dart';
+
 import '../../data/content.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
@@ -126,8 +128,7 @@ class NmConnect extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.arrow_forward,
-                              size: 15, color: Colors.white),
+                          NwsbIcon(NwsbMarks.arrow, size: 15, color: Colors.white),
                         ],
                       ),
                     ),
@@ -151,14 +152,14 @@ class NmFeed extends StatelessWidget {
   /// FEATURES — app/js/part049.js:200.
   static const features = [
     (
-      Icons.dynamic_feed_outlined,
+      NwsbMarks.feed,
       'Community Feed',
       'Share your daily practice with the world',
     ),
-    (Icons.circle_outlined, 'Stories', 'Drop 24-hour frequency moments'),
-    (Icons.video_library_outlined, 'Reels', 'Watch & post short healing reels'),
-    (Icons.explore_outlined, 'Discover Creators', 'Find people worth following'),
-    (Icons.verified_outlined, 'Verified', 'Earn your NowssB check-mark'),
+    (NwsbMarks.stories, 'Stories', 'Drop 24-hour frequency moments'),
+    (NwsbMarks.reels, 'Reels', 'Watch & post short healing reels'),
+    (NwsbMarks.discover, 'Discover Creators', 'Find people worth following'),
+    (NwsbMarks.verified, 'Verified', 'Earn your NowssB check-mark'),
   ];
 
   @override
@@ -364,8 +365,7 @@ class NmFashionSwitch extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: const Color(0x40E8D5A3)),
                 ),
-                child: const Icon(Icons.arrow_forward,
-                    size: 16, color: Color(0xD9E8D5A3)),
+                child: const NwsbIcon(NwsbMarks.arrow, size: 16, color: Color(0xD9E8D5A3)),
               ),
             ],
           ),

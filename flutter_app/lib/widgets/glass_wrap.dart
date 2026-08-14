@@ -24,6 +24,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import 'nwsb_icon.dart';
+
 class GlassWrap extends StatelessWidget {
   const GlassWrap({
     super.key,
@@ -86,18 +88,22 @@ class SectionHead extends StatelessWidget {
     super.key,
     required this.eyebrow,
     required this.title,
-    this.icon,
     this.mark,
+    this.markViewBox = 24,
+    this.art,
   });
 
   final String eyebrow;
   final String title;
 
-  /// A Material stand-in, used until [mark] can point at the real artwork.
-  final IconData? icon;
+  /// The section's own SVG path — one of [NwsbMarks].
+  final String? mark;
 
-  /// The section's own mark, when it is a bundled picture.
-  final Widget? mark;
+  /// The box that path was drawn in.
+  final double markViewBox;
+
+  /// Where the head's mark is a picture rather than a path, this is it.
+  final Widget? art;
 
   @override
   Widget build(BuildContext context) {
@@ -113,9 +119,13 @@ class SectionHead extends StatelessWidget {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: mark ??
-                Icon(icon ?? Icons.circle_outlined,
-                    size: 22, color: const Color(0xFF1A1A2E)),
+            child: art ??
+                Center(
+                  child: NwsbIcon(mark ?? NwsbMarks.arrow,
+                      size: 22,
+                      viewBox: markViewBox,
+                      color: const Color(0xFF1A1A2E)),
+                ),
           ),
           const SizedBox(width: 14),
           Expanded(

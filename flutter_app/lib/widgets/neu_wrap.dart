@@ -25,6 +25,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'nwsb_icon.dart';
+
 import '../theme/tokens.dart';
 
 class SecWrap extends StatelessWidget {
@@ -85,18 +87,22 @@ class WrapHead extends StatelessWidget {
     super.key,
     required this.eyebrow,
     required this.title,
-    this.icon,
     this.mark,
+    this.markViewBox = 24,
+    this.art,
   });
 
   final String eyebrow;
   final String title;
 
-  /// A Material stand-in, used until [mark] can point at the real artwork.
-  final IconData? icon;
+  /// The section's own SVG path — one of [NwsbMarks].
+  final String? mark;
 
-  /// The section's own mark, when it is a bundled picture.
-  final Widget? mark;
+  /// The box that path was drawn in.
+  final double markViewBox;
+
+  /// Where the head's mark is a picture rather than a path, this is it.
+  final Widget? art;
 
   /// `color: #b39a5e` — a shade darker than the eyebrow gold, because this
   /// one sits on a pale surface rather than a dark one.
@@ -118,8 +124,11 @@ class WrapHead extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: NwsbShadows.raisedXs,
             ),
-            child: mark ??
-                Icon(icon ?? Icons.circle_outlined, size: 21, color: markGold),
+            child: art ??
+                Center(
+                  child: NwsbIcon(mark ?? NwsbMarks.arrow,
+                      size: 21, viewBox: markViewBox, color: markGold),
+                ),
           ),
           const SizedBox(width: 12),
           Expanded(
