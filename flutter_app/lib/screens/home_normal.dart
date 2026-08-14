@@ -1,136 +1,247 @@
-/// The Normal home — #home-nm, in real widgets.
+/// The Normal home — `#home-nm`, the pale one.
 ///
-/// Section for section, in the order app/js/part062.js ships them:
-/// greeting, search, hero, streak, practice, tiles, quick row. Nothing here
-/// is a WebView and nothing here is HTML.
+/// The Fashion home is a dark page with the film running behind it and every
+/// block sitting on it as a pane of glass. This one is the opposite: the
+/// page's own colour everywhere, and every section RAISED out of it by a
+/// pair of shadows — a dark one down-right and a white one up-left. Drop
+/// either and the surface stops reading as raised, which is the whole
+/// language of this home.
+///
+/// WHAT THIS PAGE IS, EXACTLY
+///
+/// `REG.norm.items` in app/js/part062.js:40-101 is the list of sections this
+/// home is made of — twenty-nine of them, in that order. This file is that
+/// list, in that order.
+///
+/// Four of the twenty-nine have a registry row and no markup behind it, and
+/// that is the website's state rather than an omission here:
+///
+///   rx        "AI Prescription removed from this home" (index.html:1329) —
+///             the one search bar at the head replaced it
+///   wsearch   "removed from this home — the one search bar above covers it"
+///   msearch   the same
+///   storeban  points at `.fash-storeban-wrap`, which is Fashion markup
+///
+/// Two more are `defOff` — My Routines and Personalised Healing. So a fresh
+/// install shows twenty-three sections.
+///
+/// Nine of the sections here are the SAME widgets the Fashion home uses, out
+/// of lib/screens/shared_sections.dart. index.html writes each of them once
+/// and shows it on both homes; only the pane and the head differ, and
+/// [HomeSkinScope] is what tells them which home they are on.
 library;
 
 import 'package:flutter/material.dart';
+
+import '../data/content.dart';
 import '../data/settings.dart';
-import '../theme/tokens.dart';
-import '../widgets/neumorphic.dart';
 import '../shell/nav_shell.dart';
-import '../widgets/tv_frame.dart';
-import 'sections.dart';
+import '../theme/tokens.dart';
+import '../widgets/home_skin.dart';
+import 'normal/sections_bottom.dart';
+import 'normal/sections_top.dart';
+import 'shared_sections.dart';
+import 'sound_library.dart';
 import 'widgets_page.dart';
 
-/// The website derives this from the hour in app/js/part026.js and the same
-/// three windows are used here, so the two never disagree.
-///
-/// Top-level, not a getter on HomeNormal. It was a getter, and _Greeting
-/// reached it by building its own `const HomeNormal()` — which also meant
-/// it read that throwaway's default name rather than the one passed in, so
-/// the greeting always said "Healer" no matter who was signed in.
-String nwsbGreeting([DateTime? at]) {
-  final h = (at ?? DateTime.now()).hour;
-  if (h < 12) return 'Good Morning';
-  if (h < 17) return 'Good Afternoon';
-  return 'Good Evening';
-}
+/// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
+const kNormalSectionOrder = <String>[
+  'greet',
+  'search',
+  'herovid',
+  'streak',
+  'storedisc',
+  'practice',
+  'tiles',
+  'store',
+  'reader',
+  'trendwd',
+  'custom',
+  'rx',
+  'routines',
+  'condisc',
+  'connect',
+  'feed',
+  'quickrow',
+  'trendshop',
+  'storeban',
+  'subvid',
+  'edition',
+  'ebooks',
+  'connectban',
+  'healing',
+  'genderpath',
+  'wsearch',
+  'msearch',
+  'fashsw',
+  'footer',
+];
 
-class HomeNormal extends StatelessWidget {
+/// Registered, and with nothing behind them on this home. See the note at
+/// the head of this file — each one was taken out of `#home-nm` deliberately
+/// and its registry row was left standing.
+const kNormalNoMarkup = <String>{'rx', 'storeban', 'wsearch', 'msearch'};
+
+/// The two `defOff` entries that DO have markup. Built, not placed.
+const kNormalDefOff = <String>{'routines', 'healing'};
+
+class HomeNormal extends StatefulWidget {
   const HomeNormal({super.key, this.name = 'Healer'});
 
   final String name;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: NwsbColors.surface,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(
-            NwsbSpace.pageX,
-            NwsbSpace.pageTop,
-            NwsbSpace.pageX,
-            96, // clear of the bottom nav
-          ),
-          children: [
-            const _TopRow(),
-            const SizedBox(height: 18),
-            _Greeting(name: name),
-            const SizedBox(height: NwsbSpace.gap),
-            const _SearchBar(),
-            const SizedBox(height: NwsbSpace.gap),
+  State<HomeNormal> createState() => _HomeNormalState();
+}
 
-            // Every block below carries a clip, and every clip goes through
-            // NwsbVideo — so this whole page costs at most four decoders no
-            // matter how far it runs.
-            const HeroSection(),
-            const SizedBox(height: NwsbSpace.gap),
-            const _StreakSection(),
-            const SizedBox(height: NwsbSpace.gap),
-            TvSection(
-              eyebrow: 'Today, on film',
-              title: 'Streak',
-              onTap: () => NavScope.goTo(context, 1),
-              icon: Icons.local_fire_department_outlined,
-              asset: 'assets/video/tv-screen.mp4',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            const _PracticeCard(),
-            const SizedBox(height: NwsbSpace.gap),
-            BannerSection(
-              eyebrow: 'Today words meaning',
-              title: 'The Meaning Store',
-              onTap: () => NavScope.goTo(context, 3),
-              icon: Icons.auto_stories_outlined,
-              asset: 'assets/video/store-banner.mp4',
-              overlay: 'Every word,\nexplained',
-              bannerTitle: 'Meanings and eBooks, in one place',
-              bannerSub: 'Open the store',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            const _Tiles(),
-            const SizedBox(height: NwsbSpace.gap),
-            TvSection(
-              eyebrow: 'The rarest word',
-              title: 'The Signature',
-              onTap: () => NavScope.goTo(context, 3),
-              icon: Icons.workspace_premium_outlined,
-              asset: 'assets/video/signature-banner.mp4',
-              bannerTitle: 'One word, made only for you',
-              bannerSub: 'See the Signature',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            BannerSection(
-              eyebrow: 'Your daily word ritual',
-              title: 'The Player',
-              onTap: () => NavScope.goTo(context, 1),
-              icon: Icons.play_circle_outline,
-              asset: 'assets/video/player-liquid-splash.mp4',
-              // 9/16 made this one block taller than the whole screen. A
-              // portrait clip does not oblige the banner showing it to be
-              // portrait too — it is cropped to the same shape as every
-              // other section, which is what the page's rhythm is.
-              aspect: 16 / 10,
-              bannerTitle: 'Practice daily to keep your streak alive',
-              bannerSub: 'Open the player',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            TvSection(
-              eyebrow: 'The shelf',
-              title: 'NowssB Store',
-              onTap: () => NavScope.goTo(context, 3),
-              icon: Icons.storefront_outlined,
-              asset: 'assets/video/store-section.mp4',
-              frame: DeviceFrame.tabletPortrait,
-              bannerTitle: 'Everything the practice needs',
-              bannerSub: 'Open the store',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            BannerSection(
-              eyebrow: 'Deep-dive guides',
-              title: 'eBooks',
-              onTap: () => NavScope.goTo(context, 3),
-              icon: Icons.menu_book_outlined,
-              asset: 'assets/video/word-acts.mp4',
-              bannerTitle: 'Word science and sound healing',
-              bannerSub: 'Browse the library',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            const _QuickRow(),
-          ],
+class _HomeNormalState extends State<HomeNormal> {
+  @override
+  void initState() {
+    super.initState();
+    ContentStore.instance.addListener(_onContent);
+  }
+
+  @override
+  void dispose() {
+    ContentStore.instance.removeListener(_onContent);
+    super.dispose();
+  }
+
+  void _onContent() {
+    if (mounted) setState(() {});
+  }
+
+  void _go(int tab) => NavScope.goTo(context, tab);
+
+  void _push(Widget page) => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => page),
+      );
+
+  void _footerLink(String key) {
+    switch (key) {
+      case 'about':
+      case 'word-science':
+        _go(2);
+      case 'sound-library':
+        _push(const SoundLibraryScreen());
+      case 'meaning-store':
+        _go(3);
+      case 'practice':
+        _go(1);
+      case 'profile':
+        _go(4);
+    }
+  }
+
+  /// The twenty-nine, in `REG.norm.items` order. A null widget is a row with
+  /// no markup on this home; it keeps its place in the list so the two can
+  /// be diffed by eye against part062.js.
+  List<(String, Widget?)> _sections() => [
+        ('greet', NmGreeting(name: widget.name)),
+        ('search', NmSearch(onSearch: (_) => _go(2))),
+        ('herovid', NmStreakVideo(onTap: () => _go(1))),
+        ('streak', NmStreak(onTap: () => _go(1))),
+        (
+          'storedisc',
+          NmPromoDisc(
+            gradient: NmPromoDisc.purple,
+            slides: NmPromoDisc.storeSlides,
+            onTap: () => _go(3),
+          )
+        ),
+        ('practice', NmPractice(onTap: () => _go(1))),
+        ('tiles', NmTiles(onTile: _go)),
+        ('store', NmStore(onTap: () => _go(3))),
+        ('reader', NmReader(onTap: () => _go(2))),
+        ('trendwd', NmTrending(onTap: () => _go(2))),
+        ('custom', NmCustomize(onTap: () => _push(const WidgetsPage()))),
+        ('rx', null),
+        ('routines', RoutinesSection(onTap: () => _go(1))),
+        (
+          'condisc',
+          NmPromoDisc(
+            gradient: NmPromoDisc.blue,
+            slides: NmPromoDisc.connectSlides,
+            onTap: () => _go(0),
+          )
+        ),
+        ('connect', NmConnect(onTap: () => _go(0))),
+        ('feed', NmFeed(onTap: () => _go(0))),
+        (
+          'quickrow',
+          QuickAccessSection(
+            onCart: () => _go(3),
+            onWishlist: () => _go(3),
+            onOrders: () => _go(4),
+          )
+        ),
+        ('trendshop', NmTrendShop(onTap: () => _go(3))),
+        ('storeban', null),
+        ('subvid', SubscriptionSection(onTap: () => _go(3))),
+        ('edition', EditionSection(onTap: () => _go(3))),
+        ('ebooks', EbooksSection(onTap: () => _go(2))),
+        ('connectban', ConnectBannerSection(onTap: () => _go(0))),
+        ('healing', HealingSection(onTap: () => _go(2))),
+        (
+          'genderpath',
+          GenderPathSection(
+            onFemale: () => _go(2),
+            onMale: () => _go(2),
+            onTap: () => _go(2),
+          )
+        ),
+        ('wsearch', null),
+        ('msearch', null),
+        ('fashsw', NmFashionSwitch(onTap: () => Settings.instance.setFashionHome(true))),
+        ('footer', HomeFooterSection(onLink: _footerLink)),
+      ];
+
+  @override
+  Widget build(BuildContext context) {
+    final built = _sections();
+    assert(
+      built.map((e) => e.$1).toList().toString() ==
+          kNormalSectionOrder.toString(),
+      'the page and the registry have drifted apart',
+    );
+    assert(
+      built.where((e) => e.$2 == null).map((e) => e.$1).toSet().toString() ==
+          kNormalNoMarkup.toString(),
+      'a section lost its markup without the note at the head of this file '
+      'being updated',
+    );
+
+    final shown = [
+      for (final (k, w) in built)
+        if (w != null && !kNormalDefOff.contains(k)) w,
+    ];
+
+    return HomeSkinScope(
+      skin: HomeSkin.normal,
+      child: Scaffold(
+        backgroundColor: NwsbColors.surface,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // `.nmh-toprow` — pinned to the top, never scrolls. It is
+              // outside the list rather than its first row, which is what
+              // "never scrolls" means.
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
+                child: _TopRow(),
+              ),
+              Expanded(
+                // No horizontal padding: the sections carry their own
+                // `margin: 16px 0` inside `.nmh-wrap`'s 20px, and a raised
+                // card needs room around it for its own shadow.
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 96),
+                  itemCount: shown.length,
+                  itemBuilder: (context, i) => shown[i],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -260,382 +371,6 @@ class _HeaderButton extends StatelessWidget {
           ),
       ],
       ),
-    );
-  }
-}
-
-/// .nmh-greet-block — the orb, the hello, the name, the line under it.
-class _Greeting extends StatelessWidget {
-  const _Greeting({required this.name});
-
-  final String name;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 62,
-          height: 62,
-          decoration: const BoxDecoration(
-            color: NwsbColors.surface,
-            shape: BoxShape.circle,
-            boxShadow: NwsbShadows.raisedXs,
-          ),
-          child: const Icon(Icons.wb_sunny_outlined,
-              size: 26, color: NwsbColors.gold),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                nwsbGreeting(),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0x8C000000),
-                ),
-              ),
-              Text(
-                name,
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                "Ready for today's healing practice?",
-                style: TextStyle(fontSize: 13, color: NwsbColors.inkFaint),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// .nmh-search — one bar for words and meanings. A pressed well, not a
-/// raised card, which is why the shadows are inset on the web; here the
-/// same read comes from a dimmer fill inside the raised page.
-class _SearchBar extends StatelessWidget {
-  const _SearchBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 62,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFECEEF4),
-        borderRadius: BorderRadius.circular(31),
-        boxShadow: NwsbShadows.raisedXs,
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 10),
-          const Icon(Icons.search, size: 22, color: Color(0x59000000)),
-          const SizedBox(width: 10),
-          const Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                isCollapsed: true,
-                hintText: 'Search any word or meaning…',
-                hintStyle:
-                    TextStyle(fontSize: 15, color: Color(0x59000000)),
-              ),
-            ),
-          ),
-          Container(
-            width: 46,
-            height: 46,
-            decoration: const BoxDecoration(
-              color: NwsbColors.ink,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.search, size: 20, color: Colors.white),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// .nmh-streak-section
-class _StreakSection extends StatelessWidget {
-  const _StreakSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return NeuCard(
-      padding: const EdgeInsets.all(22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Start Building Your Streak Today',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Practice daily to keep it alive — and unlock exclusive offers',
-            style: TextStyle(fontSize: 13, color: NwsbColors.inkFaint),
-          ),
-          const SizedBox(height: 18),
-          NeuCard(
-            elevation: NwsbElevation.xs,
-            radius: NwsbRadius.bar,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            child: Row(
-              children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: const BoxDecoration(
-                    color: NwsbColors.surface,
-                    shape: BoxShape.circle,
-                    boxShadow: NwsbShadows.raisedXs,
-                  ),
-                  child: const Icon(Icons.water_drop_outlined,
-                      color: NwsbColors.gold),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '0',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: NwsbColors.gold,
-                        height: 1,
-                      ),
-                    ),
-                    Text(
-                      'day streak',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: NwsbColors.inkFaint,
-                      ),
-                    ),
-                  ],
-                ),
-                ),
-                const Text(
-                  'KEEP GOING',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                    color: Color(0x66000000),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          NwsbBanner(
-            title: 'Daily Streak',
-            sub: 'Practice daily to keep your healing streak alive',
-            icon: Icons.local_fire_department_outlined,
-            onTap: () => NavScope.goTo(context, 1),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// .nmh-practice — Today's Practice. The eyebrow, the embossed icon tile,
-/// the word, the meaning, then Enter and its arrow, in that order.
-class _PracticeCard extends StatelessWidget {
-  const _PracticeCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return NeuCard(
-      padding: const EdgeInsets.fromLTRB(26, 28, 26, 26),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "TODAY'S PRACTICE",
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-          const SizedBox(height: 14),
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: NwsbColors.surface,
-              borderRadius: BorderRadius.circular(NwsbRadius.pill),
-              boxShadow: NwsbShadows.raisedXs,
-            ),
-            child: const Icon(Icons.psychology_outlined,
-                size: 30, color: NwsbColors.ink),
-          ),
-          const SizedBox(height: 18),
-          Text(
-            'Afternoon Word Ritual',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  fontSize: 26,
-                  height: 1.15,
-                ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Go to My Routines to add words to this session.',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 13, color: NwsbColors.inkSoft),
-          ),
-          const SizedBox(height: 22),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Enter',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: NwsbColors.ink,
-                  letterSpacing: 0.4,
-                ),
-              ),
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: NwsbColors.surface,
-                  shape: BoxShape.circle,
-                  boxShadow: NwsbShadows.raisedXs,
-                ),
-                child: const Icon(Icons.arrow_forward,
-                    size: 16, color: NwsbColors.ink),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// .nmh-grid — the four tiles, two across.
-class _Tiles extends StatelessWidget {
-  const _Tiles();
-
-  static const _items = [
-    ('Sound Library', 'Root frequencies', Icons.graphic_eq),
-    ('My Progress', 'Your practice', Icons.insights_outlined),
-    ('Word Atelier', 'Origins of words', Icons.auto_stories_outlined),
-    ('Routines', 'Daily system', Icons.repeat_rounded),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      // 1.05 was a tile 12pt shorter than its own contents once the disc,
-      // the title and the caption were laid out at the system text size.
-      // Taller, and the text is allowed to ellipsize rather than overflow —
-      // a tile has to survive a reader who has turned their font up.
-      childAspectRatio: 0.92,
-      children: [
-        for (final (title, sub, icon) in _items)
-          NeuCard(
-            radius: NwsbRadius.tile,
-            elevation: NwsbElevation.sm,
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: NwsbColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: NwsbShadows.raisedXs,
-                  ),
-                  child: Icon(icon, size: 24, color: NwsbColors.ink),
-                ),
-                const Spacer(),
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  sub,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontSize: 11, color: NwsbColors.inkFaint),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-/// .nmh-quick-row — Cart, Wishlist, Order. Plain, no frame.
-class _QuickRow extends StatelessWidget {
-  const _QuickRow();
-
-  static const _items = [
-    ('Cart', Icons.shopping_cart_outlined),
-    ('Wishlist', Icons.favorite_border),
-    ('Order', Icons.shopping_bag_outlined),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (var i = 0; i < _items.length; i++) ...[
-          if (i > 0) const SizedBox(width: 10),
-          Expanded(
-            child: NeuCard(
-              radius: NwsbRadius.bar,
-              elevation: NwsbElevation.xs,
-              padding: const EdgeInsets.fromLTRB(10, 14, 10, 12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(_items[i].$2, size: 26, color: NwsbColors.gold),
-                  const SizedBox(height: 7),
-                  Text(
-                    _items[i].$1,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0x8C000000),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ],
     );
   }
 }

@@ -34,6 +34,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
+import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import 'fashion_plus.dart';
@@ -170,25 +171,25 @@ class _HomeFashionState extends State<HomeFashion> {
         ('connect', FashConnect(onTap: () => _go(0))),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', FashStoreBanner(onTap: () => _go(3))),
-        ('subvid', FashSubscription(onTap: () => _go(3))),
-        ('edition', FashEdition(onTap: () => _go(3))),
-        ('routines', FashRoutines(onTap: () => _go(1))),
+        ('subvid', SubscriptionSection(onTap: () => _go(3))),
+        ('edition', EditionSection(onTap: () => _go(3))),
+        ('routines', RoutinesSection(onTap: () => _go(1))),
         ('offer', FashOffer(onTap: () => _go(3))),
         (
           'cube',
-          FashQuickAccess(
+          QuickAccessSection(
             onCart: () => _go(3),
             onWishlist: () => _go(3),
             onOrders: () => _go(4),
           )
         ),
         ('shabda', FashShabdapathy(onTap: () => _go(2))),
-        ('ebooks', FashEbooks(onTap: () => _go(2))),
-        ('connectban', FashConnectBanner(onTap: () => _go(0))),
-        ('healing', FashHealing(onTap: () => _go(2))),
+        ('ebooks', EbooksSection(onTap: () => _go(2))),
+        ('connectban', ConnectBannerSection(onTap: () => _go(0))),
+        ('healing', HealingSection(onTap: () => _go(2))),
         (
           'genderpath',
-          FashGenderPath(
+          GenderPathSection(
             onFemale: () => _go(2),
             onMale: () => _go(2),
             onTap: () => _go(2),
@@ -198,7 +199,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
         ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),
         ('shabvid', FashShabdaVideo(onTap: () => _go(2))),
-        ('footer', FashFooter(onLink: _footerLink)),
+        ('footer', HomeFooterSection(onLink: _footerLink)),
       ];
 
   @override

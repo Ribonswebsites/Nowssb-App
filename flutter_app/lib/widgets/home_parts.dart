@@ -1,7 +1,14 @@
-/// The pieces the Fashion home repeats.
+/// The pieces both homes repeat.
 ///
-/// Three shapes turn up in almost every section, and the website builds them
-/// by hand each time. Written once here so a change lands everywhere:
+/// These are not Fashion furniture, which is why they do not live under
+/// `screens/fashion/`. `.spill`, `.nmh-sec-banner` and `.ncb-carousel` are
+/// BLACK components in the stylesheet, and they are black on both homes —
+/// the pale page puts a raised shadow under them and the dark page does not,
+/// but the bar itself is the same bar. What differs between the homes is the
+/// WRAPPER around a section, not the parts inside it.
+///
+/// The website builds each of them by hand every time it needs one. Written
+/// once here so a change lands everywhere:
 ///
 ///   Spill      `.spill` — a round mark and, beside it, a pill carrying a
 ///              small icon, a hairline rule and one line of text. It sits
@@ -16,7 +23,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../theme/tokens.dart';
+import '../theme/tokens.dart';
 
 /// The mark-and-pill that introduces a section.
 class Spill extends StatelessWidget {
@@ -395,6 +402,57 @@ class PhotoCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// `.fash-banner-cta` — the dark chip that sits ON a clip.
+///
+/// The mark is the cart on every one of them: `.nmh-cta-go` carries the same
+/// trolley whether the chip says Subscribe Today or Shop Now, because both
+/// end at the same till.
+class ScreenCta extends StatelessWidget {
+  const ScreenCta({super.key, required this.label, this.onTap});
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+        decoration: BoxDecoration(
+          color: const Color(0xB3000000),
+          border: Border.all(color: const Color(0x2EFFFFFF)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                color: const Color(0x1FFFFFFF),
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0x2EFFFFFF)),
+              ),
+              child: const Icon(Icons.shopping_cart_outlined,
+                  size: 13, color: Color(0xEBFFFFFF)),
+            ),
+          ],
         ),
       ),
     );

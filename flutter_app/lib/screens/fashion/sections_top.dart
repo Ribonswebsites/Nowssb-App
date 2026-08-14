@@ -13,9 +13,9 @@ import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/glass_wrap.dart';
+import '../../widgets/home_skin.dart';
 import '../../widgets/tv_frame.dart';
-import 'parts.dart';
+import '../../widgets/home_parts.dart';
 
 /// 1 · greet — index.html:1758. Not wrapped; it sits loose under the hero.
 class FashGreeting extends StatelessWidget {
@@ -67,7 +67,7 @@ class FashHeroRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return SectionPane(
       padding: EdgeInsets.zero,
       child: SizedBox(
         height: 92,
@@ -273,7 +273,7 @@ class FashStreakVideo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return SectionPane(
       child: TvFrame(
         asset: 'assets/video/tv-screen.mp4',
         frame: DeviceFrame.tabletLandscape,
@@ -293,7 +293,7 @@ class FashStreak extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return SectionPane(
       padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

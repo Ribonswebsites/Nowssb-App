@@ -11,8 +11,8 @@ import '../../data/settings.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/glass_wrap.dart';
-import 'parts.dart';
+import '../../widgets/home_skin.dart';
+import '../../widgets/home_parts.dart';
 
 /// 7 · tiles — index.html:1939. The tip rail, then four tiles two-up.
 class FashTiles extends StatelessWidget {
@@ -55,7 +55,7 @@ class FashTiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -212,11 +212,11 @@ class FashStore extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SectionHead(
+          const PaneHead(
             eyebrow: 'Words and meanings',
             title: 'The NowssB Store',
             icon: Icons.shopping_bag_outlined,
@@ -370,7 +370,7 @@ class FashTrending extends StatelessWidget {
         ? ''
         : words[(DateTime.now().day + 3) % words.length].word;
 
-    return GlassWrap(
+    return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -441,7 +441,7 @@ class FashCustomize extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return SectionPane(
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -601,7 +601,7 @@ class FashPrescription extends StatelessWidget {
     final picks =
         all.where((w) => w.time == slot || w.time == 'any').take(3).toList();
 
-    return GlassWrap(
+    return SectionPane(
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -772,7 +772,7 @@ class FashConnect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -864,7 +864,7 @@ class FashShopNow extends StatelessWidget {
         ? null
         : words[(DateTime.now().day + 1) % words.length];
 
-    return GlassWrap(
+    return SectionPane(
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -954,11 +954,11 @@ class FashStoreBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SectionHead(
+          const PaneHead(
             eyebrow: 'Own the sounds that heal',
             title: 'Inside the Store',
             icon: Icons.shopping_bag_outlined,

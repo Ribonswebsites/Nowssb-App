@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
-import 'package:nowssb/screens/fashion/parts.dart';
+import 'package:nowssb/widgets/home_parts.dart';
 import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 
