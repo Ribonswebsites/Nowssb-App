@@ -51,20 +51,41 @@ class NwsbVideo extends StatefulWidget {
 }
 
 class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
-  late VideoLease _lease;
+  /// Null when this clip is not meant to move at all.
+  ///
+  /// autoplay:false used to still take out a lease and simply not press
+  /// play — which meant a "still" background held one of the four decoders,
+  /// paused, doing nothing, while a clip that wanted to move went without.
+  /// With Fashion Plus off that is every page background in the app.
+  ///
+  /// A clip that is not going to move does not ask for a decoder at all. It
+  /// is its poster, and its poster is a picture.
+  VideoLease? _lease;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _lease = VideoPool.instance.lease(
+    if (widget.autoplay) _take();
+    _pump();
+  }
+
+  void _take() {
+    final l = VideoPool.instance.lease(
       widget.asset,
       priority: widget.priority,
       loop: widget.loop,
     );
-    if (widget.autoplay) _lease.play();
-    _lease.addListener(_onLease);
-    _pump();
+    l.play();
+    l.addListener(_onLease);
+    _lease = l;
+  }
+
+  void _drop() {
+    _lease?.removeListener(_onLease);
+    _lease?.dispose();
+    _lease = null;
+    _wasReady = false;
   }
 
   /// Only what changes the picture causes a rebuild.
@@ -76,7 +97,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   bool _wasReady = false;
 
   void _onLease() {
-    final ready = _lease.isReady;
+    final ready = _lease?.isReady ?? false;
     if (ready == _wasReady) return;
     _wasReady = ready;
     if (mounted) setState(() {});
@@ -85,16 +106,12 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   @override
   void didUpdateWidget(NwsbVideo old) {
     super.didUpdateWidget(old);
-    if (old.asset != widget.asset) {
-      _lease.removeListener(_onLease);
-      _lease.dispose();
-      _lease = VideoPool.instance.lease(
-        widget.asset,
-        priority: widget.priority,
-        loop: widget.loop,
-      );
-      if (widget.autoplay) _lease.play();
-      _lease.addListener(_onLease);
+    // A changed clip, or the motion switch moving under it. Both are the
+    // same thing here: let go of what was held, take what is now wanted.
+    if (old.asset != widget.asset || old.autoplay != widget.autoplay) {
+      _drop();
+      if (widget.autoplay) _take();
+      if (mounted) setState(() {});
     }
   }
 
@@ -111,8 +128,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _lease.removeListener(_onLease);
-    _lease.dispose();
+    _drop();
     super.dispose();
   }
 
@@ -143,6 +159,8 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   /// them, and no parent has to cooperate.
   void _measure() {
     if (!mounted) return;
+    final lease = _lease;
+    if (lease == null) return;   // a still has nothing to report
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize || !box.attached) {
       // Not laid out YET is not the same as off screen. Saying "infinity"
@@ -160,14 +178,14 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     // a screen's worth of travel before you reach it and keeps it a screen
     // after — scrolling back up does not restart everything.
     final visible = top < screen.height * 2 && top + box.size.height > -screen.height;
-    _lease.reportDistance(
+    lease.reportDistance(
         visible ? (centre - screen.height / 2).abs() : double.infinity);
   }
 
   @override
   Widget build(BuildContext context) {
-    final c = _lease.controller;
-    final ready = _lease.isReady && c != null;
+    final c = _lease?.controller;
+    final ready = (_lease?.isReady ?? false) && c != null;
 
     return ClipRect(
       child: Stack(

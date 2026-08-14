@@ -6,10 +6,12 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../data/settings.dart';
 import '../theme/tokens.dart';
 import '../widgets/neumorphic.dart';
 import '../shell/nav_shell.dart';
 import 'sections.dart';
+import 'widgets_page.dart';
 
 /// The website derives this from the hour in app/js/part026.js and the same
 /// three windows are used here, so the two never disagree.
@@ -96,7 +98,11 @@ class HomeNormal extends StatelessWidget {
               onTap: () => NavScope.goTo(context, 1),
               icon: Icons.play_circle_outline,
               asset: 'assets/video/player-liquid-splash.mp4',
-              aspect: 9 / 16,
+              // 9/16 made this one block taller than the whole screen. A
+              // portrait clip does not oblige the banner showing it to be
+              // portrait too — it is cropped to the same shape as every
+              // other section, which is what the page's rhythm is.
+              aspect: 16 / 10,
               bannerTitle: 'Practice daily to keep your streak alive',
               bannerSub: 'Open the player',
             ),
@@ -107,7 +113,11 @@ class HomeNormal extends StatelessWidget {
               onTap: () => NavScope.goTo(context, 3),
               icon: Icons.storefront_outlined,
               asset: 'assets/video/store-section.mp4',
-              aspect: 768 / 1168,
+              // The tall render in the tall card — this one IS meant to be
+              // portrait, the way the store card is on the website. Kept
+              // shorter than the film itself so the block does not run past
+              // a screen.
+              aspect: 4 / 5,
               bannerTitle: 'Everything the practice needs',
               bannerSub: 'Open the store',
             ),
@@ -179,22 +189,38 @@ class _TopRow extends StatelessWidget {
         const Spacer(),
         const _HeaderButton(icon: Icons.notifications_none, badge: 0),
         const SizedBox(width: 8),
-        const _HeaderButton(icon: Icons.settings_outlined),
+        _HeaderButton(
+          icon: Icons.settings_outlined,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const WidgetsPage()),
+          ),
+        ),
         const SizedBox(width: 8),
-        const _HeaderButton(icon: Icons.home_outlined),
+        // The home button switches which home you are on. There are three
+        // ways to reach the Fashion home now — this, the pill above the nav,
+        // and Settings — because one that nobody finds is one that is not
+        // built.
+        _HeaderButton(
+          icon: Icons.dark_mode_outlined,
+          onTap: () => Settings.instance.setFashionHome(true),
+        ),
       ],
     );
   }
 }
 
 class _HeaderButton extends StatelessWidget {
-  const _HeaderButton({required this.icon, this.badge});
+  const _HeaderButton({required this.icon, this.badge, this.onTap});
   final IconData icon;
   final int? badge;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
@@ -228,6 +254,7 @@ class _HeaderButton extends StatelessWidget {
             ),
           ),
       ],
+      ),
     );
   }
 }

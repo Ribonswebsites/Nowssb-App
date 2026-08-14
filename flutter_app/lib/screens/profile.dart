@@ -15,6 +15,9 @@ import '../data/firebase.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/page_shell.dart';
+import 'fashion_plus.dart';
+import 'sound_library.dart';
+import 'widgets_page.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -54,6 +57,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverList.list(children: [
             const _Identity(),
+            const SizedBox(height: 22),
+
+            const DarkHead(
+              eyebrow: 'Everything, one tap away',
+              title: 'Your pages',
+              icon: Icons.apps,
+            ),
+            const SizedBox(height: 14),
+            _Go(
+              title: 'Settings',
+              sub: 'Widgets and shortcuts',
+              icon: Icons.tune,
+              go: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const WidgetsPage()),
+              ),
+            ),
+            _Go(
+              title: 'Sound Library',
+              sub: 'Root frequencies',
+              icon: Icons.graphic_eq,
+              go: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SoundLibraryScreen()),
+              ),
+            ),
+            _Go(
+              title: 'Fashion Plus',
+              sub: 'Open the motion mode',
+              icon: Icons.auto_awesome_motion_outlined,
+              go: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+              ),
+            ),
             const SizedBox(height: 22),
 
             const DarkHead(
@@ -105,6 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const _Soon('Cart, wishlist and orders'),
             const _Soon('NowssB Connect and chat'),
             const _Soon('Notifications'),
+            const _Soon('Word audio — hearing a word, not only reading it'),
           ]),
         ),
       ],
@@ -153,6 +189,75 @@ class _Identity extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _Go extends StatelessWidget {
+  const _Go({
+    required this.title,
+    required this.sub,
+    required this.icon,
+    required this.go,
+  });
+
+  final String title;
+  final String sub;
+  final IconData icon;
+  final VoidCallback go;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: go,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0x14FFFFFF)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: const Color(0xFF14141C),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(icon, size: 19, color: NwsbColors.goldLight),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    sub,
+                    style: const TextStyle(
+                        fontSize: 11.5, color: Color(0x8CFFFFFF)),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward,
+                size: 16, color: Color(0xB3FFFFFF)),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -22,6 +22,7 @@ import '../theme/tokens.dart';
 import 'home_normal.dart' show nwsbGreeting;
 import '../shell/nav_shell.dart';
 import 'sections.dart';
+import 'widgets_page.dart';
 
 class HomeFashion extends StatefulWidget {
   const HomeFashion({super.key, this.name = 'Healer'});
@@ -122,7 +123,7 @@ class _HomeFashionState extends State<HomeFashion> {
                     onTap: () => NavScope.goTo(context, 3),
                     icon: Icons.storefront_outlined,
                     asset: 'assets/video/store-section.mp4',
-                    aspect: 768 / 1168,
+                    aspect: 4 / 5,
                     dark: true,
                     bannerTitle: 'Enter the Store',
                     bannerSub: 'Word Library & Meaning Library, in one place',
@@ -140,7 +141,7 @@ class _HomeFashionState extends State<HomeFashion> {
                     onTap: () => NavScope.goTo(context, 3),
                     icon: Icons.shopping_bag_outlined,
                     asset: 'assets/video/store-banner-fash.mp4',
-                    aspect: 1136 / 800,
+                    aspect: 16 / 10,
                     dark: true,
                     bannerTitle: 'Shop the Library',
                     bannerSub: 'Words, meanings and the origins behind them',
@@ -255,20 +256,29 @@ class _FashTopRow extends StatelessWidget {
         const SizedBox(width: 8),
         const _FashHeaderBtn(icon: Icons.home_outlined),
         const SizedBox(width: 8),
-        const _FashHeaderBtn(icon: Icons.menu),
+        _FashHeaderBtn(
+          icon: Icons.menu,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const WidgetsPage()),
+          ),
+        ),
       ],
     );
   }
 }
 
 class _FashHeaderBtn extends StatelessWidget {
-  const _FashHeaderBtn({required this.icon, this.badge});
+  const _FashHeaderBtn({required this.icon, this.badge, this.onTap});
   final IconData icon;
   final int? badge;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
       clipBehavior: Clip.none,
       children: [
         SizedBox(
@@ -297,6 +307,7 @@ class _FashHeaderBtn extends StatelessWidget {
             ),
           ),
       ],
+      ),
     );
   }
 }

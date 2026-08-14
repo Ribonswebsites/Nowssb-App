@@ -8,11 +8,12 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../data/settings.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 
-class PageShell extends StatelessWidget {
+class PageShell extends StatefulWidget {
   const PageShell({
     super.key,
     required this.eyebrow,
@@ -34,13 +35,41 @@ class PageShell extends StatelessWidget {
   final VoidCallback? onBack;
 
   @override
+  State<PageShell> createState() => _PageShellState();
+}
+
+class _PageShellState extends State<PageShell> {
+  @override
+  void initState() {
+    super.initState();
+    Settings.instance.addListener(_onSettings);
+  }
+
+  @override
+  void dispose() {
+    Settings.instance.removeListener(_onSettings);
+    super.dispose();
+  }
+
+  void _onSettings() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
           Positioned.fill(
-            child: NwsbVideo(asset: film, priority: ClipPriority.feature),
+            // Still unless motion mode is on. autoplay:false is what makes an
+            // unmoving background genuinely free — with it off the pool is
+            // never even asked for a decoder, so the page costs one picture.
+            child: NwsbVideo(
+              asset: widget.film,
+              autoplay: Settings.instance.fashionPlus,
+              priority: ClipPriority.feature,
+            ),
           ),
           const Positioned.fill(
             child: DecoratedBox(
@@ -65,9 +94,9 @@ class PageShell extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
                     child: Row(
                       children: [
-                        if (onBack != null) ...[
+                        if (widget.onBack != null) ...[
                           GestureDetector(
-                            onTap: onBack,
+                            onTap: widget.onBack,
                             behavior: HitTestBehavior.opaque,
                             child: Container(
                               width: 42,
@@ -88,7 +117,7 @@ class PageShell extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                eyebrow.toUpperCase(),
+                                widget.eyebrow.toUpperCase(),
                                 style: const TextStyle(
                                   fontSize: 10,
                                   letterSpacing: 3,
@@ -98,7 +127,7 @@ class PageShell extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                title,
+                                widget.title,
                                 style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w800,
@@ -113,7 +142,7 @@ class PageShell extends StatelessWidget {
                     ),
                   ),
                 ),
-                ...slivers,
+                ...widget.slivers,
                 // Clear of the bottom nav.
                 const SliverToBoxAdapter(child: SizedBox(height: 108)),
               ],

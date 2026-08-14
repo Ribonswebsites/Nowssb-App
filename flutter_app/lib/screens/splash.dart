@@ -12,9 +12,15 @@
 /// cannot happen here. Everything else in the app goes through NwsbVideo —
 /// this is the single exception and it is deliberate.
 ///
-/// It always ends. Three ways out: the clip finishes, the reader taps Skip,
-/// or a hard eight-second ceiling fires. A splash that can hang because a
-/// file failed to open is a splash that can brick the app on a bad device.
+/// IT PLAYS ALL THE WAY THROUGH. No Skip, and no timer cutting it short —
+/// this is the app introducing itself and it is meant to be seen. It is
+/// played a little faster than recorded ([_speed]) so that "all the way
+/// through" is not a long wait.
+///
+/// There is still a ceiling, but it is a FAILSAFE rather than a limit: it is
+/// set from the clip's own duration once that is known, so it can only fire
+/// if playback has genuinely stalled. A splash with no way out at all is a
+/// splash that can brick the app on a device where the file will not open.
 library;
 
 import 'dart:async';
@@ -22,7 +28,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import '../theme/tokens.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key, required this.onDone});
@@ -40,12 +45,16 @@ class _SplashState extends State<Splash> {
 
   static const _asset = 'assets/video/start-animation.mp4';
 
+  /// A quarter faster than recorded. Enough to take the wait off a ten-second
+  /// clip without the motion reading as sped-up.
+  static const _speed = 1.25;
+
   @override
   void initState() {
     super.initState();
     _start();
-    // The backstop. Whatever happens to the clip, the app opens.
-    _ceiling = Timer(const Duration(seconds: 8), _leave);
+    // Only until the real duration is known — see _start.
+    _ceiling = Timer(const Duration(seconds: 20), _leave);
   }
 
   Future<void> _start() async {
@@ -64,9 +73,21 @@ class _SplashState extends State<Splash> {
     }
     await c.setVolume(0);
     await c.setLooping(false);
+    await c.setPlaybackSpeed(_speed);
     c.addListener(_watch);
     await c.play();
-    setState(() {});
+
+    // Now that the clip's length is known, the failsafe becomes its own
+    // running time plus a margin. It can no longer cut the animation short —
+    // it can only catch playback that has stopped without finishing.
+    _ceiling?.cancel();
+    final runtime = c.value.duration.inMilliseconds / _speed;
+    _ceiling = Timer(
+      Duration(milliseconds: runtime.round() + 3000),
+      _leave,
+    );
+
+    if (mounted) setState(() {});
   }
 
   void _watch() {
@@ -124,35 +145,6 @@ class _SplashState extends State<Splash> {
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Colors.black),
             ),
-
-          // Skip. Small, out of the way, and always there — nobody should
-          // have to sit through this twice.
-          Positioned(
-            right: 16,
-            bottom: 28,
-            child: SafeArea(
-              child: TextButton(
-                onPressed: _leave,
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0x33FFFFFF),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: const Text(
-                  'Skip',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: NwsbColors.goldLight,
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

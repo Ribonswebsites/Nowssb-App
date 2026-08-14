@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
+import '../data/settings.dart';
 import '../screens/home_fashion.dart';
 import '../screens/home_normal.dart';
 import '../screens/library.dart';
@@ -38,9 +39,27 @@ class _NavShellState extends State<NavShell> {
   int _i = 0;
 
   /// Which home. The website keeps both in the DOM and switches a class;
-  /// here it is one flag, because they are two different screens rather
-  /// than two skins — see lib/screens/home_fashion.dart.
-  bool _fashion = false;
+  /// here it is two different screens rather than two skins — see
+  /// lib/screens/home_fashion.dart. The answer is remembered between
+  /// launches, and Settings is the other place it can be changed, so this
+  /// reads the setting rather than keeping a copy that could disagree.
+  bool get _fashion => Settings.instance.fashionHome;
+
+  @override
+  void initState() {
+    super.initState();
+    Settings.instance.addListener(_onSettings);
+  }
+
+  @override
+  void dispose() {
+    Settings.instance.removeListener(_onSettings);
+    super.dispose();
+  }
+
+  void _onSettings() {
+    if (mounted) setState(() {});
+  }
 
   static const _tabs = [
     ('Connect', Icons.groups_outlined),
@@ -86,7 +105,7 @@ class _NavShellState extends State<NavShell> {
               child: SafeArea(
                 top: false,
                 child: GestureDetector(
-                  onTap: () => setState(() => _fashion = !_fashion),
+                  onTap: () => Settings.instance.setFashionHome(!_fashion),
                   child: Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 14, vertical: 9),

@@ -20,6 +20,7 @@ import 'package:flutter/services.dart';
 
 import 'data/content.dart';
 import 'data/firebase.dart';
+import 'data/settings.dart';
 import 'media/video_pool.dart';
 import 'screens/splash.dart';
 import 'shell/nav_shell.dart';
@@ -44,6 +45,7 @@ Future<void> main() async {
   // copy seen — are local, so the first screen has something real to draw
   // whether or not the network ever answers. This sets those up and leaves
   // the Firestore watch running behind them when there is one.
+  await Settings.instance.load();
   await ContentStore.instance.start();
 
   // Nothing decodes underneath the start animation. Released by the splash

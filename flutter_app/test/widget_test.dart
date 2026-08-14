@@ -13,6 +13,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/neumorphic.dart';
@@ -21,6 +22,11 @@ import 'fake_video_platform.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  // Settings persist through SharedPreferences, which has no platform in a
+  // test — getInstance() never completes and the whole file hangs rather
+  // than failing. An in-memory store is the sanctioned stand-in.
+  SharedPreferences.setMockInitialValues({});
 
   setUpAll(FakeVideoPlatform.new);
   setUp(VideoPool.instance.debugDropAll);
