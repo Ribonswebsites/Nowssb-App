@@ -24,7 +24,12 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const OUT  = join(ROOT, 'www');
 
 /* Never copied. Directories first, then a predicate for the file names. */
-const SKIP_DIRS = new Set(['.git', '.claude', 'node_modules', 'www', 'android', 'ios', 'tools', 'functions']);
+/* flutter_app is the native port, not the website. It carries its own copy
+   of assets/video — 138 MB put there by tools/flutter-assets.mjs — and
+   sweeping that into the web bundle tripled it, from 149 MB to 486 MB, with
+   every clip in twice. The Flutter app builds from its own directory and
+   nothing in www/ ever reads from it. */
+const SKIP_DIRS = new Set(['.git', '.claude', 'node_modules', 'www', 'android', 'ios', 'tools', 'functions', 'flutter_app']);
 
 /* Skipped by path rather than by name, for directories that are fine on the
    website and wrong inside an APK.

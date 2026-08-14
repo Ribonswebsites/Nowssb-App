@@ -9548,9 +9548,15 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-top { padding: 0 1
 /* No panel behind any of it. These clips carry their own wordmark across
    the left half — the Store one runs to about 47% — so the copy starts past
    that, clear of both the artwork and the lettering baked into the frame. */
+/* Below the artwork's own words, not across them.
+   This was centred on the right half — top:50% — and several of these clips
+   carry their own wordmark at exactly that height, so the chip landed on top
+   of "NowssB Store" and the two sets of white type fought each other. Anchored
+   to the foot instead: the chip still names the section, and the film's own
+   lettering is left to be read. */
 .vb-chips {
-  position: absolute; left: 52%; right: 10px; top: 50%; transform: translateY(-50%);
-  z-index: 3; display: flex; align-items: center;
+  position: absolute; left: 52%; right: 10px; bottom: 12px;
+  z-index: 3; display: flex; align-items: flex-end; justify-content: flex-end;
   padding: 0; pointer-events: none; background: none;
 }
 .vb-chip { display: flex; align-items: center; gap: 9px; min-width: 0; }
@@ -14219,12 +14225,17 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   margin-bottom: 16px !important; padding-left: 8px !important;
 }
 
-/* The black banner in these blocks was carrying .ncb-carousel's neumorphic
-   shadow — 8px 8px 20px rgba(163,177,198,0.5) and a WHITE -6px -6px 14px,
-   which is light-home furniture. On the Fashion home's dark glass that
-   white read as a halo around the bar. It gets a plain drop shadow there. */
-:is(#home, .stw-prev-stage) .nsub-blk .ncb-carousel,
-:is(#home, .stw-prev-stage) .nwsb-vbwrap[data-vbwrap] .ncb-carousel {
+/* The black banners were carrying .ncb-carousel's neumorphic shadow —
+   8px 8px 20px rgba(163,177,198,0.5) and a WHITE -6px -6px 14px. That pair
+   is light-home furniture: it is what makes a card read as raised out of
+   the Normal home's pale grey. On the Fashion home's dark glass the white
+   half has nothing to sit against and reads as a halo around the bar.
+
+   Stated once for EVERY black bar on this home rather than per block. It
+   was two selectors, and each new section that grew a bar grew the halo
+   again — the store's two are exactly that. A dark surface never wants the
+   white shadow, so that is the rule. */
+:is(#home, .stw-prev-stage) .ncb-carousel {
   box-shadow: 0 10px 26px rgba(0,0,0,0.45) !important;
 }
 
@@ -15082,4 +15093,115 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
 #home .fash-store-wrap > .nss-store-ban {
   width: 100% !important;
   margin: 12px 0 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FASHION PLUS REACHES THE LAST TWO PLACES IT DID NOT
+
+   app/js/part076.js opens every .sub-screen up to the film behind it —
+   markImageBacked() finds the ones wearing a photograph and takes it off so
+   #fpBgVideo shows through. Two kinds of surface were never in that sweep,
+   and both of them are page-sized, so on those pages the switch appeared to
+   do nothing at all:
+
+     · THE INTRO PAGES. Nine of them, one per store — the Word Atelier, the
+       Meaning Store, the cart, the wishlist and the rest. Each is an opaque
+       black panel at z-index 30 with its own artwork inside at 0.75, which
+       is a picture ON a page rather than the page's own background, so
+       markImageBacked never saw it. The film was playing underneath the
+       whole time with a black sheet over it.
+
+     · THE MENU. .menu-drawer is not a .sub-screen at all, so it was never a
+       candidate. It also carried a Cloudinary photograph of its own, which
+       is the image being taken out here.
+
+   The rule these follow is the one part076 already states: stills before
+   the switch, film after it. Off, the artwork stays exactly as it is. On,
+   the artwork steps aside and the same clip the home is playing runs behind
+   the page — and the vignette each of these already owns is what keeps the
+   type legible over it.
+═══════════════════════════════════════════════════════════════ */
+
+/* The panel itself: transparent, so the fixed clip at z-index 0 is what is
+   behind the words. */
+/* By id for the five that have one, because they are already claimed by
+   `#nssIntroPage, #rmIntroPage, … { background:#000 !important }` further up,
+   and an id with !important is not something a class selector can answer.
+   The rest carry no id and the class is enough. */
+body.fashplus :is(#nssIntroPage, #rmIntroPage, #msIntroPage, #ebIntroPage,
+                  #sigIntroPage,
+                  .rm-intro-page, .ms-intro-page, .nss-intro-page,
+                  .sl-intro-page, .sig-intro-page, .cart-intro-page,
+                  .wish-intro-page, .orders-intro-page, .oh-intro-page) {
+  background: transparent !important;
+}
+
+/* The still it was wearing. Hidden rather than removed, because turning the
+   mode off has to put it straight back. */
+body.fashplus :is(.rm-intro-bg, .ms-intro-bg, .nss-intro-bg, .sl-intro-bg,
+                  .sig-intro-bg, .cart-intro-bg, .wish-intro-bg,
+                  .orders-intro-bg, .oh-intro-bg, .fpp-intro-bg) {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+/* A film is busier than a still, so the vignette that was enough over
+   artwork is deepened a little over moving pictures. Same gradient, more of
+   it — the page keeps its shape and the title keeps its contrast. */
+body.fashplus :is(.rm-intro-vignette, .ms-intro-vignette, .nss-intro-vignette,
+                  .sl-intro-vignette, .sig-intro-vignette) {
+  background: linear-gradient(rgba(6,12,24,0.52) 0%,
+                              rgba(6,12,24,0.62) 45%,
+                              rgba(4,9,18,0.86) 100%) !important;
+}
+
+/* ── The menu ────────────────────────────────────────────────────
+   No photograph, in either mode. It was a Cloudinary jpg behind a 58–70%
+   scrim; what is left is the scrim's own colour, which is what the rest of
+   the dark app is wearing. */
+body:not(.nm-mode) #menuDrawer.menu-drawer {
+  background: rgba(6,10,20,0.94) !important;
+}
+
+/* And with the switch on, the film — the same one the home is playing,
+   through the same fixed element, with a scrim heavy enough to read a list
+   of twelve rows against. */
+body.fashplus:not(.nm-mode) #menuDrawer.menu-drawer {
+  background: linear-gradient(rgba(6,10,20,0.62), rgba(6,10,20,0.76)) !important;
+}
+
+/* ── And the film actually reaches them ──────────────────────────
+   The block above makes those pages transparent, which on its own shows
+   the HOME through them rather than the film — #fpBgVideo sits at z-index
+   0, underneath every top-level screen. That is the trap the note at
+   "FASHION PLUS — pages keep a background" ran into, and it settled for
+   painting the pages black instead: no home showing through, but no film
+   either.
+
+   The film moves instead of the pages. While a page is open the clip is
+   lifted to just under it, so the order from the back is: home, film,
+   page. Nothing else changes — the same one element, still fixed, still
+   the only clip playing.
+
+     home 10  ·  menu 500  ·  sub-screen 600  ·  bottom nav 1000
+
+   Two values because the two surfaces sit at different heights. The menu
+   rule is second so that it wins when both are open — the menu is the
+   thing in front at that point, and film over it would bury the list. */
+body.fashplus:not(.fp-bg-off):has(.sub-screen.open) #fpBgVideo {
+  z-index: 590 !important;
+}
+body.fashplus:not(.fp-bg-off):has(.menu-drawer.open) #fpBgVideo {
+  z-index: 490 !important;
+}
+
+/* With the film up there, the pages that were forced black can stop being
+   black. Only the page actually open — a closed one is display:none and
+   its colour is nobody's business. */
+body.fashplus:not(.fp-bg-off):has(.sub-screen.open) .sub-screen.open[data-fp-img] {
+  background: transparent !important;
+}
+body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
+  .sub-screen.open[data-fp-img] > .sub-screen-bg[data-fp-img] {
+  background-color: transparent !important;
 }
