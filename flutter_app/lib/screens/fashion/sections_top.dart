@@ -12,7 +12,6 @@ import '../../data/content.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
-import '../../theme/tokens.dart';
 import '../../widgets/home_skin.dart';
 import '../../widgets/tv_frame.dart';
 import '../../widgets/home_parts.dart';
@@ -67,16 +66,20 @@ class FashHeroRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // `.hhr-tab` IS a frame — the white bezel in assets/frames, with the
+    // clip inside its aperture and the three buttons on top of that. It was
+    // a plain dark box here, which is why this strip did not look like the
+    // one on the phone.
     return SectionPane(
-      padding: EdgeInsets.zero,
-      child: SizedBox(
-        height: 92,
-        child: Stack(
+      child: TvFrame(
+        asset: 'assets/video/word-acts.mp4',
+        frame: DeviceFrame.wordActs,
+        priority: ClipPriority.decoration,
+        overlay: Stack(
           fit: StackFit.expand,
           children: [
-            const NwsbVideo(asset: 'assets/video/word-acts.mp4'),
             const DecoratedBox(
-              decoration: BoxDecoration(color: Color(0x99060C18)),
+              decoration: BoxDecoration(color: Color(0x40000000)),
             ),
             Row(
               children: [
@@ -107,6 +110,109 @@ class FashHeroRow extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The three glass boxes — index.html:1913, `.fash-streak`.
+///
+/// On the web this is ONE picture: a render of three glass blocks, with the
+/// label, the number and the call to action placed over it at 17%, 50% and
+/// 83% of its width. The picture is remote, so until the download runs the
+/// blocks are drawn — and drawn rather than left out, because three empty
+/// spaces where the count should be is not what this section says.
+class _StreakBoxes extends StatelessWidget {
+  const _StreakBoxes({required this.days, this.onTap});
+  final int days;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AspectRatio(
+        aspectRatio: 1536 / 450,
+        child: NwsbImage(
+          url:
+              'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png',
+          fit: BoxFit.contain,
+          fallback: Row(
+            children: [
+              const Expanded(child: _GlassBox(child: _BoxLabel('DAY\nSTREAK'))),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _GlassBox(
+                  child: Text(
+                    '$days',
+                    style: const TextStyle(
+                      fontFamily: 'DM Sans',
+                      fontSize: 40,
+                      fontWeight: FontWeight.w800,
+                      height: 1,
+                      color: Color(0xFF1A2230),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: _GlassBox(
+                  child: _BoxLabel('KEEP\nGOING', color: Color(0xFF9C7B3A)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A block of glass: pale, lit from the top left, with a thick bright edge.
+class _GlassBox extends StatelessWidget {
+  const _GlassBox({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xCCFFFFFF), width: 3),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xF2F4F6FA), Color(0xD9C6CDDA), Color(0xF2E8ECF3)],
+        ),
+        boxShadow: const [
+          BoxShadow(color: Color(0x61000000), blurRadius: 20,
+              offset: Offset(0, 8)),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _BoxLabel extends StatelessWidget {
+  const _BoxLabel(this.text, {this.color = const Color(0xFF2A3140)});
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.5,
+        height: 1.15,
+        color: color,
       ),
     );
   }
@@ -316,62 +422,8 @@ class FashStreak extends StatelessWidget {
               height: 1.45,
             ),
           ),
-          const SizedBox(height: 18),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-            decoration: BoxDecoration(
-              color: const Color(0x0FFFFFFF),
-              border: Border.all(color: const Color(0x14FFFFFF)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: const Color(0x14FFFFFF),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0x24FFFFFF)),
-                  ),
-                  child: const Icon(Icons.water_drop_outlined,
-                      size: 20, color: NwsbColors.gold),
-                ),
-                const SizedBox(width: 14),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$days',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: NwsbColors.gold,
-                        height: 1,
-                      ),
-                    ),
-                    const Text(
-                      'Day Streak',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0x8CFFFFFF),
-                      ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                const Text(
-                  'Keep Going',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                    color: Color(0x99FFFFFF),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const SizedBox(height: 20),
+          _StreakBoxes(days: days, onTap: onTap),
           const SizedBox(height: 14),
           SecBanner(
             title: 'Daily Streak',

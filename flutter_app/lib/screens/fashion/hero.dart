@@ -1,201 +1,387 @@
-/// The Fashion home's hero — index.html:1690-1752.
+/// The Fashion home's hero — the deck, built from app/js/part083.js.
 ///
-/// Not a glass pane: it sits above `.home-body` and fills the top of the
-/// page. `hero-bg.mp4` behind everything, the wordmark and the search button
-/// across the top, and at the foot the strapline, the card rail, the big
-/// rotating word and the two pills.
+/// I HAD THE WRONG ONE. The hero has three looks (app/js/part082.js:118) and
+/// this app was carrying the `full` one: the five photographs crossfading
+/// edge to edge with a picture rail and a big rotating word. `heroStyle()`
+/// at :137 says the shipped default is `plain` — "the set in glass, with the
+/// greeting over it and the rail running through it" — and `full` is only
+/// what someone gets if they went and chose it. So the top of the app looked
+/// nothing like the top of the app.
 ///
-/// The rotations are the website's own, timings included — HERO_WORDS and
-/// TAG_WORDS from app/js/part012.js:1379 and :1429, the card every 4s and
-/// the tagline every 2.5s. Both pause when the page is not being looked at,
-/// which is what `if (document.hidden) return` does there and what
-/// TickerMode does here.
+/// The plain look is three things, and app/js/part083.js builds all of them:
+///
+///   1. A greeting ABOVE the card — see [HeroGreeting] in header.dart.
+///   2. The card itself, in glass: a strip above the set carrying the store
+///      and the search, the television, and a strip below it carrying
+///      Explore, App Guide and Learn. Everything that is not the picture
+///      comes OUT of the television and onto the glass around it — a screen
+///      with an Explore button drawn on it is a screen with a button drawn
+///      on it, and the two were fighting for the same 230px (:463).
+///   3. A rail THROUGH it: the card is cell 0 of a deck, and six banners
+///      follow it, one at a time, each sliding in from the right.
+///
+/// Every banner is the clip its own page opens with, so the rail is a window
+/// onto the app rather than a set of adverts made for it (:34).
+///
+/// What it costs: one clip decodes at a time, because only the cell on
+/// screen holds a lease. That is the same rule the web version states at
+/// :22 and the same one [VideoPool] enforces here.
 library;
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../media/nwsb_image.dart';
-import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/glass_wrap.dart';
+import '../../widgets/tv_frame.dart';
 
-/// HERO_IMGS — app/js/part012.js:1372. Five, cycled with the word.
-const _heroImgs = [
-  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776753853585_luk2yh.jpg',
-  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776754047350_m02pef.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778662189/image-84_bqpkid.jpg',
-  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776754188034_snzcgu.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778662207/image-202_yktk8y.jpg',
-];
+/// One banner on the rail — RAIL, app/js/part083.js:106.
+///
+/// `asset` is the local stand-in where the web reads a Cloudinary URL. Four
+/// of the six are already local files on the web too; the other two fall
+/// back to the clip nearest in meaning until the download runs.
+class _Rail {
+  const _Rail(this.icon, this.hello, this.title, this.asset, this.dest);
+  final IconData icon;
+  final String hello;
+  final String title;
+  final String asset;
 
-const _heroWords = ['VIBRATION', 'FREQUENCIES', 'MIND', 'NEURONS', 'RESONANCE'];
-const _tagWords = [
-  'VIBRATION',
-  'FREQUENCY',
-  'RESONANCE',
-  'AWAKENING',
-  'SOUND BIRTH',
+  /// The tab this banner is a door to.
+  final int dest;
+}
+
+const _rail = [
+  _Rail(Icons.workspace_premium_outlined, 'The Full Library',
+      'NowssB Subscription', 'assets/video/subscription-a.mp4', 3),
+  _Rail(Icons.shopping_bag_outlined, 'Where a word begins',
+      'NowssB Word Store', 'assets/video/store-section.mp4', 3),
+  _Rail(Icons.shopping_bag_outlined, 'What a word truly means',
+      'NowssB Meaning Store', 'assets/video/store-banner.mp4', 3),
+  _Rail(Icons.auto_awesome_outlined, 'The rarest word', 'The Signature',
+      'assets/video/signature-banner.mp4', 3),
+  _Rail(Icons.menu_book_outlined, 'Page by page', 'NowssB eBooks',
+      'assets/video/word-acts.mp4', 2),
+  _Rail(Icons.graphic_eq, 'Every word you own', 'Sound Library',
+      'assets/video/sound-library-banner.mp4', 2),
 ];
 
 class FashionHero extends StatefulWidget {
-  const FashionHero({super.key, this.onExplore, this.onGuide, this.onSearch});
+  const FashionHero({
+    super.key,
+    this.onExplore,
+    this.onGuide,
+    this.onSearch,
+    this.onStore,
+    this.onRail,
+  });
 
   final VoidCallback? onExplore;
   final VoidCallback? onGuide;
   final VoidCallback? onSearch;
+  final VoidCallback? onStore;
+
+  /// Called with the banner's destination tab.
+  final void Function(int dest)? onRail;
 
   @override
   State<FashionHero> createState() => _FashionHeroState();
 }
 
 class _FashionHeroState extends State<FashionHero> {
-  Timer? _cards;
-  Timer? _tag;
-  int _card = 0;
-  int _tagIdx = 0;
+  final _deck = PageController();
+  Timer? _t;
+  int _i = 0;
+
+  /// MIN_DWELL — the web hands over when the clip ENDS, with a floor under
+  /// it. Nothing here knows when a clip ends yet, so the floor is the whole
+  /// interval.
+  static const _dwell = Duration(seconds: 7);
 
   @override
   void initState() {
     super.initState();
-    _cards = Timer.periodic(const Duration(seconds: 4), (_) {
+    _t = Timer.periodic(_dwell, (_) {
+      // `visible()` — :573. The rail stops when the home is not the screen
+      // you are on and when the app is in the background. TickerMode is
+      // both of those in Flutter.
       if (!mounted || !TickerMode.valuesOf(context).enabled) return;
-      setState(() => _card = (_card + 1) % _heroImgs.length);
-    });
-    _tag = Timer.periodic(const Duration(milliseconds: 2500), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
-      setState(() => _tagIdx = (_tagIdx + 1) % _tagWords.length);
+      if (!_deck.hasClients) return;
+      _i = (_i + 1) % (_rail.length + 1);
+      _deck.animateToPage(
+        _i,
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeOutCubic,
+      );
     });
   }
 
   @override
   void dispose() {
-    _cards?.cancel();
-    _tag?.cancel();
+    _t?.cancel();
+    _deck.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 560,
-      child: Stack(
-        fit: StackFit.expand,
+      // The deck is as tall as its tallest cell. Cell 0 is the card, and
+      // the card is a television plus two strips.
+      height: 430,
+      child: PageView.builder(
+        controller: _deck,
+        itemCount: _rail.length + 1,
+        onPageChanged: (i) => setState(() => _i = i),
+        itemBuilder: (context, i) {
+          if (i == 0) {
+            return _HeroCard(
+              onExplore: widget.onExplore,
+              onGuide: widget.onGuide,
+              onSearch: widget.onSearch,
+              onStore: widget.onStore,
+              // Only the cell on screen decodes. Off-cell clips are stills,
+              // which is what "no src at all until its turn" buys on the web.
+              live: _i == 0,
+            );
+          }
+          final r = _rail[i - 1];
+          return _RailCard(
+            rail: r,
+            live: _i == i,
+            onTap: () => widget.onRail?.call(r.dest),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Cell 0 — `.hs-hero-cell`. The strip, the set, the strip.
+class _HeroCard extends StatelessWidget {
+  const _HeroCard({
+    required this.live,
+    this.onExplore,
+    this.onGuide,
+    this.onSearch,
+    this.onStore,
+  });
+
+  final bool live;
+  final VoidCallback? onExplore;
+  final VoidCallback? onGuide;
+  final VoidCallback? onSearch;
+  final VoidCallback? onStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassWrap(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const NwsbVideo(
+          // `.hs-top` — the store on the left, the search on the right.
+          Row(
+            children: [
+              Flexible(child: _ShopChip(onTap: onStore)),
+              const _Sep(),
+              _SearchPill(onTap: onSearch),
+            ],
+          ),
+          const SizedBox(height: 10),
+          TvFrame(
             asset: 'assets/video/hero-bg.mp4',
-            priority: ClipPriority.feature,
+            frame: DeviceFrame.tvLandscape,
+            autoplay: live,
+            onTap: onExplore,
           ),
-          // The film is bright in places and every word on this hero is
-          // white, so the type sits on its own gradient rather than trusting
-          // the frame underneath it.
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x73000000),
-                  Color(0x26000000),
-                  Color(0xCC000000),
-                  Color(0xF2060C18),
-                ],
-                stops: [0, 0.3, 0.75, 1],
+          const SizedBox(height: 10),
+          // `.hs-foot` — Explore, App Guide, then the way into the guide.
+          Row(
+            children: [
+              Flexible(child: _FootButton(label: 'EXPLORE', onTap: onExplore)),
+              const _Sep(),
+              Flexible(
+                child: _FootButton(
+                  label: 'APP GUIDE',
+                  trailing: Icons.chevron_right,
+                  onTap: onGuide,
+                ),
               ),
-            ),
+              const _Sep(),
+              const Flexible(
+                child: Text(
+                  'LEARN',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                    color: Color(0xE6FFFFFF),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: onGuide,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_forward,
+                      size: 19, color: NwsbColors.ink),
+                ),
+              ),
+            ],
           ),
-          SafeArea(
-            bottom: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 10, 18, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const _Wordmark(),
-                          const Spacer(),
-                          _SearchButton(onTap: widget.onSearch),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      // One word, swapped on a fade — the same 250ms the
-                      // website uses on the tagline.
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        child: Text(
-                          _tagWords[_tagIdx],
-                          key: ValueKey(_tagIdx),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cells 1-6 — `.hs-ban`. The block's own heading, then its clip on the
+/// landscape tablet.
+class _RailCard extends StatelessWidget {
+  const _RailCard({required this.rail, required this.live, this.onTap});
+  final _Rail rail;
+  final bool live;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassWrap(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: const Color(0x14FFFFFF),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0x2EFFFFFF)),
                 ),
-                const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.only(left: 24, bottom: 20),
-                  child: RichText(
-                    text: const TextSpan(
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Color(0xD9FFFFFF),
-                        shadows: [
-                          Shadow(color: Color(0xCC000000), blurRadius: 12,
-                              offset: Offset(0, 1)),
-                        ],
-                      ),
-                      children: [
-                        TextSpan(text: 'Natural Origin of '),
-                        TextSpan(
-                          text: 'Word Science',
-                          style: TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                _CardRail(active: _card),
-                const SizedBox(height: 14),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: Text(
-                      _heroWords[_card],
-                      key: ValueKey(_card),
+                child: Icon(rail.icon, size: 21, color: Colors.white),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      rail.hello,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 30,
+                        fontSize: 13.5,
+                        color: Color(0x99FFFFFF),
+                        height: 1.2,
+                      ),
+                    ),
+                    Text(
+                      rail.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 20,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
-                        letterSpacing: 1,
-                        height: 1.1,
+                        height: 1.2,
+                        letterSpacing: -0.4,
                       ),
                     ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          TvFrame(
+            asset: rail.asset,
+            frame: DeviceFrame.tabletLandscape,
+            autoplay: live,
+            priority: live ? ClipPriority.feature : ClipPriority.decoration,
+            onTap: onTap,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// `.hs-sep` — the same hairline the app header uses between its marks.
+class _Sep extends StatelessWidget {
+  const _Sep();
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 1,
+        height: 26,
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        color: const Color(0x24FFFFFF),
+      );
+}
+
+/// `.hs-shop` — a white disc with a bag, then TODAY'S over Words & meanings.
+class _ShopChip extends StatelessWidget {
+  const _ShopChip({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.shopping_bag_outlined,
+                size: 20, color: NwsbColors.ink),
+          ),
+          const SizedBox(width: 10),
+          const Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "TODAY'S",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.6,
+                    color: NwsbColors.goldLight,
                   ),
                 ),
-                const SizedBox(height: 14),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
-                  child: Row(
-                    children: [
-                      _HeroPill(
-                        label: 'Explore',
-                        primary: true,
-                        onTap: widget.onExplore,
-                      ),
-                      const SizedBox(width: 10),
-                      _HeroPill(label: 'App Guide', onTap: widget.onGuide),
-                    ],
+                SizedBox(height: 1),
+                Text(
+                  'Words & meanings',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -207,106 +393,57 @@ class _FashionHeroState extends State<FashionHero> {
   }
 }
 
-/// `Nowss` heavy, `B` light — the mark reads as one word with a break in the
-/// weight rather than as two words.
-class _Wordmark extends StatelessWidget {
-  const _Wordmark();
+/// `.hs-searchpill` — the one control on this card that is a live invitation
+/// rather than a label, so it says what it is and wears a ring.
+class _SearchPill extends StatelessWidget {
+  const _SearchPill({this.onTap});
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size.width * 0.09;
-    return RichText(
-      text: TextSpan(
-        style: TextStyle(
-          fontSize: size.clamp(32.0, 52.0),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 5, 5, 5),
+        decoration: BoxDecoration(
           color: Colors.white,
-          height: 1.05,
+          borderRadius: BorderRadius.circular(28),
         ),
-        children: const [
-          TextSpan(text: 'Nowss', style: TextStyle(fontWeight: FontWeight.w800)),
-          TextSpan(text: 'B', style: TextStyle(fontWeight: FontWeight.w200)),
-        ],
-      ),
-    );
-  }
-}
-
-class _SearchButton extends StatelessWidget {
-  const _SearchButton({this.onTap});
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 44,
-        height: 44,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: const Color(0x1AFFFFFF),
-          shape: BoxShape.circle,
-          border: Border.all(color: const Color(0x33FFFFFF)),
-        ),
-        child: Image.asset(
-          'assets/icons/search.webp',
-          errorBuilder: (_, __, ___) =>
-              const Icon(Icons.search, size: 20, color: Colors.white),
-        ),
-      ),
-    );
-  }
-}
-
-/// `.hero-cards` — five stills, the active one wide and the rest narrow.
-class _CardRail extends StatelessWidget {
-  const _CardRail({required this.active});
-  final int active;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 92,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        itemCount: _heroImgs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, i) => AnimatedContainer(
-          duration: const Duration(milliseconds: 320),
-          curve: Curves.easeOutCubic,
-          width: i == active ? 118 : 62,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: const Color(0x14FFFFFF),
-            border: Border.all(
-              color: i == active
-                  ? const Color(0x8CFFFFFF)
-                  : const Color(0x1FFFFFFF),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'SEARCH',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2,
+                color: NwsbColors.ink,
+              ),
             ),
-          ),
-          child: NwsbImage(
-            url: _heroImgs[i],
-            // Until the download runs these are the hero clip's own frame,
-            // which is the picture the rail is sitting on anyway.
-            fallback: Image.asset(
-              'assets/video/hero-bg-poster.webp',
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: Color(0xFF0A0F1C)),
+            const SizedBox(width: 10),
+            Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(
+                color: Color(0xFF14141C),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.search, size: 19, color: Colors.white),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _HeroPill extends StatelessWidget {
-  const _HeroPill({required this.label, this.primary = false, this.onTap});
+/// `.hero-btns > *` — Explore and App Guide, bordered rather than filled.
+class _FootButton extends StatelessWidget {
+  const _FootButton({required this.label, this.trailing, this.onTap});
   final String label;
-  final bool primary;
+  final IconData? trailing;
   final VoidCallback? onTap;
 
   @override
@@ -315,21 +452,32 @@ class _HeroPill extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         decoration: BoxDecoration(
-          color: primary ? Colors.white : const Color(0x1FFFFFFF),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: primary ? Colors.white : const Color(0x59FFFFFF),
-          ),
+          color: const Color(0x0FFFFFFF),
+          border: Border.all(color: const Color(0x2EFFFFFF)),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13.5,
-            fontWeight: FontWeight.w700,
-            color: primary ? NwsbColors.ink : Colors.white,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            if (trailing != null) ...[
+              const SizedBox(width: 6),
+              Icon(trailing, size: 15, color: const Color(0x99FFFFFF)),
+            ],
+          ],
         ),
       ),
     );

@@ -27,7 +27,16 @@ class DeviceFrame {
       {required this.top,
       required this.right,
       required this.bottom,
-      required this.left});
+      required this.left,
+      this.verticalIsHeight = false});
+
+  /// True when this frame's aperture is placed by ABSOLUTE OFFSETS rather
+  /// than by padding — `top`/`bottom` percentages on a positioned box
+  /// resolve against the containing block's HEIGHT, where padding resolves
+  /// against its width. `.hhr-tab` is the one frame built that way, because
+  /// a `<video>` is a replaced element and `width: auto` on one takes its
+  /// intrinsic size and drops the `right` offset (nowssb-nm.css:14651).
+  final bool verticalIsHeight;
 
   final String image;
 
@@ -52,8 +61,8 @@ class DeviceFrame {
   /// so every television's aperture sat a little too low and a little too
   /// short of its bezel.
   EdgeInsets insets(Size box) => EdgeInsets.only(
-        top: box.width * top,
-        bottom: box.width * bottom,
+        top: (verticalIsHeight ? box.height : box.width) * top,
+        bottom: (verticalIsHeight ? box.height : box.width) * bottom,
         left: box.width * left,
         right: box.width * right,
       );
@@ -63,6 +72,17 @@ class DeviceFrame {
     'assets/frames/tab-landscape.webp',
     1339 / 875,
     top: 0.04854, right: 0.03510, bottom: 0.03734, left: 0.03510,
+  );
+
+  /// `.hhr-tab` — nowssb-nm.css:14641. The wide white frame the
+  /// Customize · Features · Earn strip sits in. Its aperture is placed by
+  /// offsets, not padding: left 1.823%, top 5.994%, width 96.208%, height
+  /// 87.381% — so right and bottom are what is left over.
+  static const wordActs = DeviceFrame(
+    'assets/frames/word-acts-tab.webp',
+    1371 / 317,
+    top: 0.05994, right: 0.01969, bottom: 0.06625, left: 0.01823,
+    verticalIsHeight: true,
   );
 
   /// `.dev-tabc-l` — padding: 1.752% 1.523% 4.570% 1.447%. Render 1313x807.
