@@ -15044,3 +15044,35 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
   border-radius: 0 !important;
 }
 #home-nm .nmh-streak-wrap .nmh-hero-vid { margin: 0 !important; }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   THE STORE, IN ONE GLASS PANEL
+
+   The clip, the trigger card and the black banner were three loose
+   blocks on the Fashion home. One panel now, wearing the head every
+   other block on this home wears — with the disc in WHITE, which is
+   what every mark on the hero card became and what this one matches.
+   ══════════════════════════════════════════════════════════════════ */
+.qa-tv-orb.qa-orb-white {
+  background: #fff !important;
+  border: none !important;
+  color: #060c18 !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+}
+.qa-tv-orb.qa-orb-white svg { width: 20px; height: 20px; display: block; }
+
+/* the three pieces sit flush inside the one panel: the wrapper's padding
+   is the spacing, so nothing inside carries a margin of its own */
+#home .fash-store-wrap > .nss-store-trigger {
+  width: 100% !important;
+  margin: 12px 0 0 !important;
+}
+#home .fash-store-wrap > .vb-banner {
+  width: 100% !important;
+  margin: 12px 0 0 !important;
+}
+#home .fash-store-wrap > .nss-store-ban {
+  width: 100% !important;
+  margin: 12px 0 0 !important;
+}

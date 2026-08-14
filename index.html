@@ -109,7 +109,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=264"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=784">
+<link rel="stylesheet" href="nowssb-nm.css?v=785">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
@@ -2430,6 +2430,28 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- ══ NOWSSB STORE — HOME TRIGGER CARD ══ -->
   
 
+  <!-- ── The store, in one glass panel ──
+       The clip, the trigger card and the black banner were three loose
+       blocks. One panel now, built the way Subscription and Choose Your
+       Path are: a white disc with a mark, a light line and a heavy one,
+       then the render, then the banner at the foot.
+
+       The WRAPPER is what app/js/part062.js registers as 'store' — the
+       registry matches ':scope > sel', a direct child of the home, so
+       leaving the entry on the pieces inside would find nothing and strand
+       them at the top of the page. The clip is injected before the trigger
+       by app/js/part067.js, which inserts into the trigger's PARENT — this
+       wrapper — so it lands between the head and the card. -->
+  <div class="glass-wrap fash-store-wrap">
+    <div class="qa-tv-head">
+      <div class="qa-tv-orb qa-orb-white" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg>
+      </div>
+      <div class="qa-tv-head-txt">
+        <div class="qa-tv-hello">Words and meanings</div>
+        <div class="qa-tv-name">The NowssB Store</div>
+      </div>
+    </div>
   <div class="nss-store-trigger" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
     <div class="nss-trigger-slides">
       <!-- The clip replaces the three crossfading stills that were here. -->
@@ -2465,6 +2487,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   <!-- /NowssB Store Trigger Card -->
+    <div class="ncb-carousel nss-store-ban" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" role="button">
+      <div class="ncb-slide">
+        <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>
+        <span class="ncb-txt"><span class="ncb-name">Enter the Store</span><span class="ncb-sub">Word Library &amp; Meaning Library, in one place</span></span>
+        <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </div>
+  </div><!-- /fash-store-wrap -->
 
   <!-- ══ VIDEO BANNER — 16:9 — above footer ══ -->
   <div class="hvb-glass-wrap">
@@ -10417,12 +10447,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=15"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=45"></script>
+<script src="app/js/part062.js?v=46"></script>
 <script src="app/js/part063.js?v=7"></script>
 <script src="app/js/part064.js?v=7"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=42"></script>
-<script src="app/js/part067.js?v=37"></script>
+<script src="app/js/part067.js?v=38"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->

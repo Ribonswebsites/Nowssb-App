@@ -107,7 +107,11 @@
         { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 , kind:'blk' },
         { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
-        { k:'store',    sel:['.vb-banner[data-vb="vb1"]', '.nss-store-trigger'],                                        t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
+        /* The clip, the trigger and the black banner are one panel now, so
+           there is one entry and it points at the wrapper — the registry
+           matches a DIRECT child of the home and all three are inside
+           something. */
+        { k:'store',    sel:['.fash-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'The clip, the card and its banner', always:1 },
         { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
         { k:'custom',   sel:['.fash-cust-panel'],                                          t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
         /* Registered so it lands where it is meant to. Anything NOT in this
