@@ -15043,7 +15043,9 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
   margin: 12px 0 0 !important;
   border-radius: 0 !important;
 }
-#home-nm .nmh-streak-wrap .nmh-hero-vid { margin: 0 !important; }
+/* The banner has a wrapper of its own now, so the clip is flush inside it
+   the same way the section is flush inside the other one. */
+#home-nm .nmh-streakvid-wrap .nmh-hero-vid { margin: 12px 0 0 !important; width: 100% !important; }
 
 
 /* ══════════════════════════════════════════════════════════════════

@@ -51,7 +51,8 @@
            wrapper because that is what is a direct child of the home.
            'always' is gone: the wrapper carries a cross, and a switch that
            refuses to switch off is not a cross. */
-        { k:'streak',   sel:['.nmh-streak-wrap'],                                          t:S, label:'Streak',                sub:'The clip, your streak and its banner' },
+        { k:'herovid',  sel:['.nmh-streakvid-wrap'],                                       t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 },
+        { k:'streak',   sel:['.nmh-streak-wrap'],                                          t:S, label:'Streak',                sub:'Your streak and its banner' },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
