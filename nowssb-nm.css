@@ -15225,7 +15225,7 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
    offer, then the set, then the way in — so nothing overlaps because
    nothing shares a box.
    ══════════════════════════════════════════════════════════════════ */
-#sub-promo-card, #home-nm .nmh-fsec, .sub-promo-card {
+#sub-promo-card, #home-nm .nmh-fsec {
   position: relative; width: 100%; box-sizing: border-box; cursor: pointer;
   background: none; border: none; box-shadow: none; padding: 0;
   aspect-ratio: auto !important; min-height: 0 !important; overflow: visible;
@@ -15269,8 +15269,8 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   letter-spacing: 4px; text-transform: uppercase; color: #e8d5a3;
   margin-top: 8px; opacity: 0.85;
 }
-.sub-promo-tv, .sub-promo-edtv { margin-top: 14px; }
-.sub-promo-edtv > video, .sub-promo-tv > video {
+.sub-promo-tv { margin: 14px 0; }
+.sub-promo-tv > video {
   display: block; width: 100%; height: 100%; object-fit: cover; background: #000;
 }
 .sub-promo-copy { margin-top: 16px; }

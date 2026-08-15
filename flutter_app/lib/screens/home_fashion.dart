@@ -68,9 +68,6 @@ const kFashionSectionOrder = <String>[
   'storeban',
   'subvid',
   'edition',
-  // Not on the website's registry — the promo is a section of its own
-  // here, so the clip has somewhere to live that is not Your Edition.
-  'promo',
   'routines',
   'offer',
   'cube',
@@ -178,7 +175,6 @@ class _HomeFashionState extends State<HomeFashion> {
         ('storeban', StoreBannerSection(onTap: () => _go(3))),
         ('subvid', SubscriptionSection(onTap: () => _go(3))),
         ('edition', EditionSection(onTap: () => _go(3))),
-        ('promo', PromoSection(onTap: () => _go(3))),
         ('routines', RoutinesSection(onTap: () => _go(1))),
         ('offer', FashOffer(onTap: () => _go(3))),
         (

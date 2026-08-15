@@ -75,13 +75,18 @@ class SubscriptionSection extends StatelessWidget {
   }
 }
 
-/// 17 · edition — index.html:2197. `#sub-promo-card` — the plan row, the
-/// promise, the benefits, and Upgrade Now with the price beside it.
+/// 17 · edition — index.html:2197. `.nedi-blk`.
 ///
-/// ON ITS OWN CLIP. This card carried `subscription-a.mp4` and I swapped it
-/// for the promo film without being asked to; the promo has a section of its
-/// own now — see [PromoSection] — and this one is back on the clip it always
-/// had.
+/// ONE SECTION, not two. This card and the promo were both showing the
+/// subscription film — the same clip twice, a few inches apart, one of them
+/// sitting on a still. They are folded together here under the key the
+/// website's own registry already has, so nothing had to be invented and the
+/// order did not move.
+///
+/// Built the way every other block on these homes is built: the orb and its
+/// two lines, the set, and one black bar saying where it goes. The offer is
+/// the only thing on the screen, set into the top-left of the film where
+/// this clip stays dark, so it reads as part of the picture.
 class EditionSection extends StatelessWidget {
   const EditionSection({super.key, this.onTap});
   final VoidCallback? onTap;
@@ -92,68 +97,16 @@ class EditionSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _PlanRow(),
-          const SizedBox(height: 12),
-          TvFrame(
-            asset: 'assets/video/subscription-a.mp4',
-            frame: DeviceFrame.tabletSlim,
-            priority: ClipPriority.decoration,
-            onTap: onTap,
+          const PaneHead(
+            eyebrow: 'Free plan · upgrade any time',
+            title: 'NowssB Edition',
+            mark: NwsbMarks.crown,
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Unlock your full healing potential',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              height: 1.2,
-              letterSpacing: -0.4,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            '50+ premium words \u00b7 AI pronunciation scoring \u00b7 '
-            '5 custom routines \u00b7 Priority access to new word drops',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w300,
-              color: Color(0xD1FFFFFF),
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _UpgradeRow(onTap: onTap),
-        ],
-      ),
-    );
-  }
-}
-
-/// THE PROMO — its own section, and one piece of film from edge to edge.
-///
-/// The offer is set ON the clip, at the top of the kiosk's screen, so it
-/// reads as part of the picture rather than as a caption stuck above it.
-/// Nothing else is on the screen: no promise, no benefit list, no button.
-/// The button is under the set, outside it, on the pane.
-class PromoSection extends StatelessWidget {
-  const PromoSection({super.key, this.onTap});
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SectionPane(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
           TvFrame(
             asset: 'assets/video/subscription-promo.mp4',
             frame: DeviceFrame.kioskPortrait,
             priority: ClipPriority.decoration,
             onTap: onTap,
-            // The ONLY thing on the screen. It sits in the top-left corner
-            // of the picture, where this clip is dark for its whole ten
-            // seconds, so it never fights the film underneath it.
             overlay: const Align(
               alignment: Alignment.topLeft,
               child: Padding(
@@ -162,85 +115,15 @@ class PromoSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          _UpgradeRow(onTap: onTap),
+          const SizedBox(height: 14),
+          SecBanner(
+            title: 'Upgrade Now',
+            sub: r'From $4.99 a month · every word and frequency unlocked',
+            mark: NwsbMarks.crown,
+            onTap: onTap,
+          ),
         ],
       ),
-    );
-  }
-}
-
-/// Upgrade Now, and what it costs. Outside every set that uses it.
-class _UpgradeRow extends StatelessWidget {
-  const _UpgradeRow({this.onTap});
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: onTap,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              color: Colors.white,
-              child: const Text(
-                'Upgrade Now',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1,
-                  color: NwsbColors.ink,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        const Text(
-          r'from $4.99/mo',
-          style: TextStyle(
-            fontSize: 10,
-            letterSpacing: 0.5,
-            color: Color(0xD9E8D5A3),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// `NowssB Edition` at one end, the plan you are on at the other.
-class _PlanRow extends StatelessWidget {
-  const _PlanRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        Text(
-          'NOWSSB EDITION',
-          style: TextStyle(
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 3,
-            color: NwsbColors.goldLight,
-          ),
-        ),
-        Spacer(),
-        Text(
-          'FREE PLAN',
-          style: TextStyle(
-            fontSize: 9,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 1.5,
-            color: Color(0xBFC8E8F5),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -82,7 +82,6 @@
         { k:'storeban', sel:['.fash-storeban-wrap'],                                       t:S, label:'Store Banner',          sub:'The clip and the Shop the Library bar', vb:1 , kind:'blk' },
         { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 },
         { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
-        { k:'promo',    sel:['.npromo-blk'],                                                t:S, label:'The Offer',             sub:'The subscription film and what it costs', vb:1 , kind:'blk' },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 },
         /* Off on the shipped Normal home, and opt-in from this editor —
@@ -135,7 +134,6 @@
         { k:'storeban', sel:['.fash-storeban-wrap'],                                       t:S, label:'Store Banner',          sub:'The clip and the Shop the Library bar', vb:1 , kind:'blk' },
         { k:'subvid',   sel:['.nsub-blk'],                                                t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 , kind:'sec' },
         { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 , kind:'blk' },
-        { k:'promo',    sel:['.npromo-blk'],                                                t:S, label:'The Offer',             sub:'The subscription film and what it costs', vb:1 , kind:'blk' },
         { k:'routines', sel:['.fash-routines-wrap'],                                       t:S, label:'My Routines',          sub:'Daily practice system', defOff:1 },
         { k:'offer',    sel:['.fash-offer-wrap'],                                          t:S, label:"Today's Offer",         sub:'Coupon art and the offer banner', vb:1 },
         { k:'cube',     sel:['#fashCubeSec'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' , kind:'blk' },

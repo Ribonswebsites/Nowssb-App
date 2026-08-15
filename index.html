@@ -1517,34 +1517,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          registers as 'edition' now. -->
     <div class="nedi-blk">
     <div class="nmh-fsec" onclick="if(window.SS)SS.open('subscription')">
-      <div class="sub-promo-plan">
-        <span class="sub-promo-plan-a">NowssB Edition</span>
-        <span class="sub-promo-plan-b">Free Plan</span>
+      <!-- ONE section, not two. This card and the promo were both showing
+           the subscription film a few inches apart, one of them on a still.
+           Built like every other block here: the orb and its two lines, the
+           set, and one black bar. The offer is the only thing on the screen,
+           set into the top-left of the film where the clip stays dark. -->
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Free plan · upgrade any time</div>
+          <div class="qa-tv-name">NowssB Edition</div>
+        </div>
       </div>
-      <div class="sub-promo-edtv nwsb-inframe dev-tabs-p">
-        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
-               src="assets/video/subscription-a.mp4"
-               poster="assets/video/subscription-a-poster.webp"></video>
-      </div>
-      <div class="sub-promo-copy">
-        <div class="sub-promo-title">Unlock your full healing potential</div>
-        <div class="sub-promo-sub">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
-      </div>
-      <div class="sub-promo-cta">
-        <div class="sub-promo-btn">Upgrade Now</div>
-        <div class="sub-promo-price">from $4.99/mo</div>
-      </div>
-    </div><!-- /nmh-fsec -->
-    </div><!-- /nedi-blk -->
-
-    <!-- The promo, in its own wrapper. -->
-    <div class="npromo-blk">
-    <div class="sub-promo-card" onclick="if(window.SS)SS.open('subscription')">
-      <!-- THE PROMO — its own section, and one piece of film edge to edge.
-           The offer is set ON the clip, at the top of the kiosk's screen, so
-           it reads as part of the picture rather than as a caption stuck
-           above it. Nothing else is on the screen. The button is under the
-           set, outside it. -->
       <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
         <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
                src="assets/video/subscription-promo.mp4"
@@ -1555,12 +1539,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div class="sub-promo-small">Subscribe · cancel anytime</div>
         </div>
       </div>
-      <div class="sub-promo-cta">
-        <div class="sub-promo-btn">Upgrade Now</div>
-        <div class="sub-promo-price">from $4.99/mo</div>
+      <div class="ncb-carousel nsub-ban" role="button" onclick="SS&&SS.open('subscription')">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Upgrade Now</span><span class="ncb-sub">From $4.99 a month · every word and frequency unlocked</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
       </div>
-    </div>
-    </div>
+    </div><!-- /nmh-fsec -->
+    </div><!-- /nedi-blk -->
 
     <!-- ══ HEALTH JOURNEY CARD — same section the Fashion Home carries ══ -->
     <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
@@ -2218,34 +2205,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Your Edition, in its glass wrapper — see the Normal home. -->
   <div class="nedi-blk glass-wrap">
     <div id="sub-promo-card" style="display:none;" onclick="SS&&SS.open('subscription')">
-      <div class="sub-promo-plan">
-        <span class="sub-promo-plan-a">NowssB Edition</span>
-        <span class="sub-promo-plan-b">Free Plan</span>
+      <!-- ONE section, not two. This card and the promo were both showing
+           the subscription film a few inches apart, one of them on a still.
+           Built like every other block here: the orb and its two lines, the
+           set, and one black bar. The offer is the only thing on the screen,
+           set into the top-left of the film where the clip stays dark. -->
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Free plan · upgrade any time</div>
+          <div class="qa-tv-name">NowssB Edition</div>
+        </div>
       </div>
-      <div class="sub-promo-edtv nwsb-inframe dev-tabs-p">
-        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
-               src="assets/video/subscription-a.mp4"
-               poster="assets/video/subscription-a-poster.webp"></video>
-      </div>
-      <div class="sub-promo-copy">
-        <div class="sub-promo-title">Unlock your full healing potential</div>
-        <div class="sub-promo-sub">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
-      </div>
-      <div class="sub-promo-cta">
-        <div class="sub-promo-btn">Upgrade Now</div>
-        <div class="sub-promo-price">from $4.99/mo</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- The promo, in its own glass wrapper. -->
-  <div class="npromo-blk glass-wrap">
-    <div class="sub-promo-card" onclick="SS&&SS.open('subscription')">
-      <!-- THE PROMO — its own section, and one piece of film edge to edge.
-           The offer is set ON the clip, at the top of the kiosk's screen, so
-           it reads as part of the picture rather than as a caption stuck
-           above it. Nothing else is on the screen. The button is under the
-           set, outside it. -->
       <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
         <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
                src="assets/video/subscription-promo.mp4"
@@ -2256,12 +2227,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div class="sub-promo-small">Subscribe · cancel anytime</div>
         </div>
       </div>
-      <div class="sub-promo-cta">
-        <div class="sub-promo-btn">Upgrade Now</div>
-        <div class="sub-promo-price">from $4.99/mo</div>
+      <div class="ncb-carousel nsub-ban" role="button" onclick="SS&&SS.open('subscription')">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Upgrade Now</span><span class="ncb-sub">From $4.99 a month · every word and frequency unlocked</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
       </div>
-    </div><!-- /sub-promo-card -->
-  </div><!-- /npromo-blk -->
+    </div>
+  </div>
+
 
   <!-- Daily Practice and its black banner, in one wrapper. -->
   <div class="glass-wrap fash-routines-wrap">

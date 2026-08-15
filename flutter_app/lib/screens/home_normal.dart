@@ -73,9 +73,6 @@ const kNormalSectionOrder = <String>[
   'storeban',
   'subvid',
   'edition',
-  // Not on the website's registry — the promo is a section of its own
-  // here, so the clip has somewhere to live that is not Your Edition.
-  'promo',
   'ebooks',
   'connectban',
   'healing',
@@ -188,7 +185,6 @@ class _HomeNormalState extends State<HomeNormal> {
         ('storeban', StoreBannerSection(onTap: () => _go(3), framed: true)),
         ('subvid', SubscriptionSection(onTap: () => _go(3))),
         ('edition', EditionSection(onTap: () => _go(3))),
-        ('promo', PromoSection(onTap: () => _go(3))),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
         ('healing', HealingSection(onTap: () => _go(2))),
