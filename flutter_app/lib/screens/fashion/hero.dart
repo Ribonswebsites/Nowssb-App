@@ -142,7 +142,11 @@ class _FashionHeroState extends State<FashionHero> {
         // GlassWrap's margin, then its padding, then its border.
         final inner = c.maxWidth - (16 * 2) - (12 * 2) - 2;
         final tv = inner / DeviceFrame.tvLandscape.aspect;
-        final h = 12 + _stripH + 10 + tv + 10 + _stripH + 12 + (8 * 2);
+        // padding, strip, gap, set, gap, strip, padding, the pane's own
+        // vertical margin, and its 1px border top and bottom — which was
+        // taken off the width and forgotten on the height.
+        final h =
+            12 + _topStripH + 10 + tv + 10 + _footStripH + 12 + (8 * 2) + 2;
         return SizedBox(
       height: h,
       child: PageView.builder(
@@ -175,9 +179,12 @@ class _FashionHeroState extends State<FashionHero> {
   }
 }
 
-/// What a strip above or below the set comes to: a 44 control plus the 5 of
-/// padding the pill and the buttons carry.
-const double _stripH = 54;
+/// The two strips are not the same height and pretending they were is what
+/// left slack under the set. The top one is the shop disc and the search
+/// pill — both 44. The foot is the two bordered buttons, which come to about
+/// 37, and the Learn disc at 34.
+const double _topStripH = 50;
+const double _footStripH = 42;
 
 /// Cell 0 — `.hs-hero-cell`. The strip, the set, the strip.
 class _HeroCard extends StatelessWidget {
@@ -204,12 +211,22 @@ class _HeroCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // `.hs-top` — the store on the left, the search on the right.
-          Row(
-            children: [
-              Flexible(child: _ShopChip(onTap: onStore)),
-              const _Sep(),
-              _SearchPill(onTap: onSearch),
-            ],
+          //
+          // The two strips are given EXACT heights because the deck's height
+          // is computed from them. An estimate there is an overflow here.
+          SizedBox(
+            height: _topStripH,
+            child: Row(
+              children: [
+                Flexible(child: _ShopChip(onTap: onStore)),
+                // The slack belongs BEFORE the rule. A Row of Flexible
+                // children is left-aligned, so without this it collected at
+                // the right-hand end and the search sat short of the edge.
+                const Spacer(),
+                const _Sep(),
+                _SearchPill(onTap: onSearch),
+              ],
+            ),
           ),
           const SizedBox(height: 10),
           TvFrame(
@@ -218,54 +235,63 @@ class _HeroCard extends StatelessWidget {
             autoplay: live,
             onTap: onExplore,
             // `.hero-content` IS the screen — index.html:1705. The wordmark,
-            // the tagline, the strapline and the big word sit ON it, and
-            // only the search button and the two buttons are moved off it
-            // onto the glass. This was empty, which is why the set read as
-            // a television showing nothing.
+            // the tagline, the strapline and the big word sit ON it; only
+            // the search button and the two buttons are moved off it onto
+            // the glass around it.
             overlay: _Screen(live: live),
           ),
           const SizedBox(height: 10),
-          // `.hs-foot` — Explore, App Guide, then the way into the guide.
-          Row(
-            children: [
-              Flexible(child: _FootButton(label: 'EXPLORE', onTap: onExplore)),
-              const _Sep(),
-              Flexible(
-                child: _FootButton(
-                  label: 'APP GUIDE',
-                  trailing: Icons.chevron_right,
+          // `.hs-foot` — Explore and App Guide on the left, then Learn and
+          // its disc hard against the right corner.
+          SizedBox(
+            height: _footStripH,
+            child: Row(
+              children: [
+                Flexible(
+                  child: _FootButton(label: 'EXPLORE', onTap: onExplore),
+                ),
+                const _Sep(),
+                Flexible(
+                  child: _FootButton(
+                    label: 'APP GUIDE',
+                    trailing: Icons.chevron_right,
+                    onTap: onGuide,
+                  ),
+                ),
+                const Spacer(),
+                const _Sep(),
+                const Flexible(
+                  child: Text(
+                    'LEARN',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.4,
+                      color: Color(0xE6FFFFFF),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
                   onTap: onGuide,
-                ),
-              ),
-              const _Sep(),
-              const Flexible(
-                child: Text(
-                  'LEARN',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.6,
-                    color: Color(0xE6FFFFFF),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: NwsbIcon(NwsbMarks.arrow,
+                          size: 15, color: NwsbColors.ink),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: onGuide,
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const NwsbIcon(NwsbMarks.arrow, size: 19, color: NwsbColors.ink),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -385,32 +411,37 @@ class _ShopChip extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
+          // The two lines can never be taller than the strip that holds
+          // them, whatever the reader's text scale is set to.
           const Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "TODAY'S",
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.6,
-                    color: NwsbColors.goldLight,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "TODAY'S",
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.6,
+                      color: NwsbColors.goldLight,
+                    ),
                   ),
-                ),
-                SizedBox(height: 1),
-                Text(
-                  'Words & meanings',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                  SizedBox(height: 1),
+                  Text(
+                    'Words & meanings',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -431,7 +462,7 @@ class _SearchPill extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 5, 5, 5),
+        padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(28),
@@ -442,16 +473,16 @@ class _SearchPill extends StatelessWidget {
             const Text(
               'SEARCH',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 1.2,
+                letterSpacing: 1,
                 color: NwsbColors.ink,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Container(
-              width: 42,
-              height: 42,
+              width: 36,
+              height: 36,
               decoration: const BoxDecoration(
                 color: Color(0xFF14141C),
                 shape: BoxShape.circle,
@@ -459,7 +490,7 @@ class _SearchPill extends StatelessWidget {
               // `.hero-search-btn` carries assets/icons/search.webp, which
               // is in the repository — the one mark on this card that is a
               // picture rather than a path.
-              padding: const EdgeInsets.all(11),
+              padding: const EdgeInsets.all(9),
               child: Image.asset(
                 'assets/icons/search.webp',
                 errorBuilder: (_, __, ___) =>
@@ -486,7 +517,7 @@ class _FootButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 13),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(
           color: const Color(0x0FFFFFFF),
           border: Border.all(color: const Color(0x2EFFFFFF)),
@@ -500,16 +531,16 @@ class _FootButton extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 10.5,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
+                  letterSpacing: 0.4,
                   color: Colors.white,
                 ),
               ),
             ),
             if (trailing != null) ...[
               const SizedBox(width: 4),
-              Icon(trailing, size: 14, color: const Color(0x99FFFFFF)),
+              Icon(trailing, size: 12, color: const Color(0x99FFFFFF)),
             ],
           ],
         ),
@@ -608,7 +639,7 @@ class _ScreenState extends State<_Screen> {
                     Text.rich(
                       TextSpan(
                         style: TextStyle(
-                          fontSize: 13 * u,
+                          fontSize: 10 * u,
                           color: Colors.white,
                           height: 1.05,
                           shadows: const [
@@ -634,7 +665,7 @@ class _ScreenState extends State<_Screen> {
                         _tags[_t],
                         key: ValueKey(_t),
                         style: TextStyle(
-                          fontSize: 3.4 * u,
+                          fontSize: 2.9 * u,
                           letterSpacing: 2,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -656,7 +687,7 @@ class _ScreenState extends State<_Screen> {
                     Text.rich(
                       TextSpan(
                         style: TextStyle(
-                          fontSize: 3.9 * u,
+                          fontSize: 3.3 * u,
                           color: const Color(0xE6FFFFFF),
                           shadows: const [
                             Shadow(color: Color(0xCC000000), blurRadius: 12),
@@ -683,7 +714,7 @@ class _ScreenState extends State<_Screen> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 9.5 * u,
+                          fontSize: 6.4 * u,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
                           letterSpacing: 3,
