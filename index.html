@@ -1521,15 +1521,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <span class="sub-promo-plan-a">NowssB Edition</span>
         <span class="sub-promo-plan-b">Free Plan</span>
       </div>
-      <div class="sub-promo-offer">
-        <div class="sub-promo-lead">Join today for</div>
-        <div class="sub-promo-big">30 Days <span>Free</span></div>
-        <div class="sub-promo-small">Subscribe · cancel anytime</div>
-      </div>
-      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
+      <div class="sub-promo-edtv nwsb-inframe dev-tabs-p">
         <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
-               src="assets/video/subscription-promo.mp4"
-               poster="assets/video/subscription-promo-poster.webp"></video>
+               src="assets/video/subscription-a.mp4"
+               poster="assets/video/subscription-a-poster.webp"></video>
       </div>
       <div class="sub-promo-copy">
         <div class="sub-promo-title">Unlock your full healing potential</div>
@@ -1541,6 +1536,31 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div><!-- /nmh-fsec -->
     </div><!-- /nedi-blk -->
+
+    <!-- The promo, in its own wrapper. -->
+    <div class="npromo-blk">
+    <div class="sub-promo-card" onclick="if(window.SS)SS.open('subscription')">
+      <!-- THE PROMO — its own section, and one piece of film edge to edge.
+           The offer is set ON the clip, at the top of the kiosk's screen, so
+           it reads as part of the picture rather than as a caption stuck
+           above it. Nothing else is on the screen. The button is under the
+           set, outside it. -->
+      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
+        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
+               src="assets/video/subscription-promo.mp4"
+               poster="assets/video/subscription-promo-poster.webp"></video>
+        <div class="sub-promo-offer">
+          <div class="sub-promo-lead">Join today for</div>
+          <div class="sub-promo-big">30 Days <span>Free</span></div>
+          <div class="sub-promo-small">Subscribe · cancel anytime</div>
+        </div>
+      </div>
+      <div class="sub-promo-cta">
+        <div class="sub-promo-btn">Upgrade Now</div>
+        <div class="sub-promo-price">from $4.99/mo</div>
+      </div>
+    </div>
+    </div>
 
     <!-- ══ HEALTH JOURNEY CARD — same section the Fashion Home carries ══ -->
     <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
@@ -2198,24 +2218,14 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- Your Edition, in its glass wrapper — see the Normal home. -->
   <div class="nedi-blk glass-wrap">
     <div id="sub-promo-card" style="display:none;" onclick="SS&&SS.open('subscription')">
-      <!-- Three parts, in the order you read them: what is on
-           offer, the set playing it, and the way in. All of this
-           used to be absolutely placed INSIDE .fsec-screen, on top
-           of the clip — two things in one rectangle. Nothing
-           overlaps now because nothing shares a box. -->
       <div class="sub-promo-plan">
         <span class="sub-promo-plan-a">NowssB Edition</span>
         <span class="sub-promo-plan-b">Free Plan</span>
       </div>
-      <div class="sub-promo-offer">
-        <div class="sub-promo-lead">Join today for</div>
-        <div class="sub-promo-big">30 Days <span>Free</span></div>
-        <div class="sub-promo-small">Subscribe · cancel anytime</div>
-      </div>
-      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
+      <div class="sub-promo-edtv nwsb-inframe dev-tabs-p">
         <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
-               src="assets/video/subscription-promo.mp4"
-               poster="assets/video/subscription-promo-poster.webp"></video>
+               src="assets/video/subscription-a.mp4"
+               poster="assets/video/subscription-a-poster.webp"></video>
       </div>
       <div class="sub-promo-copy">
         <div class="sub-promo-title">Unlock your full healing potential</div>
@@ -2227,6 +2237,31 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
   </div>
+
+  <!-- The promo, in its own glass wrapper. -->
+  <div class="npromo-blk glass-wrap">
+    <div class="sub-promo-card" onclick="SS&&SS.open('subscription')">
+      <!-- THE PROMO — its own section, and one piece of film edge to edge.
+           The offer is set ON the clip, at the top of the kiosk's screen, so
+           it reads as part of the picture rather than as a caption stuck
+           above it. Nothing else is on the screen. The button is under the
+           set, outside it. -->
+      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
+        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
+               src="assets/video/subscription-promo.mp4"
+               poster="assets/video/subscription-promo-poster.webp"></video>
+        <div class="sub-promo-offer">
+          <div class="sub-promo-lead">Join today for</div>
+          <div class="sub-promo-big">30 Days <span>Free</span></div>
+          <div class="sub-promo-small">Subscribe · cancel anytime</div>
+        </div>
+      </div>
+      <div class="sub-promo-cta">
+        <div class="sub-promo-btn">Upgrade Now</div>
+        <div class="sub-promo-price">from $4.99/mo</div>
+      </div>
+    </div><!-- /sub-promo-card -->
+  </div><!-- /npromo-blk -->
 
   <!-- Daily Practice and its black banner, in one wrapper. -->
   <div class="glass-wrap fash-routines-wrap">

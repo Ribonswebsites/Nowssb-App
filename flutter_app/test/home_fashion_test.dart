@@ -56,10 +56,12 @@ void main() {
 
   test('the registry is complete', () {
     // REG.fash.items has thirty entries and four of them are defOff, so a
-    // fresh install shows twenty-six.
-    expect(kFashionSectionOrder, hasLength(30));
+    // fresh install shows twenty-six — plus `promo`, which is this app's
+    // own: the subscription film has a section here rather than being
+    // stacked into Your Edition.
+    expect(kFashionSectionOrder, hasLength(31));
     expect(kFashionDefOff, hasLength(4));
-    expect(kFashionSectionOrder.toSet(), hasLength(30),
+    expect(kFashionSectionOrder.toSet(), hasLength(31),
         reason: 'two sections share a key');
     for (final k in kFashionDefOff) {
       expect(kFashionSectionOrder, contains(k),
@@ -67,7 +69,7 @@ void main() {
     }
     expect(
       kFashionSectionOrder.where((k) => !kFashionDefOff.contains(k)).length,
-      26,
+      27,
     );
   });
 
@@ -205,52 +207,54 @@ void main() {
         reason: 'two rows of 118 and one 10px gap');
   });
 
-  testWidgets('the subscription promo carries the offer, top left',
+  testWidgets('the promo is its own section, and the set carries only film',
       (tester) async {
-    // index.html:2199 — the same three lines, in the same order, in the same
-    // corner as the web card. The point of the section is the offer; a promo
-    // whose headline silently stopped being placed still lays out fine and
-    // still scrolls, so nothing else here would notice.
     await pump(tester);
 
     final list = find.byType(Scrollable).first;
     for (var i = 0;
-        i < 60 && find.text('Join today for').evaluate().isEmpty;
+        i < 60 && find.byType(PromoSection).evaluate().isEmpty;
         i++) {
       await tester.drag(list, const Offset(0, -320));
       await tester.pump(const Duration(milliseconds: 16));
     }
+    expect(find.byType(PromoSection), findsOneWidget);
 
-    expect(find.text('Join today for'), findsOneWidget);
-    expect(find.text('SUBSCRIBE · CANCEL ANYTIME'), findsOneWidget);
+    // The offer is set ON the clip, so it reads as part of the picture.
+    final tv = tester.getRect(find.descendant(
+      of: find.byType(PromoSection),
+      matching: find.byType(TvFrame),
+    ));
+    final offer = tester.getRect(find.text('Join today for'));
+    expect(tv.contains(offer.topLeft), isTrue,
+        reason: 'the offer belongs on the screen, not above it');
 
-    // And the whole card sits on a glass pane, like every other section on
-    // this home. SectionPane is what decides that per home — glass here, the
-    // pale neumorphic card on the Normal home — so this asserts the section
-    // goes through it rather than drawing itself bare.
-    // The pane is the section's own root — EditionSection returns a
-    // SectionPane — so the glass is INSIDE it, not around it.
+    // And the button is OUTSIDE the set, under it.
+    final button = tester.getTopLeft(find.descendant(
+      of: find.byType(PromoSection),
+      matching: find.text('Upgrade Now'),
+    ));
+    expect(button.dy, greaterThanOrEqualTo(tv.bottom - 1),
+        reason: 'the button belongs outside the set');
+
+    // Nothing else is on the screen.
     expect(
       find.descendant(
-        of: find.byType(EditionSection),
+        of: find.byType(PromoSection),
+        matching: find.text('Unlock your full healing potential'),
+      ),
+      findsNothing,
+      reason: 'the promo set is film and the offer, nothing else',
+    );
+
+    // And the promo sits on a pane like every other section.
+    expect(
+      find.descendant(
+        of: find.byType(PromoSection),
         matching: find.byType(GlassWrap),
       ),
       findsOneWidget,
-      reason: 'the subscription promo belongs in a glass wrapper',
     );
-
-    // The offer is ABOVE the set, and the button BELOW it — nothing is
-    // drawn over the clip any more.
-    final offer = tester.getBottomLeft(find.text('Join today for'));
-    final tv = tester.getRect(find.descendant(
-      of: find.byType(EditionSection),
-      matching: find.byType(TvFrame),
-    ));
-    final button = tester.getTopLeft(find.text('Upgrade Now'));
-    expect(offer.dy, lessThanOrEqualTo(tv.top + 1),
-        reason: 'the offer must clear the set, not sit on it');
-    expect(button.dy, greaterThanOrEqualTo(tv.bottom - 1),
-        reason: 'the button belongs outside the set, under it');
     expect(tester.takeException(), isNull);
   });
 

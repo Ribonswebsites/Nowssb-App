@@ -75,9 +75,13 @@ class SubscriptionSection extends StatelessWidget {
   }
 }
 
-/// 17 · edition — index.html:2197. `#sub-promo-card` on the slim portrait
-/// tablet: the plan labels pinned to the head of the screen, the promise and
-/// the benefits above the button, Upgrade Now and the price at the foot.
+/// 17 · edition — index.html:2197. `#sub-promo-card` — the plan row, the
+/// promise, the benefits, and Upgrade Now with the price beside it.
+///
+/// ON ITS OWN CLIP. This card carried `subscription-a.mp4` and I swapped it
+/// for the promo film without being asked to; the promo has a section of its
+/// own now — see [PromoSection] — and this one is back on the clip it always
+/// had.
 class EditionSection extends StatelessWidget {
   const EditionSection({super.key, this.onTap});
   final VoidCallback? onTap;
@@ -88,25 +92,11 @@ class EditionSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ABOVE the set, on the pane — not on the screen.
-          //
-          // All of this used to be drawn INSIDE the aperture, over the clip:
-          // the plan labels, the offer, the promise, the benefits and the
-          // button, stacked on top of a film that has its own picture to
-          // show. Two things in one rectangle, and the reader gets neither —
-          // which is exactly what it looked like.
-          //
-          // So the card is three parts now, in the order you read them: what
-          // is on offer, the set playing it, and the way in. Nothing overlaps
-          // anything, because nothing shares a box with anything.
           const _PlanRow(),
           const SizedBox(height: 12),
-          const _PromoOffer(),
-          const SizedBox(height: 14),
-          // The kiosk, with the clip inside it and NOTHING over it.
           TvFrame(
-            asset: 'assets/video/subscription-promo.mp4',
-            frame: DeviceFrame.kioskPortrait,
+            asset: 'assets/video/subscription-a.mp4',
+            frame: DeviceFrame.tabletSlim,
             priority: ClipPriority.decoration,
             onTap: onTap,
           ),
@@ -133,41 +123,92 @@ class EditionSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: onTap,
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    color: Colors.white,
-                    child: const Text(
-                      'Upgrade Now',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1,
-                        color: NwsbColors.ink,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                r'from $4.99/mo',
-                style: TextStyle(
-                  fontSize: 10,
-                  letterSpacing: 0.5,
-                  color: Color(0xD9E8D5A3),
-                ),
-              ),
-            ],
-          ),
+          _UpgradeRow(onTap: onTap),
         ],
       ),
+    );
+  }
+}
+
+/// THE PROMO — its own section, and one piece of film from edge to edge.
+///
+/// The offer is set ON the clip, at the top of the kiosk's screen, so it
+/// reads as part of the picture rather than as a caption stuck above it.
+/// Nothing else is on the screen: no promise, no benefit list, no button.
+/// The button is under the set, outside it, on the pane.
+class PromoSection extends StatelessWidget {
+  const PromoSection({super.key, this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionPane(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TvFrame(
+            asset: 'assets/video/subscription-promo.mp4',
+            frame: DeviceFrame.kioskPortrait,
+            priority: ClipPriority.decoration,
+            onTap: onTap,
+            // The ONLY thing on the screen. It sits in the top-left corner
+            // of the picture, where this clip is dark for its whole ten
+            // seconds, so it never fights the film underneath it.
+            overlay: const Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(18, 16, 18, 0),
+                child: _PromoOffer(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _UpgradeRow(onTap: onTap),
+        ],
+      ),
+    );
+  }
+}
+
+/// Upgrade Now, and what it costs. Outside every set that uses it.
+class _UpgradeRow extends StatelessWidget {
+  const _UpgradeRow({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              color: Colors.white,
+              child: const Text(
+                'Upgrade Now',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1,
+                  color: NwsbColors.ink,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        const Text(
+          r'from $4.99/mo',
+          style: TextStyle(
+            fontSize: 10,
+            letterSpacing: 0.5,
+            color: Color(0xD9E8D5A3),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -233,7 +274,7 @@ class _PromoOffer extends StatelessWidget {
           'Join today for',
           style: TextStyle(
             fontSize: 19,
-            fontWeight: FontWeight.w200,
+            fontWeight: FontWeight.w700,
             color: Color(0xE0FFFFFF),
             height: 1.15,
             shadows: _lift,
