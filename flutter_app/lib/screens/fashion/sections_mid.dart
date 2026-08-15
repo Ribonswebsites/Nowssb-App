@@ -394,26 +394,22 @@ class FashStore extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text.rich(
-                            TextSpan(
-                              style: TextStyle(
-                                fontSize: 27,
-                                color: Colors.white,
-                                height: 1.15,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'Enter the\n',
-                                  style: TextStyle(fontWeight: FontWeight.w300),
-                                ),
-                                TextSpan(
-                                  text: 'NowssB Store',
-                                  style: TextStyle(fontWeight: FontWeight.w800),
-                                ),
-                              ],
+                          // "NowssB Store" is gone from here. The film says
+                          // it in its own lettering and the section's head
+                          // says it again above the card — three times on one
+                          // screen, and the two drawn ones were landing on
+                          // top of each other.
+                          const Text(
+                            'Enter the',
+                            style: TextStyle(
+                              fontSize: 27,
+                              color: Colors.white,
+                              height: 1.15,
+                              fontWeight: FontWeight.w300,
                             ),
                           ),
-                          // Shop Now, directly under the title.
+                          const Spacer(),
+                          // Shop Now, directly above the pills.
                           //
                           // The paragraph that used to sit here — "Word
                           // Library & Meaning Library — own the sounds that
@@ -453,7 +449,6 @@ class FashStore extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const Spacer(),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,

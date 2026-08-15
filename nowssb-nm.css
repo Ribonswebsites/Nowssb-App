@@ -15205,12 +15205,17 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
    them readable. The paragraph is gone and the way in is a white Shop Now
    directly under the title, where there is nothing behind it.
 
-   .nss-trigger-btn already IS white (app/app.css:62); this only places the
-   copy that now sits at the top.
+   Shop Now sits at the FOOT, directly above the pills — clear of the title
+   and clear of the lettering the film carries in its middle. The card's
+   heading is "Enter the" alone now: the film says NowssB Store in its own
+   type and the section's head says it again above the card, so the drawn
+   copy of it was the third on one screen.
+
+   .nss-trigger-btn already IS white (app/app.css:62); this only places it.
    ══════════════════════════════════════════════════════════════════ */
-.nss-trigger-btn-top { margin-top: 6px; }
-/* Nothing follows the pills at the foot any more, so the gap they used to
-   hold open for the button goes with it. */
+.nss-trigger-btn-top { margin-bottom: 14px; }
+/* Nothing follows the pills any more, so the gap they held open for the
+   button that used to sit under them goes with it. */
 .nss-trigger-bottom > .nss-trigger-pills:last-child { margin-bottom: 0; }
 
 /* ══════════════════════════════════════════════════════════════════
