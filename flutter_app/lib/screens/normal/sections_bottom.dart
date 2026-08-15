@@ -105,32 +105,37 @@ class NmConnect extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  GestureDetector(
-                    onTap: onTap,
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0x1FFFFFFF),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0x59FFFFFF)),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Enter Connect',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                  // White, and only as wide as its words. A stretched
+                  // translucent bar reads as a panel; a small solid pill
+                  // reads as the one thing to press.
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: onTap,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Enter Connect',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: NwsbColors.ink,
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          NwsbIcon(NwsbMarks.arrow,
-                              size: 15, color: Colors.white),
-                        ],
+                            SizedBox(width: 8),
+                            NwsbIcon(NwsbMarks.arrow,
+                                size: 14, color: NwsbColors.ink),
+                          ],
+                        ),
                       ),
                     ),
                   ),

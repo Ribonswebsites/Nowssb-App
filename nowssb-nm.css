@@ -15378,3 +15378,36 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
 #home-nm .mo-ic { color: #b39a5e; }
 #home-nm .mo-lbl { color: #1a1a2e; }
 #home-nm .mo-rule { background: rgba(26,26,46,0.08); }
+
+/* ══════════════════════════════════════════════════════════════════
+   Enter Connect — white, and its own width.
+
+   It was the accent gold and it was stretching the full width of the card:
+   `display: inline-flex` shrink-wraps a button only until a flex COLUMN
+   with the default `align-items: stretch` gets hold of it, and the card is
+   one. `align-self` is what actually holds it to its content.
+   ══════════════════════════════════════════════════════════════════ */
+.nmh-connect-enter {
+  background: #fff !important;
+  color: #060c18 !important;
+  align-self: flex-start;
+  width: -moz-fit-content; width: fit-content;
+  max-width: 100%;
+  padding: 10px 18px !important;
+  font-size: 12px !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Today's Practice — the film runs the whole card.
+
+   In Fashion Plus the clip is `position: absolute; inset: 0` behind the
+   card, but the copy strip at the foot was painting its own ground on top
+   of it, so the picture stopped short and the bottom third read as an empty
+   black band under it. The strip keeps its text and gives up its fill; the
+   card's own scrim is what makes that text readable, and it already covers
+   the full height.
+   ══════════════════════════════════════════════════════════════════ */
+body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-bottom,
+body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-top {
+  background: transparent !important;
+}
