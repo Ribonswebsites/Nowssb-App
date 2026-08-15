@@ -413,17 +413,47 @@ class FashStore extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const Spacer(),
-                          const Text(
-                            'Word Library & Meaning Library — own the sounds '
-                            'that heal, unlock the origins that were hidden.',
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              color: Color(0xB3FFFFFF),
-                              height: 1.5,
+                          // Shop Now, directly under the title.
+                          //
+                          // The paragraph that used to sit here — "Word
+                          // Library & Meaning Library — own the sounds that
+                          // heal…" — was pushed to the foot of the card by a
+                          // Spacer, which is the band the clip carries its
+                          // own NowssB Store lettering in. Two sets of words
+                          // in the same place, and neither readable. The
+                          // card already says what it is at the top; what it
+                          // needed under that was the way in.
+                          const SizedBox(height: 14),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: GestureDetector(
+                              onTap: onTap,
+                              behavior: HitTestBehavior.opaque,
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(18, 11, 14, 11),
+                                color: Colors.white,
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Shop Now',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.3,
+                                        color: NwsbColors.ink,
+                                      ),
+                                    ),
+                                    SizedBox(width: 9),
+                                    NwsbIcon(NwsbMarks.arrow,
+                                        size: 14, color: NwsbColors.ink),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const Spacer(),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
@@ -447,27 +477,10 @@ class FashStore extends StatelessWidget {
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 14),
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 13),
-                            color: Colors.white,
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Explore Store',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: NwsbColors.ink,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                NwsbIcon(NwsbMarks.arrow,
-                                    size: 14, color: NwsbColors.ink),
-                              ],
-                            ),
-                          ),
+                          // The full-width Explore Store bar that used to
+                          // close the card is gone: Shop Now under the title
+                          // is the same door, and two white buttons on one
+                          // card is the card asking twice.
                         ],
                       ),
                     ),

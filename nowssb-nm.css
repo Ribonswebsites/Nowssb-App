@@ -9554,9 +9554,16 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-top { padding: 0 1
    of "NowssB Store" and the two sets of white type fought each other. Anchored
    to the foot instead: the chip still names the section, and the film's own
    lettering is left to be read. */
+/* Middle right, not bottom right.
+   Pinned to the vertical centre of the clip rather than to its floor: the
+   banners carry their own wordmark low and left, and a chip sitting on the
+   bottom edge lands in the same band as that artwork — which is what put
+   "Trending Word" on top of the render's own lettering. Centring it leaves
+   the bottom of the picture alone and still reads as one row. */
 .vb-chips {
-  position: absolute; left: 52%; right: 10px; bottom: 12px;
-  z-index: 3; display: flex; align-items: flex-end; justify-content: flex-end;
+  position: absolute; left: 52%; right: 10px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 3; display: flex; align-items: center; justify-content: flex-end;
   padding: 0; pointer-events: none; background: none;
 }
 .vb-chip { display: flex; align-items: center; gap: 9px; min-width: 0; }
@@ -15188,3 +15195,20 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   margin-top: 16px !important;
   margin-bottom: 16px !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   STORE TRIGGER — the offer moves up under the title.
+
+   The card's copy used to sit in .nss-trigger-bottom, which margin-top:auto
+   pins to the floor of a 9:16 card — the same band the clip carries its own
+   NowssB Store lettering in. Two sets of words in one place and neither of
+   them readable. The paragraph is gone and the way in is a white Shop Now
+   directly under the title, where there is nothing behind it.
+
+   .nss-trigger-btn already IS white (app/app.css:62); this only places the
+   copy that now sits at the top.
+   ══════════════════════════════════════════════════════════════════ */
+.nss-trigger-btn-top { margin-top: 6px; }
+/* Nothing follows the pills at the foot any more, so the gap they used to
+   hold open for the button goes with it. */
+.nss-trigger-bottom > .nss-trigger-pills:last-child { margin-bottom: 0; }
