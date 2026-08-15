@@ -20,7 +20,13 @@
 ///             the one search bar at the head replaced it
 ///   wsearch   "removed from this home — the one search bar above covers it"
 ///   msearch   the same
-///   storeban  points at `.fash-storeban-wrap`, which is Fashion markup
+///
+/// `storeban` USED TO BE ON THAT LIST — "points at .fash-storeban-wrap,
+/// which is Fashion markup". It is not any more. app/js/part062.js:82
+/// registers it on this home too, against that same selector, and there was
+/// simply no element for it to match: this home dropped a bare clip above
+/// its store card with no heading, no device and no bar under it, while the
+/// Fashion home carried the same thing as a proper block. Both build it now.
 ///
 /// Two more are `defOff` — My Routines and Personalised Healing. So a fresh
 /// install shows twenty-three sections.
@@ -80,7 +86,7 @@ const kNormalSectionOrder = <String>[
 /// Registered, and with nothing behind them on this home. See the note at
 /// the head of this file — each one was taken out of `#home-nm` deliberately
 /// and its registry row was left standing.
-const kNormalNoMarkup = <String>{'rx', 'storeban', 'wsearch', 'msearch'};
+const kNormalNoMarkup = <String>{'rx', 'wsearch', 'msearch'};
 
 /// The two `defOff` entries that DO have markup. Built, not placed.
 const kNormalDefOff = <String>{'routines', 'healing'};
@@ -176,7 +182,7 @@ class _HomeNormalState extends State<HomeNormal> {
           )
         ),
         ('trendshop', NmTrendShop(onTap: () => _go(3))),
-        ('storeban', null),
+        ('storeban', StoreBannerSection(onTap: () => _go(3), framed: true)),
         ('subvid', SubscriptionSection(onTap: () => _go(3))),
         ('edition', EditionSection(onTap: () => _go(3))),
         ('ebooks', EbooksSection(onTap: () => _go(2))),

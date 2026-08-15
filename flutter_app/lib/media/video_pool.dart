@@ -213,6 +213,46 @@ class VideoPool {
   /// and lets a new one start.
   static const _passLimit = Duration(seconds: 90);
 
+  /// How many clips may be OPENING at once.
+  ///
+  /// THIS IS WHY NOTHING WAS PLAYING.
+  ///
+  /// A pass used to start every bring-up in the same instant. Five
+  /// ExoPlayers calling initialize() together do not open five times
+  /// faster — they contend for one MediaCodec allocator, one disk and one
+  /// media service, and every one of them crawls. The readout said it
+  /// exactly: `decoders 5/8  playing 1`. Five slots taken, ONE clip open;
+  /// the other four were not refusing to play, they were still opening, all
+  /// four fighting each other to do it. Then a deadline fired and killed
+  /// them mid-open, and the next pass started the same pile-up again.
+  ///
+  /// Two at a time opens each one quickly and the set comes up in a second
+  /// or so, one after another, instead of none of them coming up at all.
+  /// The ceiling on how many EXIST is [maxLive] and is unchanged; this is
+  /// only how many may be in the act of starting.
+  static const int _openAtOnce = 2;
+
+  int _opening = 0;
+  final List<VideoLease> _openQueue = [];
+
+  void _queueOpen(VideoLease l) {
+    _openQueue.add(l);
+    _drainOpenQueue();
+  }
+
+  void _drainOpenQueue() {
+    while (_opening < _openAtOnce && _openQueue.isNotEmpty) {
+      final l = _openQueue.removeAt(0);
+      // Evicted, or the widget went away, while it sat in the queue.
+      if (l._disposed || !_live.contains(l)) continue;
+      _opening++;
+      unawaited(_bringUp(l).whenComplete(() {
+        _opening--;
+        _drainOpenQueue();
+      }));
+    }
+  }
+
   /// Deadline timers currently ticking, so they can be called off.
   ///
   /// `Future.timeout` is the obvious way to write this and the wrong one
@@ -355,6 +395,8 @@ class VideoPool {
     _leases.clear();
     _live.clear();
     _draining.clear();
+    _openQueue.clear();
+    _opening = 0;
     _again = false;
     // The in-flight flags too. A pass abandoned mid-await leaves _rebalancing
     // true, and a true _rebalancing is permanent: every later request just
@@ -376,6 +418,12 @@ class VideoPool {
       l.dispose();
     }
     _leases.clear();
+    // The open queue is state too. A test that ends with clips still queued
+    // leaves _opening above zero, and a non-zero _opening with nothing left
+    // to complete it stalls every later open — the same shape of wedge the
+    // pass guard exists for.
+    _openQueue.clear();
+    _opening = 0;
     await releaseAll();
 
     var guard = 0;
@@ -566,7 +614,7 @@ class VideoPool {
         for (final l in keep) {
           if (!_live.contains(l)) {
             _live.add(l);
-            unawaited(_bringUp(l));
+            _queueOpen(l);
           }
         }
       } while (_again && ++turns < 4);

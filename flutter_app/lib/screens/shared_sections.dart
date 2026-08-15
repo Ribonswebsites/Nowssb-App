@@ -284,6 +284,66 @@ class _PromoOffer extends StatelessWidget {
   }
 }
 
+/// 15 · storeban — index.html:2155. `.fash-storeban-wrap` — the head, the
+/// clip, and the Shop the Library bar.
+///
+/// BOTH HOMES. app/js/part062.js:82 registers 'storeban' on the Normal home
+/// too, against this same selector, and for a long time there was no element
+/// for it to match there: the Normal home just dropped a bare clip above its
+/// store card, with no heading, no device and no bar under it, while the
+/// Fashion home carried the same thing as a proper block. app/js/part067.js
+/// builds it on both now, and so does this.
+///
+/// [framed] is the one difference. The Normal home shows the clip on the
+/// landscape tablet; the Fashion home's runs full-bleed, which is what its
+/// markup has always done.
+class StoreBannerSection extends StatelessWidget {
+  const StoreBannerSection({super.key, this.onTap, this.framed = false});
+  final VoidCallback? onTap;
+  final bool framed;
+
+  static const _clip = 'assets/video/store-banner-fash.mp4';
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionPane(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const PaneHead(
+            eyebrow: 'Own the sounds that heal',
+            title: 'Inside the Store',
+            mark: NwsbMarks.bag,
+          ),
+          if (framed)
+            TvFrame(
+              asset: _clip,
+              frame: DeviceFrame.tabletLandscape,
+              priority: ClipPriority.decoration,
+              onTap: onTap,
+            )
+          else
+            GestureDetector(
+              onTap: onTap,
+              behavior: HitTestBehavior.opaque,
+              child: const AspectRatio(
+                aspectRatio: 1136 / 800,
+                child: ClipRect(child: NwsbVideo(asset: _clip)),
+              ),
+            ),
+          const SizedBox(height: 14),
+          SecBanner(
+            title: 'Shop the Library',
+            sub: 'Words, meanings and the origins behind them',
+            mark: NwsbMarks.bag,
+            onTap: onTap,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// 18 · routines — index.html:2223. `defOff`. The Daily Practice card and
 /// the My Routines bar, in one wrapper.
 class RoutinesSection extends StatelessWidget {

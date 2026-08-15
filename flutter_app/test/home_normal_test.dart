@@ -62,13 +62,18 @@ void main() {
           reason: '$k is listed as absent but is not in the order');
     }
 
-    // Four rows with no markup, two hidden by default — so a fresh install
-    // shows twenty-three.
+    // Three rows with no markup, two hidden by default — so a fresh install
+    // shows twenty-four.
+    //
+    // It was twenty-three. `storeban` has left the no-markup set: this home
+    // registers it (app/js/part062.js:82) and never had an element for it,
+    // so the store banner is a real section here now rather than a bare clip
+    // dropped above the store card.
     final shown = kNormalSectionOrder
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 23);
+    expect(shown, 24);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',

@@ -25,8 +25,12 @@ void main() {
   /// replacing it, and the initialized event that follows each creation.
   /// Generous on purpose — a count read halfway through a pass is a count of
   /// nothing in particular.
+  ///
+  /// Generous on purpose, and more so since the pool opens clips a couple at
+  /// a time rather than all at once: a full set is several batches deep, and
+  /// a count read halfway through is a count of nothing in particular.
   Future<void> pumpPool() async {
-    for (var i = 0; i < 24; i++) {
+    for (var i = 0; i < 160; i++) {
       await Future<void>.delayed(Duration.zero);
     }
   }
@@ -181,6 +185,33 @@ void main() {
         reason: 'with room to spare, nothing on screen should be a still');
     for (final l in leases) {
       expect(l.controller, isNotNull);
+    }
+  });
+
+  test('clips are opened a couple at a time, not all at once', () async {
+    // `decoders 5/8  playing 1` on the phone: five slots taken, ONE clip
+    // open. The other four were not refusing to play — they were still
+    // opening, all four at the same instant, contending for one MediaCodec
+    // allocator and one disk, and every one of them crawling because of it.
+    //
+    // The pool asks the platform for players in a queue now. This counts
+    // how many creations were outstanding at the same moment, which is the
+    // number that was wrong.
+    final leases = [
+      for (var i = 0; i < VideoPool.maxLive; i++)
+        VideoPool.instance.lease('assets/video/many-$i.mp4'),
+    ];
+    for (final l in leases) {
+      l.reportDistance(50);
+    }
+    await pumpPool();
+
+    expect(platform.peakOpen, lessThanOrEqualTo(2),
+        reason: 'more than two clips were opening at once');
+    // And they all still arrive.
+    expect(VideoPool.instance.liveCount, VideoPool.maxLive);
+    for (final l in leases) {
+      expect(l.controller, isNotNull, reason: 'a queued clip never opened');
     }
   });
 
