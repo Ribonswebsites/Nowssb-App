@@ -208,6 +208,22 @@ class VideoPool {
   /// clips are plainly visible, the measuring is wrong; if it is healthy and
   /// liveCount is zero, the opening is. Two very different bugs that look
   /// identical from the outside, which is why both numbers are on the HUD.
+  /// How many are actually MOVING — not how many decoders exist.
+  ///
+  /// The two came apart once already and the readout could not tell: six
+  /// decoders existed, all six were playing, and every one of them was
+  /// invisible behind its own poster because the picture had no size yet.
+  /// "decoders 6/8" looked healthy while the page looked frozen. This is
+  /// the number that says which of those two is happening.
+  int get playingCount {
+    var n = 0;
+    for (final l in _live) {
+      final c = l._controller;
+      if (c != null && c.value.isInitialized && c.value.isPlaying) n++;
+    }
+    return n;
+  }
+
   int get nearCount {
     var n = 0;
     for (final l in _leases) {

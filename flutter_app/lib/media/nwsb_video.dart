@@ -96,10 +96,27 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   /// measure, which reports, which notifies — round and round.
   bool _wasReady = false;
 
+  /// Whether the platform has told us how big the picture is yet.
+  ///
+  /// This is NOT the same as being initialized, and the difference is what
+  /// made every clip in the app look frozen. On Android `isInitialized`
+  /// turns true when the player is ready to be driven; `value.size` stays
+  /// Size.zero until the first frame has actually been DECODED, which is
+  /// some frames later. Between the two, the build below was handing a
+  /// FittedBox a 0x0 child — which paints nothing — so the poster underneath
+  /// was all you saw. And because readiness had already flipped, nothing
+  /// ever rebuilt this widget again, so the clip stayed invisible for as
+  /// long as it was on screen: playing, decoding, holding its slot, and
+  /// showing a still.
+  bool _wasSized = false;
+
   void _onLease() {
+    final c = _lease?.controller;
     final ready = _lease?.isReady ?? false;
-    if (ready == _wasReady) return;
+    final sized = c != null && !c.value.size.isEmpty;
+    if (ready == _wasReady && sized == _wasSized) return;
     _wasReady = ready;
+    _wasSized = sized;
     if (mounted) setState(() {});
   }
 
@@ -205,16 +222,23 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
             opacity: ready ? 1 : 0,
             duration: const Duration(milliseconds: 220),
             child: ready
-                ? FittedBox(
-                    fit: widget.fit,
-                    alignment: widget.alignment,
-                    clipBehavior: Clip.hardEdge,
-                    child: SizedBox(
-                      width: c.value.size.width,
-                      height: c.value.size.height,
-                      child: VideoPlayer(c),
-                    ),
-                  )
+                // A zero size means the first frame has not been decoded
+                // yet. Cropping to the clip's own dimensions needs those
+                // dimensions; without them the player simply fills the box,
+                // which is the right picture a fraction early rather than no
+                // picture at all.
+                ? (c.value.size.isEmpty
+                    ? VideoPlayer(c)
+                    : FittedBox(
+                        fit: widget.fit,
+                        alignment: widget.alignment,
+                        clipBehavior: Clip.hardEdge,
+                        child: SizedBox(
+                          width: c.value.size.width,
+                          height: c.value.size.height,
+                          child: VideoPlayer(c),
+                        ),
+                      ))
                 : const SizedBox.shrink(),
           ),
         ],

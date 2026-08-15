@@ -63,11 +63,15 @@ class _PoolHudState extends State<PoolHud> {
     final pool = VideoPool.instance;
     final live = pool.liveCount;
     final near = pool.nearCount;
+    final playing = pool.playingCount;
     final err = pool.lastError;
 
-    // Red when something is actually wrong: over the ceiling, or clips on
-    // screen with nothing decoding at all.
-    final bad = live > VideoPool.maxLive || (near > 0 && live == 0);
+    // Red when something is actually wrong: over the ceiling, clips on
+    // screen with nothing decoding, or decoders that exist and are not
+    // moving — the last of which is the case that used to be invisible.
+    final bad = live > VideoPool.maxLive ||
+        (near > 0 && live == 0) ||
+        (live > 0 && playing == 0);
 
     return GestureDetector(
       onTap: () => setState(() => _hidden = true),
@@ -83,7 +87,7 @@ class _PoolHudState extends State<PoolHud> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              'decoders $live/${VideoPool.maxLive}   '
+              'decoders $live/${VideoPool.maxLive}   playing $playing\n'
               'clips ${pool.leaseCount}   near $near',
               style: const TextStyle(
                 fontSize: 10,
