@@ -26,8 +26,9 @@
 //      every mipmap folder, so the app installs on the home screen under
 //      somebody else's logo. The app's icon is the same file the PWA is
 //      installed under — assets/icons/app-icon-512.png, the one named in
-//      manifest.json — and it is written into the five densities here
-//      because android/res is generated and would lose it otherwise.
+//      manifest.json — cut to the five densities by tools/flutter-icons.mjs,
+//      committed, and copied in here because android/res is generated and
+//      would lose it otherwise.
 //
 //   6. THE INTERNET PERMISSION.  flutter create writes it into the debug and
 //      profile manifests ONLY, so everything this app does over a network
@@ -42,8 +43,13 @@
 //
 //   node tools/flutter-android.mjs
 
-import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  copyFileSync,
+  mkdirSync,
+} from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -168,42 +174,47 @@ writeFileSync(appGradle, a);
 // assets/icons/app-icon-512.png as the 512 icon, so the phone shows one mark
 // whichever of the two the reader installed — which is the point of them
 // being one app.
-const ICON_SRC = join(root, 'assets', 'icons', 'app-icon-512.png');
-/** Android's five launcher densities, in px. */
-const MIPMAPS = {
-  'mipmap-mdpi': 48,
-  'mipmap-hdpi': 72,
-  'mipmap-xhdpi': 96,
-  'mipmap-xxhdpi': 144,
-  'mipmap-xxxhdpi': 192,
-};
+//
+// The five sizes are CUT AHEAD OF TIME and committed under
+// flutter_app/android-config/mipmap/, and this step only copies them.
+//
+// It used to resize assets/icons/app-icon-512.png here with Pillow. That
+// worked on a machine that happens to have Pillow and failed on every build
+// runner that does not — `ModuleNotFoundError: No module named 'PIL'`, exit
+// 1, no APK (run 136). A build step must not need a toolchain the build
+// image was never asked to carry; google-services.json below is copied for
+// exactly the same reason. To re-cut the icons after changing the source,
+// run `node tools/flutter-icons.mjs` on a machine with Pillow and commit
+// what it writes.
+const ICON_SRC = join(root, 'flutter_app', 'android-config', 'mipmap');
+/** Android's five launcher densities. */
+const MIPMAPS = [
+  'mipmap-mdpi',
+  'mipmap-hdpi',
+  'mipmap-xhdpi',
+  'mipmap-xxhdpi',
+  'mipmap-xxxhdpi',
+];
 const res = join(android, 'app', 'src', 'main', 'res');
-if (!existsSync(ICON_SRC)) {
-  console.error(`missing ${ICON_SRC}`);
-  process.exit(1);
-}
-// Written by a tiny Python step because resizing a PNG properly needs a real
-// image library, and Pillow is already what tools/asset-manifest.mjs leans on.
 {
-  const plan = Object.entries(MIPMAPS)
-    .map(([dir, px]) => `${join(res, dir, 'ic_launcher.png')}\t${px}`)
-    .join('\n');
-  const py = `
-import sys
-from PIL import Image
-src = Image.open(${JSON.stringify(ICON_SRC)}).convert('RGBA')
-for line in sys.stdin.read().strip().split('\\n'):
-    path, px = line.split('\\t')
-    px = int(px)
-    src.resize((px, px), Image.LANCZOS).save(path, 'PNG')
-print('ok')
-`;
-  const out = spawnSync('python3', ['-c', py], { input: plan, encoding: 'utf8' });
-  if (out.status !== 0) {
-    console.error('could not write launcher icons:\n' + (out.stderr || ''));
+  const missing = MIPMAPS.filter(
+    (d) => !existsSync(join(ICON_SRC, d, 'ic_launcher.png')),
+  );
+  if (missing.length) {
+    console.error(
+      `missing launcher icons under ${ICON_SRC}: ${missing.join(', ')}\n` +
+        `run: node tools/flutter-icons.mjs`,
+    );
     process.exit(1);
   }
-  done.push('wrote ic_launcher at five densities from app-icon-512.png');
+  for (const d of MIPMAPS) {
+    mkdirSync(join(res, d), { recursive: true });
+    copyFileSync(
+      join(ICON_SRC, d, 'ic_launcher.png'),
+      join(res, d, 'ic_launcher.png'),
+    );
+  }
+  done.push('copied ic_launcher at five densities');
 }
 
 // ── the manifest ───────────────────────────────────────────────────────
