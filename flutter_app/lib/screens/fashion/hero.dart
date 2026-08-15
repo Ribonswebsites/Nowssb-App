@@ -130,10 +130,21 @@ class _FashionHeroState extends State<FashionHero> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      // The deck is as tall as its tallest cell. Cell 0 is the card, and
-      // the card is a television plus two strips.
-      height: 430,
+    // A PageView needs a bounded height, and the height it needs is the one
+    // its tallest cell works out to — NOT a number picked by eye. It was 430
+    // and the card comes to about 366 at phone width, so every cell was
+    // carrying sixty-odd pixels of dead glass under it.
+    //
+    // The card is two strips and a television, and the television's height
+    // follows from the width, so the whole thing is arithmetic:
+    return LayoutBuilder(
+      builder: (context, c) {
+        // GlassWrap's margin, then its padding, then its border.
+        final inner = c.maxWidth - (16 * 2) - (12 * 2) - 2;
+        final tv = inner / DeviceFrame.tvLandscape.aspect;
+        final h = 12 + _stripH + 10 + tv + 10 + _stripH + 12 + (8 * 2);
+        return SizedBox(
+      height: h,
       child: PageView.builder(
         controller: _deck,
         itemCount: _rail.length + 1,
@@ -158,9 +169,15 @@ class _FashionHeroState extends State<FashionHero> {
           );
         },
       ),
+        );
+      },
     );
   }
 }
+
+/// What a strip above or below the set comes to: a 44 control plus the 5 of
+/// padding the pill and the buttons carry.
+const double _stripH = 54;
 
 /// Cell 0 — `.hs-hero-cell`. The strip, the set, the strip.
 class _HeroCard extends StatelessWidget {
@@ -229,18 +246,18 @@ class _HeroCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 1,
+                    letterSpacing: 0.6,
                     color: Color(0xE6FFFFFF),
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               GestureDetector(
                 onTap: onGuide,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  width: 44,
-                  height: 44,
+                  width: 42,
+                  height: 42,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
@@ -338,7 +355,7 @@ class _Sep extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         width: 1,
         height: 26,
-        margin: const EdgeInsets.symmetric(horizontal: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 7),
         color: const Color(0x24FFFFFF),
       );
 }
@@ -469,7 +486,7 @@ class _FootButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 13),
         decoration: BoxDecoration(
           color: const Color(0x0FFFFFFF),
           border: Border.all(color: const Color(0x2EFFFFFF)),
@@ -485,14 +502,14 @@ class _FootButton extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 1,
+                  letterSpacing: 0.6,
                   color: Colors.white,
                 ),
               ),
             ),
             if (trailing != null) ...[
-              const SizedBox(width: 6),
-              Icon(trailing, size: 15, color: const Color(0x99FFFFFF)),
+              const SizedBox(width: 4),
+              Icon(trailing, size: 14, color: const Color(0x99FFFFFF)),
             ],
           ],
         ),
