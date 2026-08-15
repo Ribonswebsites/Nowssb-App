@@ -2273,7 +2273,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- The coupon art and the offer banner it belongs to, in one wrapper. -->
   <div class="glass-wrap fash-offer-wrap">
   <div class="fash-banner-wrap">
+    <!-- The src is HERE, not only in part049.js.
+         nowssb-nm.css:3386 hides this image outright while it has no src
+         attribute — `:not([src]) { display: none }` — so anything that stops
+         the rotator's opening `el.src = SEQ[0]` from running takes the whole
+         coupon out of the page and leaves Today's Offer as a bare black
+         banner with nothing above it. That is what it was doing. Setting it
+         in the markup means the art is on the page before a line of script
+         runs; the rotator still swaps it afterwards.
+         onerror drops to the bundled poster, so a CDN that is unreachable
+         costs the picture rather than the section. -->
     <img class="fash-coupon-img" id="fashCouponImg" alt="NowssB Store coupons" draggable="false"
+         src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg"
+         onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='assets/video/coupon-a-poster.webp';}"
          onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
     <button class="fash-banner-cta fash-banner-cta-tc" id="fashCouponCta" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
   </div>
