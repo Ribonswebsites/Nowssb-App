@@ -25,7 +25,6 @@ import '../../theme/tokens.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/neu_wrap.dart';
 import '../../widgets/neumorphic.dart';
-import '../../widgets/tv_frame.dart';
 
 /// The time-of-day greeting the home renders — app/js/part012.js.
 String nmGreetHello([DateTime? at]) {
@@ -209,9 +208,27 @@ class NmStreakVideo extends StatelessWidget {
           title: 'Streak',
           mark: NwsbMarks.flame,
         ),
-        TvFrame(
-          asset: 'assets/video/tv-screen.mp4',
-          frame: DeviceFrame.tabletLandscape,
+        // No tablet round it. The clip runs to the pane's own edges, and the
+        // black bar under it says where it goes — the shape every other
+        // banner on this home has.
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: const AspectRatio(
+              aspectRatio: 16 / 9,
+              child: NwsbVideo(
+                asset: 'assets/video/tv-screen.mp4',
+                priority: ClipPriority.decoration,
+              ),
+            ),
+          ),
+        ),
+        SecBanner(
+          title: 'Keep Your Streak',
+          sub: 'Practice today and the run carries on',
+          mark: NwsbMarks.flame,
           onTap: onTap,
         ),
       ],
@@ -230,11 +247,9 @@ class NmStreak extends StatelessWidget {
   Widget build(BuildContext context) {
     return SecWrap(
       children: [
-        const WrapHead(
-          eyebrow: 'One day at a time',
-          title: 'Your Streak',
-          mark: NwsbMarks.flame,
-        ),
+        // No head. "Start Building Your Streak Today" is the heading of this
+        // card, and an orb with "Your Streak" over the top of it was the
+        // same thing said twice.
         const Text(
           'Start Building Your Streak Today',
           style: TextStyle(

@@ -54,7 +54,6 @@ import 'widgets_page.dart';
 const kNormalSectionOrder = <String>[
   'greet',
   'search',
-  'herovid',
   'streak',
   'storedisc',
   'practice',
@@ -69,6 +68,10 @@ const kNormalSectionOrder = <String>[
   'connect',
   'feed',
   'quickrow',
+  // MOVED. It used to open the page directly above the streak card,
+  // which put a heading, a film and a second heading in a row all saying
+  // Streak. It sits with the other video banners now.
+  'herovid',
   'trendshop',
   'storeban',
   'subvid',
@@ -145,7 +148,6 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        ('herovid', NmStreakVideo(onTap: () => _go(1))),
         ('streak', NmStreak(onTap: () => _go(1))),
         (
           'storedisc',
@@ -181,6 +183,7 @@ class _HomeNormalState extends State<HomeNormal> {
             onOrders: () => _go(4),
           )
         ),
+        ('herovid', NmStreakVideo(onTap: () => _go(1))),
         ('trendshop', NmTrendShop(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3), framed: true)),
         ('subvid', SubscriptionSection(onTap: () => _go(3))),

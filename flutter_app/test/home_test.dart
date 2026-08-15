@@ -47,6 +47,21 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
   }
 
+  /// Scroll until clips have been built.
+  ///
+  /// The Normal home's first screen has no film on it any more — the streak
+  /// banner moved down the page — so a clip has to be brought into view
+  /// before there is one to inspect. That is the page being right, not the
+  /// test being lenient: the assertions below are about what a clip IS, not
+  /// about where the first one sits.
+  Future<void> scrollToClips(WidgetTester tester) async {
+    final list = find.byType(Scrollable).first;
+    for (var i = 0; i < 40 && find.byType(NwsbVideo).evaluate().isEmpty; i++) {
+      await tester.drag(list, const Offset(0, -400));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+  }
+
   testWidgets('the home lays out on a phone without overflowing',
       (tester) async {
     await pumpHome(tester);
@@ -56,8 +71,9 @@ void main() {
     // someone reading this later.
     expect(tester.takeException(), isNull);
 
-    // The clips on the first screen are real, and each took a lease — which
-    // is the only way a clip gets a decoder in this app.
+    // The clips are real, and each took a lease — which is the only way a
+    // clip gets a decoder in this app.
+    await scrollToClips(tester);
     expect(find.byType(NwsbVideo), findsWidgets);
     expect(VideoPool.instance.leaseCount, greaterThan(0));
 
@@ -72,6 +88,7 @@ void main() {
     // The rule the port depends on: nothing constructs a VideoPlayer itself,
     // and nothing streams. A clip that did either would hold a decoder the
     // pool has never heard of — exactly the hole the website had.
+    await scrollToClips(tester);
     final clips = tester.widgetList<NwsbVideo>(find.byType(NwsbVideo));
     expect(clips, isNotEmpty);
     for (final v in clips) {

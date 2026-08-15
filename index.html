@@ -973,10 +973,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          so leaving the entries on the two pieces inside would find nothing
          and strand them at the top of the page. -->
     <div class="nmh-sec-wrap nmh-streakvid-wrap">
-      <button class="nmh-wrap-x" type="button" aria-label="Remove the streak banner"
-              onclick="nmhDropSection('herovid', this)">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
       <div class="nmh-wrap-head">
         <div class="nmh-wrap-head-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0c0-1.4-.7-2.3-1.2-3 1 .4 3.4 2 3.4 5.6a5.6 5.6 0 0 1-11.2 0C6.4 9 10.3 7.3 12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         </div>
@@ -985,8 +981,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div class="nmh-wrap-name">Streak</div>
         </div>
       </div>
-    <div class="nsvb-blk hero-vid-banner nmh-hero-vid nwsb-inframe dev-tab-l">
+    <!-- No tablet round it: the clip runs to the pane's own edges and the
+         black bar under it says where it goes, which is the shape every
+         other banner on this home has. -->
+    <div class="nsvb-blk hero-vid-banner nmh-hero-vid">
       <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
+    </div>
+    <div class="ncb-carousel nsub-ban" role="button" onclick="openSub('practice')">
+      <div class="ncb-slide">
+        <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0c0-1.4-.7-2.3-1.2-3 1 .4 3.4 2 3.4 5.6a5.6 5.6 0 0 1-11.2 0C6.4 9 10.3 7.3 12 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+        <span class="ncb-txt"><span class="ncb-name">Keep Your Streak</span><span class="ncb-sub">Practice today and the run carries on</span></span>
+        <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
     </div>
     </div><!-- /nmh-streakvid-wrap : the banner is its own block -->
 
@@ -996,14 +1002,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          Both are registered in app/js/part062.js — the registry matches a
          DIRECT child of the home, so each wrapper is its own entry. -->
     <div class="nmh-sec-wrap nmh-streak-wrap">
-      <div class="nmh-wrap-head">
-        <div class="nmh-wrap-head-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0c0-1.4-.7-2.3-1.2-3 1 .4 3.4 2 3.4 5.6a5.6 5.6 0 0 1-11.2 0C6.4 9 10.3 7.3 12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="nmh-wrap-head-txt">
-          <div class="nmh-wrap-hello">One day at a time</div>
-          <div class="nmh-wrap-name">Your Streak</div>
-        </div>
-      </div>
+      <!-- No head. "Start Building Your Streak Today" below is this card's
+           heading, and an orb with "Your Streak" over the top of it was the
+           same thing said twice. -->
     <div class="nmh-streak-section">
       <div class="nmh-streak-heading">Start Building Your Streak Today</div>
       <div class="nmh-streak-subheading">Practice daily to keep it alive — and unlock exclusive offers</div>

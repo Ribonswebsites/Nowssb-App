@@ -50,8 +50,6 @@
            there is one entry for it rather than two, and it points at the
            wrapper because that is what is a direct child of the home.
            'always' is gone: the wrapper carries a cross, and a switch that
-           refuses to switch off is not a cross. */
-        { k:'herovid',  sel:['.nmh-streakvid-wrap'],                                       t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 },
         { k:'streak',   sel:['.nmh-streak-wrap'],                                          t:S, label:'Streak',                sub:'Your streak and its banner' },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
@@ -75,6 +73,11 @@
            top of the page — which is what happened the first time the
            television went on. */
         { k:'quickrow', sel:['.qa-tv-block'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
+        /* MOVED down the page. It used to open the home directly above
+           the streak card, which put a heading, a film and a second
+           heading in a row all saying Streak. It sits with the other
+           video banners now. */
+        { k:'herovid',  sel:['.nmh-streakvid-wrap'],                                       t:S, label:'Streak Video',          sub:'The clip and its Keep Your Streak bar', vb:1 },
         { k:'trendshop',sel:['.nmh-trend-shop-wrap'],                                     t:S, label:'Trending Shop',         sub:'The clip and the Shop Now banner', vb:1 },
         /* The store's video banner is its own block, and it sits here rather
            than on top of the store card — a banner and a section are

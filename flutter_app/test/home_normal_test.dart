@@ -143,6 +143,15 @@ void main() {
     // of glass there, and this is what proves the scope is reaching them.
     await pump(tester);
 
+    // Scrolled to, not assumed at the top: the streak card lost its head
+    // (its own heading was saying the same thing underneath it) and the
+    // streak banner moved down the page, so the first screen carries none.
+    final list = find.byType(Scrollable).first;
+    for (var i = 0; i < 40 && find.byType(WrapHead).evaluate().isEmpty; i++) {
+      await tester.drag(list, const Offset(0, -400));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+
     final head = tester.widgetList<WrapHead>(find.byType(WrapHead));
     expect(head, isNotEmpty,
         reason: 'the Normal home should use the neumorphic head');
