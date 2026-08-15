@@ -65,8 +65,10 @@ class FashTiles extends StatelessWidget {
           // at the other.
           Row(
             children: [
-              const Icon(Icons.chevron_left, size: 15, color: NwsbColors.goldLight),
-              const Icon(Icons.chevron_left, size: 15, color: NwsbColors.goldLight),
+              const Icon(Icons.chevron_left,
+                  size: 15, color: NwsbColors.goldLight),
+              const Icon(Icons.chevron_left,
+                  size: 15, color: NwsbColors.goldLight),
               const SizedBox(width: 6),
               // Both ends give way rather than one pushing the other off the
               // rail: at a narrow width or a large text scale the two lines
@@ -272,13 +274,11 @@ class FashStore extends StatelessWidget {
                               children: [
                                 TextSpan(
                                   text: 'Enter the\n',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w300),
+                                  style: TextStyle(fontWeight: FontWeight.w300),
                                 ),
                                 TextSpan(
                                   text: 'NowssB Store',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w800),
+                                  style: TextStyle(fontWeight: FontWeight.w800),
                                 ),
                               ],
                             ),
@@ -333,7 +333,8 @@ class FashStore extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                NwsbIcon(NwsbMarks.arrow, size: 14, color: NwsbColors.ink),
+                                NwsbIcon(NwsbMarks.arrow,
+                                    size: 14, color: NwsbColors.ink),
                               ],
                             ),
                           ),
@@ -423,7 +424,8 @@ class FashTrending extends StatelessWidget {
           SecBanner(
             title: "Today's Trending",
             sub: 'See which words are healing the most people right now',
-            mark: NwsbMarks.trending, markViewBox: 22,
+            mark: NwsbMarks.trending,
+            markViewBox: 22,
             onTap: onTap,
           ),
         ],
@@ -690,8 +692,7 @@ class FashPrescription extends StatelessWidget {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: const Color(0xFF0B0B12),
-                          border:
-                              Border.all(color: const Color(0x14FFFFFF)),
+                          border: Border.all(color: const Color(0x14FFFFFF)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -740,8 +741,8 @@ class FashPrescription extends StatelessWidget {
                         'Tap word to practice',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 12, color: Color(0x8CFFFFFF)),
+                        style:
+                            TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -819,8 +820,7 @@ class FashConnect extends StatelessWidget {
                                 TextSpan(text: 'NowssB '),
                                 TextSpan(
                                   text: 'Connect',
-                                  style:
-                                      TextStyle(color: NwsbColors.goldLight),
+                                  style: TextStyle(color: NwsbColors.goldLight),
                                 ),
                               ],
                             ),
@@ -861,9 +861,8 @@ class FashShopNow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final words = ContentStore.instance.library;
-    final w = words.isEmpty
-        ? null
-        : words[(DateTime.now().day + 1) % words.length];
+    final w =
+        words.isEmpty ? null : words[(DateTime.now().day + 1) % words.length];
 
     return SectionPane(
       child: GestureDetector(
@@ -891,9 +890,7 @@ class FashShopNow extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      w == null
-                          ? 'HEALS'
-                          : 'HEALS ${w.organ.toUpperCase()}',
+                      w == null ? 'HEALS' : 'HEALS ${w.organ.toUpperCase()}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

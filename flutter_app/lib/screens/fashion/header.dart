@@ -40,79 +40,82 @@ class HomeHeader extends StatelessWidget {
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-      // `padding: max(env(safe-area-inset-top, 14px), 14px) 20px 14px` —
-      // the status bar's height is PART of the header, which is what makes
-      // the glass run to the top of the screen instead of starting under a
-      // black band.
-      padding: EdgeInsets.fromLTRB(
-        20,
-        MediaQuery.paddingOf(context).top + 14,
-        20,
-        14,
-      ),
-      decoration: const BoxDecoration(
-        color: Color(0x14FFFFFF),
-        border: Border(
-          bottom: BorderSide(color: Color(0x1AFFFFFF)),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(shape: BoxShape.circle),
-            child: Image.asset(
-              'assets/icons/logo-disc.webp',
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const ColoredBox(
-                color: Color(0xFF14141C),
-                child: Icon(Icons.headphones, size: 22, color: Colors.white),
-              ),
+          // `padding: max(env(safe-area-inset-top, 14px), 14px) 20px 14px` —
+          // the status bar's height is PART of the header, which is what makes
+          // the glass run to the top of the screen instead of starting under a
+          // black band.
+          padding: EdgeInsets.fromLTRB(
+            20,
+            MediaQuery.paddingOf(context).top + 14,
+            20,
+            14,
+          ),
+          decoration: const BoxDecoration(
+            color: Color(0x14FFFFFF),
+            border: Border(
+              bottom: BorderSide(color: Color(0x1AFFFFFF)),
             ),
           ),
-          const SizedBox(width: 12),
-          // `Nowsb` heavy, `ansiu` light — one word with a break in the
-          // weight, the way the mark is drawn everywhere else.
-          const Flexible(
-            child: Text.rich(
-              TextSpan(
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(color: Color(0x80000000), blurRadius: 8,
-                        offset: Offset(0, 1)),
-                  ],
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                clipBehavior: Clip.antiAlias,
+                decoration: const BoxDecoration(shape: BoxShape.circle),
+                child: Image.asset(
+                  'assets/icons/logo-disc.webp',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const ColoredBox(
+                    color: Color(0xFF14141C),
+                    child:
+                        Icon(Icons.headphones, size: 22, color: Colors.white),
+                  ),
                 ),
-                children: [
-                  TextSpan(
-                    text: 'Nowsb',
-                    style: TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  TextSpan(
-                    text: 'ansiu',
-                    style: TextStyle(fontWeight: FontWeight.w300),
-                  ),
-                ],
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+              const SizedBox(width: 12),
+              // `Nowsb` heavy, `ansiu` light — one word with a break in the
+              // weight, the way the mark is drawn everywhere else.
+              const Flexible(
+                child: Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize: 22,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                            color: Color(0x80000000),
+                            blurRadius: 8,
+                            offset: Offset(0, 1)),
+                      ],
+                    ),
+                    children: [
+                      TextSpan(
+                        text: 'Nowsb',
+                        style: TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      TextSpan(
+                        text: 'ansiu',
+                        style: TextStyle(fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              _HdrIcon(
+                mark: NwsbMarks.bell,
+                badge: notifications,
+                onTap: onNotifications,
+              ),
+              const _HdrRule(),
+              _HdrIcon(mark: NwsbMarks.house, onTap: onNormalHome),
+              const _HdrRule(),
+              _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
+            ],
           ),
-          const SizedBox(width: 8),
-          _HdrIcon(
-            mark: NwsbMarks.bell,
-            badge: notifications,
-            onTap: onNotifications,
-          ),
-          const _HdrRule(),
-          _HdrIcon(mark: NwsbMarks.house, onTap: onNormalHome),
-          const _HdrRule(),
-          _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
-        ],
-      ),
         ),
       ),
     );

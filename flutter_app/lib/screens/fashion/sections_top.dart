@@ -60,7 +60,8 @@ class FashGreeting extends StatelessWidget {
 /// 2 · herorow — index.html:1766. `.hhr-blk` — three buttons on a strip of
 /// `word-acts.mp4`, separated by hairlines.
 class FashHeroRow extends StatelessWidget {
-  const FashHeroRow({super.key, this.onCustomize, this.onFeatures, this.onEarn});
+  const FashHeroRow(
+      {super.key, this.onCustomize, this.onFeatures, this.onEarn});
 
   final VoidCallback? onCustomize;
   final VoidCallback? onFeatures;
@@ -190,8 +191,8 @@ class _GlassBox extends StatelessWidget {
           colors: [Color(0xF2F4F6FA), Color(0xD9C6CDDA), Color(0xF2E8ECF3)],
         ),
         boxShadow: const [
-          BoxShadow(color: Color(0x61000000), blurRadius: 20,
-              offset: Offset(0, 8)),
+          BoxShadow(
+              color: Color(0x61000000), blurRadius: 20, offset: Offset(0, 8)),
         ],
       ),
       child: child,
@@ -277,7 +278,8 @@ class FashPractice extends StatelessWidget {
         children: [
           Spill(
             label: 'Your daily word ritual',
-            mark: NwsbMarks.play, markViewBox: 22,
+            mark: NwsbMarks.play,
+            markViewBox: 22,
             onTap: onTap,
           ),
           PhotoCard(
@@ -315,7 +317,8 @@ class FashReader extends StatelessWidget {
         children: [
           Spill(
             label: 'Meanings and eBooks, in one place',
-            mark: NwsbMarks.reader, markViewBox: 22,
+            mark: NwsbMarks.reader,
+            markViewBox: 22,
             onTap: onTap,
           ),
           GestureDetector(
@@ -364,7 +367,8 @@ class FashReader extends StatelessWidget {
           SecBanner(
             title: 'Reader',
             sub: 'Meanings and eBooks, in one place',
-            mark: NwsbMarks.reader, markViewBox: 22,
+            mark: NwsbMarks.reader,
+            markViewBox: 22,
             onTap: onTap,
           ),
         ],

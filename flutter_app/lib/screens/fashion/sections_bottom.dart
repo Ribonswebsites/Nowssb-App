@@ -333,7 +333,8 @@ class _SearchPanelState extends State<_SearchPanel> {
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               color: Colors.white,
-                              child: const NwsbIcon(NwsbMarks.arrow, size: 16, color: NwsbColors.ink),
+                              child: const NwsbIcon(NwsbMarks.arrow,
+                                  size: 16, color: NwsbColors.ink),
                             ),
                           ),
                         ],

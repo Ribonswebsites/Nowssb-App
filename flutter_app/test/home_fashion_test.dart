@@ -15,6 +15,7 @@ import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/widgets/home_parts.dart';
 import 'package:nowssb/widgets/nwsb_icon.dart';
+import 'package:nowssb/screens/fashion/follow_steps.dart';
 import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 
@@ -119,8 +120,7 @@ void main() {
       for (final c
           in tester.widgetList<NcbCarousel>(find.byType(NcbCarousel))) {
         seen++;
-        expect(c.onTap, isNotNull,
-            reason: 'a carousel bar that goes nowhere');
+        expect(c.onTap, isNotNull, reason: 'a carousel bar that goes nowhere');
       }
       await tester.drag(list, const Offset(0, -600));
       await tester.pump(const Duration(milliseconds: 16));
@@ -158,6 +158,83 @@ void main() {
       expect(VideoPool.instance.liveCount, lessThanOrEqualTo(VideoPool.maxLive),
           reason: 'the decoder ceiling broke at scroll $i — this page is the '
               'whole reason the pool exists');
+    }
+  });
+
+  // ── Follow the steps ────────────────────────────────────────────────
+  // The guide is the one thing on this page that REPLACES the rail rather
+  // than adding to it, so the failure it can have is a quiet one: the disc
+  // does nothing, or it opens onto cards that overflow the deck's fixed
+  // height. Neither is visible in analyze and neither crashes.
+
+  testWidgets('the Learn disc runs the guide through the rail', (tester) async {
+    await pump(tester);
+
+    // Closed, the rail is the six banners and the strip says LEARN.
+    expect(find.text('LEARN'), findsOneWidget);
+    expect(find.text('Follow the steps'), findsNothing);
+
+    await tester.tap(
+      find.bySemanticsLabel('How this app works — follow the steps'),
+    );
+    await tester.pumpAndSettle();
+
+    // The set's own screen is the first card — not step one.
+    expect(find.text('Follow the steps'), findsOneWidget);
+    expect(find.text('Start'), findsOneWidget);
+    expect(find.text('${kFstSteps.length} steps'), findsOneWidget);
+
+    // And the two buttons stand down while it is up.
+    expect(find.text('EXPLORE'), findsNothing);
+    expect(find.text('APP GUIDE'), findsNothing);
+  });
+
+  testWidgets('every step card fits the deck it runs through', (tester) async {
+    await pump(tester);
+    await tester.tap(
+      find.bySemanticsLabel('How this app works — follow the steps'),
+    );
+    await tester.pumpAndSettle();
+
+    // Forward through all fifteen. A card taller than the cell overflows,
+    // and an overflow in a test is an exception — which is the point: the
+    // deck's height is computed from the hero card, and a step card has to
+    // live inside it.
+    for (var i = 1; i <= kFstSteps.length; i++) {
+      await tester.tap(find.bySemanticsLabel('Next step').first);
+      await tester.pumpAndSettle();
+      expect(find.text('Step $i of ${kFstSteps.length}'), findsOneWidget,
+          reason: 'step $i did not arrive');
+      expect(find.text(kFstSteps[i - 1].title), findsWidgets);
+    }
+  });
+
+  testWidgets('the guide gives the rail back', (tester) async {
+    await pump(tester);
+    await tester.tap(
+      find.bySemanticsLabel('How this app works — follow the steps'),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Follow the steps'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Close the steps').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Follow the steps'), findsNothing);
+    expect(find.text('EXPLORE'), findsOneWidget);
+    expect(find.text('LEARN'), findsOneWidget);
+  });
+
+  testWidgets('every step with a door has a real destination', (tester) async {
+    // The web's steps call openSub(); here the door is a tab, and a tab that
+    // is not one of the five is a button that goes nowhere.
+    for (final s in kFstSteps) {
+      expect(s.goLabel == null, s.goTab == null,
+          reason: '"${s.title}" has half a door');
+      if (s.goTab != null) {
+        expect(s.goTab, inInclusiveRange(0, 4),
+            reason: '"${s.title}" points at a tab that does not exist');
+      }
     }
   });
 }

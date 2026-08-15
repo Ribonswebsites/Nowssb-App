@@ -37,6 +37,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
+import 'follow_steps.dart';
 
 /// One banner on the rail — RAIL, app/js/part083.js:106.
 ///
@@ -59,17 +60,26 @@ class _Rail {
 
 const _rail = [
   // The subscription block's own gold clip.
-  _Rail(NwsbMarks.crown, 'The Full Library', 'NowssB Subscription',
+  _Rail(
+      NwsbMarks.crown,
+      'The Full Library',
+      'NowssB Subscription',
       'https://res.cloudinary.com/eenvubod/video/upload/v1784895544/'
           'grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
       3),
   // The clip a word page opens with — NWSB_WORD_BANNER_VID.
-  _Rail(NwsbMarks.word, 'Where a word begins', 'NowssB Word Store',
+  _Rail(
+      NwsbMarks.word,
+      'Where a word begins',
+      'NowssB Word Store',
       'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/'
           'grok_video_2026-07-31-20-43-13_qh2qjg.mp4',
       3),
   // The clip every meaning's page opens with — MS_MEANING_VID.
-  _Rail(NwsbMarks.meaning, 'What a word truly means', 'NowssB Meaning Store',
+  _Rail(
+      NwsbMarks.meaning,
+      'What a word truly means',
+      'NowssB Meaning Store',
       'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/'
           'grok_video_2026-07-31-15-41-50_oxszei.mp4',
       3),
@@ -77,7 +87,10 @@ const _rail = [
       'assets/video/signature-banner.mp4', 3),
   // The eBooks banner clip — and NOT the little one spinning in the spill
   // disc, which is the mistake part083.js:130 records having made.
-  _Rail(NwsbMarks.book, 'Page by page', 'NowssB eBooks',
+  _Rail(
+      NwsbMarks.book,
+      'Page by page',
+      'NowssB eBooks',
       'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/'
           'grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
       2),
@@ -112,10 +125,27 @@ class _FashionHeroState extends State<FashionHero> {
   Timer? _t;
   int _i = 0;
 
+  /// Whether the guide has taken the rail over — part084.js's `on()`, which
+  /// is a class on the deck for exactly this reason: it is ONE rail, showing
+  /// one of two sets of cells.
+  bool _guide = false;
+
+  /// `held` — part084.js:196. The auto-advance stands down for a while
+  /// whenever a finger touches it. "The point of pressing forward is to go
+  /// at your own speed, and a card that then slid away under you would be
+  /// the rail arguing."
+  DateTime _held = DateTime.fromMillisecondsSinceEpoch(0);
+
   /// MIN_DWELL — the web hands over when the clip ENDS, with a floor under
   /// it. Nothing here knows when a clip ends yet, so the floor is the whole
-  /// interval.
+  /// interval. ROTATE (part084.js:196) is the same 7s, which is why the
+  /// guide can share this timer rather than starting a second one.
   static const _dwell = Duration(seconds: 7);
+  static const _hold = Duration(seconds: 14);
+
+  /// How many cells the deck has. Cell 0 is the hero either way — the card
+  /// with the set in it, or the same card with the title on its screen.
+  int get _cells => (_guide ? kFstSteps.length : _rail.length) + 1;
 
   @override
   void initState() {
@@ -126,7 +156,8 @@ class _FashionHeroState extends State<FashionHero> {
       // both of those in Flutter.
       if (!mounted || !TickerMode.valuesOf(context).enabled) return;
       if (!_deck.hasClients) return;
-      _i = (_i + 1) % (_rail.length + 1);
+      if (DateTime.now().isBefore(_held)) return;
+      _i = (_i + 1) % _cells;
       _deck.animateToPage(
         _i,
         duration: const Duration(milliseconds: 520),
@@ -140,6 +171,31 @@ class _FashionHeroState extends State<FashionHero> {
     _t?.cancel();
     _deck.dispose();
     super.dispose();
+  }
+
+  /// `fstToggle` — part084.js. Tapping the disc does not jump to step one:
+  /// it changes the television's own screen first, and THAT is the guide's
+  /// first card. So both directions land on cell 0.
+  void _toggleGuide() {
+    setState(() {
+      _guide = !_guide;
+      _i = 0;
+      _held = DateTime.now().add(_hold);
+    });
+    if (_deck.hasClients) _deck.jumpToPage(0);
+  }
+
+  /// `fstStep` — :361. Clamped rather than wrapping: the arrows are a way
+  /// through the steps, and the timer is what wraps.
+  void _step(int d) {
+    final next = _i + d;
+    if (next < 0 || next >= _cells) return;
+    _held = DateTime.now().add(_hold);
+    _deck.animateToPage(
+      next,
+      duration: const Duration(milliseconds: 380),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   @override
@@ -162,31 +218,51 @@ class _FashionHeroState extends State<FashionHero> {
         final h =
             12 + _topStripH + 10 + tv + 10 + _footStripH + 12 + (8 * 2) + 2;
         return SizedBox(
-      height: h,
-      child: PageView.builder(
-        controller: _deck,
-        itemCount: _rail.length + 1,
-        onPageChanged: (i) => setState(() => _i = i),
-        itemBuilder: (context, i) {
-          if (i == 0) {
-            return _HeroCard(
-              onExplore: widget.onExplore,
-              onGuide: widget.onGuide,
-              onSearch: widget.onSearch,
-              onStore: widget.onStore,
-              // Only the cell on screen decodes. Off-cell clips are stills,
-              // which is what "no src at all until its turn" buys on the web.
-              live: _i == 0,
-            );
-          }
-          final r = _rail[i - 1];
-          return _RailCard(
-            rail: r,
-            live: _i == i,
-            onTap: () => widget.onRail?.call(r.dest),
-          );
-        },
-      ),
+          height: h,
+          child: PageView.builder(
+            controller: _deck,
+            itemCount: _cells,
+            onPageChanged: (i) {
+              // A finger on the rail means the same thing here as it does on an
+              // arrow — part084.js:540.
+              _held = DateTime.now().add(_hold);
+              setState(() => _i = i);
+            },
+            itemBuilder: (context, i) {
+              if (i == 0) {
+                return _HeroCard(
+                  onExplore: widget.onExplore,
+                  onGuide: widget.onGuide,
+                  onSearch: widget.onSearch,
+                  onStore: widget.onStore,
+                  // Only the cell on screen decodes. Off-cell clips are stills,
+                  // which is what "no src at all until its turn" buys on the web.
+                  live: _i == 0,
+                  // The guide's own first card IS the hero — the set stays, and
+                  // its screen carries the title instead of the wordmark and
+                  // the word.
+                  guide: _guide,
+                  onLearn: _toggleGuide,
+                  onStep: _step,
+                );
+              }
+              if (_guide) {
+                return FstCard(
+                  step: kFstSteps[i - 1],
+                  index: i,
+                  onClose: _toggleGuide,
+                  onStep: _step,
+                  onGo: widget.onRail,
+                );
+              }
+              final r = _rail[i - 1];
+              return _RailCard(
+                rail: r,
+                live: _i == i,
+                onTap: () => widget.onRail?.call(r.dest),
+              );
+            },
+          ),
         );
       },
     );
@@ -204,17 +280,30 @@ const double _footStripH = 42;
 class _HeroCard extends StatelessWidget {
   const _HeroCard({
     required this.live,
+    this.guide = false,
     this.onExplore,
     this.onGuide,
     this.onSearch,
     this.onStore,
+    this.onLearn,
+    this.onStep,
   });
 
   final bool live;
+
+  /// True when the guide has the rail. The set stays and keeps playing —
+  /// what changes is what is ON its screen and what is in the strip under
+  /// it.
+  final bool guide;
+
   final VoidCallback? onExplore;
   final VoidCallback? onGuide;
   final VoidCallback? onSearch;
   final VoidCallback? onStore;
+
+  /// The white disc, and the way back out of the guide.
+  final VoidCallback? onLearn;
+  final void Function(int delta)? onStep;
 
   @override
   Widget build(BuildContext context) {
@@ -256,85 +345,117 @@ class _HeroCard extends StatelessWidget {
             // the tagline, the strapline and the big word sit ON it; only
             // the search button and the two buttons are moved off it onto
             // the glass around it.
-            overlay: _Screen(live: live),
+            //
+            // With the guide on, the screen carries the title card instead:
+            // "the wordmark goes blonde, Follow the steps comes up under it,
+            // and the tagline, the word, the picture rail and the two
+            // buttons go" (part084.js:398). The thing you tapped is the
+            // thing that answers.
+            overlay: guide ? const FstTitle() : _Screen(live: live),
           ),
           const SizedBox(height: 10),
           // `.hs-foot` — Explore and App Guide on the left, then Learn and
           // its disc hard against the right corner.
           SizedBox(
             height: _footStripH,
-            child: Row(
-              // TWO GROUPS, pushed apart. The buttons keep to the left and
-              // Learn with its disc sits in the corner, which is where the
-              // markup puts them.
-              //
-              // Every child used to be a bare Flexible, and Flexible
-              // defaults to flex: 1 — so the buttons, Learn AND the Spacer
-              // were all taking a share of the free width. The buttons
-              // stretched into boxes far wider than their labels and the
-              // Spacer only ever got a quarter of the gap it was there to
-              // hold, which is why Learn floated in the middle instead of
-              // reaching the edge. flex: 0 does not fix it either: that is
-              // the same as not being flexible at all, so the labels could
-              // no longer shrink and the strip overflowed by 77.
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Shrinks if it has to; its labels ellipsise before the row
-                // ever overflows.
-                Flexible(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+            // `footNav` — part084.js:394. "Explore and App Guide stand down
+            // for as long as it is up, and come back the moment the guide
+            // closes." The strip is the title card's own row, and it is the
+            // only cell whose row is not on the card itself.
+            child: guide
+                ? Align(
+                    alignment: Alignment.centerLeft,
+                    child: FstNav(
+                      index: 0,
+                      onClose: onLearn ?? () {},
+                      onStep: onStep ?? (_) {},
+                    ),
+                  )
+                : Row(
+                    // TWO GROUPS, pushed apart. The buttons keep to the left and
+                    // Learn with its disc sits in the corner, which is where the
+                    // markup puts them.
+                    //
+                    // Every child used to be a bare Flexible, and Flexible
+                    // defaults to flex: 1 — so the buttons, Learn AND the Spacer
+                    // were all taking a share of the free width. The buttons
+                    // stretched into boxes far wider than their labels and the
+                    // Spacer only ever got a quarter of the gap it was there to
+                    // hold, which is why Learn floated in the middle instead of
+                    // reaching the edge. flex: 0 does not fix it either: that is
+                    // the same as not being flexible at all, so the labels could
+                    // no longer shrink and the strip overflowed by 77.
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Shrinks if it has to; its labels ellipsise before the row
+                      // ever overflows.
                       Flexible(
-                        child: _FootButton(label: 'EXPLORE', onTap: onExplore),
-                      ),
-                      const _Sep(),
-                      Flexible(
-                        child: _FootButton(
-                          label: 'APP GUIDE',
-                          trailing: Icons.chevron_right,
-                          onTap: onGuide,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: _FootButton(
+                                  label: 'EXPLORE', onTap: onExplore),
+                            ),
+                            const _Sep(),
+                            Flexible(
+                              child: _FootButton(
+                                label: 'APP GUIDE',
+                                trailing: Icons.chevron_right,
+                                onTap: onGuide,
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
+                      // Natural width, hard against the right edge.
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const _Sep(),
+                          const Text(
+                            'LEARN',
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.4,
+                              color: Color(0xE6FFFFFF),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // THE DISC. This is what "Learn" is for, and until now
+                          // it opened the App Guide page — the same place the
+                          // button two inches to its left already went, so the
+                          // word beside it was describing nothing of its own.
+                          //
+                          // It runs the guide: fifteen black cards through the
+                          // rail this card is cell 0 of. See follow_steps.dart.
+                          Semantics(
+                            button: true,
+                            // part084.js:509, verbatim.
+                            label: 'How this app works — follow the steps',
+                            child: GestureDetector(
+                              onTap: onLearn,
+                              behavior: HitTestBehavior.opaque,
+                              child: Container(
+                                width: 34,
+                                height: 34,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: NwsbIcon(NwsbMarks.arrow,
+                                      size: 15, color: NwsbColors.ink),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-                // Natural width, hard against the right edge.
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const _Sep(),
-                    const Text(
-                      'LEARN',
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.4,
-                        color: Color(0xE6FFFFFF),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: onGuide,
-                      behavior: HitTestBehavior.opaque,
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: NwsbIcon(NwsbMarks.arrow,
-                              size: 15, color: NwsbColors.ink),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
           ),
         ],
       ),
