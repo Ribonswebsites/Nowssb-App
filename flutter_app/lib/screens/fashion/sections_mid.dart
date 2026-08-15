@@ -394,61 +394,90 @@ class FashStore extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          // "NowssB Store" is gone from here. The film says
-                          // it in its own lettering and the section's head
-                          // says it again above the card — three times on one
-                          // screen, and the two drawn ones were landing on
-                          // top of each other.
-                          const Text(
-                            'Enter the',
-                            style: TextStyle(
-                              fontSize: 27,
-                              color: Colors.white,
-                              height: 1.15,
-                              fontWeight: FontWeight.w300,
+                          // NOT "Enter the NowssB Store". The film says
+                          // NowssB Store in its own lettering and the
+                          // section's head says it above the card, so a
+                          // third drawn copy was the store naming itself
+                          // three times on one screen. This says what the
+                          // store is FOR instead, in the app's own headline
+                          // shape: a light line over a heavy one.
+                          const Text.rich(
+                            TextSpan(
+                              style: TextStyle(
+                                fontSize: 27,
+                                color: Colors.white,
+                                height: 1.15,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'Enter the\n',
+                                  style: TextStyle(fontWeight: FontWeight.w300),
+                                ),
+                                TextSpan(
+                                  text: 'Future of Meditation',
+                                  style: TextStyle(fontWeight: FontWeight.w800),
+                                ),
+                              ],
                             ),
                           ),
                           const Spacer(),
-                          // Shop Now, directly above the pills.
+                          // The mark, a hairline, then the button — one
+                          // row, set below the lettering the film carries in
+                          // its middle so the two are read in order rather
+                          // than at once.
                           //
-                          // The paragraph that used to sit here — "Word
-                          // Library & Meaning Library — own the sounds that
-                          // heal…" — was pushed to the foot of the card by a
-                          // Spacer, which is the band the clip carries its
-                          // own NowssB Store lettering in. Two sets of words
-                          // in the same place, and neither readable. The
-                          // card already says what it is at the top; what it
-                          // needed under that was the way in.
-                          const SizedBox(height: 14),
+                          // The paragraph that used to sit here was pushed
+                          // to the foot of the card by that Spacer, which is
+                          // exactly the band the clip keeps its own NowssB
+                          // Store lettering in: two sets of words in one
+                          // place and neither of them readable.
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              onTap: onTap,
-                              behavior: HitTestBehavior.opaque,
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(18, 11, 14, 11),
-                                color: Colors.white,
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Shop Now',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 0.3,
-                                        color: NwsbColors.ink,
-                                      ),
-                                    ),
-                                    SizedBox(width: 9),
-                                    NwsbIcon(NwsbMarks.arrow,
-                                        size: 14, color: NwsbColors.ink),
-                                  ],
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const NwsbIcon(
+                                  NwsbMarks.bag,
+                                  size: 20,
+                                  color: NwsbColors.goldLight,
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                Container(
+                                  width: 1,
+                                  height: 26,
+                                  color: const Color(0x59FFFFFF),
+                                ),
+                                const SizedBox(width: 12),
+                                GestureDetector(
+                                  onTap: onTap,
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Container(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        18, 11, 14, 11),
+                                    color: Colors.white,
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Shop Now',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.3,
+                                            color: NwsbColors.ink,
+                                          ),
+                                        ),
+                                        SizedBox(width: 9),
+                                        NwsbIcon(NwsbMarks.arrow,
+                                            size: 14, color: NwsbColors.ink),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
+                          const SizedBox(height: 14),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,

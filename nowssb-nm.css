@@ -15213,7 +15213,20 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
 
    .nss-trigger-btn already IS white (app/app.css:62); this only places it.
    ══════════════════════════════════════════════════════════════════ */
-.nss-trigger-btn-top { margin-bottom: 14px; }
+/* The mark, a hairline, then the button — one row, set below the lettering
+   the film carries in its middle so the two are read in order rather than at
+   once. `align-items: center` and not stretch, or the rule and the mark grow
+   to the button's height. */
+.nss-trigger-go {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.nss-trigger-go-ic { width: 20px; height: 20px; flex-shrink: 0; }
+.nss-trigger-go-ic svg { width: 100%; height: 100%; display: block; }
+.nss-trigger-go-rule {
+  flex: 0 0 1px; height: 26px; background: rgba(255,255,255,0.35);
+}
+.nss-trigger-btn-top { margin: 0 !important; }
 /* Nothing follows the pills any more, so the gap they held open for the
    button that used to sit under them goes with it. */
 .nss-trigger-bottom > .nss-trigger-pills:last-child { margin-bottom: 0; }
