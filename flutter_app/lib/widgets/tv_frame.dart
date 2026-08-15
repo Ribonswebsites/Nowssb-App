@@ -131,6 +131,23 @@ class DeviceFrame {
     left: 0.03306,
   );
 
+  /// The kiosk — a portrait display on a stand with the wordmark printed on
+  /// its top bezel. Trimmed render 815x1511; the aperture is 773x1379, which
+  /// is 0.5606 — 9:16 to within a pixel, so a 720x1280 clip fills it exactly
+  /// with nothing cropped and no bars.
+  ///
+  /// Measured off the render rather than typed by eye: the white bezel's
+  /// bounding box gives the frame, and walking in from each edge along the
+  /// centre lines gives the screen.
+  static const kioskPortrait = DeviceFrame(
+    'assets/frames/tv-kiosk-portrait.webp',
+    815 / 1511,
+    top: 0.03804,
+    right: 0.02454,
+    bottom: 0.12270,
+    left: 0.02699,
+  );
+
   /// `.dev-tv-p` — padding: 3.4% 3.2% 8.4%. Render 862x1450.
   static const tvPortrait = DeviceFrame(
     'assets/frames/tv-portrait.webp',

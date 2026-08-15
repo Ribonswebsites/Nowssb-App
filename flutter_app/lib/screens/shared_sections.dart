@@ -85,122 +85,126 @@ class EditionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionPane(
-      child: TvFrame(
-        asset: 'assets/video/subscription-promo.mp4',
-        frame: DeviceFrame.tabletSlim,
-        priority: ClipPriority.decoration,
-        onTap: onTap,
-        overlay: Stack(
-          fit: StackFit.expand,
-          children: [
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0x00060C18),
-                    Color(0x26060C18),
-                    Color(0xB8060C18),
-                  ],
-                  stops: [0, 0.4, 1],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ABOVE the set, on the pane — not on the screen.
+          //
+          // All of this used to be drawn INSIDE the aperture, over the clip:
+          // the plan labels, the offer, the promise, the benefits and the
+          // button, stacked on top of a film that has its own picture to
+          // show. Two things in one rectangle, and the reader gets neither —
+          // which is exactly what it looked like.
+          //
+          // So the card is three parts now, in the order you read them: what
+          // is on offer, the set playing it, and the way in. Nothing overlaps
+          // anything, because nothing shares a box with anything.
+          const _PlanRow(),
+          const SizedBox(height: 12),
+          const _PromoOffer(),
+          const SizedBox(height: 14),
+          // The kiosk, with the clip inside it and NOTHING over it.
+          TvFrame(
+            asset: 'assets/video/subscription-promo.mp4',
+            frame: DeviceFrame.kioskPortrait,
+            priority: ClipPriority.decoration,
+            onTap: onTap,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Unlock your full healing potential',
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              height: 1.2,
+              letterSpacing: -0.4,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            '50+ premium words \u00b7 AI pronunciation scoring \u00b7 '
+            '5 custom routines \u00b7 Priority access to new word drops',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w300,
+              color: Color(0xD1FFFFFF),
+              height: 1.6,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: onTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    color: Colors.white,
+                    child: const Text(
+                      'Upgrade Now',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                        color: NwsbColors.ink,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Row(
-                    children: [
-                      Text(
-                        'NOWSSB EDITION',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 3,
-                          color: NwsbColors.goldLight,
-                        ),
-                      ),
-                      Spacer(),
-                      Text(
-                        'FREE PLAN',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.5,
-                          color: Color(0xBFC8E8F5),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  const _PromoOffer(),
-                  const Spacer(),
-                  const Text(
-                    'Unlock your full\nhealing potential',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      height: 1.2,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    '50+ premium words · AI pronunciation scoring · '
-                    '5 custom routines · Priority access to new word drops',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w300,
-                      color: Color(0xD1FFFFFF),
-                      height: 1.6,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          color: Colors.white,
-                          child: const Text(
-                            'Upgrade Now',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1,
-                              color: NwsbColors.ink,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Text(
-                        r'from $4.99/mo',
-                        style: TextStyle(
-                          fontSize: 10,
-                          letterSpacing: 0.5,
-                          color: Color(0xD9E8D5A3),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              const SizedBox(width: 12),
+              const Text(
+                r'from $4.99/mo',
+                style: TextStyle(
+                  fontSize: 10,
+                  letterSpacing: 0.5,
+                  color: Color(0xD9E8D5A3),
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-/// The offer, top left, under the brand row — the layout an app-store promo
-/// uses: the mark, then the number, then the small print.
+/// `NowssB Edition` at one end, the plan you are on at the other.
+class _PlanRow extends StatelessWidget {
+  const _PlanRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        Text(
+          'NOWSSB EDITION',
+          style: TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 3,
+            color: NwsbColors.goldLight,
+          ),
+        ),
+        Spacer(),
+        Text(
+          'FREE PLAN',
+          style: TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 1.5,
+            color: Color(0xBFC8E8F5),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The offer — the mark, then the number, then the small print.
 ///
 /// Typed the way this app types a headline, which is `.login-title`
 /// (app/app.css): one 42px DM Sans line split between weight 800 and weight

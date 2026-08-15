@@ -1516,35 +1516,30 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Your Edition, in a wrapper. .nedi-blk is what part062.js
          registers as 'edition' now. -->
     <div class="nedi-blk">
-    <div class="nmh-fsec nwsb-inframe dev-tabs-p" onclick="if(window.SS)SS.open('subscription')">
-        <div class="fsec-screen">
-          <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none" src="assets/video/subscription-promo.mp4" poster="assets/video/subscription-promo-poster.webp"></video>
-          <div class="nmh-fsec-fade"></div>
-          <!-- Labels pinned to top of card -->
-          <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
-            <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
-            <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
-          </div>
-          <!-- The offer, top left. Same block as the Fashion home's card at
-               :2205 — one card written twice is two places to change a price
-               in, so if either moves the other has to move with it. -->
-          <div class="sub-promo-offer" style="position:absolute;top:46px;left:20px;right:20px;z-index:2;">
-            <div style="font-family:'DM Sans',sans-serif;font-size:clamp(15px,4.4vw,19px);font-weight:200;color:rgba(255,255,255,0.88);line-height:1.15;text-shadow:0 2px 14px rgba(0,0,0,0.8);">Join today for</div>
-            <div style="font-family:'DM Sans',sans-serif;font-size:clamp(30px,9vw,44px);font-weight:800;color:#fff;line-height:1.02;letter-spacing:-1px;margin-top:2px;text-shadow:0 2px 20px rgba(0,0,0,0.85);">30 Days <span style="color:#e8d5a3;">Free</span></div>
-            <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:300;letter-spacing:4px;text-transform:uppercase;color:#e8d5a3;margin-top:8px;opacity:0.85;text-shadow:0 1px 8px rgba(0,0,0,0.8);">Subscribe · cancel anytime</div>
-          </div>
-          <!-- Title + description sit directly above the Upgrade button -->
-          <div style="position:absolute;bottom:88px;left:20px;right:20px;z-index:2;">
-            <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.7);">Unlock your full<br>healing potential</div>
-            <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.82);line-height:1.6;max-width:280px;text-shadow:0 1px 8px rgba(0,0,0,0.7);">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
-          </div>
-          <!-- Upgrade button pinned to the bottom -->
-          <div style="position:absolute;bottom:24px;left:20px;right:20px;z-index:2;display:flex;align-items:center;gap:12px;">
-            <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
-            <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.85);letter-spacing:0.5px;">from $4.99/mo</div>
-          </div>
-        </div>
+    <div class="nmh-fsec" onclick="if(window.SS)SS.open('subscription')">
+      <div class="sub-promo-plan">
+        <span class="sub-promo-plan-a">NowssB Edition</span>
+        <span class="sub-promo-plan-b">Free Plan</span>
       </div>
+      <div class="sub-promo-offer">
+        <div class="sub-promo-lead">Join today for</div>
+        <div class="sub-promo-big">30 Days <span>Free</span></div>
+        <div class="sub-promo-small">Subscribe · cancel anytime</div>
+      </div>
+      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
+        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
+               src="assets/video/subscription-promo.mp4"
+               poster="assets/video/subscription-promo-poster.webp"></video>
+      </div>
+      <div class="sub-promo-copy">
+        <div class="sub-promo-title">Unlock your full healing potential</div>
+        <div class="sub-promo-sub">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
+      </div>
+      <div class="sub-promo-cta">
+        <div class="sub-promo-btn">Upgrade Now</div>
+        <div class="sub-promo-price">from $4.99/mo</div>
+      </div>
+    
     </div>
 
     <!-- ══ HEALTH JOURNEY CARD — same section the Fashion Home carries ══ -->
@@ -2202,41 +2197,33 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        the aperture rather than against the bezel. -->
   <!-- Your Edition, in its glass wrapper — see the Normal home. -->
   <div class="nedi-blk glass-wrap">
-    <div id="sub-promo-card" class="nwsb-inframe dev-tabs-p" style="display:none;width:calc(100% - 32px);min-height:560px;margin:0 16px 16px;position:relative;overflow:hidden;border-radius:16px;background:#060c18;border:1px solid rgba(232,213,163,0.2);padding:0;" onclick="SS&&SS.open('subscription')">
-      <div class="fsec-screen">
-        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none" src="assets/video/subscription-promo.mp4" poster="assets/video/subscription-promo-poster.webp"></video>
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(6,12,24,0.0) 0%, rgba(6,12,24,0.15) 40%, rgba(6,12,24,0.72) 100%);"></div>
-        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(232,213,163,0.4),transparent);"></div>
-        <!-- Labels pinned to top of card -->
-        <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
-        </div>
-        <!-- The offer, top left, under the brand row — the layout an app-store
-             promo uses: the mark, then the number, then the small print.
-
-             Typed the way this app types a headline, which is .login-title:
-             one 42px DM Sans line split between weight 800 and weight 200,
-             with a 9px letter-spaced-4 uppercase accent line under it. Not a
-             new look — the same one the sign-in screen opens with.
-
-             clamp() because the tablet's aperture is narrower than the phone
-             and a fixed 42px wraps "30 Days Free" onto three lines there. -->
-        <div class="sub-promo-offer" style="position:absolute;top:46px;left:20px;right:20px;z-index:2;">
-          <div style="font-family:'DM Sans',sans-serif;font-size:clamp(15px,4.4vw,19px);font-weight:200;color:rgba(255,255,255,0.88);line-height:1.15;text-shadow:0 2px 14px rgba(0,0,0,0.8);">Join today for</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:clamp(30px,9vw,44px);font-weight:800;color:#fff;line-height:1.02;letter-spacing:-1px;margin-top:2px;text-shadow:0 2px 20px rgba(0,0,0,0.85);">30 Days <span style="color:#e8d5a3;">Free</span></div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:300;letter-spacing:4px;text-transform:uppercase;color:#e8d5a3;margin-top:8px;opacity:0.85;text-shadow:0 1px 8px rgba(0,0,0,0.8);">Subscribe · cancel anytime</div>
-        </div>
-        <!-- Title + description sit directly above the Upgrade button -->
-        <div style="position:absolute;bottom:88px;left:20px;right:20px;z-index:2;">
-          <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.7);">Unlock your full<br>healing potential</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.82);line-height:1.6;max-width:280px;text-shadow:0 1px 8px rgba(0,0,0,0.7);">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
-        </div>
-        <!-- Upgrade button pinned to the bottom -->
-        <div style="position:absolute;bottom:24px;left:20px;right:20px;z-index:2;display:flex;align-items:center;gap:12px;">
-          <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.85);letter-spacing:0.5px;">from $4.99/mo</div>
-        </div>
+    <div id="sub-promo-card" style="display:none;" onclick="SS&&SS.open('subscription')">
+      <!-- Three parts, in the order you read them: what is on
+           offer, the set playing it, and the way in. All of this
+           used to be absolutely placed INSIDE .fsec-screen, on top
+           of the clip — two things in one rectangle. Nothing
+           overlaps now because nothing shares a box. -->
+      <div class="sub-promo-plan">
+        <span class="sub-promo-plan-a">NowssB Edition</span>
+        <span class="sub-promo-plan-b">Free Plan</span>
+      </div>
+      <div class="sub-promo-offer">
+        <div class="sub-promo-lead">Join today for</div>
+        <div class="sub-promo-big">30 Days <span>Free</span></div>
+        <div class="sub-promo-small">Subscribe · cancel anytime</div>
+      </div>
+      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
+        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
+               src="assets/video/subscription-promo.mp4"
+               poster="assets/video/subscription-promo-poster.webp"></video>
+      </div>
+      <div class="sub-promo-copy">
+        <div class="sub-promo-title">Unlock your full healing potential</div>
+        <div class="sub-promo-sub">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
+      </div>
+      <div class="sub-promo-cta">
+        <div class="sub-promo-btn">Upgrade Now</div>
+        <div class="sub-promo-price">from $4.99/mo</div>
       </div>
     </div>
   </div>

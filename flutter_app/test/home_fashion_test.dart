@@ -18,6 +18,7 @@ import 'package:nowssb/widgets/nwsb_icon.dart';
 import 'package:nowssb/screens/fashion/follow_steps.dart';
 import 'package:nowssb/screens/shared_sections.dart';
 import 'package:nowssb/widgets/glass_wrap.dart';
+import 'package:nowssb/widgets/tv_frame.dart';
 import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 
@@ -238,12 +239,18 @@ void main() {
       reason: 'the subscription promo belongs in a glass wrapper',
     );
 
-    // The offer sits ABOVE the card's own lower copy, not under it.
-    final offer = tester.getTopLeft(find.text('Join today for'));
-    final lower =
-        tester.getTopLeft(find.text('Unlock your full\nhealing potential'));
-    expect(offer.dy, lessThan(lower.dy),
-        reason: 'the offer belongs at the top of the card');
+    // The offer is ABOVE the set, and the button BELOW it — nothing is
+    // drawn over the clip any more.
+    final offer = tester.getBottomLeft(find.text('Join today for'));
+    final tv = tester.getRect(find.descendant(
+      of: find.byType(EditionSection),
+      matching: find.byType(TvFrame),
+    ));
+    final button = tester.getTopLeft(find.text('Upgrade Now'));
+    expect(offer.dy, lessThanOrEqualTo(tv.top + 1),
+        reason: 'the offer must clear the set, not sit on it');
+    expect(button.dy, greaterThanOrEqualTo(tv.bottom - 1),
+        reason: 'the button belongs outside the set, under it');
     expect(tester.takeException(), isNull);
   });
 

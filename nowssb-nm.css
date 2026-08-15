@@ -15212,3 +15212,98 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
 /* Nothing follows the pills at the foot any more, so the gap they used to
    hold open for the button goes with it. */
 .nss-trigger-bottom > .nss-trigger-pills:last-child { margin-bottom: 0; }
+
+/* ══════════════════════════════════════════════════════════════════
+   THE SUBSCRIPTION PROMO — three parts, none of them on the screen.
+
+   #sub-promo-card and .nmh-fsec used to be a device with everything
+   absolutely placed inside its aperture: the plan labels, the promise, the
+   benefits and Upgrade Now, all stacked on top of a film that has its own
+   picture to show. Two things in one rectangle and the reader gets neither.
+
+   Now the card is a plain column inside the section's own wrapper — the
+   offer, then the set, then the way in — so nothing overlaps because
+   nothing shares a box.
+   ══════════════════════════════════════════════════════════════════ */
+#sub-promo-card, #home-nm .nmh-fsec {
+  position: relative; width: 100%; box-sizing: border-box; cursor: pointer;
+  background: none; border: none; box-shadow: none; padding: 0;
+  aspect-ratio: auto !important; min-height: 0 !important; overflow: visible;
+}
+.sub-promo-plan { display: flex; align-items: center; justify-content: space-between; }
+.sub-promo-plan-a {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: #e8d5a3;
+}
+.sub-promo-plan-b {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 500;
+  letter-spacing: 1.5px; text-transform: uppercase; color: rgba(200,232,245,0.75);
+}
+.sub-promo-offer { margin-top: 12px; }
+/* .login-title's own split — weight 200 over weight 800, accent line under. */
+.sub-promo-lead {
+  font-family: 'DM Sans', sans-serif; font-size: clamp(15px,4.4vw,19px);
+  font-weight: 200; line-height: 1.15;
+}
+.sub-promo-big {
+  font-family: 'DM Sans', sans-serif; font-size: clamp(30px,9vw,44px);
+  font-weight: 800; line-height: 1.02; letter-spacing: -1px; margin-top: 2px;
+}
+.sub-promo-big span { color: #e8d5a3; }
+.sub-promo-small {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 300;
+  letter-spacing: 4px; text-transform: uppercase; color: #e8d5a3;
+  margin-top: 8px; opacity: 0.85;
+}
+.sub-promo-tv { margin-top: 14px; }
+.sub-promo-copy { margin-top: 16px; }
+.sub-promo-title {
+  font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800;
+  line-height: 1.2; letter-spacing: -0.4px;
+}
+.sub-promo-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
+  line-height: 1.6; margin-top: 8px;
+}
+.sub-promo-cta { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.sub-promo-btn {
+  flex: 1; background: #fff; color: #060c18; text-align: center;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; padding: 14px 16px;
+}
+.sub-promo-price {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.5px;
+  color: rgba(232,213,163,0.85);
+}
+/* On the dark home the words are white; on the pale one they are ink. */
+:is(#home, .stw-prev-stage) .sub-promo-lead { color: rgba(255,255,255,0.88); }
+:is(#home, .stw-prev-stage) .sub-promo-big,
+:is(#home, .stw-prev-stage) .sub-promo-title { color: #fff; }
+:is(#home, .stw-prev-stage) .sub-promo-sub { color: rgba(255,255,255,0.82); }
+#home-nm .sub-promo-lead { color: rgba(20,20,40,0.72); }
+#home-nm .sub-promo-big, #home-nm .sub-promo-title { color: #14142c; }
+#home-nm .sub-promo-sub { color: rgba(20,20,40,0.62); }
+#home-nm .sub-promo-plan-b { color: rgba(20,20,40,0.5); }
+#home-nm .sub-promo-small, #home-nm .sub-promo-plan-a { color: #9a7f36; }
+#home-nm .sub-promo-price { color: #9a7f36; }
+#home-nm .sub-promo-btn { background: #14142c; color: #fff; border-radius: 14px !important; }
+
+/* ── The kiosk ──
+   A portrait display on a stand, the wordmark printed on its top bezel.
+   Trimmed render 815x1511, aperture 773x1379 — 9:16 to within a pixel, so a
+   720x1280 clip fills it with nothing cropped. Percentages of the WIDTH, the
+   same as every other .nwsb-inframe here. */
+.nwsb-inframe.dev-tv-kiosk {
+  padding: 3.804% 2.454% 12.270% 2.699%;
+  aspect-ratio: 815 / 1511;
+}
+/* The bezel is the ::after, the same as every other frame here — it is a
+   transparent-aperture picture drawn OVER the clip, not a background. */
+.nwsb-inframe.dev-tv-kiosk::after {
+  background-image: url('./assets/frames/tv-kiosk-portrait.webp');
+}
+/* The clip fills the aperture the padding leaves. */
+.sub-promo-tv > video {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+  background: #000;
+}

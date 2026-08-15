@@ -189,10 +189,21 @@ class VideoPool {
   /// to.
   static const int maxLive = 8;
 
-  /// How long a clip gets to open before it counts as failed. Generous
-  /// enough for a Cloudinary file on a slow connection, short enough that a
-  /// stalled one is not mistaken for a working one.
-  static const _openTimeout = Duration(seconds: 12);
+  /// How long a clip gets to open before it counts as failed.
+  ///
+  /// TWO NUMBERS, because the two cases are nothing alike. A remote clip can
+  /// stall forever and 12 seconds is already generous for one. A BUNDLED file
+  /// cannot stall — there is no network in front of it — it can only be slow,
+  /// and it is slowest exactly when several open at once on a busy device,
+  /// which is the moment a deadline must not fire.
+  ///
+  /// A single 12s deadline for both is what put
+  /// `store-section.mp4: TimeoutException after 0:00:12` on the debug
+  /// readout: a local asset, killed mid-open, its slot handed back, and the
+  /// section left showing a still for no reason at all. Failing a file that
+  /// was going to work is worse than waiting for it.
+  static const _openRemote = Duration(seconds: 12);
+  static const _openLocal = Duration(seconds: 45);
 
   /// How long any single platform round trip gets before the pool stops
   /// waiting on it. Nothing in here is allowed to wait forever.
@@ -200,7 +211,7 @@ class VideoPool {
 
   /// The longest a whole pass may take before [_passGuard] declares it hung
   /// and lets a new one start.
-  static const _passLimit = Duration(seconds: 45);
+  static const _passLimit = Duration(seconds: 90);
 
   /// Deadline timers currently ticking, so they can be called off.
   ///
@@ -591,7 +602,11 @@ class VideoPool {
       // one — initialize() does not time out on its own, it simply does not
       // return. An un-deadlined await here is the difference between "this
       // clip is slow" and "this app plays no video again until you kill it".
-      await _byThen(c.initialize(), _openTimeout, 'opening ${l.assetPath}');
+      await _byThen(
+        c.initialize(),
+        _isRemote(l.assetPath) ? _openRemote : _openLocal,
+        'opening ${l.assetPath}',
+      );
     } catch (e) {
       // A clip that will not open is not worth taking the app down for. The
       // poster is already on screen and stays there — and now the reason is

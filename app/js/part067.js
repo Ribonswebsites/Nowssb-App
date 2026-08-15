@@ -21,8 +21,37 @@
   var PLACE = [
     /* Above the NowssB Store section, on both homes. In the repo rather
        than on a CDN — the store is the thing the app sells from, and its
-       banner should not be one network hop away from not being there. */
-    { top:    '#home-nm .nmh-store-wrap',          vid: './assets/video/store-banner.mp4?v=1' },
+       banner should not be one network hop away from not being there.
+
+       THE NORMAL HOME'S IS A SECTION NOW, not a loose clip.
+       It used to drop in bare: no frame, no heading, no bar — a film lying
+       on the page above the store card with nothing saying what it was,
+       while the Fashion home carried the same thing as a proper block. So
+       it gets what every other block gets, and the same way they get it:
+       `wrap` for the card, `head` for the orb and its two lines, and the
+       black bar underneath. On the tablet, because a clip on this page
+       without a device around it is the one thing here that is not.
+
+       `.fash-storeban-wrap` is deliberate: app/js/part062.js:82 registers
+       'storeban' on the NORMAL home against that selector and there has
+       never been an element for it to match, so this fills a slot the
+       layout editor already believes in. The class's own styling is scoped
+       to `#home` (nowssb-nm.css:15095), so it brings no Fashion look with
+       it — `nwsb-vbwrap` is what makes it the pale card here.
+
+       `before`, not `top`: the block is the store section's neighbour, not
+       something inside it. */
+    { before: '#home-nm .nmh-store-wrap',          vid: './assets/video/store-banner-fash.mp4?v=1',
+      frame: 'dev-tab-l', wrap: 'nwsb-vbwrap fash-storeban-wrap',
+      head: { hello:'Own the sounds that heal', name:'Inside the Store',
+              icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z\" stroke=\"#fff\" stroke-width=\"1.6\"/><path d=\"M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10\" stroke=\"#fff\" stroke-width=\"1.6\"/></svg>",
+              banName:'Shop the Library', banSub:'Words, meanings and the origins behind them',
+              banGo: function () {
+                var s = document.getElementById('sub-nowssb-store');
+                if (s) s.classList.add('open');
+                var iv = document.getElementById('nssIntroVid');
+                if (iv) { iv.muted = true; try { iv.play().catch(function () {}); } catch (e) {} }
+              } } },
     /* The Fashion store's own clip, not the one the Normal home uses. It
        lands INSIDE .fash-store-wrap because `before` inserts into the
        trigger's parent, which is that wrapper now — between the head and
