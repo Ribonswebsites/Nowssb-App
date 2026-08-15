@@ -1,9 +1,13 @@
 /// The start animation — the film that opens the app.
 ///
-/// One clip, once, then the app. Same as the website, and the same standing
-/// rule about the file itself: assets/video/start-animation.mp4 is not
-/// re-encoded, not muted at the file level, not touched. It is played muted
-/// here, which is a decision about this playback rather than about the clip.
+/// One clip, once, WITH SOUND, then the app. Same standing rule about the
+/// file itself: assets/video/start-animation.mp4 is not re-encoded, not
+/// re-cut, not touched — only played.
+///
+/// It is the one thing in this app that is heard. Every other clip is a
+/// background loop and is muted, which is what `<video muted>` on all of
+/// them means on the web; this one is the app introducing itself and it has
+/// an audio track for that reason.
 ///
 /// It does NOT go through the pool. The pool exists to stop a hundred idle
 /// decoders existing at once; the splash is one clip, it is the only thing on
@@ -71,7 +75,15 @@ class _SplashState extends State<Splash> {
       await c.dispose();
       return;
     }
-    await c.setVolume(0);
+    // WITH SOUND. The clip has an audio track and this is the one place in
+    // the app where a film is the whole screen and the whole moment — the
+    // app introducing itself, once, before anything else. Everything else
+    // that plays here is a background loop and stays muted, which is what
+    // `<video muted>` on every one of them means on the web.
+    //
+    // Android routes this through the media stream, so the phone's own
+    // silent switch and volume still decide whether it is heard.
+    await c.setVolume(1);
     await c.setLooping(false);
     await c.setPlaybackSpeed(_speed);
     c.addListener(_watch);

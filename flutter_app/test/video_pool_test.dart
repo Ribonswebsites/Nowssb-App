@@ -63,7 +63,7 @@ void main() {
         reason: 'an off-screen clip must never cost a decoder');
   });
 
-  test('a hundred clips on screen at once still only ask for four', () async {
+  test('a hundred clips on screen at once still only ask for the ceiling', () async {
     final leases = [
       for (var i = 0; i < 100; i++)
         VideoPool.instance.lease('assets/video/clip-$i.mp4'),
@@ -84,8 +84,8 @@ void main() {
       () async {
     final far = VideoPool.instance.lease('assets/video/far.mp4');
     final near = VideoPool.instance.lease('assets/video/near.mp4');
-    for (var i = 0; i < 6; i++) {
-      VideoPool.instance.lease('assets/video/other-$i.mp4')
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
+      VideoPool.instance.lease('assets/video/other-\$i.mp4')
           .reportDistance(500);
     }
     far.reportDistance(4000);
@@ -101,8 +101,8 @@ void main() {
   test('a feature clip outranks decoration however far away it is', () async {
     final tv = VideoPool.instance.lease('assets/video/tv-screen.mp4',
         priority: ClipPriority.feature);
-    for (var i = 0; i < 8; i++) {
-      VideoPool.instance.lease('assets/video/banner-$i.mp4').reportDistance(5);
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
+      VideoPool.instance.lease('assets/video/banner-\$i.mp4').reportDistance(5);
     }
     // The television is the furthest thing on screen and still keeps a slot,
     // because a section whose entire point is its clip must not be the one
@@ -144,7 +144,11 @@ void main() {
     for (var scroll = 0; scroll < 30; scroll++) {
       for (var i = 0; i < leases.length; i++) {
         final d = (i - scroll).abs() * 400.0;
-        leases[i].reportDistance(d > 900 ? double.infinity : d);
+        // The window has to hold MORE than the ceiling or this test stops
+        // testing the ceiling and starts testing how many rows the fixture
+        // happened to call visible.
+        leases[i].reportDistance(
+            d > VideoPool.maxLive * 250 ? double.infinity : d);
       }
       await pumpPool();
       if (platform.alive > peak) peak = platform.alive;
@@ -155,6 +159,28 @@ void main() {
     expect(peak, VideoPool.maxLive, reason: 'the pool should stay full');
     expect(platform.created.length, greaterThan(VideoPool.maxLive),
         reason: 'clips really were recycled, not just created once');
+  });
+
+  test('everything visible plays when there is room for it', () async {
+    // The other side of the ceiling, and the one that matters on a real
+    // page: when FEWER clips are on screen than the pool can serve, every
+    // one of them decodes. A section that is plainly on screen and showing
+    // a still is the bug this asserts against.
+    final visible = VideoPool.maxLive - 2;
+    final leases = [
+      for (var i = 0; i < visible; i++)
+        VideoPool.instance.lease('assets/video/seen-\$i.mp4'),
+    ];
+    for (final l in leases) {
+      l.reportDistance(120);
+    }
+    await pumpPool();
+
+    expect(VideoPool.instance.liveCount, visible,
+        reason: 'with room to spare, nothing on screen should be a still');
+    for (final l in leases) {
+      expect(l.controller, isNotNull);
+    }
   });
 
   test('disposing a lease releases its player even while it holds one',
@@ -172,7 +198,7 @@ void main() {
   });
 
   test('backgrounding the app hands every decoder back', () async {
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();
@@ -194,7 +220,7 @@ void main() {
     // that struggle most, the launch would be the worst moment of the
     // session.
     VideoPool.instance.hold();
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();
@@ -212,7 +238,7 @@ void main() {
   });
 
   test('coming back to the foreground takes them again', () async {
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();

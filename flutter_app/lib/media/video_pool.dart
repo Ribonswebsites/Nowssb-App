@@ -153,13 +153,25 @@ class VideoPool {
 
   static final VideoPool instance = VideoPool._();
 
-  /// The ceiling. Four is deliberately conservative: it is under the limit
-  /// of every Android device the app will meet, including the cheap ones,
-  /// and a phone screen 900 logical pixels tall physically cannot show more
-  /// than three or four clips at a size where anyone can tell they are
-  /// moving. Raising this does not make the app look better; it makes it
-  /// crash on the devices that were already struggling.
-  static const int maxLive = 4;
+  /// The ceiling.
+  ///
+  /// This was 4, and 4 was too few — not in theory, on the page. The Fashion
+  /// home's film fills the screen and holds one slot for the whole session,
+  /// so three were left for everything else, and the hero's television and
+  /// the Customize · Features · Earn strip take two of those between them.
+  /// Anything below them showed a poster while it was plainly on screen.
+  ///
+  /// Eight is still a ceiling and still the point of this class — a hundred
+  /// clips on a page cost eight decoders, which is what the website could
+  /// not do. It is comfortably inside what Android has given for concurrent
+  /// AVC decode on anything of the last several years, and every clip here
+  /// is a short muted loop rather than a 4K stream.
+  ///
+  /// IF A DEVICE EVER STRUGGLES, THIS IS THE ONE NUMBER TO LOWER. Nothing
+  /// else has to change: every test asserts against this constant rather
+  /// than against the literal, so the invariant holds at whatever it is set
+  /// to.
+  static const int maxLive = 8;
 
   final List<VideoLease> _leases = [];
   final Set<VideoLease> _live = {};
