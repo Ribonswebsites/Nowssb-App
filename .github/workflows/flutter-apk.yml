@@ -18,9 +18,17 @@ name: Flutter APK
 # which has no such filter, ran from the same kind of push minutes earlier.
 # Rather than keep guessing at the filter, it runs on every push to main. A
 # few spare runner minutes is a cheaper problem than a build you cannot get.
+#
+# IT ALSO BUILDS THE WORK BRANCHES. Only building main meant every APK
+# installed for review was main's — so a whole session's work could be
+# written, pushed and reviewed against a build that did not contain any of
+# it. That is not a slow feedback loop, it is a wrong one: the screenshots
+# coming back were of code that had already been deleted.
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'claude/**'
   workflow_dispatch:
 
 defaults:

@@ -16,7 +16,11 @@ name: Android APK
 
 on:
   push:
-    branches: [main]
+    # Work branches too — see the note in flutter-apk.yml. An APK built only
+    # from main cannot be used to review anything that is not on main yet.
+    branches:
+      - main
+      - 'claude/**'
     paths-ignore: ['**.md']
   workflow_dispatch:
 

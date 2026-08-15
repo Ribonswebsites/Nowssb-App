@@ -230,19 +230,49 @@ class _HomeFashionState extends State<HomeFashion> {
               priority: ClipPriority.feature,
             ),
           ),
-          // A scrim, or nothing on top of it is readable. The film is busy
-          // and bright in places and the whole page is white type.
+          // `#fpBgVeil` — nowssb-nm.css:10853. TWO layers, and the point of
+          // both is that the MIDDLE OF THE SCREEN IS LEFT ALONE: a radial
+          // that pulls only the corners down, and a light top-and-bottom
+          // weight so the header and the tab bar have something to sit on.
+          //
+          // What was here was a solid scrim at 85% / 95% / 98%, which is not
+          // a vignette — it is a lid. The film was playing underneath it and
+          // could not be seen at all, which is exactly what the page looked
+          // like: black.
           const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xD9060C18),
-                    Color(0xF2060C18),
-                    Color(0xFA060C18),
-                  ],
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(0, -0.1), // 50% 45%
+                    radius: 0.88,
+                    colors: [
+                      Color(0x00000000),
+                      Color(0x24000000), // rgba(0,0,0,0.14)
+                      Color(0x57000000), // rgba(0,0,0,0.34)
+                      Color(0x94000000), // rgba(0,0,0,0.58)
+                    ],
+                    stops: [0.30, 0.58, 0.80, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x42000000), // rgba(0,0,0,0.26)
+                      Color(0x00000000),
+                      Color(0x00000000),
+                      Color(0x57000000), // rgba(0,0,0,0.34)
+                    ],
+                    stops: [0, 0.20, 0.76, 1.0],
+                  ),
                 ),
               ),
             ),
