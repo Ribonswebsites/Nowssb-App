@@ -16,6 +16,8 @@ import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/widgets/home_parts.dart';
 import 'package:nowssb/widgets/nwsb_icon.dart';
 import 'package:nowssb/screens/fashion/follow_steps.dart';
+import 'package:nowssb/screens/shared_sections.dart';
+import 'package:nowssb/widgets/glass_wrap.dart';
 import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 
@@ -200,6 +202,49 @@ void main() {
     ));
     expect(tile.height, closeTo(118 * 2 + 10, 1),
         reason: 'two rows of 118 and one 10px gap');
+  });
+
+  testWidgets('the subscription promo carries the offer, top left',
+      (tester) async {
+    // index.html:2199 — the same three lines, in the same order, in the same
+    // corner as the web card. The point of the section is the offer; a promo
+    // whose headline silently stopped being placed still lays out fine and
+    // still scrolls, so nothing else here would notice.
+    await pump(tester);
+
+    final list = find.byType(Scrollable).first;
+    for (var i = 0;
+        i < 60 && find.text('Join today for').evaluate().isEmpty;
+        i++) {
+      await tester.drag(list, const Offset(0, -320));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+
+    expect(find.text('Join today for'), findsOneWidget);
+    expect(find.text('SUBSCRIBE · CANCEL ANYTIME'), findsOneWidget);
+
+    // And the whole card sits on a glass pane, like every other section on
+    // this home. SectionPane is what decides that per home — glass here, the
+    // pale neumorphic card on the Normal home — so this asserts the section
+    // goes through it rather than drawing itself bare.
+    // The pane is the section's own root — EditionSection returns a
+    // SectionPane — so the glass is INSIDE it, not around it.
+    expect(
+      find.descendant(
+        of: find.byType(EditionSection),
+        matching: find.byType(GlassWrap),
+      ),
+      findsOneWidget,
+      reason: 'the subscription promo belongs in a glass wrapper',
+    );
+
+    // The offer sits ABOVE the card's own lower copy, not under it.
+    final offer = tester.getTopLeft(find.text('Join today for'));
+    final lower =
+        tester.getTopLeft(find.text('Unlock your full\nhealing potential'));
+    expect(offer.dy, lessThan(lower.dy),
+        reason: 'the offer belongs at the top of the card');
+    expect(tester.takeException(), isNull);
   });
 
   // ── Follow the steps ────────────────────────────────────────────────

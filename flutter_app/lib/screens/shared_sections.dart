@@ -86,7 +86,7 @@ class EditionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionPane(
       child: TvFrame(
-        asset: 'assets/video/subscription-a.mp4',
+        asset: 'assets/video/subscription-promo.mp4',
         frame: DeviceFrame.tabletSlim,
         priority: ClipPriority.decoration,
         onTap: onTap,
@@ -135,6 +135,8 @@ class EditionSection extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 14),
+                  const _PromoOffer(),
                   const Spacer(),
                   const Text(
                     'Unlock your full\nhealing potential',
@@ -193,6 +195,87 @@ class EditionSection extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The offer, top left, under the brand row — the layout an app-store promo
+/// uses: the mark, then the number, then the small print.
+///
+/// Typed the way this app types a headline, which is `.login-title`
+/// (app/app.css): one 42px DM Sans line split between weight 800 and weight
+/// 200, with a 9px letter-spaced-4 uppercase accent line under it. Not a new
+/// look — the same one the sign-in screen opens with.
+///
+/// The big line is scaled down to fit rather than allowed to wrap. This sits
+/// inside a tablet's aperture, which is narrower than the card that holds it,
+/// and "30 Days Free" at a fixed 44px runs to three lines in there.
+class _PromoOffer extends StatelessWidget {
+  const _PromoOffer();
+
+  /// `text-shadow: 0 2px 20px rgba(0,0,0,0.85)`. The clip behind this is
+  /// bright in places, and the headline has to hold on all ten seconds of it.
+  static const _lift = [
+    Shadow(color: Color(0xD9000000), blurRadius: 20, offset: Offset(0, 2)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Join today for',
+          style: TextStyle(
+            fontSize: 19,
+            fontWeight: FontWeight.w200,
+            color: Color(0xE0FFFFFF),
+            height: 1.15,
+            shadows: _lift,
+          ),
+        ),
+        SizedBox(height: 2),
+        // `clamp(30px, 9vw, 44px)` on the web; here the same thing, done by
+        // shrinking to the width there actually is.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text.rich(
+            TextSpan(
+              style: TextStyle(
+                fontSize: 44,
+                fontWeight: FontWeight.w800,
+                height: 1.02,
+                letterSpacing: -1,
+                color: Colors.white,
+                shadows: _lift,
+              ),
+              children: [
+                TextSpan(text: '30 Days '),
+                TextSpan(
+                  text: 'Free',
+                  style: TextStyle(color: NwsbColors.goldLight),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        Opacity(
+          opacity: 0.85,
+          child: Text(
+            'SUBSCRIBE · CANCEL ANYTIME',
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w300,
+              letterSpacing: 4,
+              color: NwsbColors.goldLight,
+              shadows: _lift,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
