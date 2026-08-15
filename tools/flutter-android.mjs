@@ -22,7 +22,14 @@
 //      packages do not apply this for you — without it the json is inert and
 //      Firebase.initializeApp() fails at runtime with no default options.
 //
-//   5. THE INTERNET PERMISSION.  flutter create writes it into the debug and
+//   5. THE LAUNCHER ICON.  flutter create ships its own blue Flutter mark in
+//      every mipmap folder, so the app installs on the home screen under
+//      somebody else's logo. The app's icon is the same file the PWA is
+//      installed under — assets/icons/app-icon-512.png, the one named in
+//      manifest.json — and it is written into the five densities here
+//      because android/res is generated and would lose it otherwise.
+//
+//   6. THE INTERNET PERMISSION.  flutter create writes it into the debug and
 //      profile manifests ONLY, so everything this app does over a network
 //      works while you develop and is dead in the APK you ship: Firestore,
 //      sign-in, notifications, and the Cloudinary artwork the pages are drawn
@@ -36,6 +43,7 @@
 //   node tools/flutter-android.mjs
 
 import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -154,6 +162,49 @@ if (a.includes('coreLibraryDesugaring(')) {
 }
 
 writeFileSync(appGradle, a);
+
+// ── the launcher icon ──────────────────────────────────────────────────
+// The SAME file the PWA installs under. manifest.json names
+// assets/icons/app-icon-512.png as the 512 icon, so the phone shows one mark
+// whichever of the two the reader installed — which is the point of them
+// being one app.
+const ICON_SRC = join(root, 'assets', 'icons', 'app-icon-512.png');
+/** Android's five launcher densities, in px. */
+const MIPMAPS = {
+  'mipmap-mdpi': 48,
+  'mipmap-hdpi': 72,
+  'mipmap-xhdpi': 96,
+  'mipmap-xxhdpi': 144,
+  'mipmap-xxxhdpi': 192,
+};
+const res = join(android, 'app', 'src', 'main', 'res');
+if (!existsSync(ICON_SRC)) {
+  console.error(`missing ${ICON_SRC}`);
+  process.exit(1);
+}
+// Written by a tiny Python step because resizing a PNG properly needs a real
+// image library, and Pillow is already what tools/asset-manifest.mjs leans on.
+{
+  const plan = Object.entries(MIPMAPS)
+    .map(([dir, px]) => `${join(res, dir, 'ic_launcher.png')}\t${px}`)
+    .join('\n');
+  const py = `
+import sys
+from PIL import Image
+src = Image.open(${JSON.stringify(ICON_SRC)}).convert('RGBA')
+for line in sys.stdin.read().strip().split('\\n'):
+    path, px = line.split('\\t')
+    px = int(px)
+    src.resize((px, px), Image.LANCZOS).save(path, 'PNG')
+print('ok')
+`;
+  const out = spawnSync('python3', ['-c', py], { input: plan, encoding: 'utf8' });
+  if (out.status !== 0) {
+    console.error('could not write launcher icons:\n' + (out.stderr || ''));
+    process.exit(1);
+  }
+  done.push('wrote ic_launcher at five densities from app-icon-512.png');
+}
 
 // ── the manifest ───────────────────────────────────────────────────────
 // See note 4 at the head of this file. Without INTERNET in the MAIN manifest

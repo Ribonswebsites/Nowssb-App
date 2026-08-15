@@ -205,3 +205,29 @@ exactly the hole the website had, and `test/home_test.dart` checks for it.
 - **`functions/api/push.js`** stays on Cloudflare. It already sends to FCM
   tokens as well as Web Push endpoints.
 - **The website** is unaffected by any of this and keeps shipping.
+
+## The app's marks — which file is which
+
+Four different NOWSSB images live in this repository and they are NOT crops
+of each other. Picking the wrong one is easy and has happened, so:
+
+| file | what it is |
+|---|---|
+| `assets/icons/app-icon-512.png` | **THE APP ICON.** Square, rounded. What the phone shows on the home screen. |
+| `assets/icons/app-icon-192.png` | the same icon, small |
+| `assets/icons/notif-icon-512.png` | a CIRCULAR disc on black — notifications only |
+| `assets/icons/logo-disc.webp` | circular, plain, **no headphones** — a header fallback |
+
+**`app-icon-512.png` is the app icon, on the phone.** `manifest.json` names
+it as the PWA's 512 icon, so the home-screen mark is the same whichever of
+the two the reader installed — which is the point of them being one app.
+`tools/flutter-android.mjs` resizes it into all five Android mipmap
+densities on the way into every build, because `android/res` is generated
+and `flutter create` fills it with the blue Flutter logo otherwise.
+
+Two more that are NOT in the repository and are fetched:
+
+- the header's headphones disc —
+  `res.cloudinary.com/ds6duqabl/…/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png`
+- the browser-tab favicon and the share card, both crops of one photograph —
+  `res.cloudinary.com/dkzxw33ln/…/grok_image_1776871816898_3_ll7c0m.jpg`
