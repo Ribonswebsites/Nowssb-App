@@ -166,7 +166,7 @@ void main() {
     // page: when FEWER clips are on screen than the pool can serve, every
     // one of them decodes. A section that is plainly on screen and showing
     // a still is the bug this asserts against.
-    final visible = VideoPool.maxLive - 2;
+    const visible = VideoPool.maxLive - 2;
     final leases = [
       for (var i = 0; i < visible; i++)
         VideoPool.instance.lease('assets/video/seen-\$i.mp4'),
