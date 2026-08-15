@@ -50,8 +50,7 @@ void main() {
     await VideoPool.instance.debugReset();
   });
 
-  test('a hundred off-screen clips ask the phone for nothing at all',
-      () async {
+  test('a hundred off-screen clips ask the phone for nothing at all', () async {
     for (var i = 0; i < 100; i++) {
       VideoPool.instance.lease('assets/video/clip-$i.mp4');
     }
@@ -63,7 +62,8 @@ void main() {
         reason: 'an off-screen clip must never cost a decoder');
   });
 
-  test('a hundred clips on screen at once still only ask for the ceiling', () async {
+  test('a hundred clips on screen at once still only ask for the ceiling',
+      () async {
     final leases = [
       for (var i = 0; i < 100; i++)
         VideoPool.instance.lease('assets/video/clip-$i.mp4'),
@@ -85,7 +85,8 @@ void main() {
     final far = VideoPool.instance.lease('assets/video/far.mp4');
     final near = VideoPool.instance.lease('assets/video/near.mp4');
     for (var i = 0; i < VideoPool.maxLive * 2; i++) {
-      VideoPool.instance.lease('assets/video/other-\$i.mp4')
+      VideoPool.instance
+          .lease('assets/video/other-\$i.mp4')
           .reportDistance(500);
     }
     far.reportDistance(4000);
@@ -99,8 +100,8 @@ void main() {
   });
 
   test('a feature clip outranks decoration however far away it is', () async {
-    final tv = VideoPool.instance.lease('assets/video/tv-screen.mp4',
-        priority: ClipPriority.feature);
+    final tv = VideoPool.instance
+        .lease('assets/video/tv-screen.mp4', priority: ClipPriority.feature);
     for (var i = 0; i < VideoPool.maxLive * 2; i++) {
       VideoPool.instance.lease('assets/video/banner-\$i.mp4').reportDistance(5);
     }
@@ -147,8 +148,8 @@ void main() {
         // The window has to hold MORE than the ceiling or this test stops
         // testing the ceiling and starts testing how many rows the fixture
         // happened to call visible.
-        leases[i].reportDistance(
-            d > VideoPool.maxLive * 250 ? double.infinity : d);
+        leases[i]
+            .reportDistance(d > VideoPool.maxLive * 250 ? double.infinity : d);
       }
       await pumpPool();
       if (platform.alive > peak) peak = platform.alive;
@@ -181,6 +182,57 @@ void main() {
     for (final l in leases) {
       expect(l.controller, isNotNull);
     }
+  });
+
+  test('one clip that never opens does not stop the rest', () async {
+    // THE `decoders 1/8  playing 1` BUG, kept.
+    //
+    // A Cloudinary clip on a bad connection is created and then says
+    // nothing — initialize() does not fail, it does not return. The pool
+    // used to await every bring-up before finishing its pass, so that one
+    // clip held the pass open; _rebalancing stayed true, every later
+    // request set _again and returned, and no decoder was granted again for
+    // the life of the app. On the phone: four clips on screen, eight slots
+    // free, one player running.
+    //
+    // The stalled clip is still allowed to hold its own slot until it times
+    // out. What it may not do is take everybody else's turn with it.
+    platform.stalling.add('never-opens');
+
+    final bad = VideoPool.instance.lease('https://cdn.test/never-opens.mp4');
+    bad.reportDistance(0);
+    await pumpPool();
+
+    final good = [
+      for (var i = 0; i < 4; i++) VideoPool.instance.lease('assets/ok-$i.mp4'),
+    ];
+    for (final l in good) {
+      l.reportDistance(100);
+    }
+    await pumpPool();
+
+    for (var i = 0; i < good.length; i++) {
+      expect(good[i].controller, isNotNull,
+          reason: 'clip $i was starved by a stalled one — this is the bug');
+    }
+    expect(VideoPool.instance.liveCount, greaterThanOrEqualTo(4));
+  });
+
+  test('a clip that fails is tried again rather than struck off', () async {
+    // Three failures used to blacklist a clip for the life of the app, and
+    // on a phone the first three failures are usually the first seconds
+    // after launch, before the radio has a route. Every Cloudinary clip on
+    // the page would be permanently dead because of a network that came
+    // back a moment later.
+    platform.stalling.add('flaky');
+    final l = VideoPool.instance.lease('https://cdn.test/flaky.mp4');
+    l.reportDistance(0);
+    await pumpPool();
+
+    // It is a candidate again once its backoff has passed — the pool holds
+    // no permanent verdict about it.
+    expect(VideoPool.instance.debugLeases, contains(l),
+        reason: 'a failing clip must stay in the pool to be retried');
   });
 
   test('disposing a lease releases its player even while it holds one',

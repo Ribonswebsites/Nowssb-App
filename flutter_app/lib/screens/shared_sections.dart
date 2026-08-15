@@ -225,7 +225,8 @@ class RoutinesSection extends StatelessWidget {
           SecBanner(
             title: 'My Routines',
             sub: 'Five routines — build your healing schedule',
-            mark: NwsbMarks.play, markViewBox: 22,
+            mark: NwsbMarks.play,
+            markViewBox: 22,
             onTap: onTap,
           ),
         ],
@@ -241,7 +242,8 @@ class RoutinesSection extends StatelessWidget {
 /// The rotating cube and the 2x2 grid are gone from the markup; this is the
 /// television block the Normal home has, in glass.
 class QuickAccessSection extends StatelessWidget {
-  const QuickAccessSection({super.key, this.onCart, this.onWishlist, this.onOrders});
+  const QuickAccessSection(
+      {super.key, this.onCart, this.onWishlist, this.onOrders});
 
   final VoidCallback? onCart;
   final VoidCallback? onWishlist;
@@ -256,7 +258,8 @@ class QuickAccessSection extends StatelessWidget {
           const PaneHead(
             eyebrow: 'Everything You Own',
             title: 'On One Screen',
-            mark: NwsbMarks.order, markViewBox: 22,
+            mark: NwsbMarks.order,
+            markViewBox: 22,
           ),
           TvFrame(
             asset: 'assets/video/tv-screen.mp4',
@@ -265,7 +268,8 @@ class QuickAccessSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: _QuickButton(
-                    mark: NwsbMarks.cart, markViewBox: 22,
+                    mark: NwsbMarks.cart,
+                    markViewBox: 22,
                     label: 'Cart',
                     onTap: onCart,
                   ),
@@ -273,7 +277,8 @@ class QuickAccessSection extends StatelessWidget {
                 const _QuickRule(),
                 Expanded(
                   child: _QuickButton(
-                    mark: NwsbMarks.wishlist, markViewBox: 22,
+                    mark: NwsbMarks.wishlist,
+                    markViewBox: 22,
                     label: 'Wishlist',
                     onTap: onWishlist,
                   ),
@@ -281,7 +286,8 @@ class QuickAccessSection extends StatelessWidget {
                 const _QuickRule(),
                 Expanded(
                   child: _QuickButton(
-                    mark: NwsbMarks.order, markViewBox: 22,
+                    mark: NwsbMarks.order,
+                    markViewBox: 22,
                     label: 'Order',
                     onTap: onOrders,
                   ),
@@ -372,7 +378,8 @@ class EbooksSection extends StatelessWidget {
         children: [
           Spill(
             label: 'Deep-dive guides, yours to keep',
-            mark: NwsbMarks.ebook, markViewBox: 22,
+            mark: NwsbMarks.ebook,
+            markViewBox: 22,
             onTap: onTap,
           ),
           GestureDetector(
@@ -417,12 +424,14 @@ class EbooksSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Align(alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
+          Align(
+              alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
           const SizedBox(height: 16),
           SecBanner(
             title: 'eBooks',
             sub: 'Deep-dive guides, yours to keep',
-            mark: NwsbMarks.ebook, markViewBox: 22,
+            mark: NwsbMarks.ebook,
+            markViewBox: 22,
             onTap: onTap,
           ),
         ],

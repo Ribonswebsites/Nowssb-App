@@ -193,8 +193,7 @@ class _Intro extends StatelessWidget {
                           height: 42,
                           decoration: BoxDecoration(
                             color: const Color(0x1AFFFFFF),
-                            border:
-                                Border.all(color: const Color(0x33FFFFFF)),
+                            border: Border.all(color: const Color(0x33FFFFFF)),
                           ),
                           child: const Icon(Icons.arrow_back,
                               size: 18, color: Color(0xBFFFFFFF)),

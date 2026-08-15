@@ -149,8 +149,8 @@ class _TopBar extends StatelessWidget {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back,
-                  size: 20, color: NwsbColors.ink),
+              child:
+                  const Icon(Icons.arrow_back, size: 20, color: NwsbColors.ink),
             ),
           ),
           const SizedBox(width: 14),
@@ -302,9 +302,8 @@ class _Parts extends StatelessWidget {
                   style: TextStyle(
                     fontSize: p.deva.isEmpty ? 22 : 15,
                     fontWeight: FontWeight.w700,
-                    color: p.deva.isEmpty
-                        ? Colors.white
-                        : const Color(0xB3FFFFFF),
+                    color:
+                        p.deva.isEmpty ? Colors.white : const Color(0xB3FFFFFF),
                   ),
                 ),
                 const SizedBox(height: 6),

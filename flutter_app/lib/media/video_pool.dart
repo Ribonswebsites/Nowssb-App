@@ -68,9 +68,25 @@ class VideoLease extends ChangeNotifier {
   VideoPlayerController? _controller;
   bool _wantsPlay = false;
   bool _disposed = false;
-  /// How many times this clip has refused to open. Kept so a broken file
-  /// cannot be retried on every single pass forever.
+
+  /// How many times this clip has refused to open, and the earliest moment it
+  /// may be tried again.
+  ///
+  /// This used to be a hard cap: three failures and the clip was struck off
+  /// for the life of the app. On a phone that is the wrong rule — the three
+  /// failures are usually the first three seconds after launch, before the
+  /// radio has a route, and every Cloudinary clip on the page would be
+  /// permanently dead because of a network that came back a moment later.
+  /// So it backs off instead of giving up, and a clip that opens resets to
+  /// zero.
   int _failures = 0;
+  DateTime? _retryAt;
+
+  bool get _eligible {
+    final t = _retryAt;
+    return t == null || DateTime.now().isAfter(t);
+  }
+
   double _distance = double.infinity;
 
   /// Non-null only while this lease holds one of the pool's decoders.
@@ -172,6 +188,62 @@ class VideoPool {
   /// than against the literal, so the invariant holds at whatever it is set
   /// to.
   static const int maxLive = 8;
+
+  /// How long a clip gets to open before it counts as failed. Generous
+  /// enough for a Cloudinary file on a slow connection, short enough that a
+  /// stalled one is not mistaken for a working one.
+  static const _openTimeout = Duration(seconds: 12);
+
+  /// How long any single platform round trip gets before the pool stops
+  /// waiting on it. Nothing in here is allowed to wait forever.
+  static const _giveUp = Duration(seconds: 8);
+
+  /// The longest a whole pass may take before [_passGuard] declares it hung
+  /// and lets a new one start.
+  static const _passLimit = Duration(seconds: 45);
+
+  /// Deadline timers currently ticking, so they can be called off.
+  ///
+  /// `Future.timeout` is the obvious way to write this and the wrong one
+  /// here: it owns a Timer nobody else can reach, and a bring-up is no
+  /// longer awaited by anything, so a widget test that ends mid-open leaves
+  /// a twelve-second timer running and fails on "a Timer is still pending
+  /// even after the widget tree was disposed". Owning them means
+  /// [debugDropAll] can put them out.
+  final Set<Timer> _timers = {};
+
+  /// Widget tests run on a fake clock and finish the moment their last pump
+  /// returns, so a deadline still ticking on an in-flight open fails them on
+  /// "a Timer is still pending even after the widget tree was disposed" —
+  /// and a bring-up is deliberately not awaited any more, so there is always
+  /// one in flight. Nothing in a widget test is testing a timeout;
+  /// video_pool_test.dart does that, in real async, with this left on.
+  @visibleForTesting
+  static bool debugDeadlines = true;
+
+  /// [f], but it gives up after [d].
+  Future<T> _byThen<T>(Future<T> f, Duration d, String what) {
+    if (!debugDeadlines) return f;
+    final done = Completer<T>();
+    final t = Timer(d, () {
+      if (!done.isCompleted) {
+        done.completeError(TimeoutException(what, d));
+      }
+    });
+    _timers.add(t);
+    f.then<void>(
+      (v) {
+        if (!done.isCompleted) done.complete(v);
+      },
+      onError: (Object e, StackTrace s) {
+        if (!done.isCompleted) done.completeError(e, s);
+      },
+    ).whenComplete(() {
+      t.cancel();
+      _timers.remove(t);
+    });
+    return done.future;
+  }
 
   final List<VideoLease> _leases = [];
   final Set<VideoLease> _live = {};
@@ -279,7 +351,12 @@ class VideoPool {
     // long as the app runs. Not only a test concern — it is the one state
     // this object has that can wedge.
     _rebalancing = false;
+    _passStarted = null;
     _scheduled = false;
+    for (final t in _timers) {
+      t.cancel();
+    }
+    _timers.clear();
   }
 
   @visibleForTesting
@@ -361,6 +438,26 @@ class VideoPool {
 
   bool _rebalancing = false;
   bool _again = false;
+  DateTime? _passStarted;
+
+  /// The last line of defence.
+  ///
+  /// Everything a pass awaits now has a deadline, so it should not be
+  /// possible for one to hang — but "should not be possible" is exactly what
+  /// was believed about the state that produced `decoders 1/8`. If a pass has
+  /// been open longer than any pass can legitimately take, it is abandoned
+  /// and the next request is allowed through. A pool that occasionally
+  /// double-passes is a much smaller problem than a pool that stops.
+  bool get _passGuard {
+    if (!_rebalancing) return false;
+    final t = _passStarted;
+    if (t != null && DateTime.now().difference(t) > _passLimit) {
+      debugPrint('NowssB video: a rebalance hung — starting a fresh one');
+      _rebalancing = false;
+      return false;
+    }
+    return true;
+  }
 
   Future<void> _rebalance() async {
     // One pass at a time. A pass gives players back and then takes new ones,
@@ -368,11 +465,12 @@ class VideoPool {
     // sets of "take" running against one set of "give back", which is how
     // the ceiling gets exceeded. A request that arrives mid-pass is
     // remembered and run once this one finishes.
-    if (_rebalancing) {
+    if (_passGuard) {
       _again = true;
       return;
     }
     _rebalancing = true;
+    _passStarted = DateTime.now();
 
     try {
       // Bounded. Scrolling sets _again on almost every frame, so an unbounded
@@ -390,7 +488,7 @@ class VideoPool {
         // is the whole point, and it is why a hundred idle clips now cost a
         // hundred pictures instead of a hundred ExoPlayers.
         final want = _leases
-            .where((l) => l._distance != double.infinity && l._failures < 3)
+            .where((l) => l._distance != double.infinity && l._eligible)
             .toList()
           ..sort((a, b) {
             if (a.priority != b.priority) {
@@ -424,18 +522,42 @@ class VideoPool {
         // finished releasing, and both have to be gone before a new one is
         // asked for.
         going.addAll(_draining);
-        if (going.isNotEmpty) await Future.wait(going);
+        // Bounded. A platform that never answers a dispose would otherwise
+        // hold this await — and this await open is this whole object wedged;
+        // see [_passGuard].
+        if (going.isNotEmpty) {
+          await _byThen(Future.wait(going), _giveUp, 'giving players back');
+        }
 
-        // Then take. Anything that changed while we were waiting is picked
-        // up by the loop rather than by racing this one.
-        final coming = <Future<void>>[];
+        // Then take.
+        //
+        // NOT AWAITED, and that is the fix for "decoders 1/8, playing 1".
+        //
+        // A slot is claimed by `_live.add` on the line above — synchronously,
+        // before anything asynchronous starts — so the ceiling is already
+        // enforced and waiting here buys nothing. What it cost was the pool
+        // itself: _bringUp awaits initialize(), initialize() on a Cloudinary
+        // URL can stall indefinitely, and one stalled clip held this pass
+        // open forever. _rebalancing stays true, every later request just
+        // sets _again and returns, and the pool never grants another decoder
+        // for the rest of the session. Four clips on screen, eight slots
+        // free, one player running, and no way out of it.
+        //
+        // The comment in debugDropAll has described this state from the
+        // beginning — "a true _rebalancing is permanent" — as a test concern.
+        // It was not a test concern. It was the bug.
+        //
+        // And NOT parked in `_draining` either. That set is teardowns — it
+        // is awaited at the head of every pass, so a stalled bring-up put in
+        // there starves the next pass instead of this one, which is the same
+        // bug wearing a different hat. A bring-up cleans up after itself and
+        // the slot is already reserved; nothing needs to wait on it.
         for (final l in keep) {
           if (!_live.contains(l)) {
             _live.add(l);
-            coming.add(_bringUp(l));
+            unawaited(_bringUp(l));
           }
         }
-        if (coming.isNotEmpty) await Future.wait(coming);
       } while (_again && ++turns < 4);
 
       // Anything still outstanding is left to the next frame rather than
@@ -446,6 +568,7 @@ class VideoPool {
       }
     } finally {
       _rebalancing = false;
+      _passStarted = null;
     }
   }
 
@@ -463,7 +586,12 @@ class VideoPool {
     l._controller = c;
 
     try {
-      await c.initialize();
+      // WITH A DEADLINE. A local asset opens in milliseconds; a Cloudinary
+      // URL opens in a second or two on a good connection and NEVER on a bad
+      // one — initialize() does not time out on its own, it simply does not
+      // return. An un-deadlined await here is the difference between "this
+      // clip is slow" and "this app plays no video again until you kill it".
+      await _byThen(c.initialize(), _openTimeout, 'opening ${l.assetPath}');
     } catch (e) {
       // A clip that will not open is not worth taking the app down for. The
       // poster is already on screen and stays there — and now the reason is
@@ -472,12 +600,26 @@ class VideoPool {
       lastError = '${l.assetPath.split('/').last}: $e';
       debugPrint('NowssB video: could not open ${l.assetPath} — $e');
       l._failures++;
+      // Back off, do not strike off. Five seconds, then ten, then fifteen,
+      // up to a minute — so a clip that failed because the phone had no
+      // route yet is playing a few seconds later instead of being dead for
+      // the session.
+      final wait = Duration(seconds: 5 * l._failures.clamp(1, 12));
+      l._retryAt = DateTime.now().add(wait);
       l._controller = null;
       _live.remove(l);
-      try { await c.dispose(); } catch (_) {}
+      try {
+        await _byThen(c.dispose(), _giveUp, 'dispose');
+      } catch (_) {}
       l._changed();
+      // The slot this clip just gave back belongs to whoever is next.
+      _rebalanceSoon();
       return;
     }
+
+    // It opened. Whatever went wrong before did not go wrong this time.
+    l._failures = 0;
+    l._retryAt = null;
 
     // Disposed, or evicted again, while we were awaiting initialize().
     if (l._disposed || !_live.contains(l)) {
@@ -515,12 +657,12 @@ class VideoPool {
     // Disposed, not paused. A paused ExoPlayer still holds its decoder, and
     // holding it is the entire thing this file exists to stop.
     try {
-      await c.pause();
+      await _byThen(c.pause(), _giveUp, 'pause');
     } catch (_) {
-      // Already gone. Dispose it anyway.
+      // Already gone, or not answering. Dispose it anyway.
     }
     try {
-      await c.dispose();
+      await _byThen(c.dispose(), _giveUp, 'dispose');
     } catch (_) {}
   }
 

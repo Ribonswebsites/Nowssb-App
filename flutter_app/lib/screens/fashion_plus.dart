@@ -209,8 +209,8 @@ class _ChangeRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   sub,
-                  style: const TextStyle(
-                      fontSize: 11.5, color: Color(0x8CFFFFFF)),
+                  style:
+                      const TextStyle(fontSize: 11.5, color: Color(0x8CFFFFFF)),
                 ),
               ],
             ),

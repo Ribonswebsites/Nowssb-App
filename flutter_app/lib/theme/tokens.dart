@@ -102,14 +102,15 @@ class NwsbShadows {
 /// Corner radii, straight off the stylesheet.
 class NwsbRadius {
   NwsbRadius._();
-  static const card = 26.0;   // .nmh-practice
-  static const tile = 22.0;   // .nmh-tile
-  static const bar = 16.0;    // .nmh-streak-bar
-  static const pill = 18.0;   // .nmh-practice-icon
+  static const card = 26.0; // .nmh-practice
+  static const tile = 22.0; // .nmh-tile
+  static const bar = 16.0; // .nmh-streak-bar
+  static const pill = 18.0; // .nmh-practice-icon
 }
 
 class NwsbSpace {
   NwsbSpace._();
+
   /// app.css `.nmh-wrap { padding: 16px 20px … ; gap: 14px }`
   static const pageX = 20.0;
   static const pageTop = 16.0;

@@ -73,8 +73,8 @@ class Spill extends StatelessWidget {
               // `.spill-circle` — flat black with a hairline, 40px, and the
               // mark at 19.
               child: Center(
-                child: NwsbIcon(mark, size: 19, viewBox: markViewBox,
-                    strokeWidth: 1.6),
+                child: NwsbIcon(mark,
+                    size: 19, viewBox: markViewBox, strokeWidth: 1.6),
               ),
             ),
             const SizedBox(width: 10),
@@ -360,7 +360,9 @@ class EnterPill extends StatelessWidget {
             ),
             child: const Center(
               child: NwsbIcon(NwsbMarks.enterArrow,
-                  size: 13, viewBox: 12, strokeWidth: 1.9,
+                  size: 13,
+                  viewBox: 12,
+                  strokeWidth: 1.9,
                   color: NwsbColors.ink),
             ),
           ),

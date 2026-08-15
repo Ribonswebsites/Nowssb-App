@@ -28,7 +28,12 @@ void main() {
   // than failing. An in-memory store is the sanctioned stand-in.
   SharedPreferences.setMockInitialValues({});
 
-  setUpAll(FakeVideoPlatform.new);
+  setUpAll(() {
+    FakeVideoPlatform();
+    // Deadlines own real Timers; this file runs on a fake clock. See
+    // VideoPool.debugDeadlines.
+    VideoPool.debugDeadlines = false;
+  });
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
@@ -45,7 +50,13 @@ void main() {
     // The five destinations of #ig-bottomnav. Every one is a real screen now,
     // and every one must build and lay out at phone size without throwing or
     // overflowing.
-    for (final label in ['Connect', 'Practice', 'Library', 'Store', 'Profile']) {
+    for (final label in [
+      'Connect',
+      'Practice',
+      'Library',
+      'Store',
+      'Profile'
+    ]) {
       await tester.tap(find.text(label));
       await tester.pump(const Duration(milliseconds: 50));
       expect(tester.takeException(), isNull, reason: '$label threw');

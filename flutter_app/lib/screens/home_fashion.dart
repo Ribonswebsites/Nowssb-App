@@ -286,41 +286,41 @@ class _HomeFashionState extends State<HomeFashion> {
           // black band above the header and made it look like a bar that
           // stopped short.
           Column(
-              children: [
-                HomeHeader(
-                  onNormalHome: () => Settings.instance.setFashionHome(false),
-                  onMenu: () => _push(const WidgetsPage()),
+            children: [
+              HomeHeader(
+                onNormalHome: () => Settings.instance.setFashionHome(false),
+                onMenu: () => _push(const WidgetsPage()),
+              ),
+              Expanded(
+                // No horizontal padding on the list: the wrappers carry
+                // their own `margin: 18px 16px`.
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 108),
+                  itemCount: shown.length + 1,
+                  itemBuilder: (context, i) {
+                    if (i == 0) {
+                      // The greeting sits ABOVE the deck, not inside it —
+                      // app/js/part083.js:505 inserts it before the deck
+                      // in the home; it does not travel with the rail.
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          HeroGreeting(name: widget.name),
+                          FashionHero(
+                            onExplore: () => _go(2),
+                            onGuide: () => _push(const WidgetsPage()),
+                            onSearch: () => _go(2),
+                            onStore: () => _go(3),
+                            onRail: _go,
+                          ),
+                        ],
+                      );
+                    }
+                    return shown[i - 1];
+                  },
                 ),
-                Expanded(
-                  // No horizontal padding on the list: the wrappers carry
-                  // their own `margin: 18px 16px`.
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 108),
-                    itemCount: shown.length + 1,
-                    itemBuilder: (context, i) {
-                      if (i == 0) {
-                        // The greeting sits ABOVE the deck, not inside it —
-                        // app/js/part083.js:505 inserts it before the deck
-                        // in the home; it does not travel with the rail.
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            HeroGreeting(name: widget.name),
-                            FashionHero(
-                              onExplore: () => _go(2),
-                              onGuide: () => _push(const WidgetsPage()),
-                              onSearch: () => _go(2),
-                              onStore: () => _go(3),
-                              onRail: _go,
-                            ),
-                          ],
-                        );
-                      }
-                      return shown[i - 1];
-                    },
-                  ),
-                ),
-              ],
+              ),
+            ],
           ),
         ],
       ),

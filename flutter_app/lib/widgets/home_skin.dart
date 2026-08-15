@@ -36,9 +36,7 @@ class HomeSkinScope extends InheritedWidget {
   /// (a preview, a test) gets the dark language, which is what every
   /// sub-screen in the app is.
   static HomeSkin of(BuildContext context) =>
-      context
-          .dependOnInheritedWidgetOfExactType<HomeSkinScope>()
-          ?.skin ??
+      context.dependOnInheritedWidgetOfExactType<HomeSkinScope>()?.skin ??
       HomeSkin.fashion;
 
   @override

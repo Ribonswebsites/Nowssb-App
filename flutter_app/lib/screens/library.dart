@@ -91,8 +91,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       _Chip(
                         label: c,
                         on: _category == c,
-                        onTap: () => setState(
-                            () => _category = _category == c ? '' : c),
+                        onTap: () =>
+                            setState(() => _category = _category == c ? '' : c),
                       ),
                   ],
                 ),
@@ -164,7 +164,8 @@ class _SearchField extends StatelessWidget {
           if (controller.text.isNotEmpty)
             GestureDetector(
               onTap: controller.clear,
-              child: const Icon(Icons.close, size: 18, color: Color(0x99FFFFFF)),
+              child:
+                  const Icon(Icons.close, size: 18, color: Color(0x99FFFFFF)),
             ),
         ],
       ),

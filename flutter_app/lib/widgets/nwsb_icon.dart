@@ -32,6 +32,7 @@ class NwsbIcon extends StatelessWidget {
     this.color = Colors.white,
     this.strokeWidth = 1.7,
     this.viewBox = 24,
+    this.cap = 'round',
   });
 
   /// The `<path>`/`<circle>` elements, exactly as they appear in the source.
@@ -49,13 +50,17 @@ class NwsbIcon extends StatelessWidget {
   /// by a tenth and moves it off centre.
   final double viewBox;
 
+  /// `stroke-linecap`. Round everywhere except the tiles' and the deck's
+  /// small chevrons, which the markup draws square.
+  final String cap;
+
   @override
   Widget build(BuildContext context) {
     return SvgPicture.string(
       '<svg xmlns="http://www.w3.org/2000/svg" '
       'viewBox="0 0 $viewBox $viewBox" fill="none" '
       'stroke="currentColor" stroke-width="$strokeWidth" '
-      'stroke-linecap="round" stroke-linejoin="round">$body</svg>',
+      'stroke-linecap="$cap" stroke-linejoin="round">$body</svg>',
       width: size,
       height: size,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
@@ -104,7 +109,8 @@ class NwsbMarks {
 
   // ── The hero rail — app/js/part083.js:50-66 ──────────────────────────
 
-  static const crown = '<path d="M4 8.4l3.6 3.2L12 5.4l4.4 6.2L20 8.4l-1.6 9.2H5.6z"/>'
+  static const crown =
+      '<path d="M4 8.4l3.6 3.2L12 5.4l4.4 6.2L20 8.4l-1.6 9.2H5.6z"/>'
       '<path d="M5.6 19.6h12.8"/>';
 
   /// The bag both stores wear. "The same shop, two things sold in it" — the
@@ -163,7 +169,8 @@ class NwsbMarks {
   // ── Section marks ────────────────────────────────────────────────────
 
   /// The streak flame — index.html:997. A 24 box.
-  static const flame = '<path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0'
+  static const flame =
+      '<path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0'
       'c0-1.4-.7-2.3-1.2-3 1 .4 3.4 2 3.4 5.6a5.6 5.6 0 0 1-11.2 0'
       'C6.4 9 10.3 7.3 12 2z"/>';
 

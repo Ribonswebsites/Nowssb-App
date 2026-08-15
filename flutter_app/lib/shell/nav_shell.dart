@@ -182,8 +182,9 @@ class _NavShellState extends State<NavShell> {
                                 _tabs[i].$1,
                                 style: TextStyle(
                                   fontSize: 10,
-                                  fontWeight:
-                                      i == _i ? FontWeight.w700 : FontWeight.w400,
+                                  fontWeight: i == _i
+                                      ? FontWeight.w700
+                                      : FontWeight.w400,
                                   color: i == _i
                                       ? NwsbColors.goldLight
                                       : const Color(0x99FFFFFF),

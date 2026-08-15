@@ -44,7 +44,8 @@ class NwsbVideo extends StatefulWidget {
   final Alignment alignment;
 
   /// True when [asset] is a URL rather than a bundled file.
-  bool get isRemote => asset.startsWith('http://') || asset.startsWith('https://');
+  bool get isRemote =>
+      asset.startsWith('http://') || asset.startsWith('https://');
 
   /// A bundled clip's poster is its own first frame, beside it in the
   /// bundle. A REMOTE clip has no such file — deriving one would name an
@@ -188,7 +189,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   void _measure() {
     if (!mounted) return;
     final lease = _lease;
-    if (lease == null) return;   // a still has nothing to report
+    if (lease == null) return; // a still has nothing to report
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize || !box.attached) {
       // Not laid out YET is not the same as off screen. Saying "infinity"
@@ -205,7 +206,8 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     // One viewport of slack on each side, so a clip is granted its decoder
     // a screen's worth of travel before you reach it and keeps it a screen
     // after — scrolling back up does not restart everything.
-    final visible = top < screen.height * 2 && top + box.size.height > -screen.height;
+    final visible =
+        top < screen.height * 2 && top + box.size.height > -screen.height;
     lease.reportDistance(
         visible ? (centre - screen.height / 2).abs() : double.infinity);
   }

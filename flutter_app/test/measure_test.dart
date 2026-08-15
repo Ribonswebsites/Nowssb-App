@@ -27,7 +27,12 @@ import 'fake_video_platform.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(FakeVideoPlatform.new);
+  setUpAll(() {
+    FakeVideoPlatform();
+    // Deadlines own real Timers; this file runs on a fake clock. See
+    // VideoPool.debugDeadlines.
+    VideoPool.debugDeadlines = false;
+  });
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
@@ -41,7 +46,8 @@ void main() {
       home: Scaffold(
         body: ListView(
           children: const [
-            SizedBox(height: 300, child: NwsbVideo(asset: 'assets/video/a.mp4')),
+            SizedBox(
+                height: 300, child: NwsbVideo(asset: 'assets/video/a.mp4')),
             SizedBox(height: 1200),
           ],
         ),

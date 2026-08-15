@@ -47,7 +47,11 @@ class _StoreScreenState extends State<StoreScreen> {
   @override
   Widget build(BuildContext context) {
     final store = ContentStore.instance;
-    final counts = [store.library.length, store.meanings.length, store.books.length];
+    final counts = [
+      store.library.length,
+      store.meanings.length,
+      store.books.length
+    ];
 
     return PageShell(
       eyebrow: 'Own the sounds that heal',
@@ -218,9 +222,8 @@ class _Tabs extends StatelessWidget {
                       fontSize: 12.5,
                       fontWeight:
                           i == index ? FontWeight.w700 : FontWeight.w400,
-                      color: i == index
-                          ? NwsbColors.ink
-                          : const Color(0xB3FFFFFF),
+                      color:
+                          i == index ? NwsbColors.ink : const Color(0xB3FFFFFF),
                     ),
                   ),
                 ),

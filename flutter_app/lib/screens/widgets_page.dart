@@ -79,7 +79,6 @@ class _WidgetsPageState extends State<WidgetsPage> {
               on: s.fashionPlus,
               onChanged: s.setFashionPlus,
             ),
-
             const SizedBox(height: 24),
             const DarkHead(
               eyebrow: 'Everything, one tap away',
@@ -98,10 +97,9 @@ class _WidgetsPageState extends State<WidgetsPage> {
               title: 'Fashion Plus',
               sub: 'Open the motion mode',
               icon: Icons.auto_awesome_motion_outlined,
-              go: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => const FashionPlusScreen())),
+              go: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const FashionPlusScreen())),
             ),
-
             const SizedBox(height: 24),
             const DarkHead(
               eyebrow: 'Named rather than faked',
@@ -265,8 +263,7 @@ class _Door extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward,
-                size: 16, color: Color(0xB3FFFFFF)),
+            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
           ],
         ),
       ),

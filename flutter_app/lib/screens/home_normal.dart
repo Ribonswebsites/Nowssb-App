@@ -192,7 +192,10 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('wsearch', null),
         ('msearch', null),
-        ('fashsw', NmFashionSwitch(onTap: () => Settings.instance.setFashionHome(true))),
+        (
+          'fashsw',
+          NmFashionSwitch(onTap: () => Settings.instance.setFashionHome(true))
+        ),
         ('footer', HomeFooterSection(onLink: _footerLink)),
       ];
 
@@ -279,28 +282,28 @@ class _TopRow extends StatelessWidget {
         // the three header buttons clean off the right edge.
         Flexible(
           child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'NowssB',
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
-                  ),
-            ),
-            Text(
-              'NOWSBANSIU EDITION',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontSize: 9,
-                    letterSpacing: 2,
-                  ),
-            ),
-          ],
-        ),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'NowssB',
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
+                    ),
+              ),
+              Text(
+                'NOWSBANSIU EDITION',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                      fontSize: 9,
+                      letterSpacing: 2,
+                    ),
+              ),
+            ],
+          ),
         ),
         const Spacer(),
         const _HeaderButton(icon: Icons.notifications_none, badge: 0),
@@ -337,39 +340,39 @@ class _HeaderButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: NwsbColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: NwsbShadows.raisedXs,
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: NwsbColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: NwsbShadows.raisedXs,
+            ),
+            child: Icon(icon, size: 21, color: NwsbColors.ink),
           ),
-          child: Icon(icon, size: 21, color: NwsbColors.ink),
-        ),
-        if (badge != null && badge! > 0)
-          Positioned(
-            top: -4,
-            right: -4,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE0342B),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                '$badge',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
+          if (badge != null && badge! > 0)
+            Positioned(
+              top: -4,
+              right: -4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE0342B),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$badge',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
       ),
     );
   }

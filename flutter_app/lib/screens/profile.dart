@@ -58,7 +58,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           sliver: SliverList.list(children: [
             const _Identity(),
             const SizedBox(height: 22),
-
             const DarkHead(
               eyebrow: 'Everything, one tap away',
               title: 'Your pages',
@@ -90,7 +89,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 22),
-
             const DarkHead(
               eyebrow: 'What the app is running on',
               title: 'Content',
@@ -109,7 +107,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _Stat(label: 'Words', value: '${store.library.length}'),
             _Stat(label: 'Meanings', value: '${store.meanings.length}'),
             _Stat(label: 'eBooks', value: '${store.books.length}'),
-
             const SizedBox(height: 22),
             const DarkHead(
               eyebrow: 'How the films are managed',
@@ -121,13 +118,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               label: 'Decoders in use',
               value: '${VideoPool.instance.liveCount} of ${VideoPool.maxLive}',
             ),
-            _Stat(label: 'Clips on this screen', value: '${VideoPool.instance.leaseCount}'),
+            _Stat(
+                label: 'Clips on this screen',
+                value: '${VideoPool.instance.leaseCount}'),
             const _Note(
               'Every clip is on the phone — nothing streams. At most four '
               'decode at once, which is what keeps the app from stuttering '
               'the way the website did.',
             ),
-
             const SizedBox(height: 22),
             const DarkHead(
               eyebrow: 'Not built yet',
@@ -253,8 +251,7 @@ class _Go extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward,
-                size: 16, color: Color(0xB3FFFFFF)),
+            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
           ],
         ),
       ),

@@ -26,7 +26,12 @@ import 'fake_video_platform.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(FakeVideoPlatform.new);
+  setUpAll(() {
+    FakeVideoPlatform();
+    // Deadlines own real Timers; this file runs on a fake clock. See
+    // VideoPool.debugDeadlines.
+    VideoPool.debugDeadlines = false;
+  });
 
   // The pool is a singleton, so each test starts from an empty one — and the
   // zero timer it uses to coalesce its passes has to be cancelled, or the

@@ -169,8 +169,7 @@ class _SearchBarState extends State<_SearchBar> {
                 isDense: true,
                 border: InputBorder.none,
                 hintText: 'Search any word or meaning…',
-                hintStyle:
-                    TextStyle(fontSize: 14, color: NwsbColors.inkFaint),
+                hintStyle: TextStyle(fontSize: 14, color: NwsbColors.inkFaint),
               ),
             ),
           ),
@@ -651,7 +650,8 @@ class NmPractice extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: NwsbShadows.raisedXs,
                       ),
-                      child: const NwsbIcon(NwsbMarks.arrow, size: 16, color: NwsbColors.ink),
+                      child: const NwsbIcon(NwsbMarks.arrow,
+                          size: 16, color: NwsbColors.ink),
                     ),
                   ],
                 ),
@@ -824,7 +824,8 @@ class _NmTile extends StatelessWidget {
                     child: Icon(icon, size: 20, color: NwsbColors.gold),
                   ),
                   const Spacer(),
-                  Container(height: 1, width: 26, color: const Color(0x1A000000)),
+                  Container(
+                      height: 1, width: 26, color: const Color(0x1A000000)),
                   const SizedBox(height: 9),
                   Text(
                     title,
@@ -996,7 +997,8 @@ class NmStore extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(width: 8),
-                              NwsbIcon(NwsbMarks.arrow, size: 14, color: NwsbColors.ink),
+                              NwsbIcon(NwsbMarks.arrow,
+                                  size: 14, color: NwsbColors.ink),
                             ],
                           ),
                         ),
@@ -1070,7 +1072,8 @@ class NmReader extends StatelessWidget {
             style: TextStyle(fontSize: 13, color: NwsbColors.inkSoft),
           ),
           const SizedBox(height: 14),
-          Align(alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
+          Align(
+              alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
           const SizedBox(height: 16),
           SecBanner(
             title: 'Reader',
@@ -1150,7 +1153,8 @@ class NmTrending extends StatelessWidget {
         SecBanner(
           title: "Today's Trending",
           sub: 'See which words are healing the most people right now',
-          mark: NwsbMarks.trending, markViewBox: 22,
+          mark: NwsbMarks.trending,
+          markViewBox: 22,
           onTap: onTap,
         ),
       ],
@@ -1201,13 +1205,13 @@ class NmCustomize extends StatelessWidget {
                   ),
                   Text(
                     'Make this home yours',
-                    style: TextStyle(
-                        fontSize: 12, color: NwsbColors.inkFaint),
+                    style: TextStyle(fontSize: 12, color: NwsbColors.inkFaint),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, size: 20, color: NwsbColors.inkSoft),
+            const Icon(Icons.chevron_right,
+                size: 20, color: NwsbColors.inkSoft),
           ],
         ),
       ),

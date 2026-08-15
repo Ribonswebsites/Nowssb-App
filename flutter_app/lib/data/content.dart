@@ -47,8 +47,8 @@ class ContentStore extends ChangeNotifier {
   List<Meaning> get meanings => _meanings;
 
   bool _started = false;
-  final List<StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>>
-      _subs = [];
+  final List<StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>> _subs =
+      [];
 
   /// Stages one and two, both synchronous as far as the UI is concerned:
   /// by the time the first frame is built there is already something to

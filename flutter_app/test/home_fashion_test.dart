@@ -28,7 +28,12 @@ void main() {
   // completes and the file hangs rather than failing.
   SharedPreferences.setMockInitialValues({});
 
-  setUpAll(FakeVideoPlatform.new);
+  setUpAll(() {
+    FakeVideoPlatform();
+    // Deadlines own real Timers; this file runs on a fake clock. See
+    // VideoPool.debugDeadlines.
+    VideoPool.debugDeadlines = false;
+  });
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
@@ -159,6 +164,42 @@ void main() {
           reason: 'the decoder ceiling broke at scroll $i — this page is the '
               'whole reason the pool exists');
     }
+  });
+
+  testWidgets('the four tiles are the four in the markup', (tester) async {
+    // index.html:1958-1994, in order. This list carried "The Store", which
+    // is not one of them, and was missing My Progress.
+    await pump(tester);
+
+    // The tiles are the seventh section, well below the fold, and a
+    // ListView.builder has not built them at rest.
+    final list = find.byType(Scrollable).first;
+    for (var i = 0;
+        i < 30 && find.text('Sound Library').evaluate().isEmpty;
+        i++) {
+      await tester.drag(list, const Offset(0, -320));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+
+    for (final t in [
+      'Sound Library',
+      'My Progress',
+      'Word Science',
+      'My Profile',
+    ]) {
+      expect(find.text(t), findsOneWidget, reason: '$t is not on the home');
+    }
+    expect(find.text('The Store'), findsNothing,
+        reason: 'The Store is not one of the four tiles');
+
+    // `height: 118px` — nowssb-nm.css:7950. They were sized by a ratio, so
+    // they grew with the phone and stood far taller than the site's.
+    final tile = tester.getRect(find.ancestor(
+      of: find.text('Sound Library'),
+      matching: find.byType(GridView),
+    ));
+    expect(tile.height, closeTo(118 * 2 + 10, 1),
+        reason: 'two rows of 118 and one 10px gap');
   });
 
   // ── Follow the steps ────────────────────────────────────────────────

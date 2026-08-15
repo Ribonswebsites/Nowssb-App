@@ -23,35 +23,51 @@ class FashTiles extends StatelessWidget {
   /// Called with the tile's destination tab index.
   final void Function(int)? onTile;
 
-  /// (title, sub, cover URL, icon, destination) — the four in the markup.
+  /// (title, sub, the round icon's artwork, destination) — the FOUR IN THE
+  /// MARKUP, in the markup's order: index.html:1958, 1970, 1982, 1994.
+  ///
+  /// This list was wrong in three ways at once. It carried "The Store",
+  /// which is not one of these four — `My Progress` is, and it was missing.
+  /// The order was wrong. And the URL on each row was the `.home-tile-cover`
+  /// artwork, which the DEFAULT look does not paint at all: nowssb-nm.css
+  /// :3968 says of these tiles, in as many words, "The 16:9 cover artwork
+  /// these used to carry is gone."
+  ///
+  /// Painting it full-bleed anyway is why each tile had a huge word lying
+  /// across it — that artwork carries its own title, which is the whole
+  /// reason the `image` look hides the DOM text when it uses it.
+  ///
+  /// The picture that IS painted is the small round one: `.home-tile-icon
+  /// img`, "the real feature artwork (from the Everything on NowssB page)
+  /// instead of a line SVG" (:3978).
   static const _tiles = [
     (
       'Sound Library',
       'Root frequencies',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
-      Icons.graphic_eq,
+      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
+          'v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
       2,
+    ),
+    (
+      'My Progress',
+      'Healing journey',
+      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
+          'v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png',
+      4,
     ),
     (
       'Word Science',
       'NOWSBANSIU texts',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
-      Icons.science_outlined,
+      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
+          'v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
       2,
     ),
     (
       'My Profile',
       'Your settings',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png',
-      Icons.person_outline,
+      'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/'
+          'v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
       4,
-    ),
-    (
-      'The Store',
-      'Words and meanings',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
-      Icons.storefront_outlined,
-      3,
     ),
   ];
 
@@ -96,23 +112,37 @@ class FashTiles extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 0.86,
-            children: [
-              for (final (title, sub, cover, icon, dest) in _tiles)
-                _Tile(
-                  title: title,
-                  sub: sub,
-                  cover: cover,
-                  icon: icon,
-                  onTap: () => onTile?.call(dest),
-                ),
-            ],
+          // `.home-grid` — two columns, 10px gap, and EVERY TILE 118px TALL.
+          //
+          // nowssb-nm.css:7950 sets `height: 118px` on these, and :8677 sets
+          // `grid-auto-rows: 1fr` so all four match whatever their contents
+          // do. This was `childAspectRatio: 0.86`, which is not a height at
+          // all — it is a shape, so the tiles grew with the phone's width and
+          // stood far taller than they do on the site.
+          //
+          // A ratio is what GridView takes, so the ratio is computed from the
+          // width each cell actually gets rather than guessed.
+          LayoutBuilder(
+            builder: (context, c) {
+              final cell = (c.maxWidth - 10) / 2;
+              return GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: cell / _tileHeight,
+                children: [
+                  for (final (title, sub, art, dest) in _tiles)
+                    _Tile(
+                      title: title,
+                      sub: sub,
+                      art: art,
+                      onTap: () => onTile?.call(dest),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -120,17 +150,33 @@ class FashTiles extends StatelessWidget {
   }
 }
 
+/// `height: 118px` — nowssb-nm.css:7950, for these tiles inside the glass
+/// wrapper on the Fashion home.
+const double _tileHeight = 118;
+
+/// `.home-tile` in its DEFAULT look — `fashtile-black`, which is what
+/// `savedFashStyle()` returns when nobody has chosen otherwise
+/// (app/js/part059.js:69).
+///
+/// The stylesheet describes it exactly (nowssb-nm.css:3965): "2x2, and built
+/// like the app's black banners: black card, icon puck, vertical rule, title
+/// + subtitle, Enter pill bottom-right." A row, not a stack — `grid-template
+/// -columns: auto 1px 1fr`, which is the puck, the rule, and the words.
+///
+/// What was here instead was the `fashtile-image` look, and only half of it:
+/// the cover artwork stretched over the whole tile with a scrim on top. That
+/// artwork has its own title painted into it, which is why every tile had a
+/// giant word lying across it, and it is exactly why the real `image` look
+/// hides the DOM text whenever it paints that layer.
 class _Tile extends StatelessWidget {
   const _Tile({
     required this.title,
     required this.sub,
-    required this.cover,
-    required this.icon,
+    required this.art,
     this.onTap,
   });
 
-  final String title, sub, cover;
-  final IconData icon;
+  final String title, sub, art;
   final VoidCallback? onTap;
 
   @override
@@ -138,58 +184,142 @@ class _Tile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: ClipRect(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            NwsbImage(
-              url: cover,
-              fallback: const ColoredBox(color: Color(0xFF0A0F1C)),
-            ),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0x59000000), Color(0xF7000000)],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(icon, size: 22, color: NwsbColors.goldLight),
-                  const Spacer(),
-                  Container(
-                      height: 1, width: 26, color: const Color(0x40FFFFFF)),
-                  const SizedBox(height: 9),
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    sub,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 10.5, color: Color(0x8CFFFFFF)),
-                  ),
-                  const SizedBox(height: 10),
-                  const EnterPill(),
-                ],
-              ),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border.all(color: const Color(0x14FFFFFF)),
+          // `body.fashcorner-rounded` is the default (part059.js:70) and it
+          // is 18px.
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x6B000000),
+              offset: Offset(0, 10),
+              blurRadius: 26,
             ),
           ],
         ),
+        child: Stack(
+          children: [
+            // `padding: 12px 10px 38px` — the 38 at the foot is the room the
+            // Enter pill sits in, which is why the row is not centred in the
+            // card.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 12, 10, 38),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // `.home-tile-icon` — 34px, a gold-tinted disc holding the
+                  // real feature artwork, cover-fit and clipped round.
+                  Container(
+                    width: 34,
+                    height: 34,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: const Color(0x1AE8D5A3),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0x3DE8D5A3)),
+                    ),
+                    child: NwsbImage(
+                      url: art,
+                      fit: BoxFit.cover,
+                      fallback: const ColoredBox(color: Color(0x1AE8D5A3)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // `.home-tile-rule` — 1px, `align-self: stretch`.
+                  Container(width: 1, color: const Color(0x2EFFFFFF)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            height: 1.2,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          sub,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 9.5,
+                            height: 1.35,
+                            color: Color(0x80FFFFFF),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // `.home-tile-enter` — absolute, bottom 8 right 8.
+            const Positioned(bottom: 8, right: 8, child: _TileEnter()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// `.home-tile-enter` — a white pill: the word, then the arrow in its own
+/// circle. nowssb-nm.css:3992.
+class _TileEnter extends StatelessWidget {
+  const _TileEnter();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(11, 4, 4, 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Enter',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.3,
+              color: NwsbColors.ink,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Container(
+            width: 20,
+            height: 20,
+            decoration: const BoxDecoration(
+              color: Color(0x1A060C18),
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              // The tile's own arrow — `M2 6H10M7 3L10 6L7 9` on a 12 box,
+              // square caps, not the app's usual round-capped one.
+              child: NwsbIcon(
+                '<path d="M2 6H10M7 3L10 6L7 9"/>',
+                size: 10,
+                viewBox: 12,
+                strokeWidth: 1.9,
+                cap: 'square',
+                color: NwsbColors.ink,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

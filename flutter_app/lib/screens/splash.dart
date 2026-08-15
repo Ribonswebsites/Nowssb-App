@@ -32,7 +32,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-
 class Splash extends StatefulWidget {
   const Splash({super.key, required this.onDone});
 
@@ -108,7 +107,9 @@ class _SplashState extends State<Splash> {
     final v = c.value;
     // position >= duration is the honest end. isCompleted alone is not
     // reliable across platforms.
-    if (!v.isPlaying && v.position >= v.duration && v.duration > Duration.zero) {
+    if (!v.isPlaying &&
+        v.position >= v.duration &&
+        v.duration > Duration.zero) {
       _leave();
     }
   }

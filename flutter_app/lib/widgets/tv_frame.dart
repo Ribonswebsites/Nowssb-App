@@ -71,7 +71,10 @@ class DeviceFrame {
   static const tabletLandscape = DeviceFrame(
     'assets/frames/tab-landscape.webp',
     1339 / 875,
-    top: 0.04854, right: 0.03510, bottom: 0.03734, left: 0.03510,
+    top: 0.04854,
+    right: 0.03510,
+    bottom: 0.03734,
+    left: 0.03510,
   );
 
   /// `.hhr-tab` — nowssb-nm.css:14641. The wide white frame the
@@ -81,7 +84,10 @@ class DeviceFrame {
   static const wordActs = DeviceFrame(
     'assets/frames/word-acts-tab.webp',
     1371 / 317,
-    top: 0.05994, right: 0.01969, bottom: 0.06625, left: 0.01823,
+    top: 0.05994,
+    right: 0.01969,
+    bottom: 0.06625,
+    left: 0.01823,
     verticalIsHeight: true,
   );
 
@@ -89,35 +95,50 @@ class DeviceFrame {
   static const tabletCurveLandscape = DeviceFrame(
     'assets/frames/tab2-landscape.webp',
     1313 / 807,
-    top: 0.01752, right: 0.01523, bottom: 0.04570, left: 0.01447,
+    top: 0.01752,
+    right: 0.01523,
+    bottom: 0.04570,
+    left: 0.01447,
   );
 
   /// `.dev-tabs-l` — padding: 2.766% 1.988% 5.877% 2.161%. Render 1157x863.
   static const tabletSlimLandscape = DeviceFrame(
     'assets/frames/tab3-landscape.webp',
     1157 / 863,
-    top: 0.02766, right: 0.01988, bottom: 0.05877, left: 0.02161,
+    top: 0.02766,
+    right: 0.01988,
+    bottom: 0.05877,
+    left: 0.02161,
   );
 
   /// `.dev-tabc-p` — padding: 3.859% 2.426% 5.402%. Render 907x1307.
   static const tabletPortrait = DeviceFrame(
     'assets/frames/tab2-portrait.webp',
     907 / 1307,
-    top: 0.03859, right: 0.02426, bottom: 0.05402, left: 0.02426,
+    top: 0.03859,
+    right: 0.02426,
+    bottom: 0.05402,
+    left: 0.02426,
   );
 
   /// `.dev-tabs-p` — padding: 5.195% 3.424% 4.014% 3.306%. Render 847x1299.
   static const tabletSlim = DeviceFrame(
     'assets/frames/tab3-portrait.webp',
     847 / 1299,
-    top: 0.05195, right: 0.03424, bottom: 0.04014, left: 0.03306,
+    top: 0.05195,
+    right: 0.03424,
+    bottom: 0.04014,
+    left: 0.03306,
   );
 
   /// `.dev-tv-p` — padding: 3.4% 3.2% 8.4%. Render 862x1450.
   static const tvPortrait = DeviceFrame(
     'assets/frames/tv-portrait.webp',
     862 / 1450,
-    top: 0.034, right: 0.032, bottom: 0.084, left: 0.032,
+    top: 0.034,
+    right: 0.032,
+    bottom: 0.084,
+    left: 0.032,
   );
 
   /// `.dev-laptop` — padding: 3.049% 12.058% 16.701% 11.920%. Render
@@ -125,7 +146,10 @@ class DeviceFrame {
   static const laptop = DeviceFrame(
     'assets/frames/laptop.webp',
     1443 / 915,
-    top: 0.03049, right: 0.12058, bottom: 0.16701, left: 0.11920,
+    top: 0.03049,
+    right: 0.12058,
+    bottom: 0.16701,
+    left: 0.11920,
   );
 
   /// `.dev-tv-l` — padding: 2.410% 1.791% 8.540% 1.928%, at the trimmed
@@ -140,7 +164,10 @@ class DeviceFrame {
   static const tvLandscape = DeviceFrame(
     '',
     1452 / 831,
-    top: 0.02410, right: 0.01791, bottom: 0.08540, left: 0.01928,
+    top: 0.02410,
+    right: 0.01791,
+    bottom: 0.08540,
+    left: 0.01928,
   );
 
   /// The bottom cap's height as a fraction of the box's HEIGHT — 124/831.

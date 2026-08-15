@@ -1,18 +1,23 @@
 /// The pane every Fashion-home section sits on.
 ///
 /// Lifted value for value from `:is(#home, .stw-prev-stage) .glass-wrap` in
-/// nowssb-nm.css:7904, including the second rule underneath it that squares
-/// the corners — these wrappers are NOT rounded on the Fashion home, and the
-/// Flutter version had them at a 20px radius, which is the single thing that
-/// made the whole page read as a different app.
+/// nowssb-nm.css:7904.
 ///
 ///     padding   12
 ///     fill      rgba(255,255,255,0.055)
 ///     border    1px rgba(255,255,255,0.13)
-///     radius    0            ← border-radius: 0 !important
+///     radius    18           ← see below
 ///     blur      blur(18px) saturate(1.25)
 ///     shadow    0 16px 40px rgba(0,0,0,0.34)
 ///     box       width: calc(100% - 32px); margin: 18px 16px
+///
+/// THE CORNERS ARE ROUNDED. This read `0` for a while, from the stylesheet's
+/// `border-radius: 0 !important` — but that rule is app/app.css's blanket
+/// `* { border-radius: 0 !important }` reset, which the page then puts back
+/// per element. The Fashion home's own default is rounded: `savedFashCorner()`
+/// returns `rounded` unless somebody chose otherwise (app/js/part059.js:70),
+/// and `body.fashcorner-rounded` is 18px. Square was the corner setting the
+/// reader has to go and pick.
 ///
 /// The blur is a real BackdropFilter. CSS blur(18px) is a Gaussian standard
 /// deviation of about 9, not 18 — the CSS number is the diameter and
@@ -26,17 +31,22 @@ import 'package:flutter/material.dart';
 
 import 'nwsb_icon.dart';
 
+/// `body.fashcorner-rounded` — 18px, the Fashion home's default corner.
+const double kGlassRadius = 18;
+
 class GlassWrap extends StatelessWidget {
   const GlassWrap({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(12),
     this.margin = const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+    this.radius = kGlassRadius,
   });
 
   final Widget child;
   final EdgeInsets padding;
   final EdgeInsets margin;
+  final double radius;
 
   /// CSS blur(18px) → sigma 9.
   static const double blurSigma = 9;
@@ -46,11 +56,13 @@ class GlassWrap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = BorderRadius.circular(radius);
     return Padding(
       padding: margin,
       child: DecoratedBox(
-        decoration: const BoxDecoration(
-          boxShadow: [
+        decoration: BoxDecoration(
+          borderRadius: r,
+          boxShadow: const [
             BoxShadow(
               color: Color(0x57000000), // rgba(0,0,0,0.34)
               offset: Offset(0, 16),
@@ -58,15 +70,18 @@ class GlassWrap extends StatelessWidget {
             ),
           ],
         ),
-        // ClipRect, not ClipRRect: square, and the clip is what stops the
-        // backdrop filter bleeding past the pane.
-        child: ClipRect(
+        // The clip is what stops the backdrop filter bleeding past the pane,
+        // and it has to be the SAME shape as the border or the blur squares
+        // off the corners the border rounds.
+        child: ClipRRect(
+          borderRadius: r,
           child: BackdropFilter(
             filter: ui.ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
             child: Container(
               padding: padding,
               decoration: BoxDecoration(
                 color: fill,
+                borderRadius: r,
                 border: Border.all(color: line),
               ),
               child: child,
