@@ -40,7 +40,16 @@ class HomeHeader extends StatelessWidget {
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+      // `padding: max(env(safe-area-inset-top, 14px), 14px) 20px 14px` —
+      // the status bar's height is PART of the header, which is what makes
+      // the glass run to the top of the screen instead of starting under a
+      // black band.
+      padding: EdgeInsets.fromLTRB(
+        20,
+        MediaQuery.paddingOf(context).top + 14,
+        20,
+        14,
+      ),
       decoration: const BoxDecoration(
         color: Color(0x14FFFFFF),
         border: Border(

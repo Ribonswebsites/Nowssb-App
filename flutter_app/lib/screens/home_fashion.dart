@@ -280,9 +280,12 @@ class _HomeFashionState extends State<HomeFashion> {
 
           // `.home-header` is fixed above the page and never scrolls, so
           // it is outside the scroller rather than its first row.
-          SafeArea(
-            bottom: false,
-            child: Column(
+          // NOT wrapped in a SafeArea. The header's glass has to run to the
+          // very top of the screen and the status bar sits ON it — a
+          // SafeArea out here inset the whole column instead, which left a
+          // black band above the header and made it look like a bar that
+          // stopped short.
+          Column(
               children: [
                 HomeHeader(
                   onNormalHome: () => Settings.instance.setFashionHome(false),
@@ -318,7 +321,6 @@ class _HomeFashionState extends State<HomeFashion> {
                   ),
                 ),
               ],
-            ),
           ),
         ],
       ),

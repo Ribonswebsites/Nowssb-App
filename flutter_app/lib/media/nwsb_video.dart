@@ -43,8 +43,19 @@ class NwsbVideo extends StatefulWidget {
   final bool autoplay;
   final Alignment alignment;
 
-  String get _poster =>
-      poster ?? asset.replaceAll(RegExp(r'\.mp4$'), '-poster.webp');
+  /// True when [asset] is a URL rather than a bundled file.
+  bool get isRemote => asset.startsWith('http://') || asset.startsWith('https://');
+
+  /// A bundled clip's poster is its own first frame, beside it in the
+  /// bundle. A REMOTE clip has no such file — deriving one would name an
+  /// asset that does not exist and paint a black rectangle over the video
+  /// until it opens, so a remote clip simply has no poster unless one is
+  /// given.
+  String? get _poster {
+    if (poster != null) return poster;
+    if (isRemote) return null;
+    return asset.replaceAll(RegExp(r'\.mp4$'), '-poster.webp');
+  }
 
   @override
   State<NwsbVideo> createState() => _NwsbVideoState();
@@ -208,14 +219,19 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            widget._poster,
-            fit: widget.fit,
-            alignment: widget.alignment,
-            // A missing poster must never be an exception in a list that is
-            // scrolling. Nothing is a worse picture than a red error box.
-            errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
-          ),
+          if (widget._poster case final p?)
+            Image.asset(
+              p,
+              fit: widget.fit,
+              alignment: widget.alignment,
+              // A missing poster must never be an exception in a list that
+              // is scrolling. Nothing is a worse picture than a red error
+              // box.
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: Colors.black),
+            )
+          else
+            const ColoredBox(color: Colors.black),
           // 220ms, which is long enough that a decoder arriving mid-scroll
           // reads as the picture coming to life rather than as a flicker.
           AnimatedOpacity(

@@ -452,7 +452,14 @@ class VideoPool {
   Future<void> _bringUp(VideoLease l) async {
     if (l._disposed || l._controller != null) return;
 
-    final c = VideoPlayerController.asset(l.assetPath);
+    // A bundled file OR a URL. The website plays most of these straight
+    // from Cloudinary, and until now this could only open an asset — so
+    // every remote clip had been quietly replaced with whatever local file
+    // was nearest in meaning, and the app was playing the wrong film in
+    // half its sections.
+    final c = _isRemote(l.assetPath)
+        ? VideoPlayerController.networkUrl(Uri.parse(l.assetPath))
+        : VideoPlayerController.asset(l.assetPath);
     l._controller = c;
 
     try {
@@ -493,6 +500,9 @@ class VideoPool {
     // [_assertPlaying].
     _assertPlaying();
   }
+
+  static bool _isRemote(String p) =>
+      p.startsWith('http://') || p.startsWith('https://');
 
   /// Returns when the PLATFORM has actually let the player go, not when the
   /// Dart object was dropped. Callers wait on this before creating anything —
