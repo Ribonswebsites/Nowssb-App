@@ -53,8 +53,8 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(29));
-    expect(kNormalSectionOrder.toSet(), hasLength(29),
+    expect(kNormalSectionOrder, hasLength(30));
+    expect(kNormalSectionOrder.toSet(), hasLength(30),
         reason: 'two sections share a key');
 
     for (final k in {...kNormalNoMarkup, ...kNormalDefOff}) {
@@ -73,7 +73,7 @@ void main() {
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 24);
+    expect(shown, 25);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',

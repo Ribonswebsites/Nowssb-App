@@ -56,10 +56,12 @@ void main() {
 
   test('the registry is complete', () {
     // REG.fash.items has thirty entries and four of them are defOff, so a
-    // fresh install shows twenty-six.
-    expect(kFashionSectionOrder, hasLength(30));
+    // fresh install shows twenty-six — plus `mainops`, which is this app's
+    // own: six doors on one panel, so the app can be used without knowing
+    // where anything is.
+    expect(kFashionSectionOrder, hasLength(31));
     expect(kFashionDefOff, hasLength(4));
-    expect(kFashionSectionOrder.toSet(), hasLength(30),
+    expect(kFashionSectionOrder.toSet(), hasLength(31),
         reason: 'two sections share a key');
     for (final k in kFashionDefOff) {
       expect(kFashionSectionOrder, contains(k),
@@ -67,7 +69,7 @@ void main() {
     }
     expect(
       kFashionSectionOrder.where((k) => !kFashionDefOff.contains(k)).length,
-      26,
+      27,
     );
   });
 
@@ -176,23 +178,39 @@ void main() {
 
     // The tiles are the seventh section, well below the fold, and a
     // ListView.builder has not built them at rest.
+    // Scrolled to the GRID, not to the first "Sound Library" on the page —
+    // the six-door panel above the tiles says that too, and stopping at it
+    // left the tiles still below the fold.
     final list = find.byType(Scrollable).first;
     for (var i = 0;
-        i < 30 && find.text('Sound Library').evaluate().isEmpty;
+        i < 30 &&
+            find
+                .descendant(
+                  of: find.byType(GridView),
+                  matching: find.text('Sound Library'),
+                )
+                .evaluate()
+                .isEmpty;
         i++) {
       await tester.drag(list, const Offset(0, -320));
       await tester.pump(const Duration(milliseconds: 16));
     }
 
+    // Scoped to the grid. Three of these names are also on the six-door
+    // panel above — that panel is a menu and these are the tiles, and both
+    // are meant to say Sound Library.
+    final grid = find.byType(GridView);
     for (final t in [
       'Sound Library',
       'My Progress',
       'Word Science',
       'My Profile',
     ]) {
-      expect(find.text(t), findsOneWidget, reason: '$t is not on the home');
+      expect(find.descendant(of: grid, matching: find.text(t)), findsOneWidget,
+          reason: '$t is not on the home');
     }
-    expect(find.text('The Store'), findsNothing,
+    expect(find.descendant(of: grid, matching: find.text('The Store')),
+        findsNothing,
         reason: 'The Store is not one of the four tiles');
 
     // `height: 118px` — nowssb-nm.css:7950. They were sized by a ratio, so
@@ -254,6 +272,49 @@ void main() {
       ),
       findsOneWidget,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the six doors are one compact panel', (tester) async {
+    await pump(tester);
+
+    final list = find.byType(Scrollable).first;
+    for (var i = 0;
+        i < 30 && find.byType(MainOptionsSection).evaluate().isEmpty;
+        i++) {
+      await tester.drag(list, const Offset(0, -320));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+
+    expect(MainOptionsSection.options, hasLength(6));
+    for (final (mark, _, label, tab) in MainOptionsSection.options) {
+      expect(mark.trim(), startsWith('<'),
+          reason: '$label must be a drawn path, not a glyph');
+      expect(tab, inInclusiveRange(0, 4),
+          reason: '$label points at a tab that does not exist');
+    }
+
+    // Every one of the five tabs is reachable from this panel — that is the
+    // whole point of it.
+    expect(MainOptionsSection.options.map((o) => o.$4).toSet(), hasLength(5));
+
+    // SHORT. A menu that pushes the page down is a menu that gets scrolled
+    // past, so the two rows are held to a height rather than left to grow.
+    // SHORT. Six doors cost 2 x rowHeight — 124pt for the lot, which is
+    // less than the black bar underneath them takes on its own. The head and
+    // the bar are the app's standard furniture, shared with every section on
+    // both homes, and they are 228 of the total; the grid is the part this
+    // widget controls and it is the small part.
+    expect(MainOptionsSection.rowHeight, lessThanOrEqualTo(64));
+    final panel = tester.getRect(find.byType(MainOptionsSection));
+    final bar = tester.getRect(find.descendant(
+      of: find.byType(MainOptionsSection),
+      matching: find.byType(SecBanner),
+    ));
+    expect(MainOptionsSection.rowHeight * 2, lessThan(bar.height + 10),
+        reason: 'six doors should not cost more than one banner');
+    expect(panel.height, lessThan(440),
+        reason: 'the panel got tall — it is meant to read as one menu');
     expect(tester.takeException(), isNull);
   });
 

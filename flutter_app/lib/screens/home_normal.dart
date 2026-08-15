@@ -57,6 +57,9 @@ const kNormalSectionOrder = <String>[
   'streak',
   'storedisc',
   'practice',
+  // Not on the website's registry. Six doors on one panel so the app can
+  // be used without knowing where anything is — see MainOptionsSection.
+  'mainops',
   'tiles',
   'store',
   'reader',
@@ -158,6 +161,7 @@ class _HomeNormalState extends State<HomeNormal> {
           )
         ),
         ('practice', NmPractice(onTap: () => _go(1))),
+        ('mainops', MainOptionsSection(onGo: _go)),
         ('tiles', NmTiles(onTile: _go)),
         ('store', NmStore(onTap: () => _go(3))),
         ('reader', NmReader(onTap: () => _go(2))),

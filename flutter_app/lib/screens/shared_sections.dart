@@ -26,6 +26,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/home_parts.dart';
+import '../widgets/neu_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/tv_frame.dart';
 
@@ -204,6 +205,157 @@ class _PromoOffer extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// THE SIX — every main door in the app, on one compact panel.
+///
+/// Three across and two down, each cell a mark over its name, with a hairline
+/// standing between them. It exists so the app can be used without knowing
+/// where anything is: five of these are the tab bar's own destinations and
+/// the sixth is the one people look hardest for.
+///
+/// Both homes, one widget. [SectionPane] makes the panel glass on the Fashion
+/// home and a raised neumorphic card on the Normal one, and [PaneHead] gives
+/// the heading a white disc on the first and a neumorphic disc on the second
+/// — so the two looks come from the skin rather than from two copies of this.
+///
+/// Kept SHORT on purpose. A cell is a mark, a word and the air around them;
+/// the whole panel is about the height of one banner, because a menu that
+/// pushes the page down is a menu that gets scrolled past.
+class MainOptionsSection extends StatelessWidget {
+  const MainOptionsSection({super.key, this.onGo});
+
+  /// Called with the tab the option opens.
+  final void Function(int tab)? onGo;
+
+  /// A row's height. Deliberately tight: the whole panel is a menu, and a
+  /// menu that pushes the page down is one that gets scrolled past.
+  static const double rowHeight = 62;
+
+  /// (mark, the box that mark was drawn in, label, tab).
+  static const options = <(String, double, String, int)>[
+    (NwsbMarks.play, 22, 'Practice', 1),
+    (NwsbMarks.sound, 24, 'Sound Library', 2),
+    (NwsbMarks.word, 24, 'Word Science', 2),
+    (NwsbMarks.bag, 24, 'The Store', 3),
+    (NwsbMarks.people, 24, 'Connect', 0),
+    (NwsbMarks.trending, 22, 'My Progress', 4),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
+    return SectionPane(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const PaneHead(
+            eyebrow: 'Everything, one tap away',
+            title: 'Where to Begin',
+            mark: NwsbMarks.sliders,
+          ),
+          Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color:
+                  fashion ? const Color(0x0FFFFFFF) : const Color(0x081A1A2E),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color:
+                    fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E),
+              ),
+            ),
+            child: Column(
+              children: [
+                _OptRow(options.sublist(0, 3), fashion: fashion, onGo: onGo),
+                _OptRow(options.sublist(3, 6), fashion: fashion, onGo: onGo),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          SecBanner(
+            title: 'Find Your Way Around',
+            sub: 'Every screen in the app, and what each one is for',
+            mark: NwsbMarks.sliders,
+            onTap: () => onGo?.call(4),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Three cells with a hairline between each.
+class _OptRow extends StatelessWidget {
+  const _OptRow(this.items, {required this.fashion, this.onGo});
+
+  final List<(String, double, String, int)> items;
+  final bool fashion;
+  final void Function(int tab)? onGo;
+
+  @override
+  Widget build(BuildContext context) {
+    final rule = fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
+    return SizedBox(
+      height: MainOptionsSection.rowHeight,
+      child: Row(
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            if (i > 0) Container(width: 1, height: 34, color: rule),
+            Expanded(
+              child: _Opt(items[i], fashion: fashion, onGo: onGo),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// One door: the mark, and the word under it.
+class _Opt extends StatelessWidget {
+  const _Opt(this.item, {required this.fashion, this.onGo});
+
+  final (String, double, String, int) item;
+  final bool fashion;
+  final void Function(int tab)? onGo;
+
+  @override
+  Widget build(BuildContext context) {
+    final (mark, box, label, tab) = item;
+    return GestureDetector(
+      onTap: () => onGo?.call(tab),
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          NwsbIcon(
+            mark,
+            size: 21,
+            viewBox: box,
+            color: fashion ? NwsbColors.goldLight : WrapHead.markGold,
+          ),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.1,
+                color: fashion ? const Color(0xE6FFFFFF) : NwsbColors.ink,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

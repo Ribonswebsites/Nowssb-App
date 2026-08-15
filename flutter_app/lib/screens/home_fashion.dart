@@ -54,6 +54,9 @@ const kFashionSectionOrder = <String>[
   'greet',
   'herorow',
   'practice',
+  // Not on the website's registry. Six doors on one panel so the app can
+  // be used without knowing where anything is — see MainOptionsSection.
+  'mainops',
   'reader',
   'herovid',
   'streak',
@@ -155,6 +158,7 @@ class _HomeFashionState extends State<HomeFashion> {
           )
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
+        ('mainops', MainOptionsSection(onGo: _go)),
         ('reader', FashReader(onTap: () => _go(2))),
         ('herovid', FashStreakVideo(onTap: () => _go(1))),
         ('streak', FashStreak(onTap: () => _go(1))),

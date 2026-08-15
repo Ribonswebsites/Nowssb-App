@@ -1075,6 +1075,61 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
+
+    <!-- THE SIX — every main door in the app on one compact panel. Three
+         across and two down, a hairline between each, so the app can be used
+         without knowing where anything is. -->
+    <div class="mainops-blk nmh-sec-wrap">
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Everything, one tap away</div>
+          <div class="qa-tv-name">Where to Begin</div>
+        </div>
+      </div>
+      <div class="mo-box">
+        <div class="mo-row">
+          <button class="mo-cell" type="button" onclick="openSub('practice')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.2 19 12 8 18.8z"/></svg></span>
+            <span class="mo-lbl">Practice</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('sound-library')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/></svg></span>
+            <span class="mo-lbl">Sound Library</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('word-science')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M9 12h6"/></svg></span>
+            <span class="mo-lbl">Word Science</span>
+          </button>
+        </div>
+        <div class="mo-row">
+          <button class="mo-cell" type="button" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s)s.classList.add('open');})()">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>
+            <span class="mo-lbl">The Store</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('social')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.4" cy="8.4" r="3.4"/><path d="M3.4 19.4a6 6 0 0 1 12 0"/><path d="M16.4 5.4a3.4 3.4 0 0 1 0 6M17.6 19.4a6 6 0 0 0-1.6-4.1"/></svg></span>
+            <span class="mo-lbl">Connect</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('my-progress')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M6.8 20V13M11.4 20V7.2M16 20v-4.6"/></svg></span>
+            <span class="mo-lbl">My Progress</span>
+          </button>
+        </div>
+      </div>
+      <div class="ncb-carousel nsub-ban" role="button" onclick="openSub('my-progress')">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Find Your Way Around</span><span class="ncb-sub">Every screen in the app, and what each one is for</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+    </div>
+
     <!-- Reader — pill rail, then the clip, then the copy, then the black
          banner, all in one wrapper. Nothing is laid over the clip. -->
     <!-- eBooks — the same rail / clip / copy / banner order as the Reader. -->
@@ -1823,6 +1878,61 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <!-- #fpBanner is appended here by app/js/part066.js -->
   </div>
+
+    <!-- THE SIX — every main door in the app on one compact panel. Three
+         across and two down, a hairline between each, so the app can be used
+         without knowing where anything is. -->
+    <div class="mainops-blk glass-wrap">
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Everything, one tap away</div>
+          <div class="qa-tv-name">Where to Begin</div>
+        </div>
+      </div>
+      <div class="mo-box">
+        <div class="mo-row">
+          <button class="mo-cell" type="button" onclick="openSub('practice')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.2 19 12 8 18.8z"/></svg></span>
+            <span class="mo-lbl">Practice</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('sound-library')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/></svg></span>
+            <span class="mo-lbl">Sound Library</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('word-science')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M9 12h6"/></svg></span>
+            <span class="mo-lbl">Word Science</span>
+          </button>
+        </div>
+        <div class="mo-row">
+          <button class="mo-cell" type="button" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s)s.classList.add('open');})()">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>
+            <span class="mo-lbl">The Store</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('social')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.4" cy="8.4" r="3.4"/><path d="M3.4 19.4a6 6 0 0 1 12 0"/><path d="M16.4 5.4a3.4 3.4 0 0 1 0 6M17.6 19.4a6 6 0 0 0-1.6-4.1"/></svg></span>
+            <span class="mo-lbl">Connect</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('my-progress')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M6.8 20V13M11.4 20V7.2M16 20v-4.6"/></svg></span>
+            <span class="mo-lbl">My Progress</span>
+          </button>
+        </div>
+      </div>
+      <div class="ncb-carousel nsub-ban" role="button" onclick="openSub('my-progress')">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Find Your Way Around</span><span class="ncb-sub">Every screen in the app, and what each one is for</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+    </div>
+
   <!-- Reader — pill rail, then the clip, then the copy, then the black
        banner, all in one wrapper. Nothing is laid over the clip. -->
   <div class="rdsec-wrap fash-rdsec-wrap">
