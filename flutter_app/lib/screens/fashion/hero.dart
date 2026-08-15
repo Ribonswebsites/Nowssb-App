@@ -217,14 +217,18 @@ class _HeroCard extends StatelessWidget {
           SizedBox(
             height: _topStripH,
             child: Row(
+              // Same two groups: the shop keeps left and shrinks if it must,
+              // the search sits in the right-hand corner at its own size.
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(child: _ShopChip(onTap: onStore)),
-                // The slack belongs BEFORE the rule. A Row of Flexible
-                // children is left-aligned, so without this it collected at
-                // the right-hand end and the search sat short of the edge.
-                const Spacer(),
-                const _Sep(),
-                _SearchPill(onTap: onSearch),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const _Sep(),
+                    _SearchPill(onTap: onSearch),
+                  ],
+                ),
               ],
             ),
           ),
@@ -246,49 +250,74 @@ class _HeroCard extends StatelessWidget {
           SizedBox(
             height: _footStripH,
             child: Row(
+              // TWO GROUPS, pushed apart. The buttons keep to the left and
+              // Learn with its disc sits in the corner, which is where the
+              // markup puts them.
+              //
+              // Every child used to be a bare Flexible, and Flexible
+              // defaults to flex: 1 — so the buttons, Learn AND the Spacer
+              // were all taking a share of the free width. The buttons
+              // stretched into boxes far wider than their labels and the
+              // Spacer only ever got a quarter of the gap it was there to
+              // hold, which is why Learn floated in the middle instead of
+              // reaching the edge. flex: 0 does not fix it either: that is
+              // the same as not being flexible at all, so the labels could
+              // no longer shrink and the strip overflowed by 77.
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Shrinks if it has to; its labels ellipsise before the row
+                // ever overflows.
                 Flexible(
-                  child: _FootButton(label: 'EXPLORE', onTap: onExplore),
-                ),
-                const _Sep(),
-                Flexible(
-                  child: _FootButton(
-                    label: 'APP GUIDE',
-                    trailing: Icons.chevron_right,
-                    onTap: onGuide,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: _FootButton(label: 'EXPLORE', onTap: onExplore),
+                      ),
+                      const _Sep(),
+                      Flexible(
+                        child: _FootButton(
+                          label: 'APP GUIDE',
+                          trailing: Icons.chevron_right,
+                          onTap: onGuide,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const Spacer(),
-                const _Sep(),
-                const Flexible(
-                  child: Text(
-                    'LEARN',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.4,
-                      color: Color(0xE6FFFFFF),
+                // Natural width, hard against the right edge.
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const _Sep(),
+                    const Text(
+                      'LEARN',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.4,
+                        color: Color(0xE6FFFFFF),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: onGuide,
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    width: 34,
-                    height: 34,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: onGuide,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: NwsbIcon(NwsbMarks.arrow,
+                              size: 15, color: NwsbColors.ink),
+                        ),
+                      ),
                     ),
-                    child: const Center(
-                      child: NwsbIcon(NwsbMarks.arrow,
-                          size: 15, color: NwsbColors.ink),
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),
@@ -411,37 +440,35 @@ class _ShopChip extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // The two lines can never be taller than the strip that holds
-          // them, whatever the reader's text scale is set to.
+          // Full size. Shrinking this was mine, not asked for — the strip
+          // is tall enough to hold it, and if the width ever runs out it is
+          // the one line that ellipsises, not the whole block that scales.
           const Flexible(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "TODAY'S",
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.6,
-                      color: NwsbColors.goldLight,
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "TODAY'S",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.6,
+                    color: NwsbColors.goldLight,
                   ),
-                  SizedBox(height: 1),
-                  Text(
-                    'Words & meanings',
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+                ),
+                SizedBox(height: 1),
+                Text(
+                  'Words & meanings',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -517,7 +544,7 @@ class _FootButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 12),
         decoration: BoxDecoration(
           color: const Color(0x0FFFFFFF),
           border: Border.all(color: const Color(0x2EFFFFFF)),
@@ -531,9 +558,9 @@ class _FootButton extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 10.5,
+                  fontSize: 9.5,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.4,
+                  letterSpacing: 0.2,
                   color: Colors.white,
                 ),
               ),

@@ -487,6 +487,11 @@ class VideoPool {
     if (l._wantsPlay) await c.play();
 
     l._changed();
+    // Asking once is not the same as it having happened. The readout said
+    // `decoders 4/8  playing 1`: four players existed, three of them were
+    // not moving, and a single fire-and-forget play() is why. See
+    // [_assertPlaying].
+    _assertPlaying();
   }
 
   /// Returns when the PLATFORM has actually let the player go, not when the
@@ -526,6 +531,29 @@ class VideoPool {
   /// back.
   void resume() => _rebalanceSoon();
 
+  /// Make every lease that holds a decoder and wants to move actually move.
+  ///
+  /// `play()` is asked for once, immediately after initialize(), and on
+  /// Android that request does not always take: the surface may not be
+  /// attached yet, and the call returns without error having done nothing.
+  /// The result is a player that exists, is initialized, holds its slot and
+  /// sits on frame one — which is exactly what "the videos are not playing"
+  /// looked like, with the readout reporting four decoders and one of them
+  /// moving.
+  ///
+  /// So it is asserted rather than assumed: cheap to check, harmless to
+  /// repeat, and the heartbeat runs it every two seconds so a player that
+  /// misses its moment gets another one.
+  void _assertPlaying() {
+    for (final l in _live) {
+      if (!l._wantsPlay) continue;
+      final c = l._controller;
+      if (c == null || !c.value.isInitialized) continue;
+      if (c.value.isPlaying) continue;
+      c.play();
+    }
+  }
+
   /// A slow heartbeat, as a backstop for anything the per-frame measuring
   /// misses — a screen that is completely static produces no frames, so it
   /// reports nothing, so a clip that arrived during the quiet would wait
@@ -533,7 +561,10 @@ class VideoPool {
   Timer? _beat;
   void startHeartbeat() {
     _beat ??= Timer.periodic(const Duration(seconds: 2), (_) {
-      if (_leases.isNotEmpty) _rebalanceSoon();
+      if (_leases.isEmpty) return;
+      _rebalanceSoon();
+      // A player that missed its start gets another chance every beat.
+      _assertPlaying();
     });
   }
 }

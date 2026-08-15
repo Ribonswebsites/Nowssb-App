@@ -230,6 +230,10 @@ class TvFrame extends StatelessWidget {
   }
 }
 
+/// tv-l-mid.webp's own width. The rail has to be scaled to the box, and
+/// scaling means knowing what it is being scaled from.
+const double _tvRailNaturalWidth = 1452;
+
 /// The bezel picture — one render, or the television's three slices.
 class _Bezel extends StatelessWidget {
   const _Bezel({required this.frame});
@@ -254,17 +258,36 @@ class _Bezel extends StatelessWidget {
         final railBottom = c.maxHeight * DeviceFrame.tvLandscapeCapFraction;
         return Stack(
           children: [
+            // The side rails. `background: … top center / 100% 8px repeat-y`
+            // — scaled to the FULL WIDTH of the box and tiled downwards.
+            //
+            // This was `Image.asset(fit: BoxFit.none, repeat: repeatY)`,
+            // which draws the file at its natural size: the slice is 1452
+            // wide and the television is about 600, so it was painted
+            // 1452 wide and centred, putting the left rail off the left edge
+            // and the right rail off the right one. The set has had no sides
+            // at all.
+            //
+            // `scale` on the provider is what CSS's `100%` is: dividing the
+            // natural width by the box width makes the image's LOGICAL width
+            // exactly the box, and its height follows, so repeatY then tiles
+            // the right shape.
             Positioned(
               left: 0,
               right: 0,
               top: 0,
               bottom: railBottom,
-              child: Image.asset(
-                'assets/frames/tv-l-mid.webp',
-                repeat: ImageRepeat.repeatY,
-                fit: BoxFit.none,
-                alignment: Alignment.topCenter,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: ExactAssetImage(
+                      'assets/frames/tv-l-mid.webp',
+                      scale: _tvRailNaturalWidth / c.maxWidth,
+                    ),
+                    repeat: ImageRepeat.repeatY,
+                    alignment: Alignment.topCenter,
+                  ),
+                ),
               ),
             ),
             Positioned(
