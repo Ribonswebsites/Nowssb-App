@@ -19,26 +19,14 @@ void main() {
   late FakeVideoPlatform platform;
 
   /// Let the pool's coalesced rebalance run all the way through.
-  ///
-  /// A pass is several awaits deep: the zero timer that coalesces it, the
-  /// disposal of everything being evicted, the creation of everything
-  /// replacing it, and the initialized event that follows each creation.
-  /// Generous on purpose — a count read halfway through a pass is a count of
-  /// nothing in particular.
   Future<void> pumpPool() async {
     for (var i = 0; i < 24; i++) {
       await Future<void>.delayed(Duration.zero);
     }
   }
 
-  // One platform for the whole file. Replacing it between tests would leave
-  // controllers from the previous test calling dispose() on a stranger, and
-  // the counts stop meaning anything.
   setUpAll(() => platform = FakeVideoPlatform());
 
-  // The pool is a singleton and a pass is asynchronous, so both have to be
-  // drained before the next test — otherwise a lease left in flight counts
-  // against the next test's ceiling.
   setUp(() async {
     VideoPool.instance.unhold();
     await VideoPool.instance.debugReset();
@@ -68,8 +56,6 @@ void main() {
       for (var i = 0; i < 100; i++)
         VideoPool.instance.lease('assets/video/clip-$i.mp4'),
     ];
-    // All hundred claim to be visible — the pathological case, and exactly
-    // what the website did.
     for (var i = 0; i < leases.length; i++) {
       leases[i].reportDistance(i.toDouble());
     }
@@ -97,9 +83,10 @@ void main() {
 
   test('the decoders go to the clips nearest the middle of the screen',
       () async {
+    // Fill the pool past capacity so ranking actually evicts the furthest.
     final far = VideoPool.instance.lease('assets/video/far.mp4');
     final near = VideoPool.instance.lease('assets/video/near.mp4');
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < VideoPool.maxLive; i++) {
       VideoPool.instance.lease('assets/video/other-$i.mp4')
           .reportDistance(500);
     }
@@ -116,12 +103,9 @@ void main() {
   test('a feature clip outranks decoration however far away it is', () async {
     final tv = VideoPool.instance.lease('assets/video/tv-screen.mp4',
         priority: ClipPriority.feature);
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < VideoPool.maxLive + 4; i++) {
       VideoPool.instance.lease('assets/video/banner-$i.mp4').reportDistance(5);
     }
-    // The television is the furthest thing on screen and still keeps a slot,
-    // because a section whose entire point is its clip must not be the one
-    // showing a still.
     tv.reportDistance(900);
     await pumpPool();
 
@@ -135,7 +119,7 @@ void main() {
     await pumpPool();
     expect(platform.alive, 1);
 
-    a.reportDistance(double.infinity); // scrolled off
+    a.reportDistance(double.infinity);
     await pumpPool();
 
     expect(VideoPool.instance.liveCount, 0);
@@ -147,9 +131,6 @@ void main() {
 
   test('scrolling a long page never exceeds the ceiling at any point',
       () async {
-    // Thirty clips down a page, scrolled past one at a time. This is the
-    // case that actually broke the website: not any single screen, but the
-    // accumulation as you travel.
     final leases = [
       for (var i = 0; i < 30; i++)
         VideoPool.instance.lease('assets/video/row-$i.mp4'),
@@ -187,7 +168,7 @@ void main() {
   });
 
   test('backgrounding the app hands every decoder back', () async {
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < VideoPool.maxLive; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();
@@ -203,13 +184,8 @@ void main() {
   });
 
   test('nothing decodes while the pool is held', () async {
-    // The start animation is the only thing on screen for its whole length,
-    // and the app is built behind it. Without the hold, the home would be
-    // taking four decoders while the splash holds a fifth — on the devices
-    // that struggle most, the launch would be the worst moment of the
-    // session.
     VideoPool.instance.hold();
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < VideoPool.maxLive; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();
@@ -227,7 +203,7 @@ void main() {
   });
 
   test('coming back to the foreground takes them again', () async {
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < VideoPool.maxLive; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();

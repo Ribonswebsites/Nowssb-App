@@ -23,9 +23,6 @@ import 'fake_video_platform.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // Settings persist through SharedPreferences, which has no platform in a
-  // test — getInstance() never completes and the whole file hangs rather
-  // than failing. An in-memory store is the sanctioned stand-in.
   SharedPreferences.setMockInitialValues({});
 
   setUpAll(FakeVideoPlatform.new);
@@ -61,8 +58,6 @@ void main() {
   testWidgets('the intro gate opens the page underneath it', (tester) async {
     await pump(tester, const SoundLibraryScreen());
 
-    // The intro is in front: its Enter button is showing and the page's own
-    // title row is not reachable yet.
     expect(find.text('OPEN LIBRARY'), findsOneWidget);
 
     await tester.tap(find.text('OPEN LIBRARY'));
@@ -90,15 +85,16 @@ void main() {
     await Settings.instance.setFashionPlus(false);
   });
 
-  testWidgets('motion off means a page never asks for a decoder',
+  testWidgets('page film always takes a decoder (page backgrounds play)',
       (tester) async {
-    // The whole point of the switch. With it off the background is a still,
-    // and a still costs nothing at all — the pool is never even asked.
+    // PageShell hard-codes autoplay:true so the film that IS the page always
+    // moves — same as the website's .fp-page-vid. Fashion Plus still exists
+    // for other motion, but it no longer freezes the page background itself.
     await Settings.instance.setFashionPlus(false);
     await pump(tester, const ProfileScreen());
     await tester.pump(const Duration(milliseconds: 60));
 
-    expect(VideoPool.instance.liveCount, 0,
-        reason: 'a still background must not hold a decoder');
+    expect(VideoPool.instance.liveCount, greaterThanOrEqualTo(1),
+        reason: 'the page film is always playing, matching the website');
   });
 }

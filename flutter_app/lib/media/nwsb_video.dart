@@ -88,11 +88,6 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   }
 
   /// Only what changes the picture causes a rebuild.
-  ///
-  /// The lease notifies whenever the pool grants or takes back a decoder, but
-  /// the only thing this widget draws differently is "poster" versus "moving
-  /// picture". Rebuilding on anything else would re-run the post-frame
-  /// measure, which reports, which notifies — round and round.
   bool _wasReady = false;
 
   void _onLease() {
@@ -105,8 +100,6 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   @override
   void didUpdateWidget(NwsbVideo old) {
     super.didUpdateWidget(old);
-    // A changed clip, or the motion switch moving under it. Both are the
-    // same thing here: let go of what was held, take what is now wanted.
     if (old.asset != widget.asset || old.autoplay != widget.autoplay) {
       _drop();
       if (widget.autoplay) _take();
@@ -131,19 +124,6 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  /// Measure after every frame, for as long as this widget is alive.
-  ///
-  /// This used to be registered inside build(), which looked equivalent and
-  /// was not: a post-frame callback fires ONCE, and a ListView does not
-  /// rebuild the children that are merely scrolling past. So the clip
-  /// measured itself on its first frame and never again — and because the
-  /// widget only rebuilds when the pool grants it a decoder, a clip that
-  /// failed to get one on that single measurement could never ask for
-  /// another. Nothing on screen played, ever, and the readout said 0/4.
-  ///
-  /// Re-registering does NOT schedule a frame of its own, so an idle app
-  /// stays idle — the callback simply runs on whatever frames the app was
-  /// producing anyway, which is exactly when a clip can have moved.
   void _pump() {
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -152,27 +132,20 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     });
   }
 
-  /// Where this clip is relative to the middle of the screen, measured from
-  /// the render object rather than from a scroll offset — which means it
-  /// works the same inside a list, a page view, a nested scroller or none of
-  /// them, and no parent has to cooperate.
   void _measure() {
     if (!mounted) return;
     final lease = _lease;
-    if (lease == null) return;   // a still has nothing to report
+    if (lease == null) return;
     // Inactive IndexedStack tabs stay laid out at the same coordinates as
     // the visible one. TickerMode is how IndexedStack says "this child is
     // not being looked at" — same job as the website's shown() check, so
     // Practice/Library/Store/Profile do not steal the home's films.
-    if (!TickerMode.of(context)) {
+    if (!TickerMode.valuesOf(context).enabled) {
       lease.reportDistance(double.infinity);
       return;
     }
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize || !box.attached) {
-      // Not laid out YET is not the same as off screen. Saying "infinity"
-      // here would hand the decoder away on the one frame before the first
-      // layout, so this simply waits for the next.
       return;
     }
     final screen = MediaQuery.maybeOf(context)?.size;
@@ -181,9 +154,6 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     final top = box.localToGlobal(Offset.zero).dy;
     final centre = top + box.size.height / 2;
 
-    // One viewport of slack on each side, so a clip is granted its decoder
-    // a screen's worth of travel before you reach it and keeps it a screen
-    // after — scrolling back up does not restart everything.
     final visible = top < screen.height * 2 && top + box.size.height > -screen.height;
     lease.reportDistance(
         visible ? (centre - screen.height / 2).abs() : double.infinity);
@@ -202,12 +172,8 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
             widget._poster,
             fit: widget.fit,
             alignment: widget.alignment,
-            // A missing poster must never be an exception in a list that is
-            // scrolling. Nothing is a worse picture than a red error box.
             errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
           ),
-          // 220ms, which is long enough that a decoder arriving mid-scroll
-          // reads as the picture coming to life rather than as a flicker.
           AnimatedOpacity(
             opacity: ready ? 1 : 0,
             duration: const Duration(milliseconds: 220),
