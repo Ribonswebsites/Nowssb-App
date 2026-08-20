@@ -20,6 +20,8 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/models.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 
 class WordDetail extends StatelessWidget {
@@ -33,16 +35,12 @@ class WordDetail extends StatelessWidget {
       backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
-          // The player's own artwork, which is what the website puts behind
-          // a word. assets/player/liquid-splash.webp is the still of the
-          // same film — a picture here rather than a decoder, because this
-          // page is for reading.
-          Positioned.fill(
-            child: Image.asset(
-              'assets/player/liquid-splash.webp',
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: NwsbColors.deep),
+          // Same film the website puts behind a word — playing, not a still.
+          const Positioned.fill(
+            child: NwsbVideo(
+              asset: 'assets/video/player-liquid-splash.mp4',
+              poster: 'assets/player/liquid-splash.webp',
+              priority: ClipPriority.feature,
             ),
           ),
           const Positioned.fill(
@@ -51,7 +49,7 @@ class WordDetail extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xB3060C18), Color(0xFA060C18)],
+                  colors: [Color(0x66060C18), Color(0xB3060C18)],
                 ),
               ),
             ),

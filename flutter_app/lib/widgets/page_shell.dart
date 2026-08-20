@@ -62,12 +62,13 @@ class _PageShellState extends State<PageShell> {
       body: Stack(
         children: [
           Positioned.fill(
-            // Still unless motion mode is on. autoplay:false is what makes an
-            // unmoving background genuinely free — with it off the pool is
-            // never even asked for a decoder, so the page costs one picture.
+            // The film IS the page. Always playing — same as the website's
+            // #fpBgVideo / .fp-page-vid, which loop whether Fashion Plus is
+            // on or not. The switch still exists; it no longer freezes the
+            // one thing the page is made of.
             child: NwsbVideo(
               asset: widget.film,
-              autoplay: Settings.instance.fashionPlus,
+              autoplay: true,
               priority: ClipPriority.feature,
             ),
           ),
@@ -78,9 +79,9 @@ class _PageShellState extends State<PageShell> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
+                    Color(0x66060C18),
+                    Color(0x99060C18),
                     Color(0xCC060C18),
-                    Color(0xF0060C18),
-                    Color(0xFA060C18),
                   ],
                 ),
               ),

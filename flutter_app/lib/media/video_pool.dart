@@ -153,13 +153,16 @@ class VideoPool {
 
   static final VideoPool instance = VideoPool._();
 
-  /// The ceiling. Four is deliberately conservative: it is under the limit
-  /// of every Android device the app will meet, including the cheap ones,
-  /// and a phone screen 900 logical pixels tall physically cannot show more
-  /// than three or four clips at a size where anyone can tell they are
-  /// moving. Raising this does not make the app look better; it makes it
-  /// crash on the devices that were already struggling.
-  static const int maxLive = 4;
+  /// The ceiling. Matched to the website (`MAX_PLAYING` in app/js/part051.js)
+  /// so Flutter, the Capacitor WebView and the HTML app all play the same
+  /// number of films.
+  ///
+  /// Twenty-four covers a full home of banners, televisions AND the page
+  /// film behind them. Off-screen clips still cost nothing — this is a cap
+  /// on what is being looked at, not on how many exist in the app. Four was
+  /// leaving every background and most of the section films as stills, which
+  /// is what "the videos are not playing" actually was.
+  static const int maxLive = 24;
 
   final List<VideoLease> _leases = [];
   final Set<VideoLease> _live = {};

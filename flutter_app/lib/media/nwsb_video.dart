@@ -6,12 +6,11 @@
 /// that uses this has to know any of that happened — it is a picture that
 /// sometimes moves.
 ///
-/// The poster is not an optimisation, it is the contract. Because at most
-/// four clips decode at once, MOST OF THESE ARE SHOWING A PICTURE MOST OF
-/// THE TIME, and the app looks right only if that picture is the clip's own
-/// first frame. Every mp4 in assets/video has a -poster.webp beside it,
-/// generated from the file itself, so what you see while a clip waits is
-/// exactly what it would be showing anyway.
+/// The poster is not an optimisation, it is the contract. Off-screen clips
+/// show a picture and cost nothing; every on-screen clip is granted a
+/// decoder (capped with the website at 24). Every mp4 in assets/video has
+/// a -poster.webp beside it, generated from the file itself, so what you
+/// see while a clip waits is exactly what it would be showing anyway.
 library;
 
 import 'package:flutter/material.dart';
@@ -161,6 +160,14 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     if (!mounted) return;
     final lease = _lease;
     if (lease == null) return;   // a still has nothing to report
+    // Inactive IndexedStack tabs stay laid out at the same coordinates as
+    // the visible one. TickerMode is how IndexedStack says "this child is
+    // not being looked at" — same job as the website's shown() check, so
+    // Practice/Library/Store/Profile do not steal the home's films.
+    if (!TickerMode.of(context)) {
+      lease.reportDistance(double.infinity);
+      return;
+    }
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize || !box.attached) {
       // Not laid out YET is not the same as off screen. Saying "infinity"

@@ -54,8 +54,7 @@ class HomeNormal extends StatelessWidget {
             const SizedBox(height: NwsbSpace.gap),
 
             // Every block below carries a clip, and every clip goes through
-            // NwsbVideo — so this whole page costs at most four decoders no
-            // matter how far it runs.
+            // NwsbVideo. On-screen films play; off-screen ones are posters.
             const HeroSection(),
             const SizedBox(height: NwsbSpace.gap),
             const _StreakSection(),

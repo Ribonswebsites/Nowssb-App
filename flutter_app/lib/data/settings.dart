@@ -2,11 +2,10 @@
 ///
 /// Two of them matter and both are real behaviour rather than decoration:
 ///
-///   fashionPlus  Motion mode. Off, a page background is the clip's own
-///                first frame — a still, costing nothing. On, it plays.
-///                This is the switch the website calls Fashion Plus and it
-///                is the one that trades battery for movement, so it is off
-///                by default and the page that turns it on says so.
+///   fashionPlus  Motion mode. On by default so every on-screen film plays
+///                (matching the website and the WebView). Off, page
+///                backgrounds hold their first frame. The page that turns
+///                it off says so.
 ///
 ///   fashionHome  Which home. The dark one or the pale neumorphic one.
 ///
@@ -21,10 +20,10 @@ class Settings extends ChangeNotifier {
   Settings._();
   static final Settings instance = Settings._();
 
-  static const _kPlus = 'nwsb_fashplus';
+  static const _kPlus = 'nwsb_fashplus_v2';
   static const _kHome = 'nwsb_home_mode';
 
-  bool _fashionPlus = false;
+  bool _fashionPlus = true;
   bool _fashionHome = false;
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
@@ -36,7 +35,7 @@ class Settings extends ChangeNotifier {
   Future<void> load() async {
     try {
       final p = await SharedPreferences.getInstance();
-      _fashionPlus = p.getBool(_kPlus) ?? false;
+      _fashionPlus = p.getBool(_kPlus) ?? true;
       _fashionHome = p.getBool(_kHome) ?? false;
       notifyListeners();
     } catch (_) {

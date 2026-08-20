@@ -45,10 +45,9 @@ flutter:
     # Every clip and its poster, on the phone after the download — no
     # network, no Cloudinary, no buffering. 35 mp4 and 35 -poster.webp.
     #
-    # The posters are not decoration: at most four clips decode at once
-    # (see lib/media/video_pool.dart), so most of these are showing their
-    # poster at any moment and the app looks right only because that
-    # poster is the clip's own first frame.
+    # The posters are not decoration: off-screen clips show them, on-screen
+    # clips play (see lib/media/video_pool.dart). Every poster is the clip's
+    # own first frame, so a wait never looks like a different picture.
     - assets/video/
 
     # The app's own artwork, all of it already in this repository. The

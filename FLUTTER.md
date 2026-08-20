@@ -27,13 +27,14 @@ says so — not when a garbage collector decides the page has moved on.
 
 So the rule the whole app is built around:
 
-> **At most four decoders exist at any moment.** Not "are playing" — exist.
+> **On-screen clips play. Off-screen clips are posters.**
+> At most 24 decoders exist at any moment — the same number the website
+> (`MAX_PLAYING` in `app/js/part051.js`) and the Capacitor WebView use.
 
-Everything else shows its poster, which is a picture and costs nothing. This
-is why every mp4 in `assets/video/` has a `-poster.webp` beside it, generated
-from the clip itself: most clips are showing their poster most of the time,
-and the app only looks right because that poster is the clip's own first
-frame.
+That is why the backgrounds, televisions and banners all move together, and
+why a clip that has scrolled away costs nothing. Every mp4 in `assets/video/`
+has a `-poster.webp` beside it, generated from the clip itself: what you see
+while a clip waits is its own first frame.
 
 ---
 

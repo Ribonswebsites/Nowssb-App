@@ -76,9 +76,9 @@ class _HomeFashionState extends State<HomeFashion> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xD9060C18),
-                    Color(0xF2060C18),
-                    Color(0xFA060C18),
+                    Color(0x66060C18),
+                    Color(0x8C060C18),
+                    Color(0xB3060C18),
                   ],
                 ),
               ),

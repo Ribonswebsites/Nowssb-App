@@ -9,9 +9,9 @@
 ///
 ///   · The clips are all on the phone. Nothing streams, nothing buffers,
 ///     nothing depends on Cloudinary being up or the signal being good.
-///   · At most four of them decode at any moment. A phone has a handful of
-///     hardware decoders and the website was asking for a hundred, which is
-///     what the lag, the black banners and the crashes actually were.
+///   · On-screen clips play. Off-screen clips are posters. The ceiling is
+///     the same number the website and the WebView use (24), so a home of
+///     banners, televisions and the page film all move together.
 ///     lib/media/video_pool.dart is where that ceiling is enforced.
 library;
 

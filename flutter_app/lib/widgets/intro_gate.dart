@@ -136,9 +136,9 @@ class _Intro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Still unless motion mode is on. autoplay:false is what makes an
-    // unmoving background genuinely free — the pool is never even asked.
-    final moving = Settings.instance.fashionPlus;
+    // Intro films play. Same as the website: the picture behind Enter is
+    // a looping clip, not a still waiting on a switch.
+    final moving = true;
 
     return Material(
       color: NwsbColors.deep,

@@ -63,7 +63,7 @@ void main() {
         reason: 'an off-screen clip must never cost a decoder');
   });
 
-  test('a hundred clips on screen at once still only ask for four', () async {
+  test('a hundred clips on screen at once still only ask for the ceiling', () async {
     final leases = [
       for (var i = 0; i < 100; i++)
         VideoPool.instance.lease('assets/video/clip-$i.mp4'),
@@ -78,6 +78,21 @@ void main() {
     expect(VideoPool.instance.liveCount, VideoPool.maxLive);
     expect(platform.alive, VideoPool.maxLive,
         reason: 'the ceiling is on players that exist, not players playing');
+  });
+
+  test('every on-screen clip plays when there is room under the ceiling', () async {
+    final leases = [
+      for (var i = 0; i < 8; i++)
+        VideoPool.instance.lease('assets/video/home-$i.mp4'),
+    ];
+    for (final l in leases) {
+      l.reportDistance(20);
+    }
+    await pumpPool();
+
+    expect(VideoPool.instance.liveCount, 8,
+        reason: 'a home of eight films must all move, not sit on posters');
+    expect(platform.alive, 8);
   });
 
   test('the decoders go to the clips nearest the middle of the screen',

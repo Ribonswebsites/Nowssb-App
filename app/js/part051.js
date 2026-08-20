@@ -163,9 +163,11 @@
      · The expensive part, "is this inside a screen that is currently
        shown", is cached per element and only recomputed when a class
        actually changes, not on every frame.
-     · At most MAX_PLAYING videos decode at once — the ones nearest the
-       middle of the viewport. Everything else stays paused even if it is
-       technically on screen. Decoders, not downloads, are the cost.
+     · At most MAX_PLAYING videos decode at once — every clip that is
+       actually on screen. Matched to Flutter's VideoPool.maxLive so the
+       HTML app, the Capacitor WebView and Flutter all play the same
+       films. Off-screen clips stay unmounted. Decoders, not downloads,
+       are the cost.
 
    Behaviour is otherwise unchanged: only videos this script paused are ever
    resumed, WebRTC streams are never touched, the practice player keeps its
@@ -173,11 +175,9 @@
    ── */
 (function () {
   var MARK = 'data-nwsb-vis';
-  /* 4 was leaving the smallest clips out. The section discs beside the
-     player, the Reader and the eBooks rail are 40px and cost almost
-     nothing to decode, but they queued behind full-width banners on the
-     same screen and never got a slot — so they sat black. Six covers a
-     screen's worth of banners AND the discs on it. */
+  /* 4 was leaving most films as stills. 6 was still starving backgrounds
+     the moment a home with banners was open. 24 matches Flutter's pool
+     and is enough for every on-screen clip on any page of this app. */
   /* ── Nothing decorative claims the media notification ─────────────
      Thirteen of the clips in this app carry an audio track, and Android
      treats any video playing with sound as media: the app turns up in the
@@ -205,7 +205,7 @@
     } catch (err) {}
   }, true);
 
-  var MAX_PLAYING = 6;
+  var MAX_PLAYING = 24;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();
   var shownCache = new WeakMap();   // element -> boolean, cleared on class changes
@@ -475,13 +475,13 @@
        four happened to be nearer the middle: the clip loaded, played for a
        moment, and was paused again, which looks exactly like a still. Those
        sort first and therefore always get a slot while they are on screen.
-       Still at most MAX_PLAYING — this changes which four, not how many. */
+       Still at most MAX_PLAYING — this changes which clips, not how many. */
     /* .feat-bgvid and .rd-hub-bgvid are the same kind of thing as the rest of
        this list — the film IS the page, not decoration on it — and were
        missing from it. */
     var PRIORITY = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .gsel-bg-vid, ' +
                    '.slm-head-vid, .feat-bgvid, .rd-hub-bgvid, .fp-page-vid, ' +
-                   '.wsg-bgvid, .lgp-info-video';
+                   '.wsg-bgvid, .lgp-info-video, #fpBgVideo, #fp-bg-video';
     function prio(v) { return v.matches && v.matches(PRIORITY) ? 0 : 1; }
     if (live.length > MAX_PLAYING) {
       var mid = (window.innerHeight || 800) / 2;

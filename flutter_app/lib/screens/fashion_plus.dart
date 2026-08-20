@@ -242,9 +242,9 @@ class _Cost extends StatelessWidget {
           Expanded(
             child: Text(
               'A still costs nothing at all — with motion off the app never '
-              'even asks the phone for a decoder. With it on, at most four '
-              'clips decode at once, which is what keeps this from being '
-              'the thing that drains the battery.',
+              'even asks the phone for a decoder. With it on, every clip '
+              'that is actually on screen plays, matching the website and '
+              'the WebView. Off-screen films stay as posters.',
               style: TextStyle(
                 fontSize: 12,
                 color: Color(0x99FFFFFF),

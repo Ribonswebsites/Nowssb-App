@@ -1,10 +1,8 @@
 /// The little black readout in the corner of a debug build.
 ///
-/// WHAT IT SAYS. "decoders 2/4" is how many videos are being decoded right
-/// now, out of the ceiling this app enforces; "clips 9" is how many exist on
-/// the page. The distance between those two numbers is the whole reason the
-/// Flutter app can be smooth where the website could not — the website was
-/// running the equivalent of 106/4.
+/// WHAT IT SAYS. "decoders 8/24" is how many videos are being decoded right
+/// now, out of the ceiling this app enforces (matched to the website);
+/// "clips 9" is how many exist on the page. Off-screen clips are posters.
 ///
 /// It is a development tool and nothing else. TAP IT TO HIDE IT, and it is
 /// compiled out of a release build entirely: kDebugMode is a const, so the
