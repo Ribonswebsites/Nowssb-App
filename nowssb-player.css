@@ -1,1 +1,1527 @@
-SEE_LOCAL
+/* ═══════════════════════════════════════════════════════════════
+   NowssB — LIQUID GLASS PLAYER  (mockup layout)
+   NowssB → glass waveform panel → word title → progress → ‹‹ ⏸ ››
+   6 cosmic themes rotate per word.
+═══════════════════════════════════════════════════════════════ */
+
+.lgp {
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  padding: max(env(safe-area-inset-top,8px),8px) 24px calc(env(safe-area-inset-bottom,8px) + 8px);
+  overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch;
+  box-sizing:border-box; font-family:'DM Sans',sans-serif; color:#fff;
+  background: var(--lg-bg, linear-gradient(160deg,#06323e,#1ba0b5)) center/cover no-repeat;
+  background-attachment:fixed;
+  transition: background .9s ease;
+}
+.lgp::-webkit-scrollbar { display:none; }
+.lgp * { box-sizing:border-box; }
+/* Images must never be tap targets or trigger the browser's image
+   zoom/long-press preview — taps pass straight through to the button. */
+.lgp img { pointer-events:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+
+/* themes */
+.lgp.lg-t1 { --lg-bg:linear-gradient(160deg,#06323e 0%,#0e6f81 50%,#1ba6bb 100%); --lg-accent:#5ff0e0; }
+.lgp.lg-t2 { --lg-bg:linear-gradient(160deg,#1a0033 0%,#34106a 50%,#5a23a6 100%); --lg-accent:#bd7bff; }
+.lgp.lg-t3 { --lg-bg:linear-gradient(160deg,#0a1a3a 0%,#244a86 50%,#3f7bd2 100%); --lg-accent:#a6dcff; }
+.lgp.lg-t4 { --lg-bg:url('assets/player/t-cosmic.jpg');   --lg-accent:#9bb8ff; }
+.lgp.lg-t5 { --lg-bg:url('assets/player/t-mountain.jpg'); --lg-accent:#cfdcff; }
+.lgp.lg-t6 { --lg-bg:url('assets/player/t-wave.jpg');     --lg-accent:#7fe9da; }
+
+.lgp .lgp-scrim {
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgba(255,255,255,.10), transparent 55%),
+    linear-gradient(180deg, rgba(6,10,25,.28) 0%, rgba(6,10,25,.40) 55%, rgba(6,10,25,.62) 100%);
+}
+.lgp .lgp-orbs {
+  position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.55;
+  background-image:
+    radial-gradient(circle 5px at 16% 26%, rgba(255,255,255,.7), transparent 60%),
+    radial-gradient(circle 3px at 78% 18%, rgba(255,255,255,.6), transparent 60%),
+    radial-gradient(circle 4px at 86% 60%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(circle 2px at 24% 74%, rgba(255,255,255,.6), transparent 60%);
+}
+.lgp > *:not(.lgp-bg):not(.lgp-scrim):not(.lgp-orbs) { position:relative; z-index:2; }
+
+/* top bar */
+.lgp .lgp-top { position:relative; width:100%; display:flex; align-items:center; justify-content:space-between; }
+.lgp .lgp-back, .lgp .lgp-settings {
+  width:42px; height:42px; border:none; border-radius:50% !important; cursor:pointer;
+  background:rgba(255,255,255,.14); -webkit-backdrop-filter:none; backdrop-filter:none;
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-top-right { display:flex; align-items:center; gap:10px; }
+/* ── Like ──
+   In the screen's top bar rather than on the panel: the panel's top row is
+   the ritual and the bars, and a heart that shifts about with them is a
+   heart nobody finds twice. */
+.lgp .lgp-like {
+  width:42px; height:42px; flex-shrink:0; padding:0; cursor:pointer;
+  border-radius:50% !important; border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+  display:flex; align-items:center; justify-content:center;
+  color:rgba(255,255,255,.92);
+}
+.lgp .lgp-like svg {
+  width:21px; height:21px; display:block;
+  fill:none; stroke:currentColor; stroke-width:1.7; stroke-linejoin:round;
+  transition:fill .18s ease, stroke .18s ease;
+}
+.lgp .lgp-like:active { transform:scale(.92); }
+.lgp .lgp-like.liked { color:var(--lg-accent,#8fe6ff); }
+.lgp .lgp-like.liked svg {
+  fill:var(--lg-accent,#8fe6ff);
+  filter:drop-shadow(0 0 9px var(--lg-accent,#8fe6ff));
+}
+/* one-shot on the tap that likes it — never a loop, nothing to compete with */
+.lgp .lgp-like.pop svg { animation:lgpLikePop .42s cubic-bezier(.34,1.56,.64,1) 1; }
+@keyframes lgpLikePop {
+  0%   { transform:scale(1); }
+  38%  { transform:scale(1.32); }
+  100% { transform:scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .lgp .lgp-like.pop svg { animation:none; } }
+
+.lgp .lgp-brand {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  display:flex; align-items:center; gap:8px; white-space:nowrap;
+}
+.lgp .lgp-brand-ico { width:26px; height:26px; background-size:contain; background-repeat:no-repeat; background-position:center; flex-shrink:0; }
+.lgp .lgp-brand-txt {
+  font-size:23px; font-weight:800; letter-spacing:-.5px;
+  text-shadow:0 2px 20px rgba(0,0,0,.4), 0 0 26px var(--lg-accent);
+}
+/* banner under the top bar — icon + divider + looping text, replaces the
+   old two separate static lines (tagline + ritual counter) */
+/* ══════════════════════════════════════════════════════════════════
+   The ticker banner, in a tab of its own above the picture
+   The black bar IS the tab's aperture — same frame, same size and the
+   same aperture offsets as the two rows below, so the three read as one
+   family rather than a bar and two tabs.
+   ══════════════════════════════════════════════════════════════════ */
+/* No frame here. It was the same lit tab as the rows below, which put
+   three of them on one screen — the banner is just the black bar. */
+.lgp .lgp-banner-tab {
+  position:relative; width:100%; max-width:360px; margin:10px auto 0;
+  flex-shrink:0;
+}
+.lgp .lgp-info-banner {
+  position:relative; width:100%;
+  display:flex; align-items:center; gap:13px;
+  background:#000; border-radius:16px !important; padding:13px 16px;
+  overflow:hidden;
+}
+.lgp .lgp-info-banner-icon {
+  width:34px; height:34px; min-width:0 !important; min-height:0 !important;
+  background-size:contain; background-repeat:no-repeat; background-position:center; flex-shrink:0;
+}
+.lgp .lgp-info-banner-divider { width:1px; height:34px; background:rgba(255,255,255,.15); flex-shrink:0; }
+.lgp .lgp-info-banner-text {
+  font-size:14px; font-weight:800; letter-spacing:.2px; color:#fff;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.lgp .lgp-info-banner-text.dash-in { animation:nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both; }
+/* rotating word ticker — Listen · Learn · Practice · Heal */
+/* Both of these are a handful of pixels tall, and both are flex items in a
+   column that overflows — without flex-shrink:0 they are the first things
+   the layout squashes to nothing. */
+/* The Listen · Learn · Practice · Heal ticker lived here. Gone — it was a
+   line of decoration in the one place the eye is trying to find the
+   transport. */
+
+/* central glass waveform panel */
+.lgp .lgp-visual {
+  /* Was 1/1.12. The panel was tall enough that its top half sat empty above
+     the word, and the height it spent there is what the strip under the
+     transport now uses.
+     max-height is what keeps a short phone honest: the ratio sets the
+     shape, and on a 640px-tall screen the panel gives up height rather
+     than pushing the transport off the bottom. */
+  width:100%; max-width:360px; margin:10px 0 0; aspect-ratio:1/1.02; max-height:44vh; flex-shrink:0;
+  border-radius:30px !important; overflow:hidden; position:relative;
+  background:rgba(10,16,30,.35);
+  /* NO backdrop-filter here — the video fills this panel opaquely, so the
+     blur was invisible but still forced expensive real-time GPU compositing
+     over the playing video every frame (a big cause of the stutter). */
+  border:1px solid rgba(255,255,255,.3);
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-video {
+  width:100%; height:100%; object-fit:cover; display:block; border-radius:30px !important;
+  /* keep the video on its own compositor layer — it renders independently of the
+     traveling-light repaints, so it's the priority and plays smoothly. */
+  transform:translateZ(0); will-change:transform; backface-visibility:hidden;
+}
+.lgp .lgp-wave-svg { width:88%; height:62%; overflow:visible; }
+.lgp .lgp-wp { fill:url(#lgpGrad); opacity:.92; filter:drop-shadow(0 0 14px var(--lg-accent)); }
+.lgp .lgp-wp2 { opacity:.55; transform:scaleY(.7); transform-origin:center; }
+.lgp .lgp-wp3 { fill:none; stroke:#fff; stroke-width:2.5; opacity:.85; }
+.lgp .lgp-wp1 { animation:lgpWaveA 3.2s ease-in-out infinite; }
+.lgp .lgp-wp2 { animation:lgpWaveB 3.8s ease-in-out infinite; }
+.lgp .lgp-wp3 { animation:lgpWaveC 2.6s ease-in-out infinite; }
+.lgp.playing .lgp-wp1 { animation-duration:1.0s; }
+.lgp.playing .lgp-wp2 { animation-duration:1.3s; }
+.lgp.playing .lgp-wp3 { animation-duration:.8s; }
+@keyframes lgpWaveA { 0%,100%{ transform:scaleY(1) } 50%{ transform:scaleY(1.45) } }
+@keyframes lgpWaveB { 0%,100%{ transform:scaleY(.7) } 50%{ transform:scaleY(1.05) } }
+@keyframes lgpWaveC { 0%,100%{ transform:translateY(0) scaleY(1) } 50%{ transform:translateY(-6px) scaleY(1.3) } }
+
+/* word meaning / heals / category info card */
+.lgp .lgp-info {
+  width:100%; max-width:340px; margin:9px 0 0; padding:10px 16px;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.08);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 10px 26px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.lgp .lgp-info-row { display:flex; gap:12px; padding:6px 0; align-items:baseline; }
+.lgp .lgp-info-row + .lgp-info-row { border-top:1px solid rgba(255,255,255,.1); }
+.lgp .lgp-info-row .k { flex-shrink:0; width:62px; font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--lg-accent); padding-top:1px; }
+.lgp .lgp-info-row .v { flex:1; font-size:12px; font-weight:500; color:rgba(255,255,255,.92); line-height:1.4; }
+
+/* word + syllables + organ overlaid INSIDE the video panel */
+.lgp .lgp-visual-overlay {
+  position:absolute; left:0; right:0; bottom:0; z-index:3;
+  /* The deep bottom padding is what holds the word UP off the edge of the
+     picture. The side padding is the rails' lane: a rail is 48px wide and
+     sits 10px in, so anything past 60px would be under one of them — on a
+     360-wide screen the first syllable chip was, by 2px. When the rails
+     are folded away the word takes the whole width back. */
+  padding:28px 58px 40px; display:flex; flex-direction:column; align-items:center;
+  background:linear-gradient(180deg, rgba(6,10,22,0) 0%, rgba(6,10,22,.36) 34%, rgba(6,10,22,.76) 68%, rgba(6,10,22,.93) 100%);
+  /* The gradient is scenery — only what's drawn on it takes taps. */
+  pointer-events:none;
+}
+.lgp .lgp-visual-overlay > * { pointer-events:auto; }
+/* title / syllables / organ */
+.lgp .lgp-title {
+  margin-top:0; font-size:34px; font-weight:800; letter-spacing:1.6px; text-align:center; line-height:1.02;
+  text-shadow:0 2px 26px rgba(0,0,0,.6), 0 0 32px var(--lg-accent);
+}
+/* The word as it is actually written. Devanagari is taller than latin at
+   the same font-size and its matras sit above and below the line, so it
+   gets its own size and line-height rather than inheriting the title's. */
+.nwsb-deva {
+  font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Kohinoor Devanagari',
+               'Mangal', 'Noto Serif Devanagari', sans-serif;
+}
+.lgp .lgp-deva {
+  margin-top:6px; font-size:26px; line-height:1.45; font-weight:600;
+  text-align:center; color:#fff;
+  text-shadow:0 2px 20px rgba(0,0,0,.6), 0 0 26px var(--lg-accent);
+}
+
+.lgp .lgp-syls { margin-top:15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; }
+.lgp .lgp-syl {
+  padding:8px 16px; border-radius:12px !important; font-size:14px; font-weight:600;
+  background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.34);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:0 5px 16px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.45);
+  /* Three lines now — Devanagari, roman, hold — stacked and centred. Each
+     is optional, so a box with only a roman spelling looks exactly as it
+     did before this existed. */
+  display:inline-flex; flex-direction:column; align-items:center; gap:1px;
+  min-width:54px; line-height:1.25;
+}
+.lgp .lgp-syl-deva {
+  font-family: 'Noto Sans Devanagari', 'Nirmala UI', 'Kohinoor Devanagari',
+               'Mangal', 'Noto Serif Devanagari', sans-serif;
+  font-size:17px; font-weight:600; line-height:1.5;
+}
+.lgp .lgp-syl-rom { font-size:14px; font-weight:700; letter-spacing:.6px; }
+.lgp .lgp-syl-hold {
+  font-size:8.5px; font-weight:700; letter-spacing:1px; opacity:.6; text-transform:uppercase;
+}
+/* A box with a recording behind it says so, and is tappable. */
+.lgp .lgp-syl-say { cursor:pointer; border-color:rgba(255,255,255,.6); }
+.lgp .lgp-syl-say::after {
+  content:''; width:5px; height:5px; border-radius:50%;
+  background:var(--lg-accent, rgba(255,255,255,.9)); margin-top:2px;
+}
+.lgp .lgp-syl-say:active { transform:scale(.95); }
+.lgp .lgp-syl.active { background:rgba(255,255,255,.5); color:#10202e; box-shadow:0 0 22px var(--lg-accent); }
+.lgp .lgp-syl-dot { opacity:.55; }
+/* The organ closes the block, set between two hairlines so the word, the
+   syllables and the organ read as three steps rather than one clump. The
+   rules would show as two stray dashes on a word with no organ, so an
+   empty line draws nothing at all. */
+.lgp .lgp-organ {
+  margin-top:15px; font-size:9.5px; font-weight:700; letter-spacing:2.6px; text-transform:uppercase;
+  color:rgba(255,255,255,.74);
+  display:flex; align-items:center; justify-content:center; gap:11px; max-width:100%;
+}
+.lgp .lgp-organ:empty { display:none; }
+.lgp .lgp-organ::before, .lgp .lgp-organ::after {
+  content:''; height:1px; width:28px; flex-shrink:0;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.45));
+}
+.lgp .lgp-organ::after { background:linear-gradient(90deg, rgba(255,255,255,.45), transparent); }
+
+/* progress */
+/* ── the session bar ──
+   It shows how far through the ritual you are. It used to show reps, which
+   are zero for most of the time anyone is looking at it, so it read as a
+   line that was there doing nothing.
+   overflow is visible, not hidden, because the head rides ON the end of the
+   fill — at the very start of a session the fill is a sliver, and the head
+   is what makes the bar legible as a position rather than as an empty line. */
+/* ── The bar and its wrapper ──
+   It used to be a bare 5px line sitting 7px under the picture with
+   nothing around it. It has a box now, with air inside it, and the four
+   bars on its left move while the word is being spoken. */
+.lgp .lgp-barwrap {
+  width:100%; max-width:340px; margin:14px auto 0; padding:16px;
+  display:flex; align-items:center; gap:11px; flex-shrink:0;
+  border-radius:16px !important;
+  background:rgba(6,10,22,.5);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 8px 22px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+/* ── The waveform ──
+   Four sticks bouncing at random read as a generic "audio" badge. This is
+   a WAVE: nine bars whose resting heights already draw one, centred on the
+   line rather than standing on the floor, so it looks like a sound even
+   when nothing is playing. While the word is spoken every bar runs the
+   same swell on a staggered delay, which makes the crest travel across it
+   instead of the whole thing flashing at once. */
+.lgp .lgp-bar-wave {
+  display:flex; align-items:center; gap:2px; height:20px; flex-shrink:0;
+}
+.lgp .lgp-bar-wave i {
+  display:block; width:2.5px; border-radius:2px !important;
+  background:var(--lg-accent); box-shadow:0 0 7px var(--lg-accent);
+  opacity:.85;
+}
+/* the resting shape — a wave, read left to right */
+.lgp .lgp-bar-wave i:nth-child(1) { height:26%; }
+.lgp .lgp-bar-wave i:nth-child(2) { height:48%; }
+.lgp .lgp-bar-wave i:nth-child(3) { height:76%; }
+.lgp .lgp-bar-wave i:nth-child(4) { height:100%; }
+.lgp .lgp-bar-wave i:nth-child(5) { height:76%; }
+.lgp .lgp-bar-wave i:nth-child(6) { height:48%; }
+.lgp .lgp-bar-wave i:nth-child(7) { height:70%; }
+.lgp .lgp-bar-wave i:nth-child(8) { height:42%; }
+.lgp .lgp-bar-wave i:nth-child(9) { height:22%; }
+.lgp.playing .lgp-bar-wave i { animation:lgpWaveBar .78s ease-in-out infinite; }
+.lgp.playing .lgp-bar-wave i:nth-child(1) { animation-delay:0s; }
+.lgp.playing .lgp-bar-wave i:nth-child(2) { animation-delay:.07s; }
+.lgp.playing .lgp-bar-wave i:nth-child(3) { animation-delay:.14s; }
+.lgp.playing .lgp-bar-wave i:nth-child(4) { animation-delay:.21s; }
+.lgp.playing .lgp-bar-wave i:nth-child(5) { animation-delay:.28s; }
+.lgp.playing .lgp-bar-wave i:nth-child(6) { animation-delay:.35s; }
+.lgp.playing .lgp-bar-wave i:nth-child(7) { animation-delay:.42s; }
+.lgp.playing .lgp-bar-wave i:nth-child(8) { animation-delay:.49s; }
+.lgp.playing .lgp-bar-wave i:nth-child(9) { animation-delay:.56s; }
+@keyframes lgpWaveBar {
+  0%, 100% { height:22%; opacity:.6; }
+  50%      { height:100%; opacity:1; }
+}
+
+/* the line between the wave and the bar */
+.lgp .lgp-bar-sep {
+  width:1px; height:20px; flex:0 0 1px;
+  background:rgba(255,255,255,.4);
+  border-radius:1px !important;
+}
+
+.lgp .lgp-progress {
+  position:relative;
+  width:100%; flex:1 1 auto; height:5px; margin:0; border-radius:999px !important;
+  background:rgba(255,255,255,.2); overflow:visible; flex-shrink:1;
+}
+.lgp .lgp-progress-fill {
+  position:relative; height:100%; border-radius:999px !important;
+  background:linear-gradient(90deg, var(--lg-accent), #fff);
+  box-shadow:0 0 14px var(--lg-accent);
+}
+.lgp .lgp-progress-fill::after {
+  content:''; position:absolute; right:-4px; top:50%; margin-top:-5px;
+  width:10px; height:10px; border-radius:50% !important;
+  background:#fff; box-shadow:0 0 12px var(--lg-accent), 0 1px 4px rgba(0,0,0,.5);
+}
+/* While the word is being spoken a light runs along the remaining track, so
+   the bar is doing something during the one moment it is being watched. */
+.lgp .lgp-progress.running::before {
+  content:''; position:absolute; inset:0; border-radius:999px !important;
+  overflow:hidden; pointer-events:none;
+  background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.55) 50%, transparent 100%);
+  background-size:40% 100%; background-repeat:no-repeat;
+  animation:lgpBarSweep 1.6s linear infinite;
+}
+@keyframes lgpBarSweep {
+  0%   { background-position:-45% 0; }
+  100% { background-position:145% 0; }
+}
+@media (prefers-reduced-motion: reduce) { .lgp .lgp-progress.running::before { animation:none; } }
+
+/* phase / controls */
+.lgp .lgp-phase { width:100%; flex:1 1 auto; margin-top:6px; padding-top:0; display:flex; flex-direction:column; align-items:center; }
+/* let the idle phase fill the leftover height so the Sentence/Practice/Store
+   row can sit at the bottom of the screen */
+.lgp #spPhaseIdlePlay { flex:1 1 auto; }
+.lgp .lgp-status { font-size:11px; font-weight:600; letter-spacing:1px; color:rgba(255,255,255,.78); }
+.lgp .lgp-status.recording { color:#ff8a8a; }
+/* glass-capsule image wrapped around the transport controls (e_trim crops the
+   whitespace so the capsule fills the bar) */
+.lgp .lgp-tube {
+  position:relative; width:100%; max-width:352px; margin-top:8px;
+  padding:11px 26px; min-height:86px; display:flex; align-items:center;
+  background:url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center/100% 100% no-repeat;
+  filter:drop-shadow(0 13px 26px rgba(0,0,0,.5));
+}
+/* ── a bright light that TRAVELS AROUND THE OUTSIDE of the glass capsule ──
+   a conic gradient (bright spot) masked to a thin ring just outside the tube;
+   animating its angle sweeps the spot around the perimeter. */
+@property --lgtravel { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp .lgp-tube::before {
+  content:''; position:absolute; inset:-4px; border-radius:60px; padding:4px; pointer-events:none; z-index:1;
+  /* a soft, wide glowing arc baked into the gradient (no per-frame filter) */
+  background:conic-gradient(from var(--lgtravel),
+            transparent 0deg, transparent 215deg,
+            rgba(255,255,255,.05) 250deg, var(--lg-accent) 300deg,
+            #ffffff 330deg, var(--lg-accent) 350deg, rgba(255,255,255,.05) 358deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  will-change:--lgtravel; transform:translateZ(0); opacity:.5;
+}
+@keyframes lgpTubeTravel { to { --lgtravel:360deg; } }
+/* Only ONE traveling light runs at a time — a JS sequencer adds .lgp-anim to
+   one element, it plays a single sweep, then the next. Keeps GPU free for video. */
+.lgp .lgp-tube.lgp-anim::before { opacity:1; animation:lgpTubeTravel 2s linear 1; }
+.lgp .lgp-controls { width:100%; max-width:none; display:flex; align-items:center; justify-content:space-between; gap:2px; margin-top:0; }
+/* ── Inside the capsule: flatten to 5 evenly-spaced icons, all centred in the
+   clear interior (library + replay no longer jammed onto the rounded ends) ── */
+.lgp .lgp-tube .lgp-transport { display:contents; }
+.lgp .lgp-tube .lgp-controls { justify-content:space-evenly; gap:0; }
+.lgp .lgp-tube .lgp-side { width:auto; padding:0; }
+.lgp .lgp-tube .lgp-side span { display:none; }
+.lgp .lgp-tube .lgp-side .lgp-side-ico { width:48px; height:48px; }
+.lgp .lgp-tube .lgp-ctrl { width:48px; height:48px; }
+.lgp .lgp-tube .lgp-play { width:66px; height:66px; }
+.lgp .lgp-transport { display:flex; align-items:center; justify-content:center; gap:8px; }
+/* glass-sphere icon = the button itself (no glass-circle background, full colour) */
+.lgp .lgp-img { width:100%; height:100%; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
+/* every sphere icon is now a background-image span (not an <img>) */
+.lgp .lgp-img, .lgp .lgp-side-ico, .lgp .lgp-mic-ico,
+.lgp .lgp-sentence-ico, .lgp .lgp-practice-ico, .lgp .lgp-bgico {
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+.lgp .lgp-store-ico { background-size:cover; background-position:center; background-repeat:no-repeat; }
+/* Library (left) + Replay (right) side buttons */
+.lgp .lgp-side {
+  width:52px; border:none; cursor:pointer; background:none; color:#fff;
+  display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:0;
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; opacity:.96;
+}
+.lgp .lgp-side .lgp-side-ico {
+  width:48px; height:48px; object-fit:contain; display:block;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.4));
+}
+.lgp .lgp-side:active { transform:scale(.92); }
+/* prev / next sphere buttons — bare image, no glass circle */
+.lgp .lgp-ctrl {
+  width:50px; height:50px; border:none; background:none; cursor:pointer; padding:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-ctrl:disabled { opacity:.4; }
+.lgp .lgp-ctrl:active { transform:scale(.92); }
+/* play / pause sphere button — bigger, bare image */
+.lgp .lgp-play {
+  width:72px; height:72px; border:none; background:none; cursor:pointer; padding:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-play .lgp-img { filter:drop-shadow(0 10px 26px rgba(0,0,0,.5)) drop-shadow(0 0 34px var(--lg-accent)); }
+.lgp .lgp-play:active { transform:scale(.95); }
+/* settings gear sphere in the top bar — bare image, no glass circle */
+.lgp .lgp-imgbtn {
+  width:48px; height:48px; background:none !important; border:none !important; box-shadow:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important; padding:0;
+}
+/* gear / back use a background-image span (NOT an <img>) so the browser can't
+   open/zoom them as an image — taps always trigger the button action */
+.lgp .lgp-imgbtn .lgp-bgico {
+  width:100%; height:100%; display:block; pointer-events:none;
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));
+}
+.lgp .lgp-mic, .lgp .lgp-cta {
+  margin-top:14px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 24px 10px 12px; border-radius:16px !important; color:#fff; font-size:14px; letter-spacing:.5px;
+  background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.32);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:0 10px 28px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+}
+.lgp .lgp-mic-ico { width:34px; height:34px; object-fit:contain; display:block; flex-shrink:0; filter:drop-shadow(0 3px 8px rgba(0,0,0,.4)); }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   Sentence · Practice · Store — one in each glass ring
+   The row is a strip of glass with the ring clip playing inside it, and
+   each button sits in the hole of its own ring.
+
+   assets/video/practice-row.mp4 is 1456x624. Measured off the frame, the
+   three ring centres sit at 19%, 50% and 81% of the WIDTH, vertically
+   centred, each ring 28.7% of the width across with a 14.6% hole. The
+   strip is shown at 3.11:1 with object-fit:cover, which is shorter than
+   the clip's own 2.33:1 — it crops black off the top and bottom and
+   leaves the rings whole (28.7% across vs 32.2% of height available).
+
+   Everything positions off the WIDTH, so the ring and the button in it
+   stay concentric at every screen size.
+   ══════════════════════════════════════════════════════════════════ */
+.lgp .lgp-practice-row {
+  /* Back at the bottom, where it was — lifted off the very edge, and with
+     no label band under it any more: the labels went inside the tab. */
+  position:relative; width:100%; max-width:360px; margin:12px auto 0;
+  margin-top:auto; margin-bottom:16px;
+  flex-shrink:0;
+}
+/* The same lit tab as the row under the picture, at the same size —
+   1371/317, no clip inside it, just the black aperture. */
+.lgp .lgp-pr-glass {
+  position:relative; width:100%; aspect-ratio:1371/317;
+  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
+  border-radius:9px !important;
+  /* No outer glow. The render's own lit border is the light; a white
+     box-shadow on top of it read as a smear around the box. */
+}
+.lgp .lgp-pr-glass::before {
+  content:''; position:absolute;
+  left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
+  background:#000; border-radius:5px !important;
+}
+/* the three sit over the clip */
+.lgp .lgp-practice-row > .lgp-sentence,
+.lgp .lgp-practice-row > .lgp-practice,
+.lgp .lgp-practice-row > .lgp-store,
+.lgp .lgp-practice-sep { z-index:2; }
+
+/* Each button is a column pinned to its ring's centre line: the orb is
+   centred on the strip (so it lands in the hole) and the label hangs
+   just below the glass. */
+.lgp .lgp-practice-row > .lgp-sentence,
+.lgp .lgp-practice-row > .lgp-practice,
+.lgp .lgp-practice-row > .lgp-store {
+  position:absolute; top:0; bottom:0;
+  transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px;
+  min-height:0 !important; min-width:0 !important;
+}
+.lgp .lgp-practice-row > .lgp-sentence { left:17.858%; }
+.lgp .lgp-practice-row > .lgp-practice { left:49.927%; }
+.lgp .lgp-practice-row > .lgp-store    { left:81.996%; }
+.lgp .lgp-practice-row > .lgp-sentence:active,
+.lgp .lgp-practice-row > .lgp-practice:active,
+.lgp .lgp-practice-row > .lgp-store:active { transform:translateX(-50%) scale(.92); }
+
+/* The labels are INSIDE the tab, under their icon. They hung below the
+   frame before, which put text outside the only box on the row. */
+.lgp .lgp-practice-row .lgp-pr-lbl {
+  font-family:'DM Sans',sans-serif; font-size:8.5px; font-weight:800;
+  letter-spacing:1.4px; text-transform:uppercase; color:#fff;
+  white-space:nowrap; text-shadow:0 1px 5px rgba(0,0,0,.8);
+}
+
+/* Drawn, not photographed. The three were Cloudinary pictures of metal
+   spheres — a different visual language from every other control in the
+   player, and three network fetches for three icons. */
+.lgp .lgp-pr-ico {
+  display:flex; align-items:center; justify-content:center;
+  width:clamp(21px, 7.2vw, 27px); height:clamp(21px, 7.2vw, 27px);
+  color:#fff; pointer-events:none;
+}
+.lgp .lgp-pr-ico svg {
+  width:100%; height:100%; display:block;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.75));
+}
+.lgp .lgp-store {
+  border:none; background:none; cursor:pointer; padding:0;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#fff; opacity:.96;
+}
+.lgp .lgp-store:active { transform:scale(.92); }
+.lgp .lgp-store-orb {
+  width:60px; height:60px; border-radius:50% !important; box-sizing:border-box; overflow:hidden;
+  display:flex; align-items:center; justify-content:center; background:#000;
+  box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.lgp .lgp-store-ico { width:100%; height:100%; object-fit:cover; display:block; }
+.lgp .lgp-store-lbl { text-shadow:0 1px 8px rgba(0,0,0,.4); }
+
+/* Build-your-sentence button — sphere icon, left of the Practice mic */
+.lgp .lgp-sentence {
+  border:none; background:none; cursor:pointer; padding:0;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#fff; opacity:.96;
+}
+.lgp .lgp-sentence:active { transform:scale(.92); }
+.lgp .lgp-sentence-orb { width:56px; height:56px; display:flex; align-items:center; justify-content:center; }
+.lgp .lgp-sentence-ico { width:56px; height:56px; object-fit:contain; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
+.lgp .lgp-sentence-lbl { text-shadow:0 1px 8px rgba(0,0,0,.4); }
+
+/* standalone Practice mic — sphere icon with a pulsing ring animation, label below */
+.lgp .lgp-practice {
+  border:none; background:none; cursor:pointer; padding:0;
+  display:flex; flex-direction:column; align-items:center; gap:7px;
+}
+.lgp .lgp-practice:active { transform:scale(.95); }
+.lgp .lgp-practice-orb {
+  position:relative; width:66px; height:66px; display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-practice-ico {
+  width:64px; height:64px; object-fit:contain; display:block; position:relative; z-index:1;
+  filter:drop-shadow(0 8px 20px rgba(0,0,0,.5)) drop-shadow(0 0 22px var(--lg-accent));
+}
+/* These two rings used to pulse `infinite`, outside the one-at-a-time
+   sequence entirely — so no matter how neatly the travelling lights took
+   their turns, this was always going underneath them and the player read as
+   everything moving at once. They run only during this button's turn now
+   (.lgp-practice is in _LGP_SEQ_ORDER in nowssb-player.js). */
+.lgp .lgp-practice-ring {
+  position:absolute; left:50%; top:50%; width:62px; height:62px; margin:-31px 0 0 -31px;
+  border-radius:50% !important; border:2px solid var(--lg-accent);
+  box-shadow:0 0 14px var(--lg-accent); opacity:0;
+}
+/* 1.5s + a .45s stagger fits inside the sequencer's 2s turn, so the pulse
+   finishes rather than being cut off when the turn passes on. */
+.lgp .lgp-practice.lgp-anim .lgp-practice-ring { animation:lgpPulse 1.5s ease-out 1; }
+.lgp .lgp-practice.lgp-anim .lgp-practice-ring:nth-child(2) { animation-delay:.45s; }
+.lgp.playing .lgp-practice-ring { animation:none !important; }
+.lgp .lgp-practice-lbl {
+  font-size:8.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.92);
+  text-shadow:0 1px 8px rgba(0,0,0,.4);
+}
+@keyframes lgpPulse {
+  0%   { transform:scale(.85); opacity:.7; }
+  70%  { opacity:.22; }
+  100% { transform:scale(1.32); opacity:0; }
+}
+/* Practice Now — glass pill (mic + text) with a light travelling round its edge */
+.lgp .lgp-cta {
+  background:linear-gradient(135deg, var(--lg-accent), #fff); color:#10202e;
+  position:relative; overflow:hidden;
+}
+.lgp .lgp-cta .lgp-mic-ico, .lgp .lgp-cta .lgp-cta-lbl { position:relative; z-index:2; }
+.lgp .lgp-cta:active { transform:scale(.96); }
+@property --lgcta { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp .lgp-cta::before {
+  content:''; position:absolute; inset:0; border-radius:16px !important; padding:2.5px; z-index:1; pointer-events:none;
+  background:conic-gradient(from var(--lgcta),
+    transparent 0deg, transparent 210deg,
+    rgba(255,255,255,.2) 250deg, #ffffff 300deg, var(--lg-accent,#8fe6ff) 325deg, #ffffff 350deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  will-change:--lgcta; opacity:.5;
+}
+@keyframes lgpCtaTrace { to { --lgcta:360deg; } }
+/* sequenced one-shot sweeps (see .lgp-tube.lgp-anim above). Each animated light
+   sits on its own compositor layer (translateZ) so its repaint never invalidates
+   the video's layer — the video stays the render priority. */
+.lgp .lgp-cta.lgp-anim::before { opacity:1; transform:translateZ(0); animation:lgpCtaTrace 2s linear 1; }
+.lgp .lgp-replay-orb.lgp-anim::after { opacity:1; transform:translateZ(0); animation:lgpCtaTrace 2s linear 1; }
+/* Replay = bare glass-sphere icon (NO pill) to the LEFT of Practice Now, with
+   the travelling light running around the ICON itself. */
+.lgp .lgp-cta-row { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; width:100%; }
+.lgp .lgp-cta-row .lgp-cta { margin-top:0; }
+.lgp .lgp-replay-orb {
+  position:relative; width:52px; height:52px; flex-shrink:0; border:none; background:none; cursor:pointer; padding:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-replay-orb .lgp-bgico {
+  width:100%; height:100%; display:block; pointer-events:none;
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
+}
+.lgp .lgp-replay-orb:active { transform:scale(.92); }
+.lgp .lgp-replay-orb::after {
+  content:''; position:absolute; inset:-3px; border-radius:50% !important; padding:2.5px; pointer-events:none;
+  background:conic-gradient(from var(--lgcta),
+    transparent 0deg, transparent 210deg, rgba(255,255,255,.2) 250deg, #ffffff 300deg, var(--lg-accent,#8fe6ff) 325deg, #ffffff 350deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  will-change:--lgcta; opacity:.5;
+}
+
+/* recording waveform bars */
+.lgp .sp-rec-waveform { display:flex; align-items:center; gap:3px; height:46px; }
+.lgp .sp-rec-bar {
+  width:4px; border-radius:6px !important; background:linear-gradient(to top, var(--lg-accent), #fff);
+  box-shadow:0 0 8px var(--lg-accent); transition:height .08s ease;
+}
+
+/* curved liquid-glass dock (Settings · Replay · Library) */
+.lgp .lgp-dock {
+  width:100%; max-width:340px; margin-top:18px; display:flex; align-items:center; justify-content:space-around; gap:10px;
+  padding:14px 22px calc(env(safe-area-inset-bottom,8px) + 10px);
+  border-radius:34px 34px 0 0 !important;
+  background:rgba(255,255,255,.12);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  border:1px solid rgba(255,255,255,.28); border-bottom:none;
+  box-shadow:0 -10px 34px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.45);
+}
+.lgp .lgp-dock-btn {
+  border:none; cursor:pointer; background:none; color:#fff;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700; letter-spacing:.5px;
+  opacity:.92;
+}
+.lgp .lgp-dock-btn:active { transform:scale(.92); }
+.lgp .lgp-dock-btn img { width:24px; height:24px; object-fit:contain; filter:brightness(0) invert(1); opacity:.92; }
+.lgp .lgp-dock-btn span { text-transform:uppercase; }
+
+/* curved liquid-glass ARC — slides up from Settings.
+   #lgpArc id-specificity beats the `.lgp > *` z-index rule, and !important
+   guarantees the full-screen overlay (not a narrow centered column). */
+.lgp-arc, #lgpArc { position:fixed !important; inset:0 !important; z-index:2147483000 !important; pointer-events:none; font-family:'DM Sans',sans-serif; }
+.lgp-arc.open { pointer-events:auto; }
+/* blurred backdrop — everything behind the menu goes soft */
+.lgp-arc-back {
+  position:absolute; inset:0; background:rgba(6,10,25,.32); opacity:0; transition:opacity .3s;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+}
+.lgp-arc.open .lgp-arc-back { opacity:1; }
+
+/* RADIAL menu — settings icon centred, options in a glass circle around it */
+.lgp-arc-radial {
+  position:absolute; left:50%; top:39%; width:300px; height:300px;
+  transform:translate(-50%,-50%) scale(.55); opacity:0;
+  transition:transform .36s cubic-bezier(.2,1.1,.3,1), opacity .28s;
+}
+.lgp-arc.open .lgp-arc-radial { transform:translate(-50%,-50%) scale(1); opacity:1; }
+/* the closed arc lives in <body> and persists — make sure NOTHING from it ever
+   paints (no stray box on other screens) until it's actually open */
+.lgp-arc:not(.open) { visibility:hidden !important; }
+.lgp-arc.open { visibility:visible; }
+/* glass disc the options sit on — the "circle" */
+.lgp-arc-ring {
+  position:absolute; left:50%; top:50%; width:250px; height:250px; margin:-125px 0 0 -125px;
+  border-radius:50% !important; border:2px solid rgba(255,255,255,.32);
+  background:rgba(255,255,255,.05);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:0 0 50px -6px var(--lg-accent,#8fd), inset 0 0 44px rgba(255,255,255,.1), inset 0 2px 1px rgba(255,255,255,.3);
+}
+/* a bright light that TRAVELS AROUND the ring (smooth — it's a true circle) */
+@property --lgarc { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp-arc-ring::after {
+  content:''; position:absolute; inset:-3px; border-radius:50% !important; padding:3px; pointer-events:none;
+  background:conic-gradient(from var(--lgarc),
+            transparent 0deg, transparent 215deg, rgba(255,255,255,.05) 250deg,
+            var(--lg-accent,#8fd) 300deg, #ffffff 330deg, var(--lg-accent,#8fd) 350deg, rgba(255,255,255,.05) 358deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  will-change:--lgarc;
+  animation:lgpArcTravel 3.4s linear infinite;
+}
+@keyframes lgpArcTravel { to { --lgarc:360deg; } }
+/* back button (top-left) — arc lives in <body>, so style it UNSCOPED */
+.lgp-arc-close {
+  position:absolute; top:max(env(safe-area-inset-top,16px),16px); left:16px;
+  width:48px; height:48px; border:none; background:none; padding:0; cursor:pointer; z-index:6;
+}
+.lgp-arc-close-ico {
+  display:block; width:100%; height:100%; background-size:contain; background-position:center; background-repeat:no-repeat;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));
+}
+/* brand row, right of the back button — same icon + label used on every
+   player screen's header */
+.lgp-arc-brand {
+  position:absolute; top:max(env(safe-area-inset-top,16px),16px); left:74px; height:48px;
+  display:flex; align-items:center; gap:10px; z-index:6;
+}
+.lgp-arc-brand-txt { font-size:15px; font-weight:800; color:#fff; font-family:'DM Sans',sans-serif; }
+.lgp-arc-brand-ico-corner {
+  position:absolute; top:max(env(safe-area-inset-top,16px),16px); right:16px;
+  width:38px; height:38px; background-size:contain; background-repeat:no-repeat; background-position:center;
+  z-index:6;
+}
+/* banner + word meaning/heals/category card, stacked at the bottom */
+.lgp-arc-bottom {
+  position:absolute; left:50%; bottom:max(env(safe-area-inset-bottom,26px),26px); transform:translateX(-50%);
+  width:min(90vw,360px); display:flex; flex-direction:column; gap:10px;
+}
+/* self-sufficient (not scoped under .lgp — the arc lives directly in
+   <body>, same reasoning as .lgp-arc-close/.lgp-arc-info above) */
+.lgp-arc-banner { display:flex; align-items:center; gap:14px; min-height:74px; background:#000; border-radius:16px !important; padding:14px 18px; }
+.lgp-arc-banner-icon {
+  width:48px; height:48px; flex-shrink:0;
+  background-size:contain; background-repeat:no-repeat; background-position:center;
+}
+.lgp-arc-banner-divider { width:1px; align-self:stretch; background:rgba(255,255,255,.15); flex-shrink:0; }
+.lgp-arc-banner-text {
+  flex:1; min-width:0;
+  font-size:14px; font-weight:700; letter-spacing:.2px; color:#fff; font-family:'DM Sans',sans-serif;
+  line-height:1.4;
+}
+.lgp-arc-banner-text.dash-in { animation:nmhTrendWordDash .5s cubic-bezier(.34,1.56,.64,1) both; }
+/* word meaning / heals / category — shown INSIDE the settings menu */
+.lgp-arc-info {
+  width:100%; padding:14px 18px; border-radius:22px !important; color:#fff;
+  font-family:'DM Sans',sans-serif;
+  background:rgba(255,255,255,.1);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 16px 44px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.lgp-arc-info-word { font-size:18px; font-weight:800; letter-spacing:.5px; margin-bottom:8px; }
+.lgp-arc-info-word span { font-size:11px; font-weight:500; opacity:.6; letter-spacing:1px; }
+.lgp-arc-info-row { display:flex; gap:12px; padding:6px 0; align-items:baseline; }
+.lgp-arc-info-row + .lgp-arc-info-row { border-top:1px solid rgba(255,255,255,.1); }
+.lgp-arc-info-row .k { flex-shrink:0; width:64px; font-size:9px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--lg-accent,#8fd); }
+.lgp-arc-info-row .v { flex:1; font-size:12px; font-weight:500; line-height:1.4; color:rgba(255,255,255,.92); }
+.lgp-arc-center {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:108px; height:108px; border-radius:50% !important;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  background:rgba(255,255,255,.12);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  border:1px solid rgba(255,255,255,.34);
+  box-shadow:0 16px 44px rgba(0,0,0,.5), 0 0 50px -10px var(--lg-accent,#8fd), inset 0 2px 1px rgba(255,255,255,.5);
+}
+.lgp-arc-center-ico { width:52px; height:52px; background-size:contain; background-position:center; background-repeat:no-repeat; filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)); }
+.lgp-arc-center-lbl { font-size:8px; font-weight:800; letter-spacing:1.8px; text-transform:uppercase; color:rgba(255,255,255,.85); }
+.lgp-arc-opt {
+  position:absolute; left:50%; top:50%; width:80px; height:80px; border-radius:50% !important;
+  border:1px solid rgba(255,255,255,.26); cursor:pointer; color:#fff;
+  background:rgba(255,255,255,.1);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:0 10px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.4);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  font-family:'DM Sans',sans-serif;
+}
+.lgp-arc-opt .lbl { font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; opacity:.7; }
+.lgp-arc-opt .val { font-size:13px; font-weight:800; }
+.lgp-arc-opt .ico { width:34px; height:34px; background-size:contain; background-position:center; background-repeat:no-repeat; filter:drop-shadow(0 3px 7px rgba(0,0,0,.45)); }
+.lgp-arc-opt.o1 { transform:translate(-50%,-50%) rotate(-90deg)  translateX(120px) rotate(90deg); }
+.lgp-arc-opt.o2 { transform:translate(-50%,-50%) rotate(-18deg)  translateX(120px) rotate(18deg); }
+.lgp-arc-opt.o3 { transform:translate(-50%,-50%) rotate(54deg)   translateX(120px) rotate(-54deg); }
+.lgp-arc-opt.o4 { transform:translate(-50%,-50%) rotate(126deg)  translateX(120px) rotate(-126deg); }
+.lgp-arc-opt.o5 { transform:translate(-50%,-50%) rotate(198deg)  translateX(120px) rotate(-198deg); }
+
+/* ═══════════════════════════════════════════════════════════════
+   WORD INFO PANEL — ⓘ icon on the video opens a full-screen liquid-glass
+   overlay: organ video (wired per-word later) + what's-happening + meaning
+   + results. Lives as a direct child of <body> (same reasoning as the
+   settings arc — .sub-screen's stacking context would clip it otherwise).
+═══════════════════════════════════════════════════════════════ */
+/* info icon + one-shot hint pill cluster, top-right of the video */
+/* A flex item in .lgp-visual-top now, NOT pinned to the corner. While it was
+   still position:absolute it sat outside the row, so the ritual opposite had
+   nothing to shrink against and simply ran underneath it — which is exactly
+   what the overlap was. */
+.lgp .lgp-info-cluster {
+  position:relative; z-index:4;
+  display:flex; align-items:center; gap:8px; flex-direction:row;
+  flex:0 1 auto; min-width:0;    /* the pill inside is what gives, not the panel */
+}
+/* The hint pill is a one-shot that runs for about four seconds when the
+   player opens, and while it is open it is the widest thing on the row. It
+   yields rather than pushing the cluster off the panel; the ritual opposite
+   steps out of the way for those few seconds instead of being crushed to
+   two letters (lgp-hinting is put on the row by nowssb-player.js). */
+.lgp .lgp-visual-top .lgp-info-pill { min-width:0; flex:0 1 auto; }
+.lgp .lgp-visual-tag { transition:opacity .28s ease, max-width .28s ease; }
+.lgp .lgp-visual-top.lgp-hinting .lgp-visual-tag { opacity:0; max-width:0; padding:0; border-width:0; }
+/* ── the panel's top row ──
+   One flex row, not two boxes pinned to opposite corners. Pinned, they
+   overlapped as soon as either side grew — "Afternoon" on the left and
+   "Learn your score" on the right was already too much for a 342px panel.
+   Here the ritual is the only thing allowed to shrink, and it ellipsises. */
+.lgp .lgp-visual-top {
+  position:absolute; top:9px; left:9px; right:9px; z-index:4;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  pointer-events:none;                    /* the panel stays tappable between them */
+}
+.lgp .lgp-visual-top > * { pointer-events:auto; }
+
+/* the ritual this session belongs to */
+.lgp .lgp-visual-tag {
+  display:flex; align-items:center; gap:7px; height:34px; padding:0 13px;
+  border-radius:999px !important;
+  flex:0 1 auto; min-width:0;             /* shrinks before the bars do */
+  font-size:9px; font-weight:800; letter-spacing:1.8px; text-transform:uppercase;
+  color:rgba(255,255,255,.9);
+  background:rgba(8,14,28,.42); border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 5px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.26);
+}
+.lgp .lgp-visual-tag-txt { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lgp .lgp-visual-tag-dot {
+  width:5px; height:5px; border-radius:50% !important; flex-shrink:0;
+  background:var(--lg-accent,#8fe6ff); box-shadow:0 0 9px var(--lg-accent,#8fe6ff);
+}
+
+/* ── the little equalizer that sits with it, top right of the panel ──
+   Four bars on their own delays, so they never move as a block. They
+   breathe while the player is idle and run at full tilt once the word is
+   playing — the only moving thing in the panel that isn't the video. */
+.lgp .lgp-eq {
+  display:flex; align-items:flex-end; gap:3px; height:34px; padding:0 11px 9px;
+  border-radius:999px !important; flex-shrink:0;
+  background:rgba(8,14,28,.42); border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 5px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.26);
+}
+.lgp .lgp-eq i {
+  display:block; width:3px; border-radius:2px; transform-origin:bottom;
+  background:var(--lg-accent,#8fe6ff); box-shadow:0 0 8px var(--lg-accent,#8fe6ff);
+  animation:lgpEq 1.9s ease-in-out infinite;
+}
+.lgp .lgp-eq i:nth-child(1) { height:11px; animation-delay:0s;   }
+.lgp .lgp-eq i:nth-child(2) { height:18px; animation-delay:.28s; }
+.lgp .lgp-eq i:nth-child(3) { height:8px;  animation-delay:.56s; }
+.lgp .lgp-eq i:nth-child(4) { height:15px; animation-delay:.84s; }
+.lgp.playing .lgp-eq i { animation-duration:.62s; }
+@keyframes lgpEq { 0%,100% { transform:scaleY(.32); } 50% { transform:scaleY(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .lgp .lgp-eq i { animation:none; transform:scaleY(.7); }
+}
+/* bare glass-sphere image button (bigger now) — the icon PNG IS the button */
+.lgp .lgp-info-btn {
+  position:relative; width:48px; height:48px; flex-shrink:0;
+  border:none !important; background:none !important; box-shadow:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-info-btn .lgp-bgico {
+  width:100% !important; height:100% !important; display:block !important; pointer-events:none;
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
+}
+.lgp .lgp-info-btn:active { transform:scale(.92); }
+/* travelling light that traces round the info icon — fires AFTER the pill hint */
+@property --lgib { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp .lgp-info-btn::after {
+  content:''; position:absolute; inset:-3px; border-radius:50% !important; padding:2.5px; pointer-events:none;
+  background:conic-gradient(from var(--lgib),
+    transparent 0deg, transparent 250deg, var(--lg-accent,#8fe6ff) 305deg, #ffffff 335deg, var(--lg-accent,#8fe6ff) 350deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; will-change:--lgib;
+}
+.lgp .lgp-info-btn.trace-run::after { animation:lgpInfoBtnTrace 2.6s linear forwards; }
+/* info icon also joins the one-at-a-time sequence */
+.lgp .lgp-info-btn.lgp-anim::after { transform:translateZ(0); animation:lgpInfoBtnTrace 2s linear 1; }
+/* When the word is PLAYING, every CSS animation freezes — only the video runs.
+   `*` covers elements; the traveling lights live on pseudo-elements so pause
+   those explicitly too. */
+.lgp.playing * { animation-play-state:paused !important; }
+.lgp.playing .lgp-tube::before,
+.lgp.playing .lgp-cta::before,
+.lgp.playing .lgp-replay-orb::after,
+.lgp.playing .lgp-info-btn::after { animation:none !important; }
+@keyframes lgpInfoBtnTrace {
+  0%,6% { opacity:0; --lgib:0deg; }
+  12%   { opacity:1; }
+  85%   { opacity:1; --lgib:720deg; }
+  100%  { opacity:0; --lgib:720deg; }
+}
+
+/* ── the hint pill (grows out to the LEFT of the icon, one-shot) ── */
+.lgp .lgp-info-pill {
+  position:relative; order:0; max-width:0; opacity:0; overflow:hidden; white-space:nowrap;
+  height:34px; display:flex; align-items:center; border-radius:999px !important;
+  /* Solid black. It was a translucent slate that picked up whatever was
+     behind it, which on a bright frame of the video read as grey glass. */
+  background:#000000; -webkit-backdrop-filter:none; backdrop-filter:none;
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
+}
+.lgp .lgp-info-pill-txt {
+  padding:0 15px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:800;
+  letter-spacing:.4px; color:#fff; text-transform:uppercase; opacity:0;
+}
+/* travelling light that traces around the pill border */
+@property --lgip { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.lgp .lgp-info-pill::before {
+  content:''; position:absolute; inset:0; border-radius:999px !important; padding:1.5px; pointer-events:none;
+  background:conic-gradient(from var(--lgip),
+    transparent 0deg, transparent 250deg, var(--lg-accent,#8fe6ff) 305deg, #ffffff 335deg, var(--lg-accent,#8fe6ff) 350deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; will-change:--lgip;
+}
+
+/* ── one-shot run (added by JS ~800ms after the player opens; NOT looping) ── */
+.lgp .lgp-info-cluster.hint-run .lgp-info-pill      { animation:lgpInfoPill 10.2s cubic-bezier(.2,1,.3,1) forwards; }
+.lgp .lgp-info-cluster.hint-run .lgp-info-pill-txt  { animation:lgpInfoTxt  10.2s ease forwards; }
+.lgp .lgp-info-cluster.hint-run .lgp-info-pill::before { animation:lgpInfoTrace 10.2s linear forwards; }
+.lgp .lgp-info-cluster.hint-run .lgp-info-btn       { animation:lgpInfoPulse 10.2s ease forwards; }
+@keyframes lgpInfoPill {
+  0%   { max-width:0; opacity:0; }
+  9%   { max-width:190px; opacity:1; }
+  88%  { max-width:190px; opacity:1; }
+  100% { max-width:0; opacity:0; }
+}
+@keyframes lgpInfoTxt {
+  0%,6% { opacity:0; }
+  12%,86% { opacity:1; }
+  100% { opacity:0; }
+}
+@keyframes lgpInfoTrace {
+  0%,7% { opacity:0; --lgip:0deg; }
+  12%   { opacity:1; }
+  86%   { opacity:1; --lgip:1080deg; }
+  100%  { opacity:0; --lgip:1080deg; }
+}
+@keyframes lgpInfoPulse {
+  0% { transform:scale(1); }
+  8% { transform:scale(1.22); }
+  16% { transform:scale(1); }
+  100% { transform:scale(1); }
+}
+
+.lgp-info-panel, #lgpInfoPanel { position:fixed !important; inset:0 !important; z-index:2147483000 !important; pointer-events:none; font-family:'DM Sans',sans-serif; }
+.lgp-info-panel.open { pointer-events:auto; }
+.lgp-info-panel:not(.open) { visibility:hidden !important; }
+.lgp-info-panel.open { visibility:visible; }
+.lgp-info-back {
+  position:absolute; inset:0; background:rgba(6,10,25,.4); opacity:0; transition:opacity .3s;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+}
+.lgp-info-panel.open .lgp-info-back { opacity:1; }
+
+/* full PAGE — fills the whole screen (not a bottom sheet) */
+.lgp-info-sheet {
+  position:absolute; left:0; top:0; right:0; bottom:0; transform:translateY(100%); opacity:0;
+  width:100%; max-width:none; height:100%; max-height:none; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:max(env(safe-area-inset-top,16px),16px) 20px calc(env(safe-area-inset-bottom,24px) + 24px); color:#fff;
+  border-radius:0 !important;
+  /* Black, not a see-through slate — the player behind it was showing
+     through the page and the text sat on moving video. */
+  background:#000000;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  border:none;
+  transition:transform .4s cubic-bezier(.2,1,.3,1), opacity .3s;
+}
+.lgp-info-panel.open .lgp-info-sheet { transform:translateY(0); opacity:1; }
+.lgp-info-sheet::-webkit-scrollbar { display:none; }
+
+.lgp-info-sheet-top { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+/* back button uses the glass back-sphere image (bare, like other player buttons) */
+.lgp-info-close {
+  width:46px; height:46px; flex-shrink:0; padding:0; cursor:pointer;
+  border:none !important; background:none !important; box-shadow:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp-info-close .lgp-bgico {
+  width:100% !important; height:100% !important; display:block !important; pointer-events:none;
+  background-size:contain; background-position:center; background-repeat:no-repeat;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
+}
+.lgp-info-close:active { transform:scale(.9); }
+.lgp-info-sheet-title { font-size:24px; font-weight:800; letter-spacing:.3px; flex:1; min-width:0; }
+.lgp-info-sheet-brand {
+  width:38px; height:38px; flex-shrink:0;
+  background-size:contain; background-repeat:no-repeat; background-position:center;
+}
+
+.lgp-info-video-wrap {
+  width:100%; aspect-ratio:1/1; border-radius:18px !important; overflow:hidden; margin-bottom:18px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.lgp-info-video { width:100%; height:100%; object-fit:cover; display:block; }
+.lgp-info-video-placeholder {
+  width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+  background:radial-gradient(ellipse at center, rgba(255,255,255,.08), rgba(255,255,255,.02));
+}
+.lgp-info-video-ico {
+  width:56px; height:56px; border-radius:50% !important; background:rgba(255,255,255,.12);
+  display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.24);
+}
+.lgp-info-video-lbl { font-size:11px; font-weight:600; letter-spacing:.5px; color:rgba(255,255,255,.5); text-transform:uppercase; }
+
+.lgp-info-sec { margin-bottom:16px; }
+.lgp-info-sec-h { font-size:10px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--lg-accent,#8fd); margin-bottom:8px; }
+.lgp-info-card {
+  border-radius:16px !important; padding:4px 14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+}
+.lgp-info-row { display:flex; gap:12px; padding:9px 0; align-items:baseline; }
+.lgp-info-row + .lgp-info-row { border-top:1px solid rgba(255,255,255,.08); }
+.lgp-info-row .k { flex-shrink:0; width:96px; font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:rgba(255,255,255,.5); }
+.lgp-info-row .v { flex:1; font-size:13px; font-weight:500; line-height:1.45; color:rgba(255,255,255,.92); }
+
+.lgp-info-results { display:flex; gap:8px; }
+.lgp-info-result-tile {
+  flex:1; border-radius:16px !important; padding:12px 8px; text-align:center;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+}
+.lgp-info-result-num { font-size:20px; font-weight:800; color:#fff; }
+.lgp-info-result-num span { font-size:12px; font-weight:600; opacity:.6; }
+.lgp-info-result-lbl { font-size:9px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:rgba(255,255,255,.45); margin-top:4px; line-height:1.3; }
+.lgp-info-improve { margin-top:10px; font-size:12px; line-height:1.5; color:rgba(255,255,255,.45); text-align:center; }
+
+/* ══════════════════════════════════════════════════════════════════
+   The band under the header, and the bottom row
+   ══════════════════════════════════════════════════════════════════ */
+
+/* A hairline between Sentence, Practice and Store — the three used to run
+   together with nothing but air between them. */
+.lgp .lgp-practice-sep {
+  width:1px; align-self:center; height:30px; flex:0 0 1px;
+  background:linear-gradient(180deg, rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.26) 50%, rgba(255,255,255,0) 100%);
+}
+
+/* The heart and Notes, in the band that was carrying only a divider. */
+.lgp .lgp-band-acts {
+  margin-left:auto; display:flex; align-items:center; gap:10px; flex-shrink:0;
+}
+.lgp .lgp-band-sep {
+  width:1px; height:22px; flex-shrink:0;
+  background:linear-gradient(180deg, rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.24) 50%, rgba(255,255,255,0) 100%);
+}
+/* The heart keeps the look it had in the header; only its home changed. */
+.lgp .lgp-info-banner .lgp-like {
+  position:static; width:34px; height:34px; flex-shrink:0;
+}
+.lgp .lgp-notes-btn {
+  display:flex; align-items:center; gap:6px; flex-shrink:0;
+  padding:7px 12px 7px 10px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:999px !important;
+  background:rgba(255,255,255,.07);
+  color:rgba(255,255,255,.9); cursor:pointer;
+}
+.lgp .lgp-notes-btn:active { transform:scale(.95); }
+.lgp .lgp-notes-btn svg { width:15px; height:15px; display:block; flex-shrink:0; }
+.lgp .lgp-notes-lbl {
+  font-family:'DM Sans',sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:.6px; white-space:nowrap;
+}
+
+/* The word and everything under it move up by the height the Reps band was
+   taking, so the page reads from the word rather than from the gap above
+   it. */
+
+/* ══════════════════════════════════════════════════════════════════
+   PRONUNCIATION NOTES (app/js/part081.js)
+   ══════════════════════════════════════════════════════════════════ */
+.pn-overlay {
+  position:fixed; inset:0; z-index:4200;
+  display:flex; align-items:flex-end; justify-content:center;
+  background:rgba(3,6,14,.72);
+  opacity:0; pointer-events:none; transition:opacity .26s ease;
+}
+.pn-overlay.open { opacity:1; pointer-events:auto; }
+.pn-sheet {
+  width:100%; max-width:520px; max-height:88vh;
+  display:flex; flex-direction:column;
+  background:#0a0f1c;
+  border-top:1px solid rgba(255,255,255,.14);
+  border-radius:22px 22px 0 0 !important;
+  transform:translateY(22px); transition:transform .3s cubic-bezier(.22,1,.36,1);
+  padding-bottom:max(env(safe-area-inset-bottom,14px),14px);
+}
+.pn-overlay.open .pn-sheet { transform:translateY(0); }
+.pn-handle {
+  width:42px; height:4px; border-radius:999px !important;
+  background:rgba(255,255,255,.22); margin:10px auto 4px; flex-shrink:0;
+}
+.pn-head {
+  display:flex; align-items:center; gap:12px;
+  padding:8px 18px 12px; flex-shrink:0;
+}
+.pn-title {
+  flex:1; min-width:0;
+  font-family:'DM Sans',sans-serif; font-size:19px; font-weight:800; color:#fff;
+  letter-spacing:-.3px;
+}
+.pn-close {
+  width:34px; height:34px; flex-shrink:0; padding:0; cursor:pointer;
+  border:1px solid rgba(255,255,255,.18); border-radius:50% !important;
+  background:rgba(255,255,255,.06); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+}
+.pn-close svg { width:16px; height:16px; }
+.pn-body {
+  flex:1; min-height:0; overflow-y:auto; padding:0 16px 18px;
+  scrollbar-width:none;
+}
+.pn-body::-webkit-scrollbar { display:none; }
+
+.pn-card {
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px !important;
+  padding:16px; margin-bottom:14px;
+}
+/* The score's own colour, the same three bands part019.js scores in. */
+.pn-card.pn-good { border-color:rgba(125,220,138,.42); }
+.pn-card.pn-mid  { border-color:rgba(232,213,163,.42); }
+.pn-card.pn-low  { border-color:rgba(255,107,107,.42); }
+
+.pn-score-row { display:flex; align-items:center; gap:14px; }
+.pn-score { display:flex; align-items:baseline; gap:2px; flex-shrink:0; }
+.pn-score b {
+  font-family:'DM Sans',sans-serif; font-size:38px; font-weight:800;
+  line-height:1; letter-spacing:-1.5px; color:#fff;
+}
+.pn-score span { font-size:12px; color:rgba(255,255,255,.45); font-weight:700; }
+.pn-good .pn-score b { color:#7ddc8a; }
+.pn-mid  .pn-score b { color:#e8d5a3; }
+.pn-low  .pn-score b { color:#ff6b6b; }
+.pn-score-txt { min-width:0; }
+.pn-score-head {
+  font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; color:#fff;
+}
+.pn-score-sub {
+  font-family:'DM Sans',sans-serif; font-size:11.5px; color:rgba(255,255,255,.5); margin-top:2px;
+}
+
+.pn-heard { margin-top:14px; display:flex; flex-direction:column; gap:4px; }
+.pn-lbl {
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700;
+  letter-spacing:1.6px; text-transform:uppercase; color:rgba(255,255,255,.42);
+}
+.pn-heard-txt {
+  font-family:'DM Sans',sans-serif; font-size:14px; color:rgba(255,255,255,.86); line-height:1.4;
+}
+
+.pn-syls { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }
+.pn-syl {
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700;
+  padding:6px 12px; border-radius:999px !important;
+  border:1px solid transparent;
+}
+.pn-syl.ok  { background:rgba(125,220,138,.14); border-color:rgba(125,220,138,.4); color:#a9e8b2; }
+.pn-syl.bad { background:rgba(255,107,107,.14); border-color:rgba(255,107,107,.45); color:#ff9d9d; }
+
+.pn-fix {
+  margin-top:14px; padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.1);
+  display:flex; flex-direction:column; gap:8px;
+}
+.pn-fix-lbl {
+  font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700;
+  letter-spacing:1.6px; text-transform:uppercase; color:rgba(255,255,255,.42);
+}
+.pn-fix-line { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.pn-fix-syl {
+  font-family:'DM Sans',sans-serif; font-size:20px; font-weight:800; color:#fff; letter-spacing:.4px;
+}
+.pn-fix-syl.bad {
+  color:#ff9d9d; text-decoration:underline; text-decoration-thickness:2px;
+  text-underline-offset:5px; text-decoration-color:rgba(255,107,107,.7);
+}
+.pn-fix-dot { color:rgba(255,255,255,.32); font-size:16px; }
+.pn-fix-note {
+  font-family:'DM Sans',sans-serif; font-size:12.5px; color:rgba(255,255,255,.6); line-height:1.5;
+}
+
+.pn-empty { text-align:center; }
+.pn-empty-head { font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; color:#fff; }
+.pn-empty-sub {
+  font-family:'DM Sans',sans-serif; font-size:13px; color:rgba(255,255,255,.55);
+  line-height:1.5; margin-top:6px;
+}
+.pn-cta {
+  margin-top:14px; padding:12px 22px; cursor:pointer;
+  border:1px solid rgba(232,213,163,.5); border-radius:999px !important;
+  background:rgba(232,213,163,.14); color:#e8d5a3;
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; letter-spacing:.4px;
+}
+
+.pn-sec-title {
+  font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.42);
+  margin:2px 4px 10px;
+}
+.pn-how-word {
+  font-family:'DM Sans',sans-serif; font-size:22px; font-weight:800; color:#fff;
+  letter-spacing:.5px; margin-bottom:12px;
+  display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+}
+.pn-how-ph {
+  font-size:12px; font-weight:500; letter-spacing:1px; color:rgba(255,255,255,.5);
+}
+.pn-row { display:flex; gap:12px; padding:9px 0; border-top:1px solid rgba(255,255,255,.08); }
+.pn-row:first-of-type { border-top:none; padding-top:0; }
+.pn-row-lbl {
+  flex:0 0 96px;
+  font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:1.2px; text-transform:uppercase; color:rgba(255,255,255,.42);
+  padding-top:2px;
+}
+.pn-row-txt {
+  flex:1; min-width:0;
+  font-family:'DM Sans',sans-serif; font-size:13.5px; color:rgba(255,255,255,.85); line-height:1.5;
+}
+.pn-syl-head {
+  margin-top:14px;
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; color:#fff;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   The two rails inside the picture
+   Replay · Notes · Like stand in a vertical pill down the left; the
+   volume runs down the right, with its toggle beneath it. Both fold away
+   so the artwork can be seen on its own, and that choice is remembered.
+
+   They sit ABOVE the word's gradient overlay (z-index 5 against its 3)
+   but are vertically centred on the panel, so they never cross the word.
+   ══════════════════════════════════════════════════════════════════ */
+.lgp .lgp-rail {
+  position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+  display:flex; flex-direction:column; align-items:center;
+  padding:8px 3px; gap:6px;
+  border-radius:999px !important;
+  background:rgba(6,10,22,.55);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 10px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.24);
+  transition:opacity .28s ease, transform .32s cubic-bezier(.2,1,.3,1);
+}
+.lgp .lgp-rail-l { left:10px; }
+/* The speaker lives in the bottom-right corner of the picture, not
+   halfway down the side — and because it is anchored at the BOTTOM, the
+   slider opens upward out of it and the speaker itself never moves. */
+.lgp .lgp-rail-r {
+  right:10px; bottom:10px; top:auto; transform:none;
+  padding:6px 5px; gap:0;
+}
+.lgp .lgp-rail-r.vol-open { padding:10px 5px 8px; }
+
+/* folded away — they slide out sideways and stop taking taps */
+.lgp .lgp-visual.rails-off .lgp-rail { opacity:0; pointer-events:none; }
+.lgp .lgp-visual.rails-off .lgp-rail-l { transform:translate(-130%, -50%); }
+.lgp .lgp-visual.rails-off .lgp-rail-r { transform:translateX(130%); }
+
+/* the buttons in the left rail: 40 square, bare, white */
+.lgp .lgp-rail .lgp-wa {
+  width:40px !important; height:40px !important;
+  min-width:40px !important; min-height:40px !important;
+}
+.lgp .lgp-rail .lgp-wa svg { width:21px; height:21px; }
+/* the hairline between them runs ACROSS the pill, not down it */
+.lgp .lgp-rail .lgp-wa-sep {
+  width:20px; height:1px; flex:0 0 1px; align-self:center;
+  background:rgba(255,255,255,.5);
+  box-shadow:none;
+}
+
+/* ── the volume ──
+   Hand-built rather than <input type="range">: a vertical range needs the
+   deprecated -webkit-appearance:slider-vertical or a writing-mode
+   browsers disagree about, and both fight the styling. */
+.lgp .lgp-vol {
+  position:relative; width:8px; height:clamp(74px, 17vh, 128px);
+  border-radius:999px !important; cursor:pointer; touch-action:none;
+  background:rgba(255,255,255,.2);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.5);
+  overflow:hidden;
+}
+.lgp .lgp-vol-fill {
+  position:absolute; left:0; right:0; bottom:0;
+  border-radius:999px !important;
+  background:linear-gradient(180deg, #fff, var(--lg-accent));
+  box-shadow:0 0 12px var(--lg-accent);
+}
+.lgp .lgp-vol-val {
+  font-family:'DM Sans',sans-serif; font-size:9.5px; font-weight:800;
+  letter-spacing:.4px; color:rgba(255,255,255,.9);
+  text-shadow:0 1px 5px rgba(0,0,0,.7);
+}
+/* ── the speaker, and what it folds open ── */
+.lgp .lgp-vol-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  max-height:0; opacity:0; overflow:hidden;
+  transition:max-height .32s cubic-bezier(.2,1,.3,1), opacity .24s ease, margin .32s ease;
+}
+.lgp .lgp-rail-r.vol-open .lgp-vol-wrap { max-height:200px; opacity:1; margin-bottom:2px; }
+.lgp .lgp-vol-btn {
+  width:34px !important; height:34px !important;
+  min-width:34px !important; min-height:34px !important;
+  padding:0; cursor:pointer; flex-shrink:0;
+  border:none !important; background:none !important; box-shadow:none !important;
+  color:#fff;
+  display:flex !important; align-items:center; justify-content:center;
+}
+.lgp .lgp-vol-btn svg {
+  width:20px; height:20px; display:block;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
+}
+.lgp .lgp-vol-btn:active { transform:scale(.9); }
+/* the glyph reads the level, so the folded rail still says what it is */
+.lgp .lgp-vol-mute { opacity:0; }
+.lgp .lgp-rail-r.vol-1 .lgp-vol-w2 { opacity:0; }
+.lgp .lgp-rail-r.vol-0 .lgp-vol-w1,
+.lgp .lgp-rail-r.vol-0 .lgp-vol-w2 { opacity:0; }
+.lgp .lgp-rail-r.vol-0 .lgp-vol-mute { opacity:1; }
+
+/* ── fold/unfold ──
+   Stays put when the rails go, because it is the way back. */
+/* …which is why the fold toggle moved to the other corner. */
+.lgp .lgp-rail-toggle {
+  position:absolute; left:10px; bottom:10px; z-index:6;
+  width:36px !important; height:36px !important;
+  min-width:36px !important; min-height:36px !important;
+  padding:0; cursor:pointer;
+  border-radius:50% !important; border:1px solid rgba(255,255,255,.22) !important;
+  background:rgba(6,10,22,.6) !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.4);
+  color:#fff;
+  display:flex !important; align-items:center; justify-content:center;
+  transition:opacity .25s ease;
+}
+.lgp .lgp-rail-toggle svg { width:18px; height:18px; display:block; }
+.lgp .lgp-rail-toggle:active { transform:scale(.92); }
+.lgp .lgp-visual.rails-off .lgp-rail-toggle { opacity:.55; }
+/* nothing to make room for any more */
+.lgp .lgp-visual.rails-off .lgp-visual-overlay { padding-left:14px; padding-right:14px; }
+
+/* The syllable boxes lost 24px of lane to the rails, so they give back a
+   little padding rather than wrapping onto a second line — three of them
+   have to fit across a 360-wide screen. */
+.lgp .lgp-visual-overlay .lgp-syls { gap:6px; }
+.lgp .lgp-visual-overlay .lgp-syl { padding:8px 13px; min-width:48px; }
+
+/* The word, over the bottom of the picture — lifted clear of the edge by
+   the overlay's own bottom padding rather than by anything under it. */
+.lgp .lgp-wordblock {
+  position:relative; width:100%;
+  display:flex; flex-direction:column; align-items:center;
+  flex-shrink:0; background:none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Replay · Notes · Like — inside the lit tab
+   The ELEMENT IS THE FRAME: the render is its background, stretched to
+   the element (the render is a lit rectangle floating in its own glow,
+   so stretching it stretches the glow, which is the one thing that does
+   not mind). The screen is placed against the element's own box with
+   percentage offsets — NOT padding, because percentage padding resolves
+   against the CONTAINING BLOCK's width, and this element's containing
+   block is wider than it is.
+
+   The render is cropped to just outside its outer stroke — the glow it
+   was floating in reached the edge of its own canvas, so keeping it meant
+   a hard bright line down both sides of the element. The glow is a CSS
+   box-shadow instead, which costs nothing, follows the element at any
+   size, and cannot be cut off.
+
+   Aperture in assets/frames/word-acts-tab.webp (1371x317):
+     x 25..1344  ->  1.823% from the left, 1.969% from the right
+     y 19..296   ->  5.994% from the top,  6.625% from the bottom
+   ══════════════════════════════════════════════════════════════════ */
+/* The Replay/Notes/Like tab used to be defined here. The three buttons
+   moved into the picture and the clip moved into the Sentence · Practice
+   · Store tab, which is where this rule now puts it. A <video> is a
+   REPLACED element — width:auto takes its intrinsic size and drops the
+   `right` offset — so the aperture is an explicit width and height. */
+.lgp .lgp-wa-vid {
+  position:absolute; left:1.823%; top:5.994%;
+  width:96.208%; height:87.381%;
+  border-radius:5px !important; background:#000;
+  /* The waves live in the lower part of the frame and the aperture is a
+     thin strip, so centring it showed the black above them. Anchored near
+     the bottom of the source instead — the same crop, lifted. */
+  object-fit:cover; object-position:center 88%; display:block; pointer-events:none;
+  transform:translateZ(0); backface-visibility:hidden;
+}
+
+/* The hairline between the three. In the vertical rail it runs across
+   the pill — see .lgp-rail .lgp-wa-sep above. */
+.lgp .lgp-wa-sep {
+  flex:0 0 1px; align-self:center;
+  background:rgba(255,255,255,.7);
+  border-radius:1px !important;
+}
+
+/* ── Circles, not ovals ──
+   app/app.css gives every <button> a 44px min-height, and min-height beats
+   height — a 34 or 42px button therefore came out 34x44 and drew as an
+   oval. Everything round in here is 44 square, so the radius has a circle
+   to work on. */
+.lgp .lgp-white-btn,
+.pn-close {
+  width:44px !important; height:44px !important;
+  min-width:44px !important; min-height:44px !important;
+  flex-shrink:0; padding:0; cursor:pointer;
+  border-radius:50% !important;
+  border:none !important;
+  background:#ffffff !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.34), 0 2px 6px rgba(0,0,0,.22) !important;
+  color:#0a0a12 !important;
+  display:flex !important; align-items:center; justify-content:center;
+}
+.lgp .lgp-white-btn:active,
+.pn-close:active { transform:scale(.93); }
+.lgp .lgp-white-btn svg,
+.pn-close svg { width:21px; height:21px; display:block; }
+
+/* ── The three in the tab: no wrapper at all ──
+   They lost their white discs — the tab is the surface now, and a disc
+   inside it would be a button drawn on top of a button. The tap target
+   stays 44 square (invisible); only the glyph shows, white with a shadow
+   so it survives a bright frame of the clip underneath. */
+.lgp .lgp-wa {
+  width:44px !important; height:44px !important;
+  min-width:44px !important; min-height:44px !important;
+  flex-shrink:0; padding:0; cursor:pointer;
+  border:none !important; border-radius:0 !important;
+  background:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  box-shadow:none !important;
+  color:#ffffff !important;
+  display:flex !important; align-items:center; justify-content:center;
+}
+.lgp .lgp-wa:active { transform:scale(.9); }
+.lgp .lgp-wa svg {
+  width:23px; height:23px; display:block;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.75));
+}
+
+/* The heart: white outline, filled red when liked. */
+.lgp .lgp-like svg { fill:none; stroke:#ffffff; stroke-width:1.8; }
+.lgp .lgp-like.liked svg { fill:#e5342a; stroke:#e5342a; }
+
+/* The settings sphere on the right keeps its own look — it was not part of
+   this, and it is an image rather than a glass circle. */
+
+/* ── The line between Sentence, Practice and Store ──
+   It was a gradient that faded out at both ends, which at 1px is a line
+   nobody can see. Solid, and now placed at the midpoint between two ring
+   centres — 34.5% and 65.5% — which is the gap between the rings. */
+.lgp .lgp-practice-sep {
+  /* `left` places the left EDGE, so a 1px line sits half a pixel right of
+     the boundary it is meant to be on. */
+  position:absolute; top:14%; height:calc(72% - 15px); width:1px; margin-left:-0.5px;
+  background:rgba(255,255,255,.55);
+  box-shadow:0 0 4px rgba(0,0,0,.6);
+  border-radius:1px !important;
+}
+.lgp .lgp-practice-sep:nth-of-type(1) { left:33.893%; }
+.lgp .lgp-practice-sep:nth-of-type(2) { left:65.962%; }
+
+/* The model's half of the notes. */
+.pn-coach-txt {
+  font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.6;
+  color:rgba(255,255,255,.88);
+}
+.pn-coach-wait {
+  display:flex; align-items:center; gap:10px;
+  font-family:'DM Sans',sans-serif; font-size:13px; color:rgba(255,255,255,.45);
+}
+.pn-dots { display:inline-flex; gap:4px; }
+.pn-dots i {
+  width:5px; height:5px; border-radius:50% !important;
+  background:rgba(255,255,255,.5);
+  animation:pnDot 1.1s ease-in-out infinite;
+}
+.pn-dots i:nth-child(2) { animation-delay:.16s; }
+.pn-dots i:nth-child(3) { animation-delay:.32s; }
+@keyframes pnDot { 0%,100% { opacity:.25; } 50% { opacity:1; } }
