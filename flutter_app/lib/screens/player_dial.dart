@@ -118,13 +118,13 @@ class _PlayerDialState extends State<PlayerDial> {
 
   @override
   Widget build(BuildContext context) {
-    const acts = <(String, IconData, String)>[
-      ('voice', Icons.graphic_eq, 'Voice'),
-      ('eq', Icons.tune, 'Equalizer'),
-      ('loop', Icons.repeat, 'Loop'),
-      ('reps', Icons.exposure, 'Reps'),
-      ('speed', Icons.speed, 'Speed'),
-      ('volume', Icons.volume_up, 'Volume'),
+    const acts = <(String, IconData, double)>[
+      ('voice', Icons.graphic_eq, 8),
+      ('eq', Icons.tune, 50),
+      ('loop', Icons.repeat, 94),
+      ('shuffle', Icons.shuffle, 132),
+      ('speed', Icons.speed, 228),
+      ('volume', Icons.volume_up, 302),
     ];
 
     return Stack(
@@ -141,7 +141,7 @@ class _PlayerDialState extends State<PlayerDial> {
               child: LayoutBuilder(
                 builder: (context, box) {
                   final size = box.maxWidth;
-                  final r = size * 0.318;
+                  final r = size * 0.305;
                   return GestureDetector(
                     onPanStart: (d) {
                       _lastAng = _ang(d.localPosition, Size.square(size));
@@ -175,7 +175,7 @@ class _PlayerDialState extends State<PlayerDial> {
                         ),
                         for (var i = 0; i < acts.length; i++)
                           () {
-                            final a = -math.pi / 2 + i * (math.pi / 3);
+                            final a = -math.pi / 2 + acts[i].$3 * math.pi / 180;
                             final id = acts[i].$1;
                             final armed = id == _arm;
                             final on = id == 'loop' && s.loop != 'off';
@@ -189,7 +189,11 @@ class _PlayerDialState extends State<PlayerDial> {
                                     _open('loop');
                                     return;
                                   }
-                                  if (id == 'volume' || id == 'speed' || id == 'reps') {
+                                  if (id == 'shuffle') {
+                                    _open('shuffle');
+                                    return;
+                                  }
+                                  if (id == 'volume' || id == 'speed') {
                                     setState(() => _arm = id);
                                   }
                                   _open(id);
@@ -198,24 +202,7 @@ class _PlayerDialState extends State<PlayerDial> {
                                   width: 52,
                                   height: 52,
                                   child: Center(
-                                    child: id == 'reps'
-                                        ? Text(
-                                            '${s.reps}×',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w800,
-                                              fontSize: 15,
-                                              shadows: [
-                                                Shadow(
-                                                  color: armed
-                                                      ? const Color(0xE6FFFFFF)
-                                                      : const Color(0x66FFFFFF),
-                                                  blurRadius: armed ? 12 : 6,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        : Icon(
+                                    child: Icon(
                                             acts[i].$2,
                                             color: Colors.white,
                                             size: 22,
@@ -233,6 +220,35 @@ class _PlayerDialState extends State<PlayerDial> {
                               ),
                             );
                           }(),
+                        Positioned(
+                          left: size / 2 - 19,
+                          top: size * 0.79 - 11,
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              setState(() => _arm = 'reps');
+                              _open('reps');
+                            },
+                            child: Container(
+                              width: 38,
+                              height: 22,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF050506),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: const Color(0x29FFFFFF)),
+                              ),
+                              child: Text(
+                                '${s.reps}×',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                         Center(
                           child: GestureDetector(
                             onTap: () {
@@ -244,8 +260,8 @@ class _PlayerDialState extends State<PlayerDial> {
                               _open('settings');
                             },
                             child: Container(
-                              width: size * 0.32,
-                              height: size * 0.148,
+                              width: size * 0.36,
+                              height: size * 0.155,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(99),
                                 gradient: const LinearGradient(

@@ -36,15 +36,16 @@
     eq: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 21v-7M4 8V3M12 21v-9M12 8V3M20 21v-5M20 10V3M2 8h4M10 8h4M18 10h4"/></svg>',
     loop: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',
     speed: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 14l4-7"/><circle cx="12" cy="14" r="8"/></svg>',
-    vol: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M19 5a9 9 0 010 14"/></svg>',
+    vol: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M19 5a9 9 0 010 14"/></svg>',
+    shuffle: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>',
     gear: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.2a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.2a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.2a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9c.3.7 1 1.2 1.8 1.2H21a2 2 0 110 4h-.2a1.7 1.7 0 00-1.4 1z"/></svg>'
   };
 
   function ticks() {
     var s = '<svg class="nwsb-dial-ticks" viewBox="0 0 100 100">';
-    for (var i = 0; i < 72; i++) {
-      var m = i % 6 === 0;
-      s += '<line x1="50" y1="3.2" x2="50" y2="' + (m ? '7.4' : '5.4') + '" stroke="white" stroke-opacity="' + (m ? '.42' : '.18') + '" stroke-width="' + (m ? '.45' : '.28') + '" transform="rotate(' + (i * 5) + ' 50 50)"/>';
+    for (var i = 0; i < 120; i++) {
+      var m = i % 5 === 0;
+      s += '<line x1="50" y1="2.4" x2="50" y2="' + (m ? '6.8' : '4.6') + '" stroke="white" stroke-opacity="' + (m ? '.55' : '.2') + '" stroke-width="' + (m ? '.42' : '.24') + '" transform="rotate(' + (i * 3) + ' 50 50)"/>';
     }
     return s + '</svg>';
   }
@@ -82,7 +83,7 @@
     } else {
       prefs.reps = Math.max(1, Math.min(99, prefs.reps + dir));
       save(prefs);
-      var b = document.querySelector('#nwsbDialRoot [data-act="reps"] .nwsb-dial-reps');
+      var b = document.querySelector('#nwsbDialRoot .nwsb-dial-badge');
       if (b) b.textContent = prefs.reps + '×';
       hud('Reps · ' + prefs.reps + '×');
     }
@@ -137,15 +138,16 @@
         '<div class="nwsb-dial-bezel"><div class="nwsb-dial-knurl"></div></div>' +
         '<div class="nwsb-dial-lip"></div>' +
         '<div class="nwsb-dial-face">' + ticks() + '</div>' +
-        '<button class="nwsb-dial-icon" data-slot="0" data-act="voice" aria-label="Voice">' + ICO.voice + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="1" data-act="eq" aria-label="Equalizer">' + ICO.eq + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="2" data-act="loop" aria-label="Loop">' + ICO.loop + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="3" data-act="reps" aria-label="Repetitions"><span class="nwsb-dial-reps">' + prefs.reps + '×</span></button>' +
-        '<button class="nwsb-dial-icon" data-slot="4" data-act="speed" aria-label="Speed">' + ICO.speed + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="5" data-act="volume" aria-label="Volume">' + ICO.vol + '</button>' +
+        '<button class="nwsb-dial-icon" data-slot="voice" data-act="voice" aria-label="Voice">' + ICO.voice + '</button>' +
+        '<button class="nwsb-dial-icon" data-slot="eq" data-act="eq" aria-label="Equalizer">' + ICO.eq + '</button>' +
+        '<button class="nwsb-dial-icon" data-slot="loop" data-act="loop" aria-label="Loop">' + ICO.loop + '</button>' +
+        '<button class="nwsb-dial-icon" data-slot="shuffle" data-act="shuffle" aria-label="Shuffle">' + ICO.shuffle + '</button>' +
+        '<button class="nwsb-dial-icon" data-slot="speed" data-act="speed" aria-label="Speed">' + ICO.speed + '</button>' +
+        '<button class="nwsb-dial-icon" data-slot="volume" data-act="volume" aria-label="Volume">' + ICO.vol + '</button>' +
+        '<button class="nwsb-dial-badge" data-act="reps" aria-label="Repetitions">' + prefs.reps + '×</button>' +
         '<button class="nwsb-dial-core" data-act="settings" aria-label="Open settings">' + ICO.gear + '</button>' +
       '</div>' +
-      '<div class="nd-hint">Wind the ring · tap a control</div>' +
+      '<div class="nd-hint">Voice · EQ · Loop · Reps · Speed · Volume</div>' +
       '<div class="nd-hud" id="ndHud" hidden></div>' +
       '<div class="nd-sheet" id="ndSheet"></div>';
     document.body.appendChild(root);
@@ -286,7 +288,7 @@
           prefs.reps = +v;
         }
         save(prefs);
-        var b = document.querySelector('#nwsbDialRoot [data-act="reps"] .nwsb-dial-reps');
+        var b = document.querySelector('#nwsbDialRoot .nwsb-dial-badge');
         if (b) b.textContent = prefs.reps + '×';
         act('reps');
       };
@@ -361,7 +363,7 @@
     document.getElementById('nwsbDialRoot').classList.add('open');
     var loopBtn = document.querySelector('#nwsbDialRoot [data-act="loop"]');
     if (loopBtn) loopBtn.setAttribute('data-on', prefs.loop !== 'off' ? 'true' : 'false');
-    var reps = document.querySelector('#nwsbDialRoot [data-act="reps"] .nwsb-dial-reps');
+    var reps = document.querySelector('#nwsbDialRoot .nwsb-dial-badge');
     if (reps) reps.textContent = prefs.reps + '×';
   }
   function close() {
