@@ -37,6 +37,7 @@ library;
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
+import 'cdn.dart';
 
 /// How badly a clip wants to keep its decoder when the pool is full.
 enum ClipPriority {
@@ -427,25 +428,17 @@ class VideoPool {
   Future<void> _bringUp(VideoLease l) async {
     if (l._disposed || l._controller != null) return;
 
-    final c = VideoPlayerController.asset(l.assetPath);
-    l._controller = c;
-
-    try {
-      await c.initialize();
-    } catch (e) {
-      // A clip that will not open is not worth taking the app down for. The
-      // poster is already on screen and stays there — and now the reason is
-      // recorded rather than only printed, because a debugPrint cannot be
-      // read from a phone in someone's hand.
-      lastError = '${l.assetPath.split('/').last}: $e';
-      debugPrint('NowssB video: could not open ${l.assetPath} — $e');
+    final c = await _open(l.assetPath);
+    if (c == null) {
+      lastError = '${l.assetPath.split('/').last}: would not open (bundle or network)';
+      debugPrint('NowssB video: could not open ${l.assetPath}');
       l._failures++;
-      l._controller = null;
       _live.remove(l);
-      try { await c.dispose(); } catch (_) {}
       l._changed();
       return;
     }
+
+    l._controller = c;
 
     // Disposed, or evicted again, while we were awaiting initialize().
     if (l._disposed || !_live.contains(l)) {
@@ -462,6 +455,40 @@ class VideoPool {
     if (l._wantsPlay) await c.play();
 
     l._changed();
+  }
+
+  /// Bundled file first, then the same path on nowssb.com / GitHub Pages.
+  ///
+  /// The posters are always there. The moving picture is what was missing
+  /// when a build skipped `tools/flutter-assets.mjs` — the declared
+  /// `assets/video/` directory was empty, every controller failed, and
+  /// every banner sat on its first frame forever. That is what "the
+  /// videos are not playing" actually was.
+  Future<VideoPlayerController?> _open(String assetPath) async {
+    final asset = VideoPlayerController.asset(assetPath);
+    try {
+      await asset.initialize();
+      return asset;
+    } catch (e) {
+      debugPrint('NowssB video: bundle miss $assetPath — $e');
+      try {
+        await asset.dispose();
+      } catch (_) {}
+    }
+    for (final url in NwsbCdn.urls(assetPath)) {
+      final net = VideoPlayerController.networkUrl(Uri.parse(url));
+      try {
+        await net.initialize();
+        debugPrint('NowssB video: opened $url');
+        return net;
+      } catch (e) {
+        debugPrint('NowssB video: network miss $url — $e');
+        try {
+          await net.dispose();
+        } catch (_) {}
+      }
+    }
+    return null;
   }
 
   /// Returns when the PLATFORM has actually let the player go, not when the

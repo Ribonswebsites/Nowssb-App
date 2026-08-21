@@ -15,6 +15,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import '../data/settings.dart';
+import 'cdn.dart';
 import 'video_pool.dart';
 
 class NwsbVideo extends StatefulWidget {
@@ -65,8 +67,28 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    if (widget.autoplay) _take();
+    Settings.instance.addListener(_onSettings);
+    if (_shouldPlay) _take();
     _pump();
+  }
+
+  /// Feature clips (the page film, the televisions, the hero) always play.
+  /// Decorative banners play when Fashion Plus is on — which is the default,
+  /// matching the website. Off, they hold their first frame and cost nothing.
+  bool get _shouldPlay {
+    if (!widget.autoplay) return false;
+    if (widget.priority == ClipPriority.feature) return true;
+    return Settings.instance.fashionPlus;
+  }
+
+  void _onSettings() {
+    final want = _shouldPlay;
+    if (want && _lease == null) {
+      _take();
+    } else if (!want && _lease != null) {
+      _drop();
+      if (mounted) setState(() {});
+    }
   }
 
   void _take() {
@@ -102,7 +124,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     super.didUpdateWidget(old);
     if (old.asset != widget.asset || old.autoplay != widget.autoplay) {
       _drop();
-      if (widget.autoplay) _take();
+      if (_shouldPlay) _take();
       if (mounted) setState(() {});
     }
   }
@@ -119,6 +141,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    Settings.instance.removeListener(_onSettings);
     WidgetsBinding.instance.removeObserver(this);
     _drop();
     super.dispose();
@@ -172,7 +195,13 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
             widget._poster,
             fit: widget.fit,
             alignment: widget.alignment,
-            errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+            errorBuilder: (_, __, ___) => Image.network(
+              NwsbCdn.url(widget._poster),
+              fit: widget.fit,
+              alignment: widget.alignment,
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: Colors.black),
+            ),
           ),
           AnimatedOpacity(
             opacity: ready ? 1 : 0,

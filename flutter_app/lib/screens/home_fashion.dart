@@ -16,11 +16,12 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
+import '../data/settings.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import 'home_normal.dart' show nwsbGreeting;
-import '../shell/nav_shell.dart';
+import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
 import 'sections.dart';
 import 'widgets_page.dart';
@@ -96,15 +97,32 @@ class _HomeFashionState extends State<HomeFashion> {
                 const _FashSearch(),
                 const SizedBox(height: 18),
 
-                // Every block below is a glass pane over the film.
+                // Shipped order of #home, matching app/js/part062.js REG.fash.
                 const GlassWrap(child: HeroSection()),
                 const SizedBox(height: 16),
-
+                const _FashHeroRow(),
+                const SizedBox(height: 16),
+                _FashWordOfDay(words: words),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: 'Meanings and eBooks',
+                    title: 'Reader',
+                    onTap: () => Dest.open(context, Dest.store),
+                    icon: Icons.auto_stories_outlined,
+                    asset: 'assets/video/store-banner.mp4',
+                    overlay: 'Every word,\nexplained',
+                    dark: true,
+                    bannerTitle: 'Open the Reader',
+                    bannerSub: 'Meanings and eBooks, in one place',
+                  ),
+                ),
+                const SizedBox(height: 16),
                 GlassWrap(
                   child: TvSection(
                     eyebrow: 'Today, on film',
-                    title: 'Streak',
-                    onTap: () => NavScope.goTo(context, 1),
+                    title: 'Streak Video',
+                    onTap: () => Dest.open(context, Dest.practice),
                     icon: Icons.local_fire_department_outlined,
                     asset: 'assets/video/tv-screen.mp4',
                     dark: true,
@@ -113,15 +131,13 @@ class _HomeFashionState extends State<HomeFashion> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                _FashWordOfDay(words: words),
+                const _FashTiles(),
                 const SizedBox(height: 16),
-
                 GlassWrap(
                   child: TvSection(
                     eyebrow: 'Words and meanings',
                     title: 'The NowssB Store',
-                    onTap: () => NavScope.goTo(context, 3),
+                    onTap: () => Dest.open(context, Dest.store),
                     icon: Icons.storefront_outlined,
                     asset: 'assets/video/store-section.mp4',
                     frame: DeviceFrame.tabletPortrait,
@@ -131,17 +147,60 @@ class _HomeFashionState extends State<HomeFashion> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                const _FashTiles(),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: "Today's trending",
+                    title: 'The Signature',
+                    onTap: () => Dest.open(context, Dest.store),
+                    icon: Icons.auto_awesome_outlined,
+                    asset: 'assets/video/signature-banner.mp4',
+                    dark: true,
+                    bannerTitle: 'One word, made only for you',
+                    bannerSub: 'See the Signature',
+                  ),
+                ),
                 const SizedBox(height: 16),
-
+                const GlassWrap(child: CustomizePanel(dark: true)),
+                const SizedBox(height: 16),
+                const FashionPlusDoor(),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: 'Your daily recommended words',
+                    title: 'AI Prescription',
+                    onTap: () => Dest.open(context, Dest.practice),
+                    icon: Icons.auto_awesome_outlined,
+                    asset: 'assets/video/rx-banner.mp4',
+                    overlay: 'A word\nfor today',
+                    dark: true,
+                    bannerTitle: "Open today's practice",
+                    bannerSub: 'Matched to the hour',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const GlassWrap(child: ConnectCard(dark: true)),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: 'Shop the moment',
+                    title: 'Trending Shop',
+                    onTap: () => Dest.open(context, Dest.store),
+                    icon: Icons.local_mall_outlined,
+                    asset: 'assets/video/store-banner-fash.mp4',
+                    aspect: 16 / 10,
+                    dark: true,
+                    bannerTitle: 'Shop now',
+                    bannerSub: 'Open the store',
+                  ),
+                ),
+                const SizedBox(height: 16),
                 GlassWrap(
                   child: BannerSection(
                     eyebrow: 'Own the sounds that heal',
-                    title: 'Inside the Store',
-                    onTap: () => NavScope.goTo(context, 3),
+                    title: 'Store Banner',
+                    onTap: () => Dest.open(context, Dest.store),
                     icon: Icons.shopping_bag_outlined,
-                    asset: 'assets/video/store-banner-fash.mp4',
+                    asset: 'assets/video/store-banner.mp4',
                     aspect: 16 / 10,
                     dark: true,
                     bannerTitle: 'Shop the Library',
@@ -149,12 +208,11 @@ class _HomeFashionState extends State<HomeFashion> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 GlassWrap(
                   child: TvSection(
                     eyebrow: 'The full library',
                     title: 'NowssB Subscription',
-                    onTap: () => NavScope.goTo(context, 3),
+                    onTap: () => Dest.open(context, Dest.subscribe),
                     icon: Icons.workspace_premium_outlined,
                     asset: 'assets/video/subscription-a.mp4',
                     frame: DeviceFrame.tabletSlim,
@@ -164,19 +222,122 @@ class _HomeFashionState extends State<HomeFashion> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
+                const GlassWrap(child: EditionCard(dark: true)),
+                const SizedBox(height: 16),
                 GlassWrap(
                   child: BannerSection(
-                    eyebrow: 'The rarest word',
-                    title: 'The Signature',
-                    onTap: () => NavScope.goTo(context, 3),
-                    icon: Icons.auto_awesome_outlined,
-                    asset: 'assets/video/signature-banner.mp4',
+                    eyebrow: 'Daily practice system',
+                    title: 'My Routines',
+                    onTap: () => Dest.open(context, Dest.routines),
+                    icon: Icons.repeat_rounded,
+                    asset: 'assets/video/player-liquid-splash.mp4',
+                    aspect: 16 / 10,
                     dark: true,
-                    bannerTitle: 'One word, made only for you',
-                    bannerSub: 'See the Signature',
+                    bannerTitle: 'Five slots, one day',
+                    bannerSub: 'Open routines',
                   ),
                 ),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: "Today's offer",
+                    title: 'Coupon',
+                    onTap: () => Dest.open(context, Dest.store),
+                    icon: Icons.local_offer_outlined,
+                    asset: 'assets/video/coupon-a.mp4',
+                    aspect: 16 / 10,
+                    dark: true,
+                    bannerTitle: 'Claim the offer',
+                    bannerSub: 'Open the store',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const _FashQuickRow(),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: TvSection(
+                    eyebrow: 'Featured ancient word science',
+                    title: 'Shabdapathy Foundations',
+                    onTap: () => Dest.open(context, Dest.library),
+                    icon: Icons.menu_book_outlined,
+                    asset: 'assets/video/fp-word-science.mp4',
+                    dark: true,
+                    bannerTitle: 'Open the foundations',
+                    bannerSub: 'The system behind the words',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: 'Deep-dive guides',
+                    title: 'eBooks',
+                    onTap: () => Dest.open(context, Dest.store),
+                    icon: Icons.menu_book_outlined,
+                    asset: 'assets/video/word-acts.mp4',
+                    dark: true,
+                    bannerTitle: 'Word science and sound healing',
+                    bannerSub: 'Browse the library',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: 'What Connect offers',
+                    title: 'Connect Banner',
+                    onTap: () => Dest.open(context, Dest.connect),
+                    icon: Icons.groups_outlined,
+                    asset: 'assets/video/connect-banner.mp4',
+                    aspect: 16 / 10,
+                    dark: true,
+                    bannerTitle: 'Enter Connect',
+                    bannerSub: 'People, chat, the feed',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const GlassWrap(child: HealingGrid(dark: true)),
+                const SizedBox(height: 16),
+                const GlassWrap(child: GenderPath(dark: true)),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: 'On film',
+                    title: 'Promo',
+                    onTap: () => Dest.open(context, Dest.store),
+                    icon: Icons.play_circle_outline,
+                    asset: 'assets/video/hero-bg.mp4',
+                    aspect: 16 / 9,
+                    dark: true,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                WordSearchBlock(
+                  title: 'Word Search',
+                  sub: 'Discover the origin of any word',
+                  asset: 'assets/video/fp-word-science.mp4',
+                  dark: true,
+                ),
+                const SizedBox(height: 16),
+                WordSearchBlock(
+                  title: 'Meaning Search',
+                  sub: 'Earth · Water · God · your name',
+                  asset: 'assets/video/store-verify-banner.mp4',
+                  dark: true,
+                ),
+                const SizedBox(height: 16),
+                GlassWrap(
+                  child: BannerSection(
+                    eyebrow: 'Near the foot',
+                    title: 'Shabdapathy',
+                    onTap: () => Dest.open(context, Dest.library),
+                    icon: Icons.auto_stories_outlined,
+                    asset: 'assets/video/healing-path-bg.mp4',
+                    aspect: 16 / 9,
+                    dark: true,
+                    bannerTitle: 'Natural Origin of Word Science',
+                    bannerSub: 'Open the library',
+                  ),
+                ),
+                const FooterMark(dark: true),
               ],
             ),
           ),
@@ -262,7 +423,10 @@ class _FashTopRow extends StatelessWidget {
         const Spacer(),
         const _FashHeaderBtn(icon: Icons.notifications_none, badge: 3),
         const SizedBox(width: 8),
-        const _FashHeaderBtn(icon: Icons.home_outlined),
+        _FashHeaderBtn(
+          icon: Icons.light_mode_outlined,
+          onTap: () => Settings.instance.setFashionHome(false),
+        ),
         const SizedBox(width: 8),
         _FashHeaderBtn(
           icon: Icons.menu,
@@ -376,7 +540,7 @@ class _FashSearch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => NavScope.goTo(context, 2),
+      onTap: () => Dest.open(context, Dest.library),
       behavior: HitTestBehavior.opaque,
       child: Container(
       height: 54,
@@ -505,10 +669,10 @@ class _FashTiles extends StatelessWidget {
   // (title, sub, icon, destination) — 1 Practice · 2 Library · 3 Store ·
   // 4 Profile. A tile that goes nowhere is a tile that is not finished.
   static const _items = [
-    ('Word Science', 'The system', Icons.science_outlined, 2),
-    ('NowssB Profile', 'You, so far', Icons.person_outline, 4),
-    ('Sound Library', 'Root frequencies', Icons.graphic_eq, 2),
-    ('My Routines', '5 routine slots', Icons.repeat_rounded, 1),
+    ('Word Science', 'The system', Icons.science_outlined, Dest.library),
+    ('NowssB Profile', 'You, so far', Icons.person_outline, Dest.profile),
+    ('Sound Library', 'Root frequencies', Icons.graphic_eq, Dest.sound),
+    ('My Routines', '5 routine slots', Icons.repeat_rounded, Dest.routines),
   ];
 
   @override
@@ -523,7 +687,7 @@ class _FashTiles extends StatelessWidget {
       children: [
         for (final (title, sub, icon, dest) in _items)
           GestureDetector(
-            onTap: () => NavScope.goTo(context, dest),
+            onTap: () => Dest.open(context, dest),
             behavior: HitTestBehavior.opaque,
             child: Container(
             padding: const EdgeInsets.all(16),
@@ -563,3 +727,100 @@ class _FashTiles extends StatelessWidget {
     );
   }
 }
+
+class _FashHeroRow extends StatelessWidget {
+  const _FashHeroRow();
+
+  static const _items = [
+    ('Customize', Icons.tune, Dest.settings),
+    ('Features', Icons.auto_awesome_outlined, Dest.fashionPlus),
+    ('Earn', Icons.workspace_premium_outlined, Dest.subscribe),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (var i = 0; i < _items.length; i++) ...[
+          if (i > 0) const SizedBox(width: 10),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => Dest.open(context, _items[i].$3),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: const Color(0x1AFFFFFF),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0x24FFFFFF)),
+                ),
+                child: Column(
+                  children: [
+                    Icon(_items[i].$2, size: 18, color: NwsbColors.goldLight),
+                    const SizedBox(height: 6),
+                    Text(
+                      _items[i].$1,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _FashQuickRow extends StatelessWidget {
+  const _FashQuickRow();
+
+  static const _items = [
+    ('Cart', Icons.shopping_cart_outlined, Dest.cart),
+    ('Wishlist', Icons.favorite_border, Dest.wishlist),
+    ('Order', Icons.shopping_bag_outlined, Dest.orders),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (var i = 0; i < _items.length; i++) ...[
+          if (i > 0) const SizedBox(width: 10),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => Dest.open(context, _items[i].$3),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 14, 10, 12),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0x14FFFFFF)),
+                ),
+                child: Column(
+                  children: [
+                    Icon(_items[i].$2, size: 22, color: NwsbColors.goldLight),
+                    const SizedBox(height: 7),
+                    Text(
+                      _items[i].$1,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xB3FFFFFF),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+

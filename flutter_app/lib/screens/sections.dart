@@ -15,6 +15,7 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/neumorphic.dart';
 import '../widgets/tv_frame.dart';
+import '../shell/go.dart';
 
 /// The head every section shares: a white disc with a mark in it, a small
 /// eyebrow, and the title under it.
@@ -253,7 +254,9 @@ class HeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Stack(
+      child: AspectRatio(
+        aspectRatio: 16 / 10,
+        child: Stack(
         children: [
           Positioned.fill(
             child: NwsbVideo(asset: asset, priority: ClipPriority.feature),
@@ -297,15 +300,16 @@ class HeroSection extends StatelessWidget {
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    _HeroPill(label: 'Explore', onTap: () {}),
+                    _HeroPill(label: 'Explore', onTap: () => Dest.open(context, Dest.store)),
                     const SizedBox(width: 10),
-                    _HeroPill(label: 'App Guide', onTap: () {}),
+                    _HeroPill(label: 'App Guide', onTap: () => Dest.open(context, Dest.settings)),
                   ],
                 ),
               ],
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -336,6 +340,531 @@ class _HeroPill extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Rotating store/connect promo disc — `.npc-card` on the website.
+class PromoDisc extends StatelessWidget {
+  const PromoDisc({
+    super.key,
+    required this.asset,
+    required this.title,
+    required this.sub,
+    required this.onTap,
+    this.dark = false,
+  });
+
+  final String asset;
+  final String title;
+  final String sub;
+  final VoidCallback onTap;
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final disc = GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: ClipOval(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              NwsbVideo(asset: asset, priority: ClipPriority.feature),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [Color(0x00000000), Color(0x99000000)],
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 22),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        sub,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xCCFFFFFF),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (dark) return disc;
+    return NeuCard(padding: const EdgeInsets.all(18), child: disc);
+  }
+}
+
+/// `.nedi-blk` — current plan.
+class EditionCard extends StatelessWidget {
+  const EditionCard({super.key, this.dark = false});
+
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHead(
+          eyebrow: 'Your plan',
+          title: 'Your Edition',
+          icon: Icons.workspace_premium_outlined,
+          dark: dark,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          '15-day Frequency trial',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: dark ? Colors.white : NwsbColors.ink,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Every word, every meaning, while the trial is open. Upgrade to keep it.',
+          style: TextStyle(
+            fontSize: 13,
+            color: dark ? const Color(0xB3FFFFFF) : NwsbColors.inkFaint,
+            height: 1.45,
+          ),
+        ),
+        const SizedBox(height: 18),
+        NwsbBanner(
+          title: 'Resonance · Frequency · Frequency X',
+          sub: 'See what a subscription opens',
+          icon: Icons.workspace_premium_outlined,
+          onTap: () => Dest.open(context, Dest.subscribe),
+          dark: dark,
+        ),
+      ],
+    );
+    if (dark) return body;
+    return NeuCard(padding: const EdgeInsets.all(16), child: body);
+  }
+}
+
+/// Personalised Healing — 10 category tiles.
+class HealingGrid extends StatelessWidget {
+  const HealingGrid({super.key, this.dark = false});
+
+  final bool dark;
+
+  static const items = [
+    ('Fitness', Icons.fitness_center_outlined),
+    ('Heart', Icons.favorite_border),
+    ('Skin & Glow', Icons.spa_outlined),
+    ('Gut', Icons.water_drop_outlined),
+    ('Liver', Icons.healing_outlined),
+    ('Mind', Icons.psychology_outlined),
+    ('Hormones', Icons.science_outlined),
+    ('Immunity', Icons.shield_outlined),
+    ('Breath', Icons.air),
+    ('Balance', Icons.self_improvement),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHead(
+          eyebrow: 'Choose your health journey',
+          title: 'Personalised Healing',
+          icon: Icons.favorite_border,
+          dark: dark,
+        ),
+        const SizedBox(height: 16),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 2.4,
+          children: [
+            for (final (title, icon) in items)
+              GestureDetector(
+                onTap: () => Dest.open(context, Dest.healing),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: dark ? Colors.black : NwsbColors.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: dark
+                        ? Border.all(color: const Color(0x14FFFFFF))
+                        : null,
+                    boxShadow: dark ? null : NwsbShadows.raisedXs,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(icon,
+                          size: 18,
+                          color: dark ? NwsbColors.goldLight : NwsbColors.ink),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: dark ? Colors.white : NwsbColors.ink,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+    if (dark) return body;
+    return NeuCard(padding: const EdgeInsets.all(16), child: body);
+  }
+}
+
+/// Female / Male path on the laptop frame.
+class GenderPath extends StatelessWidget {
+  const GenderPath({super.key, this.dark = false});
+
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHead(
+          eyebrow: 'Female and Male',
+          title: 'Choose Your Path',
+          icon: Icons.people_outline,
+          dark: dark,
+        ),
+        const SizedBox(height: 16),
+        TvFrame(
+          asset: 'assets/video/healing-path-bg.mp4',
+          frame: DeviceFrame.laptop,
+          onTap: () => Dest.open(context, Dest.healing),
+        ),
+        const SizedBox(height: 18),
+        NwsbBanner(
+          title: 'A path made for you',
+          sub: 'Ten categories, matched to the body',
+          icon: Icons.people_outline,
+          onTap: () => Dest.open(context, Dest.healing),
+          dark: dark,
+        ),
+      ],
+    );
+    if (dark) return body;
+    return NeuCard(padding: const EdgeInsets.all(16), child: body);
+  }
+}
+
+class CustomizePanel extends StatelessWidget {
+  const CustomizePanel({super.key, this.dark = false});
+
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHead(
+          eyebrow: 'Quick Access · Quick Links',
+          title: 'Customize',
+          icon: Icons.tune,
+          dark: dark,
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Which blocks appear on this home, and in what order — open Settings to rearrange them.',
+          style: TextStyle(
+            fontSize: 13,
+            height: 1.45,
+            color: dark ? const Color(0xB3FFFFFF) : NwsbColors.inkFaint,
+          ),
+        ),
+        const SizedBox(height: 16),
+        NwsbBanner(
+          title: 'Set as you like',
+          sub: 'Open widgets and shortcuts',
+          icon: Icons.tune,
+          onTap: () => Dest.open(context, Dest.settings),
+          dark: dark,
+        ),
+      ],
+    );
+    if (dark) return body;
+    return NeuCard(padding: const EdgeInsets.all(16), child: body);
+  }
+}
+
+class FeedCarousel extends StatelessWidget {
+  const FeedCarousel({super.key, this.dark = false});
+
+  final bool dark;
+
+  static const cards = [
+    ('AAROGYA', 'Perfect health — freedom from all disease'),
+    ('PRANA', 'Life force, breath — the pulse of all living'),
+    ('TEJAS', 'Radiance of a well-held practice'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHead(
+          eyebrow: 'Swipe the feed',
+          title: 'Community',
+          icon: Icons.groups_outlined,
+          dark: dark,
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 150,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: cards.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final (title, sub) = cards[i];
+              return GestureDetector(
+                onTap: () => Dest.open(context, Dest.connect),
+                child: Container(
+                  width: 220,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0x14FFFFFF)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: NwsbColors.goldLight,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        sub,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xB3FFFFFF),
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+    if (dark) return body;
+    return NeuCard(padding: const EdgeInsets.all(16), child: body);
+  }
+}
+
+class FashionPlusDoor extends StatelessWidget {
+  const FashionPlusDoor({super.key, this.dark = true});
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Dest.open(context, Dest.fashionPlus),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              const NwsbVideo(
+                asset: 'assets/video/fashion-plus-bg.mp4',
+                priority: ClipPriority.feature,
+              ),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x33000000), Color(0xCC000000)],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'FASHION PLUS',
+                      style: TextStyle(
+                        fontSize: 10,
+                        letterSpacing: 3,
+                        fontWeight: FontWeight.w700,
+                        color: NwsbColors.gold,
+                      ),
+                    ),
+                    Spacer(),
+                    Text(
+                      'The still ones\nstart moving.',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FooterMark extends StatelessWidget {
+  const FooterMark({super.key, this.dark = false});
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      child: Column(
+        children: [
+          Text(
+            'NowssB',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: dark ? Colors.white : NwsbColors.ink,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Across every language.',
+            style: TextStyle(
+              fontSize: 12,
+              letterSpacing: 1.4,
+              color: dark ? const Color(0x99FFFFFF) : NwsbColors.inkFaint,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ConnectCard extends StatelessWidget {
+  const ConnectCard({super.key, this.dark = false});
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHead(
+          eyebrow: 'The social space',
+          title: 'NowssB Connect',
+          icon: Icons.groups_outlined,
+          dark: dark,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Practice with other healers. Share a word, keep a streak together, sit in the same frequency.',
+          style: TextStyle(
+            fontSize: 13,
+            height: 1.5,
+            color: dark ? const Color(0xB3FFFFFF) : NwsbColors.inkSoft,
+          ),
+        ),
+        const SizedBox(height: 16),
+        NwsbBanner(
+          title: 'Enter Connect',
+          sub: 'People, chat, the feed',
+          icon: Icons.groups_outlined,
+          onTap: () => Dest.open(context, Dest.connect),
+          dark: dark,
+        ),
+      ],
+    );
+    if (dark) return body;
+    return NeuCard(padding: const EdgeInsets.all(16), child: body);
+  }
+}
+
+class WordSearchBlock extends StatelessWidget {
+  const WordSearchBlock({
+    super.key,
+    required this.title,
+    required this.sub,
+    required this.asset,
+    this.dark = false,
+  });
+  final String title;
+  final String sub;
+  final String asset;
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    return BannerSection(
+      eyebrow: sub,
+      title: title,
+      icon: Icons.search,
+      asset: asset,
+      aspect: 16 / 9,
+      onTap: () => Dest.open(context, Dest.library),
+      dark: dark,
+      bannerTitle: title,
+      bannerSub: 'Open the library',
     );
   }
 }

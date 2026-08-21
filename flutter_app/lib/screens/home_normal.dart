@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import '../data/settings.dart';
 import '../theme/tokens.dart';
 import '../widgets/neumorphic.dart';
-import '../shell/nav_shell.dart';
+import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
 import 'sections.dart';
 import 'widgets_page.dart';
@@ -53,64 +53,35 @@ class HomeNormal extends StatelessWidget {
             const _SearchBar(),
             const SizedBox(height: NwsbSpace.gap),
 
-            // Every block below carries a clip, and every clip goes through
-            // NwsbVideo. On-screen films play; off-screen ones are posters.
+            // Shipped order of #home-nm, matching app/js/part062.js REG.nm.
+            // Every clip goes through NwsbVideo. On-screen films play.
             const HeroSection(),
-            const SizedBox(height: NwsbSpace.gap),
-            const _StreakSection(),
             const SizedBox(height: NwsbSpace.gap),
             TvSection(
               eyebrow: 'Today, on film',
-              title: 'Streak',
-              onTap: () => NavScope.goTo(context, 1),
+              title: 'Streak Video',
+              onTap: () => Dest.open(context, Dest.practice),
               icon: Icons.local_fire_department_outlined,
               asset: 'assets/video/tv-screen.mp4',
             ),
             const SizedBox(height: NwsbSpace.gap),
-            const _PracticeCard(),
+            const _StreakSection(),
             const SizedBox(height: NwsbSpace.gap),
-            BannerSection(
-              eyebrow: 'Today words meaning',
-              title: 'The Meaning Store',
-              onTap: () => NavScope.goTo(context, 3),
-              icon: Icons.auto_stories_outlined,
-              asset: 'assets/video/store-banner.mp4',
-              overlay: 'Every word,\nexplained',
-              bannerTitle: 'Meanings and eBooks, in one place',
-              bannerSub: 'Open the store',
+            PromoDisc(
+              asset: 'assets/video/store-trigger.mp4',
+              title: 'NowssB Store',
+              sub: 'Words, meanings, the origins behind them',
+              onTap: () => Dest.open(context, Dest.store),
             ),
+            const SizedBox(height: NwsbSpace.gap),
+            const _PracticeCard(),
             const SizedBox(height: NwsbSpace.gap),
             const _Tiles(),
             const SizedBox(height: NwsbSpace.gap),
             TvSection(
-              eyebrow: 'The rarest word',
-              title: 'The Signature',
-              onTap: () => NavScope.goTo(context, 3),
-              icon: Icons.workspace_premium_outlined,
-              asset: 'assets/video/signature-banner.mp4',
-              bannerTitle: 'One word, made only for you',
-              bannerSub: 'See the Signature',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            BannerSection(
-              eyebrow: 'Your daily word ritual',
-              title: 'The Player',
-              onTap: () => NavScope.goTo(context, 1),
-              icon: Icons.play_circle_outline,
-              asset: 'assets/video/player-liquid-splash.mp4',
-              // 9/16 made this one block taller than the whole screen. A
-              // portrait clip does not oblige the banner showing it to be
-              // portrait too — it is cropped to the same shape as every
-              // other section, which is what the page's rhythm is.
-              aspect: 16 / 10,
-              bannerTitle: 'Practice daily to keep your streak alive',
-              bannerSub: 'Open the player',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            TvSection(
               eyebrow: 'The shelf',
               title: 'NowssB Store',
-              onTap: () => NavScope.goTo(context, 3),
+              onTap: () => Dest.open(context, Dest.store),
               icon: Icons.storefront_outlined,
               asset: 'assets/video/store-section.mp4',
               frame: DeviceFrame.tabletPortrait,
@@ -119,14 +90,170 @@ class HomeNormal extends StatelessWidget {
             ),
             const SizedBox(height: NwsbSpace.gap),
             BannerSection(
+              eyebrow: 'Today words meaning',
+              title: 'Reader',
+              onTap: () => Dest.open(context, Dest.store),
+              icon: Icons.auto_stories_outlined,
+              asset: 'assets/video/store-banner.mp4',
+              overlay: 'Every word,\nexplained',
+              bannerTitle: 'Meanings and eBooks, in one place',
+              bannerSub: 'Open the store',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            TvSection(
+              eyebrow: "Today's trending",
+              title: 'The Signature',
+              onTap: () => Dest.open(context, Dest.store),
+              icon: Icons.workspace_premium_outlined,
+              asset: 'assets/video/signature-banner.mp4',
+              bannerTitle: 'One word, made only for you',
+              bannerSub: 'See the Signature',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            const CustomizePanel(),
+            const SizedBox(height: NwsbSpace.gap),
+            BannerSection(
+              eyebrow: 'Your daily recommended words',
+              title: 'AI Prescription',
+              onTap: () => Dest.open(context, Dest.practice),
+              icon: Icons.auto_awesome_outlined,
+              asset: 'assets/video/rx-banner.mp4',
+              overlay: 'A word\nfor today',
+              bannerTitle: 'Open today’s practice',
+              bannerSub: 'Matched to the hour',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            BannerSection(
+              eyebrow: 'Daily practice system',
+              title: 'My Routines',
+              onTap: () => Dest.open(context, Dest.routines),
+              icon: Icons.repeat_rounded,
+              asset: 'assets/video/player-liquid-splash.mp4',
+              aspect: 16 / 10,
+              bannerTitle: 'Five slots, one day',
+              bannerSub: 'Open routines',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            PromoDisc(
+              asset: 'assets/video/connect-banner.mp4',
+              title: 'Connect',
+              sub: 'The social space',
+              onTap: () => Dest.open(context, Dest.connect),
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            const ConnectCard(),
+            const SizedBox(height: NwsbSpace.gap),
+            const FeedCarousel(),
+            const SizedBox(height: NwsbSpace.gap),
+            const _QuickRow(),
+            const SizedBox(height: NwsbSpace.gap),
+            BannerSection(
+              eyebrow: 'Shop the moment',
+              title: 'Trending Shop',
+              onTap: () => Dest.open(context, Dest.store),
+              icon: Icons.local_mall_outlined,
+              asset: 'assets/video/store-banner-fash.mp4',
+              aspect: 16 / 10,
+              bannerTitle: 'Shop now',
+              bannerSub: 'Open the store',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            BannerSection(
+              eyebrow: 'Own the sounds that heal',
+              title: 'Store Banner',
+              onTap: () => Dest.open(context, Dest.store),
+              icon: Icons.shopping_bag_outlined,
+              asset: 'assets/video/store-banner.mp4',
+              aspect: 16 / 10,
+              bannerTitle: 'Shop the Library',
+              bannerSub: 'Words, meanings and the origins behind them',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            TvSection(
+              eyebrow: 'The full library',
+              title: 'Subscription',
+              onTap: () => Dest.open(context, Dest.subscribe),
+              icon: Icons.workspace_premium_outlined,
+              asset: 'assets/video/subscription-a.mp4',
+              frame: DeviceFrame.tabletSlim,
+              bannerTitle: 'Every word, every meaning',
+              bannerSub: 'See what a subscription opens',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            const EditionCard(),
+            const SizedBox(height: NwsbSpace.gap),
+            BannerSection(
               eyebrow: 'Deep-dive guides',
               title: 'eBooks',
-              onTap: () => NavScope.goTo(context, 3),
+              onTap: () => Dest.open(context, Dest.store),
               icon: Icons.menu_book_outlined,
               asset: 'assets/video/word-acts.mp4',
               bannerTitle: 'Word science and sound healing',
               bannerSub: 'Browse the library',
             ),
+            const SizedBox(height: NwsbSpace.gap),
+            BannerSection(
+              eyebrow: 'What Connect offers',
+              title: 'Connect Banner',
+              onTap: () => Dest.open(context, Dest.connect),
+              icon: Icons.groups_outlined,
+              asset: 'assets/video/connect-banner.mp4',
+              aspect: 16 / 10,
+              bannerTitle: 'Enter Connect',
+              bannerSub: 'People, chat, the feed',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            const HealingGrid(),
+            const SizedBox(height: NwsbSpace.gap),
+            const GenderPath(),
+            const SizedBox(height: NwsbSpace.gap),
+            WordSearchBlock(
+              title: 'Word Search',
+              sub: 'Discover the origin of any word',
+              asset: 'assets/video/fp-word-science.mp4',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            WordSearchBlock(
+              title: 'Meaning Search',
+              sub: 'Earth · Water · God · your name',
+              asset: 'assets/video/store-verify-banner.mp4',
+            ),
+            const SizedBox(height: NwsbSpace.gap),
+            NeuCard(
+              padding: const EdgeInsets.all(16),
+              onTap: () => Settings.instance.setFashionHome(true),
+              child: Row(
+                children: const [
+                  Icon(Icons.dark_mode_outlined, color: NwsbColors.ink),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Fashion Mode',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: NwsbColors.ink,
+                          ),
+                        ),
+                        SizedBox(height: 3),
+                        Text(
+                          'Switch to the dark home with the film behind it',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: NwsbColors.inkFaint,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward, size: 16, color: NwsbColors.ink),
+                ],
+              ),
+            ),
+            const FooterMark(),
             const SizedBox(height: NwsbSpace.gap),
             const _QuickRow(),
           ],
@@ -443,7 +570,7 @@ class _StreakSection extends StatelessWidget {
             title: 'Daily Streak',
             sub: 'Practice daily to keep your healing streak alive',
             icon: Icons.local_fire_department_outlined,
-            onTap: () => NavScope.goTo(context, 1),
+            onTap: () => Dest.open(context, Dest.practice),
           ),
         ],
       ),
@@ -460,6 +587,7 @@ class _PracticeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeuCard(
       padding: const EdgeInsets.fromLTRB(26, 28, 26, 26),
+      onTap: () => Dest.open(context, Dest.player),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -533,10 +661,10 @@ class _Tiles extends StatelessWidget {
   const _Tiles();
 
   static const _items = [
-    ('Sound Library', 'Root frequencies', Icons.graphic_eq),
-    ('My Progress', 'Your practice', Icons.insights_outlined),
-    ('Word Atelier', 'Origins of words', Icons.auto_stories_outlined),
-    ('Routines', 'Daily system', Icons.repeat_rounded),
+    ('Sound Library', 'Root frequencies', Icons.graphic_eq, Dest.sound),
+    ('My Progress', 'Your practice', Icons.insights_outlined, Dest.profile),
+    ('Word Atelier', 'Origins of words', Icons.auto_stories_outlined, Dest.store),
+    ('Routines', 'Daily system', Icons.repeat_rounded, Dest.routines),
   ];
 
   @override
@@ -553,11 +681,12 @@ class _Tiles extends StatelessWidget {
       // a tile has to survive a reader who has turned their font up.
       childAspectRatio: 0.92,
       children: [
-        for (final (title, sub, icon) in _items)
+        for (final (title, sub, icon, dest) in _items)
           NeuCard(
             radius: NwsbRadius.tile,
             elevation: NwsbElevation.sm,
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
+            onTap: () => Dest.open(context, dest),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -599,9 +728,9 @@ class _QuickRow extends StatelessWidget {
   const _QuickRow();
 
   static const _items = [
-    ('Cart', Icons.shopping_cart_outlined),
-    ('Wishlist', Icons.favorite_border),
-    ('Order', Icons.shopping_bag_outlined),
+    ('Cart', Icons.shopping_cart_outlined, Dest.cart),
+    ('Wishlist', Icons.favorite_border, Dest.wishlist),
+    ('Order', Icons.shopping_bag_outlined, Dest.orders),
   ];
 
   @override
@@ -615,6 +744,7 @@ class _QuickRow extends StatelessWidget {
               radius: NwsbRadius.bar,
               elevation: NwsbElevation.xs,
               padding: const EdgeInsets.fromLTRB(10, 14, 10, 12),
+              onTap: () => Dest.open(context, _items[i].$3),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
