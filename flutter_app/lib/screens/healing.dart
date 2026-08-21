@@ -4,7 +4,6 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
-import '../theme/tokens.dart';
 import '../widgets/page_shell.dart';
 import 'word_detail.dart';
 

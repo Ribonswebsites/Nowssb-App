@@ -98,25 +98,19 @@ class Settings extends ChangeNotifier {
   void setReps(int n) {
     _reps = n.clamp(1, 99);
     notifyListeners();
-    SharedPreferences.getInstance()
-        .then((p) => p.setInt(_kReps, _reps))
-        .catchError((_) {});
+    _saveInt(_kReps, _reps);
   }
 
   void setSpeed(double v) {
     _speed = v.clamp(0.7, 1.5);
     notifyListeners();
-    SharedPreferences.getInstance()
-        .then((p) => p.setDouble(_kSpeed, _speed))
-        .catchError((_) {});
+    _saveDouble(_kSpeed, _speed);
   }
 
   void setVolume(double v) {
     _volume = v.clamp(0, 1);
     notifyListeners();
-    SharedPreferences.getInstance()
-        .then((p) => p.setDouble(_kVol, _volume))
-        .catchError((_) {});
+    _saveDouble(_kVol, _volume);
   }
 
   void setEq(String name, [List<double>? bands]) {
@@ -140,6 +134,16 @@ class Settings extends ChangeNotifier {
   void setOutput(String v) {
     _output = v;
     notifyListeners();
+  }
+
+  String cycleOutput() {
+    _output = _output == 'speaker'
+        ? 'earpiece'
+        : _output == 'earpiece'
+            ? 'bluetooth'
+            : 'speaker';
+    notifyListeners();
+    return _output;
   }
 
   void toggleQuality() {
@@ -168,6 +172,20 @@ class Settings extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       await p.setString(k, v);
+    } catch (_) {}
+  }
+
+  Future<void> _saveInt(String k, int v) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setInt(k, v);
+    } catch (_) {}
+  }
+
+  Future<void> _saveDouble(String k, double v) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setDouble(k, v);
     } catch (_) {}
   }
 }
