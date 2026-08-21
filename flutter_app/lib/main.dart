@@ -21,6 +21,7 @@ import 'package:flutter/services.dart';
 import 'data/content.dart';
 import 'data/firebase.dart';
 import 'data/settings.dart';
+import 'data/updater.dart';
 import 'media/video_pool.dart';
 import 'screens/splash.dart';
 import 'shell/nav_shell.dart';
@@ -112,6 +113,10 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
             Splash(onDone: () {
               VideoPool.instance.unhold();
               setState(() => _splashDone = true);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final ctx = context;
+                if (ctx.mounted) NwsbUpdate.maybeShow(ctx);
+              });
             }),
         ],
       ),

@@ -1,8 +1,9 @@
 {
-  "version": "9.5.1",
-  "build": 2026082110,
+  "version": "9.6.1",
+  "build": 2026082114,
   "force": false,
   "title": "Update available",
-  "notes": "Physical dial settings · every on-screen video plays · stability fixes",
-  "minVersion": "9.0.0"
+  "notes": "The player is a real watch-bezel now. Wind the knurled ring like a crown — each tick is haptic. Voice, EQ, loop, shuffle, speed, volume and 7× are real buttons, not a picture. This update installs inside the app. You do not download a new file.",
+  "web": "https://ribonswebsites.github.io/Nowssb-App/",
+  "apk": ""
 }

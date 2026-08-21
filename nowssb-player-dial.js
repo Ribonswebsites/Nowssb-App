@@ -350,7 +350,11 @@
       return;
     }
     if (kind === 'update') {
-      sheet('<div class="nd-update"><span class="nd-badge">NEW</span><h1 style="margin-top:12px">Update available</h1><p style="opacity:.55">NowssB 9.6.0</p><p style="line-height:1.55;margin:14px 0 20px">Physical settings dial. Voice, equalizer, loop, reps, speed and volume now live on the player.</p><div style="display:flex;gap:10px"><button class="nd-btn ghost" style="flex:1" data-act="back">Later</button><button class="nd-btn cyan" style="flex:1" data-act="back">Update now</button></div></div>');
+      if (typeof window.nwsbCheckUpdate === 'function') {
+        window.nwsbCheckUpdate();
+        return;
+      }
+      sheet('<div class="nd-update"><span class="nd-badge">NEW</span><h1 style="margin-top:12px">Update available</h1><p style="opacity:.55">NowssB 9.6.1</p><p style="line-height:1.55;margin:14px 0 20px">The player is a real watch-bezel now. This update installs inside the app — you do not download a new file.</p><div style="display:flex;gap:10px"><button class="nd-btn ghost" style="flex:1" data-act="back">Later</button><button class="nd-btn cyan" style="flex:1" data-act="back">Update now</button></div></div>');
       document.getElementById('ndSheet').onclick = function (e) {
         if (e.target.closest('[data-act="back"]')) hideSheet();
       };
