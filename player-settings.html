@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>Music Player Settings</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#12141c;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#f4f5f7;overflow:hidden;-webkit-tap-highlight-color:transparent;touch-action:pan-y}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:#12141c;overflow:hidden}
+
+.hdr{flex-shrink:0;padding:max(12px,env(safe-area-inset-top)) 16px 0;height:48px;display:flex;align-items:center;z-index:20}
+.back{width:40px;height:40px;border:0;background:0;color:#f4f5f7;font-size:22px;display:grid;place-items:center;cursor:pointer}
+
+/* CLOCK — visible by default */
+.clock{position:relative;height:36vh;min-height:220px;max-height:300px;flex-shrink:0;overflow:hidden;
+  transition:height .34s cubic-bezier(.25,.8,.25,1),min-height .34s cubic-bezier(.25,.8,.25,1),opacity .28s ease}
+#app.exp .clock{height:0!important;min-height:0!important;opacity:0;pointer-events:none}
+
+.ring-wrap{position:absolute;right:-40%;top:-20%;width:120%;height:145%;pointer-events:none}
+.ring{width:100%;height:100%;display:block}
+
+.time{position:absolute;left:18px;top:50%;transform:translateY(-50%);z-index:5;display:flex;align-items:center;gap:10px}
+.hh{font-size:64px;font-weight:500;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.mm{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 13px;border:1.5px solid rgba(255,255,255,.85);border-radius:999px;font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.mm i{font-style:normal;font-size:10px;letter-spacing:.18em;opacity:.8;border-left:1px solid rgba(255,255,255,.4);padding-left:8px}
+
+.date{position:absolute;right:18px;top:48%;transform:translateY(-50%);text-align:right;z-index:5}
+.date p{margin:0;font-size:11px;letter-spacing:.22em;font-weight:500;opacity:.9}
+.date p+p{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.2);letter-spacing:.18em}
+
+/* LIST — always under the clock */
+.list{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 18px 16px;background:#12141c;z-index:6;overscroll-behavior:contain}
+.kicker{margin:0 0 12px;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:rgba(255,255,255,.4);font-weight:500}
+#app.exp .kicker{margin:8px 0 18px;font-size:22px;letter-spacing:.14em;color:#f4f5f7;font-weight:600}
+
+.row{display:grid;grid-template-columns:26px 1fr auto 14px;align-items:center;gap:12px;width:100%;min-height:54px;border:0;border-bottom:1px solid rgba(255,255,255,.07);background:0;color:#f4f5f7;text-align:left;font-family:inherit;cursor:pointer;padding:0}
+.row:active{background:rgba(255,255,255,.03)}
+.row .ico{opacity:.65;display:grid;place-items:center}
+.row .ico svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5}
+.row .lab{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+.row .val{font-size:11px;letter-spacing:.1em;color:rgba(255,255,255,.4);font-weight:500}
+.row .ch{font-size:15px;opacity:.3}
+
+.tog{width:40px;height:24px;border-radius:999px;background:rgba(255,255,255,.12);position:relative;transition:background .2s}
+.tog:after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#f4f5f7;transition:transform .2s}
+.tog.on{background:rgba(255,255,255,.85)}
+.tog.on:after{transform:translateX(16px);background:#12141c}
+
+.extra{display:none}
+#app.exp .extra{display:block}
+.hint{margin:16px 0 6px;text-align:center;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.25);user-select:none}
+
+/* mini player only when expanded */
+.mini{display:none;grid-template-columns:46px 1fr auto auto auto;align-items:center;gap:10px;margin:0 14px calc(12px + env(safe-area-inset-bottom));padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);flex-shrink:0}
+#app.exp .mini{display:grid}
+.mini-art{width:46px;height:46px;border-radius:9px;background:#0a0c12;display:grid;place-items:center;font-weight:700;font-size:17px}
+.mini strong{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini small{display:block;font-size:10px;opacity:.45;margin-top:1px}
+.mini button{border:0;background:0;color:#f4f5f7;width:34px;height:34px;display:grid;place-items:center;font-size:14px;cursor:pointer}
+.mini-play{width:40px!important;height:40px!important;border-radius:50%;box-shadow:inset 0 0 0 1.4px rgba(255,255,255,.7)}
+
+/* sub sheet */
+.sub{position:absolute;inset:0;background:#12141c;transform:translateY(100%);transition:transform .3s cubic-bezier(.2,1,.3,1);overflow:auto;padding:16px 18px 40px;z-index:40}
+.sub.open{transform:translateY(0)}
+.sub h1{font-size:24px;font-weight:700;margin:6px 0 16px}
+.sub-back{border:0;background:0;color:#f4f5f7;font-size:22px;padding:6px 0;cursor:pointer}
+.sub-row{display:flex;align-items:center;width:100%;text-align:left;padding:13px 15px;margin:0 0 7px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.04);color:#fff;cursor:pointer;font-family:inherit;font-size:14px}
+.sub-row.on{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.09)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr"><button class="back" id="back" type="button">←</button></div>
+
+  <!-- CLOCK (default visible) -->
+  <div class="clock" id="clock">
+    <div class="ring-wrap"><svg class="ring" viewBox="0 0 200 200" id="svg"></svg></div>
+    <div class="time">
+      <span class="hh" id="hh">00</span>
+      <span class="mm" id="mm">00<i>AM</i></span>
+    </div>
+    <div class="date"><p id="dt">—</p><p id="wd">—</p></div>
+  </div>
+
+  <!-- SETTINGS LIST (always under clock) -->
+  <div class="list" id="list">
+    <p class="kicker" id="kicker">Music player settings</p>
+
+    <button class="row" data-a="eq">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M8 19V9M12 19V5M16 19v-7"/></svg></span>
+      <span class="lab">Equalizer</span>
+      <span class="val" id="vEq">NORMAL</span>
+      <span class="ch">›</span>
+    </button>
+    <button class="row" data-a="quality">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M19 5a9 9 0 010 14"/></svg></span>
+      <span class="lab">Audio Quality</span>
+      <span class="val" id="vQ">HIGH</span>
+      <span class="ch">›</span>
+    </button>
+    <button class="row" data-a="speed">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 14l4-7"/><circle cx="12" cy="14" r="8"/></svg></span>
+      <span class="lab">Playback Speed</span>
+      <span class="val" id="vSp">NORMAL</span>
+      <span class="ch">›</span>
+    </button>
+    <button class="row" data-a="xf">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></span>
+      <span class="lab">Crossfade</span>
+      <span class="val" id="vXf">5 SEC</span>
+      <span class="ch">›</span>
+    </button>
+    <button class="row" data-a="sleep">
+      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+      <span class="lab">Sleep Timer</span>
+      <span class="val" id="vSl">OFF</span>
+      <span class="ch">›</span>
+    </button>
+    <button class="row" data-a="npv">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h14"/></svg></span>
+      <span class="lab">Now Playing View</span>
+      <span class="val" id="vNp">CLASSIC</span>
+      <span class="ch">›</span>
+    </button>
+
+    <!-- these only show after swipe up -->
+    <div class="extra">
+      <button class="row" data-a="bass">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M4 12h3l3-8 4 16 3-8h3"/></svg></span>
+        <span class="lab">Bass Boost</span>
+        <span class="tog" id="tBass"></span>
+        <span></span>
+      </button>
+      <button class="row" data-a="dl">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></span>
+        <span class="lab">Download Only</span>
+        <span class="tog" id="tDl"></span>
+        <span></span>
+      </button>
+      <button class="row" data-a="more">
+        <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></span>
+        <span class="lab">Additional Settings</span>
+        <span class="val"></span>
+        <span class="ch">›</span>
+      </button>
+    </div>
+
+    <p class="hint" id="hint">Swipe up for more</p>
+  </div>
+
+  <div class="mini">
+    <div class="mini-art">N</div>
+    <div><strong>NOWSSB</strong><small>Player</small></div>
+    <button type="button">⏮</button>
+    <button type="button" class="mini-play">▶</button>
+    <button type="button">⏭</button>
+  </div>
+
+  <div class="sub" id="sub"></div>
+</div>
+
+<script>
+(function () {
+  var app = document.getElementById('app');
+  var list = document.getElementById('list');
+  var sub = document.getElementById('sub');
+  var hint = document.getElementById('hint');
+  var KEY = 'nwsb_ps_v2';
+
+  var p = { eq:'normal', quality:'high', speed:1, xf:5, sleep:0, npv:'classic', bass:false, dl:false };
+  try { Object.assign(p, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch(e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch(e) {} }
+
+  function refresh() {
+    document.getElementById('vEq').textContent = (p.eq || 'normal').toUpperCase();
+    document.getElementById('vQ').textContent = (p.quality || 'high').toUpperCase();
+    document.getElementById('vSp').textContent = p.speed === 1 ? 'NORMAL' : p.speed.toFixed(1) + '×';
+    document.getElementById('vXf').textContent = p.xf ? p.xf + ' SEC' : 'OFF';
+    document.getElementById('vSl').textContent = p.sleep ? p.sleep + ' MIN' : 'OFF';
+    document.getElementById('vNp').textContent = (p.npv || 'classic').toUpperCase();
+    document.getElementById('tBass').classList.toggle('on', !!p.bass);
+    document.getElementById('tDl').classList.toggle('on', !!p.dl);
+  }
+  refresh();
+
+  /* ── Clock face ───────────────────────────────────────────── */
+  (function () {
+    var s = '', i;
+    for (i = 0; i < 60; i++) {
+      var m = i % 5 === 0;
+      s += '<line x1="100" y1="8" x2="100" y2="' + (m ? 22 : 15) + '" stroke="#fff" stroke-opacity="' + (m ? .9 : .25) + '" stroke-width="' + (m ? 1.6 : .9) + '" transform="rotate(' + (i * 6) + ' 100 100)"/>';
+    }
+    [15,20,25,30,35,40,45,50,55,60].forEach(function (n) {
+      var a = (n * 6 - 90) * Math.PI / 180;
+      var x = 100 + Math.cos(a) * 62;
+      var y = 100 + Math.sin(a) * 62;
+      s += '<text x="' + x + '" y="' + y + '" text-anchor="middle" dominant-baseline="middle" fill="#fff" fill-opacity=".8" font-size="' + (n % 15 === 0 || n === 60 ? 14 : 10) + '" font-weight="600">' + n + '</text>';
+    });
+    s += '<g id="hand"><line x1="100" y1="100" x2="100" y2="26" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="100" cy="26" r="2.3" fill="#fff"/></g>';
+    s += '<circle cx="100" cy="100" r="2.5" fill="#fff"/>';
+    document.getElementById('svg').innerHTML = s;
+  })();
+
+  function tick() {
+    var now = new Date();
+    var opts = { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true, weekday:'long', day:'2-digit', month:'short', year:'numeric' };
+    try { opts.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) {}
+    var parts = new Intl.DateTimeFormat('en-GB', opts).formatToParts(now);
+    function g(t) { var x = parts.find(function (p) { return p.type === t; }); return x ? x.value : ''; }
+    document.getElementById('hh').textContent = g('hour');
+    document.getElementById('mm').innerHTML = g('minute') + '<i>' + (g('dayPeriod') || 'AM').replace(/\./g,'').toUpperCase() + '</i>';
+    document.getElementById('dt').textContent = g('day') + ' ' + g('month').toUpperCase() + ' ' + g('year');
+    document.getElementById('wd').textContent = g('weekday').toUpperCase();
+    var sec = Number(g('second') || 0) + now.getMilliseconds() / 1000;
+    var h = document.getElementById('hand');
+    if (h) h.setAttribute('transform', 'rotate(' + (sec * 6) + ' 100 100)');
+  }
+  tick();
+  setInterval(tick, 200);
+
+  /* ── ROBUST SWIPE (works in WebView) ───────────────────────── */
+  var startY = 0;
+  var startX = 0;
+  var tracking = false;
+  var moved = false;
+
+  function isInteractive(el) {
+    return el.closest && el.closest('button, input, a, .sub, .tog');
+  }
+
+  function onStart(x, y, target) {
+    if (isInteractive(target)) return;
+    tracking = true;
+    moved = false;
+    startY = y;
+    startX = x;
+  }
+
+  function onMove(x, y) {
+    if (!tracking) return;
+    var dy = startY - y;   // positive = finger moved up
+    var dx = Math.abs(x - startX);
+    if (dx > 30) { tracking = false; return; } // horizontal → ignore
+    if (Math.abs(dy) > 12) moved = true;
+
+    if (dy > 45) {           // swipe UP → expand
+      app.classList.add('exp');
+      hint.textContent = 'Swipe down for the clock';
+      tracking = false;
+    } else if (dy < -45) {   // swipe DOWN → collapse
+      app.classList.remove('exp');
+      hint.textContent = 'Swipe up for more';
+      tracking = false;
+    }
+  }
+
+  function onEnd() {
+    tracking = false;
+  }
+
+  // Touch
+  app.addEventListener('touchstart', function (e) {
+    var t = e.touches[0];
+    onStart(t.clientX, t.clientY, e.target);
+  }, { passive: true });
+
+  app.addEventListener('touchmove', function (e) {
+    if (!tracking) return;
+    var t = e.touches[0];
+    onMove(t.clientX, t.clientY);
+  }, { passive: true });
+
+  app.addEventListener('touchend', onEnd);
+  app.addEventListener('touchcancel', onEnd);
+
+  // Mouse (desktop testing)
+  app.addEventListener('mousedown', function (e) {
+    onStart(e.clientX, e.clientY, e.target);
+  });
+  app.addEventListener('mousemove', function (e) {
+    if (tracking) onMove(e.clientX, e.clientY);
+  });
+  app.addEventListener('mouseup', onEnd);
+
+  // Also allow clicking the hint text
+  hint.addEventListener('click', function () {
+    if (app.classList.contains('exp')) {
+      app.classList.remove('exp');
+      hint.textContent = 'Swipe up for more';
+    } else {
+      app.classList.add('exp');
+      hint.textContent = 'Swipe down for the clock';
+    }
+  });
+
+  /* ── Actions ──────────────────────────────────────────────── */
+  function openSub(html) {
+    sub.innerHTML = html;
+    sub.classList.add('open');
+  }
+  function closeSub() {
+    sub.classList.remove('open');
+    sub.innerHTML = '';
+  }
+
+  document.getElementById('back').onclick = function () {
+    if (sub.classList.contains('open')) closeSub();
+    else if (window.Android && Android.closeSettings) Android.closeSettings();
+    else history.back();
+  };
+
+  app.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-a]');
+    if (!b) return;
+    var a = b.getAttribute('data-a');
+
+    if (a === 'quality') { p.quality = p.quality === 'high' ? 'standard' : 'high'; save(); refresh(); return; }
+    if (a === 'xf') { var o = [0,2,5,8,12]; p.xf = o[(o.indexOf(p.xf)+1)%o.length]; save(); refresh(); return; }
+    if (a === 'sleep') { var o = [0,5,15,30,45,60]; p.sleep = o[(o.indexOf(p.sleep)+1)%o.length]; save(); refresh(); return; }
+    if (a === 'npv') { p.npv = p.npv === 'classic' ? 'minimal' : 'classic'; save(); refresh(); return; }
+    if (a === 'bass') { p.bass = !p.bass; save(); refresh(); return; }
+    if (a === 'dl') { p.dl = !p.dl; save(); refresh(); return; }
+
+    if (a === 'eq') {
+      openSub(
+        '<button class="sub-back" type="button">←</button>' +
+        '<p style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;opacity:.4;margin:36px 0 0">PLAYER</p>' +
+        '<h1>Equalizer</h1>' +
+        ['normal','focus','deep','bright'].map(function (x) {
+          return '<button class="sub-row' + (p.eq === x ? ' on' : '') + '" data-eq="' + x + '">' + x.toUpperCase() + '</button>';
+        }).join('')
+      );
+      return;
+    }
+    if (a === 'speed') {
+      openSub(
+        '<button class="sub-back" type="button">←</button>' +
+        '<p style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;opacity:.4;margin:36px 0 0">PLAYER</p>' +
+        '<h1>Playback Speed</h1>' +
+        '<div style="text-align:center;padding:18px 0">' +
+          '<div style="font-size:44px;font-weight:700;margin-bottom:10px" id="spV">' + p.speed.toFixed(1) + '×</div>' +
+          '<input type="range" min="0.7" max="1.5" step="0.05" value="' + p.speed + '" id="spR" style="width:100%;accent-color:#fff">' +
+        '</div>'
+      );
+      document.getElementById('spR').oninput = function () {
+        p.speed = +this.value;
+        document.getElementById('spV').textContent = p.speed.toFixed(1) + '×';
+        save(); refresh();
+      };
+      return;
+    }
+    if (a === 'more') {
+      openSub(
+        '<button class="sub-back" type="button">←</button>' +
+        '<p style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;opacity:.4;margin:36px 0 0">PLAYER</p>' +
+        '<h1>Additional</h1>' +
+        '<button class="sub-row">Coming soon</button>'
+      );
+      return;
+    }
+  });
+
+  sub.addEventListener('click', function (e) {
+    if (e.target.closest('.sub-back')) { closeSub(); return; }
+    var eq = e.target.closest('[data-eq]');
+    if (eq) {
+      p.eq = eq.getAttribute('data-eq');
+      save(); refresh();
+      closeSub();
+    }
+  });
+})();
+</script>
+</body>
+</html>
