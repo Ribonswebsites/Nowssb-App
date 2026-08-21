@@ -1,9 +1,9 @@
 {
-  "version": "9.6.1",
-  "build": 2026082114,
+  "version": "9.6.2",
+  "build": 2026082116,
   "force": false,
   "title": "Update available",
-  "notes": "The player is a real watch-bezel now. Wind the knurled ring like a crown — each tick is haptic. Voice, EQ, loop, shuffle, speed, volume and 7× are real buttons, not a picture. This update installs inside the app. You do not download a new file.",
+  "notes": "Player settings is a live clock. The ring moves with the seconds. Time follows your location. Swipe up for the full list. This installs inside the app. You do not download a new file.",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
   "apk": ""
 }

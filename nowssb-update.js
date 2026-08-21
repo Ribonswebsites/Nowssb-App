@@ -5,7 +5,7 @@
 (function () {
   var LIVE = 'https://raw.githubusercontent.com/Ribonswebsites/Nowssb-App/main/version.json';
   var PAGES = 'https://ribonswebsites.github.io/Nowssb-App/';
-  var LOCAL = 2026082114;
+  var LOCAL = 2026082116;
   var SEEN = 'nwsb_seen_build';
   var SNOOZE = 'nwsb_update_snooze';
 
@@ -123,10 +123,10 @@
       .catch(function () {
         if (force) {
           show({
-            version: '9.6.1',
+            version: '9.6.2',
             build: LOCAL,
             title: 'Update available',
-            notes: 'The player is a real watch-bezel now. Wind the knurled ring. This update installs inside the app — no new download.',
+            notes: 'Player settings is a live clock. The ring moves with the seconds. Time follows your location. Swipe up for the full list. This installs inside the app — no new download.',
             web: PAGES
           });
         }

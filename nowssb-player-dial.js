@@ -11,7 +11,9 @@
   var defaults = {
     voice: 'female', loop: 'off', reps: 7, speed: 1, volume: 0.85,
     eq: 'flat', bands: EQ.flat.slice(), output: 'speaker',
-    quality: 'high', animation: true, notify: true, shuffle: false
+    quality: 'high', animation: true, notify: true, shuffle: false,
+    bassBoost: false, crossfade: 5, sleepTimer: 0, downloadOnly: false,
+    nowPlayingView: 'classic'
   };
   function load() {
     try {
@@ -41,13 +43,51 @@
     gear: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.2a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.2a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.2a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9c.3.7 1 1.2 1.8 1.2H21a2 2 0 110 4h-.2a1.7 1.7 0 00-1.4 1z"/></svg>'
   };
 
-  function ticks() {
-    var s = '<svg class="nwsb-dial-ticks" viewBox="0 0 100 100">';
-    for (var i = 0; i < 120; i++) {
+  function ticksSvg() {
+    var s = '<svg class="nwsb-clock-ring" viewBox="0 0 200 200">';
+    var i;
+    for (i = 0; i < 60; i++) {
       var m = i % 5 === 0;
-      s += '<line x1="50" y1="2.4" x2="50" y2="' + (m ? '6.8' : '4.6') + '" stroke="white" stroke-opacity="' + (m ? '.55' : '.2') + '" stroke-width="' + (m ? '.42' : '.24') + '" transform="rotate(' + (i * 3) + ' 50 50)"/>';
+      s += '<line x1="100" y1="8" x2="100" y2="' + (m ? '22' : '16') + '" stroke="white" stroke-opacity="' + (m ? '.92' : '.28') + '" stroke-width="' + (m ? '1.6' : '1') + '" transform="rotate(' + (i * 6) + ' 100 100)"/>';
     }
-    return s + '</svg>';
+    [15, 20, 25, 30, 35, 40, 45, 50, 55, 60].forEach(function (n) {
+      var a = (n * 6 - 90) * Math.PI / 180;
+      var x = 100 + Math.cos(a) * 62;
+      var y = 100 + Math.sin(a) * 62;
+      s += '<text x="' + x + '" y="' + y + '" text-anchor="middle" dominant-baseline="middle" fill="white" fill-opacity=".85" font-size="' + (n % 15 === 0 || n === 60 ? 14 : 10) + '" font-weight="600">' + n + '</text>';
+    });
+    s += '<g id="nwsbSec"><line x1="100" y1="100" x2="100" y2="18" stroke="white" stroke-width="1.4" stroke-linecap="round"/><circle cx="100" cy="18" r="2.4" fill="white"/></g><circle cx="100" cy="100" r="2.2" fill="white"/></svg>';
+    return s;
+  }
+
+  function zone() {
+    try {
+      var z = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (z && z !== 'UTC') return z;
+    } catch (e) {}
+    return 'Asia/Kolkata';
+  }
+
+  function paintClock() {
+    var now = new Date();
+    var parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: zone(), hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true,
+      weekday: 'long', day: '2-digit', month: 'short', year: 'numeric'
+    }).formatToParts(now);
+    function g(t) { var p = parts.find(function (x) { return x.type === t; }); return p ? p.value : ''; }
+    var hh = document.getElementById('nwsbHh');
+    var mm = document.getElementById('nwsbMm');
+    var dt = document.getElementById('nwsbDt');
+    var wd = document.getElementById('nwsbWd');
+    var sec = document.getElementById('nwsbSec');
+    if (hh) hh.textContent = g('hour');
+    if (mm) mm.innerHTML = g('minute') + '<i>' + (g('dayPeriod') || 'AM').replace(/\./g, '').toUpperCase() + '</i>';
+    if (dt) dt.textContent = g('day') + ' ' + g('month').toUpperCase() + ' ' + g('year');
+    if (wd) wd.textContent = g('weekday').toUpperCase();
+    if (sec) {
+      var s = Number(g('second') || 0) + now.getMilliseconds() / 1000;
+      sec.setAttribute('transform', 'rotate(' + (s * 6) + ' 100 100)');
+    }
   }
 
   var arm = 'volume';
@@ -91,34 +131,30 @@
     }
   }
 
-  function bindWind(root) {
-    if (!root || root._wound) return;
-    root._wound = true;
-    var last = null, acc = 0, wind = 0;
-    function ang(e) {
-      var r = root.getBoundingClientRect();
-      return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2));
-    }
+  function bindClock(root) {
+    if (!root || root._bound) return;
+    root._bound = true;
+    var startY = 0;
     root.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('button') || e.target.closest('#ndSheet')) return;
-      root.setPointerCapture(e.pointerId);
-      last = ang(e); acc = 0;
+      if (e.target.closest('button,input,a,#ndSheet')) return;
+      startY = e.clientY;
+      try { root.setPointerCapture(e.pointerId); } catch (err) {}
     });
     root.addEventListener('pointermove', function (e) {
-      if (last == null) return;
-      var next = ang(e);
-      var d = next - last;
-      if (d > Math.PI) d -= Math.PI * 2;
-      if (d < -Math.PI) d += Math.PI * 2;
-      last = next;
-      var deg = d * 180 / Math.PI;
-      wind += deg;
-      root.style.setProperty('--wind', wind + 'deg');
-      acc += deg;
-      while (acc >= 5) { acc -= 5; hapticTick(); applyTick(1); }
-      while (acc <= -5) { acc += 5; hapticTick(); applyTick(-1); }
+      if (!startY) return;
+      var dy = startY - e.clientY;
+      if (dy > 36) {
+        root.setAttribute('data-expanded', 'true');
+        var h = root.querySelector('.nwsb-clock-hint');
+        if (h) h.textContent = 'Swipe down for the clock';
+      }
+      if (dy < -36) {
+        root.setAttribute('data-expanded', 'false');
+        var h2 = root.querySelector('.nwsb-clock-hint');
+        if (h2) h2.textContent = 'Swipe up for more';
+      }
     });
-    function up() { last = null; }
+    function up() { startY = 0; }
     root.addEventListener('pointerup', up);
     root.addEventListener('pointercancel', up);
     root.addEventListener('click', function (e) {
@@ -126,6 +162,11 @@
       if (!t || t.closest('#ndSheet')) return;
       act(t.getAttribute('data-act'));
     });
+    function loop() {
+      if (root.classList.contains('open')) paintClock();
+      root._raf = requestAnimationFrame(loop);
+    }
+    root._raf = requestAnimationFrame(loop);
   }
 
   function loopName() {
@@ -136,27 +177,34 @@
     if (document.getElementById('nwsbDialRoot')) return;
     var root = document.createElement('div');
     root.id = 'nwsbDialRoot';
+    root.setAttribute('data-expanded', 'false');
     root.innerHTML =
-      '<div class="nd-back"><div class="nd-photo"></div></div>' +
-      '<div class="nwsb-ghost nwsb-ghost-a"></div><div class="nwsb-ghost nwsb-ghost-b"></div>' +
-      '<button class="nd-close" type="button" aria-label="Close">←</button>' +
-      '<div class="nd-brand">PLAYER</div>' +
-      '<div class="nwsb-dial" role="group" aria-label="Player settings dial. Drag the metal to wind.">' +
-        '<button class="nwsb-dial-icon" data-slot="voice" data-act="voice" aria-label="Voice">' + ICO.voice + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="eq" data-act="eq" aria-label="Equalizer">' + ICO.eq + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="loop" data-act="loop" aria-label="Loop">' + ICO.loop + '</button>' +
-        '<button class="nwsb-dial-icon nwsb-dial-txt" data-slot="reps" data-act="reps" aria-label="Repetitions">' + prefs.reps + '×</button>' +
-        '<button class="nwsb-dial-icon nwsb-dial-txt" data-slot="speed" data-act="speed" aria-label="Speed">' + prefs.speed.toFixed(1) + '×</button>' +
-        '<button class="nwsb-dial-icon" data-slot="volume" data-act="volume" aria-label="Volume">' + ICO.vol + '</button>' +
-        '<button class="nwsb-dial-core" data-act="settings" aria-label="Open settings">' + ICO.gear + '</button>' +
+      '<button class="nwsb-clock-back" type="button" aria-label="Close">←</button>' +
+      '<div class="nwsb-clock-hero">' + ticksSvg() +
+        '<div class="nwsb-clock-time"><span class="nwsb-clock-hh" id="nwsbHh">00</span><span class="nwsb-clock-mm" id="nwsbMm">00<i>AM</i></span></div>' +
+        '<div class="nwsb-clock-date"><p id="nwsbDt"></p><p id="nwsbWd"></p></div>' +
       '</div>' +
-      '<div class="nd-title">PLAYER SETTINGS</div>' +
-      '<div class="nd-hint">Voice · EQ · Loop · Reps · Speed · Volume</div>' +
-      '<div class="nd-hud" id="ndHud" hidden></div>' +
+      '<div class="nwsb-clock-sheet">' +
+        '<p class="nwsb-clock-kicker">Music player settings</p>' +
+        '<button class="nwsb-clock-row" data-act="eq"><span>Equalizer</span><em>NORMAL</em><span>›</span></button>' +
+        '<button class="nwsb-clock-row" data-act="quality"><span>Audio Quality</span><em>HIGH</em><span>›</span></button>' +
+        '<button class="nwsb-clock-row" data-act="speed"><span>Playback Speed</span><em>NORMAL</em><span>›</span></button>' +
+        '<button class="nwsb-clock-row" data-act="crossfade"><span>Crossfade</span><em>5 SEC</em><span>›</span></button>' +
+        '<button class="nwsb-clock-row" data-act="sleep"><span>Sleep Timer</span><em>OFF</em><span>›</span></button>' +
+        '<button class="nwsb-clock-row" data-act="npv"><span>Now Playing View</span><em>CLASSIC</em><span>›</span></button>' +
+        '<div class="nwsb-clock-extra">' +
+          '<button class="nwsb-clock-row" data-act="bass"><span>Bass Boost</span><b data-on="false"></b></button>' +
+          '<button class="nwsb-clock-row" data-act="dl"><span>Download Only</span><b data-on="false"></b></button>' +
+          '<button class="nwsb-clock-row" data-act="settings"><span>Additional Settings</span><span>›</span></button>' +
+        '</div>' +
+        '<p class="nwsb-clock-hint">Swipe up for more</p>' +
+      '</div>' +
+      '<div class="nwsb-mini"><div class="nwsb-mini-art">N</div><div><strong>NOWSSB</strong><small>Player</small></div><button type="button">⏮</button><button type="button" class="nwsb-mini-play" data-act="play">▶</button><button type="button">⏭</button></div>' +
       '<div class="nd-sheet" id="ndSheet"></div>';
     document.body.appendChild(root);
-    root.querySelector('.nd-close').onclick = close;
-    bindWind(root);
+    root.querySelector('.nwsb-clock-back').onclick = close;
+    bindClock(root);
+    paintClock();
   }
 
   function hud(msg) {
@@ -200,6 +248,42 @@
   }
 
   function act(kind) {
+    if (kind === 'quality') {
+      prefs.quality = prefs.quality === 'high' ? 'standard' : 'high';
+      save(prefs);
+      return;
+    }
+    if (kind === 'crossfade') {
+      var xf = [0, 2, 5, 8, 12];
+      prefs.crossfade = xf[(xf.indexOf(prefs.crossfade) + 1) % xf.length];
+      save(prefs);
+      return;
+    }
+    if (kind === 'sleep') {
+      var sl = [0, 5, 15, 30, 45, 60];
+      prefs.sleepTimer = sl[(sl.indexOf(prefs.sleepTimer) + 1) % sl.length];
+      save(prefs);
+      return;
+    }
+    if (kind === 'npv') {
+      prefs.nowPlayingView = prefs.nowPlayingView === 'classic' ? 'minimal' : 'classic';
+      save(prefs);
+      return;
+    }
+    if (kind === 'bass') {
+      prefs.bassBoost = !prefs.bassBoost;
+      save(prefs);
+      return;
+    }
+    if (kind === 'dl') {
+      prefs.downloadOnly = !prefs.downloadOnly;
+      save(prefs);
+      return;
+    }
+    if (kind === 'play') {
+      speak(window._nwsbCurrentWord || 'aarogya');
+      return;
+    }
     if (kind === 'volume' || kind === 'speed' || kind === 'reps') {
       arm = kind;
       var icons = document.querySelectorAll('#nwsbDialRoot .nwsb-dial-icon');

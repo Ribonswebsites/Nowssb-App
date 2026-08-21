@@ -1,47 +1,47 @@
-/* NowssB physical settings dial — photographed knurl filling the screen. */
-#nwsbDialRoot{--wind:0deg;position:fixed;inset:0;z-index:2147483600;pointer-events:none;font-family:'DM Sans',sans-serif;color:#fff}
+/* NowssB clock player settings */
+#nwsbDialRoot{position:fixed;inset:0;z-index:2147483600;pointer-events:none;font-family:'DM Sans',sans-serif;color:#f4f5f7;background:#1b1e27;display:flex;flex-direction:column}
 #nwsbDialRoot.open{pointer-events:auto}
 #nwsbDialRoot:not(.open){visibility:hidden}
-.nd-back{position:absolute;inset:0;background:#050506 url('./assets/player/knurl-bg.jpg') center/cover no-repeat;opacity:0;transition:opacity .28s}
-.nd-photo{position:absolute;inset:-8%;background:url('./assets/player/dial-full.jpg') center/cover no-repeat;transform:rotate(var(--wind));transform-origin:50% 46%;pointer-events:none;will-change:transform}
-.nd-back::after{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 50% 46%,transparent 28%,rgba(0,0,0,.08) 58%,rgba(0,0,0,.28) 82%,rgba(0,0,0,.48) 100%);pointer-events:none}
-#nwsbDialRoot.open .nd-back{opacity:1}
-.nwsb-ghost{display:none}
-.nd-close{position:absolute;top:max(16px,env(safe-area-inset-top));left:16px;width:42px;height:42px;border:0;border-radius:10px;background:#fff;color:#1a1a2e;font-size:20px;z-index:4;cursor:pointer}
-.nd-brand{position:absolute;top:max(22px,env(safe-area-inset-top));left:70px;font-size:11px;letter-spacing:.32em;font-weight:700;color:rgba(255,255,255,.55);z-index:4}
-.nwsb-dial{--dial-size:min(92vw,390px);--icon-r:calc(var(--dial-size)*0.46);position:absolute;left:50%;top:46%;width:var(--dial-size);height:var(--dial-size);margin:0;transform:translate(-50%,-50%) scale(.92);opacity:0;isolation:isolate;touch-action:none;user-select:none;z-index:2;transition:transform .36s cubic-bezier(.2,1.1,.3,1),opacity .28s}
-#nwsbDialRoot.open .nwsb-dial{transform:translate(-50%,-50%) scale(1);opacity:1}
-.nwsb-dial-bezel,.nwsb-dial-knurl,.nwsb-dial-lip,.nwsb-dial-face,.nwsb-dial-ticks,.nwsb-dial-badge{display:none}
-.nwsb-dial-icon{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:0;display:grid;place-items:center;color:#fff;filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 14px rgba(220,245,255,.9));background:none;border:0;padding:0;cursor:pointer;z-index:3;font-family:inherit;transform:translate(-50%,-50%) rotate(var(--a,0deg)) translateY(calc(var(--icon-r)*-1)) rotate(calc(var(--a,0deg)*-1))}
-.nwsb-dial-icon:active{transform:translate(-50%,-50%) rotate(var(--a,0deg)) translateY(calc(var(--icon-r)*-1)) rotate(calc(var(--a,0deg)*-1)) scale(.96)}
-.nwsb-dial-icon[data-on="true"],.nwsb-dial-icon[data-armed="true"]{filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 18px rgba(220,245,255,1))}
-.nwsb-dial-icon[data-slot="voice"]{--a:0deg}
-.nwsb-dial-icon[data-slot="eq"]{--a:60deg}
-.nwsb-dial-icon[data-slot="loop"]{--a:120deg}
-.nwsb-dial-icon[data-slot="reps"]{--a:180deg}
-.nwsb-dial-icon[data-slot="speed"]{--a:240deg}
-.nwsb-dial-icon[data-slot="volume"]{--a:300deg}
-.nwsb-dial-txt{font-size:15px;font-weight:800;letter-spacing:.02em;line-height:1}
-.nwsb-dial-core{position:absolute;left:50%;top:50%;width:calc(var(--dial-size)*0.48);height:calc(var(--dial-size)*0.22);margin-left:calc(var(--dial-size)*-0.24);margin-top:calc(var(--dial-size)*-0.11);border:0;border-radius:999px;color:#fff;cursor:pointer;z-index:4;background:radial-gradient(120% 80% at 50% 0%,rgba(255,255,255,.5),transparent 55%),linear-gradient(180deg,#d8d8de 0%,#7a7a82 28%,#2e2e34 62%,#101012 100%);box-shadow:0 0 0 2px #fff,0 0 18px rgba(255,255,255,.95),0 0 42px rgba(220,245,255,.45),inset 0 1px 0 rgba(255,255,255,.95),inset 0 -8px 14px rgba(0,0,0,.65);display:grid;place-items:center}
-.nwsb-dial-core:active{transform:scale(.96)}
-.nd-sheet{position:absolute;inset:0;background:rgba(5,5,6,.94);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,1,.3,1);overflow:auto;padding:18px 20px 40px;z-index:6}
+.nwsb-clock-back{position:absolute;top:max(14px,env(safe-area-inset-top));left:16px;z-index:5;width:40px;height:40px;border:0;background:none;color:#f4f5f7;font-size:22px;cursor:pointer}
+.nwsb-clock-hero{position:relative;height:50%;min-height:300px;transition:height .32s cubic-bezier(.2,.8,.2,1),opacity .28s}
+#nwsbDialRoot[data-expanded="true"] .nwsb-clock-hero{height:0;min-height:0;opacity:0;pointer-events:none}
+.nwsb-clock-ring{position:absolute;left:-48%;top:-14%;width:158%;overflow:visible}
+.nwsb-clock-time{position:absolute;left:20px;top:46%;display:flex;align-items:center;gap:10px;z-index:2;white-space:nowrap}
+.nwsb-clock-hh{font-size:78px;font-weight:500;letter-spacing:-.05em;line-height:.9;font-variant-numeric:tabular-nums}
+.nwsb-clock-mm{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 16px;border:1.5px solid rgba(255,255,255,.88);border-radius:999px;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums}
+.nwsb-clock-mm i{font-style:normal;font-size:11px;letter-spacing:.2em;opacity:.85;border-left:1px solid rgba(255,255,255,.45);padding-left:10px}
+.nwsb-clock-date{position:absolute;right:22px;top:48%;text-align:right;margin:0}
+.nwsb-clock-date p{margin:0;font-size:11px;letter-spacing:.28em;font-weight:500}
+.nwsb-clock-date p+p{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.28)}
+.nwsb-clock-sheet{flex:1;min-height:0;padding:8px 22px 18px;overflow:auto}
+.nwsb-clock-kicker{margin:0 0 10px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.55);font-weight:500}
+#nwsbDialRoot[data-expanded="true"] .nwsb-clock-kicker{margin:52px 0 18px;font-size:28px;letter-spacing:.22em;line-height:1.25;color:#f4f5f7}
+.nwsb-clock-row{display:grid;grid-template-columns:28px 1fr auto 16px;align-items:center;gap:12px;width:100%;min-height:52px;padding:0;border:0;border-bottom:1px solid rgba(255,255,255,.08);background:none;color:#f4f5f7;text-align:left;font-family:inherit;cursor:pointer}
+.nwsb-clock-row span{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:500}
+.nwsb-clock-row em{font-style:normal;font-size:11px;letter-spacing:.16em;color:rgba(255,255,255,.45);font-weight:500}
+.nwsb-clock-row b{justify-self:end;width:36px;height:20px;border-radius:99px;background:rgba(255,255,255,.18);position:relative}
+.nwsb-clock-row b:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#d8dbe3}
+.nwsb-clock-row b[data-on="true"]{background:#f4f5f7}
+.nwsb-clock-row b[data-on="true"]:after{transform:translateX(16px);background:#1b1e27}
+.nwsb-clock-hint{margin:14px 0 0;text-align:center;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.28)}
+.nwsb-clock-extra{display:none}
+#nwsbDialRoot[data-expanded="true"] .nwsb-clock-extra{display:block}
+.nwsb-mini{display:none;grid-template-columns:44px 1fr 36px 44px 36px;align-items:center;gap:8px;margin:0 16px calc(10px + env(safe-area-inset-bottom));padding:10px 12px;border-radius:18px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+#nwsbDialRoot[data-expanded="true"] .nwsb-mini{display:grid}
+.nwsb-mini-art{width:44px;height:44px;border-radius:10px;background:#0c0e14;display:grid;place-items:center;font-weight:700}
+.nwsb-mini button{border:0;background:none;color:#f4f5f7;height:36px}
+.nwsb-mini-play{width:40px;height:40px;border-radius:50%;box-shadow:inset 0 0 0 1.4px rgba(255,255,255,.7)}
+.nd-sheet{position:absolute;inset:0;background:rgba(27,30,39,.96);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,1,.3,1);overflow:auto;padding:18px 20px 40px;z-index:6}
 .nd-sheet.open{transform:translateY(0)}
 .nd-sheet h1{font-size:28px;font-weight:800;margin:8px 0 16px}
 .nd-row,.nd-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;margin:0 0 8px;border:1px solid rgba(255,255,255,.14);border-radius:22px;background:rgba(8,12,20,.72);color:#fff;cursor:pointer;font-family:inherit}
-.nd-row.on,.nd-card.on{box-shadow:0 0 0 1px rgba(255,255,255,.5)}
 .nd-pill{display:inline-flex;border-radius:999px;padding:8px 14px;margin:0 6px 8px 0;border:0;background:rgba(255,255,255,.08);color:#fff;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
 .nd-pill.on{background:#fff;color:#1a1a2e}
-.nd-hud{position:absolute;left:50%;top:18%;transform:translateX(-50%);background:rgba(0,0,0,.8);border-radius:999px;padding:8px 14px;font-size:11px;letter-spacing:.16em;font-weight:700;text-transform:uppercase;color:#fff;pointer-events:none;z-index:5}
-.nd-update{margin:20vh auto 0;max-width:360px;padding:22px 20px;border-radius:28px;background:rgba(8,12,20,.82);border:1px solid rgba(255,255,255,.16);box-shadow:0 24px 60px rgba(0,0,0,.55)}
-.nd-badge{display:inline-flex;border-radius:999px;padding:3px 8px;background:rgba(255,255,255,.2);color:#fff;font-size:10px;font-weight:800;letter-spacing:.2em}
 .nd-btn{height:44px;border-radius:999px;border:0;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
 .nd-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:#fff}
-.nd-btn.cyan{background:#fff;color:#1a1a2e;box-shadow:0 0 18px rgba(255,255,255,.28)}
+.nd-btn.cyan{background:#fff;color:#1a1a2e}
 .nd-eq{display:flex;align-items:flex-end;justify-content:space-between;height:180px;padding:16px;gap:8px}
-.nd-eq label{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;gap:8px;font-size:9px;letter-spacing:.08em;color:rgba(255,255,255,.45)}
-.nd-eq input{writing-mode:vertical-lr;direction:rtl;height:100%;accent-color:#fff}
-.nd-title{position:absolute;left:50%;bottom:10%;transform:translateX(-50%);font-size:11px;letter-spacing:.38em;color:rgba(255,255,255,.86);font-weight:800;text-transform:uppercase;pointer-events:none;width:80%;text-align:center;text-shadow:0 2px 16px rgba(0,0,0,.8);z-index:3}
-.nd-hint{position:absolute;left:50%;bottom:6.5%;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.42);font-weight:700;text-transform:uppercase;pointer-events:none;width:80%;text-align:center;z-index:3}
-@media (prefers-reduced-motion:reduce){
-  .nwsb-dial,.nd-sheet,.nd-back,.nd-photo{transition:none}
-}
+.nd-eq label{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:9px;letter-spacing:.08em;color:rgba(255,255,255,.45)}
+.nd-eq input{flex:1;writing-mode:vertical-lr;direction:rtl;accent-color:#fff}
+.nd-update{margin:20vh auto 0;max-width:360px;padding:22px 20px;border-radius:28px;background:rgba(8,12,20,.82);border:1px solid rgba(255,255,255,.16)}
+.nd-badge{display:inline-flex;border-radius:999px;padding:3px 8px;background:rgba(255,255,255,.2);font-size:10px;font-weight:800;letter-spacing:.2em}
