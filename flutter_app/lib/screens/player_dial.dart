@@ -1,5 +1,5 @@
-/// Physical settings dial — knurled aluminium ring, six glowing icons,
-/// pill gear in the centre. Same instrument as the HTML player.
+/// Physical settings dial — SVG-style CustomPaint metal, six live buttons,
+/// knurl winds like a watch crown with haptic ticks.
 library;
 
 import 'dart:math' as math;
@@ -15,8 +15,15 @@ const _cyan = Color(0xFFD7F2FF);
 const _metal = Color(0xFF050506);
 
 class PlayerDial extends StatefulWidget {
-  const PlayerDial({super.key, required this.word});
+  const PlayerDial({
+    super.key,
+    required this.word,
+    this.playing = false,
+    this.onPlay,
+  });
   final String word;
+  final bool playing;
+  final VoidCallback? onPlay;
 
   @override
   State<PlayerDial> createState() => _PlayerDialState();
@@ -24,6 +31,10 @@ class PlayerDial extends StatefulWidget {
 
 class _PlayerDialState extends State<PlayerDial> {
   String? _hud;
+  double _turn = 0;
+  String _arm = 'volume';
+  double? _lastAng;
+  double _acc = 0;
 
   Settings get s => Settings.instance;
 
@@ -45,6 +56,21 @@ class _PlayerDialState extends State<PlayerDial> {
 
   void _open(String p) {
     HapticFeedback.lightImpact();
+    if (p == 'shuffle') {
+      setState(() => _hud = 'Shuffle');
+      Future<void>.delayed(const Duration(milliseconds: 1100), () {
+        if (mounted) setState(() => _hud = null);
+      });
+      return;
+    }
+    if (p == 'output') {
+      final next = s.cycleOutput();
+      setState(() => _hud = next[0].toUpperCase() + next.substring(1));
+      Future<void>.delayed(const Duration(milliseconds: 1100), () {
+        if (mounted) setState(() => _hud = null);
+      });
+      return;
+    }
     if (p == 'loop') {
       final next = s.cycleLoop();
       setState(() => _hud = 'Loop · ${next[0].toUpperCase()}${next.substring(1)}');
@@ -65,131 +91,329 @@ class _PlayerDialState extends State<PlayerDial> {
     );
   }
 
+  void _flash(String msg) {
+    setState(() => _hud = msg);
+    Future<void>.delayed(const Duration(milliseconds: 1100), () {
+      if (mounted) setState(() => _hud = null);
+    });
+  }
+
+  void _tick(int dir) {
+    HapticFeedback.selectionClick();
+    if (_arm == 'volume') {
+      s.setVolume((s.volume + dir * 0.02).clamp(0, 1));
+      _flash('Volume · ${(s.volume * 100).round()}');
+    } else if (_arm == 'speed') {
+      s.setSpeed((s.speed + dir * 0.05).clamp(0.7, 1.5));
+      _flash('Speed · ${s.speed.toStringAsFixed(2)}×');
+    } else {
+      s.setReps((s.reps + dir).clamp(1, 99));
+      _flash('Reps · ${s.reps}×');
+    }
+  }
+
+  double _ang(Offset local, Size size) {
+    return math.atan2(local.dy - size.height / 2, local.dx - size.width / 2);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+    const acts = <(String, IconData, String)>[
+      ('voice', Icons.graphic_eq, 'Voice'),
+      ('eq', Icons.tune, 'Equalizer'),
+      ('loop', Icons.repeat, 'Loop'),
+      ('reps', Icons.exposure, 'Reps'),
+      ('speed', Icons.speed, 'Speed'),
+      ('volume', Icons.volume_up, 'Volume'),
+    ];
+
+    return Stack(
+      fit: StackFit.expand,
       children: [
-        SizedBox(
-          width: 280,
-          height: 280,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              const ClipOval(
-                child: NwsbImage(
-                  'assets/player/dial-hero.jpg',
-                  fit: BoxFit.cover,
-                ),
-              ),
-              for (var i = 0; i < 6; i++)
-                _IconSlot(
-                  index: i,
-                  on: i == 2 && s.loop != 'off',
-                  child: i == 3
-                      ? Container(
-                          width: 36,
-                          height: 36,
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(
-                            color: _metal,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            '${s.reps}×',
-                            style: const TextStyle(
-                              color: _cyan,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13,
+        const ColoredBox(color: Color(0xFF050506)),
+        CustomPaint(painter: _GhostRingsPainter(), size: Size.infinite),
+        Align(
+          alignment: const Alignment(0, -0.08),
+          child: FractionallySizedBox(
+            widthFactor: 0.92,
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: LayoutBuilder(
+                builder: (context, box) {
+                  final size = box.maxWidth;
+                  final r = size * 0.318;
+                  return GestureDetector(
+                    onPanStart: (d) {
+                      _lastAng = _ang(d.localPosition, Size.square(size));
+                      _acc = 0;
+                    },
+                    onPanUpdate: (d) {
+                      if (_lastAng == null) return;
+                      final next = _ang(d.localPosition, Size.square(size));
+                      var delta = next - _lastAng!;
+                      if (delta > math.pi) delta -= math.pi * 2;
+                      if (delta < -math.pi) delta += math.pi * 2;
+                      _lastAng = next;
+                      setState(() => _turn += delta);
+                      _acc += delta * 180 / math.pi;
+                      while (_acc >= 5) {
+                        _acc -= 5;
+                        _tick(1);
+                      }
+                      while (_acc <= -5) {
+                        _acc += 5;
+                        _tick(-1);
+                      }
+                    },
+                    onPanEnd: (_) => _lastAng = null,
+                    onPanCancel: () => _lastAng = null,
+                    child: Stack(
+                      children: [
+                        CustomPaint(
+                          size: Size.square(size),
+                          painter: _DialPainter(turn: _turn, playing: widget.playing),
+                        ),
+                        for (var i = 0; i < acts.length; i++)
+                          () {
+                            final a = -math.pi / 2 + i * (math.pi / 3);
+                            final id = acts[i].$1;
+                            final armed = id == _arm;
+                            final on = id == 'loop' && s.loop != 'off';
+                            return Positioned(
+                              left: size / 2 + math.cos(a) * r - 26,
+                              top: size / 2 + math.sin(a) * r - 26,
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  if (id == 'loop') {
+                                    _open('loop');
+                                    return;
+                                  }
+                                  if (id == 'volume' || id == 'speed' || id == 'reps') {
+                                    setState(() => _arm = id);
+                                  }
+                                  _open(id);
+                                },
+                                child: SizedBox(
+                                  width: 52,
+                                  height: 52,
+                                  child: Center(
+                                    child: id == 'reps'
+                                        ? Text(
+                                            '${s.reps}×',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 15,
+                                              shadows: [
+                                                Shadow(
+                                                  color: armed
+                                                      ? const Color(0xE6FFFFFF)
+                                                      : const Color(0x66FFFFFF),
+                                                  blurRadius: armed ? 12 : 6,
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Icon(
+                                            acts[i].$2,
+                                            color: Colors.white,
+                                            size: 22,
+                                            shadows: [
+                                              Shadow(
+                                                color: on || armed
+                                                    ? const Color(0xE6FFFFFF)
+                                                    : const Color(0x66FFFFFF),
+                                                blurRadius: on || armed ? 12 : 6,
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }(),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              widget.onPlay?.call();
+                            },
+                            onLongPress: () {
+                              HapticFeedback.mediumImpact();
+                              _open('settings');
+                            },
+                            child: Container(
+                              width: size * 0.32,
+                              height: size * 0.148,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(99),
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [Color(0xFF5A5A62), Color(0xFF1C1C20), Color(0xFF0A0A0C)],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: widget.playing
+                                        ? const Color(0xA6FFFFFF)
+                                        : const Color(0x9EFFFFFF),
+                                    blurRadius: widget.playing ? 22 : 14,
+                                  ),
+                                ],
+                                border: Border.all(color: const Color(0xA6FFFFFF), width: 1.2),
+                              ),
+                              child: const Icon(Icons.settings, color: Colors.white, size: 22),
                             ),
                           ),
-                        )
-                      : const SizedBox.shrink(),
-                  onTap: () => _open(
-                    ['voice', 'eq', 'loop', 'reps', 'speed', 'volume'][i],
-                  ),
-                ),
-              GestureDetector(
-                onTap: () => _open('settings'),
-                child: Container(
-                  width: 84,
-                  height: 44,
-                  color: Colors.transparent,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 56,
+          right: 56,
+          top: 48,
+          child: Column(
+            children: [
+              Text(
+                widget.word,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 4,
+                  color: Colors.white,
                 ),
               ),
-              if (_hud != null)
-                Positioned(
-                  top: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      _hud!,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        letterSpacing: 1.6,
-                        fontWeight: FontWeight.w700,
-                        color: _cyan,
-                      ),
-                    ),
-                  ),
+              const SizedBox(height: 6),
+              Text(
+                widget.playing ? 'PLAYING' : 'WIND THE RING · TAP A CONTROL',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 9,
+                  letterSpacing: 1.8,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0x61FFFFFF),
                 ),
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 8),
-        const Text(
-          'VOICE  ·  EQ  ·  LOOP  ·  REPS  ·  SPEED  ·  VOLUME',
-          style: TextStyle(
-            fontSize: 9,
-            letterSpacing: 1.6,
-            fontWeight: FontWeight.w700,
-            color: Color(0x80D7F2FF),
+        if (_hud != null)
+          Positioned(
+            top: 64,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  _hud!,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    letterSpacing: 1.6,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
       ],
     );
   }
 }
 
-class _IconSlot extends StatelessWidget {
-  const _IconSlot({
-    required this.index,
-    required this.child,
-    required this.onTap,
-    this.on = false,
-  });
-  final int index;
-  final Widget child;
-  final VoidCallback onTap;
-  final bool on;
+class _GhostRingsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.width * 0.12;
+    void ring(Offset c, double r) {
+      for (var i = 0; i < 180; i++) {
+        final a = i / 180 * math.pi * 2;
+        paint.color = Color.fromARGB(40, 40 + (i % 4) * 16, 40 + (i % 4) * 16, 44);
+        canvas.drawLine(
+          Offset(c.dx + math.cos(a) * r * 0.86, c.dy + math.sin(a) * r * 0.86),
+          Offset(c.dx + math.cos(a) * r, c.dy + math.sin(a) * r),
+          paint..strokeWidth = i.isEven ? 2.2 : 1.1,
+        );
+      }
+    }
+    ring(Offset(-size.width * 0.15, size.height * 0.12), size.width * 0.72);
+    ring(Offset(size.width * 1.05, size.height * 0.92), size.width * 0.68);
+  }
 
   @override
-  Widget build(BuildContext context) {
-    const r = 89.0;
-    final a = (index * 60 - 90) * math.pi / 180;
-    return Transform.translate(
-      offset: Offset(math.cos(a) * r, math.sin(a) * r),
-      child: GestureDetector(
-        onTap: onTap,
-        child: SizedBox(
-          width: 48,
-          height: 48,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: on
-                  ? const [BoxShadow(color: Color(0x88D7F2FF), blurRadius: 14)]
-                  : null,
-            ),
-            child: Center(child: child),
-          ),
-        ),
-      ),
-    );
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _DialPainter extends CustomPainter {
+  _DialPainter({required this.turn, required this.playing});
+  final double turn;
+  final bool playing;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2;
+
+    for (var i = 0; i < 240; i++) {
+      final a = turn + i / 240 * math.pi * 2;
+      final shade = 14 + (i % 4) * 18;
+      final p = Paint()
+        ..color = Color.fromARGB(255, shade, shade, shade + 2)
+        ..strokeWidth = i.isEven ? 2.0 : 1.05
+        ..strokeCap = StrokeCap.butt;
+      canvas.drawLine(
+        Offset(c.dx + math.cos(a) * r * 0.705, c.dy + math.sin(a) * r * 0.705),
+        Offset(c.dx + math.cos(a) * r * 0.995, c.dy + math.sin(a) * r * 0.995),
+        p,
+      );
+    }
+
+    final lip = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF3A3A40), Color(0xFF111114), Color(0xFF050506)],
+      ).createShader(Rect.fromCircle(center: c, radius: r * 0.70));
+    canvas.drawCircle(c, r * 0.70, lip);
+
+    final face = Paint()
+      ..shader = const RadialGradient(
+        center: Alignment(-0.24, -0.4),
+        colors: [Color(0xFF2A2A30), Color(0xFF121214), Color(0xFF070708)],
+      ).createShader(Rect.fromCircle(center: c, radius: r * 0.63));
+    canvas.drawCircle(c, r * 0.63, face);
+
+    for (var i = 0; i < 72; i++) {
+      final a = -math.pi / 2 + i * (math.pi * 2 / 72);
+      final major = i % 6 == 0;
+      final p = Paint()
+        ..color = Colors.white.withValues(alpha: major ? 0.5 : 0.18)
+        ..strokeWidth = major ? 1.4 : 0.8;
+      canvas.drawLine(
+        Offset(c.dx + math.cos(a) * r * 0.585, c.dy + math.sin(a) * r * 0.585),
+        Offset(c.dx + math.cos(a) * r * (major ? 0.535 : 0.555), c.dy + math.sin(a) * r * (major ? 0.535 : 0.555)),
+        p,
+      );
+    }
   }
+
+  @override
+  bool shouldRepaint(covariant _DialPainter old) => old.turn != turn || old.playing != playing;
 }
 
 class _DialOverlay extends StatefulWidget {

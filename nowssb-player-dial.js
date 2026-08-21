@@ -11,7 +11,7 @@
   var defaults = {
     voice: 'female', loop: 'off', reps: 7, speed: 1, volume: 0.85,
     eq: 'flat', bands: EQ.flat.slice(), output: 'speaker',
-    quality: 'high', animation: true, notify: true
+    quality: 'high', animation: true, notify: true, shuffle: false
   };
   function load() {
     try {
@@ -49,6 +49,77 @@
     return s + '</svg>';
   }
 
+  var arm = 'volume';
+  var tickCtx = null;
+  function hapticTick() {
+    try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      tickCtx = tickCtx || new AC();
+      if (tickCtx.state === 'suspended') tickCtx.resume();
+      var o = tickCtx.createOscillator();
+      var g = tickCtx.createGain();
+      o.type = 'square';
+      o.frequency.value = 1760;
+      g.gain.setValueAtTime(0.032, tickCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, tickCtx.currentTime + 0.016);
+      o.connect(g).connect(tickCtx.destination);
+      o.start();
+      o.stop(tickCtx.currentTime + 0.018);
+    } catch (e) {}
+  }
+
+  function applyTick(dir) {
+    if (arm === 'volume') {
+      prefs.volume = Math.max(0, Math.min(1, +(prefs.volume + dir * 0.02).toFixed(2)));
+      save(prefs);
+      hud('Volume · ' + Math.round(prefs.volume * 100));
+    } else if (arm === 'speed') {
+      prefs.speed = Math.max(0.7, Math.min(1.5, +(prefs.speed + dir * 0.05).toFixed(2)));
+      save(prefs);
+      hud('Speed · ' + prefs.speed.toFixed(2) + '×');
+    } else {
+      prefs.reps = Math.max(1, Math.min(99, prefs.reps + dir));
+      save(prefs);
+      var b = document.querySelector('#nwsbDialRoot [data-act="reps"] .nwsb-dial-reps');
+      if (b) b.textContent = prefs.reps + '×';
+      hud('Reps · ' + prefs.reps + '×');
+    }
+  }
+
+  function bindWind(dial) {
+    if (!dial || dial._wound) return;
+    dial._wound = true;
+    var last = null, acc = 0, wind = 0;
+    function ang(e) {
+      var r = dial.getBoundingClientRect();
+      return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2));
+    }
+    dial.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('button')) return;
+      dial.setPointerCapture(e.pointerId);
+      last = ang(e); acc = 0;
+    });
+    dial.addEventListener('pointermove', function (e) {
+      if (last == null) return;
+      var next = ang(e);
+      var d = next - last;
+      if (d > Math.PI) d -= Math.PI * 2;
+      if (d < -Math.PI) d += Math.PI * 2;
+      last = next;
+      var deg = d * 180 / Math.PI;
+      wind += deg;
+      dial.style.setProperty('--wind', wind + 'deg');
+      acc += deg;
+      while (acc >= 5) { acc -= 5; hapticTick(); applyTick(1); }
+      while (acc <= -5) { acc += 5; hapticTick(); applyTick(-1); }
+    });
+    function up() { last = null; }
+    dial.addEventListener('pointerup', up);
+    dial.addEventListener('pointercancel', up);
+  }
+
   function loopName() {
     return prefs.loop === 'off' ? 'Off' : prefs.loop === 'once' ? 'Once' : 'Infinite';
   }
@@ -58,31 +129,26 @@
     var root = document.createElement('div');
     root.id = 'nwsbDialRoot';
     root.innerHTML =
-      '<div class="nd-back"></div><div class="nd-knurl-bg"></div>' +
+      '<div class="nd-back"></div>' +
+      '<div class="nwsb-ghost nwsb-ghost-a"></div><div class="nwsb-ghost nwsb-ghost-b"></div>' +
       '<button class="nd-close" type="button" aria-label="Close">←</button>' +
       '<div class="nd-brand">PLAYER</div>' +
-      '<div class="nwsb-dial is-photo" role="group" aria-label="Player settings dial">' +
-        '<img class="nwsb-dial-photo" src="./assets/player/dial-hero.jpg" alt="" draggable="false">' +
-        '<div class="nwsb-dial-knurl"></div><div class="nwsb-dial-lip"></div>' +
+      '<div class="nwsb-dial" role="group" aria-label="Player settings dial. Drag the ring to wind.">' +
+        '<div class="nwsb-dial-bezel"><div class="nwsb-dial-knurl"></div></div>' +
+        '<div class="nwsb-dial-lip"></div>' +
         '<div class="nwsb-dial-face">' + ticks() + '</div>' +
         '<button class="nwsb-dial-icon" data-slot="0" data-act="voice" aria-label="Voice">' + ICO.voice + '</button>' +
         '<button class="nwsb-dial-icon" data-slot="1" data-act="eq" aria-label="Equalizer">' + ICO.eq + '</button>' +
         '<button class="nwsb-dial-icon" data-slot="2" data-act="loop" aria-label="Loop">' + ICO.loop + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="3" data-act="reps" aria-label="Reps"><span class="nwsb-dial-reps">' + prefs.reps + '×</span></button>' +
+        '<button class="nwsb-dial-icon" data-slot="3" data-act="reps" aria-label="Repetitions"><span class="nwsb-dial-reps">' + prefs.reps + '×</span></button>' +
         '<button class="nwsb-dial-icon" data-slot="4" data-act="speed" aria-label="Speed">' + ICO.speed + '</button>' +
         '<button class="nwsb-dial-icon" data-slot="5" data-act="volume" aria-label="Volume">' + ICO.vol + '</button>' +
         '<button class="nwsb-dial-core" data-act="settings" aria-label="Open settings">' + ICO.gear + '</button>' +
       '</div>' +
-      '<div class="nd-hint">Voice · EQ · Loop · Reps · Speed · Volume</div>' +
+      '<div class="nd-hint">Wind the ring · tap a control</div>' +
       '<div class="nd-hud" id="ndHud" hidden></div>' +
       '<div class="nd-sheet" id="ndSheet"></div>';
     document.body.appendChild(root);
-    var img = root.querySelector('.nwsb-dial-photo');
-    if (img) img.onerror = function () {
-      var d = root.querySelector('.nwsb-dial');
-      if (d) d.classList.remove('is-photo');
-      this.remove();
-    };
     root.querySelector('.nd-close').onclick = close;
     root.querySelector('.nd-back').onclick = close;
     root.addEventListener('click', function (e) {
@@ -90,6 +156,7 @@
       if (!t || t.closest('#ndSheet')) return;
       act(t.getAttribute('data-act'));
     });
+    bindWind(root.querySelector('.nwsb-dial'));
   }
 
   function hud(msg) {
@@ -133,12 +200,32 @@
   }
 
   function act(kind) {
+    if (kind === 'volume' || kind === 'speed' || kind === 'reps') {
+      arm = kind;
+      var icons = document.querySelectorAll('#nwsbDialRoot .nwsb-dial-icon');
+      for (var i = 0; i < icons.length; i++) {
+        var a = icons[i].getAttribute('data-act');
+        icons[i].setAttribute('data-armed', a === arm ? 'true' : 'false');
+      }
+    }
     if (kind === 'loop') {
       prefs.loop = prefs.loop === 'off' ? 'once' : prefs.loop === 'once' ? 'infinite' : 'off';
       save(prefs);
       hud('Loop · ' + loopName());
       var b = document.querySelector('#nwsbDialRoot [data-act="loop"]');
       if (b) b.setAttribute('data-on', prefs.loop !== 'off' ? 'true' : 'false');
+      return;
+    }
+    if (kind === 'shuffle') {
+      prefs.shuffle = !prefs.shuffle;
+      save(prefs);
+      hud('Shuffle · ' + (prefs.shuffle ? 'On' : 'Off'));
+      return;
+    }
+    if (kind === 'output') {
+      prefs.output = prefs.output === 'speaker' ? 'earpiece' : prefs.output === 'earpiece' ? 'bluetooth' : 'speaker';
+      save(prefs);
+      hud(prefs.output === 'speaker' ? 'Speaker' : prefs.output === 'earpiece' ? 'Earpiece' : 'Bluetooth');
       return;
     }
     if (kind === 'voice') {
