@@ -32,8 +32,8 @@
   save(prefs);
 
   var ICO = {
-    voice: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 10v4M6 7v10M10 4v16M14 7v10M18 10v4M22 8v8"/></svg>',
-    eq: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 21v-7M4 8V3M12 21v-9M12 8V3M20 21v-5M20 10V3M2 8h4M10 8h4M18 10h4"/></svg>',
+    voice: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="3.4"/><path d="M5.2 19c1.3-3.4 3.9-5.2 6.8-5.2s5.5 1.8 6.8 5.2"/></svg>',
+    eq: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 19V9M12 19V5M16 19v-7"/></svg>',
     loop: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',
     speed: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 14l4-7"/><circle cx="12" cy="14" r="8"/></svg>',
     vol: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M19 5a9 9 0 010 14"/></svg>',
@@ -79,30 +79,32 @@
     } else if (arm === 'speed') {
       prefs.speed = Math.max(0.7, Math.min(1.5, +(prefs.speed + dir * 0.05).toFixed(2)));
       save(prefs);
-      hud('Speed · ' + prefs.speed.toFixed(2) + '×');
+      hud('Speed · ' + prefs.speed.toFixed(1) + '×');
+      var sp = document.querySelector('#nwsbDialRoot [data-act="speed"]');
+      if (sp) sp.textContent = prefs.speed.toFixed(1) + '×';
     } else {
       prefs.reps = Math.max(1, Math.min(99, prefs.reps + dir));
       save(prefs);
-      var b = document.querySelector('#nwsbDialRoot .nwsb-dial-badge');
+      var b = document.querySelector('#nwsbDialRoot [data-act="reps"]');
       if (b) b.textContent = prefs.reps + '×';
       hud('Reps · ' + prefs.reps + '×');
     }
   }
 
-  function bindWind(dial) {
-    if (!dial || dial._wound) return;
-    dial._wound = true;
+  function bindWind(root) {
+    if (!root || root._wound) return;
+    root._wound = true;
     var last = null, acc = 0, wind = 0;
     function ang(e) {
-      var r = dial.getBoundingClientRect();
+      var r = root.getBoundingClientRect();
       return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2));
     }
-    dial.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('button')) return;
-      dial.setPointerCapture(e.pointerId);
+    root.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('button') || e.target.closest('#ndSheet')) return;
+      root.setPointerCapture(e.pointerId);
       last = ang(e); acc = 0;
     });
-    dial.addEventListener('pointermove', function (e) {
+    root.addEventListener('pointermove', function (e) {
       if (last == null) return;
       var next = ang(e);
       var d = next - last;
@@ -111,14 +113,19 @@
       last = next;
       var deg = d * 180 / Math.PI;
       wind += deg;
-      dial.style.setProperty('--wind', wind + 'deg');
+      root.style.setProperty('--wind', wind + 'deg');
       acc += deg;
       while (acc >= 5) { acc -= 5; hapticTick(); applyTick(1); }
       while (acc <= -5) { acc += 5; hapticTick(); applyTick(-1); }
     });
     function up() { last = null; }
-    dial.addEventListener('pointerup', up);
-    dial.addEventListener('pointercancel', up);
+    root.addEventListener('pointerup', up);
+    root.addEventListener('pointercancel', up);
+    root.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-act]');
+      if (!t || t.closest('#ndSheet')) return;
+      act(t.getAttribute('data-act'));
+    });
   }
 
   function loopName() {
@@ -130,35 +137,26 @@
     var root = document.createElement('div');
     root.id = 'nwsbDialRoot';
     root.innerHTML =
-      '<div class="nd-back"></div>' +
+      '<div class="nd-back"><div class="nd-photo"></div></div>' +
       '<div class="nwsb-ghost nwsb-ghost-a"></div><div class="nwsb-ghost nwsb-ghost-b"></div>' +
       '<button class="nd-close" type="button" aria-label="Close">←</button>' +
       '<div class="nd-brand">PLAYER</div>' +
-      '<div class="nwsb-dial" role="group" aria-label="Player settings dial. Drag the ring to wind.">' +
-        '<div class="nwsb-dial-bezel"><div class="nwsb-dial-knurl"></div></div>' +
-        '<div class="nwsb-dial-lip"></div>' +
-        '<div class="nwsb-dial-face">' + ticks() + '</div>' +
+      '<div class="nwsb-dial" role="group" aria-label="Player settings dial. Drag the metal to wind.">' +
         '<button class="nwsb-dial-icon" data-slot="voice" data-act="voice" aria-label="Voice">' + ICO.voice + '</button>' +
         '<button class="nwsb-dial-icon" data-slot="eq" data-act="eq" aria-label="Equalizer">' + ICO.eq + '</button>' +
         '<button class="nwsb-dial-icon" data-slot="loop" data-act="loop" aria-label="Loop">' + ICO.loop + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="shuffle" data-act="shuffle" aria-label="Shuffle">' + ICO.shuffle + '</button>' +
-        '<button class="nwsb-dial-icon" data-slot="speed" data-act="speed" aria-label="Speed">' + ICO.speed + '</button>' +
+        '<button class="nwsb-dial-icon nwsb-dial-txt" data-slot="reps" data-act="reps" aria-label="Repetitions">' + prefs.reps + '×</button>' +
+        '<button class="nwsb-dial-icon nwsb-dial-txt" data-slot="speed" data-act="speed" aria-label="Speed">' + prefs.speed.toFixed(1) + '×</button>' +
         '<button class="nwsb-dial-icon" data-slot="volume" data-act="volume" aria-label="Volume">' + ICO.vol + '</button>' +
-        '<button class="nwsb-dial-badge" data-act="reps" aria-label="Repetitions">' + prefs.reps + '×</button>' +
         '<button class="nwsb-dial-core" data-act="settings" aria-label="Open settings">' + ICO.gear + '</button>' +
       '</div>' +
+      '<div class="nd-title">PLAYER SETTINGS</div>' +
       '<div class="nd-hint">Voice · EQ · Loop · Reps · Speed · Volume</div>' +
       '<div class="nd-hud" id="ndHud" hidden></div>' +
       '<div class="nd-sheet" id="ndSheet"></div>';
     document.body.appendChild(root);
     root.querySelector('.nd-close').onclick = close;
-    root.querySelector('.nd-back').onclick = close;
-    root.addEventListener('click', function (e) {
-      var t = e.target.closest('[data-act]');
-      if (!t || t.closest('#ndSheet')) return;
-      act(t.getAttribute('data-act'));
-    });
-    bindWind(root.querySelector('.nwsb-dial'));
+    bindWind(root);
   }
 
   function hud(msg) {
@@ -288,7 +286,7 @@
           prefs.reps = +v;
         }
         save(prefs);
-        var b = document.querySelector('#nwsbDialRoot .nwsb-dial-badge');
+        var b = document.querySelector('#nwsbDialRoot [data-act="reps"]');
         if (b) b.textContent = prefs.reps + '×';
         act('reps');
       };
@@ -354,7 +352,7 @@
         window.nwsbCheckUpdate();
         return;
       }
-      sheet('<div class="nd-update"><span class="nd-badge">NEW</span><h1 style="margin-top:12px">Update available</h1><p style="opacity:.55">NowssB 9.6.1</p><p style="line-height:1.55;margin:14px 0 20px">The player is a real watch-bezel now. This update installs inside the app — you do not download a new file.</p><div style="display:flex;gap:10px"><button class="nd-btn ghost" style="flex:1" data-act="back">Later</button><button class="nd-btn cyan" style="flex:1" data-act="back">Update now</button></div></div>');
+      sheet('<div class="nd-update"><span class="nd-badge">NEW</span><h1 style="margin-top:12px">Update available</h1><p style="opacity:.55">NowssB 9.6.1</p><p style="line-height:1.55;margin:14px 0 20px">The photographed metal dial is the player. Wind the knurl to change volume, speed or reps. This update installs inside the app — you do not download a new file.</p><div style="display:flex;gap:10px"><button class="nd-btn ghost" style="flex:1" data-act="back">Later</button><button class="nd-btn cyan" style="flex:1" data-act="back">Update now</button></div></div>');
       document.getElementById('ndSheet').onclick = function (e) {
         if (e.target.closest('[data-act="back"]')) hideSheet();
       };
@@ -367,8 +365,10 @@
     document.getElementById('nwsbDialRoot').classList.add('open');
     var loopBtn = document.querySelector('#nwsbDialRoot [data-act="loop"]');
     if (loopBtn) loopBtn.setAttribute('data-on', prefs.loop !== 'off' ? 'true' : 'false');
-    var reps = document.querySelector('#nwsbDialRoot .nwsb-dial-badge');
+    var reps = document.querySelector('#nwsbDialRoot [data-act="reps"]');
     if (reps) reps.textContent = prefs.reps + '×';
+    var spd = document.querySelector('#nwsbDialRoot [data-act="speed"]');
+    if (spd) spd.textContent = prefs.speed.toFixed(1) + '×';
   }
   function close() {
     var r = document.getElementById('nwsbDialRoot');

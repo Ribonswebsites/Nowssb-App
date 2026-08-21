@@ -107,12 +107,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 const Spacer(),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(16, 28, 16, 18),
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Color(0x00050506), Color(0xCC050506), Color(0xF2050506)],
+                      colors: [Color(0x00050506), Color(0x66050506), Color(0xB3050506)],
                     ),
                   ),
                   child: Column(

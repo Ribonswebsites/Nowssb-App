@@ -1,5 +1,5 @@
-/// Physical settings dial — SVG-style CustomPaint metal, six live buttons,
-/// knurl winds like a watch crown with haptic ticks.
+/// Physical settings dial — photographed knurl fills the screen.
+/// Six overlay controls + center gear. Drag the metal to wind.
 library;
 
 import 'dart:math' as math;
@@ -118,319 +118,260 @@ class _PlayerDialState extends State<PlayerDial> {
 
   @override
   Widget build(BuildContext context) {
-    const acts = <(String, IconData, double)>[
-      ('voice', Icons.graphic_eq, 8),
-      ('eq', Icons.tune, 50),
-      ('loop', Icons.repeat, 94),
-      ('shuffle', Icons.shuffle, 132),
-      ('speed', Icons.speed, 228),
-      ('volume', Icons.volume_up, 302),
+    final acts = <(String, IconData?, double)>[
+      ('voice', Icons.person_outline, 0),
+      ('eq', Icons.equalizer, 60),
+      ('loop', Icons.repeat, 120),
+      ('reps', null, 180),
+      ('speed', null, 240),
+      ('volume', Icons.volume_up, 300),
     ];
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        const ColoredBox(color: Color(0xFF050506)),
-        CustomPaint(painter: _GhostRingsPainter(), size: Size.infinite),
-        Align(
-          alignment: const Alignment(0, -0.08),
-          child: FractionallySizedBox(
-            widthFactor: 0.92,
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: LayoutBuilder(
-                builder: (context, box) {
-                  final size = box.maxWidth;
-                  final r = size * 0.305;
-                  return GestureDetector(
-                    onPanStart: (d) {
-                      _lastAng = _ang(d.localPosition, Size.square(size));
-                      _acc = 0;
-                    },
-                    onPanUpdate: (d) {
-                      if (_lastAng == null) return;
-                      final next = _ang(d.localPosition, Size.square(size));
-                      var delta = next - _lastAng!;
-                      if (delta > math.pi) delta -= math.pi * 2;
-                      if (delta < -math.pi) delta += math.pi * 2;
-                      _lastAng = next;
-                      setState(() => _turn += delta);
-                      _acc += delta * 180 / math.pi;
-                      while (_acc >= 5) {
-                        _acc -= 5;
-                        _tick(1);
-                      }
-                      while (_acc <= -5) {
-                        _acc += 5;
-                        _tick(-1);
-                      }
-                    },
-                    onPanEnd: (_) => _lastAng = null,
-                    onPanCancel: () => _lastAng = null,
-                    child: Stack(
-                      children: [
-                        CustomPaint(
-                          size: Size.square(size),
-                          painter: _DialPainter(turn: _turn, playing: widget.playing),
-                        ),
-                        for (var i = 0; i < acts.length; i++)
-                          () {
-                            final a = -math.pi / 2 + acts[i].$3 * math.pi / 180;
-                            final id = acts[i].$1;
-                            final armed = id == _arm;
-                            final on = id == 'loop' && s.loop != 'off';
-                            return Positioned(
-                              left: size / 2 + math.cos(a) * r - 26,
-                              top: size / 2 + math.sin(a) * r - 26,
-                              child: GestureDetector(
-                                onTap: () {
-                                  HapticFeedback.lightImpact();
-                                  if (id == 'loop') {
-                                    _open('loop');
-                                    return;
-                                  }
-                                  if (id == 'shuffle') {
-                                    _open('shuffle');
-                                    return;
-                                  }
-                                  if (id == 'volume' || id == 'speed') {
-                                    setState(() => _arm = id);
-                                  }
-                                  _open(id);
-                                },
-                                child: SizedBox(
-                                  width: 52,
-                                  height: 52,
-                                  child: Center(
-                                    child: Icon(
-                                            acts[i].$2,
-                                            color: Colors.white,
-                                            size: 22,
-                                            shadows: [
-                                              Shadow(
-                                                color: on || armed
-                                                    ? const Color(0xE6FFFFFF)
-                                                    : const Color(0x66FFFFFF),
-                                                blurRadius: on || armed ? 12 : 6,
-                                              ),
-                                            ],
-                                          ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }(),
-                        Positioned(
-                          left: size / 2 - 19,
-                          top: size * 0.79 - 11,
-                          child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              setState(() => _arm = 'reps');
-                              _open('reps');
-                            },
-                            child: Container(
-                              width: 38,
-                              height: 22,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF050506),
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: const Color(0x29FFFFFF)),
-                              ),
-                              child: Text(
-                                '${s.reps}×',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              widget.onPlay?.call();
-                            },
-                            onLongPress: () {
-                              HapticFeedback.mediumImpact();
-                              _open('settings');
-                            },
-                            child: Container(
-                              width: size * 0.36,
-                              height: size * 0.155,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(99),
-                                gradient: const LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [Color(0xFF5A5A62), Color(0xFF1C1C20), Color(0xFF0A0A0C)],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: widget.playing
-                                        ? const Color(0xA6FFFFFF)
-                                        : const Color(0x9EFFFFFF),
-                                    blurRadius: widget.playing ? 22 : 14,
-                                  ),
-                                ],
-                                border: Border.all(color: const Color(0xA6FFFFFF), width: 1.2),
-                              ),
-                              child: const Icon(Icons.settings, color: Colors.white, size: 22),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 56,
-          right: 56,
-          top: 48,
-          child: Column(
+    return LayoutBuilder(
+      builder: (context, box) {
+        final size = Size(box.maxWidth, box.maxHeight);
+        final layout = math.min(box.maxWidth, box.maxHeight) * 0.92;
+        final r = layout * 0.46;
+        return GestureDetector(
+          onPanStart: (d) {
+            _lastAng = _ang(d.localPosition, size);
+            _acc = 0;
+          },
+          onPanUpdate: (d) {
+            if (_lastAng == null) return;
+            final next = _ang(d.localPosition, size);
+            var delta = next - _lastAng!;
+            if (delta > math.pi) delta -= math.pi * 2;
+            if (delta < -math.pi) delta += math.pi * 2;
+            _lastAng = next;
+            setState(() => _turn += delta);
+            _acc += delta * 180 / math.pi;
+            while (_acc >= 5) {
+              _acc -= 5;
+              _tick(1);
+            }
+            while (_acc <= -5) {
+              _acc += 5;
+              _tick(-1);
+            }
+          },
+          onPanEnd: (_) => _lastAng = null,
+          onPanCancel: () => _lastAng = null,
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              Text(
-                widget.word,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 4,
-                  color: Colors.white,
-                ),
+              const Positioned.fill(
+                child: NwsbImage('assets/player/knurl-bg.jpg', fit: BoxFit.cover),
               ),
-              const SizedBox(height: 6),
-              Text(
-                widget.playing ? 'PLAYING' : 'WIND THE RING · TAP A CONTROL',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 9,
-                  letterSpacing: 1.8,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0x61FFFFFF),
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (_hud != null)
-          Positioned(
-            top: 64,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  _hud!,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    letterSpacing: 1.6,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+              Positioned.fill(
+                child: Transform.rotate(
+                  angle: _turn,
+                  child: Transform.scale(
+                    scale: 1.16,
+                    child: const NwsbImage(
+                      'assets/player/dial-full.jpg',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
-            ),
+              const Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment(0, -0.08),
+                      radius: 1.05,
+                      colors: [
+                        Color(0x00000000),
+                        Color(0x1F000000),
+                        Color(0x94000000),
+                      ],
+                      stops: [0.2, 0.56, 1],
+                    ),
+                  ),
+                ),
+              ),
+              for (var i = 0; i < acts.length; i++)
+                () {
+                  final a = -math.pi / 2 + acts[i].$3 * math.pi / 180;
+                  final id = acts[i].$1;
+                  final armed = id == _arm;
+                  final on = id == 'loop' && s.loop != 'off';
+                  final icon = acts[i].$2;
+                  return Positioned(
+                    left: box.maxWidth / 2 + math.cos(a) * r - 28,
+                    top: box.maxHeight * 0.46 + math.sin(a) * r - 28,
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        if (id == 'loop') {
+                          _open('loop');
+                          return;
+                        }
+                        if (id == 'volume' || id == 'speed' || id == 'reps') {
+                          setState(() => _arm = id);
+                        }
+                        _open(id);
+                      },
+                      child: SizedBox(
+                        width: 56,
+                        height: 56,
+                        child: Center(
+                          child: icon == null
+                              ? Text(
+                                  id == 'reps'
+                                      ? '${s.reps}×'
+                                      : '${s.speed.toStringAsFixed(1)}×',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 15,
+                                    shadows: [
+                                      Shadow(
+                                        color: on || armed
+                                            ? const Color(0xFFFFFFFF)
+                                            : const Color(0xE6DCF5FF),
+                                        blurRadius: on || armed ? 16 : 10,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Icon(
+                                  icon,
+                                  color: Colors.white,
+                                  size: 22,
+                                  shadows: [
+                                    Shadow(
+                                      color: on || armed
+                                          ? const Color(0xFFFFFFFF)
+                                          : const Color(0xE6DCF5FF),
+                                      blurRadius: on || armed ? 16 : 10,
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
+                  );
+                }(),
+              Align(
+                alignment: const Alignment(0, -0.08),
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    _open('settings');
+                  },
+                  child: Container(
+                    width: layout * 0.48,
+                    height: layout * 0.22,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(99),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFD8D8DE),
+                          Color(0xFF7A7A82),
+                          Color(0xFF2E2E34),
+                          Color(0xFF101012),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.playing
+                              ? const Color(0xF2FFFFFF)
+                              : const Color(0xE6FFFFFF),
+                          blurRadius: widget.playing ? 28 : 18,
+                        ),
+                      ],
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(Icons.settings, color: Colors.white, size: 22),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 56,
+                right: 56,
+                top: 48,
+                child: GestureDetector(
+                  onTap: widget.onPlay,
+                  child: Text(
+                    widget.word,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 4,
+                      color: Colors.white,
+                      shadows: [Shadow(color: Colors.black87, blurRadius: 12)],
+                    ),
+                  ),
+                ),
+              ),
+              const Positioned(
+                left: 24,
+                right: 24,
+                bottom: 118,
+                child: Column(
+                  children: [
+                    Text(
+                      'PLAYER SETTINGS',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 11,
+                        letterSpacing: 3.8,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xDBFFFFFF),
+                        shadows: [Shadow(color: Colors.black87, blurRadius: 12)],
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'VOICE · EQ · LOOP · REPS · SPEED · VOLUME',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 9,
+                        letterSpacing: 1.8,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0x6BFFFFFF),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (_hud != null)
+                Positioned(
+                  top: 64,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _hud!,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          letterSpacing: 1.6,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-      ],
+        );
+      },
     );
   }
 }
 
-class _GhostRingsPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.12;
-    void ring(Offset c, double r) {
-      for (var i = 0; i < 180; i++) {
-        final a = i / 180 * math.pi * 2;
-        paint.color = Color.fromARGB(40, 40 + (i % 4) * 16, 40 + (i % 4) * 16, 44);
-        canvas.drawLine(
-          Offset(c.dx + math.cos(a) * r * 0.86, c.dy + math.sin(a) * r * 0.86),
-          Offset(c.dx + math.cos(a) * r, c.dy + math.sin(a) * r),
-          paint..strokeWidth = i.isEven ? 2.2 : 1.1,
-        );
-      }
-    }
-    ring(Offset(-size.width * 0.15, size.height * 0.12), size.width * 0.72);
-    ring(Offset(size.width * 1.05, size.height * 0.92), size.width * 0.68);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _DialPainter extends CustomPainter {
-  _DialPainter({required this.turn, required this.playing});
-  final double turn;
-  final bool playing;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2;
-
-    for (var i = 0; i < 240; i++) {
-      final a = turn + i / 240 * math.pi * 2;
-      final shade = 14 + (i % 4) * 18;
-      final p = Paint()
-        ..color = Color.fromARGB(255, shade, shade, shade + 2)
-        ..strokeWidth = i.isEven ? 2.0 : 1.05
-        ..strokeCap = StrokeCap.butt;
-      canvas.drawLine(
-        Offset(c.dx + math.cos(a) * r * 0.705, c.dy + math.sin(a) * r * 0.705),
-        Offset(c.dx + math.cos(a) * r * 0.995, c.dy + math.sin(a) * r * 0.995),
-        p,
-      );
-    }
-
-    final lip = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFF3A3A40), Color(0xFF111114), Color(0xFF050506)],
-      ).createShader(Rect.fromCircle(center: c, radius: r * 0.70));
-    canvas.drawCircle(c, r * 0.70, lip);
-
-    final face = Paint()
-      ..shader = const RadialGradient(
-        center: Alignment(-0.24, -0.4),
-        colors: [Color(0xFF2A2A30), Color(0xFF121214), Color(0xFF070708)],
-      ).createShader(Rect.fromCircle(center: c, radius: r * 0.63));
-    canvas.drawCircle(c, r * 0.63, face);
-
-    for (var i = 0; i < 72; i++) {
-      final a = -math.pi / 2 + i * (math.pi * 2 / 72);
-      final major = i % 6 == 0;
-      final p = Paint()
-        ..color = Colors.white.withValues(alpha: major ? 0.5 : 0.18)
-        ..strokeWidth = major ? 1.4 : 0.8;
-      canvas.drawLine(
-        Offset(c.dx + math.cos(a) * r * 0.585, c.dy + math.sin(a) * r * 0.585),
-        Offset(c.dx + math.cos(a) * r * (major ? 0.535 : 0.555), c.dy + math.sin(a) * r * (major ? 0.535 : 0.555)),
-        p,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DialPainter old) => old.turn != turn || old.playing != playing;
-}
 
 class _DialOverlay extends StatefulWidget {
   const _DialOverlay({required this.word, required this.initial});
@@ -483,9 +424,9 @@ class _DialOverlayState extends State<_DialOverlay> {
             child: Opacity(
               opacity: 0.45,
               child: NwsbImage(
-                'assets/player/dial-knurl.png',
+                'assets/player/knurl-bg.jpg',
                 fit: BoxFit.cover,
-                alignment: Alignment.centerRight,
+                alignment: Alignment.center,
               ),
             ),
           ),
@@ -859,7 +800,7 @@ class _DialOverlayState extends State<_DialOverlay> {
           const Text('NowssB 9.6.0', style: TextStyle(color: Color(0x8CFFFFFF))),
           const SizedBox(height: 12),
           const Text(
-            'Physical settings dial. Voice, equalizer, loop, reps, speed and volume now live on the player.',
+            'The photographed metal dial is the player. Wind the knurl to change volume, speed or reps.',
             style: TextStyle(height: 1.5, color: Color(0xCCFFFFFF)),
           ),
           const SizedBox(height: 18),
