@@ -19,6 +19,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
+import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
@@ -146,12 +147,11 @@ class _Intro extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (art != null)
-            Image.asset(
+            NwsbImage(
               art!,
               fit: BoxFit.cover,
               alignment: Alignment.topCenter,
-              errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: NwsbColors.deep),
+              error: const ColoredBox(color: NwsbColors.deep),
             )
           else if (film != null)
             NwsbVideo(

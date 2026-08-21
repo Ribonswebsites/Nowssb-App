@@ -28,6 +28,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../media/cdn.dart';
+import '../media/nwsb_image.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key, required this.onDone});
@@ -58,15 +60,34 @@ class _SplashState extends State<Splash> {
   }
 
   Future<void> _start() async {
-    final c = VideoPlayerController.asset(_asset);
-    _c = c;
+    VideoPlayerController? c = VideoPlayerController.asset(_asset);
     try {
       await c.initialize();
     } catch (_) {
-      // No clip, no splash. Straight in rather than a black rectangle.
+      try {
+        await c.dispose();
+      } catch (_) {}
+      c = null;
+      for (final url in NwsbCdn.urls(_asset)) {
+        final net = VideoPlayerController.networkUrl(Uri.parse(url));
+        try {
+          await net.initialize();
+          c = net;
+          break;
+        } catch (_) {
+          try {
+            await net.dispose();
+          } catch (_) {}
+        }
+      }
+    }
+    if (c == null) {
+      // No clip at all — bundled or network. Straight in rather than a
+      // black rectangle.
       _leave();
       return;
     }
+    _c = c;
     if (!mounted) {
       await c.dispose();
       return;
@@ -139,11 +160,10 @@ class _SplashState extends State<Splash> {
           else
             // The clip's own first frame while it opens, so the launch is
             // never a black hole even for the half-second before playback.
-            Image.asset(
+            NwsbImage(
               'assets/video/start-animation-poster.webp',
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: Colors.black),
+              error: const ColoredBox(color: Colors.black),
             ),
         ],
       ),

@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 
 import '../data/content.dart';
 import '../data/settings.dart';
+import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
@@ -130,6 +131,8 @@ class _HomeFashionState extends State<HomeFashion> {
                     bannerSub: 'Practice daily to keep your healing streak alive',
                   ),
                 ),
+                const SizedBox(height: 16),
+                const _FashStreak(),
                 const SizedBox(height: 16),
                 const _FashTiles(),
                 const SizedBox(height: 16),
@@ -384,11 +387,10 @@ class _FashTopRow extends StatelessWidget {
             border: Border.all(color: const Color(0x33FFFFFF)),
           ),
           clipBehavior: Clip.antiAlias,
-          child: Image.asset(
+          child: NwsbImage(
             'assets/icons/logo-disc.webp',
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const Icon(Icons.headphones,
-                size: 22, color: Colors.white),
+            error: const Icon(Icons.headphones, size: 22, color: Colors.white),
           ),
         ),
         const SizedBox(width: 12),
@@ -724,6 +726,79 @@ class _FashTiles extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _FashStreak extends StatelessWidget {
+  const _FashStreak();
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassWrap(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Start Building Your Streak Today',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Practice daily to keep it alive — and unlock exclusive offers',
+            style: TextStyle(fontSize: 13, color: Color(0xB3FFFFFF)),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            decoration: BoxDecoration(
+              color: const Color(0x1AFFFFFF),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0x24FFFFFF)),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.local_fire_department_outlined,
+                    color: NwsbColors.goldLight, size: 26),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '0',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: NwsbColors.goldLight,
+                          height: 1,
+                        ),
+                      ),
+                      Text(
+                        'day streak',
+                        style: TextStyle(fontSize: 11, color: Color(0x99FFFFFF)),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  'KEEP GOING',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: Color(0x99FFFFFF),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

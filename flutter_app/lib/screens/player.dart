@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
@@ -21,6 +22,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   int _tab = 0;
   int _part = 0;
   bool _playing = false;
+  VideoPlayerController? _audio;
 
   Word get _word {
     if (widget.word != null) return widget.word!;
@@ -150,7 +152,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ),
                 const SizedBox(height: 28),
                 GestureDetector(
-                  onTap: () => setState(() => _playing = !_playing),
+                  onTap: () => _togglePlay(w, parts),
                   child: Container(
                     width: 88,
                     height: 88,
@@ -226,6 +228,54 @@ class _PlayerScreenState extends State<PlayerScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _togglePlay(Word w, List<WordPart> parts) async {
+    if (_playing) {
+      await _audio?.pause();
+      if (mounted) setState(() => _playing = false);
+      return;
+    }
+    final url = (parts.isNotEmpty &&
+            _part < parts.length &&
+            parts[_part].audio.isNotEmpty)
+        ? parts[_part].audio
+        : (w.audioMale.isNotEmpty ? w.audioMale : w.audioFemale);
+    if (url.isEmpty) {
+      if (mounted) setState(() => _playing = true);
+      return;
+    }
+    try {
+      await _audio?.dispose();
+    } catch (_) {}
+    final c = VideoPlayerController.networkUrl(Uri.parse(url));
+    try {
+      await c.initialize();
+      await c.setVolume(1);
+      await c.play();
+      _audio = c;
+      c.addListener(() {
+        if (!mounted) return;
+        final v = c.value;
+        if (!v.isPlaying &&
+            v.position >= v.duration &&
+            v.duration > Duration.zero) {
+          setState(() => _playing = false);
+        }
+      });
+      if (mounted) setState(() => _playing = true);
+    } catch (_) {
+      try {
+        await c.dispose();
+      } catch (_) {}
+      if (mounted) setState(() => _playing = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _audio?.dispose();
+    super.dispose();
   }
 
   Widget _tabBody(Word w, List<WordPart> parts) {

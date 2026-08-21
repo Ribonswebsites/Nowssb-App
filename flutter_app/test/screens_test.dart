@@ -10,12 +10,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
+import 'package:nowssb/screens/cart.dart';
+import 'package:nowssb/screens/connect.dart';
 import 'package:nowssb/screens/fashion_plus.dart';
+import 'package:nowssb/screens/healing.dart';
 import 'package:nowssb/screens/library.dart';
+import 'package:nowssb/screens/login.dart';
+import 'package:nowssb/screens/player.dart';
 import 'package:nowssb/screens/practice.dart';
 import 'package:nowssb/screens/profile.dart';
+import 'package:nowssb/screens/routines.dart';
 import 'package:nowssb/screens/sound_library.dart';
 import 'package:nowssb/screens/store.dart';
+import 'package:nowssb/screens/subscribe.dart';
 import 'package:nowssb/screens/widgets_page.dart';
 
 import 'fake_video_platform.dart';
@@ -45,6 +52,13 @@ void main() {
     'Sound Library': const SoundLibraryScreen(),
     'Fashion Plus': const FashionPlusScreen(),
     'Settings': const WidgetsPage(),
+    'Login': const LoginScreen(),
+    'Player': const PlayerScreen(),
+    'Routines': const RoutinesScreen(),
+    'Connect': const ConnectScreen(),
+    'Cart': const CartScreen(kind: CartKind.cart),
+    'Subscribe': const SubscribeScreen(),
+    'Healing': const HealingScreen(),
   };
 
   screens.forEach((name, screen) {

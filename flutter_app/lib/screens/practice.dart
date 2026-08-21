@@ -23,6 +23,9 @@ String nwsbSlot([DateTime? at]) {
   return 'night';
 }
 
+String nwsbSlotTitle([DateTime? at]) =>
+    _slotTitle[nwsbSlot(at)] ?? 'Morning Ritual';
+
 const _slotTitle = {
   'morning': 'Morning Ritual',
   'afternoon': 'Afternoon Session',

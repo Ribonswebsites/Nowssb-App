@@ -1,16 +1,21 @@
 /// The Normal home — #home-nm, in real widgets.
 ///
-/// Section for section, in the order app/js/part062.js ships them:
-/// greeting, search, hero, streak, practice, tiles, quick row. Nothing here
-/// is a WebView and nothing here is HTML.
+/// Section for section, in the order app/js/part062.js ships them.
+/// Greeting, search, hero, streak, store disc, practice, tiles, store,
+/// reader, signature, customize, RX, routines, connect, feed, quick row,
+/// trending shop, store banner, subscription, edition, eBooks, connect
+/// banner, healing, path, search, fashion mode, footer. Nothing here is a
+/// WebView and nothing here is HTML.
 library;
 
 import 'package:flutter/material.dart';
 import '../data/settings.dart';
+import '../media/nwsb_image.dart';
 import '../theme/tokens.dart';
 import '../widgets/neumorphic.dart';
 import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
+import 'practice.dart' show nwsbSlotTitle;
 import 'sections.dart';
 import 'widgets_page.dart';
 
@@ -254,8 +259,6 @@ class HomeNormal extends StatelessWidget {
               ),
             ),
             const FooterMark(),
-            const SizedBox(height: NwsbSpace.gap),
-            const _QuickRow(),
           ],
         ),
       ),
@@ -282,10 +285,10 @@ class _TopRow extends StatelessWidget {
             boxShadow: NwsbShadows.raisedXs,
           ),
           clipBehavior: Clip.antiAlias,
-          child: Image.asset(
+          child: NwsbImage(
             'assets/icons/logo-disc.webp',
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            error: const SizedBox.shrink(),
           ),
         ),
         const SizedBox(width: 12),
@@ -465,26 +468,38 @@ class _SearchBar extends StatelessWidget {
           const Icon(Icons.search, size: 22, color: Color(0x59000000)),
           const SizedBox(width: 10),
           const Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                isCollapsed: true,
-                hintText: 'Search any word or meaning…',
-                hintStyle:
-                    TextStyle(fontSize: 15, color: Color(0x59000000)),
-              ),
-            ),
+            child: _HomeSearchField(),
           ),
-          Container(
-            width: 46,
-            height: 46,
-            decoration: const BoxDecoration(
-              color: NwsbColors.ink,
-              shape: BoxShape.circle,
+          GestureDetector(
+            onTap: () => Dest.open(context, Dest.searchWords),
+            child: Container(
+              width: 46,
+              height: 46,
+              decoration: const BoxDecoration(
+                color: NwsbColors.ink,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.search, size: 20, color: Colors.white),
             ),
-            child: const Icon(Icons.search, size: 20, color: Colors.white),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HomeSearchField extends StatelessWidget {
+  const _HomeSearchField();
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      onSubmitted: (_) => Dest.open(context, Dest.searchWords),
+      decoration: const InputDecoration(
+        border: InputBorder.none,
+        isCollapsed: true,
+        hintText: 'Search any word or meaning…',
+        hintStyle: TextStyle(fontSize: 15, color: Color(0x59000000)),
       ),
     );
   }
@@ -609,7 +624,7 @@ class _PracticeCard extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           Text(
-            'Afternoon Word Ritual',
+            nwsbSlotTitle(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(

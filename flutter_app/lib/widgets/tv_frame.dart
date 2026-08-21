@@ -17,6 +17,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 
@@ -139,10 +140,10 @@ class TvFrame extends StatelessWidget {
                 // The bezel, over the top. IgnorePointer because it is
                 // decoration and must never eat a tap meant for the card.
                 IgnorePointer(
-                  child: Image.asset(
+                  child: NwsbImage(
                     frame.image,
                     fit: BoxFit.fill,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    error: const SizedBox.shrink(),
                   ),
                 ),
               ],
