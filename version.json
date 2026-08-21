@@ -1,9 +1,9 @@
 {
-  "version": "9.6.3",
-  "build": 2026082122,
+  "version": "9.6.4",
+  "build": 2026082123,
   "force": false,
   "title": "Update available",
-  "notes": "Player settings is the AURA clock. Live time, spinning tick rings, library, and the full Music Player Settings list. This installs inside the app.",
+  "notes": "Player settings replaced with the AURA file you sent. Exact HTML.",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
   "apk": ""
 }
