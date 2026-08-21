@@ -10,6 +10,8 @@ import '../data/models.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../data/settings.dart';
+import 'player_dial.dart';
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({super.key, this.word});
@@ -173,7 +175,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   _playing ? 'Playing' : 'Hold the last sound',
                   style: const TextStyle(fontSize: 12, color: Color(0x99FFFFFF)),
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 18),
+                PlayerDial(word: w.word),
+                const SizedBox(height: 18),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -251,15 +255,25 @@ class _PlayerScreenState extends State<PlayerScreen> {
     final c = VideoPlayerController.networkUrl(Uri.parse(url));
     try {
       await c.initialize();
-      await c.setVolume(1);
+      final s = Settings.instance;
+      await c.setVolume(s.volume);
+      await c.setPlaybackSpeed(s.speed);
+      final infinite = s.loop == 'infinite';
+      await c.setLooping(infinite);
       await c.play();
       _audio = c;
+      var left = infinite ? -1 : (s.loop == 'once' ? s.reps * 2 : s.reps);
       c.addListener(() {
         if (!mounted) return;
         final v = c.value;
         if (!v.isPlaying &&
             v.position >= v.duration &&
             v.duration > Duration.zero) {
+          if (left > 1) {
+            left--;
+            c.seekTo(Duration.zero).then((_) => c.play());
+            return;
+          }
           setState(() => _playing = false);
         }
       });
