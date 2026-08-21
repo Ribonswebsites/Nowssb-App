@@ -1,1 +1,26 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"/>
+<title>AURA</title>
+<style>html,body{margin:0;height:100%;background:#0c0e12;color:#f2f2ef;font-family:system-ui,sans-serif}
+#s{display:grid;place-items:center;height:100%;letter-spacing:.2em;font-size:12px;opacity:.5}</style>
+</head><body><div id="s">LOADING</div>
+<script>
+(async function(){
+  try {
+    const parts = ['aura-player.p0.txt','aura-player.p1.txt','aura-player.p2.txt','aura-player.p3.txt'];
+    const texts = await Promise.all(parts.map(p => fetch(p).then(r => {
+      if (!r.ok) throw new Error(p + ' ' + r.status);
+      return r.text();
+    })));
+    const html = texts.join('');
+    document.open();
+    document.write(html);
+    document.close();
+  } catch (e) {
+    document.getElementById('s').textContent = 'Error: ' + e.message;
+  }
+})();
+</script>
+</body></html>
