@@ -1,9 +1,9 @@
 {
-  "version": "9.6.4",
-  "build": 2026082123,
+  "version": "9.6.5",
+  "build": 2026082201,
   "force": false,
   "title": "Update available",
-  "notes": "Player settings replaced with the AURA file you sent. Exact HTML.",
+  "notes": "Player settings button now opens your exact AURA page (player-settings.html).",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
   "apk": ""
 }
