@@ -15453,3 +15453,31 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   font-size: 21px;
   line-height: 1;
 }
+
+/* Regression fix: the August 15 Store trigger expects this compact icon row.
+   Without explicit dimensions, Android WebView gives the inline bag SVG its
+   intrinsic oversized fallback box and it covers the Store artwork. */
+.nss-trigger-go {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.nss-trigger-go-ic {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  display: block;
+}
+.nss-trigger-go-ic svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.nss-trigger-go-rule {
+  flex: 0 0 1px;
+  height: 26px;
+  background: rgba(255,255,255,0.35);
+}
+.nss-trigger-btn-top { margin: 0 !important; }
+.nss-trigger-bottom > .nss-trigger-pills:last-child { margin-bottom: 0; }
