@@ -1,11 +1,8 @@
 /// The Normal home — #home-nm, in real widgets.
 ///
 /// Section for section, in the order app/js/part062.js ships them.
-/// Greeting, search, hero, streak, store disc, practice, tiles, store,
-/// reader, signature, customize, RX, routines, connect, feed, quick row,
-/// trending shop, store banner, subscription, edition, eBooks, connect
-/// banner, healing, path, search, fashion mode, footer. Nothing here is a
-/// WebView and nothing here is HTML.
+/// Greeting, search, dashboard, practice, library, healing, path, and footer.
+/// Nothing here is a WebView and nothing here is HTML.
 library;
 
 import 'package:flutter/material.dart';
@@ -17,7 +14,6 @@ import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
 import 'practice.dart' show nwsbSlotTitle;
 import 'sections.dart';
-import 'widgets_page.dart';
 import '../widgets/day_dashboard.dart';
 
 /// The website derives this from the hour in app/js/part026.js and the same
@@ -119,8 +115,6 @@ class HomeNormal extends StatelessWidget {
               bannerSub: 'See the Signature',
             ),
             const SizedBox(height: NwsbSpace.gap),
-            const CustomizePanel(),
-            const SizedBox(height: NwsbSpace.gap),
             BannerSection(
               eyebrow: 'Your daily recommended words',
               title: 'AI Prescription',
@@ -142,15 +136,6 @@ class HomeNormal extends StatelessWidget {
               bannerTitle: 'Five slots, one day',
               bannerSub: 'Open routines',
             ),
-            const SizedBox(height: NwsbSpace.gap),
-            PromoDisc(
-              asset: 'assets/video/connect-banner.mp4',
-              title: 'Connect',
-              sub: 'The social space',
-              onTap: () => Dest.open(context, Dest.connect),
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            const ConnectCard(),
             const SizedBox(height: NwsbSpace.gap),
             const FeedCarousel(),
             const SizedBox(height: NwsbSpace.gap),
@@ -178,19 +163,6 @@ class HomeNormal extends StatelessWidget {
               bannerSub: 'Words, meanings and the origins behind them',
             ),
             const SizedBox(height: NwsbSpace.gap),
-            TvSection(
-              eyebrow: 'The full library',
-              title: 'Subscription',
-              onTap: () => Dest.open(context, Dest.subscribe),
-              icon: Icons.workspace_premium_outlined,
-              asset: 'assets/video/subscription-a.mp4',
-              frame: DeviceFrame.tabletSlim,
-              bannerTitle: 'Every word, every meaning',
-              bannerSub: 'See what a subscription opens',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            const EditionCard(),
-            const SizedBox(height: NwsbSpace.gap),
             BannerSection(
               eyebrow: 'Deep-dive guides',
               title: 'eBooks',
@@ -199,17 +171,6 @@ class HomeNormal extends StatelessWidget {
               asset: 'assets/video/word-acts.mp4',
               bannerTitle: 'Word science and sound healing',
               bannerSub: 'Browse the library',
-            ),
-            const SizedBox(height: NwsbSpace.gap),
-            BannerSection(
-              eyebrow: 'What Connect offers',
-              title: 'Connect Banner',
-              onTap: () => Dest.open(context, Dest.connect),
-              icon: Icons.groups_outlined,
-              asset: 'assets/video/connect-banner.mp4',
-              aspect: 16 / 10,
-              bannerTitle: 'Enter Connect',
-              bannerSub: 'People, chat, the feed',
             ),
             const SizedBox(height: NwsbSpace.gap),
             const HealingGrid(),
