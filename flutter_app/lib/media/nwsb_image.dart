@@ -1,43 +1,55 @@
-/// Pictures the same way [NwsbVideo] does films: bundled first, then the
-/// same path on nowssb.com / GitHub Pages.
-///
-/// Frames, the logo disc, intro paintings and posters live in this
-/// repository once, under `assets/`. A debug APK that skipped
-/// `tools/flutter-assets.mjs` would otherwise show empty bezels and a blank
-/// mark — the same hole that made the films sit still.
 library;
 
 import 'package:flutter/material.dart';
 
 import 'cdn.dart';
 
+/// Shared NowssB image seam. It accepts the current bundled-asset form and the
+/// August 15 URL/fallback form so the exact baseline section widgets can be
+/// carried forward without losing current media behavior.
 class NwsbImage extends StatelessWidget {
   const NwsbImage(
-    this.asset, {
+    [this.asset], {
     super.key,
+    this.url,
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
     this.error,
+    this.fallback,
   });
 
-  final String asset;
+  final String? asset;
+  final String? url;
   final BoxFit fit;
   final Alignment alignment;
   final Widget? error;
+  final Widget? fallback;
+
+  String get _source => url ?? asset ?? '';
+  Widget get _fallback => fallback ?? error ?? const ColoredBox(color: Colors.black);
+
+  bool get _isLocal => _source.startsWith('./assets/') || _source.startsWith('assets/');
+  String get _localPath => _source.startsWith('./') ? _source.substring(2) : _source;
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      asset,
-      fit: fit,
-      alignment: alignment,
-      errorBuilder: (_, __, ___) => Image.network(
-        NwsbCdn.url(asset),
+    if (_source.isEmpty) return _fallback;
+    if (_isLocal) {
+      return Image.asset(
+        _localPath,
         fit: fit,
         alignment: alignment,
-        errorBuilder: (_, __, ___) =>
-            error ?? const ColoredBox(color: Colors.black),
-      ),
+        errorBuilder: (_, __, ___) => _fallback,
+      );
+    }
+    final networkUrl = _source.startsWith('http://') || _source.startsWith('https://')
+        ? _source
+        : NwsbCdn.url(_source);
+    return Image.network(
+      networkUrl,
+      fit: fit,
+      alignment: alignment,
+      errorBuilder: (_, __, ___) => _fallback,
     );
   }
 }
