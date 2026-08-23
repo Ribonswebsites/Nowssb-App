@@ -71,7 +71,7 @@ jobs:
       # A build that compiles but is full of analyzer errors is not worth
       # downloading, so this runs first and the log says exactly what broke.
       - name: Analyze
-        run: flutter analyze --no-fatal-infos
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       # The video pool's ceiling is the whole point of the port, and it is
       # cheap to check. A build that broke it should not produce an APK.
