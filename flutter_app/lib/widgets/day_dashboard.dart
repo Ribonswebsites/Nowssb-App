@@ -354,7 +354,6 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   Widget _essentialsSection(BuildContext context) {
     final headingColor = widget.fashion ? Colors.white : NwsbColors.ink;
-    final faint = widget.fashion ? const Color(0xB3FFFFFF) : NwsbColors.inkFaint;
     final visible = _essentialFilter == 0 ? _essentials : _essentials.where((item) => item.favorite).toList();
     final shell = widget.fashion
         ? _glass(child: _essentialStack(context, visible), padding: const EdgeInsets.all(14))
