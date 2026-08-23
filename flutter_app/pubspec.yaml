@@ -27,7 +27,7 @@ dependencies:
   shared_preferences: ^2.3.2
   http: ^1.2.2
   path_provider: ^2.1.4
-  record: ^5.1.2
+  record: ^7.1.1
   cached_network_image: ^3.4.1
   video_player: ^2.9.2
   google_fonts: ^6.2.1
