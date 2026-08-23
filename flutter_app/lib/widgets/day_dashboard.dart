@@ -150,9 +150,9 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
       final prefs = await SharedPreferences.getInstance();
       if (!mounted) return;
       setState(() {
-        _streak = prefs.getInt(_streakKey) ?? 0;
-        _sessions = prefs.getInt(_sessionsKey) ?? 0;
-        _words = prefs.getInt(_wordsKey) ?? 0;
+        _streak = prefs.getInt(NwsbDayDashboard._streakKey) ?? 0;
+        _sessions = prefs.getInt(NwsbDayDashboard._sessionsKey) ?? 0;
+        _words = prefs.getInt(NwsbDayDashboard._wordsKey) ?? 0;
       });
     } catch (_) {}
   }
