@@ -14,6 +14,7 @@ import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
 import 'practice.dart' show nwsbSlotTitle;
 import 'sections.dart';
+import 'widgets_page.dart';
 import '../widgets/day_dashboard.dart';
 
 /// The website derives this from the hour in app/js/part026.js and the same
