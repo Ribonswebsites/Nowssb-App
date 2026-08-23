@@ -51,6 +51,15 @@ import '../widgets/day_dashboard.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 
+/// The same local-time greeting used by both homes.
+String nwsbGreeting([DateTime? at]) {
+  final h = (at ?? DateTime.now()).hour;
+  if (h >= 5 && h < 12) return 'Good Morning';
+  if (h < 17) return 'Good Afternoon';
+  if (h < 21) return 'Good Evening';
+  return 'Good Night';
+}
+
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
 const kNormalSectionOrder = <String>[
   'greet',
