@@ -168,9 +168,15 @@ window.chkProceedToRazorpay = function() {
   var description = 'NowssB · ' + itemNames + (_coup ? ' · coupon ' + window._nssCoupon : '');
 
   // ── Create order_id via Cloudflare Worker (server-side, secure) ──
-  var RAZORPAY_KEY_ID = 'rzp_live_REPLACE_WITH_YOUR_KEY'; // Only the public key goes here
+  // Configure the public Razorpay key before enabling checkout. Never simulate success.
+  var RAZORPAY_KEY_ID = '';
 
   function openRazorpay(orderId) {
+    if (!RAZORPAY_KEY_ID || !orderId) {
+      chkPaymentUnavailable();
+      resetBtn();
+      return;
+    }
     var options = {
       key:         RAZORPAY_KEY_ID,
       amount:      amountMinor,
@@ -191,8 +197,8 @@ window.chkProceedToRazorpay = function() {
     };
     if (typeof Razorpay !== 'undefined') {
       try { new Razorpay(options).open(); }
-      catch(e) { chkFallbackConfirm(total, cart); resetBtn(); }
-    } else { chkFallbackConfirm(total, cart); resetBtn(); }
+      catch(e) { chkPaymentUnavailable(); resetBtn(); }
+    } else { chkPaymentUnavailable(); resetBtn(); }
   }
 
   function resetBtn() {
@@ -210,30 +216,12 @@ window.chkProceedToRazorpay = function() {
       body: JSON.stringify({ amount: amountMinor, currency: 'USD',
         notes: { email: email, items: itemNames.slice(0, 100) } })
     })
-    .then(function(r){ return r.json(); })
-    .then(function(ord){ openRazorpay(ord.id); })
-    .catch(function(){ openRazorpay(''); }); // fallback: no order_id
+    .then(function(r){ if (!r.ok) throw new Error('Payment order unavailable'); return r.json(); })
+    .then(function(ord){ if (!ord.id) throw new Error('Payment order unavailable'); openRazorpay(ord.id); })
+    .catch(function(){ chkPaymentUnavailable(); resetBtn(); });
   } else {
-    openRazorpay('');
-  }
-
-  // Dead code — kept as reference, never runs
-  if (false) {
-    try {
-      var rzp = {};
-      rzp.open();
-    } catch(e) {
-      chkFallbackConfirm(total, cart);
-      if (btn)     { btn.disabled = false; btn.style.opacity = ''; }
-      if (spinner) spinner.style.display = 'none';
-      if (arrow)   arrow.style.display   = '';
-    }
-  } else {
-    // Razorpay SDK not loaded yet — fallback
-    chkFallbackConfirm(total, cart);
-    if (btn)     { btn.disabled = false; btn.style.opacity = ''; }
-    if (spinner) spinner.style.display = 'none';
-    if (arrow)   arrow.style.display   = '';
+    chkPaymentUnavailable();
+    resetBtn();
   }
 };
 
@@ -324,35 +312,13 @@ function chkHandleSuccess(response, cart) {
   }, 120);
 }
 
-/* ── Fallback while Razorpay isn't wired up ── */
-function chkFallbackConfirm(total, cart) {
-  var existing = document.getElementById('chkFallbackSheet');
-  if (existing) existing.remove();
-  var names = cart.map(function(c){ return c.name; }).join(', ');
-  var sheet = document.createElement('div');
-  sheet.id = 'chkFallbackSheet';
-  sheet.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:flex-end;background:rgba(0,0,0,0.72);backdrop-filter:none;-webkit-backdrop-filter:none;';
-  sheet.innerHTML =
-    '<div style="width:100%;max-width:480px;margin:0 auto;background:#0e1624;border-radius:20px 20px 0 0;border-top:1px solid rgba(232,213,163,0.18);padding:28px 24px 40px;">' +
-      '<div style="width:40px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 24px;"></div>' +
-      '<div style="font-size:11px;font-weight:600;letter-spacing:1.2px;color:rgba(232,213,163,0.55);text-transform:uppercase;margin-bottom:8px;">Confirm Purchase</div>' +
-      '<div style="font-size:15px;font-weight:500;color:rgba(255,255,255,0.85);margin-bottom:6px;">' + names + '</div>' +
-      '<div style="font-size:28px;font-weight:700;color:rgba(232,213,163,0.95);margin-bottom:20px;">$' + (total/100).toFixed(2) + '</div>' +
-      '<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:22px;line-height:1.6;">Payment gateway coming soon. This simulates a successful purchase for testing.</div>' +
-      '<button id="chkFbConfirm" style="width:100%;padding:15px;background:linear-gradient(135deg,rgba(232,213,163,0.95),rgba(200,170,100,0.9));color:#0a0e1a;font-size:14px;font-weight:700;letter-spacing:0.5px;border:none;border-radius:12px;cursor:pointer;margin-bottom:10px;">✓ Confirm Order</button>' +
-      '<button id="chkFbCancel" style="width:100%;padding:14px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.45);font-size:13px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;cursor:pointer;">Cancel</button>' +
-    '</div>';
-  document.body.appendChild(sheet);
-  function doCancel() {
-    sheet.remove();
-    var btn=document.getElementById('chkPayBtn'),spinner=document.getElementById('chkSpinner'),arrow=document.getElementById('chkPayArrow');
-    if(btn){btn.disabled=false;btn.style.opacity='';}
-    if(spinner)spinner.style.display='none';
-    if(arrow)arrow.style.display='';
+/* ── Payment configuration guard ── */
+function chkPaymentUnavailable() {
+  if (typeof nssShowToast === 'function') {
+    nssShowToast('Payments are not configured yet. No order was created.');
+  } else {
+    alert('Payments are not configured yet. No order was created.');
   }
-  document.getElementById('chkFbConfirm').onclick=function(){sheet.remove();chkHandleSuccess({razorpay_payment_id:'sim_'+Date.now()},cart);};
-  document.getElementById('chkFbCancel').onclick=doCancel;
-  sheet.onclick=function(e){if(e.target===sheet)doCancel();};
 }
 
 /* ── Wire openSub: render checkout when opened ── */

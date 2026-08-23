@@ -2,12 +2,17 @@
 /// Same five tabs as the Walkman on the website.
 library;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 import 'package:video_player/video_player.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
 import '../data/settings.dart';
+import '../services/nowssb_api.dart';
 import 'player_dial.dart';
 
 class PlayerScreen extends StatefulWidget {
@@ -21,7 +26,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
   int _tab = 0;
   int _part = 0;
   bool _playing = false;
+  bool _recording = false;
+  bool _scoring = false;
+  String? _recordPath;
+  String? _recordError;
+  PronunciationScore? _score;
   VideoPlayerController? _audio;
+  final AudioRecorder _recorder = AudioRecorder();
 
   Word get _word {
     if (widget.word != null) return widget.word!;
@@ -159,14 +170,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       if (_tab > 0)
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
-                          child: Text(
-                            _tabBodyText(w, parts),
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xCCFFFFFF),
-                              height: 1.5,
-                            ),
-                          ),
+                          child: _tab == 1
+                              ? _recordPanel(w)
+                              : Text(
+                                  _tabBodyText(w, parts),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xCCFFFFFF),
+                                    height: 1.5,
+                                  ),
+                                ),
                         ),
                     ],
                   ),
@@ -231,8 +244,122 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
   }
 
+  Future<void> _toggleRecording() async {
+    if (_scoring) return;
+    if (_recording) {
+      setState(() {
+        _recording = false;
+        _scoring = true;
+        _recordError = null;
+      });
+      try {
+        final path = await _recorder.stop();
+        if (path == null || path.isEmpty) {
+          throw const NowssbApiException('No recording was captured.');
+        }
+        _recordPath = path;
+        final result = await NowssbApi.instance.scoreRecording(
+          file: File(path),
+          word: _word,
+        );
+        if (!mounted) return;
+        setState(() {
+          _score = result;
+          _scoring = false;
+        });
+      } catch (error) {
+        if (!mounted) return;
+        setState(() {
+          _scoring = false;
+          _recordError = error.toString();
+        });
+      }
+      return;
+    }
+
+    try {
+      final allowed = await _recorder.hasPermission();
+      if (!allowed) {
+        throw const NowssbApiException('Microphone permission was not granted.');
+      }
+      final dir = await getTemporaryDirectory();
+      final path = '${dir.path}/nowssb_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      await _recorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          numChannels: 1,
+          sampleRate: 44100,
+          bitRate: 128000,
+        ),
+        path: path,
+      );
+      if (!mounted) return;
+      setState(() {
+        _recording = true;
+        _score = null;
+        _recordError = null;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _recordError = error.toString());
+    }
+  }
+
+  Widget _recordPanel(Word w) {
+    final score = _score;
+    final scoreColor = score == null
+        ? Colors.white
+        : score.score >= 80
+            ? const Color(0xFF7DDC8A)
+            : score.score >= 55
+                ? const Color(0xFFE8D5A3)
+                : const Color(0xFFFF6B6B);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          _recording
+              ? 'Recording… tap stop when you finish the word.'
+              : _scoring
+                  ? 'Reading your pronunciation…'
+                  : 'Say “${w.word}” clearly, then tap stop for your score.',
+          style: const TextStyle(fontSize: 13, color: Color(0xCCFFFFFF), height: 1.5),
+        ),
+        const SizedBox(height: 12),
+        FilledButton.icon(
+          onPressed: _scoring ? null : _toggleRecording,
+          icon: Icon(_recording ? Icons.stop : Icons.mic),
+          label: Text(_recording ? 'Stop recording' : _scoring ? 'Scoring…' : 'Start recording'),
+          style: FilledButton.styleFrom(
+            backgroundColor: _recording ? const Color(0xFFFF6B6B) : Colors.white,
+            foregroundColor: _recording ? Colors.white : const Color(0xFF101321),
+          ),
+        ),
+        if (score != null) ...[
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Text('${score.score}', style: TextStyle(fontSize: 42, fontWeight: FontWeight.w800, color: scoreColor)),
+              const SizedBox(width: 8),
+              const Text('/100', style: TextStyle(color: Color(0x99FFFFFF))),
+              const Spacer(),
+              Text('${score.matchedSyllables}/${score.totalSyllables} syllables', style: const TextStyle(color: Color(0xB3FFFFFF))),
+            ],
+          ),
+          if (score.transcript.isNotEmpty)
+            Text('Heard: “${score.transcript}”', style: const TextStyle(color: Color(0xB3FFFFFF), height: 1.5)),
+        ],
+        if (_recordError != null) ...[
+          const SizedBox(height: 10),
+          Text(_recordError!, style: const TextStyle(color: Color(0xFFFF8A8A), height: 1.4)),
+        ],
+      ],
+    );
+  }
+
   @override
   void dispose() {
+    _recorder.dispose();
     _audio?.dispose();
     super.dispose();
   }

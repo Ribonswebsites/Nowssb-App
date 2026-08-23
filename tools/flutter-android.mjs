@@ -58,8 +58,9 @@ const DESUGAR_LIBS = '2.1.4';
 
 const appGradle = join(android, 'app', 'build.gradle.kts');
 const settings = join(android, 'settings.gradle.kts');
+const manifest = join(android, 'app', 'src', 'main', 'AndroidManifest.xml');
 
-for (const f of [appGradle, settings]) {
+for (const f of [appGradle, settings, manifest]) {
   if (!existsSync(f)) {
     console.error(`missing ${f} — this script expects the Kotlin DSL that ` +
       `flutter create writes; if Flutter has gone back to Groovy, update it`);
@@ -147,6 +148,24 @@ if (a.includes('coreLibraryDesugaring(')) {
 }
 
 writeFileSync(appGradle, a);
+
+// ── microphone permission ───────────────────────────────────────────────
+if (!existsSync(manifest)) {
+  console.error(`missing ${manifest}`);
+  process.exit(1);
+}
+let m = readFileSync(manifest, 'utf8');
+if (m.includes('android.permission.RECORD_AUDIO')) {
+  already.push('microphone permission');
+} else {
+  const marker = '<manifest';
+  const at = m.indexOf(marker);
+  const eol = m.indexOf('>', at);
+  if (at < 0 || eol < 0) throw new Error('AndroidManifest.xml: no manifest element');
+  m = m.slice(0, eol + 1) + '\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />' + m.slice(eol + 1);
+  writeFileSync(manifest, m);
+  done.push('added microphone permission');
+}
 
 // ── the config itself ──────────────────────────────────────────────────
 // Not a secret: google-services.json ships inside every copy of the APK and

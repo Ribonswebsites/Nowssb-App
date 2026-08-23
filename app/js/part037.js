@@ -60,8 +60,8 @@
   }
 
   async function fetchGroqPrescription(){
-    var GROQ_KEY = window._groqKey || (typeof window.GROQ_KEY !== 'undefined' ? window.GROQ_KEY : '');
-    if (!GROQ_KEY || GROQ_KEY === 'PASTE_YOUR_GROQ_KEY_HERE') return null;
+    // The key stays in Cloudflare. The browser only calls the shared Worker.
+    if (typeof GROQ_CHAT_URL === 'undefined') return null;
 
     var slot = getTimeSlot();
     var lib  = (typeof MASTER_WORD_LIBRARY !== "undefined" && MASTER_WORD_LIBRARY) || window.MASTER_WORD_LIBRARY || [];
@@ -83,13 +83,16 @@
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify({
-          model: 'llama3-8b-8192',
+          model: 'openai/gpt-oss-20b',
           messages: [{ role:'user', content: prompt }],
           max_tokens: 300, temperature: 0.7
         })
       });
+      if (!resp.ok) return null;
       var json = await resp.json();
-      var raw = json.choices[0].message.content.replace(/```json|```/g,'').trim();
+      var raw = json.choices?.[0]?.message?.content;
+      if (!raw) return null;
+      raw = raw.replace(/```json|```/g,'').trim();
       var parsed = JSON.parse(raw);
       // Enrich with organ from library
       parsed.words = parsed.words.map(function(pw){

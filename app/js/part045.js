@@ -248,10 +248,15 @@ window.ssStartSubscription = function(planId, billing) {
   var amountMinor = Math.round(amount * 100); // USD dollars → cents (the minor unit)
   var user = window._currentUser;
   var email = (user && user.email) || '';
-  var RAZORPAY_KEY_ID = 'rzp_live_REPLACE_WITH_YOUR_KEY';
+  // Configure the public Razorpay key before enabling checkout. Never simulate success.
+  var RAZORPAY_KEY_ID = '';
   var apiBase = (typeof NOWSSB_API !== 'undefined') ? NOWSSB_API : '';
 
   function _openPayment(orderId) {
+    if (!RAZORPAY_KEY_ID || !orderId) {
+      _paymentUnavailable();
+      return;
+    }
     var options = {
       key: RAZORPAY_KEY_ID,
       amount: amountMinor,
@@ -268,9 +273,9 @@ window.ssStartSubscription = function(planId, billing) {
     };
     if (typeof Razorpay !== 'undefined') {
       try { new Razorpay(options).open(); }
-      catch(e) { _onSubscriptionSuccess({ razorpay_payment_id: 'sim_' + Date.now() }, planId, billing, amount); }
+      catch(e) { _paymentUnavailable(); }
     } else {
-      _onSubscriptionSuccess({ razorpay_payment_id: 'sim_' + Date.now() }, planId, billing, amount);
+      _paymentUnavailable();
     }
   }
 
@@ -280,13 +285,21 @@ window.ssStartSubscription = function(planId, billing) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount: amountMinor, currency: 'USD', notes: { tier: planId, billing: billing, email: email } })
     })
-    .then(function(r){ return r.json(); })
-    .then(function(ord){ _openPayment(ord.id); })
-    .catch(function(){ _openPayment(''); });
+    .then(function(r){ if (!r.ok) throw new Error('Payment order unavailable'); return r.json(); })
+    .then(function(ord){ if (!ord.id) throw new Error('Payment order unavailable'); _openPayment(ord.id); })
+    .catch(function(){ _paymentUnavailable(); });
   } else {
-    _openPayment('');
+    _paymentUnavailable();
   }
 };
+
+function _paymentUnavailable() {
+  if (typeof nssShowToast === 'function') {
+    nssShowToast('Subscriptions are not configured yet. No charge was made.');
+  } else {
+    alert('Subscriptions are not configured yet. No charge was made.');
+  }
+}
 
 function _onSubscriptionSuccess(response, planId, billing, amount) {
   var user = window._currentUser;

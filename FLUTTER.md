@@ -126,7 +126,14 @@ flutter pub get
 flutter analyze --no-fatal-infos
 flutter test
 flutter build apk --debug
+node ../tools/flutter-ios.mjs     # only after generating an iOS project
 ```
+
+The native Record tab uses `record` to capture an AAC/M4A file and sends it to
+`https://nowssb-api.ribonpatil2.workers.dev/api/groq/score`. The Groq key is
+never included in the Flutter bundle. `tools/flutter-android.mjs` adds
+`RECORD_AUDIO` to the generated Android manifest; `tools/flutter-ios.mjs` adds
+`NSMicrophoneUsageDescription` to the generated iOS Info.plist.
 
 `tools/flutter-assets.mjs` copies `assets/video/` into the Flutter bundle and
 writes the shipped content JSON. **It has to run before `flutter pub get`**:
@@ -192,7 +199,9 @@ the next thing worth building.
 
 **Sign-in, routines, cart, chat, notifications.** Listed on the Profile
 screen so the app is honest about its own edges rather than showing dead
-buttons.
+buttons. The native pronunciation Record tab and Groq score path are now
+implemented; payments and generated word audio still require their own provider
+credentials and platform-specific wiring.
 
 Any screen added from here follows one rule: a clip goes through `NwsbVideo`,
 never a raw `VideoPlayer` — a controller the pool has never heard of is

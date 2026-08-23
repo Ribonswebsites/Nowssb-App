@@ -583,10 +583,9 @@ npm install @codetrix-studio/capacitor-google-auth
 ```
 Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The web build continues using the existing flow.
 
-### 5. Groq API Key is Placeholder
-**Impact:** All AI features (pronunciation scoring, persona feedback, sentence generation) return errors.
-**Status:** `index.html` — search `PASTE_YOUR_GROQ_KEY_HERE` — placeholder, not wired.
-**Fix:** Replace with real Groq API key. Free tier: 2,000 requests/day. Rotate across multiple Groq accounts (6,000–8,000 free checks/day) for early stage.
+### 5. Groq API is deployed and server-backed
+**Status:** The Groq key is stored as a Cloudflare Worker secret named `GROQ_API_KEY`; it is not present in the web, WebView, or Flutter bundles. The shared Worker is `https://nowssb-api.ribonpatil2.workers.dev` and uses `whisper-large-v3-turbo` for transcription and `openai/gpt-oss-20b` for text generation.
+**Working paths:** Pronunciation transcription and scoring, persona feedback, session-end sentences, library sentences, daily prescriptions, AI word search, weekly insights, onboarding prescription text, and word conversation all route through the Worker.
 
 ### 6. Razorpay Live Key is Placeholder
 **Impact:** All payments fail.
@@ -631,7 +630,6 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 - Sound Bath Mode (Sleep / Focus / Healing)
 - Healing Body Map (SVG organ visualization)
 - Voice Resonance Score (Web Audio API waveform comparison)
-- AI Daily Word Prescription on home screen (Groq)
 - ElevenLabs audio per word (using Web Speech API currently)
 - Firebase Cloud Messaging (no push notifications yet)
 - Word Mastery Certificate generation logic
@@ -650,7 +648,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 2. Add `GATE.check()` subscription enforcement on key features (Speak mode, AI feedback, Sound Bath)
 3. Add `trialStartDate` / `trialEndDate` to `saveUser()` Firestore write
 4. Fix Chat — wire Firestore real-time listener for messages
-5. Wire Groq API key — test AI pronunciation scoring end-to-end
+5. Groq Worker deployed and AI pronunciation scoring tested end-to-end
 6. Fix People Search — real Firestore query on public users
 7. Replace all placeholder words when client provides real words
 
@@ -698,7 +696,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 |---|---|---|
 | Admin panel password | `sanjay_nowssb_2026` | `admin.html` line 334 |
 | Firebase project | `nowssb-34f1b` | Already wired in both `index.html` and `admin.html` |
-| Groq API key | **NEEDS TO BE ADDED** | `index.html` — search `PASTE_YOUR_GROQ_KEY_HERE` |
+| Groq API key | **Configured as a Cloudflare Worker secret** | Cloudflare Worker `nowssb-api` — never ship in a client bundle |
 | Razorpay live key | **NEEDS TO BE ADDED** | `index.html` — search `rzp_live_REPLACE_WITH_YOUR_KEY` |
 | ElevenLabs API key | **NEEDS TO BE ADDED** | `index.html` — search for ElevenLabs config |
 

@@ -1403,37 +1403,17 @@ window.AICONVO = (function(){
       addMsg(text,'user');
       addTyping();
 
-      var GROQ_KEY = window._groqKey || (typeof GROQ_KEY!=='undefined'?GROQ_KEY:'');
-      if(!GROQ_KEY || GROQ_KEY==='PASTE_YOUR_GROQ_KEY_HERE'){
-        removeTyping();
-        var fallbacks = [
-          'The word "'+_word.word+'" resonates with the '+_word.organ+'. Every syllable targets this system specifically.',
-          'Mouth position is everything. '+_word.mouthPos,
-          'Common mistake: '+_word.mistake+'. Correct this and feel the difference immediately.',
-          'Practice tip: '+_word.tip,
-          'The natural origin meaning: '+_word.meaning,
-        ];
-        addMsg(fallbacks[_history.length%fallbacks.length],'assistant');
-        inp.disabled=false; return;
-      }
-
       try{
         var sysPrompt = (_persona?_persona.prompt:'You are a sound healing guide.')+
           ' The user is asking about the NowssB word "'+_word.word+'" (phonetic: '+_word.phonetic+
           ', organ: '+_word.organ+', benefit: '+_word.benefit+
           ', meaning: '+_word.meaning+'). Answer in 2-3 sentences max. Stay in character.';
 
-        var resp = await fetch(GROQ_CHAT_URL,{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({
-            model:'llama3-8b-8192',
-            messages:[{role:'system',content:sysPrompt}].concat(_history),
-            max_tokens:150, temperature:0.75
-          })
-        });
-        var data = await resp.json();
-        var reply = data.choices[0].message.content.trim();
+        var reply = await callAI(
+          _history,
+          { model:'openai/gpt-oss-20b', max_tokens:220, system:sysPrompt }
+        );
+        reply = String(reply || '').trim();
         removeTyping(); addMsg(reply,'assistant');
       }catch(e){
         removeTyping(); addMsg('The frequency is strong. Keep practicing.','assistant');
@@ -1516,21 +1496,16 @@ window.ONBOARD = (function(){
     var inp=document.getElementById('obConvoInput'); if(inp) inp.disabled=true;
     var btn=document.getElementById('obConvoSend'); if(btn) btn.disabled=true;
 
-    var GROQ_KEY = window._groqKey || (typeof GROQ_KEY!=='undefined'?GROQ_KEY:'');
     var prescription;
-
-    if(GROQ_KEY && GROQ_KEY!=='PASTE_YOUR_GROQ_KEY_HERE'){
-      try{
-        var prompt='User onboarding answers: '+JSON.stringify(_answers)+
-          '. Based on this, write a warm 2-sentence personal word prescription intro for a NowssB user. Then say their practice is ready. Be encouraging and specific to their answers. Max 3 sentences total.';
-        var resp=await fetch(GROQ_CHAT_URL,{
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ model:'llama3-8b-8192', messages:[{role:'user',content:prompt}], max_tokens:120 })
-        });
-        var data=await resp.json();
-        prescription=data.choices[0].message.content.trim();
-      }catch(e){}
-    }
+    try{
+      var prompt='User onboarding answers: '+JSON.stringify(_answers)+
+        '. Based on this, write a warm 2-sentence personal word prescription intro for a NowssB user. Then say their practice is ready. Be encouraging and specific to their answers. Max 3 sentences total.';
+      prescription = await callAI(
+        [{role:'user',content:prompt}],
+        { model:'openai/gpt-oss-20b', max_tokens:220 }
+      );
+      prescription = String(prescription || '').trim();
+    }catch(e){}
     if(!prescription){
       prescription='Based on what you\'ve shared, I\'ve built your personal word prescription. Your daily ritual starts now — your body is ready to receive these frequencies.';
     }

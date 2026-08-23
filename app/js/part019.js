@@ -2,11 +2,11 @@
 
 // ── NowssB API (Cloudflare Worker — free, universal) ───────
 // Deploy worker.js to Cloudflare Workers and replace this URL
-const NOWSSB_API       = 'https://nowssb-api.nowssb.workers.dev';
+const NOWSSB_API       = 'https://nowssb-api.ribonpatil2.workers.dev';
 const GROQ_CHAT_URL    = NOWSSB_API + '/api/groq/complete';
 const GROQ_WHISPER_URL = NOWSSB_API + '/api/groq/transcribe';
 const CLAUDE_URL       = NOWSSB_API + '/api/claude/complete';
-const GROQ_MODEL       = 'llama-3.3-70b-versatile';
+const GROQ_MODEL       = 'openai/gpt-oss-20b';
 // Legacy direct key — leave empty; all calls go through Worker
 const GROQ_KEY         = '';
 window._groqKey        = GROQ_KEY;
@@ -59,36 +59,57 @@ async function callClaude(messages, { model = 'claude-haiku-4-5', max_tokens = 5
 // ───────────────────────────────────────────────────────────
 
 // ── SMART AI FALLBACK ────────────────────────────────────────
-// Tries Claude first. If Claude fails for any reason (quota, rate limit,
-// network, key not set), automatically falls back to Groq LLaMA.
-// Use this instead of calling callClaude() or groqChat() directly for
-// all text-generation features.
-async function callAI(messages, { model = 'claude-haiku-4-5', max_tokens = 400, system } = {}) {
-  try {
-    return await callClaude(messages, { model, max_tokens, system });
-  } catch (claudeErr) {
-    console.warn('[NowssB] Claude fallback → Groq:', claudeErr.message);
-    return await groqChat(messages, system, max_tokens);
-  }
+// All text generation uses the secure Groq Worker in this build.
+// Use this helper instead of calling the provider endpoint directly.
+async function callAI(messages, { model = GROQ_MODEL, max_tokens = 400, system } = {}) {
+  // Groq is the configured provider for this build. Keeping the provider
+  // selection here means the web, Capacitor WebView, and future clients share
+  // exactly the same request path and no provider key reaches the browser.
+  return await groqChat(messages, system, max_tokens);
 }
 // ───────────────────────────────────────────────────────────
 
-async function groqWhisper(audioBlob) {
-  // Convert blob to base64 for Worker transport
+async function blobToBase64(audioBlob) {
   const arrayBuf = await audioBlob.arrayBuffer();
   const bytes = new Uint8Array(arrayBuf);
   let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-  const audio_base64 = btoa(binary);
+  for (let i = 0; i < bytes.byteLength; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+}
 
+async function groqWhisper(audioBlob, word) {
   const res = await fetch(GROQ_WHISPER_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ audio_base64, model: 'whisper-large-v3-turbo' })
+    headers: { 'Content-Type': 'application/json', 'X-NowssB-Client': 'web' },
+    body: JSON.stringify({
+      audio_base64: await blobToBase64(audioBlob),
+      mime_type: audioBlob.type || 'audio/webm',
+      model: 'whisper-large-v3-turbo',
+      prompt: word ? `${word.word} ${word.phonetic || ''}` : undefined,
+    })
   });
   if (!res.ok) throw new Error('Whisper ' + res.status);
   const data = await res.json();
   return data.text || '';
+}
+
+async function groqScore(audioBlob, word) {
+  const res = await fetch(NOWSSB_API + '/api/groq/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-NowssB-Client': 'web' },
+    body: JSON.stringify({
+      audio_base64: await blobToBase64(audioBlob),
+      mime_type: audioBlob.type || 'audio/webm',
+      model: 'whisper-large-v3-turbo',
+      target: word.word,
+      phonetic: word.phonetic || word.word,
+      prompt: `${word.word} ${word.phonetic || ''}`,
+    })
+  });
+  if (!res.ok) throw new Error('Groq score ' + res.status);
+  return res.json();
 }
 
 // ── SCORING MATH ────────────────────────────────────────────
@@ -145,8 +166,9 @@ async function pwScoreRecording() {
   if (scoreNum)  { scoreNum.textContent = '…'; scoreNum.style.color = 'rgba(200,232,245,0.3)'; }
 
   try {
-    const transcript = await groqWhisper(_pwRecordingBlob);
-    const score      = phoneticSimilarity(transcript, w.phonetic);
+    const scored = await groqScore(_pwRecordingBlob, w);
+    const transcript = scored.transcript || '';
+    const score      = Number.isFinite(scored.score) ? scored.score : phoneticSimilarity(transcript, w.phonetic);
     const color      = scoreColor(score);
     /* Keep the attempt. The Notes page reads it back to say which syllables
        landed and which did not — the same comparison the score is made of,

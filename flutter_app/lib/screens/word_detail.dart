@@ -23,6 +23,7 @@ import '../data/models.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import 'player.dart';
 
 class WordDetail extends StatelessWidget {
   const WordDetail({super.key, required this.word});
@@ -63,6 +64,19 @@ class WordDetail extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
                     children: [
                       _Headline(word: word),
+                      const SizedBox(height: 18),
+                      FilledButton.icon(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => PlayerScreen(word: word)),
+                        ),
+                        icon: const Icon(Icons.play_circle_outline),
+                        label: const Text('Open player · listen and record'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: NwsbColors.ink,
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                        ),
+                      ),
                       const SizedBox(height: 26),
                       if (word.parts.isNotEmpty) ...[
                         const _SectionLabel('HOW TO SAY IT'),

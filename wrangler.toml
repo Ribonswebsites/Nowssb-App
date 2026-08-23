@@ -1,0 +1,12 @@
+name = "nowssb-api"
+main = "worker.js"
+compatibility_date = "2026-08-23"
+workers_dev = true
+
+# Configure credentials outside Git:
+# wrangler secret put GROQ_API_KEY
+# Optional providers used by existing endpoints:
+# wrangler secret put RAZORPAY_KEY_ID
+# wrangler secret put RAZORPAY_KEY_SECRET
+# wrangler secret put ELEVENLABS_API_KEY
+# wrangler secret put ANTHROPIC_API_KEY
