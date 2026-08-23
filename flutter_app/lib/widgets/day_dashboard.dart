@@ -69,6 +69,34 @@ class NwsbDayDashboard extends StatefulWidget {
   const NwsbDayDashboard({super.key, required this.fashion});
 
   final bool fashion;
+  static const _streakKey = 'nwsb_dashboard_streak';
+  static const _sessionsKey = 'nwsb_dashboard_sessions';
+  static const _wordsKey = 'nwsb_dashboard_words';
+  static const _lastPracticeKey = 'nwsb_dashboard_last_practice';
+
+  /// Called by the native player after a successful Worker score.
+  static Future<void> recordPractice(String word) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now();
+      final day = '${today.year.toString().padLeft(4, '0')}-'
+          '${today.month.toString().padLeft(2, '0')}-'
+          '${today.day.toString().padLeft(2, '0')}';
+      final last = prefs.getString(_lastPracticeKey);
+      final sessions = (prefs.getInt(_sessionsKey) ?? 0) + 1;
+      final words = {...prefs.getStringList('${_wordsKey}_set') ?? <String>[]};
+      if (word.trim().isNotEmpty) words.add(word.trim().toUpperCase());
+      var streak = prefs.getInt(_streakKey) ?? 0;
+      if (last != day) {
+        streak = streak + 1;
+        await prefs.setString(_lastPracticeKey, day);
+      }
+      await prefs.setInt(_sessionsKey, sessions);
+      await prefs.setInt(_streakKey, streak);
+      await prefs.setStringList('${_wordsKey}_set', words.toList());
+      await prefs.setInt(_wordsKey, words.length);
+    } catch (_) {}
+  }
 
   @override
   State<NwsbDayDashboard> createState() => _NwsbDayDashboardState();
@@ -86,10 +114,6 @@ class _EssentialItem {
 }
 
 class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
-  static const _streakKey = 'nwsb_dashboard_streak';
-  static const _sessionsKey = 'nwsb_dashboard_sessions';
-  static const _wordsKey = 'nwsb_dashboard_words';
-  static const _lastPracticeKey = 'nwsb_dashboard_last_practice';
 
   NwsbDaySlot _slot = nwsbDaySlot();
   int _streak = 0;
@@ -130,30 +154,6 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
         _sessions = prefs.getInt(_sessionsKey) ?? 0;
         _words = prefs.getInt(_wordsKey) ?? 0;
       });
-    } catch (_) {}
-  }
-
-  /// Called by the native player after a successful Worker score.
-  static Future<void> recordPractice(String word) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final today = DateTime.now();
-      final day = '${today.year.toString().padLeft(4, '0')}-'
-          '${today.month.toString().padLeft(2, '0')}-'
-          '${today.day.toString().padLeft(2, '0')}';
-      final last = prefs.getString(_lastPracticeKey);
-      final sessions = (prefs.getInt(_sessionsKey) ?? 0) + 1;
-      final words = {...prefs.getStringList(_wordsKey + '_set') ?? <String>[]};
-      if (word.trim().isNotEmpty) words.add(word.trim().toUpperCase());
-      var streak = prefs.getInt(_streakKey) ?? 0;
-      if (last != day) {
-        streak = streak + 1;
-        await prefs.setString(_lastPracticeKey, day);
-      }
-      await prefs.setInt(_sessionsKey, sessions);
-      await prefs.setInt(_streakKey, streak);
-      await prefs.setStringList(_wordsKey + '_set', words.toList());
-      await prefs.setInt(_wordsKey, words.length);
     } catch (_) {}
   }
 
