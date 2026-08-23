@@ -1,11 +1,11 @@
 {
-  "version": "9.6.9",
-  "build": 2026082401,
+  "version": "9.6.10",
+  "build": 2026082402,
   "force": false,
   "title": "NowssB update ready",
-  "notes": "Both Android surfaces use the August 15 source baseline with accumulated Groq pronunciation scoring, R2 Hero and time-aware banners, dashboard, essentials, in-app updates, and the streamlined Normal Home.",
+  "notes": "Both Android surfaces use the August 15 source baseline with accumulated Groq pronunciation scoring, R2 Hero and time-aware banners, dashboard, essentials, in-app updates, and a corrected Flutter Fashion Hero launch.",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
-  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.9-android/nowssb-webview-debug.apk",
-  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.9-android/nowssb-flutter-debug.apk",
-  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.9-android/nowssb-webview-debug.apk"
+  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.10-android/nowssb-webview-debug.apk",
+  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.10-android/nowssb-flutter-debug.apk",
+  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.10-android/nowssb-webview-debug.apk"
 }
