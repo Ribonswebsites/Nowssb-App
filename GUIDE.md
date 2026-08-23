@@ -619,7 +619,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 | Feature | What's There | What's Missing |
 |---|---|---|
 | Razorpay payments | Checkout UI | Real key + Worker `order_id` + `chkHandleSuccess()` |
-| Groq AI | All function hooks | Real API key |
+| Groq AI | Worker-backed scoring, feedback, sentences, prescriptions, search, insights, onboarding, and conversation | Additional provider credentials are not required for Groq features |
 | Word Store | Product listings, cart | Actual payment processing |
 | Chat | UI panel, message input | Firestore real-time listener |
 | People Search | 8 hardcoded profiles | Real Firestore user query |
@@ -633,8 +633,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 - ElevenLabs audio per word (using Web Speech API currently)
 - Firebase Cloud Messaging (no push notifications yet)
 - Word Mastery Certificate generation logic
-- `chkHandleSuccess()` post-payment Firestore write
-- Sentence Alchemy auto-play after session (Groq)
+- `chkHandleSuccess()` post-payment Firestore write is blocked until Razorpay credentials are configured
 - NowssB Score system (Clarity × Dedication × Resonance composite)
 - Custom word request flow (user side)
 - Client admin panel (`nowssb.com/admin/client`) — currently one combined admin

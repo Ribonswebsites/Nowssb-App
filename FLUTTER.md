@@ -193,9 +193,10 @@ from the ~446 Cloudinary images, which `tools/asset-manifest.mjs --download`
 fetches and `tools/localise-media.mjs` rewrites the web app to match; that
 download cannot run from a sandbox with no route to Cloudinary.
 
-**Audio.** A word carries `audioMale`, `audioFemale` and a recording per
-part, and none of it plays yet. That is the practice player's heart and it is
-the next thing worth building.
+**Audio.** The Flutter player plays a published `audioMale`, `audioFemale`, or
+per-part recording when one exists. The Record tab captures an AAC/M4A sample
+locally and sends it to the deployed Groq Worker for transcription and scoring;
+server-side scoring is now the native practice path.
 
 **Sign-in, routines, cart, chat, notifications.** Listed on the Profile
 screen so the app is honest about its own edges rather than showing dead
