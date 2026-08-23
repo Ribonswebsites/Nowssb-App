@@ -14,6 +14,7 @@ import '../data/models.dart';
 import '../data/settings.dart';
 import '../services/nowssb_api.dart';
 import 'player_dial.dart';
+import '../widgets/day_dashboard.dart';
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({super.key, this.word});
@@ -267,6 +268,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           _score = result;
           _scoring = false;
         });
+        await NwsbDayDashboard.recordPractice(_word.word);
       } catch (error) {
         if (!mounted) return;
         setState(() {

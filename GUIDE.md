@@ -587,10 +587,14 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 **Status:** The Groq key is stored as a Cloudflare Worker secret named `GROQ_API_KEY`; it is not present in the web, WebView, or Flutter bundles. The shared Worker is `https://nowssb-api.ribonpatil2.workers.dev` and uses `whisper-large-v3-turbo` for transcription and `openai/gpt-oss-20b` for text generation.
 **Working paths:** Pronunciation transcription and scoring, persona feedback, session-end sentences, library sentences, daily prescriptions, AI word search, weekly insights, onboarding prescription text, and word conversation all route through the Worker.
 
-### 6. Razorpay Live Key is Placeholder
-**Impact:** All payments fail.
-**Status:** `index.html` — search `rzp_live_REPLACE_WITH_YOUR_KEY` — placeholder.
-**Fix:** Replace with real Razorpay live key. Also requires `worker.js` Cloudflare Worker to generate `order_id` server-side.
+### 6. Time-aware home dashboard and R2 media
+**Status:** The Normal and Fashion homes both include the Focus / Your Progress / Up next hierarchy. Normal uses the pale neumorphic skin; Fashion uses the dark glassmorphism skin. The Focus banner selects one of four supplied videos from the user’s local time and plays it muted with a poster fallback.
+**Media:** The optimized videos and posters are stored in the `nowssb-media` R2 bucket and served through `https://nowssb-api.ribonpatil2.workers.dev/media/home-banners/`. The Worker supports byte-range requests so WebView and Flutter can stream the MP4s. Flutter also bundles the same files and prefers R2 before falling back locally.
+
+### 7. Razorpay Live Key is Not Configured
+**Impact:** All payments fail honestly until the provider is configured.
+**Status:** Executable fake credentials and simulated-success purchase paths have been removed. The client and Worker now return a clear configuration error when no live Razorpay credentials exist.
+**Fix:** Add the real Razorpay live key and Worker secrets, then implement and verify the post-payment entitlement write. The Groq and R2 integrations do not depend on Razorpay.
 
 ### 7. `chkHandleSuccess()` Not Defined
 **Impact:** After successful Razorpay payment, nothing happens — no tier granted, no Firestore write.
@@ -610,6 +614,8 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 - Subscription panel UI (3 tiers, billing toggle)
 - People/Social screen UI (Instagram-style)
 - Fashion home with 4 themes (Default, Black, Neo, Glass Black)
+- Time-aware Focus / Progress / Up next dashboards in Normal and Fashion homes
+- Four R2-backed morning, afternoon, evening, and night home banner videos with local fallback
 - Admin panel (word studio + user management + Instagram link)
 - Blocked user enforcement on login
 - Theme system with localStorage persistence
@@ -619,7 +625,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 | Feature | What's There | What's Missing |
 |---|---|---|
 | Razorpay payments | Checkout UI | Real key + Worker `order_id` + `chkHandleSuccess()` |
-| Groq AI | Worker-backed scoring, feedback, sentences, prescriptions, search, insights, onboarding, and conversation | Additional provider credentials are not required for Groq features |
+| Groq AI | Worker-backed scoring, feedback, sentences, prescriptions, search, insights, onboarding, and conversation | Working; keep the Worker secret configured |
 | Word Store | Product listings, cart | Actual payment processing |
 | Chat | UI panel, message input | Firestore real-time listener |
 | People Search | 8 hardcoded profiles | Real Firestore user query |
@@ -652,7 +658,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 7. Replace all placeholder words when client provides real words
 
 ### Phase 2 — Premium Features
-8. AI Daily Word Prescription on home screen (Groq)
+8. Expand the home dashboard with additional time-slot content beyond the four supplied R2 banner films
 9. Sentence Alchemy auto-play at session end (Groq + player word highlight)
 10. ElevenLabs voice per word (replace Web Speech API)
 11. Word Mastery Certificates (HTML canvas generation)
@@ -683,7 +689,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 30. Word Drop scarcity mechanic (limited monthly releases + waitlist)
 31. Referral system (Firestore referral codes)
 32. Leaderboard on home screen
-33. 50-100 background videos from Ribon → Cloudflare R2
+33. Expand the time-aware R2 media library from the current four supplied banner films to 50–100 background videos
 34. ElevenLabs client voice clone setup (client records 2-3 min sample once)
 35. Clean up all old Cloudinary account (`dkzxw33ln`) URLs
 

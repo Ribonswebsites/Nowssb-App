@@ -15188,3 +15188,50 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   margin-top: 16px !important;
   margin-bottom: 16px !important;
 }
+
+
+/* ── Time-aware home dashboard: Focus · Progress · Up next ─────────────── */
+.nwsb-daydash { width:100%; margin:18px 0 22px; box-sizing:border-box; }
+.nwsb-daydash *, .nwsb-daydash *::before, .nwsb-daydash *::after { box-sizing:border-box; }
+.nwsb-focus-card { position:relative; min-height:214px; overflow:hidden; border-radius:28px; isolation:isolate; cursor:pointer; }
+.nwsb-focus-video, .nwsb-focus-scrim { position:absolute; inset:0; width:100%; height:100%; }
+.nwsb-focus-video { object-fit:cover; object-position:center; z-index:-2; background:#131629; }
+.nwsb-focus-scrim { z-index:-1; background:linear-gradient(90deg,rgba(7,10,24,.93) 0%,rgba(7,10,24,.62) 48%,rgba(7,10,24,.08) 100%); }
+.nwsb-focus-content { min-height:214px; padding:24px 22px 20px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; color:#fff; }
+.nwsb-focus-eyebrow, .nwsb-dashboard-eyebrow { text-transform:uppercase; letter-spacing:2.1px; font-size:10px; font-weight:750; }
+.nwsb-focus-eyebrow { color:rgba(232,213,163,.9); margin-bottom:9px; }
+.nwsb-focus-title { max-width:80%; font-size:clamp(25px,7vw,38px); line-height:1.06; font-weight:800; letter-spacing:-.8px; }
+.nwsb-focus-sub { max-width:76%; margin-top:9px; color:rgba(255,255,255,.78); font-size:13px; line-height:1.45; }
+.nwsb-focus-cta { margin-top:16px; padding:11px 16px; border:0; border-radius:999px; background:#fff; color:#12152a; font:750 12px/1 'DM Sans',sans-serif; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.18); }
+.nwsb-focus-cta span { margin-left:8px; font-size:16px; vertical-align:-1px; }
+.nwsb-dashboard-heading { display:flex; align-items:end; justify-content:space-between; gap:12px; margin:24px 2px 12px; }
+.nwsb-dashboard-heading h2 { margin:3px 0 0; font-size:22px; line-height:1.1; letter-spacing:-.45px; }
+.nwsb-dashboard-heading button { appearance:none; border:0; background:transparent; padding:5px 0; font:650 13px/1 'DM Sans',sans-serif; cursor:pointer; }
+.nwsb-dashboard-heading button span { margin-left:4px; font-size:20px; vertical-align:-2px; }
+.nwsb-dashboard-eyebrow { opacity:.52; }
+.nwsb-progress-card { display:grid; grid-template-columns:repeat(3,1fr); gap:0; overflow:hidden; }
+.nwsb-progress-stat { min-width:0; padding:17px 9px 15px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+.nwsb-stat-icon { width:38px; height:38px; display:grid; place-items:center; border-radius:50%; margin-bottom:9px; }
+.nwsb-stat-icon svg, .nwsb-upnext-icon svg { width:20px; height:20px; }
+.nwsb-progress-stat strong { font-size:21px; line-height:1; }
+.nwsb-progress-stat small { margin-top:6px; font-size:10px; line-height:1.2; white-space:nowrap; opacity:.58; }
+.nwsb-up-heading { margin-top:25px; }
+.nwsb-upnext-card { width:100%; display:flex; align-items:center; gap:12px; padding:15px; border:0; text-align:left; cursor:pointer; }
+.nwsb-upnext-icon { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; border-radius:15px; }
+.nwsb-upnext-copy { min-width:0; flex:1; display:flex; flex-direction:column; gap:5px; }
+.nwsb-upnext-copy strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; }
+.nwsb-upnext-copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; opacity:.58; }
+.nwsb-upnext-arrow { font-size:22px; opacity:.62; }
+.nwsb-daydash-normal .nwsb-focus-card { box-shadow:9px 9px 20px rgba(166,171,189,.42),-8px -8px 20px rgba(255,255,255,.92); }
+.nwsb-daydash-normal .nwsb-dashboard-eyebrow { color:#5d6376; }
+.nwsb-daydash-normal .nwsb-dashboard-heading h2, .nwsb-daydash-normal .nwsb-dashboard-heading button { color:#1a1a2e; }
+.nwsb-daydash-normal .nwsb-progress-card, .nwsb-daydash-normal .nwsb-upnext-card { border-radius:22px; background:#f0f2f7; box-shadow:8px 8px 17px rgba(166,171,189,.38),-7px -7px 17px rgba(255,255,255,.92); color:#1a1a2e; }
+.nwsb-daydash-normal .nwsb-progress-stat + .nwsb-progress-stat { border-left:1px solid rgba(26,26,46,.08); }
+.nwsb-daydash-normal .nwsb-stat-icon, .nwsb-daydash-normal .nwsb-upnext-icon { color:#7d6636; background:#edf0f6; box-shadow:inset 3px 3px 7px rgba(166,171,189,.28),inset -3px -3px 7px rgba(255,255,255,.9); }
+.nwsb-daydash-fashion .nwsb-focus-card { border:1px solid rgba(255,255,255,.18); box-shadow:0 18px 42px rgba(0,0,0,.28); }
+.nwsb-daydash-fashion .nwsb-dashboard-eyebrow { color:rgba(232,213,163,.84); }
+.nwsb-daydash-fashion .nwsb-dashboard-heading h2, .nwsb-daydash-fashion .nwsb-dashboard-heading button { color:#fff; }
+.nwsb-daydash-fashion .nwsb-progress-card, .nwsb-daydash-fashion .nwsb-upnext-card { border:1px solid rgba(255,255,255,.16); border-radius:20px; background:rgba(10,11,24,.48); box-shadow:inset 0 1px rgba(255,255,255,.08),0 15px 34px rgba(0,0,0,.2); color:#fff; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+.nwsb-daydash-fashion .nwsb-progress-stat + .nwsb-progress-stat { border-left:1px solid rgba(255,255,255,.14); }
+.nwsb-daydash-fashion .nwsb-stat-icon, .nwsb-daydash-fashion .nwsb-upnext-icon { color:#e8d5a3; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); }
+@media (max-width:360px) { .nwsb-progress-stat { padding-left:4px; padding-right:4px; } .nwsb-progress-stat small { font-size:9px; } .nwsb-focus-content { padding-left:18px; padding-right:18px; } }

@@ -7,7 +7,9 @@ const code = `async () => {
   const metadata = {
     main_module: 'worker.js',
     compatibility_date: '2026-08-23',
-    bindings: []
+    bindings: [
+      { type: 'r2_bucket', name: 'NWSB_MEDIA', bucket_name: 'nowssb-media' }
+    ]
   };
   const body = [
     '--' + boundary,

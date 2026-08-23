@@ -216,3 +216,12 @@ exactly the hole the website had, and `test/home_test.dart` checks for it.
 - **`functions/api/push.js`** stays on Cloudflare. It already sends to FCM
   tokens as well as Web Push endpoints.
 - **The website** is unaffected by any of this and keeps shipping.
+
+
+## Home dashboard and time-aware banner films
+
+Both native home modes now share the same Focus / Your Progress / Up next hierarchy. Normal Home uses the pale raised neumorphic surface system, while Fashion Home uses translucent dark glass panels and preserves the existing cinematic hero, Fashion Plus, and healing-path language. The Focus film is selected from the device’s local clock: morning is 05:00–11:59, afternoon is 12:00–16:59, evening is 17:00–20:59, and night is 21:00–04:59.
+
+The four optimized MP4s and their posters live in the repository under `assets/video/` and are copied to Flutter by `node tools/flutter-assets.mjs`. The native video pool prefers the R2-backed Worker media route for these four files and falls back to the bundled asset, then the legacy CDN origins. The production media route is `https://nowssb-api.ribonpatil2.workers.dev/media/home-banners/{file}` and supports byte ranges for video playback. A successful native pronunciation score increments the local dashboard session, streak, and unique-word counters.
+
+Before building a native target, run `node tools/flutter-assets.mjs`, then `flutter pub get`. Android microphone permission is applied by `node tools/flutter-android.mjs`; iOS microphone permission is applied by `node tools/flutter-ios.mjs`.

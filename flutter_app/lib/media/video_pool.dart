@@ -465,6 +465,31 @@ class VideoPool {
   /// every banner sat on its first frame forever. That is what "the
   /// videos are not playing" actually was.
   Future<VideoPlayerController?> _open(String assetPath) async {
+    final remoteFirst = assetPath.startsWith('assets/video/time-');
+    final urls = NwsbCdn.urls(assetPath).toList();
+
+    Future<VideoPlayerController?> openNetwork() async {
+      for (final url in urls) {
+        final net = VideoPlayerController.networkUrl(Uri.parse(url));
+        try {
+          await net.initialize();
+          debugPrint('NowssB video: opened $url');
+          return net;
+        } catch (e) {
+          debugPrint('NowssB video: network miss $url — $e');
+          try {
+            await net.dispose();
+          } catch (_) {}
+        }
+      }
+      return null;
+    }
+
+    if (remoteFirst) {
+      final remote = await openNetwork();
+      if (remote != null) return remote;
+    }
+
     final asset = VideoPlayerController.asset(assetPath);
     try {
       await asset.initialize();
@@ -475,19 +500,8 @@ class VideoPool {
         await asset.dispose();
       } catch (_) {}
     }
-    for (final url in NwsbCdn.urls(assetPath)) {
-      final net = VideoPlayerController.networkUrl(Uri.parse(url));
-      try {
-        await net.initialize();
-        debugPrint('NowssB video: opened $url');
-        return net;
-      } catch (e) {
-        debugPrint('NowssB video: network miss $url — $e');
-        try {
-          await net.dispose();
-        } catch (_) {}
-      }
-    }
+
+    if (!remoteFirst) return openNetwork();
     return null;
   }
 

@@ -18,6 +18,7 @@ import '../widgets/tv_frame.dart';
 import 'practice.dart' show nwsbSlotTitle;
 import 'sections.dart';
 import 'widgets_page.dart';
+import '../widgets/day_dashboard.dart';
 
 /// The website derives this from the hour in app/js/part026.js and the same
 /// three windows are used here, so the two never disagree.
@@ -28,9 +29,10 @@ import 'widgets_page.dart';
 /// the greeting always said "Healer" no matter who was signed in.
 String nwsbGreeting([DateTime? at]) {
   final h = (at ?? DateTime.now()).hour;
-  if (h < 12) return 'Good Morning';
+  if (h >= 5 && h < 12) return 'Good Morning';
   if (h < 17) return 'Good Afternoon';
-  return 'Good Evening';
+  if (h < 21) return 'Good Evening';
+  return 'Good Night';
 }
 
 class HomeNormal extends StatelessWidget {
@@ -56,6 +58,8 @@ class HomeNormal extends StatelessWidget {
             _Greeting(name: name),
             const SizedBox(height: NwsbSpace.gap),
             const _SearchBar(),
+            const SizedBox(height: NwsbSpace.gap),
+            const NwsbDayDashboard(fashion: false),
             const SizedBox(height: NwsbSpace.gap),
 
             // Shipped order of #home-nm, matching app/js/part062.js REG.nm.

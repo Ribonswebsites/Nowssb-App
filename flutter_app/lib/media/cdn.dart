@@ -16,8 +16,19 @@ class NwsbCdn {
     'https://ribonswebsites.github.io/Nowssb-App/',
   ];
 
+  static const workerMediaBase =
+      'https://nowssb-api.ribonpatil2.workers.dev/media';
+
+  static String mediaUrl(String key) => '$workerMediaBase/${key.replaceFirst(RegExp(r'^/+'), '')}';
+
   static String url(String assetPath) => '${origins.first}$assetPath';
 
-  static Iterable<String> urls(String assetPath) =>
-      origins.map((o) => '$o$assetPath');
+  static Iterable<String> urls(String assetPath) sync* {
+    final clean = assetPath.split('?').first;
+    if (clean.startsWith('assets/video/time-')) {
+      final file = clean.split('/').last;
+      yield mediaUrl('home-banners/$file');
+    }
+    yield* origins.map((o) => '$o$assetPath');
+  }
 }

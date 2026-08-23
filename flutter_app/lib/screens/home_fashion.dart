@@ -26,6 +26,7 @@ import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
 import 'sections.dart';
 import 'widgets_page.dart';
+import '../widgets/day_dashboard.dart';
 
 class HomeFashion extends StatefulWidget {
   const HomeFashion({super.key, this.name = 'Healer'});
@@ -100,6 +101,10 @@ class _HomeFashionState extends State<HomeFashion> {
 
                 // Shipped order of #home, matching app/js/part062.js REG.fash.
                 const GlassWrap(child: HeroSection()),
+                const SizedBox(height: 16),
+                const _FashPathHeading(),
+                const SizedBox(height: 14),
+                const NwsbDayDashboard(fashion: true),
                 const SizedBox(height: 16),
                 const _FashHeroRow(),
                 const SizedBox(height: 16),
@@ -481,6 +486,42 @@ class _FashHeaderBtn extends StatelessWidget {
             ),
           ),
       ],
+      ),
+    );
+  }
+}
+
+class _FashPathHeading extends StatelessWidget {
+  const _FashPathHeading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Begin Your Healing Path',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 30,
+              fontWeight: FontWeight.w800,
+              height: 1.08,
+              letterSpacing: -.6,
+            ),
+          ),
+          SizedBox(height: 7),
+          Text(
+            'NATURAL ORIGIN OF WORD SCIENCE',
+            style: TextStyle(
+              color: Color(0xB3E8D5A3),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 2.1,
+            ),
+          ),
+        ],
       ),
     );
   }

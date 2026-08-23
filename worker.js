@@ -58,6 +58,44 @@ function err(message, status = 400, origin = '') {
   return json({ error: message }, status, origin);
 }
 
+function mediaType(key) {
+  const ext = String(key).toLowerCase().split('.').pop();
+  return ({ mp4: 'video/mp4', webm: 'video/webm', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png' })[ext] || 'application/octet-stream';
+}
+
+async function r2Media(env, key, origin, request) {
+  if (!env.NWSB_MEDIA) return err('Media storage is not configured', 503, origin);
+  const clean = key.replace(/^\/+/, '').replace(/\.\./g, '');
+  if (!clean || clean.length > 240) return err('Invalid media key', 400, origin);
+  const rangeHeader = request.headers.get('Range');
+  let range;
+  if (rangeHeader) {
+    const match = /^bytes=(\d+)-(\d*)$/.exec(rangeHeader);
+    if (match) {
+      const offset = Number(match[1]);
+      const end = match[2] ? Number(match[2]) : undefined;
+      if (Number.isFinite(offset) && (end == null || Number.isFinite(end)) && (end == null || end >= offset)) {
+        range = { offset, ...(end == null ? {} : { length: end - offset + 1 }) };
+      }
+    }
+  }
+  const object = await env.NWSB_MEDIA.get(clean, range ? { range } : undefined);
+  if (!object) return err('Media not found', 404, origin);
+  const headers = new Headers(corsHeaders(origin));
+  headers.set('Content-Type', object.httpMetadata?.contentType || mediaType(clean));
+  headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+  headers.set('X-Content-Type-Options', 'nosniff');
+  headers.set('Accept-Ranges', 'bytes');
+  if (object.httpEtag) headers.set('ETag', object.httpEtag);
+  if (object.range) {
+    headers.set('Content-Range', `bytes ${object.range.offset}-${object.range.offset + object.range.length - 1}/${object.size}`);
+    headers.set('Content-Length', String(object.range.length));
+    return new Response(object.body, { status: 206, headers });
+  }
+  if (object.size != null) headers.set('Content-Length', String(object.size));
+  return new Response(object.body, { headers });
+}
+
 function clampString(value, max) {
   return typeof value === 'string' ? value.slice(0, max) : '';
 }
@@ -234,7 +272,10 @@ export default {
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(origin) });
     if (path === '/api/health' && request.method === 'GET') {
-      return json({ status: 'ok', groqConfigured: Boolean(env.GROQ_API_KEY), version: '2.0.0', ts: Date.now() }, 200, origin);
+      return json({ status: 'ok', groqConfigured: Boolean(env.GROQ_API_KEY), mediaConfigured: Boolean(env.NWSB_MEDIA), version: '2.1.0', ts: Date.now() }, 200, origin);
+    }
+    if (path.startsWith('/media/') && request.method === 'GET') {
+      return r2Media(env, decodeURIComponent(path.slice('/media/'.length)), origin, request);
     }
     if (request.method !== 'POST') return err('Method not allowed', 405, origin);
 
