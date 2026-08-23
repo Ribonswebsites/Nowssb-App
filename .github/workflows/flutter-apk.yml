@@ -11,7 +11,7 @@
 # is the second job; it runs on demand and only when the keystore is in this
 # repository's secrets, because a release build cannot be signed without one.
 
-name: Flutter APK
+name: NowssB Flutter APK
 
 # No `paths:` filter. There was one — flutter_app/** — and the workflow was
 # registered but never fired on the push that added it, while android-apk.yml,
@@ -29,7 +29,7 @@ defaults:
 
 jobs:
   debug-apk:
-    name: Debug APK
+    name: NowssB Flutter debug APK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -83,7 +83,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: nowssb-flutter-debug-apk
+          name: nowssb-flutter-debug-apk-all-changes
           path: flutter_app/build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
 

@@ -12,7 +12,7 @@
 # signing secrets are present, because a release build cannot be signed
 # without them and a keystore must never live in a repository.
 
-name: Android APK
+name: NowssB WebView APK
 
 on:
   push:
@@ -22,7 +22,7 @@ on:
 
 jobs:
   debug-apk:
-    name: Debug APK (sideloadable)
+    name: NowssB WebView debug APK (sideloadable)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,7 +60,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: nowssb-debug-apk
+          name: nowssb-webview-debug-apk-all-changes
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 

@@ -8,8 +8,7 @@
     "webContentsDebuggingEnabled": false
   },
   "server": {
-    "androidScheme": "https",
-    "url": "https://ribonswebsites.github.io/Nowssb-App/"
+    "androidScheme": "https"
   },
   "plugins": {
     "PushNotifications": {

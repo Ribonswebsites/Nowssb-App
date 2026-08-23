@@ -45,6 +45,8 @@
            was landing above the greeting for exactly that reason. It sits
            after the greeting and before the hero clip and the streak. */
         { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
+        { k:'dashboard',sel:['.nwsb-daydash'],                                             t:S, label:'Focus · Progress · Up next', sub:'Your time-aware practice dashboard' },
+        { k:'essentials',sel:['.nwsb-essentials'],                                         t:S, label:'Your essentials',          sub:'Working NowssB paths for today' },
         /* The clip and the streak are ONE block now — a heading, the
            render and the black banner in a single neumorphic wrapper — so
            there is one entry for it rather than two, and it points at the
@@ -106,6 +108,8 @@
       wrap:  '#home .home-body',
       items: [
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
+        { k:'dashboard',sel:['.nwsb-daydash'],                                             t:S, label:'Focus · Progress · Up next', sub:'Your time-aware practice dashboard' },
+        { k:'essentials',sel:['.nwsb-essentials'],                                         t:S, label:'Your essentials',          sub:'Working NowssB paths for today' },
         { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' , kind:'tab' },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
         { k:'reader',   sel:['.fash-rdsec-wrap'],                                        t:S, label:'Reader',                sub:'Meanings and eBooks' },
@@ -172,8 +176,10 @@
            the section into `off`, which is the same off the layout editor
            sets: gone, and gone across launches. That is not what a cross
            on a card means — it means "not now". Anyone whose streak was
-           taken away by the old behaviour gets it back here, once. */
-  var LAYOUT_V = 4;
+           taken away by the old behaviour gets it back here, once.
+       5 — The time-aware dashboard and Your essentials become registry items
+           so saved home layouts do not strand them above the greeting. */
+  var LAYOUT_V = 5;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });

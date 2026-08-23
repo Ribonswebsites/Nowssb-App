@@ -79,9 +79,10 @@ class NowssbApi {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw NowssbApiException(body['error']?.toString() ?? 'AI request failed.');
     }
-    final content = body['choices'] is List && (body['choices'] as List).isNotEmpty
-        ? (body['choices'][0] as Map)['message']?['content']
-        : null;
+    final choices = body['choices'];
+    final firstChoice = choices is List && choices.isNotEmpty ? choices.first : null;
+    final message = firstChoice is Map ? firstChoice['message'] : null;
+    final content = message is Map ? message['content'] : null;
     if (content is! String || content.trim().isEmpty) {
       throw const NowssbApiException('The AI returned no text.');
     }

@@ -74,6 +74,17 @@ class NwsbDayDashboard extends StatefulWidget {
   State<NwsbDayDashboard> createState() => _NwsbDayDashboardState();
 }
 
+class _EssentialItem {
+  const _EssentialItem({required this.icon, required this.title, required this.subtitle, required this.meta, required this.destination, this.featured = false});
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String meta;
+  final Object destination;
+  final bool featured;
+}
+
 class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   static const _streakKey = 'nwsb_dashboard_streak';
   static const _sessionsKey = 'nwsb_dashboard_sessions';
@@ -84,7 +95,15 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   int _streak = 0;
   int _sessions = 0;
   int _words = 0;
+  int _essentialFilter = 0;
   Timer? _clock;
+
+  static const _essentials = <_EssentialItem>[
+    _EssentialItem(icon: Icons.mic_none_outlined, title: 'Today’s word ritual', subtitle: 'Listen, speak and score your next word', meta: '3–20 min', destination: Dest.player, featured: true),
+    _EssentialItem(icon: Icons.graphic_eq_outlined, title: 'Sound Library', subtitle: 'Root frequencies for focused listening', meta: 'Explore', destination: Dest.sound),
+    _EssentialItem(icon: Icons.auto_awesome_outlined, title: 'Word Science', subtitle: 'Discover what a word truly means', meta: 'Explore', destination: Dest.library),
+    _EssentialItem(icon: Icons.route_outlined, title: 'Healing Journey', subtitle: 'Choose a body, organ or mind path', meta: 'Explore', destination: Dest.healing),
+  ];
 
   @override
   void initState() {
@@ -155,6 +174,8 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
         _heading(context, 'Keep the ritual moving', 'Up next', Dest.routines),
         const SizedBox(height: 12),
         upNext,
+        const SizedBox(height: 30),
+        _essentialsSection(context),
       ],
     );
   }
@@ -246,7 +267,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     );
   }
 
-  Widget _heading(BuildContext context, String eyebrow, String title, Dest dest) {
+  Widget _heading(BuildContext context, String eyebrow, String title, Object dest) {
     final color = widget.fashion ? Colors.white : NwsbColors.ink;
     final faint = widget.fashion ? const Color(0xB3E8D5A3) : NwsbColors.inkFaint;
     return Row(
@@ -314,6 +335,82 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     );
     final surface = widget.fashion ? _glass(child: child, padding: const EdgeInsets.all(15)) : NeuCard(radius: 22, padding: const EdgeInsets.all(15), child: child);
     return InkWell(onTap: () => Dest.open(context, Dest.routines), borderRadius: BorderRadius.circular(22), child: surface);
+  }
+
+  Widget _essentialsSection(BuildContext context) {
+    final items = _essentials;
+    final headingColor = widget.fashion ? Colors.white : NwsbColors.ink;
+    final faint = widget.fashion ? const Color(0xB3FFFFFF) : NwsbColors.inkFaint;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            _filterPill('◷  Recents', 0),
+            const SizedBox(width: 10),
+            _filterPill('♥  Favorites', 1),
+            const Spacer(),
+            Text('NOWSSB', style: TextStyle(color: widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 2.2)),
+          ],
+        ),
+        const SizedBox(height: 22),
+        Text('YOUR DAILY PATHS', style: TextStyle(color: faint, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
+        const SizedBox(height: 4),
+        Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7)),
+        const SizedBox(height: 13),
+        ...items.map((item) => Padding(padding: const EdgeInsets.only(bottom: 10), child: _essentialRow(context, item))),
+      ],
+    );
+  }
+
+  Widget _filterPill(String text, int value) {
+    final active = _essentialFilter == value;
+    return TextButton(
+      onPressed: () => setState(() => _essentialFilter = value),
+      style: TextButton.styleFrom(
+        foregroundColor: active ? (widget.fashion ? const Color(0xFF171426) : NwsbColors.ink) : (widget.fashion ? Colors.white70 : NwsbColors.inkSoft),
+        backgroundColor: active ? (widget.fashion ? Colors.white.withOpacity(.90) : Colors.white) : (widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: widget.fashion ? BorderSide(color: Colors.white.withOpacity(.14)) : BorderSide.none),
+        elevation: active && !widget.fashion ? 2 : 0,
+      ),
+      child: Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+    );
+  }
+
+  Widget _essentialRow(BuildContext context, _EssentialItem item) {
+    final surface = item.featured
+        ? (widget.fashion ? const Color(0xEA3B205D) : const Color(0xFFFFC62D))
+        : (widget.fashion ? const Color(0x9E141027) : NwsbColors.surface);
+    final textColor = item.featured && !widget.fashion ? const Color(0xFF241C16) : (widget.fashion ? Colors.white : NwsbColors.ink);
+    final subColor = item.featured && !widget.fashion ? const Color(0xB8241C16) : (widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint);
+    final iconColor = item.featured && !widget.fashion ? const Color(0xFF5B4220) : (widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold);
+    final card = Container(
+      constraints: const BoxConstraints(minHeight: 72),
+      padding: const EdgeInsets.fromLTRB(0, 12, 14, 12),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(22),
+        border: widget.fashion ? Border.all(color: Colors.white.withOpacity(.14)) : null,
+        boxShadow: widget.fashion ? const [BoxShadow(color: Color(0x44000000), blurRadius: 14, offset: Offset(0, 9))] : NwsbShadows.raised,
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 22, child: Center(child: Container(width: item.featured ? 17 : 14, height: item.featured ? 17 : 14, decoration: BoxDecoration(shape: BoxShape.circle, color: item.featured ? (widget.fashion ? const Color(0xFFE8D5A3) : const Color(0xFFFF8019)) : (widget.fashion ? Colors.white.withOpacity(.10) : const Color(0xFFF8F9FC)), border: Border.all(color: item.featured ? Colors.transparent : (widget.fashion ? Colors.white54 : const Color(0xFFD5D7DD)), width: 2))))),
+          const SizedBox(width: 5),
+          Container(width: 38, height: 38, decoration: BoxDecoration(color: widget.fashion ? Colors.white.withOpacity(.12) : Colors.white.withOpacity(.78), borderRadius: BorderRadius.circular(14)), child: Icon(item.icon, size: 19, color: iconColor)),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 5), Text(item.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 11))])),
+          const SizedBox(width: 8),
+          Text(item.meta, style: TextStyle(color: subColor, fontSize: 10, fontWeight: FontWeight.w700)),
+          const SizedBox(width: 7),
+          Icon(Icons.chevron_right, color: subColor, size: 22),
+        ],
+      ),
+    );
+    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(22), child: card));
   }
 
   Widget _pill(String text) => DecoratedBox(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999), boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 5))]), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11), child: Text(text, style: const TextStyle(color: NwsbColors.ink, fontSize: 12, fontWeight: FontWeight.w800))));
