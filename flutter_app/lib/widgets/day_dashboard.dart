@@ -119,7 +119,6 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   int _streak = 0;
   int _sessions = 0;
   int _words = 0;
-  int _essentialFilter = 0;
   Timer? _clock;
 
   static const _essentials = <_EssentialItem>[
@@ -198,8 +197,8 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xEC070A18),
-                    const Color(0x9C070A18),
+                    const Color(0xB8070A18),
+                    const Color(0x55070A18),
                     Colors.transparent,
                   ],
                   begin: Alignment.centerLeft,
@@ -293,15 +292,15 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   }
 
   Widget _progressCard(BuildContext context) {
+    final goal = (_sessions * 10).clamp(0, 100);
     final children = [
+      _stat(Icons.check_circle_outline, '$_sessions', 'tasks done'),
+      _stat(Icons.timer_outlined, '${_words}m', 'focused time'),
       _stat(Icons.local_fire_department_outlined, '$_streak', 'day streak'),
-      _stat(Icons.track_changes_outlined, '$_sessions', 'sessions'),
-      _stat(Icons.graphic_eq_outlined, '$_words', 'words explored'),
+      _stat(Icons.track_changes_outlined, '$goal%', 'goal progress'),
     ];
     final card = Row(children: [for (var i = 0; i < children.length; i++) ...[if (i > 0) _divider(), Expanded(child: children[i])]]);
-    if (!widget.fashion) {
-      return NeuCard(radius: 22, padding: EdgeInsets.zero, child: card);
-    }
+    if (!widget.fashion) return NeuCard(radius: 22, padding: EdgeInsets.zero, child: card);
     return _glass(child: card, padding: EdgeInsets.zero);
   }
 
@@ -324,93 +323,71 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   Widget _divider() => Container(width: 1, height: 74, color: widget.fashion ? const Color(0x24FFFFFF) : const Color(0x141A1A2E));
 
   Widget _upNextCard(BuildContext context) {
-    final child = Row(
-      children: [
-        Container(width: 44, height: 44, decoration: BoxDecoration(color: widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface, borderRadius: BorderRadius.circular(15), boxShadow: widget.fashion ? null : NwsbShadows.raisedXs), child: Icon(Icons.calendar_today_outlined, size: 20, color: widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold)),
-        const SizedBox(width: 12),
-        const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Open today’s practice', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)), SizedBox(height: 5), Text('Choose a word and begin your next sound ritual', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: NwsbColors.inkFaint))])),
-        const SizedBox(width: 8),
-        Icon(Icons.arrow_forward, color: widget.fashion ? Colors.white70 : NwsbColors.inkSoft, size: 20),
-      ],
-    );
-    final surface = widget.fashion ? _glass(child: child, padding: const EdgeInsets.all(15)) : NeuCard(radius: 22, padding: const EdgeInsets.all(15), child: child);
-    return InkWell(onTap: () => Dest.open(context, Dest.routines), borderRadius: BorderRadius.circular(22), child: surface);
+    final surface = widget.fashion
+        ? _glass(child: Column(children: [_upNextRow(context, 'Open today’s practice', 'Choose a word and begin your next sound ritual', Dest.player), _upNextDivider(), _upNextRow(context, 'Build your routine', 'Set a daily practice system', Dest.routines)]), padding: EdgeInsets.zero)
+        : NeuCard(radius: 22, padding: EdgeInsets.zero, child: Column(children: [_upNextRow(context, 'Open today’s practice', 'Choose a word and begin your next sound ritual', Dest.player), _upNextDivider(), _upNextRow(context, 'Build your routine', 'Set a daily practice system', Dest.routines)]));
+    return surface;
   }
+
+  Widget _upNextRow(BuildContext context, String title, String subtitle, Object destination) {
+    final iconColor = widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold;
+    final textColor = widget.fashion ? Colors.white : NwsbColors.ink;
+    final subColor = widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint;
+    return InkWell(
+      onTap: () => Dest.open(context, destination),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Row(children: [
+          Container(width: 44, height: 44, decoration: BoxDecoration(color: widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface, shape: BoxShape.circle, boxShadow: widget.fashion ? null : NwsbShadows.raisedXs), child: Icon(Icons.calendar_today_outlined, size: 20, color: iconColor)),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 5), Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 11))])),
+          const SizedBox(width: 8),
+          Icon(Icons.arrow_forward, color: widget.fashion ? Colors.white70 : NwsbColors.inkSoft, size: 20),
+        ]),
+      ),
+    );
+  }
+
+  Widget _upNextDivider() => Divider(height: 1, thickness: 1, color: widget.fashion ? const Color(0x24FFFFFF) : const Color(0x141A1A2E));
 
   Widget _essentialsSection(BuildContext context) {
-    final items = _essentials;
     final headingColor = widget.fashion ? Colors.white : NwsbColors.ink;
     final faint = widget.fashion ? const Color(0xB3FFFFFF) : NwsbColors.inkFaint;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            _filterPill('◷  Recents', 0),
-            const SizedBox(width: 10),
-            _filterPill('♥  Favorites', 1),
-            const Spacer(),
-            Text('NOWSSB', style: TextStyle(color: widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 2.2)),
-          ],
-        ),
-        const SizedBox(height: 22),
-        Text('YOUR DAILY PATHS', style: TextStyle(color: faint, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
-        const SizedBox(height: 4),
-        Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7)),
-        const SizedBox(height: 13),
-        ...items.map((item) => Padding(padding: const EdgeInsets.only(bottom: 10), child: _essentialRow(context, item))),
-      ],
-    );
+    final shell = widget.fashion
+        ? _glass(child: _essentialStack(context), padding: const EdgeInsets.all(12))
+        : NeuCard(radius: 26, padding: const EdgeInsets.all(12), child: _essentialStack(context));
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('YOUR DAILY PATHS', style: TextStyle(color: faint, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)), const SizedBox(height: 4), Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7))])), Text('NOWSSB', style: TextStyle(color: widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 2.2))]),
+      const SizedBox(height: 13),
+      shell,
+    ]);
   }
 
-  Widget _filterPill(String text, int value) {
-    final active = _essentialFilter == value;
-    return TextButton(
-      onPressed: () => setState(() => _essentialFilter = value),
-      style: TextButton.styleFrom(
-        foregroundColor: active ? (widget.fashion ? const Color(0xFF171426) : NwsbColors.ink) : (widget.fashion ? Colors.white70 : NwsbColors.inkSoft),
-        backgroundColor: active ? (widget.fashion ? Colors.white.withOpacity(.90) : Colors.white) : (widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: widget.fashion ? BorderSide(color: Colors.white.withOpacity(.14)) : BorderSide.none),
-        elevation: active && !widget.fashion ? 2 : 0,
-      ),
-      child: Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-    );
-  }
+  Widget _essentialStack(BuildContext context) => Stack(children: [
+    Positioned(left: 17, top: 27, bottom: 27, child: Container(width: 2, decoration: BoxDecoration(color: widget.fashion ? const Color(0x66FFFFFF) : const Color(0x4D7B7F8A), borderRadius: BorderRadius.circular(2)))),
+    Column(children: [for (var i = 0; i < _essentials.length; i++) Padding(padding: EdgeInsets.only(bottom: i == _essentials.length - 1 ? 0 : 9), child: _essentialRow(context, _essentials[i]))]),
+  ]);
 
   Widget _essentialRow(BuildContext context, _EssentialItem item) {
-    final surface = item.featured
-        ? (widget.fashion ? const Color(0xEA3B205D) : const Color(0xFFFFC62D))
-        : (widget.fashion ? const Color(0x9E141027) : NwsbColors.surface);
-    final textColor = item.featured && !widget.fashion ? const Color(0xFF241C16) : (widget.fashion ? Colors.white : NwsbColors.ink);
-    final subColor = item.featured && !widget.fashion ? const Color(0xB8241C16) : (widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint);
-    final iconColor = item.featured && !widget.fashion ? const Color(0xFF5B4220) : (widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold);
+    final textColor = Colors.white;
+    final subColor = const Color(0x99FFFFFF);
     final card = Container(
       constraints: const BoxConstraints(minHeight: 72),
-      padding: const EdgeInsets.fromLTRB(0, 12, 14, 12),
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(22),
-        border: widget.fashion ? Border.all(color: Colors.white.withOpacity(.14)) : null,
-        boxShadow: widget.fashion ? const [BoxShadow(color: Color(0x44000000), blurRadius: 14, offset: Offset(0, 9))] : NwsbShadows.raised,
-      ),
-      child: Row(
-        children: [
-          SizedBox(width: 22, child: Center(child: Container(width: item.featured ? 17 : 14, height: item.featured ? 17 : 14, decoration: BoxDecoration(shape: BoxShape.circle, color: item.featured ? (widget.fashion ? const Color(0xFFE8D5A3) : const Color(0xFFFF8019)) : (widget.fashion ? Colors.white.withOpacity(.10) : const Color(0xFFF8F9FC)), border: Border.all(color: item.featured ? Colors.transparent : (widget.fashion ? Colors.white54 : const Color(0xFFD5D7DD)), width: 2))))),
-          const SizedBox(width: 5),
-          Container(width: 38, height: 38, decoration: BoxDecoration(color: widget.fashion ? Colors.white.withOpacity(.12) : Colors.white.withOpacity(.78), borderRadius: BorderRadius.circular(14)), child: Icon(item.icon, size: 19, color: iconColor)),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 5), Text(item.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 11))])),
-          const SizedBox(width: 8),
-          Text(item.meta, style: TextStyle(color: subColor, fontSize: 10, fontWeight: FontWeight.w700)),
-          const SizedBox(width: 7),
-          Icon(Icons.chevron_right, color: subColor, size: 22),
-        ],
-      ),
+      padding: const EdgeInsets.fromLTRB(0, 10, 12, 10),
+      decoration: BoxDecoration(color: const Color(0xFF090A0E), borderRadius: BorderRadius.circular(18), border: widget.fashion ? Border.all(color: Colors.white.withOpacity(.13)) : null, boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 7))]),
+      child: Row(children: [
+        SizedBox(width: 32, child: Center(child: Container(width: item.featured ? 15 : 12, height: item.featured ? 15 : 12, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: const Color(0xFF090A0E), width: 2))))),
+        const SizedBox(width: 8),
+        Container(width: 40, height: 40, decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white), child: Icon(item.icon, size: 20, color: Color(0xFF090A0E))),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 5), Text(item.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 11))])),
+        const SizedBox(width: 8),
+        Text(item.meta, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 10, fontWeight: FontWeight.w700)),
+        const SizedBox(width: 6),
+        const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+      ]),
     );
-    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(22), child: card));
+    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(18), child: card));
   }
 
   Widget _pill(String text) => DecoratedBox(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999), boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 5))]), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11), child: Text(text, style: const TextStyle(color: NwsbColors.ink, fontSize: 12, fontWeight: FontWeight.w800))));
