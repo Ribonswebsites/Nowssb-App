@@ -465,7 +465,8 @@ class VideoPool {
   /// every banner sat on its first frame forever. That is what "the
   /// videos are not playing" actually was.
   Future<VideoPlayerController?> _open(String assetPath) async {
-    final remoteFirst = assetPath.startsWith('assets/video/time-');
+    final remoteFirst = assetPath.startsWith('assets/video/time-') ||
+        assetPath == 'assets/video/hero-bg.mp4';
     final urls = NwsbCdn.urls(assetPath).toList();
 
     Future<VideoPlayerController?> openNetwork() async {

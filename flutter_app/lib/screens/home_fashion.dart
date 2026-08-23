@@ -26,6 +26,8 @@ import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
 import 'sections.dart';
 import 'widgets_page.dart';
+import 'fashion/header.dart';
+import 'fashion/hero.dart';
 import '../widgets/day_dashboard.dart';
 
 class HomeFashion extends StatefulWidget {
@@ -88,23 +90,30 @@ class _HomeFashionState extends State<HomeFashion> {
             ),
           ),
 
-          SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 108),
-              children: [
-                const _FashTopRow(),
-                const SizedBox(height: 18),
-                _FashGreeting(name: widget.name),
-                const SizedBox(height: 16),
-                const _FashSearch(),
-                const SizedBox(height: 18),
-
-                // Shipped order of #home, matching app/js/part062.js REG.fash.
-                const GlassWrap(child: HeroSection()),
-                const SizedBox(height: 16),
-                const _FashPathHeading(),
-                const SizedBox(height: 14),
-                const NwsbDayDashboard(fashion: true),
+          Column(
+            children: [
+              HomeHeader(
+                notifications: 3,
+                onNormalHome: () => Settings.instance.setFashionHome(false),
+                onMenu: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const WidgetsPage()),
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.only(bottom: 108),
+                  children: [
+                    HeroGreeting(name: widget.name),
+                    FashionHero(
+                      onExplore: () => _go(2),
+                      onGuide: () => _push(const WidgetsPage()),
+                      onSearch: () => _go(2),
+                      onStore: () => _go(3),
+                      onRail: _go,
+                    ),
+                    const _FashPathHeading(),
+                    const SizedBox(height: 14),
+                    const NwsbDayDashboard(fashion: true),
                 const SizedBox(height: 16),
                 const _FashHeroRow(),
                 const SizedBox(height: 16),
@@ -346,9 +355,10 @@ class _HomeFashionState extends State<HomeFashion> {
                   ),
                 ),
                 const FooterMark(dark: true),
-              ],
-            ),
-          ),
+                  ],
+                ),
+              ),
+            ],
         ],
       ),
     );

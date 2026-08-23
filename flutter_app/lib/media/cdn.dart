@@ -28,6 +28,10 @@ class NwsbCdn {
     if (clean.startsWith('assets/video/time-')) {
       final file = clean.split('/').last;
       yield mediaUrl('home-banners/$file');
+    } else if (clean == 'assets/video/hero-bg.mp4') {
+      // The Fashion hero is served from R2 first so both APKs use the same
+      // managed media object; the bundled file remains the offline fallback.
+      yield mediaUrl('hero/hero-bg.mp4');
     }
     yield* origins.map((o) => '$o$assetPath');
   }
