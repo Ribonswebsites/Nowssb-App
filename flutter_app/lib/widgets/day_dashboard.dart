@@ -103,7 +103,7 @@ class NwsbDayDashboard extends StatefulWidget {
 }
 
 class _EssentialItem {
-  const _EssentialItem({required this.icon, required this.title, required this.subtitle, required this.meta, required this.destination, this.featured = false});
+  const _EssentialItem({required this.icon, required this.title, required this.subtitle, required this.meta, required this.destination, this.featured = false, this.favorite = false});
 
   final IconData icon;
   final String title;
@@ -111,6 +111,7 @@ class _EssentialItem {
   final String meta;
   final Object destination;
   final bool featured;
+  final bool favorite;
 }
 
 class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
@@ -119,13 +120,14 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   int _streak = 0;
   int _sessions = 0;
   int _words = 0;
+  int _essentialFilter = 0;
   Timer? _clock;
 
   static const _essentials = <_EssentialItem>[
-    _EssentialItem(icon: Icons.mic_none_outlined, title: 'Today’s word ritual', subtitle: 'Listen, speak and score your next word', meta: '3–20 min', destination: Dest.player, featured: true),
-    _EssentialItem(icon: Icons.graphic_eq_outlined, title: 'Sound Library', subtitle: 'Root frequencies for focused listening', meta: 'Explore', destination: Dest.sound),
-    _EssentialItem(icon: Icons.auto_awesome_outlined, title: 'Word Science', subtitle: 'Discover what a word truly means', meta: 'Explore', destination: Dest.library),
-    _EssentialItem(icon: Icons.route_outlined, title: 'Healing Journey', subtitle: 'Choose a body, organ or mind path', meta: 'Explore', destination: Dest.healing),
+    _EssentialItem(icon: Icons.mic_none_outlined, title: 'Today’s word ritual', subtitle: 'Today’s pronunciation', meta: '3–20 min', destination: Dest.player, featured: true, favorite: true),
+    _EssentialItem(icon: Icons.graphic_eq_outlined, title: 'Sound Library', subtitle: 'Root frequencies for focused listening', meta: 'Explore', destination: Dest.sound, favorite: true),
+    _EssentialItem(icon: Icons.lock_outline, title: 'Word Science', subtitle: 'Discover the origin behind any word', meta: 'Explore', destination: Dest.library),
+    _EssentialItem(icon: Icons.lock_outline, title: 'Healing Journey', subtitle: 'Choose a body, organ or mind path', meta: 'Explore', destination: Dest.healing, favorite: true),
   ];
 
   @override
@@ -183,7 +185,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: SizedBox(
-        height: 250,
+        height: 200,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -353,41 +355,47 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   Widget _essentialsSection(BuildContext context) {
     final headingColor = widget.fashion ? Colors.white : NwsbColors.ink;
     final faint = widget.fashion ? const Color(0xB3FFFFFF) : NwsbColors.inkFaint;
+    final visible = _essentialFilter == 0 ? _essentials : _essentials.where((item) => item.favorite).toList();
     final shell = widget.fashion
-        ? _glass(child: _essentialStack(context), padding: const EdgeInsets.all(12))
-        : NeuCard(radius: 26, padding: const EdgeInsets.all(12), child: _essentialStack(context));
+        ? _glass(child: _essentialStack(context, visible), padding: const EdgeInsets.all(14))
+        : NeuCard(radius: 26, padding: const EdgeInsets.all(14), child: _essentialStack(context, visible));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('YOUR DAILY PATHS', style: TextStyle(color: faint, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)), const SizedBox(height: 4), Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7))])), Text('NOWSSB', style: TextStyle(color: widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 2.2))]),
-      const SizedBox(height: 13),
+      Row(children: [_filterPill(context, Icons.access_time, 'Recents', 0), const SizedBox(width: 10), _filterPill(context, Icons.favorite, 'Favorites', 1)]),
+      const SizedBox(height: 28),
+      Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7)),
+      const SizedBox(height: 14),
       shell,
+      const SizedBox(height: 30),
+      Row(children: [Expanded(child: Text('What’s helping others', style: TextStyle(color: headingColor, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -.4))), Container(width: 38, height: 38, decoration: BoxDecoration(color: widget.fashion ? const Color(0x2EFFFFFF) : NwsbColors.surface, shape: BoxShape.circle, boxShadow: widget.fashion ? null : NwsbShadows.raisedXs), child: Icon(Icons.chevron_right, color: widget.fashion ? Colors.white : NwsbColors.ink, size: 25))]),
+      const SizedBox(height: 14),
+      Row(children: [Expanded(child: _helpCard(context, Icons.graphic_eq_outlined, 'Voice scoring', 'Practice and see your sound score', Dest.player, const [Color(0xFF55318E), Color(0xFFAD75D0)])), const SizedBox(width: 12), Expanded(child: _helpCard(context, Icons.auto_awesome_outlined, 'Word Science', 'Meanings, origins and sound', Dest.library, const [Color(0xFFEF62AC), Color(0xFFFF9BD2)]))]),
     ]);
   }
 
-  Widget _essentialStack(BuildContext context) => Stack(children: [
-    Positioned(left: 17, top: 27, bottom: 27, child: Container(width: 2, decoration: BoxDecoration(color: widget.fashion ? const Color(0x66FFFFFF) : const Color(0x4D7B7F8A), borderRadius: BorderRadius.circular(2)))),
-    Column(children: [for (var i = 0; i < _essentials.length; i++) Padding(padding: EdgeInsets.only(bottom: i == _essentials.length - 1 ? 0 : 9), child: _essentialRow(context, _essentials[i]))]),
+  Widget _filterPill(BuildContext context, IconData icon, String label, int value) {
+    final active = _essentialFilter == value;
+    return TextButton.icon(onPressed: () => setState(() => _essentialFilter = value), icon: Icon(icon, size: 18), label: Text(label), style: TextButton.styleFrom(foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink, backgroundColor: widget.fashion ? const Color(0x24FFFFFF) : const Color(0xFFF7F5F2), padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)), elevation: active && !widget.fashion ? 1 : 0));
+  }
+
+  Widget _essentialStack(BuildContext context, List<_EssentialItem> items) => Stack(children: [
+    Positioned(left: 17, top: items.isNotEmpty && items.first.featured ? 158 : 26, bottom: 26, child: Container(width: 3, decoration: BoxDecoration(color: widget.fashion ? const Color(0x66FFFFFF) : const Color(0x4D7B7F8A), borderRadius: BorderRadius.circular(3)))),
+    Column(children: [for (var i = 0; i < items.length; i++) Padding(padding: EdgeInsets.only(bottom: i == items.length - 1 ? 0 : 12), child: _essentialRow(context, items[i]))]),
   ]);
 
   Widget _essentialRow(BuildContext context, _EssentialItem item) {
-    final textColor = Colors.white;
-    final subColor = const Color(0x99FFFFFF);
-    final card = Container(
-      constraints: const BoxConstraints(minHeight: 72),
-      padding: const EdgeInsets.fromLTRB(0, 10, 12, 10),
-      decoration: BoxDecoration(color: const Color(0xFF090A0E), borderRadius: BorderRadius.circular(18), border: widget.fashion ? Border.all(color: Colors.white.withOpacity(.13)) : null, boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 7))]),
-      child: Row(children: [
-        SizedBox(width: 32, child: Center(child: Container(width: item.featured ? 15 : 12, height: item.featured ? 15 : 12, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: const Color(0xFF090A0E), width: 2))))),
-        const SizedBox(width: 8),
-        Container(width: 40, height: 40, decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white), child: Icon(item.icon, size: 20, color: Color(0xFF090A0E))),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 5), Text(item.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 11))])),
-        const SizedBox(width: 8),
-        Text(item.meta, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 10, fontWeight: FontWeight.w700)),
-        const SizedBox(width: 6),
-        const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
-      ]),
-    );
-    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(18), child: card));
+    if (item.featured) {
+      final featured = Container(constraints: const BoxConstraints(minHeight: 138), padding: const EdgeInsets.fromLTRB(24, 20, 24, 18), decoration: BoxDecoration(borderRadius: BorderRadius.circular(23), gradient: const LinearGradient(colors: [Color(0xFFFFD000), Color(0xFFFF8B27)]), boxShadow: const [BoxShadow(color: Color(0x26775312), blurRadius: 12, offset: Offset(0, 7))]), child: Stack(children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3), decoration: BoxDecoration(color: Colors.white.withOpacity(.70), borderRadius: BorderRadius.circular(99)), child: const Text('NOWSSB · 543', style: TextStyle(color: Color(0xFF3A3024), fontSize: 11, fontWeight: FontWeight.w800))), const SizedBox(height: 13), const Text('Today’s word ritual', style: TextStyle(color: Color(0xFF28252A), fontSize: 20, fontWeight: FontWeight.w800)), const SizedBox(height: 9), Text(item.subtitle, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 13)), const SizedBox(height: 9), Text(item.meta, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 12))]), Positioned(right: 0, top: 0, child: Container(width: 38, height: 38, decoration: BoxDecoration(color: Colors.white.withOpacity(.70), shape: BoxShape.circle), child: const Icon(Icons.graphic_eq, color: Color(0xFF3C3424), size: 19))) ]));
+      return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(23), child: featured));
+    }
+    final text = widget.fashion ? Colors.white : const Color(0xFF4C4A52);
+    final sub = widget.fashion ? const Color(0x99FFFFFF) : const Color(0xFF68666B);
+    final card = Container(constraints: const BoxConstraints(minHeight: 69), padding: const EdgeInsets.symmetric(horizontal: 17), decoration: BoxDecoration(color: widget.fashion ? const Color(0x8C141027) : const Color(0xFFF7F5F2), borderRadius: BorderRadius.circular(21), border: widget.fashion ? Border.all(color: Colors.white.withOpacity(.13)) : null, boxShadow: const [BoxShadow(color: Color(0x143D3747), blurRadius: 12, offset: Offset(0, 7))]), child: Row(children: [Icon(item.icon, size: 18, color: widget.fashion ? Colors.white70 : const Color(0xFF45434A)), const SizedBox(width: 10), Expanded(child: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: text, fontSize: 15, fontWeight: FontWeight.w600))), Text(item.meta, style: TextStyle(color: sub, fontSize: 12)), const SizedBox(width: 8), Icon(Icons.chevron_right, color: sub, size: 22)]));
+    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(21), child: card));
+  }
+
+  Widget _helpCard(BuildContext context, IconData icon, String title, String subtitle, Object destination, List<Color> colors) {
+    final card = Container(height: 166, decoration: BoxDecoration(color: widget.fashion ? const Color(0x8C141027) : const Color(0xFFF7F5F2), borderRadius: BorderRadius.circular(20), boxShadow: const [BoxShadow(color: Color(0x143D3747), blurRadius: 12, offset: Offset(0, 7))]), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Container(height: 105, decoration: BoxDecoration(borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), gradient: LinearGradient(colors: colors)), child: Icon(icon, color: Colors.white, size: 38)), Padding(padding: const EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.fashion ? Colors.white : NwsbColors.ink, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 4), Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint, fontSize: 11))]))]));
+    return InkWell(onTap: () => Dest.open(context, destination), borderRadius: BorderRadius.circular(20), child: card);
   }
 
   Widget _pill(String text) => DecoratedBox(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999), boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 5))]), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11), child: Text(text, style: const TextStyle(color: NwsbColors.ink, fontSize: 12, fontWeight: FontWeight.w800))));

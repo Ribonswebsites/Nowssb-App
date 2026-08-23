@@ -63,7 +63,9 @@ jobs:
       # google-services plugin is not applied by the FlutterFire packages.
       - name: Configure the Android project
         working-directory: .
-        run: node tools/flutter-android.mjs
+        run: |
+          node tools/flutter-android.mjs
+          node tools/flutter-updater-android.mjs
 
       - name: Dependencies
         run: flutter pub get
@@ -133,7 +135,9 @@ jobs:
       - name: Configure the Android project
         if: steps.guard.outputs.ok == 'true'
         working-directory: .
-        run: node tools/flutter-android.mjs
+        run: |
+          node tools/flutter-android.mjs
+          node tools/flutter-updater-android.mjs
 
       # Written into the runner for this run only. .gitignore already refuses
       # *.keystore, *.jks and key.properties, so it cannot reach the repo.

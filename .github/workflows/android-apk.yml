@@ -51,6 +51,9 @@ jobs:
       - name: Create the Android project
         run: npx cap add android
 
+      - name: Configure in-app updater
+        run: node tools/capacitor-updater.mjs
+
       - name: Sync
         run: npx cap sync android
 
@@ -109,6 +112,7 @@ jobs:
         if: steps.guard.outputs.ok == 'true'
         run: |
           npx cap add android
+          node tools/capacitor-updater.mjs
           npx cap sync android
 
       # The keystore is written into the runner's filesystem for this run only
