@@ -399,7 +399,6 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   Widget _startPracticeButton(BuildContext context) => Material(color: Colors.white, borderRadius: BorderRadius.circular(999), child: InkWell(onTap: () => Dest.open(context, Dest.player), borderRadius: BorderRadius.circular(999), child: Padding(padding: const EdgeInsets.fromLTRB(19, 8, 8, 8), child: Row(mainAxisSize: MainAxisSize.min, children: [const Text('Start practice', style: TextStyle(color: NwsbColors.ink, fontSize: 13, fontWeight: FontWeight.w800)), const SizedBox(width: 14), Container(width: 34, height: 34, decoration: const BoxDecoration(color: Color(0xFF080B13), shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Colors.white, size: 19))]))));
 
-  Widget _pill(String text) => DecoratedBox(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999), boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 5))]), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11), child: Text(text, style: const TextStyle(color: NwsbColors.ink, fontSize: 12, fontWeight: FontWeight.w800))));
 
   Widget _glass({required Widget child, required EdgeInsets padding}) => Container(padding: padding, decoration: BoxDecoration(color: const Color(0x7810132B), borderRadius: BorderRadius.circular(22), border: Border.all(color: const Color(0x2DFFFFFF)), boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 22, offset: Offset(0, 12))]), child: child);
 }

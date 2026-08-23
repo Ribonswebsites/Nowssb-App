@@ -148,7 +148,7 @@ class _Intro extends StatelessWidget {
         children: [
           if (art != null)
             NwsbImage(
-              art!,
+              asset: art!,
               fit: BoxFit.cover,
               alignment: Alignment.topCenter,
               error: const ColoredBox(color: NwsbColors.deep),

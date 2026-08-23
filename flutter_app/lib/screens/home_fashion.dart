@@ -393,7 +393,7 @@ class _FashTopRow extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: NwsbImage(
-            'assets/icons/logo-disc.webp',
+            asset: 'assets/icons/logo-disc.webp',
             fit: BoxFit.cover,
             error: const Icon(Icons.headphones, size: 22, color: Colors.white),
           ),

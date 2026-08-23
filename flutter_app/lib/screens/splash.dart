@@ -161,7 +161,7 @@ class _SplashState extends State<Splash> {
             // The clip's own first frame while it opens, so the launch is
             // never a black hole even for the half-second before playback.
             NwsbImage(
-              'assets/video/start-animation-poster.webp',
+              asset: 'assets/video/start-animation-poster.webp',
               fit: BoxFit.cover,
               error: const ColoredBox(color: Colors.black),
             ),

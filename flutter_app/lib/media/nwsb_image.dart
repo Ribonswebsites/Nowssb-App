@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 
 import 'cdn.dart';
 
-/// Shared NowssB image seam. It accepts the current bundled-asset form and the
-/// August 15 URL/fallback form so the exact baseline section widgets can be
-/// carried forward without losing current media behavior.
+/// Shared NowssB image seam for bundled assets and URL-backed August 15 art.
 class NwsbImage extends StatelessWidget {
-  const NwsbImage(
-    [this.asset], {
+  const NwsbImage({
     super.key,
+    this.asset,
     this.url,
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
@@ -27,7 +25,6 @@ class NwsbImage extends StatelessWidget {
 
   String get _source => url ?? asset ?? '';
   Widget get _fallback => fallback ?? error ?? const ColoredBox(color: Colors.black);
-
   bool get _isLocal => _source.startsWith('./assets/') || _source.startsWith('assets/');
   String get _localPath => _source.startsWith('./') ? _source.substring(2) : _source;
 
