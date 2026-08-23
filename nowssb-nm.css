@@ -15425,3 +15425,31 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
    poster. The video remains fully visible inside the card. */
 .nwsb-focus-card { min-height: 0 !important; height: auto; aspect-ratio: 1.9 / 1; }
 .nwsb-focus-content { min-height: 0 !important; height: 100%; }
+
+/* Reference Start practice control: white rounded button, black circular
+   arrow well, white arrow glyph. Scoped to the dashboard CTA only. */
+.nwsb-focus-cta {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 52px;
+  padding: 8px 8px 8px 20px !important;
+  border: 0;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #080b13 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,.18);
+}
+.nwsb-focus-cta span {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 50%;
+  background: #080b13;
+  color: #fff;
+  font-size: 21px;
+  line-height: 1;
+}

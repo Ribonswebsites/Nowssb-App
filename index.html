@@ -113,7 +113,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
-<link rel="stylesheet" href="nowssb-player-dial.css?v=7">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -974,10 +973,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          so leaving the entries on the two pieces inside would find nothing
          and strand them at the top of the page. -->
     <div class="nmh-sec-wrap nmh-streakvid-wrap">
-      <button class="nmh-wrap-x" type="button" aria-label="Remove the streak banner"
-              onclick="nmhDropSection('herovid', this)">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
       <div class="nmh-wrap-head">
         <div class="nmh-wrap-head-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0c0-1.4-.7-2.3-1.2-3 1 .4 3.4 2 3.4 5.6a5.6 5.6 0 0 1-11.2 0C6.4 9 10.3 7.3 12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         </div>
@@ -986,8 +981,18 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <div class="nmh-wrap-name">Streak</div>
         </div>
       </div>
-    <div class="nsvb-blk hero-vid-banner nmh-hero-vid nwsb-inframe dev-tab-l">
+    <!-- No tablet round it: the clip runs to the pane's own edges and the
+         black bar under it says where it goes, which is the shape every
+         other banner on this home has. -->
+    <div class="nsvb-blk hero-vid-banner nmh-hero-vid">
       <video data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-05_q3tyzk.mp4"></video>
+    </div>
+    <div class="ncb-carousel nsub-ban" role="button" onclick="openSub('practice')">
+      <div class="ncb-slide">
+        <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0c0-1.4-.7-2.3-1.2-3 1 .4 3.4 2 3.4 5.6a5.6 5.6 0 0 1-11.2 0C6.4 9 10.3 7.3 12 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+        <span class="ncb-txt"><span class="ncb-name">Keep Your Streak</span><span class="ncb-sub">Practice today and the run carries on</span></span>
+        <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
     </div>
     </div><!-- /nmh-streakvid-wrap : the banner is its own block -->
 
@@ -997,14 +1002,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
          Both are registered in app/js/part062.js — the registry matches a
          DIRECT child of the home, so each wrapper is its own entry. -->
     <div class="nmh-sec-wrap nmh-streak-wrap">
-      <div class="nmh-wrap-head">
-        <div class="nmh-wrap-head-ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0c0-1.4-.7-2.3-1.2-3 1 .4 3.4 2 3.4 5.6a5.6 5.6 0 0 1-11.2 0C6.4 9 10.3 7.3 12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="nmh-wrap-head-txt">
-          <div class="nmh-wrap-hello">One day at a time</div>
-          <div class="nmh-wrap-name">Your Streak</div>
-        </div>
-      </div>
+      <!-- No head. "Start Building Your Streak Today" below is this card's
+           heading, and an orb with "Your Streak" over the top of it was the
+           same thing said twice. -->
     <div class="nmh-streak-section">
       <div class="nmh-streak-heading">Start Building Your Streak Today</div>
       <div class="nmh-streak-subheading">Practice daily to keep it alive — and unlock exclusive offers</div>
@@ -1075,6 +1075,61 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
+
+    <!-- THE SIX — every main door in the app on one compact panel. Three
+         across and two down, a hairline between each, so the app can be used
+         without knowing where anything is. -->
+    <div class="mainops-blk nmh-sec-wrap">
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Everything, one tap away</div>
+          <div class="qa-tv-name">Where to Begin</div>
+        </div>
+      </div>
+      <div class="mo-box">
+        <div class="mo-row">
+          <button class="mo-cell" type="button" onclick="openSub('practice')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.2 19 12 8 18.8z"/></svg></span>
+            <span class="mo-lbl">Practice</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('sound-library')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/></svg></span>
+            <span class="mo-lbl">Sound Library</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('word-science')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M9 12h6"/></svg></span>
+            <span class="mo-lbl">Word Science</span>
+          </button>
+        </div>
+        <div class="mo-row">
+          <button class="mo-cell" type="button" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s)s.classList.add('open');})()">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>
+            <span class="mo-lbl">The Store</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('social')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.4" cy="8.4" r="3.4"/><path d="M3.4 19.4a6 6 0 0 1 12 0"/><path d="M16.4 5.4a3.4 3.4 0 0 1 0 6M17.6 19.4a6 6 0 0 0-1.6-4.1"/></svg></span>
+            <span class="mo-lbl">Connect</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('my-progress')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M6.8 20V13M11.4 20V7.2M16 20v-4.6"/></svg></span>
+            <span class="mo-lbl">My Progress</span>
+          </button>
+        </div>
+      </div>
+      <div class="ncb-carousel nsub-ban" role="button" onclick="openSub('my-progress')">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Find Your Way Around</span><span class="ncb-sub">Every screen in the app, and what each one is for</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+    </div>
+
     <!-- Reader — pill rail, then the clip, then the copy, then the black
          banner, all in one wrapper. Nothing is laid over the clip. -->
     <!-- eBooks — the same rail / clip / copy / banner order as the Reader. -->
@@ -1517,28 +1572,38 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- Your Edition, in a wrapper. .nedi-blk is what part062.js
          registers as 'edition' now. -->
     <div class="nedi-blk">
-    <div class="nmh-fsec nwsb-inframe dev-tabs-p" onclick="if(window.SS)SS.open('subscription')">
-        <div class="fsec-screen">
-          <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4"></video>
-          <div class="nmh-fsec-fade"></div>
-          <!-- Labels pinned to top of card -->
-          <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
-            <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
-            <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
-          </div>
-          <!-- Title + description sit directly above the Upgrade button -->
-          <div style="position:absolute;bottom:88px;left:20px;right:20px;z-index:2;">
-            <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.7);">Unlock your full<br>healing potential</div>
-            <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.82);line-height:1.6;max-width:280px;text-shadow:0 1px 8px rgba(0,0,0,0.7);">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
-          </div>
-          <!-- Upgrade button pinned to the bottom -->
-          <div style="position:absolute;bottom:24px;left:20px;right:20px;z-index:2;display:flex;align-items:center;gap:12px;">
-            <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
-            <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.85);letter-spacing:0.5px;">from $4.99/mo</div>
-          </div>
+    <div class="nmh-fsec" onclick="if(window.SS)SS.open('subscription')">
+      <!-- ONE section, not two. This card and the promo were both showing
+           the subscription film a few inches apart, one of them on a still.
+           Built like every other block here: the orb and its two lines, the
+           set, and one black bar. The offer is the only thing on the screen,
+           set into the top-left of the film where the clip stays dark. -->
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Free plan · upgrade any time</div>
+          <div class="qa-tv-name">NowssB Edition</div>
         </div>
       </div>
-    </div>
+      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
+        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
+               src="assets/video/subscription-promo.mp4"
+               poster="assets/video/subscription-promo-poster.webp"></video>
+        <div class="sub-promo-offer">
+          <div class="sub-promo-lead">Join today for</div>
+          <div class="sub-promo-big">30 Days <span>Free</span></div>
+          <div class="sub-promo-small">Subscribe · cancel anytime</div>
+        </div>
+      </div>
+      <div class="ncb-carousel nsub-ban" role="button" onclick="SS&&SS.open('subscription')">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Upgrade Now</span><span class="ncb-sub">From $4.99 a month · every word and frequency unlocked</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+    </div><!-- /nmh-fsec -->
+    </div><!-- /nedi-blk -->
 
     <!-- ══ HEALTH JOURNEY CARD — same section the Fashion Home carries ══ -->
     <!-- Reader — opens the chooser for the Meaning and eBook readers. -->
@@ -1586,21 +1651,28 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         <div class="nss-trigger-top">
           <span class="nss-trigger-eyebrow">Shabdapathy · Collections</span>
           <div class="nss-trigger-title">
+            <!-- NOT "Enter the NowssB Store": the film says NowssB Store in
+                 its own lettering and the section head says it above the
+                 card, so a third drawn copy was the store naming itself
+                 three times. This says what the store is FOR. -->
             <span class="nss-trigger-title-light">Enter the</span><br>
-            <span class="nss-trigger-title-bold">NowssB Store</span>
+            <span class="nss-trigger-title-bold">Future of Meditation</span>
           </div>
         </div>
         <div class="nss-trigger-bottom">
-          <div class="nss-trigger-sub">Word Library &amp; Meaning Library — own the sounds that heal, unlock the origins that were hidden.</div>
+          <div class="nss-trigger-go">
+            <span class="nss-trigger-go-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>
+            <span class="nss-trigger-go-rule"></span>
+            <button class="nss-trigger-btn nss-trigger-btn-top">
+              <span>Shop Now</span>
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+            </button>
+          </div>
           <div class="nss-trigger-pills">
             <span class="nss-trigger-pill">Word Library</span>
             <span class="nss-trigger-pill">Meaning Library</span>
             <span class="nss-trigger-pill">Organ Targeting</span>
           </div>
-          <button class="nss-trigger-btn">
-            <span>Explore Store</span>
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
-          </button>
         </div>
       </div>
     </div>
@@ -1813,6 +1885,61 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <!-- #fpBanner is appended here by app/js/part066.js -->
   </div>
+
+    <!-- THE SIX — every main door in the app on one compact panel. Three
+         across and two down, a hairline between each, so the app can be used
+         without knowing where anything is. -->
+    <div class="mainops-blk glass-wrap">
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Everything, one tap away</div>
+          <div class="qa-tv-name">Where to Begin</div>
+        </div>
+      </div>
+      <div class="mo-box">
+        <div class="mo-row">
+          <button class="mo-cell" type="button" onclick="openSub('practice')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.2 19 12 8 18.8z"/></svg></span>
+            <span class="mo-lbl">Practice</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('sound-library')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/></svg></span>
+            <span class="mo-lbl">Sound Library</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('word-science')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M9 12h6"/></svg></span>
+            <span class="mo-lbl">Word Science</span>
+          </button>
+        </div>
+        <div class="mo-row">
+          <button class="mo-cell" type="button" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s)s.classList.add('open');})()">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>
+            <span class="mo-lbl">The Store</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('social')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.4" cy="8.4" r="3.4"/><path d="M3.4 19.4a6 6 0 0 1 12 0"/><path d="M16.4 5.4a3.4 3.4 0 0 1 0 6M17.6 19.4a6 6 0 0 0-1.6-4.1"/></svg></span>
+            <span class="mo-lbl">Connect</span>
+          </button>
+          <span class="mo-rule"></span>
+          <button class="mo-cell" type="button" onclick="openSub('my-progress')">
+            <span class="mo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M6.8 20V13M11.4 20V7.2M16 20v-4.6"/></svg></span>
+            <span class="mo-lbl">My Progress</span>
+          </button>
+        </div>
+      </div>
+      <div class="ncb-carousel nsub-ban" role="button" onclick="openSub('my-progress')">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Find Your Way Around</span><span class="ncb-sub">Every screen in the app, and what each one is for</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+    </div>
+
   <!-- Reader — pill rail, then the clip, then the copy, then the black
        banner, all in one wrapper. Nothing is laid over the clip. -->
   <div class="rdsec-wrap fash-rdsec-wrap">
@@ -2196,29 +2323,39 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        the aperture rather than against the bezel. -->
   <!-- Your Edition, in its glass wrapper — see the Normal home. -->
   <div class="nedi-blk glass-wrap">
-    <div id="sub-promo-card" class="nwsb-inframe dev-tabs-p" style="display:none;width:calc(100% - 32px);min-height:560px;margin:0 16px 16px;position:relative;overflow:hidden;border-radius:16px;background:#060c18;border:1px solid rgba(232,213,163,0.2);padding:0;" onclick="SS&&SS.open('subscription')">
-      <div class="fsec-screen">
-        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/dc4nsi3xs/video/upload/v1784999997/1000002131_andxsu.mp4"></video>
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(6,12,24,0.0) 0%, rgba(6,12,24,0.15) 40%, rgba(6,12,24,0.72) 100%);"></div>
-        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(232,213,163,0.4),transparent);"></div>
-        <!-- Labels pinned to top of card -->
-        <div style="position:absolute;top:18px;left:20px;right:20px;z-index:2;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e8d5a3;text-shadow:0 1px 6px rgba(0,0,0,0.6);">NowssB Edition</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,232,245,0.75);text-shadow:0 1px 6px rgba(0,0,0,0.6);">Free Plan</div>
+    <div id="sub-promo-card" style="display:none;" onclick="SS&&SS.open('subscription')">
+      <!-- ONE section, not two. This card and the promo were both showing
+           the subscription film a few inches apart, one of them on a still.
+           Built like every other block here: the orb and its two lines, the
+           set, and one black bar. The offer is the only thing on the screen,
+           set into the top-left of the film where the clip stays dark. -->
+      <div class="qa-tv-head">
+        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="qa-tv-head-txt">
+          <div class="qa-tv-hello">Free plan · upgrade any time</div>
+          <div class="qa-tv-name">NowssB Edition</div>
         </div>
-        <!-- Title + description sit directly above the Upgrade button -->
-        <div style="position:absolute;bottom:88px;left:20px;right:20px;z-index:2;">
-          <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.7);">Unlock your full<br>healing potential</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.82);line-height:1.6;max-width:280px;text-shadow:0 1px 8px rgba(0,0,0,0.7);">50+ premium words · AI pronunciation scoring · 5 custom routines · Priority access to new word drops</div>
+      </div>
+      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
+        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
+               src="assets/video/subscription-promo.mp4"
+               poster="assets/video/subscription-promo-poster.webp"></video>
+        <div class="sub-promo-offer">
+          <div class="sub-promo-lead">Join today for</div>
+          <div class="sub-promo-big">30 Days <span>Free</span></div>
+          <div class="sub-promo-small">Subscribe · cancel anytime</div>
         </div>
-        <!-- Upgrade button pinned to the bottom -->
-        <div style="position:absolute;bottom:24px;left:20px;right:20px;z-index:2;display:flex;align-items:center;gap:12px;">
-          <div style="flex:1;background:#fff;color:#060c18;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;padding:14px 16px;border-radius:0;">Upgrade Now</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:rgba(232,213,163,0.85);letter-spacing:0.5px;">from $4.99/mo</div>
+      </div>
+      <div class="ncb-carousel nsub-ban" role="button" onclick="SS&&SS.open('subscription')">
+        <div class="ncb-slide">
+          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <span class="ncb-txt"><span class="ncb-name">Upgrade Now</span><span class="ncb-sub">From $4.99 a month · every word and frequency unlocked</span></span>
+          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </div>
       </div>
     </div>
   </div>
+
 
   <!-- Daily Practice and its black banner, in one wrapper. -->
   <div class="glass-wrap fash-routines-wrap">
@@ -2252,7 +2389,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <!-- The coupon art and the offer banner it belongs to, in one wrapper. -->
   <div class="glass-wrap fash-offer-wrap">
   <div class="fash-banner-wrap">
+    <!-- The src is HERE, not only in part049.js.
+         nowssb-nm.css:3386 hides this image outright while it has no src
+         attribute — `:not([src]) { display: none }` — so anything that stops
+         the rotator's opening `el.src = SEQ[0]` from running takes the whole
+         coupon out of the page and leaves Today's Offer as a bare black
+         banner with nothing above it. That is what it was doing. Setting it
+         in the markup means the art is on the page before a line of script
+         runs; the rotator still swaps it afterwards.
+         onerror drops to the bundled poster, so a CDN that is unreachable
+         costs the picture rather than the section. -->
     <img class="fash-coupon-img" id="fashCouponImg" alt="NowssB Store coupons" draggable="false"
+         src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg"
+         onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='assets/video/coupon-a-poster.webp';}"
          onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()" />
     <button class="fash-banner-cta fash-banner-cta-tc" id="fashCouponCta" onclick="event.stopPropagation();var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}"><span class="nmh-cta-lbl">Shop Now</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
   </div>
@@ -2513,24 +2662,29 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <div class="nss-trigger-top">
         <span class="nss-trigger-eyebrow">Shabdapathy · Collections</span>
         <div class="nss-trigger-title">
+          <!-- NOT "Enter the NowssB Store": the film says NowssB Store in
+               its own lettering and the section head says it above the
+               card, so a third drawn copy was the store naming itself
+               three times. This says what the store is FOR. -->
           <span class="nss-trigger-title-light">Enter the</span><br>
-          <span class="nss-trigger-title-bold">NowssB Store</span>
+          <span class="nss-trigger-title-bold">Future of Meditation</span>
         </div>
       </div>
       <div class="nss-trigger-bottom">
-        <div class="nss-trigger-sub">Word Library &amp; Meaning Library — own the sounds that heal, unlock the origins that were hidden.</div>
+        <div class="nss-trigger-go">
+          <span class="nss-trigger-go-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z"/><path d="M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10"/></svg></span>
+          <span class="nss-trigger-go-rule"></span>
+          <button class="nss-trigger-btn nss-trigger-btn-top">
+            <span>Shop Now</span>
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/></svg>
+          </button>
+        </div>
         <div class="nss-trigger-pills">
           <span class="nss-trigger-pill">Word Library</span>
           <span class="nss-trigger-pill">Meaning Library</span>
           <span class="nss-trigger-pill">Organ Targeting</span>
           <span class="nss-trigger-pill">AI-Decoded</span>
         </div>
-        <button class="nss-trigger-btn">
-          <span>Explore Store</span>
-          <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-            <path d="M3 7H11M7 3L11 7L7 11" stroke="#060c18" stroke-width="1.8" stroke-linecap="square"/>
-          </svg>
-        </button>
       </div>
     </div>
   </div>
@@ -10504,13 +10658,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part074.js?v=8"></script><!-- ══ NOWSSB SIGNATURE (store) ══ -->
 <script src="app/js/part076.js?v=112"></script><!-- ══ FASHION PLUS ══ -->
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
-<script src="app/js/part090.js?v=1"></script><!-- ══ TIME-AWARE HOME DASHBOARD ══ -->
-<script src="app/js/part091.js?v=1"></script><!-- ══ NOWSSB ESSENTIALS ══ -->
+<script src="app/js/part090.js?v=2"></script><!-- ══ NOWSSB TIME-AWARE DASHBOARD ══ -->
+<script src="app/js/part091.js?v=2"></script><!-- ══ NOWSSB ESSENTIALS ══ -->
+<script src="nowssb-update.js?v=2" defer></script>
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>
 <script src="nowssb-player.js?v=309" defer></script>
-<script src="nowssb-player-dial.js?v=7" defer></script>
-<script src="nowssb-update.js?v=1" defer></script>
 
 <script>
 /* ── How tall the fixed home header is, as a CSS variable ──

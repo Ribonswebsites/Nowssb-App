@@ -1,11 +1,11 @@
 {
-  "version": "9.6.7",
-  "build": 2026082303,
+  "version": "9.6.8",
+  "build": 2026082304,
   "force": false,
   "title": "NowssB update ready",
-  "notes": "Normal Home is streamlined: Connect, subscription, and Customize sections are removed. The current dashboard, essentials, pronunciation scoring, local-time banners, and in-app updater remain included.",
+  "notes": "Both Android surfaces use the August 15 source baseline with accumulated Groq pronunciation scoring, R2 time-aware banners, dashboard, essentials, in-app updates, and the streamlined Normal Home.",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
-  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.7-android/nowssb-webview-debug.apk",
-  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.7-android/nowssb-flutter-debug.apk",
-  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.7-android/nowssb-webview-debug.apk"
+  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.8-android/nowssb-webview-debug.apk",
+  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.8-android/nowssb-flutter-debug.apk",
+  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.8-android/nowssb-webview-debug.apk"
 }

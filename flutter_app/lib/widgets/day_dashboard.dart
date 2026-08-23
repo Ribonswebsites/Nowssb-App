@@ -254,7 +254,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
                             ),
                           ),
                           const SizedBox(height: 15),
-                          _pill('Start practice  →'),
+                          _startPracticeButton(context),
                         ],
                       ),
                     ),
@@ -396,6 +396,8 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     final card = Container(height: 166, decoration: BoxDecoration(color: widget.fashion ? const Color(0x8C141027) : const Color(0xFFF7F5F2), borderRadius: BorderRadius.circular(20), boxShadow: const [BoxShadow(color: Color(0x143D3747), blurRadius: 12, offset: Offset(0, 7))]), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Container(height: 105, decoration: BoxDecoration(borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), gradient: LinearGradient(colors: colors)), child: Icon(icon, color: Colors.white, size: 38)), Padding(padding: const EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.fashion ? Colors.white : NwsbColors.ink, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 4), Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint, fontSize: 11))]))]));
     return InkWell(onTap: () => Dest.open(context, destination), borderRadius: BorderRadius.circular(20), child: card);
   }
+
+  Widget _startPracticeButton(BuildContext context) => Material(color: Colors.white, borderRadius: BorderRadius.circular(999), child: InkWell(onTap: () => Dest.open(context, Dest.player), borderRadius: BorderRadius.circular(999), child: Padding(padding: const EdgeInsets.fromLTRB(19, 8, 8, 8), child: Row(mainAxisSize: MainAxisSize.min, children: [const Text('Start practice', style: TextStyle(color: NwsbColors.ink, fontSize: 13, fontWeight: FontWeight.w800)), const SizedBox(width: 14), Container(width: 34, height: 34, decoration: const BoxDecoration(color: Color(0xFF080B13), shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Colors.white, size: 19))]))));
 
   Widget _pill(String text) => DecoratedBox(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999), boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 5))]), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11), child: Text(text, style: const TextStyle(color: NwsbColors.ink, fontSize: 12, fontWeight: FontWeight.w800))));
 
