@@ -183,7 +183,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: SizedBox(
-        height: 214,
+        height: 250,
         child: Stack(
           fit: StackFit.expand,
           children: [
