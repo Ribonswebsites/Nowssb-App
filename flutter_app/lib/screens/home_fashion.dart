@@ -56,6 +56,12 @@ class _HomeFashionState extends State<HomeFashion> {
     if (mounted) setState(() {});
   }
 
+  void _go(int tab) => Dest.open(context, tab);
+
+  void _push(Widget page) => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => page),
+      );
+
   @override
   Widget build(BuildContext context) {
     final words = ContentStore.instance.library;
@@ -359,6 +365,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 ),
               ),
             ],
+          ),
         ],
       ),
     );
