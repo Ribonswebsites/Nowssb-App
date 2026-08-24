@@ -72,6 +72,22 @@ class SectionPane extends StatelessWidget {
 }
 
 /// The head a section opens with — `.qa-tv-head` or `.nmh-wrap-head`.
+/// Outer page gutter for standalone Home children that do not use
+/// [SectionPane], [SecWrap] or [GlassWrap]. Keeping this separate from pane
+/// padding prevents the Hero card and dashboard internals from changing size.
+class HomeGutter extends StatelessWidget {
+  const HomeGutter({super.key, required this.child, this.horizontal = 16});
+
+  final Widget child;
+  final double horizontal;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontal),
+        child: child,
+      );
+}
+
 class PaneHead extends StatelessWidget {
   const PaneHead({
     super.key,

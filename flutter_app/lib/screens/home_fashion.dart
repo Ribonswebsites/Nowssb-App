@@ -21,6 +21,7 @@ import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../widgets/home_skin.dart';
 import 'home_normal.dart' show nwsbGreeting;
 import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
@@ -117,11 +118,13 @@ class _HomeFashionState extends State<HomeFashion> {
                       onStore: () => _go(3),
                       onRail: _go,
                     ),
-                    const _FashPathHeading(),
+                    const HomeGutter(child: _FashPathHeading()),
                     const SizedBox(height: 14),
-                    const NwsbDayDashboard(fashion: true),
+                    const HomeGutter(
+                      child: NwsbDayDashboard(fashion: true),
+                    ),
                 const SizedBox(height: 16),
-                const _FashHeroRow(),
+                    const HomeGutter(child: _FashHeroRow()),
                 const SizedBox(height: 16),
                 _FashWordOfDay(words: words),
                 const SizedBox(height: 16),
@@ -154,7 +157,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 const SizedBox(height: 16),
                 const _FashStreak(),
                 const SizedBox(height: 16),
-                const _FashTiles(),
+                    const HomeGutter(child: _FashTiles()),
                 const SizedBox(height: 16),
                 GlassWrap(
                   child: TvSection(
@@ -275,7 +278,7 @@ class _HomeFashionState extends State<HomeFashion> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const _FashQuickRow(),
+                    const HomeGutter(child: _FashQuickRow()),
                 const SizedBox(height: 16),
                 GlassWrap(
                   child: TvSection(

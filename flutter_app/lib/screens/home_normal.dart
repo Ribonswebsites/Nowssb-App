@@ -155,7 +155,13 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        ('dashboard', const NwsbDayDashboard(fashion: false)),
+        (
+          'dashboard',
+          const HomeGutter(
+            horizontal: 20,
+            child: NwsbDayDashboard(fashion: false),
+          ),
+        ),
         ('streak', NmStreak(onTap: () => _go(1))),
         (
           'storedisc',
