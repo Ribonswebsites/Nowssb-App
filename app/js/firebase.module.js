@@ -30,6 +30,14 @@ const db   = getFirestore(app);
 // uses the v9 modular SDK, so consumers must too (no v8 .collection() chaining).
 window._db = db;
 window._splashStartTime = Date.now();
+// AURA settings writes this marker before leaving the live Player. On a cold
+// WebView return, route straight through Home so index.html can reopen Player
+// without showing the normal branded splash sequence.
+window._nwsbReturnToPlayer = false;
+try {
+  var _auraReturn = JSON.parse(sessionStorage.getItem('nwsb_return_to_player') || 'null');
+  window._nwsbReturnToPlayer = !!(_auraReturn && _auraReturn.ts && Date.now() - _auraReturn.ts < 5 * 60 * 1000);
+} catch (e) {}
     // Optimization: Defer non-critical font loading
     if ('fonts' in document) {
       document.fonts.ready.then(() => {
@@ -142,6 +150,12 @@ onAuthStateChanged(auth, async user => {
 
     // ── DURING SPLASH: logged-in users go to home or onboarding ──
     if (currentScreen === 'splash') {
+      if (window._nwsbReturnToPlayer) {
+        window._splashRoute = 'home';
+        window._splashDone = true;
+        _doNavigate('home');
+        return;
+      }
       // Set placeholder immediately so the fallback timer never defaults to 'login'
       window._splashRoute = 'home';
       try {
@@ -211,6 +225,13 @@ onAuthStateChanged(auth, async user => {
 
     // Unauthenticated → go straight to login
     if (currentScreen === 'splash') {
+      if (window._nwsbReturnToPlayer) {
+        window._guestMode = true;
+        window._splashRoute = 'home';
+        window._splashDone = true;
+        _doNavigate('home');
+        return;
+      }
       window._splashRoute = 'login';
       if (window._splashDone) _doNavigate('login');
       return;
