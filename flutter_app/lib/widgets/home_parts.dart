@@ -177,8 +177,10 @@ class SecBanner extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: const Color(0x14FFFFFF)),
         ),
         child: Row(

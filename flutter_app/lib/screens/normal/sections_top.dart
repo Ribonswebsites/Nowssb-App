@@ -116,8 +116,9 @@ class NmSearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Keep the search pill visually separated from the focus video below it.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       child: _SearchBar(onSearch: onSearch),
     );
   }

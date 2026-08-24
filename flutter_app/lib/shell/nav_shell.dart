@@ -10,7 +10,6 @@ import '../screens/library.dart';
 import '../screens/practice.dart';
 import '../screens/profile.dart';
 import '../screens/store.dart';
-import '../widgets/pool_hud.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
@@ -144,10 +143,8 @@ class _NavShellState extends State<NavShell> {
               ),
             ),
 
-          // Debug only, and compiled out of a release build: the decoder
-          // count, live, so the ceiling is something you can watch rather
-          // than something you have to take on trust.
-          const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
+          // The decoder HUD is development instrumentation only and is not
+          // part of the user-facing Flutter surface.
           Positioned(
             left: 14,
             right: 14,
