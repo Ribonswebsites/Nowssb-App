@@ -15513,3 +15513,34 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   overflow: hidden !important;
   border-radius: 20px !important;
 }
+
+/* ══ WEBVIEW HOME — rounded reference panels ══
+   Keep every visible dashboard surface rounded on all four corners. The
+   outer list clips its rows; each standalone panel also gets its own radius
+   so later theme rules cannot restore square edges. */
+.nwsb-daydash .nwsb-focus-card,
+.nwsb-daydash .nwsb-progress-card,
+.nwsb-daydash .nwsb-upnext-list {
+  border-radius: 24px !important;
+  overflow: hidden !important;
+}
+.nwsb-daydash .nwsb-progress-card {
+  box-sizing: border-box !important;
+}
+.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card,
+.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card:first-child,
+.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card:last-child {
+  border-radius: 0 !important;
+}
+.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card:first-child {
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+}
+.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card:last-child {
+  border-bottom-left-radius: 24px !important;
+  border-bottom-right-radius: 24px !important;
+}
+.nwsb-daydash .nwsb-focus-card video,
+.nwsb-daydash .nwsb-focus-card img {
+  border-radius: inherit !important;
+}
