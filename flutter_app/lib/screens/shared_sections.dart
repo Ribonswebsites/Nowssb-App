@@ -256,6 +256,7 @@ class MainOptionsSection extends StatelessWidget {
             title: 'Where to Begin',
             mark: NwsbMarks.sliders,
           ),
+          const SizedBox(height: 14),
           Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
@@ -274,7 +275,7 @@ class MainOptionsSection extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           SecBanner(
             title: 'Find Your Way Around',
             sub: 'Every screen in the app, and what each one is for',

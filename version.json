@@ -1,11 +1,11 @@
 {
-  "version": "9.6.14",
-  "build": 2026082406,
+  "version": "9.6.15",
+  "build": 2026082407,
   "force": false,
   "title": "NowssB update ready",
-  "notes": "Both Android surfaces use the August 15 source baseline with accumulated Groq pronunciation scoring, R2 shared video catalog, concurrent visible Flutter/WebView playback, five Fashion Plus backgrounds, corrected Flutter Normal Home spacing and rounded section banners, bundled exact hero films, reliable visible video startup, dashboard, essentials, and in-app updates.",
+  "notes": "Both Android surfaces use the August 15 source baseline with accumulated Groq pronunciation scoring, R2 shared video catalog, concurrent visible Flutter/WebView playback, five Fashion Plus backgrounds, corrected Flutter Normal Home spacing and rounded section banners, bundled exact hero films, reliable visible video startup, restored Fashion Where to Begin parity, dashboard, essentials, and in-app updates.",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
   "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.12-android/nowssb-webview-debug.apk",
-  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.14-android/nowssb-flutter-debug.apk",
+  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.15-android/nowssb-flutter-debug.apk",
   "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.12-android/nowssb-webview-debug.apk"
 }

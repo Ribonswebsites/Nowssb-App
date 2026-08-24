@@ -26,6 +26,7 @@ import 'home_normal.dart' show nwsbGreeting;
 import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
 import 'sections.dart';
+import 'shared_sections.dart';
 import 'widgets_page.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
@@ -123,7 +124,11 @@ class _HomeFashionState extends State<HomeFashion> {
                     const HomeGutter(
                       child: NwsbDayDashboard(fashion: true),
                     ),
-                const SizedBox(height: 16),
+                    const SizedBox(height: 16),
+                    HomeGutter(
+                      child: MainOptionsSection(onGo: _go),
+                    ),
+                    const SizedBox(height: 16),
                     const HomeGutter(child: _FashHeroRow()),
                 const SizedBox(height: 16),
                 _FashWordOfDay(words: words),
