@@ -72,14 +72,11 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     _pump();
   }
 
-  /// Feature clips (the page film, the televisions, the hero) always play.
-  /// Decorative banners play when Fashion Plus is on — which is the default,
-  /// matching the website. Off, they hold their first frame and cost nothing.
-  bool get _shouldPlay {
-    if (!widget.autoplay) return false;
-    if (widget.priority == ClipPriority.feature) return true;
-    return Settings.instance.fashionPlus;
-  }
+  /// Every visual clip is autoplay decoration in this app. The WebView starts
+  /// all visible muted films together; Flutter must not turn section videos
+  /// into posters merely because the Fashion Plus preference is off. The
+  /// preference can still shape the page skin, but it is not a play/stop gate.
+  bool get _shouldPlay => widget.autoplay;
 
   void _onSettings() {
     final want = _shouldPlay;

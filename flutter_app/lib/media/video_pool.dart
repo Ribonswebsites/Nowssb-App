@@ -457,16 +457,15 @@ class VideoPool {
     l._changed();
   }
 
-  /// Bundled file first, then the same path on nowssb.com / GitHub Pages.
+  /// R2 catalog first, then the bundled file, then the public site.
   ///
-  /// The posters are always there. The moving picture is what was missing
-  /// when a build skipped `tools/flutter-assets.mjs` — the declared
-  /// `assets/video/` directory was empty, every controller failed, and
-  /// every banner sat on its first frame forever. That is what "the
-  /// videos are not playing" actually was.
+  /// The posters are always there. R2 is the shared source used by both the
+  /// WebView and Flutter; the bundled copy keeps the same screen usable when
+  /// the network is unavailable.
   Future<VideoPlayerController?> _open(String assetPath) async {
-    final remoteFirst = assetPath.startsWith('assets/video/time-') ||
-        assetPath == 'assets/video/hero-bg.mp4';
+    // Every visual clip uses the shared R2 catalog first. The bundled copy
+    // remains the immediate offline fallback for the same asset path.
+    final remoteFirst = assetPath.startsWith('assets/video/');
     final urls = NwsbCdn.urls(assetPath).toList();
 
     Future<VideoPlayerController?> openNetwork() async {

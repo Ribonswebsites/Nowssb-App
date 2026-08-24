@@ -1,7 +1,7 @@
 name: nowssb
 description: NowssB — Shabdapathy. Natural Origin of Word Science.
 publish_to: 'none'
-version: 9.6.11+9
+version: 9.6.12+10
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -47,7 +47,8 @@ flutter:
 
   assets:
     # Every clip and its poster, on the phone after the download — no
-    # network, no Cloudinary, no buffering. 35 mp4 and 35 -poster.webp.
+    # network, no Cloudinary, no buffering. The repository ships the complete
+    # shared mp4 catalog and matching posters.
     #
     # The posters are not decoration: off-screen clips show them, on-screen
     # clips play (see lib/media/video_pool.dart). Every poster is the clip's

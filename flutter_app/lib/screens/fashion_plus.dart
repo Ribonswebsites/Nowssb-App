@@ -25,6 +25,16 @@ class FashionPlusScreen extends StatefulWidget {
 }
 
 class _FashionPlusScreenState extends State<FashionPlusScreen> {
+  static const _films = <(String, String)>[
+    ('assets/video/fashion-plus-bg.mp4', 'Shattered Glass'),
+    ('assets/video/fashion-plus-bg-1.mp4', 'Background Two'),
+    ('assets/video/fashion-plus-bg-2.mp4', 'Background Three'),
+    ('assets/video/fashion-plus-bg-3.mp4', 'Background Four'),
+    ('assets/video/fashion-plus-bg-4.mp4', 'Background Five'),
+  ];
+
+  int _filmIndex = 4;
+
   @override
   void initState() {
     super.initState();
@@ -62,8 +72,8 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
       eyebrow: 'Experience',
       title: 'The still ones\nstart moving.',
       body: 'The Fashion home in motion — the tiles, the practice card, and '
-          'every page that was wearing a photograph. One switch, and the '
-          'battery it costs.',
+          'every visible page and section film loop together. Choose one of '
+          'five managed Fashion Plus backgrounds for this page.',
       stats: [
         '${_changes.length} changes',
         'Fashion home',
@@ -74,7 +84,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
       child: PageShell(
         eyebrow: 'Experience',
         title: 'Fashion Plus',
-        film: 'assets/video/fashion-plus-bg.mp4',
+        film: _films[_filmIndex].$1,
         onBack: () => Navigator.of(context).maybePop(),
         slivers: [
           SliverPadding(
@@ -83,6 +93,12 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
               _Switch(
                 on: on,
                 onChanged: (v) => Settings.instance.setFashionPlus(v),
+              ),
+              const SizedBox(height: 16),
+              _FilmPicker(
+                films: _films,
+                selected: _filmIndex,
+                onSelected: (i) => setState(() => _filmIndex = i),
               ),
               const SizedBox(height: 24),
               const DarkHead(
@@ -96,6 +112,77 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
               const SizedBox(height: 18),
               const _Cost(),
             ]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilmPicker extends StatelessWidget {
+  const _FilmPicker({
+    required this.films,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<(String, String)> films;
+  final int selected;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0x1AFFFFFF),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0x1FFFFFFF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Choose the Fashion Plus background',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (var i = 0; i < films.length; i++)
+                GestureDetector(
+                  onTap: () => onSelected(i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                    decoration: BoxDecoration(
+                      color: i == selected
+                          ? NwsbColors.goldLight
+                          : const Color(0x1FFFFFFF),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: i == selected
+                            ? NwsbColors.goldLight
+                            : const Color(0x24FFFFFF),
+                      ),
+                    ),
+                    child: Text(
+                      films[i].$2,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: i == selected ? NwsbColors.ink : Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),

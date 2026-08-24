@@ -25,13 +25,18 @@ class NwsbCdn {
 
   static Iterable<String> urls(String assetPath) sync* {
     final clean = assetPath.split('?').first;
-    if (clean.startsWith('assets/video/time-')) {
+    if (clean.startsWith('assets/video/')) {
       final file = clean.split('/').last;
-      yield mediaUrl('home-banners/$file');
-    } else if (clean == 'assets/video/hero-bg.mp4') {
-      // The Fashion hero is served from R2 first so both APKs use the same
-      // managed media object; the bundled file remains the offline fallback.
-      yield mediaUrl('hero/hero-bg.mp4');
+      if (clean.startsWith('assets/video/time-')) {
+        // Keep the established time-aware banner keys used by the dashboard.
+        yield mediaUrl('home-banners/$file');
+      } else if (clean == 'assets/video/hero-bg.mp4') {
+        // The Fashion hero has its stable managed key.
+        yield mediaUrl('hero/hero-bg.mp4');
+      } else {
+        // Every other background and section film shares the R2 video catalog.
+        yield mediaUrl('video/$file');
+      }
     }
     yield* origins.map((o) => '$o$assetPath');
   }

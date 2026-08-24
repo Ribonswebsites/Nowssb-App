@@ -298,14 +298,42 @@
      drives by hand — the hero rail sets and clears its own sources and is
      marked data-nwsb-vis to say so. */
   var STASH = 'data-nwsb-src';
+  var LOCAL = 'data-nwsb-local-src';
+  var R2SRC = 'data-nwsb-r2-src';
+  var R2FAILED = 'data-nwsb-r2-failed';
+  var R2_VIDEO_BASE = 'https://nowssb-api.ribonpatil2.workers.dev/media/video/';
   var near = new WeakSet();     // clip is within a screen of the viewport
   var mine = false;             // this file is the one writing src right now
 
+  function localVideoSrc(src) {
+    if (!src) return '';
+    var clean = src.split('#')[0].split('?')[0];
+    return /^(?:\.\/)?assets\/video\/[^/]+\.mp4$/i.test(clean) ? clean : '';
+  }
+
+  function r2VideoSrc(src) {
+    var local = localVideoSrc(src);
+    if (!local) return '';
+    var file = local.split('/').pop();
+    if (file === 'hero-bg.mp4') return 'https://nowssb-api.ribonpatil2.workers.dev/media/hero/hero-bg.mp4';
+    if (/^time-(morning|afternoon|evening|night)\.mp4$/i.test(file)) {
+      return 'https://nowssb-api.ribonpatil2.workers.dev/media/home-banners/' + file;
+    }
+    return R2_VIDEO_BASE + file;
+  }
+
   function mount(v) {
     var src = v.getAttribute(STASH);
-    if (!src || v.getAttribute('src') === src) return;
+    if (!src) return;
+    var local = v.getAttribute(LOCAL) || localVideoSrc(src) || src;
+    v.setAttribute(LOCAL, local);
+    var remote = r2VideoSrc(local);
+    var preferred = remote && v.getAttribute(R2FAILED) !== '1' ? remote : local;
+    if (v.getAttribute('src') === preferred) return;
+    if (remote) v.setAttribute(R2SRC, remote);
+    poster(v);
     mine = true;
-    v.setAttribute('src', src);
+    v.setAttribute('src', preferred);
     mine = false;
     try { v.load(); } catch (e) {}
   }
@@ -313,7 +341,8 @@
   function unmount(v) {
     var cur = v.getAttribute('src');
     if (!cur) return;
-    v.setAttribute(STASH, cur);
+    var local = v.getAttribute(LOCAL) || localVideoSrc(cur) || cur;
+    v.setAttribute(STASH, local);
     try { v.pause(); } catch (e) {}
     mine = true;
     v.removeAttribute('src');
@@ -321,6 +350,24 @@
     /* the release. Without this the element holds its buffers. */
     try { v.load(); } catch (e) {}
   }
+
+  /* R2 is authoritative for the shared catalog, but a network outage must
+     never turn a visible card black: one media error downgrades that element
+     to its bundled copy for the rest of this session. */
+  document.addEventListener('error', function (e) {
+    var v = e.target;
+    if (!v || v.tagName !== 'VIDEO') return;
+    var remote = v.getAttribute(R2SRC);
+    if (!remote || v.getAttribute('src') !== remote) return;
+    var local = v.getAttribute(LOCAL) || v.getAttribute(STASH);
+    if (!local) return;
+    v.setAttribute(R2FAILED, '1');
+    v.setAttribute(STASH, local);
+    mine = true;
+    v.setAttribute('src', local);
+    mine = false;
+    try { v.load(); } catch (err) {}
+  }, true);
 
   /* One viewport of margin on each side: by the time a section is scrolled
      to, its clip has been mounted for a screen's worth of travel. */
@@ -352,8 +399,16 @@
       var v = m.target;
       var cur = v.getAttribute('src');
       if (!cur) return;
-      if (near.has(v)) { v.setAttribute(STASH, cur); poster(v); return; }
-      v.setAttribute(STASH, cur);
+      var local = localVideoSrc(cur) || cur;
+      v.setAttribute(LOCAL, local);
+      v.setAttribute(R2FAILED, '');
+      if (near.has(v)) {
+        v.setAttribute(STASH, local);
+        poster(v);
+        mount(v);                         /* remount the new clip through R2 */
+        return;
+      }
+      v.setAttribute(STASH, local);
       poster(v);                       /* the new clip's frame, not the old one's */
       try { v.pause(); } catch (e) {}
       mine = true;
@@ -437,6 +492,8 @@
          A page that starts with every source attached is a page that has
          already paid for every decoder before anyone has scrolled. */
       if (mountIo && manageable(v)) {
+        var local = localVideoSrc(v.getAttribute('src')) || v.getAttribute('src') || v.getAttribute(STASH);
+        if (local) v.setAttribute(LOCAL, local);
         unmount(v);
         mountIo.observe(v);
         if (srcWatch) srcWatch.observe(v, { attributes: true, attributeFilter: ['src'] });
