@@ -15544,3 +15544,44 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
 .nwsb-daydash .nwsb-focus-card img {
   border-radius: inherit !important;
 }
+
+/* Rebuilt Essentials / Helping Others reference pass. The list has a real
+   progress rail; the supporting cards are a horizontal, touch-scrollable
+   gallery so all eight working destinations remain available without
+   squeezing or overflowing on narrow Android screens. */
+.nwsb-essentials-reference .nwsb-essential-featured-card { min-height: 182px; }
+.nwsb-essentials-reference .nwsb-essential-row { min-height: 74px; }
+.nwsb-essentials-reference .nwsb-help-rail {
+  display: flex;
+  gap: 14px;
+  width: calc(100% + 4px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0 2px 10px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.nwsb-essentials-reference .nwsb-help-rail::-webkit-scrollbar { display: none; }
+.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-card {
+  flex: 0 0 190px;
+  width: 190px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: start;
+  border-radius: 22px;
+}
+.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-art { height: 124px; flex: 0 0 124px; }
+.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-copy { min-height: 0; flex: 1; padding: 13px 12px 10px 14px; }
+.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; line-height: 1.2; }
+.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-copy small { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin-top: 5px; font-size: 11px; line-height: 1.25; }
+.nwsb-essentials-reference .nwsb-help-blue .nwsb-help-art { background: linear-gradient(135deg,#243b73,#70a0d8); }
+.nwsb-essentials-reference .nwsb-help-mint .nwsb-help-art { background: linear-gradient(135deg,#218c7a,#7ad7b2); }
+.nwsb-essentials-reference .nwsb-help-amber .nwsb-help-art { background: linear-gradient(135deg,#e58c3a,#ffcb68); }
+.nwsb-essentials-reference .nwsb-help-coral .nwsb-help-art { background: linear-gradient(135deg,#b84a4a,#ff9a79); }
+.nwsb-essentials-reference .nwsb-help-cyan .nwsb-help-art { background: linear-gradient(135deg,#3a6d8c,#83c9d9); }
+@media (max-width: 380px) {
+  .nwsb-essentials-reference .nwsb-help-rail { gap: 10px; }
+  .nwsb-essentials-reference .nwsb-help-rail .nwsb-help-card { flex-basis: 178px; width: 178px; }
+}

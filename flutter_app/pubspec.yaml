@@ -1,7 +1,7 @@
 name: nowssb
 description: NowssB — Shabdapathy. Natural Origin of Word Science.
 publish_to: 'none'
-version: 9.6.16+14
+version: 9.6.17+15
 
 environment:
   sdk: '>=3.4.0 <4.0.0'

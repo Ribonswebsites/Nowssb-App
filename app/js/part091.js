@@ -9,12 +9,22 @@
   var ITEMS = [
     { id: 'practice', icon: 'lock', title: 'Today’s word ritual', sub: 'Today’s pronunciation', meta: '3–20 min', action: 'practice', featured: true, favorite: true },
     { id: 'sound-library', icon: 'sound', title: 'Sound Library', sub: 'Root frequencies for focused listening', meta: 'Explore', action: 'sound-library', favorite: true },
-    { id: 'word-science', icon: 'lock', title: 'Word Science', sub: 'Discover the origin behind any word', meta: 'Explore', action: 'word-science', favorite: false },
-    { id: 'health-journey', icon: 'lock', title: 'Healing Journey', sub: 'Choose a body, organ or mind path', meta: 'Explore', action: 'health-journey', favorite: true }
+    { id: 'health-journey', icon: 'lock', title: 'Healing Journey', sub: 'Choose a body, organ or mind path', meta: 'Explore', action: 'health-journey', favorite: true },
+    { id: 'word-science', icon: 'science', title: 'Word Science', sub: 'Discover the origin behind any word', meta: 'Explore', action: 'word-science', favorite: false },
+    { id: 'my-progress', icon: 'science', title: 'My Progress', sub: 'See your practice and sound score', meta: 'Open', action: 'my-progress', favorite: true },
+    { id: 'routines', icon: 'sound', title: 'Build your routine', sub: 'Set a daily practice system', meta: 'Open', action: 'routines', favorite: false },
+    { id: 'social', icon: 'lock', title: 'Connect', sub: 'People, chat and the NowssB feed', meta: 'Open', action: 'social', favorite: false },
+    { id: 'fashion-plus', icon: 'science', title: 'Fashion Plus', sub: 'Explore the moving visual practice', meta: 'Open', action: 'fashion-plus', favorite: false }
   ];
   var HELP = [
     { icon: 'sound', title: 'Voice scoring', sub: 'Practice and see your sound score', action: 'practice', art: 'violet' },
-    { icon: 'science', title: 'Word Science', sub: 'Meanings, origins and sound', action: 'word-science', art: 'pink' }
+    { icon: 'science', title: 'Word Science', sub: 'Meanings, origins and sound', action: 'word-science', art: 'pink' },
+    { icon: 'sound', title: 'Sleep Music', sub: 'Settle into a quieter frequency', action: 'sound-library', art: 'blue' },
+    { icon: 'science', title: 'Healing Journey', sub: 'Choose a body, organ or mind path', action: 'health-journey', art: 'mint' },
+    { icon: 'sound', title: 'Daily Routines', sub: 'Five slots to keep your practice moving', action: 'routines', art: 'amber' },
+    { icon: 'lock', title: 'Connect', sub: 'People, chat and the NowssB feed', action: 'social', art: 'coral' },
+    { icon: 'science', title: 'The Store', sub: 'Words, meanings and sound tools', action: 'nowssb-store', art: 'cyan' },
+    { icon: 'science', title: 'Fashion Plus', sub: 'A moving practice for the senses', action: 'fashion-plus', art: 'violet' }
   ];
 
   function esc(value) { return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
@@ -49,7 +59,7 @@
         '<div class="nwsb-essentials-heading"><div><h2>Your essentials</h2></div></div>' +
         '<div class="nwsb-essentials-shell"><div class="nwsb-essential-list" data-essential-list></div></div>' +
         '<div class="nwsb-help-heading"><h3>What’s helping others</h3><button type="button" data-essential-help-view aria-label="Open helpful NowssB features">›</button></div>' +
-        '<div class="nwsb-help-grid">' + HELP.map(helpCard).join('') + '</div>' +
+        '<div class="nwsb-help-rail">' + HELP.map(helpCard).join('') + '</div>' +
       '</div>' +
     '</section>';
   }

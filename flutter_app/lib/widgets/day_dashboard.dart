@@ -114,6 +114,16 @@ class _EssentialItem {
   final bool favorite;
 }
 
+class _HelpingItem {
+  const _HelpingItem({required this.icon, required this.title, required this.subtitle, required this.destination, required this.colors});
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Object destination;
+  final List<Color> colors;
+}
+
 class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   NwsbDaySlot _slot = nwsbDaySlot();
@@ -126,8 +136,23 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   static const _essentials = <_EssentialItem>[
     _EssentialItem(icon: Icons.mic_none_outlined, title: 'Today’s word ritual', subtitle: 'Today’s pronunciation', meta: '3–20 min', destination: Dest.player, featured: true, favorite: true),
     _EssentialItem(icon: Icons.graphic_eq_outlined, title: 'Sound Library', subtitle: 'Root frequencies for focused listening', meta: 'Explore', destination: Dest.sound, favorite: true),
-    _EssentialItem(icon: Icons.lock_outline, title: 'Word Science', subtitle: 'Discover the origin behind any word', meta: 'Explore', destination: Dest.library),
     _EssentialItem(icon: Icons.lock_outline, title: 'Healing Journey', subtitle: 'Choose a body, organ or mind path', meta: 'Explore', destination: Dest.healing, favorite: true),
+    _EssentialItem(icon: Icons.science_outlined, title: 'Word Science', subtitle: 'Discover the origin behind any word', meta: 'Explore', destination: Dest.library),
+    _EssentialItem(icon: Icons.track_changes_outlined, title: 'My Progress', subtitle: 'See your practice and sound score', meta: 'Open', destination: Dest.profile, favorite: true),
+    _EssentialItem(icon: Icons.repeat_rounded, title: 'Build your routine', subtitle: 'Set a daily practice system', meta: 'Open', destination: Dest.routines),
+    _EssentialItem(icon: Icons.groups_outlined, title: 'Connect', subtitle: 'People, chat and the NowssB feed', meta: 'Open', destination: Dest.connect),
+    _EssentialItem(icon: Icons.auto_awesome_outlined, title: 'Fashion Plus', subtitle: 'Explore the moving visual practice', meta: 'Open', destination: Dest.fashionPlus),
+  ];
+
+  static const _helping = <_HelpingItem>[
+    _HelpingItem(icon: Icons.graphic_eq_outlined, title: 'Voice scoring', subtitle: 'Practice and see your sound score', destination: Dest.player, colors: [Color(0xFF55318E), Color(0xFFAD75D0)]),
+    _HelpingItem(icon: Icons.auto_awesome_outlined, title: 'Word Science', subtitle: 'Meanings, origins and sound', destination: Dest.library, colors: [Color(0xFFEF62AC), Color(0xFFFF9BD2)]),
+    _HelpingItem(icon: Icons.nightlight_round, title: 'Sleep Music', subtitle: 'Settle into a quieter frequency', destination: Dest.sound, colors: [Color(0xFF243B73), Color(0xFF70A0D8)]),
+    _HelpingItem(icon: Icons.spa_outlined, title: 'Healing Journey', subtitle: 'Choose a body, organ or mind path', destination: Dest.healing, colors: [Color(0xFF218C7A), Color(0xFF7AD7B2)]),
+    _HelpingItem(icon: Icons.repeat_rounded, title: 'Daily Routines', subtitle: 'Five slots to keep your practice moving', destination: Dest.routines, colors: [Color(0xFFE58C3A), Color(0xFFFFCB68)]),
+    _HelpingItem(icon: Icons.groups_outlined, title: 'Connect', subtitle: 'People, chat and the NowssB feed', destination: Dest.connect, colors: [Color(0xFFB84A4A), Color(0xFFFF9A79)]),
+    _HelpingItem(icon: Icons.local_mall_outlined, title: 'The Store', subtitle: 'Words, meanings and sound tools', destination: Dest.store, colors: [Color(0xFF3A6D8C), Color(0xFF83C9D9)]),
+    _HelpingItem(icon: Icons.auto_awesome, title: 'Fashion Plus', subtitle: 'A moving practice for the senses', destination: Dest.fashionPlus, colors: [Color(0xFF7B3F98), Color(0xFFE27BBD)]),
   ];
 
   @override
@@ -365,9 +390,36 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
       const SizedBox(height: 14),
       shell,
       const SizedBox(height: 30),
-      Row(children: [Expanded(child: Text('What’s helping others', style: TextStyle(color: headingColor, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -.4))), Container(width: 38, height: 38, decoration: BoxDecoration(color: widget.fashion ? const Color(0x2EFFFFFF) : NwsbColors.surface, shape: BoxShape.circle, boxShadow: widget.fashion ? null : NwsbShadows.raisedXs), child: Icon(Icons.chevron_right, color: widget.fashion ? Colors.white : NwsbColors.ink, size: 25))]),
-      const SizedBox(height: 14),
-      Row(children: [Expanded(child: _helpCard(context, Icons.graphic_eq_outlined, 'Voice scoring', 'Practice and see your sound score', Dest.player, const [Color(0xFF55318E), Color(0xFFAD75D0)])), const SizedBox(width: 12), Expanded(child: _helpCard(context, Icons.auto_awesome_outlined, 'Word Science', 'Meanings, origins and sound', Dest.library, const [Color(0xFFEF62AC), Color(0xFFFF9BD2)]))]),
+      Row(
+        children: [
+          Expanded(child: Text('What’s helping others', style: TextStyle(color: headingColor, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -.4))),
+          Material(
+            color: widget.fashion ? const Color(0x2EFFFFFF) : NwsbColors.surface,
+            shape: const CircleBorder(),
+            elevation: widget.fashion ? 0 : 2,
+            child: IconButton(
+              tooltip: 'Open Word Science',
+              onPressed: () => Dest.open(context, Dest.library),
+              icon: Icon(Icons.chevron_right, color: widget.fashion ? Colors.white : NwsbColors.ink, size: 25),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+      SizedBox(
+        height: 228,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          padding: const EdgeInsets.only(right: 4, bottom: 4),
+          itemCount: _helping.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 14),
+          itemBuilder: (context, index) {
+            final item = _helping[index];
+            return _helpCard(context, item);
+          },
+        ),
+      ),
     ]);
   }
 
@@ -376,14 +428,52 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     return TextButton.icon(onPressed: () => setState(() => _essentialFilter = value), icon: Icon(icon, size: 18), label: Text(label), style: TextButton.styleFrom(foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink, backgroundColor: widget.fashion ? const Color(0x24FFFFFF) : const Color(0xFFF7F5F2), padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)), elevation: active && !widget.fashion ? 1 : 0));
   }
 
-  Widget _essentialStack(BuildContext context, List<_EssentialItem> items) => Stack(children: [
-    Positioned(left: 17, top: items.isNotEmpty && items.first.featured ? 158 : 26, bottom: 26, child: Container(width: 3, decoration: BoxDecoration(color: widget.fashion ? const Color(0x66FFFFFF) : const Color(0x4D7B7F8A), borderRadius: BorderRadius.circular(3)))),
-    Column(children: [for (var i = 0; i < items.length; i++) Padding(padding: EdgeInsets.only(bottom: i == items.length - 1 ? 0 : 12), child: _essentialRow(context, items[i]))]),
-  ]);
+  Widget _essentialStack(BuildContext context, List<_EssentialItem> items) => Stack(
+        children: [
+          Positioned(
+            left: 9,
+            top: items.isNotEmpty && items.first.featured ? 184 : 26,
+            bottom: 28,
+            child: Container(
+              width: 3,
+              decoration: BoxDecoration(
+                color: widget.fashion ? const Color(0x66FFFFFF) : const Color(0x4D7B7F8A),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+          ),
+          Positioned(left: 0, top: 12, child: _railDot(active: true)),
+          Positioned(left: 2, top: 236, child: _railDot()),
+          Positioned(left: 2, top: 388, child: _railDot()),
+          Padding(
+            padding: const EdgeInsets.only(left: 28),
+            child: Column(
+              children: [
+                for (var i = 0; i < items.length; i++)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: i == items.length - 1 ? 0 : 12),
+                    child: _essentialRow(context, items[i]),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      );
+
+  Widget _railDot({bool active = false}) => Container(
+        width: active ? 18 : 14,
+        height: active ? 18 : 14,
+        decoration: BoxDecoration(
+          color: active ? (widget.fashion ? const Color(0xFFFF9C26) : const Color(0xFFFF8B27)) : Colors.transparent,
+          shape: BoxShape.circle,
+          border: Border.all(color: active ? Colors.transparent : (widget.fashion ? const Color(0x99FFFFFF) : const Color(0x4D7B7F8A)), width: 2),
+          boxShadow: active ? const [BoxShadow(color: Color(0x447B4B16), blurRadius: 7)] : null,
+        ),
+      );
 
   Widget _essentialRow(BuildContext context, _EssentialItem item) {
     if (item.featured) {
-      final featured = Container(constraints: const BoxConstraints(minHeight: 138), padding: const EdgeInsets.fromLTRB(24, 20, 24, 18), decoration: BoxDecoration(borderRadius: BorderRadius.circular(23), gradient: const LinearGradient(colors: [Color(0xFFFFD000), Color(0xFFFF8B27)]), boxShadow: const [BoxShadow(color: Color(0x26775312), blurRadius: 12, offset: Offset(0, 7))]), child: Stack(children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3), decoration: BoxDecoration(color: Colors.white.withOpacity(.70), borderRadius: BorderRadius.circular(99)), child: const Text('NOWSSB · 543', style: TextStyle(color: Color(0xFF3A3024), fontSize: 11, fontWeight: FontWeight.w800))), const SizedBox(height: 13), const Text('Today’s word ritual', style: TextStyle(color: Color(0xFF28252A), fontSize: 20, fontWeight: FontWeight.w800)), const SizedBox(height: 9), Text(item.subtitle, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 13)), const SizedBox(height: 9), Text(item.meta, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 12))]), Positioned(right: 0, top: 0, child: Container(width: 38, height: 38, decoration: BoxDecoration(color: Colors.white.withOpacity(.70), shape: BoxShape.circle), child: const Icon(Icons.graphic_eq, color: Color(0xFF3C3424), size: 19))) ]));
+      final featured = Container(constraints: const BoxConstraints(minHeight: 182), padding: const EdgeInsets.fromLTRB(24, 20, 24, 18), decoration: BoxDecoration(borderRadius: BorderRadius.circular(23), gradient: const LinearGradient(colors: [Color(0xFFFFD000), Color(0xFFFF8B27)]), boxShadow: const [BoxShadow(color: Color(0x26775312), blurRadius: 12, offset: Offset(0, 7))]), child: Stack(children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3), decoration: BoxDecoration(color: Colors.white.withOpacity(.70), borderRadius: BorderRadius.circular(99)), child: const Text('NOWSSB · 543', style: TextStyle(color: Color(0xFF3A3024), fontSize: 11, fontWeight: FontWeight.w800))), const SizedBox(height: 13), const Text('Today’s word ritual', style: TextStyle(color: Color(0xFF28252A), fontSize: 20, fontWeight: FontWeight.w800)), const SizedBox(height: 9), Text(item.subtitle, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 13)), const SizedBox(height: 9), Text(item.meta, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 12))]), Positioned(right: 0, top: 0, child: Container(width: 38, height: 38, decoration: BoxDecoration(color: Colors.white.withOpacity(.70), shape: BoxShape.circle), child: const Icon(Icons.graphic_eq, color: Color(0xFF3C3424), size: 19))) ]));
       return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(23), child: featured));
     }
     final text = widget.fashion ? Colors.white : const Color(0xFF4C4A52);
@@ -392,9 +482,48 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(21), child: card));
   }
 
-  Widget _helpCard(BuildContext context, IconData icon, String title, String subtitle, Object destination, List<Color> colors) {
-    final card = Container(height: 166, decoration: BoxDecoration(color: widget.fashion ? const Color(0x8C141027) : const Color(0xFFF7F5F2), borderRadius: BorderRadius.circular(20), boxShadow: const [BoxShadow(color: Color(0x143D3747), blurRadius: 12, offset: Offset(0, 7))]), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Container(height: 105, decoration: BoxDecoration(borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), gradient: LinearGradient(colors: colors)), child: Icon(icon, color: Colors.white, size: 38)), Padding(padding: const EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.fashion ? Colors.white : NwsbColors.ink, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 4), Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint, fontSize: 11))]))]));
-    return InkWell(onTap: () => Dest.open(context, destination), borderRadius: BorderRadius.circular(20), child: card);
+  Widget _helpCard(BuildContext context, _HelpingItem item) {
+    final radius = BorderRadius.circular(22);
+    final card = SizedBox(
+      width: 190,
+      height: 220,
+      child: ClipRRect(
+        borderRadius: radius,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: widget.fashion ? const Color(0x8C141027) : const Color(0xFFF7F5F2),
+            borderRadius: radius,
+            boxShadow: const [BoxShadow(color: Color(0x143D3747), blurRadius: 12, offset: Offset(0, 7))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: 124,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(gradient: LinearGradient(colors: item.colors)),
+                  child: Icon(item.icon, color: Colors.white, size: 40),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 13, 12, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.fashion ? Colors.white : NwsbColors.ink, fontSize: 15, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 5),
+                      Text(item.subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint, fontSize: 11, height: 1.25)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: radius, child: card));
   }
 
   Widget _startPracticeButton(BuildContext context) => Material(color: Colors.white, borderRadius: BorderRadius.circular(999), child: InkWell(onTap: () => Dest.open(context, Dest.player), borderRadius: BorderRadius.circular(999), child: Padding(padding: const EdgeInsets.fromLTRB(19, 8, 8, 8), child: Row(mainAxisSize: MainAxisSize.min, children: [const Text('Start practice', style: TextStyle(color: NwsbColors.ink, fontSize: 13, fontWeight: FontWeight.w800)), const SizedBox(width: 14), Container(width: 34, height: 34, decoration: const BoxDecoration(color: Color(0xFF080B13), shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Colors.white, size: 19))]))));
