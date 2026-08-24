@@ -15481,3 +15481,35 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
 }
 .nss-trigger-btn-top { margin: 0 !important; }
 .nss-trigger-bottom > .nss-trigger-pills:last-child { margin-bottom: 0; }
+
+/* ══ WEBVIEW PANEL FINISH ══
+   Preserve the August 15 panel structure while giving its internal pieces
+   the small breathing space and complete corner treatment shown in the
+   reference layout. */
+:is(#home, #home-nm) .mainops-blk > .qa-tv-head {
+  margin-bottom: 12px !important;
+}
+:is(#home, #home-nm) .mainops-blk > .mo-box {
+  margin-top: 0 !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+}
+:is(#home, #home-nm) .mainops-blk > .ncb-carousel.nsub-ban {
+  margin-top: 14px !important;
+  overflow: hidden !important;
+  border-radius: 22px !important;
+}
+:is(#home, #home-nm) .mainops-blk > .ncb-carousel.nsub-ban .ncb-slide {
+  overflow: hidden !important;
+  border-radius: inherit !important;
+}
+/* Fashion's baseline practice card is present in HTML and is a required
+   early-home section; do not let a stale layout class hide it. */
+#home .home-body > .fash-plyr-wrap {
+  display: block !important;
+  visibility: visible !important;
+}
+#home .home-body > .fash-plyr-wrap > #todayPracticeCard {
+  overflow: hidden !important;
+  border-radius: 20px !important;
+}
