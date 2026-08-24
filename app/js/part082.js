@@ -840,7 +840,7 @@
 
      Reduce Motion, the mode's Page-backgrounds part switch and a paused
      app all fall back to the picture, which costs nothing to keep. */
-  var BG_STILL = './assets/fashion/fp-intro.webp';
+  var BG_STILL = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/fashion/fp-intro.webp';
 
   function filmOn() {
     /* Normal mode is neumorphism — a light page, no photograph and no film

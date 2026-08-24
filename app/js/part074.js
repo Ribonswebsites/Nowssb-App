@@ -43,8 +43,8 @@
      frame for the words, the gold Meanings case for the meanings — and
      they were previously reading whatever the store had set, which on a
      cold load was an empty string and a broken-image glyph. */
-  function wordImg() { return './assets/signature/sig-words-icon.webp'; }
-  function meanImg() { return './assets/signature/sig-meanings-icon.webp'; }
+  function wordImg() { return 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/signature/sig-words-icon.webp'; }
+  function meanImg() { return 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/signature/sig-meanings-icon.webp'; }
   function price()   { return window.MS_SIGNATURE_PRICE || 299; }
 
   /* ── What is on the shelf ──────────────────────────────────────────
@@ -179,11 +179,11 @@
      part of the same run of offers as everywhere else. Local files — they
      ship with the app and warm into the media cache with everything else. */
   var SIG_VIDS = [
-    './assets/video/signature-a.mp4',
-    './assets/video/signature-b.mp4',
-    './assets/video/signature-c.mp4',
-    './assets/video/signature-d.mp4',
-    './assets/video/signature-e.mp4'
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-a.mp4',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-b.mp4',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-c.mp4',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-d.mp4',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-e.mp4'
   ];
   /* Only the clips of a screen that has been opened are ever in the DOM, so
      a scan cannot find these until the reader has already been made to wait

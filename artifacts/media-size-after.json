@@ -1,0 +1,21 @@
+{
+  "wwwBytes": 8577332,
+  "wwwMiB": 8.18,
+  "fileCount": 114,
+  "mediaBytes": 3875128,
+  "mediaMiB": 3.696,
+  "mediaFiles": [
+    {
+      "path": "www/assets/video/start-animation-poster.webp",
+      "bytes": 52696
+    },
+    {
+      "path": "www/assets/video/start-animation.mp4",
+      "bytes": 3822041
+    },
+    {
+      "path": "www/bimi-logo.svg",
+      "bytes": 391
+    }
+  ]
+}

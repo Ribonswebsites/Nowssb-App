@@ -108,20 +108,20 @@ window.fashionHomeIntroEnter = function() {
 
   // Card 1 — NowssB Connect (blue)
   runCard({ stage: 'npcBlueStage', img: 'npcBlueImg', flash: 'npcBlueFlash', line: 'npcBlueLine' }, [
-    { img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8ed93fdc651b43c37f9808dbd165222aeaa1bf68f6a95814aa3e04e3c95b40e8.webp',
       lines: ['Your circle just got bigger.', 'Connect with learners like you.'] },
-    { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png',
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4941ad0e531fcc53b3a9fb315a42d97c3c2e0e7c663d55f2378df28d1a2b3a45.webp',
       lines: ['Stand out with a badge.', 'Blue, Silver, Gold or Diamond — your pick.'] },
-    { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png',
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8d85320f63c3e1760c436ecb735a892202453e58b9a36178183dc6c2d7f72be4.webp',
       lines: ['New voices, new stories.', 'Discover creators worth following.'] }
   ]);
 
   // Card 2 — NowssB Store (purple): the store logo + cart images from the
   // fashion home's NowssB store button
   runCard({ stage: 'npcStoreStage', img: 'npcStoreImg', flash: 'npcStoreFlash', line: 'npcStoreLine' }, [
-    { img: 'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png',
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3cccf351ff9cc39fd9add9f1fafbb3ef74d8ce34f1f3db5ea1ba5777eb3e152d.webp',
       lines: ['Enter the NowssB Store.', 'Own words that heal — yours alone.'] },
-    { img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_240/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png',
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/256d08a157cfa2a2fbeeac02a1473db70491cf65ad2a341903ca1fe1aff6aff9.webp',
       lines: ['Your cart is waiting.', 'Coupons up to 50% off today.'] }
   ]);
 })();
@@ -130,9 +130,9 @@ window.fashionHomeIntroEnter = function() {
    home), one by one, only while the Fashion home is visible. Tap opens store. */
 (function () {
   var SEQ = [
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/456a2a7e485bf504f547a2cd0364e788efac295f7e126596364b79b890850788.webp',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d5411443f5aa8dd1ec4d04df4d0a6bc2be31475207010a42848ab5d29a72a66b.webp',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/473c3c5fea86647781105d598e5c8258b8a0244f549cbbd2b3f1f580cd0298ac.webp'
   ];
   var idx = 0, preloaded = false;
   var el = document.getElementById('fashCouponImg');

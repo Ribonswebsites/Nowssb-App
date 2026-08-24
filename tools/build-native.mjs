@@ -29,7 +29,7 @@ const OUT  = join(ROOT, 'www');
    sweeping that into the web bundle tripled it, from 149 MB to 486 MB, with
    every clip in twice. The Flutter app builds from its own directory and
    nothing in www/ ever reads from it. */
-const SKIP_DIRS = new Set(['.git', '.claude', 'node_modules', 'www', 'android', 'ios', 'tools', 'functions', 'flutter_app']);
+const SKIP_DIRS = new Set(['.git', '.claude', '.github', '.tmp', 'artifacts', 'node_modules', 'www', 'android', 'ios', 'tools', 'functions', 'flutter_app']);
 
 /* Skipped by path rather than by name, for directories that are fine on the
    website and wrong inside an APK.

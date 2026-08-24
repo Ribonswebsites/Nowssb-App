@@ -40,6 +40,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
+import '../media/nwsb_image.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
@@ -280,10 +281,10 @@ class _TopRow extends StatelessWidget {
             boxShadow: NwsbShadows.raisedXs,
           ),
           clipBehavior: Clip.antiAlias,
-          child: Image.asset(
-            'assets/icons/logo-disc.webp',
+          child: const NwsbImage(
+            asset: 'assets/icons/logo-disc.webp',
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            error: SizedBox.shrink(),
           ),
         ),
         const SizedBox(width: 12),

@@ -23,8 +23,8 @@ self.addEventListener('push', (e) => {
     /* Transparent on purpose — see NOTIF_ICON in sw.js. Omitting `icon`
        makes Chrome generate an origin monogram for the right-hand side; a
        blank one leaves it empty. */
-    icon: './assets/icons/notif-blank.png',
-    badge: './assets/icons/notif-badge.png',
+    icon: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-blank.png',
+    badge: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-badge.png',
     tag: d.tag || 'studio',
     data: { url: './admin.html' },
   }));

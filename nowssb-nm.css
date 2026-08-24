@@ -4080,7 +4080,7 @@ body.nm-mode #ig-social-nav #igsn-me-av,
 #sub-social {
   background:
     linear-gradient(rgba(6,10,20,0.34), rgba(6,10,20,0.46)),
-    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg') center center / cover no-repeat !important;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/74227e809c0077da5e423130c989f85a3ea9b85d2c9e2d4fad7e62803a9fe672.webp') center center / cover no-repeat !important;
 }
 #sub-social #ss-main-view, #sub-social .ss-tab-content, #sub-social #ss-content-settings {
   background: transparent !important;
@@ -4094,7 +4094,7 @@ body:not(.nm-mode):not(.nm-night) #sub-social .menu-banner { display: none !impo
 body:not(.nm-mode) #menuDrawer.menu-drawer {
   background:
     linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
-    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094183/grok_image_1784093977513_alcdo3.jpg') center center / cover no-repeat !important;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3590ce677702261ae63a406321939307b4f5766455fb40da4824ca464c5af1da.webp') center center / cover no-repeat !important;
 }
 /* Custom background behind the Settings screen — FASHION (dark) home only.
    #sub-social's default background is a 72%-opacity black (glass overlay),
@@ -4103,7 +4103,7 @@ body:not(.nm-mode) #menuDrawer.menu-drawer {
 body:not(.nm-mode):not(.nm-night) #sub-social {
   background:
     linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
-    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094627/grok_image_1784094543609_husz87.jpg') center center / cover no-repeat !important;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/eaf3d34d495c4c08aecc28bf1c4647509602fe0fd559f4ec7ead515042a54d4e.webp') center center / cover no-repeat !important;
 }
 /* Inset the menu rows so they sit INSIDE the glass panel (L/R padding).
    Fashion (dark) menu only — the glass block image is centered, the rows must
@@ -4207,7 +4207,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
 #sub-word-search, #sub-meaning-search, #sub-explore-choice, #sub-search-choice {
   background:
     linear-gradient(rgba(0,0,0,0.66), rgba(0,0,0,0.66)),
-    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783104242/grok_image_1783103445469_fdv2uu.jpg') center center / cover no-repeat #000 !important;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ea3894c86e0bd4061c12cb9573b3f16c3cbc50dcc52ff8d657e730134b46965f.webp') center center / cover no-repeat #000 !important;
 }
 #sub-word-search .ws-page-body, #sub-meaning-search .ms-page-body { background: transparent !important; }
 #sub-word-search .sub-header, #sub-meaning-search .sub-header {
@@ -4267,7 +4267,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
   /* dark glass crystal ball (provided asset) — zoomed in (135%). border-radius
      clips the ball to a circle; NO overflow:hidden so the ripple rings can
      expand outward past the ball. */
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783232336/file_000000005418720b94ddb92836d002b1_gyw6qo.png') center center / 135% no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/bc9bddf1088a301d09a1f93144857e23fdb16609076df899fa8fc93d338027d4.webp') center center / 135% no-repeat;
   box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
 .wsg-logo img { position: relative; z-index: 2; width: 62px; height: 62px; object-fit: contain; opacity: 1; }
@@ -4452,7 +4452,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
 .wsg-gem {
   width: 78px; height: 84px; flex-shrink: 0; border-radius: 20px !important;
   overflow: hidden;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783162753/file_000000004f5471fa92179aacccd3cea8_nfw8gm.png') center center / cover no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/60a73854b97b4a6c7446c532b9653961e0359e282fcd08e3e5ee5b119ca584a5.webp') center center / cover no-repeat;
 }
 /* themed SVG icon (used on every slide except the first "Focus"/diamond one) */
 .wsg-ico {
@@ -4585,7 +4585,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
 /* header text sits INSIDE the player's glass tube/capsule image (stretched) */
 #sub-features .feat-tube {
   position: relative; margin: 0 0 24px; padding: 26px 30px 30px;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim,f_auto,q_auto,w_800/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center/100% 100% no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/876b9735c87bad5a79ef322d3d1d5df94f0eedbd96af959425b14de0f7a22198.webp') center/100% 100% no-repeat;
   filter: drop-shadow(0 14px 30px rgba(0,0,0,0.5));
 }
 #sub-features .feat-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #c8a96e; margin: 0; }
@@ -4817,7 +4817,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
   width: calc(100% - 32px) !important; margin: 16px 16px 20px; padding: 0; border: none; cursor: pointer;
   /* show only the middle band with the glass boxes — crop the metallic top/bottom */
   aspect-ratio: 1536 / 450;
-  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png') center center / 100% auto no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8bed0983f1e9348c9114f144ccee28a086ff0c9f94e474ce1fccd2c9c5700fa4.webp') center center / 100% auto no-repeat;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.38));
 }
 .fash-streak:active { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)) brightness(1.06); }
@@ -4882,7 +4882,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
   position: fixed; inset: 0; z-index: 720; display: flex; flex-direction: column;
   background:
     linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.72)),
-    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783104242/grok_image_1783103445469_fdv2uu.jpg') center center / cover no-repeat #000;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ea3894c86e0bd4061c12cb9573b3f16c3cbc50dcc52ff8d657e730134b46965f.webp') center center / cover no-repeat #000;
   transform: translateX(100%); transition: transform .34s cubic-bezier(.16,1,.3,1);
   visibility: hidden;
 }
@@ -4932,15 +4932,15 @@ body.nm-night #menuDrawer .menu-nav-icon {
 /* ── PAGE BACKGROUNDS (images clearly visible) ── */
 html body.nwsb-soc-glass #sub-ig-feed {
   background: linear-gradient(rgba(4,8,18,0.22) 0%, rgba(4,8,18,0.34) 55%, rgba(4,8,18,0.52) 100%),
-    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177099346_a7zq1m.jpg') center/cover no-repeat !important;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/73f211886e12a197fbfd371d5535cf5032af352b1c5f69eacffced60b2979b0a.webp') center/cover no-repeat !important;
 }
 html body.nwsb-soc-glass #sub-reels-feed {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
-    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177245304_ihjubs.jpg') center/cover no-repeat !important;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a2275fd4ed909e2a0137012f27d1ff4dc41891b0ba674ff41d2aa7d2aaf5ce5d.webp') center/cover no-repeat !important;
 }
 html body.nwsb-soc-glass #sub-people {
   background: linear-gradient(rgba(4,8,18,0.22) 0%, rgba(4,8,18,0.34) 55%, rgba(4,8,18,0.52) 100%),
-    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177237514_bbhcec.jpg') center/cover no-repeat !important;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/84e9f5b8d55a43eefd027c5b6ce59363c694ab8bf2eed2d7a1d9ed68a30fe16f.webp') center/cover no-repeat !important;
 }
 /* Profile: NO background photo — plain dark glass only (per request). A photo
    here was also the cause of the "white glow" around every round button: its
@@ -4951,7 +4951,7 @@ html body.nwsb-soc-glass #sub-ig-profile .ig {
 }
 html body.nwsb-soc-glass #sub-social-home {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
-    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177200001_clr7h6.jpg') center/cover no-repeat !important;
+    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/416f48f6733b9b4cb8736b76b90cdd421b4603f101bea1187832ce43f6ff9ed3.webp') center/cover no-repeat !important;
 }
 html body.nwsb-soc-glass #sub-people::before,
 html body.nwsb-soc-glass #sub-social-home::before { display: none !important; }
@@ -5352,7 +5352,7 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 #sub-connect-hub { background: #0a0e1a; }
 #sub-connect-hub .nch-bg {
   position: absolute; inset: 0; z-index: 0;
-  background: url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094627/grok_image_1784094543609_husz87.jpg') center/cover no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/eaf3d34d495c4c08aecc28bf1c4647509602fe0fd559f4ec7ead515042a54d4e.webp') center/cover no-repeat;
 }
 #sub-connect-hub .nch-scrim {
   position: absolute; inset: 0; z-index: 1;
@@ -5452,7 +5452,7 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 }
 .fbgci::before {
   content: ''; position: absolute; inset: 0; z-index: 3;
-  background: url('./assets/fashion/phone-frame-2.webp') center / 100% 100% no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/fashion/phone-frame-2.webp') center / 100% 100% no-repeat;
   pointer-events: none;
 }
 /* The picture, in the glass. Offsets rather than padding: left and right
@@ -10247,7 +10247,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 /* The page background sits behind the rows, the same way the Atelier's
    does — its own art, heavily dimmed so the cards stay the subject. */
 #sub-signature-store .sig-bg {
-  background-image: url('./assets/signature/nowssb-signature.webp');
+  background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/signature/nowssb-signature.webp');
   background-size: cover; background-position: center top;
   opacity: 0.16;
 }
@@ -10501,7 +10501,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 
 .sig-intro-bg {
   position: absolute; inset: 0; z-index: 0;
-  background-image: url('./assets/store/intro-signature.webp');
+  background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-signature.webp');
   background-size: cover; background-position: center top;
   background-repeat: no-repeat;
   animation: slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);
@@ -10554,7 +10554,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
    the mode is on. The second is `body.fashplus`, six rules at the end
    that are the mode itself.
 
-   The phone is worth explaining. assets/fashion/phone-frame.png is a
+   The phone is worth explaining. https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/fashion/phone-frame.png is a
    photograph of a handset with its studio backdrop cut away, so what is
    left is the metal and the black glass. The wallpaper does NOT go behind
    it — the frame's own screen is opaque black and would hide it — it goes
@@ -11117,7 +11117,7 @@ body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid]::before {
 }
 .fpp-intro-bg {
   position: absolute; inset: 0; z-index: 0;
-  background-image: url('./assets/fashion/fp-intro.webp');
+  background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/fashion/fp-intro.webp');
   background-size: cover; background-position: center center;
   animation: slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);
 }
@@ -11510,7 +11510,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   padding: 3.4% 3.2% 8.4%;
   background-color: #05070d;
 }
-.nwsb-inframe.dev-tv-p::after { background-image: url('./assets/frames/tv-portrait.webp'); }
+.nwsb-inframe.dev-tv-p::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-portrait.webp'); }
 
 /* ── The landscape TV — kept with the frames, worn by nothing ──
    Three slices, not one image, and that is the whole trick.
@@ -11574,8 +11574,8 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
    with the bezel bar above them that read as a rectangle drawn around the
    feet, which is the line that was showing under the television. */
 .nwsb-inframe.dev-tv-l::after {
-  background-image: url('./assets/frames/tv-l-top.webp'),
-                    url('./assets/frames/tv-l-bottom.webp');
+  background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-top.webp'),
+                    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-bottom.webp');
   background-position: top center, bottom center;
   background-size: 100% auto, 100% auto;
   background-repeat: no-repeat, no-repeat;
@@ -11592,7 +11592,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   content: '';
   position: absolute; left: 0; right: 0; top: 0; bottom: 14.922%;
   z-index: 19; pointer-events: none;
-  background: url('./assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
 }
 
 /* ── The tall tablet — the footer ──
@@ -11605,7 +11605,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   padding: 5.2% 6.4% 4.6%;
   background-color: #05070d;
 }
-.nwsb-inframe.dev-ftr::after { background-image: url('./assets/frames/footer-frame.webp'); }
+.nwsb-inframe.dev-ftr::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/footer-frame.webp'); }
 
 /* The picker in My Certificates. It is there whether or not anything has
    been earned — the designs were unreachable before, because the only way
@@ -12065,7 +12065,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tab-l::after { background-image: url('./assets/frames/tab-landscape.webp'); }
+.nwsb-inframe.dev-tab-l::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab-landscape.webp'); }
 
 /* ══════════════════════════════════════════════════════════════════
    THE FOOTER CAROUSEL, INSIDE THE TABLET
@@ -12082,7 +12082,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
    background-size: 100% 100% squashed a 908x1408 tablet into it. It is
    off the panel now and on the thing that was meant to be in it.
 
-   THE NUMBERS, all measured out of assets/frames/footer-frame.webp
+   THE NUMBERS, all measured out of https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/footer-frame.webp
    rather than eyeballed:
 
      file              908 x 1408
@@ -12118,7 +12118,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   margin-top:  calc(var(--fci-h) * 1408 / 1286 * -0.5028);
   z-index: 22;                 /* over the centre card (20) and the rest */
   pointer-events: none;        /* the cards underneath stay tappable */
-  background: url('./assets/frames/footer-frame.webp') no-repeat center / 100% 100%;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/footer-frame.webp') no-repeat center / 100% 100%;
 }
 @media (max-width: 380px) {
   .footer-carousel { --fci-w: 142px; --fci-h: 228px; }
@@ -13022,7 +13022,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tabc-l::after { background-image: url('./assets/frames/tab2-landscape.webp'); }
+.nwsb-inframe.dev-tabc-l::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab2-landscape.webp'); }
 
 /* Portrait, wordmark on the bottom bezel — the Connect section.
    Trimmed 907x1307, screen at x 22-884, y 35-1257. */
@@ -13032,7 +13032,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tabc-p::after { background-image: url('./assets/frames/tab2-portrait.webp'); }
+.nwsb-inframe.dev-tabc-p::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab2-portrait.webp'); }
 
 /* ── The Connect BANNER, on the landscape tablet ──
    app/js/part067.js puts the frame classes on the .vb-banner itself rather
@@ -13120,7 +13120,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tabs-p::after { background-image: url('./assets/frames/tab3-portrait.webp'); }
+.nwsb-inframe.dev-tabs-p::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab3-portrait.webp'); }
 
 /* Landscape, home button on the bottom bezel — its video banner.
    Trimmed 1157x863, screen at x 25-1133, y 32-794. */
@@ -13133,7 +13133,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tabs-l::after { background-image: url('./assets/frames/tab3-landscape.webp'); }
+.nwsb-inframe.dev-tabs-l::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab3-landscape.webp'); }
 
 /* ── The subscription VIDEO BANNER, on the landscape tablet ──
    The frame classes go ON the banner rather than in a wrapper around it:
@@ -13247,7 +13247,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-laptop::after { background-image: url('./assets/frames/laptop.webp'); }
+.nwsb-inframe.dev-laptop::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/laptop.webp'); }
 
 /* The banner wears the frame itself — .vb-banner[data-vb] is what the
    layout registry matches, so a wrapper around it would strand the
@@ -13381,7 +13381,7 @@ body[class] #sub-health-journey .gsel-card.dev-tabn-p {
 body[class] #sub-health-journey .gsel-card.dev-tabn-p::before {
   content: ''; position: absolute; inset: 0; z-index: 20;
   pointer-events: none;
-  background: url('./assets/frames/tab-nowss8-portrait.webp') center / 100% 100% no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab-nowss8-portrait.webp') center / 100% 100% no-repeat;
 }
 /* The photo and the ::after gradient are inset:0, which resolves against
    the PADDING box — that is the whole tablet, bezel included. Pinning the
@@ -13811,7 +13811,7 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   aspect-ratio: 1338 / 875;
   padding: 4.8580% 3.4380% 3.5874% 3.4380%;
 }
-.slm-fr.dev-tab4-l::after { background-image: url('./assets/frames/tab4-landscape.webp'); }
+.slm-fr.dev-tab4-l::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab4-landscape.webp'); }
 
 /* NOWSSB top-right, round home button — the mosaics and the covers.
    Trimmed 1214x891, screen at x 30-1182, y 46-819; aperture 1.4897. */
@@ -13819,7 +13819,7 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   aspect-ratio: 1214 / 891;
   padding: 3.7891% 2.5535% 5.8484% 2.4712%;
 }
-.slm-fr.dev-tab5-l::after { background-image: url('./assets/frames/tab5-landscape.webp'); }
+.slm-fr.dev-tab5-l::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab5-landscape.webp'); }
 
 /* Hairline bezel, label on the chin — the speed-dial tiles, because at a
    third of the screen's width it is the only one of the three whose bezel
@@ -13831,7 +13831,7 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   aspect-ratio: 1315 / 807;
   padding: 1.6730% 1.4449% 4.4867% 1.4449%;
 }
-.slm-fr.dev-tab6-l::after { background-image: url('./assets/frames/tab6-landscape.webp'); }
+.slm-fr.dev-tab6-l::after { background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab6-landscape.webp'); }
 
 /* The cards hold a tablet now, not a picture, so the shapes that were
    pinned square or 16:9 hand that job to the frame. */
@@ -14128,7 +14128,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 
 /* ══════════════════════════════════════════════════════════════════════
    THE FASHION HOME'S HERO, INSIDE THE TV
-   The element IS the frame: assets/frames/tv-hero-portrait.webp is the
+   The element IS the frame: https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-hero-portrait.webp is the
    section's background, stretched to it, and everything the hero draws is
    inset to the aperture. The section stops being 100dvh and takes the
    render's own ratio instead, so the TV is never squashed to fit a
@@ -14145,7 +14145,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   /* The render carries an alpha channel — it was exported on black and the
      black is transparent now, so the page shows through around the set and
      between its legs instead of a black slab sitting under it. */
-  background: url('./assets/frames/tv-hero-portrait.webp?v=2') center / 100% 100% no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-hero-portrait.webp?v=2') center / 100% 100% no-repeat;
   overflow: visible;
   /* Start BELOW the fixed header. #homeHeader is position:fixed, so the
      set's top bezel — and the wordmark and buttons drawn on it — were
@@ -14415,8 +14415,8 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 /* the two caps */
 .hero-simple .hero-tvbox::after {
   content: ''; position: absolute; inset: 0; z-index: 20; pointer-events: none;
-  background-image: url('./assets/frames/tv-l-top.webp'),
-                    url('./assets/frames/tv-l-bottom.webp');
+  background-image: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-top.webp'),
+                    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-bottom.webp');
   background-position: top center, bottom center;
   background-size: 100% auto, 100% auto;
   background-repeat: no-repeat, no-repeat;
@@ -14427,7 +14427,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 .hero-simple .hero-tvbox::before {
   content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: 14.922%;
   z-index: 19; pointer-events: none;
-  background: url('./assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
 }
 /* ── The screen ──
    A plain 100%/100% child of the frame, exactly like .qa-tv-screen. The
@@ -14644,7 +14644,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   max-width: none;
   margin: 0;
   aspect-ratio: 1371 / 317;
-  background: url('./assets/frames/word-acts-tab.webp') center / 100% 100% no-repeat;
+  background: url('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/word-acts-tab.webp') center / 100% 100% no-repeat;
   border-radius: 9px !important;
   flex-shrink: 0;
 }
@@ -14717,7 +14717,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 .hero-search-ic { width: 19px !important; height: 19px !important; }
 
 /* ── The search icon is artwork now, not a silhouette ──
-   assets/icons/search.webp — headphones around a magnifier, white body,
+   https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/search.webp — headphones around a magnifier, white body,
    black lens — ships in the repo instead of coming from Cloudinary.
    Every place that used the old glyph put it through a filter, because
    the old one was a flat shape that had to be recoloured for whatever it

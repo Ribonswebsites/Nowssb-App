@@ -33,7 +33,7 @@
 (function () {
   'use strict';
 
-  var VID = './assets/video/fashion-plus-bg.mp4';
+  var VID = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg.mp4';
 
   /* What moves through the phone.
 
@@ -49,25 +49,25 @@
      Both lists are walked by the same code, so they can never fall out of
      step with each other. */
   var STILLS = [
-    { img: './assets/store/intro-store.webp',     t: ['The NowssB Store', 'Still, today'] },
-    { img: './assets/store/intro-words.webp',     t: ['The Word Atelier', 'Still, today'] },
-    { img: './assets/store/intro-meanings.webp',  t: ['The Meaning Store', 'Still, today'] },
-    { img: './assets/store/intro-ebooks.webp',    t: ['NowssB eBooks', 'Still, today'] },
-    { img: './assets/store/intro-signature.webp', t: ['The Signature', 'Still, today'] },
-    { img: './assets/fashion/fp-intro.webp',      t: ['Fashion Plus', 'Still, today'] }
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-store.webp',     t: ['The NowssB Store', 'Still, today'] },
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-words.webp',     t: ['The Word Atelier', 'Still, today'] },
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-meanings.webp',  t: ['The Meaning Store', 'Still, today'] },
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-ebooks.webp',    t: ['NowssB eBooks', 'Still, today'] },
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-signature.webp', t: ['The Signature', 'Still, today'] },
+    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/fashion/fp-intro.webp',      t: ['Fashion Plus', 'Still, today'] }
   ];
   /* The backgrounds you can choose between. Add one here and it appears in
      the phone and in the picker on its own — nothing else to touch. */
   var FILMS = [
-    { vid: './assets/video/fashion-plus-bg.mp4',   name: 'Shattered Glass' },
-    { vid: './assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
-    { vid: './assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
-    { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
+    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg.mp4',   name: 'Shattered Glass' },
+    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
+    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
+    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
     /* Fifth background supplied for this release. It is also copied into the
        Flutter asset bundle and uploaded to the shared R2 video catalog. */
-    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Background Five' },
-    { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Background Six' },
-    { vid: './assets/video/fashion-plus-bg-6.mp4', name: 'Current Fashion Home' }
+    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-4.mp4', name: 'Background Five' },
+    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-5.mp4', name: 'Background Six' },
+    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-6.mp4', name: 'Current Fashion Home' }
   ];
 
   /* Preserve the current Fashion Home film as the default. Existing stored
@@ -563,7 +563,7 @@
     }).join('');
 
     window.nwsbSheet({
-      art: './assets/fashion/caution-art.webp',
+      art: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/fashion/caution-art.webp',
       head: 'This will cost you battery',
       sub: 'Fashion Plus keeps video decoding while you use the app',
       body:

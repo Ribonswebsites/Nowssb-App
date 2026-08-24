@@ -135,7 +135,7 @@
   function getTiers()    { try { return (typeof RM_TIERS         !== 'undefined') ? RM_TIERS         : {}; } catch (e) { return {}; } }
   function getWordTier() { try { return (typeof RM_WORD_TIER     !== 'undefined') ? RM_WORD_TIER     : {}; } catch (e) { return {}; } }
 
-  var STORE_ICON_URL = 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png';
+  var STORE_ICON_URL = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp';
   var _trendVidTimer = null;
   var _trendShopTimer = null;
   window._nwsbTrendPicks = [];
@@ -611,14 +611,14 @@
 
   /* ── Prebuilt banner library (in-built banners, matched to the avatars) ── */
   var NWSB_BANNERS = [
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591933705_qq3l9g.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591857840_tbznap.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782592051446_womamz.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591669371_kqnaf9.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591627828_lmde11.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591559591_yxgud5.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591561380_ytpn3b.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592260/grok_image_1782591732123_epmpiu.jpg'
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fc3d4da65185cd0535ce88f22712c4b893161e3fd16c0de4d568701cbc0687d7.jpg',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b0311b51f466541728956740ddccd061c8fa3cdcb4e22a0414e3ca7514fc6faf.jpg',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e5c7f3703725755d88aa4c461fe9dac0729d119fa6a7ac9adb39e089aa07fa81.jpg',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/df58ad45365e63d0512fbc3be059098cee7987c845bea29a418289f3e7fdcfe1.jpg',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/89c64c87db948180af9073712044c8c07345a0ed1fe7a39fa2c83b7162d04803.jpg',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/517802ba6a6c3a6cc79ba3f9c542a148bd93f745bd7b3925ff9ed47b5de12b07.jpg',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/671fd0928171078afb766af61f7cce37fa6502c976b9e66eb5388bcc449198c2.jpg',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/58d0a40a97d4a6932e64d5eee905aa413c9e31c3b0c41dd3e800486cbcb61ca2.jpg'
   ];
   window.NWSB_BANNERS = NWSB_BANNERS;
 
@@ -640,7 +640,7 @@
     w.innerHTML =
       '<div class="pps-backdrop" onclick="nwsbCloseBannerUI()"></div>' +
       '<div class="pps-card" style="padding-bottom:' + navH + ';">' +
-        '<img class="pps-banner" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784368347/grok_image_1784368231258_qti4xe.jpg" alt="">' +
+        '<img class="pps-banner" decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b6abe443d711a2e42149ed14dacb1fd6b96631a649e3634454f0ee3e3e51da52.jpg" alt="">' +
         '<div class="pps-inner">' +
           '<div class="pps-handle"></div>' +
           '<div class="pps-title">Change Banner</div>' +
@@ -763,8 +763,8 @@
   // a gold checkmark badge. Same shape as fbgApplyToast (part047.js) for
   // the Fashion Background picker, kept separate since this one always
   // shows a theme-specific image rather than one fixed icon.
-  var NWSB_THEME_TOAST_IMG_NEU   = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png';
-  var NWSB_THEME_TOAST_IMG_GLASS = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png';
+  var NWSB_THEME_TOAST_IMG_NEU   = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f7ab49ce96814d9dba07e554cafc04fca16eb849bee873501297327815552db0.webp';
+  var NWSB_THEME_TOAST_IMG_GLASS = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4ab7671cefecf91e4a4cb1db29628f21e657d6ed891092362dd631db1b1af1bb.webp';
   function nwsbShowThemeToast(theme) {
     var img = (theme === 'glass') ? NWSB_THEME_TOAST_IMG_GLASS : NWSB_THEME_TOAST_IMG_NEU;
     var msg = (theme === 'glass') ? 'NowssB Fashion theme ✓' : 'NowssB theme ✓';

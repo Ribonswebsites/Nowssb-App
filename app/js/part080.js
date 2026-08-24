@@ -254,7 +254,7 @@
     var name = (localStorage.getItem('nwsb_name') || 'Your practice');
     return '<section class="slm-sec">' +
       '<div class="slm-sd-head">' +
-        '<span class="slm-sd-ava">' + frame('tab5-l', tile('./assets/store/intro-store.webp')) + '</span>' +
+        '<span class="slm-sd-ava">' + frame('tab5-l', tile('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-store.webp')) + '</span>' +
         '<span class="slm-sd-txt"><span class="slm-sd-eye">' + esc(String(name).toUpperCase()) + '</span>' +
         '<span class="slm-sd-t">Speed dial</span></span>' +
       '</div>' + grid + dots + '</section>';
@@ -278,7 +278,7 @@
         '<span class="slm-promo-go">' + ARROW_SVG + '</span>' +
       '</div>' +
       '<div class="slm-promo-r">' +
-        frame('tab6-l', tile('./assets/store/intro-meanings.webp')) +
+        frame('tab6-l', tile('https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-meanings.webp')) +
       '</div>' +
       '</div></section>';
   }
@@ -348,7 +348,7 @@
     { v: 'subscription-a',       t: 'Subscription',     s: 'Unlock the full word library',    go: 'subscription' },
     { v: 'coupon-a',             t: 'Offers & bundles', s: 'Coupons on words and meanings',   go: 'store' }
   ];
-  var MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4';
+  var MEANING_VID = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4c1c17d70f5656d48438620681f91a5a03c9cbef907f4c865ceb4bc1e2b56ed2.mp4';
   function storeVideos() {
     return '<section class="slm-sec">' + head('From the Store', chevron("slmStore()")) +
       '<div class="slm-hscroll">' + STORE_VIDS.map(function (x) {

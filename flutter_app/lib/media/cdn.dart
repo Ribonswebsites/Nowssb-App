@@ -1,11 +1,4 @@
-/// Where the same films also live on the network.
-///
-/// `assets/video/` is filled by `tools/flutter-assets.mjs` before a build and
-/// is NOT committed (the website already has the only copy). A debug APK
-/// built without that step, or a first frame before the bundle is unpacked,
-/// would otherwise show posters forever. The pool tries the bundled file
-/// first, then these origins — nowssb.com is the live site, GitHub Pages is
-/// the same repository.
+/// Canonical remote media paths shared by the WebView and Flutter builds.
 library;
 
 class NwsbCdn {
@@ -19,25 +12,32 @@ class NwsbCdn {
   static const workerMediaBase =
       'https://nowssb-api.ribonpatil2.workers.dev/media';
 
-  static String mediaUrl(String key) => '$workerMediaBase/${key.replaceFirst(RegExp(r'^/+'), '')}';
+  static String mediaUrl(String key) =>
+      '$workerMediaBase/${key.replaceFirst(RegExp(r'^/+'), '')}';
+
+  /// Maps a repository asset path to its verified R2 object. The launch
+  /// animation is intentionally the one local-only exception.
+  static String assetUrl(String assetPath) {
+    final clean = assetPath.replaceFirst(RegExp(r'^\./'), '');
+    if (clean == 'assets/video/start-animation.mp4' ||
+        clean == 'assets/video/start-animation-poster.webp') {
+      return url(clean);
+    }
+    return mediaUrl('media/repo/$clean');
+  }
 
   static String url(String assetPath) => '${origins.first}$assetPath';
 
   static Iterable<String> urls(String assetPath) sync* {
-    final clean = assetPath.split('?').first;
+    final clean = assetPath.split('?').first.replaceFirst(RegExp(r'^\./'), '');
     if (clean.startsWith('assets/video/')) {
       final file = clean.split('/').last;
-      if (clean.startsWith('assets/video/time-')) {
-        // Keep the established time-aware banner keys used by the dashboard.
-        yield mediaUrl('home-banners/$file');
-      } else if (clean == 'assets/video/hero-bg.mp4') {
-        // The Fashion hero has its stable managed key.
-        yield mediaUrl('hero/hero-bg.mp4');
-      } else {
-        // Every other background and section film shares the R2 video catalog.
-        yield mediaUrl('video/$file');
+      if (file == 'start-animation.mp4' || file == 'start-animation-poster.webp') {
+        yield* origins.map((o) => '$o$clean');
+        return;
       }
+      yield assetUrl(clean);
     }
-    yield* origins.map((o) => '$o$assetPath');
+    yield* origins.map((o) => '$o$clean');
   }
 }

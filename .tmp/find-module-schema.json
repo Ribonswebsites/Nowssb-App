@@ -1,0 +1,1 @@
+{"code":"async () => { const p=spec.paths['/accounts/{account_id}/workers/scripts/{script_name}']; return {put:p.put, post:p.post}; }"}

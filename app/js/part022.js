@@ -69,19 +69,19 @@ var PG = {
 /* ── Show a guide ── */
 var _pgActive = null;
 var _pggBanners = {
-  'practice':       'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401851/image-109_flaoqi.jpg',
-  'routines':       'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401874/image-96_wklfon.jpg',
-  'routine-detail': 'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401905/image-206_mhgp5c.jpg',
-  'health-journey': 'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401851/image-109_flaoqi.jpg',
-  'health-male':    'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401874/image-96_wklfon.jpg',
-  'health-female':  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401905/image-206_mhgp5c.jpg',
-  'health-category':'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401851/image-109_flaoqi.jpg',
-  'sound-library':  'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401874/image-96_wklfon.jpg',
-  'my-progress':    'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401905/image-206_mhgp5c.jpg',
-  'word-science':   'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401851/image-109_flaoqi.jpg',
-  'shabdapathy':    'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401874/image-96_wklfon.jpg',
-  'profile':        'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401905/image-206_mhgp5c.jpg',
-  'real-meaning':   'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778401851/image-109_flaoqi.jpg'
+  'practice':       'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/75ab59f1e51d44e9b2c729539e221628410078ffb260ce3a0697618bf035adf7.jpg',
+  'routines':       'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5de54e3d56301c2d2bc004ec9496f09efe223e96255f5b63318795e4c75bd57b.jpg',
+  'routine-detail': 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63add4243de6c43d7a7f2a9ec607017094101026d52219971098aa1edf443dac.jpg',
+  'health-journey': 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/75ab59f1e51d44e9b2c729539e221628410078ffb260ce3a0697618bf035adf7.jpg',
+  'health-male':    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5de54e3d56301c2d2bc004ec9496f09efe223e96255f5b63318795e4c75bd57b.jpg',
+  'health-female':  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63add4243de6c43d7a7f2a9ec607017094101026d52219971098aa1edf443dac.jpg',
+  'health-category':'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/75ab59f1e51d44e9b2c729539e221628410078ffb260ce3a0697618bf035adf7.jpg',
+  'sound-library':  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5de54e3d56301c2d2bc004ec9496f09efe223e96255f5b63318795e4c75bd57b.jpg',
+  'my-progress':    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63add4243de6c43d7a7f2a9ec607017094101026d52219971098aa1edf443dac.jpg',
+  'word-science':   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/75ab59f1e51d44e9b2c729539e221628410078ffb260ce3a0697618bf035adf7.jpg',
+  'shabdapathy':    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5de54e3d56301c2d2bc004ec9496f09efe223e96255f5b63318795e4c75bd57b.jpg',
+  'profile':        'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63add4243de6c43d7a7f2a9ec607017094101026d52219971098aa1edf443dac.jpg',
+  'real-meaning':   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/75ab59f1e51d44e9b2c729539e221628410078ffb260ce3a0697618bf035adf7.jpg'
 };
 function pgShow(key) {
   if (pgHasSeen(key)) return;

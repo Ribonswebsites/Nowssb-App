@@ -41,11 +41,11 @@ let PRACTICE_WORDS = [...MASTER_WORD_LIBRARY];
 // deterministically from these pools (same word → same look, different words
 // → different looks). Add more video URLs here as Ribon shares them.
 const PW_VIDEO_POOL = [
-  'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4',
-  'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/v1778061531/grok_video_2026-05-06-15-27-23_zhylbe.mp4',
-  'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/f_auto/v1778511160/grok_video_2026-05-11-19-06-52_e67kc6.mp4',
-  'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4',
-  'https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4'
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/90550ee5f40f4a2a62154d960a717de8e53798a9901dd04aba92fc3bd358ba4c.mp4',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1e9a0c8d452a809f4a536d634acae5e78e9275425b71c640f109d57ea54beac7.mp4',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3c8eebc74d743135d122f46573bed601fbf2261eca520f1b5f1e81aee494bbc6.mp4',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3376b48971b038f63b4cad412f16877305b17e8e48169c4740c0dea542decbe9.mp4',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4ce3c9019dd56ccdf4e23823d334ebc231eadb0bdde19b0bb1c2259ff07fe394.mp4'
 ];
 const PW_ACCENT_POOL = [
   '200,232,245',  // glacial blue
@@ -139,14 +139,14 @@ function openPracticeIntro() {
    always a photo you did not just see. Random would repeat roughly one
    launch in eight, which is exactly what this is meant to avoid. */
 const PI_ART = [
-  'https://res.cloudinary.com/eenvubod/image/upload/v1785069166/file_00000000210881fabda4b62a827e2b7d_shsdnw.png',
-  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_000000005c28820693e31425ac03a99a_myqo9z.png',
-  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000fbb481fa897d6c4b800c7abc_x0fmja.png',
-  'https://res.cloudinary.com/eenvubod/image/upload/v1785069167/file_0000000013088209a33ed2b6c15a7dfe_l6j2wf.png',
-  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000868081fa8048698268ae60bb_rw97tp.png',
-  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000112882069935a3c4bce3b4ca_r6awjq.png',
-  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000fdb08207a6e3e5e768f47448_apuryf.png',
-  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000280082069ad442c609cdd790_ci1kbd.png'
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/177c353c491b0de97eafa6d2b1a9644567776abe01e942eca64dc41fe94cc48d.png',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1208f305864e171fb97694e8259ee472a1396b7393146ec4b2380000c2536864.png',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d45a2ad961881f1a034a1a1669f584720438ea2210206c3abc774e1b35b31a30.png',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0a886e63010f07db299d0de648e9e893c02a7b932ac85a458bc1e75f6a5861d4.png',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0bcdf699fbd0626d95483a3d2f1bfc1fcd54f7e1c3bf2cc5058266c1191739be.png',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d9d911700ddae27c6b3f6b97fb7baa201d1285d202c914aa57b5e4eafb66fe0f.png',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1e84950d507185ecc37072a054c05f23e455f52b0af83ca2f8179c0acd44fb50.png',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/583f4d21147adb19d0232cb143b40b77416dcdb68de05010855cd34d8ba9880d.png'
 ];
 window.NWSB_PLAYER_INTRO_ART = PI_ART;
 
@@ -271,11 +271,11 @@ function updateTodayCard() {
   if (!titleEl) return;
   // Swap banner image per time of day
   const TODAY_BANNERS = {
-    'Morning':   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg',
-    'Midday':    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052565/grok_image_1778052259502_s8fbkb.jpg',
-    'Afternoon': 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052585/grok_image_1778052247702_xxo6jv.jpg',
-    'Evening':   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052598/grok_image_1778052255147_welycg.jpg',
-    'Night':     'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052611/grok_image_1778052238350_bxdyvx.jpg'
+    'Morning':   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4daad1a85b624fed6e165ae7b21c0214bccb203b2bcdcaa2966bf961021431f7.webp',
+    'Midday':    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ab781a81c1cf69e3ff002920729cc8aad63dab76d4cc3db61e6e598607164a34.webp',
+    'Afternoon': 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a0ac864caf5d0249c2e1571ac78e255bfa8a1a1d55a2166dabff20734a575e8e.webp',
+    'Evening':   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e24b711536b724bfde7a3fafb8ac9be5a0dde573b9da4dc3758a667034d2d3ce.webp',
+    'Night':     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f7a1e80779a1f8457ca265417cb0f619c7b91042317f37fb825de09bdf97bd7f.webp'
   };
   const bgEl = document.getElementById('todayPracticeBg');
   if (bgEl) bgEl.style.backgroundImage = "url('" + (TODAY_BANNERS[timeLabel] || TODAY_BANNERS['Morning']) + "')";
@@ -422,7 +422,7 @@ function renderSentencePlayer() {
           <div class="sp-wm-arc"></div>
           <div class="sp-disc-outer${_sspPlaying?' playing':''}">
             <div class="sp-disc${_sspPlaying?' playing':''}">
-              <img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777803046/grok_image_1777802759590_giabgl.jpg" alt="NowssB" loading="eager">
+              <img decoding="async" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d88706d5f2dc5f770af2cee46a8284be040268fa8dc477c4e0ceac3706d254eb.webp" alt="NowssB" loading="eager">
             </div>
           </div>
         </div>
@@ -1012,9 +1012,9 @@ function _pwUpdateMainBtn() {
   var lbl = document.getElementById('sp3BtnLbl');
   if (!btn) return;
   var SVG = {
-    play: '<img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt="">',
+    play: '<img src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ce6a73b998c5040864af76d95c81c8aa3ea12c1764fb888711dd897c266dbd94.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt="">',
     stop: '<svg width="13" height="14" viewBox="0 0 14 16" fill="none"><rect x="1" y="1" width="4" height="14" fill="currentColor"/><rect x="9" y="1" width="4" height="14" fill="currentColor"/></svg>',
-    replay: '<img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780340485/fd31c0b0-5deb-11f1-9e1a-9303081e5fda_finid1.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt="">',
+    replay: '<img src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/29ce1410b8b517d7296478bbd945bd07f090fb593d29eb3da8e8a06b77fb9cb3.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt="">',
     stoprec: '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" fill="currentColor"/></svg>',
     spin: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5" opacity="0.3"/><path d="M7 1.5a5.5 5.5 0 015.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>'
   };

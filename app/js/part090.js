@@ -22,8 +22,8 @@
     if (hour >= 17 && hour < 21) return 'evening';
     return 'night';
   }
-  function srcFor(file, ext) { return R2_BASE + '/home-banners/' + file + '.' + ext; }
-  function localSrcFor(file, ext) { return LOCAL_VIDEO_BASE + file + '.' + ext; }
+  function srcFor(file, ext) { return R2_BASE + '/media/repo/assets/video/' + encodeURIComponent(file + '.' + ext); }
+  function localSrcFor(file, ext) { return srcFor(file, ext); }
   function esc(value) {
     return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
@@ -107,12 +107,10 @@
       video.muted = true; video.playsInline = true;
       var play = function () { var promise = video.play(); if (promise && promise.catch) promise.catch(function () {}); };
       video.addEventListener('error', function () {
-        var fallback = video.getAttribute('data-local-src');
-        var poster = video.getAttribute('data-local-poster');
-        if (poster && video.poster !== poster) video.poster = poster;
-        if (fallback && video.getAttribute('src') !== fallback) { video.setAttribute('src', fallback); video.load(); play(); }
+        video.removeAttribute('src');
+        try { video.load(); } catch (e) {}
       });
-      if ('IntersectionObserver' in window) new IntersectionObserver(function (entries) { entries.forEach(function (entry) { if (entry.isIntersecting) play(); else video.pause(); }); }, { rootMargin: '120px' }).observe(video);
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (entries) { entries.forEach(function (entry) { if (entry.isIntersecting) play(); else play(); }); }, { rootMargin: '120px' }).observe(video);
       else play();
     }
   }

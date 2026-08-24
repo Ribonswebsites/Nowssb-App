@@ -301,7 +301,7 @@
   var LOCAL = 'data-nwsb-local-src';
   var R2SRC = 'data-nwsb-r2-src';
   var R2FAILED = 'data-nwsb-r2-failed';
-  var R2_VIDEO_BASE = 'https://nowssb-api.ribonpatil2.workers.dev/media/video/';
+  var R2_VIDEO_BASE = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/';
   var near = new WeakSet();     // clip is within a screen of the viewport
   var mine = false;             // this file is the one writing src right now
 
@@ -315,11 +315,8 @@
     var local = localVideoSrc(src);
     if (!local) return '';
     var file = local.split('/').pop();
-    if (file === 'hero-bg.mp4') return 'https://nowssb-api.ribonpatil2.workers.dev/media/hero/hero-bg.mp4';
-    if (/^time-(morning|afternoon|evening|night)\.mp4$/i.test(file)) {
-      return 'https://nowssb-api.ribonpatil2.workers.dev/media/home-banners/' + file;
-    }
-    return R2_VIDEO_BASE + file;
+    if (file === 'start-animation.mp4') return '';
+    return R2_VIDEO_BASE + encodeURIComponent(file);
   }
 
   function mount(v) {
@@ -351,20 +348,17 @@
     try { v.load(); } catch (e) {}
   }
 
-  /* R2 is authoritative for the shared catalog, but a network outage must
-     never turn a visible card black: one media error downgrades that element
-     to its bundled copy for the rest of this session. */
+  /* R2 is authoritative for the shared catalog. Eligible clips do not fall
+     back to deleted bundle files; only the splash is local-owned and never
+     reaches this manager. */
   document.addEventListener('error', function (e) {
     var v = e.target;
     if (!v || v.tagName !== 'VIDEO') return;
     var remote = v.getAttribute(R2SRC);
     if (!remote || v.getAttribute('src') !== remote) return;
-    var local = v.getAttribute(LOCAL) || v.getAttribute(STASH);
-    if (!local) return;
     v.setAttribute(R2FAILED, '1');
-    v.setAttribute(STASH, local);
     mine = true;
-    v.setAttribute('src', local);
+    v.removeAttribute('src');
     mine = false;
     try { v.load(); } catch (err) {}
   }, true);

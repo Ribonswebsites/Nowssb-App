@@ -66,8 +66,8 @@ inset behind it by the exact percentages the artwork occupies — so it lands
 correctly at any size with no second set of numbers to keep in step.
 
 `assets/store/intro-*.webp` are the intro-page paintings,
-`assets/icons/logo-disc.webp` is the mark in both headers,
-`assets/player/liquid-splash.webp` sits behind a word, and
+`https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/logo-disc.webp` is the mark in both headers,
+`https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/player/liquid-splash.webp` sits behind a word, and
 `assets/banners/` and `assets/store/collections/` are ready for the shelves.
 `tools/flutter-assets.mjs` copies all of it in; `test/assets_test.dart`
 fails if the code ever names a file that is not there — a wrong asset path

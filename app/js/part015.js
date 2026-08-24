@@ -30,8 +30,8 @@ let _wlSentenceData = null;
 let _wlSpeaking     = false;
 
 const _wlBanners = [
-  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777884920/grok_image_1777884641742_yowydl.jpg',
-  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777884965/grok_image_1777884736477_wbarcd.jpg'
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4a592e40a7fc3862aaca5c8bf11dfcbd94a380f75287f94a9fa0118c67c6c3b9.webp',
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d7df86bbe8e877c5455c644de69f78523fb619c95cc308a3ad7fd18d964da7dd.webp'
 ];
 let _wlBannerIdx = 0;
 let _wlBannerTimer = null;
@@ -105,14 +105,14 @@ function wlSwitchTab(tab) {
 //   calm       → floating-blonde      (image 6)
 //   healing    → lotus-mandala-light  (image 5)
 const _wlGenreImages = {
-  all:        'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777892128/grok_image_1777891642236_lacz8v.jpg',
-  immunity:   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888701/grok_image_1777888420816_bkrtzw.jpg',
-  energy:     'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887443893_xvupmc.jpg',
-  mind:       'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887770266_zyexqb.jpg',
-  confidence: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887913840_z9mkmd.jpg',
-  fitness:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888701/grok_image_1777887990036_wmmmjt.jpg',
-  calm:       'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777888044011_sx7km5.jpg',
-  healing:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777888311729_kmtnzu.jpg',
+  all:        'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7bb4ee1b9a0fece4bba566af2f60776dc5f21b08cdb068a5d33b7eef46263463.webp',
+  immunity:   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/39650786257c6c6591862f2e55e9a929d1eca3d235287f8b0372c66132af338e.webp',
+  energy:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/02d5c8f3c11ed46e9178b19a85c93c6b7fb8821c6cea91d5bfb0eb0c46cccb5b.webp',
+  mind:       'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7a1f9d0b92965d0c1dd1d9dbeb1f697563017ec2d1781692946bc06a95a4f4e6.webp',
+  confidence: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/13640441c78bc3e9cee09992e905a3083cc38b437c3cfb821cbdeca138c41d0a.webp',
+  fitness:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fe5f2e96ba86e0fd046f3735f18e5709b2ff2e08e30f47ca2aa4c92aa3d018eb.webp',
+  calm:       'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/6b17c62bfdb691758bd2a43e589b90618373ade1ee8c542b3de4755aa3ab23bb.webp',
+  healing:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5d09420fdb73dfa6042ccd0c23bb1cc64dbeef484a2bae1a74d7c721ce48f612.webp',
 };
 
 // ── PLAYLIST ──

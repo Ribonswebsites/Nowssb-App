@@ -72,11 +72,10 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     _pump();
   }
 
-  /// Every visual clip is autoplay decoration in this app. The WebView starts
-  /// all visible muted films together; Flutter must not turn section videos
-  /// into posters merely because the Fashion Plus preference is off. The
-  /// preference can still shape the page skin, but it is not a play/stop gate.
-  bool get _shouldPlay => widget.autoplay;
+  /// Every eligible clip is a muted background/section film. Flutter keeps
+  /// every mounted clip in the play state; the separate Splash widget owns the
+  /// protected launch animation and is not part of this pool.
+  bool get _shouldPlay => true;
 
   void _onSettings() {
     final want = _shouldPlay;
@@ -156,27 +155,10 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     if (!mounted) return;
     final lease = _lease;
     if (lease == null) return;
-    // Inactive IndexedStack tabs stay laid out at the same coordinates as
-    // the visible one. TickerMode is how IndexedStack says "this child is
-    // not being looked at" — same job as the website's shown() check, so
-    // Practice/Library/Store/Profile do not steal the home's films.
-    if (!TickerMode.valuesOf(context).enabled) {
-      lease.reportDistance(double.infinity);
-      return;
-    }
-    final box = context.findRenderObject() as RenderBox?;
-    if (box == null || !box.hasSize || !box.attached) {
-      return;
-    }
-    final screen = MediaQuery.maybeOf(context)?.size;
-    if (screen == null) return;
-
-    final top = box.localToGlobal(Offset.zero).dy;
-    final centre = top + box.size.height / 2;
-
-    final visible = top < screen.height * 2 && top + box.size.height > -screen.height;
-    lease.reportDistance(
-        visible ? (centre - screen.height / 2).abs() : double.infinity);
+    // Do not mark mounted clips off-screen. Keeping a finite distance for
+    // every lease prevents the pool from pausing or disposing a video merely
+    // because the user scrolled it away; every mounted clip keeps its loop.
+    lease.reportDistance(0);
   }
 
   @override
@@ -188,17 +170,12 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            widget._poster,
+          Image.network(
+            NwsbCdn.assetUrl(widget._poster),
             fit: widget.fit,
             alignment: widget.alignment,
-            errorBuilder: (_, __, ___) => Image.network(
-              NwsbCdn.url(widget._poster),
-              fit: widget.fit,
-              alignment: widget.alignment,
-              errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: Colors.black),
-            ),
+            errorBuilder: (_, __, ___) =>
+                const ColoredBox(color: Colors.black),
           ),
           AnimatedOpacity(
             opacity: ready ? 1 : 0,

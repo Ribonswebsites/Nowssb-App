@@ -113,7 +113,7 @@
     var key = 'nwsb_terms_' + which;
     if (ls(key, '') === '1') return false;
     window.nwsbSheet({
-      art: isWord ? './assets/store/intro-words.webp' : './assets/store/intro-meanings.webp',
+      art: isWord ? 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-words.webp' : 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-meanings.webp',
       head: isWord ? 'Words described by sound' : 'Meanings described by sound',
       sub: 'Read this before you buy. Agreeing records that you have.',
       body: NOWS,

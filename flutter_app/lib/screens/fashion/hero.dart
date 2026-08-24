@@ -32,6 +32,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../media/nwsb_image.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
@@ -649,10 +650,9 @@ class _SearchPill extends StatelessWidget {
               // is in the repository — the one mark on this card that is a
               // picture rather than a path.
               padding: const EdgeInsets.all(9),
-              child: Image.asset(
-                'assets/icons/search.webp',
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.search, size: 19, color: Colors.white),
+              child: NwsbImage(
+                asset: 'assets/icons/search.webp',
+                error: const Icon(Icons.search, size: 19, color: Colors.white),
               ),
             ),
           ],

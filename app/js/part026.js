@@ -13,34 +13,34 @@ function msMoneyLabel(inr) {
 /* ── DATA ── */
 var MS_BASE_MEANINGS = [
   // Elements
-  { word:'Earth',   key:'earth',   root:'Proto-Germanic · erþō',        category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030389/grok_image_1777030001969_2_mpmpu2.jpg' },
-  { word:'Water',   key:'water',   root:'Proto-Indo-European · wódr̥',   category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030372/grok_image_1777029845867_2_abtxad.jpg' },
-  { word:'Fire',    key:'fire',    root:'Proto-Indo-European · péh₂wr̥', category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png' },
-  { word:'Sun',     key:'sun',     root:'Proto-Indo-European · séh₂wl̥', category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png' },
-  { word:'Moon',    key:'moon',    root:'Proto-Germanic · mēnô',         category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
-  { word:'Light',   key:'light',   root:'Proto-Indo-European · leuk-',   category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png' },
-  { word:'Dark',    key:'dark',    root:'Proto-Germanic · derkaz',       category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
+  { word:'Earth',   key:'earth',   root:'Proto-Germanic · erþō',        category:'Elements',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/41f5e532b0c0e6612c20db0ff1c11d52892eb45276e3e9103b63340932bcf512.webp' },
+  { word:'Water',   key:'water',   root:'Proto-Indo-European · wódr̥',   category:'Elements',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0d9f29f0abec0ed5caa9436f0a45ed6fbf4e25018c633cd25afb3b7d4bcd834e.webp' },
+  { word:'Fire',    key:'fire',    root:'Proto-Indo-European · péh₂wr̥', category:'Elements',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fe881b289d00730dc1d002390c50a91135606bc7fb0830c945510023737ffc96.webp' },
+  { word:'Sun',     key:'sun',     root:'Proto-Indo-European · séh₂wl̥', category:'Elements',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fe881b289d00730dc1d002390c50a91135606bc7fb0830c945510023737ffc96.webp' },
+  { word:'Moon',    key:'moon',    root:'Proto-Germanic · mēnô',         category:'Elements',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63bdfda9170e8c195000be15f52fd5f7f3750b8379b399fd38b573608cce9c10.webp' },
+  { word:'Light',   key:'light',   root:'Proto-Indo-European · leuk-',   category:'Elements',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fe881b289d00730dc1d002390c50a91135606bc7fb0830c945510023737ffc96.webp' },
+  { word:'Dark',    key:'dark',    root:'Proto-Germanic · derkaz',       category:'Elements',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63bdfda9170e8c195000be15f52fd5f7f3750b8379b399fd38b573608cce9c10.webp' },
   // Human
-  { word:'Body',    key:'body',    root:'Old English · bodig',           category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850607/1000033084-ezremove_ybzuzs.png' },
-  { word:'Mind',    key:'mind',    root:'Proto-Indo-European · men-',    category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850607/1000033084-ezremove_ybzuzs.png' },
-  { word:'Soul',    key:'soul',    root:'Proto-Germanic · saiwalō',      category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png' },
-  { word:'Blood',   key:'blood',   root:'Proto-Indo-European · bhel-',   category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png' },
-  { word:'Breath',  key:'breath',  root:'Proto-Germanic · brǣþ',         category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png' },
+  { word:'Body',    key:'body',    root:'Old English · bodig',           category:'Human',             price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5c4551501630cd002b8a58957b1bf6d53e902f481d7ddffd2b75cb9d0066e6aa.webp' },
+  { word:'Mind',    key:'mind',    root:'Proto-Indo-European · men-',    category:'Human',             price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5c4551501630cd002b8a58957b1bf6d53e902f481d7ddffd2b75cb9d0066e6aa.webp' },
+  { word:'Soul',    key:'soul',    root:'Proto-Germanic · saiwalō',      category:'Human',             price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d614abe902eccd1096de65da7f41cb13ca38da4fd3359b4416a206fc9edfd451.webp' },
+  { word:'Blood',   key:'blood',   root:'Proto-Indo-European · bhel-',   category:'Human',             price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fe881b289d00730dc1d002390c50a91135606bc7fb0830c945510023737ffc96.webp' },
+  { word:'Breath',  key:'breath',  root:'Proto-Germanic · brǣþ',         category:'Human',             price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d614abe902eccd1096de65da7f41cb13ca38da4fd3359b4416a206fc9edfd451.webp' },
   // Emotions
-  { word:'Love',    key:'love',    root:'Proto-Indo-European · leubh-',  category:'Emotions',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800798/grok_image_1776753853585_luk2yh.jpg' },
-  { word:'Fear',    key:'fear',    root:'Proto-Germanic · feraz',        category:'Emotions',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
-  { word:'Joy',     key:'joy',     root:'Old French · joie',             category:'Emotions',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800798/grok_image_1776753853585_luk2yh.jpg' },
+  { word:'Love',    key:'love',    root:'Proto-Indo-European · leubh-',  category:'Emotions',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dd23331ed4a9b7515c5c3c68039fbd9a24af2d8e5febfae9faba3295e871a5c6.webp' },
+  { word:'Fear',    key:'fear',    root:'Proto-Germanic · feraz',        category:'Emotions',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63bdfda9170e8c195000be15f52fd5f7f3750b8379b399fd38b573608cce9c10.webp' },
+  { word:'Joy',     key:'joy',     root:'Old French · joie',             category:'Emotions',          price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dd23331ed4a9b7515c5c3c68039fbd9a24af2d8e5febfae9faba3295e871a5c6.webp' },
   // Cosmos
-  { word:'God',     key:'god',     root:'Proto-Germanic · ǵʰew-',        category:'Cosmos',            price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
-  { word:'Time',    key:'time',    root:'Proto-Indo-European · dī-',     category:'Cosmos',            price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030423/grok_image_1777030062742_2_f7k7eo.jpg' },
-  { word:'Space',   key:'space',   root:'Latin · spatium',               category:'Cosmos',            price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
-  { word:'Truth',   key:'truth',   root:'Proto-Germanic · trewwþō',      category:'Cosmos',            price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030389/grok_image_1777030001969_2_mpmpu2.jpg' },
+  { word:'God',     key:'god',     root:'Proto-Germanic · ǵʰew-',        category:'Cosmos',            price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63bdfda9170e8c195000be15f52fd5f7f3750b8379b399fd38b573608cce9c10.webp' },
+  { word:'Time',    key:'time',    root:'Proto-Indo-European · dī-',     category:'Cosmos',            price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d59e474dabdaa2a5f1af8569b1d938617c43253b4cab30c5136c61a23247e86e.webp' },
+  { word:'Space',   key:'space',   root:'Latin · spatium',               category:'Cosmos',            price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/63bdfda9170e8c195000be15f52fd5f7f3750b8379b399fd38b573608cce9c10.webp' },
+  { word:'Truth',   key:'truth',   root:'Proto-Germanic · trewwþō',      category:'Cosmos',            price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/41f5e532b0c0e6612c20db0ff1c11d52892eb45276e3e9103b63340932bcf512.webp' },
   // Nations & People
-  { word:'Country', key:'country', root:'Latin · contra',                category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg' },
-  { word:'India',   key:'india',   root:'Natural Origin · Sindhu',             category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850589/1000033069-ezremove_hz5p0s.png' },
-  { word:'Mother',  key:'mother',  root:'Proto-Indo-European · méh₂tēr', category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg' },
-  { word:'Father',  key:'father',  root:'Proto-Indo-European · ph₂tḗr',  category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030423/grok_image_1777030062742_2_f7k7eo.jpg' },
-  { word:'Name',    key:'name',    root:'Proto-Indo-European · h₁nómn̥', category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg' },
+  { word:'Country', key:'country', root:'Latin · contra',                category:'Nations & People',  price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/99dfe1e72e000cd5602a1837fe8675946986d173067f6bb07238eae20da92bbb.webp' },
+  { word:'India',   key:'india',   root:'Natural Origin · Sindhu',             category:'Nations & People',  price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/22792c141d392143614d1992a5a6efb52eed70d672a63c556fcce9dabcfdbe8e.webp' },
+  { word:'Mother',  key:'mother',  root:'Proto-Indo-European · méh₂tēr', category:'Nations & People',  price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/99dfe1e72e000cd5602a1837fe8675946986d173067f6bb07238eae20da92bbb.webp' },
+  { word:'Father',  key:'father',  root:'Proto-Indo-European · ph₂tḗr',  category:'Nations & People',  price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d59e474dabdaa2a5f1af8569b1d938617c43253b4cab30c5136c61a23247e86e.webp' },
+  { word:'Name',    key:'name',    root:'Proto-Indo-European · h₁nómn̥', category:'Nations & People',  price:49, img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/99dfe1e72e000cd5602a1837fe8675946986d173067f6bb07238eae20da92bbb.webp' },
 ];
 window.MS_BASE_MEANINGS = MS_BASE_MEANINGS; // exposed for the AI Prescription page's "Recommended Meanings" row (app/js/part053.js)
 
@@ -101,13 +101,13 @@ window.msOpenDetailFromPlayer = function(key, wordDisplay) {
   if (window.msIsPurchased(key)) { window.msShowDetail(key, wordDisplay); }
 };
 
-var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
+var MS_CARD_IMG = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ee0598260fbb63ea7d685b7d65d637af84e27ddf980efb377ebea1b05c610d6f.webp';
 
 /* The clip that heads every meaning's page, directly under the header —
    the same one whichever meaning is open. A real <video>, so
    app/js/part051.js warms it into the media cache like every other clip
    in the app and sw.js serves it from there offline. */
-var MS_MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4';
+var MS_MEANING_VID = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4c1c17d70f5656d48438620681f91a5a03c9cbef907f4c865ceb4bc1e2b56ed2.mp4';
 /* The page is built only when a meaning is opened, so this has to be
    registered for warming rather than left to be discovered in the DOM. */
 window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat([MS_MEANING_VID]);
@@ -194,11 +194,11 @@ window.msBuy = function(key, wordDisplay, price, img) {
            raced the visibility controller pausing it — play() interrupted
            by pause() on every open. The controller owns it now, the same
            way it owns every other clip in the app. */
-        '<video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
+        '<video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/67e02704e83fbf194197567571df98364b45c8b87444564dbb1c7833e21d4fb5.mp4"></video>' +
         '<div class="nss-vid-banner-fade"></div>' +
         '<div class="nss-vid-banner-pill-wrap">' +
           '<div class="nss-vid-banner-pill">' +
-            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">' +
+            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp" alt="">' +
             '<span class="nss-vid-banner-pill-text">Subscribe Today</span>' +
           '</div>' +
         '</div>' +
@@ -272,7 +272,7 @@ window.msBuyNow = function(itemId, name, price, img) {
 
 /* ── Category banners — same black-banner-with-logo-and-divider treatment
    as the Word Atelier (reuses its rm-cat-banner* CSS directly). ── */
-var MS_CAT_LOGO = 'https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png';
+var MS_CAT_LOGO = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1a5f669e63dbae9d85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa.png';
 window.MS_CAT_LOGO = MS_CAT_LOGO; // exposed for the AI Prescription page (app/js/part053.js) — same reason as MS_BASE_MEANINGS
 var MS_CAT_SUB = {
   'Elements':          'The original sounds of the natural world',
@@ -292,7 +292,7 @@ var MS_SIGNATURE = {
   'Cosmos':             { key:'cosmossignature',    word:'Cosmos Signature',         root:'Most Exclusive' },
   'Nations & People':   { key:'nationssignature',   word:'Nations Signature',        root:'Most Exclusive' }
 };
-var MS_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784460713/file_000000008eb081fba87f16fe9146e413_mk9wbe.png';
+var MS_SIGNATURE_IMG = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a7c5f95b3e9029e5f6073d1ed08b29ec62fd793f069f9dbb360c39b578e6dd45.png';
 var MS_SIGNATURE_PRICE = 299;
 // Reused by the coupon/bundle pages (app/js/part055.js) for the Signature
 // page's "Meanings" side of the toggle.
@@ -620,7 +620,7 @@ window.msConfirmMeaningRequest = function() {
    video instead, the same clip and the same class My Progress uses, so
    there is no ring left to square off. ── */
 var NWSB_LOADING_VID =
-  './assets/video/loading.mp4';
+  'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/loading.mp4';
 
 window.nwsbProcessingOverlay = function (id, label) {
   var old = id && document.getElementById(id);

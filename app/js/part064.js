@@ -29,20 +29,20 @@
   function img(u) { return '<img loading="lazy" decoding="async" alt="" src="' + u + '">'; }
 
   var A = {
-    chat:     'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
-    reels:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/10d7afe0-5bf2-11f1-8248-b91d5cd919c2_b0bff9.png',
-    connect:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/04d5f4e0-5bf2-11f1-8248-b91d5cd919c2_mcohzv.png',
-    profile:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
-    store:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
-    cart:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png',
-    library:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png',
-    offer:    'https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png',
-    wordsci:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
-    routines: 'https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png',
-    ai:       'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png',
-    streak:   'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png',
-    every:    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png',
-    settings: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
+    chat:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/db15f3026ea179dc265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e.webp',
+    reels:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1b075adfd52b4af899c0f4c887eaf6c0590c402c1a084d711687ae57a791b8ee.webp',
+    connect:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a0b5196292b572ab589b6824072557ad8eda6d6eac0411c6056d1a4593e4130a.webp',
+    profile:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3979b9fa35b579e61e60226665c68128ad03987930169b94504c89b3fe74ccc8.webp',
+    store:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp',
+    cart:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/311c26afee2bc52c712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d.webp',
+    library:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/62e5d0908e54a2a619e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4.webp',
+    offer:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5972de26815c527d6b747aedbfb40a251b398b9008515762e808019375e58389.png',
+    wordsci:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dd44cf9fc35b783c2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7.webp',
+    routines: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/307233cd22669455f19d52470a876209c8289b54081839108ba1b076bbf63926.png',
+    ai:       'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/41c9ed21b2822c901ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7.png',
+    streak:   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f82047a0e727766b375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f.png',
+    every:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/47f9e2c9fad5a78faa2e75819832c6648532079b7499b33175725fc3eaae80db.webp',
+    settings: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/523b5889d13cb14a6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82.webp'
   };
 
   var IC = {

@@ -12,8 +12,6 @@
 (function () {
   'use strict';
 
-  var V = 'https://res.cloudinary.com/eenvubod/video/upload/';
-
   /* before: the banner is inserted as the element's previous sibling.
      top:    the banner is inserted as the element's first child.
      bottom: the banner is appended as the element's last child.
@@ -22,7 +20,7 @@
     /* Above the NowssB Store section, on both homes. In the repo rather
        than on a CDN — the store is the thing the app sells from, and its
        banner should not be one network hop away from not being there. */
-    { top:    '#home-nm .nmh-store-wrap',          vid: './assets/video/store-banner.mp4?v=1' },
+    { top:    '#home-nm .nmh-store-wrap',          vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/store-banner.mp4?v=1' },
     /* The Fashion store's own clip, not the one the Normal home uses. It
        lands INSIDE .fash-store-wrap because `before` inserts into the
        trigger's parent, which is that wrapper now — between the head and
@@ -31,7 +29,7 @@
        own landscape clip. It used to be injected on top of the store card
        carrying the TALL render — a portrait film in a landscape banner,
        which is what made both of them look wrong. */
-    { before: '#home .fash-storeban-slot',        vid: './assets/video/store-banner-fash.mp4?v=1' },
+    { before: '#home .fash-storeban-slot',        vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/store-banner-fash.mp4?v=1' },
 
     /* Choose Your Path, on the laptop, in a section of its own.
        It used to be appended INSIDE the Personalised Healing wrapper, which
@@ -40,13 +38,13 @@
        app/js/part062.js as 'genderpath'; a direct child of the home wrap
        that the registry does not know about gets stranded at the top of the
        page while everything registered is re-appended around it. */
-    { after: '#home-nm .nmh-healing-wrap',         vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
+    { after: '#home-nm .nmh-healing-wrap',         vid: "", gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
               banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
                                    else if (typeof openSub === 'function') openSub('health-category'); } } },
-    { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
+    { after: '#home .fash-healing-wrap',           vid: "", gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
@@ -59,35 +57,35 @@
        It goes INTO .nc-blk-vid rather than before the section: the banner
        and the features carousel are one block with a heading now, built the
        way Quick Access is, and .nc-blk is what part062.js registers. */
-    { top:    '#home-nm .nc-blk-vid',              vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
-    { top:    '#home .nc-blk-vid',                 vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
+    { top:    '#home-nm .nc-blk-vid',              vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
+    { top:    '#home .nc-blk-vid',                 vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
 
     // Trending
-    { top:    '#home-nm .nmh-trend-shop-wrap',     vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
-    { top:    '#home .fash-storevid-wrap',         vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
+    { top:    '#home-nm .nmh-trend-shop-wrap',     vid: "" },
+    { top:    '#home .fash-storevid-wrap',         vid: "" },
 
     // Meaning — a different clip in each place it appears
-    { before: '#home-nm .krm-section',             vid: V + 'v1785402917/grok_video_2026-07-30-14-44-14_cqj4qc.mp4', frame: 'dev-tab-l', wrap: 'nvb-blk' },
+    { before: '#home-nm .krm-section',             vid: "", frame: 'dev-tab-l', wrap: 'nvb-blk' },
     /* The clip this tablet used to carry never arrived — the tablet above
        Meaning Search on the Fashion home was a black screen. It ships in
        the repo now rather than coming from a CDN, which is also why it
        cannot silently stop working again. */
-    { before: '#home #fashMeaningSearchWrap',      vid: './assets/video/orb-loop.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap', own: 1 },
+    { before: '#home #fashMeaningSearchWrap',      vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/orb-loop.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap', own: 1 },
     /* Below the store's own cinematic hero (#msBanner), not above it — a
        `top` placement into #msMeaningBody had been landing it before the
        hero as that host's first child instead. */
-    { after:  '#msBanner',                         vid: V + 'v1785406069/grok_video_2026-07-30-15-36-38_uq9l5d.mp4' },
+    { after:  '#msBanner',                         vid: "" },
 
     /* These two pages hang their scroller off `position: absolute; inset: 0`,
        so a banner at the top of the page box sits behind it. It goes at the
        top of the scrolling content instead, below the hero and clear of the
        fixed header. */
-    { top:    '#sub-offers .bgp-content',          vid: V + 'v1785402975/grok_video_2026-07-30-14-43-34_lqppzd.mp4' },
-    { top:    '#sub-quick-access .bgp-content',    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' },
+    { top:    '#sub-offers .bgp-content',          vid: "" },
+    { top:    '#sub-quick-access .bgp-content',    vid: "" },
 
     // Every word's own page, above About This Word — a player banner, so it
     // carries the player mark on the right and opens the practice.
-    { before: '.rmd-desc-block',                   vid: 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438349/grok_video_2026-07-31-00-34-23_ouxhic.mp4',
+    { before: '.rmd-desc-block',                   vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b0f763363402ac036791e981781d269ae686e96ae4adb99ed5de6e7b1a64d32b.mp4',
       player: 1, go: 'openPracticeIntro()' }
   ];
 
@@ -101,9 +99,9 @@
      either. The two new ones are local files — they ship with the app and
      the cache warms them like everything else. */
   var COUPON_VIDS = [
-    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438343/grok_video_2026-07-31-00-34-06_c2fuko.mp4',
-    './assets/video/coupon-a.mp4',
-    './assets/video/coupon-b.mp4'
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e1c631d8fc5d325a9f90d923a687a36fcdf1f54a642f7ea88c2852f4bd89e8af.mp4',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/coupon-a.mp4',
+    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/coupon-b.mp4'
   ];
   /* The offset is per launch rather than per render, so a rotator redrawing
      a banner does not make the clip jump under the reader. */
@@ -125,14 +123,14 @@
      finally appear. See collectVideoUrls() in app/js/part051.js. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(COUPON_VIDS);
   var COUPON_HOSTS = '#nmhGreetImg, #fashCouponImg, #rmdCouponBanner, #msdCouponBanner';
-  var PLAYER_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png';
+  var PLAYER_ICON = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/93cdeb591c49c96f7217d187426a2ad9d68f2933e6605cb0f76c09f1961bc3ed.webp';
 
   /* The eBooks clip is not a plain banner — it carries its own black banner
      underneath it inside one glass wrapper, and it goes in three places: the
      home sections, above the shelf on the store page, and above the copy on
      every book's own page. */
-  var EB_VID  = V + 'v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4';
-  var EB_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png';
+  var EB_VID  = "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/beaf11ea10561d439ff2d8217da6c6e889accdbb3b20bb1e7b4236cbe754305e.mp4";
+  var EB_ICON = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/2a57d6d66570597b5e96822df79570071705c1fb1943b0c1b895278548c8e426.png';
 
   /* The subscription clip was the same one in several places. The two home
      banners keep a clip of their own; the plan banner on the subscription
@@ -145,38 +143,37 @@
      the login one especially, because it is the first thing a new reader
      sees and it should not be arriving over the network while they wait. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || [])
-    .concat(['./assets/video/subscription-a.mp4',
-             './assets/video/login-phone.mp4']);
+    .concat(['https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/subscription-a.mp4',
+             'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/login-phone.mp4']);
 
   var SWAP = [
     /* Two clips now, picked per launch — the banner that has always been
        here, and the new one. Added rather than swapped: the existing clip
        is the one the banner was designed around. */
     { sel: '#home-nm .nmh-vb-tall video, #home .fash-vb-tall video',
-      vid: [V + 'v1785403503/grok_video_2026-07-30-14-44-37_jufhyx.mp4',
-            './assets/video/subscription-a.mp4'] },
+      vid: ["",
+            'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/subscription-a.mp4'] },
     { sel: '.ss-plan-banner-vid',
-      vid: V + 'v1785406071/grok_video_2026-07-30-15-36-45_ihftsp.mp4' },
+      vid: "" },
     /* The Edition section — the card that carries the plan and Upgrade,
        not the Subscribe Today banner above it. A different cloud from the
        rest, so the full URL rather than the V prefix. */
     { sel: '.fsec-video',
-      vid: 'https://res.cloudinary.com/dkzxw33ln/video/upload/v1785518003/grok_video_2026-07-31-22-26-26_xiytvf.mp4' }
+      vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/bd608efe4ad901c6464df9b7d5bcbe0884b25ac09492f3e6f874925cdfc1fb4f.mp4' }
   ];
 
   /* ── What a banner leads to, named down its right-hand side ────────
      Every icon here is a file the app already ships and already uses for
      that section — the Quick Links rail's own map — so a chip reads as the
      same thing the user taps elsewhere. ── */
-  var I = 'https://res.cloudinary.com/';
   var CHIP_IC = {
-    meaning: I + 'eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png',
-    words:   I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
-    ebooks:  I + 'eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png',
-    connect: I + 'eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
-    chat:    I + 'ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
-    profile: I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
-    offer:   I + 'eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png'
+    meaning: "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1a5f669e63dbae9d85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa.png",
+    words:   "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp",
+    ebooks:  "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/2a57d6d66570597b5e96822df79570071705c1fb1943b0c1b895278548c8e426.png",
+    connect: "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ea559460014dd8d9447072cdece7eb07f670832effdae7f062973b76151f3bde.webp",
+    chat:    "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/db15f3026ea179dc265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e.webp",
+    profile: "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3979b9fa35b579e61e60226665c68128ad03987930169b94504c89b3fe74ccc8.webp",
+    offer:   "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5972de26815c527d6b747aedbfb40a251b398b9008515762e808019375e58389.png"
   };
   var STORE_CHIPS = [
     ['meaning', 'Meanings', 'The origin behind any word'],

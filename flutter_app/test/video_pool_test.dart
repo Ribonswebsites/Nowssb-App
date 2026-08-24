@@ -38,7 +38,7 @@ void main() {
     await VideoPool.instance.debugReset();
   });
 
-  test('a hundred off-screen clips ask the phone for nothing at all',
+  test('a hundred mounted clips keep their decoders and play state',
       () async {
     for (var i = 0; i < 100; i++) {
       VideoPool.instance.lease('assets/video/clip-$i.mp4');
@@ -46,12 +46,12 @@ void main() {
     await pumpPool();
 
     expect(VideoPool.instance.leaseCount, 100);
-    expect(VideoPool.instance.liveCount, 0);
-    expect(platform.created, isEmpty,
-        reason: 'an off-screen clip must never cost a decoder');
+    expect(VideoPool.instance.liveCount, 100);
+    expect(platform.created, hasLength(100),
+        reason: 'a mounted eligible clip stays active even when its widget is below the fold');
   });
 
-  test('a hundred clips on screen at once still only ask for the ceiling', () async {
+  test('a hundred clips on screen at once remain active together', () async {
     final leases = [
       for (var i = 0; i < 100; i++)
         VideoPool.instance.lease('assets/video/clip-$i.mp4'),
@@ -61,9 +61,9 @@ void main() {
     }
     await pumpPool();
 
-    expect(VideoPool.instance.liveCount, VideoPool.maxLive);
-    expect(platform.alive, VideoPool.maxLive,
-        reason: 'the ceiling is on players that exist, not players playing');
+    expect(VideoPool.instance.liveCount, 100);
+    expect(platform.alive, 100,
+        reason: 'all mounted clips remain playing instead of being capped by viewport ranking');
   });
 
   test('every on-screen clip plays when there is room under the ceiling', () async {
@@ -113,7 +113,7 @@ void main() {
     expect(platform.alive, VideoPool.maxLive);
   });
 
-  test('scrolling past a clip gives the decoder back to the phone', () async {
+  test('scrolling past a clip does not stop its loop', () async {
     final a = VideoPool.instance.lease('assets/video/a.mp4');
     a.reportDistance(0);
     await pumpPool();
@@ -122,11 +122,10 @@ void main() {
     a.reportDistance(double.infinity);
     await pumpPool();
 
-    expect(VideoPool.instance.liveCount, 0);
-    expect(platform.alive, 0,
-        reason: 'off screen means disposed, not paused — a paused '
-            'ExoPlayer still holds its decoder');
-    expect(a.controller, isNull);
+    expect(VideoPool.instance.liveCount, 1);
+    expect(platform.alive, 1,
+        reason: 'scrolling must not stop a mounted eligible clip');
+    expect(a.controller, isNotNull);
   });
 
   test('scrolling a long page never exceeds the ceiling at any point',
@@ -148,9 +147,9 @@ void main() {
           reason: 'exceeded the ceiling at scroll step $scroll');
     }
 
-    expect(peak, VideoPool.maxLive, reason: 'the pool should stay full');
-    expect(platform.created.length, greaterThan(VideoPool.maxLive),
-        reason: 'clips really were recycled, not just created once');
+    expect(peak, 30, reason: 'all mounted clips remain live throughout scrolling');
+    expect(platform.created.length, 30,
+        reason: 'clips are not repeatedly disposed and recreated while scrolling');
   });
 
   test('disposing a lease releases its player even while it holds one',

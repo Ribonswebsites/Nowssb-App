@@ -1,0 +1,368 @@
+{
+  "generatedAt": "2026-08-24T18:35:15.684Z",
+  "totals": {
+    "mediaFiles": 719,
+    "mediaBytes": 964111449,
+    "byType": {
+      "image": {
+        "count": 551,
+        "bytes": 187952065
+      },
+      "video": {
+        "count": 168,
+        "bytes": 776159384
+      },
+      "audio": {
+        "count": 0,
+        "bytes": 0
+      },
+      "other": {
+        "count": 0,
+        "bytes": 0
+      }
+    },
+    "cloudinaryUrls": 549,
+    "cloudinaryOccurrences": 6062,
+    "r2Urls": 4,
+    "r2Occurrences": 12,
+    "localRefOccurrences": 124
+  },
+  "largest": [
+    {
+      "path": "assets/video/fashion-hero-ebooks.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 16782893,
+      "sha256": "2ce0dd3e58d0d4653e04d0f265103b43def722c1ed623b197b0ed2cc283b1322",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/fashion-hero-ebooks.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 16782893,
+      "sha256": "2ce0dd3e58d0d4653e04d0f265103b43def722c1ed623b197b0ed2cc283b1322",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/fashion-hero-ebooks.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 16782893,
+      "sha256": "2ce0dd3e58d0d4653e04d0f265103b43def722c1ed623b197b0ed2cc283b1322",
+      "generated": true
+    },
+    {
+      "path": "assets/video/fashion-hero-meaning-store.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 16077685,
+      "sha256": "bee4f20fc4ab5472ed48af5a8dc8bccab011fd2a66782a4d41f4796a989d7c46",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/fashion-hero-meaning-store.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 16077685,
+      "sha256": "bee4f20fc4ab5472ed48af5a8dc8bccab011fd2a66782a4d41f4796a989d7c46",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/fashion-hero-meaning-store.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 16077685,
+      "sha256": "bee4f20fc4ab5472ed48af5a8dc8bccab011fd2a66782a4d41f4796a989d7c46",
+      "generated": true
+    },
+    {
+      "path": "assets/video/fashion-hero-word-store.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 15594325,
+      "sha256": "768c894d41ce6bd800bf88eda72217b0ebe74725d1be21a5e5d037aad473b9ee",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/fashion-hero-word-store.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 15594325,
+      "sha256": "768c894d41ce6bd800bf88eda72217b0ebe74725d1be21a5e5d037aad473b9ee",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/fashion-hero-word-store.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 15594325,
+      "sha256": "768c894d41ce6bd800bf88eda72217b0ebe74725d1be21a5e5d037aad473b9ee",
+      "generated": true
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/video/store-section.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 10996484,
+      "sha256": "9943073fd6db29f0bd3f37bf6648cb9e0d0540d438b024958fc2825e25ea1e25",
+      "generated": false
+    },
+    {
+      "path": "assets/video/store-section.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 10996484,
+      "sha256": "9943073fd6db29f0bd3f37bf6648cb9e0d0540d438b024958fc2825e25ea1e25",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/store-section.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 10996484,
+      "sha256": "9943073fd6db29f0bd3f37bf6648cb9e0d0540d438b024958fc2825e25ea1e25",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/store-section.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 10996484,
+      "sha256": "9943073fd6db29f0bd3f37bf6648cb9e0d0540d438b024958fc2825e25ea1e25",
+      "generated": true
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/video/player-liquid-splash.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 9252304,
+      "sha256": "92135312172a9304dd052cd7c727d17cf988a94d45052247af1f0b1d199ef00e",
+      "generated": false
+    },
+    {
+      "path": "assets/video/player-liquid-splash.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 9252304,
+      "sha256": "92135312172a9304dd052cd7c727d17cf988a94d45052247af1f0b1d199ef00e",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/player-liquid-splash.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 9252304,
+      "sha256": "92135312172a9304dd052cd7c727d17cf988a94d45052247af1f0b1d199ef00e",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/player-liquid-splash.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 9252304,
+      "sha256": "92135312172a9304dd052cd7c727d17cf988a94d45052247af1f0b1d199ef00e",
+      "generated": true
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/video/store-verify-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8864682,
+      "sha256": "2ae02344a3b6a4e4a91efded238e39d3f71feac2d67034b337b8b79b8d173282",
+      "generated": false
+    },
+    {
+      "path": "assets/video/store-verify-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8864682,
+      "sha256": "2ae02344a3b6a4e4a91efded238e39d3f71feac2d67034b337b8b79b8d173282",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/store-verify-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8864682,
+      "sha256": "2ae02344a3b6a4e4a91efded238e39d3f71feac2d67034b337b8b79b8d173282",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/store-verify-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8864682,
+      "sha256": "2ae02344a3b6a4e4a91efded238e39d3f71feac2d67034b337b8b79b8d173282",
+      "generated": true
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/video/store-trigger.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8861466,
+      "sha256": "81c244983e2df8ada46af32b27f4260aad3b28b431aa1b9b3a99991aadcd6004",
+      "generated": false
+    },
+    {
+      "path": "assets/video/store-trigger.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8861466,
+      "sha256": "81c244983e2df8ada46af32b27f4260aad3b28b431aa1b9b3a99991aadcd6004",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/store-trigger.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8861466,
+      "sha256": "81c244983e2df8ada46af32b27f4260aad3b28b431aa1b9b3a99991aadcd6004",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/store-trigger.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8861466,
+      "sha256": "81c244983e2df8ada46af32b27f4260aad3b28b431aa1b9b3a99991aadcd6004",
+      "generated": true
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/video/store-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8821014,
+      "sha256": "b5bcbb09c238b2f90e029059f075e596e01810986e9e4f92924be1731f5ef057",
+      "generated": false
+    },
+    {
+      "path": "assets/video/store-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8821014,
+      "sha256": "b5bcbb09c238b2f90e029059f075e596e01810986e9e4f92924be1731f5ef057",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/store-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8821014,
+      "sha256": "b5bcbb09c238b2f90e029059f075e596e01810986e9e4f92924be1731f5ef057",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/store-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8821014,
+      "sha256": "b5bcbb09c238b2f90e029059f075e596e01810986e9e4f92924be1731f5ef057",
+      "generated": true
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/video/connect-banner.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 8603096,
+      "sha256": "f2f5e8ba0f59af068ad07501af33ff903095d9ca95894bf0aad943ba4c4ef33c",
+      "generated": false
+    }
+  ],
+  "exclusions": [
+    {
+      "path": "android/app/src/main/assets/public/assets/video/start-animation.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 3822041,
+      "sha256": "e88fbfc64383ed7d2601b60265870b6a4476d08bca4640473fe6639018c2bafd",
+      "generated": false
+    },
+    {
+      "path": "assets/video/start-animation.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 3822041,
+      "sha256": "e88fbfc64383ed7d2601b60265870b6a4476d08bca4640473fe6639018c2bafd",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/start-animation.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 3822041,
+      "sha256": "e88fbfc64383ed7d2601b60265870b6a4476d08bca4640473fe6639018c2bafd",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/start-animation.mp4",
+      "type": "video",
+      "mime": "video/mp4",
+      "bytes": 3822041,
+      "sha256": "e88fbfc64383ed7d2601b60265870b6a4476d08bca4640473fe6639018c2bafd",
+      "generated": true
+    },
+    {
+      "path": "android/app/src/main/assets/public/assets/video/start-animation-poster.webp",
+      "type": "image",
+      "mime": "image/webp",
+      "bytes": 52696,
+      "sha256": "9b27c4055984cc2f1fdfea165405bfb9c1c91369fe6c26e5d071efd4f80ca857",
+      "generated": false
+    },
+    {
+      "path": "assets/video/start-animation-poster.webp",
+      "type": "image",
+      "mime": "image/webp",
+      "bytes": 52696,
+      "sha256": "9b27c4055984cc2f1fdfea165405bfb9c1c91369fe6c26e5d071efd4f80ca857",
+      "generated": false
+    },
+    {
+      "path": "flutter_app/assets/video/start-animation-poster.webp",
+      "type": "image",
+      "mime": "image/webp",
+      "bytes": 52696,
+      "sha256": "9b27c4055984cc2f1fdfea165405bfb9c1c91369fe6c26e5d071efd4f80ca857",
+      "generated": true
+    },
+    {
+      "path": "www/assets/video/start-animation-poster.webp",
+      "type": "image",
+      "mime": "image/webp",
+      "bytes": 52696,
+      "sha256": "9b27c4055984cc2f1fdfea165405bfb9c1c91369fe6c26e5d071efd4f80ca857",
+      "generated": true
+    }
+  ],
+  "packageOrigins": {
+    "webview": {
+      "source": "repository root walked by tools/build-native.mjs",
+      "skipDirs": [
+        "android",
+        "flutter_app",
+        "ios",
+        "node_modules",
+        "tools",
+        "www"
+      ],
+      "skippedPath": "assets/banners",
+      "output": "www/"
+    },
+    "flutter": {
+      "source": "assets/ copied by tools/flutter-assets.mjs",
+      "folders": [
+        "video",
+        "frames",
+        "icons",
+        "store",
+        "fashion",
+        "player",
+        "signature",
+        "certificates",
+        "banners"
+      ],
+      "output": "flutter_app/assets/"
+    }
+  }
+}

@@ -1,0 +1,682 @@
+{
+  "failedCount": 15,
+  "failed": [
+    {
+      "url": "https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\\",
+      "error": "download https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\\: 400 Bad Request",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/nowssb-player.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/nowssb-player.js",
+          "line": 1
+        },
+        {
+          "file": "nowssb-player.js",
+          "line": 1
+        },
+        {
+          "file": "nowssb-player.js",
+          "line": 1
+        },
+        {
+          "file": "www/nowssb-player.js",
+          "line": 1
+        },
+        {
+          "file": "www/nowssb-player.js",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg",
+      "error": "download https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778665450/grok_video_2026-05-13-15-13-43_c1npax.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/index.html",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "index.html",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/index.html",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../buddha.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../buddha.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../egyptian-queen.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../egyptian-queen.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../purple-suit.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../purple-suit.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../roman-emperor.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../roman-emperor.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../scientist.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../scientist.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../tribal-warrior.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../tribal-warrior.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../viking-thor.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../viking-thor.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../white-suit.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../white-suit.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../zeus-lightning.jpg",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../zeus-lightning.jpg: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part030.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965473/grok_image_1777891938824_cxuhwm.jpg);background-size:cover;background-position:center",
+      "error": "download https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965473/grok_image_1777891938824_cxuhwm.jpg);background-size:cover;background-position:center: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part018.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/app/js/part018.js",
+          "line": 1
+        },
+        {
+          "file": "app/js/part018.js",
+          "line": 1
+        },
+        {
+          "file": "app/js/part018.js",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part018.js",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part018.js",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png",
+      "error": "download https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png",
+      "error": "download https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png: 404 Not Found",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part053.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/app/js/part053.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/app/js/part054.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/index.html",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/index.html",
+          "line": 1
+        },
+        {
+          "file": "app/js/part053.js",
+          "line": 1
+        },
+        {
+          "file": "app/js/part053.js",
+          "line": 1
+        },
+        {
+          "file": "app/js/part054.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "index.html",
+          "line": 1
+        },
+        {
+          "file": "index.html",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part053.js",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part053.js",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part054.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/index.html",
+          "line": 1
+        },
+        {
+          "file": "www/index.html",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "url": "https://res.cloudinary.com/eenvubod/video/upload/",
+      "error": "download https://res.cloudinary.com/eenvubod/video/upload/: 400 Bad Request",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/app/js/part067.js",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "app/js/part067.js",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "www/app/js/part067.js",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ]
+    }
+  ],
+  "uploadedCount": 532,
+  "skipped": [
+    {
+      "url": "https://res.cloudinary.com/…",
+      "occurrences": [
+        {
+          "file": "tools/localise-media.mjs",
+          "line": 1
+        }
+      ],
+      "reason": "invalid host"
+    },
+    {
+      "url": "https://res.cloudinary.com/${cloud}/image/upload/${r.public_id}.${r.format",
+      "occurrences": [
+        {
+          "file": "android/app/src/main/assets/public/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "android/app/src/main/assets/public/assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "assets/media_assets.dart",
+          "line": 1
+        },
+        {
+          "file": "fetch-nowssb-v2.html",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media-manifest.json",
+          "line": 1
+        },
+        {
+          "file": "www/assets/media_assets.dart",
+          "line": 1
+        }
+      ],
+      "reason": "template placeholder"
+    }
+  ]
+}

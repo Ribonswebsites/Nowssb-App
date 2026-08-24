@@ -13,6 +13,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../../media/nwsb_image.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 
@@ -63,13 +64,12 @@ class HomeHeader extends StatelessWidget {
                 height: 48,
                 clipBehavior: Clip.antiAlias,
                 decoration: const BoxDecoration(shape: BoxShape.circle),
-                child: Image.asset(
-                  'assets/icons/logo-disc.webp',
+                child: NwsbImage(
+                  asset: 'assets/icons/logo-disc.webp',
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const ColoredBox(
+                  error: const ColoredBox(
                     color: Color(0xFF14141C),
-                    child:
-                        Icon(Icons.headphones, size: 22, color: Colors.white),
+                    child: Icon(Icons.headphones, size: 22, color: Colors.white),
                   ),
                 ),
               ),

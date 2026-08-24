@@ -384,26 +384,26 @@ class NmPromoDisc extends StatefulWidget {
 
   static const storeSlides = [
     (
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3cccf351ff9cc39fd9add9f1fafbb3ef74d8ce34f1f3db5ea1ba5777eb3e152d.webp',
       ['Enter the NowssB Store.', 'Own words that heal — yours alone.'],
     ),
     (
-      'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_240/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/256d08a157cfa2a2fbeeac02a1473db70491cf65ad2a341903ca1fe1aff6aff9.webp',
       ['Your cart is waiting.', 'Coupons up to 50% off today.'],
     ),
   ];
 
   static const connectSlides = [
     (
-      'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8ed93fdc651b43c37f9808dbd165222aeaa1bf68f6a95814aa3e04e3c95b40e8.webp',
       ['Your circle just got bigger.', 'Connect with learners like you.'],
     ),
     (
-      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4941ad0e531fcc53b3a9fb315a42d97c3c2e0e7c663d55f2378df28d1a2b3a45.webp',
       ['Stand out with a badge.', 'Blue, Silver, Gold or Diamond — your pick.'],
     ),
     (
-      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8d85320f63c3e1760c436ecb735a892202453e58b9a36178183dc6c2d7f72be4.webp',
       ['New voices, new stories.', 'Discover creators worth following.'],
     ),
   ];
@@ -696,28 +696,28 @@ class NmTiles extends StatelessWidget {
     (
       'Sound Library',
       'Root frequencies',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7fa4063875d35e04beee78307c56c371efae3bc8d6c38b310aa2e14dd7758693.png',
       Icons.graphic_eq,
       2,
     ),
     (
       'My Progress',
       'Healing journey',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899471/file_00000000345481faafd2bea97c8320ab_oknybe.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/14f6230703172bdafa32ab5ed848c77be01f0140c835765516df9446f6af272b.png',
       Icons.show_chart,
       4,
     ),
     (
       'Word Science',
       'NOWSBANSIU texts',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/47036d4cd479092923c3757198af0d7f0a7985641782b6c14b7475114b28acd9.png',
       Icons.science_outlined,
       2,
     ),
     (
       'My Profile',
       'Your settings',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png',
+      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/09748604e7de55fa6f9838be3d6f6b3f588d0818eab1711da5bcdef4ddf0e5df.png',
       Icons.person_outline,
       4,
     ),
@@ -1058,7 +1058,7 @@ class NmReader extends StatelessWidget {
                 aspectRatio: 16 / 9,
                 child: NwsbImage(
                   url:
-                      'https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4',
+                      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3a1f74f98d7a0d18aaa2ecab03e19977f1710d5be3f05a7d9a7034dd7bbd947a.mp4',
                   fallback: NwsbVideo(
                     asset: 'assets/video/word-acts.mp4',
                     priority: ClipPriority.decoration,
@@ -1130,7 +1130,7 @@ class NmTrending extends StatelessWidget {
                 children: [
                   const NwsbImage(
                     url:
-                        'https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
+                        'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7e4d709136dc254a71cad8db450236e7318ba2de50f45da79ae8e40f4ad131af.mp4',
                     fallback: NwsbVideo(
                       asset: 'assets/video/word-acts.mp4',
                       priority: ClipPriority.decoration,

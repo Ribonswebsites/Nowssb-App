@@ -154,16 +154,10 @@ class VideoPool {
 
   static final VideoPool instance = VideoPool._();
 
-  /// The ceiling. Matched to the website (`MAX_PLAYING` in app/js/part051.js)
-  /// so Flutter, the Capacitor WebView and the HTML app all play the same
-  /// number of films.
-  ///
-  /// Twenty-four covers a full home of banners, televisions AND the page
-  /// film behind them. Off-screen clips still cost nothing — this is a cap
-  /// on what is being looked at, not on how many exist in the app. Four was
-  /// leaving every background and most of the section films as stills, which
-  /// is what "the videos are not playing" actually was.
-  static const int maxLive = 24;
+  /// All mounted eligible clips stay live so a section video does not stop
+  /// when the user scrolls. The protected launch animation is managed by the
+  /// Splash widget and never enters this pool.
+  static const int maxLive = 256;
 
   final List<VideoLease> _leases = [];
   final Set<VideoLease> _live = {};
@@ -366,7 +360,7 @@ class VideoPool {
         // is the whole point, and it is why a hundred idle clips now cost a
         // hundred pictures instead of a hundred ExoPlayers.
         final want = _leases
-            .where((l) => l._distance != double.infinity && l._failures < 3)
+            .where((l) => l._failures < 3)
             .toList()
           ..sort((a, b) {
             if (a.priority != b.priority) {
@@ -447,7 +441,7 @@ class VideoPool {
       return;
     }
 
-    await c.setLooping(l.loop);
+    await c.setLooping(true);
     // Muted, always. Every clip in this app is decoration, and a video
     // playing with sound is what put the website in Android's notification
     // shade next to a music player. Keep the initial play guarded so one
@@ -486,10 +480,9 @@ class VideoPool {
       }
     }
 
-    // Bundled clips are the reliable first frame and playback source. The
-    // same clip remains R2-backed through the network fallback below, but a
-    // missing/slow R2 object must never prevent a visible local video from
-    // starting.
+    // R2 is the canonical playback source after migration. The bundled
+    // lookup is retained only as a harmless compatibility attempt for the
+    // protected launch family; eligible clips resolve to R2 below.
     final urls = NwsbCdn.urls(assetPath).toList();
 
     Future<VideoPlayerController?> openNetwork() async {

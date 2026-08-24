@@ -1,0 +1,6 @@
+
+> nowssb-app@9.6.28 build:native
+> node tools/build-native.mjs
+
+www/ built — 114 files, 8.2 MB.
+Studio excluded and verified. Next: npx cap sync   (both platforms)

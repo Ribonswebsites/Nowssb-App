@@ -66,7 +66,7 @@ class NmConnect extends StatelessWidget {
                     height: 46,
                     child: NwsbImage(
                       url:
-                          'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+                          'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8ed93fdc651b43c37f9808dbd165222aeaa1bf68f6a95814aa3e04e3c95b40e8.webp',
                       fit: BoxFit.contain,
                       fallback: Icon(Icons.people_outline,
                           size: 24, color: NwsbColors.goldLight),

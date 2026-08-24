@@ -1,5 +1,5 @@
 
-      var _cdWords = [], _cdImg = "https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778571475/grok_image_1778520937416_jazknf.jpg";
+      var _cdWords = [], _cdImg = "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/35423222df3850a9a0661779f0f275e4b432de952c8c74ca17e0255ee22e13a7.webp";
       // Per-category banner URLs — swap in real images when Ribon provides them
       var _catBanners = {
         'off50':    _cdImg, 'elements': _cdImg, 'sacred':  _cdImg,

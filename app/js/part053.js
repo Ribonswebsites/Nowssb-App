@@ -23,7 +23,7 @@
     var cart = window.nssCart || [];
     var coupons = window.NSS_COUPONS || {};
     var qualifyFn = window.chkQualifyingItems || function (c) { return c; };
-    var couponImg = 'https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png';
+    var couponImg = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/logo-disc.webp';
     couponsBox.innerHTML = Object.keys(coupons).map(function (code) {
       var c = coupons[code];
       var qualifying = qualifyFn(cart, c);
@@ -62,7 +62,7 @@
       return;
     }
 
-    var wordImg = 'https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png';
+    var wordImg = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/logo-disc.webp';
     gridBox.innerHTML = discounted.map(function (word, i) {
       var t = tiers[wordTier[word]] || {};
       return '<div class="bgp-offer-card' + (i >= 6 ? ' bgp-hidden-extra' : '') + '" onclick="nwsbOpenStoreWord(\'' + String(word).replace(/'/g, '') + '\')">' +
@@ -196,7 +196,7 @@
     var d = window._userDataCache || {};
     var streak = d.currentStreak || d.streakCount || 0;
     return '<div class="nmh-sec-banner" id="streakProfileBanner" onclick="openSub(\'streak\')">' +
-      '<div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>' +
+      '<div class="nmh-sec-banner-icon"><img loading="lazy" decoding="async" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f82047a0e727766b375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>' +
       '<div class="nmh-sec-banner-divider"></div>' +
       '<div class="nmh-sec-banner-txt">' +
         '<div class="nmh-sec-banner-title">' + streak + ' Day Streak</div>' +
@@ -253,17 +253,17 @@
      Connect features carousel — icon on the RIGHT (text block first in
      the DOM, icon last), no arrow/button since these aren't links. ── */
   var FEAT_BANNER_CARDS = [
-    { name: 'Everything NowssB', sub: 'Quick access to everything on NowssB', img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png' },
-    { name: 'NowssB Player',    sub: 'Your sound library — listen, heal, repeat',           img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png' },
-    { name: 'NowssB Connect',   sub: 'The social space of NowssB — share your journey',     img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png' },
-    { name: 'NowssB Store',     sub: 'Words & meanings — own the sounds that heal',         img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160870/file_0000000037547208b91bfd167f401961_eesfpn.png' },
-    { name: 'Verification',     sub: 'Earn your NowssB check-mark',                          img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png' },
-    { name: 'Search',           sub: 'Find any word or meaning, instantly',                  img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png' },
-    { name: 'Daily Practice',   sub: 'Your morning ritual, every day',                        img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000050d472089de0ad57116dba0f_tht26i.png' },
-    { name: 'Word Science',     sub: 'The NOWSBANSIU system, decoded',                        img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png' },
-    { name: 'My Progress',      sub: 'Track your healing journey',                            img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png' },
-    { name: 'Wishlist',         sub: 'Words you\'ve saved for later',                         img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png' },
-    { name: 'Cart',             sub: 'Your bag, ready for checkout',                          img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png' }
+    { name: 'Everything NowssB', sub: 'Quick access to everything on NowssB', img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/af0736f58e0c29f3ee1124c2298b8d90cb7cc5a5f5a99f3f531ac5d481eba949.webp' },
+    { name: 'NowssB Player',    sub: 'Your sound library — listen, heal, repeat',           img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/2ab8b4bbd1a045b068da1fb6b6781158ca16fa948a8a67f1038b8449f5499996.webp' },
+    { name: 'NowssB Connect',   sub: 'The social space of NowssB — share your journey',     img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8ed93fdc651b43c37f9808dbd165222aeaa1bf68f6a95814aa3e04e3c95b40e8.webp' },
+    { name: 'NowssB Store',     sub: 'Words & meanings — own the sounds that heal',         img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0781e6ce59dee3786df7b018f21f97d8c6cf83421f18799104f32d940d2da9d9.webp' },
+    { name: 'Verification',     sub: 'Earn your NowssB check-mark',                          img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4941ad0e531fcc53b3a9fb315a42d97c3c2e0e7c663d55f2378df28d1a2b3a45.webp' },
+    { name: 'Search',           sub: 'Find any word or meaning, instantly',                  img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8d85320f63c3e1760c436ecb735a892202453e58b9a36178183dc6c2d7f72be4.webp' },
+    { name: 'Daily Practice',   sub: 'Your morning ritual, every day',                        img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/73217a0bd6f399ea4515768d2e5716dcd9af0576c699084606e65682a19a1357.webp' },
+    { name: 'Word Science',     sub: 'The NOWSBANSIU system, decoded',                        img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dd44cf9fc35b783c2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7.webp' },
+    { name: 'My Progress',      sub: 'Track your healing journey',                            img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0480c10b8a8d79dd38f0f5ffaf71f982cb92d7e49b8cbb3a9bd93bc6820c8a99.webp' },
+    { name: 'Wishlist',         sub: 'Words you\'ve saved for later',                         img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a74a9935fb237eb82b17a92169d2b57e5a8733d5a3fd699754717fcd8869dfed.webp' },
+    { name: 'Cart',             sub: 'Your bag, ready for checkout',                          img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/311c26afee2bc52c712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d.webp' }
   ];
   var _featBannerTimer = null;
   function buildFeatBanner(track, dots) {
@@ -352,7 +352,7 @@
      "NowssB Store" row) — distinct from RM_CAT_LOGO, which is reserved
      for cart/checkout/Word Atelier word items specifically.
      Shows the first 5, rest revealed via "Show More". */
-  var RX_WORD_ICON = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783160870/file_0000000037547208b91bfd167f401961_eesfpn.png';
+  var RX_WORD_ICON = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0781e6ce59dee3786df7b018f21f97d8c6cf83421f18799104f32d940d2da9d9.webp';
   function renderRxOrganRow() {
     var box = document.getElementById('rxOrganRow');
     var moreBtn = document.getElementById('rxOrganShowMoreBtn');

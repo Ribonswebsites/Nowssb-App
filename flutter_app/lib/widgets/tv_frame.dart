@@ -17,6 +17,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../media/cdn.dart';
+import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 
@@ -286,10 +288,10 @@ class _Bezel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (frame.image.isNotEmpty) {
-      return Image.asset(
-        frame.image,
+      return NwsbImage(
+        asset: frame.image,
         fit: BoxFit.fill,
-        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        error: const SizedBox.shrink(),
       );
     }
 
@@ -324,8 +326,8 @@ class _Bezel extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: ExactAssetImage(
-                      'assets/frames/tv-l-mid.webp',
+                    image: NetworkImage(
+                      NwsbCdn.assetUrl('assets/frames/tv-l-mid.webp'),
                       scale: _tvRailNaturalWidth / c.maxWidth,
                     ),
                     repeat: ImageRepeat.repeatY,
@@ -338,20 +340,20 @@ class _Bezel extends StatelessWidget {
               left: 0,
               right: 0,
               top: 0,
-              child: Image.asset(
-                'assets/frames/tv-l-top.webp',
+              child: NwsbImage(
+                asset: 'assets/frames/tv-l-top.webp',
                 fit: BoxFit.fitWidth,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                error: const SizedBox.shrink(),
               ),
             ),
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
-              child: Image.asset(
-                'assets/frames/tv-l-bottom.webp',
+              child: NwsbImage(
+                asset: 'assets/frames/tv-l-bottom.webp',
                 fit: BoxFit.fitWidth,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                error: const SizedBox.shrink(),
               ),
             ),
           ],

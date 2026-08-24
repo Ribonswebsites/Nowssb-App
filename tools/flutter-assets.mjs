@@ -45,8 +45,8 @@ let copied = 0, skipped = 0, bytes = 0;
 function copyDir(rel) {
   const from = join(root, 'assets', rel);
   const to = join(root, 'flutter_app', 'assets', rel);
-  if (!existsSync(from)) return;
   mkdirSync(to, { recursive: true });
+  if (!existsSync(from)) return;
 
   for (const name of readdirSync(from)) {
     const src = join(from, name);

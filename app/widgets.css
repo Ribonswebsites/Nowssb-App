@@ -352,8 +352,8 @@
   padding: calc(var(--dw) * 0.02410) calc(var(--dw) * 0.01791)
            calc(var(--dw) * 0.08540) calc(var(--dw) * 0.01928);
   background:
-    url('../assets/frames/tv-l-top.webp')    top center    / 100% auto no-repeat,
-    url('../assets/frames/tv-l-bottom.webp') bottom center / 100% auto no-repeat;
+    url('.https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-top.webp')    top center    / 100% auto no-repeat,
+    url('.https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-bottom.webp') bottom center / 100% auto no-repeat;
 }
 /* The rails, tiled — and STOPPED at the top of the bottom bezel. Run to the
    foot of the box and they carry on down either side of the stand and close
@@ -365,11 +365,11 @@
   content: '';
   position: absolute; left: 0; right: 0; top: 0;
   bottom: calc(var(--dw) * 0.0854);
-  background: url('../assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
+  background: url('.https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
 }
 .stw-dev-tab {
   padding: calc(var(--dw) * 0.04854) calc(var(--dw) * 0.03510) calc(var(--dw) * 0.03734);
-  background: url('../assets/frames/tab-landscape.webp') center / 100% 100% no-repeat;
+  background: url('.https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/frames/tab-landscape.webp') center / 100% 100% no-repeat;
 }
 /* The aperture must stay EMPTY. The device is drawn over the slides — that
    is what lets them pass behind its edge — so anything painted in its

@@ -84,8 +84,8 @@ self.addEventListener('activate', e => {
    circle beside the app name on the LEFT, stays exactly as it was — that
    part already reads the way it should.
    ── */
-const NOTIF_ICON  = './assets/icons/notif-blank.png';
-const NOTIF_BADGE = './assets/icons/notif-badge.png';
+const NOTIF_ICON  = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-blank.png';
+const NOTIF_BADGE = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-badge.png';
 
 self.addEventListener('push', e => {
   let d = {};
