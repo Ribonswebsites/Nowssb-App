@@ -65,13 +65,16 @@
     { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
     /* Fifth background supplied for this release. It is also copied into the
        Flutter asset bundle and uploaded to the shared R2 video catalog. */
-    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Background Five' }
+    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Background Five' },
+    { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Background Six' },
+    { vid: './assets/video/fashion-plus-bg-6.mp4', name: 'Current Fashion Home' }
   ];
 
-  /* What a first-time reader gets. The supplied fifth film is the new
-     Fashion Plus introduction, and the name-based lookup survives reorder. */
+  /* Preserve the current Fashion Home film as the default. Existing stored
+     selections remain valid by index; first-time users see the current film,
+     while every prior and new option remains available in the picker. */
   var BG_DEFAULT = (function () {
-    for (var i = 0; i < FILMS.length; i++) if (FILMS[i].name === 'Background Five') return i;
+    for (var i = 0; i < FILMS.length; i++) if (FILMS[i].name === 'Current Fashion Home') return i;
     return FILMS.length - 1;
   })();
   FILMS.forEach(function (f, i) {

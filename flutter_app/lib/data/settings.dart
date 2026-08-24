@@ -24,6 +24,7 @@ class Settings extends ChangeNotifier {
   static const _kDownload = 'nwsb_pw_download';
   static const _kPlaylist = 'nwsb_pw_playlist';
   static const _kNowPlaying = 'nwsb_pw_nowplaying';
+  static const _kFashionBackground = 'nwsb_fashion_background_index';
 
   bool _fashionPlus = true;
   bool _fashionHome = true;
@@ -43,6 +44,7 @@ class Settings extends ChangeNotifier {
   bool _download = true;
   String _playlist = 'Classic';
   String _nowPlaying = 'On';
+  int _fashionBackgroundIndex = 6;
   bool _animation = true;
   bool _notify = true;
 
@@ -71,6 +73,7 @@ class Settings extends ChangeNotifier {
   bool get downloadOnly => _download;
   String get playlist => _playlist;
   String get nowPlaying => _nowPlaying;
+  int get fashionBackgroundIndex => _fashionBackgroundIndex;
   bool get animationOn => _animation;
   bool get notifyOn => _notify;
 
@@ -102,6 +105,7 @@ class Settings extends ChangeNotifier {
       _download = p.getBool(_kDownload) ?? true;
       _playlist = p.getString(_kPlaylist) ?? 'Classic';
       _nowPlaying = p.getString(_kNowPlaying) ?? 'On';
+      _fashionBackgroundIndex = (p.getInt(_kFashionBackground) ?? 6).clamp(0, 6).toInt();
       _bands = List<double>.from(_eqPresets[_eq] ?? _eqPresets['flat']!);
       notifyListeners();
     } catch (_) {}
@@ -226,6 +230,12 @@ class Settings extends ChangeNotifier {
     _nowPlaying = v;
     notifyListeners();
     _saveStr(_kNowPlaying, v);
+  }
+
+  void setFashionBackgroundIndex(int index) {
+    _fashionBackgroundIndex = index.clamp(0, 6).toInt();
+    notifyListeners();
+    _saveInt(_kFashionBackground, _fashionBackgroundIndex);
   }
 
   void toggleQuality() {

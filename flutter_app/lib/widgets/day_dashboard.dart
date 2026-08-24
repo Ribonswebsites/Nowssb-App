@@ -384,11 +384,14 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
         ? _glass(child: _essentialStack(context, visible), padding: const EdgeInsets.all(14))
         : NeuCard(radius: 26, padding: const EdgeInsets.all(14), child: _essentialStack(context, visible));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      _essentialsWave(),
       Row(children: [_filterPill(context, Icons.access_time, 'Recents', 0), const SizedBox(width: 10), _filterPill(context, Icons.favorite, 'Favorites', 1)]),
       const SizedBox(height: 28),
       Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7)),
       const SizedBox(height: 14),
       shell,
+      const SizedBox(height: 18),
+      _essentialsGuide(context),
       const SizedBox(height: 30),
       Row(
         children: [
@@ -421,6 +424,57 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
         ),
       ),
     ]);
+  }
+
+  Widget _essentialsWave() => Container(
+        height: 72,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(80)),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: widget.fashion
+                ? const [Color(0x3D6A37A2), Color(0xB30A081A)]
+                : const [Color(0xFF5732A8), Color(0xFFF7F5F2)],
+          ),
+        ),
+      );
+
+  Widget _essentialsGuide(BuildContext context) {
+    final guide = Container(
+      constraints: const BoxConstraints(minHeight: 116),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 14, offset: Offset(0, 8))],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(color: const Color(0xFF171717), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x24FFFFFF))),
+            child: const Icon(Icons.tune, color: Colors.white, size: 27),
+          ),
+          const SizedBox(width: 14),
+          const Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Find Your Way Around', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+                SizedBox(height: 6),
+                Text('Every screen in the app, and what each one is for', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12, height: 1.35)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0x3DFFFFFF))), child: const Icon(Icons.arrow_forward, color: Colors.white, size: 20)),
+        ],
+      ),
+    );
+    return Semantics(button: true, label: 'Find Your Way Around', child: InkWell(onTap: () => Dest.open(context, Dest.profile), borderRadius: BorderRadius.circular(24), child: guide));
   }
 
   Widget _filterPill(BuildContext context, IconData icon, String label, int value) {

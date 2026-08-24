@@ -110,7 +110,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0C0E12),
+      backgroundColor: const Color(0xFF202731),
       body: SafeArea(
         child: Column(
           children: [
@@ -130,13 +130,13 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
             const Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(24, 12, 24, 28),
-                child: Text('MUSIC PLAYER\nSETTINGS', style: TextStyle(color: Color(0xFFF2F2EF), fontSize: 26, fontWeight: FontWeight.w300, letterSpacing: 3.5, height: 1.25)),
+                padding: EdgeInsets.fromLTRB(24, 18, 24, 34),
+                child: Text('MUSIC PLAYER\nSETTINGS', style: TextStyle(color: Color(0xFFF2F2EF), fontSize: 29, fontWeight: FontWeight.w300, letterSpacing: 4.0, height: 1.28)),
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(8, 0, 8, 28),
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
                 children: [
                   _nav(Icons.tune, 'Equalizer', _eqLabel, () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq)),
                   _nav(Icons.graphic_eq, 'Audio Quality', s.quality, () => _choose('Audio Quality', _qualityOptions, s.quality, s.setQuality)),
@@ -154,12 +154,12 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Container(
-                height: 64,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(color: const Color(0x12FFFFFF), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x10FFFFFF))),
+                height: 92,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(color: const Color(0x0FFFFFFF), borderRadius: BorderRadius.circular(28), border: Border.all(color: const Color(0x1FFFFFFF))),
                 child: Row(
                   children: [
-                    Container(width: 44, height: 44, alignment: Alignment.center, decoration: BoxDecoration(color: const Color(0xFF161920), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.graphic_eq, color: Colors.white70)),
+                    Container(width: 64, height: 64, alignment: Alignment.center, decoration: BoxDecoration(color: const Color(0xFF161920), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.graphic_eq, color: Colors.white70)),
                     const SizedBox(width: 10),
                     const Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [Text('NOWSSB PLAYER', style: TextStyle(color: Colors.white, fontSize: 12, letterSpacing: 1.6, fontWeight: FontWeight.w600)), Text('AURA', style: TextStyle(color: Color(0x66FFFFFF), fontSize: 10, letterSpacing: 1.4))])),
                     IconButton(onPressed: () {}, icon: const Icon(Icons.skip_previous, color: Colors.white)),

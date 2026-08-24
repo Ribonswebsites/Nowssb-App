@@ -13,9 +13,11 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
+import '../data/settings.dart';
 import '../theme/tokens.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/page_shell.dart';
@@ -29,20 +31,62 @@ class SoundLibraryScreen extends StatefulWidget {
 }
 
 class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
+  VideoPlayerController? _audio;
+  String? _playingWord;
+
+  Future<void> _playWord(Word word) async {
+    WordPart? part;
+    for (final candidate in word.parts) {
+      if (candidate.audio.isNotEmpty) {
+        part = candidate;
+        break;
+      }
+    }
+    final url = part?.audio.isNotEmpty == true
+        ? part!.audio
+        : (word.audioMale.isNotEmpty ? word.audioMale : word.audioFemale);
+    if (url.isEmpty) return;
+    if (_playingWord == word.word) {
+      await _audio?.pause();
+      if (mounted) setState(() => _playingWord = null);
+      return;
+    }
+    await _audio?.dispose();
+    final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+    try {
+      await controller.initialize();
+      await controller.setVolume(Settings.instance.volume);
+      await controller.setPlaybackSpeed(Settings.instance.speed);
+      await controller.play();
+      controller.addListener(() {
+        if (!mounted) return;
+        final value = controller.value;
+        if (!value.isPlaying && value.position >= value.duration && value.duration > Duration.zero) {
+          setState(() { if (_playingWord == word.word) _playingWord = null; });
+        }
+      });
+      _audio = controller;
+      if (mounted) setState(() => _playingWord = word.word);
+    } catch (_) {
+      await controller.dispose();
+      if (mounted) setState(() => _playingWord = null);
+    }
+  }
   @override
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
   }
 
+  void _onContent() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
+    _audio?.dispose();
     super.dispose();
-  }
-
-  void _onContent() {
-    if (mounted) setState(() {});
   }
 
   bool _hasAudio(Word w) =>
@@ -92,7 +136,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
                     word: w.word,
                     deva: w.deva,
                     sub: w.organ.isNotEmpty ? w.organ : w.meaning,
-                    trailing: _AudioMark(has: _hasAudio(w)),
+                    trailing: _AudioMark(has: _hasAudio(w), playing: _playingWord == w.word, onTap: () => _playWord(w)),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => WordDetail(word: w)),
                     ),
@@ -106,15 +150,17 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
 }
 
 class _AudioMark extends StatelessWidget {
-  const _AudioMark({required this.has});
+  const _AudioMark({required this.has, required this.playing, required this.onTap});
   final bool has;
+  final bool playing;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      has ? Icons.graphic_eq : Icons.volume_off_outlined,
-      size: 17,
-      color: has ? NwsbColors.goldLight : const Color(0x40FFFFFF),
+    return IconButton(
+      tooltip: has ? (playing ? 'Pause recording' : 'Play recording') : 'No recording',
+      onPressed: has ? onTap : null,
+      icon: Icon(playing ? Icons.pause_circle_outline : (has ? Icons.play_circle_outline : Icons.volume_off_outlined), size: 21, color: has ? NwsbColors.goldLight : const Color(0x40FFFFFF)),
     );
   }
 }
@@ -138,9 +184,9 @@ class _AudioNote extends StatelessWidget {
           SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Playback is not built yet. A word marked with a waveform has '
-              'a recording in its record and will play as soon as it is — '
-              'the rest carry only their written form.',
+              'Tap the waveform on any recorded word to play it. Your AURA '
+              'speed and volume preferences are used for playback; unrecorded '
+              'words remain available for reading and detail.',
               style: TextStyle(
                 fontSize: 12,
                 color: Color(0x99FFFFFF),

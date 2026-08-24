@@ -32,7 +32,8 @@
     var icons = {
       lock: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.1" fill="#fff"/></svg>',
       sound: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 14h3l4 4V6L7 10H4v4ZM15 9.5a4 4 0 0 1 0 5M18 7a7.5 7.5 0 0 1 0 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      science: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/><path d="M9 9h6M10 12h4M9 15h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
+      science: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/><path d="M9 9h6M10 12h4M9 15h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+      sliders: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h8M16 7h4M4 17h4M12 17h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="14" cy="7" r="2" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="17" r="2" stroke="currentColor" stroke-width="1.7"/></svg>'
     };
     return icons[name] || icons.sound;
   }
@@ -58,6 +59,7 @@
         '<div class="nwsb-essential-tabs"><button type="button" class="nwsb-essential-tab is-active" data-essential-filter-button="recent">' + icon('sound') + '<span>Recents</span></button><button type="button" class="nwsb-essential-tab" data-essential-filter-button="favorite">' + icon('lock') + '<span>Favorites</span></button></div>' +
         '<div class="nwsb-essentials-heading"><div><h2>Your essentials</h2></div></div>' +
         '<div class="nwsb-essentials-shell"><div class="nwsb-essential-list" data-essential-list></div></div>' +
+        '<button type="button" class="nwsb-essentials-guide" data-essential-guide><span class="nwsb-essentials-guide-icon">' + icon('sliders') + '</span><span class="nwsb-essentials-guide-copy"><strong>Find Your Way Around</strong><small>Every screen in the app, and what each one is for</small></span><span class="nwsb-essentials-guide-arrow">›</span></button>' +
         '<div class="nwsb-help-heading"><h3>What’s helping others</h3><button type="button" data-essential-help-view aria-label="Open helpful NowssB features">›</button></div>' +
         '<div class="nwsb-help-rail">' + HELP.map(helpCard).join('') + '</div>' +
       '</div>' +
@@ -72,6 +74,7 @@
     root.__essentialsBound = true;
     root.querySelectorAll('[data-essential-filter-button]').forEach(function (button) { button.addEventListener('click', function () { render(root, button.getAttribute('data-essential-filter-button')); }); });
     root.querySelectorAll('[data-essential-help-view]').forEach(function (button) { button.addEventListener('click', function () { run('word-science'); }); });
+    root.querySelectorAll('[data-essential-guide]').forEach(function (button) { button.addEventListener('click', function () { run('my-progress'); }); });
     render(root, 'recent');
   }
   function mount(mode, selector, afterSelector) {

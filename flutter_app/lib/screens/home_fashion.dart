@@ -42,19 +42,35 @@ class HomeFashion extends StatefulWidget {
 }
 
 class _HomeFashionState extends State<HomeFashion> {
+  static const _backgrounds = <String>[
+    'assets/video/fashion-plus-bg.mp4',
+    'assets/video/fashion-plus-bg-1.mp4',
+    'assets/video/fashion-plus-bg-2.mp4',
+    'assets/video/fashion-plus-bg-3.mp4',
+    'assets/video/fashion-plus-bg-4.mp4',
+    'assets/video/fashion-plus-bg-5.mp4',
+    'assets/video/fashion-plus-bg-6.mp4',
+  ];
+
   @override
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
+    Settings.instance.addListener(_onSettings);
   }
 
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
+    Settings.instance.removeListener(_onSettings);
     super.dispose();
   }
 
   void _onContent() {
+    if (mounted) setState(() {});
+  }
+
+  void _onSettings() {
     if (mounted) setState(() {});
   }
 
@@ -74,9 +90,10 @@ class _HomeFashionState extends State<HomeFashion> {
         children: [
           // The page's own film, behind everything. Fixed in effect: it is
           // outside the scroller, so it does not move with the list.
-          const Positioned.fill(
+          Positioned.fill(
             child: NwsbVideo(
-              asset: 'assets/video/fashion-plus-bg-6.mp4',
+              key: ValueKey(Settings.instance.fashionBackgroundIndex),
+              asset: _backgrounds[Settings.instance.fashionBackgroundIndex.clamp(0, _backgrounds.length - 1).toInt()],
               priority: ClipPriority.feature,
             ),
           ),

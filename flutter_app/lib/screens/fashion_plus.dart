@@ -31,9 +31,11 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
     ('assets/video/fashion-plus-bg-2.mp4', 'Background Three'),
     ('assets/video/fashion-plus-bg-3.mp4', 'Background Four'),
     ('assets/video/fashion-plus-bg-4.mp4', 'Background Five'),
+    ('assets/video/fashion-plus-bg-5.mp4', 'Background Six'),
+    ('assets/video/fashion-plus-bg-6.mp4', 'Current Fashion Home'),
   ];
 
-  int _filmIndex = 4;
+  int _filmIndex = Settings.instance.fashionBackgroundIndex;
 
   @override
   void initState() {
@@ -73,7 +75,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
       title: 'The still ones\nstart moving.',
       body: 'The Fashion home in motion — the tiles, the practice card, and '
           'every visible page and section film loop together. Choose one of '
-          'five managed Fashion Plus backgrounds for this page.',
+          'seven managed Fashion Plus backgrounds for this page.',
       stats: [
         '${_changes.length} changes',
         'Fashion home',
@@ -98,7 +100,10 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
               _FilmPicker(
                 films: _films,
                 selected: _filmIndex,
-                onSelected: (i) => setState(() => _filmIndex = i),
+                onSelected: (i) {
+                  setState(() => _filmIndex = i);
+                  Settings.instance.setFashionBackgroundIndex(i);
+                },
               ),
               const SizedBox(height: 24),
               const DarkHead(
