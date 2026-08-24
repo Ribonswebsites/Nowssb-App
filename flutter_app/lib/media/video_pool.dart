@@ -121,7 +121,7 @@ class VideoLease extends ChangeNotifier {
     _wantsPlay = true;
     final c = _controller;
     if (c != null && c.value.isInitialized && !c.value.isPlaying) {
-      c.play();
+      unawaited(_pool._playMuted(this, c));
     }
   }
 
@@ -450,9 +450,13 @@ class VideoPool {
     await c.setLooping(l.loop);
     // Muted, always. Every clip in this app is decoration, and a video
     // playing with sound is what put the website in Android's notification
-    // shade next to a music player.
-    await c.setVolume(0);
-    if (l._wantsPlay) await c.play();
+    // shade next to a music player. Keep the initial play guarded so one
+    // ExoPlayer rejection cannot abort the rest of the visible pool.
+    if (l._wantsPlay) {
+      await _playMuted(l, c);
+    } else {
+      await c.setVolume(0);
+    }
 
     l._changed();
   }
@@ -463,9 +467,29 @@ class VideoPool {
   /// WebView and Flutter; the bundled copy keeps the same screen usable when
   /// the network is unavailable.
   Future<VideoPlayerController?> _open(String assetPath) async {
-    // Every visual clip uses the shared R2 catalog first. The bundled copy
-    // remains the immediate offline fallback for the same asset path.
-    final remoteFirst = assetPath.startsWith('assets/video/');
+    // Some Flutter sections intentionally use the exact Cloudinary film that
+    // the WebView uses. Treat an HTTP asset as a URL; passing it to
+    // VideoPlayerController.asset produces the misleading "bundle or network"
+    // failure seen in the debug HUD.
+    if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
+      final net = VideoPlayerController.networkUrl(Uri.parse(assetPath));
+      try {
+        await net.initialize();
+        debugPrint('NowssB video: opened direct $assetPath');
+        return net;
+      } catch (e) {
+        debugPrint('NowssB video: direct network miss $assetPath — $e');
+        try {
+          await net.dispose();
+        } catch (_) {}
+        return null;
+      }
+    }
+
+    // Bundled clips are the reliable first frame and playback source. The
+    // same clip remains R2-backed through the network fallback below, but a
+    // missing/slow R2 object must never prevent a visible local video from
+    // starting.
     final urls = NwsbCdn.urls(assetPath).toList();
 
     Future<VideoPlayerController?> openNetwork() async {
@@ -485,11 +509,6 @@ class VideoPool {
       return null;
     }
 
-    if (remoteFirst) {
-      final remote = await openNetwork();
-      if (remote != null) return remote;
-    }
-
     final asset = VideoPlayerController.asset(assetPath);
     try {
       await asset.initialize();
@@ -501,8 +520,7 @@ class VideoPool {
       } catch (_) {}
     }
 
-    if (!remoteFirst) return openNetwork();
-    return null;
+    return openNetwork();
   }
 
   /// Returns when the PLATFORM has actually let the player go, not when the
@@ -549,7 +567,28 @@ class VideoPool {
   Timer? _beat;
   void startHeartbeat() {
     _beat ??= Timer.periodic(const Duration(seconds: 2), (_) {
+      _retryPausedVisiblePlayers();
       if (_leases.isNotEmpty) _rebalanceSoon();
     });
+  }
+
+  void _retryPausedVisiblePlayers() {
+    if (_held) return;
+    for (final l in _live) {
+      final c = l._controller;
+      if (l._wantsPlay && c != null && c.value.isInitialized && !c.value.isPlaying) {
+        unawaited(_playMuted(l, c));
+      }
+    }
+  }
+
+  Future<void> _playMuted(VideoLease l, VideoPlayerController c) async {
+    if (l._disposed || !l._wantsPlay) return;
+    try {
+      await c.setVolume(0);
+      await c.play();
+    } catch (e) {
+      debugPrint('NowssB video: retry play failed ${l.assetPath} — $e');
+    }
   }
 }

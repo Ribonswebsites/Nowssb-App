@@ -41,10 +41,10 @@ import 'follow_steps.dart';
 
 /// One banner on the rail — RAIL, app/js/part083.js:106.
 ///
-/// `asset` is THE ADDRESS THE WEBSITE PLAYS, copied verbatim — a bundled
-/// file for the two that are local on the web, and the Cloudinary URL for
-/// the four that are not. Substituting a local look-alike for those four is
-/// what made this rail play the wrong film in four of its six cells.
+/// `asset` is the exact film the website plays. The four films that were
+/// previously network-only are bundled from their exact source files here, so
+/// Android can start the rail without waiting for Cloudinary or falling back
+/// to a still poster.
 class _Rail {
   const _Rail(this.mark, this.hello, this.title, this.asset, this.dest);
 
@@ -64,24 +64,21 @@ const _rail = [
       NwsbMarks.crown,
       'The Full Library',
       'NowssB Subscription',
-      'https://res.cloudinary.com/eenvubod/video/upload/v1784895544/'
-          'grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
+      'assets/video/fashion-hero-subscription.mp4',
       3),
   // The clip a word page opens with — NWSB_WORD_BANNER_VID.
   _Rail(
       NwsbMarks.word,
       'Where a word begins',
       'NowssB Word Store',
-      'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/'
-          'grok_video_2026-07-31-20-43-13_qh2qjg.mp4',
+      'assets/video/fashion-hero-word-store.mp4',
       3),
   // The clip every meaning's page opens with — MS_MEANING_VID.
   _Rail(
       NwsbMarks.meaning,
       'What a word truly means',
       'NowssB Meaning Store',
-      'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/'
-          'grok_video_2026-07-31-15-41-50_oxszei.mp4',
+      'assets/video/fashion-hero-meaning-store.mp4',
       3),
   _Rail(NwsbMarks.signature, 'The rarest word', 'The Signature',
       'assets/video/signature-banner.mp4', 3),
@@ -91,8 +88,7 @@ const _rail = [
       NwsbMarks.book,
       'Page by page',
       'NowssB eBooks',
-      'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/'
-          'grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+      'assets/video/fashion-hero-ebooks.mp4',
       2),
   _Rail(NwsbMarks.sound, 'Every word you own', 'Sound Library',
       'assets/video/sound-library-banner.mp4', 2),
