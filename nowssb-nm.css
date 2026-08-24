@@ -16434,3 +16434,127 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   .nwsb-dashboard-heading-copy h2,
   .nwsb-essentials-heading h2 { font-size: 22px !important; }
 }
+
+
+/* ══ AUGUST 15 FASHION PANEL — EXPLICIT SOURCE COPY ══
+   This block is intentionally scoped to the Fashion Where to Begin panel.
+   It restores the August 15 glass wrapper/header treatment after later global
+   dashboard compatibility rules, while leaving #home-nm's compact neumorphic
+   panel untouched. The six original buttons and guide banner remain in HTML. */
+#home .mainops-blk.aug15-fashion-reference {
+  box-sizing: border-box !important;
+  width: calc(100% - 32px) !important;
+  margin: 18px 16px !important;
+  padding: 12px !important;
+  overflow: hidden !important;
+  background: rgba(255,255,255,0.055) !important;
+  border: 1px solid rgba(255,255,255,0.13) !important;
+  border-radius: 22px !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
+  backdrop-filter: blur(18px) saturate(1.25) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.34) !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .qa-tv-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin: 0 !important;
+  padding: 0 2px 14px !important;
+}
+#home .mainops-blk.aug15-fashion-reference .qa-tv-orb {
+  width: 54px !important;
+  height: 54px !important;
+  flex: 0 0 54px !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,0.09) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  color: #e8d5a3 !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.28) !important;
+}
+#home .mainops-blk.aug15-fashion-reference .qa-tv-orb svg { width: 26px !important; height: 26px !important; }
+#home .mainops-blk.aug15-fashion-reference .qa-tv-hello {
+  color: rgba(255,255,255,0.66) !important;
+  font: 400 20px/1.2 'DM Sans', sans-serif !important;
+  letter-spacing: -0.2px !important;
+}
+#home .mainops-blk.aug15-fashion-reference .qa-tv-name {
+  color: #fff !important;
+  font: 800 27px/1.12 'DM Sans', sans-serif !important;
+  letter-spacing: -0.6px !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .mo-box {
+  padding: 0 !important;
+  margin: 0 0 14px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  background: rgba(255,255,255,0.06) !important;
+  overflow: hidden !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  height: 134px !important;
+  margin: 0 0 16px !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-row:last-child { margin-bottom: 0 !important; }
+#home .mainops-blk.aug15-fashion-reference .mo-cell {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  min-height: 134px !important;
+  height: 134px !important;
+  padding: 18px 8px 14px !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  border-radius: 28px !important;
+  background: linear-gradient(145deg, rgba(255,255,255,0.13), rgba(255,255,255,0.075)) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px rgba(255,255,255,0.08), 0 12px 24px rgba(0,0,0,0.18) !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-ic {
+  display: grid !important;
+  place-items: center !important;
+  width: 48px !important;
+  height: 48px !important;
+  flex: 0 0 48px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #fff !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-ic svg { width: 38px !important; height: 38px !important; }
+#home .mainops-blk.aug15-fashion-reference .mo-lbl {
+  display: block !important;
+  max-width: 100% !important;
+  margin-top: 12px !important;
+  overflow: hidden !important;
+  color: #fff !important;
+  font: 700 14px/1.18 'DM Sans', sans-serif !important;
+  text-align: center !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban {
+  min-height: 120px !important;
+  height: 120px !important;
+  margin: 18px 0 0 !important;
+  border: 0 !important;
+  border-radius: 28px !important;
+  background: #000 !important;
+  box-shadow: 0 14px 26px rgba(0,0,0,0.24) !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-slide {
+  min-height: 120px !important;
+  padding: 18px 20px !important;
+  border-radius: 28px !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-ico { width: 58px !important; height: 58px !important; border-radius: 18px !important; }
+#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-name { font-size: 18px !important; }
+#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-sub { font-size: 13px !important; line-height: 1.28 !important; }
+#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-btn { width: 42px !important; height: 42px !important; border-radius: 50% !important; }
+
+@media (max-width: 420px) {
+  #home .mainops-blk.aug15-fashion-reference { margin-left: 16px !important; margin-right: 16px !important; }
+  #home .mainops-blk.aug15-fashion-reference .mo-row { gap: 10px !important; }
+  #home .mainops-blk.aug15-fashion-reference .mo-cell { border-radius: 22px !important; }
+}
+/* ══ END AUGUST 15 FASHION PANEL COPY ══ */
