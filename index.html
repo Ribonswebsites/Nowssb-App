@@ -1033,20 +1033,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     </div><!-- /nmh-streak-wrap -->
 
-    <!-- NowssB Store promo card (purple) — between the streak section and
-         Today's Practice, tap opens the store -->
-    <div class="npc-card npc-purple" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
-      <div class="npc-fabric"></div>
-      <div class="npc-ambient"></div>
-      <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
-      <div class="npc-stage" id="npcStoreStage">
-        <div class="npc-ring"></div>
-        <div class="npc-disc"><img id="npcStoreImg" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt=""></div>
-        <div class="npc-flash" id="npcStoreFlash"></div>
-      </div>
-      <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
-    </div>
-
     <!-- Today's Practice, with its pill rail, in one wrapper. -->
     <div class="plyr-wrap nmh-plyr-wrap">
       <div class="spill" onclick="openPracticeIntro()">
@@ -1079,6 +1065,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <!-- THE SIX — every main door in the app on one compact panel. Three
          across and two down, a hairline between each, so the app can be used
          without knowing where anything is. -->
+    <!-- The Store promo sits between the practice card and Where to Begin,
+         matching the reference home hierarchy. It remains a real store action. -->
+    <div class="npc-card npc-purple" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
+      <div class="npc-fabric"></div>
+      <div class="npc-ambient"></div>
+      <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
+      <div class="npc-stage" id="npcStoreStage">
+        <div class="npc-ring"></div>
+        <div class="npc-disc"><img id="npcStoreImg" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png" alt=""></div>
+        <div class="npc-flash" id="npcStoreFlash"></div>
+      </div>
+      <div class="npc-text"><span class="npc-line" id="npcStoreLine"></span></div>
+    </div>
+
     <div class="mainops-blk nmh-sec-wrap">
       <div class="qa-tv-head">
         <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></div>
