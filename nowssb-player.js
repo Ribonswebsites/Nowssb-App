@@ -929,7 +929,23 @@
     } catch (e) {}
   };
 
+  /* Settings opens the AURA clock first; the clock’s Music Player Settings
+     control and upward swipe then reveal the flat settings list. The radial
+     arc remains available only for its own player controls, never as settings. */
+  window.lgpOpenAURASettings = function () {
+    var url = 'player-settings.html#clock';
+    try {
+      var pages = (window.NOWSSB_PAGES || (typeof PAGES !== 'undefined' ? PAGES : '') || '').toString();
+      if (pages && /github\.io/i.test(pages)) url = pages.replace(/\/?$/, '/') + 'player-settings.html#clock';
+    } catch (e) {}
+    location.assign(url);
+  };
+
   window.lgpToggleArc = function (forceOpen) {
+    if (forceOpen === true) {
+      window.lgpOpenAURASettings();
+      return;
+    }
     var a = document.getElementById('lgpArc');
     if (!a) return;
     var willOpen = (forceOpen === true) ? true : !a.classList.contains('open');
@@ -1011,7 +1027,7 @@
     document.addEventListener('click', function (e) {
       var t = e.target;
       var hit = t && (t.closest ? t.closest('.lgp-settings') : null);
-      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpToggleArc(); }
+      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpOpenAURASettings(); }
     }, true);
   }
 

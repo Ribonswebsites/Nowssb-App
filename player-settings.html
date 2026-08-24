@@ -553,6 +553,19 @@ showScreen = function (name) {
 document.getElementById("clk-lib").addEventListener("click", () => showScreen("library"));
 document.getElementById("clk-settings").addEventListener("click", () => showScreen("settings"));
 document.getElementById("open-settings-from-clock").addEventListener("click", () => showScreen("settings"));
+/* The reference flow reveals the flat settings page with an upward swipe from
+   the clock, while preserving the explicit Music Player Settings button. */
+let clockSwipeY = null;
+const clockScreen = document.getElementById("screen-clock");
+clockScreen.addEventListener("touchstart", (e) => {
+  clockSwipeY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
+}, {passive:true});
+clockScreen.addEventListener("touchend", (e) => {
+  if (clockSwipeY == null) return;
+  const endY = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : clockSwipeY;
+  if (clockSwipeY - endY > 56) showScreen("settings");
+  clockSwipeY = null;
+}, {passive:true});
 document.getElementById("lib-back").addEventListener("click", () => showScreen("clock"));
 document.getElementById("lib-to-clock").addEventListener("click", () => showScreen("clock"));
 document.getElementById("lib-settings").addEventListener("click", () => showScreen("settings"));

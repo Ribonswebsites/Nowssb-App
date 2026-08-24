@@ -57,11 +57,11 @@
 
   /* Open the exact AURA player-settings page (not the dial clone). */
   function open() {
-    var url = 'player-settings.html#settings';
+    var url = 'player-settings.html#clock';
     try {
       var pages = (window.NOWSSB_PAGES || (typeof PAGES !== 'undefined' ? PAGES : '') || '').toString();
       if (pages && /github\.io/i.test(pages)) {
-        url = pages.replace(/\/?$/, '/') + 'player-settings.html#settings';
+        url = pages.replace(/\/?$/, '/') + 'player-settings.html#clock';
       }
     } catch (e) {}
     location.assign(url);
