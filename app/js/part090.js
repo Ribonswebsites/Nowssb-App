@@ -78,12 +78,12 @@
           '<button type="button" class="nwsb-focus-cta" data-daydash-focus-go>Start practice <span>→</span></button>' +
         '</div>' +
       '</div>' +
-      '<div class="nwsb-dashboard-heading"><div><div class="nwsb-dashboard-eyebrow">Your practice</div><h2>Your Progress</h2></div><button type="button" data-daydash-progress>View all <span>›</span></button></div>' +
+      '<div class="nwsb-dashboard-heading"><div><div class="nwsb-dashboard-eyebrow">Your meditation</div><h2>Meditation progress</h2></div><button type="button" data-daydash-progress>View all <span>›</span></button></div>' +
       '<div class="nwsb-progress-card">' +
-        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('check') + '</span><strong data-progress-sessions>' + p.sessions + '</strong><small>sessions</small></div>' +
-        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('timer') + '</span><strong data-progress-words>' + p.words + '</strong><small>words explored</small></div>' +
+        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('check') + '</span><strong data-progress-sessions>' + p.sessions + '</strong><small>meditation sessions</small></div>' +
+        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('timer') + '</span><strong data-progress-words>' + p.words + '</strong><small>words in practice</small></div>' +
         '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('fire') + '</span><strong data-progress-streak>' + p.streak + '</strong><small>day streak</small></div>' +
-        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('target') + '</span><strong data-progress-goal>' + p.goal + '%</strong><small>goal progress</small></div>' +
+        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('target') + '</span><strong data-progress-goal>' + p.goal + '%</strong><small>meditation goal</small></div>' +
       '</div>' +
       '<div class="nwsb-dashboard-heading nwsb-up-heading"><div><div class="nwsb-dashboard-eyebrow">Keep the ritual moving</div><h2>Up next</h2></div><button type="button" data-daydash-upnext-view>View all <span>›</span></button></div>' +
       '<div class="nwsb-upnext-list">' + items.map(function (item) { return '<button type="button" class="nwsb-upnext-card" data-daydash-upnext-action="' + esc(item.action) + '"><span class="nwsb-upnext-icon">' + icon('calendar') + '</span><span class="nwsb-upnext-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span><span class="nwsb-upnext-arrow">→</span></button>'; }).join('') + '</div>' +
