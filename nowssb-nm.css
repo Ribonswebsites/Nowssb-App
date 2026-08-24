@@ -16294,6 +16294,61 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   padding: 14px 16px !important;
   border-radius: 16px !important;
 }
+/* ══ FASHION WHERE-TO-BEGIN REFERENCE ══
+   The normal home keeps its August 15 compact transplant above. Fashion
+   uses the dark glass six-door panel: larger rounded cards, no rectangular
+   light surfaces, and the black guide banner below. */
+#home .mainops-blk.glass-wrap {
+  box-sizing: border-box !important;
+  margin: 24px 28px 0 !important;
+  padding: 26px 24px 24px !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  border-radius: 30px !important;
+  overflow: hidden !important;
+  background: linear-gradient(145deg, rgba(28,20,47,.88), rgba(37,13,49,.78)) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.10), 0 18px 42px rgba(0,0,0,.32) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+#home .mainops-blk.glass-wrap > .qa-tv-head {
+  margin: 0 0 24px !important;
+  gap: 16px !important;
+  padding: 0 2px !important;
+}
+#home .mainops-blk.glass-wrap .qa-tv-orb {
+  width: 64px !important;
+  height: 64px !important;
+  flex: 0 0 64px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  color: #141221 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,.22) !important;
+}
+#home .mainops-blk.glass-wrap .qa-tv-orb svg { width: 30px !important; height: 30px !important; }
+#home .mainops-blk.glass-wrap .qa-tv-hello { color: rgba(236,225,255,.78) !important; font-size: 18px !important; line-height: 1.1 !important; }
+#home .mainops-blk.glass-wrap .qa-tv-name { color: #fff !important; font-size: 30px !important; line-height: 1.04 !important; letter-spacing: -.5px !important; }
+#home .mainops-blk.glass-wrap > .mo-box { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; overflow: visible !important; }
+#home .mainops-blk.glass-wrap .mo-row { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 16px !important; margin: 0 0 16px !important; }
+#home .mainops-blk.glass-wrap .mo-cell {
+  min-width: 0 !important;
+  min-height: 134px !important;
+  padding: 18px 8px 14px !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  border-radius: 28px !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.075)) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.08), 0 12px 24px rgba(0,0,0,.18) !important;
+}
+#home .mainops-blk.glass-wrap .mo-ic { width: 48px !important; height: 48px !important; border-radius: 50% !important; background: transparent !important; color: #fff !important; }
+#home .mainops-blk.glass-wrap .mo-ic svg { width: 38px !important; height: 38px !important; }
+#home .mainops-blk.glass-wrap .mo-lbl { margin-top: 12px !important; color: #fff !important; font-size: 14px !important; line-height: 1.18 !important; text-align: center !important; }
+#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban { min-height: 120px !important; height: 120px !important; margin: 18px 0 0 !important; border: 0 !important; border-radius: 28px !important; background: #000 !important; box-shadow: 0 14px 26px rgba(0,0,0,.24) !important; }
+#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-slide { min-height: 120px !important; padding: 18px 20px !important; border-radius: 28px !important; }
+#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-ico { width: 58px !important; height: 58px !important; border-radius: 18px !important; }
+#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-name { font-size: 18px !important; }
+#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-sub { font-size: 13px !important; line-height: 1.28 !important; }
+#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-btn { width: 42px !important; height: 42px !important; border-radius: 50% !important; }
+
 @media (max-width: 420px) {
   #home-nm .mainops-blk > .qa-tv-head { padding-left: 2px !important; padding-right: 2px !important; }
   #home-nm .mainops-blk > .mo-box { height: 126px !important; }

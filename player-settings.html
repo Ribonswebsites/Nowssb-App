@@ -27,22 +27,22 @@ body{display:flex;justify-content:center;touch-action:manipulation}
 .icon-btn{width:44px;height:44px;display:grid;place-items:center;background:none;border:0;color:var(--fg);cursor:pointer;padding:0;border-radius:50%;overflow:visible;flex-shrink:0}
 .icon-btn:active{opacity:.55}
 .icon-btn svg{width:22px;height:22px;overflow:visible;display:block}
-.icon-btn.nav-back{width:40px;height:40px;background:#f2f4f7;color:#202731;box-shadow:0 3px 10px rgba(0,0,0,.18)}
-.icon-btn.nav-back svg{width:23px;height:23px}
+.icon-btn.nav-back{width:44px;height:44px;background:none;color:var(--fg);box-shadow:none}
+.icon-btn.nav-back svg{width:24px;height:24px}
 
-/* CLOCK — large, left-weighted reference dial with clear time/date lockups */
-.clock-stage{flex:0 0 57vh;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0 0 4px;margin-top:-12px}
-.clock-frame{position:relative;width:100%;max-width:430px;aspect-ratio:430/390;margin:0 auto;transform:translate(0,-8%)}
+/* CLOCK — the established AURA reference dial: compact, left-weighted, and clear of the settings rows */
+.clock-stage{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0 0 4px;margin-top:-12px}
+.clock-frame{position:relative;width:100%;max-width:390px;aspect-ratio:390/355;margin:0 auto;transform:translateY(-8%)}
 .clock-svg{position:absolute;inset:0;width:100%;height:100%;color:var(--fg);overflow:visible}
-.time-lockup{position:absolute;left:0;top:49%;transform:translateY(-50%);display:flex;align-items:center;gap:10px;padding-left:64px;z-index:3}
-.hour{font-size:82px;font-weight:300;letter-spacing:-0.03em;line-height:1;background:transparent;padding:0;border-radius:0;margin-right:-4px}
-.minute-pill{display:flex;align-items:center;gap:9px;border:1px solid rgba(242,242,239,0.82);border-radius:999px;padding:8px 16px 8px 14px;background:transparent}
-.minute{font-size:30px;font-weight:300;letter-spacing:0.04em}
-.pill-div{width:1px;height:20px;background:rgba(242,242,239,0.62)}
-.ampm{font-size:13px;font-weight:400;letter-spacing:0.14em;opacity:.92}
-.date-lockup{position:absolute;right:8px;top:49%;transform:translateY(-50%);text-align:right;z-index:3;background:transparent;padding:0;border-radius:0}
-.date-top{font-size:11px;letter-spacing:0.22em;font-weight:400}
-.date-rule{width:170px;height:1px;background:rgba(242,242,239,0.52);margin:10px 0 10px auto}
+.time-lockup{position:absolute;left:0;top:48%;transform:translateY(-50%);display:flex;align-items:center;gap:10px;padding-left:86px;z-index:3}
+.hour{font-size:68px;font-weight:200;letter-spacing:-0.02em;line-height:1;background:rgba(12,14,18,0.88);padding:4px 6px;border-radius:8px;margin-right:-4px}
+.minute-pill{display:flex;align-items:center;gap:8px;border:1px solid rgba(242,242,239,0.4);border-radius:999px;padding:6px 14px 6px 12px;background:rgba(12,14,18,0.95)}
+.minute{font-size:26px;font-weight:300;letter-spacing:0.04em}
+.pill-div{width:1px;height:16px;background:rgba(242,242,239,0.4)}
+.ampm{font-size:12px;font-weight:400;letter-spacing:0.12em;opacity:.9}
+.date-lockup{position:absolute;right:16px;top:48%;transform:translateY(-50%);text-align:right;z-index:3;background:rgba(12,14,18,0.88);padding:8px 6px 8px 12px;border-radius:8px}
+.date-top{font-size:11px;letter-spacing:0.18em;font-weight:400}
+.date-rule{width:48px;height:1px;background:rgba(242,242,239,0.4);margin:8px 0 8px auto}
 .date-day{font-size:11px;letter-spacing:0.22em;font-weight:400}
 
 /* Bottom settings — like reference, with icons */
@@ -334,7 +334,7 @@ function showScreen(name) {
 }
 
 /* Clock */
-const CX=162, CY=190;
+const CX=176, CY=186;
 function polar(rad,deg){const a=(deg*Math.PI)/180;return{x:+(CX+rad*Math.cos(a)).toFixed(1),y:+(CY+rad*Math.sin(a)).toFixed(1)};}
 function buildArc(count,startDeg,spanDeg,radius,everyMajor,everyMid,lenMajor,lenMid,lenMin){
   const lines=[];
@@ -371,20 +371,20 @@ function buildArc(count,startDeg,spanDeg,radius,everyMajor,everyMid,lenMajor,len
 }
 function initClock(){
   // Dense C-arcs; ticks skip time/date/numbers via barriers above
-  document.getElementById("ring-outer").innerHTML=buildArc(72,48,285,178,6,3,18,11,6);
-  document.getElementById("ring-inner").innerHTML=buildArc(48,62,255,112,6,2,12,7,4.5);
+  document.getElementById("ring-outer").innerHTML=buildArc(72,48,285,152,6,3,18,11,6);
+  document.getElementById("ring-inner").innerHTML=buildArc(48,62,255,96,6,2,12,7,4.5);
   // Numbers offset off the tick path (padding from arcs)
   const nums=[
-    {n:"60",x:18,y:190,s:24},
-    {n:"55",x:34,y:48,s:17},
-    {n:"50",x:140,y:12,s:18},
-    {n:"45",x:90,y:78,s:16},
-    {n:"40",x:322,y:58,s:18},
-    {n:"35",x:162,y:300,s:16},
-    {n:"30",x:42,y:252,s:17},
-    {n:"25",x:284,y:334,s:16},
-    {n:"20",x:116,y:376,s:16},
-    {n:"15",x:20,y:316,s:16},
+    {n:"60",x:36,y:184,s:22},
+    {n:"55",x:54,y:52,s:15},
+    {n:"50",x:148,y:24,s:16},
+    {n:"45",x:104,y:84,s:14},
+    {n:"40",x:304,y:68,s:16},
+    {n:"35",x:176,y:268,s:14},
+    {n:"30",x:72,y:238,s:15},
+    {n:"25",x:272,y:308,s:14},
+    {n:"20",x:136,y:348,s:14},
+    {n:"15",x:40,y:308,s:14},
   ];
   document.getElementById("clock-numbers").innerHTML=nums.map(n=>
     `<text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="middle" class="clock-number" font-size="${n.s}">${n.n}</text>`
@@ -395,7 +395,7 @@ function startRingSpin(){
   const inner=document.getElementById("ring-inner");
   const floatG=document.getElementById("ring-float");
   if(!outer||!inner)return;
-  const OUTER_DPS=360/32, INNER_DPS=-360/22, OX=162, OY=190;
+  const OUTER_DPS=360/32, INNER_DPS=-360/22, OX=176, OY=186;
   let angleO=0,angleI=0,t0=performance.now(),last=t0,rafId=0,running=true;
   function frame(now){
     if(!running)return;
@@ -555,8 +555,9 @@ showScreen = function (name) {
   _showScreen(name);
 };
 document.getElementById("clk-back").addEventListener("click", () => {
-  if (history.length > 1) history.back();
-  else location.href = "index.html";
+  /* Return to the in-app Player explicitly. Browser history returns to the
+     previously loaded Home DOM, which loses the practice/player state. */
+  location.assign("index.html?returnTo=player");
 });
 document.getElementById("clk-lib").addEventListener("click", () => showScreen("library"));
 document.getElementById("clk-settings").addEventListener("click", () => showScreen("settings"));

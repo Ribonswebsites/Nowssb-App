@@ -10698,5 +10698,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   }
 })();
 </script>
+<script>
+/* Return from the standalone AURA settings page to the real in-app Player.
+   player-settings.html uses this query instead of history.back(), because a
+   WebView history entry restores the Home document without its open sub-screen. */
+(function () {
+  if (!/[?&]returnTo=player(?:&|$)/.test(location.search)) return;
+  var attempts = 0;
+  function restore() {
+    if (attempts++ > 80) return;
+    var practice = document.getElementById('sub-practice');
+    if (practice && typeof window.openSub === 'function') {
+      window._rtManualLaunch = true;
+      window._pwShowIntro = false;
+      window.openSub('practice');
+      return;
+    }
+    setTimeout(restore, 150);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', restore);
+  else restore();
+})();
+</script>
 </body>
 </html>

@@ -418,7 +418,21 @@
     });
   }) : null;
 
+  /* The active home’s R2 hero and time-focus films are part of the home
+     composition, not disposable list decoration. Keep them mounted and in
+     the playback set when the user scrolls past their card; shown() still
+     prevents them from playing under another full-screen layer. */
+  function pinHomeFilm(v) {
+    /* These two classes are the home’s R2-backed films. They may be hidden by
+       the other home mode, but they must not lose their source when scrolling;
+       shown() below still prevents a hidden mode from playing. */
+    if (v.matches && v.matches('.nwsb-focus-video, .hero-bg-vid')) return true;
+    return (v.id === 'fpBgVideo' || v.id === 'fp-bg-video') &&
+           document.body.classList.contains('fashplus');
+  }
+
   function manageable(v) {
+    if (pinHomeFilm(v)) return false;
     if (v.id === 'splashVid') return false;
     if (v.id === 'chatCallRemoteVideo' || v.id === 'chatCallLocalVideo') return false;
     if (v.querySelector('source')) return false;   /* <source> children: not ours to move */
@@ -523,7 +537,7 @@
     for (var i = tracked.length - 1; i >= 0; i--) {
       var v = tracked[i];
       if (!v.isConnected) { tracked.splice(i, 1); continue; }
-      if ((io ? onScreen.has(v) : true) && shown(v)) live.push(v);
+      if ((pinHomeFilm(v) || (io ? onScreen.has(v) : true)) && shown(v)) live.push(v);
     }
     /* Nearest the middle of the screen wins the decoders — except for a clip
        that IS its section rather than decoration behind one. The television
