@@ -1,0 +1,85 @@
+name: NowssB Android Release
+
+on:
+  workflow_run:
+    workflows:
+      - NowssB Flutter APK
+      - NowssB WebView APK
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: nowssb-android-release-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish paired Android APK release
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Wait for both Android workflows and download APKs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p release/flutter release/webview
+          flutter_run=""
+          webview_run=""
+          for attempt in $(seq 1 40); do
+            flutter_run=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/flutter-apk.yml/runs?head_sha=${HEAD_SHA}&status=completed&per_page=50" --jq '[.workflow_runs[] | select(.conclusion == "success")][0].id // empty')
+            webview_run=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/android-apk.yml/runs?head_sha=${HEAD_SHA}&status=completed&per_page=50" --jq '[.workflow_runs[] | select(.conclusion == "success")][0].id // empty')
+            if [ -n "$flutter_run" ] && [ -n "$webview_run" ]; then
+              break
+            fi
+            echo "Waiting for both successful Android workflows (attempt ${attempt}/40): Flutter=${flutter_run:-pending}, WebView=${webview_run:-pending}"
+            sleep 15
+          done
+          test -n "$flutter_run"
+          test -n "$webview_run"
+          gh run download "$flutter_run" --repo "$GITHUB_REPOSITORY" --name nowssb-flutter-debug-apk-all-changes --dir release/flutter
+          gh run download "$webview_run" --repo "$GITHUB_REPOSITORY" --name nowssb-webview-debug-apk-all-changes --dir release/webview
+          flutter_apk=$(find release/flutter -type f -name '*.apk' | head -1)
+          webview_apk=$(find release/webview -type f -name '*.apk' | head -1)
+          test -n "$flutter_apk"
+          test -n "$webview_apk"
+          mv "$flutter_apk" release/nowssb-flutter-debug.apk
+          mv "$webview_apk" release/nowssb-webview-debug.apk
+          unzip -tq release/nowssb-flutter-debug.apk
+          unzip -tq release/nowssb-webview-debug.apk
+          sha256sum release/nowssb-flutter-debug.apk | tee release/flutter.sha256
+          sha256sum release/nowssb-webview-debug.apk | tee release/webview.sha256
+
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          version=$(jq -r .version version.json)
+          tag="v${version}-android"
+          flutter_sha=$(awk '{print $1}' release/flutter.sha256)
+          webview_sha=$(awk '{print $1}' release/webview.sha256)
+          notes=$(mktemp)
+          cat > "$notes" <<EOF
+          Paired Flutter and Capacitor/WebView Android debug builds for commit ${HEAD_SHA}.
+
+          Flutter APK SHA-256: ${flutter_sha}
+          WebView APK SHA-256: ${webview_sha}
+
+          These APKs are debug-signed and may require uninstalling an older build if Android reports a signing-key conflict.
+          EOF
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" release/nowssb-flutter-debug.apk release/nowssb-webview-debug.apk --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$tag" release/nowssb-flutter-debug.apk release/nowssb-webview-debug.apk --repo "$GITHUB_REPOSITORY" --title "NowssB ${tag}" --notes-file "$notes"
+          fi
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json tagName,url,assets --jq '{tagName,url,assets:[.assets[]|{name,size,state,url}]}'
