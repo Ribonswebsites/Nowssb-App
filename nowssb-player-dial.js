@@ -57,6 +57,9 @@
 
   /* Open the exact AURA player-settings page (not the dial clone). */
   function open() {
+    try {
+      sessionStorage.setItem('nwsb_return_to_player', JSON.stringify({ ts: Date.now() }));
+    } catch (e) {}
     var url = 'player-settings.html#clock';
     try {
       var pages = (window.NOWSSB_PAGES || (typeof PAGES !== 'undefined' ? PAGES : '') || '').toString();

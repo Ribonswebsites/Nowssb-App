@@ -10703,15 +10703,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
    player-settings.html uses this query instead of history.back(), because a
    WebView history entry restores the Home document without its open sub-screen. */
 (function () {
-  if (!/[?&]returnTo=player(?:&|$)/.test(location.search)) return;
+  var shouldReturn = /[?&]returnTo=player(?:&|$)/.test(location.search);
+  try {
+    var marker = JSON.parse(sessionStorage.getItem('nwsb_return_to_player') || 'null');
+    if (marker && marker.ts && Date.now() - marker.ts < 5 * 60 * 1000) shouldReturn = true;
+  } catch (e) {}
+  if (!shouldReturn) return;
   var attempts = 0;
   function restore() {
-    if (attempts++ > 80) return;
+    if (attempts++ > 120) return;
     var practice = document.getElementById('sub-practice');
-    if (practice && typeof window.openSub === 'function') {
+    var ready = false;
+    try { ready = typeof currentScreen === 'undefined' || currentScreen === 'home' || currentScreen === 'home-nm'; } catch (e) {}
+    if (practice && practice.classList.contains('open')) {
+      try { sessionStorage.removeItem('nwsb_return_to_player'); } catch (e) {}
+      return;
+    }
+    if (ready && practice && typeof window.openSub === 'function') {
       window._rtManualLaunch = true;
       window._pwShowIntro = false;
       window.openSub('practice');
+      try { sessionStorage.removeItem('nwsb_return_to_player'); } catch (e) {}
       return;
     }
     setTimeout(restore, 150);

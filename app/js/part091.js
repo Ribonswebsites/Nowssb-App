@@ -66,8 +66,7 @@
     var fashion = mode === 'fashion';
     return '<section class="nwsb-essentials nwsb-essentials-reference nwsb-essentials-' + (fashion ? 'fashion' : 'normal') + '" data-essentials-mode="' + mode + '" data-essential-filter="recent">' +
       '<div class="nwsb-essentials-body">' +
-        '<div class="nwsb-essential-tabs"><button type="button" class="nwsb-essential-tab is-active" data-essential-filter-button="recent">' + icon('sound') + '<span>Recents</span></button><button type="button" class="nwsb-essential-tab" data-essential-filter-button="favorite">' + icon('lock') + '<span>Favorites</span></button></div>' +
-        '<div class="nwsb-essentials-heading"><div><h2>Your essentials</h2></div></div>' +
+        '<div class="nwsb-essentials-heading"><span class="nwsb-essentials-heading-icon" aria-hidden="true">' + icon('sliders') + '</span><div><div class="nwsb-essentials-eyebrow">Your daily practice</div><h2>Your essentials</h2></div></div>' +
         '<div class="nwsb-essentials-shell"><div class="nwsb-essential-list" data-essential-list></div><button type="button" class="nwsb-essential-expand" data-essential-expand aria-expanded="false"><span>See all essentials</span><b>⌄</b></button></div>' +
         '<button type="button" class="nwsb-essentials-guide" data-essential-guide><span class="nwsb-essentials-guide-icon">' + icon('sliders') + '</span><span class="nwsb-essentials-guide-copy"><strong>Find Your Way Around</strong><small>Every screen in the app, and what each one is for</small></span><span class="nwsb-essentials-guide-arrow">›</span></button>' +
         '<div class="nwsb-help-heading"><h3>What’s helping others</h3><button type="button" data-essential-help-view aria-label="Open helpful NowssB features">›</button></div>' +

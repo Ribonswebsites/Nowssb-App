@@ -35,14 +35,14 @@ body{display:flex;justify-content:center;touch-action:manipulation}
 .clock-frame{position:relative;width:100%;max-width:390px;aspect-ratio:390/355;margin:0 auto;transform:translateY(-8%)}
 .clock-svg{position:absolute;inset:0;width:100%;height:100%;color:var(--fg);overflow:visible}
 .time-lockup{position:absolute;left:0;top:48%;transform:translateY(-50%);display:flex;align-items:center;gap:10px;padding-left:86px;z-index:3}
-.hour{font-size:68px;font-weight:200;letter-spacing:-0.02em;line-height:1;background:rgba(12,14,18,0.88);padding:4px 6px;border-radius:8px;margin-right:-4px}
-.minute-pill{display:flex;align-items:center;gap:8px;border:1px solid rgba(242,242,239,0.4);border-radius:999px;padding:6px 14px 6px 12px;background:rgba(12,14,18,0.95)}
+.hour{font-size:68px;font-weight:200;letter-spacing:-0.02em;line-height:1;background:transparent;padding:0;border-radius:0;margin-right:-4px}
+.minute-pill{display:flex;align-items:center;gap:8px;border:1px solid rgba(242,242,239,0.82);border-radius:999px;padding:6px 14px 6px 12px;background:transparent}
 .minute{font-size:26px;font-weight:300;letter-spacing:0.04em}
-.pill-div{width:1px;height:16px;background:rgba(242,242,239,0.4)}
+.pill-div{width:1px;height:16px;background:rgba(242,242,239,0.62)}
 .ampm{font-size:12px;font-weight:400;letter-spacing:0.12em;opacity:.9}
-.date-lockup{position:absolute;right:16px;top:48%;transform:translateY(-50%);text-align:right;z-index:3;background:rgba(12,14,18,0.88);padding:8px 6px 8px 12px;border-radius:8px}
+.date-lockup{position:absolute;right:10px;top:46%;transform:translateY(-50%);text-align:right;z-index:3;background:transparent;padding:0;border-radius:0}
 .date-top{font-size:11px;letter-spacing:0.18em;font-weight:400}
-.date-rule{width:48px;height:1px;background:rgba(242,242,239,0.4);margin:8px 0 8px auto}
+.date-rule{width:170px;height:1px;background:rgba(242,242,239,0.52);margin:10px 0 10px auto}
 .date-day{font-size:11px;letter-spacing:0.22em;font-weight:400}
 
 /* Bottom settings — like reference, with icons */
@@ -555,9 +555,12 @@ showScreen = function (name) {
   _showScreen(name);
 };
 document.getElementById("clk-back").addEventListener("click", () => {
-  /* Return to the in-app Player explicitly. Browser history returns to the
-     previously loaded Home DOM, which loses the practice/player state. */
-  location.assign("index.html?returnTo=player");
+  /* Prefer the existing Player document in WebView history. This restores the
+     live Player without a Home/splash restart. The query marker is only for a
+     direct standalone visit where there is no prior app document. */
+  try { sessionStorage.setItem("nwsb_return_to_player", JSON.stringify({ts:Date.now()})); } catch (e) {}
+  if (window.history.length > 1) window.history.back();
+  else location.assign("index.html?returnTo=player");
 });
 document.getElementById("clk-lib").addEventListener("click", () => showScreen("library"));
 document.getElementById("clk-settings").addEventListener("click", () => showScreen("settings"));

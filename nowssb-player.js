@@ -933,6 +933,13 @@
      control and upward swipe then reveal the flat settings list. The radial
      arc remains available only for its own player controls, never as settings. */
   window.lgpOpenAURASettings = function () {
+    try {
+      sessionStorage.setItem('nwsb_return_to_player', JSON.stringify({
+        ts: Date.now(),
+        wordIndex: (typeof _pwIdx !== 'undefined' ? _pwIdx : 0),
+        word: (typeof PRACTICE_WORDS !== 'undefined' && PRACTICE_WORDS[_pwIdx]) ? PRACTICE_WORDS[_pwIdx].word : ''
+      }));
+    } catch (e) {}
     var url = 'player-settings.html#clock';
     try {
       var pages = (window.NOWSSB_PAGES || (typeof PAGES !== 'undefined' ? PAGES : '') || '').toString();

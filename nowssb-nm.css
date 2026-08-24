@@ -16355,3 +16355,82 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   #home-nm .mainops-blk > .mo-box .mo-cell { height: 62px !important; }
   #home-nm .mainops-blk > .mo-box .mo-lbl { font-size: 10px !important; }
 }
+
+/* ══ SHARED ICON-LED SECTION HEADINGS ══
+   Both homes use the same content hierarchy; only the wrapper language
+   changes: white circles on Fashion glass, raised surface circles on Normal. */
+.nwsb-dashboard-heading {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin: 24px 0 12px !important;
+}
+.nwsb-dashboard-heading .nwsb-dashboard-mark,
+.nwsb-essentials-heading .nwsb-essentials-heading-icon {
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 52px !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  background: #f0f2f7 !important;
+  color: #b39a5e !important;
+  box-shadow: 5px 5px 12px rgba(166,171,189,.30), -4px -4px 10px rgba(255,255,255,.88) !important;
+}
+.nwsb-dashboard-heading .nwsb-dashboard-mark svg,
+.nwsb-essentials-heading .nwsb-essentials-heading-icon svg {
+  width: 23px !important;
+  height: 23px !important;
+  display: block !important;
+}
+.nwsb-dashboard-heading-copy,
+.nwsb-essentials-heading > div { min-width: 0 !important; flex: 1 1 auto !important; }
+.nwsb-dashboard-heading-copy .nwsb-dashboard-eyebrow,
+.nwsb-essentials-eyebrow {
+  color: rgba(26,26,46,.50) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.8px !important;
+  line-height: 1.2 !important;
+  text-transform: uppercase !important;
+}
+.nwsb-dashboard-heading-copy h2,
+.nwsb-essentials-heading h2 {
+  margin: 3px 0 0 !important;
+  color: #20212c !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.45px !important;
+  line-height: 1.15 !important;
+}
+.nwsb-dashboard-heading > button {
+  flex: 0 0 auto !important;
+  align-self: center !important;
+  margin-left: auto !important;
+}
+.nwsb-essentials-heading {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin: 0 4px 14px !important;
+}
+.nwsb-essentials-reference .nwsb-essential-tabs { display: none !important; }
+.nwsb-essentials-normal .nwsb-essentials-heading .nwsb-essentials-heading-icon { background: #f0f2f7 !important; color: #b39a5e !important; }
+.nwsb-daydash-fashion .nwsb-dashboard-heading .nwsb-dashboard-mark,
+.nwsb-essentials-fashion .nwsb-essentials-heading .nwsb-essentials-heading-icon {
+  background: #fff !important;
+  color: #171326 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,.20) !important;
+}
+.nwsb-daydash-fashion .nwsb-dashboard-heading-copy .nwsb-dashboard-eyebrow,
+.nwsb-essentials-fashion .nwsb-essentials-eyebrow { color: rgba(232,213,163,.78) !important; }
+.nwsb-daydash-fashion .nwsb-dashboard-heading-copy h2,
+.nwsb-essentials-fashion .nwsb-essentials-heading h2 { color: #fff !important; }
+.nwsb-essentials-fashion .nwsb-essentials-heading { margin-top: 0 !important; }
+@media (max-width: 420px) {
+  .nwsb-dashboard-heading { gap: 11px !important; }
+  .nwsb-dashboard-heading .nwsb-dashboard-mark,
+  .nwsb-essentials-heading .nwsb-essentials-heading-icon { flex-basis: 46px !important; width: 46px !important; height: 46px !important; }
+  .nwsb-dashboard-heading-copy h2,
+  .nwsb-essentials-heading h2 { font-size: 22px !important; }
+}

@@ -8,6 +8,7 @@ import '../media/video_pool.dart';
 import '../shell/go.dart';
 import '../theme/tokens.dart';
 import 'neumorphic.dart';
+import 'nwsb_icon.dart';
 
 /// The four local-time experiences used by both home modes.
 enum NwsbDaySlot { morning, afternoon, evening, night }
@@ -130,7 +131,6 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   int _streak = 0;
   int _sessions = 0;
   int _words = 0;
-  int _essentialFilter = 0;
   Timer? _clock;
 
   static const _essentials = <_EssentialItem>[
@@ -296,9 +296,24 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   Widget _heading(BuildContext context, String eyebrow, String title, Object dest) {
     final color = widget.fashion ? Colors.white : NwsbColors.ink;
     final faint = widget.fashion ? const Color(0xB3E8D5A3) : NwsbColors.inkFaint;
+    final mark = title == 'Up next' ? NwsbMarks.reader : NwsbMarks.sound;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Container(
+          width: 52,
+          height: 52,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: widget.fashion ? Colors.white : NwsbColors.surface,
+            shape: BoxShape.circle,
+            boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
+          ),
+          child: Center(
+            child: NwsbIcon(mark, size: 23, color: widget.fashion ? const Color(0xFF171326) : NwsbColors.gold),
+          ),
+        ),
+        const SizedBox(width: 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,15 +394,39 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   Widget _essentialsSection(BuildContext context) {
     final headingColor = widget.fashion ? Colors.white : NwsbColors.ink;
-    final visible = _essentialFilter == 0 ? _essentials : _essentials.where((item) => item.favorite).toList();
+    final visible = _essentials;
     final shell = widget.fashion
         ? _glass(child: _essentialStack(context, visible), padding: const EdgeInsets.all(14))
         : NeuCard(radius: 26, padding: const EdgeInsets.all(14), child: _essentialStack(context, visible));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       _essentialsWave(),
-      Row(children: [_filterPill(context, Icons.access_time, 'Recents', 0), const SizedBox(width: 10), _filterPill(context, Icons.favorite, 'Favorites', 1)]),
-      const SizedBox(height: 28),
-      Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7)),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: widget.fashion ? Colors.white : NwsbColors.surface,
+              shape: BoxShape.circle,
+              boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
+            ),
+            child: Center(child: NwsbIcon(NwsbMarks.sliders, size: 23, color: widget.fashion ? const Color(0xFF171326) : NwsbColors.gold)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('YOUR DAILY PRACTICE', style: TextStyle(color: widget.fashion ? const Color(0xB3E8D5A3) : NwsbColors.inkFaint, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
+                const SizedBox(height: 3),
+                Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7)),
+              ],
+            ),
+          ),
+        ],
+      ),
       const SizedBox(height: 14),
       shell,
       const SizedBox(height: 18),
@@ -475,11 +514,6 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
       ),
     );
     return Semantics(button: true, label: 'Find Your Way Around', child: InkWell(onTap: () => Dest.open(context, Dest.profile), borderRadius: BorderRadius.circular(24), child: guide));
-  }
-
-  Widget _filterPill(BuildContext context, IconData icon, String label, int value) {
-    final active = _essentialFilter == value;
-    return TextButton.icon(onPressed: () => setState(() => _essentialFilter = value), icon: Icon(icon, size: 18), label: Text(label), style: TextButton.styleFrom(foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink, backgroundColor: widget.fashion ? const Color(0x24FFFFFF) : const Color(0xFFF7F5F2), padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)), elevation: active && !widget.fashion ? 1 : 0));
   }
 
   Widget _essentialStack(BuildContext context, List<_EssentialItem> items) => Stack(
