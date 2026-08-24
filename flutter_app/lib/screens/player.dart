@@ -14,6 +14,7 @@ import '../data/models.dart';
 import '../data/settings.dart';
 import '../services/nowssb_api.dart';
 import 'player_dial.dart';
+import 'player_settings.dart';
 import '../widgets/day_dashboard.dart';
 
 class PlayerScreen extends StatefulWidget {
@@ -79,7 +80,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: PlayerDial(word: w.word, playing: _playing, onPlay: () => _togglePlay(w, parts)),
+            child: PlayerDial(
+              word: w.word,
+              playing: _playing,
+              onPlay: () => _togglePlay(w, parts),
+              onSettings: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()),
+              ),
+            ),
           ),
           SafeArea(
             child: Column(

@@ -17,11 +17,13 @@ class PlayerDial extends StatefulWidget {
     this.playing = false,
     this.onPlay,
     this.onClose,
+    this.onSettings,
   });
   final String word;
   final bool playing;
   final VoidCallback? onPlay;
   final VoidCallback? onClose;
+  final VoidCallback? onSettings;
 
   @override
   State<PlayerDial> createState() => _PlayerDialState();
@@ -86,11 +88,21 @@ class _PlayerDialState extends State<PlayerDial> {
           },
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  onPressed: widget.onClose ?? () => Navigator.maybePop(context),
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: widget.onClose ?? () => Navigator.maybePop(context),
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    ),
+                    IconButton(
+                      onPressed: widget.onSettings,
+                      tooltip: 'Player settings',
+                      icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                    ),
+                  ],
                 ),
               ),
               if (!_expanded)

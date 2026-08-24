@@ -17,6 +17,13 @@ class Settings extends ChangeNotifier {
   static const _kSpeed = 'nwsb_pw_speed';
   static const _kVol = 'nwsb_pw_volume';
   static const _kEq = 'nwsb_pw_eq';
+  static const _kQuality = 'nwsb_pw_quality';
+  static const _kBass = 'nwsb_pw_bass';
+  static const _kCrossfade = 'nwsb_pw_crossfade';
+  static const _kSleep = 'nwsb_pw_sleep';
+  static const _kDownload = 'nwsb_pw_download';
+  static const _kPlaylist = 'nwsb_pw_playlist';
+  static const _kNowPlaying = 'nwsb_pw_nowplaying';
 
   bool _fashionPlus = true;
   bool _fashionHome = true;
@@ -29,6 +36,13 @@ class Settings extends ChangeNotifier {
   List<double> _bands = List<double>.filled(7, 0);
   String _output = 'speaker';
   bool _qualityHigh = true;
+  String _quality = 'High';
+  bool _bass = true;
+  String _crossfade = '5 Sec';
+  String _sleep = 'Off';
+  bool _download = true;
+  String _playlist = 'Classic';
+  String _nowPlaying = 'On';
   bool _animation = true;
   bool _notify = true;
 
@@ -50,6 +64,13 @@ class Settings extends ChangeNotifier {
   List<double> get bands => List.unmodifiable(_bands);
   String get output => _output;
   bool get qualityHigh => _qualityHigh;
+  String get quality => _quality;
+  bool get bassBoost => _bass;
+  String get crossfade => _crossfade;
+  String get sleepTimer => _sleep;
+  bool get downloadOnly => _download;
+  String get playlist => _playlist;
+  String get nowPlaying => _nowPlaying;
   bool get animationOn => _animation;
   bool get notifyOn => _notify;
 
@@ -73,6 +94,14 @@ class Settings extends ChangeNotifier {
       _speed = p.getDouble(_kSpeed) ?? 1;
       _volume = p.getDouble(_kVol) ?? 0.85;
       _eq = p.getString(_kEq) ?? 'flat';
+      _quality = p.getString(_kQuality) ?? (p.getBool('nwsb_pw_quality_high') == false ? 'Normal' : 'High');
+      _qualityHigh = _quality == 'High' || _quality == 'Lossless';
+      _bass = p.getBool(_kBass) ?? true;
+      _crossfade = p.getString(_kCrossfade) ?? '5 Sec';
+      _sleep = p.getString(_kSleep) ?? 'Off';
+      _download = p.getBool(_kDownload) ?? true;
+      _playlist = p.getString(_kPlaylist) ?? 'Classic';
+      _nowPlaying = p.getString(_kNowPlaying) ?? 'On';
       _bands = List<double>.from(_eqPresets[_eq] ?? _eqPresets['flat']!);
       notifyListeners();
     } catch (_) {}
@@ -112,7 +141,7 @@ class Settings extends ChangeNotifier {
   }
 
   void setSpeed(double v) {
-    _speed = v.clamp(0.7, 1.5);
+    _speed = v.clamp(0.5, 2.0);
     notifyListeners();
     _saveDouble(_kSpeed, _speed);
   }
@@ -156,9 +185,51 @@ class Settings extends ChangeNotifier {
     return _output;
   }
 
-  void toggleQuality() {
-    _qualityHigh = !_qualityHigh;
+  void setQuality(String v) {
+    _quality = v;
+    _qualityHigh = v == 'High' || v == 'Lossless';
     notifyListeners();
+    _saveStr(_kQuality, v);
+  }
+
+  void toggleBass() {
+    _bass = !_bass;
+    notifyListeners();
+    _saveBool(_kBass, _bass);
+  }
+
+  void setCrossfade(String v) {
+    _crossfade = v;
+    notifyListeners();
+    _saveStr(_kCrossfade, v);
+  }
+
+  void setSleepTimer(String v) {
+    _sleep = v;
+    notifyListeners();
+    _saveStr(_kSleep, v);
+  }
+
+  void toggleDownloadOnly() {
+    _download = !_download;
+    notifyListeners();
+    _saveBool(_kDownload, _download);
+  }
+
+  void setPlaylist(String v) {
+    _playlist = v;
+    notifyListeners();
+    _saveStr(_kPlaylist, v);
+  }
+
+  void setNowPlaying(String v) {
+    _nowPlaying = v;
+    notifyListeners();
+    _saveStr(_kNowPlaying, v);
+  }
+
+  void toggleQuality() {
+    setQuality(_qualityHigh ? 'Normal' : 'High');
   }
 
   void toggleAnimation() {

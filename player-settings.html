@@ -285,12 +285,33 @@ const ICONS = {
   check:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg>`,
 };
 
+const AURA_PREF_KEY = "nwsb-aura-player-settings";
 const state = {
   screen: "clock",
   current: 0,
   playing: false,
   settings: Object.fromEntries(SETTINGS_DEF.map(s => [s.key, s.value])),
 };
+try {
+  const saved = JSON.parse(localStorage.getItem(AURA_PREF_KEY) || "null");
+  if (saved && typeof saved === "object") Object.assign(state.settings, saved);
+} catch (_) {}
+function applyAURASettings() {
+  const speed = {"0.5x":0.5,"0.75x":0.75,"Normal":1,"1.25x":1.25,"1.5x":1.5,"2x":2}[state.settings.speed] || 1;
+  window._pwSpeed = speed;
+  window._pwAURAEq = state.settings.eq;
+  window._pwAURABass = !!state.settings.bass;
+  window._pwAURACrossfade = state.settings.crossfade;
+  window._pwAURASleep = state.settings.sleep;
+  window._pwAURADownloadOnly = !!state.settings.download;
+  window._pwAURAPlaylist = state.settings.playlist;
+  window._pwAURANowPlaying = state.settings.nowplaying;
+}
+function persistAURASettings() {
+  try { localStorage.setItem(AURA_PREF_KEY, JSON.stringify(state.settings)); } catch (_) {}
+  applyAURASettings();
+}
+applyAURASettings();
 
 function showScreen(name) {
   state.screen = name;
@@ -461,7 +482,7 @@ function renderSettings(){
     const key=row.dataset.key, type=row.dataset.type;
     if(type==="toggle"){
       const btn=row.querySelector(".toggle");
-      const flip=()=>{state.settings[key]=!state.settings[key];renderSettings();renderHomeRows();};
+      const flip=()=>{state.settings[key]=!state.settings[key];persistAURASettings();renderSettings();renderHomeRows();};
       btn.addEventListener("click",e=>{e.stopPropagation();flip();});
       row.addEventListener("click",flip);
     } else {
@@ -483,6 +504,7 @@ function openSheet(key){
   opts.querySelectorAll(".sheet-opt").forEach(el=>{
     el.addEventListener("click",()=>{
       state.settings[key]=el.dataset.val;
+      persistAURASettings();
       closeSheet();renderSettings();renderHomeRows();
     });
   });
@@ -563,6 +585,7 @@ setInterval(tickTime,1000);
 renderHomeRows();
 renderLibrary();
 renderSettings();
+persistAURASettings();
 updateMini();
 const bootScreen = (location.hash || "").replace("#","");
 showScreen(["clock","library","settings"].includes(bootScreen) ? bootScreen : "clock");
