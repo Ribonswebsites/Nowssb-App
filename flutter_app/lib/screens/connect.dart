@@ -283,21 +283,95 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   Future<void> _openProfile(DocumentSnapshot<Map<String, dynamic>> doc) async {
-    final d = doc.data() ?? {};
-    await showModalBottomSheet<void>(context: context, isScrollControlled: true, backgroundColor: NwsbColors.deep, builder: (_) => Padding(padding: const EdgeInsets.fromLTRB(22, 22, 22, 34), child: Column(mainAxisSize: MainAxisSize.min, children: [_avatar(d['photoURL']?.toString(), d['displayName']?.toString() ?? 'N', 76), const SizedBox(height: 12), Text(d['displayName']?.toString() ?? 'NowssB Practitioner', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)), Text('@${d['username'] ?? 'practitioner'}', style: const TextStyle(color: Color(0x99FFFFFF))), const SizedBox(height: 12), Text(d['bio']?.toString() ?? 'A NowssB practitioner building a daily sound practice.', textAlign: TextAlign.center, style: const TextStyle(color: Color(0xB3FFFFFF), height: 1.45)), const SizedBox(height: 16), Row(children: [Expanded(child: FilledButton(onPressed: () { Navigator.pop(context); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectChatScreen(peerUid: doc.id, peerName: d['displayName']?.toString() ?? 'NowssB Practitioner'))); }, child: const Text('Message'))), const SizedBox(width: 8), IconButton(onPressed: () { Navigator.pop(context); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: doc.id, peerName: d['displayName']?.toString() ?? 'NowssB Practitioner', kind: 'audio'))); }, icon: const Icon(Icons.call_outlined, color: NwsbColors.goldLight)), IconButton(onPressed: () { Navigator.pop(context); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: doc.id, peerName: d['displayName']?.toString() ?? 'NowssB Practitioner', kind: 'video'))); }, icon: const Icon(Icons.videocam_outlined, color: NwsbColors.goldLight)), IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close, color: Color(0x99FFFFFF)))])])));
+    final d = doc.data() ?? <String, dynamic>{};
+    final name = d['displayName']?.toString() ?? 'NowssB Practitioner';
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: NwsbColors.deep,
+      builder: (sheetContext) => Padding(
+        padding: const EdgeInsets.fromLTRB(22, 22, 22, 34),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _avatar(d['photoURL']?.toString(), name, 76),
+            const SizedBox(height: 12),
+            Text(name, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+            Text('@${d['username'] ?? 'practitioner'}', style: const TextStyle(color: Color(0x99FFFFFF))),
+            const SizedBox(height: 12),
+            Text(d['bio']?.toString() ?? 'A NowssB practitioner building a daily sound practice.', textAlign: TextAlign.center, style: const TextStyle(color: Color(0xB3FFFFFF), height: 1.45)),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: FilledButton(onPressed: () { Navigator.pop(sheetContext); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectChatScreen(peerUid: doc.id, peerName: name))); }, child: const Text('Message'))),
+                const SizedBox(width: 8),
+                IconButton(onPressed: () { Navigator.pop(sheetContext); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: doc.id, peerName: name, kind: 'audio'))); }, icon: const Icon(Icons.call_outlined, color: NwsbColors.goldLight)),
+                IconButton(onPressed: () { Navigator.pop(sheetContext); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: doc.id, peerName: name, kind: 'video'))); }, icon: const Icon(Icons.videocam_outlined, color: NwsbColors.goldLight)),
+                IconButton(onPressed: () => Navigator.pop(sheetContext), icon: const Icon(Icons.close, color: Color(0x99FFFFFF))),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _openComposer() async {
     final caption = TextEditingController();
     final location = TextEditingController();
     XFile? media;
-    final result = await showModalBottomSheet<bool>(context: context, isScrollControlled: true, backgroundColor: NwsbColors.deep, builder: (sheetContext) => StatefulBuilder(builder: (_, setSheetState) => Padding(padding: EdgeInsets.fromLTRB(22, 22, 22, MediaQuery.of(sheetContext).viewInsets.bottom + 28), child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('New NowssB post', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)), const SizedBox(height: 16), TextField(controller: caption, maxLength: 2200, maxLines: 4, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Share your practice…', hintStyle: TextStyle(color: Color(0x66FFFFFF)))), const SizedBox(height: 8), TextField(controller: location, maxLength: 120, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Location (optional)', hintStyle: TextStyle(color: Color(0x66FFFFFF)))), const SizedBox(height: 12), Row(children: [OutlinedButton.icon(onPressed: () async { media = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85); setSheetState(() {}); }, icon: const Icon(Icons.photo_outlined), label: Text(media == null ? 'Add photo' : 'Photo selected')), const Spacer(), FilledButton(onPressed: () async { Navigator.pop(sheetContext, true); }, child: const Text('Share'))]), if (media != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(media!.name, style: const TextStyle(color: Color(0x99FFFFFF))))]))));
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: NwsbColors.deep,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.fromLTRB(22, 22, 22, MediaQuery.of(sheetContext).viewInsets.bottom + 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('New NowssB post', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 16),
+                  TextField(controller: caption, maxLength: 2200, maxLines: 4, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Share your practice…', hintStyle: TextStyle(color: Color(0x66FFFFFF)))),
+                  const SizedBox(height: 8),
+                  TextField(controller: location, maxLength: 120, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Location (optional)', hintStyle: TextStyle(color: Color(0x66FFFFFF)))),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          media = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85);
+                          setSheetState(() {});
+                        },
+                        icon: const Icon(Icons.photo_outlined),
+                        label: Text(media == null ? 'Add photo' : 'Photo selected'),
+                      ),
+                      const Spacer(),
+                      FilledButton(onPressed: () => Navigator.pop(sheetContext, true), child: const Text('Share')),
+                    ],
+                  ),
+                  if (media != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(media!.name, style: const TextStyle(color: Color(0x99FFFFFF)))),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
     final captionValue = caption.text;
     final locationValue = location.text;
     caption.dispose();
     location.dispose();
     if (result != true) return;
-    try { await _service.createPost(caption: captionValue, media: media, location: locationValue); if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Your NowssB post was shared.'))); } catch (error) { _showError(error); }
+    try {
+      await _service.createPost(caption: captionValue, media: media, location: locationValue);
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Your NowssB post was shared.')));
+    } catch (error) {
+      _showError(error);
+    }
   }
 }
 
@@ -325,72 +399,50 @@ class _ConnectChatScreenState extends State<ConnectChatScreen> {
         title: Text(widget.peerName),
         backgroundColor: NwsbColors.deep,
         actions: [
-          IconButton(
-            onPressed: () => _startCall('audio'),
-            icon: const Icon(Icons.call_outlined),
-          ),
-          IconButton(
-            onPressed: () => _startCall('video'),
-            icon: const Icon(Icons.videocam_outlined),
-          ),
+          IconButton(onPressed: () => _startCall('audio'), icon: const Icon(Icons.call_outlined)),
+          IconButton(onPressed: () => _startCall('video'), icon: const Icon(Icons.videocam_outlined)),
         ],
       ),
       body: Column(
         children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: _service.messages(widget.peerUid),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      snapshot.error.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  );
-                }
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final docs = snapshot.data!.docs;
-                if (docs.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'Start your first NowssB message.',
-                      style: TextStyle(color: Color(0x99FFFFFF)),
-                    ),
-                  );
-                }
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: docs.length,
-                  itemBuilder: (_, i) {
-                    final data = docs[i].data();
-                    final mine = data['from'] == _service.uid;
-                    return Align(
-                      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        constraints: const BoxConstraints(maxWidth: 300),
-                        decoration: BoxDecoration(
-                          color: mine ? const Color(0xFF8F7444) : const Color(0xFF191923),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          data['text']?.toString() ?? '',
-                          style: const TextStyle(color: Colors.white, height: 1.35),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
+          Expanded(child: _messages()),
           _input(),
         ],
       ),
+    );
+  }
+
+  Widget _messages() {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: _service.messages(widget.peerUid),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text(snapshot.error.toString(), style: const TextStyle(color: Colors.white)));
+        }
+        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+        final docs = snapshot.data!.docs;
+        if (docs.isEmpty) {
+          return const Center(child: Text('Start your first NowssB message.', style: TextStyle(color: Color(0x99FFFFFF))));
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: docs.length,
+          itemBuilder: (_, index) {
+            final data = docs[index].data();
+            final mine = data['from'] == _service.uid;
+            return Align(
+              alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                constraints: const BoxConstraints(maxWidth: 300),
+                decoration: BoxDecoration(color: mine ? const Color(0xFF8F7444) : const Color(0xFF191923), borderRadius: BorderRadius.circular(16)),
+                child: Text(data['text']?.toString() ?? '', style: const TextStyle(color: Colors.white, height: 1.35)),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -432,5 +484,4 @@ class _ConnectChatScreenState extends State<ConnectChatScreen> {
 
   Future<void> _send() async { final text = _composer.text; _composer.clear(); try { await _service.sendMessage(widget.peerUid, text); } catch (error) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString()))); } }
   Future<void> _startCall(String kind) async { await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: widget.peerUid, peerName: widget.peerName, kind: kind))); }
-  Future<void> _sendText(String text) async { try { await _service.sendMessage(widget.peerUid, text); } catch (error) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString()))); } }
 }
