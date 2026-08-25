@@ -14,6 +14,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../data/content.dart';
 import '../data/settings.dart';
@@ -410,6 +411,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 const FooterMark(dark: true),
                   ],
                 ),
+              ),
               ),
             ],
           ),
