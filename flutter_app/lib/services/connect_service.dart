@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ConnectService {
@@ -51,6 +52,12 @@ class ConnectService {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> feed() => _db
       .collection('posts')
+      .where('visibility', isEqualTo: 'public')
+      .limit(50)
+      .snapshots();
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> reels() => _db
+      .collection('reels')
       .where('visibility', isEqualTo: 'public')
       .limit(50)
       .snapshots();
@@ -139,13 +146,30 @@ class ConnectService {
   Stream<DocumentSnapshot<Map<String, dynamic>>> following(String peerUid) =>
       _db.collection('follows').doc(uid).collection('following').doc(peerUid).snapshots();
 
+  String _mimeType(XFile file) {
+    final supplied = file.mimeType?.trim();
+    if (supplied != null && supplied.isNotEmpty && supplied != 'application/octet-stream') return supplied;
+    switch (file.path.toLowerCase().split('.').last) {
+      case 'jpg':
+      case 'jpeg': return 'image/jpeg';
+      case 'png': return 'image/png';
+      case 'webp': return 'image/webp';
+      case 'gif': return 'image/gif';
+      case 'mp4': return 'video/mp4';
+      case 'webm': return 'video/webm';
+      default: return 'application/octet-stream';
+    }
+  }
+
   Future<String> upload(XFile file, String kind) async {
     final token = await _user.getIdToken(true) ?? '';
     if (token.isEmpty) throw StateError('Your NowssB session expired. Sign in again.');
+    final mimeType = _mimeType(file);
+    if (mimeType == 'application/octet-stream') throw StateError('This image or video format is not supported.');
     final request = http.MultipartRequest('POST', Uri.parse('$_apiBase/api/connect/media'))
       ..headers['Authorization'] = 'Bearer $token'
       ..fields['kind'] = kind
-      ..files.add(await http.MultipartFile.fromPath('file', file.path));
+      ..files.add(await http.MultipartFile.fromPath('file', file.path, contentType: MediaType.parse(mimeType)));
     final response = await request.send();
     final body = await response.stream.bytesToString();
     final data = jsonDecode(body) as Map<String, dynamic>;
@@ -153,6 +177,52 @@ class ConnectService {
       throw StateError(data['error']?.toString() ?? 'Media upload failed.');
     }
     return data['url']?.toString() ?? (throw StateError('Media URL was missing.'));
+  }
+
+  Future<void> createReel({required String caption, required XFile media, String location = ''}) async {
+    final user = _user;
+    final mimeType = _mimeType(media);
+    if (!mimeType.startsWith('video/')) throw StateError('Choose a video file for a Reel.');
+    final profile = await _db.collection('publicProfiles').doc(uid).get();
+    final profileData = profile.data() ?? <String, dynamic>{};
+    final mediaUrl = await upload(media, 'reel');
+    final cleanCaption = caption.trim();
+    final cleanLocation = location.trim();
+    await _db.collection('reels').add({
+      'uid': uid,
+      'displayName': profileData['displayName'] ?? user.displayName ?? 'NowssB Practitioner',
+      'photoURL': profileData['photoURL'] ?? user.photoURL ?? '',
+      'mediaUrl': mediaUrl,
+      'mediaType': mimeType,
+      'caption': cleanCaption.length > 2200 ? cleanCaption.substring(0, 2200) : cleanCaption,
+      'location': cleanLocation.length > 120 ? cleanLocation.substring(0, 120) : cleanLocation,
+      'visibility': 'public',
+      'likes': 0,
+      'likeCount': 0,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> createStory({required String caption, required XFile media, String location = ''}) async {
+    final user = _user;
+    final profile = await _db.collection('publicProfiles').doc(uid).get();
+    final profileData = profile.data() ?? <String, dynamic>{};
+    final mediaUrl = await upload(media, 'story');
+    final mimeType = _mimeType(media);
+    final cleanCaption = caption.trim();
+    final cleanLocation = location.trim();
+    await _db.collection('stories').add({
+      'uid': uid,
+      'displayName': profileData['displayName'] ?? user.displayName ?? 'NowssB Practitioner',
+      'photoURL': profileData['photoURL'] ?? user.photoURL ?? '',
+      'mediaUrl': mediaUrl,
+      'mediaType': mimeType,
+      'caption': cleanCaption.length > 2200 ? cleanCaption.substring(0, 2200) : cleanCaption,
+      'location': cleanLocation.length > 120 ? cleanLocation.substring(0, 120) : cleanLocation,
+      'visibility': 'public',
+      'expiresAt': Timestamp.fromDate(DateTime.now().add(const Duration(hours: 24))),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 
   Future<void> createPost({required String caption, XFile? media, String location = ''}) async {
@@ -163,7 +233,7 @@ class ConnectService {
     String mediaType = 'text';
     if (media != null) {
       mediaUrl = await upload(media, 'post');
-      mediaType = media.mimeType ?? 'image/jpeg';
+      mediaType = _mimeType(media);
     }
     if ((caption.trim().isEmpty) && mediaUrl == null) {
       throw StateError('Add a message or choose an image.');

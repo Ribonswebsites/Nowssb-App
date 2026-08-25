@@ -7,7 +7,7 @@
  */
 import {
   collection, query, where, limit, orderBy, getDocs, addDoc, setDoc, deleteDoc,
-  doc, getDoc, getCountFromServer, serverTimestamp, onSnapshot
+  doc, getDoc, getCountFromServer, Timestamp, serverTimestamp, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
 
@@ -18,6 +18,8 @@ let feedUnsub = null;
 let profiles = [];
 let posts = [];
 let postsLoaded = false;
+let reels = [];
+let stories = [];
 let profileMap = new Map();
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -82,16 +84,18 @@ async function syncPublicProfile() {
   if (!db() || !auth.currentUser) return;
   const user = auth.currentUser;
   const existing = window._userDataCache || {};
-  const name = existing.displayName || user.displayName || 'NowssB Practitioner';
-  const username = existing.username || name.toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\.|\.$/g, '') || 'practitioner';
+  let current = {};
+  try { current = (await getDoc(doc(db(), 'publicProfiles', user.uid))).data() || {}; } catch (error) { console.warn('NowssB public profile read:', error); }
+  const name = current.displayName || existing.displayName || user.displayName || 'NowssB Practitioner';
+  const username = current.username || existing.username || name.toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\.|\.$/g, '') || 'practitioner';
   await setDoc(doc(db(), 'publicProfiles', user.uid), {
     uid: user.uid,
     displayName: name,
     username,
-    photoURL: existing.photoURL || user.photoURL || '',
-    bio: existing.bio || '',
-    category: existing.healthFocus || 'Practitioner',
-    profileVisibility: existing.profileVisibility || 'public',
+    photoURL: current.photoURL || existing.photoURL || user.photoURL || '',
+    bio: current.bio || existing.bio || '',
+    category: current.category || existing.healthFocus || 'Practitioner',
+    profileVisibility: current.profileVisibility || existing.profileVisibility || 'public',
     updatedAt: serverTimestamp(),
   }, { merge: true });
 }
@@ -123,6 +127,45 @@ async function loadPosts() {
     .sort((a, b) => b.createdAt - a.createdAt);
   postsLoaded = true;
   return posts;
+}
+
+function mediaDocFromSnapshot(snapshot) {
+  const d = snapshot.data() || {};
+  const expiresAt = d.expiresAt?.toMillis ? d.expiresAt.toMillis() : Number(d.expiresAt || 0);
+  return {
+    id: snapshot.id,
+    uid: d.uid || '',
+    displayName: d.displayName || 'NowssB Practitioner',
+    photoURL: safeUrl(d.photoURL),
+    mediaUrl: safeUrl(d.mediaUrl || d.img || d.image),
+    mediaType: d.mediaType || 'video/mp4',
+    caption: d.caption || '',
+    location: d.location || '',
+    visibility: d.visibility || 'public',
+    createdAt: d.createdAt?.toMillis ? d.createdAt.toMillis() : Number(d.createdAt || 0),
+    expiresAt,
+  };
+}
+
+async function loadReels(uid = '') {
+  requireLogin();
+  const constraints = [limit(80)];
+  if (uid) constraints.unshift(where('uid', '==', uid));
+  const snap = await getDocs(query(collection(db(), 'reels'), ...constraints));
+  reels = snap.docs.map(mediaDocFromSnapshot)
+    .filter((item) => item.mediaUrl && item.visibility === 'public')
+    .sort((a, b) => b.createdAt - a.createdAt);
+  return reels;
+}
+
+async function loadStories() {
+  requireLogin();
+  const snap = await getDocs(query(collection(db(), 'stories'), where('visibility', '==', 'public'), limit(100)));
+  const now = Date.now();
+  stories = snap.docs.map(mediaDocFromSnapshot)
+    .filter((item) => item.mediaUrl && (!item.expiresAt || item.expiresAt > now))
+    .sort((a, b) => b.createdAt - a.createdAt);
+  return stories;
 }
 
 function profileFor(uid, fallback) {
@@ -165,6 +208,11 @@ function feedCard(p) {
   </article>`;
 }
 
+function storyStrip() {
+  if (!stories.length) return '';
+  return `<div class="nwsb-live-stories">${stories.slice(0, 24).map((story) => { const author = profileFor(story.uid, story); return `<button class="nwsb-live-story" onclick="NWSBConnect.openStory('${esc(story.uid)}')">${author.avatar ? `<img src="${esc(author.avatar)}" alt="">` : `<span>${esc((author.fullName || 'N').charAt(0))}</span>`}<small>${esc(author.fullName || 'Practitioner')}</small></button>`; }).join('')}</div>`;
+}
+
 function renderFeed() {
   const screen = document.getElementById('sub-ig-feed');
   if (!screen) return;
@@ -174,6 +222,7 @@ function renderFeed() {
   screen.innerHTML = `<div class="nwsb-live-feed-shell">
     <header class="nwsb-live-feed-header"><button onclick="IG.nav('home')" aria-label="Back">‹</button><div class="nwsb-live-brand"><img src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><strong>NowssB Connect</strong></div><button onclick="NWSBConnect.openComposer()" aria-label="Create">＋</button></header>
     <div class="nwsb-live-feed-tools"><button onclick="IG.openExplore()">Find practitioners</button><button onclick="NWSBConnect.openInbox()">Messages</button><button onclick="NWSBConnect.openProfile('${esc(currentUid())}')">${avatarHtml} My profile</button></div>
+    ${storyStrip()}
     <main class="nwsb-live-feed-list">${posts.length ? posts.map(feedCard).join('') : `<div class="nwsb-live-empty"><img src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><h2>Your Connect feed starts here</h2><p>Share the first public practice post or find another practitioner to follow.</p><button onclick="NWSBConnect.openComposer()">Create a post</button></div>`}</main>
   </div>`;
 }
@@ -212,6 +261,8 @@ async function openProfile(uid) {
   if (!postsLoaded) await loadPosts();
   const p = profileFor(uid);
   const publicPosts = posts.filter((post) => post.uid === uid);
+  let publicReels = [];
+  try { publicReels = await loadReels(uid); } catch (error) { console.warn('NowssB Connect profile reels:', error); }
   try {
     const [followers, following] = await Promise.all([
       getCountFromServer(collection(db(), 'follows', uid, 'followers')),
@@ -227,7 +278,7 @@ async function openProfile(uid) {
   overlay.id = 'nwsb-live-profile';
   overlay.className = 'nwsb-live-profile-overlay';
   const avatar = p.avatar ? `<img src="${esc(p.avatar)}" alt="">` : `<span>${esc((p.fullName || 'N').charAt(0).toUpperCase())}</span>`;
-  overlay.innerHTML = `<div class="nwsb-live-profile-card"><button class="nwsb-live-profile-close" onclick="NWSBConnect.closeProfile()">×</button><div class="nwsb-live-profile-head">${avatar}<div><h2>${esc(p.fullName)}</h2><p>@${esc(p.username)}</p><small>${esc(p.category)}</small></div></div><p class="nwsb-live-bio">${esc(p.bio || 'A NowssB practitioner building a daily sound practice.')}</p><div class="nwsb-live-profile-actions">${isSelf ? `<button onclick="NWSBConnect.editProfile()">Edit profile</button><button onclick="NWSBConnect.openComposer()">Create post</button>` : `<button onclick="NWSBConnect.toggleFollow('${esc(uid)}')">${p.following_state ? 'Following' : 'Follow'}</button><button onclick="NWSBConnect.message('${esc(uid)}')">Message</button><button onclick="NWSBConnect.call('${esc(uid)}','audio')">Call</button><button onclick="NWSBConnect.call('${esc(uid)}','video')">Video</button>`}</div><div class="nwsb-live-profile-stats"><span><b>${publicPosts.length}</b> posts</span><span><b>${p.followers || 0}</b> followers</span><span><b>${p.following || 0}</b> following</span></div><div class="nwsb-live-profile-grid">${publicPosts.length ? publicPosts.map((post) => `<button onclick="NWSBConnect.openPost('${esc(post.id)}')"><img src="${esc(post.mediaUrl)}" alt=""></button>`).join('') : '<div class="nwsb-live-empty-small">No public posts yet.</div>'}</div></div>`;
+  overlay.innerHTML = `<div class="nwsb-live-profile-card"><button class="nwsb-live-profile-close" onclick="NWSBConnect.closeProfile()">×</button><div class="nwsb-live-profile-head">${avatar}<div><h2>${esc(p.fullName)}</h2><p>@${esc(p.username)}</p><small>${esc(p.category)}</small></div></div><p class="nwsb-live-bio">${esc(p.bio || 'A NowssB practitioner building a daily sound practice.')}</p><div class="nwsb-live-profile-actions">${isSelf ? `<button onclick="NWSBConnect.editProfile()">Edit profile</button><button onclick="NWSBConnect.openComposer()">Create post</button>` : `<button onclick="NWSBConnect.toggleFollow('${esc(uid)}')">${p.following_state ? 'Following' : 'Follow'}</button><button onclick="NWSBConnect.message('${esc(uid)}')">Message</button><button onclick="NWSBConnect.call('${esc(uid)}','audio')">Call</button><button onclick="NWSBConnect.call('${esc(uid)}','video')">Video</button>`}</div><div class="nwsb-live-profile-stats"><span><b>${publicPosts.length}</b> posts</span><span><b>${publicReels.length}</b> reels</span><span><b>${p.followers || 0}</b> followers</span><span><b>${p.following || 0}</b> following</span></div><h3 class="nwsb-live-profile-section-title">Posts</h3><div class="nwsb-live-profile-grid">${publicPosts.length ? publicPosts.map((post) => `<button onclick="NWSBConnect.openPost('${esc(post.id)}')"><img src="${esc(post.mediaUrl)}" alt=""></button>`).join('') : '<div class="nwsb-live-empty-small">No public posts yet.</div>'}</div>${publicReels.length ? `<h3 class="nwsb-live-profile-section-title">Reels</h3><div class="nwsb-live-profile-grid">${publicReels.map((reel) => `<button onclick="NWSBConnect.openReels()"><video src="${esc(reel.mediaUrl)}" muted playsinline preload="metadata"></video></button>`).join('')}</div>` : ''}</div>`;
   if (!overlay.parentNode) document.body.appendChild(overlay);
   overlay.style.display = 'flex';
 }
@@ -355,30 +406,82 @@ async function uploadMedia(file, kind) {
   return data;
 }
 
+function renderReels() {
+  const screen = document.getElementById('sub-reels-feed');
+  if (!screen) return;
+  const cards = reels.length ? reels.map((reel) => {
+    const author = profileFor(reel.uid, reel);
+    return `<article class="nwsb-live-reel"><header>${author.avatar ? `<img src="${esc(author.avatar)}" alt="">` : `<span>${esc((author.fullName || 'N').charAt(0))}</span>`}<button onclick="NWSBConnect.openProfile('${esc(reel.uid)}')"><b>${esc(author.fullName || reel.displayName)}</b><small>@${esc(author.username || 'practitioner')}</small></button></header><video src="${esc(reel.mediaUrl)}" controls playsinline preload="metadata"></video>${reel.caption ? `<p>${esc(reel.caption)}</p>` : ''}<time>${esc(formatTime(reel.createdAt))}</time></article>`;
+  }).join('') : '<div class="nwsb-live-empty"><img src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><h2>No public Reels yet</h2><p>Share a short video from Create on NowssB Connect.</p><button onclick="NWSBConnect.openComposer()">Create a Reel</button></div>';
+  screen.innerHTML = `<div class="nwsb-live-reels-shell"><header class="nwsb-live-feed-header"><button onclick="IG.socialNav('home')" aria-label="Back">‹</button><div class="nwsb-live-brand"><img src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><strong>NowssB Reels</strong></div><button onclick="NWSBConnect.openComposer()" aria-label="Create">＋</button></header><main class="nwsb-live-reels-list">${cards}</main></div>`;
+}
+
+async function openReels() {
+  requireLogin();
+  const screen = document.getElementById('sub-reels-feed');
+  if (!screen) return;
+  document.querySelectorAll('.sub-screen.open').forEach((item) => item.classList.remove('open'));
+  screen.classList.add('open');
+  const socialNav = document.getElementById('ig-social-nav');
+  if (socialNav) socialNav.style.display = 'flex';
+  try { await loadProfiles(); await loadReels(); renderReels(); } catch (error) { screen.innerHTML = `<div class="nwsb-live-error">${esc(error.message || 'Could not load Reels.')}</div>`; }
+}
+
+async function openStory(uid) {
+  requireLogin();
+  if (!stories.length) await loadStories();
+  const items = stories.filter((story) => story.uid === uid);
+  const story = items[0];
+  if (!story) return;
+  let overlay = document.getElementById('nwsb-live-story-viewer');
+  if (!overlay) { overlay = document.createElement('div'); overlay.id = 'nwsb-live-story-viewer'; overlay.className = 'nwsb-live-composer-overlay'; document.body.appendChild(overlay); }
+  const author = profileFor(uid, story);
+  const media = story.mediaType.startsWith('video') ? `<video src="${esc(story.mediaUrl)}" controls autoplay playsinline></video>` : `<img src="${esc(story.mediaUrl)}" alt="NowssB Story">`;
+  overlay.innerHTML = `<div class="nwsb-live-story-card"><button class="nwsb-live-profile-close" data-close>×</button><div class="nwsb-live-story-author">${author.avatar ? `<img src="${esc(author.avatar)}" alt="">` : `<span>${esc((author.fullName || 'N').charAt(0))}</span>`}<b>${esc(author.fullName || 'Practitioner')}</b></div>${media}${story.caption ? `<p>${esc(story.caption)}</p>` : ''}</div>`;
+  overlay.style.display = 'flex';
+  overlay.querySelector('[data-close]').onclick = () => { overlay.style.display = 'none'; };
+}
+
 function openComposer() {
   requireLogin();
   let overlay = document.getElementById('nwsb-live-composer');
   if (overlay) { overlay.style.display = 'flex'; return; }
   overlay = document.createElement('div'); overlay.id = 'nwsb-live-composer'; overlay.className = 'nwsb-live-composer-overlay';
-  overlay.innerHTML = `<form class="nwsb-live-composer-card"><button type="button" class="nwsb-live-profile-close" data-close>×</button><h2>New NowssB post</h2><input name="media" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" required><textarea name="caption" maxlength="${MAX_CAPTION}" placeholder="Share your practice…"></textarea><input name="location" maxlength="120" placeholder="Add location (optional)"><button class="nwsb-live-submit" type="submit">Share to Connect</button><p class="nwsb-live-form-note">Images and videos up to 8 MB. Your post will be visible to signed-in Connect members.</p></form>`;
+  overlay.innerHTML = `<form class="nwsb-live-composer-card"><button type="button" class="nwsb-live-profile-close" data-close>×</button><h2>Create on NowssB Connect</h2><label>Content type<select name="contentType"><option value="post">Post</option><option value="reel">Reel</option><option value="story">Story · 24 hours</option></select></label><input name="media" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" required><textarea name="caption" maxlength="${MAX_CAPTION}" placeholder="Share your practice…"></textarea><input name="location" maxlength="120" placeholder="Add location (optional)"><button class="nwsb-live-submit" type="submit">Share to Connect</button><p class="nwsb-live-form-note">Images and videos up to 8 MB. Reels are persistent video posts; Stories expire after 24 hours.</p></form>`;
   document.body.appendChild(overlay); overlay.style.display = 'flex';
+  const form = overlay.querySelector('form');
+  const typeSelect = form.querySelector('[name=contentType]');
+  const mediaInput = form.querySelector('[name=media]');
+  typeSelect.onchange = () => { mediaInput.accept = typeSelect.value === 'reel' ? 'video/mp4,video/webm' : 'image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm'; };
   overlay.querySelector('[data-close]').onclick = () => { overlay.style.display = 'none'; };
-  overlay.querySelector('form').onsubmit = async (event) => {
+  form.onsubmit = async (event) => {
     event.preventDefault();
-    const form = event.currentTarget; const file = form.media.files[0]; const button = form.querySelector('button[type=submit]');
+    const file = mediaInput.files[0]; const button = form.querySelector('button[type=submit]');
     if (!file) return;
+    const contentType = typeSelect.value;
+    if (contentType === 'reel' && !file.type.startsWith('video/')) { alert('Choose a video for a Reel.'); return; }
     button.disabled = true; button.textContent = 'Uploading…';
     try {
-      const uploaded = await uploadMedia(file, 'post');
+      const uploaded = await uploadMedia(file, contentType);
       const user = auth.currentUser; const u = window._userDataCache || {};
-      await addDoc(collection(db(), 'posts'), { uid: currentUid(), displayName: u.displayName || user.displayName || 'NowssB Practitioner', photoURL: u.photoURL || user.photoURL || '', mediaUrl: uploaded.url, mediaType: file.type, caption: form.caption.value.trim(), location: form.location.value.trim(), visibility: 'public', likeCount: 0, commentCount: 0, createdAt: serverTimestamp() });
+      const base = { uid: currentUid(), displayName: u.displayName || user.displayName || 'NowssB Practitioner', photoURL: u.photoURL || user.photoURL || '', mediaUrl: uploaded.url, mediaType: file.type, caption: form.caption.value.trim(), location: form.location.value.trim(), visibility: 'public', createdAt: serverTimestamp() };
+      if (contentType === 'reel') {
+        await addDoc(collection(db(), 'reels'), { ...base, likes: 0, likeCount: 0 });
+      } else if (contentType === 'story') {
+        await addDoc(collection(db(), 'stories'), { ...base, expiresAt: Timestamp.fromMillis(Date.now() + 24 * 60 * 60 * 1000) });
+      } else {
+        await addDoc(collection(db(), 'posts'), { ...base, likeCount: 0, commentCount: 0 });
+      }
       form.reset(); overlay.style.display = 'none'; await refreshFeed();
     } catch (error) { button.disabled = false; button.textContent = 'Share to Connect'; alert(error.message); }
   };
 }
 
 async function refreshFeed() {
-  return Promise.resolve().then(loadProfiles).then(loadPosts).then(renderFeed);
+  await loadProfiles();
+  await loadPosts();
+  await loadStories().catch((error) => { console.warn('NowssB Connect stories:', error); stories = []; });
+  renderFeed();
 }
 
 let liveChatPeer = null;
@@ -494,6 +597,12 @@ function patchLegacyUI() {
   window.IG.openFeed = function () { refreshFeed().catch((e) => console.warn('Connect feed:', e)); };
   window.IG.openExplore = function () { openPeople().catch((e) => console.warn('Connect people:', e)); };
   window.IG.search = function (value) { renderPeople(value); };
+  window.IG.socialNav = function (which) {
+    if (which === 'feed') return openReels().catch((e) => alert(e.message));
+    if (which === 'profile' || which === 'me') return openProfile(currentUid()).catch((e) => alert(e.message));
+    if (which === 'chat') return openInbox().catch((e) => alert(e.message));
+    if (which === 'home') { document.querySelectorAll('.sub-screen.open').forEach((item) => item.classList.remove('open')); if (typeof goTo === 'function') goTo('home'); }
+  };
   window.IG.message = function (id) { message(String(id)).catch((e) => alert(e.message)); };
   window.IG.openProfile = function (id) { openProfile(typeof id === 'object' ? (id.uid || id.id) : String(id)).catch((e) => alert(e.message)); };
   window.IG.closeProfile = closeProfile;
@@ -519,7 +628,7 @@ function patchLegacyUI() {
   };
 }
 
-window.NWSBConnect = { refreshFeed, loadProfiles, loadPosts, openComposer, openProfile, editProfile, closeProfile, toggleFollow, message, call, likePost, commentPost, focusComment, sharePost, openInbox, openPost: (id) => { const p = posts.find((x) => x.id === id); if (p) window.open(p.mediaUrl, '_blank', 'noopener'); } };
+window.NWSBConnect = { refreshFeed, loadProfiles, loadPosts, loadReels, loadStories, openComposer, openProfile, editProfile, closeProfile, toggleFollow, message, call, likePost, commentPost, focusComment, sharePost, openInbox, openReels, openStory, openPost: (id) => { const p = posts.find((x) => x.id === id); if (p) window.open(p.mediaUrl, '_blank', 'noopener'); } };
 window.NWSBConnectReady = true;
 
 function boot() {

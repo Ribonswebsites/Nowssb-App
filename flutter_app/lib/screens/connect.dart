@@ -4,6 +4,7 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 
 import '../services/connect_service.dart';
 import 'connect_call.dart';
@@ -80,7 +81,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   Widget _tabs() {
-    const labels = ['Feed', 'People', 'Chats'];
+    const labels = ['Feed', 'People', 'Reels', 'Chats'];
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Row(
@@ -120,8 +121,39 @@ class _ConnectScreenState extends State<ConnectScreen> {
 
   Widget _body() {
     if (_tab == 1) return _people();
-    if (_tab == 2) return _chats();
+    if (_tab == 2) return _reels();
+    if (_tab == 3) return _chats();
     return _feed();
+  }
+
+  Widget _reels() {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: _service.reels(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) return _errorCard(snapshot.error!);
+        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+        final docs = [...snapshot.data!.docs]..sort((a, b) => _time(b).compareTo(_time(a)));
+        if (docs.isEmpty) return _emptyCard('No public Reels yet', 'Share a short NowssB video from the Create button.');
+        return Column(children: [for (final doc in docs) _reelCard(doc)]);
+      },
+    );
+  }
+
+  Widget _reelCard(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data() ?? <String, dynamic>{};
+    final name = data['displayName']?.toString() ?? 'NowssB Practitioner';
+    final caption = data['caption']?.toString() ?? '';
+    final mediaUrl = data['mediaUrl']?.toString() ?? '';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x1FFFFFFF))),
+      clipBehavior: Clip.antiAlias,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.all(14), child: Row(children: [_avatar(data['photoURL']?.toString(), name, 42), const SizedBox(width: 10), Expanded(child: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))), const Icon(Icons.movie_outlined, color: NwsbColors.goldLight)])),
+        if (mediaUrl.isNotEmpty) ConnectVideo(url: mediaUrl),
+        if (caption.isNotEmpty) Padding(padding: const EdgeInsets.fromLTRB(14, 10, 14, 14), child: Text(caption, style: const TextStyle(color: Color(0xDDFFFFFF), height: 1.45))),
+      ]),
+    );
   }
 
   Widget _feed() {
@@ -381,6 +413,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
     final caption = TextEditingController();
     final location = TextEditingController();
     XFile? media;
+    String contentType = 'post';
     final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -394,8 +427,21 @@ class _ConnectScreenState extends State<ConnectScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('New NowssB post', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                  const Text('Create on NowssB Connect', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: contentType,
+                    dropdownColor: NwsbColors.deep,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(labelText: 'Content type'),
+                    items: const [
+                      DropdownMenuItem(value: 'post', child: Text('Post')),
+                      DropdownMenuItem(value: 'reel', child: Text('Reel · video')),
+                      DropdownMenuItem(value: 'story', child: Text('Story · 24 hours')),
+                    ],
+                    onChanged: (value) => setSheetState(() => contentType = value ?? 'post'),
+                  ),
+                  const SizedBox(height: 10),
                   TextField(controller: caption, maxLength: 2200, maxLines: 4, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Share your practice…', hintStyle: TextStyle(color: Color(0x66FFFFFF)))),
                   const SizedBox(height: 8),
                   TextField(controller: location, maxLength: 120, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Location (optional)', hintStyle: TextStyle(color: Color(0x66FFFFFF)))),
@@ -437,11 +483,81 @@ class _ConnectScreenState extends State<ConnectScreen> {
     location.dispose();
     if (result != true) return;
     try {
-      await _service.createPost(caption: captionValue, media: media, location: locationValue);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Your NowssB post was shared.')));
+      if (media == null) throw StateError('Choose an image or video first.');
+      if (contentType == 'reel') {
+        await _service.createReel(caption: captionValue, media: media!, location: locationValue);
+      } else if (contentType == 'story') {
+        await _service.createStory(caption: captionValue, media: media!, location: locationValue);
+      } else {
+        await _service.createPost(caption: captionValue, media: media, location: locationValue);
+      }
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(contentType == 'reel' ? 'Your NowssB Reel was shared.' : contentType == 'story' ? 'Your NowssB Story was shared for 24 hours.' : 'Your NowssB post was shared.')));
     } catch (error) {
       _showError(error);
     }
+  }
+}
+
+class ConnectVideo extends StatefulWidget {
+  const ConnectVideo({super.key, required this.url});
+  final String url;
+
+  @override
+  State<ConnectVideo> createState() => _ConnectVideoState();
+}
+
+class _ConnectVideoState extends State<ConnectVideo> {
+  late final VideoPlayerController _controller;
+  late final Future<void> _ready;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _ready = _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    if (!_controller.value.isInitialized) return;
+    setState(() {
+      if (_controller.value.isPlaying) {
+        _controller.pause();
+      } else {
+        _controller.play();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _ready,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done || !_controller.value.isInitialized) {
+          return Container(height: 260, color: const Color(0xFF101018), alignment: Alignment.center, child: const CircularProgressIndicator(color: NwsbColors.goldLight));
+        }
+        return GestureDetector(
+          onTap: _toggle,
+          child: AspectRatio(
+            aspectRatio: _controller.value.aspectRatio == 0 ? 1 : _controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                VideoPlayer(_controller),
+                if (!_controller.value.isPlaying) const Icon(Icons.play_circle_outline, size: 60, color: NwsbColors.goldLight),
+                Positioned(left: 0, right: 0, bottom: 0, child: VideoProgressIndicator(_controller, allowScrubbing: true, colors: const VideoProgressColors(playedColor: NwsbColors.goldLight))),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 

@@ -48,14 +48,20 @@ try {
 async function saveUser(user) {
   const ref  = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
+  let existingPublic = {};
+  try {
+    const publicSnap = await getDoc(doc(db, 'publicProfiles', user.uid));
+    existingPublic = publicSnap.data() || {};
+  } catch (e) {}
+  const fallbackUsername = (user.displayName || 'practitioner').toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\\.|\\.$/g, '') || 'practitioner';
   const publicProfile = {
     uid: user.uid,
-    displayName: user.displayName || 'NowssB Practitioner',
-    username: (user.displayName || 'practitioner').toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\\.|\\.$/g, ''),
-    photoURL: user.photoURL || '',
-    bio: '',
-    category: 'Practitioner',
-    profileVisibility: 'public',
+    displayName: existingPublic.displayName || user.displayName || 'NowssB Practitioner',
+    username: existingPublic.username || fallbackUsername,
+    photoURL: existingPublic.photoURL || user.photoURL || '',
+    bio: existingPublic.bio || '',
+    category: existingPublic.category || 'Practitioner',
+    profileVisibility: existingPublic.profileVisibility || 'public',
     updatedAt: serverTimestamp()
   };
   // Keep a deliberately small public projection for Connect discovery. Email,
