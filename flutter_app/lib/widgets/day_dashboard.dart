@@ -116,13 +116,13 @@ class _EssentialItem {
 }
 
 class _HelpingItem {
-  const _HelpingItem({required this.icon, required this.title, required this.subtitle, required this.destination, required this.colors});
+  const _HelpingItem({required this.icon, required this.title, required this.subtitle, required this.destination, required this.asset});
 
   final IconData icon;
   final String title;
   final String subtitle;
   final Object destination;
-  final List<Color> colors;
+  final String asset;
 }
 
 class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
@@ -131,6 +131,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   int _streak = 0;
   int _sessions = 0;
   int _words = 0;
+  bool _essentialsExpanded = false;
   Timer? _clock;
 
   static const _essentials = <_EssentialItem>[
@@ -145,14 +146,8 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   ];
 
   static const _helping = <_HelpingItem>[
-    _HelpingItem(icon: Icons.graphic_eq_outlined, title: 'Voice scoring', subtitle: 'Practice and see your sound score', destination: Dest.player, colors: [Color(0xFF55318E), Color(0xFFAD75D0)]),
-    _HelpingItem(icon: Icons.auto_awesome_outlined, title: 'Word Science', subtitle: 'Meanings, origins and sound', destination: Dest.library, colors: [Color(0xFFEF62AC), Color(0xFFFF9BD2)]),
-    _HelpingItem(icon: Icons.nightlight_round, title: 'Sleep Music', subtitle: 'Settle into a quieter frequency', destination: Dest.sound, colors: [Color(0xFF243B73), Color(0xFF70A0D8)]),
-    _HelpingItem(icon: Icons.spa_outlined, title: 'Healing Journey', subtitle: 'Choose a body, organ or mind path', destination: Dest.healing, colors: [Color(0xFF218C7A), Color(0xFF7AD7B2)]),
-    _HelpingItem(icon: Icons.repeat_rounded, title: 'Daily Routines', subtitle: 'Five slots to keep your practice moving', destination: Dest.routines, colors: [Color(0xFFE58C3A), Color(0xFFFFCB68)]),
-    _HelpingItem(icon: Icons.groups_outlined, title: 'Connect', subtitle: 'People, chat and the NowssB feed', destination: Dest.connect, colors: [Color(0xFFB84A4A), Color(0xFFFF9A79)]),
-    _HelpingItem(icon: Icons.local_mall_outlined, title: 'The Store', subtitle: 'Words, meanings and sound tools', destination: Dest.store, colors: [Color(0xFF3A6D8C), Color(0xFF83C9D9)]),
-    _HelpingItem(icon: Icons.auto_awesome, title: 'Fashion Plus', subtitle: 'A moving practice for the senses', destination: Dest.fashionPlus, colors: [Color(0xFF7B3F98), Color(0xFFE27BBD)]),
+    _HelpingItem(icon: Icons.graphic_eq_outlined, title: 'Study Beats', subtitle: 'Focus Music', destination: Dest.sound, asset: 'assets/media/image/essentials-study-beats.png'),
+    _HelpingItem(icon: Icons.nightlight_round, title: 'Pink Noise', subtitle: 'Sleep Music', destination: Dest.sound, asset: 'assets/media/image/essentials-pink-noise.png'),
   ];
 
   @override
@@ -394,12 +389,11 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   Widget _essentialsSection(BuildContext context) {
     final headingColor = widget.fashion ? Colors.white : NwsbColors.ink;
-    final visible = _essentials;
+    final visible = _essentialsExpanded ? _essentials : _essentials.take(3).toList(growable: false);
     final shell = widget.fashion
         ? _glass(child: _essentialStack(context, visible), padding: const EdgeInsets.all(14))
         : NeuCard(radius: 26, padding: const EdgeInsets.all(14), child: _essentialStack(context, visible));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      _essentialsWave(),
       Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -429,8 +423,21 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
       ),
       const SizedBox(height: 14),
       shell,
-      const SizedBox(height: 18),
-      _essentialsGuide(context),
+      if (_essentials.length > 3)
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: TextButton.icon(
+            onPressed: () => setState(() => _essentialsExpanded = !_essentialsExpanded),
+            icon: Icon(_essentialsExpanded ? Icons.expand_less : Icons.expand_more, size: 19),
+            label: Text(_essentialsExpanded ? 'Show less' : 'See more'),
+            style: TextButton.styleFrom(
+              foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink,
+              backgroundColor: widget.fashion ? const Color(0x221FFFFFF) : const Color(0xFFF4F2EE),
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
+            ),
+          ),
+        ),
       const SizedBox(height: 30),
       Row(
         children: [
@@ -465,62 +472,11 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     ]);
   }
 
-  Widget _essentialsWave() => Container(
-        height: 72,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(80)),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: widget.fashion
-                ? const [Color(0x3D6A37A2), Color(0xB30A081A)]
-                : const [Color(0xFF5732A8), Color(0xFFF7F5F2)],
-          ),
-        ),
-      );
-
-  Widget _essentialsGuide(BuildContext context) {
-    final guide = Container(
-      constraints: const BoxConstraints(minHeight: 116),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 14, offset: Offset(0, 8))],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(color: const Color(0xFF171717), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x24FFFFFF))),
-            child: const Icon(Icons.tune, color: Colors.white, size: 27),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Help & Coach', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
-                SizedBox(height: 6),
-                Text('Get app support or a personal practice guide', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12, height: 1.35)),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0x3DFFFFFF))), child: const Icon(Icons.arrow_forward, color: Colors.white, size: 20)),
-        ],
-      ),
-    );
-    return Semantics(button: true, label: 'Help and Coach', child: InkWell(onTap: () => Dest.open(context, Dest.assistant), borderRadius: BorderRadius.circular(24), child: guide));
-  }
-
   Widget _essentialStack(BuildContext context, List<_EssentialItem> items) => Stack(
         children: [
           Positioned(
             left: 9,
-            top: items.isNotEmpty && items.first.featured ? 184 : 26,
+            top: items.isNotEmpty && items.first.featured ? 214 : 26,
             bottom: 28,
             child: Container(
               width: 3,
@@ -530,9 +486,9 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
               ),
             ),
           ),
-          Positioned(left: 0, top: 12, child: _railDot(active: true)),
+          Positioned(left: 0, top: 14, child: _railDot(active: true)),
           Positioned(left: 2, top: 236, child: _railDot()),
-          Positioned(left: 2, top: 388, child: _railDot()),
+          Positioned(left: 2, top: 318, child: _railDot()),
           Padding(
             padding: const EdgeInsets.only(left: 28),
             child: Column(
@@ -561,7 +517,43 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   Widget _essentialRow(BuildContext context, _EssentialItem item) {
     if (item.featured) {
-      final featured = Container(constraints: const BoxConstraints(minHeight: 182), padding: const EdgeInsets.fromLTRB(24, 20, 24, 18), decoration: BoxDecoration(borderRadius: BorderRadius.circular(23), gradient: const LinearGradient(colors: [Color(0xFFFFD000), Color(0xFFFF8B27)]), boxShadow: const [BoxShadow(color: Color(0x26775312), blurRadius: 12, offset: Offset(0, 7))]), child: Stack(children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3), decoration: BoxDecoration(color: Colors.white.withOpacity(.70), borderRadius: BorderRadius.circular(99)), child: const Text('NOWSSB · 543', style: TextStyle(color: Color(0xFF3A3024), fontSize: 11, fontWeight: FontWeight.w800))), const SizedBox(height: 13), const Text('Today’s word ritual', style: TextStyle(color: Color(0xFF28252A), fontSize: 20, fontWeight: FontWeight.w800)), const SizedBox(height: 9), Text(item.subtitle, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 13)), const SizedBox(height: 9), Text(item.meta, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 12))]), Positioned(right: 0, top: 0, child: Container(width: 38, height: 38, decoration: BoxDecoration(color: Colors.white.withOpacity(.70), shape: BoxShape.circle), child: const Icon(Icons.graphic_eq, color: Color(0xFF3C3424), size: 19))) ]));
+      final featured = ClipRRect(
+        borderRadius: BorderRadius.circular(23),
+        child: SizedBox(
+          height: 210,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset('assets/media/image/essentials-featured-ritual.png', fit: BoxFit.cover),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xB8FFD000), Color(0x36FFB51B), Color(0x08FF8121)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3), decoration: BoxDecoration(color: Colors.white.withOpacity(.78), borderRadius: BorderRadius.circular(99)), child: const Text('NOWSSB · 543', style: TextStyle(color: Color(0xFF3A3024), fontSize: 11, fontWeight: FontWeight.w800))),
+                    const SizedBox(height: 13),
+                    const Text('Today’s word ritual', style: TextStyle(color: Color(0xFF28252A), fontSize: 20, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 9),
+                    Text(item.subtitle, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 13)),
+                    const SizedBox(height: 9),
+                    Text(item.meta, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 12)),
+                  ],
+                ),
+              ),
+              Positioned(right: 18, top: 18, child: Container(width: 40, height: 40, decoration: BoxDecoration(color: Colors.white.withOpacity(.78), shape: BoxShape.circle), child: const Icon(Icons.graphic_eq, color: Color(0xFF3C3424), size: 19))),
+            ],
+          ),
+        ),
+      );
       return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(23), child: featured));
     }
     final text = widget.fashion ? Colors.white : const Color(0xFF4C4A52);
@@ -588,10 +580,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
             children: [
               SizedBox(
                 height: 124,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(gradient: LinearGradient(colors: item.colors)),
-                  child: Icon(item.icon, color: Colors.white, size: 40),
-                ),
+                child: Image.asset(item.asset, fit: BoxFit.cover),
               ),
               Expanded(
                 child: Padding(

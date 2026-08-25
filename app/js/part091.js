@@ -1,7 +1,6 @@
 /*
- * NowssB Your essentials — faithful reference layout.
- * The visual hierarchy follows the supplied screen; labels and destinations are
- * NowssB features, not generic placeholder content.
+ * NowssB Your essentials — reference-aligned daily practice section.
+ * The first three paths stay visible; See more reveals the remaining app paths.
  */
 (function () {
   'use strict';
@@ -17,14 +16,8 @@
     { id: 'fashion-plus', icon: 'science', title: 'Fashion Plus', sub: 'Explore the moving visual practice', meta: 'Open', action: 'fashion-plus', favorite: false }
   ];
   var HELP = [
-    { icon: 'sound', title: 'Voice scoring', sub: 'Practice and see your sound score', action: 'practice', art: 'violet' },
-    { icon: 'science', title: 'Word Science', sub: 'Meanings, origins and sound', action: 'word-science', art: 'pink' },
-    { icon: 'sound', title: 'Sleep Music', sub: 'Settle into a quieter frequency', action: 'sound-library', art: 'blue' },
-    { icon: 'science', title: 'Healing Journey', sub: 'Choose a body, organ or mind path', action: 'health-journey', art: 'mint' },
-    { icon: 'sound', title: 'Daily Routines', sub: 'Five slots to keep your practice moving', action: 'routines', art: 'amber' },
-    { icon: 'lock', title: 'Connect', sub: 'People, chat and the NowssB feed', action: 'social', art: 'coral' },
-    { icon: 'science', title: 'The Store', sub: 'Words, meanings and sound tools', action: 'nowssb-store', art: 'cyan' },
-    { icon: 'science', title: 'Fashion Plus', sub: 'A moving practice for the senses', action: 'fashion-plus', art: 'violet' }
+    { icon: 'sound', title: 'Study Beats', sub: 'Focus Music', action: 'sound-library', art: 'study-beats', image: 'assets/media/image/essentials-study-beats.png' },
+    { icon: 'sound', title: 'Pink Noise', sub: 'Sleep Music', action: 'sound-library', art: 'pink-noise', image: 'assets/media/image/essentials-pink-noise.png' }
   ];
 
   function esc(value) { return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
@@ -37,19 +30,18 @@
     };
     return icons[name] || icons.sound;
   }
-  function filterValue(root) { return root.getAttribute('data-essential-filter') || 'recent'; }
   function isExpanded(root) { return root.getAttribute('data-essential-expanded') === 'true'; }
+  function filterValue(root) { return root.getAttribute('data-essential-filter') || 'recent'; }
   function filteredItems(filter) { return filter === 'favorite' ? ITEMS.filter(function (item) { return item.favorite; }) : ITEMS; }
   function visibleRows(root, items) { return isExpanded(root) ? items : items.slice(0, 3); }
   function row(item) {
-    if (item.featured) return '<button type="button" class="nwsb-essential-featured-card" data-essential-action="' + esc(item.action) + '"><span class="nwsb-essential-badge">NOWSSB · 543</span><span class="nwsb-essential-featured-icon">' + icon('sound') + '</span><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small><em>' + esc(item.meta) + '</em><span class="nwsb-essential-featured-art" aria-hidden="true"></span></button>';
+    if (item.featured) return '<button type="button" class="nwsb-essential-featured-card" data-essential-action="' + esc(item.action) + '"><span class="nwsb-essential-badge">NOWSSB · 543</span><span class="nwsb-essential-featured-icon">' + icon('sound') + '</span><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small><em>' + esc(item.meta) + '</em></button>';
     return '<button type="button" class="nwsb-essential-row" data-essential-action="' + esc(item.action) + '"><span class="nwsb-essential-row-icon">' + icon(item.icon) + '</span><span class="nwsb-essential-row-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span><span class="nwsb-essential-meta">' + esc(item.meta) + '</span><span class="nwsb-essential-arrow" aria-hidden="true">›</span></button>';
   }
-  function helpCard(item) { return '<button type="button" class="nwsb-help-card nwsb-help-' + item.art + '" data-essential-action="' + esc(item.action) + '"><span class="nwsb-help-art">' + icon(item.icon) + '</span><span class="nwsb-help-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span></button>'; }
+  function helpCard(item) { return '<button type="button" class="nwsb-help-card nwsb-help-' + item.art + '" data-essential-action="' + esc(item.action) + '"><span class="nwsb-help-art"><img src="' + esc(item.image) + '" alt="" loading="lazy" decoding="async"> </span><span class="nwsb-help-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span></button>'; }
   function render(root, filter) {
     var list = root.querySelector('[data-essential-list]'); if (!list) return;
     root.setAttribute('data-essential-filter', filter);
-    root.querySelectorAll('[data-essential-filter-button]').forEach(function (button) { button.classList.toggle('is-active', button.getAttribute('data-essential-filter-button') === filter); });
     var items = filteredItems(filter);
     list.innerHTML = visibleRows(root, items).map(row).join('');
     var expand = root.querySelector('[data-essential-expand]');
@@ -57,7 +49,7 @@
       var needsExpand = items.length > 3;
       expand.hidden = !needsExpand;
       expand.setAttribute('aria-expanded', isExpanded(root) ? 'true' : 'false');
-      expand.querySelector('span').textContent = isExpanded(root) ? 'Show fewer' : 'See all essentials';
+      expand.querySelector('span').textContent = isExpanded(root) ? 'Show less' : 'See more';
       expand.querySelector('b').textContent = isExpanded(root) ? '⌃' : '⌄';
     }
     bindActions(root);
@@ -67,24 +59,19 @@
     return '<section class="nwsb-essentials nwsb-essentials-reference nwsb-essentials-' + (fashion ? 'fashion' : 'normal') + '" data-essentials-mode="' + mode + '" data-essential-filter="recent">' +
       '<div class="nwsb-essentials-body">' +
         '<div class="nwsb-essentials-heading"><span class="nwsb-essentials-heading-icon" aria-hidden="true">' + icon('sliders') + '</span><div><div class="nwsb-essentials-eyebrow">Your daily practice</div><h2>Your essentials</h2></div></div>' +
-        '<div class="nwsb-essentials-shell"><div class="nwsb-essential-list" data-essential-list></div><button type="button" class="nwsb-essential-expand" data-essential-expand aria-expanded="false"><span>See all essentials</span><b>⌄</b></button></div>' +
-        '<button type="button" class="nwsb-essentials-guide" data-essential-guide><span class="nwsb-essentials-guide-icon">' + icon('sliders') + '</span><span class="nwsb-essentials-guide-copy"><strong>Find Your Way Around</strong><small>Every screen in the app, and what each one is for</small></span><span class="nwsb-essentials-guide-arrow">›</span></button>' +
-        '<div class="nwsb-help-heading"><h3>What’s helping others</h3><button type="button" data-essential-help-view aria-label="Open helpful NowssB features">›</button></div>' +
+        '<div class="nwsb-essentials-shell"><div class="nwsb-essential-list" data-essential-list></div><button type="button" class="nwsb-essential-expand" data-essential-expand aria-expanded="false"><span>See more</span><b>⌄</b></button></div>' +
+        '<div class="nwsb-help-heading"><h3>What’s helping others</h3><button type="button" data-essential-help-view aria-label="See more helpful NowssB features">›</button></div>' +
         '<div class="nwsb-help-rail">' + HELP.map(helpCard).join('') + '</div>' +
       '</div>' +
     '</section>';
   }
   function run(action) { if (action === 'practice' && typeof openPracticeIntro === 'function') return openPracticeIntro(); if (typeof openSub === 'function') return openSub(action); }
-  function bindActions(root) {
-    root.querySelectorAll('[data-essential-action]').forEach(function (el) { if (el.__bound) return; el.__bound = true; el.addEventListener('click', function () { run(el.getAttribute('data-essential-action')); }); });
-  }
+  function bindActions(root) { root.querySelectorAll('[data-essential-action]').forEach(function (el) { if (el.__bound) return; el.__bound = true; el.addEventListener('click', function () { run(el.getAttribute('data-essential-action')); }); }); }
   function bind(root) {
     if (!root || root.__essentialsBound) return;
     root.__essentialsBound = true;
-    root.querySelectorAll('[data-essential-filter-button]').forEach(function (button) { button.addEventListener('click', function () { root.setAttribute('data-essential-expanded', 'false'); render(root, button.getAttribute('data-essential-filter-button')); }); });
     root.querySelectorAll('[data-essential-expand]').forEach(function (button) { button.addEventListener('click', function () { root.setAttribute('data-essential-expanded', isExpanded(root) ? 'false' : 'true'); render(root, filterValue(root)); }); });
     root.querySelectorAll('[data-essential-help-view]').forEach(function (button) { button.addEventListener('click', function () { run('word-science'); }); });
-    root.querySelectorAll('[data-essential-guide]').forEach(function (button) { button.addEventListener('click', function () { run('my-progress'); }); });
     root.setAttribute('data-essential-expanded', 'false');
     render(root, 'recent');
   }
