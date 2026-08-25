@@ -1,5 +1,5 @@
 // Generated from assets/media-manifest.json. Do not edit by hand.
-const Map<String, String> kNowssbImageAssets = <String>{
+const Map<String, String> kNowssbImageAssets = <String, String>{
   "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fba7611b6670d59300ac7f94e88c80e85295c3cc50364c31b03b09866c67fef3.jpg": "assets/media/image/00ac7f94e88c80e85295c3cc50364c31b03b09866c67fef3-c3b5d036.jpg",
   "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8f24c24937a4499500da8a08f9ab87781a15ecca02ac3c9069ece74fc44eba30.jpg": "assets/media/image/00da8a08f9ab87781a15ecca02ac3c9069ece74fc44eba30-76095bee.jpg",
   "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/669d6c9cb31ffa5e00dba04d283ed1bcb38737b20377c9d0b1b0a38916a63d2c.webp": "assets/media/image/00dba04d283ed1bcb38737b20377c9d0b1b0a38916a63d2c-aa29336e.webp",
