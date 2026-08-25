@@ -43,6 +43,9 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   VideoPlayerController? _c;
   Timer? _ceiling;
+  Timer? _watchdog;
+  Duration _lastPosition = Duration.zero;
+  DateTime _lastProgressAt = DateTime.now();
   bool _leaving = false;
 
   static const _asset = 'assets/video/start-animation.mp4';
@@ -55,14 +58,14 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
     _start();
-    // Only until the real duration is known — see _start.
-    _ceiling = Timer(const Duration(seconds: 20), _leave);
+    // Hard escape hatch for a device/codec that never opens the clip.
+    _ceiling = Timer(const Duration(seconds: 12), _leave);
   }
 
   Future<void> _start() async {
     VideoPlayerController? c = VideoPlayerController.asset(_asset);
     try {
-      await c.initialize();
+        await c.initialize().timeout(const Duration(seconds: 5));
     } catch (_) {
       try {
         await c.dispose();
@@ -71,7 +74,7 @@ class _SplashState extends State<Splash> {
       for (final url in NwsbCdn.urls(_asset)) {
         final net = VideoPlayerController.networkUrl(Uri.parse(url));
         try {
-          await net.initialize();
+            await net.initialize().timeout(const Duration(seconds: 5));
           c = net;
           break;
         } catch (_) {
@@ -96,15 +99,26 @@ class _SplashState extends State<Splash> {
     await c.setLooping(false);
     await c.setPlaybackSpeed(_speed);
     c.addListener(_watch);
-    await c.play();
+    try {
+      await c.play().timeout(const Duration(seconds: 2));
+    } catch (_) {
+      _leave();
+      return;
+    }
+    _lastPosition = c.value.position;
+    _lastProgressAt = DateTime.now();
+    _watchdog?.cancel();
+    _watchdog = Timer.periodic(const Duration(milliseconds: 500), (_) => _watchPlayback());
 
-    // Now that the clip's length is known, the failsafe becomes its own
-    // running time plus a margin. It can no longer cut the animation short —
-    // it can only catch playback that has stopped without finishing.
+    // Use the clip's own runtime with a small margin, capped so a broken
+    // duration cannot keep the user behind a frozen splash indefinitely.
     _ceiling?.cancel();
     final runtime = c.value.duration.inMilliseconds / _speed;
+    final ceilingMs = runtime.isFinite && runtime > 0
+        ? runtime.round() + 2200
+        : 12000;
     _ceiling = Timer(
-      Duration(milliseconds: runtime.round() + 3000),
+      Duration(milliseconds: ceilingMs.clamp(6000, 12000).toInt()),
       _leave,
     );
 
@@ -115,9 +129,32 @@ class _SplashState extends State<Splash> {
     final c = _c;
     if (c == null || !c.value.isInitialized) return;
     final v = c.value;
+    if (v.position > _lastPosition) {
+      _lastPosition = v.position;
+      _lastProgressAt = DateTime.now();
+    }
     // position >= duration is the honest end. isCompleted alone is not
     // reliable across platforms.
     if (!v.isPlaying && v.position >= v.duration && v.duration > Duration.zero) {
+      _leave();
+    }
+  }
+
+  void _watchPlayback() {
+    final c = _c;
+    if (_leaving || c == null || !c.value.isInitialized) return;
+    final v = c.value;
+    if (v.position > _lastPosition) {
+      _lastPosition = v.position;
+      _lastProgressAt = DateTime.now();
+      return;
+    }
+    if (!v.isPlaying && DateTime.now().difference(_lastProgressAt) > const Duration(milliseconds: 1200)) {
+      try {
+        c.play();
+      } catch (_) {}
+    }
+    if (DateTime.now().difference(_lastProgressAt) > const Duration(seconds: 3)) {
       _leave();
     }
   }
@@ -132,6 +169,7 @@ class _SplashState extends State<Splash> {
   @override
   void dispose() {
     _ceiling?.cancel();
+    _watchdog?.cancel();
     _c?.removeListener(_watch);
     _c?.dispose();
     super.dispose();
