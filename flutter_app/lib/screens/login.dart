@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../data/firebase.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -45,7 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
     final code = error is FirebaseAuthException ? error.code : '';
     final message = switch (code) {
-      'auth/invalid-credential' || 'auth/wrong-password' =>
+      'auth/invalid-credential' ||
+      'auth/wrong-password' =>
         'That email or password is not correct.',
       'auth/user-not-found' => 'No NowssB account exists for that email yet.',
       'auth/email-already-in-use' =>
@@ -75,7 +77,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _runAuth(Future<void> Function() action) async {
     if (_busy) return;
     if (!NwsbFirebase.ready) {
-      _setError('NowssB sign-in is still starting. Please try again in a moment.');
+      _setError(
+          'NowssB sign-in is still starting. Please try again in a moment.');
       return;
     }
     setState(() {
@@ -130,7 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = 'Enter an email and password to create an account.');
+      setState(
+          () => _error = 'Enter an email and password to create an account.');
       return;
     }
     if (password.length < 6) {
@@ -138,7 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     await _runAuth(() async {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
     });
   }
 
@@ -234,7 +239,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final phoneCodeSent = _verificationId != null;
     return Scaffold(
       backgroundColor: NwsbColors.deep,
+      resizeToAvoidBottomInset: true,
       body: Stack(
+        fit: StackFit.expand,
         children: [
           const Positioned.fill(
             child: NwsbVideo(
@@ -248,202 +255,234 @@ class _LoginScreenState extends State<LoginScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0x66060C18), Color(0xE6060C18)],
+                  colors: [Color(0x30060C18), Color(0xE8060C18)],
+                  stops: [0, .78],
                 ),
               ),
             ),
           ),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(22, 12, 22, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).maybePop(),
-                    child: const Icon(Icons.arrow_back, color: Colors.white),
-                  ),
-                  const Spacer(),
-                  Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final minHeight = (constraints.maxHeight - 32)
+                    .clamp(0.0, double.infinity)
+                    .toDouble();
+                final brandToFormGap =
+                    (constraints.maxHeight * .14).clamp(42.0, 132.0).toDouble();
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(22, 12, 22, 24),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: minHeight),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipOval(
-                          child: Image.asset(
-                            'assets/media/image/logo-disc-8b052034.webp',
-                            width: 56,
-                            height: 56,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).maybePop(),
+                          child: const Padding(
+                            padding: EdgeInsets.all(2),
+                            child: Icon(Icons.arrow_back,
+                                color: Colors.white, size: 30),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 18),
+                        const _LoginBrandLockup(),
+                        SizedBox(height: brandToFormGap),
                         const Text(
-                          'NowssB',
+                          'Welcome',
                           style: TextStyle(
-                            fontSize: 15,
-                            letterSpacing: 4,
-                            color: NwsbColors.gold,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 36,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.08,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         const Text(
-                          'Natural Origin of Word Science',
-                          textAlign: TextAlign.center,
+                          'Sign in to keep your streak, your words and your path.',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xB3FFFFFF),
-                            letterSpacing: .4,
+                              fontSize: 15,
+                              color: Color(0xC4FFFFFF),
+                              height: 1.45),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            for (var i = 0; i < 3; i++)
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      EdgeInsets.only(right: i == 2 ? 0 : 4),
+                                  child: GestureDetector(
+                                    onTap: _busy
+                                        ? null
+                                        : () => setState(() {
+                                              _tab = i;
+                                              _clearError();
+                                            }),
+                                    child: AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 160),
+                                      height: 44,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: _tab == i
+                                            ? Colors.white
+                                            : const Color(0x241B2230),
+                                        borderRadius: BorderRadius.circular(22),
+                                        border: Border.all(
+                                            color: const Color(0x22FFFFFF)),
+                                      ),
+                                      child: Text(
+                                        ['Google', 'Email', 'Phone'][i],
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: _tab == i
+                                              ? NwsbColors.ink
+                                              : Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        if (_tab == 0)
+                          _AuthButton(
+                            label:
+                                _busy ? 'Connecting…' : 'Continue with Google',
+                            leading: const _GoogleGlyph(),
+                            onTap: _busy ? null : _signInWithGoogle,
+                          )
+                        else if (_tab == 1) ...[
+                          TextField(
+                            controller: _emailController,
+                            style: const TextStyle(color: Colors.white),
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (_) => _clearError(),
+                            decoration: _inputDecoration('Email'),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            style: const TextStyle(color: Colors.white),
+                            onChanged: (_) => _clearError(),
+                            decoration: _inputDecoration(
+                              'Password',
+                              suffixIcon: IconButton(
+                                onPressed: () => setState(
+                                    () => _obscurePassword = !_obscurePassword),
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: const Color(0x99FFFFFF),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          _AuthButton(
+                            label: _busy ? 'Signing in…' : 'Sign in',
+                            onTap: _busy ? null : _signInWithEmail,
+                          ),
+                          TextButton(
+                            onPressed: _busy ? null : _createEmailAccount,
+                            child: const Text('Create a new NowssB account',
+                                style: TextStyle(color: NwsbColors.gold)),
+                          ),
+                        ] else ...[
+                          TextField(
+                            controller: _phoneController,
+                            style: const TextStyle(color: Colors.white),
+                            keyboardType: TextInputType.phone,
+                            onChanged: (_) => _clearError(),
+                            decoration: _inputDecoration('+91 98765 43210'),
+                          ),
+                          if (phoneCodeSent) ...[
+                            const SizedBox(height: 10),
+                            TextField(
+                              controller: _codeController,
+                              style: const TextStyle(color: Colors.white),
+                              keyboardType: TextInputType.number,
+                              maxLength: 6,
+                              decoration:
+                                  _inputDecoration('6-digit verification code'),
+                            ),
+                          ],
+                          const SizedBox(height: 8),
+                          _AuthButton(
+                            label: _busy
+                                ? 'Sending…'
+                                : phoneCodeSent
+                                    ? 'Verify code'
+                                    : 'Send code',
+                            onTap: _busy
+                                ? null
+                                : (phoneCodeSent
+                                    ? _verifyPhoneCode
+                                    : _sendPhoneCode),
+                          ),
+                          if (phoneCodeSent)
+                            TextButton(
+                              onPressed: _busy ? null : _sendPhoneCode,
+                              child: const Text('Send a new code',
+                                  style: TextStyle(color: NwsbColors.gold)),
+                            ),
+                        ],
+                        if (_error != null) ...[
+                          const SizedBox(height: 10),
+                          Text(
+                            _error!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: Color(0xFFFFB4AB),
+                                fontSize: 12,
+                                height: 1.35),
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        Center(
+                          child: TextButton(
+                            onPressed: _busy
+                                ? null
+                                : () {
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute<void>(
+                                          builder: (_) => const NavShell()),
+                                    );
+                                  },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 8),
+                              foregroundColor: NwsbColors.gold,
+                            ),
+                            child: const Text(
+                              'Explore without account →',
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        const Center(
+                          child: Text(
+                            'Your account syncs securely across your NowssB devices.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 11, color: Color(0x72FFFFFF)),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 22),
-                  const Text(
-                    'Welcome',
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      height: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Sign in to keep your streak, your words and your path.',
-                    style: TextStyle(fontSize: 14, color: Color(0xB3FFFFFF), height: 1.5),
-                  ),
-                  const SizedBox(height: 22),
-                  Row(
-                    children: [
-                      for (final (i, label) in ['Google', 'Email', 'Phone'].indexed)
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: _busy
-                                ? null
-                                : () => setState(() {
-                                      _tab = i;
-                                      _clearError();
-                                    }),
-                            child: Container(
-                              height: 40,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: _tab == i ? Colors.white : const Color(0x1AFFFFFF),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                label,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: _tab == i ? NwsbColors.ink : Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  if (_tab == 0)
-                    _AuthButton(
-                      label: _busy ? 'Connecting…' : 'Continue with Google',
-                      onTap: _busy ? null : _signInWithGoogle,
-                    )
-                  else if (_tab == 1) ...[
-                    TextField(
-                      controller: _emailController,
-                      style: const TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (_) => _clearError(),
-                      decoration: _inputDecoration('Email'),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      style: const TextStyle(color: Colors.white),
-                      onChanged: (_) => _clearError(),
-                      decoration: _inputDecoration(
-                        'Password',
-                        suffixIcon: IconButton(
-                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                          icon: Icon(
-                            _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                            color: const Color(0x99FFFFFF),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    _AuthButton(
-                      label: _busy ? 'Signing in…' : 'Sign in',
-                      onTap: _busy ? null : _signInWithEmail,
-                    ),
-                    TextButton(
-                      onPressed: _busy ? null : _createEmailAccount,
-                      child: const Text(
-                        'Create a new NowssB account',
-                        style: TextStyle(color: NwsbColors.gold),
-                      ),
-                    ),
-                  ] else ...[
-                    TextField(
-                      controller: _phoneController,
-                      style: const TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.phone,
-                      onChanged: (_) => _clearError(),
-                      decoration: _inputDecoration('+91 98765 43210'),
-                    ),
-                    if (phoneCodeSent) ...[
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: _codeController,
-                        style: const TextStyle(color: Colors.white),
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        decoration: _inputDecoration('6-digit verification code'),
-                      ),
-                    ],
-                    const SizedBox(height: 8),
-                    _AuthButton(
-                      label: _busy
-                          ? 'Sending…'
-                          : phoneCodeSent
-                              ? 'Verify code'
-                              : 'Send code',
-                      onTap: _busy ? null : (phoneCodeSent ? _verifyPhoneCode : _sendPhoneCode),
-                    ),
-                    if (phoneCodeSent)
-                      TextButton(
-                        onPressed: _busy ? null : _sendPhoneCode,
-                        child: const Text(
-                          'Send a new code',
-                          style: TextStyle(color: NwsbColors.gold),
-                        ),
-                      ),
-                  ],
-                  if (_error != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      _error!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 12, height: 1.35),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  const Center(
-                    child: Text(
-                      'Your account syncs securely across your NowssB devices.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Color(0x66FFFFFF)),
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -452,11 +491,72 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+class _LoginBrandLockup extends StatelessWidget {
+  const _LoginBrandLockup();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ClipOval(
+          child: Image.asset(
+            'assets/media/image/logo-disc-8b052034.webp',
+            width: 68,
+            height: 68,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const SizedBox(width: 68, height: 68),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Container(width: 1, height: 52, color: const Color(0x66FFFFFF)),
+        const SizedBox(width: 16),
+        const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'NowssB',
+              style: TextStyle(
+                  fontSize: 34,
+                  height: 1,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white),
+            ),
+            SizedBox(height: 9),
+            Text(
+              'BY NOWSBANSIU',
+              style: TextStyle(
+                  fontSize: 11,
+                  letterSpacing: 2.4,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xB3FFFFFF)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _GoogleGlyph extends StatelessWidget {
+  const _GoogleGlyph();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      'G',
+      style: TextStyle(
+          fontSize: 23, fontWeight: FontWeight.w800, color: Color(0xFF4285F4)),
+    );
+  }
+}
+
 class _AuthButton extends StatelessWidget {
-  const _AuthButton({required this.label, required this.onTap});
+  const _AuthButton({required this.label, required this.onTap, this.leading});
 
   final String label;
   final VoidCallback? onTap;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -467,19 +567,27 @@ class _AuthButton extends StatelessWidget {
         opacity: enabled ? 1 : .55,
         duration: const Duration(milliseconds: 150),
         child: Container(
-          height: 52,
+          height: 58,
           alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 22),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: NwsbColors.ink,
-            ),
+          child: Row(
+            mainAxisAlignment: leading == null
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
+            children: [
+              if (leading != null) ...[leading!, const SizedBox(width: 16)],
+              Text(
+                label,
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: NwsbColors.ink),
+              ),
+            ],
           ),
         ),
       ),
