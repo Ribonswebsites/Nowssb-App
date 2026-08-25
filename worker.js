@@ -122,6 +122,13 @@ const CONNECT_MEDIA_TYPES = new Map([
   ['image/jpeg', 'jpg'], ['image/png', 'png'], ['image/webp', 'webp'],
   ['image/gif', 'gif'], ['video/mp4', 'mp4'], ['video/webm', 'webm'],
   ['audio/webm', 'webm'], ['audio/mpeg', 'mp3'], ['audio/mp4', 'm4a'],
+  ['audio/wav', 'wav'], ['audio/x-wav', 'wav'], ['audio/ogg', 'ogg'],
+  ['audio/flac', 'flac'], ['audio/aac', 'aac'],
+]);
+const CONNECT_MEDIA_EXTENSIONS = new Map([
+  ['jpg', 'image/jpeg'], ['jpeg', 'image/jpeg'], ['png', 'image/png'], ['webp', 'image/webp'], ['gif', 'image/gif'],
+  ['mp4', 'video/mp4'], ['webm', 'video/webm'], ['mp3', 'audio/mpeg'], ['m4a', 'audio/mp4'],
+  ['wav', 'audio/wav'], ['ogg', 'audio/ogg'], ['flac', 'audio/flac'], ['aac', 'audio/aac'],
 ]);
 
 async function connectMediaUpload(request, env, origin) {
@@ -133,8 +140,12 @@ async function connectMediaUpload(request, env, origin) {
   const kind = String(form.get('kind') || 'post').replace(/[^a-z]/g, '').slice(0, 16) || 'post';
   if (!file || typeof file.arrayBuffer !== 'function') return err('A media file is required', 400, origin);
   if (file.size <= 0 || file.size > CONNECT_MEDIA_LIMIT) return err('Media must be between 1 byte and 8 MB', 413, origin);
-  const type = CONNECT_MEDIA_TYPES.has(file.type) ? file.type : '';
-  if (!type) return err('This image or video format is not supported', 415, origin);
+  const declaredType = String(file.type || '').toLowerCase().split(';')[0];
+  const fileExt = String(file.name || '').toLowerCase().split('.').pop();
+  const type = CONNECT_MEDIA_TYPES.has(declaredType)
+    ? declaredType
+    : (CONNECT_MEDIA_EXTENSIONS.get(fileExt) || '');
+  if (!type) return err('This image, video, or audio format is not supported', 415, origin);
   const ext = CONNECT_MEDIA_TYPES.get(type);
   const key = `connect/${claims.sub}/${kind}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
   await env.NWSB_MEDIA.put(key, await file.arrayBuffer(), {
@@ -146,7 +157,7 @@ async function connectMediaUpload(request, env, origin) {
 
 function mediaType(key) {
   const ext = String(key).toLowerCase().split('.').pop();
-  return ({ mp4: 'video/mp4', webm: 'video/webm', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', mp3: 'audio/mpeg', m4a: 'audio/mp4' })[ext] || 'application/octet-stream';
+  return ({ mp4: 'video/mp4', webm: 'video/webm', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', mp3: 'audio/mpeg', m4a: 'audio/mp4', wav: 'audio/wav', ogg: 'audio/ogg', flac: 'audio/flac', aac: 'audio/aac' })[ext] || 'application/octet-stream';
 }
 
 async function r2Media(env, key, origin, request) {

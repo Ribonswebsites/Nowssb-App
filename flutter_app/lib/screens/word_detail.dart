@@ -63,6 +63,20 @@ class WordDetail extends StatelessWidget {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
                     children: [
+                      if (word.img.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 18),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.network(
+                              word.img,
+                              height: 190,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                            ),
+                          ),
+                        ),
                       _Headline(word: word),
                       const SizedBox(height: 18),
                       FilledButton.icon(

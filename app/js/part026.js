@@ -395,15 +395,18 @@ window.msRenderStore = function() {
     cats[cat].forEach(function(m) {
       var isPur = purchasedKeys.indexOf(m.key) !== -1;
       var cached = localStorage.getItem('nwsb_meaning_cache_' + m.key) || '';
+      var cardImg = String(m.img || MS_CARD_IMG).replace(/'/g, "\\'");
+      var cardSub = String(m.sub || m.description || '').replace(/[&<>\"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]; });
       html += '<div class="ms-card' + (isPur ? ' unlocked' : '') + '" style="position:relative;" onclick="' +
         (isPur ? 'window.msShowDetail(\'' + m.key + '\',\'' + m.word + '\')' : 'window.msBuy(\'' + m.key + '\',\'' + m.word + '\',' + m.price + ')') +
         '">' +
-        cardActions(m.key, m.word, m.price, MS_CARD_IMG, isPur) +
-        '<div class="ms-card-img" style="background-image:url(\'' + MS_CARD_IMG + '\')"></div>' +
+        cardActions(m.key, m.word, m.price, cardImg, isPur) +
+        '<div class="ms-card-img" style="background-image:url(\'' + cardImg + '\')"></div>' +
         '<div class="ms-card-overlay"></div>' +
         '<div class="ms-card-body">' +
         '<div class="ms-card-word">' + m.word + '</div>' +
         '<div class="ms-card-root">' + m.root + '</div>' +
+        (cardSub ? '<div class="ms-card-sub" style="margin-top:5px;font-size:11px;line-height:1.35;color:rgba(255,255,255,.62);">' + cardSub + '</div>' : '') +
         (isPur
           ? '<div class="ms-card-unlocked-badge"><svg width="8" height="7" viewBox="0 0 10 9" fill="none"><path d="M1 4L3.5 7L9 1" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/></svg>Unlocked</div>'
           : '<div class="ms-card-price">' + msMoneyLabel(m.price) + '</div>') +

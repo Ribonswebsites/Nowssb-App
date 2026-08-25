@@ -36,6 +36,16 @@ window.MASTER_WORD_LIBRARY = MASTER_WORD_LIBRARY;
 // Active session words — set by routine launch or direct open
 let PRACTICE_WORDS = [...MASTER_WORD_LIBRARY];
 
+/* part073.js mutates MASTER_WORD_LIBRARY when the studio publishes. Keep the
+   active Player session in step as well, without replacing a category/routine
+   selection with unrelated words. */
+window.addEventListener('nwsb-library', () => {
+  const fresh = new Map(MASTER_WORD_LIBRARY.map(w => [w.key || w.word, w]));
+  PRACTICE_WORDS = PRACTICE_WORDS.map(w => fresh.get(w.key || w.word) || fresh.get(w.word) || w);
+  if (!PRACTICE_WORDS.length) PRACTICE_WORDS = [...MASTER_WORD_LIBRARY];
+  if (typeof renderPractice === 'function' && document.getElementById('practiceBody')?.classList.contains('open')) renderPractice();
+});
+
 // ── PER-WORD PLAYER THEME ──
 // Every word gets its own background video + UI accent color, picked
 // deterministically from these pools (same word → same look, different words

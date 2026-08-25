@@ -120,10 +120,24 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 42),
+                      const SizedBox(height: 42),
                     ],
                   ),
                 ),
+                if (w.img.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: Image.network(
+                        w.img,
+                        height: 100,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
                 const Spacer(),
                 Container(
                   width: double.infinity,

@@ -301,6 +301,7 @@
       var cur = ex ? ex.querySelector('.lgp-wa-vid') : null;
       if (cur) { _keepWaVid = cur; if (cur.parentNode) cur.parentNode.removeChild(cur); }
     })();
+    var wordImage = typeof w.img === 'string' ? w.img.trim().replace(/["'()\\]/g, '') : '';
     var visual = th.video
       ? (_keepVid ? '<span class="lgp-video-slot"></span>'
                   : '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + _newVidSrc + '"></video>')
@@ -474,7 +475,7 @@
       '</div>';
 
     body.innerHTML =
-      '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
+      '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + (wordImage || th.img) + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
           /* A white disc with a plain arrow, not the glass sphere. */

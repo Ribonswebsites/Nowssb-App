@@ -84,6 +84,7 @@ class _StoreScreenState extends State<StoreScreen> {
           word: w.word,
           deva: w.deva,
           sub: w.meaning.isNotEmpty ? w.meaning : w.organ,
+          imageUrl: w.img,
           trailing: _Price(w.price),
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => WordDetail(word: w)),
@@ -106,6 +107,7 @@ class _StoreScreenState extends State<StoreScreen> {
           word: m.name,
           deva: '',
           sub: m.sub,
+          imageUrl: m.img,
           trailing: _Price(m.price),
         ),
     ];
@@ -136,8 +138,18 @@ class _StoreScreenState extends State<StoreScreen> {
                   color: const Color(0xFF14141C),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.menu_book,
-                    size: 22, color: NwsbColors.goldLight),
+                child: b.cover.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          b.cover,
+                          width: 52,
+                          height: 68,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Icon(Icons.menu_book, size: 22, color: NwsbColors.goldLight),
+                        ),
+                      )
+                    : const Icon(Icons.menu_book, size: 22, color: NwsbColors.goldLight),
               ),
               const SizedBox(width: 14),
               Expanded(

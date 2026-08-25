@@ -223,6 +223,7 @@ class WordRow extends StatelessWidget {
     required this.sub,
     this.trailing,
     this.onTap,
+    this.imageUrl,
   });
 
   final String word;
@@ -230,6 +231,7 @@ class WordRow extends StatelessWidget {
   final String sub;
   final Widget? trailing;
   final VoidCallback? onTap;
+  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -254,14 +256,26 @@ class WordRow extends StatelessWidget {
                 color: const Color(0xFF14141C),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                deva.isNotEmpty ? deva.characters.first : word.characters.first,
-                style: const TextStyle(
-                  fontSize: 20,
-                  color: NwsbColors.goldLight,
-                  height: 1.2,
-                ),
-              ),
+              child: imageUrl != null && imageUrl!.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        imageUrl!,
+                        width: 46,
+                        height: 46,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Center(
+                          child: Text(
+                            deva.isNotEmpty ? deva.characters.first : word.characters.first,
+                            style: const TextStyle(fontSize: 20, color: NwsbColors.goldLight, height: 1.2),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Text(
+                      deva.isNotEmpty ? deva.characters.first : word.characters.first,
+                      style: const TextStyle(fontSize: 20, color: NwsbColors.goldLight, height: 1.2),
+                    ),
             ),
             const SizedBox(width: 14),
             Expanded(
