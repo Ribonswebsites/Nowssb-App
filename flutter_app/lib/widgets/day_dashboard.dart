@@ -189,7 +189,12 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
       children: [
         focus,
         const SizedBox(height: 24),
-        _heading(context, 'Your practice', 'Your Progress', Dest.profile),
+        _heading(
+          context,
+          widget.fashion ? 'Your practice' : 'Your meditation',
+          widget.fashion ? 'Your Progress' : 'Meditation progress',
+          Dest.profile,
+        ),
         const SizedBox(height: 12),
         progress,
         const SizedBox(height: 24),
@@ -290,40 +295,76 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   }
 
   Widget _heading(BuildContext context, String eyebrow, String title, Object dest) {
+    final normal = !widget.fashion;
     final color = widget.fashion ? Colors.white : NwsbColors.ink;
-    final faint = widget.fashion ? const Color(0xB3E8D5A3) : NwsbColors.inkFaint;
+    final faint = widget.fashion ? const Color(0xB3E8D5A3) : const Color(0xFFA4A7B0);
     final mark = title == 'Up next' ? NwsbMarks.reader : NwsbMarks.sound;
+    final discSize = normal ? 58.0 : 52.0;
+    final icon = title == 'Meditation progress'
+        ? Icon(Icons.track_changes_outlined, size: 28, color: NwsbColors.gold)
+        : title == 'Up next'
+            ? Icon(
+                Icons.calendar_today_outlined,
+                size: normal ? 25 : 21,
+                color: widget.fashion ? const Color(0xFF171326) : NwsbColors.gold,
+              )
+            : NwsbIcon(
+                mark,
+                size: normal ? 27 : 23,
+                color: widget.fashion ? const Color(0xFF171326) : NwsbColors.gold,
+              );
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 52,
-          height: 52,
+          width: discSize,
+          height: discSize,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: widget.fashion ? Colors.white : NwsbColors.surface,
             shape: BoxShape.circle,
             boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
           ),
-          child: Center(
-            child: NwsbIcon(mark, size: 23, color: widget.fashion ? const Color(0xFF171326) : NwsbColors.gold),
-          ),
+          child: Center(child: icon),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: normal ? 15 : 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(eyebrow.toUpperCase(), style: TextStyle(color: faint, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
-              const SizedBox(height: 3),
-              Text(title, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -.4)),
+              Text(
+                eyebrow.toUpperCase(),
+                style: TextStyle(
+                  color: faint,
+                  fontSize: normal ? 12 : 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: normal ? 2.8 : 1.8,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontSize: normal ? 26 : 22,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: normal ? -.9 : -.4,
+                ),
+              ),
             ],
           ),
         ),
         TextButton(
           onPressed: () => Dest.open(context, dest),
-          style: TextButton.styleFrom(foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink, padding: EdgeInsets.zero, minimumSize: const Size(0, 32)),
-          child: const Text('View all  ›', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+          style: TextButton.styleFrom(
+            foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink,
+            padding: EdgeInsets.zero,
+            minimumSize: const Size(0, 32),
+          ),
+          child: Text(
+            'View all  ›',
+            style: TextStyle(fontSize: normal ? 15 : 13, fontWeight: FontWeight.w700),
+          ),
         ),
       ],
     );
@@ -331,56 +372,122 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   Widget _progressCard(BuildContext context) {
     final goal = (_sessions * 10).clamp(0, 100);
-    final children = [
-      _stat(Icons.check_circle_outline, '$_sessions', 'tasks done'),
-      _stat(Icons.timer_outlined, '${_words}m', 'focused time'),
-      _stat(Icons.local_fire_department_outlined, '$_streak', 'day streak'),
-      _stat(Icons.track_changes_outlined, '$goal%', 'goal progress'),
-    ];
+    final children = widget.fashion
+        ? [
+            _stat(Icons.check_circle_outline, '$_sessions', 'tasks done'),
+            _stat(Icons.timer_outlined, '${_words}m', 'focused time'),
+            _stat(Icons.local_fire_department_outlined, '$_streak', 'day streak'),
+            _stat(Icons.track_changes_outlined, '$goal%', 'goal progress'),
+          ]
+        : [
+            _stat(Icons.check_circle_outline, '$_sessions', 'meditation sessions'),
+            _stat(Icons.timer_outlined, '$_words', 'words in practice'),
+            _stat(Icons.local_fire_department_outlined, '$_streak', 'day streak'),
+            _stat(Icons.track_changes_outlined, '$goal%', 'meditation goal'),
+          ];
     final card = Row(children: [for (var i = 0; i < children.length; i++) ...[if (i > 0) _divider(), Expanded(child: children[i])]]);
-    if (!widget.fashion) return NeuCard(radius: 22, padding: EdgeInsets.zero, child: card);
+    if (!widget.fashion) {
+      return NeuCard(
+        radius: 26,
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 4),
+        child: card,
+      );
+    }
     return _glass(child: card, padding: EdgeInsets.zero);
   }
 
   Widget _stat(IconData icon, String value, String label) {
+    final normal = !widget.fashion;
     final accent = widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold;
+    final size = normal ? 54.0 : 38.0;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 6),
+      padding: EdgeInsets.symmetric(vertical: normal ? 0 : 17, horizontal: normal ? 4 : 6),
       child: Column(
         children: [
-          Container(width: 38, height: 38, decoration: BoxDecoration(color: widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface, shape: BoxShape.circle, boxShadow: widget.fashion ? null : NwsbShadows.raisedXs), child: Icon(icon, size: 20, color: accent)),
-          const SizedBox(height: 9),
-          Text(value, style: TextStyle(color: widget.fashion ? Colors.white : NwsbColors.ink, fontSize: 21, fontWeight: FontWeight.w800, height: 1)),
-          const SizedBox(height: 6),
-          Text(label, textAlign: TextAlign.center, maxLines: 2, style: TextStyle(color: widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint, fontSize: 10, height: 1.2)),
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface,
+              shape: BoxShape.circle,
+              boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
+            ),
+            child: Icon(icon, size: normal ? 25 : 20, color: accent),
+          ),
+          SizedBox(height: normal ? 11 : 9),
+          Text(
+            value,
+            style: TextStyle(
+              color: widget.fashion ? Colors.white : NwsbColors.ink,
+              fontSize: normal ? 25 : 21,
+              fontWeight: FontWeight.w800,
+              height: 1,
+            ),
+          ),
+          SizedBox(height: normal ? 8 : 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            style: TextStyle(
+              color: widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint,
+              fontSize: normal ? 11 : 10,
+              height: 1.2,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _divider() => Container(width: 1, height: 74, color: widget.fashion ? const Color(0x24FFFFFF) : const Color(0x141A1A2E));
+  Widget _divider() => Container(width: 1, height: widget.fashion ? 74 : 108, color: widget.fashion ? const Color(0x24FFFFFF) : const Color(0x141A1A2E));
 
   Widget _upNextCard(BuildContext context) {
-    final surface = widget.fashion
-        ? _glass(child: Column(children: [_upNextRow(context, 'Open today’s practice', 'Choose a word and begin your next sound ritual', Dest.player), _upNextDivider(), _upNextRow(context, 'Build your routine', 'Set a daily practice system', Dest.routines)]), padding: EdgeInsets.zero)
-        : NeuCard(radius: 22, padding: EdgeInsets.zero, child: Column(children: [_upNextRow(context, 'Open today’s practice', 'Choose a word and begin your next sound ritual', Dest.player), _upNextDivider(), _upNextRow(context, 'Build your routine', 'Set a daily practice system', Dest.routines)]));
-    return surface;
+    final rows = Column(
+      children: [
+        _upNextRow(context, 'Open today’s practice', 'Choose a word and begin your next sound ritual', Dest.player),
+        _upNextDivider(),
+        _upNextRow(context, 'Build your routine', 'Set a daily practice system', Dest.routines),
+      ],
+    );
+    if (widget.fashion) return _glass(child: rows, padding: EdgeInsets.zero);
+    return NeuCard(radius: 26, padding: EdgeInsets.zero, child: rows);
   }
 
   Widget _upNextRow(BuildContext context, String title, String subtitle, Object destination) {
+    final normal = !widget.fashion;
     final iconColor = widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold;
     final textColor = widget.fashion ? Colors.white : NwsbColors.ink;
     final subColor = widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint;
+    final iconSize = normal ? 48.0 : 44.0;
     return InkWell(
       onTap: () => Dest.open(context, destination),
       child: Padding(
-        padding: const EdgeInsets.all(15),
+        padding: EdgeInsets.symmetric(horizontal: normal ? 20 : 15, vertical: normal ? 17 : 15),
         child: Row(children: [
-          Container(width: 44, height: 44, decoration: BoxDecoration(color: widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface, shape: BoxShape.circle, boxShadow: widget.fashion ? null : NwsbShadows.raisedXs), child: Icon(Icons.calendar_today_outlined, size: 20, color: iconColor)),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 5), Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 11))])),
+          Container(
+            width: iconSize,
+            height: iconSize,
+            decoration: BoxDecoration(
+              color: widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface,
+              shape: BoxShape.circle,
+              boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
+            ),
+            child: Icon(Icons.calendar_today_outlined, size: normal ? 23 : 20, color: iconColor),
+          ),
+          SizedBox(width: normal ? 14 : 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: normal ? 17 : 14, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 5),
+                Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: normal ? 13 : 11)),
+              ],
+            ),
+          ),
           const SizedBox(width: 8),
-          Icon(Icons.arrow_forward, color: widget.fashion ? Colors.white70 : NwsbColors.inkSoft, size: 20),
+          Icon(Icons.arrow_forward, color: widget.fashion ? Colors.white70 : NwsbColors.inkSoft, size: normal ? 22 : 20),
         ]),
       ),
     );
