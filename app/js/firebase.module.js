@@ -312,7 +312,8 @@ window.saveOnboardingAnswers = async (answers, skipped) => {
   if (!skipped && answers[3]) window._userGender = answers[3];
 };
 
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+// Use redirect-first everywhere: it is reliable in desktop browsers, PWAs, and embedded WebViews, while popup callbacks can lose their opener.
+const useRedirectFlow = true;
     // Optimization: Passive event listeners for better scroll performance
     const passiveEvents = { passive: true };
     window.addEventListener('touchstart', () => {}, passiveEvents);
@@ -350,15 +351,11 @@ window.fbGoogleLogin = async () => {
   const provider = new GoogleAuthProvider();
   const loader = document.getElementById('authLoader');
 
-  // Embedded WebViews and standalone PWAs often open a popup that cannot return
-  // its Firebase result to the parent page. Use the full-page redirect first for
-  // those environments; it returns through /__/auth/handler and is consumed by
-  // getRedirectResult above. Desktop browsers keep the faster popup flow.
-  const isStandalone = window.matchMedia?.('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
-  const isEmbeddedWebView = /; wv\)|WebView|Instagram|FBAN|FBAV/i.test(navigator.userAgent);
+  // Embedded WebViews, standalone PWAs, and some desktop browser privacy modes can
+  // lose popup results. Use the full-page redirect in every context; it returns
+  // through /__/auth/handler and is consumed by getRedirectResult above.
   if (loader) loader.classList.add('visible');
-  if (isMobile || isStandalone || isEmbeddedWebView) {
+  if (useRedirectFlow) {
     try {
       await signInWithRedirect(auth, provider);
       return;
