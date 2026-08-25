@@ -18213,3 +18213,10 @@ body.fashion-home-active #home #hsRail {
   .nwsb-reference-dashboard .progress-value { font-size: 17px !important; }
   .nwsb-reference-dashboard .progress-label { font-size: 10px !important; }
 }
+
+/* Normal reference dashboard: remove the extra outer gutter so its section edges are even. */
+#home-nm .nmh-wrap > .nwsb-reference-dashboard {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}

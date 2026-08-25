@@ -128,11 +128,15 @@
      under the old meaning is read forward as 'full'. ── */
   var HKEY = 'nwsb_hero_style';
   var HVER = 'nwsb_hero_style_v';
+  /* The 15 August Hero Header is the Fashion home’s intended default. Migrate
+     older saved `full`/legacy values to the historical plain deck once; after
+     that, the user can still choose another look from the selector. */
   (function migrate() {
     try {
-      if (localStorage.getItem(HVER)) return;
-      if (localStorage.getItem(HKEY) === 'plain') localStorage.setItem(HKEY, 'full');
-      localStorage.setItem(HVER, '2');
+      if (localStorage.getItem(HVER) !== '3') {
+        localStorage.setItem(HKEY, 'plain');
+        localStorage.setItem(HVER, '3');
+      }
     } catch (e) {}
   })();
   window.heroStyle = function () {
