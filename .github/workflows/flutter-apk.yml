@@ -87,7 +87,7 @@ jobs:
         run: flutter build apk --debug
 
       - name: Report debug signing fingerprint
-        working-directory: android
+        working-directory: flutter_app/android
         run: |
           echo "Flutter debug APK signing certificate:"
           ./gradlew --no-daemon signingReport | grep -A3 -E 'Variant: debug|SHA1:' || true
