@@ -36,7 +36,7 @@ const AUTH_LOADER = `
   #nwsbAuthWait .t{font-size:13px;font-weight:300;letter-spacing:1px;color:rgba(255,255,255,0.62);}
 </style>
 <div id="nwsbAuthWait">
-  <video src="/https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/loading.mp4" autoplay muted loop playsinline preload="auto"></video>
+  <video src="https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/loading.mp4" autoplay muted loop playsinline preload="auto"></video>
   <div class="t">Signing you in…</div>
 </div>`;
 

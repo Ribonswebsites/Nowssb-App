@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _runAuth(Future<void> Function() action) async {
     if (_busy) return;
     if (!NwsbFirebase.ready) {
-      _setError('Firebase is not ready');
+      _setError('NowssB sign-in is still starting. Please try again in a moment.');
       return;
     }
     setState(() {
