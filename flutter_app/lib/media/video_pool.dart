@@ -486,7 +486,21 @@ class VideoPool {
       }
     }
 
-    // The private media pack is the only normal playback path. A missing file
+    // Named home/player clips are bundled locally. Open them first so the
+    // screen is immediately usable while the remote access queue continues.
+    if (assetPath.startsWith('assets/video/')) {
+      final local = VideoPlayerController.asset(assetPath);
+      try {
+        await local.initialize();
+        return local;
+      } catch (_) {
+        try {
+          await local.dispose();
+        } catch (_) {}
+      }
+    }
+
+    // The private media pack is the fallback for remote films. A missing file
     // stays a poster rather than opening a second network decoder while the
     // downloader is still working.
     final urls = NwsbCdn.urls(assetPath).toList();

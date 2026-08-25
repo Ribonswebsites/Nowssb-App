@@ -16833,3 +16833,25 @@ a:active,
   will-change: auto !important;
 }
 #home > *, #home-nm > * { animation: none !important; }
+
+/* Interactive preparation handoff: stable black card, animated app marks, white pills. */
+.nwsb-video-pack-brand-lockup { display:flex; align-items:center; min-width:0; gap:10px; }
+.nwsb-video-pack-continue { min-height:34px !important; padding:0 12px !important; border:1px solid rgba(255,255,255,.28) !important; border-radius:999px !important; background:transparent !important; color:#fff !important; font:800 10px/1 'DM Sans',sans-serif !important; white-space:nowrap; }
+.nwsb-video-pack-continue:hover { background:rgba(255,255,255,.1) !important; }
+.nwsb-video-pack-status-row { display:flex; align-items:center; min-width:0; gap:12px; }
+.nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap { display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; flex:0 0 48px; border-radius:50%; background:#fff; color:#05070b; box-shadow:0 6px 18px rgba(255,255,255,.16); }
+.nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap svg { width:28px; height:28px; animation:nwsbPackMarkPulse 1.6s ease-in-out infinite; }
+.nwsb-video-pack-status-row .nwsb-video-pack-divider { width:1px; height:33px; flex:0 0 1px; background:rgba(255,255,255,.25); }
+.nwsb-video-pack-status-copy { min-width:0; flex:1; }
+.nwsb-video-pack-status-copy .nwsb-video-pack-kicker { margin:0 0 5px; }
+.nwsb-video-pack-status-copy h2 { margin:0; }
+.nwsb-video-pack-actions button { border-radius:999px !important; }
+.nwsb-video-pack-actions .nwsb-video-pack-later { border:1px solid rgba(255,255,255,.18) !important; }
+.nwsb-video-pack-actions .nwsb-video-pack-start { background:#fff !important; color:#05070b !important; }
+@keyframes nwsbPackMarkPulse { 0%,100% { opacity:.58; transform:scale(.94); } 50% { opacity:1; transform:scale(1); } }
+@media (max-width:430px) {
+  .nwsb-video-pack-continue { padding-left:10px !important; padding-right:10px !important; font-size:9px !important; }
+  .nwsb-video-pack-status-row { gap:9px; }
+  .nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap { width:44px; height:44px; flex-basis:44px; }
+  .nwsb-video-pack-status-row .nwsb-video-pack-divider { height:30px; }
+}

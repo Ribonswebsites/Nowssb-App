@@ -22,8 +22,14 @@
     if (hour >= 17 && hour < 21) return 'evening';
     return 'night';
   }
-  function srcFor(file, ext) { return R2_BASE + '/media/repo/assets/video/' + encodeURIComponent(file + '.' + ext); }
-  function localSrcFor(file, ext) { return srcFor(file, ext); }
+  var LOCAL_FOCUS_FILES = { 'time-morning': true, 'time-afternoon': true, 'time-evening': true, 'time-night': true };
+  function srcFor(file, ext) {
+    if (LOCAL_FOCUS_FILES[file] && ext === 'mp4') return LOCAL_VIDEO_BASE + file + '.' + ext;
+    return R2_BASE + '/media/repo/assets/video/' + encodeURIComponent(file + '.' + ext);
+  }
+  function localSrcFor(file, ext) {
+    return LOCAL_FOCUS_FILES[file] ? LOCAL_VIDEO_BASE + file + '.' + ext : srcFor(file, ext);
+  }
   function esc(value) {
     return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }

@@ -52,7 +52,7 @@
     if (window.NWSB_EXTRA_VIDEO_URLS) urls = urls.concat(window.NWSB_EXTRA_VIDEO_URLS);
     // Keep this queue video-only and de-dupe repeated background films.
     urls = urls.filter(function (u, i) {
-      return u && /\.mp4(?:[?#]|$)/i.test(u) && urls.indexOf(u) === i;
+      return u && !/^\.?\/?assets\/video\//i.test(u) && /\.mp4(?:[?#]|$)/i.test(u) && urls.indexOf(u) === i;
     });
     /* The start animation goes first, ahead of thirty decorative loops. It
        is the one clip that plays on every single launch, so it is the one
@@ -61,7 +61,7 @@
        sw.js also grabs it at install; this is the retry path for when that
        failed (offline at install, or a browser that never installed one). */
     var splash = window.NWSB_SPLASH_VIDEO;
-    if (splash) {
+    if (splash && !/^\.?\/?assets\/video\//i.test(splash)) {
       var at = urls.indexOf(splash);
       if (at > 0) urls.splice(at, 1);
       if (at !== 0) urls.unshift(splash);
@@ -71,35 +71,56 @@
 
   function warmOne(cache, url) {
     return cache.match(url).then(function (existing) {
-      if (existing) return true; // already warmed in a previous session
-      return fetch(url, { mode: 'cors' })
-        .then(function (res) {
-          if (!res || !res.ok) return false;
-          return cache.put(url, res).then(function () { return true; });
-        })
-        .catch(function () { return false; });
+      if (existing) return true;
+      var attempt = 0;
+      function tryFetch() {
+        attempt++;
+        var controller = typeof AbortController === 'function' ? new AbortController() : null;
+        var timer = setTimeout(function () { if (controller) controller.abort(); }, 35000);
+        return fetch(url, { mode: 'cors', signal: controller ? controller.signal : undefined })
+          .then(function (res) {
+            clearTimeout(timer);
+            if (!res || !res.ok) throw new Error('HTTP ' + (res ? res.status : 0));
+            return cache.put(url, res).then(function () { return true; });
+          })
+          .catch(function () {
+            clearTimeout(timer);
+            if (attempt < 3) return new Promise(function (resolve) { setTimeout(resolve, attempt * 1200); }).then(tryFetch);
+            return false;
+          });
+      }
+      return tryFetch();
     });
   }
 
-  var warmedUrls = {}; // every URL we've ever kicked off a warmOne() for — never re-queue it
+  var warmedUrls = {};
 
   function warmAll(urls, onDone) {
-    var fresh = urls.filter(function (u) { return !warmedUrls[u]; });
+    var fresh = urls.filter(function (u) { return !warmedUrls[u] && !packInFlight[u]; });
     if (!fresh.length) return;
-    fresh.forEach(function (u) { warmedUrls[u] = true; });
+    fresh.forEach(function (u) { packInFlight[u] = true; });
     var cache;
     var i = 0;
     function next() {
       if (i >= fresh.length) return;
       var url = fresh[i++];
       warmOne(cache, url).then(function (ok) {
+        delete packInFlight[url];
+        if (ok) warmedUrls[url] = true;
         if (onDone) onDone(ok, url);
-        // Exactly one fetch at a time. The short pause keeps the WebView
-        // responsive between files without creating a request burst.
-        setTimeout(next, 800);
+        if (!ok && (packRetryCount[url] || 0) < 4 && !packRetryTimers[url]) {
+          packRetryCount[url] = (packRetryCount[url] || 0) + 1;
+          packRetryTimers[url] = setTimeout(function () {
+            delete packRetryTimers[url];
+            warmAll([url], onDone);
+          }, Math.min(18000, 2500 * packRetryCount[url]));
+        }
+        setTimeout(next, 500);
       });
     }
-    caches.open(VIDEO_CACHE).then(function (c) { cache = c; next(); });
+    caches.open(VIDEO_CACHE).then(function (c) { cache = c; next(); }).catch(function () {
+      fresh.forEach(function (url) { delete packInFlight[url]; if (onDone) onDone(false, url); });
+    });
   }
 
   var PACK_PROMPTED = 'nowssb-video-pack-prompted-v1';
@@ -107,16 +128,47 @@
   var packStarted = localStorage.getItem(PACK_ACCEPTED) === '1';
   var packTotal = 0, packDone = 0, packFailed = 0;
   var packPanel = null, packCopy = null, packBar = null, packButton = null;
+  var packKicker = null, packTitle = null, packStatus = null, packSignalWrap = null;
+  var packVisualTimer = null;
+  var packDoneUrls = {}, packFailedUrls = {}, packRetryTimers = {};
+  var PACK_MARKS = [
+    { kicker: 'PREPARING YOUR EXPERIENCE', title: 'Almost ready', body: '<path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/>' },
+    { kicker: 'LOADING YOUR PRACTICE', title: 'Setting up your rhythm', body: '<path d="M5 4.5h6.4a2 2 0 0 1 2 2v12a2.4 2.4 0 0 0-2-1H5z"/><path d="M19 4.5h-6.4a2 2 0 0 0-2 2v12a2.4 2.4 0 0 1 2-1H19z"/>' },
+    { kicker: 'READYING YOUR LIBRARY', title: 'Arranging your words', body: '<path d="M4 5.4h6.4a2 2 0 0 1 2 2v11.2a2.4 2.4 0 0 0-2-1H4z"/><path d="M20 5.4h-6.4a2 2 0 0 0-2 2v11.2a2.4 2.4 0 0 1 2-1H20z"/>' },
+    { kicker: 'TUNING YOUR EXPERIENCE', title: 'Making space to focus', body: '<path d="M3.6 16.6c3-.4 5-2.2 6.6-5.4 1.2-2.4 2-4.6 3.2-4.6 1 0 1.4 1 1 2.4-.5 1.8-2 3-3.4 3.6-1.4.6-2 1.4-1.6 2.2.4.8 1.8.9 3.2.4 1.6-.6 2.8-1.6 4-3"/><path d="M4 20h16"/>' },
+    { kicker: 'OPENING YOUR PATH', title: 'Almost there', body: '<circle cx="6.5" cy="8" r="2.6"/><circle cx="17.5" cy="8" r="2.6"/><path d="M2.5 19v-1.2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4V19M13.5 19v-1.2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4V19"/><path d="M9.6 8.4c.9-.9 1.6-.9 2.4 0s1.5.9 2.4 0"/>' }
+  ];
+  var packVisualIndex = 0;
+  var packInFlight = {};
+  var packRetryCount = {};
 
   function updatePackPrompt() {
     if (!packCopy) return;
     if (!packStarted) {
       packCopy.textContent = 'Additional access files are getting ready for a smoother NowssB experience. It may take a few minutes the first time — thanks for your patience.';
+      if (packButton) packButton.textContent = 'Prepare files';
       return;
     }
-    packCopy.textContent = packDone + ' of ' + packTotal + ' files ready' + (packFailed ? ' · ' + packFailed + ' unavailable' : '') + '. You can keep using NowssB while the rest finishes.';
+    packCopy.textContent = packDone + ' of ' + packTotal + ' files ready' + (packFailed ? ' · ' + packFailed + ' will retry' : '') + '. You can keep using NowssB while the rest finishes.';
     if (packBar) packBar.style.width = (packTotal ? Math.round(packDone / packTotal * 100) : 0) + '%';
-    if (packButton) packButton.textContent = packDone >= packTotal ? 'Ready' : 'Preparing…';
+    if (packButton) packButton.textContent = packDone >= packTotal ? 'Ready to use' : 'Preparing…';
+    if (packStatus) packStatus.textContent = packDone >= packTotal ? 'Your private access files are ready.' : (packFailed ? 'A connection paused briefly. We will retry automatically.' : 'A few more seconds while NowssB prepares your experience.');
+  }
+
+  function renderPackVisual() {
+    var mark = PACK_MARKS[packVisualIndex % PACK_MARKS.length];
+    if (packSignalWrap) packSignalWrap.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + mark.body + '</svg>';
+    if (packKicker) packKicker.textContent = mark.kicker;
+    if (packTitle) packTitle.textContent = mark.title;
+  }
+
+  function startPackVisuals() {
+    renderPackVisual();
+    if (packVisualTimer) clearInterval(packVisualTimer);
+    packVisualTimer = setInterval(function () {
+      packVisualIndex = (packVisualIndex + 1) % PACK_MARKS.length;
+      renderPackVisual();
+    }, 2400);
   }
 
   function beginPack() {
@@ -126,9 +178,15 @@
     var urls = collectVideoUrls();
     packTotal = urls.length;
     if (!urls.length) return;
-    warmAll(urls, function (ok) {
-      if (ok) packDone++;
-      else packFailed++;
+    warmAll(urls, function (ok, url) {
+      if (ok && !packDoneUrls[url]) {
+        packDoneUrls[url] = true;
+        delete packFailedUrls[url];
+        packDone++;
+      } else if (!ok && !packDoneUrls[url]) {
+        packFailedUrls[url] = true;
+      }
+      packFailed = Object.keys(packFailedUrls).length;
       updatePackPrompt();
     });
     updatePackPrompt();
@@ -141,17 +199,29 @@
     packPanel.className = 'nwsb-video-pack-prompt';
     packPanel.setAttribute('role', 'dialog');
     packPanel.setAttribute('aria-label', 'Prepare additional NowssB access');
-    packPanel.innerHTML = '<div class="nwsb-video-pack-card"><div class="nwsb-video-pack-brand"><img class="nwsb-video-pack-logo" src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><div class="nwsb-video-pack-brand-side"><span class="nwsb-video-pack-signal-wrap"><svg class="nwsb-video-pack-signal" viewBox="0 0 96 32" fill="none" aria-hidden="true"><path d="M2 16h12l5-10 8 20 7-14 7 8 7-4h10l5-9 8 18 6-13 7 4h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="nwsb-video-pack-divider" aria-hidden="true"></span><span class="nwsb-video-pack-brand-name">NOWSSB<small>Natural word science</small></span></div></div><div class="nwsb-video-pack-rule" aria-hidden="true"></div><div class="nwsb-video-pack-kicker">PREPARING YOUR EXPERIENCE</div><h2>Almost ready</h2><p class="nwsb-video-pack-copy"></p><div class="nwsb-video-pack-progress"><span></span></div><div class="nwsb-video-pack-status">A few more seconds while NowssB sets things up.</div><div class="nwsb-video-pack-actions"><button type="button" class="nwsb-video-pack-later">Maybe later</button><button type="button" class="nwsb-video-pack-start">Prepare now</button></div></div>';
+    packPanel.innerHTML = '<div class="nwsb-video-pack-card"><div class="nwsb-video-pack-brand"><div class="nwsb-video-pack-brand-lockup"><img class="nwsb-video-pack-logo" src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><span class="nwsb-video-pack-divider" aria-hidden="true"></span><span class="nwsb-video-pack-brand-name">NOWSSB<small>Natural word science</small></span></div><button type="button" class="nwsb-video-pack-continue">Continue to app</button></div><div class="nwsb-video-pack-rule" aria-hidden="true"></div><div class="nwsb-video-pack-status-row"><span class="nwsb-video-pack-signal-wrap" aria-hidden="true"></span><span class="nwsb-video-pack-divider" aria-hidden="true"></span><div class="nwsb-video-pack-status-copy"><div class="nwsb-video-pack-kicker"></div><h2></h2></div></div><p class="nwsb-video-pack-copy"></p><div class="nwsb-video-pack-progress"><span></span></div><div class="nwsb-video-pack-status">A few more seconds while NowssB prepares your experience.</div><div class="nwsb-video-pack-actions"><button type="button" class="nwsb-video-pack-later">Maybe later</button><button type="button" class="nwsb-video-pack-start">Prepare files</button></div></div>';
     document.body.appendChild(packPanel);
     packCopy = packPanel.querySelector('.nwsb-video-pack-copy');
     packBar = packPanel.querySelector('.nwsb-video-pack-progress span');
     packButton = packPanel.querySelector('.nwsb-video-pack-start');
+    packKicker = packPanel.querySelector('.nwsb-video-pack-kicker');
+    packTitle = packPanel.querySelector('.nwsb-video-pack-status-copy h2');
+    packStatus = packPanel.querySelector('.nwsb-video-pack-status');
+    packSignalWrap = packPanel.querySelector('.nwsb-video-pack-signal-wrap');
     updatePackPrompt();
-    packPanel.querySelector('.nwsb-video-pack-later').addEventListener('click', function () { packPanel.remove(); packPanel = null; });
+    startPackVisuals();
+    function continueToApp() {
+      beginPack();
+      if (packVisualTimer) { clearInterval(packVisualTimer); packVisualTimer = null; }
+      if (packPanel) { packPanel.remove(); packPanel = null; }
+      packCopy = packBar = packButton = packKicker = packTitle = packStatus = packSignalWrap = null;
+    }
+    packPanel.querySelector('.nwsb-video-pack-continue').addEventListener('click', continueToApp);
+    packPanel.querySelector('.nwsb-video-pack-later').addEventListener('click', function () { if (packVisualTimer) clearInterval(packVisualTimer); packPanel.remove(); packPanel = null; });
     packButton.addEventListener('click', function () {
       packButton.disabled = true;
-      packButton.textContent = 'Preparing…';
       beginPack();
+      updatePackPrompt();
     });
   }
 
@@ -160,9 +230,15 @@
     var urls = collectVideoUrls();
     if (urls.length) {
       packTotal = Math.max(packTotal, urls.length);
-      warmAll(urls, function (ok) {
-        if (ok) packDone++;
-        else packFailed++;
+      warmAll(urls, function (ok, url) {
+        if (ok && !packDoneUrls[url]) {
+          packDoneUrls[url] = true;
+          delete packFailedUrls[url];
+          packDone++;
+        } else if (!ok && !packDoneUrls[url]) {
+          packFailedUrls[url] = true;
+        }
+        packFailed = Object.keys(packFailedUrls).length;
         updatePackPrompt();
       });
     }

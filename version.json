@@ -1,11 +1,11 @@
 {
-  "version": "9.6.36",
-  "build": 2026082428,
+  "version": "9.6.37",
+  "build": 2026082429,
   "force": false,
   "title": "NowssB update ready",
-  "notes": "Home hero headers are stable and no longer move or animate during home scrolling. Both Android surfaces retain the black rounded NowssB preparation card with logo-left hierarchy, animated SVG in a white circle, short divider, and clear additional-access copy. Essentials retains the full local mascot artwork set, eight working destinations, three-item initial view, and See more expansion.",
+  "notes": "The preparation handoff now cycles real NowssB SVG marks and changing status copy, uses white pill controls, and lets users continue into the app while background preparation retries safely. All named home and player UI videos are bundled locally, while remaining remote access files continue in a resilient background queue.",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
-  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.36-android/nowssb-webview-debug.apk",
-  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.36-android/nowssb-flutter-debug.apk",
-  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.36-android/nowssb-webview-debug.apk"
+  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.37-android/nowssb-webview-debug.apk",
+  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.37-android/nowssb-flutter-debug.apk",
+  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.37-android/nowssb-webview-debug.apk"
 }

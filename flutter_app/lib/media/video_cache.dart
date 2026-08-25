@@ -49,7 +49,7 @@ class VideoCache extends ChangeNotifier {
   VideoCache._();
 
   static final VideoCache instance = VideoCache._();
-  static const _version = 'video-pack-v1';
+  static const _version = 'video-pack-v2';
   static const _promptKey = 'nowssb.video-pack.prompted.v1';
   static const _acceptedKey = 'nowssb.video-pack.accepted.v1';
 
@@ -174,30 +174,44 @@ class VideoCache extends ChangeNotifier {
     notifyListeners();
 
     try {
-      if (await part.exists()) await part.delete();
-      final request = http.Request('GET', Uri.parse(url));
-      final response = await _client.send(request);
-      if (response.statusCode != HttpStatus.ok) {
-        throw HttpException('HTTP ${response.statusCode}', uri: Uri.parse(url));
+      for (var attempt = 1; attempt <= 3; attempt++) {
+        try {
+          if (await part.exists()) await part.delete();
+          final request = http.Request('GET', Uri.parse(url));
+          final response = await _client
+              .send(request)
+              .timeout(const Duration(seconds: 35));
+          if (response.statusCode != HttpStatus.ok) {
+            throw HttpException('HTTP ${response.statusCode}', uri: Uri.parse(url));
+          }
+          final sink = part.openWrite();
+          try {
+            await for (final chunk in response.stream.timeout(const Duration(seconds: 35))) {
+              sink.add(chunk);
+            }
+            await sink.flush();
+          } finally {
+            await sink.close();
+          }
+          if (!await part.exists() || await part.length() == 0) {
+            throw const FileSystemException('Empty video response');
+          }
+          if (await file.exists()) await file.delete();
+          await part.rename(file.path);
+          _completed = await _countCompleted();
+          _error = null;
+          return file.path;
+        } catch (error) {
+          _error = error.toString();
+          try {
+            if (await part.exists()) await part.delete();
+          } catch (_) {}
+          if (attempt < 3) {
+            await Future<void>.delayed(Duration(seconds: attempt * 2));
+          }
+        }
       }
-      final sink = part.openWrite();
-      await for (final chunk in response.stream) {
-        sink.add(chunk);
-      }
-      await sink.close();
-      if (!await part.exists() || await part.length() == 0) {
-        throw const FileSystemException('Empty video response');
-      }
-      if (await file.exists()) await file.delete();
-      await part.rename(file.path);
-      _completed = await _countCompleted();
-      return file.path;
-    } catch (error) {
       _failed++;
-      _error = error.toString();
-      try {
-        if (await part.exists()) await part.delete();
-      } catch (_) {}
       return null;
     } finally {
       _activeUrl = null;
