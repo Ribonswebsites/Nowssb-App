@@ -2207,10 +2207,14 @@ window.pplLoad = async function () {
 
   /* What the app knows — plans, blocks, last seen. Best effort: if the
      rules are not published this still shows the accounts. */
-  const extra = {};
+  const extra = {}, profileExtra = {};
   try {
     const snap = await getDocs(collection(_db, 'users'));
     snap.forEach(d => { extra[d.id] = d.data(); });
+  } catch (e) {}
+  try {
+    const snap = await getDocs(collection(_db, 'publicProfiles'));
+    snap.forEach(d => { profileExtra[d.id] = d.data(); });
   } catch (e) {}
 
   let accounts = null, why = '';
@@ -2226,7 +2230,7 @@ window.pplLoad = async function () {
 
   if (accounts) {
     _ppl = accounts.map(a => {
-      const e = extra[a.uid] || {};
+      const e = { ...(profileExtra[a.uid] || {}), ...(extra[a.uid] || {}) };
       return {
         uid: a.uid,
         name: a.name || e.name || e.displayName || null,
@@ -2247,11 +2251,20 @@ window.pplLoad = async function () {
   } else {
     /* No server list — fall back to what the app wrote, and say so, rather
        than showing a short list as if it were everybody. */
-    _ppl = Object.keys(extra).map(uid => ({ uid, ...extra[uid], fallback: 1 }));
+    const ids = new Set([...Object.keys(extra), ...Object.keys(profileExtra)]);
+    _ppl = [...ids].map(uid => ({
+      uid,
+      ...(profileExtra[uid] || {}),
+      ...(extra[uid] || {}),
+      name: extra[uid]?.name || extra[uid]?.displayName || profileExtra[uid]?.displayName || null,
+      displayName: extra[uid]?.displayName || profileExtra[uid]?.displayName || null,
+      email: extra[uid]?.email || profileExtra[uid]?.email || null,
+      fallback: 1,
+    }));
     if (wrap) {
       const note = document.createElement('div');
       note.style.cssText = 'color:rgba(232,213,163,0.85);font-size:12px;line-height:1.6;padding:10px 12px;margin-bottom:10px;background:rgba(232,213,163,0.08);border:1px solid rgba(232,213,163,0.25);border-radius:12px;';
-      note.textContent = 'Showing only accounts the app has written a record for — the full sign-up list needs /api/users. ' + why;
+      note.textContent = 'Showing app-known and public Connect profiles. The optional full Firebase Auth list is unavailable: ' + why;
       wrap.innerHTML = '';
       wrap.appendChild(note);
     }
