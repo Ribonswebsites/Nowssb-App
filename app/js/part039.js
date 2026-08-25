@@ -897,13 +897,12 @@ window.RTC = (function(){
       getFS().then(function(fs){
         var q = fs.query(
           fs.collection(window._db, 'calls'),
-          fs.where('calleeUid', '==', window._currentUid),
-          fs.where('status', '==', 'ringing')
+          fs.where('calleeUid', '==', window._currentUid)
         );
         _incomingUnsub = fs.onSnapshot(q, function(snap){
           snap.docChanges().forEach(function(change){
-            if (change.type === 'added' && !self.isActive()){
-              var data = change.doc.data();
+            var data = change.doc.data();
+            if (change.type === 'added' && data.status === 'ringing' && !self.isActive()){
               _ringingCall = { id: change.doc.id, data: data };
               showOverlay(
                 { fullName: data.callerName, avatar: data.callerAvatar },

@@ -7,7 +7,7 @@
  */
 import {
   collection, query, where, limit, orderBy, getDocs, addDoc, setDoc, deleteDoc,
-  doc, serverTimestamp, onSnapshot
+  doc, getDoc, getCountFromServer, serverTimestamp, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
 
@@ -17,6 +17,7 @@ const MAX_CAPTION = 2200;
 let feedUnsub = null;
 let profiles = [];
 let posts = [];
+let postsLoaded = false;
 let profileMap = new Map();
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -99,6 +100,13 @@ async function loadProfiles() {
   requireLogin();
   const snap = await getDocs(query(collection(db(), 'publicProfiles'), where('profileVisibility', '==', 'public'), limit(100)));
   profiles = snap.docs.map(profileFromDoc).filter((p) => p.uid && p.fullName);
+  try {
+    const followingSnap = await getDocs(collection(db(), 'follows', currentUid(), 'following'));
+    const followingIds = new Set(followingSnap.docs.map((item) => item.id));
+    profiles.forEach((profile) => { profile.following_state = followingIds.has(profile.uid); });
+  } catch (error) {
+    console.warn('NowssB Connect follow state:', error);
+  }
   profileMap = new Map(profiles.map((p) => [p.uid, p]));
   if (window.IG) {
     window.IG._allPeople = profiles;
@@ -110,7 +118,10 @@ async function loadProfiles() {
 async function loadPosts() {
   requireLogin();
   const snap = await getDocs(query(collection(db(), 'posts'), where('visibility', '==', 'public'), limit(80)));
-  posts = snap.docs.map(postFromDoc).filter((p) => p.mediaUrl && p.visibility === 'public');
+  posts = snap.docs.map(postFromDoc)
+    .filter((p) => p.mediaUrl && p.visibility === 'public')
+    .sort((a, b) => b.createdAt - a.createdAt);
+  postsLoaded = true;
   return posts;
 }
 
@@ -198,8 +209,19 @@ function boxFor(id) { return document.getElementById(id); }
 async function openProfile(uid) {
   requireLogin();
   if (!profiles.length) await loadProfiles();
+  if (!postsLoaded) await loadPosts();
   const p = profileFor(uid);
   const publicPosts = posts.filter((post) => post.uid === uid);
+  try {
+    const [followers, following] = await Promise.all([
+      getCountFromServer(collection(db(), 'follows', uid, 'followers')),
+      getCountFromServer(collection(db(), 'follows', uid, 'following')),
+    ]);
+    p.followers = followers.data().count;
+    p.following = following.data().count;
+  } catch (error) {
+    console.warn('NowssB Connect profile counts:', error);
+  }
   const isSelf = uid === currentUid();
   const overlay = document.getElementById('nwsb-live-profile') || document.createElement('div');
   overlay.id = 'nwsb-live-profile';
@@ -230,7 +252,10 @@ async function toggleFollow(uid) {
   } else {
     await Promise.all([deleteDoc(ref), deleteDoc(reverse)]);
   }
-  if (p) p.following_state = nowFollowing;
+  if (p) {
+    p.following_state = nowFollowing;
+    p.followers = Math.max(0, (p.followers || 0) + (nowFollowing ? 1 : -1));
+  }
   await openProfile(uid);
 }
 
@@ -263,8 +288,11 @@ async function likePost(postId) {
   const post = posts.find((p) => p.id === postId);
   if (!post) return;
   const likeRef = doc(db(), 'posts', postId, 'likes', currentUid());
-  await setDoc(likeRef, { uid: currentUid(), createdAt: serverTimestamp() });
-  await setDoc(doc(db(), 'posts', postId), { likeCount: (post.likeCount || 0) + 1 }, { merge: true });
+  const existing = await getDoc(likeRef);
+  const nextCount = Math.max(0, (post.likeCount || 0) + (existing.exists() ? -1 : 1));
+  if (existing.exists()) await deleteDoc(likeRef);
+  else await setDoc(likeRef, { uid: currentUid(), createdAt: serverTimestamp() });
+  await setDoc(doc(db(), 'posts', postId), { likeCount: nextCount }, { merge: true });
   await refreshFeed();
 }
 

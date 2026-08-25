@@ -103,10 +103,12 @@ class _ConnectScreenState extends State<ConnectScreen> {
 
   Widget _incomingCallBanner() {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.collection('calls').where('calleeUid', isEqualTo: _service.uid).where('status', isEqualTo: 'ringing').limit(1).snapshots(),
+      stream: FirebaseFirestore.instance.collection('calls').where('calleeUid', isEqualTo: _service.uid).limit(10).snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return const SizedBox.shrink();
-        final call = snapshot.data!.docs.first;
+        if (!snapshot.hasData) return const SizedBox.shrink();
+        final ringing = snapshot.data!.docs.where((doc) => doc.data()['status'] == 'ringing').toList();
+        if (ringing.isEmpty) return const SizedBox.shrink();
+        final call = ringing.first;
         final data = call.data();
         final callerUid = data['callerUid']?.toString() ?? '';
         final callerName = data['callerName']?.toString() ?? 'NowssB Practitioner';
@@ -303,10 +305,24 @@ class _ConnectScreenState extends State<ConnectScreen> {
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: FilledButton(onPressed: () { Navigator.pop(sheetContext); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectChatScreen(peerUid: doc.id, peerName: name))); }, child: const Text('Message'))),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.pop(sheetContext);
+                      if (doc.id == _service.uid) {
+                        _editProfile(d);
+                      } else {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectChatScreen(peerUid: doc.id, peerName: name)));
+                      }
+                    },
+                    child: Text(doc.id == _service.uid ? 'Edit profile' : 'Message'),
+                  ),
+                ),
                 const SizedBox(width: 8),
-                IconButton(onPressed: () { Navigator.pop(sheetContext); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: doc.id, peerName: name, kind: 'audio'))); }, icon: const Icon(Icons.call_outlined, color: NwsbColors.goldLight)),
-                IconButton(onPressed: () { Navigator.pop(sheetContext); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: doc.id, peerName: name, kind: 'video'))); }, icon: const Icon(Icons.videocam_outlined, color: NwsbColors.goldLight)),
+                if (doc.id != _service.uid) ...[
+                  IconButton(onPressed: () { Navigator.pop(sheetContext); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: doc.id, peerName: name, kind: 'audio'))); }, icon: const Icon(Icons.call_outlined, color: NwsbColors.goldLight)),
+                  IconButton(onPressed: () { Navigator.pop(sheetContext); Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: doc.id, peerName: name, kind: 'video'))); }, icon: const Icon(Icons.videocam_outlined, color: NwsbColors.goldLight)),
+                ],
                 IconButton(onPressed: () => Navigator.pop(sheetContext), icon: const Icon(Icons.close, color: Color(0x99FFFFFF))),
               ],
             ),
@@ -314,6 +330,51 @@ class _ConnectScreenState extends State<ConnectScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _editProfile(Map<String, dynamic> data) async {
+    final name = TextEditingController(text: data['displayName']?.toString() ?? '');
+    final username = TextEditingController(text: data['username']?.toString() ?? '');
+    final bio = TextEditingController(text: data['bio']?.toString() ?? '');
+    final category = TextEditingController(text: data['category']?.toString() ?? 'Practitioner');
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: NwsbColors.deep,
+      builder: (sheetContext) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(22, 22, 22, MediaQuery.of(sheetContext).viewInsets.bottom + 28),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Edit NowssB profile', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 16),
+                TextField(controller: name, maxLength: 80, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Display name')),
+                TextField(controller: username, maxLength: 32, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Username')),
+                TextField(controller: category, maxLength: 80, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Practice area')),
+                TextField(controller: bio, maxLength: 500, maxLines: 4, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Bio')),
+                const SizedBox(height: 14),
+                SizedBox(width: double.infinity, child: FilledButton(onPressed: () => Navigator.pop(sheetContext, true), child: const Text('Save profile'))),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    final values = <String>[name.text, username.text, bio.text, category.text];
+    name.dispose();
+    username.dispose();
+    bio.dispose();
+    category.dispose();
+    if (result != true) return;
+    try {
+      await _service.updatePublicProfile(displayName: values[0], username: values[1], bio: values[2], category: values[3]);
+      if (mounted) setState(() {});
+    } catch (error) {
+      _showError(error);
+    }
   }
 
   Future<void> _openComposer() async {
