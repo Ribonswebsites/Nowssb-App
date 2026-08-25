@@ -74,17 +74,26 @@
     var p = progress();
     var s = SLOT[slotFor(new Date())];
     var items = upNextItems();
-    var rootClass = 'nwsb-daydash ' + (fashion ? 'nwsb-daydash-fashion' : 'nwsb-daydash-normal');
+    var rootClass = 'nwsb-daydash nwsb-reference-dashboard ' + (fashion ? 'nwsb-daydash-fashion' : 'nwsb-daydash-normal');
+    var chevron = '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+    var blob = '<svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="nwsbBlobLight" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c9c2f0"/><stop offset="100%" stop-color="#e7e2fb"/></linearGradient><linearGradient id="nwsbBlobDark" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c6ae0"/><stop offset="100%" stop-color="#9384e8"/></linearGradient></defs><path fill="url(#nwsbBlobLight)" d="M20,55 C10,80 30,105 60,100 C90,95 100,70 90,45 C80,20 50,10 30,25 C15,35 25,40 20,55 Z"/><circle cx="88" cy="38" r="26" fill="url(#nwsbBlobDark)"/></svg>';
     return '<section class="' + rootClass + '" data-daydash-mode="' + mode + '" data-slot="' + slotFor(new Date()) + '">' +
-      '<div class="nwsb-dashboard-heading"><span class="nwsb-dashboard-mark" aria-hidden="true">' + icon('target') + '</span><div class="nwsb-dashboard-heading-copy"><div class="nwsb-dashboard-eyebrow">Your meditation</div><h2>Meditation progress</h2></div><button type="button" data-daydash-progress>View all <span>›</span></button></div>' +
-      '<div class="nwsb-progress-card">' +
-        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('check') + '</span><strong data-progress-sessions>' + p.sessions + '</strong><small>meditation sessions</small></div>' +
-        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('timer') + '</span><strong data-progress-words>' + p.words + '</strong><small>words in practice</small></div>' +
-        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('fire') + '</span><strong data-progress-streak>' + p.streak + '</strong><small>day streak</small></div>' +
-        '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('target') + '</span><strong data-progress-goal>' + p.goal + '%</strong><small>meditation goal</small></div>' +
+      '<div class="focus-card neo-raised" data-daydash-focus-go>' +
+        '<div class="focus-label">' + esc(s.eyebrow || 'Today’s focus') + '</div>' +
+        '<div class="focus-title">' + esc(s.title) + '</div>' +
+        '<div class="focus-meta"><span class="dot"></span><span class="bold">Daily practice</span><span class="dot"></span><span>' + esc(s.sub) + '</span></div>' +
+        '<button class="start-btn neo-pill-dark" type="button" data-daydash-focus-go>Start practice <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>' +
+        '<div class="blob-wrap">' + blob + '</div>' +
       '</div>' +
-      '<div class="nwsb-dashboard-heading nwsb-up-heading"><span class="nwsb-dashboard-mark" aria-hidden="true">' + icon('calendar') + '</span><div class="nwsb-dashboard-heading-copy"><div class="nwsb-dashboard-eyebrow">Keep the ritual moving</div><h2>Up next</h2></div><button type="button" data-daydash-upnext-view>View all <span>›</span></button></div>' +
-      '<div class="nwsb-upnext-list">' + items.map(function (item) { return '<button type="button" class="nwsb-upnext-card" data-daydash-upnext-action="' + esc(item.action) + '"><span class="nwsb-upnext-icon">' + icon('calendar') + '</span><span class="nwsb-upnext-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span><span class="nwsb-upnext-arrow">→</span></button>'; }).join('') + '</div>' +
+      '<div class="section-header"><h2>Your progress</h2><button class="view-all" type="button" data-daydash-progress>View all ' + chevron + '</button></div>' +
+      '<div class="progress-card neo-raised">' +
+        '<div class="progress-item"><div class="icon-circle-wrap">' + icon('check') + '</div><div class="progress-value" data-progress-sessions>' + p.sessions + '</div><div class="progress-label">meditation sessions</div></div>' +
+        '<div class="progress-item"><div class="icon-circle-wrap">' + icon('timer') + '</div><div class="progress-value" data-progress-words>' + p.words + '</div><div class="progress-label">words in practice</div></div>' +
+        '<div class="progress-item"><div class="icon-circle-wrap">' + icon('fire') + '</div><div class="progress-value" data-progress-streak>' + p.streak + '</div><div class="progress-label">day streak</div></div>' +
+        '<div class="progress-item"><div class="icon-circle-wrap">' + icon('target') + '</div><div class="progress-value" data-progress-goal>' + p.goal + '%</div><div class="progress-label">meditation goal</div></div>' +
+      '</div>' +
+      '<div class="section-header reference-upnext-header"><h2>Up next</h2><button class="view-all" type="button" data-daydash-upnext-view>View all ' + chevron + '</button></div>' +
+      '<div class="upnext-card neo-raised">' + items.map(function (item) { return '<button type="button" class="upnext-row" data-daydash-upnext-action="' + esc(item.action) + '"><span class="icon-circle-wrap-sm">' + icon('calendar') + '</span><span class="icon-divider"></span><span class="upnext-text"><span class="upnext-title">' + esc(item.title) + '</span><span class="upnext-sub">' + esc(item.sub) + '</span></span>' + chevron + '</button>'; }).join('') + '</div>' +
     '</section>';
   }
 

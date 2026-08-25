@@ -18103,3 +18103,113 @@ body.fashion-home-active #home #hsDeck {
 body.fashion-home-active #home #hsRail {
   display: none !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   REFERENCE DASHBOARDS — exact supplied neomorphic_dashboard.html and
+   glass_dashboard.html geometry, scoped to the two home-mode mounts only.
+   The content remains live NowssB content from part090.js.
+═══════════════════════════════════════════════════════════════════════ */
+#home-nm .nmh-wrap > .nwsb-reference-dashboard,
+#home .home-body > .nwsb-reference-dashboard {
+  width: calc(100% - 36px) !important;
+  margin: 26px 18px 34px !important;
+  padding: 22px 18px 30px !important;
+  border-radius: 36px !important;
+  box-sizing: border-box !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  overflow: visible !important;
+  color: #1c1c1c !important;
+}
+#home-nm .nmh-wrap > .nwsb-reference-dashboard {
+  background: #f5f5f5 !important;
+  box-shadow: 14px 14px 30px #d9d9d9, -14px -14px 30px #fff !important;
+}
+#home .home-body > .nwsb-reference-dashboard {
+  background: rgba(255,255,255,.12) !important;
+  border: 1px solid rgba(255,255,255,.35) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(160%) !important;
+  backdrop-filter: blur(30px) saturate(160%) !important;
+  box-shadow: 0 20px 50px rgba(31,26,80,.35), inset 0 1px 0 rgba(255,255,255,.4) !important;
+}
+#home-nm .nwsb-reference-dashboard .neo-raised,
+#home .home-body > .nwsb-reference-dashboard .neo-raised {
+  position: relative;
+  background: #f5f5f5 !important;
+  border: 0 !important;
+  box-shadow: 8px 8px 16px #d9d9d9, -8px -8px 16px #fff !important;
+}
+#home .home-body > .nwsb-reference-dashboard .neo-raised {
+  background: rgba(255,255,255,.28) !important;
+  border: 1px solid rgba(255,255,255,.55) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  box-shadow: 0 8px 32px rgba(31,26,80,.18), inset 0 1px 0 rgba(255,255,255,.5) !important;
+}
+#home-nm .nwsb-reference-dashboard .focus-card,
+#home .home-body > .nwsb-reference-dashboard .focus-card {
+  border-radius: 28px !important;
+  padding: 22px 22px 24px !important;
+  margin: 0 0 26px !important;
+  min-height: 208px !important;
+  overflow: hidden !important;
+  text-align: left !important;
+  cursor: pointer !important;
+}
+.nwsb-reference-dashboard .focus-label { color: #767676 !important; font-size: 13px !important; line-height: 1.2 !important; margin: 0 0 10px !important; }
+.nwsb-reference-dashboard .focus-title { max-width: 70% !important; margin: 0 0 16px !important; color: #1c1c1c !important; font-size: 26px !important; font-weight: 700 !important; line-height: 1.2 !important; }
+.nwsb-reference-dashboard .focus-meta { display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 0 20px !important; color: #767676 !important; font-size: 13px !important; line-height: 1.2 !important; }
+.nwsb-reference-dashboard .focus-meta .dot { width: 6px !important; height: 6px !important; flex: 0 0 6px !important; border-radius: 50% !important; background: #a79ae8 !important; }
+.nwsb-reference-dashboard .focus-meta .bold { color: #1c1c1c !important; font-weight: 600 !important; }
+.nwsb-reference-dashboard .blob-wrap { position: absolute !important; top: 18px !important; right: 14px !important; width: 130px !important; height: 130px !important; pointer-events: none !important; }
+.nwsb-reference-dashboard .blob-wrap svg { display: block !important; width: 130px !important; height: 130px !important; }
+.nwsb-reference-dashboard .start-btn { display: inline-flex !important; align-items: center !important; gap: 10px !important; padding: 13px 22px !important; border: 0 !important; border-radius: 18px !important; color: #f3f0ff !important; font-size: 14px !important; font-weight: 600 !important; cursor: pointer !important; }
+#home-nm .nwsb-reference-dashboard .start-btn { background: linear-gradient(145deg,#333a4a,#232833) !important; box-shadow: 6px 6px 14px #b9bfc9, -6px -6px 14px #fff !important; }
+#home .home-body > .nwsb-reference-dashboard .start-btn { background: #000 !important; border: 1px solid rgba(255,255,255,.15) !important; box-shadow: 0 8px 20px rgba(0,0,0,.3) !important; }
+.nwsb-reference-dashboard .start-btn svg { width: 16px !important; height: 16px !important; }
+.nwsb-reference-dashboard .section-header { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 10px !important; margin: 0 0 14px !important; }
+.nwsb-reference-dashboard .section-header h2 { margin: 0 !important; color: #1c1c1c !important; font-size: 17px !important; font-weight: 700 !important; line-height: 1.2 !important; }
+.nwsb-reference-dashboard .section-header .view-all { display: inline-flex !important; align-items: center !important; gap: 4px !important; min-height: 30px !important; padding: 0 !important; border: 0 !important; background: transparent !important; color: #767676 !important; font-size: 13px !important; line-height: 1 !important; cursor: pointer !important; }
+.nwsb-reference-dashboard .section-header .view-all .chevron { width: 14px !important; height: 14px !important; color: currentColor !important; }
+.nwsb-reference-dashboard .progress-card { display: flex !important; width: 100% !important; min-height: 154px !important; padding: 20px 6px !important; margin: 0 0 28px !important; border-radius: 24px !important; box-sizing: border-box !important; }
+.nwsb-reference-dashboard .progress-item { position: relative !important; display: flex !important; min-width: 0 !important; flex: 1 1 0 !important; flex-direction: column !important; align-items: center !important; padding: 0 6px !important; text-align: center !important; }
+.nwsb-reference-dashboard .progress-item + .progress-item::before { content: "" !important; position: absolute !important; top: 14px !important; left: 0 !important; width: 1px !important; height: 38px !important; background: #d9d9d9 !important; opacity: .6 !important; }
+#home .home-body > .nwsb-reference-dashboard .progress-item + .progress-item::before { background: rgba(255,255,255,.5) !important; opacity: .8 !important; }
+.nwsb-reference-dashboard .icon-circle-wrap { display: flex !important; align-items: center !important; justify-content: center !important; width: 52px !important; height: 52px !important; flex: 0 0 52px !important; margin: 0 0 10px !important; border-radius: 50% !important; background: #fff !important; box-shadow: 6px 6px 12px #d9d9d9, -6px -6px 12px #fff !important; }
+#home .home-body > .nwsb-reference-dashboard .icon-circle-wrap { border: 1px solid rgba(0,0,0,.06) !important; box-shadow: 0 6px 14px rgba(31,26,80,.1) !important; }
+.nwsb-reference-dashboard .icon-circle-wrap svg { width: 52px !important; height: 52px !important; color: #8a8a8a !important; }
+#home-nm .nwsb-reference-dashboard .progress-item:nth-child(1) .icon-circle-wrap svg { color: #3ba55d !important; }
+#home-nm .nwsb-reference-dashboard .progress-item:nth-child(2) .icon-circle-wrap svg { color: #8a8a8a !important; }
+#home-nm .nwsb-reference-dashboard .progress-item:nth-child(3) .icon-circle-wrap svg { color: #e78a3e !important; }
+#home-nm .nwsb-reference-dashboard .progress-item:nth-child(4) .icon-circle-wrap svg { color: #8a6fe0 !important; }
+.nwsb-reference-dashboard .progress-value { margin: 0 0 3px !important; color: #1c1c1c !important; font-size: 19px !important; font-weight: 700 !important; line-height: 1.1 !important; white-space: nowrap !important; }
+.nwsb-reference-dashboard .progress-label { max-width: 100% !important; margin: 0 0 6px !important; overflow: hidden !important; color: #767676 !important; font-size: 11.5px !important; line-height: 1.2 !important; white-space: normal !important; }
+.nwsb-reference-dashboard .reference-upnext-header { margin-top: 26px !important; }
+.nwsb-reference-dashboard .upnext-card { width: 100% !important; padding: 8px 16px !important; border-radius: 24px !important; box-sizing: border-box !important; }
+.nwsb-reference-dashboard .upnext-row { display: flex !important; align-items: center !important; gap: 14px !important; width: 100% !important; min-height: 72px !important; padding: 14px 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: inherit !important; text-align: left !important; cursor: pointer !important; }
+.nwsb-reference-dashboard .upnext-row + .upnext-row { border-top: 1px solid #d9d9d9 !important; }
+#home .home-body > .nwsb-reference-dashboard .upnext-row + .upnext-row { border-top-color: rgba(255,255,255,.35) !important; }
+.nwsb-reference-dashboard .icon-circle-wrap-sm { display: flex !important; align-items: center !important; justify-content: center !important; width: 44px !important; height: 44px !important; flex: 0 0 44px !important; border-radius: 50% !important; background: #fff !important; box-shadow: 5px 5px 10px #d9d9d9, -5px -5px 10px #fff !important; }
+#home .home-body > .nwsb-reference-dashboard .icon-circle-wrap-sm { border: 1px solid rgba(0,0,0,.06) !important; box-shadow: 0 5px 12px rgba(31,26,80,.1) !important; }
+.nwsb-reference-dashboard .icon-circle-wrap-sm svg { width: 44px !important; height: 44px !important; color: #8a8a8a !important; }
+#home-nm .nwsb-reference-dashboard .upnext-row:first-child .icon-circle-wrap-sm svg { color: #e78a3e !important; }
+.nwsb-reference-dashboard .icon-divider { align-self: stretch !important; width: 1px !important; flex: 0 0 1px !important; margin: 6px 0 !important; background: #d9d9d9 !important; opacity: .6 !important; }
+#home .home-body > .nwsb-reference-dashboard .icon-divider { background: rgba(255,255,255,.5) !important; opacity: .8 !important; }
+.nwsb-reference-dashboard .upnext-text { min-width: 0 !important; flex: 1 1 auto !important; }
+.nwsb-reference-dashboard .upnext-title { display: block !important; margin: 0 0 2px !important; overflow: hidden !important; color: #1c1c1c !important; font-size: 15px !important; font-weight: 600 !important; line-height: 1.2 !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+.nwsb-reference-dashboard .upnext-sub { display: block !important; overflow: hidden !important; color: #767676 !important; font-size: 12.5px !important; line-height: 1.2 !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+.nwsb-reference-dashboard .upnext-row .chevron { flex: 0 0 16px !important; color: #a8a8a8 !important; }
+#home .home-body > .nwsb-reference-dashboard .upnext-row .chevron { color: #9797a8 !important; }
+.nwsb-reference-dashboard .view-all:focus-visible,
+.nwsb-reference-dashboard .start-btn:focus-visible,
+.nwsb-reference-dashboard .upnext-row:focus-visible { outline: 2px solid rgba(109,91,208,.72) !important; outline-offset: 3px !important; }
+@media (max-width: 380px) {
+  #home-nm .nmh-wrap > .nwsb-reference-dashboard,
+  #home .home-body > .nwsb-reference-dashboard { width: calc(100% - 28px) !important; margin-left: 14px !important; margin-right: 14px !important; padding-left: 14px !important; padding-right: 14px !important; }
+  .nwsb-reference-dashboard .focus-title { font-size: 24px !important; }
+  .nwsb-reference-dashboard .focus-card { padding-left: 18px !important; padding-right: 18px !important; }
+  .nwsb-reference-dashboard .icon-circle-wrap { width: 46px !important; height: 46px !important; flex-basis: 46px !important; }
+  .nwsb-reference-dashboard .icon-circle-wrap svg { width: 46px !important; height: 46px !important; }
+  .nwsb-reference-dashboard .progress-value { font-size: 17px !important; }
+  .nwsb-reference-dashboard .progress-label { font-size: 10px !important; }
+}
