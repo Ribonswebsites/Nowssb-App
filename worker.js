@@ -62,6 +62,87 @@ function err(message, status = 400, origin = '') {
   return json({ error: message }, status, origin);
 }
 
+function b64urlBytes(value) {
+  const padded = String(value || '').replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((String(value || '').length + 3) % 4);
+  const raw = atob(padded);
+  return Uint8Array.from(raw, c => c.charCodeAt(0));
+}
+
+let firebaseCertCache = { at: 0, certs: null };
+async function firebaseCerts() {
+  if (firebaseCertCache.certs && Date.now() - firebaseCertCache.at < 3600e3) return firebaseCertCache.certs;
+  const response = await fetch('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com');
+  if (!response.ok) throw new Error('Firebase certificate lookup failed');
+  firebaseCertCache = { at: Date.now(), certs: await response.json() };
+  return firebaseCertCache.certs;
+}
+
+function certSpki(der) {
+  const oid = [0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01];
+  for (let i = 0; i < der.length - oid.length; i++) {
+    if (!oid.every((byte, j) => der[i + j] === byte)) continue;
+    for (let start = i; start >= 2; start--) {
+      if (der[start] !== 0x30 || der[start + 1] !== 0x82) continue;
+      const length = (der[start + 2] << 8) | der[start + 3];
+      const end = start + 4 + length;
+      if (end <= der.length && end - start > 200 && der[start + 4] === 0x30) return der.slice(start, end);
+    }
+  }
+  return null;
+}
+
+async function verifyFirebaseToken(token, projectId) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 3) return null;
+  let header, claims;
+  try {
+    header = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[0])));
+    claims = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[1])));
+  } catch { return null; }
+  const now = Math.floor(Date.now() / 1000);
+  if (header.alg !== 'RS256' || claims.aud !== projectId || claims.iss !== `https://securetoken.google.com/${projectId}` || !claims.sub || claims.exp <= now) return null;
+  const pem = (await firebaseCerts())[header.kid];
+  if (!pem) return null;
+  const der = b64urlBytes(pem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, ''));
+  const spki = certSpki(der);
+  if (!spki) return null;
+  const key = await crypto.subtle.importKey('spki', spki, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+  const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64urlBytes(parts[2]), new TextEncoder().encode(`${parts[0]}.${parts[1]}`));
+  return valid ? claims : null;
+}
+
+async function connectClaims(request, env) {
+  const auth = request.headers.get('Authorization') || '';
+  if (!auth.startsWith('Bearer ')) return null;
+  return verifyFirebaseToken(auth.slice(7), env.FIREBASE_PROJECT_ID || 'nowssb-34f1b');
+}
+
+const CONNECT_MEDIA_LIMIT = 8 * 1024 * 1024;
+const CONNECT_MEDIA_TYPES = new Map([
+  ['image/jpeg', 'jpg'], ['image/png', 'png'], ['image/webp', 'webp'],
+  ['image/gif', 'gif'], ['video/mp4', 'mp4'], ['video/webm', 'webm'],
+]);
+
+async function connectMediaUpload(request, env, origin) {
+  if (!env.NWSB_MEDIA) return err('Connect media storage is not configured', 503, origin);
+  const claims = await connectClaims(request, env);
+  if (!claims?.sub) return err('Sign in to upload Connect media', 401, origin);
+  const form = await request.formData();
+  const file = form.get('file');
+  const kind = String(form.get('kind') || 'post').replace(/[^a-z]/g, '').slice(0, 16) || 'post';
+  if (!file || typeof file.arrayBuffer !== 'function') return err('A media file is required', 400, origin);
+  if (file.size <= 0 || file.size > CONNECT_MEDIA_LIMIT) return err('Media must be between 1 byte and 8 MB', 413, origin);
+  const type = CONNECT_MEDIA_TYPES.has(file.type) ? file.type : '';
+  if (!type) return err('This image or video format is not supported', 415, origin);
+  const ext = CONNECT_MEDIA_TYPES.get(type);
+  const key = `connect/${claims.sub}/${kind}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  await env.NWSB_MEDIA.put(key, await file.arrayBuffer(), {
+    httpMetadata: { contentType: type, cacheControl: 'public, max-age=31536000, immutable' },
+    customMetadata: { uid: claims.sub, kind },
+  });
+  return json({ key, url: new URL(`/media/${encodeURIComponent(key)}`, request.url).toString(), contentType: type, size: file.size }, 201, origin);
+}
+
 function mediaType(key) {
   const ext = String(key).toLowerCase().split('.').pop();
   return ({ mp4: 'video/mp4', webm: 'video/webm', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png' })[ext] || 'application/octet-stream';
@@ -317,6 +398,14 @@ export default {
     const path = url.pathname;
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(origin) });
+    if (path === '/api/connect/media' && request.method === 'POST') {
+      try {
+        return await connectMediaUpload(request, env, origin);
+      } catch (error) {
+        console.error('Connect media upload error', error?.message || error);
+        return err('Connect media upload failed', 502, origin);
+      }
+    }
     if (path === '/api/health' && request.method === 'GET') {
       return json({ status: 'ok', groqConfigured: Boolean(env.GROQ_API_KEY), mediaConfigured: Boolean(env.NWSB_MEDIA), version: '2.1.0', ts: Date.now() }, 200, origin);
     }

@@ -48,6 +48,20 @@ try {
 async function saveUser(user) {
   const ref  = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
+  const publicProfile = {
+    uid: user.uid,
+    displayName: user.displayName || 'NowssB Practitioner',
+    username: (user.displayName || 'practitioner').toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\\.|\\.$/g, ''),
+    photoURL: user.photoURL || '',
+    bio: '',
+    category: 'Practitioner',
+    profileVisibility: 'public',
+    updatedAt: serverTimestamp()
+  };
+  // Keep a deliberately small public projection for Connect discovery. Email,
+  // subscription fields, onboarding answers, and private settings stay only in
+  // users/{uid}, which remains owner/admin-readable.
+  await setDoc(doc(db, 'publicProfiles', user.uid), publicProfile, { merge: true });
   if (!snap.exists()) {
     // No trialStartDate/trialEndDate here — a trial only begins when the
     // user explicitly starts one from the Subscription screen (card saved,

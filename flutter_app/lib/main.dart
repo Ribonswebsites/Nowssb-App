@@ -27,6 +27,7 @@ import 'data/updater.dart';
 import 'media/video_cache.dart';
 import 'media/video_pool.dart';
 import 'screens/login.dart';
+import 'services/connect_service.dart';
 import 'screens/splash.dart';
 import 'widgets/video_pack_dialog.dart';
 import 'widgets/motion.dart';
@@ -93,14 +94,26 @@ class NowssbApp extends StatefulWidget {
 }
 
 class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
+  StreamSubscription<User?>? _authSubscription;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    if (NwsbFirebase.ready) {
+      _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+        if (user != null) {
+          ConnectService.instance.ensurePublicProfile().catchError((error) {
+            debugPrint('NowssB Connect profile sync failed: $error');
+          });
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
+    _authSubscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

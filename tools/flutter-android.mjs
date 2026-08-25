@@ -167,6 +167,19 @@ if (m.includes('android.permission.RECORD_AUDIO')) {
   done.push('added microphone permission');
 }
 
+// ── camera permission ───────────────────────────────────────────────────
+if (m.includes('android.permission.CAMERA')) {
+  already.push('camera permission');
+} else {
+  const marker = '<manifest';
+  const at = m.indexOf(marker);
+  const eol = m.indexOf('>', at);
+  if (at < 0 || eol < 0) throw new Error('AndroidManifest.xml: no manifest element');
+  m = m.slice(0, eol + 1) + '\n    <uses-permission android:name="android.permission.CAMERA" />' + m.slice(eol + 1);
+  writeFileSync(manifest, m);
+  done.push('added camera permission');
+}
+
 // ── the config itself ──────────────────────────────────────────────────
 // Not a secret: google-services.json ships inside every copy of the APK and
 // identifies the project rather than authorising anything. The keystore and
