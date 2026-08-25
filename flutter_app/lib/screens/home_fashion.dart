@@ -392,7 +392,6 @@ class _HomeFashionState extends State<HomeFashion> {
                   ],
                 ),
               ),
-              ),
             ],
           ),
         ],
