@@ -1,7 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /admin.html
+Disallow: /admin
 Disallow: /admin-dev.html
 Disallow: /fetch-nowssb-v2.html
+Disallow: /player-settings.html
+Disallow: /aura-player.html
 
 Sitemap: https://nowssb.com/sitemap.xml
