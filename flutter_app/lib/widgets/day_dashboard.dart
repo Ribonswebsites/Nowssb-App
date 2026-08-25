@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -189,7 +190,12 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
       children: [
         focus,
         const SizedBox(height: 24),
-        _heading(context, 'Your practice', 'Your Progress', Dest.profile),
+        _heading(
+          context,
+          widget.fashion ? 'Your practice' : 'Your meditation',
+          widget.fashion ? 'Your Progress' : 'Meditation progress',
+          Dest.profile,
+        ),
         const SizedBox(height: 12),
         progress,
         const SizedBox(height: 24),
@@ -290,40 +296,71 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   }
 
   Widget _heading(BuildContext context, String eyebrow, String title, Object dest) {
-    final color = widget.fashion ? Colors.white : NwsbColors.ink;
-    final faint = widget.fashion ? const Color(0xB3E8D5A3) : NwsbColors.inkFaint;
+    final normal = !widget.fashion;
+    final reference = true;
+    final color = widget.fashion ? const Color(0xFF1C1C1C) : NwsbColors.ink;
+    final faint = widget.fashion ? const Color(0xFF6B6B7D) : const Color(0xFFA4A7B0);
+    final accent = widget.fashion ? const Color(0xFF6D5BD0) : NwsbColors.gold;
     final mark = title == 'Up next' ? NwsbMarks.reader : NwsbMarks.sound;
+    final discSize = reference ? 58.0 : 52.0;
+    final icon = title == 'Meditation progress'
+        ? Icon(Icons.track_changes_outlined, size: 28, color: accent)
+        : title == 'Up next'
+            ? Icon(Icons.calendar_today_outlined, size: reference ? 25 : 21, color: accent)
+            : NwsbIcon(mark, size: reference ? 27 : 23, color: accent);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 52,
-          height: 52,
+          width: discSize,
+          height: discSize,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: widget.fashion ? Colors.white : NwsbColors.surface,
+            color: widget.fashion ? Colors.white.withOpacity(.74) : NwsbColors.surface,
             shape: BoxShape.circle,
-            boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
+            border: widget.fashion ? Border.all(color: Colors.black.withOpacity(.06)) : null,
+            boxShadow: widget.fashion ? const [BoxShadow(color: Color(0x19311A50), blurRadius: 14, offset: Offset(0, 6))] : NwsbShadows.raisedXs,
           ),
-          child: Center(
-            child: NwsbIcon(mark, size: 23, color: widget.fashion ? const Color(0xFF171326) : NwsbColors.gold),
-          ),
+          child: Center(child: icon),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: normal ? 15 : 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(eyebrow.toUpperCase(), style: TextStyle(color: faint, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
-              const SizedBox(height: 3),
-              Text(title, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -.4)),
+              Text(
+                eyebrow.toUpperCase(),
+                style: TextStyle(
+                  color: faint,
+                  fontSize: reference ? 12 : 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: reference ? 2.8 : 1.8,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontSize: reference ? 26 : 22,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: reference ? -.9 : -.4,
+                ),
+              ),
             ],
           ),
         ),
         TextButton(
           onPressed: () => Dest.open(context, dest),
-          style: TextButton.styleFrom(foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink, padding: EdgeInsets.zero, minimumSize: const Size(0, 32)),
-          child: const Text('View all  ›', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+          style: TextButton.styleFrom(
+            foregroundColor: widget.fashion ? const Color(0xFF1C1C1C) : NwsbColors.ink,
+            padding: EdgeInsets.zero,
+            minimumSize: const Size(0, 32),
+          ),
+          child: Text(
+            'View all  ›',
+            style: TextStyle(fontSize: reference ? 15 : 13, fontWeight: FontWeight.w700),
+          ),
         ),
       ],
     );
@@ -331,62 +368,130 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   Widget _progressCard(BuildContext context) {
     final goal = (_sessions * 10).clamp(0, 100);
-    final children = [
-      _stat(Icons.check_circle_outline, '$_sessions', 'tasks done'),
-      _stat(Icons.timer_outlined, '${_words}m', 'focused time'),
-      _stat(Icons.local_fire_department_outlined, '$_streak', 'day streak'),
-      _stat(Icons.track_changes_outlined, '$goal%', 'goal progress'),
-    ];
+    final children = widget.fashion
+        ? [
+            _stat(Icons.check_circle_outline, '$_sessions', 'tasks done'),
+            _stat(Icons.timer_outlined, '${_words}m', 'focused time'),
+            _stat(Icons.local_fire_department_outlined, '$_streak', 'day streak'),
+            _stat(Icons.track_changes_outlined, '$goal%', 'goal progress'),
+          ]
+        : [
+            _stat(Icons.check_circle_outline, '$_sessions', 'meditation sessions'),
+            _stat(Icons.timer_outlined, '$_words', 'words in practice'),
+            _stat(Icons.local_fire_department_outlined, '$_streak', 'day streak'),
+            _stat(Icons.track_changes_outlined, '$goal%', 'meditation goal'),
+          ];
     final card = Row(children: [for (var i = 0; i < children.length; i++) ...[if (i > 0) _divider(), Expanded(child: children[i])]]);
-    if (!widget.fashion) return NeuCard(radius: 22, padding: EdgeInsets.zero, child: card);
-    return _glass(child: card, padding: EdgeInsets.zero);
+    if (!widget.fashion) {
+      return NeuCard(
+        radius: 26,
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 4),
+        child: card,
+      );
+    }
+    return _glassReference(child: card, radius: 24);
   }
 
   Widget _stat(IconData icon, String value, String label) {
-    final accent = widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold;
+    final normal = !widget.fashion;
+    final accent = widget.fashion ? const Color(0xFF6D5BD0) : NwsbColors.gold;
+    final size = normal || widget.fashion ? 54.0 : 38.0;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 6),
+      padding: EdgeInsets.symmetric(vertical: normal ? 0 : 17, horizontal: normal ? 4 : 6),
       child: Column(
         children: [
-          Container(width: 38, height: 38, decoration: BoxDecoration(color: widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface, shape: BoxShape.circle, boxShadow: widget.fashion ? null : NwsbShadows.raisedXs), child: Icon(icon, size: 20, color: accent)),
-          const SizedBox(height: 9),
-          Text(value, style: TextStyle(color: widget.fashion ? Colors.white : NwsbColors.ink, fontSize: 21, fontWeight: FontWeight.w800, height: 1)),
-          const SizedBox(height: 6),
-          Text(label, textAlign: TextAlign.center, maxLines: 2, style: TextStyle(color: widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint, fontSize: 10, height: 1.2)),
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: widget.fashion ? Colors.white.withOpacity(.82) : NwsbColors.surface,
+              shape: BoxShape.circle,
+              border: widget.fashion ? Border.all(color: Colors.black.withOpacity(.06)) : null,
+              boxShadow: widget.fashion ? const [BoxShadow(color: Color(0x19311A50), blurRadius: 14, offset: Offset(0, 6))] : NwsbShadows.raisedXs,
+            ),
+            child: Icon(icon, size: normal || widget.fashion ? 25 : 20, color: accent),
+          ),
+          SizedBox(height: normal ? 11 : 9),
+          Text(
+            value,
+            style: TextStyle(
+              color: widget.fashion ? const Color(0xFF1C1C1C) : NwsbColors.ink,
+              fontSize: normal || widget.fashion ? 25 : 21,
+              fontWeight: FontWeight.w800,
+              height: 1,
+            ),
+          ),
+          SizedBox(height: normal ? 8 : 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            style: TextStyle(
+              color: widget.fashion ? const Color(0xFF6B6B7D) : NwsbColors.inkFaint,
+              fontSize: normal || widget.fashion ? 11 : 10,
+              height: 1.2,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _divider() => Container(width: 1, height: 74, color: widget.fashion ? const Color(0x24FFFFFF) : const Color(0x141A1A2E));
+  Widget _divider() => Container(width: 1, height: 108, color: widget.fashion ? const Color(0x80FFFFFF) : const Color(0x141A1A2E));
 
   Widget _upNextCard(BuildContext context) {
-    final surface = widget.fashion
-        ? _glass(child: Column(children: [_upNextRow(context, 'Open today’s practice', 'Choose a word and begin your next sound ritual', Dest.player), _upNextDivider(), _upNextRow(context, 'Build your routine', 'Set a daily practice system', Dest.routines)]), padding: EdgeInsets.zero)
-        : NeuCard(radius: 22, padding: EdgeInsets.zero, child: Column(children: [_upNextRow(context, 'Open today’s practice', 'Choose a word and begin your next sound ritual', Dest.player), _upNextDivider(), _upNextRow(context, 'Build your routine', 'Set a daily practice system', Dest.routines)]));
-    return surface;
+    final rows = Column(
+      children: [
+        _upNextRow(context, 'Open today’s practice', 'Choose a word and begin your next sound ritual', Dest.player),
+        _upNextDivider(),
+        _upNextRow(context, 'Build your routine', 'Set a daily practice system', Dest.routines),
+      ],
+    );
+    if (widget.fashion) return _glassReference(child: rows, radius: 24);
+    return NeuCard(radius: 26, padding: EdgeInsets.zero, child: rows);
   }
 
   Widget _upNextRow(BuildContext context, String title, String subtitle, Object destination) {
-    final iconColor = widget.fashion ? const Color(0xFFE8D5A3) : NwsbColors.gold;
-    final textColor = widget.fashion ? Colors.white : NwsbColors.ink;
-    final subColor = widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint;
+    final normal = !widget.fashion;
+    final iconColor = widget.fashion ? const Color(0xFF6D5BD0) : NwsbColors.gold;
+    final textColor = widget.fashion ? const Color(0xFF1C1C1C) : NwsbColors.ink;
+    final subColor = widget.fashion ? const Color(0xFF6B6B7D) : NwsbColors.inkFaint;
+    final iconSize = normal || widget.fashion ? 48.0 : 44.0;
     return InkWell(
       onTap: () => Dest.open(context, destination),
       child: Padding(
-        padding: const EdgeInsets.all(15),
+        padding: EdgeInsets.symmetric(horizontal: normal || widget.fashion ? 20 : 15, vertical: normal || widget.fashion ? 17 : 15),
         child: Row(children: [
-          Container(width: 44, height: 44, decoration: BoxDecoration(color: widget.fashion ? Colors.white.withOpacity(.10) : NwsbColors.surface, shape: BoxShape.circle, boxShadow: widget.fashion ? null : NwsbShadows.raisedXs), child: Icon(Icons.calendar_today_outlined, size: 20, color: iconColor)),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800)), const SizedBox(height: 5), Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 11))])),
+          Container(
+            width: iconSize,
+            height: iconSize,
+            decoration: BoxDecoration(
+              color: widget.fashion ? Colors.white.withOpacity(.82) : NwsbColors.surface,
+              shape: BoxShape.circle,
+              border: widget.fashion ? Border.all(color: Colors.black.withOpacity(.06)) : null,
+              boxShadow: widget.fashion ? const [BoxShadow(color: Color(0x19311A50), blurRadius: 12, offset: Offset(0, 5))] : NwsbShadows.raisedXs,
+            ),
+            child: Icon(Icons.calendar_today_outlined, size: normal || widget.fashion ? 23 : 20, color: iconColor),
+          ),
+          SizedBox(width: normal || widget.fashion ? 14 : 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: normal || widget.fashion ? 17 : 14, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 5),
+                Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: normal || widget.fashion ? 13 : 11)),
+              ],
+            ),
+          ),
           const SizedBox(width: 8),
-          Icon(Icons.arrow_forward, color: widget.fashion ? Colors.white70 : NwsbColors.inkSoft, size: 20),
+          Icon(Icons.arrow_forward, color: widget.fashion ? const Color(0xFF9797A8) : NwsbColors.inkSoft, size: normal || widget.fashion ? 22 : 20),
         ]),
       ),
     );
   }
 
-  Widget _upNextDivider() => Divider(height: 1, thickness: 1, color: widget.fashion ? const Color(0x24FFFFFF) : const Color(0x141A1A2E));
+  Widget _upNextDivider() => Divider(height: 1, thickness: 1, color: widget.fashion ? const Color(0x59FFFFFF) : const Color(0x141A1A2E));
 
   Widget _essentialsSection(BuildContext context) {
     final visible = _essentialsExpanded ? _essentials : _essentials.take(4).toList(growable: false);
@@ -631,6 +736,29 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
   Widget _startPracticeButton(BuildContext context) => Material(color: Colors.white, borderRadius: BorderRadius.circular(999), child: InkWell(onTap: () => Dest.open(context, Dest.player), borderRadius: BorderRadius.circular(999), child: Padding(padding: const EdgeInsets.fromLTRB(19, 8, 8, 8), child: Row(mainAxisSize: MainAxisSize.min, children: [const Text('Start practice', style: TextStyle(color: NwsbColors.ink, fontSize: 13, fontWeight: FontWeight.w800)), const SizedBox(width: 14), Container(width: 34, height: 34, decoration: const BoxDecoration(color: Color(0xFF080B13), shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Colors.white, size: 19))]))));
 
+
+  Widget _glassReference({required Widget child, required double radius, EdgeInsets padding = EdgeInsets.zero}) {
+    final shape = BorderRadius.circular(radius);
+    return ClipRRect(
+      borderRadius: shape,
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: const Color(0x47FFFFFF),
+            borderRadius: shape,
+            border: Border.all(color: const Color(0x8CFFFFFF)),
+            boxShadow: const [
+              BoxShadow(color: Color(0x2E1F1A50), blurRadius: 32, offset: Offset(0, 8)),
+              BoxShadow(color: Color(0x80FFFFFF), blurRadius: 0, offset: Offset(0, -1)),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
 
   Widget _glass({required Widget child, required EdgeInsets padding}) => Container(padding: padding, decoration: BoxDecoration(color: const Color(0x7810132B), borderRadius: BorderRadius.circular(22), border: Border.all(color: const Color(0x2DFFFFFF)), boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 22, offset: Offset(0, 12))]), child: child);
 }

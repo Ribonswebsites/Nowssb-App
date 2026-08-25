@@ -13,7 +13,7 @@
 ///   1. A greeting ABOVE the card — see [HeroGreeting] in header.dart.
 ///   2. The card itself, in glass: a strip above the set carrying the store
 ///      and the search, the television, and a strip below it carrying
-///      Explore, Help & Coach and Learn. Everything that is not the picture
+///      Explore, App Guide and Learn. Everything that is not the picture
 ///      comes OUT of the television and onto the glass around it — a screen
 ///      with an Explore button drawn on it is a screen with a button drawn
 ///      on it, and the two were fighting for the same 230px (:463).
@@ -32,7 +32,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../media/nwsb_image.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
@@ -42,10 +41,10 @@ import 'follow_steps.dart';
 
 /// One banner on the rail — RAIL, app/js/part083.js:106.
 ///
-/// `asset` is the exact film the website plays. The four films that were
-/// previously network-only are bundled from their exact source files here, so
-/// Android can start the rail without waiting for Cloudinary or falling back
-/// to a still poster.
+/// `asset` is THE ADDRESS THE WEBSITE PLAYS, copied verbatim — a bundled
+/// file for the two that are local on the web, and the Cloudinary URL for
+/// the four that are not. Substituting a local look-alike for those four is
+/// what made this rail play the wrong film in four of its six cells.
 class _Rail {
   const _Rail(this.mark, this.hello, this.title, this.asset, this.dest);
 
@@ -65,21 +64,24 @@ const _rail = [
       NwsbMarks.crown,
       'The Full Library',
       'NowssB Subscription',
-      'assets/video/fashion-hero-subscription.mp4',
+      'https://res.cloudinary.com/eenvubod/video/upload/v1784895544/'
+          'grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
       3),
   // The clip a word page opens with — NWSB_WORD_BANNER_VID.
   _Rail(
       NwsbMarks.word,
       'Where a word begins',
       'NowssB Word Store',
-      'assets/video/fashion-hero-word-store.mp4',
+      'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/'
+          'grok_video_2026-07-31-20-43-13_qh2qjg.mp4',
       3),
   // The clip every meaning's page opens with — MS_MEANING_VID.
   _Rail(
       NwsbMarks.meaning,
       'What a word truly means',
       'NowssB Meaning Store',
-      'assets/video/fashion-hero-meaning-store.mp4',
+      'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/'
+          'grok_video_2026-07-31-15-41-50_oxszei.mp4',
       3),
   _Rail(NwsbMarks.signature, 'The rarest word', 'The Signature',
       'assets/video/signature-banner.mp4', 3),
@@ -89,7 +91,8 @@ const _rail = [
       NwsbMarks.book,
       'Page by page',
       'NowssB eBooks',
-      'assets/video/fashion-hero-ebooks.mp4',
+      'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/'
+          'grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
       2),
   _Rail(NwsbMarks.sound, 'Every word you own', 'Sound Library',
       'assets/video/sound-library-banner.mp4', 2),
@@ -351,14 +354,13 @@ class _HeroCard extends StatelessWidget {
             overlay: guide ? const FstTitle() : _Screen(live: live),
           ),
           const SizedBox(height: 10),
-          // `.hs-foot` — Explore and Help & Coach on the left, then Learn and
+          // `.hs-foot` — Explore and App Guide on the left, then Learn and
           // its disc hard against the right corner.
           SizedBox(
             height: _footStripH,
-            // `footNav` — part084.js:394. "Explore and Help & Coach stand down
-            // for as long as the practice panel is up, and return when it closes."
-            // The strip is the title card's own row, and it is the
-
+            // `footNav` — part084.js:394. "Explore and App Guide stand down
+            // for as long as it is up, and come back the moment the guide
+            // closes." The strip is the title card's own row, and it is the
             // only cell whose row is not on the card itself.
             child: guide
                 ? Align(
@@ -422,9 +424,10 @@ class _HeroCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          // THE DISC. This is what "Learn" is for: it keeps the
-                          // word guidance action distinct from the Help & Coach
-                          // entry beside it, so each control has one clear job.
+                          // THE DISC. This is what "Learn" is for, and until now
+                          // it opened the App Guide page — the same place the
+                          // button two inches to its left already went, so the
+                          // word beside it was describing nothing of its own.
                           //
                           // It runs the guide: fifteen black cards through the
                           // rail this card is cell 0 of. See follow_steps.dart.
@@ -650,9 +653,10 @@ class _SearchPill extends StatelessWidget {
               // is in the repository — the one mark on this card that is a
               // picture rather than a path.
               padding: const EdgeInsets.all(9),
-              child: NwsbImage(
-                asset: 'assets/icons/search.webp',
-                error: const Icon(Icons.search, size: 19, color: Colors.white),
+              child: Image.asset(
+                'assets/icons/search.webp',
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.search, size: 19, color: Colors.white),
               ),
             ),
           ],
@@ -662,7 +666,7 @@ class _SearchPill extends StatelessWidget {
   }
 }
 
-/// `.hero-btns > *` — Explore and Help & Coach, bordered rather than filled.
+/// `.hero-btns > *` — Explore and App Guide, bordered rather than filled.
 class _FootButton extends StatelessWidget {
   const _FootButton({required this.label, this.trailing, this.onTap});
   final String label;

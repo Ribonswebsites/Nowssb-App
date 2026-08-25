@@ -17604,3 +17604,502 @@ body.fashplus #home video[poster] { background-image: none !important; }
   .nwsb-essentials-supplied .nwsb-essential-featured small,
   .nwsb-essentials-supplied .nwsb-essential-featured em { left: 18px !important; }
 }
+
+
+/* ══ NORMAL HOME — provided neomorphic dashboard reference ══
+   Scoped to the normal home only. The renderer in part090.js remains the
+   source of truth for the existing copy, dynamic values, and actions. */
+#home-nm .nmh-wrap > .nwsb-daydash-normal {
+  width: calc(100% - 32px);
+  margin: 24px 16px 28px;
+  color: #1c1d2d;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+#home-nm .nwsb-daydash-normal,
+#home-nm .nwsb-daydash-normal * {
+  box-sizing: border-box;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+  min-height: 58px;
+  margin: 24px 0 15px;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading:first-child {
+  margin-top: 0;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-mark {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 50%;
+  color: #aa8d53;
+  background: #f2f4f9;
+  box-shadow: 8px 8px 16px rgba(170,175,190,.30), -8px -8px 16px rgba(255,255,255,.96);
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-mark svg {
+  width: 28px;
+  height: 28px;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading-copy {
+  min-width: 0;
+  flex: 1;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-eyebrow {
+  margin: 0 0 5px;
+  color: #a4a7b0;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 2.8px;
+  text-transform: uppercase;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading h2 {
+  margin: 0;
+  color: #171827;
+  font-size: clamp(25px, 7vw, 34px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -.9px;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  appearance: none;
+  border: 0;
+  padding: 8px 0 8px 8px;
+  background: transparent;
+  color: #171827;
+  font: 700 15px/1 'DM Sans', sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading button span {
+  margin: 0;
+  color: #171827;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: .7;
+}
+#home-nm .nwsb-daydash-normal .nwsb-progress-card {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  padding: 20px 4px 18px;
+  border: 0;
+  border-radius: 26px;
+  background: #f0f2f7;
+  box-shadow: 10px 10px 22px rgba(166,171,189,.38), -10px -10px 22px rgba(255,255,255,.94);
+}
+#home-nm .nwsb-daydash-normal .nwsb-progress-stat {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 4px;
+  text-align: center;
+}
+#home-nm .nwsb-daydash-normal .nwsb-progress-stat + .nwsb-progress-stat {
+  border-left: 1px solid rgba(40,42,58,.11);
+}
+#home-nm .nwsb-daydash-normal .nwsb-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  margin: 0 0 11px;
+  border-radius: 50%;
+  color: #9b814e;
+  background: #f1f3f8;
+  box-shadow: 6px 6px 12px rgba(166,171,189,.28), -6px -6px 12px rgba(255,255,255,.92);
+}
+#home-nm .nwsb-daydash-normal .nwsb-stat-icon svg {
+  width: 25px;
+  height: 25px;
+}
+#home-nm .nwsb-daydash-normal .nwsb-progress-stat strong {
+  color: #191a2b;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+#home-nm .nwsb-daydash-normal .nwsb-progress-stat small {
+  max-width: 100%;
+  margin-top: 8px;
+  overflow: hidden;
+  color: #858895;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#home-nm .nwsb-daydash-normal .nwsb-up-heading {
+  margin-top: 29px;
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-list {
+  display: grid;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 26px;
+  background: #f0f2f7;
+  box-shadow: 10px 10px 22px rgba(166,171,189,.38), -10px -10px 22px rgba(255,255,255,.94);
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 92px;
+  padding: 17px 20px;
+  border: 0;
+  border-bottom: 1px solid rgba(40,42,58,.11);
+  border-radius: 0;
+  background: transparent;
+  color: #1a1b2b;
+  text-align: left;
+  cursor: pointer;
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-card:last-child {
+  border-bottom: 0;
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 50%;
+  color: #9b814e;
+  background: #f1f3f8;
+  box-shadow: 5px 5px 11px rgba(166,171,189,.28), -5px -5px 11px rgba(255,255,255,.92);
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-icon svg {
+  width: 23px;
+  height: 23px;
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-copy strong {
+  overflow: hidden;
+  color: #1d1e2e;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-copy small {
+  overflow: hidden;
+  color: #868995;
+  font-size: 13px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#home-nm .nwsb-daydash-normal .nwsb-upnext-arrow {
+  flex: 0 0 auto;
+  color: #777a84;
+  font-size: 27px;
+  font-weight: 300;
+  line-height: 1;
+}
+#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading button:focus-visible,
+#home-nm .nwsb-daydash-normal .nwsb-upnext-card:focus-visible {
+  outline: 2px solid rgba(170,141,83,.72);
+  outline-offset: 3px;
+}
+@media (max-width: 380px) {
+  #home-nm .nwsb-daydash-normal .nwsb-dashboard-heading { gap: 11px; }
+  #home-nm .nwsb-daydash-normal .nwsb-dashboard-mark { width: 51px; height: 51px; flex-basis: 51px; }
+  #home-nm .nwsb-daydash-normal .nwsb-dashboard-mark svg { width: 24px; height: 24px; }
+  #home-nm .nwsb-daydash-normal .nwsb-dashboard-eyebrow { font-size: 10px; letter-spacing: 2px; }
+  #home-nm .nwsb-daydash-normal .nwsb-dashboard-heading h2 { font-size: 24px; }
+  #home-nm .nwsb-daydash-normal .nwsb-dashboard-heading button { font-size: 13px; }
+  #home-nm .nwsb-daydash-normal .nwsb-stat-icon { width: 46px; height: 46px; flex-basis: 46px; }
+  #home-nm .nwsb-daydash-normal .nwsb-progress-stat strong { font-size: 21px; }
+  #home-nm .nwsb-daydash-normal .nwsb-progress-stat small { font-size: 9px; }
+  #home-nm .nwsb-daydash-normal .nwsb-upnext-card { padding-left: 15px; padding-right: 15px; }
+}
+/* Keep the supplied dashboard skin light on the normal home, even when the
+   optional dark-mode class is present elsewhere in the application. */
+#home-nm.nm-dark .nwsb-daydash-normal .nwsb-dashboard-heading h2,
+#home-nm.nm-dark .nwsb-daydash-normal .nwsb-dashboard-heading button,
+#home-nm.nm-dark .nwsb-daydash-normal .nwsb-upnext-copy strong,
+#home-nm.nm-dark .nwsb-daydash-normal .nwsb-progress-stat strong { color: #191a2b; }
+#home-nm.nm-dark .nwsb-daydash-normal .nwsb-progress-card,
+#home-nm.nm-dark .nwsb-daydash-normal .nwsb-upnext-list { background: #f0f2f7; }
+
+
+/* ══ FASHION HOME — supplied glass dashboard reference ══
+   Only the Fashion dashboard is restyled here. The surrounding Fashion home
+   and the normal home keep their existing layouts and navigation. */
+#home .home-body > .nwsb-daydash-fashion {
+  width: calc(100% - 32px);
+  margin: 24px 16px 28px;
+  padding: 8px 0 12px;
+  color: #1c1c1c;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 28px;
+  background: linear-gradient(145deg, rgba(255,255,255,.38), rgba(255,255,255,.12));
+  box-shadow: 0 20px 50px rgba(31,26,80,.20), inset 0 1px 0 rgba(255,255,255,.45);
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+}
+#home .home-body > .nwsb-daydash-fashion,
+#home .home-body > .nwsb-daydash-fashion * {
+  box-sizing: border-box;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+  min-height: 58px;
+  margin: 20px 18px 15px;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading:first-child {
+  margin-top: 10px;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-mark {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 50%;
+  color: #6d5bd0;
+  background: rgba(255,255,255,.74);
+  box-shadow: 0 6px 14px rgba(31,26,80,.10);
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-mark svg {
+  width: 28px;
+  height: 28px;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading-copy {
+  min-width: 0;
+  flex: 1;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-eyebrow {
+  margin: 0 0 5px;
+  color: #6b6b7d;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 2.8px;
+  text-transform: uppercase;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading h2 {
+  margin: 0;
+  color: #1c1c1c;
+  font-size: clamp(25px, 7vw, 34px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -.9px;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  appearance: none;
+  border: 0;
+  padding: 8px 0 8px 8px;
+  background: transparent;
+  color: #1c1c1c;
+  font: 700 15px/1 'DM Sans', sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading button span {
+  margin: 0;
+  color: #1c1c1c;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: .7;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-progress-card {
+  display: flex;
+  width: calc(100% - 36px);
+  margin: 0 18px;
+  overflow: hidden;
+  padding: 20px 4px 18px;
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 24px;
+  background: rgba(255,255,255,.28);
+  box-shadow: 0 8px 32px rgba(31,26,80,.18), inset 0 1px 0 rgba(255,255,255,.5);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 4px;
+  text-align: center;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat + .nwsb-progress-stat {
+  border-left: 1px solid rgba(255,255,255,.5);
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  margin: 0 0 11px;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 50%;
+  color: #6d5bd0;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 6px 14px rgba(31,26,80,.10);
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-stat-icon svg {
+  width: 25px;
+  height: 25px;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat strong {
+  color: #1c1c1c;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat small {
+  max-width: 100%;
+  margin-top: 8px;
+  overflow: hidden;
+  color: #6b6b7d;
+  font-size: 11px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-up-heading {
+  margin-top: 26px;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-list {
+  display: grid;
+  width: calc(100% - 36px);
+  margin: 0 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 24px;
+  background: rgba(255,255,255,.28);
+  box-shadow: 0 8px 32px rgba(31,26,80,.18), inset 0 1px 0 rgba(255,255,255,.5);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 92px;
+  padding: 17px 20px;
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,.35);
+  border-radius: 0;
+  background: transparent;
+  color: #1c1c1c;
+  text-align: left;
+  cursor: pointer;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card:last-child {
+  border-bottom: 0;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 50%;
+  color: #6d5bd0;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 5px 12px rgba(31,26,80,.10);
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-icon svg {
+  width: 23px;
+  height: 23px;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-copy strong {
+  overflow: hidden;
+  color: #1c1c1c;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-copy small {
+  overflow: hidden;
+  color: #6b6b7d;
+  font-size: 13px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-arrow {
+  flex: 0 0 auto;
+  color: #9797a8;
+  font-size: 27px;
+  font-weight: 300;
+  line-height: 1;
+}
+#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading button:focus-visible,
+#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card:focus-visible {
+  outline: 2px solid rgba(109,91,208,.72);
+  outline-offset: 3px;
+}
+@media (max-width: 380px) {
+  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading { gap: 11px; margin-left: 14px; margin-right: 14px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-mark { width: 51px; height: 51px; flex-basis: 51px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-mark svg { width: 24px; height: 24px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-eyebrow { font-size: 10px; letter-spacing: 2px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading h2 { font-size: 24px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading button { font-size: 13px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-progress-card,
+  #home .home-body > .nwsb-daydash-fashion .nwsb-upnext-list { width: calc(100% - 28px); margin-left: 14px; margin-right: 14px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-stat-icon { width: 46px; height: 46px; flex-basis: 46px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat strong { font-size: 21px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat small { font-size: 9px; }
+  #home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card { padding-left: 15px; padding-right: 15px; }
+}
+
+
+/* ══ FASHION HERO HEADER — restore latest 15 Aug deck contract ══
+   part083.js from 2026-08-15 builds #hsDeck/.hs-cell. The later rail
+   fallback must not hide that historical hero when Fashion mode is active. */
+body.fashion-home-active #home #hsDeck {
+  display: flex !important;
+}
+body.fashion-home-active #home #hsRail {
+  display: none !important;
+}
