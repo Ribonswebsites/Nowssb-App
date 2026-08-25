@@ -6,7 +6,7 @@
  * modules remain responsible for message rendering and WebRTC media exchange.
  */
 import {
-  collection, query, limit, orderBy, getDocs, addDoc, setDoc, deleteDoc,
+  collection, query, where, limit, orderBy, getDocs, addDoc, setDoc, deleteDoc,
   doc, serverTimestamp, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
@@ -97,7 +97,7 @@ async function syncPublicProfile() {
 
 async function loadProfiles() {
   requireLogin();
-  const snap = await getDocs(query(collection(db(), 'publicProfiles'), limit(100)));
+  const snap = await getDocs(query(collection(db(), 'publicProfiles'), where('profileVisibility', '==', 'public'), limit(100)));
   profiles = snap.docs.map(profileFromDoc).filter((p) => p.uid && p.fullName);
   profileMap = new Map(profiles.map((p) => [p.uid, p]));
   if (window.IG) {
@@ -109,7 +109,7 @@ async function loadProfiles() {
 
 async function loadPosts() {
   requireLogin();
-  const snap = await getDocs(query(collection(db(), 'posts'), orderBy('createdAt', 'desc'), limit(80)));
+  const snap = await getDocs(query(collection(db(), 'posts'), where('visibility', '==', 'public'), limit(80)));
   posts = snap.docs.map(postFromDoc).filter((p) => p.mediaUrl && p.visibility === 'public');
   return posts;
 }
@@ -162,7 +162,7 @@ function renderFeed() {
   const avatarHtml = avatar ? `<img src="${esc(avatar)}" alt="">` : `<span>${esc((me?.fullName || 'N').charAt(0).toUpperCase())}</span>`;
   screen.innerHTML = `<div class="nwsb-live-feed-shell">
     <header class="nwsb-live-feed-header"><button onclick="IG.nav('home')" aria-label="Back">‹</button><div class="nwsb-live-brand"><img src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><strong>NowssB Connect</strong></div><button onclick="NWSBConnect.openComposer()" aria-label="Create">＋</button></header>
-    <div class="nwsb-live-feed-tools"><button onclick="IG.openExplore()">Find practitioners</button><button onclick="chatInboxOpen()">Messages</button><button onclick="NWSBConnect.openProfile('${esc(currentUid())}')">${avatarHtml} My profile</button></div>
+    <div class="nwsb-live-feed-tools"><button onclick="IG.openExplore()">Find practitioners</button><button onclick="NWSBConnect.openInbox()">Messages</button><button onclick="NWSBConnect.openProfile('${esc(currentUid())}')">${avatarHtml} My profile</button></div>
     <main class="nwsb-live-feed-list">${posts.length ? posts.map(feedCard).join('') : `<div class="nwsb-live-empty"><img src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><h2>Your Connect feed starts here</h2><p>Share the first public practice post or find another practitioner to follow.</p><button onclick="NWSBConnect.openComposer()">Create a post</button></div>`}</main>
   </div>`;
 }
@@ -322,11 +322,97 @@ function openComposer() {
 }
 
 async function refreshFeed() {
-  await loadProfiles();
-  await loadPosts();
-  renderFeed();
+  return Promise.resolve().then(loadProfiles).then(loadPosts).then(renderFeed);
 }
 
+let liveChatPeer = null;
+let liveChatUnsub = null;
+let liveChatRecorder = null;
+let liveChatRecordStream = null;
+function liveRoomId(peerUid) { return [currentUid(), peerUid].sort().join('_'); }
+function liveChatTime(value) {
+  const ms = value?.toMillis ? value.toMillis() : Number(value || 0);
+  if (!ms) return '';
+  return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function liveRenderMessages(messages) {
+  const box = document.getElementById('chatMessages');
+  if (!box) return;
+  box.innerHTML = messages.map((m) => {
+    const mine = m.from === currentUid();
+    const body = m.type === 'image' && m.img ? `<img class="chat-bubble-img" src="${esc(m.img)}" alt="Shared image">` : m.type === 'voice' && m.audioUrl ? `<audio controls src="${esc(m.audioUrl)}"></audio>` : esc(m.text || '');
+    return `<div class="chat-bubble-wrap${mine ? ' me' : ''}"><div class="chat-bubble ${mine ? 'me' : 'them'}${m.type === 'image' ? ' has-img' : ''}">${body}</div></div><div class="chat-time" style="text-align:${mine ? 'right' : 'left'};">${esc(liveChatTime(m.createdAt || m.ts))}</div>`;
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+function liveOpenChat(peer) {
+  requireLogin();
+  liveChatPeer = peer;
+  const overlay = document.getElementById('chatScreenOverlay');
+  if (!overlay) return;
+  const av = document.getElementById('chatTopAv'); const name = document.getElementById('chatTopName'); const rank = document.getElementById('chatTopRank');
+  if (av) av.src = peer.avatar || '';
+  if (name) name.textContent = peer.fullName || peer.displayName || 'NowssB Practitioner';
+  if (rank) rank.textContent = peer.category || 'Practitioner';
+  const bn = document.getElementById('ig-bottomnav'); const sn = document.getElementById('ig-social-nav');
+  overlay._prevBnDisplay = bn ? bn.style.display : null; overlay._prevSnDisplay = sn ? sn.style.display : null;
+  if (bn) bn.style.display = 'none'; if (sn) sn.style.display = 'none';
+  overlay.style.display = 'block';
+  const room = liveRoomId(peer.uid || peer.id);
+  if (liveChatUnsub) liveChatUnsub();
+  const q = query(collection(db(), 'chats', room, 'messages'), limit(100));
+  liveChatUnsub = onSnapshot(q, (snap) => {
+    const messages = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.createdAt?.toMillis?.() || a.ts?.toMillis?.() || Number(a.ts || 0)) - (b.createdAt?.toMillis?.() || b.ts?.toMillis?.() || Number(b.ts || 0)));
+    liveRenderMessages(messages);
+  }, (error) => console.warn('NowssB Connect chat listener:', error));
+  const input = document.getElementById('chatInput'); if (input) { input.value = ''; input.focus(); }
+}
+async function liveSendChat() {
+  requireLogin();
+  const input = document.getElementById('chatInput'); const text = input?.value.trim();
+  if (!text || !liveChatPeer) return;
+  input.value = '';
+  const room = await ensureChat(liveChatPeer);
+  await addDoc(collection(db(), 'chats', room, 'messages'), { from: currentUid(), text: text.slice(0, 4000), type: 'text', createdAt: serverTimestamp(), ts: serverTimestamp() });
+  await setDoc(doc(db(), 'chats', room), { lastMessage: text.slice(0, 140), lastMessageAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+}
+async function liveSendImage(file) {
+  if (!file || !liveChatPeer) return;
+  const uploaded = await uploadMedia(file, 'chat');
+  const room = await ensureChat(liveChatPeer);
+  await addDoc(collection(db(), 'chats', room, 'messages'), { from: currentUid(), img: uploaded.url, type: 'image', createdAt: serverTimestamp(), ts: serverTimestamp() });
+}
+function liveToggleVoice(button) {
+  if (liveChatRecorder) {
+    liveChatRecorder.stop();
+    liveChatRecordStream?.getTracks().forEach((track) => track.stop());
+    liveChatRecorder = null; liveChatRecordStream = null; if (button) button.classList.remove('recording'); return;
+  }
+  if (!navigator.mediaDevices || !window.MediaRecorder) return alert('Voice messages are not supported in this browser.');
+  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+    liveChatRecordStream = stream; const chunks = []; const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+    liveChatRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+    liveChatRecorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+    liveChatRecorder.onstop = async () => { try { const blob = new Blob(chunks, { type: liveChatRecorder?.mimeType || 'audio/webm' }); const uploaded = await uploadMedia(blob, 'voice'); const room = await ensureChat(liveChatPeer); await addDoc(collection(db(), 'chats', room, 'messages'), { from: currentUid(), audioUrl: uploaded.url, type: 'voice', createdAt: serverTimestamp(), ts: serverTimestamp() }); } catch (error) { alert(error.message); } };
+    liveChatRecorder.start(); if (button) button.classList.add('recording');
+  }).catch(() => alert('Allow microphone access to record a NowssB voice message.'));
+}
+function liveCloseChat() {
+  if (liveChatUnsub) { liveChatUnsub(); liveChatUnsub = null; }
+  const overlay = document.getElementById('chatScreenOverlay'); if (!overlay) return;
+  const bn = document.getElementById('ig-bottomnav'); const sn = document.getElementById('ig-social-nav');
+  if (bn) bn.style.display = overlay._prevBnDisplay || ''; if (sn) sn.style.display = overlay._prevSnDisplay || '';
+  overlay.style.display = 'none'; liveChatPeer = null;
+}
+function openInbox() {
+  requireLogin();
+  let overlay = document.getElementById('nwsb-live-inbox');
+  if (!overlay) { overlay = document.createElement('div'); overlay.id = 'nwsb-live-inbox'; overlay.className = 'nwsb-live-composer-overlay'; document.body.appendChild(overlay); }
+  overlay.style.display = 'flex';
+  overlay.innerHTML = `<div class="nwsb-live-composer-card"><button class="nwsb-live-profile-close" data-close>×</button><h2>NowssB Messages</h2><p class="nwsb-live-form-note">Choose a real Connect profile to start a private conversation.</p><div>${profiles.filter((p) => p.uid !== currentUid()).map((p) => `<button class="nwsb-live-person" data-peer="${esc(p.uid)}">${p.avatar ? `<img src="${esc(p.avatar)}" alt="">` : `<span>${esc((p.fullName || 'N').charAt(0))}</span>`}<span><b>${esc(p.fullName)}</b><small>@${esc(p.username)}</small></span></button>`).join('') || '<div class="nwsb-live-empty-small">No other public profiles are available yet.</div>'}</div></div>`;
+  overlay.querySelector('[data-close]').onclick = () => { overlay.style.display = 'none'; };
+  overlay.querySelectorAll('[data-peer]').forEach((button) => button.onclick = () => { const p = profileMap.get(button.dataset.peer); overlay.style.display = 'none'; if (p) liveOpenChat(p); });
+}
 function patchLegacyUI() {
   if (!window.IG || window.IG._nwsbLivePatched) return;
   window.IG._nwsbLivePatched = true;
@@ -341,14 +427,24 @@ function patchLegacyUI() {
   window.IG.shareProfile = function () { sharePost('profile'); };
   window.nwsbOpenCreate = openComposer;
   const fab = document.getElementById('nwsbCreateFab'); if (fab) fab.onclick = openComposer;
-  if (window.CHAT && !window.CHAT._nwsbLiveChatPatched) {
-    const originalOpen = window.CHAT.open.bind(window.CHAT);
-    window.CHAT.open = function (peer) { ensureChat(peer).catch((e) => console.warn('Connect chat room:', e)); return originalOpen(peer); };
-    window.CHAT._nwsbLiveChatPatched = true;
-  }
+  window.CHAT = {
+    _nwsbLiveChatPatched: true,
+    open: liveOpenChat,
+    send: () => liveSendChat().catch((e) => alert(e.message)),
+    onInputChange: (el) => { const hasText = !!el?.value.trim(); const tools = document.getElementById('chatInputTools'); const send = document.getElementById('chatSendBtn'); if (tools) tools.style.display = hasText ? 'none' : 'flex'; if (send) send.style.display = hasText ? 'flex' : 'none'; },
+    openPeerProfile: () => { if (liveChatPeer) openProfile(liveChatPeer.uid); },
+    pickImage: () => document.getElementById('chatImageInput')?.click(),
+    onImageChosen: (input) => { const file = input.files?.[0]; input.value = ''; liveSendImage(file).catch((e) => alert(e.message)); },
+    sendVoiceNote: (button) => liveToggleVoice(button),
+    startCall: (kind) => { if (liveChatPeer && window.RTC) window.RTC.startCall(liveChatPeer, kind); },
+    endCall: () => { if (window.RTC?.isActive()) window.RTC.hangup(); else document.getElementById('chatCallOverlay')?.style.setProperty('display', 'none'); },
+    close: liveCloseChat,
+    sendSticker: (emoji) => { const input = document.getElementById('chatInput'); if (input) { input.value = `${input.value}${emoji}`; window.CHAT.onInputChange(input); } },
+    toggleStickers: () => document.getElementById('chatStickerTray')?.style.setProperty('display', 'flex'),
+  };
 }
 
-window.NWSBConnect = { refreshFeed, loadProfiles, loadPosts, openComposer, openProfile, closeProfile, toggleFollow, message, call, likePost, commentPost, focusComment, sharePost, openPost: (id) => { const p = posts.find((x) => x.id === id); if (p) window.open(p.mediaUrl, '_blank', 'noopener'); } };
+window.NWSBConnect = { refreshFeed, loadProfiles, loadPosts, openComposer, openProfile, closeProfile, toggleFollow, message, call, likePost, commentPost, focusComment, sharePost, openInbox, openPost: (id) => { const p = posts.find((x) => x.id === id); if (p) window.open(p.mediaUrl, '_blank', 'noopener'); } };
 window.NWSBConnectReady = true;
 
 function boot() {

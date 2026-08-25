@@ -52,7 +52,6 @@ class ConnectService {
   Stream<QuerySnapshot<Map<String, dynamic>>> feed() => _db
       .collection('posts')
       .where('visibility', isEqualTo: 'public')
-      .orderBy('createdAt', descending: true)
       .limit(50)
       .snapshots();
 

@@ -121,6 +121,7 @@ const CONNECT_MEDIA_LIMIT = 8 * 1024 * 1024;
 const CONNECT_MEDIA_TYPES = new Map([
   ['image/jpeg', 'jpg'], ['image/png', 'png'], ['image/webp', 'webp'],
   ['image/gif', 'gif'], ['video/mp4', 'mp4'], ['video/webm', 'webm'],
+  ['audio/webm', 'webm'], ['audio/mpeg', 'mp3'], ['audio/mp4', 'm4a'],
 ]);
 
 async function connectMediaUpload(request, env, origin) {
@@ -145,7 +146,7 @@ async function connectMediaUpload(request, env, origin) {
 
 function mediaType(key) {
   const ext = String(key).toLowerCase().split('.').pop();
-  return ({ mp4: 'video/mp4', webm: 'video/webm', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png' })[ext] || 'application/octet-stream';
+  return ({ mp4: 'video/mp4', webm: 'video/webm', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', mp3: 'audio/mpeg', m4a: 'audio/mp4' })[ext] || 'application/octet-stream';
 }
 
 async function r2Media(env, key, origin, request) {
