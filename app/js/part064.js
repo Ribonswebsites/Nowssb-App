@@ -29,20 +29,20 @@
   function img(u) { return '<img loading="lazy" decoding="async" alt="" src="' + u + '">'; }
 
   var A = {
-    chat:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/db15f3026ea179dc265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e.webp',
-    reels:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1b075adfd52b4af899c0f4c887eaf6c0590c402c1a084d711687ae57a791b8ee.webp',
-    connect:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a0b5196292b572ab589b6824072557ad8eda6d6eac0411c6056d1a4593e4130a.webp',
-    profile:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3979b9fa35b579e61e60226665c68128ad03987930169b94504c89b3fe74ccc8.webp',
-    store:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp',
-    cart:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/311c26afee2bc52c712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d.webp',
-    library:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/62e5d0908e54a2a619e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4.webp',
-    offer:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5972de26815c527d6b747aedbfb40a251b398b9008515762e808019375e58389.png',
-    wordsci:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dd44cf9fc35b783c2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7.webp',
-    routines: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/307233cd22669455f19d52470a876209c8289b54081839108ba1b076bbf63926.png',
-    ai:       'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/41c9ed21b2822c901ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7.png',
-    streak:   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f82047a0e727766b375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f.png',
-    every:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/47f9e2c9fad5a78faa2e75819832c6648532079b7499b33175725fc3eaae80db.webp',
-    settings: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/523b5889d13cb14a6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82.webp'
+    chat:     'assets/media/image/265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e-46fef40b.webp',
+    reels:    'assets/media/image/99c0f4c887eaf6c0590c402c1a084d711687ae57a791b8ee-f9494031.webp',
+    connect:  'assets/media/image/589b6824072557ad8eda6d6eac0411c6056d1a4593e4130a-c4734c2d.webp',
+    profile:  'assets/media/image/1e60226665c68128ad03987930169b94504c89b3fe74ccc8-d7dfb697.webp',
+    store:    'assets/media/image/71c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d-330d4dee.webp',
+    cart:     'assets/media/image/712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d-e05a2e25.webp',
+    library:  'assets/media/image/19e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4-e7261be5.webp',
+    offer:    'assets/media/image/6b747aedbfb40a251b398b9008515762e808019375e58389-afcb8741.png',
+    wordsci:  'assets/media/image/2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7-64ecc8c2.webp',
+    routines: 'assets/media/image/f19d52470a876209c8289b54081839108ba1b076bbf63926-64c6e8a0.png',
+    ai:       'assets/media/image/1ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7-66da3ed1.png',
+    streak:   'assets/media/image/375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f-5e809db4.png',
+    every:    'assets/media/image/aa2e75819832c6648532079b7499b33175725fc3eaae80db-1e188c9b.webp',
+    settings: 'assets/media/image/6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82-75bedcbf.webp'
   };
 
   var IC = {

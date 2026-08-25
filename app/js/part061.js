@@ -22,35 +22,35 @@
   'use strict';
 
   var IC = {
-    store:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp',
-    health:   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b14b882bcba539ca2188cb3479a63fbef5bf6df8587338deaa1d3672a5af01ea.png',
-    connect:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ea559460014dd8d9447072cdece7eb07f670832effdae7f062973b76151f3bde.webp',
-    streak:   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f82047a0e727766b375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f.png',
-    offer:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5972de26815c527d6b747aedbfb40a251b398b9008515762e808019375e58389.png',
-    ai:       'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/41c9ed21b2822c901ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7.png',
-    meaning:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1a5f669e63dbae9d85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa.png',
-    quick:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/272b820a002190feecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b.png',
-    tiles:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/909b614a4f984b774551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2.png',
-    library:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/62e5d0908e54a2a619e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4.webp',
-    progress: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0480c10b8a8d79dd38f0f5ffaf71f982cb92d7e49b8cbb3a9bd93bc6820c8a99.webp',
-    wordsci:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dd44cf9fc35b783c2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7.webp',
-    routines: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/307233cd22669455f19d52470a876209c8289b54081839108ba1b076bbf63926.png',
-    cart:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/311c26afee2bc52c712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d.webp',
-    wishlist: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a74a9935fb237eb82b17a92169d2b57e5a8733d5a3fd699754717fcd8869dfed.webp',
-    search:   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8d85320f63c3e1760c436ecb735a892202453e58b9a36178183dc6c2d7f72be4.webp',
-    chat:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/db15f3026ea179dc265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e.webp',
-    profile:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3979b9fa35b579e61e60226665c68128ad03987930169b94504c89b3fe74ccc8.webp',
-    settings: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/523b5889d13cb14a6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82.webp',
-    every:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/47f9e2c9fad5a78faa2e75819832c6648532079b7499b33175725fc3eaae80db.webp'
+    store:    'assets/media/image/71c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d-330d4dee.webp',
+    health:   'assets/media/image/2188cb3479a63fbef5bf6df8587338deaa1d3672a5af01ea-1b73ed0b.png',
+    connect:  'assets/media/image/447072cdece7eb07f670832effdae7f062973b76151f3bde-08f4337b.webp',
+    streak:   'assets/media/image/375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f-5e809db4.png',
+    offer:    'assets/media/image/6b747aedbfb40a251b398b9008515762e808019375e58389-afcb8741.png',
+    ai:       'assets/media/image/1ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7-66da3ed1.png',
+    meaning:  'assets/media/image/85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa-fa4f86f4.png',
+    quick:    'assets/media/image/ecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b-187c10b3.png',
+    tiles:    'assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png',
+    library:  'assets/media/image/19e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4-e7261be5.webp',
+    progress: 'assets/media/image/38f0f5ffaf71f982cb92d7e49b8cbb3a9bd93bc6820c8a99-09267100.webp',
+    wordsci:  'assets/media/image/2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7-64ecc8c2.webp',
+    routines: 'assets/media/image/f19d52470a876209c8289b54081839108ba1b076bbf63926-64c6e8a0.png',
+    cart:     'assets/media/image/712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d-e05a2e25.webp',
+    wishlist: 'assets/media/image/2b17a92169d2b57e5a8733d5a3fd699754717fcd8869dfed-4296b74d.webp',
+    search:   'assets/media/image/0c436ecb735a892202453e58b9a36178183dc6c2d7f72be4-a65cce23.webp',
+    chat:     'assets/media/image/265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e-46fef40b.webp',
+    profile:  'assets/media/image/1e60226665c68128ad03987930169b94504c89b3fe74ccc8-d7dfb697.webp',
+    settings: 'assets/media/image/6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82-75bedcbf.webp',
+    every:    'assets/media/image/aa2e75819832c6648532079b7499b33175725fc3eaae80db-1e188c9b.webp'
   };
 
   /* Floating-button faces. Each is the same black NowssB orb with a different
      energy wave, so the tracing ring around the wrapper is tinted to match. */
   var FAB_ICONS = [
-    { id: 'blue',   label: 'Blue',   img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1db081eb0720a0cc9cb6b4420672e2ebd7b16d3934015c0e6f33c2b8d2aa82d9.png' },
-    { id: 'yellow', label: 'Yellow', img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4112f09762434e9986d4a2c36581f40ad2b760b5f4f290ef7a907e80266f8668.png' },
-    { id: 'red',    label: 'Red',    img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/885cc343fad096d16cd72f01920d04f65bffce88611932ac6399ecaf88fa0598.png' },
-    { id: 'purple', label: 'Purple', img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/9d4368e1342dac5d10795e0e60f6f3531ce22120569b13cda96976bd9dd0a309.png' }
+    { id: 'blue',   label: 'Blue',   img: 'assets/media/image/9cb6b4420672e2ebd7b16d3934015c0e6f33c2b8d2aa82d9-47548392.png' },
+    { id: 'yellow', label: 'Yellow', img: 'assets/media/image/86d4a2c36581f40ad2b760b5f4f290ef7a907e80266f8668-665529b0.png' },
+    { id: 'red',    label: 'Red',    img: 'assets/media/image/6cd72f01920d04f65bffce88611932ac6399ecaf88fa0598-596254d4.png' },
+    { id: 'purple', label: 'Purple', img: 'assets/media/image/10795e0e60f6f3531ce22120569b13cda96976bd9dd0a309-05b0abbc.png' }
   ];
   function fabIcon() {
     var id = ls('nwsb_ql_icon', 'blue');
@@ -376,7 +376,7 @@
     '        <div class="ql-head-sub">Jump straight to any corner of NowssB</div>' +
     '      </div>' +
     '      <button class="ql-hbtn ql-gear" onclick="qlShowSettings()" aria-label="Quick Links settings">' +
-    '        <img decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/909b614a4f984b774551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2.png" alt="">' +
+    '        <img decoding="async" loading="lazy" src="assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png" alt="">' +
     '      </button>' +
     '      <button class="ql-hbtn ql-close" onclick="qlClose()" aria-label="Close">' +
     '        <svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
@@ -420,7 +420,7 @@
     '' +
     '<!-- Floating Quick Links button — off by default, enabled in the sheet\'s settings -->' +
     '<div class="ql-fab" id="qlFab" style="display:none;" role="button" aria-label="Quick Links">' +
-    '  <img decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/272b820a002190feecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b.png" alt="">' +
+    '  <img decoding="async" loading="lazy" src="assets/media/image/ecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b-187c10b3.png" alt="">' +
     '  <span class="ql-fab-arrow" aria-hidden="true">' +
     '    <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#060c18" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
     '  </span>' +
@@ -429,7 +429,7 @@
     '     with a target the button magnets into when it gets close. -->' +
     '<div class="ql-drop" id="qlDrop" aria-hidden="true">' +
     '  <div class="ql-drop-target" id="qlDropTarget">' +
-    '    <img decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/9a6e05ad9b9f5cddeddbc65e16389c1c87f60e1a3f3b7726bb6394912dfbdbda.png" alt="">' +
+    '    <img decoding="async" loading="lazy" src="assets/media/image/eddbc65e16389c1c87f60e1a3f3b7726bb6394912dfbdbda-4e6cca52.png" alt="">' +
     '    <span class="ql-drop-vignette"></span>' +
     '    <span class="ql-drop-hot" id="qlDropHot"></span>' +
     '  </div>' +

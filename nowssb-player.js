@@ -56,37 +56,37 @@
        from Cloudinary, which is also why it is the one worth having
        before anything else: cldVid() leaves a path with no
        /video/upload/ in it alone, so it reaches the <video> untouched. */
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/player/liquid-splash.webp',
+    { img:'assets/media/image/liquid-splash-7b7b346a.webp',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/player-liquid-splash.mp4',
       accent:'#ffcf4d' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3670d1e477f48c314113d8864e815fd9bf493296dbcad1f09ffcffe3e62a7744.jpg',
+    { img:'assets/media/image/4113d8864e815fd9bf493296dbcad1f09ffcffe3e62a7744-6d3597ff.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a1b0a1b513ec57f60f4af24187d38d8c0b11f6723902c9198210299fba5e2b30.mp4',
       accent:'#7fe9da' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d694cb3157c4e58f8a5d63b9eb4185408cc030e7c049109c01d77bdeec5b6b82.jpg',
+    { img:'assets/media/image/8a5d63b9eb4185408cc030e7c049109c01d77bdeec5b6b82-a8d90fbd.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/79d7c93a6734ed8d306b3eeafb392ea0c86fd1a2ee52c86e4dbba97db1ca014b.mp4',
       accent:'#9bb8ff' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fd380f5670852d0c76f0f18f22dec4fa26f8f0323b494eb5455c645f4025d4cd.jpg',
+    { img:'assets/media/image/76f0f18f22dec4fa26f8f0323b494eb5455c645f4025d4cd-6c38fe98.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dc68caaf51e870039c6336a85fa794dc56803d1a8a8c9db7eff3d73cf7fd956a.mp4',
       accent:'#bd7bff' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e8bb832f2815c15a85e5b33902255f291353af0de7bcf22f1118d910ad23d81b.jpg',
+    { img:'assets/media/image/85e5b33902255f291353af0de7bcf22f1118d910ad23d81b-b16d4c21.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d8ac259577c403f3142246611dd133f990ccc47768e4047f599c79437a39f2b0.mp4',
       accent:'#a6dcff' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/48ad23ade254b2d7ef2a2f937caf9dd13cfa91c4bd0e6c4357af9d21bf68522f.jpg',
+    { img:'assets/media/image/ef2a2f937caf9dd13cfa91c4bd0e6c4357af9d21bf68522f-6b74309d.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3b63edc1485a45e29531af4eb7ef03c0f7b865a6c1611419162d274135afc4d2.mp4',
       accent:'#b9a6ff' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/20314fda05d34b49098367670c8091670d8d4dbd7e5b528a1e2c0469cb2fc26c.jpg',
+    { img:'assets/media/image/098367670c8091670d8d4dbd7e5b528a1e2c0469cb2fc26c-912aa9a0.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a779a65872bf917cf1e6f71d70fa31da71c88f3b2b51655928b753960c2441cc.mp4',
       accent:'#a6c8ff' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f734c819e92db433e0f91382fcc5eb563a2cc64da552514d0e10db7529ffc2d0.jpg',
+    { img:'assets/media/image/e0f91382fcc5eb563a2cc64da552514d0e10db7529ffc2d0-455e9fe7.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/da4159578099ee480fc5bf967efae49a1bcd80a1435b29706c153e1dafcad4b0.mp4',
       accent:'#b9a6ff' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e103480a2c87d55b6e2211e7b5dfe439c44c7ec95bb1a4e83ba3ae8247a65d94.jpg',
+    { img:'assets/media/image/6e2211e7b5dfe439c44c7ec95bb1a4e83ba3ae8247a65d94-ff46a3b9.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e55e1f1f879d8074934477d811da565cd8fabce42ecf92dcf2aceecc25e51b39.mp4',
       accent:'#e8d5a3' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/122962572090895c9bfd7902d01145e2286ef6d5c08686fe3eac24f5c6681c97.jpg',
+    { img:'assets/media/image/9bfd7902d01145e2286ef6d5c08686fe3eac24f5c6681c97-db320556.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7a0e0cf6903f3b16c406f92ad6b28764c7b961ad667118ab25399275f0819446.mp4',
       accent:'#f0d9a8' },
-    { img:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/28b7b32c972324725eb9ad9244ef64dded8add6fa95902546bc1d0d4e3c68a15.jpg',
+    { img:'assets/media/image/5eb9ad9244ef64dded8add6fa95902546bc1d0d4e3c68a15-fb93d3f7.jpg',
       video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/39905d27bd778cffb57c0ba632f61d4b84e5d40dfaec89ca5d2f9fe26c4bc661.mp4',
       accent:'#8fe6ff' },
   ];
@@ -250,19 +250,19 @@
     /* ── Custom glass-sphere icons (background-removed PNGs). Each sphere IS the
        button — the round glass button background is dropped in CSS. ── */
     var IC = {
-      play:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/74d38b3c7b69b30b2c50cf8b4c45c700fd3de0720dc8f4308c6ebf266a3e0a87.png',
-      pause:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f073aa60452e1cb99aabb4d00e9525cb1caaa5e5ea6a3a59d4e54ceadfc49bf7.png',
-      prev:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/2f091c1083cd0b659fccbe035598522f1566cef09be92ebd9e8f2069a6d8b391.png',
-      next:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/71a2d8954b5e6209ad9c188ccc1a1af57cdf76aaeff1d40f4a989508f3e731a4.png',
-      replay:   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/982488a58a8e453e16a2e9320e5813b82179193a841f8b09e66336829c345c70.png',
-      mic:      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a8a2eb1bb04d59d13da0555e497160e43f19fc651e90426a8901650a10ca838b.png',
-      library:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/643dd804e986b5f6bfa1c5cc431958f35659b7bcdb86cb07ae7dafb275e77346.png',
-      settings: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/909b614a4f984b774551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2.png',
-      info:     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/924446cd8446dc7bb01152ef2666539f0afd4bd38bedcff2a2e1a4295af93fb5.png',
-      brand:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/93cdeb591c49c96f7217d187426a2ad9d68f2933e6605cb0f76c09f1961bc3ed.webp',
+      play:     'assets/media/image/2c50cf8b4c45c700fd3de0720dc8f4308c6ebf266a3e0a87-a1653656.png',
+      pause:    'assets/media/image/9aabb4d00e9525cb1caaa5e5ea6a3a59d4e54ceadfc49bf7-6d7b9ac7.png',
+      prev:     'assets/media/image/9fccbe035598522f1566cef09be92ebd9e8f2069a6d8b391-c6053e46.png',
+      next:     'assets/media/image/ad9c188ccc1a1af57cdf76aaeff1d40f4a989508f3e731a4-bb68dadd.png',
+      replay:   'assets/media/image/16a2e9320e5813b82179193a841f8b09e66336829c345c70-434fdcf8.png',
+      mic:      'assets/media/image/3da0555e497160e43f19fc651e90426a8901650a10ca838b-c6005693.png',
+      library:  'assets/media/image/bfa1c5cc431958f35659b7bcdb86cb07ae7dafb275e77346-0ed529b4.png',
+      settings: 'assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png',
+      info:     'assets/media/image/b01152ef2666539f0afd4bd38bedcff2a2e1a4295af93fb5-d6193253.png',
+      brand:    'assets/media/image/7217d187426a2ad9d68f2933e6605cb0f76c09f1961bc3ed-3db811d6.webp',
       /* Only the two black banners use this. The top bar, the corner mark
          and the info sheet keep IC.brand — same icon there as before. */
-      banner:   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/aece3225c7dc8d274f7725ff7f39643319c37ac480f74aef4b64541111e6337d.png'
+      banner:   'assets/media/image/4f7725ff7f39643319c37ac480f74aef4b64541111e6337d-6463550f.png'
     };
     /* render every icon as a background-image SPAN (never an <img>) so the
        browser can't open/zoom it on tap and taps always hit the button */
@@ -368,7 +368,7 @@
     var arc =
       '<div class="lgp-arc" id="lgpArc" style="--lg-accent:' + th.accent + '">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
-        '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7ee8439eec0e17a8c045f4e825013a0a0a707508c6b95941853d7259923150a5.png\')"></span></button>' +
+        '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'assets/media/image/c045f4e825013a0a0a707508c6b95941853d7259923150a5-482cac58.png\')"></span></button>' +
         '<div class="lgp-arc-brand"><span class="lgp-arc-brand-txt">NowssB Player</span></div>' +
         '<span class="lgp-arc-brand-ico-corner" style="background-image:url(\'' + IC.brand + '\')"></span>' +
         '<div class="lgp-arc-radial">' +
@@ -421,7 +421,7 @@
         '<div class="lgp-info-sheet">' +
           '<div class="lgp-info-sheet-top">' +
             '<button class="lgp-info-close lgp-imgbtn" onclick="lgpToggleInfo()" aria-label="Back">' +
-              '<span class="lgp-bgico" style="background-image:url(\'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7ee8439eec0e17a8c045f4e825013a0a0a707508c6b95941853d7259923150a5.png\')"></span>' +
+              '<span class="lgp-bgico" style="background-image:url(\'assets/media/image/c045f4e825013a0a0a707508c6b95941853d7259923150a5-482cac58.png\')"></span>' +
             '</button>' +
             '<div class="lgp-info-sheet-title">' + (w.word || '') + '</div>' +
             '<div class="lgp-info-sheet-brand" style="background-image:url(\'' + IC.brand + '\')"></div>' +

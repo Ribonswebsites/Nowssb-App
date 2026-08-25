@@ -11,8 +11,8 @@
     support: {
       title: 'Chat Support',
       desc: 'Get clear help with the player, practice, library, routines, account, and every part of NowssB.',
-      hero: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/assistant/support-hero.png',
-      secondary: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/assistant/support-topics.png',
+      hero: 'assets/media/image/support-hero-291ea476.png',
+      secondary: 'assets/media/image/support-topics-2830aa1b.png',
       featureEyebrow: 'App-aware help',
       featureTitle: 'Ask about any NowssB screen',
       featureCopy: 'Player controls, videos, audio, routines, the library, settings, subscriptions, and account guidance.',
@@ -23,8 +23,8 @@
     coach: {
       title: 'Personal Coach',
       desc: 'A calm NowssB companion for choosing a practice, building a routine, and reflecting on your day.',
-      hero: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/assistant/coach-hero.png',
-      secondary: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/assistant/coach-practice.png',
+      hero: 'assets/media/image/coach-hero-4e870666.png',
+      secondary: 'assets/media/image/coach-practice-d7bfc5b8.png',
       featureEyebrow: 'Practice guidance',
       featureTitle: 'Make today’s next step simple',
       featureCopy: 'Talk about your mood, choose a time-aware practice, build a routine, and reflect without pressure.',

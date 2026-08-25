@@ -68,13 +68,13 @@ window.ohOpenListFromIntro = function(type) {
 
   if (type === 'words') {
     _ohSetBanners([
-      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4153f130e7a6764a0f59581a898ffd95ea63928600e13473cd010d63039872bc.jpg',
-      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0ac103578b4ce074fa5d369177111365a92adb381d4cce8be25d0c05749e77ae.jpg'
+      'assets/media/image/0f59581a898ffd95ea63928600e13473cd010d63039872bc-9c4bd9ad.jpg',
+      'assets/media/image/fa5d369177111365a92adb381d4cce8be25d0c05749e77ae-10476390.jpg'
     ]);
   } else {
     _ohSetBanners([
-      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8d7fdfb575f4e0bc5d4a983fe6bd13ba569ad975495d6034e631f3e7746ad13a.jpg',
-      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/537005b8862b2be0a2f754595d7aa6cfd0f9d262abe0499ca35bdc5f650d7bff.jpg'
+      'assets/media/image/5d4a983fe6bd13ba569ad975495d6034e631f3e7746ad13a-c6f398ea.jpg',
+      'assets/media/image/a2f754595d7aa6cfd0f9d262abe0499ca35bdc5f650d7bff-d9c39a8e.jpg'
     ]);
   }
 

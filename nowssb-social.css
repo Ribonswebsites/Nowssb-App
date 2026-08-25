@@ -310,7 +310,7 @@
   height: 196px;
   background:
     linear-gradient(to bottom, rgba(6,12,24,0) 0%, rgba(6,12,24,.04) 78%, rgba(6,12,24,.12) 100%),
-    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f7e0b23df165dd828fd717970e58ea295a9f9024bdf84dc5a4cb9c840d79aabf.webp') center / cover no-repeat;
+    url('assets/media/image/8fd717970e58ea295a9f9024bdf84dc5a4cb9c840d79aabf-4eedcce3.webp') center / cover no-repeat;
 }
 
 .nwsb-hero-body {
@@ -902,7 +902,7 @@
 .chat-screen {
   background:
     linear-gradient(180deg, rgba(6,12,24,.90) 0%, rgba(6,12,24,.94) 40%, rgba(6,12,24,.97) 100%),
-    url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/416f48f6733b9b4cb8736b76b90cdd421b4603f101bea1187832ce43f6ff9ed3.webp') center/cover no-repeat !important;
+    url('assets/media/image/b8736b76b90cdd421b4603f101bea1187832ce43f6ff9ed3-c2a2463d.webp') center/cover no-repeat !important;
 }
 
 .chat-topbar {

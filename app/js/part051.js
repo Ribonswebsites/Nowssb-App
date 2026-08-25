@@ -40,9 +40,8 @@
     // none of them exist in the DOM yet at this point — nowssb-player.js
     // exposes the full pre-transformed list separately for exactly this.
     if (window.NWSB_PLAYER_VIDEO_URLS) urls = urls.concat(window.NWSB_PLAYER_VIDEO_URLS);
-    // and the pictures those clips sit behind — an uncached one is a
-    // visible blank on the first word while the clip is still opening
-    if (window.NWSB_PLAYER_IMAGE_URLS) urls = urls.concat(window.NWSB_PLAYER_IMAGE_URLS);
+    // Images are intentionally not part of this queue. They use the browser
+    // image cache and should never compete with video downloads.
     // Same problem, everywhere else it happens: a clip that is only built
     // when a screen opens cannot be found by scanning the DOM before the
     // user goes there, which is precisely when warming it would have helped.
@@ -51,8 +50,10 @@
     // all. Any file with clips like that appends them here (word pages in
     // part012.js, meaning pages in part026.js, routines in part066.js).
     if (window.NWSB_EXTRA_VIDEO_URLS) urls = urls.concat(window.NWSB_EXTRA_VIDEO_URLS);
-    // de-dupe — several screens intentionally reuse the same background video
-    urls = urls.filter(function (u, i) { return u && urls.indexOf(u) === i; });
+    // Keep this queue video-only and de-dupe repeated background films.
+    urls = urls.filter(function (u, i) {
+      return u && /\.mp4(?:[?#]|$)/i.test(u) && urls.indexOf(u) === i;
+    });
     /* The start animation goes first, ahead of thirty decorative loops. It
        is the one clip that plays on every single launch, so it is the one
        worth having before any of them — the queue is staggered 800ms apart
@@ -70,16 +71,19 @@
 
   function warmOne(cache, url) {
     return cache.match(url).then(function (existing) {
-      if (existing) return; // already warmed in a previous session
+      if (existing) return true; // already warmed in a previous session
       return fetch(url, { mode: 'cors' })
-        .then(function (res) { if (res && res.ok) return cache.put(url, res); })
-        .catch(function () { /* cross-origin/network hiccup — just skip it, no retry */ });
+        .then(function (res) {
+          if (!res || !res.ok) return false;
+          return cache.put(url, res).then(function () { return true; });
+        })
+        .catch(function () { return false; });
     });
   }
 
   var warmedUrls = {}; // every URL we've ever kicked off a warmOne() for — never re-queue it
 
-  function warmAll(urls) {
+  function warmAll(urls, onDone) {
     var fresh = urls.filter(function (u) { return !warmedUrls[u]; });
     if (!fresh.length) return;
     fresh.forEach(function (u) { warmedUrls[u] = true; });
@@ -88,63 +92,105 @@
     function next() {
       if (i >= fresh.length) return;
       var url = fresh[i++];
-      warmOne(cache, url).catch(function () {}).then(function () {
-        // Still staggered (never fire dozens of fetches in the same tick and
-        // choke whatever the user is actively doing), but short — the goal
-        // is "download everything soon", not "trickle it in over minutes".
+      warmOne(cache, url).then(function (ok) {
+        if (onDone) onDone(ok, url);
+        // Exactly one fetch at a time. The short pause keeps the WebView
+        // responsive between files without creating a request burst.
         setTimeout(next, 800);
       });
     }
     caches.open(VIDEO_CACHE).then(function (c) { cache = c; next(); });
   }
 
-  function start() {
-    if (shouldSkip()) return;
-    var urls = collectVideoUrls();
-    if (urls.length) warmAll(urls);
+  var PACK_PROMPTED = 'nowssb-video-pack-prompted-v1';
+  var PACK_ACCEPTED = 'nowssb-video-pack-accepted-v1';
+  var packStarted = localStorage.getItem(PACK_ACCEPTED) === '1';
+  var packTotal = 0, packDone = 0, packFailed = 0;
+  var packPanel = null, packCopy = null, packBar = null, packButton = null;
+
+  function updatePackPrompt() {
+    if (!packCopy) return;
+    if (!packStarted) {
+      packCopy.textContent = 'Download the private video pack once for smoother playback. It stays inside NowssB and never appears in your gallery.';
+      return;
+    }
+    packCopy.textContent = packDone + ' of ' + packTotal + ' videos ready' + (packFailed ? ' · ' + packFailed + ' unavailable' : '') + '. You can keep using NowssB while it continues.';
+    if (packBar) packBar.style.width = (packTotal ? Math.round(packDone / packTotal * 100) : 0) + '%';
+    if (packButton) packButton.textContent = packDone >= packTotal ? 'Done' : 'Downloading…';
   }
 
-  var idle = window.requestIdleCallback || function (cb) { setTimeout(cb, 4000); };
-  /* Not while the start animation is playing. requestIdleCallback fires as
-     soon as the main thread quietens, which during the splash it does — so
-     this was queueing thirty video downloads underneath the one clip that
-     is actually on screen, and the clip is what paid for it.
-     nwsbSplashWait (index.html) is the callback form; window._nwsbSplashOver
-     is the same answer read synchronously. Read the flag rather than latching
-     a copy of it, so every file that defers work to it agrees. */
+  function beginPack() {
+    if (packStarted || shouldSkip()) return;
+    packStarted = true;
+    localStorage.setItem(PACK_ACCEPTED, '1');
+    var urls = collectVideoUrls();
+    packTotal = urls.length;
+    if (!urls.length) return;
+    warmAll(urls, function (ok) {
+      if (ok) packDone++;
+      else packFailed++;
+      updatePackPrompt();
+    });
+    updatePackPrompt();
+  }
+
+  function showPackPrompt() {
+    if (shouldSkip() || localStorage.getItem(PACK_PROMPTED) === '1') return;
+    localStorage.setItem(PACK_PROMPTED, '1');
+    packPanel = document.createElement('div');
+    packPanel.className = 'nwsb-video-pack-prompt';
+    packPanel.setAttribute('role', 'dialog');
+    packPanel.setAttribute('aria-label', 'Download NowssB videos');
+    packPanel.innerHTML = '<div class="nwsb-video-pack-card"><div class="nwsb-video-pack-kicker">NOWSSB MEDIA</div><h2>Download the video pack?</h2><p class="nwsb-video-pack-copy"></p><div class="nwsb-video-pack-progress"><span></span></div><div class="nwsb-video-pack-actions"><button type="button" class="nwsb-video-pack-later">Not now</button><button type="button" class="nwsb-video-pack-start">Download videos</button></div></div>';
+    document.body.appendChild(packPanel);
+    packCopy = packPanel.querySelector('.nwsb-video-pack-copy');
+    packBar = packPanel.querySelector('.nwsb-video-pack-progress span');
+    packButton = packPanel.querySelector('.nwsb-video-pack-start');
+    updatePackPrompt();
+    packPanel.querySelector('.nwsb-video-pack-later').addEventListener('click', function () { packPanel.remove(); packPanel = null; });
+    packButton.addEventListener('click', function () {
+      packButton.disabled = true;
+      beginPack();
+    });
+  }
+
+  function start() {
+    if (!packStarted || shouldSkip()) return;
+    var urls = collectVideoUrls();
+    if (urls.length) {
+      packTotal = Math.max(packTotal, urls.length);
+      warmAll(urls, function (ok) {
+        if (ok) packDone++;
+        else packFailed++;
+        updatePackPrompt();
+      });
+    }
+  }
+
+  /* The start animation remains the only launch-time video. The full pack is
+     offered after it, and only a user acceptance starts the private queue. */
   function splashOver() { return window._nwsbSplashOver !== false; }
   function startAfterSplash() {
-    var go = function () { idle(start, { timeout: 8000 }); };
+    var go = function () {
+      if (packStarted) start();
+      else showPackPrompt();
+    };
     if (typeof window.nwsbSplashWait === 'function') window.nwsbSplashWait(go);
     else go();
   }
   startAfterSplash();
 
-  // Screens/banners built dynamically after the initial scan (e.g. a store's
-  // buy-page video banner, injected via innerHTML only once the user opens
-  // it) never existed in the DOM when collectVideoUrls() first ran, so their
-  // videos were silently never warmed. Watch for any newly-inserted <video>
-  // and warm it too, same rules (Data Saver still respected).
+  // Dynamically-created screens are added to the same single-file queue only
+  // after the user accepted the pack. Before that, DOM mutations do nothing.
   if ('MutationObserver' in window) {
     var mo = new MutationObserver(function () {
-      /* Same reason as above, and this one matters more: the app rewrites
-         a great deal of DOM while it boots, so this callback ran over and
-         over — each time doing a querySelectorAll('video') across the whole
-         document — during the exact seconds the start animation is on
-         screen. Nothing is warmed before the clip is done anyway. */
-      if (!splashOver()) return;
-      if (shouldSkip()) return;
-      var urls = collectVideoUrls();
-      if (urls.length) warmAll(urls);
+      if (!splashOver() || !packStarted || shouldSkip()) return;
+      start();
     });
     mo.observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  // A PWA install is exactly the moment the user commits to this being a
-  // real app on their device — that's the signal to eagerly grab everything
-  // right away instead of waiting for idle time, so it's already fast by the
-  // time they actually open it again.
-  window.addEventListener('appinstalled', function () { start(); });
+  window.addEventListener('appinstalled', function () { showPackPrompt(); });
 })();
 /* ── Decorative-video playback controller ─────────────────────────────────
    Every looping background video in the app is managed here: play the few
@@ -205,7 +251,7 @@
     } catch (err) {}
   }, true);
 
-  var MAX_PLAYING = 24;
+  var MAX_PLAYING = 4;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();
   var shownCache = new WeakMap();   // element -> boolean, cleared on class changes
@@ -371,7 +417,7 @@
       else { near.delete(e.target); unmount(e.target); }
     });
     queue();
-  }, { rootMargin: '100% 0px 100% 0px', threshold: 0 }) : null;
+  }, { rootMargin: '20% 0px 20% 0px', threshold: 0 }) : null;
 
   /* ── The stash stays authoritative ────────────────────────────────
      A dozen other files in this app set a clip's src by hand: the video

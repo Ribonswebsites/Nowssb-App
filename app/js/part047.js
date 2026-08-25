@@ -4,9 +4,9 @@
   // banner — reused here so every word/meaning detail page can show one at
   // random instead of needing its own dedicated art.
   var COUPON_BANNERS = [
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/456a2a7e485bf504f547a2cd0364e788efac295f7e126596364b79b890850788.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d5411443f5aa8dd1ec4d04df4d0a6bc2be31475207010a42848ab5d29a72a66b.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/473c3c5fea86647781105d598e5c8258b8a0244f549cbbd2b3f1f580cd0298ac.webp'
+    'assets/media/image/f547a2cd0364e788efac295f7e126596364b79b890850788-b0295a59.webp',
+    'assets/media/image/ec4d04df4d0a6bc2be31475207010a42848ab5d29a72a66b-a8787861.webp',
+    'assets/media/image/81105d598e5c8258b8a0244f549cbbd2b3f1f580cd0298ac-7d6775a6.webp'
   ];
   window.nwsbSetRandomCouponBanner = function (elId) {
     var el = document.getElementById(elId);
@@ -50,7 +50,7 @@
     if (theme === 'black' && !window._beBgPreloaded) {
       window._beBgPreloaded = true;
       var _pre = new Image();
-      _pre.src = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/9ed0b7a998986b73b241190e18a566a3d03290ee5ada91e6137a6ce86815e4bb.jpg';
+      _pre.src = 'assets/media/image/b241190e18a566a3d03290ee5ada91e6137a6ce86815e4bb-196489ac.jpg';
     }
 
     // Fashion intro only when user explicitly selects Black — never on page-load restore
@@ -91,15 +91,15 @@
      active (see nowssb-nm.css). Picking a theme card clears it again, so
      the two controls never fight silently. */
   var NWSB_FASHION_BGS = [
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7faefee62e30b487c20dfe09052ea94736db5d076886a9b3e4e86ac6ec686d9b.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/c771dc2fac1db73daeac0fb81685e021d9d08359c0268c1fb8ce18a1c54b494e.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/c8ba2816200e306a9c467e9f172ef75fe9f12f4313d60c07e15e691ea9024f9d.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1ed28e3e65f105144644221bee571acadae57bb2285a0126c3cd9e095ab9356d.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/83f500ce2239fab2d7f9a33e2229352fca42e152adc5eb23b8c2e3d675736442.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/70dff54c281619bd19540c1a081843c541f6e3d511bd56c4bfefda898140623d.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b61051b0901b12154320a713975835ad07de345d41f50567f8d04013c68ba4e0.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/6a172050c86e14a8db886b606c99c0e99f900d618e5ae31e2237570bddb6d32b.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/89223ef1f18d6a9e31f92fc4c2fa5d42951917614024f8f9634adb02648e3f8d.jpg'
+    'assets/media/image/c20dfe09052ea94736db5d076886a9b3e4e86ac6ec686d9b-a547e3dc.jpg',
+    'assets/media/image/aeac0fb81685e021d9d08359c0268c1fb8ce18a1c54b494e-4e02aaf3.jpg',
+    'assets/media/image/9c467e9f172ef75fe9f12f4313d60c07e15e691ea9024f9d-68070510.jpg',
+    'assets/media/image/4644221bee571acadae57bb2285a0126c3cd9e095ab9356d-b5e5798b.jpg',
+    'assets/media/image/d7f9a33e2229352fca42e152adc5eb23b8c2e3d675736442-9da8c189.jpg',
+    'assets/media/image/19540c1a081843c541f6e3d511bd56c4bfefda898140623d-30baefd8.jpg',
+    'assets/media/image/4320a713975835ad07de345d41f50567f8d04013c68ba4e0-f4ccada5.jpg',
+    'assets/media/image/db886b606c99c0e99f900d618e5ae31e2237570bddb6d32b-1385ed16.jpg',
+    'assets/media/image/31f92fc4c2fa5d42951917614024f8f9634adb02648e3f8d-751a302d.jpg'
   ];
   window.NWSB_FASHION_BGS = NWSB_FASHION_BGS;
 
@@ -117,7 +117,7 @@
     var t = document.createElement('div');
     t.className = 'fbg-toast';
     t.innerHTML =
-      '<div class="fbg-toast-icon"><img loading="lazy" decoding="async" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1568bbd5dc719a6bd571c50bd69e5c142ac08854f713455691cb1ca77251d29e.png" alt=""></div>' +
+      '<div class="fbg-toast-icon"><img loading="lazy" decoding="async" src="assets/media/image/d571c50bd69e5c142ac08854f713455691cb1ca77251d29e-9a149bb6.png" alt=""></div>' +
       '<div class="fbg-toast-text"></div>' +
       '<div class="fbg-toast-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>';
     t.querySelector('.fbg-toast-text').textContent = msg;

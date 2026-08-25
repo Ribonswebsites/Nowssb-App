@@ -694,7 +694,7 @@ function ssSubBgSync() {
   var custom = null;
   try { custom = localStorage.getItem('nwsb_fashion_bg_custom'); } catch (e) {}
   var fallback = (window.NWSB_FASHION_BGS && window.NWSB_FASHION_BGS[0]) ||
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7faefee62e30b487c20dfe09052ea94736db5d076886a9b3e4e86ac6ec686d9b.jpg';
+    'assets/media/image/c20dfe09052ea94736db5d076886a9b3e4e86ac6ec686d9b-a547e3dc.jpg';
   var imgUrl = custom || fallback;
   panel.style.setProperty('background-image', "linear-gradient(rgba(6,12,24,0.72),rgba(6,12,24,0.92)), url('" + imgUrl + "')", 'important');
   panel.style.setProperty('background-size', 'cover', 'important');
@@ -747,7 +747,7 @@ window.ssRenderDiscover = function() {
       '<div style="position:absolute;top:14px;right:16px;font-size:12px;font-weight:800;color:'+rankColor+';font-family:\'DM Sans\',sans-serif;">#'+u.rank+'</div>'+
       '<div style="display:flex;align-items:flex-start;gap:12px;">'+
       '<div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,rgba(232,213,163,.11),rgba(200,232,245,.08));border:2px solid '+(u.tier==='elite'?'#f5c842':u.tier==='pro'?'#c8e8f5':'rgba(255,255,255,.08)')+';display:flex;align-items:center;justify-content:center;">'+
-      '<img loading="lazy" decoding="async" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/28756f50b55ff7928f325e3039adb86b0d774de587a192208b3be1a0a8f10d6b.png" style="width:20px;height:20px;object-fit:contain;display:block;" alt=""></div>'+
+      '<img loading="lazy" decoding="async" src="assets/media/image/8f325e3039adb86b0d774de587a192208b3be1a0a8f10d6b-d258f9b7.png" style="width:20px;height:20px;object-fit:contain;display:block;" alt=""></div>'+
       '<div style="flex:1;min-width:0;padding-right:30px;">'+
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap;">'+
       '<span style="font-size:15px;font-weight:700;color:#fff;font-family:\'DM Sans\',sans-serif;">'+u.name+'</span>'+

@@ -45,7 +45,9 @@ const SKIP_PATHS = new Set([join('assets', 'banners')]);
 /* The studio, in every form it takes. Matched on the name rather than a
    fixed list so a new admin-something.html cannot be added later and
    quietly ship. */
-const isStudio = (name) => /^admin[-.]/i.test(name) || name === 'admin.html';
+const isStudio = (name) =>
+  name === 'admin.html' ||
+  (/^admin[-.]/i.test(name) && /\.(html|js|json|css)$/i.test(name));
 
 /* Server-side or repository-side files with nothing to do inside an app. */
 const SKIP_FILES = new Set([

@@ -49,12 +49,12 @@
      Both lists are walked by the same code, so they can never fall out of
      step with each other. */
   var STILLS = [
-    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-store.webp',     t: ['The NowssB Store', 'Still, today'] },
-    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-words.webp',     t: ['The Word Atelier', 'Still, today'] },
-    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-meanings.webp',  t: ['The Meaning Store', 'Still, today'] },
-    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-ebooks.webp',    t: ['NowssB eBooks', 'Still, today'] },
-    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/store/intro-signature.webp', t: ['The Signature', 'Still, today'] },
-    { img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/fashion/fp-intro.webp',      t: ['Fashion Plus', 'Still, today'] }
+    { img: 'assets/media/image/intro-store-e670c163.webp',     t: ['The NowssB Store', 'Still, today'] },
+    { img: 'assets/media/image/intro-words-9adb7eb3.webp',     t: ['The Word Atelier', 'Still, today'] },
+    { img: 'assets/media/image/intro-meanings-0a159fa2.webp',  t: ['The Meaning Store', 'Still, today'] },
+    { img: 'assets/media/image/intro-ebooks-5294ccf0.webp',    t: ['NowssB eBooks', 'Still, today'] },
+    { img: 'assets/media/image/intro-signature-25cf5fe5.webp', t: ['The Signature', 'Still, today'] },
+    { img: 'assets/media/image/fp-intro-22a4699e.webp',      t: ['Fashion Plus', 'Still, today'] }
   ];
   /* The backgrounds you can choose between. Add one here and it appears in
      the phone and in the picker on its own — nothing else to touch. */
@@ -563,7 +563,7 @@
     }).join('');
 
     window.nwsbSheet({
-      art: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/fashion/caution-art.webp',
+      art: 'assets/media/image/caution-art-37cf9ea8.webp',
       head: 'This will cost you battery',
       sub: 'Fashion Plus keeps video decoding while you use the app',
       body:

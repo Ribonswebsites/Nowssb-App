@@ -123,14 +123,14 @@
      finally appear. See collectVideoUrls() in app/js/part051.js. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(COUPON_VIDS);
   var COUPON_HOSTS = '#nmhGreetImg, #fashCouponImg, #rmdCouponBanner, #msdCouponBanner';
-  var PLAYER_ICON = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/93cdeb591c49c96f7217d187426a2ad9d68f2933e6605cb0f76c09f1961bc3ed.webp';
+  var PLAYER_ICON = 'assets/media/image/7217d187426a2ad9d68f2933e6605cb0f76c09f1961bc3ed-3db811d6.webp';
 
   /* The eBooks clip is not a plain banner — it carries its own black banner
      underneath it inside one glass wrapper, and it goes in three places: the
      home sections, above the shelf on the store page, and above the copy on
      every book's own page. */
   var EB_VID  = "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/beaf11ea10561d439ff2d8217da6c6e889accdbb3b20bb1e7b4236cbe754305e.mp4";
-  var EB_ICON = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/2a57d6d66570597b5e96822df79570071705c1fb1943b0c1b895278548c8e426.png';
+  var EB_ICON = 'assets/media/image/5e96822df79570071705c1fb1943b0c1b895278548c8e426-0dde6c30.png';
 
   /* The subscription clip was the same one in several places. The two home
      banners keep a clip of their own; the plan banner on the subscription
@@ -167,13 +167,13 @@
      that section — the Quick Links rail's own map — so a chip reads as the
      same thing the user taps elsewhere. ── */
   var CHIP_IC = {
-    meaning: "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1a5f669e63dbae9d85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa.png",
-    words:   "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp",
-    ebooks:  "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/2a57d6d66570597b5e96822df79570071705c1fb1943b0c1b895278548c8e426.png",
-    connect: "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ea559460014dd8d9447072cdece7eb07f670832effdae7f062973b76151f3bde.webp",
-    chat:    "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/db15f3026ea179dc265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e.webp",
-    profile: "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3979b9fa35b579e61e60226665c68128ad03987930169b94504c89b3fe74ccc8.webp",
-    offer:   "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5972de26815c527d6b747aedbfb40a251b398b9008515762e808019375e58389.png"
+    meaning: "assets/media/image/85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa-fa4f86f4.png",
+    words:   "assets/media/image/71c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d-330d4dee.webp",
+    ebooks:  "assets/media/image/5e96822df79570071705c1fb1943b0c1b895278548c8e426-0dde6c30.png",
+    connect: "assets/media/image/447072cdece7eb07f670832effdae7f062973b76151f3bde-08f4337b.webp",
+    chat:    "assets/media/image/265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e-46fef40b.webp",
+    profile: "assets/media/image/1e60226665c68128ad03987930169b94504c89b3fe74ccc8-d7dfb697.webp",
+    offer:   "assets/media/image/6b747aedbfb40a251b398b9008515762e808019375e58389-afcb8741.png"
   };
   var STORE_CHIPS = [
     ['meaning', 'Meanings', 'The origin behind any word'],

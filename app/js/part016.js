@@ -110,12 +110,12 @@ setTimeout(initGSAP, 400);
 
 // ── HEALTH BANNER ROTATION ──
 const maleBanners = [
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a2ad0fe279aaea00e8acb980f25e265375ee1964bdf8b53b207302614259073f.webp',
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/651aea1619f75cfe562cef0845a4db9e196fc202d82ff0ee049e8e019d7140a7.webp'
+  'assets/media/image/e8acb980f25e265375ee1964bdf8b53b207302614259073f-ba360a16.webp',
+  'assets/media/image/562cef0845a4db9e196fc202d82ff0ee049e8e019d7140a7-bfa25c44.webp'
 ];
 const femaleBanners = [
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1ecf1fbd58edba8e92728fb6df6bd487a528a3451504d3728fb509ec020fae93.webp',
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/58198a4884965cc67314a1836a55dc99d75b5a8db2b560c86420ac8039e97eb7.webp'
+  'assets/media/image/92728fb6df6bd487a528a3451504d3728fb509ec020fae93-490099f9.webp',
+  'assets/media/image/7314a1836a55dc99d75b5a8db2b560c86420ac8039e97eb7-51a59b3a.webp'
 ];
 let maleIdx = 0, femaleIdx = 0;
 function rotateBanner(el, banners, idxRef, setIdx) {

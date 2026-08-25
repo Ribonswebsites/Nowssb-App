@@ -21,23 +21,23 @@
        is IG.nav('profile'), NOT 'home': routing it to 'home' just bounced the
        user to the home screen, which is why Connect stopped working once a
        nav customization had been applied. */
-    { id: 'connect',      label: 'Connect',    img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ea559460014dd8d9447072cdece7eb07f670832effdae7f062973b76151f3bde.webp', run: function () { if (window.IG) IG.nav('profile'); } },
-    { id: 'practice',     label: 'Practice',   img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/44ed38a222535b9c30291d2e0b1c0217c7e5703cbc9fef0cad292a30a99414f5.webp', run: function () { if (window.IG) IG.nav('practice'); else if (typeof openPracticeIntro === 'function') openPracticeIntro(); } },
-    { id: 'library',      label: 'Library',    img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/62e5d0908e54a2a619e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4.webp', run: function () { if (window.IG) IG.nav('library'); else openSub('sound-library'); } },
-    { id: 'store',        label: 'Store',      img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp', run: function () { if (window.IG) IG.nav('store'); else openSub('nowssb-store'); } },
-    { id: 'profile',      label: 'Profile',    img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3979b9fa35b579e61e60226665c68128ad03987930169b94504c89b3fe74ccc8.webp', run: function () { if (window.IG) IG.nav('myprofile'); else openSub('profile'); } },
-    { id: 'progress',     label: 'Progress',   img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/0480c10b8a8d79dd38f0f5ffaf71f982cb92d7e49b8cbb3a9bd93bc6820c8a99.webp', run: function () { openSub('my-progress'); } },
-    { id: 'wordscience',  label: 'Word Sci',   img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dd44cf9fc35b783c2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7.webp', run: function () { openSub('word-science'); } },
-    { id: 'meaningstore', label: 'Meaning',    img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1a5f669e63dbae9d85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa.png', run: function () { openSub('meaning-store'); } },
-    { id: 'search',       label: 'Search',     img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8d85320f63c3e1760c436ecb735a892202453e58b9a36178183dc6c2d7f72be4.webp', run: function () { openSub('search-choice'); } },
-    { id: 'cart',         label: 'Cart',       img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/311c26afee2bc52c712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d.webp', run: function () { openSub('cart'); } },
-    { id: 'wishlist',     label: 'Wishlist',   img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a74a9935fb237eb82b17a92169d2b57e5a8733d5a3fd699754717fcd8869dfed.webp', run: function () { openSub('wishlist'); } },
-    { id: 'routines',     label: 'Routines',   img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/307233cd22669455f19d52470a876209c8289b54081839108ba1b076bbf63926.png', run: function () { openSub('routines'); } },
-    { id: 'chat',         label: 'Chat',       img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/db15f3026ea179dc265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e.webp', run: function () { if (typeof chatInboxOpen === 'function') chatInboxOpen(); } },
-    { id: 'ai',           label: 'AI Rx',      img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/41c9ed21b2822c901ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7.png', run: function () { openSub('ai-prescription'); } },
-    { id: 'streak',       label: 'Streak',     img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f82047a0e727766b375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f.png', run: function () { openSub('streak'); } },
-    { id: 'settings',     label: 'Settings',   img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/523b5889d13cb14a6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82.webp', run: function () { openSub('social'); } },
-    { id: 'everything',   label: 'Everything', img: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/47f9e2c9fad5a78faa2e75819832c6648532079b7499b33175725fc3eaae80db.webp', run: function () { openSub('features'); } }
+    { id: 'connect',      label: 'Connect',    img: 'assets/media/image/447072cdece7eb07f670832effdae7f062973b76151f3bde-08f4337b.webp', run: function () { if (window.IG) IG.nav('profile'); } },
+    { id: 'practice',     label: 'Practice',   img: 'assets/media/image/30291d2e0b1c0217c7e5703cbc9fef0cad292a30a99414f5-16695ec7.webp', run: function () { if (window.IG) IG.nav('practice'); else if (typeof openPracticeIntro === 'function') openPracticeIntro(); } },
+    { id: 'library',      label: 'Library',    img: 'assets/media/image/19e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4-e7261be5.webp', run: function () { if (window.IG) IG.nav('library'); else openSub('sound-library'); } },
+    { id: 'store',        label: 'Store',      img: 'assets/media/image/71c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d-330d4dee.webp', run: function () { if (window.IG) IG.nav('store'); else openSub('nowssb-store'); } },
+    { id: 'profile',      label: 'Profile',    img: 'assets/media/image/1e60226665c68128ad03987930169b94504c89b3fe74ccc8-d7dfb697.webp', run: function () { if (window.IG) IG.nav('myprofile'); else openSub('profile'); } },
+    { id: 'progress',     label: 'Progress',   img: 'assets/media/image/38f0f5ffaf71f982cb92d7e49b8cbb3a9bd93bc6820c8a99-09267100.webp', run: function () { openSub('my-progress'); } },
+    { id: 'wordscience',  label: 'Word Sci',   img: 'assets/media/image/2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7-64ecc8c2.webp', run: function () { openSub('word-science'); } },
+    { id: 'meaningstore', label: 'Meaning',    img: 'assets/media/image/85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa-fa4f86f4.png', run: function () { openSub('meaning-store'); } },
+    { id: 'search',       label: 'Search',     img: 'assets/media/image/0c436ecb735a892202453e58b9a36178183dc6c2d7f72be4-a65cce23.webp', run: function () { openSub('search-choice'); } },
+    { id: 'cart',         label: 'Cart',       img: 'assets/media/image/712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d-e05a2e25.webp', run: function () { openSub('cart'); } },
+    { id: 'wishlist',     label: 'Wishlist',   img: 'assets/media/image/2b17a92169d2b57e5a8733d5a3fd699754717fcd8869dfed-4296b74d.webp', run: function () { openSub('wishlist'); } },
+    { id: 'routines',     label: 'Routines',   img: 'assets/media/image/f19d52470a876209c8289b54081839108ba1b076bbf63926-64c6e8a0.png', run: function () { openSub('routines'); } },
+    { id: 'chat',         label: 'Chat',       img: 'assets/media/image/265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e-46fef40b.webp', run: function () { if (typeof chatInboxOpen === 'function') chatInboxOpen(); } },
+    { id: 'ai',           label: 'AI Rx',      img: 'assets/media/image/1ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7-66da3ed1.png', run: function () { openSub('ai-prescription'); } },
+    { id: 'streak',       label: 'Streak',     img: 'assets/media/image/375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f-5e809db4.png', run: function () { openSub('streak'); } },
+    { id: 'settings',     label: 'Settings',   img: 'assets/media/image/6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82-75bedcbf.webp', run: function () { openSub('social'); } },
+    { id: 'everything',   label: 'Everything', img: 'assets/media/image/aa2e75819832c6648532079b7499b33175725fc3eaae80db-1e188c9b.webp', run: function () { openSub('features'); } }
   ];
   var DEFAULT_SLOTS = ['connect', 'practice', 'library', 'store', 'profile'];
 
@@ -164,7 +164,7 @@
 
   // ── Toast ─────────────────────────────────────────────────────
   var _toastT = null;
-  var QA_TOAST_ICON = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/272b820a002190feecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b.png';
+  var QA_TOAST_ICON = 'assets/media/image/ecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b-187c10b3.png';
   function toast(msg) {
     var scr = document.getElementById('sub-quick-access'); if (!scr) return;
     var t = document.getElementById('qaToast');

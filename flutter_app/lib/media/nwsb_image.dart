@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'cdn.dart';
+import 'media_assets.dart';
 
-/// Shared NowssB image seam for the protected launch art and R2-backed media.
+/// Shared NowssB image seam for restored local artwork and uncatalogued runtime media.
 class NwsbImage extends StatelessWidget {
   const NwsbImage({
     super.key,
@@ -25,25 +26,21 @@ class NwsbImage extends StatelessWidget {
   Widget get _fallback => fallback ?? error ?? const ColoredBox(color: Colors.black);
   bool get _isLocal => _source.startsWith('./assets/') || _source.startsWith('assets/');
   String get _localPath => _source.startsWith('./') ? _source.substring(2) : _source;
-  bool get _protectedLaunchArt =>
-      _localPath == 'assets/video/start-animation-poster.webp';
-
   @override
   Widget build(BuildContext context) {
     if (_source.isEmpty) return _fallback;
-    if (_isLocal && _protectedLaunchArt) {
+    final localPath = _isLocal ? _localPath : nowssbImageAsset(_source);
+    if (localPath != null) {
       return Image.asset(
-        _localPath,
+        localPath,
         fit: fit,
         alignment: alignment,
         errorBuilder: (_, __, ___) => _fallback,
       );
     }
-    final networkUrl = _isLocal
-        ? NwsbCdn.assetUrl(_localPath)
-        : (_source.startsWith('http://') || _source.startsWith('https://')
-            ? _source
-            : NwsbCdn.url(_source));
+    final networkUrl = _source.startsWith('http://') || _source.startsWith('https://')
+        ? _source
+        : NwsbCdn.url(_source);
     return Image.network(
       networkUrl,
       fit: fit,

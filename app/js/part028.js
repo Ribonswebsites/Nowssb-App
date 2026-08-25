@@ -88,7 +88,7 @@ function renderCartPage() {
           '<div class="cwp-item-price">$' + (item.price/100).toFixed(2) + '</div>' +
           '<div class="cwp-item-actions">' +
             '<div class="cwp-item-btn gold" title="Save to wishlist" onclick="cwpCartToWish(\'' + safeId + '\',\'' + safeName + '\',' + item.price + ',\'' + (item.img||'').replace(/'/g,"\\'") + '\',\'' + (item.type||'Word') + '\')">' +
-              '<img class="cw-svg-img" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e5cf26d9ba2b3fb04c5a74647ca238c0ec7556500962374469cc3badd240f23d.png" alt="Wishlist" style="width:20px;height:20px;object-fit:contain;display:block;">' +
+              '<img class="cw-svg-img" src="assets/media/image/4c5a74647ca238c0ec7556500962374469cc3badd240f23d-fe07ebec.png" alt="Wishlist" style="width:20px;height:20px;object-fit:contain;display:block;">' +
             '</div>' +
             '<div class="cwp-item-btn red" title="Remove" onclick="cwpRemoveFromCart(\'' + safeId + '\')">' +
               '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="rgba(255,80,80,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg>' +
@@ -158,7 +158,7 @@ function renderWishPage(filter) {
           '<div class="cwp-item-price">$' + (item.price/100).toFixed(2) + '</div>' +
           '<div class="cwp-item-actions">' +
             '<div class="cwp-item-btn gold" title="Move to cart" onclick="cwpWishToCart(\'' + safeId + '\')">' +
-              '<img class="cw-svg-img" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f0b0ce0012f71cffa0203505c409f8dc212e5a85747c86c4d892e706abf7b7d6.png" alt="Move to cart" style="width:20px;height:20px;object-fit:contain;display:block;">' +
+              '<img class="cw-svg-img" src="assets/media/image/a0203505c409f8dc212e5a85747c86c4d892e706abf7b7d6-90ab3800.png" alt="Move to cart" style="width:20px;height:20px;object-fit:contain;display:block;">' +
             '</div>' +
             '<div class="cwp-item-btn red" title="Remove" onclick="cwpRemoveFromWish(\'' + safeId + '\',\'' + safeName + '\',' + item.price + ',\'' + (item.img||'').replace(/'/g,"\\'") + '\',\'' + (item.type||'Word') + '\')">' +
               '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1L9 9M9 1L1 9" stroke="rgba(255,80,80,0.7)" stroke-width="1.4" stroke-linecap="square"/></svg>' +
@@ -357,13 +357,13 @@ window.wishOpenListFromIntro = function(type) {
     if (title)    title.textContent = 'Words';
     if (eyebrow)  { eyebrow.textContent = 'NowssB Store · Words'; eyebrow.style.color = 'rgba(200,232,245,0.75)'; }
     if (heroTitle) heroTitle.innerHTML = 'Saved <span style="font-weight:200;">Words</span>';
-    if (heroBg)    { heroBg.style.backgroundImage = "url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e0ccbdeda57846deff033126f200556d41b5b933dcef38d00c055704df25e44f.webp')"; heroBg.style.backgroundPosition = 'center top'; }
+    if (heroBg)    { heroBg.style.backgroundImage = "url('assets/media/image/ff033126f200556d41b5b933dcef38d00c055704df25e44f-3134302e.webp')"; heroBg.style.backgroundPosition = 'center top'; }
     if (heroOvl)   heroOvl.style.background = 'none';
   } else {
     if (title)    title.textContent = 'Meanings';
     if (eyebrow)  { eyebrow.textContent = 'NowssB Store · Meanings'; eyebrow.style.color = 'rgba(232,213,163,0.75)'; }
     if (heroTitle) heroTitle.innerHTML = 'Saved <span style="font-weight:200;">Meanings</span>';
-    if (heroBg)    { heroBg.style.backgroundImage = "url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/47b5ce86758a02343e619e50ea4ecef00c709f4ec0310e60346e44aba33b4a4d.webp')"; heroBg.style.backgroundPosition = 'center top'; }
+    if (heroBg)    { heroBg.style.backgroundImage = "url('assets/media/image/3e619e50ea4ecef00c709f4ec0310e60346e44aba33b4a4d-5579a042.webp')"; heroBg.style.backgroundPosition = 'center top'; }
     if (heroOvl)   heroOvl.style.background = 'none';
   }
 

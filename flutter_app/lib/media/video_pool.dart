@@ -35,9 +35,12 @@
 library;
 
 import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
 import 'cdn.dart';
+import 'video_cache.dart';
 
 /// How badly a clip wants to keep its decoder when the pool is full.
 enum ClipPriority {
@@ -60,7 +63,8 @@ class VideoLease extends ChangeNotifier {
 
   final VideoPool _pool;
 
-  /// The bundled asset path. Always local — nothing here streams.
+  /// The repository asset path. Playback is local after the private media pack
+  /// is downloaded; this lease never owns a download or a decoder itself.
   final String assetPath;
 
   final ClipPriority priority;
@@ -154,10 +158,10 @@ class VideoPool {
 
   static final VideoPool instance = VideoPool._();
 
-  /// All mounted eligible clips stay live so a section video does not stop
-  /// when the user scrolls. The protected launch animation is managed by the
-  /// Splash widget and never enters this pool.
-  static const int maxLive = 256;
+  /// Keep only a small number of hardware decoders alive. Every other
+  /// mounted clip remains on its poster until it becomes the selected feature.
+  /// The protected launch animation is managed by Splash and never enters this pool.
+  static const int maxLive = 4;
 
   final List<VideoLease> _leases = [];
   final Set<VideoLease> _live = {};
@@ -455,51 +459,52 @@ class VideoPool {
     l._changed();
   }
 
-  /// R2 catalog first, then the bundled file, then the public site.
+  /// Private cache first, then the protected bundled launch family.
   ///
-  /// The posters are always there. R2 is the shared source used by both the
-  /// WebView and Flutter; the bundled copy keeps the same screen usable when
-  /// the network is unavailable.
+  /// Decorative clips are never opened directly from R2 by the decoder. A
+  /// missing cache file safely leaves the poster visible while the pack queue
+  /// retries, which is preferable to spawning competing network players.
   Future<VideoPlayerController?> _open(String assetPath) async {
     // Some Flutter sections intentionally use the exact Cloudinary film that
     // the WebView uses. Treat an HTTP asset as a URL; passing it to
     // VideoPlayerController.asset produces the misleading "bundle or network"
     // failure seen in the debug HUD.
     if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
-      final net = VideoPlayerController.networkUrl(Uri.parse(assetPath));
+      final cachedPath = await VideoCache.instance.ensure(assetPath);
+      if (cachedPath == null) return null;
+      final cached = VideoPlayerController.file(File(cachedPath));
       try {
-        await net.initialize();
-        debugPrint('NowssB video: opened direct $assetPath');
-        return net;
+        await cached.initialize();
+        debugPrint('NowssB video: opened private cache ${Uri.parse(assetPath).pathSegments.last}');
+        return cached;
       } catch (e) {
-        debugPrint('NowssB video: direct network miss $assetPath — $e');
+        debugPrint('NowssB video: direct cached file rejected — $e');
         try {
-          await net.dispose();
+          await cached.dispose();
         } catch (_) {}
         return null;
       }
     }
 
-    // R2 is the canonical playback source after migration. The bundled
-    // lookup is retained only as a harmless compatibility attempt for the
-    // protected launch family; eligible clips resolve to R2 below.
+    // The private media pack is the only normal playback path. A missing file
+    // stays a poster rather than opening a second network decoder while the
+    // downloader is still working.
     final urls = NwsbCdn.urls(assetPath).toList();
-
-    Future<VideoPlayerController?> openNetwork() async {
-      for (final url in urls) {
-        final net = VideoPlayerController.networkUrl(Uri.parse(url));
+    if (urls.isNotEmpty) {
+      final cachedPath = await VideoCache.instance.ensure(urls.first);
+      if (cachedPath != null) {
+        final cached = VideoPlayerController.file(File(cachedPath));
         try {
-          await net.initialize();
-          debugPrint('NowssB video: opened $url');
-          return net;
+          await cached.initialize();
+          debugPrint('NowssB video: opened private cache ${assetPath.split('/').last}');
+          return cached;
         } catch (e) {
-          debugPrint('NowssB video: network miss $url — $e');
+          debugPrint('NowssB video: cached file rejected ${assetPath.split('/').last} — $e');
           try {
-            await net.dispose();
+            await cached.dispose();
           } catch (_) {}
         }
       }
-      return null;
     }
 
     final asset = VideoPlayerController.asset(assetPath);
@@ -513,7 +518,7 @@ class VideoPool {
       } catch (_) {}
     }
 
-    return openNetwork();
+    return null;
   }
 
   /// Returns when the PLATFORM has actually let the player go, not when the

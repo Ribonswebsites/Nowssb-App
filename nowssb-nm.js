@@ -135,7 +135,7 @@
   function getTiers()    { try { return (typeof RM_TIERS         !== 'undefined') ? RM_TIERS         : {}; } catch (e) { return {}; } }
   function getWordTier() { try { return (typeof RM_WORD_TIER     !== 'undefined') ? RM_WORD_TIER     : {}; } catch (e) { return {}; } }
 
-  var STORE_ICON_URL = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/86a128368819649971c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d.webp';
+  var STORE_ICON_URL = 'assets/media/image/71c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d-330d4dee.webp';
   var _trendVidTimer = null;
   var _trendShopTimer = null;
   window._nwsbTrendPicks = [];
@@ -611,14 +611,14 @@
 
   /* ── Prebuilt banner library (in-built banners, matched to the avatars) ── */
   var NWSB_BANNERS = [
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/fc3d4da65185cd0535ce88f22712c4b893161e3fd16c0de4d568701cbc0687d7.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b0311b51f466541728956740ddccd061c8fa3cdcb4e22a0414e3ca7514fc6faf.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e5c7f3703725755d88aa4c461fe9dac0729d119fa6a7ac9adb39e089aa07fa81.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/df58ad45365e63d0512fbc3be059098cee7987c845bea29a418289f3e7fdcfe1.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/89c64c87db948180af9073712044c8c07345a0ed1fe7a39fa2c83b7162d04803.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/517802ba6a6c3a6cc79ba3f9c542a148bd93f745bd7b3925ff9ed47b5de12b07.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/671fd0928171078afb766af61f7cce37fa6502c976b9e66eb5388bcc449198c2.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/58d0a40a97d4a6932e64d5eee905aa413c9e31c3b0c41dd3e800486cbcb61ca2.jpg'
+    'assets/media/image/35ce88f22712c4b893161e3fd16c0de4d568701cbc0687d7-56f68982.jpg',
+    'assets/media/image/28956740ddccd061c8fa3cdcb4e22a0414e3ca7514fc6faf-831ce629.jpg',
+    'assets/media/image/88aa4c461fe9dac0729d119fa6a7ac9adb39e089aa07fa81-0caeda49.jpg',
+    'assets/media/image/512fbc3be059098cee7987c845bea29a418289f3e7fdcfe1-2d21966f.jpg',
+    'assets/media/image/af9073712044c8c07345a0ed1fe7a39fa2c83b7162d04803-464a661d.jpg',
+    'assets/media/image/c79ba3f9c542a148bd93f745bd7b3925ff9ed47b5de12b07-b187c1bb.jpg',
+    'assets/media/image/fb766af61f7cce37fa6502c976b9e66eb5388bcc449198c2-665329b9.jpg',
+    'assets/media/image/2e64d5eee905aa413c9e31c3b0c41dd3e800486cbcb61ca2-c8837c1a.jpg'
   ];
   window.NWSB_BANNERS = NWSB_BANNERS;
 
@@ -640,7 +640,7 @@
     w.innerHTML =
       '<div class="pps-backdrop" onclick="nwsbCloseBannerUI()"></div>' +
       '<div class="pps-card" style="padding-bottom:' + navH + ';">' +
-        '<img class="pps-banner" decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b6abe443d711a2e42149ed14dacb1fd6b96631a649e3634454f0ee3e3e51da52.jpg" alt="">' +
+        '<img class="pps-banner" decoding="async" loading="lazy" src="assets/media/image/2149ed14dacb1fd6b96631a649e3634454f0ee3e3e51da52-e0a9fef5.jpg" alt="">' +
         '<div class="pps-inner">' +
           '<div class="pps-handle"></div>' +
           '<div class="pps-title">Change Banner</div>' +
@@ -763,8 +763,8 @@
   // a gold checkmark badge. Same shape as fbgApplyToast (part047.js) for
   // the Fashion Background picker, kept separate since this one always
   // shows a theme-specific image rather than one fixed icon.
-  var NWSB_THEME_TOAST_IMG_NEU   = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f7ab49ce96814d9dba07e554cafc04fca16eb849bee873501297327815552db0.webp';
-  var NWSB_THEME_TOAST_IMG_GLASS = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4ab7671cefecf91e4a4cb1db29628f21e657d6ed891092362dd631db1b1af1bb.webp';
+  var NWSB_THEME_TOAST_IMG_NEU   = 'assets/media/image/ba07e554cafc04fca16eb849bee873501297327815552db0-b486f1d6.webp';
+  var NWSB_THEME_TOAST_IMG_GLASS = 'assets/media/image/4a4cb1db29628f21e657d6ed891092362dd631db1b1af1bb-7c2a8296.webp';
   function nwsbShowThemeToast(theme) {
     var img = (theme === 'glass') ? NWSB_THEME_TOAST_IMG_GLASS : NWSB_THEME_TOAST_IMG_NEU;
     var msg = (theme === 'glass') ? 'NowssB Fashion theme ✓' : 'NowssB theme ✓';

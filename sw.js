@@ -84,8 +84,8 @@ self.addEventListener('activate', e => {
    circle beside the app name on the LEFT, stays exactly as it was — that
    part already reads the way it should.
    ── */
-const NOTIF_ICON  = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-blank.png';
-const NOTIF_BADGE = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-badge.png';
+const NOTIF_ICON  = 'assets/media/image/notif-blank-442eb067.png';
+const NOTIF_BADGE = 'assets/media/image/notif-badge-81c1b3e2.png';
 
 self.addEventListener('push', e => {
   let d = {};
@@ -126,51 +126,12 @@ self.addEventListener('notificationclick', e => {
   })());
 });
 
-/* ── Range requests against a cached video ────────────────────────────────
-   A <video> asks for bytes, not for files: it sends `Range: bytes=0-` and
-   expects `206 Partial Content` with a Content-Range back.
-
-   Cache Storage does NOT do that. caches.match() ignores the Range header
-   entirely and hands back the whole 200. Chrome will play it, but its media
-   stack loses the ability to ask for the part it wants, so it re-requests
-   and re-buffers — which is heard as a clip that keeps catching for a few
-   frames at a time. The start animation only started doing this once it
-   was genuinely cached; before that it streamed from the server, which
-   answers ranges properly, and was smooth.
-
-   So the slicing is done here. */
-async function rangeResponse(req, cached) {
-  const range = req.headers.get('range');
-  if (!range) return cached;
-  const m = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
-  if (!m) return cached;
-
-  const buf = await cached.clone().arrayBuffer();
-  const size = buf.byteLength;
-  let start, end;
-  if (m[1] === '') {
-    // `bytes=-N` — the last N bytes, which is how a player finds the index
-    // of a file whose moov atom sits at the end.
-    const n = parseInt(m[2], 10);
-    if (!isFinite(n) || n <= 0) return cached;
-    start = Math.max(0, size - n);
-    end = size - 1;
-  } else {
-    start = parseInt(m[1], 10);
-    end = m[2] === '' ? size - 1 : parseInt(m[2], 10);
-  }
-  if (!isFinite(start) || start < 0 || start >= size) {
-    return new Response(null, { status: 416, headers: { 'Content-Range': 'bytes */' + size } });
-  }
-  if (!isFinite(end) || end >= size) end = size - 1;
-  if (end < start) return cached;
-
-  const body = buf.slice(start, end + 1);
-  const headers = new Headers(cached.headers);
-  headers.set('Content-Range', 'bytes ' + start + '-' + end + '/' + size);
-  headers.set('Content-Length', String(body.byteLength));
-  headers.set('Accept-Ranges', 'bytes');
-  return new Response(body, { status: 206, statusText: 'Partial Content', headers });
+/* Cached decorative videos are complete files in private Cache Storage. Return
+   the cached Response directly instead of cloning it into an ArrayBuffer for
+   manual range slicing; that conversion duplicates a large video in memory and
+   was a direct native-WebView crash risk. Decorative loops do not seek. */
+async function rangeResponse(_req, cached) {
+  return cached;
 }
 
 self.addEventListener('fetch', e => {

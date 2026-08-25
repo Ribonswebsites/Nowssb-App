@@ -36,7 +36,7 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const OUT_DIR = join(ROOT, 'assets');
 const MEDIA_DIR = join(OUT_DIR, 'media');
 
-const SKIP_DIRS = new Set(['.git', '.claude', 'node_modules', 'www', 'android', 'ios', 'assets']);
+const SKIP_DIRS = new Set(['.git', '.claude', 'node_modules', 'www', 'android', 'ios', 'assets', 'artifacts', '.tmp']);
 const SCAN_EXT = new Set(['.html', '.js', '.mjs', '.css', '.json']);
 
 /* Bare http(s) URLs, stopped at the first character that cannot be in one.
@@ -93,6 +93,7 @@ await walk(ROOT, async (file) => {
   for (const raw of text.match(URL_RE) || []) {
     /* Trailing punctuation from the surrounding markup, not the URL. */
     const url = raw.replace(/[.,;:]+$/, '');
+    if (url.includes('${')) continue;
     let kind;
     try { kind = kindOf(url); } catch (e) { continue; }
     if (!kind) continue;

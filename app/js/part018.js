@@ -96,10 +96,10 @@ function renderRoutines() {
 
   body.innerHTML = `
     <div class="rt-screen" style="position:relative;overflow:hidden;">
-      <div class="rt-bg" style="background-image:url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/41d76c00d1a3dcea1cccea433931bdcec0bec73caa1b11eb598667f39619ca50.webp');background-size:cover;background-position:center top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>
+      <div class="rt-bg" style="background-image:url('assets/media/image/1cccea433931bdcec0bec73caa1b11eb598667f39619ca50-f8a07671.webp');background-size:cover;background-position:center top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>
       <div class="rt-bg-overlay"></div>
       <div class="rt-banner">
-        <div class="rt-banner-img" style="background-image:url('https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f1ea22d4d0b022f8fb86093d8b5ce7c5baa69397e7a8b9ed9d1d45cd3ca736d8.webp');"></div>
+        <div class="rt-banner-img" style="background-image:url('assets/media/image/fb86093d8b5ce7c5baa69397e7a8b9ed9d1d45cd3ca736d8-a4a3016a.webp');"></div>
         <div class="rt-banner-fade"></div>
         <div class="rt-banner-header">
           <button onclick="closeSub('routines')" style="width:38px;height:38px;border-radius:50% !important;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;backdrop-filter:none;-webkit-backdrop-filter:none;">
@@ -107,7 +107,7 @@ function renderRoutines() {
           </button>
           <div class="rt-banner-title">My Routines</div>
           <div style="width:38px;height:38px;border-radius:50% !important;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            <img decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/307233cd22669455f19d52470a876209c8289b54081839108ba1b076bbf63926.png" alt="" style="width:26px;height:26px;object-fit:contain;display:block;">
+            <img decoding="async" loading="lazy" src="assets/media/image/f19d52470a876209c8289b54081839108ba1b076bbf63926-64c6e8a0.png" alt="" style="width:26px;height:26px;object-fit:contain;display:block;">
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@ function renderRoutineIntro() {
   body.innerHTML =
     '<div class="rt-screen" style="position:relative;overflow:hidden;background:#060c18;">' +
     '<div style="position:absolute;top:0;left:0;right:0;bottom:0;' +
-      'background-image:url(https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a7fbeb97ac863b8d76e57414edf91bd1506ac5b0d0b19c6ec14e5ae0bce608c0.webp);' +
+      'background-image:url(assets/media/image/76e57414edf91bd1506ac5b0d0b19c6ec14e5ae0bce608c0-8995eaa5.webp);' +
       'background-size:cover;background-position:center center;"></div>' +
 
     '<div style="position:absolute;top:0;left:0;right:0;bottom:0;' +
@@ -214,7 +214,7 @@ function renderRoutineIntro() {
           'display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:8px;">' +
-          '<img decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/307233cd22669455f19d52470a876209c8289b54081839108ba1b076bbf63926.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;">' +
+          '<img decoding="async" loading="lazy" src="assets/media/image/f19d52470a876209c8289b54081839108ba1b076bbf63926-64c6e8a0.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;">' +
           '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
         '</div>' +
         '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;">' +
@@ -355,17 +355,17 @@ function renderRoutineDetail_inline() {
     }).join('');
 
   var inlineBanners = {
-    'Morning':   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8f5a03313006f0062bb1a5648e4fc0f145c5d5649008293b5a7e80fca83e9df1.webp',
-    'Midday':    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/587e1bb2f67f6ef36c12b4daa0f8a68b6f04b0bd7d314be6fe3c201c3c2c5e7f.webp',
-    'Afternoon': 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/cca341c230dc12b573400cb52775c87f828d40c37a166ee5e6964651991a1aa2.webp',
-    'Evening':   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/946cac311ac8df344e312869bb6e85694170cbd4e0df39091dbde6ae6cd0b191.webp',
-    'Night':     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1f7dfa55c4b428c04540b1fd65baaa3656993c1660a326299186dab00adcfe3e.webp'
+    'Morning':   'assets/media/image/2bb1a5648e4fc0f145c5d5649008293b5a7e80fca83e9df1-dc125994.webp',
+    'Midday':    'assets/media/image/6c12b4daa0f8a68b6f04b0bd7d314be6fe3c201c3c2c5e7f-2b8d560e.webp',
+    'Afternoon': 'assets/media/image/73400cb52775c87f828d40c37a166ee5e6964651991a1aa2-aadc9135.webp',
+    'Evening':   'assets/media/image/4e312869bb6e85694170cbd4e0df39091dbde6ae6cd0b191-239584eb.webp',
+    'Night':     'assets/media/image/4540b1fd65baaa3656993c1660a326299186dab00adcfe3e-ff346bb4.webp'
   };
   var inlineBannerUrl = inlineBanners[r.time] || inlineBanners['Evening'];
 
   body.innerHTML =
     '<div class="rtd-screen" style="position:relative;overflow:hidden;">' +
-      '<div class="rt-bg" style="background-image:url(https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/71885f2b3e946b9a453f5146a0095c4b5e6e3223a043db86e2dbbdb77dfde7e6.jpg top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>' +
+      '<div class="rt-bg" style="background-image:url(assets/media/image/453f5146a0095c4b5e6e3223a043db86e2dbbdb77dfde7e6-aca143dc.jpg top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>' +
       '<div class="rt-bg-overlay"></div>' +
       '<div class="rt-banner" style="flex-shrink:0;position:relative;">' +
         '<div class="rt-banner-img" style="background-image:url(\'' + inlineBannerUrl + '\');"></div>' +
@@ -374,7 +374,7 @@ function renderRoutineDetail_inline() {
           '<button class="rtd-inline-back" style="width:42px;height:42px;cursor:pointer;padding:0;border-radius:50% !important;background:#fff url(\'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\'%3E%3Cpath d=\'M15 5l-7 7 7 7\' stroke=\'%230a0a12\' stroke-width=\'2.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E\') center/21px no-repeat;border:none;box-shadow:0 8px 20px rgba(0,0,0,.34),0 2px 6px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
           '</button>' +
           '<button class="rtd-myroutines-btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:100px;cursor:pointer;padding:6px 14px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.65);">' +
-            '<img decoding="async" loading="lazy" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/307233cd22669455f19d52470a876209c8289b54081839108ba1b076bbf63926.png" alt="" style="width:16px;height:16px;object-fit:contain;display:block;">' +
+            '<img decoding="async" loading="lazy" src="assets/media/image/f19d52470a876209c8289b54081839108ba1b076bbf63926-64c6e8a0.png" alt="" style="width:16px;height:16px;object-fit:contain;display:block;">' +
             'My Routines' +
           '</button>' +
         '</div>' +
@@ -531,17 +531,17 @@ function renderRoutineDetail() {
       : '<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.25);font-size:13px;">No sessions yet</div>'}`;
 
   const ROUTINE_BANNERS = {
-    'Morning':   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8f5a03313006f0062bb1a5648e4fc0f145c5d5649008293b5a7e80fca83e9df1.webp',
-    'Midday':    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/587e1bb2f67f6ef36c12b4daa0f8a68b6f04b0bd7d314be6fe3c201c3c2c5e7f.webp',
-    'Afternoon': 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/cca341c230dc12b573400cb52775c87f828d40c37a166ee5e6964651991a1aa2.webp',
-    'Evening':   'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/946cac311ac8df344e312869bb6e85694170cbd4e0df39091dbde6ae6cd0b191.webp',
-    'Night':     'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1f7dfa55c4b428c04540b1fd65baaa3656993c1660a326299186dab00adcfe3e.webp'
+    'Morning':   'assets/media/image/2bb1a5648e4fc0f145c5d5649008293b5a7e80fca83e9df1-dc125994.webp',
+    'Midday':    'assets/media/image/6c12b4daa0f8a68b6f04b0bd7d314be6fe3c201c3c2c5e7f-2b8d560e.webp',
+    'Afternoon': 'assets/media/image/73400cb52775c87f828d40c37a166ee5e6964651991a1aa2-aadc9135.webp',
+    'Evening':   'assets/media/image/4e312869bb6e85694170cbd4e0df39091dbde6ae6cd0b191-239584eb.webp',
+    'Night':     'assets/media/image/4540b1fd65baaa3656993c1660a326299186dab00adcfe3e-ff346bb4.webp'
   };
   const bannerUrl = ROUTINE_BANNERS[r.time] || ROUTINE_BANNERS['Evening'];
 
   body.innerHTML = `
     <div class="rtd-screen" style="position:relative;overflow:hidden;">
-      <div class="rt-bg" style="background-image:url(https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/71885f2b3e946b9a453f5146a0095c4b5e6e3223a043db86e2dbbdb77dfde7e6.jpg top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>
+      <div class="rt-bg" style="background-image:url(assets/media/image/453f5146a0095c4b5e6e3223a043db86e2dbbdb77dfde7e6-aca143dc.jpg top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>
       <div class="rt-bg-overlay"></div>
       <div class="rt-banner" style="flex-shrink:0;position:relative;">
         <div class="rt-banner-img" style="background-image:url('${bannerUrl}');"></div>

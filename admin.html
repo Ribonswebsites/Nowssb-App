@@ -6,8 +6,8 @@
 <title>NowssB — CEO Admin</title>
 <link rel="manifest" href="./admin-manifest.json">
 <meta name="theme-color" content="#060c18">
-<link rel="apple-touch-icon" href="https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/admin-icon-180.png">
-<link rel="icon" type="image/png" sizes="64x64" href="https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/admin-favicon.png">
+<link rel="apple-touch-icon" href="assets/media/image/admin-icon-180-8f3d1b24.png">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/media/image/admin-favicon-27fcd4e1.png">
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -391,7 +391,7 @@ input.nwsb-deva { font-size: 16px; }
 <!-- ══ AUTH SCREEN ══ -->
 <div id="authWrap">
   <div class="auth-card">
-    <div class="auth-mark"><img src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/af0736f58e0c29f3ee1124c2298b8d90cb7cc5a5f5a99f3f531ac5d481eba949.webp" alt=""></div>
+    <div class="auth-mark"><img src="assets/media/image/ee1124c2298b8d90cb7cc5a5f5a99f3f531ac5d481eba949-0b9b04bd.webp" alt=""></div>
     <div class="auth-logo">NowssB</div>
     <div class="auth-sub">CEO Content Studio</div>
     <!-- The app signs people in with Google, so the studio has to as well:
@@ -1450,8 +1450,8 @@ function reqNotify(n) {
   navigator.serviceWorker?.ready.then(reg => {
     reg.showNotification('New request: ' + n.word, {
       body: (n.name || n.email || 'Someone') + ' asked for a ' + (n.kind || 'meaning') + '.',
-      icon: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-blank.png',   // blank on purpose — see sw.js
-      badge: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-badge.png',
+      icon: 'assets/media/image/notif-blank-442eb067.png',   // blank on purpose — see sw.js
+      badge: 'assets/media/image/notif-badge-81c1b3e2.png',
       tag: 'req-' + n.id, renotify: false,
       data: { url: './admin.html' },
     }).catch(() => {});

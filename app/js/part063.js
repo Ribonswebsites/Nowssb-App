@@ -29,15 +29,15 @@
               '<rect x="13" y="13" width="5" height="5" rx="1.5" fill="rgba(200,232,245,0.12)" stroke="rgba(200,232,245,0.3)" stroke-width="1"/>' +
             '</svg>' },
     { k: 'bg',      label: 'Background',     sub: 'Fashion backdrop',     run: 'nwsbOpenFashionBgOverlay()',
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/cfc84fc5478b4b639e605b46cabaaef1327cf5d749f1c444ee76dd64115eba57.webp">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="assets/media/image/9e605b46cabaaef1327cf5d749f1c444ee76dd64115eba57-44779ae8.webp">' },
     { k: 'startbg', label: 'Start Image',    sub: 'Art behind the start', run: "SS.open('startbg')",
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/5e8a9fdb18e034ec7b544018b1e2a320c5a820f8459af21d30c1ae75b41a03ba.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="assets/media/image/7b544018b1e2a320c5a820f8459af21d30c1ae75b41a03ba-9150a0e3.png">' },
     { k: 'qa',      label: 'Quick Access',   sub: 'Bottom nav bar',       run: "openSub('quick-access')",
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + ';border-radius:50%;" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/272b820a002190feecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + ';border-radius:50%;" src="assets/media/image/ecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b-187c10b3.png">' },
     { k: 'qlinks',  label: 'Quick Links',    sub: 'One-tap shortcuts',    run: 'qlOpen()',
       icon: '<svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
     { k: 'tiles',   label: 'Home Tiles',     sub: 'The four buttons',     run: 'htOpen()',
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/909b614a4f984b774551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png">' },
     { k: 'layout',  label: 'Set As You Like', sub: 'Order the sections',  run: 'hlOpen()',
       icon: '<svg viewBox="0 0 22 22" fill="none">' +
               '<rect x="3" y="2.5" width="16" height="4.2" rx="1" stroke="#fff" stroke-width="1.5"/>' +
@@ -71,7 +71,7 @@
       '<div class="cu-box">' +
         '<div class="cu-head">' +
           '<div class="cu-head-icon"><img loading="lazy" decoding="async" alt="" style="' + IMG + '" ' +
-            'src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/cfc84fc5478b4b639e605b46cabaaef1327cf5d749f1c444ee76dd64115eba57.webp"></div>' +
+            'src="assets/media/image/9e605b46cabaaef1327cf5d749f1c444ee76dd64115eba57-44779ae8.webp"></div>' +
           '<div class="cu-head-txt">' +
             '<div class="cu-head-title">Customize</div>' +
             '<div class="cu-head-sub">Everything you can change, in one place</div>' +

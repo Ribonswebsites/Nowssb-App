@@ -43,8 +43,8 @@
      frame for the words, the gold Meanings case for the meanings — and
      they were previously reading whatever the store had set, which on a
      cold load was an empty string and a broken-image glyph. */
-  function wordImg() { return 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/signature/sig-words-icon.webp'; }
-  function meanImg() { return 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/signature/sig-meanings-icon.webp'; }
+  function wordImg() { return 'assets/media/image/sig-words-icon-92721e36.webp'; }
+  function meanImg() { return 'assets/media/image/sig-meanings-icon-55f12bc1.webp'; }
   function price()   { return window.MS_SIGNATURE_PRICE || 299; }
 
   /* ── What is on the shelf ──────────────────────────────────────────

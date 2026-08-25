@@ -8,10 +8,10 @@
   /* ── NowssB Verified IMAGE badge (the headphone check-mark seal images),
      shown as a neumorphic circle — replaces the old teal headphone SVG ── */
   var VB_IMG = {
-    blue:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1eb628997d943cba8bb41c1b8cc0044504cc36583aca8b710ea218c2c26537e8.png',
-    silver:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/03903b4c656873e3101f0f04cb6c9be22e5c1eda5e4387de159223f571945d2b.png',
-    gold:    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/33017c6a53892db5aa8425fabea2fb35c1c0dff22559c56d9dc5b8b3dc586eb7.png',
-    diamond: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/084c2a7f3f2c85dc2a7e23dc6ed9d3fc6f4152146ad0cd64cf86b60c4e568ade.png'
+    blue:    'assets/media/image/8bb41c1b8cc0044504cc36583aca8b710ea218c2c26537e8-c935fb9b.png',
+    silver:  'assets/media/image/101f0f04cb6c9be22e5c1eda5e4387de159223f571945d2b-9bf9fafe.png',
+    gold:    'assets/media/image/aa8425fabea2fb35c1c0dff22559c56d9dc5b8b3dc586eb7-fbcb27b3.png',
+    diamond: 'assets/media/image/2a7e23dc6ed9d3fc6f4152146ad0cd64cf86b60c4e568ade-38b88c60.png'
   };
   function imgBadge(tier, size) {
     size = size || 18;
@@ -361,10 +361,10 @@
       /* Image-explainer slots — placeholders for the user's own evolution/origin imagery */
       '<div class="nwsb-section-hd">The New Fashion Trend</div>' +
       '<div class="nwsb-explainer-grid">' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8a4d334229f9ff557e85debd11b23f4cf52eecc4e0aaf072efbafa603c209405.jpg)"><span>Origin</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b0d670b6066b0c4995c7afb74831b20b0d6a759c5511fabaf1deca5940eb1452.jpg)"><span>Evolution</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d143c72a353c7f2eb64c269f8de625ac19b9478500081fb0cf2ed69eb95edb66.jpg)"><span>Frequency</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/c061be5a902cf11b86f1f9d6fd01218089100b3e281dc0e919a5d411b17d8577.jpg)"><span>Healing</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/media/image/7e85debd11b23f4cf52eecc4e0aaf072efbafa603c209405-6da5e997.jpg)"><span>Origin</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/media/image/95c7afb74831b20b0d6a759c5511fabaf1deca5940eb1452-b0dca9f7.jpg)"><span>Evolution</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/media/image/b64c269f8de625ac19b9478500081fb0cf2ed69eb95edb66-30622439.jpg)"><span>Frequency</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/media/image/86f1f9d6fd01218089100b3e281dc0e919a5d411b17d8577-bb456386.jpg)"><span>Healing</span></div>' +
       '</div>' +
 
       (people.length
@@ -1143,8 +1143,8 @@
   }
   window.nwsbApplyStrippedBg = nwsbApplyStrippedBg;
 
-  var NWSB_THEME_IMG_NEU   = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f7ab49ce96814d9dba07e554cafc04fca16eb849bee873501297327815552db0.webp';
-  var NWSB_THEME_IMG_GLASS = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4ab7671cefecf91e4a4cb1db29628f21e657d6ed891092362dd631db1b1af1bb.webp';
+  var NWSB_THEME_IMG_NEU   = 'assets/media/image/ba07e554cafc04fca16eb849bee873501297327815552db0-b486f1d6.webp';
+  var NWSB_THEME_IMG_GLASS = 'assets/media/image/4a4cb1db29628f21e657d6ed891092362dd631db1b1af1bb-7c2a8296.webp';
   nwsbApplyStrippedBg(NWSB_THEME_IMG_NEU,   '#nwsbcsThemeNeu .nwsb-theme-opt-img, #nch-theme-neu .nwsb-theme-opt-img, #nwsb-theme-neu .nwsb-theme-opt-img');
   nwsbApplyStrippedBg(NWSB_THEME_IMG_GLASS, '#nwsbcsThemeGlass .nwsb-theme-opt-img, #nch-theme-glass .nwsb-theme-opt-img, #nwsb-theme-glass .nwsb-theme-opt-img');
 
@@ -1159,19 +1159,19 @@
      4 existing Connect glass photos (feed/reels/discover/home) with the
      9 Fashion Home photos for 13 choices total. ── */
   var NWSB_CONNECT_BGS = [
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/73f211886e12a197fbfd371d5535cf5032af352b1c5f69eacffced60b2979b0a.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a2275fd4ed909e2a0137012f27d1ff4dc41891b0ba674ff41d2aa7d2aaf5ce5d.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/84e9f5b8d55a43eefd027c5b6ce59363c694ab8bf2eed2d7a1d9ed68a30fe16f.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/416f48f6733b9b4cb8736b76b90cdd421b4603f101bea1187832ce43f6ff9ed3.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7faefee62e30b487c20dfe09052ea94736db5d076886a9b3e4e86ac6ec686d9b.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/c771dc2fac1db73daeac0fb81685e021d9d08359c0268c1fb8ce18a1c54b494e.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/c8ba2816200e306a9c467e9f172ef75fe9f12f4313d60c07e15e691ea9024f9d.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1ed28e3e65f105144644221bee571acadae57bb2285a0126c3cd9e095ab9356d.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/83f500ce2239fab2d7f9a33e2229352fca42e152adc5eb23b8c2e3d675736442.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/70dff54c281619bd19540c1a081843c541f6e3d511bd56c4bfefda898140623d.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b61051b0901b12154320a713975835ad07de345d41f50567f8d04013c68ba4e0.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/6a172050c86e14a8db886b606c99c0e99f900d618e5ae31e2237570bddb6d32b.jpg',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/89223ef1f18d6a9e31f92fc4c2fa5d42951917614024f8f9634adb02648e3f8d.jpg'
+    'assets/media/image/fbfd371d5535cf5032af352b1c5f69eacffced60b2979b0a-1f7fd285.webp',
+    'assets/media/image/0137012f27d1ff4dc41891b0ba674ff41d2aa7d2aaf5ce5d-5e1a96af.webp',
+    'assets/media/image/fd027c5b6ce59363c694ab8bf2eed2d7a1d9ed68a30fe16f-da533b17.webp',
+    'assets/media/image/b8736b76b90cdd421b4603f101bea1187832ce43f6ff9ed3-c2a2463d.webp',
+    'assets/media/image/c20dfe09052ea94736db5d076886a9b3e4e86ac6ec686d9b-a547e3dc.jpg',
+    'assets/media/image/aeac0fb81685e021d9d08359c0268c1fb8ce18a1c54b494e-4e02aaf3.jpg',
+    'assets/media/image/9c467e9f172ef75fe9f12f4313d60c07e15e691ea9024f9d-68070510.jpg',
+    'assets/media/image/4644221bee571acadae57bb2285a0126c3cd9e095ab9356d-b5e5798b.jpg',
+    'assets/media/image/d7f9a33e2229352fca42e152adc5eb23b8c2e3d675736442-9da8c189.jpg',
+    'assets/media/image/19540c1a081843c541f6e3d511bd56c4bfefda898140623d-30baefd8.jpg',
+    'assets/media/image/4320a713975835ad07de345d41f50567f8d04013c68ba4e0-f4ccada5.jpg',
+    'assets/media/image/db886b606c99c0e99f900d618e5ae31e2237570bddb6d32b-1385ed16.jpg',
+    'assets/media/image/31f92fc4c2fa5d42951917614024f8f9634adb02648e3f8d-751a302d.jpg'
   ];
 
   window.nwsbSetConnectBg = function (url) {

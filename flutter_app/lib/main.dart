@@ -7,13 +7,14 @@
 ///
 /// Two things are true at once and both matter:
 ///
-///   · The clips are all on the phone. Nothing streams, nothing buffers,
-///     nothing depends on Cloudinary being up or the signal being good.
-///   · On-screen clips play. Off-screen clips are posters. The ceiling is
-///     the same number the website and the WebView use (24), so a home of
-///     banners, televisions and the page film all move together.
+///   · Decorative videos download into private app storage in a controlled
+///     one-file-at-a-time pack. The launch animation remains bundled locally.
+///   · On-screen clips play from the private cache. Off-screen clips are
+///     posters, and the decoder ceiling is deliberately small for stability.
 ///     lib/media/video_pool.dart is where that ceiling is enforced.
 library;
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,8 +23,10 @@ import 'data/content.dart';
 import 'data/firebase.dart';
 import 'data/settings.dart';
 import 'data/updater.dart';
+import 'media/video_cache.dart';
 import 'media/video_pool.dart';
 import 'screens/splash.dart';
+import 'widgets/video_pack_dialog.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
@@ -48,6 +51,7 @@ Future<void> main() async {
   // the Firestore watch running behind them when there is one.
   await Settings.instance.load();
   await ContentStore.instance.start();
+  await VideoCache.instance.init();
 
   // Nothing decodes underneath the start animation. Released by the splash
   // when it finishes, and by the eight-second ceiling if it never does.
@@ -115,7 +119,17 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
               setState(() => _splashDone = true);
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 final ctx = context;
-                if (ctx.mounted) NwsbUpdate.maybeShow(ctx);
+                if (!ctx.mounted) return;
+                NwsbUpdate.maybeShow(ctx);
+                if (VideoCache.instance.accepted && !VideoCache.instance.isComplete) {
+                  unawaited(VideoCache.instance.downloadAll());
+                } else if (!VideoCache.instance.hasPrompted && !VideoCache.instance.isComplete) {
+                  showDialog<void>(
+                    context: ctx,
+                    barrierDismissible: false,
+                    builder: (_) => const VideoPackDialog(),
+                  );
+                }
               });
             }),
         ],
