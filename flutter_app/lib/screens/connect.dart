@@ -321,12 +321,114 @@ class _ConnectChatScreenState extends State<ConnectChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: NwsbColors.deep,
-      appBar: AppBar(title: Text(widget.peerName), backgroundColor: NwsbColors.deep, actions: [IconButton(onPressed: () => _startCall('audio'), icon: const Icon(Icons.call_outlined)), IconButton(onPressed: () => _startCall('video'), icon: const Icon(Icons.videocam_outlined))]),
-      body: Column(children: [Expanded(child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(stream: _service.messages(widget.peerUid), builder: (context, snapshot) { if (snapshot.hasError) return Center(child: Text(snapshot.error.toString(), style: const TextStyle(color: Colors.white))); if (!snapshot.hasData) return const Center(child: CircularProgressIndicator()); final docs = snapshot.data!.docs; if (docs.isEmpty) return const Center(child: Text('Start your first NowssB message.', style: TextStyle(color: Color(0x99FFFFFF)))); return ListView.builder(padding: const EdgeInsets.all(16), itemCount: docs.length, itemBuilder: (_, i) { final data = docs[i].data(); final mine = data['from'] == _service.uid; return Align(alignment: mine ? Alignment.centerRight : Alignment.centerLeft, child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10), constraints: const BoxConstraints(maxWidth: 300), decoration: BoxDecoration(color: mine ? const Color(0xFF8F7444) : const Color(0xFF191923), borderRadius: BorderRadius.circular(16)), child: Text(data['text']?.toString() ?? '', style: const TextStyle(color: Colors.white, height: 1.35))); }); })), _input()]),
+      appBar: AppBar(
+        title: Text(widget.peerName),
+        backgroundColor: NwsbColors.deep,
+        actions: [
+          IconButton(
+            onPressed: () => _startCall('audio'),
+            icon: const Icon(Icons.call_outlined),
+          ),
+          IconButton(
+            onPressed: () => _startCall('video'),
+            icon: const Icon(Icons.videocam_outlined),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: _service.messages(widget.peerUid),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      snapshot.error.toString(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  );
+                }
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final docs = snapshot.data!.docs;
+                if (docs.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'Start your first NowssB message.',
+                      style: TextStyle(color: Color(0x99FFFFFF)),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: docs.length,
+                  itemBuilder: (_, i) {
+                    final data = docs[i].data();
+                    final mine = data['from'] == _service.uid;
+                    return Align(
+                      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        constraints: const BoxConstraints(maxWidth: 300),
+                        decoration: BoxDecoration(
+                          color: mine ? const Color(0xFF8F7444) : const Color(0xFF191923),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          data['text']?.toString() ?? '',
+                          style: const TextStyle(color: Colors.white, height: 1.35),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          _input(),
+        ],
+      ),
     );
   }
 
-  Widget _input() => SafeArea(child: Padding(padding: const EdgeInsets.fromLTRB(12, 8, 12, 12), child: Row(children: [Expanded(child: TextField(controller: _composer, style: const TextStyle(color: Colors.white), minLines: 1, maxLines: 4, onSubmitted: (_) => _send(), decoration: InputDecoration(hintText: 'Message ${widget.peerName}…', hintStyle: const TextStyle(color: Color(0x66FFFFFF)), filled: true, fillColor: const Color(0xFF101018), border: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none))), const SizedBox(width: 8), IconButton(onPressed: _send, icon: const Icon(Icons.send_rounded, color: NwsbColors.goldLight))])));
+  Widget _input() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _composer,
+                style: const TextStyle(color: Colors.white),
+                minLines: 1,
+                maxLines: 4,
+                onSubmitted: (_) => _send(),
+                decoration: InputDecoration(
+                  hintText: 'Message ${widget.peerName}…',
+                  hintStyle: const TextStyle(color: Color(0x66FFFFFF)),
+                  filled: true,
+                  fillColor: const Color(0xFF101018),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(22),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: _send,
+              icon: const Icon(Icons.send_rounded, color: NwsbColors.goldLight),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Future<void> _send() async { final text = _composer.text; _composer.clear(); try { await _service.sendMessage(widget.peerUid, text); } catch (error) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString()))); } }
   Future<void> _startCall(String kind) async { await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectCallScreen(peerUid: widget.peerUid, peerName: widget.peerName, kind: kind))); }
