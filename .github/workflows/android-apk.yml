@@ -61,6 +61,12 @@ jobs:
         working-directory: android
         run: ./gradlew --no-daemon assembleDebug
 
+      - name: Report debug signing fingerprint
+        working-directory: android
+        run: |
+          echo "WebView debug APK signing certificate:"
+          ./gradlew --no-daemon signingReport | grep -A3 -E 'Variant: debug|SHA1:' || true
+
       - uses: actions/upload-artifact@v4
         with:
           name: nowssb-webview-debug-apk-all-changes
