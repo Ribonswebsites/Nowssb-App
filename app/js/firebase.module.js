@@ -350,10 +350,27 @@ window.fbGoogleLogin = async () => {
   const provider = new GoogleAuthProvider();
   const loader = document.getElementById('authLoader');
 
-  // Always try popup first — on mobile Chrome this shows the native account picker
-  // overlay without leaving the page (same as Manus / Claude). Only fall back to
-  // redirect if the browser explicitly blocks popups (PWA standalone, some WebViews).
+  // Embedded WebViews and standalone PWAs often open a popup that cannot return
+  // its Firebase result to the parent page. Use the full-page redirect first for
+  // those environments; it returns through /__/auth/handler and is consumed by
+  // getRedirectResult above. Desktop browsers keep the faster popup flow.
+  const isStandalone = window.matchMedia?.('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+  const isEmbeddedWebView = /; wv\)|WebView|Instagram|FBAN|FBAV/i.test(navigator.userAgent);
   if (loader) loader.classList.add('visible');
+  if (isMobile || isStandalone || isEmbeddedWebView) {
+    try {
+      await signInWithRedirect(auth, provider);
+      return;
+    } catch (redirectError) {
+      _googleSignInInProgress = false;
+      if (loader) loader.classList.remove('visible');
+      alert(redirectError.code === 'auth/unauthorized-domain'
+        ? 'Google sign-in is not available on this domain. Please use Email instead.'
+        : 'Sign-in failed: ' + redirectError.message);
+      return;
+    }
+  }
   try {
     await signInWithPopup(auth, provider);
     // onAuthStateChanged fires and handles navigation — nothing to do here

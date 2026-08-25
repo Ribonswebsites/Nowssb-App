@@ -16,6 +16,7 @@ library;
 
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,6 +26,7 @@ import 'data/settings.dart';
 import 'data/updater.dart';
 import 'media/video_cache.dart';
 import 'media/video_pool.dart';
+import 'screens/login.dart';
 import 'screens/splash.dart';
 import 'widgets/video_pack_dialog.dart';
 import 'widgets/motion.dart';
@@ -60,6 +62,27 @@ Future<void> main() async {
   VideoPool.instance.startHeartbeat();
 
   runApp(const NowssbApp());
+}
+
+class _AuthGate extends StatelessWidget {
+  const _AuthGate();
+
+  @override
+  Widget build(BuildContext context) {
+    // Firebase is intentionally optional for offline/local-content launches.
+    // When it is ready, the auth stream becomes the single source of truth for
+    // whether the user sees the branded login or the app shell.
+    if (!NwsbFirebase.ready) return const NavShell();
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const ColoredBox(color: NwsbColors.deep);
+        }
+        return snapshot.data == null ? const LoginScreen() : const NavShell();
+      },
+    );
+  }
 }
 
 class NowssbApp extends StatefulWidget {
@@ -114,7 +137,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
       scrollBehavior: const NwsbScrollBehavior(),
       home: Stack(
         children: [
-          const NavShell(),
+          const _AuthGate(),
           if (!_splashDone)
             Splash(onDone: () {
               VideoPool.instance.unhold();

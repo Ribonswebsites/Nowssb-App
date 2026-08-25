@@ -1,19 +1,4 @@
-/// Firebase, made optional.
-///
-/// The website's Firebase config is for a WEB app. An Android build needs its
-/// own app registered in the same project (nowssb-34f1b) and its own
-/// `google-services.json` — that file cannot be written from here, it comes
-/// out of the Firebase console, and until it exists this app has no Firebase
-/// to talk to.
-///
-/// That must not be a crash, and it must not be a blank app. The content
-/// contract already has two local stages before Firestore — what ships, and
-/// the last copy seen — so an app with no Firebase is simply an app that
-/// shows the words it shipped with and does not receive published edits. It
-/// runs, it looks right, and it gets live content the moment the file lands.
-///
-/// [ready] is what the rest of the app asks. Nothing calls Firestore without
-/// checking it.
+/// Firebase bootstrap for the NowssB web and Android clients.
 library;
 
 import 'package:firebase_core/firebase_core.dart';
@@ -25,28 +10,48 @@ class NwsbFirebase {
   static bool _ready = false;
   static String? _why;
 
-  /// True only if Firebase actually came up. Guard every Firestore, Auth and
-  /// Messaging call on this.
+  static const FirebaseOptions _web = FirebaseOptions(
+    apiKey: 'AIzaSyBly5XnqNnpVom11thjlvT5q_BfxNJBfgQ',
+    appId: '1:1024709686012:web:20d425060043141a0b5d79',
+    messagingSenderId: '1024709686012',
+    projectId: 'nowssb-34f1b',
+    authDomain: 'nowssb.com',
+    storageBucket: 'nowssb-34f1b.firebasestorage.app',
+    measurementId: 'G-KNGQK10PHJ',
+  );
+
+  static const FirebaseOptions _android = FirebaseOptions(
+    apiKey: 'AIzaSyD3r4HfV5ofHzWaQ-tfWvjGbsJAoXupbHo',
+    appId: '1:1024709686012:android:a780fb4ab2bd46e90b5d79',
+    messagingSenderId: '1024709686012',
+    projectId: 'nowssb-34f1b',
+    storageBucket: 'nowssb-34f1b.firebasestorage.app',
+    authDomain: 'nowssb-34f1b.firebaseapp.com',
+  );
+
+  /// True only when Firebase actually initialized for this platform.
   static bool get ready => _ready;
 
-  /// Why it did not, for the diagnostics screen. Null when it did.
+  /// Human-readable initialization failure for diagnostics screens and logs.
   static String? get unavailableReason => _why;
 
-  /// Never throws. A missing google-services.json, a project that refuses,
-  /// no network on first run — all of them land here as `ready == false`.
+  static FirebaseOptions get options => kIsWeb ? _web : _android;
+
+  /// Initializes Firebase with explicit options so the app works even before a
+  /// generated firebase_options.dart or Android Gradle project is present.
+  /// Never throws during launch: offline/local content remains available, but
+  /// the login screen reports the real reason instead of pretending to work.
   static Future<void> start() async {
     try {
-      await Firebase.initializeApp();
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(options: options);
+      }
       _ready = true;
-    } catch (e) {
+      _why = null;
+    } catch (error) {
       _ready = false;
-      _why = '$e';
-      debugPrint(
-        'NowssB: running without Firebase — bundled content only.\n'
-        '  $e\n'
-        '  Add android/app/google-services.json from the Firebase console '
-        '(project nowssb-34f1b) to switch live content on.',
-      );
+      _why = '$error';
+      debugPrint('NowssB Firebase initialization failed: $error');
     }
   }
 }
