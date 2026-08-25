@@ -13,6 +13,8 @@
 ///     lib/media/video_pool.dart is where that ceiling is enforced.
 library;
 
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
