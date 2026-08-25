@@ -270,21 +270,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         /* The splash waits for this to finish rather than for a timer.
            part012.js and firebase.module.js both wait on nwsbSplashWait(). */
         window._splashHoldForClip = true;
-        vid.addEventListener('ended', function () {
-          /* hold the last frame — the clip ends on the wordmark */
-          try { vid.pause(); } catch (e) {}
-          window._splashClipDone = true;
-        });
-        /* If the clip cannot play at all — no codec, a bad file — nothing
-           would ever end and the app would sit here. Any error releases the
-           hold immediately. */
-        vid.addEventListener('error', function () { window._splashClipDone = true; });
-
-        /* SOUND. A browser will not autoplay an unmuted video without a
-           gesture; it rejects play() instead. So: try with sound, and if it
-           is refused fall back to muted — which always plays — and unmute on
-           the first touch. That is the most sound anyone can get here; a
-           silent-but-playing start beats a start that does not play. */
+        /* Fluid-first playback. Start muted so browser autoplay policy cannot
+           block the first frame. A gesture may turn sound on later, but sound
+           is never allowed to delay or stall the launch animation. */
         var unmuteOnGesture = function () {
           try {
             vid.muted = false;
@@ -300,23 +288,56 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
         var startIt = function () {
           vid.classList.add('vis');
-          vid.muted = false;
-          try { vid.volume = 1; } catch (e) {}
+          vid.muted = true;
+          try { vid.volume = 0; } catch (e) {}
           var p = null;
           try { p = vid.play(); } catch (e) {}
-          if (p && p.catch) {
-            p.catch(function () {
-              /* Refused because it is not muted — the usual policy. Muted
-                 always plays, and the listeners above turn the sound on the
-                 moment anything is touched. In the packaged app the WebView
-                 has no such policy, so there it starts with sound. */
-              vid.muted = true;
-              try { vid.play().catch(function () { window._splashClipDone = true; }); }
-              catch (e) { window._splashClipDone = true; }
-            });
+          if (p && p.catch) p.catch(function () { window._splashClipDone = true; });
+        };
+        var startedAt = Date.now();
+        var lastTime = -1;
+        var lastProgressAt = Date.now();
+        var watchdog = null;
+        var markDone = function () {
+          if (window._splashClipDone) return;
+          window._splashClipDone = true;
+          if (watchdog) { clearInterval(watchdog); watchdog = null; }
+        };
+        vid.addEventListener('ended', function () {
+          /* hold the last frame — the clip ends on the wordmark */
+          try { vid.pause(); } catch (e) {}
+          markDone();
+        });
+        /* If the clip cannot play at all — no codec, a bad file — nothing
+           would ever end and the app would sit here. Any error releases the
+           hold immediately. */
+        vid.addEventListener('error', markDone);
+        var noteProgress = function () {
+          if (vid.currentTime > lastTime + 0.01) {
+            lastTime = vid.currentTime;
+            lastProgressAt = Date.now();
           }
         };
-        setTimeout(startIt, 1000);
+        ['timeupdate', 'progress', 'playing', 'canplay'].forEach(function (ev) {
+          vid.addEventListener(ev, noteProgress);
+        });
+        vid.addEventListener('abort', markDone);
+        vid.addEventListener('emptied', function () {
+          if (Date.now() - startedAt > 3500) markDone();
+        });
+        /* A local clip normally advances continuously. If the media pipeline
+           pauses briefly, retry play without resetting the source. If it has
+           made no progress for four seconds, release the splash rather than
+           trapping the user behind a frozen frame. */
+        watchdog = setInterval(function () {
+          if (window._splashClipDone) { clearInterval(watchdog); watchdog = null; return; }
+          var silentFor = Date.now() - lastProgressAt;
+          if (silentFor > 4000) { markDone(); return; }
+          if (silentFor > 1300 && vid.paused) {
+            try { vid.play().catch(function () {}); } catch (e) {}
+          }
+        }, 500);
+        setTimeout(startIt, 150);
       }
       if (img) img.style.backgroundImage = 'none';
     } else if (img) {
@@ -346,7 +367,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
        When the start animation is an image, _splashHoldForClip is never set
        and this calls back immediately, so nothing about that path changes. */
     window.nwsbSplashWait = function (cb) {
-      var CEILING = 15000, t0 = Date.now();
+      var CEILING = 12000, t0 = Date.now();
       (function tick() {
         if (!window._splashHoldForClip || window._splashClipDone) {
           window._nwsbSplashOver = true;
