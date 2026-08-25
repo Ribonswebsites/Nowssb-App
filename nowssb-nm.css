@@ -18092,3 +18092,14 @@ body.fashplus #home video[poster] { background-image: none !important; }
   #home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat small { font-size: 9px; }
   #home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card { padding-left: 15px; padding-right: 15px; }
 }
+
+
+/* ══ FASHION HERO HEADER — restore latest 15 Aug deck contract ══
+   part083.js from 2026-08-15 builds #hsDeck/.hs-cell. The later rail
+   fallback must not hide that historical hero when Fashion mode is active. */
+body.fashion-home-active #home #hsDeck {
+  display: flex !important;
+}
+body.fashion-home-active #home #hsRail {
+  display: none !important;
+}
