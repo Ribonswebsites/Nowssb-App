@@ -104,13 +104,14 @@ class NwsbDayDashboard extends StatefulWidget {
 }
 
 class _EssentialItem {
-  const _EssentialItem({required this.icon, required this.title, required this.subtitle, required this.meta, required this.destination, this.featured = false, this.favorite = false});
+  const _EssentialItem({required this.icon, required this.title, required this.subtitle, required this.meta, required this.destination, required this.asset, this.featured = false, this.favorite = false});
 
   final IconData icon;
   final String title;
   final String subtitle;
   final String meta;
   final Object destination;
+  final String asset;
   final bool featured;
   final bool favorite;
 }
@@ -135,19 +136,19 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   Timer? _clock;
 
   static const _essentials = <_EssentialItem>[
-    _EssentialItem(icon: Icons.mic_none_outlined, title: 'Today’s word ritual', subtitle: 'Today’s pronunciation', meta: '3–20 min', destination: Dest.player, featured: true, favorite: true),
-    _EssentialItem(icon: Icons.graphic_eq_outlined, title: 'Sound Library', subtitle: 'Root frequencies for focused listening', meta: 'Explore', destination: Dest.sound, favorite: true),
-    _EssentialItem(icon: Icons.lock_outline, title: 'Healing Journey', subtitle: 'Choose a body, organ or mind path', meta: 'Explore', destination: Dest.healing, favorite: true),
-    _EssentialItem(icon: Icons.science_outlined, title: 'Word Science', subtitle: 'Discover the origin behind any word', meta: 'Explore', destination: Dest.library),
-    _EssentialItem(icon: Icons.track_changes_outlined, title: 'My Progress', subtitle: 'See your practice and sound score', meta: 'Open', destination: Dest.profile, favorite: true),
-    _EssentialItem(icon: Icons.repeat_rounded, title: 'Build your routine', subtitle: 'Set a daily practice system', meta: 'Open', destination: Dest.routines),
-    _EssentialItem(icon: Icons.groups_outlined, title: 'Connect', subtitle: 'People, chat and the NowssB feed', meta: 'Open', destination: Dest.connect),
-    _EssentialItem(icon: Icons.auto_awesome_outlined, title: 'Fashion Plus', subtitle: 'Explore the moving visual practice', meta: 'Open', destination: Dest.fashionPlus),
+    _EssentialItem(icon: Icons.mic_none_outlined, title: 'Today’s word ritual', subtitle: 'Today’s pronunciation', meta: '3–20 min', destination: Dest.player, asset: 'assets/media/image/essentials-featured-ritual-v2.png', featured: true, favorite: true),
+    _EssentialItem(icon: Icons.graphic_eq_outlined, title: 'Sound Library', subtitle: 'Root frequencies for focused listening', meta: 'Explore', destination: Dest.sound, asset: 'assets/media/image/essentials-sound-library-v2.png', favorite: true),
+    _EssentialItem(icon: Icons.lock_outline, title: 'Healing Journey', subtitle: 'Choose a body, organ or mind path', meta: 'Explore', destination: Dest.healing, asset: 'assets/media/image/essentials-healing-journey-v2.png', favorite: true),
+    _EssentialItem(icon: Icons.science_outlined, title: 'Word Science', subtitle: 'Discover the origin behind any word', meta: 'Explore', destination: Dest.library, asset: 'assets/media/image/essentials-word-science-v2.png'),
+    _EssentialItem(icon: Icons.track_changes_outlined, title: 'My Progress', subtitle: 'See your practice and sound score', meta: 'Open', destination: Dest.profile, asset: 'assets/media/image/essentials-progress-v2.png', favorite: true),
+    _EssentialItem(icon: Icons.repeat_rounded, title: 'Build your routine', subtitle: 'Set a daily practice system', meta: 'Open', destination: Dest.routines, asset: 'assets/media/image/essentials-routine-v2.png'),
+    _EssentialItem(icon: Icons.groups_outlined, title: 'Connect', subtitle: 'People, chat and the NowssB feed', meta: 'Open', destination: Dest.connect, asset: 'assets/media/image/essentials-connect-v2.png'),
+    _EssentialItem(icon: Icons.auto_awesome_outlined, title: 'Fashion Plus', subtitle: 'Explore the moving visual practice', meta: 'Open', destination: Dest.fashionPlus, asset: 'assets/media/image/essentials-fashion-plus-v2.png'),
   ];
 
   static const _helping = <_HelpingItem>[
-    _HelpingItem(icon: Icons.graphic_eq_outlined, title: 'Study Beats', subtitle: 'Focus Music', destination: Dest.sound, asset: 'assets/media/image/essentials-study-beats.png'),
-    _HelpingItem(icon: Icons.nightlight_round, title: 'Pink Noise', subtitle: 'Sleep Music', destination: Dest.sound, asset: 'assets/media/image/essentials-pink-noise.png'),
+    _HelpingItem(icon: Icons.graphic_eq_outlined, title: 'Study Beats', subtitle: 'Focus Music', destination: Dest.sound, asset: 'assets/media/image/essentials-study-beats-v2.png'),
+    _HelpingItem(icon: Icons.nightlight_round, title: 'Pink Noise', subtitle: 'Sleep Music', destination: Dest.sound, asset: 'assets/media/image/essentials-pink-noise-v2.png'),
   ];
 
   @override
@@ -524,7 +525,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset('assets/media/image/essentials-featured-ritual.png', fit: BoxFit.cover),
+              Image.asset(item.asset, fit: BoxFit.cover),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -558,7 +559,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
     }
     final text = widget.fashion ? Colors.white : const Color(0xFF4C4A52);
     final sub = widget.fashion ? const Color(0x99FFFFFF) : const Color(0xFF68666B);
-    final card = Container(constraints: const BoxConstraints(minHeight: 69), padding: const EdgeInsets.symmetric(horizontal: 17), decoration: BoxDecoration(color: widget.fashion ? const Color(0x8C141027) : const Color(0xFFF7F5F2), borderRadius: BorderRadius.circular(21), border: widget.fashion ? Border.all(color: Colors.white.withOpacity(.13)) : null, boxShadow: const [BoxShadow(color: Color(0x143D3747), blurRadius: 12, offset: Offset(0, 7))]), child: Row(children: [Icon(item.icon, size: 18, color: widget.fashion ? Colors.white70 : const Color(0xFF45434A)), const SizedBox(width: 10), Expanded(child: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: text, fontSize: 15, fontWeight: FontWeight.w600))), Text(item.meta, style: TextStyle(color: sub, fontSize: 12)), const SizedBox(width: 8), Icon(Icons.chevron_right, color: sub, size: 22)]));
+    final card = Container(constraints: const BoxConstraints(minHeight: 78), padding: const EdgeInsets.fromLTRB(15, 9, 11, 9), decoration: BoxDecoration(color: widget.fashion ? const Color(0x8C141027) : const Color(0xFFF7F5F2), borderRadius: BorderRadius.circular(21), border: widget.fashion ? Border.all(color: Colors.white.withOpacity(.13)) : null, boxShadow: const [BoxShadow(color: Color(0x143D3747), blurRadius: 12, offset: Offset(0, 7))]), child: Row(children: [Icon(item.icon, size: 18, color: widget.fashion ? Colors.white70 : const Color(0xFF45434A)), const SizedBox(width: 10), Expanded(child: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: text, fontSize: 15, fontWeight: FontWeight.w600))), ClipRRect(borderRadius: BorderRadius.circular(13), child: Image.asset(item.asset, width: 54, height: 54, fit: BoxFit.cover)), const SizedBox(width: 9), Text(item.meta, style: TextStyle(color: sub, fontSize: 11)), const SizedBox(width: 5), Icon(Icons.chevron_right, color: sub, size: 21)]));
     return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(21), child: card));
   }
 

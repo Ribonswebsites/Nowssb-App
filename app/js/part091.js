@@ -6,18 +6,18 @@
   'use strict';
 
   var ITEMS = [
-    { id: 'practice', icon: 'lock', title: 'Today’s word ritual', sub: 'Today’s pronunciation', meta: '3–20 min', action: 'practice', featured: true, favorite: true },
-    { id: 'sound-library', icon: 'sound', title: 'Sound Library', sub: 'Root frequencies for focused listening', meta: 'Explore', action: 'sound-library', favorite: true },
-    { id: 'health-journey', icon: 'lock', title: 'Healing Journey', sub: 'Choose a body, organ or mind path', meta: 'Explore', action: 'health-journey', favorite: true },
-    { id: 'word-science', icon: 'science', title: 'Word Science', sub: 'Discover the origin behind any word', meta: 'Explore', action: 'word-science', favorite: false },
-    { id: 'my-progress', icon: 'science', title: 'My Progress', sub: 'See your practice and sound score', meta: 'Open', action: 'my-progress', favorite: true },
-    { id: 'routines', icon: 'sound', title: 'Build your routine', sub: 'Set a daily practice system', meta: 'Open', action: 'routines', favorite: false },
-    { id: 'social', icon: 'lock', title: 'Connect', sub: 'People, chat and the NowssB feed', meta: 'Open', action: 'social', favorite: false },
-    { id: 'fashion-plus', icon: 'science', title: 'Fashion Plus', sub: 'Explore the moving visual practice', meta: 'Open', action: 'fashion-plus', favorite: false }
+    { id: 'practice', icon: 'lock', title: 'Today’s word ritual', sub: 'Today’s pronunciation', meta: '3–20 min', action: 'practice', image: 'assets/media/image/essentials-featured-ritual-v2.png', featured: true, favorite: true },
+    { id: 'sound-library', icon: 'sound', title: 'Sound Library', sub: 'Root frequencies for focused listening', meta: 'Explore', action: 'sound-library', image: 'assets/media/image/essentials-sound-library-v2.png', favorite: true },
+    { id: 'health-journey', icon: 'lock', title: 'Healing Journey', sub: 'Choose a body, organ or mind path', meta: 'Explore', action: 'health-journey', image: 'assets/media/image/essentials-healing-journey-v2.png', favorite: true },
+    { id: 'word-science', icon: 'science', title: 'Word Science', sub: 'Discover the origin behind any word', meta: 'Explore', action: 'word-science', image: 'assets/media/image/essentials-word-science-v2.png', favorite: false },
+    { id: 'my-progress', icon: 'science', title: 'My Progress', sub: 'See your practice and sound score', meta: 'Open', action: 'my-progress', image: 'assets/media/image/essentials-progress-v2.png', favorite: true },
+    { id: 'routines', icon: 'sound', title: 'Build your routine', sub: 'Set a daily practice system', meta: 'Open', action: 'routines', image: 'assets/media/image/essentials-routine-v2.png', favorite: false },
+    { id: 'social', icon: 'lock', title: 'Connect', sub: 'People, chat and the NowssB feed', meta: 'Open', action: 'social', image: 'assets/media/image/essentials-connect-v2.png', favorite: false },
+    { id: 'fashion-plus', icon: 'science', title: 'Fashion Plus', sub: 'Explore the moving visual practice', meta: 'Open', action: 'fashion-plus', image: 'assets/media/image/essentials-fashion-plus-v2.png', favorite: false }
   ];
   var HELP = [
-    { icon: 'sound', title: 'Study Beats', sub: 'Focus Music', action: 'sound-library', art: 'study-beats', image: 'assets/media/image/essentials-study-beats.png' },
-    { icon: 'sound', title: 'Pink Noise', sub: 'Sleep Music', action: 'sound-library', art: 'pink-noise', image: 'assets/media/image/essentials-pink-noise.png' }
+    { icon: 'sound', title: 'Study Beats', sub: 'Focus Music', action: 'sound-library', art: 'study-beats', image: 'assets/media/image/essentials-study-beats-v2.png' },
+    { icon: 'sound', title: 'Pink Noise', sub: 'Sleep Music', action: 'sound-library', art: 'pink-noise', image: 'assets/media/image/essentials-pink-noise-v2.png' }
   ];
 
   function esc(value) { return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
@@ -36,7 +36,7 @@
   function visibleRows(root, items) { return isExpanded(root) ? items : items.slice(0, 3); }
   function row(item) {
     if (item.featured) return '<button type="button" class="nwsb-essential-featured-card" data-essential-action="' + esc(item.action) + '"><span class="nwsb-essential-badge">NOWSSB · 543</span><span class="nwsb-essential-featured-icon">' + icon('sound') + '</span><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small><em>' + esc(item.meta) + '</em></button>';
-    return '<button type="button" class="nwsb-essential-row" data-essential-action="' + esc(item.action) + '"><span class="nwsb-essential-row-icon">' + icon(item.icon) + '</span><span class="nwsb-essential-row-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span><span class="nwsb-essential-meta">' + esc(item.meta) + '</span><span class="nwsb-essential-arrow" aria-hidden="true">›</span></button>';
+    return '<button type="button" class="nwsb-essential-row" data-essential-action="' + esc(item.action) + '"><span class="nwsb-essential-row-art"><img src="' + esc(item.image) + '" alt="" loading="lazy" decoding="async"></span><span class="nwsb-essential-row-icon">' + icon(item.icon) + '</span><span class="nwsb-essential-row-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span><span class="nwsb-essential-meta">' + esc(item.meta) + '</span><span class="nwsb-essential-arrow" aria-hidden="true">›</span></button>';
   }
   function helpCard(item) { return '<button type="button" class="nwsb-help-card nwsb-help-' + item.art + '" data-essential-action="' + esc(item.action) + '"><span class="nwsb-help-art"><img src="' + esc(item.image) + '" alt="" loading="lazy" decoding="async"> </span><span class="nwsb-help-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span></button>'; }
   function render(root, filter) {

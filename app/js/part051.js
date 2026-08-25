@@ -111,12 +111,12 @@
   function updatePackPrompt() {
     if (!packCopy) return;
     if (!packStarted) {
-      packCopy.textContent = 'Download the private video pack once for smoother playback. It stays inside NowssB and never appears in your gallery.';
+      packCopy.textContent = 'Additional access files are getting ready for a smoother NowssB experience. It may take a few minutes the first time — thanks for your patience.';
       return;
     }
-    packCopy.textContent = packDone + ' of ' + packTotal + ' videos ready' + (packFailed ? ' · ' + packFailed + ' unavailable' : '') + '. You can keep using NowssB while it continues.';
+    packCopy.textContent = packDone + ' of ' + packTotal + ' files ready' + (packFailed ? ' · ' + packFailed + ' unavailable' : '') + '. You can keep using NowssB while the rest finishes.';
     if (packBar) packBar.style.width = (packTotal ? Math.round(packDone / packTotal * 100) : 0) + '%';
-    if (packButton) packButton.textContent = packDone >= packTotal ? 'Done' : 'Downloading…';
+    if (packButton) packButton.textContent = packDone >= packTotal ? 'Ready' : 'Preparing…';
   }
 
   function beginPack() {
@@ -140,8 +140,8 @@
     packPanel = document.createElement('div');
     packPanel.className = 'nwsb-video-pack-prompt';
     packPanel.setAttribute('role', 'dialog');
-    packPanel.setAttribute('aria-label', 'Download NowssB videos');
-    packPanel.innerHTML = '<div class="nwsb-video-pack-card"><div class="nwsb-video-pack-kicker">NOWSSB MEDIA</div><h2>Download the video pack?</h2><p class="nwsb-video-pack-copy"></p><div class="nwsb-video-pack-progress"><span></span></div><div class="nwsb-video-pack-actions"><button type="button" class="nwsb-video-pack-later">Not now</button><button type="button" class="nwsb-video-pack-start">Download videos</button></div></div>';
+    packPanel.setAttribute('aria-label', 'Prepare additional NowssB access');
+    packPanel.innerHTML = '<div class="nwsb-video-pack-card"><div class="nwsb-video-pack-brand"><img class="nwsb-video-pack-logo" src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><div class="nwsb-video-pack-brand-side"><span class="nwsb-video-pack-signal-wrap"><svg class="nwsb-video-pack-signal" viewBox="0 0 96 32" fill="none" aria-hidden="true"><path d="M2 16h12l5-10 8 20 7-14 7 8 7-4h10l5-9 8 18 6-13 7 4h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="nwsb-video-pack-divider" aria-hidden="true"></span><span class="nwsb-video-pack-brand-name">NOWSSB<small>Natural word science</small></span></div></div><div class="nwsb-video-pack-rule" aria-hidden="true"></div><div class="nwsb-video-pack-kicker">PREPARING YOUR EXPERIENCE</div><h2>Almost ready</h2><p class="nwsb-video-pack-copy"></p><div class="nwsb-video-pack-progress"><span></span></div><div class="nwsb-video-pack-status">A few more seconds while NowssB sets things up.</div><div class="nwsb-video-pack-actions"><button type="button" class="nwsb-video-pack-later">Maybe later</button><button type="button" class="nwsb-video-pack-start">Prepare now</button></div></div>';
     document.body.appendChild(packPanel);
     packCopy = packPanel.querySelector('.nwsb-video-pack-copy');
     packBar = packPanel.querySelector('.nwsb-video-pack-progress span');
@@ -150,6 +150,7 @@
     packPanel.querySelector('.nwsb-video-pack-later').addEventListener('click', function () { packPanel.remove(); packPanel = null; });
     packButton.addEventListener('click', function () {
       packButton.disabled = true;
+      packButton.textContent = 'Preparing…';
       beginPack();
     });
   }

@@ -1,11 +1,11 @@
 {
-  "version": "9.6.33",
-  "build": 2026082425,
+  "version": "9.6.34",
+  "build": 2026082426,
   "force": false,
   "title": "NowssB update ready",
-  "notes": "Both Android surfaces use the August 15 source baseline with accumulated Groq pronunciation scoring, R2 shared video catalog, concurrent visible Flutter/WebView playback, seven selectable Fashion Plus backgrounds, corrected Flutter Normal Home spacing and rounded section banners, bundled exact hero films, reliable visible video startup, restored Fashion Where to Begin parity, exact AURA player settings in Flutter and WebView, rebuilt reference Essentials and Helping Others sections with eight working destinations, WebView reference correction for the normal-home header, rounded Where to Begin meditation panel, three-item expandable Essentials rail, meditation-specific progress labels, and preserved player video and settings behavior, dashboard, and in-app updates.",
+  "notes": "Both Android surfaces now include a black rounded NowssB preparation card with the logo at top-left, animated SVG in a white circle, short divider, and clear additional-access copy. Essentials includes the full local mascot artwork set, white NowssB-branded headphones, eight working destinations, three-item initial view, and See more expansion. Existing AURA motion, private media behavior, and in-app updates are preserved.",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
-  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.33-android/nowssb-webview-debug.apk",
-  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.33-android/nowssb-flutter-debug.apk",
-  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.33-android/nowssb-webview-debug.apk"
+  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.34-android/nowssb-webview-debug.apk",
+  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.34-android/nowssb-flutter-debug.apk",
+  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.34-android/nowssb-webview-debug.apk"
 }

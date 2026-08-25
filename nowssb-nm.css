@@ -16669,7 +16669,7 @@ a:active,
 .nwsb-essentials-reference .nwsb-essential-featured-card {
   min-height: 210px !important;
   height: 210px !important;
-  background-image: linear-gradient(90deg, rgba(255,205,18,.97) 0%, rgba(255,180,18,.79) 50%, rgba(255,121,30,.20) 100%), url('assets/media/image/essentials-featured-ritual.png') !important;
+  background-image: linear-gradient(90deg, rgba(255,205,18,.97) 0%, rgba(255,180,18,.79) 50%, rgba(255,121,30,.20) 100%), url('assets/media/image/essentials-featured-ritual-v2.png') !important;
   background-size: cover !important;
   background-position: center !important;
 }
@@ -16752,3 +16752,70 @@ a:active,
   box-shadow: 0 6px 14px rgba(61,55,71,.08) !important;
 }
 .nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-help-heading > button { background: rgba(255,255,255,.14) !important; color: #fff !important; }
+
+/* ── Media preparation card: black NowssB access handoff ─────────────── */
+.nwsb-video-pack-prompt {
+  align-items: center;
+  padding: 18px;
+  background: rgba(2, 4, 8, .78);
+  backdrop-filter: blur(18px) saturate(.82);
+  -webkit-backdrop-filter: blur(18px) saturate(.82);
+}
+.nwsb-video-pack-card {
+  width: min(100%, 420px);
+  box-sizing: border-box;
+  padding: 22px 21px 18px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 30px;
+  background: #05070b;
+  box-shadow: 0 28px 90px rgba(0,0,0,.68), inset 0 1px 0 rgba(255,255,255,.06);
+  color: #fff;
+  animation: nwsbPackCardIn 360ms cubic-bezier(.16,1,.3,1) both;
+}
+.nwsb-video-pack-brand { display:flex; align-items:center; justify-content:space-between; gap:14px; min-height:48px; }
+.nwsb-video-pack-brand-lockup { display:flex; align-items:center; min-width:0; gap:10px; }
+.nwsb-video-pack-brand-lockup img { width:42px; height:42px; flex:0 0 42px; object-fit:contain; border-radius:50%; background:#fff; box-shadow:0 5px 18px rgba(255,255,255,.16); }
+.nwsb-video-pack-divider { width:1px; height:27px; flex:0 0 1px; background:rgba(255,255,255,.24); }
+.nwsb-video-pack-brand-name { display:flex; flex-direction:column; gap:3px; color:#fff; font:800 12px/1 'DM Sans',sans-serif; letter-spacing:2.2px; }
+.nwsb-video-pack-brand-name small { color:rgba(255,255,255,.48); font:500 9px/1.1 'DM Sans',sans-serif; letter-spacing:.2px; text-transform:none; }
+.nwsb-video-pack-signal { width:84px; height:30px; flex:0 0 84px; color:#fff; opacity:.88; animation:nwsbPackSignal 1.8s ease-in-out infinite; }
+.nwsb-video-pack-rule { height:1px; margin:17px 0 16px; background:rgba(255,255,255,.13); }
+.nwsb-video-pack-kicker { margin-bottom:8px; color:rgba(255,255,255,.56); font:800 10px/1.2 'DM Sans',sans-serif; letter-spacing:2.2px; }
+.nwsb-video-pack-card h2 { margin:0 0 9px; color:#fff; font:800 25px/1.12 'DM Sans',sans-serif; letter-spacing:-.5px; }
+.nwsb-video-pack-copy { margin:0; color:rgba(255,255,255,.72); font:13px/1.55 'DM Sans',sans-serif; }
+.nwsb-video-pack-progress { height:5px; margin:19px 0 7px; overflow:hidden; border-radius:99px; background:rgba(255,255,255,.12); }
+.nwsb-video-pack-progress span { display:block; width:0; height:100%; border-radius:inherit; background:#fff; box-shadow:0 0 14px rgba(255,255,255,.6); transition:width .3s cubic-bezier(.16,1,.3,1); }
+.nwsb-video-pack-status { color:rgba(255,255,255,.46); font:11px/1.45 'DM Sans',sans-serif; }
+.nwsb-video-pack-actions { display:flex; justify-content:flex-end; align-items:center; gap:9px; margin-top:19px; }
+.nwsb-video-pack-actions button { min-height:46px; padding:0 16px; border:0; border-radius:15px; font:800 12px/1 'DM Sans',sans-serif; cursor:pointer; transition:transform .16s cubic-bezier(.16,1,.3,1), background .16s ease, opacity .16s ease; }
+.nwsb-video-pack-actions button:active { transform:scale(.97); }
+.nwsb-video-pack-later { background:transparent; color:rgba(255,255,255,.66); }
+.nwsb-video-pack-later:hover { color:#fff; background:rgba(255,255,255,.08); }
+.nwsb-video-pack-start { background:#fff; color:#05070b; box-shadow:0 8px 24px rgba(255,255,255,.16); }
+.nwsb-video-pack-start:hover { background:#e9edf2; }
+.nwsb-video-pack-start:disabled { opacity:.58; cursor:wait; }
+@keyframes nwsbPackCardIn { from { opacity:0; transform:translateY(18px) scale(.97); } to { opacity:1; transform:none; } }
+@keyframes nwsbPackSignal { 0%,100% { opacity:.52; transform:scaleX(.96); } 50% { opacity:1; transform:scaleX(1); } }
+@media (max-width:430px) { .nwsb-video-pack-card { padding:20px 18px 16px; } .nwsb-video-pack-signal { width:68px; flex-basis:68px; } .nwsb-video-pack-actions button { padding-left:13px; padding-right:13px; } }
+
+/* Header hierarchy correction: logo left, white SVG orb, divider, title. */
+.nwsb-video-pack-brand { align-items: flex-start; justify-content: flex-start; gap: 13px; }
+.nwsb-video-pack-logo { width: 44px !important; height: 44px !important; flex: 0 0 44px !important; object-fit: contain !important; border-radius: 50% !important; background: #fff !important; box-shadow: 0 5px 18px rgba(255,255,255,.16) !important; }
+.nwsb-video-pack-brand-side { display: flex; align-items: center; min-width: 0; gap: 10px; flex: 1; padding-top: 3px; }
+.nwsb-video-pack-signal-wrap { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; background: #fff; color: #05070b; box-shadow: 0 6px 18px rgba(255,255,255,.16); }
+.nwsb-video-pack-signal { width: 28px !important; height: 22px !important; flex: 0 0 28px !important; color: #05070b !important; animation: nwsbPackSignal 1.8s ease-in-out infinite; }
+.nwsb-video-pack-brand-side .nwsb-video-pack-divider { width: 1px; height: 25px; flex: 0 0 1px; background: rgba(255,255,255,.26); }
+.nwsb-video-pack-brand-name { min-width: 0; }
+@media (max-width:430px) { .nwsb-video-pack-brand-side { gap: 8px; } .nwsb-video-pack-signal-wrap { width: 38px; height: 38px; flex-basis: 38px; } }
+
+/* Per-path Essentials art: every expanded row gets its own local thumbnail. */
+.nwsb-essentials-reference .nwsb-essential-row { min-height: 82px !important; padding: 9px 14px 9px 15px !important; gap: 9px !important; }
+.nwsb-essentials-reference .nwsb-essential-row-art { display:block !important; order:1 !important; width:54px !important; height:54px !important; flex:0 0 54px !important; overflow:hidden !important; border-radius:14px !important; background:#e9e5de !important; }
+.nwsb-essentials-reference .nwsb-essential-row-art img { display:block !important; width:100% !important; height:100% !important; object-fit:cover !important; }
+.nwsb-essentials-reference .nwsb-essential-row-icon { order:2 !important; }
+.nwsb-essentials-reference .nwsb-essential-row-copy { order:3 !important; min-width:0 !important; }
+.nwsb-essentials-reference .nwsb-essential-meta { order:4 !important; font-size:11px !important; }
+.nwsb-essentials-reference .nwsb-essential-arrow { order:5 !important; }
+@media (max-width:430px) { .nwsb-essentials-reference .nwsb-essential-row-art { width:48px !important; height:48px !important; flex-basis:48px !important; border-radius:13px !important; } .nwsb-essentials-reference .nwsb-essential-row { min-height:76px !important; } }
+
+.nwsb-video-pack-card { border-radius: 30px !important; overflow: hidden !important; }
