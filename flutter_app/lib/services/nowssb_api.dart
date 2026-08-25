@@ -89,6 +89,37 @@ class NowssbApi {
     return content.trim();
   }
 
+  Future<String> assistantChat({
+    required String mode,
+    required List<Map<String, String>> messages,
+    String? context,
+  }) async {
+    final response = await http
+        .post(
+          Uri.parse('$baseUrl/api/assistant/chat'),
+          headers: const {
+            'Content-Type': 'application/json',
+            'X-NowssB-Client': 'flutter',
+          },
+          body: jsonEncode({
+            'mode': mode == 'coach' ? 'coach' : 'support',
+            'messages': messages,
+            if (context != null && context.trim().isNotEmpty) 'context': context.trim(),
+          }),
+        )
+        .timeout(const Duration(seconds: 35));
+
+    final body = _decodeBody(response);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw NowssbApiException(body['error']?.toString() ?? 'Assistant request failed.');
+    }
+    final message = body['message'];
+    if (message is! String || message.trim().isEmpty) {
+      throw const NowssbApiException('The assistant returned no text.');
+    }
+    return message.trim();
+  }
+
   Map<String, dynamic> _decodeBody(http.Response response) {
     try {
       final decoded = jsonDecode(response.body);

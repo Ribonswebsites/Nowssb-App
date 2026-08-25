@@ -13,7 +13,7 @@
 ///   1. A greeting ABOVE the card — see [HeroGreeting] in header.dart.
 ///   2. The card itself, in glass: a strip above the set carrying the store
 ///      and the search, the television, and a strip below it carrying
-///      Explore, App Guide and Learn. Everything that is not the picture
+///      Explore, Help & Coach and Learn. Everything that is not the picture
 ///      comes OUT of the television and onto the glass around it — a screen
 ///      with an Explore button drawn on it is a screen with a button drawn
 ///      on it, and the two were fighting for the same 230px (:463).
@@ -351,13 +351,14 @@ class _HeroCard extends StatelessWidget {
             overlay: guide ? const FstTitle() : _Screen(live: live),
           ),
           const SizedBox(height: 10),
-          // `.hs-foot` — Explore and App Guide on the left, then Learn and
+          // `.hs-foot` — Explore and Help & Coach on the left, then Learn and
           // its disc hard against the right corner.
           SizedBox(
             height: _footStripH,
-            // `footNav` — part084.js:394. "Explore and App Guide stand down
-            // for as long as it is up, and come back the moment the guide
-            // closes." The strip is the title card's own row, and it is the
+            // `footNav` — part084.js:394. "Explore and Help & Coach stand down
+            // for as long as the practice panel is up, and return when it closes."
+            // The strip is the title card's own row, and it is the
+
             // only cell whose row is not on the card itself.
             child: guide
                 ? Align(
@@ -421,10 +422,9 @@ class _HeroCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          // THE DISC. This is what "Learn" is for, and until now
-                          // it opened the App Guide page — the same place the
-                          // button two inches to its left already went, so the
-                          // word beside it was describing nothing of its own.
+                          // THE DISC. This is what "Learn" is for: it keeps the
+                          // word guidance action distinct from the Help & Coach
+                          // entry beside it, so each control has one clear job.
                           //
                           // It runs the guide: fifteen black cards through the
                           // rail this card is cell 0 of. See follow_steps.dart.
@@ -662,7 +662,7 @@ class _SearchPill extends StatelessWidget {
   }
 }
 
-/// `.hero-btns > *` — Explore and App Guide, bordered rather than filled.
+/// `.hero-btns > *` — Explore and Help & Coach, bordered rather than filled.
 class _FootButton extends StatelessWidget {
   const _FootButton({required this.label, this.trailing, this.onTap});
   final String label;

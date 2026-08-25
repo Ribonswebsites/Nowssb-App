@@ -14,10 +14,9 @@
     el.src = COUPON_BANNERS[Math.floor(Math.random() * COUPON_BANNERS.length)];
   };
 
-  // Reusable "scroll down" hint — same behavior as the App Guide's own
-  // nwagShowScrollHint()/scroll listener: show briefly on entry, hide once
-  // the user actually starts scrolling. Any banner using .nwsb-scroll-hint
-  // can opt in with these two calls.
+  // Reusable "scroll down" hint — show briefly on entry and hide once
+  // the user actually starts scrolling, matching the app’s other scrollable screens.
+  // Any banner using .nwsb-scroll-hint can opt in with these two calls.
   window.nwsbShowScrollHint = function (hintId) {
     var hint = document.getElementById(hintId);
     if (!hint) return;

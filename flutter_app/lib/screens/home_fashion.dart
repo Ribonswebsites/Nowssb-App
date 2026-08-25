@@ -27,6 +27,7 @@ import '../shell/go.dart';
 import '../widgets/tv_frame.dart';
 import 'sections.dart';
 import 'shared_sections.dart';
+import 'assistant.dart';
 import 'widgets_page.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
@@ -131,7 +132,7 @@ class _HomeFashionState extends State<HomeFashion> {
                     HeroGreeting(name: widget.name),
                     FashionHero(
                       onExplore: () => _go(2),
-                      onGuide: () => _push(const WidgetsPage()),
+                      onGuide: () => _push(const AssistantHubScreen()),
                       onSearch: () => _go(2),
                       onStore: () => _go(3),
                       onRail: _go,

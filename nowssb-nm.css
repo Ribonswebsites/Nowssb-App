@@ -14187,7 +14187,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    z-index 0 puts it under .hero-content (z-index 5), which is the whole
    point: in the television look the geometry above insets it to the set's
    aperture, so the clip plays IN the screen and the wordmark, the rotating
-   word, the search button and Explore / App Guide all sit on top of it —
+   word, the search button and Explore / Help & Coach all sit on top of it —
    everything the header draws is inside the television.
 
    `width/height: auto` matters in the television look: the inset above
@@ -14488,7 +14488,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 .hero-simple .hero-content .brand-tag,
 .hero-simple .hero-content .hero-word,
 .hero-simple .hero-content #heroTagline { text-shadow: 0 2px 10px rgba(0,0,0,0.85); }
-/* App Guide says where it goes. A chevron drawn from two borders rather
+/* The secondary hero action uses a chevron drawn from two borders rather
    than a glyph, so it takes the button's own colour and needs no asset. */
 .hero-simple .hero-btn-s { display: inline-flex !important; align-items: center; gap: 9px; }
 .hero-simple .hero-btn-s::after {
@@ -14807,7 +14807,7 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
    fighting for the same 230px, and the furniture lost every time.
 
      above the set   the store on the left, the search on the right
-     below the set   Explore and App Guide, and the way into the guide
+     below the set   Explore and Help & Coach, and the way into assistance
 
    The pieces are moved here by app/js/part083.js and moved back when the
    look changes, because this is one look of three and the other two want
@@ -14925,12 +14925,12 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 .hs-searchwrap .hero-search-ic,
 .hs-searchwrap .nwsb-search-icon { width: 15px !important; height: 15px !important; }
 
-/* ── Explore and App Guide, below the set ── */
+/* ── Explore and Help & Coach, below the set ── */
 .hs-foot .hero-btns {
   flex-shrink: 0; margin: 0 !important; padding: 0 !important;
   display: flex !important; align-items: center; gap: 9px;
 }
-/* the rule between Explore and App Guide does not stretch — inside this
+/* the rule between Explore and Help & Coach does not stretch — inside this
    row it is a divider, not a spacer */
 .hs-foot .hero-btns > .hs-sep { flex: 0 0 1px; }
 .hs-foot .hero-btn {
@@ -16558,3 +16558,22 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   #home .mainops-blk.aug15-fashion-reference .mo-cell { border-radius: 22px !important; }
 }
 /* ══ END AUGUST 15 FASHION PANEL COPY ══ */
+
+/* ══ HELP & COACH — Support + Personal Coach ══ */
+.nwsb-assistant-screen{position:fixed;inset:0;z-index:1600;display:flex;align-items:stretch;justify-content:center;visibility:hidden;pointer-events:none;opacity:0;transition:opacity .24s ease,visibility .24s ease;background:rgba(3,7,14,.82)}
+.nwsb-assistant-screen.open{visibility:visible;pointer-events:auto;opacity:1}
+.nwsb-assistant-overlay{position:absolute;inset:0;background:rgba(2,5,10,.72);backdrop-filter:blur(14px)}
+.nwsb-assistant-panel{position:relative;width:min(100%,680px);height:100%;overflow:hidden;background:linear-gradient(180deg,#0b101a 0%,#101725 52%,#080c14 100%);color:#fff;box-shadow:0 0 70px rgba(0,0,0,.48)}
+.nwsb-assistant-header{position:absolute;z-index:3;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 20px 14px;background:linear-gradient(180deg,rgba(6,10,17,.96),rgba(6,10,17,.78),transparent)}
+.nwsb-assistant-back{width:40px;height:40px;border:0;border-radius:50%;background:#fff;color:#0a0f18;font-size:25px;line-height:1;cursor:pointer}
+.nwsb-assistant-heading{min-width:0;flex:1}.nwsb-assistant-eyebrow,.nwsb-assistant-kicker,.nwsb-assistant-feature-eyebrow{color:#e8d5a3;font-size:9px;letter-spacing:2.1px;text-transform:uppercase;font-weight:800}.nwsb-assistant-title{margin-top:3px;font-size:21px;font-weight:850;letter-spacing:-.3px}.nwsb-assistant-logo{width:42px;height:42px;border-radius:50%;background:#fff;padding:7px;display:grid;place-items:center}.nwsb-assistant-logo img{display:block;width:100%;height:100%;object-fit:contain}
+.nwsb-assistant-inline-logo{display:grid;place-items:center;width:34px;height:34px;padding:6px;border-radius:50%;background:#fff}.nwsb-assistant-inline-logo img{display:block;width:100%;height:100%;object-fit:contain}
+.nwsb-assistant-body{height:100%;overflow-y:auto;padding:0 20px calc(34px + env(safe-area-inset-bottom));scroll-behavior:smooth}.nwsb-assistant-hero{position:relative;height:255px;margin:0 -20px;overflow:hidden}.nwsb-assistant-hero img{display:block;width:100%;height:100%;object-fit:cover}.nwsb-assistant-hero-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,11,18,.15) 0%,rgba(7,11,18,.1) 35%,#0b101a 100%)}
+.nwsb-assistant-intro{position:relative;margin-top:-22px;padding:0 2px 14px}.nwsb-assistant-intro h2{margin:5px 0 7px;font-size:29px;line-height:1.05;letter-spacing:-.7px}.nwsb-assistant-intro p{margin:0;color:rgba(255,255,255,.68);font-size:13px;line-height:1.5;max-width:520px}
+.nwsb-assistant-switch{display:flex;gap:7px;padding:5px;margin:4px 0 14px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(255,255,255,.045)}.nwsb-assistant-switch button{flex:1;border:0;border-radius:13px;background:transparent;color:rgba(255,255,255,.58);padding:11px 8px;font:inherit;font-size:11px;font-weight:800;cursor:pointer}.nwsb-assistant-switch button.active{background:#fff;color:#0a0f18;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.nwsb-assistant-feature{display:grid;grid-template-columns:116px 1fr;gap:13px;align-items:center;padding:10px;border:1px solid rgba(255,255,255,.13);border-radius:20px;background:rgba(255,255,255,.065);box-shadow:0 12px 25px rgba(0,0,0,.18)}.nwsb-assistant-feature-image{height:88px;overflow:hidden;border-radius:14px}.nwsb-assistant-feature-image img{width:100%;height:100%;object-fit:cover}.nwsb-assistant-feature-title{margin:4px 0;color:#fff;font-size:15px;font-weight:800;line-height:1.2}.nwsb-assistant-feature-copy{color:rgba(255,255,255,.62);font-size:11px;line-height:1.4}
+.nwsb-assistant-quick{display:flex;flex-wrap:wrap;gap:8px;padding:15px 0 4px}.nwsb-assistant-quick button{border:1px solid rgba(232,213,163,.35);border-radius:999px;padding:9px 11px;background:rgba(232,213,163,.1);color:#f6e6bd;font-size:10.5px;line-height:1.2;cursor:pointer}.nwsb-assistant-quick button:disabled{opacity:.45;cursor:default}
+.nwsb-assistant-chat{min-height:92px;max-height:270px;overflow-y:auto;padding:13px 2px 5px}.nwsb-assistant-message{max-width:87%;margin:0 0 9px;padding:11px 13px;border-radius:16px;font-size:12.5px;line-height:1.45;white-space:normal}.nwsb-assistant-message.assistant{margin-right:auto;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.9);border-bottom-left-radius:5px}.nwsb-assistant-message.user{margin-left:auto;background:#fff;color:#0a0f18;border-bottom-right-radius:5px}.nwsb-assistant-typing{color:rgba(255,255,255,.5);font-size:11px;padding:4px 8px}
+.nwsb-assistant-composer{display:flex;gap:8px;align-items:center;margin-top:5px;padding:7px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(0,0,0,.25)}.nwsb-assistant-composer input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#fff;padding:8px 6px;font:inherit;font-size:12.5px}.nwsb-assistant-composer input::placeholder{color:rgba(255,255,255,.45)}.nwsb-assistant-composer button{width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#0a0f18;font-size:19px;line-height:1;cursor:pointer}.nwsb-assistant-note{padding:10px 3px 0;color:rgba(255,255,255,.42);font-size:9.5px;line-height:1.4;text-align:center}
+@media (min-width:681px){.nwsb-assistant-panel{margin:18px 0;height:calc(100% - 36px);border-radius:28px}.nwsb-assistant-header{border-radius:28px 28px 0 0}.nwsb-assistant-body{border-radius:28px}}
+@media (max-width:390px){.nwsb-assistant-body{padding-left:15px;padding-right:15px}.nwsb-assistant-hero{margin-left:-15px;margin-right:-15px}.nwsb-assistant-feature{grid-template-columns:95px 1fr}.nwsb-assistant-feature-image{height:82px}}

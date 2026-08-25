@@ -388,8 +388,8 @@
      with a wordmark already in it; three controls in there is what made it
      unreadable. So the title card's row goes in the strip under the set,
      which is the card's own bottom edge and is present exactly when the
-     title card is the cell on show. Explore and App Guide stand down for
-     as long as it is up, and come back the moment the guide closes. */
+     title card is the cell on show. Explore and Help & Coach stand down for
+     as long as it is up, and come back when the title card closes. */
   function footNav(on) {
     var hero = document.querySelector('#home .hero-section.hero-simple');
     var foot = hero && hero.querySelector(':scope > .hs-foot');

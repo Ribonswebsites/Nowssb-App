@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../screens/assistant.dart';
 import '../screens/cart.dart';
 import '../screens/connect.dart';
 import '../screens/fashion_plus.dart';
@@ -39,6 +40,9 @@ class Dest {
   static const login = 'login';
   static const searchWords = 'searchWords';
   static const searchMeanings = 'searchMeanings';
+  static const assistant = 'assistant';
+  static const support = 'support';
+  static const coach = 'coach';
 
   static void open(BuildContext context, Object dest) {
     if (dest is int) {
@@ -67,6 +71,9 @@ class Dest {
       healing => const HealingScreen(),
       fashionPlus => const FashionPlusScreen(),
       settings => const WidgetsPage(),
+      assistant => const AssistantHubScreen(),
+      support => const AssistantChatScreen(mode: AssistantMode.support),
+      coach => const AssistantChatScreen(mode: AssistantMode.coach),
       sound => const SoundLibraryScreen(),
       login => const LoginScreen(),
       _ => null,

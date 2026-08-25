@@ -502,9 +502,9 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Find Your Way Around', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+                Text('Help & Coach', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
                 SizedBox(height: 6),
-                Text('Every screen in the app, and what each one is for', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12, height: 1.35)),
+                Text('Get app support or a personal practice guide', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12, height: 1.35)),
               ],
             ),
           ),
@@ -513,7 +513,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
         ],
       ),
     );
-    return Semantics(button: true, label: 'Find Your Way Around', child: InkWell(onTap: () => Dest.open(context, Dest.profile), borderRadius: BorderRadius.circular(24), child: guide));
+    return Semantics(button: true, label: 'Help and Coach', child: InkWell(onTap: () => Dest.open(context, Dest.assistant), borderRadius: BorderRadius.circular(24), child: guide));
   }
 
   Widget _essentialStack(BuildContext context, List<_EssentialItem> items) => Stack(

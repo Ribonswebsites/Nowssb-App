@@ -179,8 +179,8 @@
 }
 .fst-title > .fst-nav { margin-top: auto; pointer-events: auto; }
 /* ── The strip, in two states ──
-   Closed it is the card's own row: Explore, App Guide, Learn and the disc.
-   Open it is the guide's row for the TITLE card — and only that card, which
+   Closed it is the card's own row: Explore, Help & Coach, Learn and the disc.
+   Open it is the practice row for the TITLE card — and only that card, which
    is the hero, which is exactly when this strip is the cell on show. Every
    step card carries its own row inside itself, where there is room for it.
 

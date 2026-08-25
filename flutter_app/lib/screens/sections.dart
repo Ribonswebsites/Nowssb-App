@@ -302,7 +302,7 @@ class HeroSection extends StatelessWidget {
                   children: [
                     _HeroPill(label: 'Explore', onTap: () => Dest.open(context, Dest.store)),
                     const SizedBox(width: 10),
-                    _HeroPill(label: 'App Guide', onTap: () => Dest.open(context, Dest.settings)),
+                    _HeroPill(label: 'Help & Coach', onTap: () => Dest.open(context, Dest.assistant)),
                   ],
                 ),
               ],

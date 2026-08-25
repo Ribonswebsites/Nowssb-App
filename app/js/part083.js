@@ -407,7 +407,7 @@
      So the wrapper gets a strip above the set and a strip below it:
 
        above   the store, on the left, and the search on the right
-       below   Explore and App Guide, and the way into the guide
+       below   Explore and Help & Coach, and the way into assistance
 
      The elements are MOVED, not copied. The search opens the explore
      sheet and the two buttons are the app's real doors — a second copy of
