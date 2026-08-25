@@ -400,7 +400,9 @@ class _ConnectScreenState extends State<ConnectScreen> {
                   const SizedBox(height: 8),
                   TextField(controller: location, maxLength: 120, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Location (optional)', hintStyle: TextStyle(color: Color(0x66FFFFFF)))),
                   const SizedBox(height: 12),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       OutlinedButton.icon(
                         onPressed: () async {
@@ -408,9 +410,16 @@ class _ConnectScreenState extends State<ConnectScreen> {
                           setSheetState(() {});
                         },
                         icon: const Icon(Icons.photo_outlined),
-                        label: Text(media == null ? 'Add photo' : 'Photo selected'),
+                        label: const Text('Add photo'),
                       ),
-                      const Spacer(),
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          media = await ImagePicker().pickVideo(source: ImageSource.gallery, maxDuration: const Duration(minutes: 2));
+                          setSheetState(() {});
+                        },
+                        icon: const Icon(Icons.video_library_outlined),
+                        label: const Text('Add video'),
+                      ),
                       FilledButton(onPressed: () => Navigator.pop(sheetContext, true), child: const Text('Share')),
                     ],
                   ),
