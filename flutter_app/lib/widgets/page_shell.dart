@@ -12,6 +12,7 @@ import '../data/settings.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import 'motion.dart';
 
 class PageShell extends StatefulWidget {
   const PageShell({
@@ -89,6 +90,7 @@ class _PageShellState extends State<PageShell> {
           ),
           SafeArea(
             child: CustomScrollView(
+              physics: const NwsbSmoothScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(

@@ -27,6 +27,7 @@ import 'media/video_cache.dart';
 import 'media/video_pool.dart';
 import 'screens/splash.dart';
 import 'widgets/video_pack_dialog.dart';
+import 'widgets/motion.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
@@ -110,6 +111,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
       darkTheme: NwsbTheme.dark,
       themeMode: ThemeMode.light,
       color: NwsbColors.deep,
+      scrollBehavior: const NwsbScrollBehavior(),
       home: Stack(
         children: [
           const NavShell(),

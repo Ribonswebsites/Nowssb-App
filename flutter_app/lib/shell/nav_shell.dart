@@ -10,6 +10,7 @@ import '../screens/library.dart';
 import '../screens/practice.dart';
 import '../screens/profile.dart';
 import '../screens/store.dart';
+import '../widgets/motion.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
@@ -71,9 +72,44 @@ class _NavShellState extends State<NavShell> {
   @override
   Widget build(BuildContext context) {
     return NavScope(
-      go: (i) => setState(() => _i = i),
+      go: (i) {
+        if (i == _i) return;
+        setState(() => _i = i);
+      },
       child: _build(context),
     );
+  }
+
+  Widget _screen(int i) {
+    switch (i) {
+      case 0:
+        return AnimatedSwitcher(
+          duration: NwsbMotion.tabDuration,
+          switchInCurve: NwsbMotion.curve,
+          switchOutCurve: NwsbMotion.softCurve,
+          transitionBuilder: (child, animation) => FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(begin: const Offset(.018, 0), end: Offset.zero)
+                  .animate(animation),
+              child: child,
+            ),
+          ),
+          child: KeyedSubtree(
+            key: ValueKey(_fashion),
+            child: _fashion ? const HomeFashion() : const HomeNormal(),
+          ),
+        );
+      case 1:
+        return const PracticeScreen();
+      case 2:
+        return const LibraryScreen();
+      case 3:
+        return const StoreScreen();
+      case 4:
+      default:
+        return const ProfileScreen();
+    }
   }
 
   Widget _build(BuildContext context) {
@@ -81,18 +117,27 @@ class _NavShellState extends State<NavShell> {
       backgroundColor: NwsbColors.surface,
       body: Stack(
         children: [
-          // IndexedStack rather than swapping the child: it keeps each tab's
-          // scroll position and state alive, which is what the website does
-          // (its screens are all in the DOM at once, one of them .active).
-          IndexedStack(
-            index: _i,
-            children: [
-              _fashion ? const HomeFashion() : const HomeNormal(),
-              const PracticeScreen(),
-              const LibraryScreen(),
-              const StoreScreen(),
-              const ProfileScreen(),
-            ],
+          // Keep only the visible tab subtree mounted. The transition overlaps
+          // the outgoing frame briefly, then disposes it so video-heavy tabs do
+          // not retain decoders while another tab is active.
+          AnimatedSwitcher(
+            duration: NwsbMotion.tabDuration,
+            switchInCurve: NwsbMotion.curve,
+            switchOutCurve: NwsbMotion.softCurve,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(.025, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            ),
+            child: KeyedSubtree(
+              key: ValueKey('$_i-$_fashion'),
+              child: _screen(_i),
+            ),
           ),
           // The switch between the two homes. On the website this lives in
           // Customize; until that screen is ported it is here, because a
