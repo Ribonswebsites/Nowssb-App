@@ -1,7 +1,7 @@
 {
-  "name": "NOWSBANSIU \u2014 Shabdapathy",
+  "name": "NowssB \u2014 Word Science and Sound Practice",
   "short_name": "NowssB",
-  "description": "Natural Origin Word Science",
+  "description": "NowssB is a daily word and sound practice for mindful attention.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

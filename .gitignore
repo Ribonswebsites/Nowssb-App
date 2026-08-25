@@ -1,5 +1,7 @@
 # Capacitor / Android — all generated, all rebuildable.
 node_modules/
+# Local migration cache; never include disposable binaries in Pages uploads.
+.tmp/media-migration-cache/
 www/
 android/
 ios/
