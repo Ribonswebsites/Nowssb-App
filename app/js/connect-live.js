@@ -227,9 +227,37 @@ async function openProfile(uid) {
   overlay.id = 'nwsb-live-profile';
   overlay.className = 'nwsb-live-profile-overlay';
   const avatar = p.avatar ? `<img src="${esc(p.avatar)}" alt="">` : `<span>${esc((p.fullName || 'N').charAt(0).toUpperCase())}</span>`;
-  overlay.innerHTML = `<div class="nwsb-live-profile-card"><button class="nwsb-live-profile-close" onclick="NWSBConnect.closeProfile()">×</button><div class="nwsb-live-profile-head">${avatar}<div><h2>${esc(p.fullName)}</h2><p>@${esc(p.username)}</p><small>${esc(p.category)}</small></div></div><p class="nwsb-live-bio">${esc(p.bio || 'A NowssB practitioner building a daily sound practice.')}</p><div class="nwsb-live-profile-actions">${isSelf ? `<button onclick="NWSBConnect.openComposer()">Create post</button>` : `<button onclick="NWSBConnect.toggleFollow('${esc(uid)}')">${p.following_state ? 'Following' : 'Follow'}</button><button onclick="NWSBConnect.message('${esc(uid)}')">Message</button><button onclick="NWSBConnect.call('${esc(uid)}','audio')">Call</button><button onclick="NWSBConnect.call('${esc(uid)}','video')">Video</button>`}</div><div class="nwsb-live-profile-stats"><span><b>${publicPosts.length}</b> posts</span><span><b>${p.followers || 0}</b> followers</span><span><b>${p.following || 0}</b> following</span></div><div class="nwsb-live-profile-grid">${publicPosts.length ? publicPosts.map((post) => `<button onclick="NWSBConnect.openPost('${esc(post.id)}')"><img src="${esc(post.mediaUrl)}" alt=""></button>`).join('') : '<div class="nwsb-live-empty-small">No public posts yet.</div>'}</div></div>`;
+  overlay.innerHTML = `<div class="nwsb-live-profile-card"><button class="nwsb-live-profile-close" onclick="NWSBConnect.closeProfile()">×</button><div class="nwsb-live-profile-head">${avatar}<div><h2>${esc(p.fullName)}</h2><p>@${esc(p.username)}</p><small>${esc(p.category)}</small></div></div><p class="nwsb-live-bio">${esc(p.bio || 'A NowssB practitioner building a daily sound practice.')}</p><div class="nwsb-live-profile-actions">${isSelf ? `<button onclick="NWSBConnect.editProfile()">Edit profile</button><button onclick="NWSBConnect.openComposer()">Create post</button>` : `<button onclick="NWSBConnect.toggleFollow('${esc(uid)}')">${p.following_state ? 'Following' : 'Follow'}</button><button onclick="NWSBConnect.message('${esc(uid)}')">Message</button><button onclick="NWSBConnect.call('${esc(uid)}','audio')">Call</button><button onclick="NWSBConnect.call('${esc(uid)}','video')">Video</button>`}</div><div class="nwsb-live-profile-stats"><span><b>${publicPosts.length}</b> posts</span><span><b>${p.followers || 0}</b> followers</span><span><b>${p.following || 0}</b> following</span></div><div class="nwsb-live-profile-grid">${publicPosts.length ? publicPosts.map((post) => `<button onclick="NWSBConnect.openPost('${esc(post.id)}')"><img src="${esc(post.mediaUrl)}" alt=""></button>`).join('') : '<div class="nwsb-live-empty-small">No public posts yet.</div>'}</div></div>`;
   if (!overlay.parentNode) document.body.appendChild(overlay);
   overlay.style.display = 'flex';
+}
+
+async function editProfile() {
+  requireLogin();
+  const p = profileMap.get(currentUid()) || {};
+  let overlay = document.getElementById('nwsb-live-profile-editor');
+  if (!overlay) { overlay = document.createElement('div'); overlay.id = 'nwsb-live-profile-editor'; overlay.className = 'nwsb-live-composer-overlay'; document.body.appendChild(overlay); }
+  overlay.style.display = 'flex';
+  overlay.innerHTML = `<form class="nwsb-live-composer-card"><button type="button" class="nwsb-live-profile-close" data-close>×</button><h2>Edit NowssB profile</h2><label>Display name<input name="displayName" maxlength="80" value="${esc(p.fullName || '')}" required></label><label>Username<input name="username" maxlength="32" value="${esc(p.username || '')}" required></label><label>Practice area<input name="category" maxlength="80" value="${esc(p.category || 'Practitioner')}"></label><label>Bio<textarea name="bio" maxlength="500" rows="4">${esc(p.bio || '')}</textarea></label><button class="nwsb-live-submit" type="submit">Save profile</button></form>`;
+  overlay.querySelector('[data-close]').onclick = () => { overlay.style.display = 'none'; };
+  overlay.querySelector('form').onsubmit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type=submit]');
+    button.disabled = true; button.textContent = 'Saving…';
+    try {
+      const cleanUsername = form.username.value.trim().toLowerCase().replace(/[^a-z0-9_.]/g, '').slice(0, 32);
+      const cleanName = form.displayName.value.trim().slice(0, 80);
+      if (!cleanName || !cleanUsername) throw new Error('Name and username are required.');
+      await setDoc(doc(db(), 'publicProfiles', currentUid()), { uid: currentUid(), displayName: cleanName, username: cleanUsername, category: form.category.value.trim().slice(0, 80), bio: form.bio.value.trim().slice(0, 500), profileVisibility: 'public', updatedAt: serverTimestamp() }, { merge: true });
+      overlay.style.display = 'none';
+      await loadProfiles();
+      await openProfile(currentUid());
+    } catch (error) {
+      button.disabled = false; button.textContent = 'Save profile';
+      alert(error.message || 'Could not save your profile.');
+    }
+  };
 }
 
 function closeProfile() {
@@ -432,14 +460,33 @@ function liveCloseChat() {
   if (bn) bn.style.display = overlay._prevBnDisplay || ''; if (sn) sn.style.display = overlay._prevSnDisplay || '';
   overlay.style.display = 'none'; liveChatPeer = null;
 }
-function openInbox() {
+async function openInbox() {
   requireLogin();
+  if (!profiles.length) await loadProfiles();
   let overlay = document.getElementById('nwsb-live-inbox');
   if (!overlay) { overlay = document.createElement('div'); overlay.id = 'nwsb-live-inbox'; overlay.className = 'nwsb-live-composer-overlay'; document.body.appendChild(overlay); }
   overlay.style.display = 'flex';
-  overlay.innerHTML = `<div class="nwsb-live-composer-card"><button class="nwsb-live-profile-close" data-close>×</button><h2>NowssB Messages</h2><p class="nwsb-live-form-note">Choose a real Connect profile to start a private conversation.</p><div>${profiles.filter((p) => p.uid !== currentUid()).map((p) => `<button class="nwsb-live-person" data-peer="${esc(p.uid)}">${p.avatar ? `<img src="${esc(p.avatar)}" alt="">` : `<span>${esc((p.fullName || 'N').charAt(0))}</span>`}<span><b>${esc(p.fullName)}</b><small>@${esc(p.username)}</small></span></button>`).join('') || '<div class="nwsb-live-empty-small">No other public profiles are available yet.</div>'}</div></div>`;
+  overlay.innerHTML = '<div class="nwsb-live-composer-card"><button class="nwsb-live-profile-close" data-close>×</button><h2>NowssB Messages</h2><p class="nwsb-live-form-note">Private conversations between signed-in Connect members.</p><div class="nwsb-live-inbox-list"><div class="nwsb-live-empty-small">Loading conversations…</div></div></div>';
   overlay.querySelector('[data-close]').onclick = () => { overlay.style.display = 'none'; };
-  overlay.querySelectorAll('[data-peer]').forEach((button) => button.onclick = () => { const p = profileMap.get(button.dataset.peer); overlay.style.display = 'none'; if (p) liveOpenChat(p); });
+  try {
+    const snap = await getDocs(query(collection(db(), 'chats'), where('participants', 'array-contains', currentUid()), limit(50)));
+    const chats = snap.docs.map((item) => ({ id: item.id, ...item.data() })).sort((a, b) => {
+      const time = (value) => value?.toMillis ? value.toMillis() : Number(value || 0);
+      return time(b.updatedAt || b.lastMessageAt) - time(a.updatedAt || a.lastMessageAt);
+    });
+    const rows = chats.map((chat) => {
+      const peerUid = (chat.participants || []).find((uid) => uid !== currentUid());
+      const peer = profileMap.get(peerUid) || { uid: peerUid, fullName: 'NowssB Practitioner', username: 'practitioner', avatar: '', category: 'Practitioner' };
+      return `<button class="nwsb-live-person" data-peer="${esc(peerUid)}">${peer.avatar ? `<img src="${esc(peer.avatar)}" alt="">` : `<span>${esc((peer.fullName || 'N').charAt(0))}</span>`}<span><b>${esc(peer.fullName)}</b><small>@${esc(peer.username)} · ${esc(chat.lastMessage || 'Conversation started')}</small></span><time>${esc(formatTime(chat.updatedAt?.toMillis ? chat.updatedAt.toMillis() : chat.lastMessageAt?.toMillis?.() || 0))}</time></button>`;
+    });
+    const starters = profiles.filter((p) => p.uid !== currentUid()).map((p) => `<button class="nwsb-live-person" data-peer="${esc(p.uid)}">${p.avatar ? `<img src="${esc(p.avatar)}" alt="">` : `<span>${esc((p.fullName || 'N').charAt(0))}</span>`}<span><b>${esc(p.fullName)}</b><small>@${esc(p.username)} · Start a private chat</small></span></button>`).join('');
+    const list = overlay.querySelector('.nwsb-live-inbox-list');
+    if (list) list.innerHTML = rows.join('') || starters || '<div class="nwsb-live-empty-small">No other public profiles are available yet.</div>';
+    overlay.querySelectorAll('[data-peer]').forEach((button) => button.onclick = () => { const p = profileMap.get(button.dataset.peer); overlay.style.display = 'none'; if (p) liveOpenChat(p); });
+  } catch (error) {
+    const list = overlay.querySelector('.nwsb-live-inbox-list');
+    if (list) list.innerHTML = `<div class="nwsb-live-error">${esc(error.message || 'Could not load messages.')}</div>`;
+  }
 }
 function patchLegacyUI() {
   if (!window.IG || window.IG._nwsbLivePatched) return;
@@ -472,7 +519,7 @@ function patchLegacyUI() {
   };
 }
 
-window.NWSBConnect = { refreshFeed, loadProfiles, loadPosts, openComposer, openProfile, closeProfile, toggleFollow, message, call, likePost, commentPost, focusComment, sharePost, openInbox, openPost: (id) => { const p = posts.find((x) => x.id === id); if (p) window.open(p.mediaUrl, '_blank', 'noopener'); } };
+window.NWSBConnect = { refreshFeed, loadProfiles, loadPosts, openComposer, openProfile, editProfile, closeProfile, toggleFollow, message, call, likePost, commentPost, focusComment, sharePost, openInbox, openPost: (id) => { const p = posts.find((x) => x.id === id); if (p) window.open(p.mediaUrl, '_blank', 'noopener'); } };
 window.NWSBConnectReady = true;
 
 function boot() {
