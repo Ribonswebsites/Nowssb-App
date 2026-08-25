@@ -214,14 +214,6 @@
       ],
       go: ['See the plans', function () { if (window.SS && SS.open) SS.open('subscription'); }] },
 
-    { i: 'spark', t: 'Make it yours',
-      lead: 'The last step is the app itself. Almost nothing here is fixed.',
-      pts: [
-        ['Hero header', 'Three ways the top can look — this is one of them.'],
-        ['Fashion Plus', 'Turns the app to film. The tiles and cards start moving.'],
-        ['Your layout', 'Sections go on and off, and the home remembers it.']
-      ],
-      go: ['Change the hero header', function () { if (typeof window.stOpen === 'function') window.stOpen(); }] }
   ];
 
   function esc(s) {
@@ -441,9 +433,13 @@
   }
 
   window.fstOpen = function () {
-    if (typeof window.nwsbHeroCells !== 'function') return;
+    /* The old Hero Header rail is gone. The remaining home guide still has a
+       useful destination: the existing all-features Explore overlay. */
+    if (typeof window.nwsbHeroCells !== 'function' || !deck()) {
+      if (typeof window.openExploreOverlay === 'function') window.openExploreOverlay();
+      return;
+    }
     var d = deck();
-    if (!d) return;
     syncHeight();
     window.nwsbHeroAuto(false);
     /* set before the cells are built: on() reads this flag, and both the

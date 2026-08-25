@@ -179,11 +179,11 @@
      part of the same run of offers as everywhere else. Local files — they
      ship with the app and warm into the media cache with everything else. */
   var SIG_VIDS = [
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-a.mp4',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-b.mp4',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-c.mp4',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-d.mp4',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/signature-e.mp4'
+    './assets/video/signature-a.mp4',
+    './assets/video/signature-b.mp4',
+    './assets/video/signature-c.mp4',
+    './assets/video/signature-d.mp4',
+    './assets/video/signature-e.mp4'
   ];
   /* Only the clips of a screen that has been opened are ever in the DOM, so
      a scan cannot find these until the reader has already been made to wait

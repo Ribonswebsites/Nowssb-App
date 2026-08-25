@@ -348,7 +348,7 @@
     { v: 'subscription-a',       t: 'Subscription',     s: 'Unlock the full word library',    go: 'subscription' },
     { v: 'coupon-a',             t: 'Offers & bundles', s: 'Coupons on words and meanings',   go: 'store' }
   ];
-  var MEANING_VID = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4c1c17d70f5656d48438620681f91a5a03c9cbef907f4c865ceb4bc1e2b56ed2.mp4';
+  var MEANING_VID = './assets/video/remote-4c1c17d70f5656d48438620681f91a5a03c9cbef907f4c865ceb4bc1e2b56ed2.mp4';
   function storeVideos() {
     return '<section class="slm-sec">' + head('From the Store', chevron("slmStore()")) +
       '<div class="slm-hscroll">' + STORE_VIDS.map(function (x) {

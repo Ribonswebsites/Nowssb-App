@@ -896,26 +896,10 @@
     if (p && p.catch) p.catch(function () {});
   }
 
-  window.stOpen = function () {
-    render();
-    paintBg();
-    var s = document.getElementById('sub-settings');
-    if (s && typeof openSub === 'function') openSub('settings');
-    haptic(24);
-    /* The rail is measured for the first time while the screen is still
-       opening. Look again once it has arrived, and fill the first few
-       outright so the page is never blank while the observer decides. */
-    setTimeout(function () {
-      var wins = document.querySelectorAll('.stw-prev');
-      for (var i = 0; i < Math.min(3, wins.length); i++) {
-        var st = wins[i].querySelector('.stw-prev-stage');
-        if (st) fillPreview(st);
-      }
-      observe();
-      visObserve();
-      pump();
-    }, 420);
-  };
+  /* The Hero Header page was removed. Keep a no-op compatibility hook for
+     older inline handlers and deep links; the Fashion hero itself remains
+     controlled by the saved mode and never opens a settings screen. */
+  window.stOpen = function () {};
   window.stClose = function () {
     if (typeof closeSub === 'function') closeSub('settings');
     /* Everything on this page is a copy of something else, so nothing is

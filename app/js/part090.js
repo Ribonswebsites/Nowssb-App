@@ -76,14 +76,6 @@
     var items = upNextItems();
     var rootClass = 'nwsb-daydash ' + (fashion ? 'nwsb-daydash-fashion' : 'nwsb-daydash-normal');
     return '<section class="' + rootClass + '" data-daydash-mode="' + mode + '" data-slot="' + slotFor(new Date()) + '">' +
-      '<div class="nwsb-focus-card" data-daydash-focus>' +
-        '<video class="nwsb-focus-video" data-nwsb-own="1" muted autoplay loop playsinline preload="auto" poster="' + esc(srcFor(s.file, 'webp')) + '" src="' + esc(srcFor(s.file, 'mp4')) + '" data-local-poster="' + esc(localSrcFor(s.file, 'webp')) + '" data-local-src="' + esc(localSrcFor(s.file, 'mp4')) + '" aria-hidden="true"></video>' +
-        '<div class="nwsb-focus-scrim"></div>' +
-        '<div class="nwsb-focus-content">' +
-          '<div class="nwsb-focus-eyebrow">' + esc(s.eyebrow) + '</div><div class="nwsb-focus-title">' + esc(s.title) + '</div><div class="nwsb-focus-sub">' + esc(s.sub) + '</div>' +
-          '<button type="button" class="nwsb-focus-cta" data-daydash-focus-go>Start practice <span class="nwsb-focus-cta-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>' +
-        '</div>' +
-      '</div>' +
       '<div class="nwsb-dashboard-heading"><span class="nwsb-dashboard-mark" aria-hidden="true">' + icon('target') + '</span><div class="nwsb-dashboard-heading-copy"><div class="nwsb-dashboard-eyebrow">Your meditation</div><h2>Meditation progress</h2></div><button type="button" data-daydash-progress>View all <span>›</span></button></div>' +
       '<div class="nwsb-progress-card">' +
         '<div class="nwsb-progress-stat"><span class="nwsb-stat-icon">' + icon('check') + '</span><strong data-progress-sessions>' + p.sessions + '</strong><small>meditation sessions</small></div>' +

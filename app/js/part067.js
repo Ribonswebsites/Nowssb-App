@@ -20,7 +20,7 @@
     /* Above the NowssB Store section, on both homes. In the repo rather
        than on a CDN — the store is the thing the app sells from, and its
        banner should not be one network hop away from not being there. */
-    { top:    '#home-nm .nmh-store-wrap',          vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/store-banner.mp4?v=1' },
+    { top:    '#home-nm .nmh-store-wrap',          vid: './assets/video/store-banner.mp4?v=1' },
     /* The Fashion store's own clip, not the one the Normal home uses. It
        lands INSIDE .fash-store-wrap because `before` inserts into the
        trigger's parent, which is that wrapper now — between the head and
@@ -29,7 +29,7 @@
        own landscape clip. It used to be injected on top of the store card
        carrying the TALL render — a portrait film in a landscape banner,
        which is what made both of them look wrong. */
-    { before: '#home .fash-storeban-slot',        vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/store-banner-fash.mp4?v=1' },
+    { before: '#home .fash-storeban-slot',        vid: './assets/video/store-banner-fash.mp4?v=1' },
 
     /* Choose Your Path, on the laptop, in a section of its own.
        It used to be appended INSIDE the Personalised Healing wrapper, which
@@ -57,8 +57,8 @@
        It goes INTO .nc-blk-vid rather than before the section: the banner
        and the features carousel are one block with a heading now, built the
        way Quick Access is, and .nc-blk is what part062.js registers. */
-    { top:    '#home-nm .nc-blk-vid',              vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
-    { top:    '#home .nc-blk-vid',                 vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
+    { top:    '#home-nm .nc-blk-vid',              vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
+    { top:    '#home .nc-blk-vid',                 vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
 
     // Trending
     { top:    '#home-nm .nmh-trend-shop-wrap',     vid: "" },
@@ -70,7 +70,7 @@
        Meaning Search on the Fashion home was a black screen. It ships in
        the repo now rather than coming from a CDN, which is also why it
        cannot silently stop working again. */
-    { before: '#home #fashMeaningSearchWrap',      vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/orb-loop.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap', own: 1 },
+    { before: '#home #fashMeaningSearchWrap',      vid: './assets/video/orb-loop.mp4?v=1', frame: 'dev-tab-l', wrap: 'nvb-blk glass-wrap', own: 1 },
     /* Below the store's own cinematic hero (#msBanner), not above it — a
        `top` placement into #msMeaningBody had been landing it before the
        hero as that host's first child instead. */
@@ -85,7 +85,7 @@
 
     // Every word's own page, above About This Word — a player banner, so it
     // carries the player mark on the right and opens the practice.
-    { before: '.rmd-desc-block',                   vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b0f763363402ac036791e981781d269ae686e96ae4adb99ed5de6e7b1a64d32b.mp4',
+    { before: '.rmd-desc-block',                   vid: './assets/video/remote-b0f763363402ac036791e981781d269ae686e96ae4adb99ed5de6e7b1a64d32b.mp4',
       player: 1, go: 'openPracticeIntro()' }
   ];
 
@@ -99,9 +99,9 @@
      either. The two new ones are local files — they ship with the app and
      the cache warms them like everything else. */
   var COUPON_VIDS = [
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e1c631d8fc5d325a9f90d923a687a36fcdf1f54a642f7ea88c2852f4bd89e8af.mp4',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/coupon-a.mp4',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/coupon-b.mp4'
+    './assets/video/remote-e1c631d8fc5d325a9f90d923a687a36fcdf1f54a642f7ea88c2852f4bd89e8af.mp4',
+    './assets/video/coupon-a.mp4',
+    './assets/video/coupon-b.mp4'
   ];
   /* The offset is per launch rather than per render, so a rotator redrawing
      a banner does not make the clip jump under the reader. */
@@ -129,7 +129,7 @@
      underneath it inside one glass wrapper, and it goes in three places: the
      home sections, above the shelf on the store page, and above the copy on
      every book's own page. */
-  var EB_VID  = "https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/beaf11ea10561d439ff2d8217da6c6e889accdbb3b20bb1e7b4236cbe754305e.mp4";
+  var EB_VID  = "./assets/video/remote-beaf11ea10561d439ff2d8217da6c6e889accdbb3b20bb1e7b4236cbe754305e.mp4";
   var EB_ICON = 'assets/media/image/5e96822df79570071705c1fb1943b0c1b895278548c8e426-0dde6c30.png';
 
   /* The subscription clip was the same one in several places. The two home
@@ -143,8 +143,8 @@
      the login one especially, because it is the first thing a new reader
      sees and it should not be arriving over the network while they wait. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || [])
-    .concat(['https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/subscription-a.mp4',
-             'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/login-phone.mp4']);
+    .concat(['./assets/video/subscription-a.mp4',
+             './assets/video/login-phone.mp4']);
 
   var SWAP = [
     /* Two clips now, picked per launch — the banner that has always been
@@ -152,14 +152,14 @@
        is the one the banner was designed around. */
     { sel: '#home-nm .nmh-vb-tall video, #home .fash-vb-tall video',
       vid: ["",
-            'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/subscription-a.mp4'] },
+            './assets/video/subscription-a.mp4'] },
     { sel: '.ss-plan-banner-vid',
       vid: "" },
     /* The Edition section — the card that carries the plan and Upgrade,
        not the Subscribe Today banner above it. A different cloud from the
        rest, so the full URL rather than the V prefix. */
     { sel: '.fsec-video',
-      vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/bd608efe4ad901c6464df9b7d5bcbe0884b25ac09492f3e6f874925cdfc1fb4f.mp4' }
+      vid: './assets/video/remote-bd608efe4ad901c6464df9b7d5bcbe0884b25ac09492f3e6f874925cdfc1fb4f.mp4' }
   ];
 
   /* ── What a banner leads to, named down its right-hand side ────────

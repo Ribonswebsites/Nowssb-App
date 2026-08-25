@@ -31,7 +31,7 @@
     el.innerHTML = `
     <!-- Video banner — below the header -->
     <div class="fash-video-banner">
-      <video autoplay muted loop playsinline preload="metadata" src="https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4e72457832f1696f4ff3732ab1ce4f556ee4104e448cc12ff297df227a9b7aac.mp4"></video>
+      <video autoplay muted loop playsinline preload="metadata" src="./assets/video/remote-4e72457832f1696f4ff3732ab1ce4f556ee4104e448cc12ff297df227a9b7aac.mp4"></video>
     </div>
     <!-- ── ACCOUNT ── -->
     <div class="ss-section-title">ACCOUNT</div>
@@ -158,13 +158,6 @@
           <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="sr-body"><div class="sr-label">Quick Links</div><div class="sr-sub">One-tap shortcuts to every corner of NowssB</div></div>
-        <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="sr" onclick="window.stOpen&&stOpen()">
-        <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"><rect x="3.4" y="3.4" width="7.2" height="7.2" rx="2"/><rect x="13.4" y="3.4" width="7.2" height="7.2" rx="2"/><rect x="3.4" y="13.4" width="7.2" height="7.2" rx="2"/><rect x="13.4" y="13.4" width="7.2" height="7.2" rx="2"/></svg>
-        </div>
-        <div class="sr-body"><div class="sr-label">Hero header</div><div class="sr-sub">Three ways the top of your home can look</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="openSub('fashion-plus')">

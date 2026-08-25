@@ -21,18 +21,18 @@
   /* One entry per tile, keyed by the sub-screen it opens — that is the only
      stable handle the markup gives us. `img` means a still, `vid` a loop. */
   var TILES = [
-    { open: 'sound-library', vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/09aedc60417dbf0a7d47d40262c3c5d53e69ec86d17a7bc5642c4262d1f9785c.mp4' },
-    { open: 'my-progress',   vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4e7c79be023083831bdb8c61e162c8a5657b4154d83222d0ac00294c1aa9bd7f.mp4' },
+    { open: 'sound-library', vid: './assets/video/remote-09aedc60417dbf0a7d47d40262c3c5d53e69ec86d17a7bc5642c4262d1f9785c.mp4' },
+    { open: 'my-progress',   vid: './assets/video/remote-4e7c79be023083831bdb8c61e162c8a5657b4154d83222d0ac00294c1aa9bd7f.mp4' },
     /* Word Science was the one tile still showing a still while the other
        three played — so with Fashion Plus on, three tiles moved and one
        sat there. Its clip lives in the repo rather than on Cloudinary
        because it was supplied as a file; mediaEl() already builds a
        <video> for `vid` and an <img> for `img`, so this is the only line
        that had to change. */
-    { open: 'word-science',  vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fp-word-science.mp4' },
-    { open: 'profile',       vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/8d7a2d4192fa1dfd59096dad44674769aad32216c50b00c3ba29893dd0ceefe9.mp4' }
+    { open: 'word-science',  vid: './assets/video/fp-word-science.mp4' },
+    { open: 'profile',       vid: './assets/video/remote-8d7a2d4192fa1dfd59096dad44674769aad32216c50b00c3ba29893dd0ceefe9.mp4' }
   ];
-  var PRACTICE_VID = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/09a50041065bdeabacf4eab4564a84f0cfdc253c14d302b1656aa70ed32ba527.mp4';
+  var PRACTICE_VID = './assets/video/remote-09a50041065bdeabacf4eab4564a84f0cfdc253c14d302b1656aa70ed32ba527.mp4';
 
   /* The clip above My Routines. It belongs to this file rather than the
      banner table in part067.js because it is a Fashion Plus concern: on the
@@ -44,9 +44,9 @@
      the position kept in localStorage, so it alternates from one session
      to the next instead of being the same clip forever. */
   var RT_VIDS = [
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/49d09283f71e97f0af7e3adef30c889de81105663a40b7ba13b88a4eea8c14d3.mp4',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4b99766dec9f4c4081e153c1f7f8a806976e45579a1529ee53765499c87a9940.mp4',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/b1e2c78385f45657a14cdb868324167b2b2c449d9660e390118e119022bed65b.mp4'
+    './assets/video/remote-49d09283f71e97f0af7e3adef30c889de81105663a40b7ba13b88a4eea8c14d3.mp4',
+    './assets/video/remote-4b99766dec9f4c4081e153c1f7f8a806976e45579a1529ee53765499c87a9940.mp4',
+    './assets/video/remote-b1e2c78385f45657a14cdb868324167b2b2c449d9660e390118e119022bed65b.mp4'
   ];
   var RT_KEY = 'nwsb_rtvid_i';
   /* Only whichever one is playing is ever in the document, so the other two

@@ -12,6 +12,9 @@
    Respects Data Saver / slow connections: skips entirely rather than
    burning someone's mobile data in the background without asking. ── */
 (function () {
+  /* All shipped videos are local again. Do not show a preparation prompt or
+     start a background Cache Storage queue that competes with playback. */
+  return;
   if (typeof caches === 'undefined') return;
 
   /* MUST match VIDEO_CACHE in sw.js. The service worker deletes every
@@ -436,7 +439,7 @@
   var LOCAL = 'data-nwsb-local-src';
   var R2SRC = 'data-nwsb-r2-src';
   var R2FAILED = 'data-nwsb-r2-failed';
-  var R2_VIDEO_BASE = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/';
+  var R2_VIDEO_BASE = './assets/video/';
   var near = new WeakSet();     // clip is within a screen of the viewport
   var mine = false;             // this file is the one writing src right now
 
@@ -447,11 +450,9 @@
   }
 
   function r2VideoSrc(src) {
-    var local = localVideoSrc(src);
-    if (!local) return '';
-    var file = local.split('/').pop();
-    if (file === 'start-animation.mp4') return '';
-    return R2_VIDEO_BASE + encodeURIComponent(file);
+    /* Repository MP4s are deliberately served from the bundled WebView
+       assets; the worker is no longer a playback hop. */
+    return '';
   }
 
   function mount(v) {
@@ -483,9 +484,8 @@
     try { v.load(); } catch (e) {}
   }
 
-  /* R2 is authoritative for the shared catalog. Eligible clips do not fall
-     back to deleted bundle files; only the splash is local-owned and never
-     reaches this manager. */
+  /* Bundled repository assets are authoritative for playback. The worker is
+     not used as a remount hop, and the splash remains owned by its launcher. */
   document.addEventListener('error', function (e) {
     var v = e.target;
     if (!v || v.tagName !== 'VIDEO') return;
@@ -534,7 +534,7 @@
       if (near.has(v)) {
         v.setAttribute(STASH, local);
         poster(v);
-        mount(v);                         /* remount the new clip through R2 */
+        mount(v);                         /* remount the new bundled clip */
         return;
       }
       v.setAttribute(STASH, local);

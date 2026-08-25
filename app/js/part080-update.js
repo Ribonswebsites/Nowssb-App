@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  var CLIENT_VERSION = '9.6.39';
+  var CLIENT_VERSION = '9.6.40';
   var STORAGE_KEY = 'nwsb_last_seen_version';
   var CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
   var CHECKED_KEY = 'nwsb_last_update_check';

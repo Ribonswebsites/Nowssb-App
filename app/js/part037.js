@@ -123,7 +123,7 @@
       '<div class="rx-card">'+
         '<video class="rx-banner" data-nwsb-auto muted loop playsinline preload="none" '+
           'aria-hidden="true" tabindex="-1" onclick="openSub(\'ai-prescription\')" '+
-          'src="https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/rx-banner.mp4?v=1"></video>'+
+          'src="./assets/video/rx-banner.mp4?v=1"></video>'+
         '<div class="rx-header" onclick="openSub(\'ai-prescription\')" style="cursor:pointer;">'+
           '<div class="rx-header-left">'+
             '<div class="rx-ai-dot"></div>'+
@@ -158,7 +158,7 @@
       '<div class="rx-card">'+
         '<video class="rx-banner" data-nwsb-auto muted loop playsinline preload="none" '+
           'aria-hidden="true" tabindex="-1" onclick="openSub(\'ai-prescription\')" '+
-          'src="https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/rx-banner.mp4?v=1"></video>'+
+          'src="./assets/video/rx-banner.mp4?v=1"></video>'+
         '<div class="rx-header">'+
           '<div class="rx-header-left"><div class="rx-ai-dot"></div><span class="rx-label">AI Prescription</span></div>'+
           '<span class="rx-time-badge">Building your ritual…</span>'+

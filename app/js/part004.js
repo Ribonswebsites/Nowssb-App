@@ -51,11 +51,11 @@ window.addEventListener('nwsb-library', () => {
 // deterministically from these pools (same word → same look, different words
 // → different looks). Add more video URLs here as Ribon shares them.
 const PW_VIDEO_POOL = [
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/90550ee5f40f4a2a62154d960a717de8e53798a9901dd04aba92fc3bd358ba4c.mp4',
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/1e9a0c8d452a809f4a536d634acae5e78e9275425b71c640f109d57ea54beac7.mp4',
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3c8eebc74d743135d122f46573bed601fbf2261eca520f1b5f1e81aee494bbc6.mp4',
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3376b48971b038f63b4cad412f16877305b17e8e48169c4740c0dea542decbe9.mp4',
-  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4ce3c9019dd56ccdf4e23823d334ebc231eadb0bdde19b0bb1c2259ff07fe394.mp4'
+  './assets/video/remote-90550ee5f40f4a2a62154d960a717de8e53798a9901dd04aba92fc3bd358ba4c.mp4',
+  './assets/video/remote-1e9a0c8d452a809f4a536d634acae5e78e9275425b71c640f109d57ea54beac7.mp4',
+  './assets/video/remote-3c8eebc74d743135d122f46573bed601fbf2261eca520f1b5f1e81aee494bbc6.mp4',
+  './assets/video/remote-3376b48971b038f63b4cad412f16877305b17e8e48169c4740c0dea542decbe9.mp4',
+  './assets/video/remote-4ce3c9019dd56ccdf4e23823d334ebc231eadb0bdde19b0bb1c2259ff07fe394.mp4'
 ];
 const PW_ACCENT_POOL = [
   '200,232,245',  // glacial blue

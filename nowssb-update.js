@@ -7,8 +7,8 @@
   'use strict';
   var LIVE = 'https://raw.githubusercontent.com/Ribonswebsites/Nowssb-App/main/version.json';
   var PAGES = 'https://ribonswebsites.github.io/Nowssb-App/';
-  var LOCAL_VERSION = '9.6.39';
-  var LOCAL_BUILD = 2026082431;
+  var LOCAL_VERSION = '9.6.40';
+  var LOCAL_BUILD = 2026082432;
   var SEEN = 'nwsb_seen_build';
   var SNOOZE = 'nwsb_update_snooze';
 

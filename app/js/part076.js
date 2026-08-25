@@ -33,7 +33,7 @@
 (function () {
   'use strict';
 
-  var VID = 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg.mp4';
+  var VID = './assets/video/fashion-plus-bg.mp4';
 
   /* What moves through the phone.
 
@@ -59,15 +59,14 @@
   /* The backgrounds you can choose between. Add one here and it appears in
      the phone and in the picker on its own — nothing else to touch. */
   var FILMS = [
-    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg.mp4',   name: 'Shattered Glass' },
-    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
-    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
-    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
-    /* Fifth background supplied for this release. It is also copied into the
-       Flutter asset bundle and uploaded to the shared R2 video catalog. */
-    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-4.mp4', name: 'Background Five' },
-    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-5.mp4', name: 'Background Six' },
-    { vid: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/fashion-plus-bg-6.mp4', name: 'Current Fashion Home' }
+    { vid: './assets/video/fashion-plus-bg.mp4',   name: 'Shattered Glass' },
+    { vid: './assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
+    { vid: './assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
+    { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
+    /* Fifth background supplied for this release and bundled locally. */
+    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Background Five' },
+    { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Background Six' },
+    { vid: './assets/video/fashion-plus-bg-6.mp4', name: 'Current Fashion Home' }
   ];
 
   /* Preserve the current Fashion Home film as the default. Existing stored
