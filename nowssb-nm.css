@@ -16855,3 +16855,199 @@ a:active,
   .nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap { width:44px; height:44px; flex-basis:44px; }
   .nwsb-video-pack-status-row .nwsb-video-pack-divider { height:30px; }
 }
+
+/* ══ FASHION WHERE TO BEGIN — reference geometry, final cascade ══ */
+#home .mainops-blk.aug15-fashion-reference {
+  width: calc(100% - 32px) !important;
+  margin: 18px 16px !important;
+  padding: 14px 12px 16px !important;
+  box-sizing: border-box !important;
+  border-radius: 24px !important;
+  background: rgba(255,255,255,.055) !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
+  backdrop-filter: blur(18px) saturate(1.25) !important;
+  overflow: hidden !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .qa-tv-head {
+  min-height: 68px !important;
+  padding: 0 4px 14px !important;
+  gap: 14px !important;
+}
+#home .mainops-blk.aug15-fashion-reference .qa-tv-orb {
+  width: 58px !important;
+  height: 58px !important;
+  flex: 0 0 58px !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.92) !important;
+  border: 0 !important;
+  color: #161525 !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,.26) !important;
+}
+#home .mainops-blk.aug15-fashion-reference .qa-tv-orb svg { width: 28px !important; height: 28px !important; }
+#home .mainops-blk.aug15-fashion-reference .qa-tv-hello {
+  font-size: 20px !important;
+  line-height: 1.12 !important;
+  color: rgba(255,255,255,.68) !important;
+}
+#home .mainops-blk.aug15-fashion-reference .qa-tv-name {
+  font-size: 28px !important;
+  line-height: 1.08 !important;
+  color: #fff !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .mo-box {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  background: rgba(8,8,18,.24) !important;
+  overflow: hidden !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-row {
+  display: flex !important;
+  width: 100% !important;
+  height: 108px !important;
+  min-height: 108px !important;
+  margin: 0 !important;
+  gap: 0 !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-row + .mo-row { border-top: 1px solid rgba(255,255,255,.14) !important; }
+#home .mainops-blk.aug15-fashion-reference .mo-cell {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 108px !important;
+  height: 108px !important;
+  padding: 12px 6px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #fff !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-cell:active,
+#home .mainops-blk.aug15-fashion-reference .mo-cell:focus-visible { background: rgba(255,255,255,.09) !important; }
+#home .mainops-blk.aug15-fashion-reference .mo-rule {
+  display: block !important;
+  width: 1px !important;
+  height: 66px !important;
+  flex: 0 0 1px !important;
+  align-self: center !important;
+  background: rgba(255,255,255,.18) !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-ic {
+  width: 46px !important;
+  height: 46px !important;
+  flex: 0 0 46px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #e8d5a3 !important;
+}
+#home .mainops-blk.aug15-fashion-reference .mo-ic svg { width: 34px !important; height: 34px !important; }
+#home .mainops-blk.aug15-fashion-reference .mo-lbl {
+  margin-top: 8px !important;
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+  font-weight: 700 !important;
+  color: rgba(255,255,255,.94) !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way {
+  display: block !important;
+  width: 100% !important;
+  min-height: 120px !important;
+  height: 120px !important;
+  margin: 18px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 30px !important;
+  background: #000 !important;
+  color: #fff !important;
+  box-shadow: 0 14px 28px rgba(0,0,0,.28) !important;
+  overflow: hidden !important;
+  text-align: left !important;
+}
+#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way .ncb-slide {
+  display: flex !important;
+  width: 100% !important;
+  height: 120px !important;
+  min-height: 120px !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 18px 20px !important;
+  border-radius: 30px !important;
+  background: #000 !important;
+}
+#home .mainops-blk.aug15-fashion-reference .nwsb-find-way-ico {
+  display: grid !important;
+  place-items: center !important;
+  width: 58px !important;
+  height: 58px !important;
+  flex: 0 0 58px !important;
+  border-radius: 50% !important;
+  background: #12121c !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  color: #e8d5a3 !important;
+}
+#home .mainops-blk.aug15-fashion-reference .nwsb-find-way-ico svg { width: 28px !important; height: 28px !important; }
+#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-txt { min-width: 0 !important; flex: 1 1 auto !important; }
+#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-name { font-size: 20px !important; line-height: 1.15 !important; color: #fff !important; }
+#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-sub { margin-top: 5px !important; font-size: 14px !important; line-height: 1.28 !important; color: rgba(255,255,255,.68) !important; }
+#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-btn { width: 44px !important; height: 44px !important; flex: 0 0 44px !important; border-radius: 50% !important; background: #1a1a24 !important; border: 1px solid rgba(255,255,255,.16) !important; }
+#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-btn svg { width: 22px !important; height: 22px !important; }
+/* The Fashion film and glass wrappers keep their default brightness and stay
+   behind the home content; only the fixed navigation is allowed above cards. */
+body.fashplus #fpBgVideo { opacity: 1 !important; z-index: 0 !important; }
+body.fashplus #fpBgVeil { z-index: 1 !important; }
+body.fashplus #homeHeader { z-index: 1005 !important; }
+body.fashplus #home .home-body { position: relative !important; z-index: 2 !important; }
+body.fashplus #home .mainops-blk,
+body.fashplus #home .glass-wrap { isolation: isolate; }
+
+/* ══ FASHION HOME — stable hero plane and reference section order ══ */
+body.fashplus #home .hero-section.hero-simple {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: calc(100% - 32px) !important;
+  margin: calc(var(--home-header-h, 92px) + 8px) 16px 16px !important;
+  transform: none !important;
+  z-index: 30 !important;
+}
+body.fashplus #home .hs-deck.hs-below-hero {
+  position: relative !important;
+  z-index: 20 !important;
+  margin: 0 16px 18px !important;
+  min-height: 0 !important;
+  isolation: isolate !important;
+}
+body.fashplus #home .hs-deck.hs-below-hero .hs-cell {
+  z-index: 1 !important;
+}
+body.fashplus #home .hs-deck.hs-below-hero .hs-cell.on { z-index: 2 !important; }
+body.fashplus #home .hero-section.hero-simple .hs-top,
+body.fashplus #home .hero-section.hero-simple .hs-foot { position: relative !important; z-index: 4 !important; }
+body.fashplus #home .home-body { position: relative !important; z-index: 10 !important; }
+body.fashplus #home .home-body > .mainops-blk.aug15-fashion-reference { position: relative !important; z-index: 12 !important; }
+/* Restore the default Fashion glass treatment instead of an extra-dark veil. */
+body.fashplus #fpBgVideo { opacity: 1 !important; }
+/* The quick-access panel must remain the first strong action block after the
+   player; the rest of the page follows it normally. */
+body.fashplus #home .mainops-blk.aug15-fashion-reference { order: initial !important; }
+
+/* The Fashion quick-access panel follows the hero experience, not the long
+   player/dashboard stream it shares with the Normal-home markup. */
+body.fashplus #home > .mainops-blk.aug15-fashion-reference {
+  position: relative !important;
+  z-index: 25 !important;
+  margin: 0 16px 18px !important;
+}
+
+/* Fashion video sections begin on a clean media surface; only the video
+   element is affected, never the surrounding logo/icon artwork. */
+body.fashplus #home video { background-color: #020307 !important; }
+body.fashplus #home video[poster] { background-image: none !important; }

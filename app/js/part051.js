@@ -589,9 +589,20 @@
   var POSMARK = 'data-nwsb-pos';
 
   function poster(v) {
+    /* Fashion's video sections intentionally begin as clean glass/black video
+       surfaces rather than showing a still screenshot before playback. This
+       opt-out also prevents the preparation pass below from re-adding a local
+       poster after markup removed it. */
+    var fashionHome = document.body && document.body.classList.contains('fashplus') &&
+                      v.closest && v.closest('#home');
+    if (fashionHome || v.hasAttribute('data-nwsb-no-poster')) {
+      v.removeAttribute('poster');
+      v.removeAttribute(POSMARK);
+      return;
+    }
     /* A poster written here is marked, so that when another file swaps the
-       clip — the coupon strip picks a new one, the reader changes the film
-       — the frame under it can be swapped too. A poster that came with the
+       clip — the coupon strip picks a new one, the reader changes the film —
+       the frame under it can be swapped too. A poster that came with the
        markup is left alone: someone chose that one. */
     if (v.getAttribute('poster') && !v.getAttribute(POSMARK)) return;
     var p = posterFor(v.getAttribute('src') || v.getAttribute(STASH) ||

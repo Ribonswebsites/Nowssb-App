@@ -102,11 +102,6 @@
   }
 
   var RAIL = [
-    { i: 'crown',   h: 'The Full Library',       t: 'NowssB Subscription',
-      s: 'Every word and every frequency',
-      sel: '#home .nsub-blk .vbs-screen video',
-      v: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/650223ca119ab9368a3fc6e3b4b3e533621fed8dda158319aa9299a8485b2dfc.mp4',
-      go: function () { if (window.SS && SS.open) SS.open('subscription'); } },
     { i: 'word',    h: 'Where a word begins',    t: 'NowssB Word Store',
       s: 'Every root, every origin',
       v: vidOf('NWSB_WORD_BANNER_VID',
@@ -520,12 +515,21 @@
     if (!d) {
       d = document.createElement('div');
       d.id = 'hsDeck';
-      d.className = 'hs-deck';
-      home.insertBefore(d, hero);
-      hero.classList.add('hs-cell', 'hs-hero-cell', 'on');
-      hero.setAttribute('data-i', '0');
-      d.appendChild(hero);                       /* moved, not copied */
+      d.className = 'hs-deck hs-below-hero';
+      /* The hero TV stays in the home flow. Only the supplementary cards
+         belong to the swipe deck, which sits below the hero instead of
+         occupying the same visual plane. */
+      if (hero.nextSibling) home.insertBefore(d, hero.nextSibling);
+      else home.appendChild(d);
       d.insertAdjacentHTML('beforeend', cellsHtml());
+    }
+    /* The reference puts the six-door Where to Begin panel immediately after
+       the hero experience. It is authored inside home-body for normal-flow
+       reuse, then promoted here only on the Fashion home. */
+    var quick = home.querySelector('.mainops-blk.aug15-fashion-reference');
+    if (quick && quick.parentNode !== home) {
+      park(quick, home);
+      if (d.nextSibling) home.insertBefore(quick, d.nextSibling);
     }
     furniture(hero);
     armSwipe(d);
@@ -539,15 +543,12 @@
     if (g) g.remove();
     var d = document.getElementById('hsDeck');
     if (!d) return;
-    var hero = d.querySelector('.hero-section');
+    var hero = document.querySelector('#home .hero-section.hero-simple');
     if (hero) {
-      hero.classList.remove('hs-cell', 'hs-hero-cell', 'on', 'out');
-      hero.removeAttribute('data-i');
       /* the strips go, and everything they borrowed goes home */
       unpark();
       var t = hero.querySelector(':scope > .hs-top'); if (t) t.remove();
       var f = hero.querySelector(':scope > .hs-foot'); if (f) f.remove();
-      d.parentNode.insertBefore(hero, d);        /* put it back */
     }
     d.querySelectorAll('video').forEach(function (v) {
       try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
