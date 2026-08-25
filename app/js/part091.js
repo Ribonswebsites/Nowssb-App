@@ -1,23 +1,19 @@
 /*
- * NowssB Your essentials — reference-aligned daily practice section.
- * The first three paths stay visible; See more reveals the remaining app paths.
+ * NowssB Your essentials — supplied timeline structure.
+ * The markup is shared; the final stylesheet supplies the neumorphic Normal
+ * surface and glassmorphic Fashion surface.
  */
 (function () {
   'use strict';
 
   var ITEMS = [
-    { id: 'practice', icon: 'lock', title: 'Today’s word ritual', sub: 'Today’s pronunciation', meta: '3–20 min', action: 'practice', image: 'assets/media/image/essentials-featured-ritual-v2.png', featured: true, favorite: true },
-    { id: 'sound-library', icon: 'sound', title: 'Sound Library', sub: 'Root frequencies for focused listening', meta: 'Explore', action: 'sound-library', image: 'assets/media/image/essentials-sound-library-v2.png', favorite: true },
-    { id: 'health-journey', icon: 'lock', title: 'Healing Journey', sub: 'Choose a body, organ or mind path', meta: 'Explore', action: 'health-journey', image: 'assets/media/image/essentials-healing-journey-v2.png', favorite: true },
-    { id: 'word-science', icon: 'science', title: 'Word Science', sub: 'Discover the origin behind any word', meta: 'Explore', action: 'word-science', image: 'assets/media/image/essentials-word-science-v2.png', favorite: false },
-    { id: 'my-progress', icon: 'science', title: 'My Progress', sub: 'See your practice and sound score', meta: 'Open', action: 'my-progress', image: 'assets/media/image/essentials-progress-v2.png', favorite: true },
-    { id: 'routines', icon: 'sound', title: 'Build your routine', sub: 'Set a daily practice system', meta: 'Open', action: 'routines', image: 'assets/media/image/essentials-routine-v2.png', favorite: false },
-    { id: 'social', icon: 'lock', title: 'Connect', sub: 'People, chat and the NowssB feed', meta: 'Open', action: 'social', image: 'assets/media/image/essentials-connect-v2.png', favorite: false },
-    { id: 'fashion-plus', icon: 'science', title: 'Fashion Plus', sub: 'Explore the moving visual practice', meta: 'Open', action: 'fashion-plus', image: 'assets/media/image/essentials-fashion-plus-v2.png', favorite: false }
-  ];
-  var HELP = [
-    { icon: 'sound', title: 'Study Beats', sub: 'Focus Music', action: 'sound-library', art: 'study-beats', image: 'assets/media/image/essentials-study-beats-v2.png' },
-    { icon: 'sound', title: 'Pink Noise', sub: 'Sleep Music', action: 'sound-library', art: 'pink-noise', image: 'assets/media/image/essentials-pink-noise-v2.png' }
+    { id: 'sound-library', icon: 'sound', title: 'Sound Library', sub: 'Root frequencies for focused listening', meta: 'Explore', action: 'sound-library' },
+    { id: 'health-journey', icon: 'lock', title: 'Healing Journey', sub: 'Choose a body, organ or mind path', meta: 'Explore', action: 'health-journey' },
+    { id: 'word-science', icon: 'science', title: 'Word Science', sub: 'Discover the origin behind any word', meta: 'Explore', action: 'word-science' },
+    { id: 'my-progress', icon: 'science', title: 'My Progress', sub: 'See your practice and sound score', meta: 'Open', action: 'my-progress' },
+    { id: 'routines', icon: 'sound', title: 'Build your routine', sub: 'Set a daily practice system', meta: 'Open', action: 'routines' },
+    { id: 'social', icon: 'lock', title: 'Connect', sub: 'People, chat and the NowssB feed', meta: 'Open', action: 'social' },
+    { id: 'fashion-plus', icon: 'science', title: 'Fashion Plus', sub: 'Explore the moving visual practice', meta: 'Open', action: 'fashion-plus' }
   ];
 
   function esc(value) { return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
@@ -31,57 +27,72 @@
     return icons[name] || icons.sound;
   }
   function isExpanded(root) { return root.getAttribute('data-essential-expanded') === 'true'; }
-  function filterValue(root) { return root.getAttribute('data-essential-filter') || 'recent'; }
-  function filteredItems(filter) { return filter === 'favorite' ? ITEMS.filter(function (item) { return item.favorite; }) : ITEMS; }
-  function visibleRows(root, items) { return isExpanded(root) ? items : items.slice(0, 3); }
-  function row(item) {
-    if (item.featured) return '<button type="button" class="nwsb-essential-featured-card" data-essential-action="' + esc(item.action) + '"><span class="nwsb-essential-badge">NOWSSB · 543</span><span class="nwsb-essential-featured-icon">' + icon('sound') + '</span><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small><em>' + esc(item.meta) + '</em></button>';
-    return '<button type="button" class="nwsb-essential-row" data-essential-action="' + esc(item.action) + '"><span class="nwsb-essential-row-art"><img src="' + esc(item.image) + '" alt="" loading="lazy" decoding="async"></span><span class="nwsb-essential-row-icon">' + icon(item.icon) + '</span><span class="nwsb-essential-row-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span><span class="nwsb-essential-meta">' + esc(item.meta) + '</span><span class="nwsb-essential-arrow" aria-hidden="true">›</span></button>';
+  function action(actionName) {
+    if (actionName === 'practice' && typeof openPracticeIntro === 'function') return openPracticeIntro();
+    if (typeof openSub === 'function') return openSub(actionName);
   }
-  function helpCard(item) { return '<button type="button" class="nwsb-help-card nwsb-help-' + item.art + '" data-essential-action="' + esc(item.action) + '"><span class="nwsb-help-art"><img src="' + esc(item.image) + '" alt="" loading="lazy" decoding="async"> </span><span class="nwsb-help-copy"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span></button>'; }
-  function render(root, filter) {
-    var list = root.querySelector('[data-essential-list]'); if (!list) return;
-    root.setAttribute('data-essential-filter', filter);
-    var items = filteredItems(filter);
-    list.innerHTML = visibleRows(root, items).map(row).join('');
+  function itemPill(item) {
+    return '<div class="nwsb-essential-row-wrap"><div class="nwsb-essential-track"><span class="nwsb-essential-dot" aria-hidden="true"></span><span class="nwsb-essential-connector" aria-hidden="true"></span></div>' +
+      '<button type="button" class="nwsb-essential-pill" data-essential-action="' + esc(item.action) + '">' +
+        '<span class="nwsb-essential-icon-circle">' + icon(item.icon) + '</span>' +
+        '<span class="nwsb-essential-pill-text"><strong>' + esc(item.title) + '</strong><small>' + esc(item.sub) + '</small></span>' +
+        '<span class="nwsb-essential-meta">' + esc(item.meta) + '</span><span class="nwsb-essential-arrow" aria-hidden="true">→</span>' +
+      '</button></div>';
+  }
+  function render(root) {
+    var list = root.querySelector('[data-essential-list]');
+    if (!list) return;
+    list.innerHTML = (isExpanded(root) ? ITEMS : ITEMS.slice(0, 3)).map(itemPill).join('');
     var expand = root.querySelector('[data-essential-expand]');
     if (expand) {
-      var needsExpand = items.length > 3;
-      expand.hidden = !needsExpand;
+      expand.hidden = ITEMS.length <= 3;
       expand.setAttribute('aria-expanded', isExpanded(root) ? 'true' : 'false');
       expand.querySelector('span').textContent = isExpanded(root) ? 'Show less' : 'See more';
       expand.querySelector('b').textContent = isExpanded(root) ? '⌃' : '⌄';
     }
-    bindActions(root);
+    root.querySelectorAll('[data-essential-action]').forEach(function (el) {
+      el.addEventListener('click', function () { action(el.getAttribute('data-essential-action')); });
+    });
   }
   function html(mode) {
     var fashion = mode === 'fashion';
-    return '<section class="nwsb-essentials nwsb-essentials-reference nwsb-essentials-' + (fashion ? 'fashion' : 'normal') + '" data-essentials-mode="' + mode + '" data-essential-filter="recent">' +
+    return '<section class="nwsb-essentials nwsb-essentials-supplied nwsb-essentials-' + (fashion ? 'fashion' : 'normal') + '" data-essentials-mode="' + mode + '" data-essential-expanded="false">' +
       '<div class="nwsb-essentials-body">' +
-        '<div class="nwsb-essentials-heading"><span class="nwsb-essentials-heading-icon" aria-hidden="true">' + icon('sliders') + '</span><div><div class="nwsb-essentials-eyebrow">Your daily practice</div><h2>Your essentials</h2></div></div>' +
-        '<div class="nwsb-essentials-shell"><div class="nwsb-essential-list" data-essential-list></div><button type="button" class="nwsb-essential-expand" data-essential-expand aria-expanded="false"><span>See more</span><b>⌄</b></button></div>' +
-        '<div class="nwsb-help-heading"><h3>What’s helping others</h3><button type="button" data-essential-help-view aria-label="See more helpful NowssB features">›</button></div>' +
-        '<div class="nwsb-help-rail">' + HELP.map(helpCard).join('') + '</div>' +
+        '<div class="nwsb-essentials-heading"><span class="nwsb-essentials-heading-icon">' + icon('sliders') + '</span><div><div class="nwsb-essentials-eyebrow">Your daily practice</div><h2>Your essentials</h2></div></div>' +
+        '<div class="nwsb-essentials-timeline">' +
+          '<div class="nwsb-essential-row-wrap nwsb-essential-featured-wrap"><div class="nwsb-essential-track"><span class="nwsb-essential-dot active" aria-hidden="true"></span><span class="nwsb-essential-connector" aria-hidden="true"></span></div>' +
+            '<button type="button" class="nwsb-essential-featured" data-essential-action="practice"><span class="nwsb-essential-badge">NOWSSB · 543</span><span class="nwsb-essential-featured-icon">' + icon('sound') + '</span><strong>Today’s word ritual</strong><small>Today’s pronunciation</small><em>3–20 min</em><svg class="nwsb-essential-face" viewBox="0 0 100 100" aria-hidden="true"><path d="M25 55 Q35 65 45 55M55 55 Q65 65 75 55" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/></svg></button>' +
+          '</div>' +
+          '<div data-essential-list></div>' +
+        '</div>' +
+        '<button type="button" class="nwsb-essential-expand" data-essential-expand aria-expanded="false"><span>See more</span><b>⌄</b></button>' +
       '</div>' +
     '</section>';
   }
-  function run(action) { if (action === 'practice' && typeof openPracticeIntro === 'function') return openPracticeIntro(); if (typeof openSub === 'function') return openSub(action); }
-  function bindActions(root) { root.querySelectorAll('[data-essential-action]').forEach(function (el) { if (el.__bound) return; el.__bound = true; el.addEventListener('click', function () { run(el.getAttribute('data-essential-action')); }); }); }
   function bind(root) {
-    if (!root || root.__essentialsBound) return;
-    root.__essentialsBound = true;
-    root.querySelectorAll('[data-essential-expand]').forEach(function (button) { button.addEventListener('click', function () { root.setAttribute('data-essential-expanded', isExpanded(root) ? 'false' : 'true'); render(root, filterValue(root)); }); });
-    root.querySelectorAll('[data-essential-help-view]').forEach(function (button) { button.addEventListener('click', function () { run('word-science'); }); });
-    root.setAttribute('data-essential-expanded', 'false');
-    render(root, 'recent');
+    if (!root || root.__essentialsSuppliedBound) return;
+    root.__essentialsSuppliedBound = true;
+    root.querySelector('[data-essential-expand]').addEventListener('click', function () {
+      root.setAttribute('data-essential-expanded', isExpanded(root) ? 'false' : 'true');
+      render(root);
+    });
+    root.querySelector('[data-essential-action="practice"]').addEventListener('click', function () { action('practice'); });
+    render(root);
   }
   function mount(mode, selector, afterSelector) {
-    var host = document.querySelector(selector); if (!host || host.querySelector(':scope > .nwsb-essentials')) return;
-    var wrap = document.createElement('div'); wrap.innerHTML = html(mode); var node = wrap.firstElementChild; var after = host.querySelector(afterSelector);
+    var host = document.querySelector(selector);
+    if (!host || host.querySelector(':scope > .nwsb-essentials')) return;
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html(mode);
+    var node = wrap.firstElementChild;
+    var after = host.querySelector(afterSelector);
     if (after && after.parentNode === host) after.insertAdjacentElement('afterend', node); else host.appendChild(node);
     bind(node);
   }
-  function boot() { mount('normal', '#home-nm .nmh-wrap', '.nwsb-daydash'); mount('fashion', '#home .home-body', '.nwsb-daydash'); }
+  function boot() {
+    mount('normal', '#home-nm .nmh-wrap', '.nwsb-daydash');
+    mount('fashion', '#home .home-body', '.nwsb-daydash');
+  }
   window.NWSBEssentials = { boot: boot };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

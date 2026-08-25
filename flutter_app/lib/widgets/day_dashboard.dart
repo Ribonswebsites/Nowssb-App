@@ -389,178 +389,203 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
   Widget _upNextDivider() => Divider(height: 1, thickness: 1, color: widget.fashion ? const Color(0x24FFFFFF) : const Color(0x141A1A2E));
 
   Widget _essentialsSection(BuildContext context) {
-    final headingColor = widget.fashion ? Colors.white : NwsbColors.ink;
-    final visible = _essentialsExpanded ? _essentials : _essentials.take(3).toList(growable: false);
+    final visible = _essentialsExpanded ? _essentials : _essentials.take(4).toList(growable: false);
+    final timeline = Column(
+      children: [
+        _essentialFeatured(context, visible.first),
+        for (var i = 1; i < visible.length; i++) _essentialTimelineRow(context, visible[i]),
+      ],
+    );
     final shell = widget.fashion
-        ? _glass(child: _essentialStack(context, visible), padding: const EdgeInsets.all(14))
-        : NeuCard(radius: 26, padding: const EdgeInsets.all(14), child: _essentialStack(context, visible));
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        ? _glass(child: timeline, padding: const EdgeInsets.all(14))
+        : NeuCard(radius: 28, padding: const EdgeInsets.all(14), child: timeline);
+    final headingColor = widget.fashion ? Colors.white : NwsbColors.ink;
+    final eyebrowColor = widget.fashion ? const Color(0xB3E8D5A3) : NwsbColors.inkFaint;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: widget.fashion ? Colors.white : NwsbColors.surface,
+                shape: BoxShape.circle,
+                boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
+              ),
+              child: Center(child: NwsbIcon(NwsbMarks.sliders, size: 23, color: widget.fashion ? const Color(0xFF171326) : NwsbColors.gold)),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('YOUR DAILY PRACTICE', style: TextStyle(color: eyebrowColor, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
+                  const SizedBox(height: 3),
+                  Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        shell,
+        if (_essentials.length > 4)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: TextButton.icon(
+              onPressed: () => setState(() => _essentialsExpanded = !_essentialsExpanded),
+              icon: Icon(_essentialsExpanded ? Icons.expand_less : Icons.expand_more, size: 18),
+              label: Text(_essentialsExpanded ? 'Show less' : 'See more'),
+              style: TextButton.styleFrom(
+                foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink,
+                backgroundColor: widget.fashion ? const Color(0x221FFFFFF) : const Color(0xFFF4F2EE),
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _essentialFeatured(BuildContext context, _EssentialItem item) {
+    final card = ClipRRect(
+      borderRadius: BorderRadius.circular(26),
+      child: SizedBox(
+        height: 148,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(item.asset, fit: BoxFit.cover),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: widget.fashion
+                      ? const [Color(0xD9FFB44D), Color(0x9AFF8A3D), Color(0x22111118)]
+                      : const [Color(0xE6FFB44D), Color(0xB8FF8A3D), Color(0x33111118)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 18, 22, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(.55), borderRadius: BorderRadius.circular(20)),
+                    child: const Text('NOWSSB · 543', style: TextStyle(color: Color(0xFF6B3F13), fontSize: 12, fontWeight: FontWeight.w800)),
+                  ),
+                  const Spacer(),
+                  Text(item.title, style: const TextStyle(color: Color(0xFF4A2A09), fontSize: 20, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 5),
+                  Text(item.subtitle, style: const TextStyle(color: Color(0xFF5C3812), fontSize: 13, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 2),
+                  Text(item.meta, style: const TextStyle(color: Color(0xFF5C3812), fontSize: 13, fontWeight: FontWeight.w700)),
+                ],
+              ),
+            ),
+            Positioned(
+              right: 18,
+              top: 18,
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(color: Colors.white.withOpacity(.78), shape: BoxShape.circle),
+                child: const Icon(Icons.graphic_eq, color: Color(0xFF3C3424), size: 20),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(26), child: card));
+  }
+
+  Widget _essentialTimelineRow(BuildContext context, _EssentialItem item) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          width: 22,
+          child: Column(
+            children: [
+              const SizedBox(height: 26),
+              _essentialDot(),
+              Expanded(child: CustomPaint(painter: _DottedTrackPainter(widget.fashion ? const Color(0x6670707A) : const Color(0x4D7B7F8A)))),
+            ],
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: _essentialPill(context, item),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _essentialDot() => Container(
+        width: 18,
+        height: 18,
+        decoration: BoxDecoration(
+          color: widget.fashion ? const Color(0x66FFFFFF) : NwsbColors.surface,
+          shape: BoxShape.circle,
+          boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
+        ),
+      );
+
+  Widget _essentialPill(BuildContext context, _EssentialItem item) {
+    final text = widget.fashion ? const Color(0xFFF2F2F2) : NwsbColors.ink;
+    final sub = widget.fashion ? const Color(0x99FFFFFF) : NwsbColors.inkFaint;
+    final surface = Container(
+      constraints: const BoxConstraints(minHeight: 62),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      decoration: BoxDecoration(
+        color: widget.fashion ? const Color(0xC7000000) : NwsbColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: widget.fashion ? Border.all(color: const Color(0x1AFFFFFF)) : null,
+        boxShadow: widget.fashion ? const [BoxShadow(color: Color(0x243C425A), blurRadius: 16, offset: Offset(0, 6))] : NwsbShadows.raisedSm,
+      ),
+      child: Row(
         children: [
           Container(
-            width: 52,
-            height: 52,
-            clipBehavior: Clip.antiAlias,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: widget.fashion ? Colors.white : NwsbColors.surface,
+              color: widget.fashion ? Colors.white.withOpacity(.92) : NwsbColors.surface,
               shape: BoxShape.circle,
               boxShadow: widget.fashion ? null : NwsbShadows.raisedXs,
             ),
-            child: Center(child: NwsbIcon(NwsbMarks.sliders, size: 23, color: widget.fashion ? const Color(0xFF171326) : NwsbColors.gold)),
+            child: Icon(item.icon, size: 20, color: widget.fashion ? const Color(0xFF6D7280) : const Color(0xFF9AA0AB)),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('YOUR DAILY PRACTICE', style: TextStyle(color: widget.fashion ? const Color(0xB3E8D5A3) : NwsbColors.inkFaint, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
+                Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: text, fontSize: 16, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 3),
-                Text('Your essentials', style: TextStyle(color: headingColor, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -.7)),
+                Text(item.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: sub, fontSize: 13, fontWeight: FontWeight.w500)),
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          Text(item.meta, style: TextStyle(color: sub, fontSize: 12, fontWeight: FontWeight.w600)),
+          const SizedBox(width: 8),
+          Icon(Icons.arrow_forward, color: widget.fashion ? Colors.white70 : NwsbColors.inkSoft, size: 20),
         ],
       ),
-      const SizedBox(height: 14),
-      shell,
-      if (_essentials.length > 3)
-        Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: TextButton.icon(
-            onPressed: () => setState(() => _essentialsExpanded = !_essentialsExpanded),
-            icon: Icon(_essentialsExpanded ? Icons.expand_less : Icons.expand_more, size: 19),
-            label: Text(_essentialsExpanded ? 'Show less' : 'See more'),
-            style: TextButton.styleFrom(
-              foregroundColor: widget.fashion ? Colors.white : NwsbColors.ink,
-              backgroundColor: widget.fashion ? const Color(0x221FFFFFF) : const Color(0xFFF4F2EE),
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
-            ),
-          ),
-        ),
-      const SizedBox(height: 30),
-      Row(
-        children: [
-          Expanded(child: Text('What’s helping others', style: TextStyle(color: headingColor, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -.4))),
-          Material(
-            color: widget.fashion ? const Color(0x2EFFFFFF) : NwsbColors.surface,
-            shape: const CircleBorder(),
-            elevation: widget.fashion ? 0 : 2,
-            child: IconButton(
-              tooltip: 'Open Word Science',
-              onPressed: () => Dest.open(context, Dest.library),
-              icon: Icon(Icons.chevron_right, color: widget.fashion ? Colors.white : NwsbColors.ink, size: 25),
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 16),
-      SizedBox(
-        height: 228,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.none,
-          padding: const EdgeInsets.only(right: 4, bottom: 4),
-          itemCount: _helping.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 14),
-          itemBuilder: (context, index) {
-            final item = _helping[index];
-            return _helpCard(context, item);
-          },
-        ),
-      ),
-    ]);
-  }
-
-  Widget _essentialStack(BuildContext context, List<_EssentialItem> items) => Stack(
-        children: [
-          Positioned(
-            left: 9,
-            top: items.isNotEmpty && items.first.featured ? 214 : 26,
-            bottom: 28,
-            child: Container(
-              width: 3,
-              decoration: BoxDecoration(
-                color: widget.fashion ? const Color(0x66FFFFFF) : const Color(0x4D7B7F8A),
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          ),
-          Positioned(left: 0, top: 14, child: _railDot(active: true)),
-          Positioned(left: 2, top: 236, child: _railDot()),
-          Positioned(left: 2, top: 318, child: _railDot()),
-          Padding(
-            padding: const EdgeInsets.only(left: 28),
-            child: Column(
-              children: [
-                for (var i = 0; i < items.length; i++)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: i == items.length - 1 ? 0 : 12),
-                    child: _essentialRow(context, items[i]),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      );
-
-  Widget _railDot({bool active = false}) => Container(
-        width: active ? 18 : 14,
-        height: active ? 18 : 14,
-        decoration: BoxDecoration(
-          color: active ? (widget.fashion ? const Color(0xFFFF9C26) : const Color(0xFFFF8B27)) : Colors.transparent,
-          shape: BoxShape.circle,
-          border: Border.all(color: active ? Colors.transparent : (widget.fashion ? const Color(0x99FFFFFF) : const Color(0x4D7B7F8A)), width: 2),
-          boxShadow: active ? const [BoxShadow(color: Color(0x447B4B16), blurRadius: 7)] : null,
-        ),
-      );
-
-  Widget _essentialRow(BuildContext context, _EssentialItem item) {
-    if (item.featured) {
-      final featured = ClipRRect(
-        borderRadius: BorderRadius.circular(23),
-        child: SizedBox(
-          height: 210,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset(item.asset, fit: BoxFit.cover),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xB8FFD000), Color(0x36FFB51B), Color(0x08FF8121)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3), decoration: BoxDecoration(color: Colors.white.withOpacity(.78), borderRadius: BorderRadius.circular(99)), child: const Text('NOWSSB · 543', style: TextStyle(color: Color(0xFF3A3024), fontSize: 11, fontWeight: FontWeight.w800))),
-                    const SizedBox(height: 13),
-                    const Text('Today’s word ritual', style: TextStyle(color: Color(0xFF28252A), fontSize: 20, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 9),
-                    Text(item.subtitle, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 13)),
-                    const SizedBox(height: 9),
-                    Text(item.meta, style: const TextStyle(color: Color(0xFF3F392F), fontSize: 12)),
-                  ],
-                ),
-              ),
-              Positioned(right: 18, top: 18, child: Container(width: 40, height: 40, decoration: BoxDecoration(color: Colors.white.withOpacity(.78), shape: BoxShape.circle), child: const Icon(Icons.graphic_eq, color: Color(0xFF3C3424), size: 19))),
-            ],
-          ),
-        ),
-      );
-      return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(23), child: featured));
-    }
-    final text = widget.fashion ? Colors.white : const Color(0xFF4C4A52);
-    final sub = widget.fashion ? const Color(0x99FFFFFF) : const Color(0xFF68666B);
-    final card = Container(constraints: const BoxConstraints(minHeight: 78), padding: const EdgeInsets.fromLTRB(15, 9, 11, 9), decoration: BoxDecoration(color: widget.fashion ? const Color(0x8C141027) : const Color(0xFFF7F5F2), borderRadius: BorderRadius.circular(21), border: widget.fashion ? Border.all(color: Colors.white.withOpacity(.13)) : null, boxShadow: const [BoxShadow(color: Color(0x143D3747), blurRadius: 12, offset: Offset(0, 7))]), child: Row(children: [Icon(item.icon, size: 18, color: widget.fashion ? Colors.white70 : const Color(0xFF45434A)), const SizedBox(width: 10), Expanded(child: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: text, fontSize: 15, fontWeight: FontWeight.w600))), ClipRRect(borderRadius: BorderRadius.circular(13), child: Image.asset(item.asset, width: 54, height: 54, fit: BoxFit.cover)), const SizedBox(width: 9), Text(item.meta, style: TextStyle(color: sub, fontSize: 11)), const SizedBox(width: 5), Icon(Icons.chevron_right, color: sub, size: 21)]));
-    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(21), child: card));
+    );
+    return Semantics(button: true, label: item.title, child: InkWell(onTap: () => Dest.open(context, item.destination), borderRadius: BorderRadius.circular(20), child: surface));
   }
 
   Widget _helpCard(BuildContext context, _HelpingItem item) {
@@ -608,4 +633,26 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
 
 
   Widget _glass({required Widget child, required EdgeInsets padding}) => Container(padding: padding, decoration: BoxDecoration(color: const Color(0x7810132B), borderRadius: BorderRadius.circular(22), border: Border.all(color: const Color(0x2DFFFFFF)), boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 22, offset: Offset(0, 12))]), child: child);
+}
+
+
+class _DottedTrackPainter extends CustomPainter {
+  const _DottedTrackPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color..strokeWidth = 3..strokeCap = StrokeCap.round;
+    const dash = 5.0;
+    const gap = 5.0;
+    var y = 0.0;
+    while (y < size.height) {
+      canvas.drawLine(Offset(size.width / 2, y), Offset(size.width / 2, (y + dash).clamp(0, size.height).toDouble()), paint);
+      y += dash + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DottedTrackPainter oldDelegate) => oldDelegate.color != color;
 }
