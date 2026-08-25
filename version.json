@@ -1,11 +1,11 @@
 {
-  "version": "9.6.34",
-  "build": 2026082426,
+  "version": "9.6.35",
+  "build": 2026082427,
   "force": false,
   "title": "NowssB update ready",
-  "notes": "Both Android surfaces now include a black rounded NowssB preparation card with the logo at top-left, animated SVG in a white circle, short divider, and clear additional-access copy. Essentials includes the full local mascot artwork set, white NowssB-branded headphones, eight working destinations, three-item initial view, and See more expansion. Existing AURA motion, private media behavior, and in-app updates are preserved.",
+  "notes": "Home hero headers are now stable and no longer move or animate during home scrolling. Both Android surfaces retain the black rounded NowssB preparation card with logo-left hierarchy, animated SVG in a white circle, short divider, and clear additional-access copy. Essentials retains the full local mascot artwork set, eight working destinations, three-item initial view, and See more expansion.",
   "web": "https://ribonswebsites.github.io/Nowssb-App/",
-  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.34-android/nowssb-webview-debug.apk",
-  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.34-android/nowssb-flutter-debug.apk",
-  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.34-android/nowssb-webview-debug.apk"
+  "webviewApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.35-android/nowssb-webview-debug.apk",
+  "flutterApk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.35-android/nowssb-flutter-debug.apk",
+  "apk": "https://github.com/Ribonswebsites/Nowssb-App/releases/download/v9.6.35-android/nowssb-webview-debug.apk"
 }

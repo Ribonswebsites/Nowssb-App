@@ -16819,3 +16819,17 @@ a:active,
 @media (max-width:430px) { .nwsb-essentials-reference .nwsb-essential-row-art { width:48px !important; height:48px !important; flex-basis:48px !important; border-radius:13px !important; } .nwsb-essentials-reference .nwsb-essential-row { min-height:76px !important; } }
 
 .nwsb-video-pack-card { border-radius: 30px !important; overflow: hidden !important; }
+
+/* Home reference stability: do not move the hero/header while scrolling or entering. */
+#home .hero-section,
+#home-nm .nmh-toprow,
+#home.nwsb-scroll-forward .hero-section,
+#home.nwsb-scroll-back .hero-section,
+#home-nm.nwsb-scroll-forward .nmh-toprow,
+#home-nm.nwsb-scroll-back .nmh-toprow {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+  will-change: auto !important;
+}
+#home > *, #home-nm > * { animation: none !important; }

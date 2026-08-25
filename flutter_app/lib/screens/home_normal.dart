@@ -38,7 +38,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import '../data/content.dart';
 import '../media/nwsb_image.dart';
@@ -50,7 +49,6 @@ import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'shared_sections.dart';
 import '../widgets/day_dashboard.dart';
-import '../widgets/motion.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 
@@ -114,7 +112,6 @@ class HomeNormal extends StatefulWidget {
 }
 
 class _HomeNormalState extends State<HomeNormal> {
-  bool _scrollingDown = false;
   @override
   void initState() {
     super.initState();
@@ -243,40 +240,19 @@ class _HomeNormalState extends State<HomeNormal> {
               // `.nmh-toprow` — pinned to the top, never scrolls. It is
               // outside the list rather than its first row, which is what
               // "never scrolls" means.
-              AnimatedSlide(
-                offset: _scrollingDown ? const Offset(0, -.04) : Offset.zero,
-                duration: NwsbMotion.pageDuration,
-                curve: NwsbMotion.softCurve,
-                child: const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
-                  child: _TopRow(),
-                ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
+                child: _TopRow(),
               ),
               Expanded(
                 // No horizontal padding: the sections carry their own
                 // `margin: 16px 0` inside `.nmh-wrap`'s 20px, and a raised
                 // card needs room around it for its own shadow.
-                child: NotificationListener<UserScrollNotification>(
-                  onNotification: (notification) {
-                    final direction = notification.direction;
-                    if (direction == ScrollDirection.reverse ||
-                        direction == ScrollDirection.forward) {
-                      final next = direction == ScrollDirection.reverse;
-                      if (_scrollingDown != next) setState(() => _scrollingDown = next);
-                    } else if (direction == ScrollDirection.idle && _scrollingDown) {
-                      setState(() => _scrollingDown = false);
-                    }
-                    return false;
-                  },
-                  child: ListView.builder(
-                    physics: const NwsbSmoothScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 96),
-                    itemCount: shown.length,
-                    itemBuilder: (context, i) => NwsbMotionReveal(
-                      delay: Duration(milliseconds: (i.clamp(0, 8) as num).toInt() * 24),
-                      child: shown[i],
-                    ),
-                  ),
+                child: ListView.builder(
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 96),
+                  itemCount: shown.length,
+                  itemBuilder: (context, i) => shown[i],
                 ),
               ),
             ],

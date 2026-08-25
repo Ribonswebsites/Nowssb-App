@@ -87,13 +87,7 @@
     each(document.querySelectorAll('.sub-screen'), function (el) {
       markOverlay(el, el.classList.contains('open'));
     });
-    each(document.querySelectorAll('#home, #home-nm'), function (root) {
-      attachScroll(root);
-      if (root.classList.contains('active') && root.getAttribute('data-nwsb-motion-active') !== '1') {
-        root.setAttribute('data-nwsb-motion-active', '1');
-        revealChildren(root);
-      }
-    });
+    /* Home surfaces stay visually stable; no hero/header scroll or entrance motion. */
   }
 
   function observe() {
@@ -107,17 +101,7 @@
           if (target.matches && target.matches('.sub-screen')) {
             markOverlay(target, target.classList.contains('open'));
           }
-          if (target.id === 'home' || target.id === 'home-nm') {
-            if (target.classList.contains('active')) {
-              if (target.getAttribute('data-nwsb-motion-active') !== '1') {
-                target.setAttribute('data-nwsb-motion-active', '1');
-                revealChildren(target);
-              }
-            } else {
-              target.removeAttribute('data-nwsb-motion-active');
-            }
-            attachScroll(target);
-          }
+          /* Home hero/header motion is intentionally disabled. */
         }
       });
       if (needsScan) {

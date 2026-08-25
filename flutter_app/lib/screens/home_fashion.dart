@@ -14,7 +14,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import '../data/content.dart';
 import '../data/settings.dart';
@@ -33,7 +32,6 @@ import 'widgets_page.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
 import '../widgets/day_dashboard.dart';
-import '../widgets/motion.dart';
 
 class HomeFashion extends StatefulWidget {
   const HomeFashion({super.key, this.name = 'Healer'});
@@ -45,7 +43,6 @@ class HomeFashion extends StatefulWidget {
 }
 
 class _HomeFashionState extends State<HomeFashion> {
-  bool _scrollingDown = false;
 
   static const _backgrounds = <String>[
     'assets/video/fashion-plus-bg.mp4',
@@ -122,35 +119,18 @@ class _HomeFashionState extends State<HomeFashion> {
 
           Column(
             children: [
-              AnimatedSlide(
-                offset: _scrollingDown ? const Offset(0, -.04) : Offset.zero,
-                duration: NwsbMotion.pageDuration,
-                curve: NwsbMotion.softCurve,
-                child: HomeHeader(
-                  notifications: 3,
-                  onNormalHome: () => Settings.instance.setFashionHome(false),
-                  onMenu: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const WidgetsPage()),
-                  ),
+              HomeHeader(
+                notifications: 3,
+                onNormalHome: () => Settings.instance.setFashionHome(false),
+                onMenu: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const WidgetsPage()),
                 ),
               ),
               Expanded(
-                child: NotificationListener<UserScrollNotification>(
-                  onNotification: (notification) {
-                    final direction = notification.direction;
-                    if (direction == ScrollDirection.reverse ||
-                        direction == ScrollDirection.forward) {
-                      final next = direction == ScrollDirection.reverse;
-                      if (_scrollingDown != next) setState(() => _scrollingDown = next);
-                    } else if (direction == ScrollDirection.idle && _scrollingDown) {
-                      setState(() => _scrollingDown = false);
-                    }
-                    return false;
-                  },
-                  child: ListView(
-                    physics: const NwsbSmoothScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 108),
-                    children: [
+                child: ListView(
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 108),
+                  children: [
                     HeroGreeting(name: widget.name),
                     FashionHero(
                       onExplore: () => _go(2),
