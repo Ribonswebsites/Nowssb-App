@@ -17051,3 +17051,34 @@ body.fashplus #home > .mainops-blk.aug15-fashion-reference {
    element is affected, never the surrounding logo/icon artwork. */
 body.fashplus #home video { background-color: #020307 !important; }
 body.fashplus #home video[poster] { background-image: none !important; }
+
+/* Preparation handoff — explicit geometry, not just a radius hint. */
+.nwsb-video-pack-brand { justify-content: space-between !important; align-items: flex-start !important; }
+.nwsb-video-pack-brand-lockup { flex: 1 1 auto !important; min-width: 0 !important; }
+.nwsb-video-pack-continue {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  min-height: 38px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #05070b !important;
+  box-shadow: 0 8px 22px rgba(255,255,255,.16) !important;
+}
+.nwsb-video-pack-continue:hover { background: #edf0f4 !important; }
+.nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  flex: 0 0 48px !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  display: inline-flex !important;
+}
+.nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap svg {
+  display: block !important;
+  width: 28px !important;
+  height: 28px !important;
+}

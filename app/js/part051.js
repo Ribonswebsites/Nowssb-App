@@ -95,30 +95,42 @@
 
   var warmedUrls = {};
 
+  /* Four streams keep a 5G connection busy without opening dozens of
+     decoders or making one slow CDN response block the entire pack. */
+  var PACK_CONCURRENCY = 4;
   function warmAll(urls, onDone) {
     var fresh = urls.filter(function (u) { return !warmedUrls[u] && !packInFlight[u]; });
     if (!fresh.length) return;
     fresh.forEach(function (u) { packInFlight[u] = true; });
-    var cache;
-    var i = 0;
-    function next() {
-      if (i >= fresh.length) return;
-      var url = fresh[i++];
-      warmOne(cache, url).then(function (ok) {
-        delete packInFlight[url];
-        if (ok) warmedUrls[url] = true;
-        if (onDone) onDone(ok, url);
-        if (!ok && (packRetryCount[url] || 0) < 4 && !packRetryTimers[url]) {
-          packRetryCount[url] = (packRetryCount[url] || 0) + 1;
-          packRetryTimers[url] = setTimeout(function () {
-            delete packRetryTimers[url];
-            warmAll([url], onDone);
-          }, Math.min(18000, 2500 * packRetryCount[url]));
-        }
-        setTimeout(next, 500);
+    var nextIndex = 0;
+    function finish(url, ok) {
+      delete packInFlight[url];
+      if (ok) warmedUrls[url] = true;
+      if (onDone) onDone(ok, url);
+      if (!ok && (packRetryCount[url] || 0) < 4 && !packRetryTimers[url]) {
+        packRetryCount[url] = (packRetryCount[url] || 0) + 1;
+        packRetryTimers[url] = setTimeout(function () {
+          delete packRetryTimers[url];
+          warmAll([url], onDone);
+        }, Math.min(18000, 1800 * packRetryCount[url]));
+      }
+    }
+    function worker(cache) {
+      var at = nextIndex++;
+      if (at >= fresh.length) return Promise.resolve();
+      var url = fresh[at];
+      return warmOne(cache, url).then(function (ok) {
+        finish(url, ok);
+        return worker(cache);
+      }, function () {
+        finish(url, false);
+        return worker(cache);
       });
     }
-    caches.open(VIDEO_CACHE).then(function (c) { cache = c; next(); }).catch(function () {
+    caches.open(VIDEO_CACHE).then(function (cache) {
+      var count = Math.min(PACK_CONCURRENCY, fresh.length);
+      return Promise.all(Array.from({ length: count }, function () { return worker(cache); }));
+    }).catch(function () {
       fresh.forEach(function (url) { delete packInFlight[url]; if (onDone) onDone(false, url); });
     });
   }

@@ -1,9 +1,10 @@
 /// Private, app-only storage for the decorative video pack.
 ///
-/// The pack is deliberately downloaded one file at a time into the application
-/// support directory. It is never written to Downloads or the user's gallery.
-/// A `.part` file is discarded on failure, so only a complete file is ever
-/// handed to the video player.
+/// The pack is downloaded with a small bounded number of workers into the
+/// application support directory. It is never written to Downloads or the
+/// user's gallery. A `.part` file is retained across transient failures so a
+/// supported CDN can resume from the last received byte; only a complete file
+/// is handed to the video player.
 library;
 
 import 'dart:async';
@@ -56,7 +57,9 @@ class VideoCache extends ChangeNotifier {
   final http.Client _client = http.Client();
   final Map<String, Future<String?>> _inFlight = <String, Future<String?>>{};
   final List<_VideoJob> _jobs = <_VideoJob>[];
-  bool _queueRunning = false;
+  static const int _maxConcurrent = 4;
+  int _activeJobs = 0;
+  final Set<String> _activeUrls = <String>{};
 
   Directory? _directory;
   SharedPreferences? _prefs;
@@ -64,7 +67,6 @@ class VideoCache extends ChangeNotifier {
   bool _running = false;
   int _completed = 0;
   int _failed = 0;
-  String? _activeUrl;
   String? _error;
 
   VideoPackState get state => VideoPackState(
@@ -72,7 +74,7 @@ class VideoCache extends ChangeNotifier {
         completed: _completed,
         failed: _failed,
         running: _running,
-        activeUrl: _activeUrl,
+        activeUrl: _activeUrls.isEmpty ? null : _activeUrls.first,
         error: _error,
       );
 
@@ -121,7 +123,7 @@ class VideoCache extends ChangeNotifier {
   }
 
   /// Returns a complete private file for [url], downloading it through the
-  /// single-file queue when needed. A failure returns null and never reaches
+  /// bounded worker queue when needed. A failure returns null and never reaches
   /// the video decoder, so the widget can remain on its poster.
   Future<String?> ensure(String url, {bool priority = true}) async {
     await init();
@@ -149,10 +151,11 @@ class VideoCache extends ChangeNotifier {
   }
 
   void _pumpQueue() {
-    if (_queueRunning || _jobs.isEmpty) return;
-    _queueRunning = true;
-    final job = _jobs.removeAt(0);
-    unawaited(_runJob(job));
+    while (_activeJobs < _maxConcurrent && _jobs.isNotEmpty) {
+      final job = _jobs.removeAt(0);
+      _activeJobs++;
+      unawaited(_runJob(job));
+    }
   }
 
   Future<void> _runJob(_VideoJob job) async {
@@ -161,7 +164,7 @@ class VideoCache extends ChangeNotifier {
     } catch (error, stack) {
       job.completer.completeError(error, stack);
     } finally {
-      _queueRunning = false;
+      _activeJobs--;
       _pumpQueue();
     }
   }
@@ -169,24 +172,32 @@ class VideoCache extends ChangeNotifier {
   Future<String?> _downloadOne(String url) async {
     final file = await _fileFor(url);
     final part = File('${file.path}.part');
-    _activeUrl = url;
+    _activeUrls.add(url);
     _error = null;
     notifyListeners();
 
     try {
-      for (var attempt = 1; attempt <= 3; attempt++) {
+      for (var attempt = 1; attempt <= 5; attempt++) {
         try {
-          if (await part.exists()) await part.delete();
+          var offset = await part.exists() ? await part.length() : 0;
           final request = http.Request('GET', Uri.parse(url));
+          if (offset > 0) request.headers['Range'] = 'bytes=$offset-';
           final response = await _client
               .send(request)
-              .timeout(const Duration(seconds: 35));
-          if (response.statusCode != HttpStatus.ok) {
-            throw HttpException('HTTP ${response.statusCode}', uri: Uri.parse(url));
+              .timeout(const Duration(seconds: 45));
+          final resumes = offset > 0 && response.statusCode == HttpStatus.partialContent;
+          if (response.statusCode != HttpStatus.ok && !resumes) {
+            /* A server that ignores Range returns 200; overwrite the partial
+               file and continue rather than appending a duplicate stream. */
+            if (offset > 0 && response.statusCode == HttpStatus.ok) {
+              offset = 0;
+            } else {
+              throw HttpException('HTTP ${response.statusCode}', uri: Uri.parse(url));
+            }
           }
-          final sink = part.openWrite();
+          final sink = part.openWrite(mode: offset > 0 && resumes ? FileMode.append : FileMode.write);
           try {
-            await for (final chunk in response.stream.timeout(const Duration(seconds: 35))) {
+            await for (final chunk in response.stream.timeout(const Duration(seconds: 45))) {
               sink.add(chunk);
             }
             await sink.flush();
@@ -203,18 +214,17 @@ class VideoCache extends ChangeNotifier {
           return file.path;
         } catch (error) {
           _error = error.toString();
-          try {
-            if (await part.exists()) await part.delete();
-          } catch (_) {}
-          if (attempt < 3) {
-            await Future<void>.delayed(Duration(seconds: attempt * 2));
+          /* Keep a partial file. The next attempt asks for the remaining
+             bytes when the CDN supports HTTP Range. */
+          if (attempt < 5) {
+            await Future<void>.delayed(Duration(milliseconds: 600 * attempt));
           }
         }
       }
       _failed++;
       return null;
     } finally {
-      _activeUrl = null;
+      _activeUrls.remove(url);
       notifyListeners();
     }
   }
@@ -228,7 +238,7 @@ class VideoCache extends ChangeNotifier {
     return count;
   }
 
-  /// Starts the full pack download in a single-file queue. Calling this twice
+  /// Starts the full pack download through the bounded worker queue. Calling this twice
   /// is harmless; the second call simply observes the existing run.
   Future<void> downloadAll() async {
     await init();
@@ -238,13 +248,17 @@ class VideoCache extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
+      /* Enqueue the whole catalog at once. The queue pumps four downloads in
+         parallel and Future.wait keeps this lifecycle alive until every job
+         has either completed or exhausted its retries. */
+      final jobs = <Future<String?>>[];
       for (final url in kNowssbVideoPackUrls) {
         if (_running == false) break;
-        await ensure(url, priority: false);
+        jobs.add(ensure(url, priority: false));
       }
+      await Future.wait(jobs);
     } finally {
       _running = false;
-      _activeUrl = null;
       await _refreshCompleted();
       notifyListeners();
     }

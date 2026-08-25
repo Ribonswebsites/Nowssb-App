@@ -11,8 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/tokens.dart';
 
 class NwsbUpdate {
-  static const localVersion = '9.6.38';
-  static const localBuild = 2026082430;
+  static const localVersion = '9.6.39';
+  static const localBuild = 2026082431;
   static const _url = 'https://raw.githubusercontent.com/Ribonswebsites/Nowssb-App/main/version.json';
   static const _channel = MethodChannel('nowssb/updater');
 

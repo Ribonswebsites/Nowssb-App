@@ -77,18 +77,21 @@ class _VideoPackDialogState extends State<VideoPackDialog>
       child: Transform.scale(
         key: ValueKey(visual.title),
         scale: .96 + pulse * .04,
-        child: Container(
-          width: 48,
-          height: 48,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          padding: const EdgeInsets.all(10),
-          child: NwsbIcon(
-            visual.mark,
-            size: 28,
-            color: NwsbColors.ink,
+        child: ClipOval(
+          clipBehavior: Clip.antiAlias,
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            padding: const EdgeInsets.all(10),
+            child: NwsbIcon(
+              visual.mark,
+              size: 28,
+              color: NwsbColors.ink,
+            ),
           ),
         ),
       ),
@@ -198,11 +201,11 @@ class _VideoPackDialogState extends State<VideoPackDialog>
                       ),
                     ),
                     const SizedBox(width: 8),
-                    OutlinedButton(
+                    FilledButton(
                       onPressed: () => _prepare(close: true),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.white.withOpacity(.28)),
+                      style: FilledButton.styleFrom(
+                        foregroundColor: NwsbColors.ink,
+                        backgroundColor: Colors.white,
                         minimumSize: const Size(0, 34),
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         shape: const StadiumBorder(),
