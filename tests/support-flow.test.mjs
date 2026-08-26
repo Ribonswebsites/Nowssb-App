@@ -21,6 +21,8 @@ assert.match(flow, /makeCaseReference/, "Each escalated case must receive a refe
 assert.match(flow, /Reference:/, "The success confirmation must display the case reference");
 assert.match(flow, /openMySupportCases/, "Users must be able to open their support-case history");
 assert.match(flow, /View conversation history/, "Users must be able to view each case conversation history");
+assert.match(flow, /In Progress/, "Users must see an In Progress badge for active cases");
+assert.match(flow, /supportCaseState/, "My Support Cases must normalize Open, In Progress, and Resolved states");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");
@@ -34,6 +36,8 @@ assert.match(rules, /allow list: if isAdmin\(\) \|\| \(signedIn\(\) && resource\
 assert.match(admin, /SUPPORT CASES/, "The admin dashboard must contain a Support Cases inbox");
 assert.match(admin, /watchSupportCases\(\)/, "The admin dashboard must watch incoming support cases");
 assert.match(admin, /Case /, "The admin inbox must display the support case reference");
+assert.match(admin, /Start progress/, "The admin inbox must support moving a case to In Progress");
+assert.match(admin, /in_progress/, "The admin inbox must persist the In Progress state");
 assert.match(worker, /\/api\/support\/escalate/, "The worker must expose a background escalation route");
 assert.match(worker, /caseReference/, "The background escalation must retain the support case reference");
 assert.match(worker, /RESEND_API_KEY/, "The worker must use a server-side Resend credential");

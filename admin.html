@@ -1578,29 +1578,36 @@ function renderSupportCases(rows) {
     return;
   }
   wrap.innerHTML = rows.map((row) => {
-    const done = row.status === 'resolved';
+    const state = row.status === 'resolved' ? 'resolved' : row.status === 'in_progress' ? 'in_progress' : 'new';
+    const label = state === 'resolved' ? 'Resolved' : state === 'in_progress' ? 'In Progress' : 'Open';
+    const statusClass = state === 'resolved' ? 'approved' : state === 'in_progress' ? 'pending' : 'pending';
     const transcript = Array.isArray(row.messages) ? row.messages.slice(-4).map((message) =>
       '<div style="margin-top:6px;line-height:1.45;"><b style="color:rgba(232,213,163,0.92);">' +
       esc(message.role === 'assistant' ? 'Support' : 'Member') + ':</b> ' + esc(message.content || '') + '</div>'
     ).join('') : '';
     return '<div class="wl-card">' +
-      '<span class="wl-status ' + (done ? 'approved' : 'pending') + '">' + (done ? 'Resolved' : 'New') + '</span>' +
+      '<span class="wl-status ' + statusClass + '">' + label + '</span>' +
       '<div class="wl-name">' + esc(row.type || 'Support') + '</div>' +
       '<div class="wl-phonetic">Case ' + esc(row.caseReference || row.id || 'pending') + '</div>' +
       '<div class="wl-phonetic">' + esc(row.reason || 'follow-up') + '</div>' +
       '<div class="wl-meta">' + esc(row.reporterName || row.reporterUid || 'member') + ' · ' + supportCaseWhen(row.createdAt || row.createdAtClient) + '</div>' +
       transcript +
       '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
-      '<button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'' + (done ? 'new' : 'resolved') + '\')">' + (done ? 'Reopen' : 'Mark resolved') + '</button>' +
+      (state === 'new' ? '<button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'in_progress\')">Start progress</button>' : '') +
+      (state === 'in_progress' ? '<button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'resolved\')">Mark resolved</button><button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'new\')">Reopen</button>' : '') +
+      (state === 'resolved' ? '<button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'new\')">Reopen</button>' : '') +
       '</div></div>';
   }).join('');
 }
 
 window.supportCaseStatus = async function (id, status) {
   try {
+    const next = ['new', 'in_progress', 'resolved'].includes(status) ? status : 'new';
     await updateDoc(doc(_db, 'reports', id), {
-      status: status === 'resolved' ? 'resolved' : 'new',
-      resolvedAt: status === 'resolved' ? Date.now() : null,
+      status: next,
+      inProgressAt: next === 'in_progress' ? Date.now() : null,
+      resolvedAt: next === 'resolved' ? Date.now() : null,
+      updatedAt: Date.now(),
     });
   } catch (e) { showToast('Could not update this support case.', true); }
 };
