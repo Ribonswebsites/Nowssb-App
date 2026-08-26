@@ -136,7 +136,7 @@
       else { var p = progress(); var set = function (sel, value) { var el = root.querySelector(sel); if (el) el.textContent = value; }; set('[data-progress-sessions]', p.sessions); set('[data-progress-words]', p.words); set('[data-progress-streak]', p.streak); set('[data-progress-goal]', p.goal + '%'); }
     });
   }
-  function boot() { mount('normal', '#home-nm .nmh-wrap', '.nmh-search'); refresh(); }
+  function boot() { mount('normal', '#home-nm .nmh-wrap', '.nmh-search'); mount('fashion', '#home .home-body', '.home-tagline'); refresh(); }
   window.NWSBDayDash = { refresh: refresh, slotFor: slotFor };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   setInterval(refresh, 15 * 60 * 1000);

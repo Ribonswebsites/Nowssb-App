@@ -91,6 +91,7 @@
   }
   function boot() {
     mount('normal', '#home-nm .nmh-wrap', '.nwsb-daydash');
+    mount('fashion', '#home .home-body', '.nwsb-daydash');
   }
   window.NWSBEssentials = { boot: boot };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
