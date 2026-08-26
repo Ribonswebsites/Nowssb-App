@@ -541,6 +541,20 @@ window._fbCreateSupportReport = async function (payload) {
   }).then(() => ({ caseReference }));
 };
 
+/* A signed-in member can only query reports whose reporterUid matches their
+   own session. The matching Firestore rule rejects any broader query. */
+window._fbGetMySupportReports = async function () {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Sign in to view your support cases.');
+  const snap = await getDocs(query(
+    collection(db, 'reports'),
+    where('reporterUid', '==', user.uid),
+    limit(50)
+  ));
+  return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }))
+    .sort((a, b) => Number(b.createdAtClient || 0) - Number(a.createdAtClient || 0));
+};
+
 window._fbGetReels = async (opts) => {
   opts = opts || {};
   var constraints = [orderBy('createdAt', 'desc'), limit(opts.limit || 30)];

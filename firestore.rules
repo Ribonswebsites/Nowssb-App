@@ -176,7 +176,8 @@ service cloud.firestore {
     match /reports/{reportId} {
       allow create: if signedIn() && request.resource.data.reporterUid == request.auth.uid;
       allow get: if isAdmin() || (signedIn() && resource.data.reporterUid == request.auth.uid);
-      allow list, update, delete: if isAdmin();
+      allow list: if isAdmin() || (signedIn() && resource.data.reporterUid == request.auth.uid);
+      allow update, delete: if isAdmin();
     }
 
     match /ratings/{uid}/entries/{raterUid} {

@@ -10411,6 +10411,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </script>
 <div id="nwsbHelpSupport" class="nwsb-help-screen" aria-hidden="true">
   <iframe id="nwsbHelpFrame" src="app/widgets/help-support.html?v=1" title="Help and Support"></iframe>
+  <button class="nwsb-help-my-cases" type="button" onclick="openMySupportCases()">My Support Cases</button>
 </div>
 <div id="nwsbSupportChat" class="nwsb-support-chat-screen" aria-hidden="true">
   <section class="nwsb-support-chat-shell" role="dialog" aria-modal="true" aria-label="NowssB Support chat">
@@ -10426,6 +10427,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </form>
     <div id="nwsbSupportCaseStatus" class="nwsb-support-case-status" role="status" aria-live="polite" hidden></div>
     <div class="nwsb-support-chat-note">NowssB Support can help with app features and troubleshooting.</div>
+  </section>
+</div>
+<div id="nwsbMySupportCases" class="nwsb-my-cases-screen" aria-hidden="true">
+  <section class="nwsb-my-cases-shell" role="dialog" aria-modal="true" aria-label="My Support Cases">
+    <header class="nwsb-my-cases-header">
+      <button class="nwsb-support-chat-back" type="button" onclick="openHelpSupport()" aria-label="Back to Help and Support">‹</button>
+      <div><div class="nwsb-support-chat-title">My Support Cases</div><div class="nwsb-my-cases-subtitle">Status and conversation history</div></div>
+      <button class="nwsb-my-cases-refresh" type="button" onclick="loadMySupportCases()" aria-label="Refresh support cases">↻</button>
+    </header>
+    <main id="nwsbMySupportCasesList" class="nwsb-my-cases-list" aria-live="polite"></main>
   </section>
 </div>
 </body>
