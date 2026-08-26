@@ -1354,26 +1354,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     </div><!-- /nmh-trend-wrap -->
 
-    <!-- Customize panel — Quick Access, Quick Links and Set As You Like in
-         one card instead of three banners scattered down the page. Tapping
-         the header opens the full Customize hub (app/js/part063.js). -->
-    <div class="cust-panel nmh-cust-panel">
-      <div class="cust-panel-head" onclick="cuOpen()">
-        <div class="cust-panel-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>
-        <div class="cust-panel-txt">
-          <div class="cust-panel-title">Customize</div>
-          <div class="cust-panel-sub">Make this home yours</div>
-        </div>
-        <div class="cust-panel-more"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <!-- Rows rendered by app/js/part063.js from the same list the
-           Customize hub uses, so the two can never drift apart. -->
-      <div class="cust-scroll">
-        <div class="cust-rows"></div>
-        <div class="cust-scrollbar"><div class="cust-scrollthumb"></div></div>
-      </div>
-    </div>
-
     <!-- ══ TODAY'S OFFER SECTION (offer banner + rotating coupon), right
          below Today's Practice, combined into one padded section. ══ -->
     <!-- The Today's Offer / Shop Now coupon banner that sat here is gone. -->
@@ -1420,25 +1400,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
       <div class="npc-text"><span class="npc-line" id="npcBlueLine"></span></div>
     </div>
-
-    <!-- NowssB Connect — what it is (video bg) -->
-    <!-- The section on the portrait tablet. The frame classes go ON
-         .nmh-connect-sec rather than in a wrapper around it, because that is
-         the element app/js/part062.js matches on the Normal home — a wrapper
-         would make it a grandchild of the home wrap and strand the section at
-         the top of the page. Its padding is the bezel and .ncs-screen is the
-         aperture; the clip, the scrim and the copy all live in there. -->
-    <div class="nmh-connect-sec nwsb-inframe dev-tabs-p" onclick="window.IG&&IG.nav('profile')">
-      <div class="ncs-screen">
-        <video class="nmh-connect-vid" data-nwsb-auto muted loop playsinline preload="none" poster="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784171094/grok_video_2026-07-16-08-26-13_ipsk4u.mp4"></video>
-        <div class="nmh-connect-scrim"></div>
-        <img class="nmh-connect-logo" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt="NowssB Connect">
-        <div class="nmh-connect-title">NowssB <span class="accent">Connect</span></div>
-        <div class="nmh-connect-desc">The social space of NowssB — share your daily practice, post your frequency journey, and connect with a community of sound healers and word-science practitioners. Follow creators, react, and grow together.</div>
-        <button class="nmh-connect-enter" onclick="event.stopPropagation();window.IG&&IG.nav('profile')">Enter Connect<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </div>
-    </div>
-
 
     <!-- Cart, Wishlist and Order — a heading, the television, a black banner.
          .qa-tv-block is what app/js/part062.js registers, NOT anything
@@ -1561,49 +1522,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </div>
       </div>
     </div>
-
-    <!-- Subscription — auto-rotating crossfade background (3 images), no
-         dots. Exact same structure/styling as the Fashion Home version
-         (#sub-promo-card) — top labels row, image, then pushed-down text. -->
-    <!-- On the portrait tablet. Same reasoning as the banner above, and
-         .fsec-screen being position:relative is what makes the card's
-         absolutely-placed labels, copy and Upgrade button resolve against
-         the aperture rather than against the bezel. -->
-    <!-- Your Edition, in a wrapper. .nedi-blk is what part062.js
-         registers as 'edition' now. -->
-    <div class="nedi-blk">
-    <div class="nmh-fsec" onclick="if(window.SS)SS.open('subscription')">
-      <!-- ONE section, not two. This card and the promo were both showing
-           the subscription film a few inches apart, one of them on a still.
-           Built like every other block here: the orb and its two lines, the
-           set, and one black bar. The offer is the only thing on the screen,
-           set into the top-left of the film where the clip stays dark. -->
-      <div class="qa-tv-head">
-        <div class="qa-tv-orb nsub-blk-orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        <div class="qa-tv-head-txt">
-          <div class="qa-tv-hello">Free plan · upgrade any time</div>
-          <div class="qa-tv-name">NowssB Edition</div>
-        </div>
-      </div>
-      <div class="sub-promo-tv nwsb-inframe dev-tv-kiosk">
-        <video class="fsec-video" data-nwsb-auto muted loop playsinline preload="none"
-               src="assets/video/subscription-promo.mp4"
-               poster="assets/video/subscription-promo-poster.webp"></video>
-        <div class="sub-promo-offer">
-          <div class="sub-promo-lead">Join today for</div>
-          <div class="sub-promo-big">30 Days <span>Free</span></div>
-          <div class="sub-promo-small">Subscribe · cancel anytime</div>
-        </div>
-      </div>
-      <div class="ncb-carousel nsub-ban" role="button" onclick="SS&&SS.open('subscription')">
-        <div class="ncb-slide">
-          <span class="ncb-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 17.5l-1.2-9 5.1 3.4L12 4.5l4.6 7.4 5.1-3.4-1.2 9z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M3.5 20h17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-          <span class="ncb-txt"><span class="ncb-name">Upgrade Now</span><span class="ncb-sub">From $4.99 a month · every word and frequency unlocked</span></span>
-          <span class="ncb-btn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="rgba(255,255,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        </div>
-      </div>
-    </div><!-- /nmh-fsec -->
-    </div><!-- /nedi-blk -->
 
     <!-- ══ HEALTH JOURNEY CARD — same section the Fashion Home carries ══ -->
     <!-- Reader — opens the chooser for the Meaning and eBook readers. -->

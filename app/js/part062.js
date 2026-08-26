@@ -59,7 +59,6 @@
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
         { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
-        { k:'custom',   sel:['.nmh-cust-panel'],                                           t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
         /* 'offer' and 'shopvid' are gone — the two Shop Now banners they
            pointed at were removed from the homes, and a registry row with
            nothing behind it shows up in Customize as a switch that does
@@ -67,7 +66,6 @@
         { k:'rx',       sel:['.nmh-rx-heading', '.nmh-rx-section'],                        t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'routines', sel:['.home-card.home-card-static.w100'],                          t:S, label:'My Routines',           sub:'Daily practice system', defOff:1 },
         { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc', vb:1 },
-        { k:'connect',  sel:['.nmh-connect-sec'],                                        t:S, label:'NowssB Connect',        sub:'What the social space is' },
         { k:'feed',     sel:['#ncbCarouselNm'],                                            t:S, label:'Community Carousel',    sub:'Swipeable feed cards' },
         /* The BLOCK, not the frame or the row inside it: this registry
            matches ':scope > sel', a DIRECT child of the wrap. Pointing it
@@ -86,7 +84,6 @@
            different things and they are apart now. */
         { k:'storeban', sel:['.fash-storeban-wrap'],                                       t:S, label:'Store Banner',          sub:'The clip and the Shop the Library bar', vb:1 , kind:'blk' },
         { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 },
-        { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 },
         /* Off on the shipped Normal home, and opt-in from this editor —
