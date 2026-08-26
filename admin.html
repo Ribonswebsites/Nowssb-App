@@ -1607,6 +1607,7 @@ window.supportCaseStatus = async function (id, status) {
       status: next,
       inProgressAt: next === 'in_progress' ? Date.now() : null,
       resolvedAt: next === 'resolved' ? Date.now() : null,
+      statusUpdatedAt: Date.now(),
       updatedAt: Date.now(),
     });
   } catch (e) { showToast('Could not update this support case.', true); }

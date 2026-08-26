@@ -27,6 +27,8 @@ assert.match(flow, /makeCaseReference/, "Each escalated case must receive a refe
 assert.match(flow, /Reference:/, "The success confirmation must display the case reference");
 assert.match(flow, /openMySupportCases/, "Users must be able to open their support-case history");
 assert.match(flow, /View conversation history/, "Users must be able to view each case conversation history");
+assert.match(flow, /Last updated/, "Support cases must display a last-updated timestamp label");
+assert.match(flow, /statusUpdatedAt \|\| row\.updatedAt/, "Support cases must prefer the persisted status-change time for the last-updated label");
 assert.match(flow, /Tap to view history/, "First-time support-case users must receive a conversation-history helper");
 assert.match(flow, /nwsb-support-history-hint-seen/, "The conversation-history helper must only appear until the user interacts with it");
 assert.match(flow, /history\.addEventListener\('toggle'/, "Opening a support-case history must dismiss the first-use helper");
@@ -72,6 +74,7 @@ assert.match(admin, /watchSupportCases\(\)/, "The admin dashboard must watch inc
 assert.match(admin, /Case /, "The admin inbox must display the support case reference");
 assert.match(admin, /Start progress/, "The admin inbox must support moving a case to In Progress");
 assert.match(admin, /in_progress/, "The admin inbox must persist the In Progress state");
+assert.match(admin, /statusUpdatedAt/, "The admin inbox must persist when a support-case status last changed");
 assert.match(worker, /\/api\/support\/escalate/, "The worker must expose a background escalation route");
 assert.match(worker, /caseReference/, "The background escalation must retain the support case reference");
 assert.match(worker, /RESEND_API_KEY/, "The worker must use a server-side Resend credential");
