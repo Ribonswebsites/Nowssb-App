@@ -12174,6 +12174,10 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   width: 100%;
   margin: 0 0 18px;
 }
+#home-nm .nmh-supplied-actionbar {
+  width: 100%;
+  margin: 0 0 20px;
+}
 }
 
 

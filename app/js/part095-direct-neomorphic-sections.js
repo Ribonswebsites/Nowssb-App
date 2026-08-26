@@ -94,19 +94,37 @@
     });
   }
 
+  function wireActionBar(root) {
+    root.querySelectorAll('[data-actionbar-action]').forEach(function (control) {
+      control.addEventListener('click', function () {
+        var action = control.dataset.actionbarAction;
+        if (action === 'support') {
+          if (typeof window.ssOpenPanel === 'function') window.ssOpenPanel('support');
+          else if (typeof window.openSub === 'function') window.openSub('settings');
+        } else if (action === 'coach' && typeof window.openSub === 'function') {
+          window.openSub('practice');
+        }
+      });
+    });
+  }
+
   async function start() {
     var dashboardHost = document.querySelector('[data-direct-neomorphic="dashboard"]');
     var essentialsHost = document.querySelector('[data-direct-neomorphic="essentials"]');
-    if (!dashboardHost || !essentialsHost) return;
+    var actionBarHost = document.querySelector('[data-direct-neomorphic="actionbar"]');
+    if (!dashboardHost || !essentialsHost || !actionBarHost) return;
     try {
       var sources = await Promise.all([
         fetch('app/widgets/neomorphic_dashboard.html').then(function (response) { return response.text(); }),
-        fetch('app/widgets/neumorphic-essentials.html').then(function (response) { return response.text(); })
+        fetch('app/widgets/neumorphic-essentials.html').then(function (response) { return response.text(); }),
+        fetch('app/widgets/neomorphic-action-bar-1.html').then(function (response) { return response.text(); })
       ]);
       var dashboardRoot = mount(dashboardHost, sources[0]);
       var essentialsRoot = mount(essentialsHost, sources[1]);
+      var actionBarRoot = mount(actionBarHost, sources[2]);
       wireDashboard(dashboardRoot);
       wireEssentials(essentialsRoot);
+      wireActionBar(actionBarRoot);
       window.nowssbDirectDashboardRender = function (data) { renderDashboard(dashboardRoot, data); };
       if (typeof window.nowssbDashboardRefresh === 'function') window.nowssbDashboardRefresh();
     } catch (error) {

@@ -53,8 +53,8 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(32));
-    expect(kNormalSectionOrder.toSet(), hasLength(32),
+    expect(kNormalSectionOrder, hasLength(33));
+    expect(kNormalSectionOrder.toSet(), hasLength(33),
         reason: 'two sections share a key');
     expect(kNormalSectionOrder.indexOf('dashboard'),
         kNormalSectionOrder.indexOf('search') + 1,
@@ -62,6 +62,9 @@ void main() {
     expect(kNormalSectionOrder.indexOf('essentials'),
         kNormalSectionOrder.indexOf('dashboard') + 1,
         reason: 'the supplied essentials must sit directly below the dashboard');
+    expect(kNormalSectionOrder.indexOf('actionbar'),
+        kNormalSectionOrder.indexOf('mainops') + 1,
+        reason: 'the supplied action bar must sit directly below Where to Begin');
 
     for (final k in {...kNormalNoMarkup, ...kNormalDefOff}) {
       expect(kNormalSectionOrder, contains(k),
@@ -79,7 +82,7 @@ void main() {
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 27);
+    expect(shown, 28);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',
