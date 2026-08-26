@@ -27,6 +27,9 @@ assert.match(flow, /makeCaseReference/, "Each escalated case must receive a refe
 assert.match(flow, /Reference:/, "The success confirmation must display the case reference");
 assert.match(flow, /openMySupportCases/, "Users must be able to open their support-case history");
 assert.match(flow, /View conversation history/, "Users must be able to view each case conversation history");
+assert.match(flow, /Tap to view history/, "First-time support-case users must receive a conversation-history helper");
+assert.match(flow, /nwsb-support-history-hint-seen/, "The conversation-history helper must only appear until the user interacts with it");
+assert.match(flow, /history\.addEventListener\('toggle'/, "Opening a support-case history must dismiss the first-use helper");
 assert.match(flow, /In Progress/, "Users must see an In Progress badge for active cases");
 assert.match(flow, /supportCaseState/, "My Support Cases must normalize Open, In Progress, and Resolved states");
 assert.match(flow, /filterMySupportCases/, "My Support Cases must re-render when the user changes the case filter");
@@ -49,6 +52,7 @@ assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-card:focus-within/, "Support case cards must provide keyboard focus feedback");
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-history summary::after/, "Expandable support-case histories must expose a chevron cue");
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-history\[open\] summary::after/, "The support-history chevron must change direction when expanded");
+assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-history-hint/, "The first-use support-history helper must have dedicated styles");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");

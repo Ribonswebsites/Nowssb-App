@@ -71,6 +71,8 @@
 .nwsb-my-case-status.open{background:rgba(102,176,255,.14);color:#8cc8ff}
 .nwsb-my-case-status.in-progress{background:rgba(255,190,80,.14);color:#ffc86b}
 .nwsb-my-case-status.resolved{background:rgba(56,214,107,.14);color:#87e58f}
+.nwsb-my-case-history-hint{display:flex;align-items:center;gap:6px;margin:0 16px 10px;color:#aaaab1;font-size:12px;font-weight:700;line-height:1.35}
+.nwsb-my-case-history-hint span{display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:rgba(140,200,255,.14);color:#8cc8ff;font-size:12px;font-weight:900;line-height:1}
 .nwsb-my-case-history{border-top:1px solid #29292e}
 .nwsb-my-case-history summary{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;color:#d4c9fb;font-size:13px;font-weight:800;cursor:pointer;list-style:none}
 .nwsb-my-case-history summary::-webkit-details-marker{display:none}
