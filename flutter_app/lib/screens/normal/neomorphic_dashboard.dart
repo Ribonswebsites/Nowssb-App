@@ -66,7 +66,7 @@ class _FocusCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Deep work session',
+                  'Morning\nResonance',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
@@ -80,9 +80,9 @@ class _FocusCard extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     _FocusDot(),
-                    Text('2h 0m', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: NmSuppliedDashboard._textDark)),
+                    Text('Daily practice', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: NmSuppliedDashboard._textDark)),
                     _FocusDot(),
-                    Text('High priority', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
+                    Text('Begin with a clear tone', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -101,7 +101,7 @@ class _FocusCard extends StatelessWidget {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Start session', style: TextStyle(color: Color(0xFFF3F0FF), fontSize: 14, fontWeight: FontWeight.w600)),
+                        Text('Start practice', style: TextStyle(color: Color(0xFFF3F0FF), fontSize: 14, fontWeight: FontWeight.w600)),
                         SizedBox(width: 10),
                         Icon(Icons.arrow_forward, size: 16, color: Color(0xFFF3F0FF)),
                       ],
@@ -203,13 +203,13 @@ class _ProgressCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 6),
       child: const Row(
         children: [
-          Expanded(child: _Metric(icon: Icons.check, iconColor: Color(0xFF3BA55D), value: '12', label: 'Tasks done', delta: '+20% ↑', deltaColor: Color(0xFF3BA55D))),
+          Expanded(child: _Metric(icon: Icons.check, iconColor: Color(0xFF3BA55D), value: '0', label: 'meditation\nsessions', delta: '', deltaColor: Color(0xFF3BA55D))),
           _MetricDivider(),
-          Expanded(child: _Metric(icon: Icons.schedule_outlined, iconColor: Color(0xFF8A8A8A), value: '8h 45m', label: 'Focused time', delta: '+15% ↑', deltaColor: Color(0xFF767676))),
+          Expanded(child: _Metric(icon: Icons.timer_outlined, iconColor: Color(0xFF8A8A8A), value: '0', label: 'words in\npractice', delta: '', deltaColor: Color(0xFF767676))),
           _MetricDivider(),
-          Expanded(child: _Metric(icon: Icons.local_fire_department_outlined, iconColor: Color(0xFFE78A3E), value: '5', label: 'Day streak', delta: '+1 ↑', deltaColor: Color(0xFFE78A3E))),
+          Expanded(child: _Metric(icon: Icons.local_fire_department_outlined, iconColor: Color(0xFFE78A3E), value: '0', label: 'day streak', delta: '', deltaColor: Color(0xFFE78A3E))),
           _MetricDivider(),
-          Expanded(child: _Metric(icon: Icons.track_changes, iconColor: Color(0xFF8A6FE0), value: '78%', label: 'Goal progress', delta: '+8% ↑', deltaColor: Color(0xFF8A6FE0))),
+          Expanded(child: _Metric(icon: Icons.track_changes, iconColor: Color(0xFF8A6FE0), value: '0%', label: 'meditation\ngoal', delta: '', deltaColor: Color(0xFF8A6FE0))),
         ],
       ),
     );
@@ -246,8 +246,10 @@ class _Metric extends StatelessWidget {
             Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: NmSuppliedDashboard._textDark)),
             const SizedBox(height: 3),
             Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10.5, color: NmSuppliedDashboard._textMid)),
-            const SizedBox(height: 6),
-            Text(delta, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: deltaColor)),
+            if (delta.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(delta, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: deltaColor)),
+            ],
           ],
         ),
       );
@@ -263,9 +265,9 @@ class _UpNextCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: const Column(
           children: [
-            _UpNextRow(icon: Icons.calendar_today_outlined, color: Color(0xFFE78A3E), title: 'Team stand-up', subtitle: '10:00 AM · 30 min', status: 'Soon'),
+            _UpNextRow(icon: Icons.calendar_today_outlined, color: Color(0xFFE78A3E), title: 'Morning', subtitle: 'Morning'),
             Divider(height: 1, color: Color(0x99D9D9D9)),
-            _UpNextRow(icon: Icons.description_outlined, color: Color(0xFF8A8A8A), title: 'Design review', subtitle: '2:00 PM · 1h 0m'),
+            _UpNextRow(icon: Icons.calendar_today_outlined, color: Color(0xFF8A8A8A), title: 'Build your routine', subtitle: 'Set a daily practice system'),
           ],
         ),
       );
