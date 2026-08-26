@@ -73,11 +73,21 @@
   /* Action bar: help, coach and enter all inside one wrapper */
   .action-wrapper {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     background: var(--surface);
-    border-radius: 26px;
-    padding: 6px 8px;
+    border-radius: 999px;
+    padding: 8px;
     box-shadow: 8px 8px 18px var(--shadow-dark), -8px -8px 18px var(--shadow-light);
+  }
+
+  .icons-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
   }
 
   .option-row {
@@ -137,7 +147,6 @@
     font-size: 15px;
     font-weight: 700;
     padding: 13px 22px;
-    margin-top: 6px;
     border-radius: 999px;
     white-space: nowrap;
     box-shadow: 5px 5px 11px var(--shadow-dark), -5px -5px 11px var(--shadow-light);

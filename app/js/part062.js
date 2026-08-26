@@ -58,6 +58,7 @@
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
+        { k:'actionbar',sel:['#nwsbActionBar'],                                             t:S, label:'How can we help today?', sub:'Help, Personal Coach, and Enter', locked:1, always:1 },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
@@ -186,7 +187,7 @@
        9 — Choose Your Path moves immediately before Experience · Fashion Mode
            on the Normal home as well, matching the injected HTML order and
            correcting existing WebView layouts stored on device. */
-  var LAYOUT_V = 9;
+  var LAYOUT_V = 10;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -254,11 +255,16 @@
         if (fashionPlusAt < 0) fashionPlusAt = order.length;
         order.splice(fashionPlusAt, 0, 'healing', 'genderpath');
       }
-      /* v9: the normal home must keep the Choose Your Path laptop directly
-         above the Experience · Fashion Mode switch. This is deliberately a
-         narrow migration: it moves only that block and preserves every other
-         arrangement the reader has already selected. */
-      if (which === 'nm' && (raw.v || 0) < 9) {
+      /* v10: the supplied help bar belongs immediately below Where to Begin,
+         never at the top of the home; Choose Your Path belongs immediately
+         above Experience · Fashion Mode. Move only those fixed relationships
+         and preserve every other user-selected arrangement. */
+      if (which === 'nm' && (raw.v || 0) < 10) {
+        var actionBarAt = order.indexOf('actionbar');
+        if (actionBarAt >= 0) order.splice(actionBarAt, 1);
+        var whereToBeginAt = order.indexOf('mainops');
+        if (whereToBeginAt < 0) whereToBeginAt = order.length - 1;
+        order.splice(whereToBeginAt + 1, 0, 'actionbar');
         var genderPathAt = order.indexOf('genderpath');
         if (genderPathAt >= 0) order.splice(genderPathAt, 1);
         var fashionSwitchAt = order.indexOf('fashsw');
