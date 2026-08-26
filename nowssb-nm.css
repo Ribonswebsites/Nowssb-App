@@ -12180,7 +12180,16 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   margin: 0 0 20px;
   display: block !important;
 }
+.nwsb-personal-coach-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  overflow-y: auto;
+  background: #000;
 }
+.nwsb-personal-coach-overlay.open { display: block; }
+#nwsbPersonalCoachMount { min-height: 100%; }
 
 
 /* The Normal home's dark mode keeps the same shapes, darker. */

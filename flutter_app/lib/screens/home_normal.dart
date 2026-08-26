@@ -50,6 +50,7 @@ import '../theme/tokens.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
+import 'personal_coach.dart';
 import 'normal/neomorphic_essentials.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
@@ -186,7 +187,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('practice', NmPractice(onTap: () => _go(1))),
         ('mainops', MainOptionsSection(onGo: _go)),
-        ('actionbar', NmSuppliedActionBar(onSupport: () => _go(4), onCoach: () => _go(1))),
+        ('actionbar', NmSuppliedActionBar(onSupport: () => _go(4), onCoach: () => _push(const PersonalCoachScreen()))),
         ('tiles', NmTiles(onTile: _go)),
         ('store', NmStore(onTap: () => _go(3))),
         ('reader', NmReader(onTap: () => _go(2))),

@@ -7,11 +7,13 @@ const flutter = readFileSync(new URL("../flutter_app/lib/screens/home_normal.dar
 const flutterDashboard = readFileSync(new URL("../flutter_app/lib/screens/normal/neomorphic_dashboard.dart", import.meta.url), "utf8");
 const flutterEssentials = readFileSync(new URL("../flutter_app/lib/screens/normal/neomorphic_essentials.dart", import.meta.url), "utf8");
 const flutterActionBar = readFileSync(new URL("../flutter_app/lib/screens/normal/neomorphic_action_bar.dart", import.meta.url), "utf8");
+const flutterCoach = readFileSync(new URL("../flutter_app/lib/screens/personal_coach.dart", import.meta.url), "utf8");
 const directSections = readFileSync(new URL("../app/js/part095-direct-neomorphic-sections.js", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../nowssb-nm.css", import.meta.url), "utf8");
 const dashboard = readFileSync(new URL("../app/widgets/neomorphic_dashboard.html", import.meta.url), "utf8");
 const essentials = readFileSync(new URL("../app/widgets/neumorphic-essentials.html", import.meta.url), "utf8");
 const actionBar = readFileSync(new URL("../app/widgets/neomorphic-action-bar-1.html", import.meta.url), "utf8");
+const coachPage = readFileSync(new URL("../app/widgets/personal-coach.html", import.meta.url), "utf8");
 
 const searchAt = index.indexOf('class="nmh-search"');
 const dashboardAt = index.indexOf('class="nmh-supplied-dashboard"');
@@ -43,6 +45,8 @@ assert.match(directSections, /nowssbDirectDashboardRender/, "Direct renderer mus
 assert.match(directSections, /runDashboardAction/, "Direct renderer must route dashboard actions in the page");
 assert.match(directSections, /See less/, "Direct renderer must preserve the supplied essentials expand behavior");
 assert.match(directSections, /wireActionBar/, "Direct renderer must wire the supplied action-bar controls");
+assert.match(directSections, /openPersonalCoach/, "Direct renderer must open the supplied Personal Coach page");
+assert.match(directSections, /wirePersonalCoach/, "WebView Personal Coach chat controls must be interactive");
 assert.match(directSections, /placeActionBar/, "Direct renderer must force the coach bar below Where to Begin");
 assert.match(directSections, /startDashboardPractice/, "Dashboard actions must start the playable practice session");
 assert.match(index, /part094-dashboard-live\.js/, "Normal Home must load the live dashboard controller");
@@ -59,5 +63,11 @@ assert.match(flutterDashboard, /Plays aloud/, "Flutter dashboard must identify t
 assert.match(flutter, /bottomNavigationClearance/, "Flutter Normal Home must reserve space above the floating navigation");
 assert.match(flutterEssentials, /See more/, "Flutter must preserve the supplied essentials expand control");
 assert.match(flutterActionBar, /How can we help today\?/, "Flutter must preserve the supplied action-bar text");
+assert.match(actionBar, /Personal Coach/, "WebView action bar must show the Personal Coach text");
+assert.match(actionBar, /data-actionbar-action="coach"/, "WebView Enter must launch Personal Coach");
+assert.match(coachPage, /Personal Coach/, "WebView must ship the supplied Personal Coach source");
+assert.match(flutter, /PersonalCoachScreen/, "Flutter action bar must open a real Personal Coach screen");
+assert.match(flutterCoach, /Start focused practice/, "Flutter coach must start a real practice flow");
+assert.match(flutterActionBar, /Personal Coach/, "Flutter action bar must visibly label Personal Coach");
 
 console.log("Supplied dashboard is anchored below Normal Home search in WebView and Flutter.");

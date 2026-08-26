@@ -23,6 +23,7 @@
   .header-icon { color: var(--accent); }
   .action-wrapper { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border-radius: 999px; padding: 8px; box-shadow: 8px 8px 18px var(--shadow-dark), -8px -8px 18px var(--shadow-light); }
   .icons-group { display: flex; flex-direction: row; align-items: center; gap: 8px; }
+  .coach-label { color: var(--text-primary); font-size: 14px; font-weight: 700; white-space: nowrap; }
   .icon-btn { border: none; cursor: pointer; padding: 0; color: var(--text-secondary); }
   .neo-circle.sm { width: 40px; height: 40px; color: var(--text-secondary); transition: box-shadow 0.15s ease, transform 0.15s ease; }
   .neo-circle.sm svg { width: 18px; height: 18px; }
@@ -50,7 +51,8 @@
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9.5" cy="7.5" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M4 19c0-3.3 2.5-5.6 5.5-5.6s5.5 2.3 5.5 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M15 11l4-4m0 0h-3m3 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
-      <button class="enter-btn" type="button" data-actionbar-action="support">Enter <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h13m0 0l-5-5m5 5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <span class="coach-label">Personal Coach</span>
+      <button class="enter-btn" type="button" data-actionbar-action="coach">Enter <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h13m0 0l-5-5m5 5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
 </body>

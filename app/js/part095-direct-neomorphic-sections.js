@@ -102,12 +102,92 @@
         if (action === 'support') {
           if (typeof window.ssOpenPanel === 'function') window.ssOpenPanel('support');
           else if (typeof window.openSub === 'function') window.openSub('settings');
-        } else if (action === 'coach' && typeof window.openSub === 'function') {
-          window.openSub('practice');
+        } else if (action === 'coach' && typeof window.openPersonalCoach === 'function') {
+          window.openPersonalCoach();
         }
       });
     });
   }
+
+  function closePersonalCoach() {
+    var overlay = document.getElementById('nwsbPersonalCoachOverlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.classList.remove('nwsb-personal-coach-open');
+  }
+
+  function wirePersonalCoach(root) {
+    var placeholder = root.querySelector('.chat-placeholder');
+    var send = root.querySelector('.send-btn');
+    var chatBox = root.querySelector('.chat-box');
+    if (!placeholder || !send || !chatBox) return;
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'How can I help you today?';
+    input.setAttribute('aria-label', 'Message your Personal Coach');
+    input.style.cssText = 'width:100%;border:0;outline:0;background:transparent;color:#fff;font:inherit;';
+    placeholder.replaceWith(input);
+    function respond(text) {
+      var message = (text || '').trim();
+      if (!message) return;
+      var response = root.querySelector('.coach-live-response');
+      if (!response) {
+        response = document.createElement('div');
+        response.className = 'coach-live-response';
+        response.style.cssText = 'margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);color:#f5f5f5;font-size:13px;line-height:1.45;';
+        chatBox.appendChild(response);
+      }
+      response.textContent = 'Coach: For “' + message + '”, start with one focused practice now, then return here to review your completed session.';
+      input.value = '';
+    }
+    send.setAttribute('role', 'button');
+    send.setAttribute('tabindex', '0');
+    send.setAttribute('aria-label', 'Send message to Personal Coach');
+    send.addEventListener('click', function () { respond(input.value); });
+    send.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); respond(input.value); } });
+    input.addEventListener('keydown', function (event) { if (event.key === 'Enter') respond(input.value); });
+    root.querySelectorAll('.chip').forEach(function (chip) {
+      chip.setAttribute('role', 'button');
+      chip.setAttribute('tabindex', '0');
+      chip.addEventListener('click', function () { respond(chip.textContent.trim()); });
+    });
+  }
+
+  function personalCoachOverlay() {
+    var overlay = document.getElementById('nwsbPersonalCoachOverlay');
+    if (overlay) return overlay;
+    overlay = document.createElement('div');
+    overlay.id = 'nwsbPersonalCoachOverlay';
+    overlay.className = 'nwsb-personal-coach-overlay';
+    overlay.innerHTML = '<div id="nwsbPersonalCoachMount"></div>';
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  window.openPersonalCoach = function () {
+    var overlay = personalCoachOverlay();
+    overlay.classList.add('open');
+    document.body.classList.add('nwsb-personal-coach-open');
+    var mountPoint = document.getElementById('nwsbPersonalCoachMount');
+    if (mountPoint && mountPoint.shadowRoot) return;
+    fetch('app/widgets/personal-coach.html')
+      .then(function (response) { return response.text(); })
+      .then(function (source) {
+        if (!mountPoint) return;
+        var root = mount(mountPoint, source);
+        wirePersonalCoach(root);
+        var back = root.querySelector('.back-btn');
+        if (back) {
+          back.setAttribute('role', 'button');
+          back.setAttribute('tabindex', '0');
+          back.setAttribute('aria-label', 'Close Personal Coach');
+          back.addEventListener('click', closePersonalCoach);
+          back.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); closePersonalCoach(); }
+          });
+        }
+      })
+      .catch(function (error) { console.warn('Personal Coach:', error.message); });
+  };
 
   function placeActionBar(host) {
     var mainOps = document.querySelector('#home-nm .mainops-blk.nmh-sec-wrap');

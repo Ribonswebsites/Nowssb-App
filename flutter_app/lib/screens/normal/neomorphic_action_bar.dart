@@ -47,9 +47,10 @@ class NmSuppliedActionBar extends StatelessWidget {
                 _ActionCircle(icon: Icons.support_agent_outlined, label: 'Help and support', onTap: onSupport),
                 const SizedBox(width: 8),
                 _ActionCircle(icon: Icons.person_add_alt_1_outlined, label: 'Personal coach', onTap: onCoach),
-                const Spacer(),
+                const SizedBox(width: 10),
+                const Expanded(child: Text('Personal Coach', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _textPrimary))),
                 GestureDetector(
-                  onTap: onSupport,
+                  onTap: onCoach,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
                     decoration: BoxDecoration(
