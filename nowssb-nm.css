@@ -17349,10 +17349,11 @@ body.fashplus #home video[poster] { background-image: none !important; }
   overflow: hidden !important;
 }
 
-/* The restored stable Fashion hero owns the TV/rail; the old deck must never
-   be allowed to mount over it if stale code or saved state calls it. */
-#home #hsDeck { display: none !important; }
-#home #hsRail { display: flex !important; }
+/* The Fashion home uses the hero deck built by part083.js. A legacy override
+   hid that deck and exposed an incompatible rail, causing hero layers to
+   collide. Keep one visible hero owner at every Fashion-home state. */
+#home #hsDeck { display: block !important; }
+#home #hsRail { display: none !important; }
 #home .hero-section { position: relative !important; z-index: 4 !important; }
 #home .hero-section .hero-tv-frame,
 #home .hero-section .hero-screen,
@@ -18098,7 +18099,7 @@ body.fashplus #home video[poster] { background-image: none !important; }
    part083.js from 2026-08-15 builds #hsDeck/.hs-cell. The later rail
    fallback must not hide that historical hero when Fashion mode is active. */
 body.fashion-home-active #home #hsDeck {
-  display: flex !important;
+  display: block !important;
 }
 body.fashion-home-active #home #hsRail {
   display: none !important;

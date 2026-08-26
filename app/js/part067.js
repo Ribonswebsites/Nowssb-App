@@ -45,13 +45,6 @@
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
               banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
                                    else if (typeof openSub === 'function') openSub('health-category'); } } },
-    { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
-      head: { hello:'Body, organ and mind', name:'Choose Your Path',
-              icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
-              banName:'Female or Male', banSub:'Your wellness, decoded for your body',
-              banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
-                                   else if (typeof openSub === 'function') openSub('health-category'); } } },
-
     /* The Connect banner — the clip that introduces the section, not the
        section's own background clip (.nmh-connect-vid, which is untouched).
        On the landscape tablet, wordmark on the bottom bezel.

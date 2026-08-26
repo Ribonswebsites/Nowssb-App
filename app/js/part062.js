@@ -131,7 +131,6 @@
            home no matter where it was written. That is exactly what happened
            to this card. */
         { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
-        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 , kind:'blk' },
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' , kind:'tab' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'sec' },
