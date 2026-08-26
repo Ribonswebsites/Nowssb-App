@@ -966,10 +966,19 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <section class="nmh-supplied-dashboard" aria-label="Daily dashboard">
       <iframe src="app/widgets/neomorphic_dashboard.html" title="Daily dashboard" loading="lazy" onload="this.style.height=(this.contentDocument.documentElement.scrollHeight + 1) + 'px'" scrolling="no"></iframe>
     </section>
+    <section class="nmh-supplied-essentials" aria-label="Your essentials">
+      <iframe src="app/widgets/neumorphic-essentials.html" title="Your essentials" loading="lazy" onload="this.style.height=(this.contentDocument.documentElement.scrollHeight + 1) + 'px'" scrolling="no"></iframe>
+    </section>
     <script>
       window.addEventListener('message', function(event) {
         var dashboardFrame = document.querySelector('.nmh-supplied-dashboard iframe');
-        if (event.origin !== window.location.origin || event.source !== (dashboardFrame && dashboardFrame.contentWindow) || !event.data) return;
+        var essentialsFrame = document.querySelector('.nmh-supplied-essentials iframe');
+        if (event.origin !== window.location.origin || !event.data) return;
+        if (event.source === (essentialsFrame && essentialsFrame.contentWindow) && event.data.type === 'nowssb-essentials-resize') {
+          essentialsFrame.style.height = (essentialsFrame.contentDocument.documentElement.scrollHeight + 1) + 'px';
+          return;
+        }
+        if (event.source !== (dashboardFrame && dashboardFrame.contentWindow)) return;
         if (event.data.type === 'nowssb-dashboard-resize') {
           dashboardFrame.style.height = (dashboardFrame.contentDocument.documentElement.scrollHeight + 1) + 'px';
           return;

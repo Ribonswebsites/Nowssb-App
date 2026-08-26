@@ -46,6 +46,7 @@
            after the greeting and before the hero clip and the streak. */
         { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
         { k:'dashboard',sel:['.nmh-supplied-dashboard'],                                    t:S, label:'Daily dashboard',       sub:'Today’s focus, progress and up next', locked:1, after:'search' },
+        { k:'essentials',sel:['.nmh-supplied-essentials'],                                  t:S, label:'Your essentials',       sub:'Today’s meditation and sleep rituals', locked:1, after:'dashboard' },
         /* The streak card, on its own. The clip that used to sit directly
            above it has moved down the page to the other video banners —
            a heading, a film and a second heading in a row all saying Streak

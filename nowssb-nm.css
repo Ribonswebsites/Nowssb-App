@@ -12177,6 +12177,17 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   border: 0;
   background: transparent;
 }
+#home-nm .nmh-supplied-essentials {
+  width: 100%;
+  margin: 0 0 18px;
+}
+#home-nm .nmh-supplied-essentials iframe {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+}
 }
 
 

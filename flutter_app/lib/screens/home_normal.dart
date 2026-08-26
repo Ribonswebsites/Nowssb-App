@@ -49,6 +49,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_dashboard.dart';
+import 'normal/neomorphic_essentials.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'shared_sections.dart';
@@ -61,6 +62,7 @@ const kNormalSectionOrder = <String>[
   'greet',
   'search',
   'dashboard',
+  'essentials',
   'streak',
   'storedisc',
   'practice',
@@ -170,6 +172,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
         ('dashboard', NmSuppliedDashboard(onStart: _openDashboardSession, onProgress: _openDashboardProgress)),
+        ('essentials', const NmSuppliedEssentials()),
         ('streak', NmStreak(onTap: () => _go(1))),
         (
           'storedisc',
