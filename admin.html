@@ -644,6 +644,15 @@ input.nwsb-deva { font-size: 16px; }
     <div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">Waiting for requests…</div>
   </div>
 
+  <!-- ══ SUPPORT CASES ══
+       Only signed-in people can create their own case. Firestore rules limit
+       this inbox to administrators, so routing details never surface in the
+       public support UI. ══ -->
+  <div class="sec-label" style="margin-top:40px;">SUPPORT CASES</div>
+  <div class="word-list-wrap" id="supportCaseListWrap">
+    <div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">Waiting for support cases…</div>
+  </div>
+
   <!-- ══ SEND A NOTIFICATION ══
        Goes to every phone that has subscribed, whether or not the app is
        open on it. The sending itself happens at /api/push, which holds the
@@ -840,13 +849,14 @@ window.studioInstall = function () {
    order is an accident of how the page was written — Instagram happens to
    be first in the markup and is the last thing anybody comes here for. */
 var STU_ORDER = [
-  'WORD STUDIO', 'THE CATALOGUE', 'REQUESTS FROM THE APP', 'PEOPLE',
+  'WORD STUDIO', 'THE CATALOGUE', 'REQUESTS FROM THE APP', 'SUPPORT CASES', 'PEOPLE',
   'SEND A NOTIFICATION', 'USER ACCESS CONTROL', 'SEND WORD TO USER', 'SOCIAL'
 ];
 var STU_META = {
   'WORD STUDIO':          { icon: '✎', sub: 'Add or edit any word the app teaches' },
   'THE CATALOGUE':        { icon: '☰', sub: 'The shelves — words and meanings' },
   'REQUESTS FROM THE APP':{ icon: '!', sub: 'What people have asked you for' },
+  'SUPPORT CASES':        { icon: '?', sub: 'Private follow-ups from support chat' },
   'SEND A NOTIFICATION':  { icon: '◉', sub: 'Push to every phone' },
   'PEOPLE':               { icon: '☺', sub: 'Everyone who has signed up' },
   'USER ACCESS CONTROL':  { icon: '⚿', sub: 'Find one person and change their plan' },
@@ -1468,7 +1478,7 @@ onAuthStateChanged(_auth, async (user) => {
     if (wn) wn.textContent = user.displayName || (user.email || '').split('@')[0] || 'admin';
     if (wm) wm.textContent = user.email || user.uid;
     if (window.stuBuildNav) stuBuildNav();
-    countSubs(); watchRequests(); catLoad(); wsLoad(); pplLoad();
+    countSubs(); watchRequests(); watchSupportCases(); catLoad(); wsLoad(); pplLoad();
   }
   else closeStudio();
 });
@@ -1543,6 +1553,67 @@ function watchRequests() {
     }, () => {
       const wrap = document.getElementById('reqListWrap');
       if (wrap) wrap.innerHTML = '<div style="color:rgba(220,80,80,0.8);font-size:13px;padding:4px 2px;">Could not read requests — are the rules published?</div>';
+    });
+  } catch (e) {}
+}
+
+/* ══ SUPPORT CASES, LIVE ═══════════════════════════════════════════════
+   The support chat writes a compact, authenticated transcript here only
+   after it cannot resolve a report (or for explicit feedback). This inbox
+   is admin-only under firestore.rules. */
+let _supportCaseUnsub = null;
+
+function supportCaseWhen(value) {
+  try {
+    if (value && typeof value.toMillis === 'function') return new Date(value.toMillis()).toLocaleString();
+    return new Date(value || Date.now()).toLocaleString();
+  } catch (e) { return 'Just now'; }
+}
+
+function renderSupportCases(rows) {
+  const wrap = document.getElementById('supportCaseListWrap');
+  if (!wrap) return;
+  if (!rows.length) {
+    wrap.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">No support cases yet.</div>';
+    return;
+  }
+  wrap.innerHTML = rows.map((row) => {
+    const done = row.status === 'resolved';
+    const transcript = Array.isArray(row.messages) ? row.messages.slice(-4).map((message) =>
+      '<div style="margin-top:6px;line-height:1.45;"><b style="color:rgba(232,213,163,0.92);">' +
+      esc(message.role === 'assistant' ? 'Support' : 'Member') + ':</b> ' + esc(message.content || '') + '</div>'
+    ).join('') : '';
+    return '<div class="wl-card">' +
+      '<span class="wl-status ' + (done ? 'approved' : 'pending') + '">' + (done ? 'Resolved' : 'New') + '</span>' +
+      '<div class="wl-name">' + esc(row.type || 'Support') + '</div>' +
+      '<div class="wl-phonetic">' + esc(row.reason || 'follow-up') + '</div>' +
+      '<div class="wl-meta">' + esc(row.reporterName || row.reporterUid || 'member') + ' · ' + supportCaseWhen(row.createdAt || row.createdAtClient) + '</div>' +
+      transcript +
+      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
+      '<button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'' + (done ? 'new' : 'resolved') + '\')">' + (done ? 'Reopen' : 'Mark resolved') + '</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+window.supportCaseStatus = async function (id, status) {
+  try {
+    await updateDoc(doc(_db, 'reports', id), {
+      status: status === 'resolved' ? 'resolved' : 'new',
+      resolvedAt: status === 'resolved' ? Date.now() : null,
+    });
+  } catch (e) { showToast('Could not update this support case.', true); }
+};
+
+function watchSupportCases() {
+  if (_supportCaseUnsub) return;
+  try {
+    _supportCaseUnsub = onSnapshot(query(collection(_db, 'reports'), orderBy('createdAtClient', 'desc')), (snap) => {
+      const rows = [];
+      snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
+      renderSupportCases(rows);
+    }, () => {
+      const wrap = document.getElementById('supportCaseListWrap');
+      if (wrap) wrap.innerHTML = '<div style="color:rgba(220,80,80,0.8);font-size:13px;padding:4px 2px;">Could not read support cases.</div>';
     });
   } catch (e) {}
 }

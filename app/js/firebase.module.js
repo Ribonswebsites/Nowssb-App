@@ -511,6 +511,33 @@ window._fbServerTimestamp = () => serverTimestamp();
 window._fbAddReelDoc = (reelData) =>
   addDoc(collection(db, 'reels'), { ...reelData, createdAt: serverTimestamp(), likes: 0 });
 
+/* Support cases are intentionally created from the signed-in person's account.
+   Firestore rules allow the owner to create only their own case, while the
+   protected Admin Studio can list and manage the collection. */
+window._fbCreateSupportReport = async function (payload) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Sign in to securely send a support case.');
+  const allowedTypes = ['report', 'feedback', 'support', 'help'];
+  const type = allowedTypes.includes(String(payload?.type || '')) ? String(payload.type) : 'support';
+  const messages = Array.isArray(payload?.messages) ? payload.messages.slice(-10).map((entry) => ({
+    role: entry?.role === 'assistant' ? 'assistant' : 'user',
+    content: String(entry?.content || '').replace(/\0/g, '').slice(0, 1200),
+  })).filter((entry) => entry.content) : [];
+  return addDoc(collection(db, 'reports'), {
+    reporterUid: user.uid,
+    reporterName: String(user.displayName || '').slice(0, 120),
+    type,
+    reason: String(payload?.reason || 'support_follow_up').slice(0, 120),
+    messages,
+    context: String(payload?.context || '').slice(0, 2400),
+    screen: String(payload?.screen || '').slice(0, 240),
+    status: 'new',
+    source: 'support_chat',
+    createdAt: serverTimestamp(),
+    createdAtClient: Date.now(),
+  });
+};
+
 window._fbGetReels = async (opts) => {
   opts = opts || {};
   var constraints = [orderBy('createdAt', 'desc'), limit(opts.limit || 30)];
