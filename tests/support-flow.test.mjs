@@ -47,6 +47,8 @@ assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /prefers-reduced-motion:reduce/, "The illustration animation must respect reduced-motion preferences");
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-card:hover/, "Support case cards must have subtle pointer hover feedback");
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-card:focus-within/, "Support case cards must provide keyboard focus feedback");
+assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-history summary::after/, "Expandable support-case histories must expose a chevron cue");
+assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-history\[open\] summary::after/, "The support-history chevron must change direction when expanded");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");

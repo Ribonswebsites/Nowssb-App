@@ -72,10 +72,13 @@
 .nwsb-my-case-status.in-progress{background:rgba(255,190,80,.14);color:#ffc86b}
 .nwsb-my-case-status.resolved{background:rgba(56,214,107,.14);color:#87e58f}
 .nwsb-my-case-history{border-top:1px solid #29292e}
-.nwsb-my-case-history summary{padding:13px 16px;color:#d4c9fb;font-size:13px;font-weight:800;cursor:pointer;list-style:none}
+.nwsb-my-case-history summary{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;color:#d4c9fb;font-size:13px;font-weight:800;cursor:pointer;list-style:none}
 .nwsb-my-case-history summary::-webkit-details-marker{display:none}
-.nwsb-my-case-history summary::after{content:"⌄";float:right;color:#9c9ca2}
-.nwsb-my-case-history[open] summary::after{transform:rotate(180deg)}
+.nwsb-my-case-history summary::after{content:"";width:8px;height:8px;box-sizing:border-box;flex:0 0 auto;border-right:2px solid #a9a9b0;border-bottom:2px solid #a9a9b0;transform:rotate(45deg) translate(-2px,-2px);transition:transform .16s ease,border-color .16s ease}
+.nwsb-my-case-history summary:hover::after,.nwsb-my-case-history summary:focus-visible::after{border-color:#d4c9fb}
+.nwsb-my-case-history summary:focus-visible{outline:2px solid #8cc8ff;outline-offset:-3px;border-radius:8px}
+.nwsb-my-case-history[open] summary::after{transform:rotate(-135deg) translate(-1px,-1px)}
+@media (prefers-reduced-motion:reduce){.nwsb-my-case-history summary::after{transition:none}}
 .nwsb-my-case-thread{display:grid;gap:8px;padding:0 12px 14px}
 .nwsb-my-case-message{padding:10px 11px;border-radius:12px;background:#1a1a1e;color:#e6e6e9;font-size:13px;line-height:1.45}
 .nwsb-my-case-message.user{background:#25262c}
