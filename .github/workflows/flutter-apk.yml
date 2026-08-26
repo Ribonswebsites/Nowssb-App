@@ -31,6 +31,12 @@ on:
       - 'claude/**'
   workflow_dispatch:
 
+# Keep only the newest APK build for each branch so stale runs do not occupy
+# the GitHub-hosted runner queue indefinitely.
+concurrency:
+  group: apk-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     working-directory: flutter_app
