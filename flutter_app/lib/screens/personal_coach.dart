@@ -97,10 +97,3 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w700)), const SizedBox(height: 10), Text(title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)), const SizedBox(height: 8), Text(detail, style: const TextStyle(color: Colors.white60, fontSize: 12, height: 1.35))]),
   );
 }
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
