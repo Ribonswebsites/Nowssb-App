@@ -10439,6 +10439,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     <div class="nwsb-my-cases-filter"><label for="nwsbMySupportCasesFilter">Show</label><select id="nwsbMySupportCasesFilter" onchange="filterMySupportCases()"><option value="all">All cases</option><option value="active">Active cases</option><option value="resolved">Resolved cases</option></select></div>
     <label class="nwsb-my-cases-search" for="nwsbMySupportCasesSearch"><span>Find by reference</span><input id="nwsbMySupportCasesSearch" type="search" inputmode="search" autocomplete="off" placeholder="Search case reference" oninput="filterMySupportCases()"></label>
     <main id="nwsbMySupportCasesList" class="nwsb-my-cases-list" aria-live="polite"></main>
+    <div id="nwsbMySupportCasesPagination" class="nwsb-my-cases-pagination" aria-live="polite"></div>
   </section>
 </div>
 </body>

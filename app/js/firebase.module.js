@@ -7,7 +7,7 @@ import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
   RecaptchaVerifier, signInWithPhoneNumber }
   from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp,
-  collection, addDoc, getDocs, query, orderBy, limit, where }
+  collection, addDoc, getDocs, query, orderBy, limit, where, startAfter }
   from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
 const app = initializeApp({
@@ -553,6 +553,28 @@ window._fbGetMySupportReports = async function () {
   ));
   return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }))
     .sort((a, b) => Number(b.createdAtClient || 0) - Number(a.createdAtClient || 0));
+};
+
+/* Cursor-backed pages keep a large private case history responsive without
+   broadening the self-only report query enforced by Firestore rules. */
+window._fbGetMySupportReportsPage = async function (options) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Sign in to view your support cases.');
+  options = options || {};
+  const pageSize = Math.max(4, Math.min(Number(options.pageSize) || 8, 24));
+  const constraints = [
+    where('reporterUid', '==', user.uid),
+    orderBy('createdAtClient', 'desc')
+  ];
+  if (options.cursor) constraints.push(startAfter(options.cursor));
+  constraints.push(limit(pageSize + 1));
+  const snap = await getDocs(query(collection(db, 'reports'), ...constraints));
+  const docs = snap.docs.slice(0, pageSize);
+  return {
+    rows: docs.map((entry) => ({ id: entry.id, ...entry.data() })),
+    cursor: docs.length ? docs[docs.length - 1] : (options.cursor || null),
+    hasMore: snap.docs.length > pageSize
+  };
 };
 
 window._fbGetReels = async (opts) => {

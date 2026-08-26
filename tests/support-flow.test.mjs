@@ -18,6 +18,7 @@ assert.match(index, /Active cases/, "The support-case filter must offer active c
 assert.match(index, /Resolved cases/, "The support-case filter must offer resolved cases");
 assert.match(index, /nwsbMySupportCasesSearch/, "My Support Cases must include a case-reference search field");
 assert.match(index, /Search case reference/, "The support-case search field must clearly describe its purpose");
+assert.match(index, /nwsbMySupportCasesPagination/, "My Support Cases must include pagination controls");
 assert.match(flow, /\/api\/assistant\/chat/, "Support messages must use the existing secured AI route");
 assert.match(flow, /Submitting your support case/, "Escalation must show a loading message while submission is in progress");
 assert.match(flow, /submitted successfully/, "Escalation must show a clear success confirmation");
@@ -32,6 +33,8 @@ assert.match(flow, /filterMySupportCases/, "My Support Cases must re-render when
 assert.match(flow, /filterSupportRows/, "My Support Cases must filter cached rows without widening Firestore access");
 assert.match(flow, /mySupportReferenceSearch/, "My Support Cases must read the reference-number search query");
 assert.match(flow, /caseReference \|\| row\.id/, "The reference search must use each case reference with an ID fallback");
+assert.match(flow, /loadMoreMySupportCases/, "My Support Cases must expose a Load more action");
+assert.match(flow, /_fbGetMySupportReportsPage/, "My Support Cases must use the paginated Firestore helper");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");
@@ -41,6 +44,9 @@ assert.match(firebase, /collection\(db, 'reports'\)/, "Support cases must use th
 assert.match(firebase, /caseReference/, "The support case reference must persist with the report");
 assert.match(firebase, /window\._fbGetMySupportReports/, "Firebase must expose a signed-in user case-history query");
 assert.match(firebase, /where\('reporterUid', '==', user\.uid\)/, "User support history must query only the signed-in reporter");
+assert.match(firebase, /window\._fbGetMySupportReportsPage/, "Firebase must expose a cursor-backed support-case page query");
+assert.match(firebase, /startAfter\(options\.cursor\)/, "Support report pages must advance using a Firestore cursor");
+assert.match(firebase, /limit\(pageSize \+ 1\)/, "Support report pages must efficiently detect whether another page exists");
 assert.match(rules, /allow list: if isAdmin\(\) \|\| \(signedIn\(\) && resource\.data\.reporterUid == request\.auth\.uid\);/, "Firestore rules must allow a signed-in user to list only their own support cases");
 assert.match(admin, /SUPPORT CASES/, "The admin dashboard must contain a Support Cases inbox");
 assert.match(admin, /watchSupportCases\(\)/, "The admin dashboard must watch incoming support cases");
