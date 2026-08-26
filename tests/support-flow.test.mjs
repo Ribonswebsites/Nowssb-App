@@ -37,6 +37,9 @@ assert.match(flow, /loadMoreMySupportCases/, "My Support Cases must expose a Loa
 assert.match(flow, /_fbGetMySupportReportsPage/, "My Support Cases must use the paginated Firestore helper");
 assert.match(flow, /nwsb-load-more-spinner/, "The Load more control must render a loading spinner while the next page is requested");
 assert.match(flow, /aria-busy="true"/, "The Load more control must announce its busy state while loading");
+assert.match(flow, /No matching cases yet/, "My Support Cases must show a friendly search no-match title");
+assert.match(flow, /You’re all caught up/, "My Support Cases must show a friendly active-filter empty state");
+assert.match(flow, /clearMySupportCaseFilters/, "My Support Cases must let users clear a no-match search or filter");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");

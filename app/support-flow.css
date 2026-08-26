@@ -53,6 +53,9 @@
 .nwsb-load-more-spinner{width:14px;height:14px;box-sizing:border-box;border:2px solid rgba(244,244,245,.32);border-top-color:#f4f4f5;border-radius:50%;animation:nwsb-case-spin .7s linear infinite}
 @keyframes nwsb-case-spin{to{transform:rotate(360deg)}}
 .nwsb-my-cases-empty{padding:28px 18px;border:1px solid #29292e;border-radius:18px;background:#111214;color:#aaaab1;font-size:14px;line-height:1.5;text-align:center}
+.nwsb-my-cases-empty h3{margin:0 0 7px;color:#f4f4f5;font-size:16px;line-height:1.25}
+.nwsb-my-cases-empty p{margin:0 auto;max-width:290px}
+.nwsb-my-cases-empty button{margin-top:16px;min-height:38px;border:1px solid #3b3b42;border-radius:12px;background:#191a1d;color:#f4f4f5;padding:0 13px;font:800 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .nwsb-my-case-card{overflow:hidden;border:1px solid #2b2b31;border-radius:18px;background:#111214}
 .nwsb-my-case-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 12px}
 .nwsb-my-case-ref{color:#f5e6c8;font-size:14px;font-weight:900;letter-spacing:.04em}
