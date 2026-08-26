@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 import '../data/models.dart';
@@ -11,6 +12,20 @@ class NowssbApi {
 
   static const baseUrl = 'https://nowssb-api.ribonpatil2.workers.dev';
   static final NowssbApi instance = NowssbApi._();
+
+  Future<Map<String, String>> _authHeaders() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw const NowssbApiException('Sign in to use this NowssB feature.');
+    final token = await user.getIdToken();
+    if (token == null || token.isEmpty) {
+      throw const NowssbApiException('Your NowssB sign-in session needs refreshing.');
+    }
+    return <String, String>{
+      'Content-Type': 'application/json',
+      'X-NowssB-Client': 'flutter',
+      'Authorization': 'Bearer $token',
+    };
+  }
 
   Future<PronunciationScore> scoreRecording({
     required File file,
@@ -26,10 +41,7 @@ class NowssbApi {
     final response = await http
         .post(
           Uri.parse('$baseUrl/api/groq/score'),
-          headers: const {
-            'Content-Type': 'application/json',
-            'X-NowssB-Client': 'flutter',
-          },
+          headers: await _authHeaders(),
           body: jsonEncode({
             'audio_base64': base64Encode(bytes),
             'mime_type': 'audio/mp4',
@@ -61,10 +73,7 @@ class NowssbApi {
     final response = await http
         .post(
           Uri.parse('$baseUrl/api/groq/complete'),
-          headers: const {
-            'Content-Type': 'application/json',
-            'X-NowssB-Client': 'flutter',
-          },
+          headers: await _authHeaders(),
           body: jsonEncode({
             'messages': messages,
             'model': model,
@@ -97,10 +106,7 @@ class NowssbApi {
     final response = await http
         .post(
           Uri.parse('$baseUrl/api/assistant/chat'),
-          headers: const {
-            'Content-Type': 'application/json',
-            'X-NowssB-Client': 'flutter',
-          },
+          headers: await _authHeaders(),
           body: jsonEncode({
             'mode': mode == 'coach' ? 'coach' : 'support',
             'messages': messages,

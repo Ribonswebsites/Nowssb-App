@@ -137,10 +137,15 @@
     state.busy = true;
     renderMessages();
     renderQuick();
-    fetch(API + '/api/assistant/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-NowssB-Client': 'webview' },
-      body: JSON.stringify({ mode: state.mode, messages: state.messages, context: appContext() })
+    var headerPromise = typeof window.nwsbWorkerHeaders === 'function'
+      ? window.nwsbWorkerHeaders({ 'Content-Type': 'application/json', 'X-NowssB-Client': 'webview' })
+      : Promise.reject(new Error('Sign in to use this NowssB feature'));
+    headerPromise.then(function (headers) {
+      return fetch(API + '/api/assistant/chat', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ mode: state.mode, messages: state.messages, context: appContext() })
+      });
     }).then(function (response) {
       return response.json().then(function (body) {
         if (!response.ok) throw new Error(body.error || 'Assistant request failed');

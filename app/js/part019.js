@@ -10,6 +10,15 @@ const GROQ_MODEL       = 'openai/gpt-oss-20b';
 // Legacy direct key — leave empty; all calls go through Worker
 const GROQ_KEY         = '';
 window._groqKey        = GROQ_KEY;
+
+// Provider-backed requests must carry a real Firebase ID token. This keeps
+// the Worker useful for signed-in users while preventing anonymous quota abuse.
+async function workerHeaders(extra = {}) {
+  const user = window._currentUser;
+  if (!user || typeof user.getIdToken !== 'function') throw new Error('Sign in to use this NowssB feature');
+  return { ...extra, Authorization: `Bearer ${await user.getIdToken()}` };
+}
+window.nwsbWorkerHeaders = workerHeaders;
 // ───────────────────────────────────────────────────────────
 
 // AI Personas for pronunciation feedback
@@ -25,7 +34,7 @@ const GROQ_PERSONAS = {
 async function groqChat(messages, systemPrompt, maxTokens = 400) {
   const res = await fetch(GROQ_CHAT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await workerHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({
       model: GROQ_MODEL,
       max_tokens: maxTokens,
@@ -48,7 +57,7 @@ async function callClaude(messages, { model = 'claude-haiku-4-5', max_tokens = 5
   if (thinking) payload.thinking = thinking;
   const res = await fetch(CLAUDE_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await workerHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload)
   });
   if (!res.ok) throw new Error('Claude API ' + res.status);
@@ -82,7 +91,7 @@ async function blobToBase64(audioBlob) {
 async function groqWhisper(audioBlob, word) {
   const res = await fetch(GROQ_WHISPER_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-NowssB-Client': 'web' },
+    headers: await workerHeaders({ 'Content-Type': 'application/json', 'X-NowssB-Client': 'web' }),
     body: JSON.stringify({
       audio_base64: await blobToBase64(audioBlob),
       mime_type: audioBlob.type || 'audio/webm',
@@ -98,7 +107,7 @@ async function groqWhisper(audioBlob, word) {
 async function groqScore(audioBlob, word) {
   const res = await fetch(NOWSSB_API + '/api/groq/score', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-NowssB-Client': 'web' },
+    headers: await workerHeaders({ 'Content-Type': 'application/json', 'X-NowssB-Client': 'web' }),
     body: JSON.stringify({
       audio_base64: await blobToBase64(audioBlob),
       mime_type: audioBlob.type || 'audio/webm',

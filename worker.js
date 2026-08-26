@@ -426,6 +426,24 @@ export default {
     }
     if (request.method !== 'POST') return err('Method not allowed', 405, origin);
 
+    // Expensive/provider-backed routes must be tied to a real Firebase user.
+    // CORS is not authentication: server-to-server callers can bypass it and
+    // otherwise burn the account's Workers/Groq quota anonymously.
+    const authRequiredPaths = new Set([
+      '/api/assistant/chat',
+      '/api/groq/transcribe',
+      '/api/groq/score',
+      '/api/groq/complete',
+      '/api/claude/complete',
+      '/api/elevenlabs/speak',
+      '/api/razorpay/order',
+    ]);
+    if (authRequiredPaths.has(path)) {
+      let claims = null;
+      try { claims = await connectClaims(request, env); } catch (_) { claims = null; }
+      if (!claims?.sub) return err('Sign in to use this NowssB feature', 401, origin);
+    }
+
     let body;
     try {
       body = await request.json();

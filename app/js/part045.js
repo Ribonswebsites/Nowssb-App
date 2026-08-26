@@ -280,10 +280,15 @@ window.ssStartSubscription = function(planId, billing) {
   }
 
   if (apiBase) {
-    fetch(apiBase + '/api/razorpay/order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: amountMinor, currency: 'USD', notes: { tier: planId, billing: billing, email: email } })
+    var paymentHeaders = typeof window.nwsbWorkerHeaders === 'function'
+      ? window.nwsbWorkerHeaders({ 'Content-Type': 'application/json' })
+      : Promise.reject(new Error('Sign in to use this NowssB feature'));
+    paymentHeaders.then(function(headers) {
+      return fetch(apiBase + '/api/razorpay/order', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ amount: amountMinor, currency: 'USD', notes: { tier: planId, billing: billing, email: email } })
+      });
     })
     .then(function(r){ if (!r.ok) throw new Error('Payment order unavailable'); return r.json(); })
     .then(function(ord){ if (!ord.id) throw new Error('Payment order unavailable'); _openPayment(ord.id); })
