@@ -467,6 +467,23 @@
     return d;
   }
 
+  /* The layout editor may run before or after these injected banners. Keep
+     the Normal Home's one Choose Your Path block anchored to the Fashion Mode
+     card regardless of that timing, and discard any accidental duplicate so
+     it can never remain at the top of the page. */
+  function placeNormalGenderPathBelowFashionMode() {
+    var home = document.querySelector('#home-nm .nmh-wrap');
+    var fashionMode = document.getElementById('nmhFashSwitch');
+    if (!home || !fashionMode || fashionMode.parentNode !== home) return;
+    var paths = home.querySelectorAll(':scope > [data-vbwrap="vb2"]');
+    if (!paths.length) return;
+    var path = paths[0];
+    for (var i = 1; i < paths.length; i++) paths[i].remove();
+    if (fashionMode.nextElementSibling !== path) {
+      fashionMode.parentNode.insertBefore(path, fashionMode.nextSibling);
+    }
+  }
+
   function place() {
     var added = false;
     PLACE.forEach(function (spec, i) {
@@ -504,6 +521,9 @@
        newly injected one has to be run through that pass or it stays where
        it landed while its section moves away. */
     if (added && window.hlApplyLayout) { try { window.hlApplyLayout(); } catch (e) {} }
+    placeNormalGenderPathBelowFashionMode();
+    requestAnimationFrame(placeNormalGenderPathBelowFashionMode);
+    setTimeout(placeNormalGenderPathBelowFashionMode, 80);
 
     /* Store page: the block introduces the shelf, so it sits directly above
        #ebGrid rather than at the top of the page above the hero. */
