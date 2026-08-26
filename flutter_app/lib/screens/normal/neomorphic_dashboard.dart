@@ -97,13 +97,17 @@ class _FocusCard extends StatelessWidget {
                         BoxShadow(color: Colors.white, offset: Offset(-6, -6), blurRadius: 14),
                       ],
                     ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Start session', style: TextStyle(color: Color(0xFFF3F0FF), fontSize: 14, fontWeight: FontWeight.w600)),
-                        SizedBox(width: 10),
-                        Icon(Icons.arrow_forward, size: 16, color: Color(0xFFF3F0FF)),
-                      ],
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Start session', style: TextStyle(color: Color(0xFFF3F0FF), fontSize: 14, fontWeight: FontWeight.w600)),
+                          SizedBox(width: 10),
+                          Icon(Icons.arrow_forward, size: 16, color: Color(0xFFF3F0FF)),
+                        ],
+                      ),
                     ),
                   ),
                 ),
