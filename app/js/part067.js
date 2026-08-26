@@ -20,7 +20,6 @@
     /* Above the NowssB Store section, on both homes. In the repo rather
        than on a CDN — the store is the thing the app sells from, and its
        banner should not be one network hop away from not being there. */
-    { top:    '#home-nm .nmh-store-wrap',          vid: './assets/video/store-banner.mp4?v=1' },
     /* The Fashion store's own clip, not the one the Normal home uses. It
        lands INSIDE .fash-store-wrap because `before` inserts into the
        trigger's parent, which is that wrapper now — between the head and
