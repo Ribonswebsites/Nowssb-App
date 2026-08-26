@@ -1730,19 +1730,27 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     </div><!-- /nmh-store-wrap -->
 
-    <!-- Switch to Fashion Mode section -->
-    <div id="nmhFashSwitch" onclick="localStorage.setItem('nwsb_home_mode','home');goTo('home')" style="width:100%;margin-top:16px;border-radius:22px;background:#1a1a2e;box-shadow:6px 6px 16px rgba(0,0,0,0.35),-3px -3px 8px rgba(60,60,100,0.2);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-sizing:border-box;">
-      <div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(232,213,163,0.65);margin-bottom:4px;">Experience</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:600;color:#fff;letter-spacing:0.2px;">Fashion Mode</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:rgba(255,255,255,0.45);margin-top:3px;">Dark · Cinematic · Editorial</div>
-      </div>
-      <div style="width:44px;height:44px;border-radius:50%;background:rgba(232,213,163,0.12);border:1px solid rgba(232,213,163,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
-          <path d="M3 7H11M7 3L11 7L7 11" stroke="rgba(232,213,163,0.85)" stroke-width="1.5" stroke-linecap="square"/>
-        </svg>
-      </div>
-    </div>
+    <iframe
+      id="nmhFashSwitch"
+      src="app/widgets/fashion-mode-neumorphic-white.html"
+      title="Discover the fashion experience"
+      loading="lazy"
+      style="display:block;width:100%;height:470px;margin:16px 0 0;border:0;"
+    ></iframe>
+    <script>
+      (function () {
+        var fashionCard = document.getElementById('nmhFashSwitch');
+        if (!fashionCard) return;
+        fashionCard.addEventListener('load', function () {
+          var enterButton = fashionCard.contentDocument && fashionCard.contentDocument.querySelector('[aria-label="Enter fashion mode"]');
+          if (!enterButton) return;
+          enterButton.addEventListener('click', function () {
+            localStorage.setItem('nwsb_home_mode', 'home');
+            if (typeof goTo === 'function') goTo('home');
+          });
+        });
+      })();
+    </script>
 
     <!-- Footer — same footer as the Fashion home, own ids so both carousels run independently -->
     <div class="home-footer" id="homeFooterNm">
