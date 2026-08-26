@@ -131,6 +131,8 @@ class _HomeFashionState extends State<HomeFashion> {
                   physics: const ClampingScrollPhysics(),
                   padding: const EdgeInsets.only(bottom: 108),
                   children: [
+                    const GlassWrap(child: GenderPath(dark: true)),
+                    const SizedBox(height: 16),
                     HeroGreeting(name: widget.name),
                     FashionHero(
                       onExplore: () => _go(2),
@@ -214,8 +216,6 @@ class _HomeFashionState extends State<HomeFashion> {
                 const GlassWrap(child: CustomizePanel(dark: true)),
                 const SizedBox(height: 16),
                 const GlassWrap(child: HealingGrid(dark: true)),
-                const SizedBox(height: 16),
-                const GlassWrap(child: GenderPath(dark: true)),
                 const SizedBox(height: 16),
                 const FashionPlusDoor(),
                 const SizedBox(height: 16),
