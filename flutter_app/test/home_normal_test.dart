@@ -53,9 +53,12 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(30));
-    expect(kNormalSectionOrder.toSet(), hasLength(30),
+    expect(kNormalSectionOrder, hasLength(31));
+    expect(kNormalSectionOrder.toSet(), hasLength(31),
         reason: 'two sections share a key');
+    expect(kNormalSectionOrder.indexOf('dashboard'),
+        kNormalSectionOrder.indexOf('search') + 1,
+        reason: 'the supplied dashboard must sit directly below search');
 
     for (final k in {...kNormalNoMarkup, ...kNormalDefOff}) {
       expect(kNormalSectionOrder, contains(k),
@@ -63,7 +66,7 @@ void main() {
     }
 
     // Three rows with no markup, two hidden by default — so a fresh install
-    // shows twenty-four.
+    // shows twenty-five.
     //
     // It was twenty-three. `storeban` has left the no-markup set: this home
     // registers it (app/js/part062.js:82) and never had an element for it,
@@ -73,7 +76,7 @@ void main() {
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 25);
+    expect(shown, 26);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',
