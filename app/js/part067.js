@@ -32,14 +32,14 @@
        which is what made both of them look wrong. */
     { before: '#home .fash-storeban-slot',        vid: './assets/video/store-banner-fash.mp4?v=1' },
 
-    /* Choose Your Path, on the laptop, in a section of its own.
-       It used to be appended INSIDE the Personalised Healing wrapper, which
-       made it part of that section — `after` puts it beside it instead, and
-       `wrap` gives it a wrapper of its own. Both are registered in
-       app/js/part062.js as 'genderpath'; a direct child of the home wrap
-       that the registry does not know about gets stranded at the top of the
-       page while everything registered is re-appended around it. */
-    { after: '#home-nm .nmh-healing-wrap',         vid: "", gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
+    /* Choose Your Path, on the laptop, in a section of its own. On the Normal
+       home it is inserted directly before the Experience · Fashion Mode
+       switch, so the same order survives a fresh HTML/WebView load before the
+       layout manager applies any saved custom arrangement. The wrapper is
+       registered in app/js/part062.js as 'genderpath'; a direct child of the
+       home wrap that the registry does not know about gets stranded at the top
+       of the page while everything registered is re-appended around it. */
+    { before: '#home-nm #nmhFashSwitch',            vid: "", gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',

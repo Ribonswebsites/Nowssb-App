@@ -182,8 +182,11 @@
            so saved home layouts do not strand them above the greeting.
        8 — Personalized Healing and Choose Your Path move directly before
            Experience · Fashion Mode (Fashion Plus), preventing the healing
-           block from being hoisted to the top by a saved Fashion layout. */
-  var LAYOUT_V = 8;
+           block from being hoisted to the top by a saved Fashion layout.
+       9 — Choose Your Path moves immediately before Experience · Fashion Mode
+           on the Normal home as well, matching the injected HTML order and
+           correcting existing WebView layouts stored on device. */
+  var LAYOUT_V = 9;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -250,6 +253,17 @@
         var fashionPlusAt = order.indexOf('fashplus');
         if (fashionPlusAt < 0) fashionPlusAt = order.length;
         order.splice(fashionPlusAt, 0, 'healing', 'genderpath');
+      }
+      /* v9: the normal home must keep the Choose Your Path laptop directly
+         above the Experience · Fashion Mode switch. This is deliberately a
+         narrow migration: it moves only that block and preserves every other
+         arrangement the reader has already selected. */
+      if (which === 'nm' && (raw.v || 0) < 9) {
+        var genderPathAt = order.indexOf('genderpath');
+        if (genderPathAt >= 0) order.splice(genderPathAt, 1);
+        var fashionSwitchAt = order.indexOf('fashsw');
+        if (fashionSwitchAt < 0) fashionSwitchAt = order.length;
+        order.splice(fashionSwitchAt, 0, 'genderpath');
       }
       try {
         localStorage.setItem(LSKEY(which), JSON.stringify({ order: order, off: off, v: LAYOUT_V }));
