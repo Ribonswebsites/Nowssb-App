@@ -45,6 +45,8 @@ assert.match(flow, /aria-hidden="true"/, "The decorative empty-state illustratio
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-empty-support-illustration/, "The support empty-state illustration must have dedicated styles");
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /@keyframes nwsb-empty-illustration-in/, "The support empty-state illustration must have a subtle entry animation");
 assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /prefers-reduced-motion:reduce/, "The illustration animation must respect reduced-motion preferences");
+assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-card:hover/, "Support case cards must have subtle pointer hover feedback");
+assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-my-case-card:focus-within/, "Support case cards must provide keyboard focus feedback");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");
