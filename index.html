@@ -962,41 +962,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 
     <!-- Supplied dashboard — used directly below Normal Home search. The
-         host adds only placement and lets the file size itself to content. -->
-    <section class="nmh-supplied-dashboard" aria-label="Daily dashboard">
-      <iframe src="app/widgets/neomorphic_dashboard.html" title="Daily dashboard" loading="lazy" onload="this.style.height=(this.contentDocument.documentElement.scrollHeight + 1) + 'px'" scrolling="no"></iframe>
-    </section>
-    <section class="nmh-supplied-essentials" aria-label="Your essentials">
-      <iframe src="app/widgets/neumorphic-essentials.html" title="Your essentials" loading="lazy" onload="this.style.height=(this.contentDocument.documentElement.scrollHeight + 1) + 'px'" scrolling="no"></iframe>
-    </section>
-    <script>
-      window.addEventListener('message', function(event) {
-        var dashboardFrame = document.querySelector('.nmh-supplied-dashboard iframe');
-        var essentialsFrame = document.querySelector('.nmh-supplied-essentials iframe');
-        if (event.origin !== window.location.origin || !event.data) return;
-        if (event.source === (essentialsFrame && essentialsFrame.contentWindow) && event.data.type === 'nowssb-essentials-resize') {
-          essentialsFrame.style.height = (essentialsFrame.contentDocument.documentElement.scrollHeight + 1) + 'px';
-          return;
-        }
-        if (event.source !== (dashboardFrame && dashboardFrame.contentWindow)) return;
-        if (event.data.type === 'nowssb-dashboard-resize') {
-          dashboardFrame.style.height = (dashboardFrame.contentDocument.documentElement.scrollHeight + 1) + 'px';
-          return;
-        }
-        if (event.data.type === 'nowssb-dashboard-ready') {
-          if (typeof window.nowssbDashboardRefresh === 'function') window.nowssbDashboardRefresh();
-          return;
-        }
-        if (event.data.type !== 'nowssb-dashboard-action') return;
-        if (event.data.action === 'practice' && typeof window.startDashboardPractice === 'function') {
-          window.startDashboardPractice(event.data.routineId);
-        } else if (event.data.action === 'progress' && typeof openSub === 'function') {
-          openSub('my-progress');
-        } else if (event.data.action === 'routines' && typeof openSub === 'function') {
-          openSub('routines');
-        }
-      });
-    </script>
+         hosts add only placement; their supplied documents are rendered
+         directly into this page rather than inside an external iframe. -->
+    <section class="nmh-supplied-dashboard" aria-label="Daily dashboard" data-direct-neomorphic="dashboard"></section>
+    <section class="nmh-supplied-essentials" aria-label="Your essentials" data-direct-neomorphic="essentials"></section>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <filter id="npcRippleBlue" x="-20%" y="-20%" width="140%" height="140%">
         <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="2" seed="11" result="turb">
@@ -10645,6 +10614,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="nowssb-nm.js?v=180" defer></script>
 <script src="nowssb-player.js?v=309" defer></script>
 <script src="app/js/part094-dashboard-live.js?v=1" defer></script>
+<script src="app/js/part095-direct-neomorphic-sections.js?v=1" defer></script>
 
 <script>
 /* ── How tall the fixed home header is, as a CSS variable ──

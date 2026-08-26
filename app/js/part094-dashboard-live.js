@@ -1,6 +1,6 @@
 /* Live Normal Home dashboard.
-   The iframe owns only the supplied visual design; this file owns account
-   data, routine selection, and the real practice-player launch. */
+   The direct page renderer owns the supplied visual design; this file owns
+   account data, routine selection, and the real practice-player launch. */
 (function () {
   'use strict';
 
@@ -124,9 +124,10 @@
   }
 
   function postDashboard() {
-    var frame = document.querySelector('.nmh-supplied-dashboard iframe');
-    if (!frame || !frame.contentWindow) return;
-    frame.contentWindow.postMessage({ type: 'nowssb-dashboard-data', dashboard: dashboardState(cachedData) }, window.location.origin);
+    var state = dashboardState(cachedData);
+    if (typeof window.nowssbDirectDashboardRender === 'function') {
+      window.nowssbDirectDashboardRender(state);
+    }
   }
 
   window.nowssbDashboardRefresh = async function () {
