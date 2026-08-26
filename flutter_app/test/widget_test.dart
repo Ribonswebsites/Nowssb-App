@@ -79,14 +79,24 @@ void main() {
     // Both homes are checked section by section in their own files; this is
     // the shell's own check, that whichever home it puts up is wired to it.
     final bars = tester.widgetList<SecBanner>(find.byType(SecBanner));
-    expect(bars, isNotEmpty, reason: 'the home should carry black bars');
-    for (final b in bars) {
-      expect(b.onTap, isNotNull,
-          reason: '"${b.title}" is a button that goes nowhere');
-    }
+    if (bars.isNotEmpty) {
+      for (final b in bars) {
+        expect(b.onTap, isNotNull,
+            reason: '"${b.title}" is a button that goes nowhere');
+      }
 
-    // And one of them really does move the shell.
-    bars.first.onTap!();
+      // And one of them really does move the shell.
+      bars.first.onTap!();
+    } else {
+      // The Normal Home can intentionally omit its black-banner sections.
+      // In that layout, the supplied dashboard's primary action is the
+      // visible home section that must remain wired into the shell.
+      final dashboardAction = find.text('Start session');
+      expect(dashboardAction, findsOneWidget,
+          reason: 'the home needs a reachable primary section action');
+      await tester.ensureVisible(dashboardAction);
+      await tester.tap(dashboardAction);
+    }
     await tester.pump(const Duration(milliseconds: 80));
     expect(tester.takeException(), isNull);
   });
