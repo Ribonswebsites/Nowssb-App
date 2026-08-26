@@ -12,6 +12,8 @@
 (function () {
   'use strict';
 
+  var V = 'https://res.cloudinary.com/eenvubod/video/upload/';
+
   /* before: the banner is inserted as the element's previous sibling.
      top:    the banner is inserted as the element's first child.
      bottom: the banner is appended as the element's last child.
@@ -43,7 +45,7 @@
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
               banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
                                    else if (typeof openSub === 'function') openSub('health-category'); } } },
-    { after: '#home .fash-healing-wrap',           vid: "", gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
+    { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
@@ -61,7 +63,7 @@
 
     // Trending
     { top:    '#home-nm .nmh-trend-shop-wrap',     vid: "" },
-    { top:    '#home .fash-storevid-wrap',         vid: "" },
+    { top:    '#home .fash-storevid-wrap',         vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
 
     // Meaning — a different clip in each place it appears
     { before: '#home-nm .krm-section',             vid: "", frame: 'dev-tab-l', wrap: 'nvb-blk' },
@@ -73,7 +75,7 @@
     /* Below the store's own cinematic hero (#msBanner), not above it — a
        `top` placement into #msMeaningBody had been landing it before the
        hero as that host's first child instead. */
-    { after:  '#msBanner',                         vid: "" },
+    { after:  '#msBanner',                         vid: V + 'v1785406069/grok_video_2026-07-30-15-36-38_uq9l5d.mp4' },
 
     /* These two pages hang their scroller off `position: absolute; inset: 0`,
        so a banner at the top of the page box sits behind it. It goes at the
@@ -84,7 +86,7 @@
 
     // Every word's own page, above About This Word — a player banner, so it
     // carries the player mark on the right and opens the practice.
-    { before: '.rmd-desc-block',                   vid: './assets/video/remote-b0f763363402ac036791e981781d269ae686e96ae4adb99ed5de6e7b1a64d32b.mp4',
+    { before: '.rmd-desc-block',                   vid: 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438349/grok_video_2026-07-31-00-34-23_ouxhic.mp4',
       player: 1, go: 'openPracticeIntro()' }
   ];
 
@@ -98,7 +100,7 @@
      either. The two new ones are local files — they ship with the app and
      the cache warms them like everything else. */
   var COUPON_VIDS = [
-    './assets/video/remote-e1c631d8fc5d325a9f90d923a687a36fcdf1f54a642f7ea88c2852f4bd89e8af.mp4',
+    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438343/grok_video_2026-07-31-00-34-06_c2fuko.mp4',
     './assets/video/coupon-a.mp4',
     './assets/video/coupon-b.mp4'
   ];
@@ -122,14 +124,14 @@
      finally appear. See collectVideoUrls() in app/js/part051.js. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(COUPON_VIDS);
   var COUPON_HOSTS = '#nmhGreetImg, #fashCouponImg, #rmdCouponBanner, #msdCouponBanner';
-  var PLAYER_ICON = 'assets/media/image/7217d187426a2ad9d68f2933e6605cb0f76c09f1961bc3ed-3db811d6.webp';
+  var PLAYER_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png';
 
   /* The eBooks clip is not a plain banner — it carries its own black banner
      underneath it inside one glass wrapper, and it goes in three places: the
      home sections, above the shelf on the store page, and above the copy on
      every book's own page. */
-  var EB_VID  = "./assets/video/remote-beaf11ea10561d439ff2d8217da6c6e889accdbb3b20bb1e7b4236cbe754305e.mp4";
-  var EB_ICON = 'assets/media/image/5e96822df79570071705c1fb1943b0c1b895278548c8e426-0dde6c30.png';
+  var EB_VID  = V + 'v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4';
+  var EB_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png';
 
   /* The subscription clip was the same one in several places. The two home
      banners keep a clip of their own; the plan banner on the subscription
@@ -153,26 +155,27 @@
       vid: ["",
             './assets/video/subscription-a.mp4'] },
     { sel: '.ss-plan-banner-vid',
-      vid: "" },
+      vid: V + 'v1785406071/grok_video_2026-07-30-15-36-45_ihftsp.mp4' },
     /* The Edition section — the card that carries the plan and Upgrade,
        not the Subscribe Today banner above it. A different cloud from the
        rest, so the full URL rather than the V prefix. */
     { sel: '.fsec-video',
-      vid: './assets/video/remote-bd608efe4ad901c6464df9b7d5bcbe0884b25ac09492f3e6f874925cdfc1fb4f.mp4' }
+      vid: 'https://res.cloudinary.com/dkzxw33ln/video/upload/v1785518003/grok_video_2026-07-31-22-26-26_xiytvf.mp4' }
   ];
 
   /* ── What a banner leads to, named down its right-hand side ────────
      Every icon here is a file the app already ships and already uses for
      that section — the Quick Links rail's own map — so a chip reads as the
      same thing the user taps elsewhere. ── */
+  var I = 'https://res.cloudinary.com/';
   var CHIP_IC = {
-    meaning: "assets/media/image/85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa-fa4f86f4.png",
-    words:   "assets/media/image/71c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d-330d4dee.webp",
-    ebooks:  "assets/media/image/5e96822df79570071705c1fb1943b0c1b895278548c8e426-0dde6c30.png",
-    connect: "assets/media/image/447072cdece7eb07f670832effdae7f062973b76151f3bde-08f4337b.webp",
-    chat:    "assets/media/image/265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e-46fef40b.webp",
-    profile: "assets/media/image/1e60226665c68128ad03987930169b94504c89b3fe74ccc8-d7dfb697.webp",
-    offer:   "assets/media/image/6b747aedbfb40a251b398b9008515762e808019375e58389-afcb8741.png"
+    meaning: I + 'eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png',
+    words:   I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
+    ebooks:  I + 'eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png',
+    connect: I + 'eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+    chat:    I + 'ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
+    profile: I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+    offer:   I + 'eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png'
   };
   var STORE_CHIPS = [
     ['meaning', 'Meanings', 'The origin behind any word'],

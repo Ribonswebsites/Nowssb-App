@@ -80,7 +80,7 @@ const _videoMap = {
   'sub-meaning-search':['krm-video', 'nssMeaningVid', 'msBannerImg'],
 };
 // Step screens share same video src — just one preload needed
-const _stepVideoSrc = './assets/video/remote-90550ee5f40f4a2a62154d960a717de8e53798a9901dd04aba92fc3bd358ba4c.mp4';
+const _stepVideoSrc = 'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4';
 const _stepScreens = ['sub-shabdapathy','sub-pronunciation','sub-namasmaran','sub-electricity','sub-moral','sub-birthday'];
 
 // Preload a video src silently in background
@@ -124,14 +124,14 @@ function _pauseScreenVideos(screenId) {
 function _runSequentialPreload() {
   const queue = [
     // Home video first — most likely destination
-    './assets/video/remote-1e9a0c8d452a809f4a536d634acae5e78e9275425b71c640f109d57ea54beac7.mp4',
+    'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/v1778061531/grok_video_2026-05-06-15-27-23_zhylbe.mp4',
     // Step screen video (shared)
     _stepVideoSrc,
     // Word search
-    './assets/video/remote-4ce3c9019dd56ccdf4e23823d334ebc231eadb0bdde19b0bb1c2259ff07fe394.mp4',
+    'https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4',
     // Meaning search
-    './assets/video/remote-3376b48971b038f63b4cad412f16877305b17e8e48169c4740c0dea542decbe9.mp4',
-    './assets/video/remote-3c8eebc74d743135d122f46573bed601fbf2261eca520f1b5f1e81aee494bbc6.mp4',
+    'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4',
+    'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/f_auto/v1778511160/grok_video_2026-05-11-19-06-52_e67kc6.mp4',
   ];
   let i = 0;
   function next() {
@@ -2361,8 +2361,8 @@ var _rmdCurrentKey = null;
    media cache with every other clip in the app and sw.js serves them
    from there offline. */
 var RMD_VIDS = [
-  './assets/video/remote-928f93861b9beb2672f989f80fc1ee0d5db4572a4cd60ac3dd599976f6899118.mp4',
-  './assets/video/remote-ee4719e03b541a089e4aabfa7afe619d3b5af7bd84ce907b0b8768c9abf0a280.mp4'
+  'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-43-13_qh2qjg.mp4',
+  'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-42-54_we5gke.mp4'
 ];
 var _rmdVidIdx = -1;
 /* Built only when a word is opened, so the pre-warmer cannot find them by
