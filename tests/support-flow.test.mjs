@@ -40,6 +40,9 @@ assert.match(flow, /aria-busy="true"/, "The Load more control must announce its 
 assert.match(flow, /No matching cases yet/, "My Support Cases must show a friendly search no-match title");
 assert.match(flow, /You’re all caught up/, "My Support Cases must show a friendly active-filter empty state");
 assert.match(flow, /clearMySupportCaseFilters/, "My Support Cases must let users clear a no-match search or filter");
+assert.match(flow, /nwsb-empty-support-illustration/, "My Support Cases empty states must include a friendly support illustration");
+assert.match(flow, /aria-hidden="true"/, "The decorative empty-state illustration must stay out of the accessibility tree");
+assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /nwsb-empty-support-illustration/, "The support empty-state illustration must have dedicated styles");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");
