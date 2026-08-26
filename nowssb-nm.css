@@ -12163,59 +12163,20 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
 .nmh-search-go .nwsb-search-icon { width: 18px; height: 18px; object-fit: contain; display: block; filter: brightness(0) invert(1); }
 .nmh-search-go:active { transform: scale(0.94); }
 
-/* Daily dashboard — compact cards directly below Normal Home search. There
-   is deliberately no fixed-height outer phone/frame, so the following home
-   section begins as soon as the dashboard content ends. */
+/* Supplied dashboard — direct document below Normal Home search. The host
+   deliberately provides no phone/card frame, shadow or fixed height; the
+   dashboard file keeps its exact own design and sizes to its content. */
 #home-nm .nmh-supplied-dashboard {
-  width: calc(100% - 32px);
-  margin: 24px 16px 18px;
-  color: #1c1c1c;
+  width: 100%;
+  margin: 24px 0 18px;
 }
-.nmh-dashboard-focus,
-.nmh-dashboard-progress,
-.nmh-dashboard-next {
-  background: #f5f5f5;
-  box-shadow: 8px 8px 16px #d9d9d9, -8px -8px 16px #ffffff;
+#home-nm .nmh-supplied-dashboard iframe {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  background: transparent;
 }
-.nmh-dashboard-focus { position: relative; overflow: hidden; border-radius: 28px; padding: 24px; min-height: 184px; }
-.nmh-dashboard-copy { position: relative; z-index: 1; max-width: 68%; }
-.nmh-dashboard-label { font-size: 13px; color: #767676; margin-bottom: 10px; }
-.nmh-dashboard-focus h2 { margin: 0; color: #1c1c1c; font-size: 27px; line-height: 1.08; letter-spacing: -.6px; }
-.nmh-dashboard-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin: 16px 0 20px; color: #767676; font-size: 12px; line-height: 1.2; }
-.nmh-dashboard-meta span { width: 6px; height: 6px; border-radius: 50%; background: #a79ae8; }
-.nmh-dashboard-meta strong { color: #1c1c1c; font-weight: 600; }
-.nmh-dashboard-start { display: inline-flex; align-items: center; gap: 10px; border: 0; border-radius: 18px; padding: 13px 20px; background: linear-gradient(145deg,#333a4a,#232833); color: #f3f0ff; font: 600 14px 'DM Sans',sans-serif; box-shadow: 6px 6px 14px #b9bfc9, -6px -6px 14px #fff; }
-.nmh-dashboard-start svg { width: 16px; height: 16px; }
-.nmh-dashboard-blobs { position: absolute; right: 15px; top: 18px; width: 120px; height: 120px; }
-.nmh-dashboard-blobs i { position: absolute; left: 2px; top: 28px; width: 76px; height: 68px; border-radius: 48% 52% 47% 53%; background: linear-gradient(135deg,#c9c2f0,#e7e2fb); transform: rotate(18deg); }
-.nmh-dashboard-blobs b { position: absolute; right: 0; top: 0; width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg,#7c6ae0,#9384e8); }
-.nmh-dashboard-heading { display: flex; align-items: center; justify-content: space-between; margin: 28px 2px 14px; }
-.nmh-dashboard-heading h2 { margin: 0; font-size: 17px; line-height: 1; color: #1c1c1c; }
-.nmh-dashboard-heading button { display: inline-flex; align-items: center; gap: 4px; border: 0; padding: 0; background: transparent; color: #767676; font: 13px 'DM Sans',sans-serif; }
-.nmh-dashboard-heading svg { width: 16px; height: 16px; }
-.nmh-dashboard-progress { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border-radius: 24px; padding: 20px 6px; }
-.nmh-dashboard-metric { min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 5px; }
-.nmh-dashboard-metric + .nmh-dashboard-metric { border-left: 1px solid rgba(217,217,217,.8); }
-.nmh-dashboard-metric i { width: 50px; height: 50px; display: grid; place-items: center; margin-bottom: 10px; border-radius: 50%; background: #fff; box-shadow: 6px 6px 12px #d9d9d9, -6px -6px 12px #fff; color: #888; font: 32px/1 sans-serif; font-style: normal; }
-.nmh-dashboard-metric i.check { color: #3ba55d; font-size: 37px; }
-.nmh-dashboard-metric i.fire { color: #e78a3e; font-size: 35px; }
-.nmh-dashboard-metric i.target { color: #8a6fe0; font-size: 39px; }
-.nmh-dashboard-metric strong { color: #1c1c1c; font-size: 22px; line-height: 1; }
-.nmh-dashboard-metric span { margin-top: 7px; color: #767676; font-size: 11px; line-height: 1.23; }
-.nmh-dashboard-upnext-head { margin-top: 30px; }
-.nmh-dashboard-next { border-radius: 24px; padding: 8px 16px; }
-.nmh-dashboard-next-row { width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 0; border: 0; background: transparent; color: #1c1c1c; text-align: left; }
-.nmh-dashboard-next-row + .nmh-dashboard-next-row { border-top: 1px solid rgba(217,217,217,.9); }
-.nmh-dashboard-next-row i { width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center; border-radius: 50%; background: #fff; box-shadow: 5px 5px 10px #d9d9d9, -5px -5px 10px #fff; color: #e78a3e; font: 30px/1 sans-serif; font-style: normal; }
-.nmh-dashboard-next-row i.muted { color: #8a8a8a; }
-.nmh-dashboard-next-row span { flex: 1; min-width: 0; border-left: 1px solid rgba(217,217,217,.9); padding-left: 14px; }
-.nmh-dashboard-next-row strong,.nmh-dashboard-next-row small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.nmh-dashboard-next-row strong { font-size: 15px; font-weight: 600; }
-.nmh-dashboard-next-row small { margin-top: 2px; font-size: 12.5px; color: #767676; }
-.nmh-dashboard-next-row svg { width: 18px; height: 18px; color: #a8a8a8; }
-@media (max-width:360px) { .nmh-dashboard-focus h2 { font-size:24px; } .nmh-dashboard-meta { font-size:11px; } .nmh-dashboard-metric i { width:44px; height:44px; } .nmh-dashboard-metric strong { font-size:19px; } }
-#home-nm.nm-dark .nmh-supplied-dashboard { color: #1c1c1c; }
-#home-nm.nm-dark .nmh-dashboard-focus,#home-nm.nm-dark .nmh-dashboard-progress,#home-nm.nm-dark .nmh-dashboard-next { background:#f5f5f5; }
 }
 
 

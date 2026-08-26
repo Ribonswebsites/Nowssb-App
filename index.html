@@ -933,33 +933,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </button>
     </div>
 
-    <!-- Daily dashboard — one compact Normal Home section directly below
-         search. Its cards fit their content; there is no outer iframe or
-         fixed-height panel underneath. -->
+    <!-- Supplied dashboard — used directly below Normal Home search. The
+         host adds only placement and lets the file size itself to content. -->
     <section class="nmh-supplied-dashboard" aria-label="Daily dashboard">
-      <article class="nmh-dashboard-focus">
-        <div class="nmh-dashboard-copy">
-          <div class="nmh-dashboard-label">Today's focus</div>
-          <h2>Morning<br>Resonance</h2>
-          <div class="nmh-dashboard-meta"><span></span><strong>Daily practice</strong><span></span>Begin with a clear tone</div>
-          <button type="button" class="nmh-dashboard-start" onclick="openSub('practice')">Start practice <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>
-        <div class="nmh-dashboard-blobs" aria-hidden="true"><i></i><b></b></div>
-      </article>
-
-      <div class="nmh-dashboard-heading"><h2>Your progress</h2><button type="button">View all <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-      <div class="nmh-dashboard-progress">
-        <div class="nmh-dashboard-metric"><i class="check">✓</i><strong>0</strong><span>meditation<br>sessions</span></div>
-        <div class="nmh-dashboard-metric"><i>◷</i><strong>0</strong><span>words in<br>practice</span></div>
-        <div class="nmh-dashboard-metric"><i class="fire">♨</i><strong>0</strong><span>day streak</span></div>
-        <div class="nmh-dashboard-metric"><i class="target">◎</i><strong>0%</strong><span>meditation<br>goal</span></div>
-      </div>
-
-      <div class="nmh-dashboard-heading nmh-dashboard-upnext-head"><h2>Up next</h2><button type="button">View all <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-      <div class="nmh-dashboard-next">
-        <button type="button" class="nmh-dashboard-next-row" onclick="openSub('practice')"><i class="calendar">▣</i><span><strong>Morning</strong><small>Morning</small></span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <button type="button" class="nmh-dashboard-next-row" onclick="openSub('practice')"><i class="calendar muted">▣</i><span><strong>Build your routine</strong><small>Set a daily practice system</small></span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </div>
+      <iframe src="app/widgets/neomorphic_dashboard.html" title="Daily dashboard" loading="lazy" onload="this.style.height=(this.contentDocument.documentElement.scrollHeight + 1) + 'px'" scrolling="no"></iframe>
     </section>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <filter id="npcRippleBlue" x="-20%" y="-20%" width="140%" height="140%">
