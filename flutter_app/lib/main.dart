@@ -22,7 +22,7 @@ import 'data/content.dart';
 import 'data/firebase.dart';
 import 'data/settings.dart';
 import 'media/video_pool.dart';
-import 'screens/splash.dart';
+import 'screens/hero_reveal.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
@@ -109,7 +109,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
         children: [
           const NavShell(),
           if (!_splashDone)
-            Splash(onDone: () {
+            HeroReveal(onDone: () {
               VideoPool.instance.unhold();
               setState(() => _splashDone = true);
             }),
