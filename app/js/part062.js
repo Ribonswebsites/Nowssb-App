@@ -96,7 +96,7 @@
            the wrapper above. A direct child of the home wrap that this
            registry does not know about gets stranded at the top of the page
            while every registered one is re-appended around it. */
-        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 },
+        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1, locked:1, before:'fashsw' },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name', defOff:1 },
         { k:'fashsw',   sel:['#nmhFashSwitch'],                                            t:S, label:'Fashion Mode',          sub:'Switch to the Fashion home' },
@@ -186,7 +186,7 @@
        9 — Choose Your Path moves immediately before Experience · Fashion Mode
            on the Normal home as well, matching the injected HTML order and
            correcting existing WebView layouts stored on device. */
-  var LAYOUT_V = 10;
+  var LAYOUT_V = 11;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -347,6 +347,21 @@
         if (n === ref || !ref.parentNode) return;
         ref.parentNode.insertBefore(n, ref.nextSibling);
         ref = n;   // keep a multi-node section in its own order
+      });
+    });
+
+    /* A fixed section can be anchored immediately ABOVE another section as
+       well. Choose Your Path must never be allowed to remain at the top of
+       the Normal home: it belongs directly before the Fashion Mode card even
+       when an existing saved order was created before that relationship. */
+    reg.items.forEach(function (it) {
+      if (!it.before) return;
+      var anchors = nodesOf(wrap, itemOf(which, it.before));
+      if (!anchors.length) return;
+      var ref = anchors[0];
+      nodesOf(wrap, it).forEach(function (n) {
+        if (n === ref || !ref.parentNode) return;
+        ref.parentNode.insertBefore(n, ref);
       });
     });
   }
