@@ -11,6 +11,7 @@ class Settings extends ChangeNotifier {
   static const _kPlus = 'nwsb_fashplus_v2';
   static const _kHome = 'nwsb_home_mode';
   static const _kFashionHeroFix = 'nwsb_fashion_hero_fix_v1';
+  static const _kNativeNormalStartupFix = 'nwsb_native_normal_startup_v1';
   static const _kVoice = 'nwsb_pw_voice';
   static const _kLoop = 'nwsb_pw_loop';
   static const _kReps = 'nwsb_pw_reps';
@@ -27,7 +28,7 @@ class Settings extends ChangeNotifier {
   static const _kFashionBackground = 'nwsb_fashion_background_index';
 
   bool _fashionPlus = true;
-  bool _fashionHome = true;
+  bool _fashionHome = false;
   String _voice = 'female';
   String _loop = 'off';
   int _reps = 7;
@@ -81,14 +82,21 @@ class Settings extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       _fashionPlus = p.getBool(_kPlus) ?? true;
-      _fashionHome = p.getBool(_kHome) ?? true;
-      // Existing 9.6.8 installs persisted Normal Home, which hid the
-      // August 15 TV Hero. Move them to the corrected Fashion Hero once;
-      // afterward the user’s explicit Normal/Fashion choice is respected.
-      final heroFixApplied = p.getBool(_kFashionHeroFix) ?? false;
-      if (!heroFixApplied) {
-        _fashionHome = true;
-        await p.setBool(_kHome, true);
+      _fashionHome = p.getBool(_kHome) ?? false;
+      // The previous release could launch into the legacy Fashion/WebView-like
+      // surface by default. Make the native Normal home the first surface once;
+      // the Fashion home remains available through the mode switch and all of
+      // the Fashion-specific composition stays unchanged afterward.
+      final nativeNormalStartupApplied =
+          p.getBool(_kNativeNormalStartupFix) ?? false;
+      if (!nativeNormalStartupApplied) {
+        _fashionHome = false;
+        await p.setBool(_kHome, false);
+        await p.setBool(_kNativeNormalStartupFix, true);
+      }
+      // Keep the historical migration marker so older installs do not repeat
+      // the obsolete hero migration if they already carried it.
+      if (!(p.getBool(_kFashionHeroFix) ?? false)) {
         await p.setBool(_kFashionHeroFix, true);
       }
       _voice = p.getString(_kVoice) ?? 'female';

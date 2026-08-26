@@ -66,11 +66,7 @@ class HomeHeader extends StatelessWidget {
                 child: Image.asset(
                   'assets/icons/logo-disc.webp',
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const ColoredBox(
-                    color: Color(0xFF14141C),
-                    child:
-                        Icon(Icons.headphones, size: 22, color: Colors.white),
-                  ),
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),
               const SizedBox(width: 12),
