@@ -213,6 +213,10 @@ class _HomeFashionState extends State<HomeFashion> {
                 const SizedBox(height: 16),
                 const GlassWrap(child: CustomizePanel(dark: true)),
                 const SizedBox(height: 16),
+                const GlassWrap(child: HealingGrid(dark: true)),
+                const SizedBox(height: 16),
+                const GlassWrap(child: GenderPath(dark: true)),
+                const SizedBox(height: 16),
                 const FashionPlusDoor(),
                 const SizedBox(height: 16),
                 GlassWrap(
@@ -344,10 +348,6 @@ class _HomeFashionState extends State<HomeFashion> {
                     bannerSub: 'People, chat, the feed',
                   ),
                 ),
-                const SizedBox(height: 16),
-                const GlassWrap(child: HealingGrid(dark: true)),
-                const SizedBox(height: 16),
-                const GlassWrap(child: GenderPath(dark: true)),
                 const SizedBox(height: 16),
                 GlassWrap(
                   child: BannerSection(

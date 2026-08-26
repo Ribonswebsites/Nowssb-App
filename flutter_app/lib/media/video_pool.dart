@@ -158,10 +158,13 @@ class VideoPool {
 
   static final VideoPool instance = VideoPool._();
 
-  /// Keep only a small number of hardware decoders alive. Every other
-  /// mounted clip remains on its poster until it becomes the selected feature.
+  /// Do not impose the former four-controller application cap. Only mounted,
+  /// visible leases ask for a controller, so every visible native Flutter video
+  /// can play concurrently. The platform may still reject a controller when a
+  /// particular device exhausts its hardware decoder capacity; those clips
+  /// remain on their poster and retry through the normal heartbeat.
   /// The protected launch animation is managed by Splash and never enters this pool.
-  static const int maxLive = 4;
+  static const int maxLive = 64;
 
   final List<VideoLease> _leases = [];
   final Set<VideoLease> _live = {};
