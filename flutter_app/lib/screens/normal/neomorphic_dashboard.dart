@@ -28,13 +28,13 @@ class NmSuppliedDashboard extends StatelessWidget {
         children: [
           _FocusCard(onStart: onStart),
           const SizedBox(height: 26),
-          const _SectionHeader(title: 'Your progress'),
+          _SectionHeader(title: 'Your progress', onTap: onStart),
           const SizedBox(height: 14),
           const _ProgressCard(),
           const SizedBox(height: 26),
-          const _SectionHeader(title: 'Up next'),
+          _SectionHeader(title: 'Up next', onTap: onStart),
           const SizedBox(height: 14),
-          const _UpNextCard(),
+          _UpNextCard(onTap: onStart),
         ],
       ),
     );
@@ -176,20 +176,24 @@ class _FocusBlob extends StatelessWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
+  const _SectionHeader({required this.title, this.onTap});
   final String title;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: NmSuppliedDashboard._textDark)),
-          const Row(
-            children: [
-              Text('View all', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
-              SizedBox(width: 4),
-              Icon(Icons.chevron_right, size: 16, color: NmSuppliedDashboard._textMid),
-            ],
+          GestureDetector(
+            onTap: onTap,
+            child: const Row(
+              children: [
+                Text('View all', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
+                SizedBox(width: 4),
+                Icon(Icons.chevron_right, size: 16, color: NmSuppliedDashboard._textMid),
+              ],
+            ),
           ),
         ],
       );
@@ -257,33 +261,37 @@ class _Metric extends StatelessWidget {
 }
 
 class _UpNextCard extends StatelessWidget {
-  const _UpNextCard();
+  const _UpNextCard({this.onTap});
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => const NeuCard(
+  Widget build(BuildContext context) => NeuCard(
         color: NmSuppliedDashboard._surface,
         radius: 24,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: const Column(
+        child: Column(
           children: [
-            _UpNextRow(icon: Icons.calendar_today_outlined, color: Color(0xFFE78A3E), title: 'Team stand-up', subtitle: '10:00 AM · 30 min', status: 'Soon'),
-            Divider(height: 1, color: Color(0x99D9D9D9)),
-            _UpNextRow(icon: Icons.description_outlined, color: Color(0xFF8A8A8A), title: 'Design review', subtitle: '2:00 PM · 1h 0m'),
+            _UpNextRow(icon: Icons.calendar_today_outlined, color: const Color(0xFFE78A3E), title: 'Team stand-up', subtitle: '10:00 AM · 30 min', status: 'Soon', onTap: onTap),
+            const Divider(height: 1, color: Color(0x99D9D9D9)),
+            _UpNextRow(icon: Icons.description_outlined, color: const Color(0xFF8A8A8A), title: 'Design review', subtitle: '2:00 PM · 1h 0m', onTap: onTap),
           ],
         ),
       );
 }
 
 class _UpNextRow extends StatelessWidget {
-  const _UpNextRow({required this.icon, required this.color, required this.title, required this.subtitle, this.status});
+  const _UpNextRow({required this.icon, required this.color, required this.title, required this.subtitle, this.status, this.onTap});
   final IconData icon;
   final Color color;
   final String title;
   final String subtitle;
   final String? status;
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 14),
         child: Row(
           children: [
@@ -309,6 +317,7 @@ class _UpNextRow extends StatelessWidget {
             else
               const Icon(Icons.chevron_right, size: 18, color: Color(0xFFA8A8A8)),
           ],
+        ),
         ),
       );
 }

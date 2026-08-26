@@ -19,18 +19,7 @@
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg);
-    display:flex;
-    justify-content:center;
-    padding:24px 10px;
-  }
-  .phone{
-    width:380px;
-    background:var(--bg);
-    border-radius:36px;
-    padding:22px 18px 30px;
-    box-shadow:
-      14px 14px 30px var(--shadow-dark),
-      -14px -14px 30px var(--shadow-light);
+    padding:0;
   }
 
   /* ---------- Neomorphic helpers ---------- */
@@ -130,6 +119,7 @@
     display:flex;
     align-items:center;
     gap:4px;
+    cursor:pointer;
   }
 
   /* ---------- Progress ---------- */
@@ -205,6 +195,7 @@
     gap:14px;
     padding:14px 0;
     position:relative;
+    cursor:pointer;
   }
   .upnext-row + .upnext-row{
     border-top:1px solid var(--shadow-dark);
@@ -264,8 +255,6 @@
 </head>
 <body>
 
-<div class="phone">
-
   <!-- Today's focus -->
   <div class="focus-card neo-raised">
     <div class="focus-label">Today's focus</div>
@@ -274,7 +263,7 @@
       <span class="dot"></span><span class="bold">2h 0m</span>
       <span class="dot"></span><span>High priority</span>
     </div>
-    <button class="start-btn neo-pill-dark">
+    <button class="start-btn neo-pill-dark" data-dashboard-action="practice">
       Start session
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </button>
@@ -300,7 +289,7 @@
   <!-- Your progress -->
   <div class="section-header">
     <h2>Your progress</h2>
-    <div class="view-all">View all
+    <div class="view-all" role="button" tabindex="0" data-dashboard-action="practice">View all
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
   </div>
@@ -359,14 +348,14 @@
   <!-- Up next -->
   <div class="section-header" style="margin-top:26px;">
     <h2>Up next</h2>
-    <div class="view-all">View all
+    <div class="view-all" role="button" tabindex="0" data-dashboard-action="practice">View all
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
   </div>
 
   <div class="upnext-card neo-raised">
 
-    <div class="upnext-row">
+    <div class="upnext-row" role="button" tabindex="0" data-dashboard-action="practice">
       <div class="icon-circle-wrap-sm">
         <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
           <rect x="14" y="14" width="16" height="14" rx="2.5" fill="none" stroke="#e78a3e" stroke-width="1.8"/>
@@ -385,7 +374,7 @@
       </div>
     </div>
 
-    <div class="upnext-row">
+    <div class="upnext-row" role="button" tabindex="0" data-dashboard-action="practice">
       <div class="icon-circle-wrap-sm">
         <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
           <rect x="15" y="12" width="14" height="18" rx="2" fill="none" stroke="#8a8a8a" stroke-width="1.8"/>
@@ -404,7 +393,19 @@
 
   </div>
 
-</div>
-
+<script>
+  function dashboardAction(action) {
+    window.parent.postMessage({ type: 'nowssb-dashboard-action', action: action }, window.location.origin);
+  }
+  document.querySelectorAll('[data-dashboard-action]').forEach(function(control) {
+    control.addEventListener('click', function() { dashboardAction(control.dataset.dashboardAction); });
+    control.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        dashboardAction(control.dataset.dashboardAction);
+      }
+    });
+  });
+</script>
 </body>
 </html>
