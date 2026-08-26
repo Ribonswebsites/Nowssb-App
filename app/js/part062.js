@@ -109,8 +109,6 @@
       wrap:  '#home .home-body',
       items: [
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
-        { k:'dashboard',sel:['.nwsb-daydash'],                                             t:S, label:'Focus · Progress · Up next', sub:'Your time-aware practice dashboard' },
-        { k:'essentials',sel:['.nwsb-essentials'],                                         t:S, label:'Your essentials',          sub:'Working NowssB paths for today' },
         { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' , kind:'tab' },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
@@ -130,7 +128,6 @@
            re-appended around it — which puts the stray one at the TOP of the
            home no matter where it was written. That is exactly what happened
            to this card. */
-        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' , kind:'tab' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'sec' },
@@ -147,6 +144,8 @@
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science', vb:1, defOff:1 },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 , kind:'blk' },
+        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
+        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 , kind:'blk' },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 , kind:'blk' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' , kind:'blk', defOff:1 },
@@ -185,8 +184,10 @@
            block from being hoisted to the top by a saved Fashion layout.
        9 — Choose Your Path moves immediately before Experience · Fashion Mode
            on the Normal home as well, matching the injected HTML order and
-           correcting existing WebView layouts stored on device. */
-  var LAYOUT_V = 11;
+           correcting existing WebView layouts stored on device.
+       12 — Fashion Home returns to the August 15 WebView section set and
+            order, without changing the separately stored Normal Home. */
+  var LAYOUT_V = 12;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -219,6 +220,11 @@
        back on therefore sticks: save() writes the version too, so there is
        nothing left for a later load to migrate. */
     if (raw && (raw.v || 0) < LAYOUT_V) {
+      var restoreAugustFashion = which === 'fash' && (raw.v || 0) < 12;
+      if (restoreAugustFashion) {
+        order = all.slice();
+        off = reg.items.filter(function (i) { return i.defOff; }).map(function (i) { return i.k; });
+      }
       reg.items.forEach(function (i) {
         if (i.defOff && off.indexOf(i.k) < 0) off.push(i.k);
       });
@@ -245,7 +251,7 @@
       /* v8: healing and its injected Choose Your Path banner belong directly
          above Fashion Plus. Reposition both entries for existing saved layouts
          while leaving every other user-selected section in its chosen order. */
-      if (which === 'fash' && (raw.v || 0) < 8) {
+      if (!restoreAugustFashion && which === 'fash' && (raw.v || 0) < 8) {
         ['healing', 'genderpath'].forEach(function (k) {
           var old = order.indexOf(k);
           if (old >= 0) order.splice(old, 1);
