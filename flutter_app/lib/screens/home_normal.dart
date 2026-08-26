@@ -234,6 +234,7 @@ class _HomeNormalState extends State<HomeNormal> {
   @override
   Widget build(BuildContext context) {
     final built = _sections();
+    final bottomNavigationClearance = MediaQuery.paddingOf(context).bottom + 112;
     assert(
       built.map((e) => e.$1).toList().toString() ==
           kNormalSectionOrder.toString(),
@@ -270,7 +271,10 @@ class _HomeNormalState extends State<HomeNormal> {
                 // `margin: 16px 0` inside `.nmh-wrap`'s 20px, and a raised
                 // card needs room around it for its own shadow.
                 child: ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 96),
+                  // The navigation is a floating shell overlay. Reserve its
+                  // height plus the device inset so the last dashboard row can
+                  // always scroll completely above it instead of being hidden.
+                  padding: EdgeInsets.only(bottom: bottomNavigationClearance),
                   itemCount: shown.length,
                   itemBuilder: (context, i) => shown[i],
                 ),

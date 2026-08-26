@@ -18,7 +18,9 @@ assert.doesNotMatch(dashboard, /class="phone"/, "Dashboard must not retain the l
 assert.match(dashboard, /type: 'nowssb-dashboard-action'/, "Dashboard actions must notify the parent application");
 assert.match(dashboard, /nowssb-dashboard-data/, "Dashboard values must be supplied by the parent app");
 assert.match(dashboard, /dashboardMetricToday/, "Dashboard must expose a live sessions-today metric");
+assert.match(dashboard, /nowssb-dashboard-resize/, "Dashboard must request an iframe height refresh after live data updates");
 assert.match(index, /nowssb-dashboard-action/, "Normal Home must handle dashboard action messages");
+assert.match(index, /nowssb-dashboard-resize/, "Normal Home must resize the dashboard iframe after live content changes");
 assert.match(index, /startDashboardPractice/, "Dashboard actions must start the playable practice session");
 assert.match(index, /part094-dashboard-live\.js/, "Normal Home must load the live dashboard controller");
 assert.match(registry, /k:'dashboard'[\s\S]*sel:\['\.nmh-supplied-dashboard'\][\s\S]*after:'search'/, "Dashboard must remain anchored below search");
@@ -26,5 +28,6 @@ assert.ok(flutter.indexOf("'search'") < flutter.indexOf("'dashboard'"), "Flutter
 assert.match(flutter, /NmSuppliedDashboard\(onStart: _openDashboardSession, onProgress: _openDashboardProgress\)/, "Flutter must wire the dashboard to its real player and progress screen");
 assert.match(flutterDashboard, /PracticeProgress\.instance/, "Flutter dashboard must use persistent user session data");
 assert.match(flutterDashboard, /Plays aloud/, "Flutter dashboard must identify the audible session behavior");
+assert.match(flutter, /bottomNavigationClearance/, "Flutter Normal Home must reserve space above the floating navigation");
 
 console.log("Supplied dashboard is anchored below Normal Home search in WebView and Flutter.");

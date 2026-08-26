@@ -422,6 +422,9 @@
       row.setAttribute('aria-label', 'Play ' + routine.title);
     }
   }
+  function dashboardResize() {
+    window.parent.postMessage({ type: 'nowssb-dashboard-resize' }, window.location.origin);
+  }
   window.addEventListener('message', function(event) {
     if (event.origin !== window.location.origin || !event.data || event.data.type !== 'nowssb-dashboard-data') return;
     var data = event.data.dashboard;
@@ -442,6 +445,7 @@
     dashboardText('dashboardMetricGoalDetail', data.metrics.goal.detail);
     dashboardRoutine('dashboardRoutineOne', data.routines[0]);
     dashboardRoutine('dashboardRoutineTwo', data.routines[1]);
+    dashboardResize();
   });
   window.parent.postMessage({ type: 'nowssb-dashboard-ready' }, window.location.origin);
 </script>
