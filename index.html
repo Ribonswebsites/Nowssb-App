@@ -142,6 +142,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
 <link rel="stylesheet" href="nowssb-player.css?v=216">
+<link rel="stylesheet" href="app/support-flow.css?v=1">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -1170,7 +1171,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           </button>
         </div>
       </div>
-      <div class="ncb-carousel nsub-ban" role="button" onclick="openAssistant('support')">
+      <div class="ncb-carousel nsub-ban" role="button" onclick="openHelpSupport()">
         <div class="ncb-slide">
           <span class="ncb-ico"><span class="nwsb-assistant-inline-logo"><svg viewBox="0 0 64 64" width="64" height="64" fill="none" aria-label="Chat Support" role="img" style="display:block;width:100%;height:100%;"><circle cx="32" cy="32" r="30" fill="#17171b" stroke="rgba(255,255,255,0.36)" stroke-width="1.5"/><path d="M18 33v-3.5a14 14 0 0 1 28 0V33" stroke="#e8d5a3" stroke-width="3" stroke-linecap="round"/><path d="M18 32.5h4.5v9H18a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3ZM46 32.5h-4.5v9H46a3 3 0 0 0 3-3v-3a3 3 0 0 0-3-3Z" fill="#e8d5a3"/><path d="M41.5 43.5c-1.8 2.1-4.7 3.5-8 3.5h-3" stroke="#e8d5a3" stroke-width="2.5" stroke-linecap="round"/><path d="M25 38h14" stroke="rgba(255,255,255,0.72)" stroke-width="2.4" stroke-linecap="round"/><path d="m45.5 15 1.3 3.2L50 19.5l-3.2 1.3-1.3 3.2-1.3-3.2-3.2-1.3 3.2-1.3 1.3-3.2Z" fill="#fff"/></svg></span></span>
           <span class="ncb-txt"><span class="ncb-name">Chat Support</span><span class="ncb-sub">Get help with the player, practice, library, and app</span></span>
@@ -10334,6 +10335,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part077.js?v=1"></script><!-- ══ FULL-SCREEN SHEET + STORE TERMS ══ -->
 <script src="app/js/part090.js?v=3"></script><!-- ══ NOWSSB TIME-AWARE DASHBOARD ══ -->
 <script src="app/js/part091.js?v=3"></script><!-- ══ NOWSSB ESSENTIALS ══ -->
+<script src="app/js/part093-support-flow.js?v=1"></script><!-- ══ HELP & SUPPORT FLOW ══ -->
 <script src="nowssb-update.js?v=2" defer></script>
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>
@@ -10407,5 +10409,23 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   else restore();
 })();
 </script>
+<div id="nwsbHelpSupport" class="nwsb-help-screen" aria-hidden="true">
+  <iframe id="nwsbHelpFrame" src="app/widgets/help-support.html?v=1" title="Help and Support"></iframe>
+</div>
+<div id="nwsbSupportChat" class="nwsb-support-chat-screen" aria-hidden="true">
+  <section class="nwsb-support-chat-shell" role="dialog" aria-modal="true" aria-label="NowssB Support chat">
+    <header class="nwsb-support-chat-header">
+      <button class="nwsb-support-chat-back" type="button" onclick="closeSupportChat()" aria-label="Back">‹</button>
+      <div class="nwsb-support-chat-avatar" aria-hidden="true">⌁</div>
+      <div><div class="nwsb-support-chat-title">Support</div><div class="nwsb-support-chat-status">Online</div></div>
+    </header>
+    <main id="nwsbSupportChatFeed" class="nwsb-support-chat-feed" aria-live="polite"></main>
+    <form class="nwsb-support-chat-form" onsubmit="sendSupportMessage(event)">
+      <input id="nwsbSupportInput" type="text" autocomplete="off" maxlength="4000" placeholder="Type a message…" aria-label="Message support">
+      <button id="nwsbSupportSend" type="submit" aria-label="Send message">➤</button>
+    </form>
+    <div class="nwsb-support-chat-note">NowssB Support can help with app features and troubleshooting.</div>
+  </section>
+</div>
 </body>
 </html>
