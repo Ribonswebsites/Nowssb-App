@@ -1,20 +1,56 @@
 const CACHE = 'nowsbansiu-v952';
-/* All MP4s are shipped inside the app now. The service worker does not
-   prefetch, cache, or replay video responses; the browser reads the local
-   repository asset directly and only the ordinary static shell cache remains. */
+// Separate, stable-named bucket for background-prefetched videos (see
+// app/js/part051.js). Kept OUT of the version-bumped CACHE above so a
+// routine JS/CSS deploy never wipes out videos the user already has warmed —
+// it's purged only by its own explicit version number when the prefetch
+// list itself changes.
+// Bump this whenever a video FILE changes behind a URL that stays the same.
+// The fetch handler answers every .mp4 from cache first, and this bucket
+// survives ordinary deploys — so without a bump here, replacing a clip on
+// disk changes nothing for anyone who already had the old one warmed. That
+// is exactly what happened to the start animation.
+const VIDEO_CACHE = 'nowssb-media-precache-v2';
+
+/* The start animation is not like the other clips. Every one of those is
+   decorative and warmed at idle time by app/js/part051.js, four to eight
+   seconds after boot — which is fine for a banner nobody has scrolled to
+   yet, and useless for this one, because it starts playing one second into
+   the launch. Left to the idle warmer it streamed from the network on every
+   open, which is what made it stutter.
+   So it is fetched here, at install, and from then on the fetch handler
+   below answers it from cache instantly. Keep the ?v= in step with
+   index.html — a different query is a different cache entry. */
+const BOOT_MEDIA = ['./assets/video/start-animation.mp4?v=2'];
+
 self.addEventListener('install', e => {
-  e.waitUntil(self.skipWaiting());
+  self.skipWaiting();
+  e.waitUntil((async () => {
+    try {
+      const c = await caches.open(VIDEO_CACHE);
+      await Promise.all(BOOT_MEDIA.map(async u => {
+        try {
+          if (await c.match(u)) return;                 // already have it
+          const res = await fetch(u, { cache: 'reload' });
+          if (res && res.ok) await c.put(u, res);
+        } catch (err) { /* offline at install — the idle warmer retries */ }
+      }));
+    } catch (err) {}
+  })());
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
-    // Purge stale shell caches and every obsolete private video bucket.
+    // Purge stale *versioned* caches so a stale index.html can never be
+    // served — but never touch VIDEO_CACHE here, it's versioned separately.
     const keys = await caches.keys();
     await Promise.all(
-      keys.filter(k => k !== CACHE && k.startsWith('nowsbansiu-')).map(k => caches.delete(k))
+      keys.filter(k => k !== CACHE && k !== VIDEO_CACHE && k.startsWith('nowsbansiu-')).map(k => caches.delete(k))
     );
+    // Superseded media buckets go too. Same rule, its own prefix: anything
+    // named nowssb-media-precache-* that isn't the current one is holding
+    // videos that have since been replaced on disk.
     await Promise.all(
-      keys.filter(k => k.startsWith('nowssb-media-precache-')).map(k => caches.delete(k))
+      keys.filter(k => k !== VIDEO_CACHE && k.startsWith('nowssb-media-precache-')).map(k => caches.delete(k))
     );
     await clients.claim();
   })());
@@ -48,8 +84,8 @@ self.addEventListener('activate', e => {
    circle beside the app name on the LEFT, stays exactly as it was — that
    part already reads the way it should.
    ── */
-const NOTIF_ICON  = 'assets/media/image/notif-blank-442eb067.png';
-const NOTIF_BADGE = 'assets/media/image/notif-badge-81c1b3e2.png';
+const NOTIF_ICON  = './assets/icons/notif-blank.png';
+const NOTIF_BADGE = './assets/icons/notif-badge.png';
 
 self.addEventListener('push', e => {
   let d = {};
@@ -90,19 +126,74 @@ self.addEventListener('notificationclick', e => {
   })());
 });
 
+/* ── Range requests against a cached video ────────────────────────────────
+   A <video> asks for bytes, not for files: it sends `Range: bytes=0-` and
+   expects `206 Partial Content` with a Content-Range back.
+
+   Cache Storage does NOT do that. caches.match() ignores the Range header
+   entirely and hands back the whole 200. Chrome will play it, but its media
+   stack loses the ability to ask for the part it wants, so it re-requests
+   and re-buffers — which is heard as a clip that keeps catching for a few
+   frames at a time. The start animation only started doing this once it
+   was genuinely cached; before that it streamed from the server, which
+   answers ranges properly, and was smooth.
+
+   So the slicing is done here. */
+async function rangeResponse(req, cached) {
+  const range = req.headers.get('range');
+  if (!range) return cached;
+  const m = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
+  if (!m) return cached;
+
+  const buf = await cached.clone().arrayBuffer();
+  const size = buf.byteLength;
+  let start, end;
+  if (m[1] === '') {
+    // `bytes=-N` — the last N bytes, which is how a player finds the index
+    // of a file whose moov atom sits at the end.
+    const n = parseInt(m[2], 10);
+    if (!isFinite(n) || n <= 0) return cached;
+    start = Math.max(0, size - n);
+    end = size - 1;
+  } else {
+    start = parseInt(m[1], 10);
+    end = m[2] === '' ? size - 1 : parseInt(m[2], 10);
+  }
+  if (!isFinite(start) || start < 0 || start >= size) {
+    return new Response(null, { status: 416, headers: { 'Content-Range': 'bytes */' + size } });
+  }
+  if (!isFinite(end) || end >= size) end = size - 1;
+  if (end < start) return cached;
+
+  const body = buf.slice(start, end + 1);
+  const headers = new Headers(cached.headers);
+  headers.set('Content-Range', 'bytes ' + start + '-' + end + '/' + size);
+  headers.set('Content-Length', String(body.byteLength));
+  headers.set('Accept-Ranges', 'bytes');
+  return new Response(body, { status: 206, statusText: 'Partial Content', headers });
+}
+
 self.addEventListener('fetch', e => {
   const req = e.request;
   const url = req.url;
-  // MP4s pass straight through. All shipped videos are local repository assets;
-  // do not duplicate them in Cache Storage or hold complete responses in memory.
+  // Videos: never fetched eagerly by the SW itself (that's the large-download
+  // cost we're avoiding), but if app/js/part051.js already background-warmed
+  // this exact file into VIDEO_CACHE during idle time, serve it from there
+  // instantly instead of hitting the network. Anything not yet warmed just
+  // falls through to the network as before.
+  if (url.includes('.mp4') || url.includes('/video/upload/') || url.includes('video/mp4')) {
+    e.respondWith((async () => {
+      const cached = await caches.match(req, { ignoreVary: true });
+      if (!cached) return fetch(req);
+      try { return await rangeResponse(req, cached); }
+      catch (err) { return cached; }   // never let a slice failure kill playback
+    })());
+    return;
+  }
   // Never touch the Firebase Auth handler/helpers — let them pass straight to the
   // network (reverse-proxied by functions/_middleware.js) so Google sign-in works.
   if (url.includes('/__/')) return;
   if (req.method !== 'GET') return;
-  if (url.includes('.mp4') || url.includes('/video/upload/') || url.includes('video/mp4')) {
-    e.respondWith(fetch(req, { cache: 'no-store' }));
-    return;
-  }
 
   // Never serve HTML from cache — always go to network so updates land immediately.
   // cache:'reload' for the same reason as the static-asset handler below: skip

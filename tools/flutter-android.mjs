@@ -22,13 +22,34 @@
 //      packages do not apply this for you — without it the json is inert and
 //      Firebase.initializeApp() fails at runtime with no default options.
 //
+//   5. THE LAUNCHER ICON.  flutter create ships its own blue Flutter mark in
+//      every mipmap folder, so the app installs on the home screen under
+//      somebody else's logo. The app's icon is the same file the PWA is
+//      installed under — assets/icons/app-icon-512.png, the one named in
+//      manifest.json — cut to the five densities by tools/flutter-icons.mjs,
+//      committed, and copied in here because android/res is generated and
+//      would lose it otherwise.
+//
+//   6. THE INTERNET PERMISSION.  flutter create writes it into the debug and
+//      profile manifests ONLY, so everything this app does over a network
+//      works while you develop and is dead in the APK you ship: Firestore,
+//      sign-in, notifications, and the Cloudinary artwork the pages are drawn
+//      from. It has to be in the main manifest, and the main manifest is
+//      generated, so it has to be added here.
+//
 // Run it AFTER `flutter create` and BEFORE `flutter build`. It is idempotent:
 // running twice is a no-op, so a local android/ that is already configured is
 // left alone.
 //
 //   node tools/flutter-android.mjs
 
-import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  copyFileSync,
+  mkdirSync,
+} from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -58,9 +79,8 @@ const DESUGAR_LIBS = '2.1.4';
 
 const appGradle = join(android, 'app', 'build.gradle.kts');
 const settings = join(android, 'settings.gradle.kts');
-const manifest = join(android, 'app', 'src', 'main', 'AndroidManifest.xml');
 
-for (const f of [appGradle, settings, manifest]) {
+for (const f of [appGradle, settings]) {
   if (!existsSync(f)) {
     console.error(`missing ${f} — this script expects the Kotlin DSL that ` +
       `flutter create writes; if Flutter has gone back to Groovy, update it`);
@@ -149,35 +169,80 @@ if (a.includes('coreLibraryDesugaring(')) {
 
 writeFileSync(appGradle, a);
 
-// ── microphone permission ───────────────────────────────────────────────
+// ── the launcher icon ──────────────────────────────────────────────────
+// The SAME file the PWA installs under. manifest.json names
+// assets/icons/app-icon-512.png as the 512 icon, so the phone shows one mark
+// whichever of the two the reader installed — which is the point of them
+// being one app.
+//
+// The five sizes are CUT AHEAD OF TIME and committed under
+// flutter_app/android-config/mipmap/, and this step only copies them.
+//
+// It used to resize assets/icons/app-icon-512.png here with Pillow. That
+// worked on a machine that happens to have Pillow and failed on every build
+// runner that does not — `ModuleNotFoundError: No module named 'PIL'`, exit
+// 1, no APK (run 136). A build step must not need a toolchain the build
+// image was never asked to carry; google-services.json below is copied for
+// exactly the same reason. To re-cut the icons after changing the source,
+// run `node tools/flutter-icons.mjs` on a machine with Pillow and commit
+// what it writes.
+const ICON_SRC = join(root, 'flutter_app', 'android-config', 'mipmap');
+/** Android's five launcher densities. */
+const MIPMAPS = [
+  'mipmap-mdpi',
+  'mipmap-hdpi',
+  'mipmap-xhdpi',
+  'mipmap-xxhdpi',
+  'mipmap-xxxhdpi',
+];
+const res = join(android, 'app', 'src', 'main', 'res');
+{
+  const missing = MIPMAPS.filter(
+    (d) => !existsSync(join(ICON_SRC, d, 'ic_launcher.png')),
+  );
+  if (missing.length) {
+    console.error(
+      `missing launcher icons under ${ICON_SRC}: ${missing.join(', ')}\n` +
+        `run: node tools/flutter-icons.mjs`,
+    );
+    process.exit(1);
+  }
+  for (const d of MIPMAPS) {
+    mkdirSync(join(res, d), { recursive: true });
+    copyFileSync(
+      join(ICON_SRC, d, 'ic_launcher.png'),
+      join(res, d, 'ic_launcher.png'),
+    );
+  }
+  done.push('copied ic_launcher at five densities');
+}
+
+// ── the manifest ───────────────────────────────────────────────────────
+// See note 4 at the head of this file. Without INTERNET in the MAIN manifest
+// a release build has no network at all, and the failure looks like empty
+// pages rather than like a permission.
+const manifest = join(android, 'app', 'src', 'main', 'AndroidManifest.xml');
 if (!existsSync(manifest)) {
   console.error(`missing ${manifest}`);
   process.exit(1);
 }
 let m = readFileSync(manifest, 'utf8');
-if (m.includes('android.permission.RECORD_AUDIO')) {
-  already.push('microphone permission');
+if (m.includes('android.permission.INTERNET')) {
+  already.push('INTERNET permission present');
 } else {
-  const marker = '<manifest';
-  const at = m.indexOf(marker);
-  const eol = m.indexOf('>', at);
-  if (at < 0 || eol < 0) throw new Error('AndroidManifest.xml: no manifest element');
-  m = m.slice(0, eol + 1) + '\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />' + m.slice(eol + 1);
+  const open = m.match(/<manifest[^>]*>\s*/);
+  if (!open) throw new Error('AndroidManifest.xml: no <manifest> element');
+  m = m.replace(
+    open[0],
+    open[0] +
+      '    <!-- flutter create puts these in the debug and profile manifests\n' +
+      '         only. Without them a release build has no network: no\n' +
+      '         Firestore, no sign-in, no notifications, and no artwork. -->\n' +
+      '    <uses-permission android:name="android.permission.INTERNET"/>\n' +
+      '    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n\n',
+  );
   writeFileSync(manifest, m);
-  done.push('added microphone permission');
-}
-
-// ── camera permission ───────────────────────────────────────────────────
-if (m.includes('android.permission.CAMERA')) {
-  already.push('camera permission');
-} else {
-  const marker = '<manifest';
-  const at = m.indexOf(marker);
-  const eol = m.indexOf('>', at);
-  if (at < 0 || eol < 0) throw new Error('AndroidManifest.xml: no manifest element');
-  m = m.slice(0, eol + 1) + '\n    <uses-permission android:name="android.permission.CAMERA" />' + m.slice(eol + 1);
-  writeFileSync(manifest, m);
-  done.push('added camera permission');
+  done.push('added INTERNET and ACCESS_NETWORK_STATE');
 }
 
 // ── the config itself ──────────────────────────────────────────────────

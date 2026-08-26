@@ -68,13 +68,13 @@ window.ohOpenListFromIntro = function(type) {
 
   if (type === 'words') {
     _ohSetBanners([
-      'assets/media/image/0f59581a898ffd95ea63928600e13473cd010d63039872bc-9c4bd9ad.jpg',
-      'assets/media/image/fa5d369177111365a92adb381d4cce8be25d0c05749e77ae-10476390.jpg'
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891277/image-143_pfuqmd.jpg',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891320/image-213_sggc81.jpg'
     ]);
   } else {
     _ohSetBanners([
-      'assets/media/image/5d4a983fe6bd13ba569ad975495d6034e631f3e7746ad13a-c6f398ea.jpg',
-      'assets/media/image/a2f754595d7aa6cfd0f9d262abe0499ca35bdc5f650d7bff-d9c39a8e.jpg'
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778848483/image-148_zfrtqg.jpg',
+      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891248/image-101_pppzbn.jpg'
     ]);
   }
 

@@ -21,7 +21,37 @@
   var PLACE = [
     /* Above the NowssB Store section, on both homes. In the repo rather
        than on a CDN — the store is the thing the app sells from, and its
-       banner should not be one network hop away from not being there. */
+       banner should not be one network hop away from not being there.
+
+       THE NORMAL HOME'S IS A SECTION NOW, not a loose clip.
+       It used to drop in bare: no frame, no heading, no bar — a film lying
+       on the page above the store card with nothing saying what it was,
+       while the Fashion home carried the same thing as a proper block. So
+       it gets what every other block gets, and the same way they get it:
+       `wrap` for the card, `head` for the orb and its two lines, and the
+       black bar underneath. On the tablet, because a clip on this page
+       without a device around it is the one thing here that is not.
+
+       `.fash-storeban-wrap` is deliberate: app/js/part062.js:82 registers
+       'storeban' on the NORMAL home against that selector and there has
+       never been an element for it to match, so this fills a slot the
+       layout editor already believes in. The class's own styling is scoped
+       to `#home` (nowssb-nm.css:15095), so it brings no Fashion look with
+       it — `nwsb-vbwrap` is what makes it the pale card here.
+
+       `before`, not `top`: the block is the store section's neighbour, not
+       something inside it. */
+    { before: '#home-nm .nmh-store-wrap',          vid: './assets/video/store-banner-fash.mp4?v=1',
+      frame: 'dev-tab-l', wrap: 'nwsb-vbwrap fash-storeban-wrap',
+      head: { hello:'Own the sounds that heal', name:'Inside the Store',
+              icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4.4 7.6h15.2l-1.1 12.2a1.5 1.5 0 0 1-1.5 1.4H7a1.5 1.5 0 0 1-1.5-1.4z\" stroke=\"#fff\" stroke-width=\"1.6\"/><path d=\"M8.7 10V6.6a3.3 3.3 0 0 1 6.6 0V10\" stroke=\"#fff\" stroke-width=\"1.6\"/></svg>",
+              banName:'Shop the Library', banSub:'Words, meanings and the origins behind them',
+              banGo: function () {
+                var s = document.getElementById('sub-nowssb-store');
+                if (s) s.classList.add('open');
+                var iv = document.getElementById('nssIntroVid');
+                if (iv) { iv.muted = true; try { iv.play().catch(function () {}); } catch (e) {} }
+              } } },
     /* The Fashion store's own clip, not the one the Normal home uses. It
        lands INSIDE .fash-store-wrap because `before` inserts into the
        trigger's parent, which is that wrapper now — between the head and
@@ -32,19 +62,26 @@
        which is what made both of them look wrong. */
     { before: '#home .fash-storeban-slot',        vid: './assets/video/store-banner-fash.mp4?v=1' },
 
-    /* Choose Your Path, on the laptop, in a section of its own. On the Normal
-       home it is inserted directly below the Experience · Fashion Mode
-       switch, so the same order survives a fresh HTML/WebView load before the
-       layout manager applies any saved custom arrangement. The wrapper is
-       registered in app/js/part062.js as 'genderpath'; a direct child of the
-       home wrap that the registry does not know about gets stranded at the top
-       of the page while everything registered is re-appended around it. */
-    { after: '#home-nm #nmhFashSwitch',             vid: "", gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
+    /* Choose Your Path, on the laptop, in a section of its own.
+       It used to be appended INSIDE the Personalised Healing wrapper, which
+       made it part of that section — `after` puts it beside it instead, and
+       `wrap` gives it a wrapper of its own. Both are registered in
+       app/js/part062.js as 'genderpath'; a direct child of the home wrap
+       that the registry does not know about gets stranded at the top of the
+       page while everything registered is re-appended around it. */
+    { after: '#home-nm .nmh-healing-wrap',         vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
               banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
                                    else if (typeof openSub === 'function') openSub('health-category'); } } },
+    { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
+      head: { hello:'Body, organ and mind', name:'Choose Your Path',
+              icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
+              banName:'Female or Male', banSub:'Your wellness, decoded for your body',
+              banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
+                                   else if (typeof openSub === 'function') openSub('health-category'); } } },
+
     /* The Connect banner — the clip that introduces the section, not the
        section's own background clip (.nmh-connect-vid, which is untouched).
        On the landscape tablet, wordmark on the bottom bezel.
@@ -55,11 +92,11 @@
     { top:    '#home .nc-blk-vid',                 vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
 
     // Trending
-    { top:    '#home-nm .nmh-trend-shop-wrap',     vid: "" },
+    { top:    '#home-nm .nmh-trend-shop-wrap',     vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
     { top:    '#home .fash-storevid-wrap',         vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
 
     // Meaning — a different clip in each place it appears
-    { before: '#home-nm .krm-section',             vid: "", frame: 'dev-tab-l', wrap: 'nvb-blk' },
+    { before: '#home-nm .krm-section',             vid: V + 'v1785402917/grok_video_2026-07-30-14-44-14_cqj4qc.mp4', frame: 'dev-tab-l', wrap: 'nvb-blk' },
     /* The clip this tablet used to carry never arrived — the tablet above
        Meaning Search on the Fashion home was a black screen. It ships in
        the repo now rather than coming from a CDN, which is also why it
@@ -74,8 +111,8 @@
        so a banner at the top of the page box sits behind it. It goes at the
        top of the scrolling content instead, below the hero and clear of the
        fixed header. */
-    { top:    '#sub-offers .bgp-content',          vid: "" },
-    { top:    '#sub-quick-access .bgp-content',    vid: "" },
+    { top:    '#sub-offers .bgp-content',          vid: V + 'v1785402975/grok_video_2026-07-30-14-43-34_lqppzd.mp4' },
+    { top:    '#sub-quick-access .bgp-content',    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' },
 
     // Every word's own page, above About This Word — a player banner, so it
     // carries the player mark on the right and opens the practice.
@@ -145,7 +182,7 @@
        here, and the new one. Added rather than swapped: the existing clip
        is the one the banner was designed around. */
     { sel: '#home-nm .nmh-vb-tall video, #home .fash-vb-tall video',
-      vid: ["",
+      vid: [V + 'v1785403503/grok_video_2026-07-30-14-44-37_jufhyx.mp4',
             './assets/video/subscription-a.mp4'] },
     { sel: '.ss-plan-banner-vid',
       vid: V + 'v1785406071/grok_video_2026-07-30-15-36-45_ihftsp.mp4' },
@@ -467,23 +504,6 @@
     return d;
   }
 
-  /* The layout editor may run before or after these injected banners. Keep
-     the Normal Home's one Choose Your Path block anchored to the Fashion Mode
-     card regardless of that timing, and discard any accidental duplicate so
-     it can never remain at the top of the page. */
-  function placeNormalGenderPathBelowFashionMode() {
-    var home = document.querySelector('#home-nm .nmh-wrap');
-    var fashionMode = document.getElementById('nmhFashSwitch');
-    if (!home || !fashionMode || fashionMode.parentNode !== home) return;
-    var paths = home.querySelectorAll(':scope > [data-vbwrap="vb2"]');
-    if (!paths.length) return;
-    var path = paths[0];
-    for (var i = 1; i < paths.length; i++) paths[i].remove();
-    if (fashionMode.nextElementSibling !== path) {
-      fashionMode.parentNode.insertBefore(path, fashionMode.nextSibling);
-    }
-  }
-
   function place() {
     var added = false;
     PLACE.forEach(function (spec, i) {
@@ -521,9 +541,6 @@
        newly injected one has to be run through that pass or it stays where
        it landed while its section moves away. */
     if (added && window.hlApplyLayout) { try { window.hlApplyLayout(); } catch (e) {} }
-    placeNormalGenderPathBelowFashionMode();
-    requestAnimationFrame(placeNormalGenderPathBelowFashionMode);
-    setTimeout(placeNormalGenderPathBelowFashionMode, 80);
 
     /* Store page: the block introduces the shelf, so it sits directly above
        #ebGrid rather than at the top of the page above the hero. */

@@ -40,9 +40,31 @@ class FakeVideoPlatform extends VideoPlayerPlatform {
   /// Players asked for and not yet returned — the number that matters.
   int get alive => created.length - disposed.length;
 
+  /// The most players that were ever OPENING at the same moment — created
+  /// but not yet reporting a size.
+  ///
+  /// Not the same as [alive], which counts players that exist and correctly
+  /// reaches the pool's ceiling. This is the number that was wrong on the
+  /// phone: every clip on screen starting to open in the same instant, all
+  /// of them contending, none of them arriving.
+  int peakOpen = 0;
+  int _openNow = 0;
+
+  /// Sources that open and then never report a size.
+  ///
+  /// This is the real behaviour of a network clip on a bad connection, and
+  /// it is not a curiosity: one of these held a whole rebalance open and
+  /// stopped the pool granting decoders for the rest of the session, which
+  /// on the phone read as `decoders 1/8  playing 1` with four clips on
+  /// screen. A fake that only ever succeeds cannot catch that.
+  final Set<String> stalling = {};
+
   void reset() {
     created.clear();
     disposed.clear();
+    stalling.clear();
+    peakOpen = 0;
+    _openNow = 0;
     for (final c in _events.values) {
       c.close();
     }
@@ -56,6 +78,8 @@ class FakeVideoPlatform extends VideoPlayerPlatform {
   Future<int?> create(DataSource dataSource) async {
     final id = _next++;
     created.add(id);
+    _openNow++;
+    if (_openNow > peakOpen) peakOpen = _openNow;
 
     // The initialized event goes out ON SUBSCRIBE, not from create().
     //
@@ -67,11 +91,19 @@ class FakeVideoPlatform extends VideoPlayerPlatform {
     // first, and it made the pool's own tests hang mid-pass while still
     // reporting green, because they were counting create() calls rather than
     // controllers that came up.
+    final src = dataSource.asset ?? dataSource.uri ?? '';
+    final stalls = stalling.any(src.contains);
+
     late final StreamController<VideoEvent> c;
     c = StreamController<VideoEvent>.broadcast(onListen: () {
+      // A stalled source is created and then simply says nothing — exactly
+      // what the plugin does when the bytes never arrive.
+      if (stalls) return; // still open, forever — and still counted
+
       // A turn later, so it is asynchronous the way the real plugin is —
       // the demuxer has to read the header before it can report a size.
       scheduleMicrotask(() {
+        _openNow--;
         if (!c.isClosed) {
           c.add(VideoEvent(
             eventType: VideoEventType.initialized,

@@ -45,56 +45,60 @@
            was landing above the greeting for exactly that reason. It sits
            after the greeting and before the hero clip and the streak. */
         { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
-        { k:'dashboard',sel:['.nwsb-daydash'],                                             t:S, label:'Focus · Progress · Up next', sub:'Your time-aware practice dashboard' },
-        { k:'essentials',sel:['.nwsb-essentials'],                                         t:S, label:'Your essentials',          sub:'Working NowssB paths for today' },
-        /* The clip and the streak are ONE block now — a heading, the
-           render and the black banner in a single neumorphic wrapper — so
-           there is one entry for it rather than two, and it points at the
-           wrapper because that is what is a direct child of the home.
-           'always' is gone: the wrapper carries a cross, and a switch that
-           refuses to switch off is not a cross. */
-        { k:'herovid',  sel:['.nmh-streakvid-wrap'],                                       t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 },
+        /* The streak card, on its own. The clip that used to sit directly
+           above it has moved down the page to the other video banners —
+           a heading, a film and a second heading in a row all saying Streak
+           was three introductions to one thing. This card carries no head of
+           its own now either: "Start Building Your Streak Today" is its
+           heading and always was. */
         { k:'streak',   sel:['.nmh-streak-wrap'],                                          t:S, label:'Streak',                sub:'Your streak and its banner' },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
-        { k:'actionbar',sel:['#nwsbActionBar'],                                             t:S, label:'How can we help today?', sub:'Help, Personal Coach, and Enter', locked:1, always:1 },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
         { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
-        { k:'custom',   sel:['.nmh-cust-panel'],                                           t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like', defOff:1 },
+        { k:'custom',   sel:['.nmh-cust-panel'],                                           t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
         /* 'offer' and 'shopvid' are gone — the two Shop Now banners they
            pointed at were removed from the homes, and a registry row with
            nothing behind it shows up in Customize as a switch that does
            nothing. */
         { k:'rx',       sel:['.nmh-rx-heading', '.nmh-rx-section'],                        t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'routines', sel:['.home-card.home-card-static.w100'],                          t:S, label:'My Routines',           sub:'Daily practice system', defOff:1 },
-        { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc', vb:1, defOff:1 },
-        { k:'feed',     sel:['#ncbCarouselNm'],                                            t:S, label:'Community Carousel',    sub:'Swipeable feed cards', defOff:1 },
+        { k:'condisc',  sel:['.npc-card.npc-blue'],                                        t:B, label:'Connect Disc',          sub:'Rotating Connect promo disc', vb:1 },
+        { k:'connect',  sel:['.nmh-connect-sec'],                                        t:S, label:'NowssB Connect',        sub:'What the social space is' },
+        { k:'feed',     sel:['#ncbCarouselNm'],                                            t:S, label:'Community Carousel',    sub:'Swipeable feed cards' },
         /* The BLOCK, not the frame or the row inside it: this registry
            matches ':scope > sel', a DIRECT child of the wrap. Pointing it
            at anything nested finds nothing and strands the section at the
            top of the page — which is what happened the first time the
            television went on. */
         { k:'quickrow', sel:['.qa-tv-block'],                                              t:S, label:'Quick Access',          sub:'Cart · Wishlist · Order' },
+        /* MOVED down the page. It used to open the home directly above
+           the streak card, which put a heading, a film and a second
+           heading in a row all saying Streak. It sits with the other
+           video banners now. */
+        { k:'herovid',  sel:['.nmh-streakvid-wrap'],                                       t:S, label:'Streak Video',          sub:'The clip and its Keep Your Streak bar', vb:1 },
         { k:'trendshop',sel:['.nmh-trend-shop-wrap'],                                     t:S, label:'Trending Shop',         sub:'The clip and the Shop Now banner', vb:1 },
         /* The store's video banner is its own block, and it sits here rather
            than on top of the store card — a banner and a section are
            different things and they are apart now. */
         { k:'storeban', sel:['.fash-storeban-wrap'],                                       t:S, label:'Store Banner',          sub:'The clip and the Shop the Library bar', vb:1 , kind:'blk' },
-        { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1, defOff:1 },
-        { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', defOff:1 },
+        { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 },
+        { k:'edition',  sel:['.nedi-blk'],                                                 t:S, label:'Your Edition',          sub:'Current plan and upgrade', always:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
-        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1, defOff:1 },
+        { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 },
         /* Off on the shipped Normal home, and opt-in from this editor —
            `always` is gone precisely so it CAN be switched off, and defOff
            keeps it off until someone turns it on. The Fashion home's own
            healing entry is untouched. */
         { k:'healing',  sel:['.nmh-healing-wrap'],                                        t:S, label:'Personalised Healing',  sub:'Choose your health journey', defOff:1 },
-        /* Choose Your Path is its own section now — it sits directly below
-           Fashion Mode, never at the top of the home. */
-        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1, locked:1, after:'fashsw' },
+        /* Choose Your Path is its own section now — it used to live inside
+           the wrapper above. A direct child of the home wrap that this
+           registry does not know about gets stranded at the top of the page
+           while every registered one is re-appended around it. */
+        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name', defOff:1 },
         { k:'fashsw',   sel:['#nmhFashSwitch'],                                            t:S, label:'Fashion Mode',          sub:'Switch to the Fashion home' },
@@ -107,8 +111,6 @@
       wrap:  '#home .home-body',
       items: [
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
-        { k:'dashboard',sel:['.nwsb-daydash'],                                             t:S, label:'Focus · Progress · Up next', sub:'Your time-aware practice dashboard' },
-        { k:'essentials',sel:['.nwsb-essentials'],                                         t:S, label:'Your essentials',          sub:'Working NowssB paths for today' },
         { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' , kind:'tab' },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
@@ -128,7 +130,6 @@
            re-appended around it — which puts the stray one at the TOP of the
            home no matter where it was written. That is exactly what happened
            to this card. */
-        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' , kind:'tab' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'sec' },
@@ -145,6 +146,8 @@
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science', vb:1, defOff:1 },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 , kind:'blk' },
+        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
+        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 , kind:'blk' },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 , kind:'blk' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' , kind:'blk', defOff:1 },
@@ -175,18 +178,8 @@
            the section into `off`, which is the same off the layout editor
            sets: gone, and gone across launches. That is not what a cross
            on a card means — it means "not now". Anyone whose streak was
-           taken away by the old behaviour gets it back here, once.
-       5 — The time-aware dashboard and Your essentials become registry items
-           so saved home layouts do not strand them above the greeting.
-       8 — Personalized Healing and Choose Your Path move directly before
-           Experience · Fashion Mode (Fashion Plus), preventing the healing
-           block from being hoisted to the top by a saved Fashion layout.
-       9 — Choose Your Path moves immediately before Experience · Fashion Mode
-           on the Normal home as well, matching the injected HTML order and
-           correcting existing WebView layouts stored on device.
-       13 — Choose Your Path moves directly below Fashion Mode on the Normal
-            home, never above it or at the top of the page. */
-  var LAYOUT_V = 13;
+           taken away by the old behaviour gets it back here, once. */
+  var LAYOUT_V = 4;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -242,38 +235,6 @@
           order.splice(ti + 1, 0, 'store');
         }
       }
-      /* v8: healing and its injected Choose Your Path banner belong directly
-         above Fashion Plus. Reposition both entries for existing saved layouts
-         while leaving every other user-selected section in its chosen order. */
-      if (which === 'fash' && (raw.v || 0) < 8) {
-        ['healing', 'genderpath'].forEach(function (k) {
-          var old = order.indexOf(k);
-          if (old >= 0) order.splice(old, 1);
-        });
-        var fashionPlusAt = order.indexOf('fashplus');
-        if (fashionPlusAt < 0) fashionPlusAt = order.length;
-        order.splice(fashionPlusAt, 0, 'healing', 'genderpath');
-      }
-      /* v10: the supplied help bar belongs immediately below Where to Begin,
-         never at the top of the home; Choose Your Path belongs immediately
-         above Experience · Fashion Mode. Move only those fixed relationships
-         and preserve every other user-selected arrangement. */
-      if (which === 'nm' && (raw.v || 0) < 10) {
-        var actionBarAt = order.indexOf('actionbar');
-        if (actionBarAt >= 0) order.splice(actionBarAt, 1);
-        var whereToBeginAt = order.indexOf('mainops');
-        if (whereToBeginAt < 0) whereToBeginAt = order.length - 1;
-        order.splice(whereToBeginAt + 1, 0, 'actionbar');
-        var genderPathAt = order.indexOf('genderpath');
-        if (genderPathAt >= 0) order.splice(genderPathAt, 1);
-        var fashionSwitchAt = order.indexOf('fashsw');
-        if (fashionSwitchAt < 0) fashionSwitchAt = order.length;
-        order.splice(fashionSwitchAt, 0, 'genderpath');
-      }
-      /* v13: the Normal Home's Choose Your Path section belongs directly
-         below Fashion Mode. It is locked in the registry, so the final
-         `after` relationship above enforces the same placement for fresh,
-         saved, and newly injected WebView layouts. */
       try {
         localStorage.setItem(LSKEY(which), JSON.stringify({ order: order, off: off, v: LAYOUT_V }));
       } catch (e) {}
@@ -351,21 +312,6 @@
         if (n === ref || !ref.parentNode) return;
         ref.parentNode.insertBefore(n, ref.nextSibling);
         ref = n;   // keep a multi-node section in its own order
-      });
-    });
-
-    /* A fixed section can be anchored immediately ABOVE another section as
-       well. Choose Your Path must never be allowed to remain at the top of
-       the Normal home: it belongs directly before the Fashion Mode card even
-       when an existing saved order was created before that relationship. */
-    reg.items.forEach(function (it) {
-      if (!it.before) return;
-      var anchors = nodesOf(wrap, itemOf(which, it.before));
-      if (!anchors.length) return;
-      var ref = anchors[0];
-      nodesOf(wrap, it).forEach(function (n) {
-        if (n === ref || !ref.parentNode) return;
-        ref.parentNode.insertBefore(n, ref);
       });
     });
   }

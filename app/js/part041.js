@@ -3,7 +3,7 @@
   var oldPanel = document.getElementById('ss-panel-profile-edit');
   if(!oldPanel) return;
   oldPanel.innerHTML = `
-    <div class="nwsb-pe-cover" style="position:relative;width:100%;height:172px;background:#0a0a14 url('assets/media/image/8fd717970e58ea295a9f9024bdf84dc5a4cb9c840d79aabf-4eedcce3.webp') center/cover no-repeat;">
+    <div class="nwsb-pe-cover" style="position:relative;width:100%;height:172px;background:#0a0a14 url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784171086/grok_image_1784171046763_kfygmv.jpg') center/cover no-repeat;">
       <button class="ss-panel-back" onclick="nwsbCloseEditProfile()" style="position:absolute;top:calc(max(env(safe-area-inset-top,12px),12px));left:14px;z-index:2;display:inline-flex;align-items:center;gap:6px;margin:0;padding:9px 14px 9px 11px;border:none;border-radius:50px !important;background:rgba(255,255,255,0.94);color:#1a1a2e;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.4);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         Back
@@ -55,11 +55,11 @@
         <div class="slbl" style="margin-bottom:10px;">PROFILE THEME</div>
         <div style="display:flex;gap:12px;">
           <button type="button" id="nwsb-theme-neu" class="nwsb-theme-opt" onclick="nwsbSetSocTheme('neu')">
-            <div class="nwsb-theme-opt-img" style="background-image:url('assets/media/image/ba07e554cafc04fca16eb849bee873501297327815552db0-b486f1d6.webp')"></div>
+            <div class="nwsb-theme-opt-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png')"></div>
             <div class="nwsb-theme-opt-label">NowssB</div>
           </button>
           <button type="button" id="nwsb-theme-glass" class="nwsb-theme-opt" onclick="nwsbSetSocTheme('glass')">
-            <div class="nwsb-theme-opt-img" style="background-image:url('assets/media/image/4a4cb1db29628f21e657d6ed891092362dd631db1b1af1bb-7c2a8296.webp')"></div>
+            <div class="nwsb-theme-opt-img" style="background-image:url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png')"></div>
             <div class="nwsb-theme-opt-label">NowssB Fashion</div>
           </button>
         </div>

@@ -37,7 +37,7 @@
     <div class="ss-section-title">ACCOUNT</div>
     <div class="ss-section">
       <div class="sr" onclick="SS.open('profile-edit')">
-        <div class="sr-icon gold"><img loading="lazy" decoding="async" src="assets/media/image/8f325e3039adb86b0d774de587a192208b3be1a0a8f10d6b-d258f9b7.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon gold"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label" id="ss-prof-name">Practitioner</div><div class="sr-sub" id="ss-prof-email">—</div></div>
         <span class="sub-badge starter" id="ss-prof-badge" style="font-size:9px;padding:3px 8px;border-radius:6px;font-weight:700;font-family:'DM Sans',sans-serif;">FREE</span>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
@@ -99,13 +99,13 @@
     <div class="ss-section-title">AUDIO</div>
     <div class="ss-section">
       <div class="sr" onclick="SS.open('ambient')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="assets/media/image/970d7535b1216e12dbbc3dacf0a8205a56648ffdad0138cf-1d355eb2.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Ambient Sound</div><div class="sr-sub">Practice background audio</div></div>
         <span class="sr-val" id="ss-ambient-val">None</span>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr last" onclick="SS.toggle('notif')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="assets/media/image/ca119c1719f00e756d3dcb97b6d73d3f6cb0df9accd26232-cd120a75.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657311/e3815a20-57ad-11f1-ae7e-3f26811e4481_y2zb7t.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Practice Reminders</div><div class="sr-sub">Daily routine notifications</div></div>
         <div class="stgl" id="sstgl-notif" style="background:#e8d5a3;"><div class="stgl-knob" style="left:24px;background:#060c18;"></div></div>
       </div>
@@ -116,7 +116,7 @@
     <div class="ss-section">
       <div class="sr" onclick="cuOpen()">
         <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="assets/media/image/9e605b46cabaaef1327cf5d749f1c444ee76dd64115eba57-44779ae8.webp" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Customize</div><div class="sr-sub">Every appearance control in one place</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
@@ -136,20 +136,20 @@
       </div>
       <div class="sr" onclick="SS.open('fashionbg')">
         <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="assets/media/image/d571c50bd69e5c142ac08854f713455691cb1ca77251d29e-9a149bb6.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Fashion Background</div><div class="sr-sub">Backdrop for the Fashion home</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="SS.open('startbg')">
         <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="assets/media/image/7b544018b1e2a320c5a820f8459af21d30c1ae75b41a03ba-9150a0e3.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1785014506/file_000000009f10820bb6872a5ed8007148_pvqjaa.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Start Page Image</div><div class="sr-sub">Art behind the start animation</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="openSub('quick-access')">
-        <div class="sr-icon gold" style="overflow:hidden;"><img loading="lazy" decoding="async" src="assets/media/image/ecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b-187c10b3.png" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;" alt=""></div>
+        <div class="sr-icon gold" style="overflow:hidden;"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Quick Access</div><div class="sr-sub">Customize your bottom navigation bar</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
@@ -158,6 +158,13 @@
           <svg width="19" height="19" viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="sr-body"><div class="sr-label">Quick Links</div><div class="sr-sub">One-tap shortcuts to every corner of NowssB</div></div>
+        <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="sr" onclick="window.stOpen&&stOpen()">
+        <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"><rect x="3.4" y="3.4" width="7.2" height="7.2" rx="2"/><rect x="13.4" y="3.4" width="7.2" height="7.2" rx="2"/><rect x="3.4" y="13.4" width="7.2" height="7.2" rx="2"/><rect x="13.4" y="13.4" width="7.2" height="7.2" rx="2"/></svg>
+        </div>
+        <div class="sr-body"><div class="sr-label">Hero header</div><div class="sr-sub">Three ways the top of your home can look</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="openSub('fashion-plus')">
@@ -176,7 +183,7 @@
       </div>
       <div class="sr last" onclick="htOpen()">
         <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Home Tiles</div><div class="sr-sub">Restyle your four home buttons</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
@@ -199,23 +206,23 @@
     <div class="ss-section-title">PRIVACY & SOCIAL</div>
     <div class="ss-section">
       <div class="sr" onclick="SS.toggle('visible')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="assets/media/image/search-b04780d5.webp" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="./assets/icons/search.webp?v=2" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Appear in Discover</div><div class="sr-sub">Others can find your profile</div></div>
         <div class="stgl" id="sstgl-visible" style="background:#e8d5a3;"><div class="stgl-knob" style="left:24px;background:#060c18;"></div></div>
       </div>
       <div class="sr" onclick="SS.open('chatperm')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="assets/media/image/bcf0b0864ef02217e1d34ccec8e939c5d1324469fb568d75-f104184a.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657309/7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Chat Permissions</div><div class="sr-sub">Who can message you</div></div>
         <span class="sr-val" id="ss-chatperm-val">Everyone</span>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="SS.open('privacy')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="assets/media/image/c5b407265f205150d876eba92ba1250b3794609722dc0b87-0d157f24.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/e_background_removal/v1779657311/25bb3d70-57ae-11f1-ae7e-3f26811e4481_fhfzwy.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Privacy Settings</div><div class="sr-sub">Profile visibility &amp; data</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr last" onclick="SS.downloadData()">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="assets/media/image/4dc65a48424ae170dc5b7825d7cc9098655d0c4257a92307-2f4a9a6c.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657311/6f8d5c90-57ad-11f1-ae7e-3f26811e4481_y6etkn.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Download My Data</div><div class="sr-sub">Export everything as JSON</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
@@ -225,12 +232,12 @@
     <div class="ss-section-title">ABOUT</div>
     <div class="ss-section">
       <div class="sr" onclick="SS.open('about')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="assets/media/image/61081eaa800bccf6a798ddd4aa6ca08212441a288f5842a0-b5d5336d.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657309/fdd80ef0-57ad-11f1-ae7e-3f26811e4481_lfscbr.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">About NowssB</div><div class="sr-sub">Version 1.0.0 · nowssb.com</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr last" onclick="SS.open('terms')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="assets/media/image/7403656c1e9a9d3f5f22894eb12c28633704fc3c70b2833b-a577ed01.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Terms &amp; Privacy Policy</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>

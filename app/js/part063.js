@@ -29,22 +29,35 @@
               '<rect x="13" y="13" width="5" height="5" rx="1.5" fill="rgba(200,232,245,0.12)" stroke="rgba(200,232,245,0.3)" stroke-width="1"/>' +
             '</svg>' },
     { k: 'bg',      label: 'Background',     sub: 'Fashion backdrop',     run: 'nwsbOpenFashionBgOverlay()',
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="assets/media/image/9e605b46cabaaef1327cf5d749f1c444ee76dd64115eba57-44779ae8.webp">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png">' },
     { k: 'startbg', label: 'Start Image',    sub: 'Art behind the start', run: "SS.open('startbg')",
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="assets/media/image/7b544018b1e2a320c5a820f8459af21d30c1ae75b41a03ba-9150a0e3.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1785014506/file_000000009f10820bb6872a5ed8007148_pvqjaa.png">' },
     { k: 'qa',      label: 'Quick Access',   sub: 'Bottom nav bar',       run: "openSub('quick-access')",
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + ';border-radius:50%;" src="assets/media/image/ecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b-187c10b3.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + ';border-radius:50%;" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png">' },
     { k: 'qlinks',  label: 'Quick Links',    sub: 'One-tap shortcuts',    run: 'qlOpen()',
       icon: '<svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
     { k: 'tiles',   label: 'Home Tiles',     sub: 'The four buttons',     run: 'htOpen()',
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png">' },
     { k: 'layout',  label: 'Set As You Like', sub: 'Order the sections',  run: 'hlOpen()',
       icon: '<svg viewBox="0 0 22 22" fill="none">' +
               '<rect x="3" y="2.5" width="16" height="4.2" rx="1" stroke="#fff" stroke-width="1.5"/>' +
               '<rect x="3" y="8.9" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>' +
               '<rect x="3" y="15.3" width="16" height="4.2" rx="1" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>' +
             '</svg>' },
-    /* Fashion Plus is the only remaining appearance destination. */
+    /* A mode, not a destination — it toggles rather than opening anything,
+       so it carries a switch instead of an Enter pill. Fashion home only. */
+    /* Fashion Plus was a `mode` card: a switch and nothing else, so the
+       page behind it could not be reached from either the hub or the
+       panel on the home. It is an ordinary card now and it opens that
+       page, where the mode is switched — a door beats a switch when the
+       room behind it is where everything else lives. */
+    { k: 'widgets', label: 'Hero header', sub: 'Three ways the top can look', run: 'stOpen()',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round">' +
+              '<rect x="3.4" y="3.4" width="7.2" height="7.2" rx="2"/>' +
+              '<rect x="13.4" y="3.4" width="7.2" height="7.2" rx="2" stroke="#e8d5a3"/>' +
+              '<rect x="3.4" y="13.4" width="7.2" height="7.2" rx="2"/>' +
+              '<rect x="13.4" y="13.4" width="7.2" height="7.2" rx="2"/>' +
+            '</svg>' },
     { k: 'fashplus', label: 'Fashion Plus', sub: 'Open the motion mode', run: "openSub('fashion-plus')",
       icon: '<svg viewBox="0 0 24 24" fill="none">' +
               '<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5z" stroke="#fff" stroke-width="1.5"/>' +
@@ -58,7 +71,7 @@
       '<div class="cu-box">' +
         '<div class="cu-head">' +
           '<div class="cu-head-icon"><img loading="lazy" decoding="async" alt="" style="' + IMG + '" ' +
-            'src="assets/media/image/9e605b46cabaaef1327cf5d749f1c444ee76dd64115eba57-44779ae8.webp"></div>' +
+            'src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png"></div>' +
           '<div class="cu-head-txt">' +
             '<div class="cu-head-title">Customize</div>' +
             '<div class="cu-head-sub">Everything you can change, in one place</div>' +

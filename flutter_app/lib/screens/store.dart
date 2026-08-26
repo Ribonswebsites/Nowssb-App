@@ -47,7 +47,11 @@ class _StoreScreenState extends State<StoreScreen> {
   @override
   Widget build(BuildContext context) {
     final store = ContentStore.instance;
-    final counts = [store.library.length, store.meanings.length, store.books.length];
+    final counts = [
+      store.library.length,
+      store.meanings.length,
+      store.books.length
+    ];
 
     return PageShell(
       eyebrow: 'Own the sounds that heal',
@@ -84,7 +88,6 @@ class _StoreScreenState extends State<StoreScreen> {
           word: w.word,
           deva: w.deva,
           sub: w.meaning.isNotEmpty ? w.meaning : w.organ,
-          imageUrl: w.img,
           trailing: _Price(w.price),
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => WordDetail(word: w)),
@@ -107,7 +110,6 @@ class _StoreScreenState extends State<StoreScreen> {
           word: m.name,
           deva: '',
           sub: m.sub,
-          imageUrl: m.img,
           trailing: _Price(m.price),
         ),
     ];
@@ -138,18 +140,8 @@ class _StoreScreenState extends State<StoreScreen> {
                   color: const Color(0xFF14141C),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: b.cover.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          b.cover,
-                          width: 52,
-                          height: 68,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(Icons.menu_book, size: 22, color: NwsbColors.goldLight),
-                        ),
-                      )
-                    : const Icon(Icons.menu_book, size: 22, color: NwsbColors.goldLight),
+                child: const Icon(Icons.menu_book,
+                    size: 22, color: NwsbColors.goldLight),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -230,9 +222,8 @@ class _Tabs extends StatelessWidget {
                       fontSize: 12.5,
                       fontWeight:
                           i == index ? FontWeight.w700 : FontWeight.w400,
-                      color: i == index
-                          ? NwsbColors.ink
-                          : const Color(0xB3FFFFFF),
+                      color:
+                          i == index ? NwsbColors.ink : const Color(0xB3FFFFFF),
                     ),
                   ),
                 ),

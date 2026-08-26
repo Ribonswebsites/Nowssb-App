@@ -256,7 +256,6 @@ class MainOptionsSection extends StatelessWidget {
             title: 'Where to Begin',
             mark: NwsbMarks.sliders,
           ),
-          const SizedBox(height: 14),
           Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
@@ -275,7 +274,7 @@ class MainOptionsSection extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           SecBanner(
             title: 'Find Your Way Around',
             sub: 'Every screen in the app, and what each one is for',
@@ -436,7 +435,7 @@ class RoutinesSection extends StatelessWidget {
           PhotoCard(
             background: const NwsbImage(
               url:
-                  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4f13105270db8787278515dce45bf037acb0d188ed73487f3a65d0ec67bc7662.webp',
+                  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778078302/grok_image_1778070967319_ys14eq.jpg',
               fallback: ColoredBox(color: Color(0xFF060C18)),
             ),
             label: 'My Routines',
@@ -614,7 +613,7 @@ class EbooksSection extends StatelessWidget {
               child: ClipRect(
                 child: NwsbImage(
                   url:
-                      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/beaf11ea10561d439ff2d8217da6c6e889accdbb3b20bb1e7b4236cbe754305e.mp4',
+                      'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
                   fallback: NwsbVideo(
                     asset: 'assets/video/word-acts.mp4',
                     priority: ClipPriority.decoration,
@@ -733,7 +732,7 @@ class HealingSection extends StatelessWidget {
               children: [
                 const NwsbImage(
                   url:
-                      'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/28eb0c85b5fd748ea413a306696f8a567ea0248ad38d426847fc986e53515569.mp4',
+                      'https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4',
                   fallback: NwsbVideo(
                     asset: 'assets/video/healing-path-bg.mp4',
                   ),
@@ -925,16 +924,16 @@ class HomeFooterSection extends StatefulWidget {
 class _HomeFooterSectionState extends State<HomeFooterSection> {
   /// The ten in `#footerTrack` — index.html:2596.
   static const _shots = [
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/de6f1331af862c18f7b8511ab1bad2129e4e963d5a9d9ee20a3e6526a069f618.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/c63fd60894cef334cfb72e9b02a51949f6ff0d1749f2979b50d75747de4eb4e0.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7b69c8d374502725e0b66a396dfe4a368bd4468e0ab7989f9b27295e747997d1.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/ef785a342307f50803e6c785ef5e06781ada43f3060374315f7c04e8f50146f8.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/f67dedbd317ef3c3f6e553a77ebb5d4468ce347fd790dadce8472c735848d3e8.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/43cdce970c2897dd878bbd915083ac1cbcef66fba4ce8d82ffd969fe5136c447.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e4a21614b9e3d1c0926fd3a5d8a83d0c3f5237c007b953c04878e32a71562794.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/378e89b2f157b2a9c0b766e250dbc3345c4be6bc8d943eb48dd8d3c41235a53e.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/4ef4e116dedc8ef602b68bf4e8af0c3a8dddd74e1d070c1460a24e5342c0346e.webp',
-    'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/c37c1f7e2c2a1fa0e9d99386d477f760a7b41b74f8f4f253fe482181ff4d4dd9.webp',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931241446_2_oqn7z0.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931251298_2_nuhjin.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931991083_2_eyvogv.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776932343988_3_bofj1s.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931659181_2_l3dxyi.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931253654_2_hrtsra.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934920/grok_image_1776932830246_2_x0yyb6.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776933033268_2_m3fmo9.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932933365_2_jb1lch.jpg',
+    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932486772_2_spplq4.jpg',
   ];
 
   static const _links = [
@@ -1065,10 +1064,10 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                 IgnorePointer(
                   child: FractionallySizedBox(
                     widthFactor: 0.62,
-                    child: NwsbImage(
-                      asset: 'assets/frames/tab-nowss8-portrait.webp',
+                    child: Image.asset(
+                      'assets/frames/tab-nowss8-portrait.webp',
                       fit: BoxFit.contain,
-                      error: const SizedBox.shrink(),
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                     ),
                   ),
                 ),

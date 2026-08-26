@@ -4080,7 +4080,7 @@ body.nm-mode #ig-social-nav #igsn-me-av,
 #sub-social {
   background:
     linear-gradient(rgba(6,10,20,0.34), rgba(6,10,20,0.46)),
-    url('assets/media/image/5e423130c989f85a3ea9b85d2c9e2d4fad7e62803a9fe672-00a26ad7.webp') center center / cover no-repeat !important;
+    url('https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_900/v1783104736/grok_image_1783104637863_uiynel.jpg') center center / cover no-repeat !important;
 }
 #sub-social #ss-main-view, #sub-social .ss-tab-content, #sub-social #ss-content-settings {
   background: transparent !important;
@@ -4094,7 +4094,7 @@ body:not(.nm-mode):not(.nm-night) #sub-social .menu-banner { display: none !impo
 body:not(.nm-mode) #menuDrawer.menu-drawer {
   background:
     linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
-    url('assets/media/image/e63a406321939307b4f5766455fb40da4824ca464c5af1da-68cce823.webp') center center / cover no-repeat !important;
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094183/grok_image_1784093977513_alcdo3.jpg') center center / cover no-repeat !important;
 }
 /* Custom background behind the Settings screen — FASHION (dark) home only.
    #sub-social's default background is a 72%-opacity black (glass overlay),
@@ -4103,7 +4103,7 @@ body:not(.nm-mode) #menuDrawer.menu-drawer {
 body:not(.nm-mode):not(.nm-night) #sub-social {
   background:
     linear-gradient(rgba(6,10,20,0.58), rgba(6,10,20,0.7)),
-    url('assets/media/image/aecc28bf1c4647509602fe0fd559f4ec7ead515042a54d4e-1d7fd108.webp') center center / cover no-repeat !important;
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094627/grok_image_1784094543609_husz87.jpg') center center / cover no-repeat !important;
 }
 /* Inset the menu rows so they sit INSIDE the glass panel (L/R padding).
    Fashion (dark) menu only — the glass block image is centered, the rows must
@@ -4207,7 +4207,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
 #sub-word-search, #sub-meaning-search, #sub-explore-choice, #sub-search-choice {
   background:
     linear-gradient(rgba(0,0,0,0.66), rgba(0,0,0,0.66)),
-    url('assets/media/image/1c12cb9573b3f16c3cbc50dcc52ff8d657e730134b46965f-7e48543a.webp') center center / cover no-repeat #000 !important;
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783104242/grok_image_1783103445469_fdv2uu.jpg') center center / cover no-repeat #000 !important;
 }
 #sub-word-search .ws-page-body, #sub-meaning-search .ms-page-body { background: transparent !important; }
 #sub-word-search .sub-header, #sub-meaning-search .sub-header {
@@ -4267,7 +4267,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
   /* dark glass crystal ball (provided asset) — zoomed in (135%). border-radius
      clips the ball to a circle; NO overflow:hidden so the ripple rings can
      expand outward past the ball. */
-  background: url('assets/media/image/09a1f93144857e23fdb16609076df899fa8fc93d338027d4-952fd52d.webp') center center / 135% no-repeat;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783232336/file_000000005418720b94ddb92836d002b1_gyw6qo.png') center center / 135% no-repeat;
   box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
 .wsg-logo img { position: relative; z-index: 2; width: 62px; height: 62px; object-fit: contain; opacity: 1; }
@@ -4452,7 +4452,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
 .wsg-gem {
   width: 78px; height: 84px; flex-shrink: 0; border-radius: 20px !important;
   overflow: hidden;
-  background: url('assets/media/image/7446c532b9653961e0359e282fcd08e3e5ee5b119ca584a5-89bba1aa.webp') center center / cover no-repeat;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_260/v1783162753/file_000000004f5471fa92179aacccd3cea8_nfw8gm.png') center center / cover no-repeat;
 }
 /* themed SVG icon (used on every slide except the first "Focus"/diamond one) */
 .wsg-ico {
@@ -4585,7 +4585,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
 /* header text sits INSIDE the player's glass tube/capsule image (stretched) */
 #sub-features .feat-tube {
   position: relative; margin: 0 0 24px; padding: 26px 30px 30px;
-  background: url('assets/media/image/79ef322d3d1d5df94f0eedbd96af959425b14de0f7a22198-4b58c8a6.webp') center/100% 100% no-repeat;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/e_trim,f_auto,q_auto,w_800/v1782726159/file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center/100% 100% no-repeat;
   filter: drop-shadow(0 14px 30px rgba(0,0,0,0.5));
 }
 #sub-features .feat-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #c8a96e; margin: 0; }
@@ -4817,7 +4817,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
   width: calc(100% - 32px) !important; margin: 16px 16px 20px; padding: 0; border: none; cursor: pointer;
   /* show only the middle band with the glass boxes — crop the metallic top/bottom */
   aspect-ratio: 1536 / 450;
-  background: url('assets/media/image/9114f144ccee28a086ff0c9f94e474ce1fccd2c9c5700fa4-49ddc8db.webp') center center / 100% auto no-repeat;
+  background: url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png') center center / 100% auto no-repeat;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.38));
 }
 .fash-streak:active { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)) brightness(1.06); }
@@ -4882,7 +4882,7 @@ body.nm-night #menuDrawer .menu-nav-icon {
   position: fixed; inset: 0; z-index: 720; display: flex; flex-direction: column;
   background:
     linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.72)),
-    url('assets/media/image/1c12cb9573b3f16c3cbc50dcc52ff8d657e730134b46965f-7e48543a.webp') center center / cover no-repeat #000;
+    url('https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783104242/grok_image_1783103445469_fdv2uu.jpg') center center / cover no-repeat #000;
   transform: translateX(100%); transition: transform .34s cubic-bezier(.16,1,.3,1);
   visibility: hidden;
 }
@@ -4932,15 +4932,15 @@ body.nm-night #menuDrawer .menu-nav-icon {
 /* ── PAGE BACKGROUNDS (images clearly visible) ── */
 html body.nwsb-soc-glass #sub-ig-feed {
   background: linear-gradient(rgba(4,8,18,0.22) 0%, rgba(4,8,18,0.34) 55%, rgba(4,8,18,0.52) 100%),
-    url('assets/media/image/fbfd371d5535cf5032af352b1c5f69eacffced60b2979b0a-1f7fd285.webp') center/cover no-repeat !important;
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177099346_a7zq1m.jpg') center/cover no-repeat !important;
 }
 html body.nwsb-soc-glass #sub-reels-feed {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
-    url('assets/media/image/0137012f27d1ff4dc41891b0ba674ff41d2aa7d2aaf5ce5d-5e1a96af.webp') center/cover no-repeat !important;
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177245304_ihjubs.jpg') center/cover no-repeat !important;
 }
 html body.nwsb-soc-glass #sub-people {
   background: linear-gradient(rgba(4,8,18,0.22) 0%, rgba(4,8,18,0.34) 55%, rgba(4,8,18,0.52) 100%),
-    url('assets/media/image/fd027c5b6ce59363c694ab8bf2eed2d7a1d9ed68a30fe16f-da533b17.webp') center/cover no-repeat !important;
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177237514_bbhcec.jpg') center/cover no-repeat !important;
 }
 /* Profile: NO background photo — plain dark glass only (per request). A photo
    here was also the cause of the "white glow" around every round button: its
@@ -4951,7 +4951,7 @@ html body.nwsb-soc-glass #sub-ig-profile .ig {
 }
 html body.nwsb-soc-glass #sub-social-home {
   background: linear-gradient(rgba(4,8,18,0.2) 0%, rgba(4,8,18,0.32) 55%, rgba(4,8,18,0.5) 100%),
-    url('assets/media/image/b8736b76b90cdd421b4603f101bea1187832ce43f6ff9ed3-c2a2463d.webp') center/cover no-repeat !important;
+    url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177200001_clr7h6.jpg') center/cover no-repeat !important;
 }
 html body.nwsb-soc-glass #sub-people::before,
 html body.nwsb-soc-glass #sub-social-home::before { display: none !important; }
@@ -5352,7 +5352,7 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 #sub-connect-hub { background: #0a0e1a; }
 #sub-connect-hub .nch-bg {
   position: absolute; inset: 0; z-index: 0;
-  background: url('assets/media/image/aecc28bf1c4647509602fe0fd559f4ec7ead515042a54d4e-1d7fd108.webp') center/cover no-repeat;
+  background: url('https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784094627/grok_image_1784094543609_husz87.jpg') center/cover no-repeat;
 }
 #sub-connect-hub .nch-scrim {
   position: absolute; inset: 0; z-index: 1;
@@ -5452,7 +5452,7 @@ html body.nwsb-soc-glass #sub-social-home .nwsb-hero-stat {
 }
 .fbgci::before {
   content: ''; position: absolute; inset: 0; z-index: 3;
-  background: url('assets/media/image/phone-frame-2-61f7103c.webp') center / 100% 100% no-repeat;
+  background: url('./assets/fashion/phone-frame-2.webp') center / 100% 100% no-repeat;
   pointer-events: none;
 }
 /* The picture, in the glass. Offsets rather than padding: left and right
@@ -9554,9 +9554,16 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-top { padding: 0 1
    of "NowssB Store" and the two sets of white type fought each other. Anchored
    to the foot instead: the chip still names the section, and the film's own
    lettering is left to be read. */
+/* Middle right, not bottom right.
+   Pinned to the vertical centre of the clip rather than to its floor: the
+   banners carry their own wordmark low and left, and a chip sitting on the
+   bottom edge lands in the same band as that artwork — which is what put
+   "Trending Word" on top of the render's own lettering. Centring it leaves
+   the bottom of the picture alone and still reads as one row. */
 .vb-chips {
-  position: absolute; left: 52%; right: 10px; bottom: 12px;
-  z-index: 3; display: flex; align-items: flex-end; justify-content: flex-end;
+  position: absolute; left: 52%; right: 10px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 3; display: flex; align-items: center; justify-content: flex-end;
   padding: 0; pointer-events: none; background: none;
 }
 .vb-chip { display: flex; align-items: center; gap: 9px; min-width: 0; }
@@ -10247,7 +10254,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 /* The page background sits behind the rows, the same way the Atelier's
    does — its own art, heavily dimmed so the cards stay the subject. */
 #sub-signature-store .sig-bg {
-  background-image: url('assets/media/image/nowssb-signature-3589d2cc.webp');
+  background-image: url('./assets/signature/nowssb-signature.webp');
   background-size: cover; background-position: center top;
   opacity: 0.16;
 }
@@ -10501,7 +10508,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
 
 .sig-intro-bg {
   position: absolute; inset: 0; z-index: 0;
-  background-image: url('assets/media/image/intro-signature-25cf5fe5.webp');
+  background-image: url('./assets/store/intro-signature.webp');
   background-size: cover; background-position: center top;
   background-repeat: no-repeat;
   animation: slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);
@@ -10554,7 +10561,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
    the mode is on. The second is `body.fashplus`, six rules at the end
    that are the mode itself.
 
-   The phone is worth explaining. assets/media/image/phone-frame-f577eb5e.png is a
+   The phone is worth explaining. assets/fashion/phone-frame.png is a
    photograph of a handset with its studio backdrop cut away, so what is
    left is the metal and the black glass. The wallpaper does NOT go behind
    it — the frame's own screen is opaque black and would hide it — it goes
@@ -11117,7 +11124,7 @@ body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-solid]::before {
 }
 .fpp-intro-bg {
   position: absolute; inset: 0; z-index: 0;
-  background-image: url('assets/media/image/fp-intro-22a4699e.webp');
+  background-image: url('./assets/fashion/fp-intro.webp');
   background-size: cover; background-position: center center;
   animation: slIntroBgSettle 1.6s 0s both cubic-bezier(0.22,1,0.36,1);
 }
@@ -11510,7 +11517,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   padding: 3.4% 3.2% 8.4%;
   background-color: #05070d;
 }
-.nwsb-inframe.dev-tv-p::after { background-image: url('assets/media/image/tv-portrait-15036215.webp'); }
+.nwsb-inframe.dev-tv-p::after { background-image: url('./assets/frames/tv-portrait.webp'); }
 
 /* ── The landscape TV — kept with the frames, worn by nothing ──
    Three slices, not one image, and that is the whole trick.
@@ -11574,8 +11581,8 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
    with the bezel bar above them that read as a rectangle drawn around the
    feet, which is the line that was showing under the television. */
 .nwsb-inframe.dev-tv-l::after {
-  background-image: url('assets/media/image/tv-l-top-ebc3578b.webp'),
-                    url('assets/media/image/tv-l-bottom-c847689d.webp');
+  background-image: url('./assets/frames/tv-l-top.webp'),
+                    url('./assets/frames/tv-l-bottom.webp');
   background-position: top center, bottom center;
   background-size: 100% auto, 100% auto;
   background-repeat: no-repeat, no-repeat;
@@ -11592,7 +11599,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   content: '';
   position: absolute; left: 0; right: 0; top: 0; bottom: 14.922%;
   z-index: 19; pointer-events: none;
-  background: url('assets/media/image/tv-l-mid-9b5cea85.webp') top center / 100% 8px repeat-y;
+  background: url('./assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
 }
 
 /* ── The tall tablet — the footer ──
@@ -11605,7 +11612,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   padding: 5.2% 6.4% 4.6%;
   background-color: #05070d;
 }
-.nwsb-inframe.dev-ftr::after { background-image: url('assets/media/image/footer-frame-827f9e2f.webp'); }
+.nwsb-inframe.dev-ftr::after { background-image: url('./assets/frames/footer-frame.webp'); }
 
 /* The picker in My Certificates. It is there whether or not anything has
    been earned — the designs were unreachable before, because the only way
@@ -12065,7 +12072,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tab-l::after { background-image: url('assets/media/image/tab-landscape-221ff371.webp'); }
+.nwsb-inframe.dev-tab-l::after { background-image: url('./assets/frames/tab-landscape.webp'); }
 
 /* ══════════════════════════════════════════════════════════════════
    THE FOOTER CAROUSEL, INSIDE THE TABLET
@@ -12082,7 +12089,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
    background-size: 100% 100% squashed a 908x1408 tablet into it. It is
    off the panel now and on the thing that was meant to be in it.
 
-   THE NUMBERS, all measured out of assets/media/image/footer-frame-827f9e2f.webp
+   THE NUMBERS, all measured out of assets/frames/footer-frame.webp
    rather than eyeballed:
 
      file              908 x 1408
@@ -12118,7 +12125,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   margin-top:  calc(var(--fci-h) * 1408 / 1286 * -0.5028);
   z-index: 22;                 /* over the centre card (20) and the rest */
   pointer-events: none;        /* the cards underneath stay tappable */
-  background: url('assets/media/image/footer-frame-827f9e2f.webp') no-repeat center / 100% 100%;
+  background: url('./assets/frames/footer-frame.webp') no-repeat center / 100% 100%;
 }
 @media (max-width: 380px) {
   .footer-carousel { --fci-w: 142px; --fci-h: 228px; }
@@ -13022,7 +13029,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tabc-l::after { background-image: url('assets/media/image/tab2-landscape-d7149003.webp'); }
+.nwsb-inframe.dev-tabc-l::after { background-image: url('./assets/frames/tab2-landscape.webp'); }
 
 /* Portrait, wordmark on the bottom bezel — the Connect section.
    Trimmed 907x1307, screen at x 22-884, y 35-1257. */
@@ -13032,7 +13039,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tabc-p::after { background-image: url('assets/media/image/tab2-portrait-4f180436.webp'); }
+.nwsb-inframe.dev-tabc-p::after { background-image: url('./assets/frames/tab2-portrait.webp'); }
 
 /* ── The Connect BANNER, on the landscape tablet ──
    app/js/part067.js puts the frame classes on the .vb-banner itself rather
@@ -13120,7 +13127,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tabs-p::after { background-image: url('assets/media/image/tab3-portrait-19958393.webp'); }
+.nwsb-inframe.dev-tabs-p::after { background-image: url('./assets/frames/tab3-portrait.webp'); }
 
 /* Landscape, home button on the bottom bezel — its video banner.
    Trimmed 1157x863, screen at x 25-1133, y 32-794. */
@@ -13133,7 +13140,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-tabs-l::after { background-image: url('assets/media/image/tab3-landscape-0214696c.webp'); }
+.nwsb-inframe.dev-tabs-l::after { background-image: url('./assets/frames/tab3-landscape.webp'); }
 
 /* ── The subscription VIDEO BANNER, on the landscape tablet ──
    The frame classes go ON the banner rather than in a wrapper around it:
@@ -13247,7 +13254,7 @@ body.nm-night .nc-blk-orb { color: #e8d5a3; }
   background-clip: content-box;
   -webkit-background-clip: content-box;
 }
-.nwsb-inframe.dev-laptop::after { background-image: url('assets/media/image/laptop-1d74435b.webp'); }
+.nwsb-inframe.dev-laptop::after { background-image: url('./assets/frames/laptop.webp'); }
 
 /* The banner wears the frame itself — .vb-banner[data-vb] is what the
    layout registry matches, so a wrapper around it would strand the
@@ -13381,7 +13388,7 @@ body[class] #sub-health-journey .gsel-card.dev-tabn-p {
 body[class] #sub-health-journey .gsel-card.dev-tabn-p::before {
   content: ''; position: absolute; inset: 0; z-index: 20;
   pointer-events: none;
-  background: url('assets/media/image/tab-nowss8-portrait-ddb93026.webp') center / 100% 100% no-repeat;
+  background: url('./assets/frames/tab-nowss8-portrait.webp') center / 100% 100% no-repeat;
 }
 /* The photo and the ::after gradient are inset:0, which resolves against
    the PADDING box — that is the whole tablet, bezel included. Pinning the
@@ -13811,7 +13818,7 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   aspect-ratio: 1338 / 875;
   padding: 4.8580% 3.4380% 3.5874% 3.4380%;
 }
-.slm-fr.dev-tab4-l::after { background-image: url('assets/media/image/tab4-landscape-5258e476.webp'); }
+.slm-fr.dev-tab4-l::after { background-image: url('./assets/frames/tab4-landscape.webp'); }
 
 /* NOWSSB top-right, round home button — the mosaics and the covers.
    Trimmed 1214x891, screen at x 30-1182, y 46-819; aperture 1.4897. */
@@ -13819,7 +13826,7 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   aspect-ratio: 1214 / 891;
   padding: 3.7891% 2.5535% 5.8484% 2.4712%;
 }
-.slm-fr.dev-tab5-l::after { background-image: url('assets/media/image/tab5-landscape-8341cfa8.webp'); }
+.slm-fr.dev-tab5-l::after { background-image: url('./assets/frames/tab5-landscape.webp'); }
 
 /* Hairline bezel, label on the chin — the speed-dial tiles, because at a
    third of the screen's width it is the only one of the three whose bezel
@@ -13831,7 +13838,7 @@ body[class] #sub-sound-library .slm-back.sl-back-btn > svg path {
   aspect-ratio: 1315 / 807;
   padding: 1.6730% 1.4449% 4.4867% 1.4449%;
 }
-.slm-fr.dev-tab6-l::after { background-image: url('assets/media/image/tab6-landscape-6d9e786f.webp'); }
+.slm-fr.dev-tab6-l::after { background-image: url('./assets/frames/tab6-landscape.webp'); }
 
 /* The cards hold a tablet now, not a picture, so the shapes that were
    pinned square or 16:9 hand that job to the frame. */
@@ -14128,7 +14135,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 
 /* ══════════════════════════════════════════════════════════════════════
    THE FASHION HOME'S HERO, INSIDE THE TV
-   The element IS the frame: assets/media/image/tv-hero-portrait-c066fac1.webp is the
+   The element IS the frame: assets/frames/tv-hero-portrait.webp is the
    section's background, stretched to it, and everything the hero draws is
    inset to the aperture. The section stops being 100dvh and takes the
    render's own ratio instead, so the TV is never squashed to fit a
@@ -14145,7 +14152,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   /* The render carries an alpha channel — it was exported on black and the
      black is transparent now, so the page shows through around the set and
      between its legs instead of a black slab sitting under it. */
-  background: url('assets/media/image/tv-hero-portrait-c066fac1.webp?v=2') center / 100% 100% no-repeat;
+  background: url('./assets/frames/tv-hero-portrait.webp?v=2') center / 100% 100% no-repeat;
   overflow: visible;
   /* Start BELOW the fixed header. #homeHeader is position:fixed, so the
      set's top bezel — and the wordmark and buttons drawn on it — were
@@ -14187,7 +14194,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
    z-index 0 puts it under .hero-content (z-index 5), which is the whole
    point: in the television look the geometry above insets it to the set's
    aperture, so the clip plays IN the screen and the wordmark, the rotating
-   word, the search button and Explore / Help & Coach all sit on top of it —
+   word, the search button and Explore / App Guide all sit on top of it —
    everything the header draws is inside the television.
 
    `width/height: auto` matters in the television look: the inset above
@@ -14415,8 +14422,8 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 /* the two caps */
 .hero-simple .hero-tvbox::after {
   content: ''; position: absolute; inset: 0; z-index: 20; pointer-events: none;
-  background-image: url('assets/media/image/tv-l-top-ebc3578b.webp'),
-                    url('assets/media/image/tv-l-bottom-c847689d.webp');
+  background-image: url('./assets/frames/tv-l-top.webp'),
+                    url('./assets/frames/tv-l-bottom.webp');
   background-position: top center, bottom center;
   background-size: 100% auto, 100% auto;
   background-repeat: no-repeat, no-repeat;
@@ -14427,7 +14434,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 .hero-simple .hero-tvbox::before {
   content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: 14.922%;
   z-index: 19; pointer-events: none;
-  background: url('assets/media/image/tv-l-mid-9b5cea85.webp') top center / 100% 8px repeat-y;
+  background: url('./assets/frames/tv-l-mid.webp') top center / 100% 8px repeat-y;
 }
 /* ── The screen ──
    A plain 100%/100% child of the frame, exactly like .qa-tv-screen. The
@@ -14488,7 +14495,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 .hero-simple .hero-content .brand-tag,
 .hero-simple .hero-content .hero-word,
 .hero-simple .hero-content #heroTagline { text-shadow: 0 2px 10px rgba(0,0,0,0.85); }
-/* The secondary hero action uses a chevron drawn from two borders rather
+/* App Guide says where it goes. A chevron drawn from two borders rather
    than a glyph, so it takes the button's own colour and needs no asset. */
 .hero-simple .hero-btn-s { display: inline-flex !important; align-items: center; gap: 9px; }
 .hero-simple .hero-btn-s::after {
@@ -14644,7 +14651,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
   max-width: none;
   margin: 0;
   aspect-ratio: 1371 / 317;
-  background: url('assets/media/image/word-acts-tab-64345ac9.webp') center / 100% 100% no-repeat;
+  background: url('./assets/frames/word-acts-tab.webp') center / 100% 100% no-repeat;
   border-radius: 9px !important;
   flex-shrink: 0;
 }
@@ -14717,7 +14724,7 @@ body.nm-night .nsub-blk-orb { color: #e8d5a3; }
 .hero-search-ic { width: 19px !important; height: 19px !important; }
 
 /* ── The search icon is artwork now, not a silhouette ──
-   assets/media/image/search-d3d45c51.webp — headphones around a magnifier, white body,
+   assets/icons/search.webp — headphones around a magnifier, white body,
    black lens — ships in the repo instead of coming from Cloudinary.
    Every place that used the old glyph put it through a filter, because
    the old one was a flat shape that had to be recoloured for whatever it
@@ -14807,7 +14814,7 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
    fighting for the same 230px, and the furniture lost every time.
 
      above the set   the store on the left, the search on the right
-     below the set   Explore and Help & Coach, and the way into assistance
+     below the set   Explore and App Guide, and the way into the guide
 
    The pieces are moved here by app/js/part083.js and moved back when the
    look changes, because this is one look of three and the other two want
@@ -14925,12 +14932,12 @@ html body.nwsb-soc-glass #sub-people .nwsb-search-icon,
 .hs-searchwrap .hero-search-ic,
 .hs-searchwrap .nwsb-search-icon { width: 15px !important; height: 15px !important; }
 
-/* ── Explore and Help & Coach, below the set ── */
+/* ── Explore and App Guide, below the set ── */
 .hs-foot .hero-btns {
   flex-shrink: 0; margin: 0 !important; padding: 0 !important;
   display: flex !important; align-items: center; gap: 9px;
 }
-/* the rule between Explore and Help & Coach does not stretch — inside this
+/* the rule between Explore and App Guide does not stretch — inside this
    row it is a divider, not a spacer */
 .hs-foot .hero-btns > .hs-sep { flex: 0 0 1px; }
 .hs-foot .hero-btn {
@@ -15189,3096 +15196,231 @@ body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   margin-bottom: 16px !important;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   STORE TRIGGER — the offer moves up under the title.
 
-/* ── Time-aware home dashboard: Focus · Progress · Up next ─────────────── */
-.nwsb-daydash { width:100%; margin:18px 0 22px; box-sizing:border-box; }
-.nwsb-daydash *, .nwsb-daydash *::before, .nwsb-daydash *::after { box-sizing:border-box; }
-.nwsb-focus-card { position:relative; min-height:214px; overflow:hidden; border-radius:28px; isolation:isolate; cursor:pointer; }
-.nwsb-focus-video, .nwsb-focus-scrim { position:absolute; inset:0; width:100%; height:100%; }
-.nwsb-focus-video { object-fit:cover; object-position:center; z-index:-2; background:#131629; }
-.nwsb-focus-scrim { z-index:-1; background:linear-gradient(90deg,rgba(7,10,24,.93) 0%,rgba(7,10,24,.62) 48%,rgba(7,10,24,.08) 100%); }
-.nwsb-focus-content { min-height:214px; padding:24px 22px 20px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; color:#fff; }
-.nwsb-focus-eyebrow, .nwsb-dashboard-eyebrow { text-transform:uppercase; letter-spacing:2.1px; font-size:10px; font-weight:750; }
-.nwsb-focus-eyebrow { color:rgba(232,213,163,.9); margin-bottom:9px; }
-.nwsb-focus-title { max-width:80%; font-size:clamp(25px,7vw,38px); line-height:1.06; font-weight:800; letter-spacing:-.8px; }
-.nwsb-focus-sub { max-width:76%; margin-top:9px; color:rgba(255,255,255,.78); font-size:13px; line-height:1.45; }
-.nwsb-focus-cta { margin-top:16px; padding:11px 16px; border:0; border-radius:999px; background:#fff; color:#12152a; font:750 12px/1 'DM Sans',sans-serif; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.18); }
-.nwsb-focus-cta span { margin-left:8px; font-size:16px; vertical-align:-1px; }
-.nwsb-dashboard-heading { display:flex; align-items:end; justify-content:space-between; gap:12px; margin:24px 2px 12px; }
-.nwsb-dashboard-heading h2 { margin:3px 0 0; font-size:22px; line-height:1.1; letter-spacing:-.45px; }
-.nwsb-dashboard-heading button { appearance:none; border:0; background:transparent; padding:5px 0; font:650 13px/1 'DM Sans',sans-serif; cursor:pointer; }
-.nwsb-dashboard-heading button span { margin-left:4px; font-size:20px; vertical-align:-2px; }
-.nwsb-dashboard-eyebrow { opacity:.52; }
-.nwsb-progress-card { display:grid; grid-template-columns:repeat(3,1fr); gap:0; overflow:hidden; }
-.nwsb-progress-stat { min-width:0; padding:17px 9px 15px; display:flex; flex-direction:column; align-items:center; text-align:center; }
-.nwsb-stat-icon { width:38px; height:38px; display:grid; place-items:center; border-radius:50%; margin-bottom:9px; }
-.nwsb-stat-icon svg, .nwsb-upnext-icon svg { width:20px; height:20px; }
-.nwsb-progress-stat strong { font-size:21px; line-height:1; }
-.nwsb-progress-stat small { margin-top:6px; font-size:10px; line-height:1.2; white-space:nowrap; opacity:.58; }
-.nwsb-up-heading { margin-top:25px; }
-.nwsb-upnext-card { width:100%; display:flex; align-items:center; gap:12px; padding:15px; border:0; text-align:left; cursor:pointer; }
-.nwsb-upnext-icon { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; border-radius:15px; }
-.nwsb-upnext-copy { min-width:0; flex:1; display:flex; flex-direction:column; gap:5px; }
-.nwsb-upnext-copy strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; }
-.nwsb-upnext-copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; opacity:.58; }
-.nwsb-upnext-arrow { font-size:22px; opacity:.62; }
-.nwsb-daydash-normal .nwsb-focus-card { box-shadow:9px 9px 20px rgba(166,171,189,.42),-8px -8px 20px rgba(255,255,255,.92); }
-.nwsb-daydash-normal .nwsb-dashboard-eyebrow { color:#5d6376; }
-.nwsb-daydash-normal .nwsb-dashboard-heading h2, .nwsb-daydash-normal .nwsb-dashboard-heading button { color:#1a1a2e; }
-.nwsb-daydash-normal .nwsb-progress-card, .nwsb-daydash-normal .nwsb-upnext-card { border-radius:22px; background:#f0f2f7; box-shadow:8px 8px 17px rgba(166,171,189,.38),-7px -7px 17px rgba(255,255,255,.92); color:#1a1a2e; }
-.nwsb-daydash-normal .nwsb-progress-stat + .nwsb-progress-stat { border-left:1px solid rgba(26,26,46,.08); }
-.nwsb-daydash-normal .nwsb-stat-icon, .nwsb-daydash-normal .nwsb-upnext-icon { color:#7d6636; background:#edf0f6; box-shadow:inset 3px 3px 7px rgba(166,171,189,.28),inset -3px -3px 7px rgba(255,255,255,.9); }
-.nwsb-daydash-fashion .nwsb-focus-card { border:1px solid rgba(255,255,255,.18); box-shadow:0 18px 42px rgba(0,0,0,.28); }
-.nwsb-daydash-fashion .nwsb-dashboard-eyebrow { color:rgba(232,213,163,.84); }
-.nwsb-daydash-fashion .nwsb-dashboard-heading h2, .nwsb-daydash-fashion .nwsb-dashboard-heading button { color:#fff; }
-.nwsb-daydash-fashion .nwsb-progress-card, .nwsb-daydash-fashion .nwsb-upnext-card { border:1px solid rgba(255,255,255,.16); border-radius:20px; background:rgba(10,11,24,.48); box-shadow:inset 0 1px rgba(255,255,255,.08),0 15px 34px rgba(0,0,0,.2); color:#fff; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
-.nwsb-daydash-fashion .nwsb-progress-stat + .nwsb-progress-stat { border-left:1px solid rgba(255,255,255,.14); }
-.nwsb-daydash-fashion .nwsb-stat-icon, .nwsb-daydash-fashion .nwsb-upnext-icon { color:#e8d5a3; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14); }
-@media (max-width:360px) { .nwsb-progress-stat { padding-left:4px; padding-right:4px; } .nwsb-progress-stat small { font-size:9px; } .nwsb-focus-content { padding-left:18px; padding-right:18px; } }
+   The card's copy used to sit in .nss-trigger-bottom, which margin-top:auto
+   pins to the floor of a 9:16 card — the same band the clip carries its own
+   NowssB Store lettering in. Two sets of words in one place and neither of
+   them readable. The paragraph is gone and the way in is a white Shop Now
+   directly under the title, where there is nothing behind it.
 
+   Shop Now sits at the FOOT, directly above the pills — clear of the title
+   and clear of the lettering the film carries in its middle. The card's
+   heading is "Enter the" alone now: the film says NowssB Store in its own
+   type and the section's head says it again above the card, so the drawn
+   copy of it was the third on one screen.
 
-/* ══ YOUR ESSENTIALS — shared information architecture, mode-specific skin ══ */
-.nwsb-essentials { margin: 28px 0 8px; color: var(--nm-ink, #15182a); }
-.nwsb-essential-tabs { display: flex; gap: 10px; margin: 0 0 24px; }
-.nwsb-essential-tab { appearance: none; border: 0; border-radius: 999px; padding: 12px 20px; background: #f2f3f8; color: #464a5a; font: 700 14px/1 inherit; cursor: pointer; box-shadow: 7px 7px 16px rgba(169,174,188,.32), -7px -7px 16px rgba(255,255,255,.94); transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
-.nwsb-essential-tab:hover, .nwsb-essential-tab:focus-visible { transform: translateY(-1px); outline: none; }
-.nwsb-essential-tab.is-active { background: #fff; color: #111526; box-shadow: inset 2px 2px 7px rgba(169,174,188,.24), inset -2px -2px 7px rgba(255,255,255,.94); }
-.nwsb-essentials-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 0 4px 12px; }
-.nwsb-essentials-heading h2 { margin: 4px 0 0; font-size: clamp(24px, 4.8vw, 34px); line-height: 1.05; letter-spacing: -.8px; }
-.nwsb-essentials-mark { color: #b09255; font-size: 9px; font-weight: 800; letter-spacing: 2.5px; }
-.nwsb-essential-list { position: relative; display: grid; gap: 10px; }
-.nwsb-essential-row { position: relative; display: grid; grid-template-columns: 22px 40px minmax(0,1fr) auto 18px; align-items: center; min-height: 70px; width: 100%; padding: 12px 14px 12px 0; border: 0; border-radius: 22px; background: #f1f3f8; color: #202335; text-align: left; cursor: pointer; box-shadow: 8px 8px 18px rgba(169,174,188,.25), -8px -8px 18px rgba(255,255,255,.90); transition: transform .18s ease, box-shadow .18s ease; }
-.nwsb-essential-row:hover, .nwsb-essential-row:focus-visible { transform: translateY(-2px); outline: none; box-shadow: 10px 12px 22px rgba(169,174,188,.28), -9px -9px 20px rgba(255,255,255,.96); }
-.nwsb-essential-row[hidden] { display: none; }
-.nwsb-essential-featured { min-height: 106px; background: linear-gradient(116deg, #ffd33f 0%, #ffc526 58%, #ff9b2c 100%); color: #241c16; }
-.nwsb-essential-rail { align-self: stretch; position: relative; display: flex; align-items: center; justify-content: center; }
-.nwsb-essential-rail::before { content: ''; position: absolute; top: -10px; bottom: -10px; width: 3px; background: repeating-linear-gradient(to bottom, #d7d9df 0 10px, transparent 10px 18px); border-radius: 3px; }
-.nwsb-essential-row:first-child .nwsb-essential-rail::before { top: 50%; }
-.nwsb-essential-row:last-child .nwsb-essential-rail::before { bottom: 50%; }
-.nwsb-essential-dot { position: relative; z-index: 1; width: 15px; height: 15px; border: 2px solid #d5d7dd; border-radius: 50%; background: #f8f9fc; }
-.nwsb-essential-featured .nwsb-essential-dot { width: 18px; height: 18px; border-color: #f47f16; background: #ff8019; box-shadow: 0 0 0 5px rgba(255,255,255,.40); }
-.nwsb-essential-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 14px; background: rgba(255,255,255,.78); color: #5b513a; font-size: 20px; font-weight: 800; box-shadow: 3px 3px 8px rgba(150,120,70,.12); }
-.nwsb-essential-copy { min-width: 0; display: grid; gap: 5px; padding-right: 10px; }
-.nwsb-essential-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; line-height: 1.15; }
-.nwsb-essential-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #747889; font-size: 11px; line-height: 1.2; }
-.nwsb-essential-featured .nwsb-essential-copy small { color: rgba(36,28,22,.72); }
-.nwsb-essential-meta { color: #747889; font-size: 11px; white-space: nowrap; }
-.nwsb-essential-featured .nwsb-essential-meta { color: rgba(36,28,22,.74); font-weight: 700; }
-.nwsb-essential-arrow { color: #777c8c; font-size: 24px; line-height: 1; }
-.nwsb-essential-help { margin: 10px 4px 0; color: #828697; font-size: 12px; }
-.nwsb-essentials-fashion { color: #fff; }
-.nwsb-essentials-fashion .nwsb-essential-tab { background: rgba(255,255,255,.10); color: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 12px 28px rgba(0,0,0,.20); }
-.nwsb-essentials-fashion .nwsb-essential-tab.is-active { background: rgba(255,255,255,.90); color: #171426; }
-.nwsb-essentials-fashion .nwsb-essential-row { background: rgba(20,16,39,.62); color: #fff; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 18px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.05); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-.nwsb-essentials-fashion .nwsb-essential-row:hover, .nwsb-essentials-fashion .nwsb-essential-row:focus-visible { background: rgba(56,38,85,.72); }
-.nwsb-essentials-fashion .nwsb-essential-featured { background: linear-gradient(120deg, rgba(74,35,104,.92), rgba(23,15,47,.78)); border-color: rgba(225,195,255,.26); }
-.nwsb-essentials-fashion .nwsb-essential-rail::before { background: repeating-linear-gradient(to bottom, rgba(255,255,255,.23) 0 10px, transparent 10px 18px); }
-.nwsb-essentials-fashion .nwsb-essential-dot { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.42); }
-.nwsb-essentials-fashion .nwsb-essential-featured .nwsb-essential-dot { border-color: #e8d5a3; background: #e8d5a3; box-shadow: 0 0 0 5px rgba(232,213,163,.16); }
-.nwsb-essentials-fashion .nwsb-essential-icon { background: rgba(255,255,255,.13); color: #e8d5a3; box-shadow: none; }
-.nwsb-essentials-fashion .nwsb-essential-copy small, .nwsb-essentials-fashion .nwsb-essential-meta, .nwsb-essentials-fashion .nwsb-essential-arrow { color: rgba(255,255,255,.62); }
-.nwsb-essentials-fashion .nwsb-essential-featured .nwsb-essential-copy small, .nwsb-essentials-fashion .nwsb-essential-featured .nwsb-essential-meta { color: rgba(255,255,255,.72); }
-.nwsb-essentials-fashion .nwsb-essential-mark { color: #e8d5a3; }
-.nwsb-essentials-fashion .nwsb-essential-help { color: rgba(255,255,255,.55); }
-@media (max-width: 430px) {
-  .nwsb-essential-row { grid-template-columns: 18px 36px minmax(0,1fr) 16px; padding-right: 10px; }
-  .nwsb-essential-meta { grid-column: 3; grid-row: 2; margin-top: -2px; }
-  .nwsb-essential-arrow { grid-column: 4; grid-row: 1 / span 2; }
-  .nwsb-essential-icon { width: 34px; height: 34px; }
-  .nwsb-essential-copy { padding-right: 4px; }
-}
-
-/* ══ REFERENCE DASHBOARD PASS — exact wrapper geometry and controls ══ */
-.nwsb-daydash { width: 100%; }
-.nwsb-focus-card { min-height: 250px; overflow: hidden; background: #060b18; }
-.nwsb-focus-video { opacity: 1 !important; filter: brightness(1.18) contrast(1.16) saturate(1.08); transform: scale(1.01); }
-.nwsb-focus-scrim { background: linear-gradient(90deg, rgba(3,6,16,.54) 0%, rgba(3,6,16,.22) 54%, rgba(3,6,16,.04) 100%) !important; opacity: .78; }
-.nwsb-progress-card { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.nwsb-progress-stat { padding: 18px 6px 16px; }
-.nwsb-stat-icon, .nwsb-upnext-icon { border-radius: 50% !important; }
-.nwsb-stat-icon svg, .nwsb-upnext-icon svg { width: 21px; height: 21px; }
-.nwsb-progress-stat + .nwsb-progress-stat { border-left: 1px solid rgba(26,26,46,.10); }
-.nwsb-upnext-list { display: grid; overflow: hidden; border-radius: 22px; }
-.nwsb-upnext-list .nwsb-upnext-card { border-radius: 0; border-bottom: 1px solid rgba(26,26,46,.10); }
-.nwsb-upnext-list .nwsb-upnext-card:last-child { border-bottom: 0; }
-.nwsb-daydash-normal .nwsb-upnext-list { background: #f0f2f7; box-shadow: 8px 8px 17px rgba(166,171,189,.38),-7px -7px 17px rgba(255,255,255,.92); }
-.nwsb-daydash-fashion .nwsb-upnext-list { background: rgba(10,11,24,.48); border: 1px solid rgba(255,255,255,.16); box-shadow: inset 0 1px rgba(255,255,255,.08),0 15px 34px rgba(0,0,0,.2); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-.nwsb-daydash-fashion .nwsb-upnext-list .nwsb-upnext-card { background: transparent; border-bottom-color: rgba(255,255,255,.14); }
-.nwsb-daydash-fashion .nwsb-progress-stat + .nwsb-progress-stat { border-left-color: rgba(255,255,255,.14); }
-
-.nwsb-essentials { width: 100%; margin: 28px 0 8px; }
-.nwsb-essentials-heading { margin: 0 4px 13px; }
-.nwsb-essentials-shell { width: 100%; padding: 12px; border-radius: 26px; }
-.nwsb-essential-list { position: relative; display: grid; gap: 9px; padding: 4px 0; }
-.nwsb-essential-list::before { content: ''; position: absolute; z-index: 0; left: 16px; top: 26px; bottom: 26px; width: 2px; border-radius: 2px; background: rgba(120,123,132,.38); }
-.nwsb-essential-row { z-index: 1; grid-template-columns: 32px 42px minmax(0,1fr) auto 22px; min-height: 68px; padding: 10px 14px 10px 0; border-radius: 18px; background: #090a0e; color: #fff; box-shadow: 0 8px 18px rgba(0,0,0,.18); }
-.nwsb-essential-row:hover, .nwsb-essential-row:focus-visible { background: #161820; transform: translateY(-1px); }
-.nwsb-essential-featured { min-height: 78px; background: #090a0e; color: #fff; }
-.nwsb-essential-rail { z-index: 2; }
-.nwsb-essential-rail::before { display: none; }
-.nwsb-essential-dot { width: 12px; height: 12px; border: 2px solid #0b0c10; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.22); }
-.nwsb-essential-featured .nwsb-essential-dot { width: 14px; height: 14px; border: 2px solid #090a0e; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.30); }
-.nwsb-essential-icon { width: 38px; height: 38px; border-radius: 50%; background: #fff; color: #090a0e; box-shadow: none; }
-.nwsb-essential-icon svg { width: 20px; height: 20px; }
-.nwsb-essential-copy strong { color: #fff; }
-.nwsb-essential-copy small, .nwsb-essential-meta { color: rgba(255,255,255,.64); }
-.nwsb-essential-arrow { color: #fff; font-size: 22px; }
-.nwsb-essentials-normal .nwsb-essentials-shell { background: #f0f2f7; box-shadow: 10px 10px 22px rgba(166,171,189,.34),-10px -10px 22px rgba(255,255,255,.94); }
-.nwsb-essentials-normal .nwsb-essential-row { box-shadow: 0 9px 18px rgba(0,0,0,.20); }
-.nwsb-essentials-fashion .nwsb-essentials-shell { background: rgba(10,9,20,.48); border: 1px solid rgba(255,255,255,.16); box-shadow: 0 18px 36px rgba(0,0,0,.26), inset 0 1px rgba(255,255,255,.06); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-.nwsb-essentials-fashion .nwsb-essential-list::before { background: rgba(255,255,255,.28); }
-.nwsb-essentials-fashion .nwsb-essential-row { background: #090a0e; border: 1px solid rgba(255,255,255,.12); }
-.nwsb-essentials-fashion .nwsb-essential-featured { background: #090a0e; }
-.nwsb-essentials-fashion .nwsb-essential-icon { background: #fff; color: #090a0e; }
-.nwsb-essentials-fashion .nwsb-essential-copy small, .nwsb-essentials-fashion .nwsb-essential-meta { color: rgba(255,255,255,.64); }
-@media (max-width: 430px) {
-  .nwsb-essential-row { grid-template-columns: 32px 40px minmax(0,1fr) 20px; }
-  .nwsb-essential-meta { display: none; }
-  .nwsb-essential-arrow { grid-column: 4; grid-row: 1 / span 2; }
-  .nwsb-progress-stat small { font-size: 9px; }
-}
-
-/* Fashion home alignment: the dashboard stack shares the same 16px side inset
-   as the neighboring glass sections instead of touching the viewport edges. */
-#home .home-body > .nwsb-daydash,
-#home .home-body > .nwsb-essentials {
-  width: calc(100% - 32px);
-  margin-left: 16px;
-  margin-right: 16px;
-}
-#home .home-body > .nwsb-daydash { margin-top: 18px; }
-#home .home-body > .nwsb-essentials { margin-top: 28px; }
-
-/* ══ YOUR ESSENTIALS — faithful reference screen pass ══ */
-.nwsb-essentials-reference { position: relative; overflow: hidden; width: 100%; margin: 28px 0 8px; color: #20212c; }
-.nwsb-essentials-reference .nwsb-essentials-wave { height: 72px; background: linear-gradient(180deg, #5433a5 0%, #7b4bb1 62%, #ffffff 63%, #ffffff 100%); border-radius: 0 0 52% 52% / 0 0 72% 72%; }
-.nwsb-essentials-reference .nwsb-essentials-body { position: relative; margin-top: -1px; padding: 0 20px 28px; background: #ffffff; }
-.nwsb-essentials-reference .nwsb-essentials-heading { margin: 38px 0 14px; }
-.nwsb-essentials-reference .nwsb-essentials-heading h2 { margin: 0; color: #20212c; font-size: 27px; line-height: 1.1; letter-spacing: -.8px; }
-.nwsb-essentials-reference .nwsb-essential-tabs { display: flex; gap: 10px; margin: -5px 0 38px; }
-.nwsb-essentials-reference .nwsb-essential-tab { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 126px; height: 49px; padding: 0 18px; border: 0; border-radius: 999px; background: #f7f5f2; color: #262530; font: 800 15px/1 'DM Sans',sans-serif; box-shadow: 0 5px 14px rgba(44,39,61,.08); }
-.nwsb-essentials-reference .nwsb-essential-tab svg { width: 18px; height: 18px; }
-.nwsb-essentials-reference .nwsb-essential-tab.is-active { background: #f5f2ed; box-shadow: inset 1px 1px 4px rgba(80,74,86,.10), 0 5px 14px rgba(44,39,61,.08); }
-.nwsb-essentials-reference .nwsb-essentials-shell { padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.nwsb-essentials-reference .nwsb-essential-list { position: relative; display: grid; gap: 12px; padding: 0 0 0 47px; }
-.nwsb-essentials-reference .nwsb-essential-list::before { content: ''; position: absolute; z-index: 0; left: 17px; top: 38px; bottom: 24px; width: 6px; border-radius: 5px; background: repeating-linear-gradient(to bottom, #dededc 0 13px, transparent 13px 25px); }
-.nwsb-essentials-reference .nwsb-essential-row, .nwsb-essentials-reference .nwsb-essential-featured-card { position: relative; z-index: 1; width: 100%; border: 0; text-align: left; font-family: 'DM Sans',sans-serif; cursor: pointer; }
-.nwsb-essentials-reference .nwsb-essential-featured-card { min-height: 138px; padding: 26px 26px 20px; overflow: hidden; border-radius: 23px; background: linear-gradient(120deg, #ffd000 0%, #ffcb0b 56%, #ff8b27 100%); color: #28252a; box-shadow: 0 10px 20px rgba(119,83,18,.14); }
-.nwsb-essentials-reference .nwsb-essential-featured-card::after { content: ''; position: absolute; right: -28px; bottom: -52px; width: 210px; height: 176px; border-radius: 50% 50% 0 0; background: rgba(255,155,35,.42); transform: rotate(-18deg); }
-.nwsb-essentials-reference .nwsb-essential-badge { position: relative; z-index: 2; display: block; width: max-content; margin-bottom: 14px; padding: 3px 10px; border-radius: 99px; background: rgba(255,255,255,.70); font-size: 12px; font-weight: 800; }
-.nwsb-essentials-reference .nwsb-essential-featured-icon { position: absolute; z-index: 2; right: 18px; top: 20px; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.68); color: #3c3424; }
-.nwsb-essentials-reference .nwsb-essential-featured-icon svg { width: 19px; height: 19px; }
-.nwsb-essentials-reference .nwsb-essential-featured-card > strong, .nwsb-essentials-reference .nwsb-essential-featured-card > small, .nwsb-essentials-reference .nwsb-essential-featured-card > em { position: relative; z-index: 2; display: block; }
-.nwsb-essentials-reference .nwsb-essential-featured-card > strong { max-width: 72%; font-size: 21px; line-height: 1.15; }
-.nwsb-essentials-reference .nwsb-essential-featured-card > small { margin-top: 11px; font-size: 14px; }
-.nwsb-essentials-reference .nwsb-essential-featured-card > em { margin-top: 10px; font-style: normal; font-size: 13px; }
-.nwsb-essentials-reference .nwsb-essential-featured-art { position: absolute; z-index: 1; right: 7px; bottom: 3px; width: 138px; height: 108px; border: 7px solid rgba(79,54,28,.62); border-left-color: transparent; border-bottom-color: transparent; border-radius: 50%; transform: rotate(25deg); opacity: .66; }
-.nwsb-essentials-reference .nwsb-essential-row { display: grid; grid-template-columns: 22px minmax(0,1fr) auto 18px; align-items: center; min-height: 69px; padding: 0 17px; border-radius: 21px; background: #f7f5f2; color: #3c3a43; box-shadow: 0 7px 15px rgba(61,55,71,.08); }
-.nwsb-essentials-reference .nwsb-essential-row-icon { display: grid; place-items: center; width: 21px; height: 21px; color: #45434a; }
-.nwsb-essentials-reference .nwsb-essential-row-icon svg { width: 17px; height: 17px; }
-.nwsb-essentials-reference .nwsb-essential-row-copy { min-width: 0; padding-left: 8px; }
-.nwsb-essentials-reference .nwsb-essential-row-copy strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #4c4a52; font-size: 16px; font-weight: 500; }
-.nwsb-essentials-reference .nwsb-essential-row-copy small { display: none; }
-.nwsb-essentials-reference .nwsb-essential-meta { padding-left: 9px; color: #68666b; font-size: 14px; white-space: nowrap; }
-.nwsb-essentials-reference .nwsb-essential-arrow { color: #6b696e; font-size: 25px; line-height: 1; }
-.nwsb-essentials-reference .nwsb-help-heading { display: flex; align-items: center; justify-content: space-between; margin: 36px 0 18px; }
-.nwsb-essentials-reference .nwsb-help-heading h3 { margin: 0; color: #20212c; font-size: 23px; letter-spacing: -.45px; }
-.nwsb-essentials-reference .nwsb-help-heading button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #f7f5f2; color: #3d3b43; font-size: 28px; line-height: 1; box-shadow: 0 5px 12px rgba(44,39,61,.08); }
-.nwsb-essentials-reference .nwsb-help-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
-.nwsb-essentials-reference .nwsb-help-card { min-width: 0; overflow: hidden; padding: 0; border: 0; border-radius: 20px; background: #f7f5f2; color: #26242c; text-align: left; box-shadow: 0 7px 15px rgba(61,55,71,.08); cursor: pointer; }
-.nwsb-essentials-reference .nwsb-help-art { display: grid; place-items: center; height: 128px; color: #fff; }
-.nwsb-essentials-reference .nwsb-help-art svg { width: 38px; height: 38px; }
-.nwsb-essentials-reference .nwsb-help-violet .nwsb-help-art { background: linear-gradient(135deg,#55318e,#ad75d0); }
-.nwsb-essentials-reference .nwsb-help-pink .nwsb-help-art { background: repeating-linear-gradient(165deg,#ef62ac 0 8px,#ff9bd2 8px 12px); }
-.nwsb-essentials-reference .nwsb-help-copy { display: block; padding: 14px 14px 16px; }
-.nwsb-essentials-reference .nwsb-help-copy strong, .nwsb-essentials-reference .nwsb-help-copy small { display: block; }
-.nwsb-essentials-reference .nwsb-help-copy strong { font-size: 15px; }
-.nwsb-essentials-reference .nwsb-help-copy small { margin-top: 5px; color: #68666b; font-size: 12px; line-height: 1.35; }
-.nwsb-essentials-reference .nwsb-essentials-mark { display: none; }
-#home .home-body > .nwsb-essentials-reference { width: calc(100% - 32px); margin-left: 16px; margin-right: 16px; }
-#home .home-body > .nwsb-essentials-reference .nwsb-essentials-body { padding-left: 20px; padding-right: 20px; }
-@media (max-width: 380px) {
-  .nwsb-essentials-reference .nwsb-essentials-body { padding-left: 14px; padding-right: 14px; }
-  .nwsb-essentials-reference .nwsb-essential-list { padding-left: 38px; }
-  .nwsb-essentials-reference .nwsb-essential-list::before { left: 13px; }
-  .nwsb-essentials-reference .nwsb-essential-meta { display: none; }
-  .nwsb-essentials-reference .nwsb-help-grid { gap: 9px; }
-}
-
-/* Final reference geometry: the rail is a short connector for the three
-   supporting rows, not a full-height line through the whole section. */
-.nwsb-essentials-reference .nwsb-essential-list::before {
-  top: 158px;
-  bottom: 28px;
-  width: 3px;
-  background: repeating-linear-gradient(to bottom, #d9d9d7 0 9px, transparent 9px 20px);
-}
-.nwsb-focus-cta {
-  border-radius: 999px !important;
-  padding: 13px 20px !important;
-}
-@media (max-width: 380px) {
-  .nwsb-essentials-reference .nwsb-essential-list::before { top: 154px; bottom: 25px; width: 2px; }
-}
-
-/* Compact reference proportions: a wide rounded banner rather than a tall
-   poster. The video remains fully visible inside the card. */
-.nwsb-focus-card { min-height: 0 !important; height: auto; aspect-ratio: 1.9 / 1; }
-.nwsb-focus-content { min-height: 0 !important; height: 100%; }
-
-/* Reference Start practice control: white rounded button, black circular
-   arrow well, white arrow glyph. Scoped to the dashboard CTA only. */
-.nwsb-focus-cta {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  min-height: 52px;
-  padding: 8px 8px 8px 20px !important;
-  border: 0;
-  border-radius: 999px !important;
-  background: #fff !important;
-  color: #080b13 !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,.18);
-}
-.nwsb-focus-cta span.nwsb-focus-cta-arrow {
-  display: inline-grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
-  border-radius: 50% !important;
-  background: #080b13 !important;
-  color: #fff;
-  font-size: 21px;
-  line-height: 1;
-}
-.nwsb-focus-cta-arrow svg {
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-
-/* Regression fix: the August 15 Store trigger expects this compact icon row.
-   Without explicit dimensions, Android WebView gives the inline bag SVG its
-   intrinsic oversized fallback box and it covers the Store artwork. */
+   .nss-trigger-btn already IS white (app/app.css:62); this only places it.
+   ══════════════════════════════════════════════════════════════════ */
+/* The mark, a hairline, then the button — one row, set below the lettering
+   the film carries in its middle so the two are read in order rather than at
+   once. `align-items: center` and not stretch, or the rule and the mark grow
+   to the button's height. */
 .nss-trigger-go {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: flex; align-items: center; gap: 12px;
   margin-bottom: 14px;
 }
-.nss-trigger-go-ic {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
-  display: block;
-}
-.nss-trigger-go-ic svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+.nss-trigger-go-ic { width: 20px; height: 20px; flex-shrink: 0; }
+.nss-trigger-go-ic svg { width: 100%; height: 100%; display: block; }
 .nss-trigger-go-rule {
-  flex: 0 0 1px;
-  height: 26px;
-  background: rgba(255,255,255,0.35);
+  flex: 0 0 1px; height: 26px; background: rgba(255,255,255,0.35);
 }
 .nss-trigger-btn-top { margin: 0 !important; }
+/* Nothing follows the pills any more, so the gap they held open for the
+   button that used to sit under them goes with it. */
 .nss-trigger-bottom > .nss-trigger-pills:last-child { margin-bottom: 0; }
 
-/* ══ WEBVIEW PANEL FINISH ══
-   Preserve the August 15 panel structure while giving its internal pieces
-   the small breathing space and complete corner treatment shown in the
-   reference layout. */
-:is(#home, #home-nm) .mainops-blk > .qa-tv-head {
-  margin-bottom: 12px !important;
+/* ══════════════════════════════════════════════════════════════════
+   THE SUBSCRIPTION PROMO — three parts, none of them on the screen.
+
+   #sub-promo-card and .nmh-fsec used to be a device with everything
+   absolutely placed inside its aperture: the plan labels, the promise, the
+   benefits and Upgrade Now, all stacked on top of a film that has its own
+   picture to show. Two things in one rectangle and the reader gets neither.
+
+   Now the card is a plain column inside the section's own wrapper — the
+   offer, then the set, then the way in — so nothing overlaps because
+   nothing shares a box.
+   ══════════════════════════════════════════════════════════════════ */
+#sub-promo-card, #home-nm .nmh-fsec {
+  position: relative; width: 100%; box-sizing: border-box; cursor: pointer;
+  background: none; border: none; box-shadow: none; padding: 0;
+  aspect-ratio: auto !important; min-height: 0 !important; overflow: visible;
 }
-:is(#home, #home-nm) .mainops-blk > .mo-box {
-  margin-top: 0 !important;
-  overflow: hidden !important;
-  border-radius: 18px !important;
+.sub-promo-plan { display: flex; align-items: center; justify-content: space-between; }
+.sub-promo-plan-a {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: #e8d5a3;
 }
-:is(#home, #home-nm) .mainops-blk > .ncb-carousel.nsub-ban {
-  margin-top: 14px !important;
-  overflow: hidden !important;
-  border-radius: 22px !important;
+.sub-promo-plan-b {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 500;
+  letter-spacing: 1.5px; text-transform: uppercase; color: rgba(200,232,245,0.75);
 }
-:is(#home, #home-nm) .mainops-blk > .ncb-carousel.nsub-ban .ncb-slide {
-  overflow: hidden !important;
-  border-radius: inherit !important;
+/* ON THE FILM, in the top-left of the kiosk's screen — where this clip is
+   dark for its whole ten seconds. It reads as part of the picture rather
+   than as a caption stuck above it, which is the whole point of putting a
+   promo on a screen. The lift is what keeps it legible if the film brightens.
+   Bold throughout. */
+.sub-promo-tv { position: relative; }
+.sub-promo-tv > .sub-promo-offer {
+  position: absolute; z-index: 10;
+  top: 5%; left: 6%; right: 6%;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.9);
 }
-/* Fashion's baseline practice card is present in HTML and is a required
-   early-home section; do not let a stale layout class hide it. */
-#home .home-body > .fash-plyr-wrap {
-  display: block !important;
-  visibility: visible !important;
+.sub-promo-tv > .sub-promo-offer .sub-promo-lead,
+.sub-promo-tv > .sub-promo-offer .sub-promo-big { color: #fff !important; }
+.sub-promo-tv > .sub-promo-offer .sub-promo-small { color: #e8d5a3 !important; }
+.sub-promo-offer { margin-top: 12px; }
+/* .login-title's own split — weight 200 over weight 800, accent line under. */
+.sub-promo-lead {
+  font-family: 'DM Sans', sans-serif; font-size: clamp(15px,4.4vw,19px);
+  font-weight: 700; line-height: 1.15;
 }
-#home .home-body > .fash-plyr-wrap > #todayPracticeCard {
-  overflow: hidden !important;
-  border-radius: 20px !important;
+.sub-promo-big {
+  font-family: 'DM Sans', sans-serif; font-size: clamp(30px,9vw,44px);
+  font-weight: 800; line-height: 1.02; letter-spacing: -1px; margin-top: 2px;
+}
+.sub-promo-big span { color: #e8d5a3; }
+.sub-promo-small {
+  font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 300;
+  letter-spacing: 4px; text-transform: uppercase; color: #e8d5a3;
+  margin-top: 8px; opacity: 0.85;
+}
+.sub-promo-tv { margin: 14px 0; }
+.sub-promo-tv > video {
+  display: block; width: 100%; height: 100%; object-fit: cover; background: #000;
+}
+.sub-promo-copy { margin-top: 16px; }
+.sub-promo-title {
+  font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 800;
+  line-height: 1.2; letter-spacing: -0.4px;
+}
+.sub-promo-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
+  line-height: 1.6; margin-top: 8px;
+}
+.sub-promo-cta { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.sub-promo-btn {
+  flex: 1; background: #fff; color: #060c18; text-align: center;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; padding: 14px 16px;
+}
+.sub-promo-price {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.5px;
+  color: rgba(232,213,163,0.85);
+}
+/* On the dark home the words are white; on the pale one they are ink. */
+:is(#home, .stw-prev-stage) .sub-promo-lead { color: rgba(255,255,255,0.88); }
+:is(#home, .stw-prev-stage) .sub-promo-big,
+:is(#home, .stw-prev-stage) .sub-promo-title { color: #fff; }
+:is(#home, .stw-prev-stage) .sub-promo-sub { color: rgba(255,255,255,0.82); }
+#home-nm .sub-promo-lead { color: rgba(20,20,40,0.72); }
+#home-nm .sub-promo-big, #home-nm .sub-promo-title { color: #14142c; }
+#home-nm .sub-promo-sub { color: rgba(20,20,40,0.62); }
+#home-nm .sub-promo-plan-b { color: rgba(20,20,40,0.5); }
+#home-nm .sub-promo-small, #home-nm .sub-promo-plan-a { color: #9a7f36; }
+#home-nm .sub-promo-price { color: #9a7f36; }
+#home-nm .sub-promo-btn { background: #14142c; color: #fff; border-radius: 14px !important; }
+
+/* ── The kiosk ──
+   A portrait display on a stand, the wordmark printed on its top bezel.
+   Trimmed render 815x1511, aperture 773x1379 — 9:16 to within a pixel, so a
+   720x1280 clip fills it with nothing cropped. Percentages of the WIDTH, the
+   same as every other .nwsb-inframe here. */
+.nwsb-inframe.dev-tv-kiosk {
+  padding: 3.804% 2.454% 12.270% 2.699%;
+  aspect-ratio: 815 / 1511;
+}
+/* The bezel is the ::after, the same as every other frame here — it is a
+   transparent-aperture picture drawn OVER the clip, not a background. */
+.nwsb-inframe.dev-tv-kiosk::after {
+  background-image: url('./assets/frames/tv-kiosk-portrait.webp');
 }
 
-/* ══ WEBVIEW HOME — rounded reference panels ══
-   Keep every visible dashboard surface rounded on all four corners. The
-   outer list clips its rows; each standalone panel also gets its own radius
-   so later theme rules cannot restore square edges. */
-.nwsb-daydash .nwsb-focus-card,
-.nwsb-daydash .nwsb-progress-card,
-.nwsb-daydash .nwsb-upnext-list {
-  border-radius: 24px !important;
-  overflow: hidden !important;
-}
-.nwsb-daydash .nwsb-progress-card {
-  box-sizing: border-box !important;
-}
-.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card,
-.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card:first-child,
-.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card:last-child {
-  border-radius: 0 !important;
-}
-.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card:first-child {
-  border-top-left-radius: 24px !important;
-  border-top-right-radius: 24px !important;
-}
-.nwsb-daydash .nwsb-upnext-list .nwsb-upnext-card:last-child {
-  border-bottom-left-radius: 24px !important;
-  border-bottom-right-radius: 24px !important;
-}
-.nwsb-daydash .nwsb-focus-card video,
-.nwsb-daydash .nwsb-focus-card img {
-  border-radius: inherit !important;
-}
-
-/* Rebuilt Essentials / Helping Others reference pass. The list has a real
-   progress rail; the supporting cards are a horizontal, touch-scrollable
-   gallery so all eight working destinations remain available without
-   squeezing or overflowing on narrow Android screens. */
-.nwsb-essentials-reference .nwsb-essential-featured-card { min-height: 182px; }
-.nwsb-essentials-reference .nwsb-essential-row { min-height: 74px; }
-.nwsb-essentials-reference .nwsb-help-rail {
-  display: flex;
-  gap: 14px;
-  width: calc(100% + 4px);
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0 2px 10px;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.nwsb-essentials-reference .nwsb-help-rail::-webkit-scrollbar { display: none; }
-.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-card {
-  flex: 0 0 190px;
-  width: 190px;
-  height: 220px;
-  display: flex;
-  flex-direction: column;
-  scroll-snap-align: start;
-  border-radius: 22px;
-}
-.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-art { height: 124px; flex: 0 0 124px; }
-.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-copy { min-height: 0; flex: 1; padding: 13px 12px 10px 14px; }
-.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; line-height: 1.2; }
-.nwsb-essentials-reference .nwsb-help-rail .nwsb-help-copy small { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin-top: 5px; font-size: 11px; line-height: 1.25; }
-.nwsb-essentials-reference .nwsb-help-blue .nwsb-help-art { background: linear-gradient(135deg,#243b73,#70a0d8); }
-.nwsb-essentials-reference .nwsb-help-mint .nwsb-help-art { background: linear-gradient(135deg,#218c7a,#7ad7b2); }
-.nwsb-essentials-reference .nwsb-help-amber .nwsb-help-art { background: linear-gradient(135deg,#e58c3a,#ffcb68); }
-.nwsb-essentials-reference .nwsb-help-coral .nwsb-help-art { background: linear-gradient(135deg,#b84a4a,#ff9a79); }
-.nwsb-essentials-reference .nwsb-help-cyan .nwsb-help-art { background: linear-gradient(135deg,#3a6d8c,#83c9d9); }
-@media (max-width: 380px) {
-  .nwsb-essentials-reference .nwsb-help-rail { gap: 10px; }
-  .nwsb-essentials-reference .nwsb-help-rail .nwsb-help-card { flex-basis: 178px; width: 178px; }
-}
-
-
-/* ══ FOUR-SURFACE REFERENCE PASS — Essentials geometry ══
-   The rail is an actual visual guide: the line remains behind the cards and
-   each row contributes a visible hollow/active circle. The cards stay on the
-   right side of that rail, matching the supplied narrow-phone composition. */
-.nwsb-essentials-reference {
-  margin: 24px 0 12px !important;
-  border-radius: 0 !important;
-  overflow: visible !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-wave {
-  height: 78px !important;
-  border-radius: 0 0 52% 52% / 0 0 74% 74% !important;
-  background: linear-gradient(180deg, #5732a8 0%, #7b4bb1 55%, #ffffff 100%) !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-body {
-  margin-top: -1px !important;
-  padding: 0 20px 30px !important;
-  background: #ffffff !important;
-}
-.nwsb-essentials-reference .nwsb-essential-tabs {
-  gap: 10px !important;
-  margin: -5px 0 38px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-tab {
-  min-width: 126px !important;
-  height: 49px !important;
-  padding: 0 18px !important;
-  border-radius: 999px !important;
-  background: #f7f4ef !important;
-  color: #282631 !important;
-  box-shadow: 0 7px 16px rgba(50,45,60,.10) !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-heading {
-  margin: 0 0 16px !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-heading h2 {
-  font-size: 28px !important;
-  font-weight: 800 !important;
-  letter-spacing: -.8px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-list {
-  gap: 12px !important;
-  padding: 0 0 0 47px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-list::before {
-  left: 16px !important;
-  top: 40px !important;
-  bottom: 28px !important;
-  width: 4px !important;
-  background: repeating-linear-gradient(to bottom, #d7d8d6 0 12px, transparent 12px 26px) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-card {
-  min-height: 220px !important;
-  padding: 28px 26px 22px !important;
-  border-radius: 28px !important;
-  background: linear-gradient(125deg, #ffd000 0%, #ffc20c 52%, #ff8b27 100%) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-card::before,
-.nwsb-essentials-reference .nwsb-essential-row::before {
-  content: '';
-  position: absolute;
-  z-index: 4;
-  left: -39px;
-  top: 50%;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 3px solid #d8d9d7;
-  background: #ffffff;
-  box-sizing: border-box;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-card::before {
-  top: 28px;
-  width: 30px;
-  height: 30px;
-  left: -46px;
-  border: 0;
-  background: #ff8d22;
-  box-shadow: 0 0 0 4px rgba(255,141,34,.12);
-}
-.nwsb-essentials-reference .nwsb-essential-row {
-  min-height: 74px !important;
-  border-radius: 24px !important;
-  background: #f8f6f2 !important;
-  box-shadow: 0 8px 18px rgba(61,55,71,.09) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-row-copy strong {
-  font-size: 16px !important;
-  font-weight: 600 !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-guide {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  min-height: 128px;
-  margin: 28px 0 0;
-  padding: 22px 20px;
-  border: 0;
-  border-radius: 24px;
-  background: #050505;
-  color: #ffffff;
-  text-align: left;
-  box-shadow: 0 10px 20px rgba(0,0,0,.18);
-  cursor: pointer;
-}
-.nwsb-essentials-reference .nwsb-essentials-guide-icon {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  flex: 0 0 58px;
-  border-radius: 19px;
-  background: #171717;
-  border: 1px solid rgba(255,255,255,.14);
-}
-.nwsb-essentials-reference .nwsb-essentials-guide-icon svg { width: 28px; height: 28px; }
-.nwsb-essentials-reference .nwsb-essentials-guide-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 6px; }
-.nwsb-essentials-reference .nwsb-essentials-guide-copy strong { font-size: 17px; font-weight: 800; line-height: 1.15; }
-.nwsb-essentials-reference .nwsb-essentials-guide-copy small { color: rgba(255,255,255,.62); font-size: 12px; line-height: 1.35; }
-.nwsb-essentials-reference .nwsb-essentials-guide-arrow { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.22); color: #fff; font-size: 30px; line-height: 1; }
-.nwsb-essentials-reference .nwsb-help-heading { margin: 34px 0 18px !important; }
-.nwsb-essentials-reference .nwsb-help-heading h3 { font-size: 24px !important; font-weight: 800 !important; }
-.nwsb-essentials-reference .nwsb-help-heading button { width: 42px !important; height: 42px !important; }
-.nwsb-essentials-reference .nwsb-help-rail { margin-left: 0; }
-
-/* Fashion keeps the exact geometry but changes only the surface language. */
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essentials-wave {
-  background: linear-gradient(180deg, rgba(9,7,22,.10), rgba(10,8,25,.92)) !important;
-}
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essentials-body {
-  background: rgba(8,7,20,.58) !important;
-  color: #fff !important;
-}
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essential-tab {
-  background: rgba(255,255,255,.12) !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,.16) !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,.22) !important;
-}
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essential-tab.is-active {
-  background: rgba(255,255,255,.88) !important;
-  color: #171426 !important;
-}
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essentials-heading h2,
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-help-heading h3 { color: #fff !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essential-row {
-  background: rgba(12,10,25,.68) !important;
-  border: 1px solid rgba(255,255,255,.16) !important;
-  box-shadow: 0 13px 28px rgba(0,0,0,.28) !important;
-}
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essential-featured-card { box-shadow: 0 13px 30px rgba(0,0,0,.30) !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essential-row::before { background: rgba(17,14,35,.94); border-color: rgba(255,255,255,.55); }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essential-list::before { background: repeating-linear-gradient(to bottom, rgba(255,255,255,.40) 0 12px, transparent 12px 26px) !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essentials-guide { background: #000; }
-
-@media (max-width: 380px) {
-  .nwsb-essentials-reference .nwsb-essentials-body { padding-left: 14px !important; padding-right: 14px !important; }
-  .nwsb-essentials-reference .nwsb-essential-list { padding-left: 42px !important; }
-  .nwsb-essentials-reference .nwsb-essential-list::before { left: 13px !important; }
-  .nwsb-essentials-reference .nwsb-essential-featured-card::before,
-  .nwsb-essentials-reference .nwsb-essential-row::before { left: -34px; }
-  .nwsb-essentials-reference .nwsb-essential-featured-card::before { left: -40px; }
-  .nwsb-essentials-reference .nwsb-essentials-guide { padding-left: 14px; padding-right: 14px; }
-}
-
-
-/* ══════════════════════════════════════════════════════════════════════
-   WEBVIEW REFERENCE CORRECTION — normal home geometry
-   The essentials rail is intentionally collapsed to three meditation paths.
-   The line begins after the featured card; it never runs through the banner.
-   The old purple wave is not part of the reference composition.
-   ══════════════════════════════════════════════════════════════════════ */
-.nwsb-essentials-reference .nwsb-essentials-wave { display: none !important; }
-.nwsb-essentials-reference {
-  width: 100% !important;
-  margin: 22px 0 8px !important;
-  box-sizing: border-box;
-}
-.nwsb-essentials-reference .nwsb-essentials-body {
-  padding: 0 28px 24px !important;
-  background: #ffffff !important;
-  color: #20212a !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-.nwsb-essentials-reference .nwsb-essential-tabs {
-  gap: 12px !important;
-  margin: 0 0 30px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-tab {
-  min-height: 52px !important;
-  padding: 12px 24px !important;
-  border-radius: 999px !important;
-  background: #f7f5f1 !important;
-  color: #24232a !important;
-  box-shadow: 0 8px 18px rgba(70,62,55,.08), -4px -4px 12px rgba(255,255,255,.9) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-tab svg { width: 19px !important; height: 19px !important; }
-.nwsb-essentials-reference .nwsb-essential-tab.is-active {
-  background: #f7f5f1 !important;
-  color: #24232a !important;
-  box-shadow: 0 8px 18px rgba(70,62,55,.08), -4px -4px 12px rgba(255,255,255,.9) !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-heading {
-  margin: 0 0 26px !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-heading h2 {
-  color: #171821 !important;
-  font-size: clamp(28px, 7vw, 40px) !important;
-  font-weight: 800 !important;
-  letter-spacing: -1.25px !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-shell {
-  position: relative !important;
-  padding: 0 0 0 46px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-list {
-  position: relative !important;
-  display: grid !important;
-  gap: 14px !important;
-  padding: 0 !important;
-  overflow: visible !important;
-}
-.nwsb-essentials-reference .nwsb-essential-list::before {
-  content: '' !important;
-  position: absolute !important;
-  z-index: 0 !important;
-  left: -23px !important;
-  top: 202px !important;
-  bottom: 24px !important;
-  width: 5px !important;
-  border-radius: 999px !important;
-  background: repeating-linear-gradient(to bottom, #d8d9d8 0 11px, transparent 11px 23px) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-card,
-.nwsb-essentials-reference .nwsb-essential-row {
-  z-index: 1 !important;
-  box-sizing: border-box !important;
-  border-radius: 28px !important;
-  overflow: hidden !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-card {
-  min-height: 186px !important;
-  height: 186px !important;
-  padding: 24px 24px 20px !important;
-  background: linear-gradient(124deg, #ffd000 0%, #ffc51c 56%, #ff8d24 100%) !important;
-  box-shadow: 0 12px 22px rgba(119,83,18,.15) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-card::before {
-  left: -61px !important;
-  top: 24px !important;
-  width: 30px !important;
-  height: 30px !important;
-  border-radius: 50% !important;
-  background: #ff8d22 !important;
-  box-shadow: 0 0 0 4px rgba(255,141,34,.15) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-card > strong {
-  max-width: 68% !important;
-  margin-top: 18px !important;
-  font-size: 24px !important;
-  line-height: 1.14 !important;
-  letter-spacing: -.45px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-card > small { margin-top: 12px !important; font-size: 15px !important; }
-.nwsb-essentials-reference .nwsb-essential-featured-card > em { margin-top: 10px !important; font-size: 14px !important; }
-.nwsb-essentials-reference .nwsb-essential-badge {
-  border-radius: 999px !important;
-  background: rgba(255,255,255,.76) !important;
-  padding: 7px 13px !important;
-  font-size: 13px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-icon {
-  top: 22px !important;
-  right: 22px !important;
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 50% !important;
-  background: rgba(255,255,255,.78) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-featured-icon svg { width: 24px !important; height: 24px !important; }
-.nwsb-essentials-reference .nwsb-essential-row {
-  display: grid !important;
-  grid-template-columns: 24px minmax(0,1fr) auto 20px !important;
-  align-items: center !important;
-  gap: 12px !important;
-  min-height: 78px !important;
-  padding: 16px 18px !important;
-  background: #faf9f6 !important;
-  border: 0 !important;
-  box-shadow: 0 8px 18px rgba(61,55,71,.10) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-row::before {
-  left: -61px !important;
-  top: 50% !important;
-  width: 22px !important;
-  height: 22px !important;
-  border: 3px solid #d8d9d7 !important;
-  border-radius: 50% !important;
-  background: #ffffff !important;
-  transform: translateY(-50%) !important;
-}
-.nwsb-essentials-reference .nwsb-essential-row-icon { width: 24px !important; height: 24px !important; }
-.nwsb-essentials-reference .nwsb-essential-row-icon svg { width: 20px !important; height: 20px !important; }
-.nwsb-essentials-reference .nwsb-essential-row-copy { min-width: 0 !important; }
-.nwsb-essentials-reference .nwsb-essential-row-copy strong { font-size: 18px !important; font-weight: 650 !important; color: #33323a !important; }
-.nwsb-essentials-reference .nwsb-essential-row-copy small { display: none !important; }
-.nwsb-essentials-reference .nwsb-essential-meta { color: #77747b !important; font-size: 13px !important; }
-.nwsb-essentials-reference .nwsb-essential-arrow { color: #5c5a61 !important; font-size: 28px !important; }
-.nwsb-essentials-reference .nwsb-essential-expand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  min-height: 44px;
-  margin: 14px 0 0;
-  padding: 10px 16px;
-  border: 0;
-  border-radius: 999px;
-  background: #f4f2ee;
-  color: #424047;
-  font: 700 13px/1 'DM Sans', sans-serif;
-  box-shadow: 0 6px 14px rgba(61,55,71,.08);
-  cursor: pointer;
-}
-.nwsb-essentials-reference .nwsb-essential-expand b { font-size: 18px; line-height: .7; }
-.nwsb-essentials-reference .nwsb-essential-expand[hidden] { display: none !important; }
-.nwsb-essentials-reference .nwsb-essentials-guide {
-  min-height: 104px !important;
-  height: 104px !important;
-  margin: 20px 0 0 !important;
-  padding: 16px 18px !important;
-  border-radius: 26px !important;
-  background: #000 !important;
-  box-shadow: 0 12px 22px rgba(0,0,0,.18) !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-guide-icon {
-  width: 56px !important;
-  height: 56px !important;
-  flex-basis: 56px !important;
-  border-radius: 18px !important;
-}
-.nwsb-essentials-reference .nwsb-essentials-guide-copy { gap: 4px !important; }
-.nwsb-essentials-reference .nwsb-essentials-guide-copy strong { font-size: 17px !important; }
-.nwsb-essentials-reference .nwsb-essentials-guide-copy small { font-size: 12px !important; }
-.nwsb-essentials-reference .nwsb-essentials-guide-arrow { width: 40px !important; height: 40px !important; flex-basis: 40px !important; font-size: 27px !important; }
-
-/* Six real meditation destinations: one rounded panel, no square tile edges. */
-:is(#home-nm, #home) .mainops-blk {
-  box-sizing: border-box !important;
-  margin: 24px 34px 0 !important;
-  padding: 26px 24px 22px !important;
-  border-radius: 28px !important;
-  overflow: hidden !important;
-}
-#home-nm .mainops-blk {
-  background: #f1f3f7 !important;
-  border: 0 !important;
-  box-shadow: 8px 8px 20px rgba(164,171,187,.22), -8px -8px 20px rgba(255,255,255,.96) !important;
-}
-#home .mainops-blk {
-  background: rgba(11,10,25,.56) !important;
-  border: 1px solid rgba(255,255,255,.14) !important;
-  box-shadow: 0 14px 30px rgba(0,0,0,.26) !important;
-}
-:is(#home-nm, #home) .mainops-blk > .qa-tv-head { margin: 0 0 22px !important; align-items: center !important; }
-:is(#home-nm, #home) .mainops-blk .qa-tv-hello { font-size: 19px !important; line-height: 1.15 !important; }
-:is(#home-nm, #home) .mainops-blk .qa-tv-name { font-size: 29px !important; line-height: 1.05 !important; }
-:is(#home-nm, #home) .mainops-blk > .mo-box {
-  padding: 0 !important;
-  overflow: visible !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-}
-:is(#home-nm, #home) .mainops-blk .mo-row {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 10px !important;
-  margin: 0 0 10px !important;
-}
-:is(#home-nm, #home) .mainops-blk .mo-rule { display: none !important; }
-:is(#home-nm, #home) .mainops-blk .mo-cell {
-  box-sizing: border-box !important;
-  min-width: 0 !important;
-  min-height: 124px !important;
-  padding: 16px 6px 13px !important;
-  border: 0 !important;
-  border-radius: 20px !important;
-  background: #f8f7f4 !important;
-  color: #171821 !important;
-  box-shadow: 0 7px 15px rgba(61,55,71,.09) !important;
-}
-#home .mainops-blk .mo-cell {
-  background: rgba(255,255,255,.10) !important;
-  border: 1px solid rgba(255,255,255,.14) !important;
-  color: #fff !important;
-  box-shadow: 0 9px 20px rgba(0,0,0,.18) !important;
-}
-:is(#home-nm, #home) .mainops-blk .mo-ic { width: 48px !important; height: 48px !important; border-radius: 50% !important; }
-:is(#home-nm, #home) .mainops-blk .mo-ic svg { width: 34px !important; height: 34px !important; }
-:is(#home-nm, #home) .mainops-blk .mo-lbl { margin-top: 10px !important; font-size: 12px !important; line-height: 1.08 !important; text-align: center !important; }
-:is(#home-nm, #home) .mainops-blk > .ncb-carousel.nsub-ban {
-  min-height: 104px !important;
-  height: 104px !important;
-  margin: 20px 0 0 !important;
-  overflow: hidden !important;
-  border: 0 !important;
-  border-radius: 26px !important;
-  background: #000 !important;
-  box-shadow: 0 12px 22px rgba(0,0,0,.18) !important;
-}
-:is(#home-nm, #home) .mainops-blk > .ncb-carousel.nsub-ban .ncb-slide {
-  min-height: 104px !important;
-  padding: 16px 18px !important;
-  border-radius: 26px !important;
-  box-sizing: border-box !important;
-}
-:is(#home-nm, #home) .mainops-blk > .ncb-carousel.nsub-ban .ncb-ico { width: 56px !important; height: 56px !important; border-radius: 18px !important; }
-:is(#home-nm, #home) .mainops-blk > .ncb-carousel.nsub-ban .ncb-name { font-size: 17px !important; }
-:is(#home-nm, #home) .mainops-blk > .ncb-carousel.nsub-ban .ncb-sub { font-size: 12px !important; line-height: 1.3 !important; }
-:is(#home-nm, #home) .mainops-blk > .ncb-carousel.nsub-ban .ncb-btn { width: 40px !important; height: 40px !important; }
-
-@media (max-width: 420px) {
-  .nwsb-essentials-reference .nwsb-essentials-body { padding-left: 20px !important; padding-right: 20px !important; }
-  .nwsb-essentials-reference .nwsb-essentials-shell { padding-left: 40px !important; }
-  .nwsb-essentials-reference .nwsb-essential-list::before { left: -20px !important; top: 202px !important; }
-  .nwsb-essentials-reference .nwsb-essential-featured-card::before,
-  .nwsb-essentials-reference .nwsb-essential-row::before { left: -56px !important; }
-  .nwsb-essentials-reference .nwsb-essential-featured-card { height: 178px !important; min-height: 178px !important; padding: 22px 20px 18px !important; }
-  .nwsb-essentials-reference .nwsb-essential-featured-card > strong { font-size: 21px !important; }
-  .nwsb-essentials-reference .nwsb-essential-row-copy strong { font-size: 16px !important; }
-  :is(#home-nm, #home) .mainops-blk { margin-left: 20px !important; margin-right: 20px !important; padding-left: 16px !important; padding-right: 16px !important; }
-  :is(#home-nm, #home) .mainops-blk .mo-cell { min-height: 112px !important; }
-  :is(#home-nm, #home) .mainops-blk .mo-lbl { font-size: 11px !important; }
-}
-
-
-/* Final cascade guard: the legacy button reset sets radius to zero without
-   affecting the other properties. Keep every new reference control rounded. */
-.nwsb-essentials-reference .nwsb-essential-expand,
-.nwsb-essentials-reference .nwsb-essentials-guide,
-:is(#home-nm, #home) .mainops-blk .mo-cell,
-:is(#home-nm, #home) .mainops-blk > .ncb-carousel.nsub-ban,
-:is(#home-nm, #home) .mainops-blk > .ncb-carousel.nsub-ban .ncb-slide {
-  border-radius: 26px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-tab { border-radius: 999px !important; }
-.nwsb-essentials-reference .nwsb-essential-row,
-.nwsb-essentials-reference .nwsb-essential-featured-card { border-radius: 28px !important; }
-/* The purple store promo is a separate legacy card above the normal-home
-   dashboard. It is not the retained player background video. */
-#home-nm .nmh-wrap > .npc-purple { display: none !important; }
-
-
-#home-nm .mainops-blk {
-  margin: 0 34px 22px !important;
-  padding: 28px 24px 22px !important;
-  border-radius: 28px !important;
-  background: #f1f3f7 !important;
-  box-shadow: 8px 8px 20px rgba(164,171,187,.20), -8px -8px 20px rgba(255,255,255,.96) !important;
-}
-#home-nm .mainops-blk > .qa-tv-head { margin-bottom: 22px !important; }
-#home-nm .mainops-blk .qa-tv-orb {
-  width: 58px !important;
-  height: 58px !important;
-  flex: 0 0 58px !important;
-  border-radius: 50% !important;
-  background: #f8f9fb !important;
-  color: #b59a5c !important;
-  box-shadow: 7px 7px 14px rgba(164,171,187,.20), -5px -5px 13px #fff !important;
-}
-#home-nm .mainops-blk .qa-tv-hello { color: #6e707a !important; font-size: 18px !important; }
-#home-nm .mainops-blk .qa-tv-name { color: #12131d !important; font-size: 30px !important; letter-spacing: -.8px !important; }
-#home-nm .mainops-blk > .mo-box {
-  display: block !important;
-  box-sizing: border-box !important;
-  padding: 0 !important;
-  border: 1px solid #dfe1e7 !important;
-  border-radius: 21px !important;
-  background: #f5f6f9 !important;
-  overflow: hidden !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72) !important;
-}
-#home-nm .mainops-blk .mo-row {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 0 !important;
-  margin: 0 !important;
-}
-#home-nm .mainops-blk .mo-row + .mo-row { border-top: 1px solid #dfe1e7 !important; }
-#home-nm .mainops-blk .mo-rule { display: none !important; }
-#home-nm .mainops-blk .mo-cell {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-sizing: border-box !important;
-  min-width: 0 !important;
-  min-height: 94px !important;
-  padding: 13px 4px 11px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #22232d !important;
-  box-shadow: none !important;
-}
-#home-nm .mainops-blk .mo-row .mo-cell:nth-of-type(1),
-#home-nm .mainops-blk .mo-row .mo-cell:nth-of-type(2) { border-right: 1px solid #dfe1e7 !important; }
-#home-nm .mainops-blk .mo-ic {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 50% !important;
-  background: transparent !important;
-  color: #af9251 !important;
-}
-#home-nm .mainops-blk .mo-ic svg { width: 27px !important; height: 27px !important; }
-#home-nm .mainops-blk .mo-lbl {
-  display: block !important;
-  max-width: 100% !important;
-  margin-top: 8px !important;
-  color: #292a34 !important;
-  font-size: 12px !important;
-  font-weight: 700 !important;
-  line-height: 1.12 !important;
-  text-align: center !important;
-}
-#home-nm .mainops-blk > .ncb-carousel.nsub-ban {
-  min-height: 104px !important;
-  height: 104px !important;
-  margin: 20px 0 0 !important;
-  border-radius: 26px !important;
-  overflow: hidden !important;
-  background: #000 !important;
-}
-#home-nm .mainops-blk > .ncb-carousel.nsub-ban .ncb-slide { min-height: 104px !important; padding: 16px 18px !important; border-radius: 26px !important; }
-#home-nm .mainops-blk > .ncb-carousel.nsub-ban .ncb-ico { width: 56px !important; height: 56px !important; border-radius: 18px !important; }
-#home-nm .mainops-blk > .ncb-carousel.nsub-ban .ncb-name { font-size: 17px !important; }
-#home-nm .mainops-blk > .ncb-carousel.nsub-ban .ncb-sub { font-size: 12px !important; line-height: 1.3 !important; }
-#home-nm .mainops-blk > .ncb-carousel.nsub-ban .ncb-btn { width: 40px !important; height: 40px !important; border-radius: 50% !important; }
-
-@media (max-width: 420px) {
-  #home-nm .nmh-wrap > .npc-purple { width: calc(100% - 28px) !important; margin-left: 14px !important; margin-right: 14px !important; border-width: 8px !important; }
-  #home-nm .mainops-blk { margin-left: 16px !important; margin-right: 16px !important; padding-left: 14px !important; padding-right: 14px !important; }
-  #home-nm .mainops-blk .qa-tv-hello { font-size: 16px !important; }
-  #home-nm .mainops-blk .qa-tv-name { font-size: 25px !important; }
-  #home-nm .mainops-blk .mo-cell { min-height: 86px !important; }
-  #home-nm .mainops-blk .mo-lbl { font-size: 10px !important; }
-}
-
-/* ══ AUGUST 15 WHERE-TO-BEGIN COMPATIBILITY ══
-   Keep the complete current stylesheet above. These final selectors transplant
-   only the August 15 normal-home panel geometry and original padding after
-   later dashboard overrides, without removing current dashboard styles. */
-#home-nm .mainops-blk.nmh-sec-wrap {
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-  width: 100% !important;
-  margin: 16px 0 !important;
-  padding: 14px !important;
-  background: #f0f2f7 !important;
-  border: 0 !important;
-  border-radius: 22px !important;
-  box-shadow: 7px 7px 16px rgba(0,0,0,0.14), -5px -5px 12px rgba(255,255,255,0.97) !important;
-}
-#home-nm.nm-dark .mainops-blk.nmh-sec-wrap {
-  background: #16163c !important;
-  box-shadow: 8px 8px 22px rgba(0,0,0,0.88), -4px -4px 14px rgba(50,50,110,0.32) !important;
-}
-#home-nm .mainops-blk > .qa-tv-head {
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  margin: 0 !important;
-  padding: 0 2px 14px !important;
-}
-#home-nm .mainops-blk > .qa-tv-head .qa-tv-orb {
-  width: 54px !important;
-  height: 54px !important;
-  flex: 0 0 54px !important;
-  border-radius: 50% !important;
-}
-#home-nm .mainops-blk > .qa-tv-head .qa-tv-hello {
-  font-family: 'DM Sans', sans-serif !important;
-  font-size: 20px !important;
-  line-height: 1.2 !important;
-}
-#home-nm .mainops-blk > .qa-tv-head .qa-tv-name {
-  font-family: 'DM Sans', sans-serif !important;
-  font-size: 27px !important;
-  line-height: 1.12 !important;
-}
-#home-nm .mainops-blk > .mo-box {
-  display: block !important;
-  box-sizing: border-box !important;
-  width: 100% !important;
-  height: 126px !important;
-  margin: 10px 0 14px !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(26,26,46,0.08) !important;
-  border-radius: 16px !important;
-  background: rgba(26,26,46,0.03) !important;
-  box-shadow: none !important;
-}
-#home-nm .mainops-blk > .mo-box .mo-row {
-  display: flex !important;
-  align-items: stretch !important;
-  width: 100% !important;
-  height: 62px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-}
-#home-nm .mainops-blk > .mo-box .mo-cell {
-  flex: 1 1 0 !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  height: 62px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  padding: 0 3px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-#home-nm .mainops-blk > .mo-box .mo-rule {
-  display: block !important;
-  flex: 0 0 1px !important;
-  align-self: center !important;
-  width: 1px !important;
-  height: 34px !important;
-  margin: 0 !important;
-  background: rgba(26,26,46,0.08) !important;
-}
-#home-nm .mainops-blk > .mo-box .mo-ic {
-  display: block !important;
-  width: 21px !important;
-  height: 21px !important;
-  flex: 0 0 21px !important;
-  margin: 0 !important;
-  background: transparent !important;
-  color: #b39a5e !important;
-}
-#home-nm .mainops-blk > .mo-box .mo-ic svg {
-  width: 100% !important;
-  height: 100% !important;
-}
-#home-nm .mainops-blk > .mo-box .mo-lbl {
-  display: block !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-  color: #1a1a2e !important;
-  font-family: 'DM Sans', sans-serif !important;
-  font-size: 10.5px !important;
-  font-weight: 700 !important;
-  line-height: 1.1 !important;
-  text-align: center !important;
-}
-#home-nm .mainops-blk > .ncb-carousel.nsub-ban {
-  min-height: 0 !important;
-  height: auto !important;
-  margin: 10px 0 0 !important;
-  overflow: hidden !important;
-  border-radius: 16px !important;
-}
-#home-nm .mainops-blk > .ncb-carousel.nsub-ban .ncb-slide {
-  min-height: 0 !important;
-  padding: 14px 16px !important;
-  border-radius: 16px !important;
-}
-/* ══ FASHION WHERE-TO-BEGIN REFERENCE ══
-   The normal home keeps its August 15 compact transplant above. Fashion
-   uses the dark glass six-door panel: larger rounded cards, no rectangular
-   light surfaces, and the black guide banner below. */
-#home .mainops-blk.glass-wrap {
-  box-sizing: border-box !important;
-  margin: 24px 28px 0 !important;
-  padding: 26px 24px 24px !important;
-  border: 1px solid rgba(255,255,255,.18) !important;
-  border-radius: 30px !important;
-  overflow: hidden !important;
-  background: linear-gradient(145deg, rgba(28,20,47,.88), rgba(37,13,49,.78)) !important;
-  box-shadow: inset 0 1px rgba(255,255,255,.10), 0 18px 42px rgba(0,0,0,.32) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-}
-#home .mainops-blk.glass-wrap > .qa-tv-head {
-  margin: 0 0 24px !important;
-  gap: 16px !important;
-  padding: 0 2px !important;
-}
-#home .mainops-blk.glass-wrap .qa-tv-orb {
-  width: 64px !important;
-  height: 64px !important;
-  flex: 0 0 64px !important;
-  border-radius: 50% !important;
-  background: #fff !important;
-  color: #141221 !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,.22) !important;
-}
-#home .mainops-blk.glass-wrap .qa-tv-orb svg { width: 30px !important; height: 30px !important; }
-#home .mainops-blk.glass-wrap .qa-tv-hello { color: rgba(236,225,255,.78) !important; font-size: 18px !important; line-height: 1.1 !important; }
-#home .mainops-blk.glass-wrap .qa-tv-name { color: #fff !important; font-size: 30px !important; line-height: 1.04 !important; letter-spacing: -.5px !important; }
-#home .mainops-blk.glass-wrap > .mo-box { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; overflow: visible !important; }
-#home .mainops-blk.glass-wrap .mo-row { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 16px !important; margin: 0 0 16px !important; }
-#home .mainops-blk.glass-wrap .mo-cell {
-  min-width: 0 !important;
-  min-height: 134px !important;
-  padding: 18px 8px 14px !important;
-  border: 1px solid rgba(255,255,255,.16) !important;
-  border-radius: 28px !important;
-  background: linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.075)) !important;
-  color: #fff !important;
-  box-shadow: inset 0 1px rgba(255,255,255,.08), 0 12px 24px rgba(0,0,0,.18) !important;
-}
-#home .mainops-blk.glass-wrap .mo-ic { width: 48px !important; height: 48px !important; border-radius: 50% !important; background: transparent !important; color: #fff !important; }
-#home .mainops-blk.glass-wrap .mo-ic svg { width: 38px !important; height: 38px !important; }
-#home .mainops-blk.glass-wrap .mo-lbl { margin-top: 12px !important; color: #fff !important; font-size: 14px !important; line-height: 1.18 !important; text-align: center !important; }
-#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban { min-height: 120px !important; height: 120px !important; margin: 18px 0 0 !important; border: 0 !important; border-radius: 28px !important; background: #000 !important; box-shadow: 0 14px 26px rgba(0,0,0,.24) !important; }
-#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-slide { min-height: 120px !important; padding: 18px 20px !important; border-radius: 28px !important; }
-#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-ico { width: 58px !important; height: 58px !important; border-radius: 18px !important; }
-#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-name { font-size: 18px !important; }
-#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-sub { font-size: 13px !important; line-height: 1.28 !important; }
-#home .mainops-blk.glass-wrap > .ncb-carousel.nsub-ban .ncb-btn { width: 42px !important; height: 42px !important; border-radius: 50% !important; }
-
-@media (max-width: 420px) {
-  #home-nm .mainops-blk > .qa-tv-head { padding-left: 2px !important; padding-right: 2px !important; }
-  #home-nm .mainops-blk > .mo-box { height: 126px !important; }
-  #home-nm .mainops-blk > .mo-box .mo-cell { height: 62px !important; }
-  #home-nm .mainops-blk > .mo-box .mo-lbl { font-size: 10px !important; }
-}
-
-/* ══ SHARED ICON-LED SECTION HEADINGS ══
-   Both homes use the same content hierarchy; only the wrapper language
-   changes: white circles on Fashion glass, raised surface circles on Normal. */
-.nwsb-dashboard-heading {
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  margin: 24px 0 12px !important;
-}
-.nwsb-dashboard-heading .nwsb-dashboard-mark,
-.nwsb-essentials-heading .nwsb-essentials-heading-icon {
-  display: grid !important;
-  place-items: center !important;
-  flex: 0 0 52px !important;
-  width: 52px !important;
-  height: 52px !important;
-  border-radius: 50% !important;
-  background: #f0f2f7 !important;
-  color: #b39a5e !important;
-  box-shadow: 5px 5px 12px rgba(166,171,189,.30), -4px -4px 10px rgba(255,255,255,.88) !important;
-}
-.nwsb-dashboard-heading .nwsb-dashboard-mark svg,
-.nwsb-essentials-heading .nwsb-essentials-heading-icon svg {
-  width: 23px !important;
-  height: 23px !important;
-  display: block !important;
-}
-.nwsb-dashboard-heading-copy,
-.nwsb-essentials-heading > div { min-width: 0 !important; flex: 1 1 auto !important; }
-.nwsb-dashboard-heading-copy .nwsb-dashboard-eyebrow,
-.nwsb-essentials-eyebrow {
-  color: rgba(26,26,46,.50) !important;
-  font-size: 10px !important;
-  font-weight: 800 !important;
-  letter-spacing: 1.8px !important;
-  line-height: 1.2 !important;
-  text-transform: uppercase !important;
-}
-.nwsb-dashboard-heading-copy h2,
-.nwsb-essentials-heading h2 {
-  margin: 3px 0 0 !important;
-  color: #20212c !important;
-  font-size: 24px !important;
-  font-weight: 800 !important;
-  letter-spacing: -.45px !important;
-  line-height: 1.15 !important;
-}
-.nwsb-dashboard-heading > button {
-  flex: 0 0 auto !important;
-  align-self: center !important;
-  margin-left: auto !important;
-}
-.nwsb-essentials-heading {
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  margin: 0 4px 14px !important;
-}
-.nwsb-essentials-reference .nwsb-essential-tabs { display: none !important; }
-.nwsb-essentials-normal .nwsb-essentials-heading .nwsb-essentials-heading-icon { background: #f0f2f7 !important; color: #b39a5e !important; }
-.nwsb-daydash-fashion .nwsb-dashboard-heading .nwsb-dashboard-mark,
-.nwsb-essentials-fashion .nwsb-essentials-heading .nwsb-essentials-heading-icon {
-  background: #fff !important;
-  color: #171326 !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,.20) !important;
-}
-.nwsb-daydash-fashion .nwsb-dashboard-heading-copy .nwsb-dashboard-eyebrow,
-.nwsb-essentials-fashion .nwsb-essentials-eyebrow { color: rgba(232,213,163,.78) !important; }
-.nwsb-daydash-fashion .nwsb-dashboard-heading-copy h2,
-.nwsb-essentials-fashion .nwsb-essentials-heading h2 { color: #fff !important; }
-.nwsb-essentials-fashion .nwsb-essentials-heading { margin-top: 0 !important; }
-@media (max-width: 420px) {
-  .nwsb-dashboard-heading { gap: 11px !important; }
-  .nwsb-dashboard-heading .nwsb-dashboard-mark,
-  .nwsb-essentials-heading .nwsb-essentials-heading-icon { flex-basis: 46px !important; width: 46px !important; height: 46px !important; }
-  .nwsb-dashboard-heading-copy h2,
-  .nwsb-essentials-heading h2 { font-size: 22px !important; }
-}
-
-
-/* ══ AUGUST 15 FASHION PANEL — EXPLICIT SOURCE COPY ══
-   This block is intentionally scoped to the Fashion Where to Begin panel.
-   It restores the August 15 glass wrapper/header treatment after later global
-   dashboard compatibility rules, while leaving #home-nm's compact neumorphic
-   panel untouched. The six original buttons and guide banner remain in HTML. */
-#home .mainops-blk.aug15-fashion-reference {
-  box-sizing: border-box !important;
-  width: calc(100% - 32px) !important;
-  margin: 18px 16px !important;
-  padding: 12px !important;
-  overflow: hidden !important;
-  background: rgba(255,255,255,0.055) !important;
-  border: 1px solid rgba(255,255,255,0.13) !important;
-  border-radius: 22px !important;
-  -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
-  backdrop-filter: blur(18px) saturate(1.25) !important;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.34) !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .qa-tv-head {
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  margin: 0 !important;
-  padding: 0 2px 14px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .qa-tv-orb {
-  width: 54px !important;
-  height: 54px !important;
-  flex: 0 0 54px !important;
-  border-radius: 50% !important;
-  background: rgba(255,255,255,0.09) !important;
-  border: 1px solid rgba(255,255,255,0.22) !important;
-  color: #e8d5a3 !important;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.28) !important;
-}
-#home .mainops-blk.aug15-fashion-reference .qa-tv-orb svg { width: 26px !important; height: 26px !important; }
-#home .mainops-blk.aug15-fashion-reference .qa-tv-hello {
-  color: rgba(255,255,255,0.66) !important;
-  font: 400 20px/1.2 'DM Sans', sans-serif !important;
-  letter-spacing: -0.2px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .qa-tv-name {
-  color: #fff !important;
-  font: 800 27px/1.12 'DM Sans', sans-serif !important;
-  letter-spacing: -0.6px !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .mo-box {
-  padding: 0 !important;
-  margin: 0 0 14px !important;
-  border-radius: 16px !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  background: rgba(255,255,255,0.06) !important;
-  overflow: hidden !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-row {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 16px !important;
-  height: 134px !important;
-  margin: 0 0 16px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-row:last-child { margin-bottom: 0 !important; }
-#home .mainops-blk.aug15-fashion-reference .mo-cell {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 0 !important;
-  min-height: 134px !important;
-  height: 134px !important;
-  padding: 18px 8px 14px !important;
-  border: 1px solid rgba(255,255,255,0.16) !important;
-  border-radius: 28px !important;
-  background: linear-gradient(145deg, rgba(255,255,255,0.13), rgba(255,255,255,0.075)) !important;
-  color: #fff !important;
-  box-shadow: inset 0 1px rgba(255,255,255,0.08), 0 12px 24px rgba(0,0,0,0.18) !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-ic {
-  display: grid !important;
-  place-items: center !important;
-  width: 48px !important;
-  height: 48px !important;
-  flex: 0 0 48px !important;
-  border-radius: 50% !important;
-  background: transparent !important;
-  color: #fff !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-ic svg { width: 38px !important; height: 38px !important; }
-#home .mainops-blk.aug15-fashion-reference .mo-lbl {
-  display: block !important;
-  max-width: 100% !important;
-  margin-top: 12px !important;
-  overflow: hidden !important;
-  color: #fff !important;
-  font: 700 14px/1.18 'DM Sans', sans-serif !important;
-  text-align: center !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban {
-  min-height: 120px !important;
-  height: 120px !important;
-  margin: 18px 0 0 !important;
-  border: 0 !important;
-  border-radius: 28px !important;
-  background: #000 !important;
-  box-shadow: 0 14px 26px rgba(0,0,0,0.24) !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-slide {
-  min-height: 120px !important;
-  padding: 18px 20px !important;
-  border-radius: 28px !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-ico { width: 58px !important; height: 58px !important; border-radius: 18px !important; }
-#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-name { font-size: 18px !important; }
-#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-sub { font-size: 13px !important; line-height: 1.28 !important; }
-#home .mainops-blk.aug15-fashion-reference > .ncb-carousel.nsub-ban .ncb-btn { width: 42px !important; height: 42px !important; border-radius: 50% !important; }
-
-@media (max-width: 420px) {
-  #home .mainops-blk.aug15-fashion-reference { margin-left: 16px !important; margin-right: 16px !important; }
-  #home .mainops-blk.aug15-fashion-reference .mo-row { gap: 10px !important; }
-  #home .mainops-blk.aug15-fashion-reference .mo-cell { border-radius: 22px !important; }
-}
-/* ══ END AUGUST 15 FASHION PANEL COPY ══ */
-
-/* ══ HELP & COACH — Support + Personal Coach ══ */
-.nwsb-assistant-screen{position:fixed;inset:0;z-index:1600;display:flex;align-items:stretch;justify-content:center;visibility:hidden;pointer-events:none;opacity:0;transition:opacity .24s ease,visibility .24s ease;background:rgba(3,7,14,.82)}
-.nwsb-assistant-screen.open{visibility:visible;pointer-events:auto;opacity:1}
-.nwsb-assistant-overlay{position:absolute;inset:0;background:rgba(2,5,10,.72);backdrop-filter:blur(14px)}
-.nwsb-assistant-panel{position:relative;width:min(100%,680px);height:100%;overflow:hidden;background:linear-gradient(180deg,#0b101a 0%,#101725 52%,#080c14 100%);color:#fff;box-shadow:0 0 70px rgba(0,0,0,.48)}
-.nwsb-assistant-header{position:absolute;z-index:3;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 20px 14px;background:linear-gradient(180deg,rgba(6,10,17,.96),rgba(6,10,17,.78),transparent)}
-.nwsb-assistant-back{width:40px;height:40px;border:0;border-radius:50%;background:#fff;color:#0a0f18;font-size:25px;line-height:1;cursor:pointer}
-.nwsb-assistant-heading{min-width:0;flex:1}.nwsb-assistant-eyebrow,.nwsb-assistant-kicker,.nwsb-assistant-feature-eyebrow{color:#e8d5a3;font-size:9px;letter-spacing:2.1px;text-transform:uppercase;font-weight:800}.nwsb-assistant-title{margin-top:3px;font-size:21px;font-weight:850;letter-spacing:-.3px}.nwsb-assistant-logo{width:42px;height:42px;border-radius:50%;background:#fff;padding:7px;display:grid;place-items:center}.nwsb-assistant-logo img{display:block;width:100%;height:100%;object-fit:contain}
-.nwsb-assistant-inline-logo{display:grid;place-items:center;width:34px;height:34px;padding:6px;border-radius:50%;background:#fff}.nwsb-assistant-inline-logo img{display:block;width:100%;height:100%;object-fit:contain}
-.nwsb-assistant-body{height:100%;overflow-y:auto;padding:0 20px calc(34px + env(safe-area-inset-bottom));scroll-behavior:smooth}.nwsb-assistant-hero{position:relative;height:255px;margin:0 -20px;overflow:hidden}.nwsb-assistant-hero img{display:block;width:100%;height:100%;object-fit:cover}.nwsb-assistant-hero-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,11,18,.15) 0%,rgba(7,11,18,.1) 35%,#0b101a 100%)}
-.nwsb-assistant-intro{position:relative;margin-top:-22px;padding:0 2px 14px}.nwsb-assistant-intro h2{margin:5px 0 7px;font-size:29px;line-height:1.05;letter-spacing:-.7px}.nwsb-assistant-intro p{margin:0;color:rgba(255,255,255,.68);font-size:13px;line-height:1.5;max-width:520px}
-.nwsb-assistant-switch{display:flex;gap:7px;padding:5px;margin:4px 0 14px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(255,255,255,.045)}.nwsb-assistant-switch button{flex:1;border:0;border-radius:13px;background:transparent;color:rgba(255,255,255,.58);padding:11px 8px;font:inherit;font-size:11px;font-weight:800;cursor:pointer}.nwsb-assistant-switch button.active{background:#fff;color:#0a0f18;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.nwsb-assistant-feature{display:grid;grid-template-columns:116px 1fr;gap:13px;align-items:center;padding:10px;border:1px solid rgba(255,255,255,.13);border-radius:20px;background:rgba(255,255,255,.065);box-shadow:0 12px 25px rgba(0,0,0,.18)}.nwsb-assistant-feature-image{height:88px;overflow:hidden;border-radius:14px}.nwsb-assistant-feature-image img{width:100%;height:100%;object-fit:cover}.nwsb-assistant-feature-title{margin:4px 0;color:#fff;font-size:15px;font-weight:800;line-height:1.2}.nwsb-assistant-feature-copy{color:rgba(255,255,255,.62);font-size:11px;line-height:1.4}
-.nwsb-assistant-quick{display:flex;flex-wrap:wrap;gap:8px;padding:15px 0 4px}.nwsb-assistant-quick button{border:1px solid rgba(232,213,163,.35);border-radius:999px;padding:9px 11px;background:rgba(232,213,163,.1);color:#f6e6bd;font-size:10.5px;line-height:1.2;cursor:pointer}.nwsb-assistant-quick button:disabled{opacity:.45;cursor:default}
-.nwsb-assistant-chat{min-height:92px;max-height:270px;overflow-y:auto;padding:13px 2px 5px}.nwsb-assistant-message{max-width:87%;margin:0 0 9px;padding:11px 13px;border-radius:16px;font-size:12.5px;line-height:1.45;white-space:normal}.nwsb-assistant-message.assistant{margin-right:auto;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.9);border-bottom-left-radius:5px}.nwsb-assistant-message.user{margin-left:auto;background:#fff;color:#0a0f18;border-bottom-right-radius:5px}.nwsb-assistant-typing{color:rgba(255,255,255,.5);font-size:11px;padding:4px 8px}
-.nwsb-assistant-composer{display:flex;gap:8px;align-items:center;margin-top:5px;padding:7px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(0,0,0,.25)}.nwsb-assistant-composer input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#fff;padding:8px 6px;font:inherit;font-size:12.5px}.nwsb-assistant-composer input::placeholder{color:rgba(255,255,255,.45)}.nwsb-assistant-composer button{width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#0a0f18;font-size:19px;line-height:1;cursor:pointer}.nwsb-assistant-note{padding:10px 3px 0;color:rgba(255,255,255,.42);font-size:9.5px;line-height:1.4;text-align:center}
-@media (min-width:681px){.nwsb-assistant-panel{margin:18px 0;height:calc(100% - 36px);border-radius:28px}.nwsb-assistant-header{border-radius:28px 28px 0 0}.nwsb-assistant-body{border-radius:28px}}
-@media (max-width:390px){.nwsb-assistant-body{padding-left:15px;padding-right:15px}.nwsb-assistant-hero{margin-left:-15px;margin-right:-15px}.nwsb-assistant-feature{grid-template-columns:95px 1fr}.nwsb-assistant-feature-image{height:82px}}
-
-/* ── Private video pack prompt ─────────────────────────────────────── */
-.nwsb-video-pack-prompt{position:fixed;inset:0;z-index:10080;display:flex;align-items:flex-end;justify-content:center;padding:20px;background:rgba(5,8,14,.68);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.nwsb-video-pack-card{width:min(100%,420px);padding:24px 22px 20px;border:1px solid rgba(255,255,255,.14);border-radius:28px;background:linear-gradient(145deg,rgba(30,38,53,.98),rgba(13,17,27,.98));box-shadow:0 24px 70px rgba(0,0,0,.42);color:#fff}
-.nwsb-video-pack-kicker{margin-bottom:8px;color:#e8d5a3;font:700 10px/1.2 'DM Sans',sans-serif;letter-spacing:2.4px}
-.nwsb-video-pack-card h2{margin:0 0 9px;font:700 23px/1.15 'DM Sans',sans-serif;letter-spacing:-.4px}
-.nwsb-video-pack-copy{margin:0;color:rgba(255,255,255,.72);font:13px/1.5 'DM Sans',sans-serif}
-.nwsb-video-pack-progress{height:8px;margin:18px 0 5px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.1)}
-.nwsb-video-pack-progress span{display:block;width:0;height:100%;border-radius:inherit;background:#e8d5a3;transition:width .22s ease-out}
-.nwsb-video-pack-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px}
-.nwsb-video-pack-actions button{min-height:44px;padding:0 15px;border:0;border-radius:14px;font:700 12px/1 'DM Sans',sans-serif;cursor:pointer}
-.nwsb-video-pack-later{background:transparent;color:rgba(255,255,255,.72)}
-.nwsb-video-pack-start{background:#fff;color:#121722;box-shadow:0 5px 16px rgba(0,0,0,.18)}
-.nwsb-video-pack-start:disabled{opacity:.65;cursor:wait}
-@media (min-width:520px){.nwsb-video-pack-prompt{align-items:center}.nwsb-video-pack-card{padding:28px 26px 22px}}
 
 /* ══════════════════════════════════════════════════════════════════
-   NOWSSB MOTION SYSTEM — AURA-inspired, app-wide
-   Keep movement on opacity and transform so transitions stay fast on phones.
-   The controller in app/js/part092-motion.js only observes existing state;
-   feature navigation remains authoritative.
+   THE SIX — every main door on one compact panel.
+
+   Three across and two down, a hairline standing between each. It is a menu,
+   so it is SHORT: a cell is a mark, a word and the air round them, and the
+   two rows together cost less than the black bar under them. A menu that
+   pushes the page down is a menu that gets scrolled past.
+
+   The panel itself takes its look from the home it is on — `.glass-wrap` on
+   the Fashion home, `.nmh-sec-wrap` on the Normal one — so only the box
+   inside and the cells are described here.
    ══════════════════════════════════════════════════════════════════ */
-:root {
-  --nwsb-motion-ease: cubic-bezier(.16, 1, .3, 1);
-  --nwsb-motion-ease-soft: cubic-bezier(.22, 1, .36, 1);
-  --nwsb-motion-fast: 180ms;
-  --nwsb-motion-page: 300ms;
+.mo-box {
+  border-radius: 16px !important;
+  overflow: hidden;
+  margin-bottom: 14px;
 }
-
-html { scroll-behavior: smooth; }
-body { overscroll-behavior-y: none; }
-
-/* Top-level screens fade and lift their contents without transforming the
-   screen root, which keeps fixed overlays genuinely fixed on Android WebView. */
-.screen:not(#splash) {
-  opacity: 0;
-  transition: opacity var(--nwsb-motion-page) var(--nwsb-motion-ease-soft);
-  will-change: opacity;
-}
-.screen:not(#splash).active { opacity: 1; }
-.screen:not(#splash).exit { opacity: 0; }
-
-/* Every app page uses the same AURA-like short slide/fade rather than a
-   collection of unrelated modal timings. Visibility/pointer-events remain
-   controlled by app.css. */
-.sub-screen {
-  opacity: 0;
-  transform: translate3d(22px, 0, 0);
-  transition: opacity 260ms var(--nwsb-motion-ease-soft),
-              transform 320ms var(--nwsb-motion-ease);
-  will-change: opacity, transform;
-}
-.sub-screen.open {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-/* Lightweight scroll direction response on the two homes. It is deliberately
-   tiny: the list remains native and momentum scrolling remains untouched. */
-#home .hero-section,
-#home-nm .nmh-toprow {
-  transition: transform 220ms var(--nwsb-motion-ease-soft);
-  will-change: transform;
-}
-#home.nwsb-scroll-forward .hero-section,
-#home-nm.nwsb-scroll-forward .nmh-toprow { transform: translate3d(0, -3px, 0); }
-#home.nwsb-scroll-back .hero-section,
-#home-nm.nwsb-scroll-back .nmh-toprow { transform: translate3d(0, 2px, 0); }
-
-button,
-a,
-[role="button"] {
+.mo-row { display: flex; align-items: stretch; height: 62px; }
+.mo-cell {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: 0 3px;
+  background: none; border: none; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-button:active,
-a:active,
-[role="button"]:active {
-  transform: scale(.985);
-  transition: transform var(--nwsb-motion-fast) var(--nwsb-motion-ease);
+.mo-cell:active { opacity: 0.6; }
+.mo-ic { display: block; width: 21px; height: 21px; flex-shrink: 0; }
+.mo-ic svg { width: 100%; height: 100%; display: block; }
+.mo-lbl {
+  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.1px; line-height: 1.1;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+.mo-rule { flex: 0 0 1px; align-self: center; height: 34px; }
 
-@keyframes nwsbMotionPageIn {
-  from { opacity: 0; transform: translate3d(12px, 0, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
+/* Fashion — glass over the film, gold marks, white words. */
+:is(#home, .stw-prev-stage) .mo-box {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
 }
+:is(#home, .stw-prev-stage) .mo-ic { color: #e8d5a3; }
+:is(#home, .stw-prev-stage) .mo-lbl { color: rgba(255,255,255,0.9); }
+:is(#home, .stw-prev-stage) .mo-rule { background: rgba(255,255,255,0.12); }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .screen:not(#splash),
-  .sub-screen,
-  #home .hero-section,
-  #home-nm .nmh-toprow {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-    animation: none !important;
-  }
+/* Normal — a recess in the raised card, the darker gold, ink words. */
+#home-nm .mo-box {
+  background: rgba(26,26,46,0.03);
+  border: 1px solid rgba(26,26,46,0.08);
 }
-
-.nwsb-motion-scroll-host {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-}
-.nwsb-motion-ready .screen,
-.nwsb-motion-ready .sub-screen {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* ── Essentials reference finish: local artwork, wide banner, two tiles ── */
-.nwsb-essentials-reference .nwsb-essential-featured-card {
-  min-height: 210px !important;
-  height: 210px !important;
-  background-image: linear-gradient(90deg, rgba(255,205,18,.97) 0%, rgba(255,180,18,.79) 50%, rgba(255,121,30,.20) 100%), url('assets/media/image/essentials-featured-ritual-v2.png') !important;
-  background-size: cover !important;
-  background-position: center !important;
-}
-.nwsb-essentials-reference .nwsb-essential-list::before { top: 226px !important; }
-.nwsb-essentials-reference .nwsb-essential-featured-card::before { top: 24px !important; }
-.nwsb-essentials-reference .nwsb-help-heading {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  margin: 34px 0 16px !important;
-}
-.nwsb-essentials-reference .nwsb-help-heading h3 { margin: 0 !important; color: #171821 !important; font-size: 24px !important; letter-spacing: -.7px !important; }
-.nwsb-essentials-reference .nwsb-help-heading > button {
-  width: auto !important;
-  height: auto !important;
-  min-width: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #77747b !important;
-  font: 700 12px/1 'DM Sans', sans-serif !important;
-  cursor: pointer !important;
-}
-.nwsb-essentials-reference .nwsb-help-rail {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 12px !important;
-  overflow: visible !important;
-}
-.nwsb-essentials-reference .nwsb-help-card {
-  display: block !important;
-  min-width: 0 !important;
-  width: 100% !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 22px !important;
-  overflow: hidden !important;
-  background: #faf9f6 !important;
-  box-shadow: 0 8px 18px rgba(61,55,71,.10) !important;
-  color: #33323a !important;
-  text-align: left !important;
-}
-.nwsb-essentials-reference .nwsb-help-art {
-  display: block !important;
-  height: 132px !important;
-  overflow: hidden !important;
-  background: #f0e9f8 !important;
-}
-.nwsb-essentials-reference .nwsb-help-art img { display: block !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
-.nwsb-essentials-reference .nwsb-help-copy { display: block !important; padding: 14px 13px 16px !important; }
-.nwsb-essentials-reference .nwsb-help-copy strong { display: block !important; color: #33323a !important; font-size: 16px !important; font-weight: 800 !important; }
-.nwsb-essentials-reference .nwsb-help-copy small { display: block !important; margin-top: 6px !important; color: #77747b !important; font-size: 12px !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-essentials-body { background: transparent !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-help-heading h3 { color: #fff !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-help-heading > button { color: rgba(255,255,255,.72) !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-help-card { background: rgba(15,13,31,.82) !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-help-copy strong { color: #fff !important; }
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-help-copy small { color: rgba(255,255,255,.62) !important; }
-@media (max-width: 380px) {
-  .nwsb-essentials-reference .nwsb-essentials-body { padding-left: 16px !important; padding-right: 16px !important; }
-  .nwsb-essentials-reference .nwsb-help-rail { gap: 9px !important; }
-  .nwsb-essentials-reference .nwsb-help-art { height: 112px !important; }
-}
-
-.nwsb-essentials-reference .nwsb-help-heading > button {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 42px !important;
-  height: 42px !important;
-  min-width: 42px !important;
-  padding: 0 !important;
-  border-radius: 50% !important;
-  background: #f4f2ee !important;
-  color: #4f4c52 !important;
-  font-size: 28px !important;
-  line-height: 1 !important;
-  box-shadow: 0 6px 14px rgba(61,55,71,.08) !important;
-}
-.nwsb-essentials-reference.nwsb-essentials-fashion .nwsb-help-heading > button { background: rgba(255,255,255,.14) !important; color: #fff !important; }
-
-/* ── Media preparation card: black NowssB access handoff ─────────────── */
-.nwsb-video-pack-prompt {
-  align-items: center;
-  padding: 18px;
-  background: rgba(2, 4, 8, .78);
-  backdrop-filter: blur(18px) saturate(.82);
-  -webkit-backdrop-filter: blur(18px) saturate(.82);
-}
-.nwsb-video-pack-card {
-  width: min(100%, 420px);
-  box-sizing: border-box;
-  padding: 22px 21px 18px;
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 30px;
-  background: #05070b;
-  box-shadow: 0 28px 90px rgba(0,0,0,.68), inset 0 1px 0 rgba(255,255,255,.06);
-  color: #fff;
-  animation: nwsbPackCardIn 360ms cubic-bezier(.16,1,.3,1) both;
-}
-.nwsb-video-pack-brand { display:flex; align-items:center; justify-content:space-between; gap:14px; min-height:48px; }
-.nwsb-video-pack-brand-lockup { display:flex; align-items:center; min-width:0; gap:10px; }
-.nwsb-video-pack-brand-lockup img { width:42px; height:42px; flex:0 0 42px; object-fit:contain; border-radius:50%; background:#fff; box-shadow:0 5px 18px rgba(255,255,255,.16); }
-.nwsb-video-pack-divider { width:1px; height:27px; flex:0 0 1px; background:rgba(255,255,255,.24); }
-.nwsb-video-pack-brand-name { display:flex; flex-direction:column; gap:3px; color:#fff; font:800 12px/1 'DM Sans',sans-serif; letter-spacing:2.2px; }
-.nwsb-video-pack-brand-name small { color:rgba(255,255,255,.48); font:500 9px/1.1 'DM Sans',sans-serif; letter-spacing:.2px; text-transform:none; }
-.nwsb-video-pack-signal { width:84px; height:30px; flex:0 0 84px; color:#fff; opacity:.88; animation:nwsbPackSignal 1.8s ease-in-out infinite; }
-.nwsb-video-pack-rule { height:1px; margin:17px 0 16px; background:rgba(255,255,255,.13); }
-.nwsb-video-pack-kicker { margin-bottom:8px; color:rgba(255,255,255,.56); font:800 10px/1.2 'DM Sans',sans-serif; letter-spacing:2.2px; }
-.nwsb-video-pack-card h2 { margin:0 0 9px; color:#fff; font:800 25px/1.12 'DM Sans',sans-serif; letter-spacing:-.5px; }
-.nwsb-video-pack-copy { margin:0; color:rgba(255,255,255,.72); font:13px/1.55 'DM Sans',sans-serif; }
-.nwsb-video-pack-progress { height:5px; margin:19px 0 7px; overflow:hidden; border-radius:99px; background:rgba(255,255,255,.12); }
-.nwsb-video-pack-progress span { display:block; width:0; height:100%; border-radius:inherit; background:#fff; box-shadow:0 0 14px rgba(255,255,255,.6); transition:width .3s cubic-bezier(.16,1,.3,1); }
-.nwsb-video-pack-status { color:rgba(255,255,255,.46); font:11px/1.45 'DM Sans',sans-serif; }
-.nwsb-video-pack-actions { display:flex; justify-content:flex-end; align-items:center; gap:9px; margin-top:19px; }
-.nwsb-video-pack-actions button { min-height:46px; padding:0 16px; border:0; border-radius:15px; font:800 12px/1 'DM Sans',sans-serif; cursor:pointer; transition:transform .16s cubic-bezier(.16,1,.3,1), background .16s ease, opacity .16s ease; }
-.nwsb-video-pack-actions button:active { transform:scale(.97); }
-.nwsb-video-pack-later { background:transparent; color:rgba(255,255,255,.66); }
-.nwsb-video-pack-later:hover { color:#fff; background:rgba(255,255,255,.08); }
-.nwsb-video-pack-start { background:#fff; color:#05070b; box-shadow:0 8px 24px rgba(255,255,255,.16); }
-.nwsb-video-pack-start:hover { background:#e9edf2; }
-.nwsb-video-pack-start:disabled { opacity:.58; cursor:wait; }
-@keyframes nwsbPackCardIn { from { opacity:0; transform:translateY(18px) scale(.97); } to { opacity:1; transform:none; } }
-@keyframes nwsbPackSignal { 0%,100% { opacity:.52; transform:scaleX(.96); } 50% { opacity:1; transform:scaleX(1); } }
-@media (max-width:430px) { .nwsb-video-pack-card { padding:20px 18px 16px; } .nwsb-video-pack-signal { width:68px; flex-basis:68px; } .nwsb-video-pack-actions button { padding-left:13px; padding-right:13px; } }
-
-/* Header hierarchy correction: logo left, white SVG orb, divider, title. */
-.nwsb-video-pack-brand { align-items: flex-start; justify-content: flex-start; gap: 13px; }
-.nwsb-video-pack-logo { width: 44px !important; height: 44px !important; flex: 0 0 44px !important; object-fit: contain !important; border-radius: 50% !important; background: #fff !important; box-shadow: 0 5px 18px rgba(255,255,255,.16) !important; }
-.nwsb-video-pack-brand-side { display: flex; align-items: center; min-width: 0; gap: 10px; flex: 1; padding-top: 3px; }
-.nwsb-video-pack-signal-wrap { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; background: #fff; color: #05070b; box-shadow: 0 6px 18px rgba(255,255,255,.16); }
-.nwsb-video-pack-signal { width: 28px !important; height: 22px !important; flex: 0 0 28px !important; color: #05070b !important; animation: nwsbPackSignal 1.8s ease-in-out infinite; }
-.nwsb-video-pack-brand-side .nwsb-video-pack-divider { width: 1px; height: 25px; flex: 0 0 1px; background: rgba(255,255,255,.26); }
-.nwsb-video-pack-brand-name { min-width: 0; }
-@media (max-width:430px) { .nwsb-video-pack-brand-side { gap: 8px; } .nwsb-video-pack-signal-wrap { width: 38px; height: 38px; flex-basis: 38px; } }
-
-/* Per-path Essentials art: every expanded row gets its own local thumbnail. */
-.nwsb-essentials-reference .nwsb-essential-row { min-height: 82px !important; padding: 9px 14px 9px 15px !important; gap: 9px !important; }
-.nwsb-essentials-reference .nwsb-essential-row-art { display:block !important; order:1 !important; width:54px !important; height:54px !important; flex:0 0 54px !important; overflow:hidden !important; border-radius:14px !important; background:#e9e5de !important; }
-.nwsb-essentials-reference .nwsb-essential-row-art img { display:block !important; width:100% !important; height:100% !important; object-fit:cover !important; }
-.nwsb-essentials-reference .nwsb-essential-row-icon { order:2 !important; }
-.nwsb-essentials-reference .nwsb-essential-row-copy { order:3 !important; min-width:0 !important; }
-.nwsb-essentials-reference .nwsb-essential-meta { order:4 !important; font-size:11px !important; }
-.nwsb-essentials-reference .nwsb-essential-arrow { order:5 !important; }
-@media (max-width:430px) { .nwsb-essentials-reference .nwsb-essential-row-art { width:48px !important; height:48px !important; flex-basis:48px !important; border-radius:13px !important; } .nwsb-essentials-reference .nwsb-essential-row { min-height:76px !important; } }
-
-.nwsb-video-pack-card { border-radius: 30px !important; overflow: hidden !important; }
-
-/* Home reference stability: do not move the hero/header while scrolling or entering. */
-#home .hero-section,
-#home-nm .nmh-toprow,
-#home.nwsb-scroll-forward .hero-section,
-#home.nwsb-scroll-back .hero-section,
-#home-nm.nwsb-scroll-forward .nmh-toprow,
-#home-nm.nwsb-scroll-back .nmh-toprow {
-  transform: none !important;
-  transition: none !important;
-  animation: none !important;
-  will-change: auto !important;
-}
-#home > *, #home-nm > * { animation: none !important; }
-
-/* Interactive preparation handoff: stable black card, animated app marks, white pills. */
-.nwsb-video-pack-brand-lockup { display:flex; align-items:center; min-width:0; gap:10px; }
-.nwsb-video-pack-continue { min-height:34px !important; padding:0 12px !important; border:1px solid rgba(255,255,255,.28) !important; border-radius:999px !important; background:transparent !important; color:#fff !important; font:800 10px/1 'DM Sans',sans-serif !important; white-space:nowrap; }
-.nwsb-video-pack-continue:hover { background:rgba(255,255,255,.1) !important; }
-.nwsb-video-pack-status-row { display:flex; align-items:center; min-width:0; gap:12px; }
-.nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap { display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; flex:0 0 48px; border-radius:50%; background:#fff; color:#05070b; box-shadow:0 6px 18px rgba(255,255,255,.16); }
-.nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap svg { width:28px; height:28px; animation:nwsbPackMarkPulse 1.6s ease-in-out infinite; }
-.nwsb-video-pack-status-row .nwsb-video-pack-divider { width:1px; height:33px; flex:0 0 1px; background:rgba(255,255,255,.25); }
-.nwsb-video-pack-status-copy { min-width:0; flex:1; }
-.nwsb-video-pack-status-copy .nwsb-video-pack-kicker { margin:0 0 5px; }
-.nwsb-video-pack-status-copy h2 { margin:0; }
-.nwsb-video-pack-actions button { border-radius:999px !important; }
-.nwsb-video-pack-actions .nwsb-video-pack-later { border:1px solid rgba(255,255,255,.18) !important; }
-.nwsb-video-pack-actions .nwsb-video-pack-start { background:#fff !important; color:#05070b !important; }
-@keyframes nwsbPackMarkPulse { 0%,100% { opacity:.58; transform:scale(.94); } 50% { opacity:1; transform:scale(1); } }
-@media (max-width:430px) {
-  .nwsb-video-pack-continue { padding-left:10px !important; padding-right:10px !important; font-size:9px !important; }
-  .nwsb-video-pack-status-row { gap:9px; }
-  .nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap { width:44px; height:44px; flex-basis:44px; }
-  .nwsb-video-pack-status-row .nwsb-video-pack-divider { height:30px; }
-}
-
-/* ══ FASHION WHERE TO BEGIN — reference geometry, final cascade ══ */
-#home .mainops-blk.aug15-fashion-reference {
-  width: calc(100% - 32px) !important;
-  margin: 18px 16px !important;
-  padding: 14px 12px 16px !important;
-  box-sizing: border-box !important;
-  border-radius: 24px !important;
-  background: rgba(255,255,255,.055) !important;
-  border: 1px solid rgba(255,255,255,.16) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
-  backdrop-filter: blur(18px) saturate(1.25) !important;
-  overflow: hidden !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .qa-tv-head {
-  min-height: 68px !important;
-  padding: 0 4px 14px !important;
-  gap: 14px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .qa-tv-orb {
-  width: 58px !important;
-  height: 58px !important;
-  flex: 0 0 58px !important;
-  border-radius: 50% !important;
-  background: rgba(255,255,255,.92) !important;
-  border: 0 !important;
-  color: #161525 !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,.26) !important;
-}
-#home .mainops-blk.aug15-fashion-reference .qa-tv-orb svg { width: 28px !important; height: 28px !important; }
-#home .mainops-blk.aug15-fashion-reference .qa-tv-hello {
-  font-size: 20px !important;
-  line-height: 1.12 !important;
-  color: rgba(255,255,255,.68) !important;
-}
-#home .mainops-blk.aug15-fashion-reference .qa-tv-name {
-  font-size: 28px !important;
-  line-height: 1.08 !important;
-  color: #fff !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .mo-box {
-  display: flex !important;
-  flex-direction: column !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 22px !important;
-  border: 1px solid rgba(255,255,255,.14) !important;
-  background: rgba(8,8,18,.24) !important;
-  overflow: hidden !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-row {
-  display: flex !important;
-  width: 100% !important;
-  height: 108px !important;
-  min-height: 108px !important;
-  margin: 0 !important;
-  gap: 0 !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-row + .mo-row { border-top: 1px solid rgba(255,255,255,.14) !important; }
-#home .mainops-blk.aug15-fashion-reference .mo-cell {
-  flex: 1 1 0 !important;
-  width: auto !important;
-  min-width: 0 !important;
-  min-height: 108px !important;
-  height: 108px !important;
-  padding: 12px 6px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  color: #fff !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-cell:active,
-#home .mainops-blk.aug15-fashion-reference .mo-cell:focus-visible { background: rgba(255,255,255,.09) !important; }
-#home .mainops-blk.aug15-fashion-reference .mo-rule {
-  display: block !important;
-  width: 1px !important;
-  height: 66px !important;
-  flex: 0 0 1px !important;
-  align-self: center !important;
-  background: rgba(255,255,255,.18) !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-ic {
-  width: 46px !important;
-  height: 46px !important;
-  flex: 0 0 46px !important;
-  border-radius: 50% !important;
-  background: transparent !important;
-  color: #e8d5a3 !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-ic svg { width: 34px !important; height: 34px !important; }
-#home .mainops-blk.aug15-fashion-reference .mo-lbl {
-  margin-top: 8px !important;
-  font-size: 13px !important;
-  line-height: 1.15 !important;
-  font-weight: 700 !important;
-  color: rgba(255,255,255,.94) !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way {
-  display: block !important;
-  width: 100% !important;
-  min-height: 120px !important;
-  height: 120px !important;
-  margin: 18px 0 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 30px !important;
-  background: #000 !important;
-  color: #fff !important;
-  box-shadow: 0 14px 28px rgba(0,0,0,.28) !important;
-  overflow: hidden !important;
-  text-align: left !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way .ncb-slide {
-  display: flex !important;
-  width: 100% !important;
-  height: 120px !important;
-  min-height: 120px !important;
-  align-items: center !important;
-  gap: 16px !important;
-  padding: 18px 20px !important;
-  border-radius: 30px !important;
-  background: #000 !important;
-}
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way-ico {
-  display: grid !important;
-  place-items: center !important;
-  width: 58px !important;
-  height: 58px !important;
-  flex: 0 0 58px !important;
-  border-radius: 50% !important;
-  background: #12121c !important;
-  border: 1px solid rgba(255,255,255,.08) !important;
-  color: #e8d5a3 !important;
-}
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way-ico svg { width: 28px !important; height: 28px !important; }
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-txt { min-width: 0 !important; flex: 1 1 auto !important; }
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-name { font-size: 20px !important; line-height: 1.15 !important; color: #fff !important; }
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-sub { margin-top: 5px !important; font-size: 14px !important; line-height: 1.28 !important; color: rgba(255,255,255,.68) !important; }
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-btn { width: 44px !important; height: 44px !important; flex: 0 0 44px !important; border-radius: 50% !important; background: #1a1a24 !important; border: 1px solid rgba(255,255,255,.16) !important; }
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-btn svg { width: 22px !important; height: 22px !important; }
-/* The Fashion film and glass wrappers keep their default brightness and stay
-   behind the home content; only the fixed navigation is allowed above cards. */
-body.fashplus #fpBgVideo { opacity: 1 !important; z-index: 0 !important; }
-body.fashplus #fpBgVeil { z-index: 1 !important; }
-body.fashplus #homeHeader { z-index: 1005 !important; }
-body.fashplus #home .home-body { position: relative !important; z-index: 2 !important; }
-body.fashplus #home .mainops-blk,
-body.fashplus #home .glass-wrap { isolation: isolate; }
-
-/* ══ FASHION HOME — stable hero plane and reference section order ══ */
-body.fashplus #home .hero-section.hero-simple {
-  position: relative !important;
-  inset: auto !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  width: calc(100% - 32px) !important;
-  margin: calc(var(--home-header-h, 92px) + 8px) 16px 16px !important;
-  transform: none !important;
-  z-index: 30 !important;
-}
-body.fashplus #home .hs-deck.hs-below-hero {
-  position: relative !important;
-  z-index: 20 !important;
-  margin: 0 16px 18px !important;
-  min-height: 0 !important;
-  isolation: isolate !important;
-}
-body.fashplus #home .hs-deck.hs-below-hero .hs-cell {
-  z-index: 1 !important;
-}
-body.fashplus #home .hs-deck.hs-below-hero .hs-cell.on { z-index: 2 !important; }
-body.fashplus #home .hero-section.hero-simple .hs-top,
-body.fashplus #home .hero-section.hero-simple .hs-foot { position: relative !important; z-index: 4 !important; }
-body.fashplus #home .home-body { position: relative !important; z-index: 10 !important; }
-body.fashplus #home .home-body > .mainops-blk.aug15-fashion-reference { position: relative !important; z-index: 12 !important; }
-/* Restore the default Fashion glass treatment instead of an extra-dark veil. */
-body.fashplus #fpBgVideo { opacity: 1 !important; }
-/* The quick-access panel must remain the first strong action block after the
-   player; the rest of the page follows it normally. */
-body.fashplus #home .mainops-blk.aug15-fashion-reference { order: initial !important; }
-
-/* The Fashion quick-access panel follows the hero experience, not the long
-   player/dashboard stream it shares with the Normal-home markup. */
-body.fashplus #home > .mainops-blk.aug15-fashion-reference {
-  position: relative !important;
-  z-index: 25 !important;
-  margin: 0 16px 18px !important;
-}
-
-/* Fashion video sections begin on a clean media surface; only the video
-   element is affected, never the surrounding logo/icon artwork. */
-body.fashplus #home video { background-color: #020307 !important; }
-body.fashplus #home video[poster] { background-image: none !important; }
-
-/* Preparation handoff — explicit geometry, not just a radius hint. */
-.nwsb-video-pack-brand { justify-content: space-between !important; align-items: flex-start !important; }
-.nwsb-video-pack-brand-lockup { flex: 1 1 auto !important; min-width: 0 !important; }
-.nwsb-video-pack-continue {
-  flex: 0 0 auto !important;
-  margin-left: auto !important;
-  min-height: 38px !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  background: #fff !important;
-  color: #05070b !important;
-  box-shadow: 0 8px 22px rgba(255,255,255,.16) !important;
-}
-.nwsb-video-pack-continue:hover { background: #edf0f4 !important; }
-.nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap {
-  width: 48px !important;
-  height: 48px !important;
-  min-width: 48px !important;
-  min-height: 48px !important;
-  flex: 0 0 48px !important;
-  aspect-ratio: 1 / 1 !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  display: inline-flex !important;
-}
-.nwsb-video-pack-status-row .nwsb-video-pack-signal-wrap svg {
-  display: block !important;
-  width: 28px !important;
-  height: 28px !important;
-}
-
-/* The black banner in these blocks was carrying .ncb-carousel's neumorphic
-   shadow — 8px 8px 20px rgba(163,177,198,0.5) and a WHITE -6px -6px 14px,
-   which is light-home furniture. On the Fashion home's dark glass that
-   white read as a halo around the bar. It gets a plain drop shadow there. */
-:is(#home, .stw-prev-stage) .nsub-blk .ncb-carousel,
-:is(#home, .stw-prev-stage) .nwsb-vbwrap[data-vbwrap] .ncb-carousel {
-  box-shadow: 0 10px 26px rgba(0,0,0,0.45) !important;
-}
-
-/* On a short screen the free height is small, so the set is small, so the
-   screen inside it is small — 217x405 on a 360x640 phone. The hero's
-   furniture was sized for a full viewport and pushed out through the
-   bezel there. It comes down to match. */
-@media (max-height: 740px) {
-  .hero-tv .hero-content { padding: 14px 10px 12px; }
-  .hero-tv .brand-name { font-size: 21px !important; }
-  .hero-tv .hero-cust-btn,
-  .hero-tv .hero-feat-btn,
-  .hero-tv .hero-search-btn { width: 32px !important; height: 32px !important;
-    min-width: 32px !important; min-height: 32px !important; }
-  .hero-tv .hero-search-ic { width: 16px !important; height: 16px !important; }
-  .hero-tv .hero-glass { height: 84px; }
-  .hero-tv .hero-word-wrap { margin-top: 4px; height: 30px; }
-  .hero-tv .hero-word { font-size: 26px !important; }
-  .hero-tv .hero-btns { margin-top: 7px; gap: 7px; }
-  .hero-tv .hero-btn { padding: 8px 12px !important; font-size: 10px !important; }
-  .hero-tv .hero-bottom > div:first-child { margin-bottom: 8px !important; }
-  .hero-tv .hero-bottom > div:first-child .brand-tag { font-size: 11px !important; }
-}
-
-/* ══════════════════════════════════════════════════════════════════════
-   THE PLAIN HEADER — the third way the hero can look
-   Neither the set nor the full-bleed photographs: an ordinary app header.
-   No rotating artwork behind it, no rail of five pictures inside it — the
-   wordmark, the tagline, the search, today's word and the two buttons on
-   the app's own dark card, sized to its content instead of to the screen.
-
-   It is the same markup as the other two. What makes a hero a television
-   is a class, and what makes it plain is this one: the photographs and the
-   picture rail are hidden rather than removed, so switching back brings
-   them straight back with no rebuild.
-   ══════════════════════════════════════════════════════════════════════ */
-/* ── The greeting, above the card ──
-   The Normal home opens by saying hello; this one did not, and started
-   cold with a wordmark. It clears the fixed header — that is what
-   --home-header-h measures — and the card follows it rather than carrying
-   the offset itself. */
-.hs-greet {
-  margin: calc(var(--home-header-h, 92px) + 6px) 20px 12px;
-}
-.hs-hello {
-  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 400;
-  letter-spacing: .1px; color: rgba(255,255,255,0.62); line-height: 1.2;
-}
-.hs-name {
-  margin-top: 2px;
-  font-family: 'DM Sans', sans-serif; font-size: 30px; font-weight: 800;
-  letter-spacing: -0.7px; color: #fff; line-height: 1.1;
-}
-
-.hero-section.hero-simple {
-  height: auto !important;
-  aspect-ratio: auto;
-  /* ── Glass ──
-     Behind this card is either the Fashion Plus film or the home's own
-     artwork, and both are worth seeing through. A translucent fill, a lit
-     top edge and a real blur — the same glass the rest of the Fashion home
-     is built from, at the size the hero needs it. */
-  background:
-    /* the lit face of the glass … */
-    linear-gradient(158deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 100%),
-    /* … over a dark base, so white type is legible whatever is behind it.
-       Glass alone reads beautifully over the film and disappears over a
-       bright frame of it; this keeps the contrast without closing it. */
-    linear-gradient(180deg, rgba(6,12,24,0.52) 0%, rgba(6,12,24,0.64) 100%);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 26px;
-  overflow: hidden;
-  -webkit-backdrop-filter: blur(26px) saturate(1.5);
-          backdrop-filter: blur(26px) saturate(1.5);
-  box-shadow:
-    0 22px 54px rgba(0,0,0,0.46),
-    inset 0 1px 0 rgba(255,255,255,0.30),
-    inset 0 -1px 0 rgba(255,255,255,0.06);
-  /* the greeting above carries the header offset now */
-  margin: 0 16px 16px;
-  width: auto;
-}
-/* Without the greeting — the look applied before its furniture is built —
-   the card still has to clear the header on its own. */
-.hero-section.hero-simple:first-child {
-  margin-top: calc(var(--home-header-h, 92px) + 6px);
-}
-/* the five crossfading photographs and the five-picture rail are what
-   this look is defined by NOT having */
-.hero-simple .hero-bg,
-.hero-simple .hero-glass { display: none !important; }
-/* the content stops being an overlay and becomes the card itself */
-.hero-simple .hero-content {
-  position: relative; inset: auto;
-  padding: 20px 4px 22px;
-  gap: 18px;
-}
-.hero-simple .hero-content > div:first-child {
-  margin-left: 14px !important; margin-right: 14px !important;
-}
-.hero-simple .brand-name { font-size: clamp(26px, 8vw, 40px) !important; }
-.hero-simple .hero-bottom { padding: 0 14px; }
-.hero-simple .hero-bottom > div:first-child {
-  margin-bottom: 14px !important; padding-left: 0 !important;
-}
-.hero-simple .hero-word-wrap { margin-top: 0; height: 42px; }
-.hero-simple .hero-word { font-size: 30px !important; }
-.hero-simple .hero-btns { margin-top: 14px; }
+#home-nm .mo-ic { color: #b39a5e; }
+#home-nm .mo-lbl { color: #1a1a2e; }
+#home-nm .mo-rule { background: rgba(26,26,46,0.08); }
 
 /* ══════════════════════════════════════════════════════════════════
-   THE RAIL INSIDE THE PLAIN HERO
-   Where the five photographs sit in the other two looks. One banner at a
-   time: it arrives FROM THE RIGHT, plays once, and leaves to the LEFT as
-   the next one arrives. Every clip is the one its own page opens with, and
-   every slide is the door to that page.
+   Enter Connect — white, and its own width.
+
+   It was the accent gold and it was stretching the full width of the card:
+   `display: inline-flex` shrink-wraps a button only until a flex COLUMN
+   with the default `align-items: stretch` gets hold of it, and the card is
+   one. `align-self` is what actually holds it to its content.
    ══════════════════════════════════════════════════════════════════ */
-.hs-rail { width: 100%; margin: 2px 0 4px; }
-.hs-track {
-  position: relative; width: 100%;
-  aspect-ratio: 16 / 8.2;
-  overflow: hidden;
-  border-radius: 18px;
-  background: rgba(0,0,0,0.42);
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 10px 26px rgba(0,0,0,0.4);
-}
-.hs-slide {
-  position: absolute; inset: 0;
-  display: block; padding: 0 !important; margin: 0 !important;
-  min-height: 0 !important;
-  border: none !important; border-radius: 0 !important;
-  background: #05070d; cursor: pointer; overflow: hidden;
-  text-align: left; color: #fff;
-  /* everything waits off to the right until it is its turn */
-  transform: translateX(103%);
-  opacity: 0;
-  transition: transform .68s cubic-bezier(.22,1,.28,1), opacity .38s ease;
-  will-change: transform;
-}
-.hs-slide.on  { transform: translateX(0);      opacity: 1; z-index: 2; }
-.hs-slide.out { transform: translateX(-103%);  opacity: 0; z-index: 1; }
-.hs-vid {
-  position: absolute; inset: 0;
-  width: 100% !important; height: 100% !important;
-  object-fit: cover; display: block;
-}
-/* the words sit on a gradient, not on whatever frame happens to be under
-   them — a clip is not a background you can rely on */
-.hs-shade {
-  position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg,
-    rgba(4,7,14,0.86) 0%, rgba(4,7,14,0.58) 42%, rgba(4,7,14,0.06) 74%, rgba(4,7,14,0) 100%);
-}
-.hs-cap {
-  position: absolute; left: 16px; right: 62px; bottom: 14px;
-  display: flex; flex-direction: column; gap: 3px; pointer-events: none;
-}
-.hs-cap-t {
-  font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800;
-  letter-spacing: -0.2px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.6);
-}
-.hs-cap-s {
-  font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 400;
-  color: rgba(255,255,255,0.74); text-shadow: 0 2px 8px rgba(0,0,0,.6);
-}
-.hs-open {
-  position: absolute; right: 14px; bottom: 14px;
-  width: 34px; height: 34px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.94); color: #06101f;
-  box-shadow: 0 8px 20px rgba(0,0,0,.45);
-  pointer-events: none;
-}
-.hs-open svg { width: 16px; height: 16px; display: block; }
-.hs-slide:active .hs-open { transform: scale(.92); }
-
-.hs-dots { display: flex; justify-content: center; gap: 6px; padding: 10px 0 2px; }
-.hs-dots i {
-  width: 6px; height: 6px; border-radius: 50%; cursor: pointer;
-  background: rgba(255,255,255,0.26);
-  transition: width .26s ease, background .26s ease;
-}
-.hs-dots i.on { width: 20px; border-radius: 3px; background: #e8d5a3; }
-
-@media (prefers-reduced-motion: reduce) {
-  .hs-slide { transition: opacity .3s ease; transform: none !important; }
-  .hs-slide:not(.on) { opacity: 0; pointer-events: none; }
-}
-
-
-/* ══ Requested compact Fashion quick access ══ */
-#home .mainops-blk.aug15-fashion-reference .mo-row + .mo-row {
-  border-top: 0 !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-row,
-#home .mainops-blk.aug15-fashion-reference .mo-cell {
-  height: 92px !important;
-  min-height: 92px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-cell {
-  padding: 8px 6px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-ic {
-  width: 38px !important;
-  height: 38px !important;
-  flex-basis: 38px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-ic svg {
-  width: 29px !important;
-  height: 29px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-lbl {
-  margin-top: 5px !important;
+.nmh-connect-enter {
+  background: #fff !important;
+  color: #060c18 !important;
+  align-self: flex-start;
+  width: -moz-fit-content; width: fit-content;
+  max-width: 100%;
+  padding: 10px 18px !important;
   font-size: 12px !important;
 }
-#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way {
-  min-height: 98px !important;
-  height: 98px !important;
-  margin-top: 12px !important;
-  border-radius: 26px !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way .ncb-slide {
-  height: 98px !important;
-  min-height: 98px !important;
-  padding: 12px 16px !important;
-  border-radius: 26px !important;
-  gap: 12px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way-ico {
-  width: 48px !important;
-  height: 48px !important;
-  flex-basis: 48px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way-ico svg {
-  width: 24px !important;
-  height: 24px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-name {
-  font-size: 18px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-sub {
-  margin-top: 3px !important;
-  font-size: 13px !important;
-}
 
-/* Restore the Normal-home brand mark: the legacy base stylesheet hid this
-   image because the logo was once painted as a wrapper background. */
-#home-nm .nmh-logo > img {
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  border-radius: 50% !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-#home-nm .nmh-logo {
-  overflow: hidden !important;
-}
+/* ══════════════════════════════════════════════════════════════════
+   Today's Practice — the film runs the whole card.
 
-/* The Fashion home uses the hero deck built by part083.js. A legacy override
-   hid that deck and exposed an incompatible rail, causing hero layers to
-   collide. Keep one visible hero owner at every Fashion-home state. */
-#home #hsDeck { display: block !important; }
-#home #hsRail { display: none !important; }
-#home .hero-section { position: relative !important; z-index: 4 !important; }
-#home .hero-section .hero-tv-frame,
-#home .hero-section .hero-screen,
-#home .hero-section .hero-device,
-#home .hero-section .hero-media { position: relative; z-index: 5; }
-
-/* Final compact footprint: shorter doors and shorter guide banner. */
-#home .mainops-blk.aug15-fashion-reference .mo-row,
-#home .mainops-blk.aug15-fashion-reference .mo-cell {
-  height: 78px !important;
-  min-height: 78px !important;
-  max-height: 78px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-cell { padding: 5px 4px !important; }
-#home .mainops-blk.aug15-fashion-reference .mo-ic {
-  width: 32px !important;
-  height: 32px !important;
-  flex-basis: 32px !important;
-}
-#home .mainops-blk.aug15-fashion-reference .mo-ic svg { width: 24px !important; height: 24px !important; }
-#home .mainops-blk.aug15-fashion-reference .mo-lbl { margin-top: 3px !important; font-size: 11px !important; }
-#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way,
-#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way .ncb-slide {
-  height: 88px !important;
-  min-height: 88px !important;
-  max-height: 88px !important;
-  overflow: hidden !important;
-  border-radius: 24px !important;
-}
-#home .mainops-blk.aug15-fashion-reference > .nwsb-find-way .ncb-slide { padding: 10px 14px !important; }
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way-ico { width: 42px !important; height: 42px !important; flex-basis: 42px !important; }
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-name { font-size: 16px !important; }
-#home .mainops-blk.aug15-fashion-reference .nwsb-find-way .ncb-sub { font-size: 12px !important; }
-
-/* ══ Supplied Essentials timeline: Normal neumorphic / Fashion glassmorphic ══ */
-.nwsb-essentials-supplied {
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  color: #2b2d33;
-}
-.nwsb-essentials-supplied .nwsb-essentials-body {
-  padding: 26px 22px 30px !important;
-  border-radius: 30px !important;
-  background: #eceef2 !important;
-  box-sizing: border-box !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essentials-body {
-  background: rgba(120,126,140,.30) !important;
-  border: 1px solid rgba(255,255,255,.42) !important;
-  box-shadow: 0 10px 30px rgba(12,12,28,.20), inset 0 1px 0 rgba(255,255,255,.12) !important;
-  backdrop-filter: blur(24px) saturate(145%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(145%) !important;
-}
-.nwsb-essentials-supplied .nwsb-essentials-heading {
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  margin: 0 0 18px 4px !important;
-}
-.nwsb-essentials-supplied .nwsb-essentials-heading-icon {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 52px !important;
-  height: 52px !important;
-  flex: 0 0 52px !important;
-  border-radius: 50% !important;
-  background: #eceef2 !important;
-  color: #8a6c2c !important;
-  box-shadow: 6px 6px 12px #c7cdd9, -6px -6px 12px #fff !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essentials-heading-icon {
-  background: rgba(255,255,255,.88) !important;
-  color: #4a4d59 !important;
-  box-shadow: 0 6px 16px rgba(60,66,90,.14) !important;
-}
-.nwsb-essentials-supplied .nwsb-essentials-heading-icon svg { width: 25px !important; height: 25px !important; }
-.nwsb-essentials-supplied .nwsb-essentials-eyebrow {
-  margin: 0 0 3px !important;
-  color: #8a8f9a !important;
-  font: 800 10px/1.2 'DM Sans', sans-serif !important;
-  letter-spacing: 1.8px !important;
-  text-transform: uppercase !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essentials-eyebrow { color: rgba(255,255,255,.68) !important; }
-.nwsb-essentials-supplied .nwsb-essentials-heading h2 {
-  margin: 0 !important;
-  color: #2b2d33 !important;
-  font: 800 26px/1.05 'DM Sans', sans-serif !important;
-  letter-spacing: -.7px !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essentials-heading h2 { color: #fff !important; }
-.nwsb-essentials-supplied .nwsb-essentials-timeline { display: flex !important; flex-direction: column !important; }
-.nwsb-essentials-supplied .nwsb-essential-row-wrap {
-  display: flex !important;
-  align-items: stretch !important;
-  gap: 16px !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-track {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  width: 22px !important;
-  flex: 0 0 22px !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-dot {
-  width: 18px !important;
-  height: 18px !important;
-  flex: 0 0 18px !important;
-  margin-top: 26px !important;
-  border-radius: 50% !important;
-  background: #eceef2 !important;
-  box-shadow: 4px 4px 8px #c7cdd9, -4px -4px 8px #fff !important;
-  position: relative !important;
-  z-index: 2 !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-dot.active {
-  background: linear-gradient(145deg,#ffb44d,#ff8a3d) !important;
-  box-shadow: 3px 3px 6px #c7cdd9, -2px -2px 6px #fff, 0 0 0 4px rgba(255,138,61,.15) !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-dot { background: rgba(255,255,255,.38) !important; box-shadow: 0 6px 16px rgba(60,66,90,.14) !important; }
-.nwsb-essentials-supplied .nwsb-essential-connector {
-  width: 3px !important;
-  flex: 1 1 auto !important;
-  min-height: 22px !important;
-  margin: 2px 0 !important;
-  background-image: linear-gradient(#c7cdd9 40%, transparent 0%) !important;
-  background-size: 3px 10px !important;
-  background-repeat: repeat-y !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-connector { background-image: linear-gradient(rgba(60,66,90,.25) 40%, transparent 0%) !important; }
-.nwsb-essentials-supplied .nwsb-essential-featured,
-.nwsb-essentials-supplied .nwsb-essential-pill {
-  position: relative !important;
-  display: flex !important;
-  align-items: center !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-  border: 0 !important;
-  text-align: left !important;
-  cursor: pointer !important;
-  font-family: 'DM Sans', sans-serif !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-featured {
-  min-height: 148px !important;
-  margin-bottom: 18px !important;
-  padding: 22px 24px !important;
-  overflow: hidden !important;
-  border-radius: 26px !important;
-  background: linear-gradient(135deg,rgba(255,180,77,.96),rgba(255,138,61,.92)), url('assets/media/image/essentials-featured-ritual-v2.png') center/cover !important;
-  box-shadow: 9px 9px 18px #c7cdd9, -9px -9px 18px #fff, inset 0 1px 1px rgba(255,255,255,.35) !important;
-  color: #4a2a09 !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-featured {
-  box-shadow: 0 10px 30px rgba(60,66,90,.18) !important;
-  border: 1px solid rgba(255,255,255,.2) !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-badge {
-  position: absolute !important;
-  top: 18px !important;
-  left: 18px !important;
-  padding: 7px 13px !important;
-  border-radius: 20px !important;
-  background: rgba(255,255,255,.55) !important;
-  color: #6b3f13 !important;
-  font-size: 13px !important;
-  font-weight: 800 !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-featured-icon {
-  position: absolute !important;
-  top: 18px !important;
-  right: 18px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: 50% !important;
-  background: rgba(255,255,255,.74) !important;
-  color: #4a2a09 !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-featured-icon svg { width: 22px !important; height: 22px !important; }
-.nwsb-essentials-supplied .nwsb-essential-featured strong { display: block !important; margin-top: 33px !important; font-size: 22px !important; font-weight: 800 !important; }
-.nwsb-essentials-supplied .nwsb-essential-featured small { position: absolute !important; left: 24px !important; bottom: 33px !important; font-size: 14px !important; font-weight: 600 !important; }
-.nwsb-essentials-supplied .nwsb-essential-featured em { position: absolute !important; left: 24px !important; bottom: 12px !important; font-size: 14px !important; font-style: normal !important; font-weight: 700 !important; }
-.nwsb-essentials-supplied .nwsb-essential-face { position: absolute !important; right: 18px !important; bottom: 14px !important; width: 70px !important; height: 70px !important; opacity: .33 !important; }
-.nwsb-essentials-supplied .nwsb-essential-pill {
-  min-height: 62px !important;
-  margin-bottom: 18px !important;
-  padding: 14px 18px !important;
-  gap: 14px !important;
-  border-radius: 20px !important;
-  background: #eceef2 !important;
-  box-shadow: 7px 7px 14px #c7cdd9, -7px -7px 14px #fff !important;
-  color: #2b2d33 !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-pill {
-  background: rgba(0,0,0,.78) !important;
-  border: 1px solid rgba(255,255,255,.1) !important;
-  box-shadow: 0 6px 16px rgba(60,66,90,.14) !important;
-  color: #f2f2f2 !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-icon-circle {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 44px !important;
-  height: 44px !important;
-  flex: 0 0 44px !important;
-  border-radius: 50% !important;
-  background: #eceef2 !important;
-  color: #9aa0ab !important;
-  box-shadow: 5px 5px 10px #c7cdd9, -5px -5px 10px #fff !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-icon-circle { background: rgba(255,255,255,.92) !important; color: #6d7280 !important; box-shadow: 0 6px 16px rgba(60,66,90,.14) !important; }
-.nwsb-essentials-supplied .nwsb-essential-icon-circle svg { width: 21px !important; height: 21px !important; }
-.nwsb-essentials-supplied .nwsb-essential-pill-text { display: flex !important; flex: 1 1 auto !important; min-width: 0 !important; flex-direction: column !important; gap: 3px !important; }
-.nwsb-essentials-supplied .nwsb-essential-pill-text strong { overflow: hidden !important; color: #2b2d33 !important; font-size: 16px !important; font-weight: 700 !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-pill-text strong { color: #f2f2f2 !important; }
-.nwsb-essentials-supplied .nwsb-essential-pill-text small { overflow: hidden !important; color: #8a8f9a !important; font-size: 13px !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-pill-text small { color: #b8bac0 !important; }
-.nwsb-essentials-supplied .nwsb-essential-meta { color: #8a8f9a !important; font-size: 12px !important; font-weight: 600 !important; white-space: nowrap !important; }
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-meta { color: #b8bac0 !important; }
-.nwsb-essentials-supplied .nwsb-essential-arrow { color: #6d7280 !important; font-size: 22px !important; line-height: 1 !important; }
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-arrow { color: #f2f2f2 !important; }
-.nwsb-essentials-supplied .nwsb-essential-expand {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  width: calc(100% - 38px) !important;
-  margin: 4px 0 6px 38px !important;
-  padding: 12px 0 !important;
-  border: 0 !important;
-  border-radius: 16px !important;
+   In Fashion Plus the clip is `position: absolute; inset: 0` behind the
+   card, but the copy strip at the foot was painting its own ground on top
+   of it, so the picture stopped short and the bottom third read as an empty
+   black band under it. The strip keeps its text and gives up its fill; the
+   card's own scrim is what makes that text readable, and it already covers
+   the full height.
+   ══════════════════════════════════════════════════════════════════ */
+body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-bottom,
+body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-top {
   background: transparent !important;
-  color: #8a8f9a !important;
-  font: 700 14.5px/1.1 'DM Sans', sans-serif !important;
-  cursor: pointer !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-expand { color: rgba(255,255,255,.74) !important; }
-.nwsb-essentials-supplied .nwsb-essential-expand b { font-size: 15px !important; font-weight: 800 !important; }
-@media (max-width: 430px) {
-  .nwsb-essentials-supplied .nwsb-essentials-body { padding-left: 18px !important; padding-right: 18px !important; }
-  .nwsb-essentials-supplied .nwsb-essential-meta { display: none !important; }
-  .nwsb-essentials-supplied .nwsb-essential-featured { padding-left: 18px !important; padding-right: 18px !important; }
-  .nwsb-essentials-supplied .nwsb-essential-featured small,
-  .nwsb-essentials-supplied .nwsb-essential-featured em { left: 18px !important; }
-}
-
-
-/* ══ NORMAL HOME — provided neomorphic dashboard reference ══
-   Scoped to the normal home only. The renderer in part090.js remains the
-   source of truth for the existing copy, dynamic values, and actions. */
-#home-nm .nmh-wrap > .nwsb-daydash-normal {
-  width: calc(100% - 32px);
-  margin: 24px 16px 28px;
-  color: #1c1d2d;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-#home-nm .nwsb-daydash-normal,
-#home-nm .nwsb-daydash-normal * {
-  box-sizing: border-box;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 15px;
-  min-height: 58px;
-  margin: 24px 0 15px;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading:first-child {
-  margin-top: 0;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-mark {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  flex: 0 0 58px;
-  border-radius: 50%;
-  color: #aa8d53;
-  background: #f2f4f9;
-  box-shadow: 8px 8px 16px rgba(170,175,190,.30), -8px -8px 16px rgba(255,255,255,.96);
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-mark svg {
-  width: 28px;
-  height: 28px;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading-copy {
-  min-width: 0;
-  flex: 1;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-eyebrow {
-  margin: 0 0 5px;
-  color: #a4a7b0;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 2.8px;
-  text-transform: uppercase;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading h2 {
-  margin: 0;
-  color: #171827;
-  font-size: clamp(25px, 7vw, 34px);
-  font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -.9px;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading button {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex: 0 0 auto;
-  appearance: none;
-  border: 0;
-  padding: 8px 0 8px 8px;
-  background: transparent;
-  color: #171827;
-  font: 700 15px/1 'DM Sans', sans-serif;
-  white-space: nowrap;
-  cursor: pointer;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading button span {
-  margin: 0;
-  color: #171827;
-  font-size: 26px;
-  font-weight: 400;
-  line-height: .7;
-}
-#home-nm .nwsb-daydash-normal .nwsb-progress-card {
-  display: flex;
-  width: 100%;
-  overflow: hidden;
-  padding: 20px 4px 18px;
-  border: 0;
-  border-radius: 26px;
-  background: #f0f2f7;
-  box-shadow: 10px 10px 22px rgba(166,171,189,.38), -10px -10px 22px rgba(255,255,255,.94);
-}
-#home-nm .nwsb-daydash-normal .nwsb-progress-stat {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 0;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 4px;
-  text-align: center;
-}
-#home-nm .nwsb-daydash-normal .nwsb-progress-stat + .nwsb-progress-stat {
-  border-left: 1px solid rgba(40,42,58,.11);
-}
-#home-nm .nwsb-daydash-normal .nwsb-stat-icon {
-  display: grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-  flex: 0 0 54px;
-  margin: 0 0 11px;
-  border-radius: 50%;
-  color: #9b814e;
-  background: #f1f3f8;
-  box-shadow: 6px 6px 12px rgba(166,171,189,.28), -6px -6px 12px rgba(255,255,255,.92);
-}
-#home-nm .nwsb-daydash-normal .nwsb-stat-icon svg {
-  width: 25px;
-  height: 25px;
-}
-#home-nm .nwsb-daydash-normal .nwsb-progress-stat strong {
-  color: #191a2b;
-  font-size: 25px;
-  font-weight: 800;
-  line-height: 1;
-  white-space: nowrap;
-}
-#home-nm .nwsb-daydash-normal .nwsb-progress-stat small {
-  max-width: 100%;
-  margin-top: 8px;
-  overflow: hidden;
-  color: #858895;
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#home-nm .nwsb-daydash-normal .nwsb-up-heading {
-  margin-top: 29px;
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-list {
-  display: grid;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 26px;
-  background: #f0f2f7;
-  box-shadow: 10px 10px 22px rgba(166,171,189,.38), -10px -10px 22px rgba(255,255,255,.94);
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  min-height: 92px;
-  padding: 17px 20px;
-  border: 0;
-  border-bottom: 1px solid rgba(40,42,58,.11);
-  border-radius: 0;
-  background: transparent;
-  color: #1a1b2b;
-  text-align: left;
-  cursor: pointer;
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-card:last-child {
-  border-bottom: 0;
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-icon {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  flex: 0 0 48px;
-  border-radius: 50%;
-  color: #9b814e;
-  background: #f1f3f8;
-  box-shadow: 5px 5px 11px rgba(166,171,189,.28), -5px -5px 11px rgba(255,255,255,.92);
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-icon svg {
-  width: 23px;
-  height: 23px;
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-copy {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
-  gap: 5px;
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-copy strong {
-  overflow: hidden;
-  color: #1d1e2e;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.15;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-copy small {
-  overflow: hidden;
-  color: #868995;
-  font-size: 13px;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#home-nm .nwsb-daydash-normal .nwsb-upnext-arrow {
-  flex: 0 0 auto;
-  color: #777a84;
-  font-size: 27px;
-  font-weight: 300;
-  line-height: 1;
-}
-#home-nm .nwsb-daydash-normal .nwsb-dashboard-heading button:focus-visible,
-#home-nm .nwsb-daydash-normal .nwsb-upnext-card:focus-visible {
-  outline: 2px solid rgba(170,141,83,.72);
-  outline-offset: 3px;
-}
-@media (max-width: 380px) {
-  #home-nm .nwsb-daydash-normal .nwsb-dashboard-heading { gap: 11px; }
-  #home-nm .nwsb-daydash-normal .nwsb-dashboard-mark { width: 51px; height: 51px; flex-basis: 51px; }
-  #home-nm .nwsb-daydash-normal .nwsb-dashboard-mark svg { width: 24px; height: 24px; }
-  #home-nm .nwsb-daydash-normal .nwsb-dashboard-eyebrow { font-size: 10px; letter-spacing: 2px; }
-  #home-nm .nwsb-daydash-normal .nwsb-dashboard-heading h2 { font-size: 24px; }
-  #home-nm .nwsb-daydash-normal .nwsb-dashboard-heading button { font-size: 13px; }
-  #home-nm .nwsb-daydash-normal .nwsb-stat-icon { width: 46px; height: 46px; flex-basis: 46px; }
-  #home-nm .nwsb-daydash-normal .nwsb-progress-stat strong { font-size: 21px; }
-  #home-nm .nwsb-daydash-normal .nwsb-progress-stat small { font-size: 9px; }
-  #home-nm .nwsb-daydash-normal .nwsb-upnext-card { padding-left: 15px; padding-right: 15px; }
-}
-/* Keep the supplied dashboard skin light on the normal home, even when the
-   optional dark-mode class is present elsewhere in the application. */
-#home-nm.nm-dark .nwsb-daydash-normal .nwsb-dashboard-heading h2,
-#home-nm.nm-dark .nwsb-daydash-normal .nwsb-dashboard-heading button,
-#home-nm.nm-dark .nwsb-daydash-normal .nwsb-upnext-copy strong,
-#home-nm.nm-dark .nwsb-daydash-normal .nwsb-progress-stat strong { color: #191a2b; }
-#home-nm.nm-dark .nwsb-daydash-normal .nwsb-progress-card,
-#home-nm.nm-dark .nwsb-daydash-normal .nwsb-upnext-list { background: #f0f2f7; }
-
-
-/* ══ FASHION HOME — supplied glass dashboard reference ══
-   Only the Fashion dashboard is restyled here. The surrounding Fashion home
-   and the normal home keep their existing layouts and navigation. */
-#home .home-body > .nwsb-daydash-fashion {
-  width: calc(100% - 32px);
-  margin: 24px 16px 28px;
-  padding: 8px 0 12px;
-  color: #1c1c1c;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  border: 1px solid rgba(255,255,255,.35);
-  border-radius: 28px;
-  background: linear-gradient(145deg, rgba(255,255,255,.38), rgba(255,255,255,.12));
-  box-shadow: 0 20px 50px rgba(31,26,80,.20), inset 0 1px 0 rgba(255,255,255,.45);
-  backdrop-filter: blur(30px) saturate(160%);
-  -webkit-backdrop-filter: blur(30px) saturate(160%);
-}
-#home .home-body > .nwsb-daydash-fashion,
-#home .home-body > .nwsb-daydash-fashion * {
-  box-sizing: border-box;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 15px;
-  min-height: 58px;
-  margin: 20px 18px 15px;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading:first-child {
-  margin-top: 10px;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-mark {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  flex: 0 0 58px;
-  border: 1px solid rgba(0,0,0,.06);
-  border-radius: 50%;
-  color: #6d5bd0;
-  background: rgba(255,255,255,.74);
-  box-shadow: 0 6px 14px rgba(31,26,80,.10);
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-mark svg {
-  width: 28px;
-  height: 28px;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading-copy {
-  min-width: 0;
-  flex: 1;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-eyebrow {
-  margin: 0 0 5px;
-  color: #6b6b7d;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 2.8px;
-  text-transform: uppercase;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading h2 {
-  margin: 0;
-  color: #1c1c1c;
-  font-size: clamp(25px, 7vw, 34px);
-  font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -.9px;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading button {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex: 0 0 auto;
-  appearance: none;
-  border: 0;
-  padding: 8px 0 8px 8px;
-  background: transparent;
-  color: #1c1c1c;
-  font: 700 15px/1 'DM Sans', sans-serif;
-  white-space: nowrap;
-  cursor: pointer;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading button span {
-  margin: 0;
-  color: #1c1c1c;
-  font-size: 26px;
-  font-weight: 400;
-  line-height: .7;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-progress-card {
-  display: flex;
-  width: calc(100% - 36px);
-  margin: 0 18px;
-  overflow: hidden;
-  padding: 20px 4px 18px;
-  border: 1px solid rgba(255,255,255,.55);
-  border-radius: 24px;
-  background: rgba(255,255,255,.28);
-  box-shadow: 0 8px 32px rgba(31,26,80,.18), inset 0 1px 0 rgba(255,255,255,.5);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 0;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 4px;
-  text-align: center;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat + .nwsb-progress-stat {
-  border-left: 1px solid rgba(255,255,255,.5);
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-stat-icon {
-  display: grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-  flex: 0 0 54px;
-  margin: 0 0 11px;
-  border: 1px solid rgba(0,0,0,.06);
-  border-radius: 50%;
-  color: #6d5bd0;
-  background: rgba(255,255,255,.82);
-  box-shadow: 0 6px 14px rgba(31,26,80,.10);
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-stat-icon svg {
-  width: 25px;
-  height: 25px;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat strong {
-  color: #1c1c1c;
-  font-size: 25px;
-  font-weight: 800;
-  line-height: 1;
-  white-space: nowrap;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat small {
-  max-width: 100%;
-  margin-top: 8px;
-  overflow: hidden;
-  color: #6b6b7d;
-  font-size: 11px;
-  line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-up-heading {
-  margin-top: 26px;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-list {
-  display: grid;
-  width: calc(100% - 36px);
-  margin: 0 18px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.55);
-  border-radius: 24px;
-  background: rgba(255,255,255,.28);
-  box-shadow: 0 8px 32px rgba(31,26,80,.18), inset 0 1px 0 rgba(255,255,255,.5);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  min-height: 92px;
-  padding: 17px 20px;
-  border: 0;
-  border-bottom: 1px solid rgba(255,255,255,.35);
-  border-radius: 0;
-  background: transparent;
-  color: #1c1c1c;
-  text-align: left;
-  cursor: pointer;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card:last-child {
-  border-bottom: 0;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-icon {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  flex: 0 0 48px;
-  border: 1px solid rgba(0,0,0,.06);
-  border-radius: 50%;
-  color: #6d5bd0;
-  background: rgba(255,255,255,.82);
-  box-shadow: 0 5px 12px rgba(31,26,80,.10);
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-icon svg {
-  width: 23px;
-  height: 23px;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-copy {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
-  gap: 5px;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-copy strong {
-  overflow: hidden;
-  color: #1c1c1c;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.15;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-copy small {
-  overflow: hidden;
-  color: #6b6b7d;
-  font-size: 13px;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-arrow {
-  flex: 0 0 auto;
-  color: #9797a8;
-  font-size: 27px;
-  font-weight: 300;
-  line-height: 1;
-}
-#home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading button:focus-visible,
-#home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card:focus-visible {
-  outline: 2px solid rgba(109,91,208,.72);
-  outline-offset: 3px;
-}
-@media (max-width: 380px) {
-  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading { gap: 11px; margin-left: 14px; margin-right: 14px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-mark { width: 51px; height: 51px; flex-basis: 51px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-mark svg { width: 24px; height: 24px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-eyebrow { font-size: 10px; letter-spacing: 2px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading h2 { font-size: 24px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-dashboard-heading button { font-size: 13px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-progress-card,
-  #home .home-body > .nwsb-daydash-fashion .nwsb-upnext-list { width: calc(100% - 28px); margin-left: 14px; margin-right: 14px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-stat-icon { width: 46px; height: 46px; flex-basis: 46px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat strong { font-size: 21px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-progress-stat small { font-size: 9px; }
-  #home .home-body > .nwsb-daydash-fashion .nwsb-upnext-card { padding-left: 15px; padding-right: 15px; }
-}
-
-
-/* ══ FASHION HERO HEADER — restore latest 15 Aug deck contract ══
-   part083.js from 2026-08-15 builds #hsDeck/.hs-cell. The later rail
-   fallback must not hide that historical hero when Fashion mode is active. */
-body.fashion-home-active #home #hsDeck {
-  display: block !important;
-}
-body.fashion-home-active #home #hsRail {
-  display: none !important;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════════════
-   REFERENCE DASHBOARDS — exact supplied neomorphic_dashboard.html and
-   glass_dashboard.html geometry, scoped to the two home-mode mounts only.
-   The content remains live NowssB content from part090.js.
-═══════════════════════════════════════════════════════════════════════ */
-#home-nm .nmh-wrap > .nwsb-reference-dashboard,
-#home .home-body > .nwsb-reference-dashboard {
-  width: calc(100% - 36px) !important;
-  margin: 26px 18px 34px !important;
-  padding: 22px 18px 30px !important;
-  border-radius: 36px !important;
-  box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-  overflow: visible !important;
-  color: #1c1c1c !important;
-}
-#home-nm .nmh-wrap > .nwsb-reference-dashboard {
-  background: #f5f5f5 !important;
-  box-shadow: 14px 14px 30px #d9d9d9, -14px -14px 30px #fff !important;
-}
-#home .home-body > .nwsb-reference-dashboard {
-  background: rgba(255,255,255,.12) !important;
-  border: 1px solid rgba(255,255,255,.35) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(160%) !important;
-  backdrop-filter: blur(30px) saturate(160%) !important;
-  box-shadow: 0 20px 50px rgba(31,26,80,.35), inset 0 1px 0 rgba(255,255,255,.4) !important;
-}
-#home-nm .nwsb-reference-dashboard .neo-raised,
-#home .home-body > .nwsb-reference-dashboard .neo-raised {
-  position: relative;
-  background: #f5f5f5 !important;
-  border: 0 !important;
-  box-shadow: 8px 8px 16px #d9d9d9, -8px -8px 16px #fff !important;
-}
-#home .home-body > .nwsb-reference-dashboard .neo-raised {
-  background: rgba(255,255,255,.28) !important;
-  border: 1px solid rgba(255,255,255,.55) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
-  backdrop-filter: blur(18px) saturate(160%) !important;
-  box-shadow: 0 8px 32px rgba(31,26,80,.18), inset 0 1px 0 rgba(255,255,255,.5) !important;
-}
-#home-nm .nwsb-reference-dashboard .focus-card,
-#home .home-body > .nwsb-reference-dashboard .focus-card {
-  border-radius: 28px !important;
-  padding: 22px 22px 24px !important;
-  margin: 0 0 26px !important;
-  min-height: 208px !important;
-  overflow: hidden !important;
-  text-align: left !important;
-  cursor: pointer !important;
-}
-.nwsb-reference-dashboard .focus-label { color: #767676 !important; font-size: 13px !important; line-height: 1.2 !important; margin: 0 0 10px !important; }
-.nwsb-reference-dashboard .focus-title { max-width: 70% !important; margin: 0 0 16px !important; color: #1c1c1c !important; font-size: 26px !important; font-weight: 700 !important; line-height: 1.2 !important; }
-.nwsb-reference-dashboard .focus-meta { display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 0 20px !important; color: #767676 !important; font-size: 13px !important; line-height: 1.2 !important; }
-.nwsb-reference-dashboard .focus-meta .dot { width: 6px !important; height: 6px !important; flex: 0 0 6px !important; border-radius: 50% !important; background: #a79ae8 !important; }
-.nwsb-reference-dashboard .focus-meta .bold { color: #1c1c1c !important; font-weight: 600 !important; }
-.nwsb-reference-dashboard .blob-wrap { position: absolute !important; top: 18px !important; right: 14px !important; width: 130px !important; height: 130px !important; pointer-events: none !important; }
-.nwsb-reference-dashboard .blob-wrap svg { display: block !important; width: 130px !important; height: 130px !important; }
-.nwsb-reference-dashboard .start-btn { display: inline-flex !important; align-items: center !important; gap: 10px !important; padding: 13px 22px !important; border: 0 !important; border-radius: 18px !important; color: #f3f0ff !important; font-size: 14px !important; font-weight: 600 !important; cursor: pointer !important; }
-#home-nm .nwsb-reference-dashboard .start-btn { background: linear-gradient(145deg,#333a4a,#232833) !important; box-shadow: 6px 6px 14px #b9bfc9, -6px -6px 14px #fff !important; }
-#home .home-body > .nwsb-reference-dashboard .start-btn { background: #000 !important; border: 1px solid rgba(255,255,255,.15) !important; box-shadow: 0 8px 20px rgba(0,0,0,.3) !important; }
-.nwsb-reference-dashboard .start-btn svg { width: 16px !important; height: 16px !important; }
-.nwsb-reference-dashboard .section-header { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 10px !important; margin: 0 0 14px !important; }
-.nwsb-reference-dashboard .section-header h2 { margin: 0 !important; color: #1c1c1c !important; font-size: 17px !important; font-weight: 700 !important; line-height: 1.2 !important; }
-.nwsb-reference-dashboard .section-header .view-all { display: inline-flex !important; align-items: center !important; gap: 4px !important; min-height: 30px !important; padding: 0 !important; border: 0 !important; background: transparent !important; color: #767676 !important; font-size: 13px !important; line-height: 1 !important; cursor: pointer !important; }
-.nwsb-reference-dashboard .section-header .view-all .chevron { width: 14px !important; height: 14px !important; color: currentColor !important; }
-.nwsb-reference-dashboard .progress-card { display: flex !important; width: 100% !important; min-height: 154px !important; padding: 20px 6px !important; margin: 0 0 28px !important; border-radius: 24px !important; box-sizing: border-box !important; }
-.nwsb-reference-dashboard .progress-item { position: relative !important; display: flex !important; min-width: 0 !important; flex: 1 1 0 !important; flex-direction: column !important; align-items: center !important; padding: 0 6px !important; text-align: center !important; }
-.nwsb-reference-dashboard .progress-item + .progress-item::before { content: "" !important; position: absolute !important; top: 14px !important; left: 0 !important; width: 1px !important; height: 38px !important; background: #d9d9d9 !important; opacity: .6 !important; }
-#home .home-body > .nwsb-reference-dashboard .progress-item + .progress-item::before { background: rgba(255,255,255,.5) !important; opacity: .8 !important; }
-.nwsb-reference-dashboard .icon-circle-wrap { display: flex !important; align-items: center !important; justify-content: center !important; width: 52px !important; height: 52px !important; flex: 0 0 52px !important; margin: 0 0 10px !important; border-radius: 50% !important; background: #fff !important; box-shadow: 6px 6px 12px #d9d9d9, -6px -6px 12px #fff !important; }
-#home .home-body > .nwsb-reference-dashboard .icon-circle-wrap { border: 1px solid rgba(0,0,0,.06) !important; box-shadow: 0 6px 14px rgba(31,26,80,.1) !important; }
-.nwsb-reference-dashboard .icon-circle-wrap svg { width: 52px !important; height: 52px !important; color: #8a8a8a !important; }
-#home-nm .nwsb-reference-dashboard .progress-item:nth-child(1) .icon-circle-wrap svg { color: #3ba55d !important; }
-#home-nm .nwsb-reference-dashboard .progress-item:nth-child(2) .icon-circle-wrap svg { color: #8a8a8a !important; }
-#home-nm .nwsb-reference-dashboard .progress-item:nth-child(3) .icon-circle-wrap svg { color: #e78a3e !important; }
-#home-nm .nwsb-reference-dashboard .progress-item:nth-child(4) .icon-circle-wrap svg { color: #8a6fe0 !important; }
-.nwsb-reference-dashboard .progress-value { margin: 0 0 3px !important; color: #1c1c1c !important; font-size: 19px !important; font-weight: 700 !important; line-height: 1.1 !important; white-space: nowrap !important; }
-.nwsb-reference-dashboard .progress-label { max-width: 100% !important; margin: 0 0 6px !important; overflow: hidden !important; color: #767676 !important; font-size: 11.5px !important; line-height: 1.2 !important; white-space: normal !important; }
-.nwsb-reference-dashboard .reference-upnext-header { margin-top: 26px !important; }
-.nwsb-reference-dashboard .upnext-card { width: 100% !important; padding: 8px 16px !important; border-radius: 24px !important; box-sizing: border-box !important; }
-.nwsb-reference-dashboard .upnext-row { display: flex !important; align-items: center !important; gap: 14px !important; width: 100% !important; min-height: 72px !important; padding: 14px 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: inherit !important; text-align: left !important; cursor: pointer !important; }
-.nwsb-reference-dashboard .upnext-row + .upnext-row { border-top: 1px solid #d9d9d9 !important; }
-#home .home-body > .nwsb-reference-dashboard .upnext-row + .upnext-row { border-top-color: rgba(255,255,255,.35) !important; }
-.nwsb-reference-dashboard .icon-circle-wrap-sm { display: flex !important; align-items: center !important; justify-content: center !important; width: 44px !important; height: 44px !important; flex: 0 0 44px !important; border-radius: 50% !important; background: #fff !important; box-shadow: 5px 5px 10px #d9d9d9, -5px -5px 10px #fff !important; }
-#home .home-body > .nwsb-reference-dashboard .icon-circle-wrap-sm { border: 1px solid rgba(0,0,0,.06) !important; box-shadow: 0 5px 12px rgba(31,26,80,.1) !important; }
-.nwsb-reference-dashboard .icon-circle-wrap-sm svg { width: 44px !important; height: 44px !important; color: #8a8a8a !important; }
-#home-nm .nwsb-reference-dashboard .upnext-row:first-child .icon-circle-wrap-sm svg { color: #e78a3e !important; }
-.nwsb-reference-dashboard .icon-divider { align-self: stretch !important; width: 1px !important; flex: 0 0 1px !important; margin: 6px 0 !important; background: #d9d9d9 !important; opacity: .6 !important; }
-#home .home-body > .nwsb-reference-dashboard .icon-divider { background: rgba(255,255,255,.5) !important; opacity: .8 !important; }
-.nwsb-reference-dashboard .upnext-text { min-width: 0 !important; flex: 1 1 auto !important; }
-.nwsb-reference-dashboard .upnext-title { display: block !important; margin: 0 0 2px !important; overflow: hidden !important; color: #1c1c1c !important; font-size: 15px !important; font-weight: 600 !important; line-height: 1.2 !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
-.nwsb-reference-dashboard .upnext-sub { display: block !important; overflow: hidden !important; color: #767676 !important; font-size: 12.5px !important; line-height: 1.2 !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
-.nwsb-reference-dashboard .upnext-row .chevron { flex: 0 0 16px !important; color: #a8a8a8 !important; }
-#home .home-body > .nwsb-reference-dashboard .upnext-row .chevron { color: #9797a8 !important; }
-.nwsb-reference-dashboard .view-all:focus-visible,
-.nwsb-reference-dashboard .start-btn:focus-visible,
-.nwsb-reference-dashboard .upnext-row:focus-visible { outline: 2px solid rgba(109,91,208,.72) !important; outline-offset: 3px !important; }
-@media (max-width: 380px) {
-  #home-nm .nmh-wrap > .nwsb-reference-dashboard,
-  #home .home-body > .nwsb-reference-dashboard { width: calc(100% - 28px) !important; margin-left: 14px !important; margin-right: 14px !important; padding-left: 14px !important; padding-right: 14px !important; }
-  .nwsb-reference-dashboard .focus-title { font-size: 24px !important; }
-  .nwsb-reference-dashboard .focus-card { padding-left: 18px !important; padding-right: 18px !important; }
-  .nwsb-reference-dashboard .icon-circle-wrap { width: 46px !important; height: 46px !important; flex-basis: 46px !important; }
-  .nwsb-reference-dashboard .icon-circle-wrap svg { width: 46px !important; height: 46px !important; }
-  .nwsb-reference-dashboard .progress-value { font-size: 17px !important; }
-  .nwsb-reference-dashboard .progress-label { font-size: 10px !important; }
-}
-
-/* Normal reference dashboard: remove the extra outer gutter so its section edges are even. */
-#home-nm .nmh-wrap > .nwsb-reference-dashboard {
-  width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-/* World-class essentials expander: a compact pill with a tactile circular chevron. */
-.nwsb-essentials-supplied .nwsb-essential-expand {
-  width: min(100%, 184px) !important;
-  min-height: 50px !important;
-  margin: 6px auto 0 !important;
-  padding: 6px 8px 6px 20px !important;
-  display: inline-flex !important;
-  flex: 0 0 auto !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  background: #eceef2 !important;
-  color: #6f7580 !important;
-  box-shadow: 7px 7px 14px #c7cdd9, -7px -7px 14px #fff, inset 0 1px 0 rgba(255,255,255,.62) !important;
-  font: 700 15px/1 'DM Sans', sans-serif !important;
-  letter-spacing: .1px !important;
-  transition: box-shadow .16s ease, transform .12s ease !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-expand:active {
-  transform: translateY(1px) !important;
-  box-shadow: inset 4px 4px 9px #c7cdd9, inset -4px -4px 9px #fff !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-expand-label {
-  display: block !important;
-  flex: 1 1 auto !important;
-  text-align: left !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-expand-icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 34px !important;
-  height: 34px !important;
-  flex: 0 0 34px !important;
-  border-radius: 50% !important;
-  background: #eceef2 !important;
-  color: #7c838e !important;
-  box-shadow: 4px 4px 9px #c7cdd9, -4px -4px 9px #fff !important;
-  transition: box-shadow .16s ease, transform .16s ease !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-expand-icon svg {
-  display: block !important;
-  width: 17px !important;
-  height: 17px !important;
-  overflow: visible !important;
-}
-.nwsb-essentials-supplied .nwsb-essential-expand.is-expanded .nwsb-essential-expand-icon {
-  transform: rotate(180deg) !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-expand {
-  background: rgba(0,0,0,.78) !important;
-  color: rgba(255,255,255,.82) !important;
-  box-shadow: 0 7px 18px rgba(60,66,90,.18), inset 0 1px 0 rgba(255,255,255,.1) !important;
-}
-.nwsb-essentials-supplied.nwsb-essentials-fashion .nwsb-essential-expand-icon {
-  background: rgba(255,255,255,.12) !important;
-  color: #fff !important;
-  box-shadow: 0 5px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.18) !important;
 }

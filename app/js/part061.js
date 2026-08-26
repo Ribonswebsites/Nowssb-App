@@ -22,35 +22,35 @@
   'use strict';
 
   var IC = {
-    store:    'assets/media/image/71c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d-330d4dee.webp',
-    health:   'assets/media/image/2188cb3479a63fbef5bf6df8587338deaa1d3672a5af01ea-1b73ed0b.png',
-    connect:  'assets/media/image/447072cdece7eb07f670832effdae7f062973b76151f3bde-08f4337b.webp',
-    streak:   'assets/media/image/375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f-5e809db4.png',
-    offer:    'assets/media/image/6b747aedbfb40a251b398b9008515762e808019375e58389-afcb8741.png',
-    ai:       'assets/media/image/1ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7-66da3ed1.png',
-    meaning:  'assets/media/image/85d9c9de036d868f67d74e40a0bd42c178110839f9572cfa-fa4f86f4.png',
-    quick:    'assets/media/image/ecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b-187c10b3.png',
-    tiles:    'assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png',
-    library:  'assets/media/image/19e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4-e7261be5.webp',
-    progress: 'assets/media/image/38f0f5ffaf71f982cb92d7e49b8cbb3a9bd93bc6820c8a99-09267100.webp',
-    wordsci:  'assets/media/image/2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7-64ecc8c2.webp',
-    routines: 'assets/media/image/f19d52470a876209c8289b54081839108ba1b076bbf63926-64c6e8a0.png',
-    cart:     'assets/media/image/712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d-e05a2e25.webp',
-    wishlist: 'assets/media/image/2b17a92169d2b57e5a8733d5a3fd699754717fcd8869dfed-4296b74d.webp',
-    search:   'assets/media/image/0c436ecb735a892202453e58b9a36178183dc6c2d7f72be4-a65cce23.webp',
-    chat:     'assets/media/image/265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e-46fef40b.webp',
-    profile:  'assets/media/image/1e60226665c68128ad03987930169b94504c89b3fe74ccc8-d7dfb697.webp',
-    settings: 'assets/media/image/6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82-75bedcbf.webp',
-    every:    'assets/media/image/aa2e75819832c6648532079b7499b33175725fc3eaae80db-1e188c9b.webp'
+    store:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
+    health:   'https://res.cloudinary.com/ds6duqabl/image/upload/v1785014534/file_0000000020cc82089a4eded2b0c2c62b_hmu0qv.png',
+    connect:  'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+    streak:   'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png',
+    offer:    'https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png',
+    ai:       'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png',
+    meaning:  'https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png',
+    quick:    'https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png',
+    tiles:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png',
+    library:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png',
+    progress: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png',
+    wordsci:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
+    routines: 'https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png',
+    cart:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png',
+    wishlist: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png',
+    search:   'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png',
+    chat:     'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
+    profile:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+    settings: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png',
+    every:    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'
   };
 
   /* Floating-button faces. Each is the same black NowssB orb with a different
      energy wave, so the tracing ring around the wrapper is tinted to match. */
   var FAB_ICONS = [
-    { id: 'blue',   label: 'Blue',   img: 'assets/media/image/9cb6b4420672e2ebd7b16d3934015c0e6f33c2b8d2aa82d9-47548392.png' },
-    { id: 'yellow', label: 'Yellow', img: 'assets/media/image/86d4a2c36581f40ad2b760b5f4f290ef7a907e80266f8668-665529b0.png' },
-    { id: 'red',    label: 'Red',    img: 'assets/media/image/6cd72f01920d04f65bffce88611932ac6399ecaf88fa0598-596254d4.png' },
-    { id: 'purple', label: 'Purple', img: 'assets/media/image/10795e0e60f6f3531ce22120569b13cda96976bd9dd0a309-05b0abbc.png' }
+    { id: 'blue',   label: 'Blue',   img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785040037/file_00000000f6e881fa9c614af0994b5dda_pxkbl4.png' },
+    { id: 'yellow', label: 'Yellow', img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785040061/file_00000000989482309ec4a5e82fead5e0_i4cbfw.png' },
+    { id: 'red',    label: 'Red',    img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785040038/file_00000000394081fa9924bcd31a345869_magp1x.png' },
+    { id: 'purple', label: 'Purple', img: 'https://res.cloudinary.com/eenvubod/image/upload/v1785040038/file_00000000944081fabf1a7c01b225f478_qbxhjq.png' }
   ];
   function fabIcon() {
     var id = ls('nwsb_ql_icon', 'blue');
@@ -376,7 +376,7 @@
     '        <div class="ql-head-sub">Jump straight to any corner of NowssB</div>' +
     '      </div>' +
     '      <button class="ql-hbtn ql-gear" onclick="qlShowSettings()" aria-label="Quick Links settings">' +
-    '        <img decoding="async" loading="lazy" src="assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png" alt="">' +
+    '        <img decoding="async" loading="lazy" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" alt="">' +
     '      </button>' +
     '      <button class="ql-hbtn ql-close" onclick="qlClose()" aria-label="Close">' +
     '        <svg viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
@@ -420,7 +420,7 @@
     '' +
     '<!-- Floating Quick Links button — off by default, enabled in the sheet\'s settings -->' +
     '<div class="ql-fab" id="qlFab" style="display:none;" role="button" aria-label="Quick Links">' +
-    '  <img decoding="async" loading="lazy" src="assets/media/image/ecdbb45d06acb8a2b6737bb411d9a4bf6459fa3171900b2b-187c10b3.png" alt="">' +
+    '  <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt="">' +
     '  <span class="ql-fab-arrow" aria-hidden="true">' +
     '    <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#060c18" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
     '  </span>' +
@@ -429,7 +429,7 @@
     '     with a target the button magnets into when it gets close. -->' +
     '<div class="ql-drop" id="qlDrop" aria-hidden="true">' +
     '  <div class="ql-drop-target" id="qlDropTarget">' +
-    '    <img decoding="async" loading="lazy" src="assets/media/image/eddbc65e16389c1c87f60e1a3f3b7726bb6394912dfbdbda-4e6cca52.png" alt="">' +
+    '    <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1785040037/file_00000000735c8207b7fa48448b9f6ecf_ouac1f.png" alt="">' +
     '    <span class="ql-drop-vignette"></span>' +
     '    <span class="ql-drop-hot" id="qlDropHot"></span>' +
     '  </div>' +

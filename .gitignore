@@ -1,13 +1,13 @@
 # Capacitor / Android — all generated, all rebuildable.
 node_modules/
-# Local migration cache; never include disposable binaries in Pages uploads.
-.tmp/media-migration-cache/
 www/
 android/
 ios/
 
-# Restored repository image pack. Images are intentionally committed so
-# the apps can render their visual system offline. Videos remain R2-backed.
+# The downloaded copies of every image and video (tools/asset-manifest.mjs
+# --download). Hundreds of megabytes, all re-fetchable from the manifest,
+# which IS committed. Delete the folder and run the tool again.
+assets/media/
 
 # Never commit these. google-services.json identifies the Firebase project to
 # the app and is not secret, but the signing keystore and the service-account
@@ -35,7 +35,6 @@ flutter_app/pubspec.lock
 # directory that does not exist.
 flutter_app/assets/video/
 flutter_app/assets/frames/
-flutter_app/assets/media/
 flutter_app/assets/icons/
 flutter_app/assets/store/
 flutter_app/assets/fashion/

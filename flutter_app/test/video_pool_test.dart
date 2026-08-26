@@ -19,14 +19,30 @@ void main() {
   late FakeVideoPlatform platform;
 
   /// Let the pool's coalesced rebalance run all the way through.
+  ///
+  /// A pass is several awaits deep: the zero timer that coalesces it, the
+  /// disposal of everything being evicted, the creation of everything
+  /// replacing it, and the initialized event that follows each creation.
+  /// Generous on purpose — a count read halfway through a pass is a count of
+  /// nothing in particular.
+  ///
+  /// Generous on purpose, and more so since the pool opens clips a couple at
+  /// a time rather than all at once: a full set is several batches deep, and
+  /// a count read halfway through is a count of nothing in particular.
   Future<void> pumpPool() async {
-    for (var i = 0; i < 24; i++) {
+    for (var i = 0; i < 160; i++) {
       await Future<void>.delayed(Duration.zero);
     }
   }
 
+  // One platform for the whole file. Replacing it between tests would leave
+  // controllers from the previous test calling dispose() on a stranger, and
+  // the counts stop meaning anything.
   setUpAll(() => platform = FakeVideoPlatform());
 
+  // The pool is a singleton and a pass is asynchronous, so both have to be
+  // drained before the next test — otherwise a lease left in flight counts
+  // against the next test's ceiling.
   setUp(() async {
     VideoPool.instance.unhold();
     await VideoPool.instance.debugReset();
@@ -38,56 +54,43 @@ void main() {
     await VideoPool.instance.debugReset();
   });
 
-  test('a hundred mounted clips keep their decoders and play state',
-      () async {
+  test('a hundred off-screen clips ask the phone for nothing at all', () async {
     for (var i = 0; i < 100; i++) {
       VideoPool.instance.lease('assets/video/clip-$i.mp4');
     }
     await pumpPool();
 
     expect(VideoPool.instance.leaseCount, 100);
-    expect(VideoPool.instance.liveCount, 100);
-    expect(platform.created, hasLength(100),
-        reason: 'a mounted eligible clip stays active even when its widget is below the fold');
+    expect(VideoPool.instance.liveCount, 0);
+    expect(platform.created, isEmpty,
+        reason: 'an off-screen clip must never cost a decoder');
   });
 
-  test('a hundred clips on screen at once remain active together', () async {
+  test('a hundred clips on screen at once still only ask for the ceiling',
+      () async {
     final leases = [
       for (var i = 0; i < 100; i++)
         VideoPool.instance.lease('assets/video/clip-$i.mp4'),
     ];
+    // All hundred claim to be visible — the pathological case, and exactly
+    // what the website did.
     for (var i = 0; i < leases.length; i++) {
       leases[i].reportDistance(i.toDouble());
     }
     await pumpPool();
 
-    expect(VideoPool.instance.liveCount, 100);
-    expect(platform.alive, 100,
-        reason: 'all mounted clips remain playing instead of being capped by viewport ranking');
-  });
-
-  test('every on-screen clip plays when there is room under the ceiling', () async {
-    final leases = [
-      for (var i = 0; i < 8; i++)
-        VideoPool.instance.lease('assets/video/home-$i.mp4'),
-    ];
-    for (final l in leases) {
-      l.reportDistance(20);
-    }
-    await pumpPool();
-
-    expect(VideoPool.instance.liveCount, 8,
-        reason: 'a home of eight films must all move, not sit on posters');
-    expect(platform.alive, 8);
+    expect(VideoPool.instance.liveCount, VideoPool.maxLive);
+    expect(platform.alive, VideoPool.maxLive,
+        reason: 'the ceiling is on players that exist, not players playing');
   });
 
   test('the decoders go to the clips nearest the middle of the screen',
       () async {
-    // Fill the pool past capacity so ranking actually evicts the furthest.
     final far = VideoPool.instance.lease('assets/video/far.mp4');
     final near = VideoPool.instance.lease('assets/video/near.mp4');
-    for (var i = 0; i < VideoPool.maxLive; i++) {
-      VideoPool.instance.lease('assets/video/other-$i.mp4')
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
+      VideoPool.instance
+          .lease('assets/video/other-\$i.mp4')
           .reportDistance(500);
     }
     far.reportDistance(4000);
@@ -101,11 +104,14 @@ void main() {
   });
 
   test('a feature clip outranks decoration however far away it is', () async {
-    final tv = VideoPool.instance.lease('assets/video/tv-screen.mp4',
-        priority: ClipPriority.feature);
-    for (var i = 0; i < VideoPool.maxLive + 4; i++) {
-      VideoPool.instance.lease('assets/video/banner-$i.mp4').reportDistance(5);
+    final tv = VideoPool.instance
+        .lease('assets/video/tv-screen.mp4', priority: ClipPriority.feature);
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
+      VideoPool.instance.lease('assets/video/banner-\$i.mp4').reportDistance(5);
     }
+    // The television is the furthest thing on screen and still keeps a slot,
+    // because a section whose entire point is its clip must not be the one
+    // showing a still.
     tv.reportDistance(900);
     await pumpPool();
 
@@ -113,23 +119,27 @@ void main() {
     expect(platform.alive, VideoPool.maxLive);
   });
 
-  test('scrolling past a clip does not stop its loop', () async {
+  test('scrolling past a clip gives the decoder back to the phone', () async {
     final a = VideoPool.instance.lease('assets/video/a.mp4');
     a.reportDistance(0);
     await pumpPool();
     expect(platform.alive, 1);
 
-    a.reportDistance(double.infinity);
+    a.reportDistance(double.infinity); // scrolled off
     await pumpPool();
 
-    expect(VideoPool.instance.liveCount, 1);
-    expect(platform.alive, 1,
-        reason: 'scrolling must not stop a mounted eligible clip');
-    expect(a.controller, isNotNull);
+    expect(VideoPool.instance.liveCount, 0);
+    expect(platform.alive, 0,
+        reason: 'off screen means disposed, not paused — a paused '
+            'ExoPlayer still holds its decoder');
+    expect(a.controller, isNull);
   });
 
   test('scrolling a long page never exceeds the ceiling at any point',
       () async {
+    // Thirty clips down a page, scrolled past one at a time. This is the
+    // case that actually broke the website: not any single screen, but the
+    // accumulation as you travel.
     final leases = [
       for (var i = 0; i < 30; i++)
         VideoPool.instance.lease('assets/video/row-$i.mp4'),
@@ -139,7 +149,11 @@ void main() {
     for (var scroll = 0; scroll < 30; scroll++) {
       for (var i = 0; i < leases.length; i++) {
         final d = (i - scroll).abs() * 400.0;
-        leases[i].reportDistance(d > 900 ? double.infinity : d);
+        // The window has to hold MORE than the ceiling or this test stops
+        // testing the ceiling and starts testing how many rows the fixture
+        // happened to call visible.
+        leases[i]
+            .reportDistance(d > VideoPool.maxLive * 250 ? double.infinity : d);
       }
       await pumpPool();
       if (platform.alive > peak) peak = platform.alive;
@@ -147,9 +161,109 @@ void main() {
           reason: 'exceeded the ceiling at scroll step $scroll');
     }
 
-    expect(peak, 30, reason: 'all mounted clips remain live throughout scrolling');
-    expect(platform.created.length, 30,
-        reason: 'clips are not repeatedly disposed and recreated while scrolling');
+    expect(peak, VideoPool.maxLive, reason: 'the pool should stay full');
+    expect(platform.created.length, greaterThan(VideoPool.maxLive),
+        reason: 'clips really were recycled, not just created once');
+  });
+
+  test('everything visible plays when there is room for it', () async {
+    // The other side of the ceiling, and the one that matters on a real
+    // page: when FEWER clips are on screen than the pool can serve, every
+    // one of them decodes. A section that is plainly on screen and showing
+    // a still is the bug this asserts against.
+    const visible = VideoPool.maxLive - 2;
+    final leases = [
+      for (var i = 0; i < visible; i++)
+        VideoPool.instance.lease('assets/video/seen-\$i.mp4'),
+    ];
+    for (final l in leases) {
+      l.reportDistance(120);
+    }
+    await pumpPool();
+
+    expect(VideoPool.instance.liveCount, visible,
+        reason: 'with room to spare, nothing on screen should be a still');
+    for (final l in leases) {
+      expect(l.controller, isNotNull);
+    }
+  });
+
+  test('clips are opened a couple at a time, not all at once', () async {
+    // `decoders 5/8  playing 1` on the phone: five slots taken, ONE clip
+    // open. The other four were not refusing to play — they were still
+    // opening, all four at the same instant, contending for one MediaCodec
+    // allocator and one disk, and every one of them crawling because of it.
+    //
+    // The pool asks the platform for players in a queue now. This counts
+    // how many creations were outstanding at the same moment, which is the
+    // number that was wrong.
+    final leases = [
+      for (var i = 0; i < VideoPool.maxLive; i++)
+        VideoPool.instance.lease('assets/video/many-$i.mp4'),
+    ];
+    for (final l in leases) {
+      l.reportDistance(50);
+    }
+    await pumpPool();
+
+    expect(platform.peakOpen, lessThanOrEqualTo(2),
+        reason: 'more than two clips were opening at once');
+    // And they all still arrive.
+    expect(VideoPool.instance.liveCount, VideoPool.maxLive);
+    for (final l in leases) {
+      expect(l.controller, isNotNull, reason: 'a queued clip never opened');
+    }
+  });
+
+  test('one clip that never opens does not stop the rest', () async {
+    // THE `decoders 1/8  playing 1` BUG, kept.
+    //
+    // A Cloudinary clip on a bad connection is created and then says
+    // nothing — initialize() does not fail, it does not return. The pool
+    // used to await every bring-up before finishing its pass, so that one
+    // clip held the pass open; _rebalancing stayed true, every later
+    // request set _again and returned, and no decoder was granted again for
+    // the life of the app. On the phone: four clips on screen, eight slots
+    // free, one player running.
+    //
+    // The stalled clip is still allowed to hold its own slot until it times
+    // out. What it may not do is take everybody else's turn with it.
+    platform.stalling.add('never-opens');
+
+    final bad = VideoPool.instance.lease('https://cdn.test/never-opens.mp4');
+    bad.reportDistance(0);
+    await pumpPool();
+
+    final good = [
+      for (var i = 0; i < 4; i++) VideoPool.instance.lease('assets/ok-$i.mp4'),
+    ];
+    for (final l in good) {
+      l.reportDistance(100);
+    }
+    await pumpPool();
+
+    for (var i = 0; i < good.length; i++) {
+      expect(good[i].controller, isNotNull,
+          reason: 'clip $i was starved by a stalled one — this is the bug');
+    }
+    expect(VideoPool.instance.liveCount, greaterThanOrEqualTo(4));
+  });
+
+  test('a clip that fails is tried again rather than struck off', () async {
+    // Three failures used to blacklist a clip for the life of the app, and
+    // on a phone the first three failures are usually the first seconds
+    // after launch, before the radio has a route. Every Cloudinary clip on
+    // the page would be permanently dead because of a network that came
+    // back a moment later.
+    platform.stalling.add('flaky');
+    final l = VideoPool.instance.lease('https://cdn.test/flaky.mp4');
+    l.reportDistance(0);
+    await pumpPool();
+
+    // It is a candidate again once its backoff has passed — the pool holds
+    // no permanent verdict about it.
+    expect(VideoPool.instance.debugLeases, contains(l),
+        reason: 'a failing clip must stay in the pool to be retried');
   });
 
   test('disposing a lease releases its player even while it holds one',
@@ -167,7 +281,7 @@ void main() {
   });
 
   test('backgrounding the app hands every decoder back', () async {
-    for (var i = 0; i < VideoPool.maxLive; i++) {
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();
@@ -183,8 +297,13 @@ void main() {
   });
 
   test('nothing decodes while the pool is held', () async {
+    // The start animation is the only thing on screen for its whole length,
+    // and the app is built behind it. Without the hold, the home would be
+    // taking four decoders while the splash holds a fifth — on the devices
+    // that struggle most, the launch would be the worst moment of the
+    // session.
     VideoPool.instance.hold();
-    for (var i = 0; i < VideoPool.maxLive; i++) {
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();
@@ -202,7 +321,7 @@ void main() {
   });
 
   test('coming back to the foreground takes them again', () async {
-    for (var i = 0; i < VideoPool.maxLive; i++) {
+    for (var i = 0; i < VideoPool.maxLive * 2; i++) {
       VideoPool.instance.lease('assets/video/$i.mp4').reportDistance(10);
     }
     await pumpPool();

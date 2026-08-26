@@ -39,23 +39,6 @@
 
 /admin.html
   Cache-Control: no-cache
-  X-Robots-Tag: noindex, nofollow
-
-/admin
-  Cache-Control: no-cache
-  X-Robots-Tag: noindex, nofollow
-
-/admin-dev.html
-  X-Robots-Tag: noindex, nofollow
-
-/player-settings.html
-  X-Robots-Tag: noindex, nofollow
-
-/aura-player.html
-  X-Robots-Tag: noindex, nofollow
-
-/fetch-nowssb-v2.html
-  X-Robots-Tag: noindex, nofollow
 
 # The manifest decides the installed app's name, icons and start URL.
 /manifest.json

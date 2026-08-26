@@ -1,7 +1,7 @@
 {
-  "name": "NowssB \u2014 Word Science and Sound Practice",
+  "name": "NOWSBANSIU \u2014 Shabdapathy",
   "short_name": "NowssB",
-  "description": "NowssB is a daily word and sound practice for mindful attention.",
+  "description": "Natural Origin Word Science",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -10,13 +10,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/app-icon-192.png",
+      "src": "./assets/icons/app-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/app-icon-512.png",
+      "src": "./assets/icons/app-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

@@ -12,9 +12,6 @@
    Respects Data Saver / slow connections: skips entirely rather than
    burning someone's mobile data in the background without asking. ── */
 (function () {
-  /* All shipped videos are local again. Do not show a preparation prompt or
-     start a background Cache Storage queue that competes with playback. */
-  return;
   if (typeof caches === 'undefined') return;
 
   /* MUST match VIDEO_CACHE in sw.js. The service worker deletes every
@@ -43,8 +40,9 @@
     // none of them exist in the DOM yet at this point — nowssb-player.js
     // exposes the full pre-transformed list separately for exactly this.
     if (window.NWSB_PLAYER_VIDEO_URLS) urls = urls.concat(window.NWSB_PLAYER_VIDEO_URLS);
-    // Images are intentionally not part of this queue. They use the browser
-    // image cache and should never compete with video downloads.
+    // and the pictures those clips sit behind — an uncached one is a
+    // visible blank on the first word while the clip is still opening
+    if (window.NWSB_PLAYER_IMAGE_URLS) urls = urls.concat(window.NWSB_PLAYER_IMAGE_URLS);
     // Same problem, everywhere else it happens: a clip that is only built
     // when a screen opens cannot be found by scanning the DOM before the
     // user goes there, which is precisely when warming it would have helped.
@@ -53,10 +51,8 @@
     // all. Any file with clips like that appends them here (word pages in
     // part012.js, meaning pages in part026.js, routines in part066.js).
     if (window.NWSB_EXTRA_VIDEO_URLS) urls = urls.concat(window.NWSB_EXTRA_VIDEO_URLS);
-    // Keep this queue video-only and de-dupe repeated background films.
-    urls = urls.filter(function (u, i) {
-      return u && !/^\.?\/?assets\/video\//i.test(u) && /\.mp4(?:[?#]|$)/i.test(u) && urls.indexOf(u) === i;
-    });
+    // de-dupe — several screens intentionally reuse the same background video
+    urls = urls.filter(function (u, i) { return u && urls.indexOf(u) === i; });
     /* The start animation goes first, ahead of thirty decorative loops. It
        is the one clip that plays on every single launch, so it is the one
        worth having before any of them — the queue is staggered 800ms apart
@@ -64,7 +60,7 @@
        sw.js also grabs it at install; this is the retry path for when that
        failed (offline at install, or a browser that never installed one). */
     var splash = window.NWSB_SPLASH_VIDEO;
-    if (splash && !/^\.?\/?assets\/video\//i.test(splash)) {
+    if (splash) {
       var at = urls.indexOf(splash);
       if (at > 0) urls.splice(at, 1);
       if (at !== 0) urls.unshift(splash);
@@ -74,215 +70,81 @@
 
   function warmOne(cache, url) {
     return cache.match(url).then(function (existing) {
-      if (existing) return true;
-      var attempt = 0;
-      function tryFetch() {
-        attempt++;
-        var controller = typeof AbortController === 'function' ? new AbortController() : null;
-        var timer = setTimeout(function () { if (controller) controller.abort(); }, 35000);
-        return fetch(url, { mode: 'cors', signal: controller ? controller.signal : undefined })
-          .then(function (res) {
-            clearTimeout(timer);
-            if (!res || !res.ok) throw new Error('HTTP ' + (res ? res.status : 0));
-            return cache.put(url, res).then(function () { return true; });
-          })
-          .catch(function () {
-            clearTimeout(timer);
-            if (attempt < 3) return new Promise(function (resolve) { setTimeout(resolve, attempt * 1200); }).then(tryFetch);
-            return false;
-          });
-      }
-      return tryFetch();
+      if (existing) return; // already warmed in a previous session
+      return fetch(url, { mode: 'cors' })
+        .then(function (res) { if (res && res.ok) return cache.put(url, res); })
+        .catch(function () { /* cross-origin/network hiccup — just skip it, no retry */ });
     });
   }
 
-  var warmedUrls = {};
+  var warmedUrls = {}; // every URL we've ever kicked off a warmOne() for — never re-queue it
 
-  /* Four streams keep a 5G connection busy without opening dozens of
-     decoders or making one slow CDN response block the entire pack. */
-  var PACK_CONCURRENCY = 4;
-  function warmAll(urls, onDone) {
-    var fresh = urls.filter(function (u) { return !warmedUrls[u] && !packInFlight[u]; });
+  function warmAll(urls) {
+    var fresh = urls.filter(function (u) { return !warmedUrls[u]; });
     if (!fresh.length) return;
-    fresh.forEach(function (u) { packInFlight[u] = true; });
-    var nextIndex = 0;
-    function finish(url, ok) {
-      delete packInFlight[url];
-      if (ok) warmedUrls[url] = true;
-      if (onDone) onDone(ok, url);
-      if (!ok && (packRetryCount[url] || 0) < 4 && !packRetryTimers[url]) {
-        packRetryCount[url] = (packRetryCount[url] || 0) + 1;
-        packRetryTimers[url] = setTimeout(function () {
-          delete packRetryTimers[url];
-          warmAll([url], onDone);
-        }, Math.min(18000, 1800 * packRetryCount[url]));
-      }
-    }
-    function worker(cache) {
-      var at = nextIndex++;
-      if (at >= fresh.length) return Promise.resolve();
-      var url = fresh[at];
-      return warmOne(cache, url).then(function (ok) {
-        finish(url, ok);
-        return worker(cache);
-      }, function () {
-        finish(url, false);
-        return worker(cache);
+    fresh.forEach(function (u) { warmedUrls[u] = true; });
+    var cache;
+    var i = 0;
+    function next() {
+      if (i >= fresh.length) return;
+      var url = fresh[i++];
+      warmOne(cache, url).catch(function () {}).then(function () {
+        // Still staggered (never fire dozens of fetches in the same tick and
+        // choke whatever the user is actively doing), but short — the goal
+        // is "download everything soon", not "trickle it in over minutes".
+        setTimeout(next, 800);
       });
     }
-    caches.open(VIDEO_CACHE).then(function (cache) {
-      var count = Math.min(PACK_CONCURRENCY, fresh.length);
-      return Promise.all(Array.from({ length: count }, function () { return worker(cache); }));
-    }).catch(function () {
-      fresh.forEach(function (url) { delete packInFlight[url]; if (onDone) onDone(false, url); });
-    });
-  }
-
-  var PACK_PROMPTED = 'nowssb-video-pack-prompted-v1';
-  var PACK_ACCEPTED = 'nowssb-video-pack-accepted-v1';
-  var packStarted = localStorage.getItem(PACK_ACCEPTED) === '1';
-  var packTotal = 0, packDone = 0, packFailed = 0;
-  var packPanel = null, packCopy = null, packBar = null, packButton = null;
-  var packKicker = null, packTitle = null, packStatus = null, packSignalWrap = null;
-  var packVisualTimer = null;
-  var packDoneUrls = {}, packFailedUrls = {}, packRetryTimers = {};
-  var PACK_MARKS = [
-    { kicker: 'PREPARING YOUR EXPERIENCE', title: 'Almost ready', body: '<path d="M11.4 4.6 6.8 8.6H3.6v6.8h3.2l4.6 4V4.6z"/><path d="M15.6 8.8a4.6 4.6 0 0 1 0 6.4M18.4 6a8.6 8.6 0 0 1 0 12"/>' },
-    { kicker: 'LOADING YOUR PRACTICE', title: 'Setting up your rhythm', body: '<path d="M5 4.5h6.4a2 2 0 0 1 2 2v12a2.4 2.4 0 0 0-2-1H5z"/><path d="M19 4.5h-6.4a2 2 0 0 0-2 2v12a2.4 2.4 0 0 1 2-1H19z"/>' },
-    { kicker: 'READYING YOUR LIBRARY', title: 'Arranging your words', body: '<path d="M4 5.4h6.4a2 2 0 0 1 2 2v11.2a2.4 2.4 0 0 0-2-1H4z"/><path d="M20 5.4h-6.4a2 2 0 0 0-2 2v11.2a2.4 2.4 0 0 1 2-1H20z"/>' },
-    { kicker: 'TUNING YOUR EXPERIENCE', title: 'Making space to focus', body: '<path d="M3.6 16.6c3-.4 5-2.2 6.6-5.4 1.2-2.4 2-4.6 3.2-4.6 1 0 1.4 1 1 2.4-.5 1.8-2 3-3.4 3.6-1.4.6-2 1.4-1.6 2.2.4.8 1.8.9 3.2.4 1.6-.6 2.8-1.6 4-3"/><path d="M4 20h16"/>' },
-    { kicker: 'OPENING YOUR PATH', title: 'Almost there', body: '<circle cx="6.5" cy="8" r="2.6"/><circle cx="17.5" cy="8" r="2.6"/><path d="M2.5 19v-1.2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4V19M13.5 19v-1.2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4V19"/><path d="M9.6 8.4c.9-.9 1.6-.9 2.4 0s1.5.9 2.4 0"/>' }
-  ];
-  var packVisualIndex = 0;
-  var packInFlight = {};
-  var packRetryCount = {};
-
-  function updatePackPrompt() {
-    if (!packCopy) return;
-    if (!packStarted) {
-      packCopy.textContent = 'Additional access files are getting ready for a smoother NowssB experience. It may take a few minutes the first time — thanks for your patience.';
-      if (packButton) packButton.textContent = 'Prepare files';
-      return;
-    }
-    packCopy.textContent = packDone + ' of ' + packTotal + ' files ready' + (packFailed ? ' · ' + packFailed + ' will retry' : '') + '. You can keep using NowssB while the rest finishes.';
-    if (packBar) packBar.style.width = (packTotal ? Math.round(packDone / packTotal * 100) : 0) + '%';
-    if (packButton) packButton.textContent = packDone >= packTotal ? 'Ready to use' : 'Preparing…';
-    if (packStatus) packStatus.textContent = packDone >= packTotal ? 'Your private access files are ready.' : (packFailed ? 'A connection paused briefly. We will retry automatically.' : 'A few more seconds while NowssB prepares your experience.');
-  }
-
-  function renderPackVisual() {
-    var mark = PACK_MARKS[packVisualIndex % PACK_MARKS.length];
-    if (packSignalWrap) packSignalWrap.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + mark.body + '</svg>';
-    if (packKicker) packKicker.textContent = mark.kicker;
-    if (packTitle) packTitle.textContent = mark.title;
-  }
-
-  function startPackVisuals() {
-    renderPackVisual();
-    if (packVisualTimer) clearInterval(packVisualTimer);
-    packVisualTimer = setInterval(function () {
-      packVisualIndex = (packVisualIndex + 1) % PACK_MARKS.length;
-      renderPackVisual();
-    }, 2400);
-  }
-
-  function beginPack() {
-    if (packStarted || shouldSkip()) return;
-    packStarted = true;
-    localStorage.setItem(PACK_ACCEPTED, '1');
-    var urls = collectVideoUrls();
-    packTotal = urls.length;
-    if (!urls.length) return;
-    warmAll(urls, function (ok, url) {
-      if (ok && !packDoneUrls[url]) {
-        packDoneUrls[url] = true;
-        delete packFailedUrls[url];
-        packDone++;
-      } else if (!ok && !packDoneUrls[url]) {
-        packFailedUrls[url] = true;
-      }
-      packFailed = Object.keys(packFailedUrls).length;
-      updatePackPrompt();
-    });
-    updatePackPrompt();
-  }
-
-  function showPackPrompt() {
-    if (shouldSkip() || localStorage.getItem(PACK_PROMPTED) === '1') return;
-    localStorage.setItem(PACK_PROMPTED, '1');
-    packPanel = document.createElement('div');
-    packPanel.className = 'nwsb-video-pack-prompt';
-    packPanel.setAttribute('role', 'dialog');
-    packPanel.setAttribute('aria-label', 'Prepare additional NowssB access');
-    packPanel.innerHTML = '<div class="nwsb-video-pack-card"><div class="nwsb-video-pack-brand"><div class="nwsb-video-pack-brand-lockup"><img class="nwsb-video-pack-logo" src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"><span class="nwsb-video-pack-divider" aria-hidden="true"></span><span class="nwsb-video-pack-brand-name">NOWSSB<small>Natural word science</small></span></div><button type="button" class="nwsb-video-pack-continue">Continue to app</button></div><div class="nwsb-video-pack-rule" aria-hidden="true"></div><div class="nwsb-video-pack-status-row"><span class="nwsb-video-pack-signal-wrap" aria-hidden="true"></span><span class="nwsb-video-pack-divider" aria-hidden="true"></span><div class="nwsb-video-pack-status-copy"><div class="nwsb-video-pack-kicker"></div><h2></h2></div></div><p class="nwsb-video-pack-copy"></p><div class="nwsb-video-pack-progress"><span></span></div><div class="nwsb-video-pack-status">A few more seconds while NowssB prepares your experience.</div><div class="nwsb-video-pack-actions"><button type="button" class="nwsb-video-pack-later">Maybe later</button><button type="button" class="nwsb-video-pack-start">Prepare files</button></div></div>';
-    document.body.appendChild(packPanel);
-    packCopy = packPanel.querySelector('.nwsb-video-pack-copy');
-    packBar = packPanel.querySelector('.nwsb-video-pack-progress span');
-    packButton = packPanel.querySelector('.nwsb-video-pack-start');
-    packKicker = packPanel.querySelector('.nwsb-video-pack-kicker');
-    packTitle = packPanel.querySelector('.nwsb-video-pack-status-copy h2');
-    packStatus = packPanel.querySelector('.nwsb-video-pack-status');
-    packSignalWrap = packPanel.querySelector('.nwsb-video-pack-signal-wrap');
-    updatePackPrompt();
-    startPackVisuals();
-    function continueToApp() {
-      beginPack();
-      if (packVisualTimer) { clearInterval(packVisualTimer); packVisualTimer = null; }
-      if (packPanel) { packPanel.remove(); packPanel = null; }
-      packCopy = packBar = packButton = packKicker = packTitle = packStatus = packSignalWrap = null;
-    }
-    packPanel.querySelector('.nwsb-video-pack-continue').addEventListener('click', continueToApp);
-    packPanel.querySelector('.nwsb-video-pack-later').addEventListener('click', function () { if (packVisualTimer) clearInterval(packVisualTimer); packPanel.remove(); packPanel = null; });
-    packButton.addEventListener('click', function () {
-      packButton.disabled = true;
-      beginPack();
-      updatePackPrompt();
-    });
+    caches.open(VIDEO_CACHE).then(function (c) { cache = c; next(); });
   }
 
   function start() {
-    if (!packStarted || shouldSkip()) return;
+    if (shouldSkip()) return;
     var urls = collectVideoUrls();
-    if (urls.length) {
-      packTotal = Math.max(packTotal, urls.length);
-      warmAll(urls, function (ok, url) {
-        if (ok && !packDoneUrls[url]) {
-          packDoneUrls[url] = true;
-          delete packFailedUrls[url];
-          packDone++;
-        } else if (!ok && !packDoneUrls[url]) {
-          packFailedUrls[url] = true;
-        }
-        packFailed = Object.keys(packFailedUrls).length;
-        updatePackPrompt();
-      });
-    }
+    if (urls.length) warmAll(urls);
   }
 
-  /* The start animation remains the only launch-time video. The full pack is
-     offered after it, and only a user acceptance starts the private queue. */
+  var idle = window.requestIdleCallback || function (cb) { setTimeout(cb, 4000); };
+  /* Not while the start animation is playing. requestIdleCallback fires as
+     soon as the main thread quietens, which during the splash it does — so
+     this was queueing thirty video downloads underneath the one clip that
+     is actually on screen, and the clip is what paid for it.
+     nwsbSplashWait (index.html) is the callback form; window._nwsbSplashOver
+     is the same answer read synchronously. Read the flag rather than latching
+     a copy of it, so every file that defers work to it agrees. */
   function splashOver() { return window._nwsbSplashOver !== false; }
   function startAfterSplash() {
-    var go = function () {
-      if (packStarted) start();
-      else showPackPrompt();
-    };
+    var go = function () { idle(start, { timeout: 8000 }); };
     if (typeof window.nwsbSplashWait === 'function') window.nwsbSplashWait(go);
     else go();
   }
   startAfterSplash();
 
-  // Dynamically-created screens are added to the same single-file queue only
-  // after the user accepted the pack. Before that, DOM mutations do nothing.
+  // Screens/banners built dynamically after the initial scan (e.g. a store's
+  // buy-page video banner, injected via innerHTML only once the user opens
+  // it) never existed in the DOM when collectVideoUrls() first ran, so their
+  // videos were silently never warmed. Watch for any newly-inserted <video>
+  // and warm it too, same rules (Data Saver still respected).
   if ('MutationObserver' in window) {
     var mo = new MutationObserver(function () {
-      if (!splashOver() || !packStarted || shouldSkip()) return;
-      start();
+      /* Same reason as above, and this one matters more: the app rewrites
+         a great deal of DOM while it boots, so this callback ran over and
+         over — each time doing a querySelectorAll('video') across the whole
+         document — during the exact seconds the start animation is on
+         screen. Nothing is warmed before the clip is done anyway. */
+      if (!splashOver()) return;
+      if (shouldSkip()) return;
+      var urls = collectVideoUrls();
+      if (urls.length) warmAll(urls);
     });
     mo.observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  window.addEventListener('appinstalled', function () { showPackPrompt(); });
+  // A PWA install is exactly the moment the user commits to this being a
+  // real app on their device — that's the signal to eagerly grab everything
+  // right away instead of waiting for idle time, so it's already fast by the
+  // time they actually open it again.
+  window.addEventListener('appinstalled', function () { start(); });
 })();
 /* ── Decorative-video playback controller ─────────────────────────────────
    Every looping background video in the app is managed here: play the few
@@ -301,11 +163,9 @@
      · The expensive part, "is this inside a screen that is currently
        shown", is cached per element and only recomputed when a class
        actually changes, not on every frame.
-     · At most MAX_PLAYING videos decode at once — every clip that is
-       actually on screen. Matched to Flutter's VideoPool.maxLive so the
-       HTML app, the Capacitor WebView and Flutter all play the same
-       films. Off-screen clips stay unmounted. Decoders, not downloads,
-       are the cost.
+     · At most MAX_PLAYING videos decode at once — the ones nearest the
+       middle of the viewport. Everything else stays paused even if it is
+       technically on screen. Decoders, not downloads, are the cost.
 
    Behaviour is otherwise unchanged: only videos this script paused are ever
    resumed, WebRTC streams are never touched, the practice player keeps its
@@ -313,9 +173,11 @@
    ── */
 (function () {
   var MARK = 'data-nwsb-vis';
-  /* 4 was leaving most films as stills. 6 was still starving backgrounds
-     the moment a home with banners was open. 24 matches Flutter's pool
-     and is enough for every on-screen clip on any page of this app. */
+  /* 4 was leaving the smallest clips out. The section discs beside the
+     player, the Reader and the eBooks rail are 40px and cost almost
+     nothing to decode, but they queued behind full-width banners on the
+     same screen and never got a slot — so they sat black. Six covers a
+     screen's worth of banners AND the discs on it. */
   /* ── Nothing decorative claims the media notification ─────────────
      Thirteen of the clips in this app carry an audio track, and Android
      treats any video playing with sound as media: the app turns up in the
@@ -343,7 +205,7 @@
     } catch (err) {}
   }, true);
 
-  var MAX_PLAYING = 4;
+  var MAX_PLAYING = 6;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();
   var shownCache = new WeakMap();   // element -> boolean, cleared on class changes
@@ -436,37 +298,14 @@
      drives by hand — the hero rail sets and clears its own sources and is
      marked data-nwsb-vis to say so. */
   var STASH = 'data-nwsb-src';
-  var LOCAL = 'data-nwsb-local-src';
-  var R2SRC = 'data-nwsb-r2-src';
-  var R2FAILED = 'data-nwsb-r2-failed';
-  var R2_VIDEO_BASE = './assets/video/';
   var near = new WeakSet();     // clip is within a screen of the viewport
   var mine = false;             // this file is the one writing src right now
 
-  function localVideoSrc(src) {
-    if (!src) return '';
-    var clean = src.split('#')[0].split('?')[0];
-    return /^(?:\.\/)?assets\/video\/[^/]+\.mp4$/i.test(clean) ? clean : '';
-  }
-
-  function r2VideoSrc(src) {
-    /* Repository MP4s are deliberately served from the bundled WebView
-       assets; the worker is no longer a playback hop. */
-    return '';
-  }
-
   function mount(v) {
     var src = v.getAttribute(STASH);
-    if (!src) return;
-    var local = v.getAttribute(LOCAL) || localVideoSrc(src) || src;
-    v.setAttribute(LOCAL, local);
-    var remote = r2VideoSrc(local);
-    var preferred = remote && v.getAttribute(R2FAILED) !== '1' ? remote : local;
-    if (v.getAttribute('src') === preferred) return;
-    if (remote) v.setAttribute(R2SRC, remote);
-    poster(v);
+    if (!src || v.getAttribute('src') === src) return;
     mine = true;
-    v.setAttribute('src', preferred);
+    v.setAttribute('src', src);
     mine = false;
     try { v.load(); } catch (e) {}
   }
@@ -474,8 +313,7 @@
   function unmount(v) {
     var cur = v.getAttribute('src');
     if (!cur) return;
-    var local = v.getAttribute(LOCAL) || localVideoSrc(cur) || cur;
-    v.setAttribute(STASH, local);
+    v.setAttribute(STASH, cur);
     try { v.pause(); } catch (e) {}
     mine = true;
     v.removeAttribute('src');
@@ -483,20 +321,6 @@
     /* the release. Without this the element holds its buffers. */
     try { v.load(); } catch (e) {}
   }
-
-  /* Bundled repository assets are authoritative for playback. The worker is
-     not used as a remount hop, and the splash remains owned by its launcher. */
-  document.addEventListener('error', function (e) {
-    var v = e.target;
-    if (!v || v.tagName !== 'VIDEO') return;
-    var remote = v.getAttribute(R2SRC);
-    if (!remote || v.getAttribute('src') !== remote) return;
-    v.setAttribute(R2FAILED, '1');
-    mine = true;
-    v.removeAttribute('src');
-    mine = false;
-    try { v.load(); } catch (err) {}
-  }, true);
 
   /* One viewport of margin on each side: by the time a section is scrolled
      to, its clip has been mounted for a screen's worth of travel. */
@@ -506,7 +330,7 @@
       else { near.delete(e.target); unmount(e.target); }
     });
     queue();
-  }, { rootMargin: '20% 0px 20% 0px', threshold: 0 }) : null;
+  }, { rootMargin: '100% 0px 100% 0px', threshold: 0 }) : null;
 
   /* ── The stash stays authoritative ────────────────────────────────
      A dozen other files in this app set a clip's src by hand: the video
@@ -528,16 +352,8 @@
       var v = m.target;
       var cur = v.getAttribute('src');
       if (!cur) return;
-      var local = localVideoSrc(cur) || cur;
-      v.setAttribute(LOCAL, local);
-      v.setAttribute(R2FAILED, '');
-      if (near.has(v)) {
-        v.setAttribute(STASH, local);
-        poster(v);
-        mount(v);                         /* remount the new bundled clip */
-        return;
-      }
-      v.setAttribute(STASH, local);
+      if (near.has(v)) { v.setAttribute(STASH, cur); poster(v); return; }
+      v.setAttribute(STASH, cur);
       poster(v);                       /* the new clip's frame, not the old one's */
       try { v.pause(); } catch (e) {}
       mine = true;
@@ -547,21 +363,7 @@
     });
   }) : null;
 
-  /* The active home’s R2 hero and time-focus films are part of the home
-     composition, not disposable list decoration. Keep them mounted and in
-     the playback set when the user scrolls past their card; shown() still
-     prevents them from playing under another full-screen layer. */
-  function pinHomeFilm(v) {
-    /* These two classes are the home’s R2-backed films. They may be hidden by
-       the other home mode, but they must not lose their source when scrolling;
-       shown() below still prevents a hidden mode from playing. */
-    if (v.matches && v.matches('.nwsb-focus-video, .hero-bg-vid')) return true;
-    return (v.id === 'fpBgVideo' || v.id === 'fp-bg-video') &&
-           document.body.classList.contains('fashplus');
-  }
-
   function manageable(v) {
-    if (pinHomeFilm(v)) return false;
     if (v.id === 'splashVid') return false;
     if (v.id === 'chatCallRemoteVideo' || v.id === 'chatCallLocalVideo') return false;
     if (v.querySelector('source')) return false;   /* <source> children: not ours to move */
@@ -595,26 +397,18 @@
     if (!src) return '';
     var clean = src.split('#')[0].split('?')[0];
     if (/assets\/video\/[^/]+\.mp4$/i.test(clean)) return clean.replace(/\.mp4$/i, '-poster.webp');
+    if (clean.indexOf('res.cloudinary.com') >= 0 && clean.indexOf('/video/upload/') >= 0) {
+      return clean.replace('/video/upload/', '/image/upload/f_auto/').replace(/\.(mp4|webm|mov)$/i, '.jpg');
+    }
     return '';
   }
 
   var POSMARK = 'data-nwsb-pos';
 
   function poster(v) {
-    /* Fashion's video sections intentionally begin as clean glass/black video
-       surfaces rather than showing a still screenshot before playback. This
-       opt-out also prevents the preparation pass below from re-adding a local
-       poster after markup removed it. */
-    var fashionHome = document.body && document.body.classList.contains('fashplus') &&
-                      v.closest && v.closest('#home');
-    if (fashionHome || v.hasAttribute('data-nwsb-no-poster')) {
-      v.removeAttribute('poster');
-      v.removeAttribute(POSMARK);
-      return;
-    }
     /* A poster written here is marked, so that when another file swaps the
-       clip — the coupon strip picks a new one, the reader changes the film —
-       the frame under it can be swapped too. A poster that came with the
+       clip — the coupon strip picks a new one, the reader changes the film
+       — the frame under it can be swapped too. A poster that came with the
        markup is left alone: someone chose that one. */
     if (v.getAttribute('poster') && !v.getAttribute(POSMARK)) return;
     var p = posterFor(v.getAttribute('src') || v.getAttribute(STASH) ||
@@ -643,8 +437,6 @@
          A page that starts with every source attached is a page that has
          already paid for every decoder before anyone has scrolled. */
       if (mountIo && manageable(v)) {
-        var local = localVideoSrc(v.getAttribute('src')) || v.getAttribute('src') || v.getAttribute(STASH);
-        if (local) v.setAttribute(LOCAL, local);
         unmount(v);
         mountIo.observe(v);
         if (srcWatch) srcWatch.observe(v, { attributes: true, attributeFilter: ['src'] });
@@ -674,7 +466,7 @@
     for (var i = tracked.length - 1; i >= 0; i--) {
       var v = tracked[i];
       if (!v.isConnected) { tracked.splice(i, 1); continue; }
-      if ((pinHomeFilm(v) || (io ? onScreen.has(v) : true)) && shown(v)) live.push(v);
+      if ((io ? onScreen.has(v) : true) && shown(v)) live.push(v);
     }
     /* Nearest the middle of the screen wins the decoders — except for a clip
        that IS its section rather than decoration behind one. The television
@@ -683,13 +475,13 @@
        four happened to be nearer the middle: the clip loaded, played for a
        moment, and was paused again, which looks exactly like a still. Those
        sort first and therefore always get a slot while they are on screen.
-       Still at most MAX_PLAYING — this changes which clips, not how many. */
+       Still at most MAX_PLAYING — this changes which four, not how many. */
     /* .feat-bgvid and .rd-hub-bgvid are the same kind of thing as the rest of
        this list — the film IS the page, not decoration on it — and were
        missing from it. */
     var PRIORITY = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .gsel-bg-vid, ' +
                    '.slm-head-vid, .feat-bgvid, .rd-hub-bgvid, .fp-page-vid, ' +
-                   '.wsg-bgvid, .lgp-info-video, #fpBgVideo, #fp-bg-video';
+                   '.wsg-bgvid, .lgp-info-video';
     function prio(v) { return v.matches && v.matches(PRIORITY) ? 0 : 1; }
     if (live.length > MAX_PLAYING) {
       var mid = (window.innerHeight || 800) / 2;

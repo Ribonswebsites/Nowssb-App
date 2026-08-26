@@ -1,4 +1,17 @@
 /// The app's own switches, remembered between launches.
+///
+/// Two of them matter and both are real behaviour rather than decoration:
+///
+///   fashionPlus  Motion mode. Off, a page background is the clip's own
+///                first frame — a still, costing nothing. On, it plays.
+///                This is the switch the website calls Fashion Plus and it
+///                is the one that trades battery for movement, so it is off
+///                by default and the page that turns it on says so.
+///
+///   fashionHome  Which home. The dark one or the pale neumorphic one.
+///
+/// Written through [ChangeNotifier] so a screen rebuilds the moment the
+/// switch moves, and through SharedPreferences so it survives a relaunch.
 library;
 
 import 'package:flutter/foundation.dart';
@@ -8,283 +21,48 @@ class Settings extends ChangeNotifier {
   Settings._();
   static final Settings instance = Settings._();
 
-  static const _kPlus = 'nwsb_fashplus_v2';
+  static const _kPlus = 'nwsb_fashplus';
   static const _kHome = 'nwsb_home_mode';
-  static const _kFashionHeroFix = 'nwsb_fashion_hero_fix_v1';
-  static const _kNativeNormalStartupFix = 'nwsb_native_normal_startup_v1';
-  static const _kVoice = 'nwsb_pw_voice';
-  static const _kLoop = 'nwsb_pw_loop';
-  static const _kReps = 'nwsb_pw_reps';
-  static const _kSpeed = 'nwsb_pw_speed';
-  static const _kVol = 'nwsb_pw_volume';
-  static const _kEq = 'nwsb_pw_eq';
-  static const _kQuality = 'nwsb_pw_quality';
-  static const _kBass = 'nwsb_pw_bass';
-  static const _kCrossfade = 'nwsb_pw_crossfade';
-  static const _kSleep = 'nwsb_pw_sleep';
-  static const _kDownload = 'nwsb_pw_download';
-  static const _kPlaylist = 'nwsb_pw_playlist';
-  static const _kNowPlaying = 'nwsb_pw_nowplaying';
-  static const _kFashionBackground = 'nwsb_fashion_background_index';
 
-  bool _fashionPlus = true;
+  bool _fashionPlus = false;
   bool _fashionHome = false;
-  String _voice = 'female';
-  String _loop = 'off';
-  int _reps = 7;
-  double _speed = 1;
-  double _volume = 0.85;
-  String _eq = 'flat';
-  List<double> _bands = List<double>.filled(7, 0);
-  String _output = 'speaker';
-  bool _qualityHigh = true;
-  String _quality = 'High';
-  bool _bass = true;
-  String _crossfade = '5 Sec';
-  String _sleep = 'Off';
-  bool _download = true;
-  String _playlist = 'Classic';
-  String _nowPlaying = 'On';
-  int _fashionBackgroundIndex = 6;
-  bool _animation = true;
-  bool _notify = true;
 
-  static const Map<String, List<double>> _eqPresets = {
-    'flat': [0, 0, 0, 0, 0, 0, 0],
-    'focus': [-2, -1, 1, 4, 5, 1, -2],
-    'deep': [6, 5, 2, 0, -1, -3, -4],
-    'bright': [-3, -2, 0, 1, 3, 6, 7],
-  };
-
+  /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
+
+  /// Which home is behind the Connect tab.
   bool get fashionHome => _fashionHome;
-  String get voice => _voice;
-  String get loop => _loop;
-  int get reps => _reps;
-  double get speed => _speed;
-  double get volume => _volume;
-  String get eq => _eq;
-  List<double> get bands => List.unmodifiable(_bands);
-  String get output => _output;
-  bool get qualityHigh => _qualityHigh;
-  String get quality => _quality;
-  bool get bassBoost => _bass;
-  String get crossfade => _crossfade;
-  String get sleepTimer => _sleep;
-  bool get downloadOnly => _download;
-  String get playlist => _playlist;
-  String get nowPlaying => _nowPlaying;
-  int get fashionBackgroundIndex => _fashionBackgroundIndex;
-  bool get animationOn => _animation;
-  bool get notifyOn => _notify;
 
   Future<void> load() async {
     try {
       final p = await SharedPreferences.getInstance();
-      _fashionPlus = p.getBool(_kPlus) ?? true;
+      _fashionPlus = p.getBool(_kPlus) ?? false;
       _fashionHome = p.getBool(_kHome) ?? false;
-      // The previous release could launch into the legacy Fashion/WebView-like
-      // surface by default. Make the native Normal home the first surface once;
-      // the Fashion home remains available through the mode switch and all of
-      // the Fashion-specific composition stays unchanged afterward.
-      final nativeNormalStartupApplied =
-          p.getBool(_kNativeNormalStartupFix) ?? false;
-      if (!nativeNormalStartupApplied) {
-        _fashionHome = false;
-        await p.setBool(_kHome, false);
-        await p.setBool(_kNativeNormalStartupFix, true);
-      }
-      // Keep the historical migration marker so older installs do not repeat
-      // the obsolete hero migration if they already carried it.
-      if (!(p.getBool(_kFashionHeroFix) ?? false)) {
-        await p.setBool(_kFashionHeroFix, true);
-      }
-      _voice = p.getString(_kVoice) ?? 'female';
-      _loop = p.getString(_kLoop) ?? 'off';
-      _reps = p.getInt(_kReps) ?? 7;
-      _speed = p.getDouble(_kSpeed) ?? 1;
-      _volume = p.getDouble(_kVol) ?? 0.85;
-      _eq = p.getString(_kEq) ?? 'flat';
-      _quality = p.getString(_kQuality) ?? (p.getBool('nwsb_pw_quality_high') == false ? 'Normal' : 'High');
-      _qualityHigh = _quality == 'High' || _quality == 'Lossless';
-      _bass = p.getBool(_kBass) ?? true;
-      _crossfade = p.getString(_kCrossfade) ?? '5 Sec';
-      _sleep = p.getString(_kSleep) ?? 'Off';
-      _download = p.getBool(_kDownload) ?? true;
-      _playlist = p.getString(_kPlaylist) ?? 'Classic';
-      _nowPlaying = p.getString(_kNowPlaying) ?? 'On';
-      _fashionBackgroundIndex = (p.getInt(_kFashionBackground) ?? 6).clamp(0, 6).toInt();
-      _bands = List<double>.from(_eqPresets[_eq] ?? _eqPresets['flat']!);
       notifyListeners();
-    } catch (_) {}
+    } catch (_) {
+      // A platform that refuses storage is not a reason to fail to start.
+      // The defaults are the safe ones: still backgrounds, pale home.
+    }
   }
 
   Future<void> setFashionPlus(bool on) async {
     if (_fashionPlus == on) return;
     _fashionPlus = on;
     notifyListeners();
-    await _saveBool(_kPlus, on);
+    await _save(_kPlus, on);
   }
 
   Future<void> setFashionHome(bool on) async {
     if (_fashionHome == on) return;
     _fashionHome = on;
     notifyListeners();
-    await _saveBool(_kHome, on);
+    await _save(_kHome, on);
   }
 
-  void setVoice(String v) {
-    _voice = v;
-    notifyListeners();
-    _saveStr(_kVoice, v);
-  }
-
-  String cycleLoop() {
-    _loop = _loop == 'off' ? 'once' : _loop == 'once' ? 'infinite' : 'off';
-    notifyListeners();
-    _saveStr(_kLoop, _loop);
-    return _loop;
-  }
-
-  void setReps(int n) {
-    _reps = n.clamp(1, 99);
-    notifyListeners();
-    _saveInt(_kReps, _reps);
-  }
-
-  void setSpeed(double v) {
-    _speed = v.clamp(0.5, 2.0);
-    notifyListeners();
-    _saveDouble(_kSpeed, _speed);
-  }
-
-  void setVolume(double v) {
-    _volume = v.clamp(0, 1);
-    notifyListeners();
-    _saveDouble(_kVol, _volume);
-  }
-
-  void setEq(String name, [List<double>? bands]) {
-    _eq = name;
-    if (name != 'custom') {
-      _bands = List<double>.from(_eqPresets[name] ?? _eqPresets['flat']!);
-    } else if (bands != null) {
-      _bands = bands;
-    }
-    notifyListeners();
-    _saveStr(_kEq, name);
-  }
-
-  void setBand(int i, double v) {
-    _bands = List<double>.from(_bands);
-    _bands[i] = v.clamp(-12, 12);
-    _eq = 'custom';
-    notifyListeners();
-  }
-
-  void setOutput(String v) {
-    _output = v;
-    notifyListeners();
-  }
-
-  String cycleOutput() {
-    _output = _output == 'speaker'
-        ? 'earpiece'
-        : _output == 'earpiece'
-            ? 'bluetooth'
-            : 'speaker';
-    notifyListeners();
-    return _output;
-  }
-
-  void setQuality(String v) {
-    _quality = v;
-    _qualityHigh = v == 'High' || v == 'Lossless';
-    notifyListeners();
-    _saveStr(_kQuality, v);
-  }
-
-  void toggleBass() {
-    _bass = !_bass;
-    notifyListeners();
-    _saveBool(_kBass, _bass);
-  }
-
-  void setCrossfade(String v) {
-    _crossfade = v;
-    notifyListeners();
-    _saveStr(_kCrossfade, v);
-  }
-
-  void setSleepTimer(String v) {
-    _sleep = v;
-    notifyListeners();
-    _saveStr(_kSleep, v);
-  }
-
-  void toggleDownloadOnly() {
-    _download = !_download;
-    notifyListeners();
-    _saveBool(_kDownload, _download);
-  }
-
-  void setPlaylist(String v) {
-    _playlist = v;
-    notifyListeners();
-    _saveStr(_kPlaylist, v);
-  }
-
-  void setNowPlaying(String v) {
-    _nowPlaying = v;
-    notifyListeners();
-    _saveStr(_kNowPlaying, v);
-  }
-
-  void setFashionBackgroundIndex(int index) {
-    _fashionBackgroundIndex = index.clamp(0, 6).toInt();
-    notifyListeners();
-    _saveInt(_kFashionBackground, _fashionBackgroundIndex);
-  }
-
-  void toggleQuality() {
-    setQuality(_qualityHigh ? 'Normal' : 'High');
-  }
-
-  void toggleAnimation() {
-    _animation = !_animation;
-    notifyListeners();
-  }
-
-  void toggleNotify() {
-    _notify = !_notify;
-    notifyListeners();
-  }
-
-  Future<void> _saveBool(String k, bool v) async {
+  Future<void> _save(String k, bool v) async {
     try {
       final p = await SharedPreferences.getInstance();
       await p.setBool(k, v);
-    } catch (_) {}
-  }
-
-  Future<void> _saveStr(String k, String v) async {
-    try {
-      final p = await SharedPreferences.getInstance();
-      await p.setString(k, v);
-    } catch (_) {}
-  }
-
-  Future<void> _saveInt(String k, int v) async {
-    try {
-      final p = await SharedPreferences.getInstance();
-      await p.setInt(k, v);
-    } catch (_) {}
-  }
-
-  Future<void> _saveDouble(String k, double v) async {
-    try {
-      final p = await SharedPreferences.getInstance();
-      await p.setDouble(k, v);
     } catch (_) {}
   }
 }

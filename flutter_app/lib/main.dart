@@ -7,27 +7,22 @@
 ///
 /// Two things are true at once and both matter:
 ///
-///   · Decorative and practice videos ship in the app bundle, so launch never
-///     starts a background download pack or competes with playback for bandwidth.
-///   · On-screen clips are opened by the small decoder pool for stability;
+///   · The clips are all on the phone. Nothing streams, nothing buffers,
+///     nothing depends on Cloudinary being up or the signal being good.
+///   · At most four of them decode at any moment. A phone has a handful of
+///     hardware decoders and the website was asking for a hundred, which is
+///     what the lag, the black banners and the crashes actually were.
 ///     lib/media/video_pool.dart is where that ceiling is enforced.
 library;
 
-import 'dart:async';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'data/content.dart';
 import 'data/firebase.dart';
 import 'data/settings.dart';
-import 'data/updater.dart';
 import 'media/video_pool.dart';
-import 'screens/login.dart';
-import 'services/connect_service.dart';
 import 'screens/splash.dart';
-import 'widgets/motion.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
@@ -53,33 +48,12 @@ Future<void> main() async {
   await Settings.instance.load();
   await ContentStore.instance.start();
 
-  // Nothing decodes underneath the start animation. The bundled video pool is
-  // released by the splash when it finishes, and by the eight-second ceiling.
+  // Nothing decodes underneath the start animation. Released by the splash
+  // when it finishes, and by the eight-second ceiling if it never does.
   VideoPool.instance.hold();
   VideoPool.instance.startHeartbeat();
 
   runApp(const NowssbApp());
-}
-
-class _AuthGate extends StatelessWidget {
-  const _AuthGate();
-
-  @override
-  Widget build(BuildContext context) {
-    // Firebase is intentionally optional for offline/local-content launches.
-    // When it is ready, the auth stream becomes the single source of truth for
-    // whether the user sees the branded login or the app shell.
-    if (!NwsbFirebase.ready) return const NavShell();
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const ColoredBox(color: NwsbColors.deep);
-        }
-        return snapshot.data == null ? const LoginScreen() : const NavShell();
-      },
-    );
-  }
 }
 
 class NowssbApp extends StatefulWidget {
@@ -90,26 +64,14 @@ class NowssbApp extends StatefulWidget {
 }
 
 class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
-  StreamSubscription<User?>? _authSubscription;
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    if (NwsbFirebase.ready) {
-      _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
-        if (user != null) {
-          ConnectService.instance.ensurePublicProfile().catchError((error) {
-            debugPrint('NowssB Connect profile sync failed: $error');
-          });
-        }
-      });
-    }
   }
 
   @override
   void dispose() {
-    _authSubscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -143,19 +105,13 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
       darkTheme: NwsbTheme.dark,
       themeMode: ThemeMode.light,
       color: NwsbColors.deep,
-      scrollBehavior: const NwsbScrollBehavior(),
       home: Stack(
         children: [
-          const _AuthGate(),
+          const NavShell(),
           if (!_splashDone)
             Splash(onDone: () {
               VideoPool.instance.unhold();
               setState(() => _splashDone = true);
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                final ctx = context;
-                if (!ctx.mounted) return;
-                NwsbUpdate.maybeShow(ctx);
-              });
             }),
         ],
       ),

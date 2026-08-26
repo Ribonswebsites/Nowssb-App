@@ -214,6 +214,14 @@
       ],
       go: ['See the plans', function () { if (window.SS && SS.open) SS.open('subscription'); }] },
 
+    { i: 'spark', t: 'Make it yours',
+      lead: 'The last step is the app itself. Almost nothing here is fixed.',
+      pts: [
+        ['Hero header', 'Three ways the top can look — this is one of them.'],
+        ['Fashion Plus', 'Turns the app to film. The tiles and cards start moving.'],
+        ['Your layout', 'Sections go on and off, and the home remembers it.']
+      ],
+      go: ['Change the hero header', function () { if (typeof window.stOpen === 'function') window.stOpen(); }] }
   ];
 
   function esc(s) {
@@ -380,8 +388,8 @@
      with a wordmark already in it; three controls in there is what made it
      unreadable. So the title card's row goes in the strip under the set,
      which is the card's own bottom edge and is present exactly when the
-     title card is the cell on show. Explore and Help & Coach stand down for
-     as long as it is up, and come back when the title card closes. */
+     title card is the cell on show. Explore and App Guide stand down for
+     as long as it is up, and come back the moment the guide closes. */
   function footNav(on) {
     var hero = document.querySelector('#home .hero-section.hero-simple');
     var foot = hero && hero.querySelector(':scope > .hs-foot');
@@ -433,13 +441,9 @@
   }
 
   window.fstOpen = function () {
-    /* The old Hero Header rail is gone. The remaining home guide still has a
-       useful destination: the existing all-features Explore overlay. */
-    if (typeof window.nwsbHeroCells !== 'function' || !deck()) {
-      if (typeof window.openExploreOverlay === 'function') window.openExploreOverlay();
-      return;
-    }
+    if (typeof window.nwsbHeroCells !== 'function') return;
     var d = deck();
+    if (!d) return;
     syncHeight();
     window.nwsbHeroAuto(false);
     /* set before the cells are built: on() reads this flag, and both the

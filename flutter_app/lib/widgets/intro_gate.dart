@@ -19,7 +19,6 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
-import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
@@ -137,9 +136,9 @@ class _Intro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Intro films play. Same as the website: the picture behind Enter is
-    // a looping clip, not a still waiting on a switch.
-    final moving = true;
+    // Still unless motion mode is on. autoplay:false is what makes an
+    // unmoving background genuinely free — the pool is never even asked.
+    final moving = Settings.instance.fashionPlus;
 
     return Material(
       color: NwsbColors.deep,
@@ -147,11 +146,12 @@ class _Intro extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (art != null)
-            NwsbImage(
-              asset: art!,
+            Image.asset(
+              art!,
               fit: BoxFit.cover,
               alignment: Alignment.topCenter,
-              error: const ColoredBox(color: NwsbColors.deep),
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: NwsbColors.deep),
             )
           else if (film != null)
             NwsbVideo(
@@ -193,8 +193,7 @@ class _Intro extends StatelessWidget {
                           height: 42,
                           decoration: BoxDecoration(
                             color: const Color(0x1AFFFFFF),
-                            border:
-                                Border.all(color: const Color(0x33FFFFFF)),
+                            border: Border.all(color: const Color(0x33FFFFFF)),
                           ),
                           child: const Icon(Icons.arrow_back,
                               size: 18, color: Color(0xBFFFFFFF)),

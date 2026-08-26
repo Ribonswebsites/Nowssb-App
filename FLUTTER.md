@@ -27,14 +27,13 @@ says so — not when a garbage collector decides the page has moved on.
 
 So the rule the whole app is built around:
 
-> **On-screen clips play. Off-screen clips are posters.**
-> At most 24 decoders exist at any moment — the same number the website
-> (`MAX_PLAYING` in `app/js/part051.js`) and the Capacitor WebView use.
+> **At most four decoders exist at any moment.** Not "are playing" — exist.
 
-That is why the backgrounds, televisions and banners all move together, and
-why a clip that has scrolled away costs nothing. Every mp4 in `assets/video/`
-has a `-poster.webp` beside it, generated from the clip itself: what you see
-while a clip waits is its own first frame.
+Everything else shows its poster, which is a picture and costs nothing. This
+is why every mp4 in `assets/video/` has a `-poster.webp` beside it, generated
+from the clip itself: most clips are showing their poster most of the time,
+and the app only looks right because that poster is the clip's own first
+frame.
 
 ---
 
@@ -66,8 +65,8 @@ inset behind it by the exact percentages the artwork occupies — so it lands
 correctly at any size with no second set of numbers to keep in step.
 
 `assets/store/intro-*.webp` are the intro-page paintings,
-`https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/logo-disc.webp` is the mark in both headers,
-`https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/player/liquid-splash.webp` sits behind a word, and
+`assets/icons/logo-disc.webp` is the mark in both headers,
+`assets/player/liquid-splash.webp` sits behind a word, and
 `assets/banners/` and `assets/store/collections/` are ready for the shelves.
 `tools/flutter-assets.mjs` copies all of it in; `test/assets_test.dart`
 fails if the code ever names a file that is not there — a wrong asset path
@@ -126,14 +125,7 @@ flutter pub get
 flutter analyze --no-fatal-infos
 flutter test
 flutter build apk --debug
-node ../tools/flutter-ios.mjs     # only after generating an iOS project
 ```
-
-The native Record tab uses `record` to capture an AAC/M4A file and sends it to
-`https://nowssb-api.ribonpatil2.workers.dev/api/groq/score`. The Groq key is
-never included in the Flutter bundle. `tools/flutter-android.mjs` adds
-`RECORD_AUDIO` to the generated Android manifest; `tools/flutter-ios.mjs` adds
-`NSMicrophoneUsageDescription` to the generated iOS Info.plist.
 
 `tools/flutter-assets.mjs` copies `assets/video/` into the Flutter bundle and
 writes the shipped content JSON. **It has to run before `flutter pub get`**:
@@ -193,16 +185,13 @@ from the ~446 Cloudinary images, which `tools/asset-manifest.mjs --download`
 fetches and `tools/localise-media.mjs` rewrites the web app to match; that
 download cannot run from a sandbox with no route to Cloudinary.
 
-**Audio.** The Flutter player plays a published `audioMale`, `audioFemale`, or
-per-part recording when one exists. The Record tab captures an AAC/M4A sample
-locally and sends it to the deployed Groq Worker for transcription and scoring;
-server-side scoring is now the native practice path.
+**Audio.** A word carries `audioMale`, `audioFemale` and a recording per
+part, and none of it plays yet. That is the practice player's heart and it is
+the next thing worth building.
 
 **Sign-in, routines, cart, chat, notifications.** Listed on the Profile
 screen so the app is honest about its own edges rather than showing dead
-buttons. The native pronunciation Record tab and Groq score path are now
-implemented; payments and generated word audio still require their own provider
-credentials and platform-specific wiring.
+buttons.
 
 Any screen added from here follows one rule: a clip goes through `NwsbVideo`,
 never a raw `VideoPlayer` — a controller the pool has never heard of is
@@ -217,11 +206,28 @@ exactly the hole the website had, and `test/home_test.dart` checks for it.
   tokens as well as Web Push endpoints.
 - **The website** is unaffected by any of this and keeps shipping.
 
+## The app's marks — which file is which
 
-## Home dashboard and time-aware banner films
+Four different NOWSSB images live in this repository and they are NOT crops
+of each other. Picking the wrong one is easy and has happened, so:
 
-Both native home modes now share the same Focus / Your Progress / Up next hierarchy. Normal Home uses the pale raised neumorphic surface system, while Fashion Home uses translucent dark glass panels and preserves the existing cinematic hero, Fashion Plus, and healing-path language. The Focus film is selected from the device’s local clock: morning is 05:00–11:59, afternoon is 12:00–16:59, evening is 17:00–20:59, and night is 21:00–04:59.
+| file | what it is |
+|---|---|
+| `assets/icons/app-icon-512.png` | **THE APP ICON.** Square, rounded. What the phone shows on the home screen. |
+| `assets/icons/app-icon-192.png` | the same icon, small |
+| `assets/icons/notif-icon-512.png` | a CIRCULAR disc on black — notifications only |
+| `assets/icons/logo-disc.webp` | circular, plain, **no headphones** — a header fallback |
 
-The four optimized MP4s and their posters live in the repository under `assets/video/` and are copied to Flutter by `node tools/flutter-assets.mjs`. The native video pool prefers the R2-backed Worker media route for these four files and falls back to the bundled asset, then the legacy CDN origins. The production media route is `https://nowssb-api.ribonpatil2.workers.dev/media/home-banners/{file}` and supports byte ranges for video playback. A successful native pronunciation score increments the local dashboard session, streak, and unique-word counters.
+**`app-icon-512.png` is the app icon, on the phone.** `manifest.json` names
+it as the PWA's 512 icon, so the home-screen mark is the same whichever of
+the two the reader installed — which is the point of them being one app.
+`tools/flutter-android.mjs` resizes it into all five Android mipmap
+densities on the way into every build, because `android/res` is generated
+and `flutter create` fills it with the blue Flutter logo otherwise.
 
-Before building a native target, run `node tools/flutter-assets.mjs`, then `flutter pub get`. Android microphone permission is applied by `node tools/flutter-android.mjs`; iOS microphone permission is applied by `node tools/flutter-ios.mjs`.
+Two more that are NOT in the repository and are fetched:
+
+- the header's headphones disc —
+  `res.cloudinary.com/ds6duqabl/…/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png`
+- the browser-tab favicon and the share card, both crops of one photograph —
+  `res.cloudinary.com/dkzxw33ln/…/grok_image_1776871816898_3_ll7c0m.jpg`

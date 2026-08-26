@@ -108,20 +108,20 @@ window.fashionHomeIntroEnter = function() {
 
   // Card 1 — NowssB Connect (blue)
   runCard({ stage: 'npcBlueStage', img: 'npcBlueImg', flash: 'npcBlueFlash', line: 'npcBlueLine' }, [
-    { img: 'assets/media/image/7f9808dbd165222aeaa1bf68f6a95814aa3e04e3c95b40e8-d010e32e.webp',
+    { img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
       lines: ['Your circle just got bigger.', 'Connect with learners like you.'] },
-    { img: 'assets/media/image/b3a9fb315a42d97c3c2e0e7c663d55f2378df28d1a2b3a45-11b5d7bd.webp',
+    { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png',
       lines: ['Stand out with a badge.', 'Blue, Silver, Gold or Diamond — your pick.'] },
-    { img: 'assets/media/image/0c436ecb735a892202453e58b9a36178183dc6c2d7f72be4-a65cce23.webp',
+    { img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png',
       lines: ['New voices, new stories.', 'Discover creators worth following.'] }
   ]);
 
   // Card 2 — NowssB Store (purple): the store logo + cart images from the
   // fashion home's NowssB store button
   runCard({ stage: 'npcStoreStage', img: 'npcStoreImg', flash: 'npcStoreFlash', line: 'npcStoreLine' }, [
-    { img: 'assets/media/image/d9add9f1fafbb3ef74d8ce34f1f3db5ea1ba5777eb3e152d-2fd048e4.webp',
+    { img: 'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png',
       lines: ['Enter the NowssB Store.', 'Own words that heal — yours alone.'] },
-    { img: 'assets/media/image/fbeeac02a1473db70491cf65ad2a341903ca1fe1aff6aff9-574525a1.webp',
+    { img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_240/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png',
       lines: ['Your cart is waiting.', 'Coupons up to 50% off today.'] }
   ]);
 })();
@@ -130,9 +130,9 @@ window.fashionHomeIntroEnter = function() {
    home), one by one, only while the Fashion home is visible. Tap opens store. */
 (function () {
   var SEQ = [
-    'assets/media/image/f547a2cd0364e788efac295f7e126596364b79b890850788-b0295a59.webp',
-    'assets/media/image/ec4d04df4d0a6bc2be31475207010a42848ab5d29a72a66b-a8787861.webp',
-    'assets/media/image/81105d598e5c8258b8a0244f549cbbd2b3f1f580cd0298ac-7d6775a6.webp'
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
   ];
   var idx = 0, preloaded = false;
   var el = document.getElementById('fashCouponImg');

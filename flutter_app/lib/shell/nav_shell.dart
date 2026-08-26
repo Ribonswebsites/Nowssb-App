@@ -10,7 +10,7 @@ import '../screens/library.dart';
 import '../screens/practice.dart';
 import '../screens/profile.dart';
 import '../screens/store.dart';
-import '../widgets/motion.dart';
+import '../widgets/pool_hud.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
@@ -72,44 +72,9 @@ class _NavShellState extends State<NavShell> {
   @override
   Widget build(BuildContext context) {
     return NavScope(
-      go: (i) {
-        if (i == _i) return;
-        setState(() => _i = i);
-      },
+      go: (i) => setState(() => _i = i),
       child: _build(context),
     );
-  }
-
-  Widget _screen(int i) {
-    switch (i) {
-      case 0:
-        return AnimatedSwitcher(
-          duration: NwsbMotion.tabDuration,
-          switchInCurve: NwsbMotion.curve,
-          switchOutCurve: NwsbMotion.softCurve,
-          transitionBuilder: (child, animation) => FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(begin: const Offset(.018, 0), end: Offset.zero)
-                  .animate(animation),
-              child: child,
-            ),
-          ),
-          child: KeyedSubtree(
-            key: ValueKey(_fashion),
-            child: _fashion ? const HomeFashion() : const HomeNormal(),
-          ),
-        );
-      case 1:
-        return const PracticeScreen();
-      case 2:
-        return const LibraryScreen();
-      case 3:
-        return const StoreScreen();
-      case 4:
-      default:
-        return const ProfileScreen();
-    }
   }
 
   Widget _build(BuildContext context) {
@@ -117,27 +82,18 @@ class _NavShellState extends State<NavShell> {
       backgroundColor: NwsbColors.surface,
       body: Stack(
         children: [
-          // Keep only the visible tab subtree mounted. The transition overlaps
-          // the outgoing frame briefly, then disposes it so video-heavy tabs do
-          // not retain decoders while another tab is active.
-          AnimatedSwitcher(
-            duration: NwsbMotion.tabDuration,
-            switchInCurve: NwsbMotion.curve,
-            switchOutCurve: NwsbMotion.softCurve,
-            transitionBuilder: (child, animation) => FadeTransition(
-              opacity: animation,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(.025, 0),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              ),
-            ),
-            child: KeyedSubtree(
-              key: ValueKey('$_i-$_fashion'),
-              child: _screen(_i),
-            ),
+          // IndexedStack rather than swapping the child: it keeps each tab's
+          // scroll position and state alive, which is what the website does
+          // (its screens are all in the DOM at once, one of them .active).
+          IndexedStack(
+            index: _i,
+            children: [
+              _fashion ? const HomeFashion() : const HomeNormal(),
+              const PracticeScreen(),
+              const LibraryScreen(),
+              const StoreScreen(),
+              const ProfileScreen(),
+            ],
           ),
           // The switch between the two homes. On the website this lives in
           // Customize; until that screen is ported it is here, because a
@@ -188,8 +144,10 @@ class _NavShellState extends State<NavShell> {
               ),
             ),
 
-          // The decoder HUD is development instrumentation only and is not
-          // part of the user-facing Flutter surface.
+          // Debug only, and compiled out of a release build: the decoder
+          // count, live, so the ceiling is something you can watch rather
+          // than something you have to take on trust.
+          const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
           Positioned(
             left: 14,
             right: 14,
@@ -224,8 +182,9 @@ class _NavShellState extends State<NavShell> {
                                 _tabs[i].$1,
                                 style: TextStyle(
                                   fontSize: 10,
-                                  fontWeight:
-                                      i == _i ? FontWeight.w700 : FontWeight.w400,
+                                  fontWeight: i == _i
+                                      ? FontWeight.w700
+                                      : FontWeight.w400,
                                   color: i == _i
                                       ? NwsbColors.goldLight
                                       : const Color(0x99FFFFFF),

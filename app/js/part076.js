@@ -49,12 +49,12 @@
      Both lists are walked by the same code, so they can never fall out of
      step with each other. */
   var STILLS = [
-    { img: 'assets/media/image/intro-store-e670c163.webp',     t: ['The NowssB Store', 'Still, today'] },
-    { img: 'assets/media/image/intro-words-9adb7eb3.webp',     t: ['The Word Atelier', 'Still, today'] },
-    { img: 'assets/media/image/intro-meanings-0a159fa2.webp',  t: ['The Meaning Store', 'Still, today'] },
-    { img: 'assets/media/image/intro-ebooks-5294ccf0.webp',    t: ['NowssB eBooks', 'Still, today'] },
-    { img: 'assets/media/image/intro-signature-25cf5fe5.webp', t: ['The Signature', 'Still, today'] },
-    { img: 'assets/media/image/fp-intro-22a4699e.webp',      t: ['Fashion Plus', 'Still, today'] }
+    { img: './assets/store/intro-store.webp',     t: ['The NowssB Store', 'Still, today'] },
+    { img: './assets/store/intro-words.webp',     t: ['The Word Atelier', 'Still, today'] },
+    { img: './assets/store/intro-meanings.webp',  t: ['The Meaning Store', 'Still, today'] },
+    { img: './assets/store/intro-ebooks.webp',    t: ['NowssB eBooks', 'Still, today'] },
+    { img: './assets/store/intro-signature.webp', t: ['The Signature', 'Still, today'] },
+    { img: './assets/fashion/fp-intro.webp',      t: ['Fashion Plus', 'Still, today'] }
   ];
   /* The backgrounds you can choose between. Add one here and it appears in
      the phone and in the picker on its own — nothing else to touch. */
@@ -63,18 +63,23 @@
     { vid: './assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
     { vid: './assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
     { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
-    /* Fifth background supplied for this release and bundled locally. */
-    { vid: './assets/video/fashion-plus-bg-4.mp4', name: 'Background Five' },
-    { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Background Six' },
-    { vid: './assets/video/fashion-plus-bg-6.mp4', name: 'Current Fashion Home' }
+    /* Words Science used to sit here. It is the clip that belongs to the
+       Word Science button, not a wallpaper, and at 0.03 bits per pixel it
+       was the worst-looking thing in the list as well. Removing it shifts
+       the indices after it by one, so anyone who had it saved lands on
+       Falling Diamonds — which is the point.
+       These two are encoded at 720x1280 / ~0.19 bits per pixel, against
+       0.08-0.11 for the four above. */
+    { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Falling Diamonds' },
+    { vid: './assets/video/fashion-plus-bg-6.mp4', name: 'Violet Silk' }
   ];
-
-  /* Preserve the current Fashion Home film as the default. Existing stored
-     selections remain valid by index; first-time users see the current film,
-     while every prior and new option remains available in the picker. */
+  /* What a first-time reader gets. Not index 0 — Violet Silk is the one
+     that should introduce the mode, and it is one of the two encoded for
+     it. Kept as a name rather than a number so it survives the list
+     changing again. */
   var BG_DEFAULT = (function () {
-    for (var i = 0; i < FILMS.length; i++) if (FILMS[i].name === 'Current Fashion Home') return i;
-    return FILMS.length - 1;
+    for (var i = 0; i < FILMS.length; i++) if (FILMS[i].name === 'Violet Silk') return i;
+    return 0;
   })();
   FILMS.forEach(function (f, i) {
     f.t = [f.name, 'Background ' + (i + 1) + ' of ' + FILMS.length];
@@ -562,7 +567,7 @@
     }).join('');
 
     window.nwsbSheet({
-      art: 'assets/media/image/caution-art-37cf9ea8.webp',
+      art: './assets/fashion/caution-art.webp',
       head: 'This will cost you battery',
       sub: 'Fashion Plus keeps video decoding while you use the app',
       body:

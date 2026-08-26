@@ -24,25 +24,25 @@
 
   var HOME_TILES = [
     { name: 'Sound Library', sub: 'Root frequencies', tip: 'Root frequencies to practice with',
-      icon: 'assets/media/image/68da1fb6b6781158ca16fa948a8a67f1038b8449f5499996-e8164d5a.webp',
-      cover: 'assets/media/image/4e765753b9ec9d958af86f51d9375454362920495f27b2af-f1a87f28.jpg',
-      photo: 'assets/media/image/e3a3b8f23725a3e0f9ab5777d7d47252c751e649d7526de8-d30ce3d0.webp', photoPos: 'center',
-      art: 'assets/media/image/9c4dc33eefb40dd39731667d6e27789d588bfab485457054-eebebc11.webp' },
+      icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
+      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
+      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784119058739_g0ihh7.jpg', photoPos: 'center',
+      art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123006/file_00000000048471f4ab69afc37df973c0_iab33r.png' },
     { name: 'My Progress', sub: 'Healing journey', tip: 'Your healing journey and body map',
-      icon: 'assets/media/image/38f0f5ffaf71f982cb92d7e49b8cbb3a9bd93bc6820c8a99-09267100.webp',
-      cover: 'assets/media/image/4f0f4d155237f485093a88112226e07b7d816fe37ed6c1a7-eaa9e4d3.webp',
-      photo: 'assets/media/image/71729c5e07e675a21e8c7fd4db5a71e8ed4832ddfe08a5aa-de1d378e.webp', photoPos: 'center top',
-      art: 'assets/media/image/719d9885f3a62cd476ee72c8a0c55cc4777ab66478c48ffd-06d50e0c.webp' },
+      icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png',
+      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899471/file_00000000345481faafd2bea97c8320ab_oknybe.png',
+      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784120246538_thvpik.jpg', photoPos: 'center top',
+      art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_000000009f8871f48dbd29b870dbdc9e_z9idoj.png' },
     { name: 'Word Science', sub: 'NOWSBANSIU texts', tip: 'The NOWSBANSIU word science texts',
-      icon: 'assets/media/image/2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7-64ecc8c2.webp',
-      cover: 'assets/media/image/cb1b2989360650fe701229e53bfb5461d4b7f8f8fd907a9c-3ca7f41b.webp',
-      photo: 'assets/media/image/7cdebb57292ff2b18739dad49f7f09080c6a5725f4139962-af412a71.webp', photoPos: 'center',
-      art: 'assets/media/image/1028feef3e61ce97de6488b98f372629cc29e293140cf4cd-c7d819fe.webp' },
+      icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
+      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
+      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784120203500_t6zwrf.jpg', photoPos: 'center',
+      art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_0000000015b071f48397d34be0129b36_bx9cur.png' },
     { name: 'My Profile', sub: 'Your settings', tip: 'Your profile and app settings',
-      icon: 'assets/media/image/1e60226665c68128ad03987930169b94504c89b3fe74ccc8-d7dfb697.webp',
-      cover: 'assets/media/image/cd3ea2a1dca984676954873f673ae78e59bd854463801884-a2f3c0c1.webp',
-      photo: 'assets/media/image/4d8845d4de3736d8ba7ddf5146dede314fa548d3f1a67fda-e565f2c6.webp', photoPos: 'center',
-      art: 'assets/media/image/50c459bc547b0eecdbf18fb29912e30688824142cd23723e-e38fd059.webp' }
+      icon: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png',
+      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130232/grok_image_1784119291881_s6pws0.jpg', photoPos: 'center',
+      art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_00000000536071f4bf5172014811968f_jkt450.png' }
   ];
 
   /* The Normal Home's identity is the soft raised card the rest of that page is
@@ -146,7 +146,7 @@
   };
 
   // ── Toast ─────────────────────────────────────────────────────
-  var HT_ICON = 'assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png';
+  var HT_ICON = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png';
   var _toastT = null;
   function toast(msg) {
     var scr = document.getElementById('sub-home-tiles'); if (!scr) return;

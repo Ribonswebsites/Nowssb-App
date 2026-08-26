@@ -6,17 +6,16 @@
 /// that uses this has to know any of that happened — it is a picture that
 /// sometimes moves.
 ///
-/// The poster is not an optimisation, it is the contract. Off-screen clips
-/// show a picture and cost nothing; every on-screen clip is granted a
-/// decoder (capped with the website at 24). Every mp4 in assets/video has
-/// a -poster.webp beside it, generated from the file itself, so what you
-/// see while a clip waits is exactly what it would be showing anyway.
+/// The poster is not an optimisation, it is the contract. Because at most
+/// four clips decode at once, MOST OF THESE ARE SHOWING A PICTURE MOST OF
+/// THE TIME, and the app looks right only if that picture is the clip's own
+/// first frame. Every mp4 in assets/video has a -poster.webp beside it,
+/// generated from the file itself, so what you see while a clip waits is
+/// exactly what it would be showing anyway.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import '../data/settings.dart';
-import 'cdn.dart';
 import 'video_pool.dart';
 
 class NwsbVideo extends StatefulWidget {
@@ -44,8 +43,20 @@ class NwsbVideo extends StatefulWidget {
   final bool autoplay;
   final Alignment alignment;
 
-  String get _poster =>
-      poster ?? asset.replaceAll(RegExp(r'\.mp4$'), '-poster.webp');
+  /// True when [asset] is a URL rather than a bundled file.
+  bool get isRemote =>
+      asset.startsWith('http://') || asset.startsWith('https://');
+
+  /// A bundled clip's poster is its own first frame, beside it in the
+  /// bundle. A REMOTE clip has no such file — deriving one would name an
+  /// asset that does not exist and paint a black rectangle over the video
+  /// until it opens, so a remote clip simply has no poster unless one is
+  /// given.
+  String? get _poster {
+    if (poster != null) return poster;
+    if (isRemote) return null;
+    return asset.replaceAll(RegExp(r'\.mp4$'), '-poster.webp');
+  }
 
   @override
   State<NwsbVideo> createState() => _NwsbVideoState();
@@ -67,24 +78,8 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    Settings.instance.addListener(_onSettings);
-    if (_shouldPlay) _take();
+    if (widget.autoplay) _take();
     _pump();
-  }
-
-  /// Every eligible clip is a muted background/section film. Flutter keeps
-  /// every mounted clip in the play state; the separate Splash widget owns the
-  /// protected launch animation and is not part of this pool.
-  bool get _shouldPlay => true;
-
-  void _onSettings() {
-    final want = _shouldPlay;
-    if (want && _lease == null) {
-      _take();
-    } else if (!want && _lease != null) {
-      _drop();
-      if (mounted) setState(() {});
-    }
   }
 
   void _take() {
@@ -106,21 +101,45 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   }
 
   /// Only what changes the picture causes a rebuild.
+  ///
+  /// The lease notifies whenever the pool grants or takes back a decoder, but
+  /// the only thing this widget draws differently is "poster" versus "moving
+  /// picture". Rebuilding on anything else would re-run the post-frame
+  /// measure, which reports, which notifies — round and round.
   bool _wasReady = false;
 
+  /// Whether the platform has told us how big the picture is yet.
+  ///
+  /// This is NOT the same as being initialized, and the difference is what
+  /// made every clip in the app look frozen. On Android `isInitialized`
+  /// turns true when the player is ready to be driven; `value.size` stays
+  /// Size.zero until the first frame has actually been DECODED, which is
+  /// some frames later. Between the two, the build below was handing a
+  /// FittedBox a 0x0 child — which paints nothing — so the poster underneath
+  /// was all you saw. And because readiness had already flipped, nothing
+  /// ever rebuilt this widget again, so the clip stayed invisible for as
+  /// long as it was on screen: playing, decoding, holding its slot, and
+  /// showing a still.
+  bool _wasSized = false;
+
   void _onLease() {
+    final c = _lease?.controller;
     final ready = _lease?.isReady ?? false;
-    if (ready == _wasReady) return;
+    final sized = c != null && !c.value.size.isEmpty;
+    if (ready == _wasReady && sized == _wasSized) return;
     _wasReady = ready;
+    _wasSized = sized;
     if (mounted) setState(() {});
   }
 
   @override
   void didUpdateWidget(NwsbVideo old) {
     super.didUpdateWidget(old);
+    // A changed clip, or the motion switch moving under it. Both are the
+    // same thing here: let go of what was held, take what is now wanted.
     if (old.asset != widget.asset || old.autoplay != widget.autoplay) {
       _drop();
-      if (_shouldPlay) _take();
+      if (widget.autoplay) _take();
       if (mounted) setState(() {});
     }
   }
@@ -137,12 +156,24 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    Settings.instance.removeListener(_onSettings);
     WidgetsBinding.instance.removeObserver(this);
     _drop();
     super.dispose();
   }
 
+  /// Measure after every frame, for as long as this widget is alive.
+  ///
+  /// This used to be registered inside build(), which looked equivalent and
+  /// was not: a post-frame callback fires ONCE, and a ListView does not
+  /// rebuild the children that are merely scrolling past. So the clip
+  /// measured itself on its first frame and never again — and because the
+  /// widget only rebuilds when the pool grants it a decoder, a clip that
+  /// failed to get one on that single measurement could never ask for
+  /// another. Nothing on screen played, ever, and the readout said 0/4.
+  ///
+  /// Re-registering does NOT schedule a frame of its own, so an idle app
+  /// stays idle — the callback simply runs on whatever frames the app was
+  /// producing anyway, which is exactly when a clip can have moved.
   void _pump() {
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -151,14 +182,34 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     });
   }
 
+  /// Where this clip is relative to the middle of the screen, measured from
+  /// the render object rather than from a scroll offset — which means it
+  /// works the same inside a list, a page view, a nested scroller or none of
+  /// them, and no parent has to cooperate.
   void _measure() {
     if (!mounted) return;
     final lease = _lease;
-    if (lease == null) return;
-    // Do not mark mounted clips off-screen. Keeping a finite distance for
-    // every lease prevents the pool from pausing or disposing a video merely
-    // because the user scrolled it away; every mounted clip keeps its loop.
-    lease.reportDistance(0);
+    if (lease == null) return; // a still has nothing to report
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize || !box.attached) {
+      // Not laid out YET is not the same as off screen. Saying "infinity"
+      // here would hand the decoder away on the one frame before the first
+      // layout, so this simply waits for the next.
+      return;
+    }
+    final screen = MediaQuery.maybeOf(context)?.size;
+    if (screen == null) return;
+
+    final top = box.localToGlobal(Offset.zero).dy;
+    final centre = top + box.size.height / 2;
+
+    // One viewport of slack on each side, so a clip is granted its decoder
+    // a screen's worth of travel before you reach it and keeps it a screen
+    // after — scrolling back up does not restart everything.
+    final visible =
+        top < screen.height * 2 && top + box.size.height > -screen.height;
+    lease.reportDistance(
+        visible ? (centre - screen.height / 2).abs() : double.infinity);
   }
 
   @override
@@ -170,27 +221,42 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.network(
-            NwsbCdn.assetUrl(widget._poster),
-            fit: widget.fit,
-            alignment: widget.alignment,
-            errorBuilder: (_, __, ___) =>
-                const ColoredBox(color: Colors.black),
-          ),
+          if (widget._poster case final p?)
+            Image.asset(
+              p,
+              fit: widget.fit,
+              alignment: widget.alignment,
+              // A missing poster must never be an exception in a list that
+              // is scrolling. Nothing is a worse picture than a red error
+              // box.
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: Colors.black),
+            )
+          else
+            const ColoredBox(color: Colors.black),
+          // 220ms, which is long enough that a decoder arriving mid-scroll
+          // reads as the picture coming to life rather than as a flicker.
           AnimatedOpacity(
             opacity: ready ? 1 : 0,
             duration: const Duration(milliseconds: 220),
             child: ready
-                ? FittedBox(
-                    fit: widget.fit,
-                    alignment: widget.alignment,
-                    clipBehavior: Clip.hardEdge,
-                    child: SizedBox(
-                      width: c.value.size.width,
-                      height: c.value.size.height,
-                      child: VideoPlayer(c),
-                    ),
-                  )
+                // A zero size means the first frame has not been decoded
+                // yet. Cropping to the clip's own dimensions needs those
+                // dimensions; without them the player simply fills the box,
+                // which is the right picture a fraction early rather than no
+                // picture at all.
+                ? (c.value.size.isEmpty
+                    ? VideoPlayer(c)
+                    : FittedBox(
+                        fit: widget.fit,
+                        alignment: widget.alignment,
+                        clipBehavior: Clip.hardEdge,
+                        child: SizedBox(
+                          width: c.value.size.width,
+                          height: c.value.size.height,
+                          child: VideoPlayer(c),
+                        ),
+                      ))
                 : const SizedBox.shrink(),
           ),
         ],

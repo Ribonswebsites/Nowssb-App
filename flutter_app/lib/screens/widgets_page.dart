@@ -19,13 +19,6 @@ import '../theme/tokens.dart';
 import '../widgets/page_shell.dart';
 import 'fashion_plus.dart';
 import 'sound_library.dart';
-import 'login.dart';
-import 'routines.dart';
-import 'connect.dart';
-import 'player.dart';
-import 'subscribe.dart';
-import 'cart.dart';
-import 'healing.dart';
 
 class WidgetsPage extends StatefulWidget {
   const WidgetsPage({super.key});
@@ -86,7 +79,6 @@ class _WidgetsPageState extends State<WidgetsPage> {
               on: s.fashionPlus,
               onChanged: s.setFashionPlus,
             ),
-
             const SizedBox(height: 24),
             const DarkHead(
               eyebrow: 'Everything, one tap away',
@@ -105,59 +97,9 @@ class _WidgetsPageState extends State<WidgetsPage> {
               title: 'Fashion Plus',
               sub: 'Open the motion mode',
               icon: Icons.auto_awesome_motion_outlined,
-              go: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => const FashionPlusScreen())),
-            ),
-            _Door(
-              title: 'The Player',
-              sub: 'Listen · Record · Repeat · Meaning · Guide',
-              icon: Icons.play_circle_outline,
               go: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const PlayerScreen())),
+                  MaterialPageRoute(builder: (_) => const FashionPlusScreen())),
             ),
-            _Door(
-              title: 'My Routines',
-              sub: 'Five slots, one day',
-              icon: Icons.repeat_rounded,
-              go: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const RoutinesScreen())),
-            ),
-            _Door(
-              title: 'NowssB Connect',
-              sub: 'People, chat, the feed',
-              icon: Icons.groups_outlined,
-              go: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ConnectScreen())),
-            ),
-            _Door(
-              title: 'Healing Path',
-              sub: 'Ten categories, matched to the body',
-              icon: Icons.favorite_border,
-              go: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const HealingScreen())),
-            ),
-            _Door(
-              title: 'Subscription',
-              sub: 'Resonance · Frequency · Frequency X',
-              icon: Icons.workspace_premium_outlined,
-              go: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SubscribeScreen())),
-            ),
-            _Door(
-              title: 'Cart',
-              sub: 'Words you picked up',
-              icon: Icons.shopping_cart_outlined,
-              go: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => const CartScreen(kind: CartKind.cart))),
-            ),
-            _Door(
-              title: 'Sign in',
-              sub: 'Google, email, phone',
-              icon: Icons.login,
-              go: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const LoginScreen())),
-            ),
-
             const SizedBox(height: 24),
             const DarkHead(
               eyebrow: 'Named rather than faked',
@@ -321,8 +263,7 @@ class _Door extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward,
-                size: 16, color: Color(0xB3FFFFFF)),
+            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
           ],
         ),
       ),

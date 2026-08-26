@@ -16,7 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/shell/nav_shell.dart';
-import 'package:nowssb/widgets/neumorphic.dart';
+import 'package:nowssb/widgets/home_parts.dart';
 
 import 'fake_video_platform.dart';
 
@@ -28,7 +28,12 @@ void main() {
   // than failing. An in-memory store is the sanctioned stand-in.
   SharedPreferences.setMockInitialValues({});
 
-  setUpAll(FakeVideoPlatform.new);
+  setUpAll(() {
+    FakeVideoPlatform();
+    // Deadlines own real Timers; this file runs on a fake clock. See
+    // VideoPool.debugDeadlines.
+    VideoPool.debugDeadlines = false;
+  });
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
@@ -45,7 +50,13 @@ void main() {
     // The five destinations of #ig-bottomnav. Every one is a real screen now,
     // and every one must build and lay out at phone size without throwing or
     // overflowing.
-    for (final label in ['Connect', 'Practice', 'Library', 'Store', 'Profile']) {
+    for (final label in [
+      'Connect',
+      'Practice',
+      'Library',
+      'Store',
+      'Profile'
+    ]) {
       await tester.tap(find.text(label));
       await tester.pump(const Duration(milliseconds: 50));
       expect(tester.takeException(), isNull, reason: '$label threw');
@@ -64,7 +75,10 @@ void main() {
     // than tapped: the bar sits under the bottom nav at rest, and fighting
     // hit-testing would be testing the scroll position rather than the
     // wiring. What matters is that the callback exists and moves the shell.
-    final bars = tester.widgetList<NwsbBanner>(find.byType(NwsbBanner));
+    //
+    // Both homes are checked section by section in their own files; this is
+    // the shell's own check, that whichever home it puts up is wired to it.
+    final bars = tester.widgetList<SecBanner>(find.byType(SecBanner));
     expect(bars, isNotEmpty, reason: 'the home should carry black bars');
     for (final b in bars) {
       expect(b.onTap, isNotNull,

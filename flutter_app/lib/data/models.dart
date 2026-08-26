@@ -125,11 +125,8 @@ class Word {
     var parts = <WordPart>[];
     final rawParts = raw['parts'];
     if (rawParts is List) {
-      parts = rawParts
-          .map(WordPart.from)
-          .whereType<WordPart>()
-          .take(5)
-          .toList();
+      parts =
+          rawParts.map(WordPart.from).whereType<WordPart>().take(5).toList();
     }
 
     // Older records carry `syllables` and no `parts`; build the boxes from
@@ -137,8 +134,8 @@ class Word {
     if (parts.isEmpty && raw['syllables'] is List) {
       parts = (raw['syllables'] as List)
           .take(5)
-          .map((s) => WordPart(
-              roman: '$s', deva: '', hold: 1.5, say: '', audio: ''))
+          .map((s) =>
+              WordPart(roman: '$s', deva: '', hold: 1.5, say: '', audio: ''))
           .toList();
     }
 
@@ -160,7 +157,8 @@ class Word {
       audioMale: _str(raw['audioMale']),
       audioFemale: _str(raw['audioFemale']),
       organ: _str(raw['organ']),
-      origin: _str(raw['origin']).isEmpty ? 'Natural Origin' : _str(raw['origin']),
+      origin:
+          _str(raw['origin']).isEmpty ? 'Natural Origin' : _str(raw['origin']),
       benefit: _str(raw['benefit']),
       meaning: _str(raw['meaning']),
       mouthPos: _str(raw['mouthPos']),
@@ -233,7 +231,8 @@ class Meaning {
 
   static Meaning? from(dynamic raw) {
     if (raw is! Map) return null;
-    final name = _str(raw['name']).isEmpty ? _str(raw['word']) : _str(raw['name']);
+    final name =
+        _str(raw['name']).isEmpty ? _str(raw['word']) : _str(raw['name']);
     if (name.isEmpty) return null;
     return Meaning(
       key: _str(raw['key']).isEmpty

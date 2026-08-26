@@ -12,7 +12,6 @@ import '../data/settings.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
-import 'motion.dart';
 
 class PageShell extends StatefulWidget {
   const PageShell({
@@ -63,13 +62,12 @@ class _PageShellState extends State<PageShell> {
       body: Stack(
         children: [
           Positioned.fill(
-            // The film IS the page. Always playing — same as the website's
-            // #fpBgVideo / .fp-page-vid, which loop whether Fashion Plus is
-            // on or not. The switch still exists; it no longer freezes the
-            // one thing the page is made of.
+            // Still unless motion mode is on. autoplay:false is what makes an
+            // unmoving background genuinely free — with it off the pool is
+            // never even asked for a decoder, so the page costs one picture.
             child: NwsbVideo(
               asset: widget.film,
-              autoplay: true,
+              autoplay: Settings.instance.fashionPlus,
               priority: ClipPriority.feature,
             ),
           ),
@@ -80,9 +78,9 @@ class _PageShellState extends State<PageShell> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0x66060C18),
-                    Color(0x99060C18),
                     Color(0xCC060C18),
+                    Color(0xF0060C18),
+                    Color(0xFA060C18),
                   ],
                 ),
               ),
@@ -90,7 +88,6 @@ class _PageShellState extends State<PageShell> {
           ),
           SafeArea(
             child: CustomScrollView(
-              physics: const NwsbSmoothScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
@@ -223,7 +220,6 @@ class WordRow extends StatelessWidget {
     required this.sub,
     this.trailing,
     this.onTap,
-    this.imageUrl,
   });
 
   final String word;
@@ -231,7 +227,6 @@ class WordRow extends StatelessWidget {
   final String sub;
   final Widget? trailing;
   final VoidCallback? onTap;
-  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -256,26 +251,14 @@ class WordRow extends StatelessWidget {
                 color: const Color(0xFF14141C),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: imageUrl != null && imageUrl!.isNotEmpty
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        imageUrl!,
-                        width: 46,
-                        height: 46,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Center(
-                          child: Text(
-                            deva.isNotEmpty ? deva.characters.first : word.characters.first,
-                            style: const TextStyle(fontSize: 20, color: NwsbColors.goldLight, height: 1.2),
-                          ),
-                        ),
-                      ),
-                    )
-                  : Text(
-                      deva.isNotEmpty ? deva.characters.first : word.characters.first,
-                      style: const TextStyle(fontSize: 20, color: NwsbColors.goldLight, height: 1.2),
-                    ),
+              child: Text(
+                deva.isNotEmpty ? deva.characters.first : word.characters.first,
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: NwsbColors.goldLight,
+                  height: 1.2,
+                ),
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(

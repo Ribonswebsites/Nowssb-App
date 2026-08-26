@@ -128,15 +128,11 @@
      under the old meaning is read forward as 'full'. ── */
   var HKEY = 'nwsb_hero_style';
   var HVER = 'nwsb_hero_style_v';
-  /* The 15 August Hero Header is the Fashion home’s intended default. Migrate
-     older saved `full`/legacy values to the historical plain deck once; after
-     that, the user can still choose another look from the selector. */
   (function migrate() {
     try {
-      if (localStorage.getItem(HVER) !== '3') {
-        localStorage.setItem(HKEY, 'plain');
-        localStorage.setItem(HVER, '3');
-      }
+      if (localStorage.getItem(HVER)) return;
+      if (localStorage.getItem(HKEY) === 'plain') localStorage.setItem(HKEY, 'full');
+      localStorage.setItem(HVER, '2');
     } catch (e) {}
   })();
   window.heroStyle = function () {
@@ -844,7 +840,7 @@
 
      Reduce Motion, the mode's Page-backgrounds part switch and a paused
      app all fall back to the picture, which costs nothing to keep. */
-  var BG_STILL = 'assets/media/image/fp-intro-22a4699e.webp';
+  var BG_STILL = './assets/fashion/fp-intro.webp';
 
   function filmOn() {
     /* Normal mode is neumorphism — a light page, no photograph and no film
@@ -900,10 +896,26 @@
     if (p && p.catch) p.catch(function () {});
   }
 
-  /* The Hero Header page was removed. Keep a no-op compatibility hook for
-     older inline handlers and deep links; the Fashion hero itself remains
-     controlled by the saved mode and never opens a settings screen. */
-  window.stOpen = function () {};
+  window.stOpen = function () {
+    render();
+    paintBg();
+    var s = document.getElementById('sub-settings');
+    if (s && typeof openSub === 'function') openSub('settings');
+    haptic(24);
+    /* The rail is measured for the first time while the screen is still
+       opening. Look again once it has arrived, and fill the first few
+       outright so the page is never blank while the observer decides. */
+    setTimeout(function () {
+      var wins = document.querySelectorAll('.stw-prev');
+      for (var i = 0; i < Math.min(3, wins.length); i++) {
+        var st = wins[i].querySelector('.stw-prev-stage');
+        if (st) fillPreview(st);
+      }
+      observe();
+      visObserve();
+      pump();
+    }, 420);
+  };
   window.stClose = function () {
     if (typeof closeSub === 'function') closeSub('settings');
     /* Everything on this page is a copy of something else, so nothing is

@@ -1,8 +1,10 @@
 /// The little black readout in the corner of a debug build.
 ///
-/// WHAT IT SAYS. "decoders 8/24" is how many videos are being decoded right
-/// now, out of the ceiling this app enforces (matched to the website);
-/// "clips 9" is how many exist on the page. Off-screen clips are posters.
+/// WHAT IT SAYS. "decoders 2/4" is how many videos are being decoded right
+/// now, out of the ceiling this app enforces; "clips 9" is how many exist on
+/// the page. The distance between those two numbers is the whole reason the
+/// Flutter app can be smooth where the website could not — the website was
+/// running the equivalent of 106/4.
 ///
 /// It is a development tool and nothing else. TAP IT TO HIDE IT, and it is
 /// compiled out of a release build entirely: kDebugMode is a const, so the
@@ -61,11 +63,15 @@ class _PoolHudState extends State<PoolHud> {
     final pool = VideoPool.instance;
     final live = pool.liveCount;
     final near = pool.nearCount;
+    final playing = pool.playingCount;
     final err = pool.lastError;
 
-    // Red when something is actually wrong: over the ceiling, or clips on
-    // screen with nothing decoding at all.
-    final bad = live > VideoPool.maxLive || (near > 0 && live == 0);
+    // Red when something is actually wrong: over the ceiling, clips on
+    // screen with nothing decoding, or decoders that exist and are not
+    // moving — the last of which is the case that used to be invisible.
+    final bad = live > VideoPool.maxLive ||
+        (near > 0 && live == 0) ||
+        (live > 0 && playing == 0);
 
     return GestureDetector(
       onTap: () => setState(() => _hidden = true),
@@ -81,7 +87,7 @@ class _PoolHudState extends State<PoolHud> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              'decoders $live/${VideoPool.maxLive}   '
+              'decoders $live/${VideoPool.maxLive}   playing $playing\n'
               'clips ${pool.leaseCount}   near $near',
               style: const TextStyle(
                 fontSize: 10,

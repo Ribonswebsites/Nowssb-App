@@ -7,7 +7,7 @@ import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
   RecaptchaVerifier, signInWithPhoneNumber }
   from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp,
-  collection, addDoc, getDocs, query, orderBy, limit, where, startAfter }
+  collection, addDoc, getDocs, query, orderBy, limit, where }
   from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
 const app = initializeApp({
@@ -30,14 +30,6 @@ const db   = getFirestore(app);
 // uses the v9 modular SDK, so consumers must too (no v8 .collection() chaining).
 window._db = db;
 window._splashStartTime = Date.now();
-// AURA settings writes this marker before leaving the live Player. On a cold
-// WebView return, route straight through Home so index.html can reopen Player
-// without showing the normal branded splash sequence.
-window._nwsbReturnToPlayer = false;
-try {
-  var _auraReturn = JSON.parse(sessionStorage.getItem('nwsb_return_to_player') || 'null');
-  window._nwsbReturnToPlayer = !!(_auraReturn && _auraReturn.ts && Date.now() - _auraReturn.ts < 5 * 60 * 1000);
-} catch (e) {}
     // Optimization: Defer non-critical font loading
     if ('fonts' in document) {
       document.fonts.ready.then(() => {
@@ -48,26 +40,6 @@ try {
 async function saveUser(user) {
   const ref  = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-  let existingPublic = {};
-  try {
-    const publicSnap = await getDoc(doc(db, 'publicProfiles', user.uid));
-    existingPublic = publicSnap.data() || {};
-  } catch (e) {}
-  const fallbackUsername = (user.displayName || 'practitioner').toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\\.|\\.$/g, '') || 'practitioner';
-  const publicProfile = {
-    uid: user.uid,
-    displayName: existingPublic.displayName || user.displayName || 'NowssB Practitioner',
-    username: existingPublic.username || fallbackUsername,
-    photoURL: existingPublic.photoURL || user.photoURL || '',
-    bio: existingPublic.bio || '',
-    category: existingPublic.category || 'Practitioner',
-    profileVisibility: existingPublic.profileVisibility || 'public',
-    updatedAt: serverTimestamp()
-  };
-  // Keep a deliberately small public projection for Connect discovery. Email,
-  // subscription fields, onboarding answers, and private settings stay only in
-  // users/{uid}, which remains owner/admin-readable.
-  await setDoc(doc(db, 'publicProfiles', user.uid), publicProfile, { merge: true });
   if (!snap.exists()) {
     // No trialStartDate/trialEndDate here — a trial only begins when the
     // user explicitly starts one from the Subscription screen (card saved,
@@ -170,12 +142,6 @@ onAuthStateChanged(auth, async user => {
 
     // ── DURING SPLASH: logged-in users go to home or onboarding ──
     if (currentScreen === 'splash') {
-      if (window._nwsbReturnToPlayer) {
-        window._splashRoute = 'home';
-        window._splashDone = true;
-        _doNavigate('home');
-        return;
-      }
       // Set placeholder immediately so the fallback timer never defaults to 'login'
       window._splashRoute = 'home';
       try {
@@ -245,13 +211,6 @@ onAuthStateChanged(auth, async user => {
 
     // Unauthenticated → go straight to login
     if (currentScreen === 'splash') {
-      if (window._nwsbReturnToPlayer) {
-        window._guestMode = true;
-        window._splashRoute = 'home';
-        window._splashDone = true;
-        _doNavigate('home');
-        return;
-      }
       window._splashRoute = 'login';
       if (window._splashDone) _doNavigate('login');
       return;
@@ -332,8 +291,7 @@ window.saveOnboardingAnswers = async (answers, skipped) => {
   if (!skipped && answers[3]) window._userGender = answers[3];
 };
 
-// Use redirect-first everywhere: it is reliable in desktop browsers, PWAs, and embedded WebViews, while popup callbacks can lose their opener.
-const useRedirectFlow = true;
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     // Optimization: Passive event listeners for better scroll performance
     const passiveEvents = { passive: true };
     window.addEventListener('touchstart', () => {}, passiveEvents);
@@ -371,23 +329,10 @@ window.fbGoogleLogin = async () => {
   const provider = new GoogleAuthProvider();
   const loader = document.getElementById('authLoader');
 
-  // Embedded WebViews, standalone PWAs, and some desktop browser privacy modes can
-  // lose popup results. Use the full-page redirect in every context; it returns
-  // through /__/auth/handler and is consumed by getRedirectResult above.
+  // Always try popup first — on mobile Chrome this shows the native account picker
+  // overlay without leaving the page (same as Manus / Claude). Only fall back to
+  // redirect if the browser explicitly blocks popups (PWA standalone, some WebViews).
   if (loader) loader.classList.add('visible');
-  if (useRedirectFlow) {
-    try {
-      await signInWithRedirect(auth, provider);
-      return;
-    } catch (redirectError) {
-      _googleSignInInProgress = false;
-      if (loader) loader.classList.remove('visible');
-      alert(redirectError.code === 'auth/unauthorized-domain'
-        ? 'Google sign-in is not available on this domain. Please use Email instead.'
-        : 'Sign-in failed: ' + redirectError.message);
-      return;
-    }
-  }
   try {
     await signInWithPopup(auth, provider);
     // onAuthStateChanged fires and handles navigation — nothing to do here
@@ -510,72 +455,6 @@ window._fbServerTimestamp = () => serverTimestamp();
 /* ── Reels collection helpers ── */
 window._fbAddReelDoc = (reelData) =>
   addDoc(collection(db, 'reels'), { ...reelData, createdAt: serverTimestamp(), likes: 0 });
-
-/* Support cases are intentionally created from the signed-in person's account.
-   Firestore rules allow the owner to create only their own case, while the
-   protected Admin Studio can list and manage the collection. */
-window._fbCreateSupportReport = async function (payload) {
-  const user = auth.currentUser;
-  if (!user) throw new Error('Sign in to securely send a support case.');
-  const allowedTypes = ['report', 'feedback', 'support', 'help'];
-  const type = allowedTypes.includes(String(payload?.type || '')) ? String(payload.type) : 'support';
-  const caseReference = String(payload?.caseReference || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 40);
-  if (!caseReference) throw new Error('Support case reference required.');
-  const messages = Array.isArray(payload?.messages) ? payload.messages.slice(-10).map((entry) => ({
-    role: entry?.role === 'assistant' ? 'assistant' : 'user',
-    content: String(entry?.content || '').replace(/\0/g, '').slice(0, 1200),
-  })).filter((entry) => entry.content) : [];
-  return addDoc(collection(db, 'reports'), {
-    reporterUid: user.uid,
-    reporterName: String(user.displayName || '').slice(0, 120),
-    caseReference,
-    type,
-    reason: String(payload?.reason || 'support_follow_up').slice(0, 120),
-    messages,
-    context: String(payload?.context || '').slice(0, 2400),
-    screen: String(payload?.screen || '').slice(0, 240),
-    status: 'new',
-    source: 'support_chat',
-    createdAt: serverTimestamp(),
-    createdAtClient: Date.now(),
-  }).then(() => ({ caseReference }));
-};
-
-/* A signed-in member can only query reports whose reporterUid matches their
-   own session. The matching Firestore rule rejects any broader query. */
-window._fbGetMySupportReports = async function () {
-  const user = auth.currentUser;
-  if (!user) throw new Error('Sign in to view your support cases.');
-  const snap = await getDocs(query(
-    collection(db, 'reports'),
-    where('reporterUid', '==', user.uid),
-    limit(50)
-  ));
-  return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }))
-    .sort((a, b) => Number(b.createdAtClient || 0) - Number(a.createdAtClient || 0));
-};
-
-/* Cursor-backed pages keep a large private case history responsive without
-   broadening the self-only report query enforced by Firestore rules. */
-window._fbGetMySupportReportsPage = async function (options) {
-  const user = auth.currentUser;
-  if (!user) throw new Error('Sign in to view your support cases.');
-  options = options || {};
-  const pageSize = Math.max(4, Math.min(Number(options.pageSize) || 8, 24));
-  const constraints = [
-    where('reporterUid', '==', user.uid),
-    orderBy('createdAtClient', 'desc')
-  ];
-  if (options.cursor) constraints.push(startAfter(options.cursor));
-  constraints.push(limit(pageSize + 1));
-  const snap = await getDocs(query(collection(db, 'reports'), ...constraints));
-  const docs = snap.docs.slice(0, pageSize);
-  return {
-    rows: docs.map((entry) => ({ id: entry.id, ...entry.data() })),
-    cursor: docs.length ? docs[docs.length - 1] : (options.cursor || null),
-    hasMore: snap.docs.length > pageSize
-  };
-};
 
 window._fbGetReels = async (opts) => {
   opts = opts || {};

@@ -8,10 +8,10 @@
   /* ── NowssB Verified IMAGE badge (the headphone check-mark seal images),
      shown as a neumorphic circle — replaces the old teal headphone SVG ── */
   var VB_IMG = {
-    blue:    'assets/media/image/8bb41c1b8cc0044504cc36583aca8b710ea218c2c26537e8-c935fb9b.png',
-    silver:  'assets/media/image/101f0f04cb6c9be22e5c1eda5e4387de159223f571945d2b-9bf9fafe.png',
-    gold:    'assets/media/image/aa8425fabea2fb35c1c0dff22559c56d9dc5b8b3dc586eb7-fbcb27b3.png',
-    diamond: 'assets/media/image/2a7e23dc6ed9d3fc6f4152146ad0cd64cf86b60c4e568ade-38b88c60.png'
+    blue:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png',
+    silver:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png',
+    gold:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png',
+    diamond: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png'
   };
   function imgBadge(tier, size) {
     size = size || 18;
@@ -361,10 +361,10 @@
       /* Image-explainer slots — placeholders for the user's own evolution/origin imagery */
       '<div class="nwsb-section-hd">The New Fashion Trend</div>' +
       '<div class="nwsb-explainer-grid">' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/media/image/7e85debd11b23f4cf52eecc4e0aaf072efbafa603c209405-6da5e997.jpg)"><span>Origin</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/media/image/95c7afb74831b20b0d6a759c5511fabaf1deca5940eb1452-b0dca9f7.jpg)"><span>Evolution</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/media/image/b64c269f8de625ac19b9478500081fb0cf2ed69eb95edb66-30622439.jpg)"><span>Frequency</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(assets/media/image/86f1f9d6fd01218089100b3e281dc0e919a5d411b17d8577-bb456386.jpg)"><span>Healing</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/grok_image_1782620063491_op58of.jpg)"><span>Origin</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/image_qg7ro5.jpg)"><span>Evolution</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/image_dtmprf.jpg)"><span>Frequency</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/grok_image_1782620475749_fgncxl.jpg)"><span>Healing</span></div>' +
       '</div>' +
 
       (people.length
@@ -1143,8 +1143,8 @@
   }
   window.nwsbApplyStrippedBg = nwsbApplyStrippedBg;
 
-  var NWSB_THEME_IMG_NEU   = 'assets/media/image/ba07e554cafc04fca16eb849bee873501297327815552db0-b486f1d6.webp';
-  var NWSB_THEME_IMG_GLASS = 'assets/media/image/4a4cb1db29628f21e657d6ed891092362dd631db1b1af1bb-7c2a8296.webp';
+  var NWSB_THEME_IMG_NEU   = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png';
+  var NWSB_THEME_IMG_GLASS = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png';
   nwsbApplyStrippedBg(NWSB_THEME_IMG_NEU,   '#nwsbcsThemeNeu .nwsb-theme-opt-img, #nch-theme-neu .nwsb-theme-opt-img, #nwsb-theme-neu .nwsb-theme-opt-img');
   nwsbApplyStrippedBg(NWSB_THEME_IMG_GLASS, '#nwsbcsThemeGlass .nwsb-theme-opt-img, #nch-theme-glass .nwsb-theme-opt-img, #nwsb-theme-glass .nwsb-theme-opt-img');
 
@@ -1159,19 +1159,19 @@
      4 existing Connect glass photos (feed/reels/discover/home) with the
      9 Fashion Home photos for 13 choices total. ── */
   var NWSB_CONNECT_BGS = [
-    'assets/media/image/fbfd371d5535cf5032af352b1c5f69eacffced60b2979b0a-1f7fd285.webp',
-    'assets/media/image/0137012f27d1ff4dc41891b0ba674ff41d2aa7d2aaf5ce5d-5e1a96af.webp',
-    'assets/media/image/fd027c5b6ce59363c694ab8bf2eed2d7a1d9ed68a30fe16f-da533b17.webp',
-    'assets/media/image/b8736b76b90cdd421b4603f101bea1187832ce43f6ff9ed3-c2a2463d.webp',
-    'assets/media/image/c20dfe09052ea94736db5d076886a9b3e4e86ac6ec686d9b-a547e3dc.jpg',
-    'assets/media/image/aeac0fb81685e021d9d08359c0268c1fb8ce18a1c54b494e-4e02aaf3.jpg',
-    'assets/media/image/9c467e9f172ef75fe9f12f4313d60c07e15e691ea9024f9d-68070510.jpg',
-    'assets/media/image/4644221bee571acadae57bb2285a0126c3cd9e095ab9356d-b5e5798b.jpg',
-    'assets/media/image/d7f9a33e2229352fca42e152adc5eb23b8c2e3d675736442-9da8c189.jpg',
-    'assets/media/image/19540c1a081843c541f6e3d511bd56c4bfefda898140623d-30baefd8.jpg',
-    'assets/media/image/4320a713975835ad07de345d41f50567f8d04013c68ba4e0-f4ccada5.jpg',
-    'assets/media/image/db886b606c99c0e99f900d618e5ae31e2237570bddb6d32b-1385ed16.jpg',
-    'assets/media/image/31f92fc4c2fa5d42951917614024f8f9634adb02648e3f8d-751a302d.jpg'
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177099346_a7zq1m.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177245304_ihjubs.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177237514_bbhcec.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177200001_clr7h6.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261485118_fnnndw.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263702345_zlt99m.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263836740_qclr5g.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261493254_szhsuw.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263881946_zespcn.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263699783_tyf4l8.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263996/grok_image_1784263979789_doxtcp.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263836740_atjk35.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg'
   ];
 
   window.nwsbSetConnectBg = function (url) {

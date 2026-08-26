@@ -12,17 +12,21 @@
 # signing secrets are present, because a release build cannot be signed
 # without them and a keystore must never live in a repository.
 
-name: NowssB WebView APK
+name: Android APK
 
 on:
   push:
-    branches: [main]
+    # Work branches too — see the note in flutter-apk.yml. An APK built only
+    # from main cannot be used to review anything that is not on main yet.
+    branches:
+      - main
+      - 'claude/**'
     paths-ignore: ['**.md']
   workflow_dispatch:
 
 jobs:
   debug-apk:
-    name: NowssB WebView debug APK (sideloadable)
+    name: Debug APK (sideloadable)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,9 +55,6 @@ jobs:
       - name: Create the Android project
         run: npx cap add android
 
-      - name: Configure in-app updater
-        run: node tools/capacitor-updater.mjs
-
       - name: Sync
         run: npx cap sync android
 
@@ -61,15 +62,9 @@ jobs:
         working-directory: android
         run: ./gradlew --no-daemon assembleDebug
 
-      - name: Report debug signing fingerprint
-        working-directory: android
-        run: |
-          echo "WebView debug APK signing certificate:"
-          ./gradlew --no-daemon signingReport | grep -A3 -E 'Variant: debug|SHA1:' || true
-
       - uses: actions/upload-artifact@v4
         with:
-          name: nowssb-webview-debug-apk-all-changes
+          name: nowssb-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 
@@ -118,7 +113,6 @@ jobs:
         if: steps.guard.outputs.ok == 'true'
         run: |
           npx cap add android
-          node tools/capacitor-updater.mjs
           npx cap sync android
 
       # The keystore is written into the runner's filesystem for this run only

@@ -29,7 +29,7 @@ const OUT  = join(ROOT, 'www');
    sweeping that into the web bundle tripled it, from 149 MB to 486 MB, with
    every clip in twice. The Flutter app builds from its own directory and
    nothing in www/ ever reads from it. */
-const SKIP_DIRS = new Set(['.git', '.claude', '.github', '.tmp', 'artifacts', 'node_modules', 'www', 'android', 'ios', 'tools', 'functions', 'flutter_app']);
+const SKIP_DIRS = new Set(['.git', '.claude', 'node_modules', 'www', 'android', 'ios', 'tools', 'functions', 'flutter_app']);
 
 /* Skipped by path rather than by name, for directories that are fine on the
    website and wrong inside an APK.
@@ -45,9 +45,7 @@ const SKIP_PATHS = new Set([join('assets', 'banners')]);
 /* The studio, in every form it takes. Matched on the name rather than a
    fixed list so a new admin-something.html cannot be added later and
    quietly ship. */
-const isStudio = (name) =>
-  name === 'admin.html' ||
-  (/^admin[-.]/i.test(name) && /\.(html|js|json|css)$/i.test(name));
+const isStudio = (name) => /^admin[-.]/i.test(name) || name === 'admin.html';
 
 /* Server-side or repository-side files with nothing to do inside an app. */
 const SKIP_FILES = new Set([

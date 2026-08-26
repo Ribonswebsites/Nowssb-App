@@ -20,13 +20,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/media/nwsb_video.dart';
 import 'package:nowssb/media/video_pool.dart';
+import 'package:video_player/video_player.dart';
 
 import 'fake_video_platform.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(FakeVideoPlatform.new);
+  setUpAll(() {
+    FakeVideoPlatform();
+    // Deadlines own real Timers; this file runs on a fake clock. See
+    // VideoPool.debugDeadlines.
+    VideoPool.debugDeadlines = false;
+  });
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
@@ -40,7 +46,8 @@ void main() {
       home: Scaffold(
         body: ListView(
           children: const [
-            SizedBox(height: 300, child: NwsbVideo(asset: 'assets/video/a.mp4')),
+            SizedBox(
+                height: 300, child: NwsbVideo(asset: 'assets/video/a.mp4')),
             SizedBox(height: 1200),
           ],
         ),
@@ -88,5 +95,33 @@ void main() {
     expect(VideoPool.instance.liveCount, greaterThan(0),
         reason: 'a clip filling the screen must get one of the four '
             'decoders — 0/4 here is the bug the first APK shipped with');
+  });
+
+  testWidgets('a clip that holds a decoder paints a player, not just a poster',
+      (tester) async {
+    // A granted clip must have the PLAYER in the tree. Holding a decoder and
+    // showing only the poster underneath it is the failure that looks like
+    // "the videos are not playing" while the readout says everything is
+    // fine, and nothing else in the suite would notice it.
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 300,
+            height: 200,
+            child: NwsbVideo(asset: 'assets/video/hero-bg.mp4'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 60));
+    await tester.pump(const Duration(milliseconds: 60));
+
+    // Whatever the platform has reported, a granted clip must be PAINTING a
+    // player rather than only its poster.
+    expect(VideoPool.instance.liveCount, greaterThan(0),
+        reason: 'a clip on screen should hold a decoder');
+    expect(find.byType(VideoPlayer), findsOneWidget,
+        reason: 'the player must be in the tree, not just the poster');
   });
 }

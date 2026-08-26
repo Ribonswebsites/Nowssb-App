@@ -40,7 +40,6 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
-import '../media/nwsb_image.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
@@ -48,24 +47,13 @@ import '../widgets/home_skin.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'shared_sections.dart';
-import '../widgets/day_dashboard.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
-
-/// The same local-time greeting used by both homes.
-String nwsbGreeting([DateTime? at]) {
-  final h = (at ?? DateTime.now()).hour;
-  if (h >= 5 && h < 12) return 'Good Morning';
-  if (h < 17) return 'Good Afternoon';
-  if (h < 21) return 'Good Evening';
-  return 'Good Night';
-}
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
 const kNormalSectionOrder = <String>[
   'greet',
   'search',
-  'dashboard',
   'streak',
   'storedisc',
   'practice',
@@ -76,8 +64,12 @@ const kNormalSectionOrder = <String>[
   'store',
   'reader',
   'trendwd',
+  'custom',
   'rx',
   'routines',
+  'condisc',
+  'connect',
+  'feed',
   'quickrow',
   // MOVED. It used to open the page directly above the streak card,
   // which put a heading, a film and a second heading in a row all saying
@@ -85,7 +77,10 @@ const kNormalSectionOrder = <String>[
   'herovid',
   'trendshop',
   'storeban',
+  'subvid',
+  'edition',
   'ebooks',
+  'connectban',
   'healing',
   'genderpath',
   'wsearch',
@@ -156,13 +151,6 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        (
-          'dashboard',
-          const HomeGutter(
-            horizontal: 20,
-            child: NwsbDayDashboard(fashion: false),
-          ),
-        ),
         ('streak', NmStreak(onTap: () => _go(1))),
         (
           'storedisc',
@@ -178,8 +166,19 @@ class _HomeNormalState extends State<HomeNormal> {
         ('store', NmStore(onTap: () => _go(3))),
         ('reader', NmReader(onTap: () => _go(2))),
         ('trendwd', NmTrending(onTap: () => _go(2))),
+        ('custom', NmCustomize(onTap: () => _push(const WidgetsPage()))),
         ('rx', null),
         ('routines', RoutinesSection(onTap: () => _go(1))),
+        (
+          'condisc',
+          NmPromoDisc(
+            gradient: NmPromoDisc.blue,
+            slides: NmPromoDisc.connectSlides,
+            onTap: () => _go(0),
+          )
+        ),
+        ('connect', NmConnect(onTap: () => _go(0))),
+        ('feed', NmFeed(onTap: () => _go(0))),
         (
           'quickrow',
           QuickAccessSection(
@@ -191,7 +190,10 @@ class _HomeNormalState extends State<HomeNormal> {
         ('herovid', NmStreakVideo(onTap: () => _go(1))),
         ('trendshop', NmTrendShop(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3), framed: true)),
+        ('subvid', SubscriptionSection(onTap: () => _go(3))),
+        ('edition', EditionSection(onTap: () => _go(3))),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
+        ('connectban', ConnectBannerSection(onTap: () => _go(0))),
         ('healing', HealingSection(onTap: () => _go(2))),
         (
           'genderpath',
@@ -249,7 +251,6 @@ class _HomeNormalState extends State<HomeNormal> {
                 // `margin: 16px 0` inside `.nmh-wrap`'s 20px, and a raised
                 // card needs room around it for its own shadow.
                 child: ListView.builder(
-                  physics: const ClampingScrollPhysics(),
                   padding: const EdgeInsets.only(bottom: 96),
                   itemCount: shown.length,
                   itemBuilder: (context, i) => shown[i],
@@ -282,10 +283,10 @@ class _TopRow extends StatelessWidget {
             boxShadow: NwsbShadows.raisedXs,
           ),
           clipBehavior: Clip.antiAlias,
-          child: const NwsbImage(
-            asset: 'assets/icons/logo-disc.webp',
+          child: Image.asset(
+            'assets/icons/logo-disc.webp',
             fit: BoxFit.cover,
-            error: SizedBox.shrink(),
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
           ),
         ),
         const SizedBox(width: 12),

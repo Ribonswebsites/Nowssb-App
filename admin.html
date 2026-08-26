@@ -6,8 +6,8 @@
 <title>NowssB — CEO Admin</title>
 <link rel="manifest" href="./admin-manifest.json">
 <meta name="theme-color" content="#060c18">
-<link rel="apple-touch-icon" href="assets/media/image/admin-icon-180-8f3d1b24.png">
-<link rel="icon" type="image/png" sizes="64x64" href="assets/media/image/admin-favicon-27fcd4e1.png">
+<link rel="apple-touch-icon" href="./assets/icons/admin-icon-180.png">
+<link rel="icon" type="image/png" sizes="64x64" href="./assets/icons/admin-favicon.png">
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -391,7 +391,7 @@ input.nwsb-deva { font-size: 16px; }
 <!-- ══ AUTH SCREEN ══ -->
 <div id="authWrap">
   <div class="auth-card">
-    <div class="auth-mark"><img src="assets/media/image/ee1124c2298b8d90cb7cc5a5f5a99f3f531ac5d481eba949-0b9b04bd.webp" alt=""></div>
+    <div class="auth-mark"><img src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""></div>
     <div class="auth-logo">NowssB</div>
     <div class="auth-sub">CEO Content Studio</div>
     <!-- The app signs people in with Google, so the studio has to as well:
@@ -543,15 +543,13 @@ input.nwsb-deva { font-size: 16px; }
       <div class="grid-2">
         <div class="field">
           <label>Male voice</label>
-          <input type="text" id="wsAudioM" placeholder="Uploaded audio URL">
-          <input type="file" accept="audio/*" onchange="wsUploadAudio('wsAudioM',this)" style="margin-top:7px;color:rgba(255,255,255,.7);font-size:11px;width:100%;">
-          <button class="rec-action-btn" onclick="wsRec('wsAudioM')" style="margin-top:6px;">● Record and upload</button>
+          <input type="text" id="wsAudioM" placeholder="https://… .mp3">
+          <button class="rec-action-btn" onclick="wsRec('wsAudioM')" style="margin-top:6px;">● Record</button>
         </div>
         <div class="field">
           <label>Female voice</label>
-          <input type="text" id="wsAudioF" placeholder="Uploaded audio URL">
-          <input type="file" accept="audio/*" onchange="wsUploadAudio('wsAudioF',this)" style="margin-top:7px;color:rgba(255,255,255,.7);font-size:11px;width:100%;">
-          <button class="rec-action-btn" onclick="wsRec('wsAudioF')" style="margin-top:6px;">● Record and upload</button>
+          <input type="text" id="wsAudioF" placeholder="https://… .mp3">
+          <button class="rec-action-btn" onclick="wsRec('wsAudioF')" style="margin-top:6px;">● Record</button>
         </div>
       </div>
 
@@ -560,7 +558,6 @@ input.nwsb-deva { font-size: 16px; }
       <div class="field"><label>Organ / body system *</label><input type="text" id="wsOrgan" placeholder="e.g. Immune System"></div>
       <div class="field"><label>Healing benefit</label><input type="text" id="wsBenefit" placeholder="e.g. Activates cellular immunity and vital life force"></div>
       <div class="field"><label>Meaning &amp; natural origin story</label><textarea id="wsMeaning" placeholder="What this word means, and where the sound comes from naturally."></textarea></div>
-      <button class="rec-action-btn" onclick="wsGenerateWithGroq()">Generate a cautious draft with Groq</button><div id="wsAiStatus" class="ws-hint" style="margin-top:8px;"></div>
 
       <!-- ── The guide tab in the player ── -->
       <div class="sec-label" style="margin:22px 0 10px;padding:0;">THE GUIDE</div>
@@ -587,7 +584,7 @@ input.nwsb-deva { font-size: 16px; }
       </div>
       <div class="grid-2">
         <div class="field"><label>Price (₹)</label><input type="number" id="wsPrice" value="200"></div>
-        <div class="field"><label>Word image</label><input type="text" id="wsImg" placeholder="Uploaded image URL"><input type="file" accept="image/*" onchange="wsUploadImage('wsImg',this)" style="margin-top:7px;color:rgba(255,255,255,.7);font-size:11px;width:100%;"></div>
+        <div class="field"><label>Image URL</label><input type="text" id="wsImg" placeholder="https://…"></div>
       </div>
 
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;">
@@ -642,15 +639,6 @@ input.nwsb-deva { font-size: 16px; }
   <div class="sec-label" style="margin-top:40px;">REQUESTS FROM THE APP</div>
   <div class="word-list-wrap" id="reqListWrap">
     <div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">Waiting for requests…</div>
-  </div>
-
-  <!-- ══ SUPPORT CASES ══
-       Only signed-in people can create their own case. Firestore rules limit
-       this inbox to administrators, so routing details never surface in the
-       public support UI. ══ -->
-  <div class="sec-label" style="margin-top:40px;">SUPPORT CASES</div>
-  <div class="word-list-wrap" id="supportCaseListWrap">
-    <div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">Waiting for support cases…</div>
   </div>
 
   <!-- ══ SEND A NOTIFICATION ══
@@ -849,14 +837,13 @@ window.studioInstall = function () {
    order is an accident of how the page was written — Instagram happens to
    be first in the markup and is the last thing anybody comes here for. */
 var STU_ORDER = [
-  'WORD STUDIO', 'THE CATALOGUE', 'REQUESTS FROM THE APP', 'SUPPORT CASES', 'PEOPLE',
+  'WORD STUDIO', 'THE CATALOGUE', 'REQUESTS FROM THE APP', 'PEOPLE',
   'SEND A NOTIFICATION', 'USER ACCESS CONTROL', 'SEND WORD TO USER', 'SOCIAL'
 ];
 var STU_META = {
   'WORD STUDIO':          { icon: '✎', sub: 'Add or edit any word the app teaches' },
   'THE CATALOGUE':        { icon: '☰', sub: 'The shelves — words and meanings' },
   'REQUESTS FROM THE APP':{ icon: '!', sub: 'What people have asked you for' },
-  'SUPPORT CASES':        { icon: '?', sub: 'Private follow-ups from support chat' },
   'SEND A NOTIFICATION':  { icon: '◉', sub: 'Push to every phone' },
   'PEOPLE':               { icon: '☺', sub: 'Everyone who has signed up' },
   'USER ACCESS CONTROL':  { icon: '⚿', sub: 'Find one person and change their plan' },
@@ -1333,39 +1320,6 @@ const _auth = getAuth(_fbApp);
    it and signing in again. */
 try { setPersistence(_auth, browserLocalPersistence); } catch (e) {}
 var _foundUid = null;
-const ADMIN_API_BASE = 'https://nowssb-api.ribonpatil2.workers.dev';
-
-window.adminUploadMedia = async function (file, kind) {
-  const user = _auth.currentUser;
-  if (!user) throw new Error('Sign in to the NowssB Admin first.');
-  if (!file || !file.size) throw new Error('Choose a file first.');
-  const token = await user.getIdToken(true);
-  const form = new FormData();
-  form.append('kind', String(kind || 'admin-media'));
-  form.append('file', file, file.name || ('nowssb-' + Date.now() + '.webm'));
-  const response = await fetch(ADMIN_API_BASE + '/api/connect/media', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + token, 'X-NowssB-Client': 'admin' },
-    body: form,
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'NowssB media upload failed.');
-  return data;
-};
-
-window.adminGroqComplete = async function (body) {
-  const user = _auth.currentUser;
-  if (!user) throw new Error('Sign in to the NowssB Admin first.');
-  const token = await user.getIdToken(true);
-  const response = await fetch(ADMIN_API_BASE + '/api/groq/complete', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, 'X-NowssB-Client': 'admin' },
-    body: JSON.stringify(body || {}),
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'Groq generation failed.');
-  return data;
-};
 
 /* ══ ADMIN GATE ══════════════════════════════════════════════════════
    Two locks, and the second is the one that counts.
@@ -1478,7 +1432,7 @@ onAuthStateChanged(_auth, async (user) => {
     if (wn) wn.textContent = user.displayName || (user.email || '').split('@')[0] || 'admin';
     if (wm) wm.textContent = user.email || user.uid;
     if (window.stuBuildNav) stuBuildNav();
-    countSubs(); watchRequests(); watchSupportCases(); catLoad(); wsLoad(); pplLoad();
+    countSubs(); watchRequests(); catLoad(); wsLoad(); pplLoad();
   }
   else closeStudio();
 });
@@ -1496,8 +1450,8 @@ function reqNotify(n) {
   navigator.serviceWorker?.ready.then(reg => {
     reg.showNotification('New request: ' + n.word, {
       body: (n.name || n.email || 'Someone') + ' asked for a ' + (n.kind || 'meaning') + '.',
-      icon: 'assets/media/image/notif-blank-442eb067.png',   // blank on purpose — see sw.js
-      badge: 'assets/media/image/notif-badge-81c1b3e2.png',
+      icon: './assets/icons/notif-blank.png',   // blank on purpose — see sw.js
+      badge: './assets/icons/notif-badge.png',
       tag: 'req-' + n.id, renotify: false,
       data: { url: './admin.html' },
     }).catch(() => {});
@@ -1553,76 +1507,6 @@ function watchRequests() {
     }, () => {
       const wrap = document.getElementById('reqListWrap');
       if (wrap) wrap.innerHTML = '<div style="color:rgba(220,80,80,0.8);font-size:13px;padding:4px 2px;">Could not read requests — are the rules published?</div>';
-    });
-  } catch (e) {}
-}
-
-/* ══ SUPPORT CASES, LIVE ═══════════════════════════════════════════════
-   The support chat writes a compact, authenticated transcript here only
-   after it cannot resolve a report (or for explicit feedback). This inbox
-   is admin-only under firestore.rules. */
-let _supportCaseUnsub = null;
-
-function supportCaseWhen(value) {
-  try {
-    if (value && typeof value.toMillis === 'function') return new Date(value.toMillis()).toLocaleString();
-    return new Date(value || Date.now()).toLocaleString();
-  } catch (e) { return 'Just now'; }
-}
-
-function renderSupportCases(rows) {
-  const wrap = document.getElementById('supportCaseListWrap');
-  if (!wrap) return;
-  if (!rows.length) {
-    wrap.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:4px 2px;">No support cases yet.</div>';
-    return;
-  }
-  wrap.innerHTML = rows.map((row) => {
-    const state = row.status === 'resolved' ? 'resolved' : row.status === 'in_progress' ? 'in_progress' : 'new';
-    const label = state === 'resolved' ? 'Resolved' : state === 'in_progress' ? 'In Progress' : 'Open';
-    const statusClass = state === 'resolved' ? 'approved' : state === 'in_progress' ? 'pending' : 'pending';
-    const transcript = Array.isArray(row.messages) ? row.messages.slice(-4).map((message) =>
-      '<div style="margin-top:6px;line-height:1.45;"><b style="color:rgba(232,213,163,0.92);">' +
-      esc(message.role === 'assistant' ? 'Support' : 'Member') + ':</b> ' + esc(message.content || '') + '</div>'
-    ).join('') : '';
-    return '<div class="wl-card">' +
-      '<span class="wl-status ' + statusClass + '">' + label + '</span>' +
-      '<div class="wl-name">' + esc(row.type || 'Support') + '</div>' +
-      '<div class="wl-phonetic">Case ' + esc(row.caseReference || row.id || 'pending') + '</div>' +
-      '<div class="wl-phonetic">' + esc(row.reason || 'follow-up') + '</div>' +
-      '<div class="wl-meta">' + esc(row.reporterName || row.reporterUid || 'member') + ' · ' + supportCaseWhen(row.createdAt || row.createdAtClient) + '</div>' +
-      transcript +
-      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
-      (state === 'new' ? '<button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'in_progress\')">Start progress</button>' : '') +
-      (state === 'in_progress' ? '<button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'resolved\')">Mark resolved</button><button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'new\')">Reopen</button>' : '') +
-      (state === 'resolved' ? '<button class="rec-action-btn" onclick="supportCaseStatus(\'' + row.id + '\',\'new\')">Reopen</button>' : '') +
-      '</div></div>';
-  }).join('');
-}
-
-window.supportCaseStatus = async function (id, status) {
-  try {
-    const next = ['new', 'in_progress', 'resolved'].includes(status) ? status : 'new';
-    await updateDoc(doc(_db, 'reports', id), {
-      status: next,
-      inProgressAt: next === 'in_progress' ? Date.now() : null,
-      resolvedAt: next === 'resolved' ? Date.now() : null,
-      statusUpdatedAt: Date.now(),
-      updatedAt: Date.now(),
-    });
-  } catch (e) { showToast('Could not update this support case.', true); }
-};
-
-function watchSupportCases() {
-  if (_supportCaseUnsub) return;
-  try {
-    _supportCaseUnsub = onSnapshot(query(collection(_db, 'reports'), orderBy('createdAtClient', 'desc')), (snap) => {
-      const rows = [];
-      snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
-      renderSupportCases(rows);
-    }, () => {
-      const wrap = document.getElementById('supportCaseListWrap');
-      if (wrap) wrap.innerHTML = '<div style="color:rgba(220,80,80,0.8);font-size:13px;padding:4px 2px;">Could not read support cases.</div>';
     });
   } catch (e) {}
 }
@@ -1808,7 +1692,7 @@ function wsRenderParts() {
       '</div>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Hold (seconds)</label><input type="number" step="0.5" value="' + (p.hold || 1.5) + '" oninput="wsSetPart(' + i + ',\'hold\',this.value)"></div>' +
-        '<div class="field"><label>Recording URL</label><input type="text" value="' + esc(p.audio || '') + '" oninput="wsSetPart(' + i + ',\'audio\',this.value)" placeholder="Uploaded audio URL"><input type="file" accept="audio/*" onchange="wsUploadPart(' + i + ',this)" style="margin-top:7px;color:rgba(255,255,255,.7);font-size:11px;width:100%;"></div>' +
+        '<div class="field"><label>Recording URL</label><input type="text" value="' + esc(p.audio || '') + '" oninput="wsSetPart(' + i + ',\'audio\',this.value)" placeholder="https://…"></div>' +
       '</div>' +
       '<div class="field"><label>How to make this sound</label><input type="text" value="' + esc(p.say || '') + '" oninput="wsSetPart(' + i + ',\'say\',this.value)" placeholder="long, like the a in father"></div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
@@ -1933,18 +1817,7 @@ function wsRecInto(setUrl, label) {
       stream.getTracks().forEach(t => t.stop());
       const blob = new Blob(_wsChunks, { type: 'audio/webm' });
       try { new Audio(URL.createObjectURL(blob)).play().catch(() => {}); } catch (e) {}
-      if (window.adminUploadMedia) {
-        showToast('Uploading to NowssB…');
-        try {
-          const uploaded = await window.adminUploadMedia(blob, 'word-audio');
-          if (!uploaded || !uploaded.url) throw new Error('The upload returned no URL.');
-          setUrl(uploaded.url);
-          showToast('Recorded and uploaded to NowssB');
-          return;
-        } catch (e) {
-          showToast(e.message || 'NowssB upload failed', true);
-        }
-      } else if (CLOUDINARY_CLOUD && CLOUDINARY_PRESET) {
+      if (CLOUDINARY_CLOUD && CLOUDINARY_PRESET) {
         showToast('Uploading…');
         try {
           const fd = new FormData();
@@ -1953,10 +1826,11 @@ function wsRecInto(setUrl, label) {
           const r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/auto/upload', { method: 'POST', body: fd });
           const d = await r.json();
           if (d.secure_url) { setUrl(d.secure_url); showToast('Recorded and uploaded'); return; }
-        } catch (e) {}
+          showToast('Upload refused — check the preset is unsigned', true);
+        } catch (e) { showToast('Upload failed — saving the file instead', true); }
       }
-      /* If a signed-in Worker upload is unavailable, hand over the file so it
-         can be recovered locally rather than pretending it was published. */
+      /* No preset, or the upload did not take: hand over the file so it
+         can be put somewhere and pasted back in. Nothing is lost. */
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = (label || 'nowssb') + '-' + Date.now() + '.webm';
@@ -1975,77 +1849,6 @@ window.wsRec = function (inputId) {
 window.wsRecPart = function (i) {
   wsRecInto(url => { _libParts[i].audio = url; wsRenderParts(); },
             ((document.getElementById('wsWord').value || 'word') + '-' + (i + 1)).toLowerCase());
-};
-
-async function wsUploadFile(file, kind) {
-  if (!file) return null;
-  if (file.size > 8 * 1024 * 1024) throw new Error('Files must be 8 MB or smaller.');
-  if (!window.adminUploadMedia) throw new Error('The secure NowssB upload service is not ready. Reload the studio.');
-  return window.adminUploadMedia(file, kind);
-}
-window.wsUploadAudio = async function (fieldId, input) {
-  const file = input && input.files && input.files[0]; if (!file) return;
-  try {
-    const uploaded = await wsUploadFile(file, 'word-audio');
-    document.getElementById(fieldId).value = uploaded.url;
-    showToast('Audio uploaded — save and publish the word');
-  } catch (e) { showToast(e.message || 'Audio upload failed', true); }
-  input.value = '';
-};
-window.wsUploadImage = async function (fieldId, input) {
-  const file = input && input.files && input.files[0]; if (!file) return;
-  try {
-    const uploaded = await wsUploadFile(file, 'word-image');
-    document.getElementById(fieldId).value = uploaded.url;
-    showToast('Image uploaded — save and publish the word');
-  } catch (e) { showToast(e.message || 'Image upload failed', true); }
-  input.value = '';
-};
-window.wsUploadPart = async function (index, input) {
-  const file = input && input.files && input.files[0]; if (!file || !_libParts[index]) return;
-  try {
-    const uploaded = await wsUploadFile(file, 'word-part-audio');
-    _libParts[index].audio = uploaded.url;
-    wsRenderParts();
-    showToast('Pronunciation box audio uploaded');
-  } catch (e) { showToast(e.message || 'Audio upload failed', true); }
-  input.value = '';
-};
-window.catUploadImage = async function (index, input) {
-  const file = input && input.files && input.files[0]; if (!file || !_catM || !_catM[index]) return;
-  try {
-    const uploaded = await wsUploadFile(file, 'meaning-image');
-    _catM[index].img = uploaded.url;
-    catRender();
-    showToast('Store image uploaded — publish the catalogue');
-  } catch (e) { showToast(e.message || 'Image upload failed', true); }
-  input.value = '';
-};
-
-window.wsGenerateWithGroq = async function () {
-  const word = (document.getElementById('wsWord').value || '').trim();
-  const deva = (document.getElementById('wsDeva').value || '').trim();
-  const phonetic = (document.getElementById('wsTranslit').value || document.getElementById('wsWord').value || '').trim();
-  const status = document.getElementById('wsAiStatus');
-  if (!word) { showToast('Enter the word first, then generate a draft.', true); return; }
-  if (!window.adminGroqComplete) { showToast('The secure Groq service is not ready. Reload the studio.', true); return; }
-  if (status) status.textContent = 'Groq is preparing an editable draft…';
-  try {
-    const data = await window.adminGroqComplete({
-      model: 'openai/gpt-oss-20b', max_completion_tokens: 1200, temperature: 0.25,
-      response_format: { type: 'json_object' },
-      system: 'You are an editorial assistant for NowssB. Return only valid JSON. Create cautious language-learning copy, not medical advice. Never claim a word heals, cures, treats, diagnoses, or changes a body organ. Describe pronunciation, cultural/language meaning, and traditional context as non-medical educational content. Use empty strings or arrays when unknown.',
-      messages: [{ role: 'user', content: JSON.stringify({ task: 'Draft a NowssB word record for human review.', word, deva, phonetic, fields: ['translit','origin','parts','organ','benefit','meaning','mouthPos','resonance','mistake','tip','categories'], parts: 'array of {roman,deva,hold,say}' }) }]
-    });
-    const raw = data?.choices?.[0]?.message?.content || '';
-    const draft = JSON.parse(String(raw).replace(/^```json\\s*/i, '').replace(/\\s*```$/i, '').trim());
-    const map = { wsDeva: 'deva', wsTranslit: 'translit', wsOrigin: 'origin', wsOrgan: 'organ', wsBenefit: 'benefit', wsMeaning: 'meaning', wsMouth: 'mouthPos', wsResonance: 'resonance', wsMistake: 'mistake', wsTip: 'tip' };
-    Object.keys(map).forEach(id => { const el = document.getElementById(id); if (el && draft[map[id]] != null) el.value = Array.isArray(draft[map[id]]) ? draft[map[id]].join(', ') : String(draft[map[id]]); });
-    const cats = document.getElementById('wsCats'); if (cats && Array.isArray(draft.categories)) cats.value = draft.categories.join(', ');
-    if (Array.isArray(draft.parts) && draft.parts.length) { _libParts = draft.parts.slice(0, 5).map(p => ({ roman: String(p.roman || ''), deva: String(p.deva || ''), hold: Number(p.hold) || 1.5, say: String(p.say || ''), audio: '' })).filter(p => p.roman || p.deva); wsRenderParts(); }
-    if (status) status.textContent = 'Draft inserted. Review every field, add recordings/images, then Save and Publish.';
-    showToast('Groq draft inserted for review');
-  } catch (e) { if (status) status.textContent = e.message || 'Groq draft failed.'; showToast(e.message || 'Groq draft failed', true); }
 };
 
 /* ── A request, straight into the template ─────────────────────────
@@ -2158,8 +1961,7 @@ function catRender() {
           '<div class="field"><label>Category</label><input type="text" value="' + esc(m.category || '') + '" oninput="catSetM(' + i + ',\'category\',this.value)"></div>' +
           '<div class="field"><label>Price (₹)</label><input type="number" value="' + (m.price || 0) + '" oninput="catSetM(' + i + ',\'price\',this.value)"></div>' +
         '</div>' +
-        '<div class="field"><label>Description shown in Store</label><textarea rows="3" oninput="catSetM(' + i + ',\'sub\',this.value)">' + esc(m.sub || m.description || '') + '</textarea></div>' +
-        '<div class="field"><label>Store image</label><input type="text" value="' + esc(m.img || '') + '" oninput="catSetM(' + i + ',\'img\',this.value)"><input type="file" accept="image/*" onchange="catUploadImage(' + i + ',this)" style="margin-top:7px;color:rgba(255,255,255,.7);font-size:11px;width:100%;"></div>' +
+        '<div class="field"><label>Image URL</label><input type="text" value="' + esc(m.img || '') + '" oninput="catSetM(' + i + ',\'img\',this.value)"></div>' +
         '<button class="rec-action-btn" onclick="catDelM(' + i + ')">Remove</button>' +
       '</div>').join('') ||
       '<div style="color:rgba(255,255,255,0.3);font-size:13px;">No meanings loaded.</div>';
@@ -2193,7 +1995,7 @@ window.catSetM = function (i, field, val) {
 window.catDelM = function (i) { if (_catM) { _catM.splice(i, 1); catRender(); } };
 window.catAddMeaning = function () {
   if (!_catM) _catM = [];
-  _catM.unshift({ word: '', key: '', root: '', category: '', sub: '', price: 49, img: '' });
+  _catM.unshift({ word: '', key: '', root: '', category: '', price: 49, img: '' });
   catRender();
 };
 window.catAddWord = function () {
@@ -2287,14 +2089,10 @@ window.pplLoad = async function () {
 
   /* What the app knows — plans, blocks, last seen. Best effort: if the
      rules are not published this still shows the accounts. */
-  const extra = {}, profileExtra = {};
+  const extra = {};
   try {
     const snap = await getDocs(collection(_db, 'users'));
     snap.forEach(d => { extra[d.id] = d.data(); });
-  } catch (e) {}
-  try {
-    const snap = await getDocs(collection(_db, 'publicProfiles'));
-    snap.forEach(d => { profileExtra[d.id] = d.data(); });
   } catch (e) {}
 
   let accounts = null, why = '';
@@ -2310,7 +2108,7 @@ window.pplLoad = async function () {
 
   if (accounts) {
     _ppl = accounts.map(a => {
-      const e = { ...(profileExtra[a.uid] || {}), ...(extra[a.uid] || {}) };
+      const e = extra[a.uid] || {};
       return {
         uid: a.uid,
         name: a.name || e.name || e.displayName || null,
@@ -2331,20 +2129,11 @@ window.pplLoad = async function () {
   } else {
     /* No server list — fall back to what the app wrote, and say so, rather
        than showing a short list as if it were everybody. */
-    const ids = new Set([...Object.keys(extra), ...Object.keys(profileExtra)]);
-    _ppl = [...ids].map(uid => ({
-      uid,
-      ...(profileExtra[uid] || {}),
-      ...(extra[uid] || {}),
-      name: extra[uid]?.name || extra[uid]?.displayName || profileExtra[uid]?.displayName || null,
-      displayName: extra[uid]?.displayName || profileExtra[uid]?.displayName || null,
-      email: extra[uid]?.email || profileExtra[uid]?.email || null,
-      fallback: 1,
-    }));
+    _ppl = Object.keys(extra).map(uid => ({ uid, ...extra[uid], fallback: 1 }));
     if (wrap) {
       const note = document.createElement('div');
       note.style.cssText = 'color:rgba(232,213,163,0.85);font-size:12px;line-height:1.6;padding:10px 12px;margin-bottom:10px;background:rgba(232,213,163,0.08);border:1px solid rgba(232,213,163,0.25);border-radius:12px;';
-      note.textContent = 'Showing app-known and public Connect profiles. The optional full Firebase Auth list is unavailable: ' + why;
+      note.textContent = 'Showing only accounts the app has written a record for — the full sign-up list needs /api/users. ' + why;
       wrap.innerHTML = '';
       wrap.appendChild(note);
     }

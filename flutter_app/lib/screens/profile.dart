@@ -18,12 +18,6 @@ import '../widgets/page_shell.dart';
 import 'fashion_plus.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
-import 'login.dart';
-import 'routines.dart';
-import 'cart.dart';
-import 'connect.dart';
-import 'player.dart';
-import 'subscribe.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -64,7 +58,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           sliver: SliverList.list(children: [
             const _Identity(),
             const SizedBox(height: 22),
-
             const DarkHead(
               eyebrow: 'Everything, one tap away',
               title: 'Your pages',
@@ -95,57 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
               ),
             ),
-            _Go(
-              title: 'Sign in',
-              sub: 'Google, email, phone',
-              icon: Icons.login,
-              go: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              ),
-            ),
-            _Go(
-              title: 'My Routines',
-              sub: 'Five slots, one day',
-              icon: Icons.repeat_rounded,
-              go: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const RoutinesScreen()),
-              ),
-            ),
-            _Go(
-              title: 'The Player',
-              sub: 'Listen, record, repeat',
-              icon: Icons.play_circle_outline,
-              go: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const PlayerScreen()),
-              ),
-            ),
-            _Go(
-              title: 'Cart, wishlist, orders',
-              sub: 'The shelf',
-              icon: Icons.shopping_bag_outlined,
-              go: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (_) => const CartScreen(kind: CartKind.cart)),
-              ),
-            ),
-            _Go(
-              title: 'NowssB Connect',
-              sub: 'People, chat, the feed',
-              icon: Icons.groups_outlined,
-              go: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ConnectScreen()),
-              ),
-            ),
-            _Go(
-              title: 'Subscription',
-              sub: 'Resonance · Frequency · Frequency X',
-              icon: Icons.workspace_premium_outlined,
-              go: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SubscribeScreen()),
-              ),
-            ),
             const SizedBox(height: 22),
-
             const DarkHead(
               eyebrow: 'What the app is running on',
               title: 'Content',
@@ -164,7 +107,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _Stat(label: 'Words', value: '${store.library.length}'),
             _Stat(label: 'Meanings', value: '${store.meanings.length}'),
             _Stat(label: 'eBooks', value: '${store.books.length}'),
-
             const SizedBox(height: 22),
             const DarkHead(
               eyebrow: 'How the films are managed',
@@ -176,22 +118,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
               label: 'Decoders in use',
               value: '${VideoPool.instance.liveCount} of ${VideoPool.maxLive}',
             ),
-            _Stat(label: 'Clips on this screen', value: '${VideoPool.instance.leaseCount}'),
+            _Stat(
+                label: 'Clips on this screen',
+                value: '${VideoPool.instance.leaseCount}'),
             const _Note(
-              'Every clip is on the phone — and if a build skipped copying '
-              'assets/video, the same films play from nowssb.com. At most 24 '
-              'decode at once, matching the website and the WebView.',
+              'Every clip is on the phone — nothing streams. At most four '
+              'decode at once, which is what keeps the app from stuttering '
+              'the way the website did.',
             ),
-
             const SizedBox(height: 22),
             const DarkHead(
-              eyebrow: 'Still on the website first',
+              eyebrow: 'Not built yet',
               title: 'Coming',
               icon: Icons.construction_outlined,
             ),
             const SizedBox(height: 14),
-            const _Soon('Notifications — FCM token to give the server'),
-            const _Soon('Word audio recordings from the studio'),
+            const _Soon('Sign in and your account'),
+            const _Soon('My Routines'),
+            const _Soon('Cart, wishlist and orders'),
+            const _Soon('NowssB Connect and chat'),
+            const _Soon('Notifications'),
+            const _Soon('Word audio — hearing a word, not only reading it'),
           ]),
         ),
       ],
@@ -304,8 +251,7 @@ class _Go extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward,
-                size: 16, color: Color(0xB3FFFFFF)),
+            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
           ],
         ),
       ),

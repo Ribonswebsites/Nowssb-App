@@ -544,7 +544,7 @@ Be poetic but grounded. 80 words max.`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-20b',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 150,
         messages: [{ role: 'user', content: prompt }]
       })

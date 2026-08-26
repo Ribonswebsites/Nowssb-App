@@ -1,9 +1,13 @@
 /// The start animation — the film that opens the app.
 ///
-/// One clip, once, then the app. Same as the website, and the same standing
-/// rule about the file itself: assets/video/start-animation.mp4 is not
-/// re-encoded, not muted at the file level, not touched. It is played muted
-/// here, which is a decision about this playback rather than about the clip.
+/// One clip, once, WITH SOUND, then the app. Same standing rule about the
+/// file itself: assets/video/start-animation.mp4 is not re-encoded, not
+/// re-cut, not touched — only played.
+///
+/// It is the one thing in this app that is heard. Every other clip is a
+/// background loop and is muted, which is what `<video muted>` on all of
+/// them means on the web; this one is the app introducing itself and it has
+/// an audio track for that reason.
 ///
 /// It does NOT go through the pool. The pool exists to stop a hundred idle
 /// decoders existing at once; the splash is one clip, it is the only thing on
@@ -28,9 +32,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import '../media/cdn.dart';
-import '../media/nwsb_image.dart';
-
 class Splash extends StatefulWidget {
   const Splash({super.key, required this.onDone});
 
@@ -43,9 +44,6 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   VideoPlayerController? _c;
   Timer? _ceiling;
-  Timer? _watchdog;
-  Duration _lastPosition = Duration.zero;
-  DateTime _lastProgressAt = DateTime.now();
   bool _leaving = false;
 
   static const _asset = 'assets/video/start-animation.mp4';
@@ -58,67 +56,45 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
     _start();
-    // Hard escape hatch for a device/codec that never opens the clip.
-    _ceiling = Timer(const Duration(seconds: 12), _leave);
+    // Only until the real duration is known — see _start.
+    _ceiling = Timer(const Duration(seconds: 20), _leave);
   }
 
   Future<void> _start() async {
-    VideoPlayerController? c = VideoPlayerController.asset(_asset);
+    final c = VideoPlayerController.asset(_asset);
+    _c = c;
     try {
-        await c.initialize().timeout(const Duration(seconds: 5));
+      await c.initialize();
     } catch (_) {
-      try {
-        await c.dispose();
-      } catch (_) {}
-      c = null;
-      for (final url in NwsbCdn.urls(_asset)) {
-        final net = VideoPlayerController.networkUrl(Uri.parse(url));
-        try {
-            await net.initialize().timeout(const Duration(seconds: 5));
-          c = net;
-          break;
-        } catch (_) {
-          try {
-            await net.dispose();
-          } catch (_) {}
-        }
-      }
-    }
-    if (c == null) {
-      // No clip at all — bundled or network. Straight in rather than a
-      // black rectangle.
+      // No clip, no splash. Straight in rather than a black rectangle.
       _leave();
       return;
     }
-    _c = c;
     if (!mounted) {
       await c.dispose();
       return;
     }
-    await c.setVolume(0);
+    // WITH SOUND. The clip has an audio track and this is the one place in
+    // the app where a film is the whole screen and the whole moment — the
+    // app introducing itself, once, before anything else. Everything else
+    // that plays here is a background loop and stays muted, which is what
+    // `<video muted>` on every one of them means on the web.
+    //
+    // Android routes this through the media stream, so the phone's own
+    // silent switch and volume still decide whether it is heard.
+    await c.setVolume(1);
     await c.setLooping(false);
     await c.setPlaybackSpeed(_speed);
     c.addListener(_watch);
-    try {
-      await c.play().timeout(const Duration(seconds: 2));
-    } catch (_) {
-      _leave();
-      return;
-    }
-    _lastPosition = c.value.position;
-    _lastProgressAt = DateTime.now();
-    _watchdog?.cancel();
-    _watchdog = Timer.periodic(const Duration(milliseconds: 500), (_) => _watchPlayback());
+    await c.play();
 
-    // Use the clip's own runtime with a small margin, capped so a broken
-    // duration cannot keep the user behind a frozen splash indefinitely.
+    // Now that the clip's length is known, the failsafe becomes its own
+    // running time plus a margin. It can no longer cut the animation short —
+    // it can only catch playback that has stopped without finishing.
     _ceiling?.cancel();
     final runtime = c.value.duration.inMilliseconds / _speed;
-    final ceilingMs = runtime.isFinite && runtime > 0
-        ? runtime.round() + 2200
-        : 12000;
     _ceiling = Timer(
-      Duration(milliseconds: ceilingMs.clamp(6000, 12000).toInt()),
+      Duration(milliseconds: runtime.round() + 3000),
       _leave,
     );
 
@@ -129,32 +105,11 @@ class _SplashState extends State<Splash> {
     final c = _c;
     if (c == null || !c.value.isInitialized) return;
     final v = c.value;
-    if (v.position > _lastPosition) {
-      _lastPosition = v.position;
-      _lastProgressAt = DateTime.now();
-    }
     // position >= duration is the honest end. isCompleted alone is not
     // reliable across platforms.
-    if (!v.isPlaying && v.position >= v.duration && v.duration > Duration.zero) {
-      _leave();
-    }
-  }
-
-  void _watchPlayback() {
-    final c = _c;
-    if (_leaving || c == null || !c.value.isInitialized) return;
-    final v = c.value;
-    if (v.position > _lastPosition) {
-      _lastPosition = v.position;
-      _lastProgressAt = DateTime.now();
-      return;
-    }
-    if (!v.isPlaying && DateTime.now().difference(_lastProgressAt) > const Duration(milliseconds: 1200)) {
-      try {
-        c.play();
-      } catch (_) {}
-    }
-    if (DateTime.now().difference(_lastProgressAt) > const Duration(seconds: 3)) {
+    if (!v.isPlaying &&
+        v.position >= v.duration &&
+        v.duration > Duration.zero) {
       _leave();
     }
   }
@@ -169,7 +124,6 @@ class _SplashState extends State<Splash> {
   @override
   void dispose() {
     _ceiling?.cancel();
-    _watchdog?.cancel();
     _c?.removeListener(_watch);
     _c?.dispose();
     super.dispose();
@@ -198,10 +152,11 @@ class _SplashState extends State<Splash> {
           else
             // The clip's own first frame while it opens, so the launch is
             // never a black hole even for the half-second before playback.
-            NwsbImage(
-              asset: 'assets/video/start-animation-poster.webp',
+            Image.asset(
+              'assets/video/start-animation-poster.webp',
               fit: BoxFit.cover,
-              error: const ColoredBox(color: Colors.black),
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: Colors.black),
             ),
         ],
       ),

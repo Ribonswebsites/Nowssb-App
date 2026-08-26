@@ -60,8 +60,8 @@
      authored as a full disc with the word knocked out of it, which is the
      only way to get "solid circle, NowssB showing through" — a coloured
      PNG would come back as a flat silhouette. */
-  var ICON  = 'assets/media/image/notif-blank-442eb067.png';
-  var BADGE = 'assets/media/image/notif-badge-81c1b3e2.png';
+  var ICON  = './assets/icons/notif-blank.png';
+  var BADGE = './assets/icons/notif-badge.png';
 
   var K_ASKED = 'nwsb_push_asked';
   var K_PEND  = 'nwsb_push_pending';   // a tap that arrived before the app booted

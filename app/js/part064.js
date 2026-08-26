@@ -29,20 +29,20 @@
   function img(u) { return '<img loading="lazy" decoding="async" alt="" src="' + u + '">'; }
 
   var A = {
-    chat:     'assets/media/image/265b5e8805e9e2288b69852af9cf4d7e4eac111b034d565e-46fef40b.webp',
-    reels:    'assets/media/image/99c0f4c887eaf6c0590c402c1a084d711687ae57a791b8ee-f9494031.webp',
-    connect:  'assets/media/image/589b6824072557ad8eda6d6eac0411c6056d1a4593e4130a-c4734c2d.webp',
-    profile:  'assets/media/image/1e60226665c68128ad03987930169b94504c89b3fe74ccc8-d7dfb697.webp',
-    store:    'assets/media/image/71c48094f340d790cd2e7020f0ad78fd80e7f268edc6fe6d-330d4dee.webp',
-    cart:     'assets/media/image/712ebb6fcce54014ce10264bcb6805954a9f3b45a9c99c5d-e05a2e25.webp',
-    library:  'assets/media/image/19e9a80ef81fcb8f99de917b2ada10114250cf63f44978f4-e7261be5.webp',
-    offer:    'assets/media/image/6b747aedbfb40a251b398b9008515762e808019375e58389-afcb8741.png',
-    wordsci:  'assets/media/image/2e30a7d85cff2f88eeca40d929d9fe19db47b941586210f7-64ecc8c2.webp',
-    routines: 'assets/media/image/f19d52470a876209c8289b54081839108ba1b076bbf63926-64c6e8a0.png',
-    ai:       'assets/media/image/1ad8a28461e97ed8e682ad06730f6d245fd8bb3a718b71f7-66da3ed1.png',
-    streak:   'assets/media/image/375647daaff93ba2784f6ac0ecf6c3f9b207639c3444529f-5e809db4.png',
-    every:    'assets/media/image/aa2e75819832c6648532079b7499b33175725fc3eaae80db-1e188c9b.webp',
-    settings: 'assets/media/image/6fec694bea6199550bbf4ea9df232769f01e6cfa5ccbfd82-75bedcbf.webp'
+    chat:     'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
+    reels:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/10d7afe0-5bf2-11f1-8248-b91d5cd919c2_b0bff9.png',
+    connect:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/04d5f4e0-5bf2-11f1-8248-b91d5cd919c2_mcohzv.png',
+    profile:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+    store:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
+    cart:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png',
+    library:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png',
+    offer:    'https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png',
+    wordsci:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
+    routines: 'https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png',
+    ai:       'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png',
+    streak:   'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png',
+    every:    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png',
+    settings: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
   };
 
   var IC = {

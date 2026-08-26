@@ -43,25 +43,25 @@
     { k: 'classic', name: 'Classic', sub: 'The app card', built: 1 },
 
     { k: 'ivory-words', name: 'Ivory · Words', sub: 'Store words', kind: 'word', tone: 'light',
-      img: 'assets/media/image/cert-ivory-words-c7a55fc0.webp',
+      img: './assets/certificates/cert-ivory-words.webp',
       f: { name: [0.4746, 0.1992, 0.8018], word: [0.6068, 0.4395, 0.7998],
            mean: [0.6439, 0.4189, 0.8008], date: [0.7956, 0.4014, 0.6621],
            id:   [0.8301, 0.5332, 0.6943] } },
 
     { k: 'ivory-meanings', name: 'Ivory · Meanings', sub: 'Store meanings', kind: 'meaning', tone: 'light',
-      img: 'assets/media/image/cert-ivory-meanings-c91595c2.webp',
+      img: './assets/certificates/cert-ivory-meanings.webp',
       f: { name: [0.4769, 0.2014, 0.7996], word: [0.6103, 0.3734, 0.7967],
            mean: [0.6474, 0.4184, 0.7967], date: [0.7983, 0.4027, 0.6618],
            id:   [0.8334, 0.5327, 0.6931] } },
 
     { k: 'onyx-words', name: 'Onyx · Words', sub: 'Requested words', kind: 'word', tone: 'dark',
-      img: 'assets/media/image/cert-onyx-words-8ac14f8e.webp',
+      img: './assets/certificates/cert-onyx-words.webp',
       f: { name: [0.4967, 0.2002, 0.7998], word: [0.6712, 0.3789, 0.7998],
            mean: [0.7096, 0.4238, 0.8008], date: [0.8594, 0.3848, 0.6660],
            id:   [0.8893, 0.5352, 0.7129] } },
 
     { k: 'onyx-meanings', name: 'Onyx · Meanings', sub: 'Requested meanings', kind: 'meaning', tone: 'dark',
-      img: 'assets/media/image/cert-onyx-meanings-d587ec7e.webp',
+      img: './assets/certificates/cert-onyx-meanings.webp',
       f: { name: [0.5130, 0.1963, 0.8037], word: [0.6790, 0.3555, 0.8027],
            mean: [0.7122, 0.4023, 0.8047], date: [0.8529, 0.3887, 0.6621],
            id:   [0.8783, 0.5469, 0.7314] } }

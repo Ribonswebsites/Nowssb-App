@@ -16,10 +16,10 @@
      you send it (lungs first). Leave '' to keep the "coming soon"
      placeholder for organs not wired yet. ═══════════════════════════ */
   var ORGAN_VIDEOS = {
-    lungs:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/aa7be224940a8451b0804cba672cab6dca32d1a8db1297d91a7fcd6c1642c946.mp4',   // ← lungs / breath / respiratory
-    heart:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/9020d24aadc3adc3beca929e71673792279d809abe3a63f95895f38a4e26dfc5.mp4',   // ← heart / cardiac / circulation
-    kidney: 'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/6355694c6db62e0dac32c682095ed4fc6046f28ca8cb331dcd9015a09960f489.mp4',   // ← kidney / renal / bladder
-    liver:  'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/421bc4d59cb1bfcf43084983310fa0ccb65e6ee7a5ed9a7cfdc525587b4f01cb.mp4'    // ← liver / hepatic / detox
+    lungs:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991520/grok_video_2026-07-02-16-52-38_pehfcr.mp4',   // ← lungs / breath / respiratory
+    heart:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991522/grok_video_2026-07-02-16-51-54_zpffyf.mp4',   // ← heart / cardiac / circulation
+    kidney: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991521/grok_video_2026-07-02-16-52-19_mlfgei.mp4',   // ← kidney / renal / bladder
+    liver:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991522/grok_video_2026-07-02-16-51-43_gilelq.mp4'    // ← liver / hepatic / detox
   };
   /* Cloudinary on-the-fly compression — the raw grok mp4s are huge and lag /
      take forever. Inject q_auto,f_auto (+ a width cap) so Cloudinary serves a
@@ -56,38 +56,38 @@
        from Cloudinary, which is also why it is the one worth having
        before anything else: cldVid() leaves a path with no
        /video/upload/ in it alone, so it reaches the <video> untouched. */
-    { img:'assets/media/image/liquid-splash-7b7b346a.webp',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/player-liquid-splash.mp4',
+    { img:'./assets/player/liquid-splash.webp',
+      video:'./assets/video/player-liquid-splash.mp4',
       accent:'#ffcf4d' },
-    { img:'assets/media/image/4113d8864e815fd9bf493296dbcad1f09ffcffe3e62a7744-6d3597ff.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a1b0a1b513ec57f60f4af24187d38d8c0b11f6723902c9198210299fba5e2b30.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656918/grok_image_1782656676834_rzp2cz.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656947/grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
       accent:'#7fe9da' },
-    { img:'assets/media/image/8a5d63b9eb4185408cc030e7c049109c01d77bdeec5b6b82-a8d90fbd.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/79d7c93a6734ed8d306b3eeafb392ea0c86fd1a2ee52c86e4dbba97db1ca014b.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656710977_nj5r6x.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656870/grok_video_2026-06-28-19-55-09_otgbxd.mp4',
       accent:'#9bb8ff' },
-    { img:'assets/media/image/76f0f18f22dec4fa26f8f0323b494eb5455c645f4025d4cd-6c38fe98.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/dc68caaf51e870039c6336a85fa794dc56803d1a8a8c9db7eff3d73cf7fd956a.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656704854_cfsah3.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656923/grok_video_2026-06-28-19-55-02_of5fwh.mp4',
       accent:'#bd7bff' },
-    { img:'assets/media/image/85e5b33902255f291353af0de7bcf22f1118d910ad23d81b-b16d4c21.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/d8ac259577c403f3142246611dd133f990ccc47768e4047f599c79437a39f2b0.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782657140/grok_image_1782656684101_o9vc93.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656932/grok_video_2026-06-28-19-54-43_it2bur.mp4',
       accent:'#a6dcff' },
-    { img:'assets/media/image/ef2a2f937caf9dd13cfa91c4bd0e6c4357af9d21bf68522f-6b74309d.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/3b63edc1485a45e29531af4eb7ef03c0f7b865a6c1611419162d274135afc4d2.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782795978/grok_image_1782795582310_llvpix.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782795956/grok_video_2026-06-30-10-29-43_hzxyun.mp4',
       accent:'#b9a6ff' },
-    { img:'assets/media/image/098367670c8091670d8d4dbd7e5b528a1e2c0469cb2fc26c-912aa9a0.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/a779a65872bf917cf1e6f71d70fa31da71c88f3b2b51655928b753960c2441cc.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796537731_vzyhwn.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796761/grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
       accent:'#a6c8ff' },
-    { img:'assets/media/image/e0f91382fcc5eb563a2cc64da552514d0e10db7529ffc2d0-455e9fe7.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/da4159578099ee480fc5bf967efae49a1bcd80a1435b29706c153e1dafcad4b0.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796725/grok_image_1782796641824_izkh09.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796770/grok_video_2026-06-30-10-47-20_rljghs.mp4',
       accent:'#b9a6ff' },
-    { img:'assets/media/image/6e2211e7b5dfe439c44c7ec95bb1a4e83ba3ae8247a65d94-ff46a3b9.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/e55e1f1f879d8074934477d811da565cd8fabce42ecf92dcf2aceecc25e51b39.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796519587_thrrws.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796770/grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
       accent:'#e8d5a3' },
-    { img:'assets/media/image/9bfd7902d01145e2286ef6d5c08686fe3eac24f5c6681c97-db320556.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/7a0e0cf6903f3b16c406f92ad6b28764c7b961ad667118ab25399275f0819446.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796924745_nmksmi.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782797027/grok_video_2026-06-30-10-52-07_gvffol.mp4',
       accent:'#f0d9a8' },
-    { img:'assets/media/image/5eb9ad9244ef64dded8add6fa95902546bc1d0d4e3c68a15-fb93d3f7.jpg',
-      video:'https://nowssb-api.ribonpatil2.workers.dev/media/media/cloudinary/39905d27bd778cffb57c0ba632f61d4b84e5d40dfaec89ca5d2f9fe26c4bc661.mp4',
+    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796933792_qwzfgx.jpg',
+      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796996/grok_video_2026-06-30-10-52-20_zk87yh.mp4',
       accent:'#8fe6ff' },
   ];
 
@@ -224,8 +224,8 @@
        exactly as they did — every extra line is conditional. */
     var _e = function (s) {
       return String(s == null ? '' : s)
-        .replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
-        .replace(/"/g, '"').replace(/'/g, '&#39;');
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     };
     var boxes = (w.parts && w.parts.length)
       ? w.parts
@@ -250,19 +250,19 @@
     /* ── Custom glass-sphere icons (background-removed PNGs). Each sphere IS the
        button — the round glass button background is dropped in CSS. ── */
     var IC = {
-      play:     'assets/media/image/2c50cf8b4c45c700fd3de0720dc8f4308c6ebf266a3e0a87-a1653656.png',
-      pause:    'assets/media/image/9aabb4d00e9525cb1caaa5e5ea6a3a59d4e54ceadfc49bf7-6d7b9ac7.png',
-      prev:     'assets/media/image/9fccbe035598522f1566cef09be92ebd9e8f2069a6d8b391-c6053e46.png',
-      next:     'assets/media/image/ad9c188ccc1a1af57cdf76aaeff1d40f4a989508f3e731a4-bb68dadd.png',
-      replay:   'assets/media/image/16a2e9320e5813b82179193a841f8b09e66336829c345c70-434fdcf8.png',
-      mic:      'assets/media/image/3da0555e497160e43f19fc651e90426a8901650a10ca838b-c6005693.png',
-      library:  'assets/media/image/bfa1c5cc431958f35659b7bcdb86cb07ae7dafb275e77346-0ed529b4.png',
-      settings: 'assets/media/image/4551ffc7076a62c79a7ff2c49cde35ccbb88f2195ad74ae2-e7337986.png',
-      info:     'assets/media/image/b01152ef2666539f0afd4bd38bedcff2a2e1a4295af93fb5-d6193253.png',
-      brand:    'assets/media/image/7217d187426a2ad9d68f2933e6605cb0f76c09f1961bc3ed-3db811d6.webp',
+      play:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718777/e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png',
+      pause:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718776/e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png',
+      prev:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718778/ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png',
+      next:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718778/c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png',
+      replay:   'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/file_00000000a484720aa71b5f34f8539f05_amesbb.png',
+      mic:      'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png',
+      library:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
+      settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png',
+      info:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782986898/file_000000002038722fac63c79466d73f0f_jnhjvg.png',
+      brand:    'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png',
       /* Only the two black banners use this. The top bar, the corner mark
          and the info sheet keep IC.brand — same icon there as before. */
-      banner:   'assets/media/image/4f7725ff7f39643319c37ac480f74aef4b64541111e6337d-6463550f.png'
+      banner:   'https://res.cloudinary.com/eenvubod/image/upload/v1785070108/1000002027_o74vwe.png'
     };
     /* render every icon as a background-image SPAN (never an <img>) so the
        browser can't open/zoom it on tap and taps always hit the button */
@@ -301,7 +301,6 @@
       var cur = ex ? ex.querySelector('.lgp-wa-vid') : null;
       if (cur) { _keepWaVid = cur; if (cur.parentNode) cur.parentNode.removeChild(cur); }
     })();
-    var wordImage = typeof w.img === 'string' ? w.img.trim().replace(/["'()\\]/g, '') : '';
     var visual = th.video
       ? (_keepVid ? '<span class="lgp-video-slot"></span>'
                   : '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + _newVidSrc + '"></video>')
@@ -369,7 +368,7 @@
     var arc =
       '<div class="lgp-arc" id="lgpArc" style="--lg-accent:' + th.accent + '">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
-        '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'assets/media/image/c045f4e825013a0a0a707508c6b95941853d7259923150a5-482cac58.png\')"></span></button>' +
+        '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
         '<div class="lgp-arc-brand"><span class="lgp-arc-brand-txt">NowssB Player</span></div>' +
         '<span class="lgp-arc-brand-ico-corner" style="background-image:url(\'' + IC.brand + '\')"></span>' +
         '<div class="lgp-arc-radial">' +
@@ -422,7 +421,7 @@
         '<div class="lgp-info-sheet">' +
           '<div class="lgp-info-sheet-top">' +
             '<button class="lgp-info-close lgp-imgbtn" onclick="lgpToggleInfo()" aria-label="Back">' +
-              '<span class="lgp-bgico" style="background-image:url(\'assets/media/image/c045f4e825013a0a0a707508c6b95941853d7259923150a5-482cac58.png\')"></span>' +
+              '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
             '</button>' +
             '<div class="lgp-info-sheet-title">' + (w.word || '') + '</div>' +
             '<div class="lgp-info-sheet-brand" style="background-image:url(\'' + IC.brand + '\')"></div>' +
@@ -456,7 +455,7 @@
           (_keepWaVid
             ? '<span class="lgp-wa-vid-slot"></span>'
             : '<video class="lgp-wa-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
-              ' src="https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/video/word-acts.mp4"></video>') +
+              ' src="./assets/video/word-acts.mp4"></video>') +
         '</div>' +
         '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
           '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7.5 9.5h9M7.5 12.6h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
@@ -475,7 +474,7 @@
       '</div>';
 
     body.innerHTML =
-      '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + (wordImage || th.img) + '\');--lg-accent:' + th.accent + ';">' +
+      '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
           /* A white disc with a plain arrow, not the glass sphere. */
@@ -930,30 +929,7 @@
     } catch (e) {}
   };
 
-  /* Settings opens the AURA clock first; the clock’s Music Player Settings
-     control and upward swipe then reveal the flat settings list. The radial
-     arc remains available only for its own player controls, never as settings. */
-  window.lgpOpenAURASettings = function () {
-    try {
-      sessionStorage.setItem('nwsb_return_to_player', JSON.stringify({
-        ts: Date.now(),
-        wordIndex: (typeof _pwIdx !== 'undefined' ? _pwIdx : 0),
-        word: (typeof PRACTICE_WORDS !== 'undefined' && PRACTICE_WORDS[_pwIdx]) ? PRACTICE_WORDS[_pwIdx].word : ''
-      }));
-    } catch (e) {}
-    var url = 'player-settings.html#clock';
-    try {
-      var pages = (window.NOWSSB_PAGES || (typeof PAGES !== 'undefined' ? PAGES : '') || '').toString();
-      if (pages && /github\.io/i.test(pages)) url = pages.replace(/\/?$/, '/') + 'player-settings.html#clock';
-    } catch (e) {}
-    location.assign(url);
-  };
-
   window.lgpToggleArc = function (forceOpen) {
-    if (forceOpen === true) {
-      window.lgpOpenAURASettings();
-      return;
-    }
     var a = document.getElementById('lgpArc');
     if (!a) return;
     var willOpen = (forceOpen === true) ? true : !a.classList.contains('open');
@@ -1035,7 +1011,7 @@
     document.addEventListener('click', function (e) {
       var t = e.target;
       var hit = t && (t.closest ? t.closest('.lgp-settings') : null);
-      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpOpenAURASettings(); }
+      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpToggleArc(); }
     }, true);
   }
 

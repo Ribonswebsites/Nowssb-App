@@ -10,7 +10,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'tokens.dart';
-import '../widgets/motion.dart';
 
 class NwsbTheme {
   NwsbTheme._();
@@ -67,16 +66,6 @@ class NwsbTheme {
         ),
         textTheme: _text(NwsbColors.ink, NwsbColors.inkSoft),
         splashFactory: NoSplash.splashFactory,
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: {
-            TargetPlatform.android: NwsbPageTransitionsBuilder(),
-            TargetPlatform.iOS: NwsbPageTransitionsBuilder(),
-            TargetPlatform.linux: NwsbPageTransitionsBuilder(),
-            TargetPlatform.macOS: NwsbPageTransitionsBuilder(),
-            TargetPlatform.windows: NwsbPageTransitionsBuilder(),
-            TargetPlatform.fuchsia: NwsbPageTransitionsBuilder(),
-          },
-        ),
       );
 
   /// Everything else. Deep navy, pale copy, gold accents.
@@ -90,15 +79,5 @@ class NwsbTheme {
         ),
         textTheme: _text(Colors.white, const Color(0xB3C8E8F5)),
         splashFactory: NoSplash.splashFactory,
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: {
-            TargetPlatform.android: NwsbPageTransitionsBuilder(),
-            TargetPlatform.iOS: NwsbPageTransitionsBuilder(),
-            TargetPlatform.linux: NwsbPageTransitionsBuilder(),
-            TargetPlatform.macOS: NwsbPageTransitionsBuilder(),
-            TargetPlatform.windows: NwsbPageTransitionsBuilder(),
-            TargetPlatform.fuchsia: NwsbPageTransitionsBuilder(),
-          },
-        ),
       );
 }

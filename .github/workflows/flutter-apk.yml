@@ -11,16 +11,24 @@
 # is the second job; it runs on demand and only when the keystore is in this
 # repository's secrets, because a release build cannot be signed without one.
 
-name: NowssB Flutter APK
+name: Flutter APK
 
 # No `paths:` filter. There was one — flutter_app/** — and the workflow was
 # registered but never fired on the push that added it, while android-apk.yml,
 # which has no such filter, ran from the same kind of push minutes earlier.
 # Rather than keep guessing at the filter, it runs on every push to main. A
 # few spare runner minutes is a cheaper problem than a build you cannot get.
+#
+# IT ALSO BUILDS THE WORK BRANCHES. Only building main meant every APK
+# installed for review was main's — so a whole session's work could be
+# written, pushed and reviewed against a build that did not contain any of
+# it. That is not a slow feedback loop, it is a wrong one: the screenshots
+# coming back were of code that had already been deleted.
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'claude/**'
   workflow_dispatch:
 
 defaults:
@@ -29,7 +37,7 @@ defaults:
 
 jobs:
   debug-apk:
-    name: NowssB Flutter debug APK
+    name: Debug APK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,9 +71,7 @@ jobs:
       # google-services plugin is not applied by the FlutterFire packages.
       - name: Configure the Android project
         working-directory: .
-        run: |
-          node tools/flutter-android.mjs
-          node tools/flutter-updater-android.mjs
+        run: node tools/flutter-android.mjs
 
       - name: Dependencies
         run: flutter pub get
@@ -73,28 +79,19 @@ jobs:
       # A build that compiles but is full of analyzer errors is not worth
       # downloading, so this runs first and the log says exactly what broke.
       - name: Analyze
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+        run: flutter analyze --no-fatal-infos
 
-      # Run the suite for diagnostics, but keep artifact generation available
-      # when an existing visual/widget assertion is flaky on the hosted runner.
-      # Analyze and the APK compiler remain blocking; failures are surfaced as
-      # a workflow warning rather than silently discarded.
-      - name: Test (diagnostic)
-        run: |
-          flutter test || echo "::warning::Flutter test suite reported failures; continuing to the compile and APK artifact steps."
+      # The video pool's ceiling is the whole point of the port, and it is
+      # cheap to check. A build that broke it should not produce an APK.
+      - name: Test
+        run: flutter test
 
       - name: Build
         run: flutter build apk --debug
 
-      - name: Report debug signing fingerprint
-        working-directory: flutter_app/android
-        run: |
-          echo "Flutter debug APK signing certificate:"
-          ./gradlew --no-daemon signingReport | grep -A3 -E 'Variant: debug|SHA1:' || true
-
       - uses: actions/upload-artifact@v4
         with:
-          name: nowssb-flutter-debug-apk-all-changes
+          name: nowssb-flutter-debug-apk
           path: flutter_app/build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
 
@@ -141,9 +138,7 @@ jobs:
       - name: Configure the Android project
         if: steps.guard.outputs.ok == 'true'
         working-directory: .
-        run: |
-          node tools/flutter-android.mjs
-          node tools/flutter-updater-android.mjs
+        run: node tools/flutter-android.mjs
 
       # Written into the runner for this run only. .gitignore already refuses
       # *.keystore, *.jks and key.properties, so it cannot reach the repo.

@@ -112,7 +112,7 @@ place — see step 4.
    ```
 
 6. The small status-bar icon must be a white-on-transparent silhouette or
-   Android draws a grey square. `https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/notif-badge.png` is exactly
+   Android draws a grey square. `assets/icons/notif-badge.png` is exactly
    that — import it in Android Studio via **res → New → Image Asset →
    Notification Icons** and name it `ic_stat_notify`.
 
@@ -126,7 +126,7 @@ button as the web app, on the Notifications page.
 
 - App name: `android/app/src/main/res/values/strings.xml` → `app_name`.
 - Launcher icon: **res → New → Image Asset → Launcher Icons**, from
-  `https://nowssb-api.ribonpatil2.workers.dev/media/media/repo/assets/icons/app-icon-512.png`.
+  `assets/icons/app-icon-512.png`.
 - Splash background is `#060c18`, already set in `capacitor.config.json`.
 
 ---

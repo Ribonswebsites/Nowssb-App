@@ -384,9 +384,6 @@ function hideWelcome(cb) {
 
 /* ══ Public ══ */
 function start() {
-  /* The legacy welcome-tour page was removed from the app. Keep this
-     compatibility entry point inert so old startup hooks cannot recreate it. */
-  return;
   if (_active) return;
   _active = true;
   welcome(

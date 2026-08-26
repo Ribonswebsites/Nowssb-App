@@ -8,7 +8,6 @@
     "webContentsDebuggingEnabled": false
   },
   "server": {
-    "url": "https://nowssb.com",
     "androidScheme": "https"
   },
   "plugins": {

@@ -110,12 +110,12 @@ setTimeout(initGSAP, 400);
 
 // ── HEALTH BANNER ROTATION ──
 const maleBanners = [
-  'assets/media/image/e8acb980f25e265375ee1964bdf8b53b207302614259073f-ba360a16.webp',
-  'assets/media/image/562cef0845a4db9e196fc202d82ff0ee049e8e019d7140a7-bfa25c44.webp'
+  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706672/grok_image_1777706360035_kdvj3e.jpg',
+  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706671/grok_image_1777706008418_slbqza.jpg'
 ];
 const femaleBanners = [
-  'assets/media/image/92728fb6df6bd487a528a3451504d3728fb509ec020fae93-490099f9.webp',
-  'assets/media/image/7314a1836a55dc99d75b5a8db2b560c86420ac8039e97eb7-51a59b3a.webp'
+  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706671/grok_image_1777706116245_awevjm.jpg',
+  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706672/grok_image_1777706263630_mahjss.jpg'
 ];
 let maleIdx = 0, femaleIdx = 0;
 function rotateBanner(el, banners, idxRef, setIdx) {

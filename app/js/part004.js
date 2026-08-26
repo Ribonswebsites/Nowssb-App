@@ -36,16 +36,6 @@ window.MASTER_WORD_LIBRARY = MASTER_WORD_LIBRARY;
 // Active session words — set by routine launch or direct open
 let PRACTICE_WORDS = [...MASTER_WORD_LIBRARY];
 
-/* part073.js mutates MASTER_WORD_LIBRARY when the studio publishes. Keep the
-   active Player session in step as well, without replacing a category/routine
-   selection with unrelated words. */
-window.addEventListener('nwsb-library', () => {
-  const fresh = new Map(MASTER_WORD_LIBRARY.map(w => [w.key || w.word, w]));
-  PRACTICE_WORDS = PRACTICE_WORDS.map(w => fresh.get(w.key || w.word) || fresh.get(w.word) || w);
-  if (!PRACTICE_WORDS.length) PRACTICE_WORDS = [...MASTER_WORD_LIBRARY];
-  if (typeof renderPractice === 'function' && document.getElementById('practiceBody')?.classList.contains('open')) renderPractice();
-});
-
 // ── PER-WORD PLAYER THEME ──
 // Every word gets its own background video + UI accent color, picked
 // deterministically from these pools (same word → same look, different words
@@ -149,14 +139,14 @@ function openPracticeIntro() {
    always a photo you did not just see. Random would repeat roughly one
    launch in eight, which is exactly what this is meant to avoid. */
 const PI_ART = [
-  'assets/media/image/7eafa6d2b1a9644567776abe01e942eca64dc41fe94cc48d-c82f0be9.png',
-  'assets/media/image/b97694e8259ee472a1396b7393146ec4b2380000c2536864-f5efde4a.png',
-  'assets/media/image/034a1a1669f584720438ea2210206c3abc774e1b35b31a30-16e4605a.png',
-  'assets/media/image/299d0de648e9e893c02a7b932ac85a458bc1e75f6a5861d4-2813b131.png',
-  'assets/media/image/95483a3d2f1bfc1fcd54f7e1c3bf2cc5058266c1191739be-cc21f294.png',
-  'assets/media/image/6b3f6b97fb7baa201d1285d202c914aa57b5e4eafb66fe0f-267a8e7b.png',
-  'assets/media/image/c37072a054c05f23e455f52b0af83ca2f8179c0acd44fb50-2f4a7f33.png',
-  'assets/media/image/d0232cb143b40b77416dcdb68de05010855cd34d8ba9880d-3358cba9.png'
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069166/file_00000000210881fabda4b62a827e2b7d_shsdnw.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_000000005c28820693e31425ac03a99a_myqo9z.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000fbb481fa897d6c4b800c7abc_x0fmja.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069167/file_0000000013088209a33ed2b6c15a7dfe_l6j2wf.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000868081fa8048698268ae60bb_rw97tp.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000112882069935a3c4bce3b4ca_r6awjq.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000fdb08207a6e3e5e768f47448_apuryf.png',
+  'https://res.cloudinary.com/eenvubod/image/upload/v1785069165/file_00000000280082069ad442c609cdd790_ci1kbd.png'
 ];
 window.NWSB_PLAYER_INTRO_ART = PI_ART;
 
@@ -281,11 +271,11 @@ function updateTodayCard() {
   if (!titleEl) return;
   // Swap banner image per time of day
   const TODAY_BANNERS = {
-    'Morning':   'assets/media/image/6e165ae7b21c0214bccb203b2bcdcaa2966bf961021431f7-09b87757.webp',
-    'Midday':    'assets/media/image/ff002920729cc8aad63dab76d4cc3db61e6e598607164a34-c67c07fd.webp',
-    'Afternoon': 'assets/media/image/c2e1571ac78e255bfa8a1a1d55a2166dabff20734a575e8e-12567bd8.webp',
-    'Evening':   'assets/media/image/de7a3fafb8ac9be5a0dde573b9da4dc3758a667034d2d3ce-d8624d36.webp',
-    'Night':     'assets/media/image/7ca265417cb0f619c7b91042317f37fb825de09bdf97bd7f-9c0502c1.webp'
+    'Morning':   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg',
+    'Midday':    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052565/grok_image_1778052259502_s8fbkb.jpg',
+    'Afternoon': 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052585/grok_image_1778052247702_xxo6jv.jpg',
+    'Evening':   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052598/grok_image_1778052255147_welycg.jpg',
+    'Night':     'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052611/grok_image_1778052238350_bxdyvx.jpg'
   };
   const bgEl = document.getElementById('todayPracticeBg');
   if (bgEl) bgEl.style.backgroundImage = "url('" + (TODAY_BANNERS[timeLabel] || TODAY_BANNERS['Morning']) + "')";
@@ -432,7 +422,7 @@ function renderSentencePlayer() {
           <div class="sp-wm-arc"></div>
           <div class="sp-disc-outer${_sspPlaying?' playing':''}">
             <div class="sp-disc${_sspPlaying?' playing':''}">
-              <img decoding="async" src="assets/media/image/0af2cee46a8284be040268fa8dc477c4e0ceac3706d254eb-fdd2ca79.webp" alt="NowssB" loading="eager">
+              <img decoding="async" src="https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777803046/grok_image_1777802759590_giabgl.jpg" alt="NowssB" loading="eager">
             </div>
           </div>
         </div>
@@ -1022,9 +1012,9 @@ function _pwUpdateMainBtn() {
   var lbl = document.getElementById('sp3BtnLbl');
   if (!btn) return;
   var SVG = {
-    play: '<img src="assets/media/image/64af76d95c81c8aa3ea12c1764fb888711dd897c266dbd94-5dc9ba16.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt="">',
+    play: '<img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780340484/04610c10-5dec-11f1-9e1a-9303081e5fda_cbsa8c.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt="">',
     stop: '<svg width="13" height="14" viewBox="0 0 14 16" fill="none"><rect x="1" y="1" width="4" height="14" fill="currentColor"/><rect x="9" y="1" width="4" height="14" fill="currentColor"/></svg>',
-    replay: '<img src="assets/media/image/296478bbd945bd07f090fb593d29eb3da8e8a06b77fb9cb3-d1fd9848.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt="">',
+    replay: '<img src="https://res.cloudinary.com/ds6duqabl/image/upload/v1780340485/fd31c0b0-5deb-11f1-9e1a-9303081e5fda_finid1.png" style="width:26px;height:26px;object-fit:contain;display:block;" alt="">',
     stoprec: '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" fill="currentColor"/></svg>',
     spin: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5" opacity="0.3"/><path d="M7 1.5a5.5 5.5 0 015.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>'
   };

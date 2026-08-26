@@ -4,9 +4,9 @@
   // banner — reused here so every word/meaning detail page can show one at
   // random instead of needing its own dedicated art.
   var COUPON_BANNERS = [
-    'assets/media/image/f547a2cd0364e788efac295f7e126596364b79b890850788-b0295a59.webp',
-    'assets/media/image/ec4d04df4d0a6bc2be31475207010a42848ab5d29a72a66b-a8787861.webp',
-    'assets/media/image/81105d598e5c8258b8a0244f549cbbd2b3f1f580cd0298ac-7d6775a6.webp'
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
   ];
   window.nwsbSetRandomCouponBanner = function (elId) {
     var el = document.getElementById(elId);
@@ -14,9 +14,10 @@
     el.src = COUPON_BANNERS[Math.floor(Math.random() * COUPON_BANNERS.length)];
   };
 
-  // Reusable "scroll down" hint — show briefly on entry and hide once
-  // the user actually starts scrolling, matching the app’s other scrollable screens.
-  // Any banner using .nwsb-scroll-hint can opt in with these two calls.
+  // Reusable "scroll down" hint — same behavior as the App Guide's own
+  // nwagShowScrollHint()/scroll listener: show briefly on entry, hide once
+  // the user actually starts scrolling. Any banner using .nwsb-scroll-hint
+  // can opt in with these two calls.
   window.nwsbShowScrollHint = function (hintId) {
     var hint = document.getElementById(hintId);
     if (!hint) return;
@@ -50,7 +51,7 @@
     if (theme === 'black' && !window._beBgPreloaded) {
       window._beBgPreloaded = true;
       var _pre = new Image();
-      _pre.src = 'assets/media/image/b241190e18a566a3d03290ee5ada91e6137a6ce86815e4bb-196489ac.jpg';
+      _pre.src = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780209363/grok_image_1780209143800_i8lcry.jpg';
     }
 
     // Fashion intro only when user explicitly selects Black — never on page-load restore
@@ -91,15 +92,15 @@
      active (see nowssb-nm.css). Picking a theme card clears it again, so
      the two controls never fight silently. */
   var NWSB_FASHION_BGS = [
-    'assets/media/image/c20dfe09052ea94736db5d076886a9b3e4e86ac6ec686d9b-a547e3dc.jpg',
-    'assets/media/image/aeac0fb81685e021d9d08359c0268c1fb8ce18a1c54b494e-4e02aaf3.jpg',
-    'assets/media/image/9c467e9f172ef75fe9f12f4313d60c07e15e691ea9024f9d-68070510.jpg',
-    'assets/media/image/4644221bee571acadae57bb2285a0126c3cd9e095ab9356d-b5e5798b.jpg',
-    'assets/media/image/d7f9a33e2229352fca42e152adc5eb23b8c2e3d675736442-9da8c189.jpg',
-    'assets/media/image/19540c1a081843c541f6e3d511bd56c4bfefda898140623d-30baefd8.jpg',
-    'assets/media/image/4320a713975835ad07de345d41f50567f8d04013c68ba4e0-f4ccada5.jpg',
-    'assets/media/image/db886b606c99c0e99f900d618e5ae31e2237570bddb6d32b-1385ed16.jpg',
-    'assets/media/image/31f92fc4c2fa5d42951917614024f8f9634adb02648e3f8d-751a302d.jpg'
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261485118_fnnndw.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263702345_zlt99m.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263836740_qclr5g.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261493254_szhsuw.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263881946_zespcn.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263699783_tyf4l8.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784263996/grok_image_1784263979789_doxtcp.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263836740_atjk35.jpg',
+    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg'
   ];
   window.NWSB_FASHION_BGS = NWSB_FASHION_BGS;
 
@@ -117,7 +118,7 @@
     var t = document.createElement('div');
     t.className = 'fbg-toast';
     t.innerHTML =
-      '<div class="fbg-toast-icon"><img loading="lazy" decoding="async" src="assets/media/image/d571c50bd69e5c142ac08854f713455691cb1ca77251d29e-9a149bb6.png" alt=""></div>' +
+      '<div class="fbg-toast-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>' +
       '<div class="fbg-toast-text"></div>' +
       '<div class="fbg-toast-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>';
     t.querySelector('.fbg-toast-text').textContent = msg;

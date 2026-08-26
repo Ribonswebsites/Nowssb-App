@@ -23,9 +23,6 @@ String nwsbSlot([DateTime? at]) {
   return 'night';
 }
 
-String nwsbSlotTitle([DateTime? at]) =>
-    _slotTitle[nwsbSlot(at)] ?? 'Morning Ritual';
-
 const _slotTitle = {
   'morning': 'Morning Ritual',
   'afternoon': 'Afternoon Session',
@@ -193,7 +190,8 @@ class _Empty extends StatelessWidget {
             'should be here already — if this is empty, the bundled copy '
             'did not read.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: Color(0x66FFFFFF), height: 1.5),
+            style:
+                TextStyle(fontSize: 12, color: Color(0x66FFFFFF), height: 1.5),
           ),
         ],
       ),

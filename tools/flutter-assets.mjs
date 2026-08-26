@@ -1,136 +1,137 @@
 // Fills flutter_app/assets/ before a Flutter build.
 //
-// The 25 August native build did not copy the entire repository media catalog
-// into the APK. It bundled the curated home/player film set and the small app
-// artwork, while the generated media/image library stayed remote. Keeping this
-// mirror selective is what keeps the native package near 200 MB instead of
-// approaching 1 GB.
+// The clips live in one place in this repository — assets/video/ — because
+// the website and the app show the same films and a second copy is a second
+// copy to keep in step. So flutter_app/assets/video/ is NOT committed; it is
+// filled from assets/video/ on the way into a build, the same way www/ is
+// filled by tools/build-native.mjs.
 //
 //   node tools/flutter-assets.mjs
 //
-// Run this before `flutter pub get`.
+// Run this BEFORE `flutter pub get`. A directory named in pubspec.yaml's
+// assets: block that does not exist fails pub get outright, so this is not
+// optional and it is not an optimisation — it is a build step.
+//
+// It also writes the shipped content, by calling tools/export-content.mjs,
+// so one command puts everything the bundle needs in place.
 
-import {
-  readdirSync,
-  mkdirSync,
-  copyFileSync,
-  statSync,
-  existsSync,
-  rmSync,
-} from 'node:fs';
+import { readdirSync, mkdirSync, copyFileSync, statSync, existsSync,
+         readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-
-// This is the compact media set used by the 25 August build. Posters are kept
-// with the clips that have them; remote/generated media is intentionally not
-// copied into the APK.
-const VIDEO_KEEP = new Set([
-  'connect-banner.mp4',
-  'coupon-a-poster.webp',
-  'coupon-a.mp4',
-  'coupon-b.mp4',
-  'fashion-hero-ebooks.mp4',
-  'fashion-hero-meaning-store.mp4',
-  'fashion-hero-subscription.mp4',
-  'fashion-hero-word-store.mp4',
-  'fashion-plus-bg-1.mp4',
-  'fashion-plus-bg-2.mp4',
-  'fashion-plus-bg-3.mp4',
-  'fashion-plus-bg-4.mp4',
-  'fashion-plus-bg-5.mp4',
-  'fashion-plus-bg-6.mp4',
-  'fashion-plus-bg.mp4',
-  'fp-word-science.mp4',
-  'healing-path-bg-poster.webp',
-  'healing-path-bg.mp4',
-  'hero-bg.mp4',
-  'loading.mp4',
-  'login-phone-poster.webp',
-  'login-phone.mp4',
-  'orb-loop.mp4',
-  'player-liquid-splash.mp4',
-  'rx-banner.mp4',
-  'signature-a.mp4',
-  'signature-b.mp4',
-  'signature-banner-poster.webp',
-  'signature-banner.mp4',
-  'signature-c.mp4',
-  'signature-d.mp4',
-  'signature-e.mp4',
-  'signature-store-poster.webp',
-  'signature-store.mp4',
-  'sound-library-banner-poster.webp',
-  'sound-library-banner.mp4',
-  'start-animation-poster.webp',
-  'start-animation.mp4',
-  'store-banner-fash.mp4',
-  'store-banner.mp4',
-  'store-section-poster.webp',
-  'store-section.mp4',
-  'store-verify-banner-poster.webp',
-  'store-verify-banner.mp4',
-  'subscription-a.mp4',
-  'subscription-promo-poster.webp',
-  'subscription-promo.mp4',
-  'time-afternoon.mp4',
-  'time-evening.mp4',
-  'time-morning.mp4',
-  'time-night.mp4',
-  'tv-screen-poster.webp',
-  'tv-screen.mp4',
-  'word-acts.mp4',
-]);
-
-// These folders are small, named app artwork. The large generated
-// assets/media/image catalog is deliberately absent from this list.
+/* The folders that go into the bundle. Not only the clips: the app's own
+   artwork lives here too and is what makes it look like NowssB rather than
+   like a Material demo — the device bezels the televisions are drawn from,
+   the intro-page paintings, the logo disc, the collection banners. All of
+   it is already in this repository; none of it needed downloading. */
 const FOLDERS = [
-  'video',
-  'frames',
-  'icons',
-  'store',
-  'fashion',
-  'player',
-  'signature',
+  'video',        // the clips and their posters
+  'frames',       // the device bezels — see lib/widgets/tv_frame.dart
+  'icons',        // the logo disc, the search mark
+  'store',        // the intro-page artwork, and the collection covers
+  'fashion',      // the Fashion Plus intro and its icon
+  'player',       // the player's own artwork
+  'signature',    // the Signature's marks
   'certificates',
+  'banners',      // the collection banners
 ];
+
 const KEEP = /\.(mp4|webp|png|jpe?g|svg)$/i;
 
-let copied = 0;
-let bytes = 0;
+let copied = 0, skipped = 0, bytes = 0;
 
 function copyDir(rel) {
   const from = join(root, 'assets', rel);
   const to = join(root, 'flutter_app', 'assets', rel);
-  rmSync(to, { recursive: true, force: true });
-  mkdirSync(to, { recursive: true });
   if (!existsSync(from)) return;
+  mkdirSync(to, { recursive: true });
 
   for (const name of readdirSync(from)) {
     const src = join(from, name);
     const s = statSync(src);
-    if (s.isDirectory()) continue;
+    if (s.isDirectory()) { copyDir(join(rel, name)); continue; }
     if (!KEEP.test(name)) continue;
-    if (rel === 'video' && !VIDEO_KEEP.has(name)) continue;
-    copyFileSync(src, join(to, name));
-    copied++;
-    bytes += s.size;
+
+    const dst = join(to, name);
+    // Same size and not older: already there. Makes a re-run cheap, which
+    // matters when this is 200 MB.
+    if (existsSync(dst)) {
+      const d = statSync(dst);
+      if (d.size === s.size && d.mtimeMs >= s.mtimeMs) {
+        skipped++; bytes += s.size; continue;
+      }
+    }
+    copyFileSync(src, dst);
+    copied++; bytes += s.size;
   }
 }
 
-for (const folder of FOLDERS) copyDir(folder);
-for (const stale of ['media/image', 'banners']) {
-  rmSync(join(root, 'flutter_app', 'assets', stale), {
-    recursive: true,
-    force: true,
-  });
-}
+for (const f of FOLDERS) copyDir(f);
+
 console.log(
-  `flutter_app/assets/  ${copied} files, ` +
-    `${(bytes / 1024 / 1024).toFixed(1)} MB selected`,
+  `flutter_app/assets/  ${copied} copied, ${skipped} already current, ` +
+  `${(bytes / 1024 / 1024).toFixed(1)} MB total`
 );
+
+/* ── The URL → bundled-file map ────────────────────────────────────────
+   lib/media/nwsb_image.dart reads this. A section names a picture by the
+   URL index.html uses; this says whether that picture is on disk yet.
+
+   Written from the manifest and filtered to what has ACTUALLY been
+   downloaded, so a URL in the map is a promise the bundle can keep. Until
+   `node tools/asset-manifest.mjs --download` runs, the map is nearly empty
+   and every section falls back — which is the designed state, not a
+   failure. */
+const manifestPath = join(root, 'assets', 'media-manifest.json');
+const mapOut = join(root, 'flutter_app', 'lib', 'media', 'media_map.dart');
+
+let entries = [];
+if (existsSync(manifestPath)) {
+  const m = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  entries = m.assets || m.entries || m;
+  if (!Array.isArray(entries)) entries = [];
+}
+
+const have = entries.filter(
+  (e) => e && e.url && e.local &&
+         existsSync(join(root, 'assets', 'media', e.local)),
+);
+
+// Copy the downloaded media in too — it is only useful to the app if it is
+// in the bundle beside everything else.
+if (have.length) {
+  mkdirSync(join(root, 'flutter_app', 'assets', 'media'), { recursive: true });
+  for (const e of have) {
+    const src = join(root, 'assets', 'media', e.local);
+    const dst = join(root, 'flutter_app', 'assets', 'media', e.local);
+    mkdirSync(dirname(dst), { recursive: true });
+    if (!existsSync(dst) || statSync(dst).size !== statSync(src).size) {
+      copyFileSync(src, dst);
+    }
+  }
+}
+
+writeFileSync(
+  mapOut,
+  '// GENERATED by tools/flutter-assets.mjs — do not edit by hand.\n' +
+  '//\n' +
+  '// The address a section names, and the file in the bundle that answers\n' +
+  '// it. Only URLs that have actually been downloaded appear here; the rest\n' +
+  '// fall back, which is what lib/media/nwsb_image.dart is for.\n' +
+  '//\n' +
+  '//   node tools/asset-manifest.mjs --download   fetches them\n' +
+  '//   node tools/flutter-assets.mjs              rebuilds this\n' +
+  'library;\n\n' +
+  'const Map<String, String> kNowssbMedia = {\n' +
+  have.map((e) => `  ${JSON.stringify(e.url)}: 'assets/media/${e.local}',`)
+      .join('\n') +
+  (have.length ? '\n' : '') +
+  '};\n',
+);
+console.log(`lib/media/media_map.dart  ${have.length} of ${entries.length} downloaded`);
 
 execFileSync(process.execPath, [join(root, 'tools', 'export-content.mjs')], {
   stdio: 'inherit',

@@ -10,19 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
-import 'package:nowssb/screens/cart.dart';
-import 'package:nowssb/screens/connect.dart';
 import 'package:nowssb/screens/fashion_plus.dart';
-import 'package:nowssb/screens/healing.dart';
 import 'package:nowssb/screens/library.dart';
-import 'package:nowssb/screens/login.dart';
-import 'package:nowssb/screens/player.dart';
 import 'package:nowssb/screens/practice.dart';
 import 'package:nowssb/screens/profile.dart';
-import 'package:nowssb/screens/routines.dart';
 import 'package:nowssb/screens/sound_library.dart';
 import 'package:nowssb/screens/store.dart';
-import 'package:nowssb/screens/subscribe.dart';
 import 'package:nowssb/screens/widgets_page.dart';
 
 import 'fake_video_platform.dart';
@@ -30,9 +23,17 @@ import 'fake_video_platform.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // Settings persist through SharedPreferences, which has no platform in a
+  // test — getInstance() never completes and the whole file hangs rather
+  // than failing. An in-memory store is the sanctioned stand-in.
   SharedPreferences.setMockInitialValues({});
 
-  setUpAll(FakeVideoPlatform.new);
+  setUpAll(() {
+    FakeVideoPlatform();
+    // Deadlines own real Timers; this file runs on a fake clock. See
+    // VideoPool.debugDeadlines.
+    VideoPool.debugDeadlines = false;
+  });
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
@@ -52,13 +53,6 @@ void main() {
     'Sound Library': const SoundLibraryScreen(),
     'Fashion Plus': const FashionPlusScreen(),
     'Settings': const WidgetsPage(),
-    'Login': const LoginScreen(),
-    'Player': const PlayerScreen(),
-    'Routines': const RoutinesScreen(),
-    'Connect': const ConnectScreen(),
-    'Cart': const CartScreen(kind: CartKind.cart),
-    'Subscribe': const SubscribeScreen(),
-    'Healing': const HealingScreen(),
   };
 
   screens.forEach((name, screen) {
@@ -72,6 +66,8 @@ void main() {
   testWidgets('the intro gate opens the page underneath it', (tester) async {
     await pump(tester, const SoundLibraryScreen());
 
+    // The intro is in front: its Enter button is showing and the page's own
+    // title row is not reachable yet.
     expect(find.text('OPEN LIBRARY'), findsOneWidget);
 
     await tester.tap(find.text('OPEN LIBRARY'));
@@ -99,16 +95,15 @@ void main() {
     await Settings.instance.setFashionPlus(false);
   });
 
-  testWidgets('page film always takes a decoder (page backgrounds play)',
+  testWidgets('motion off means a page never asks for a decoder',
       (tester) async {
-    // PageShell hard-codes autoplay:true so the film that IS the page always
-    // moves — same as the website's .fp-page-vid. Fashion Plus still exists
-    // for other motion, but it no longer freezes the page background itself.
+    // The whole point of the switch. With it off the background is a still,
+    // and a still costs nothing at all — the pool is never even asked.
     await Settings.instance.setFashionPlus(false);
     await pump(tester, const ProfileScreen());
     await tester.pump(const Duration(milliseconds: 60));
 
-    expect(VideoPool.instance.liveCount, greaterThanOrEqualTo(1),
-        reason: 'the page film is always playing, matching the website');
+    expect(VideoPool.instance.liveCount, 0,
+        reason: 'a still background must not hold a decoder');
   });
 }

@@ -20,10 +20,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/models.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 import '../theme/tokens.dart';
-import 'player.dart';
 
 class WordDetail extends StatelessWidget {
   const WordDetail({super.key, required this.word});
@@ -36,12 +33,16 @@ class WordDetail extends StatelessWidget {
       backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
-          // Same film the website puts behind a word — playing, not a still.
-          const Positioned.fill(
-            child: NwsbVideo(
-              asset: 'assets/video/player-liquid-splash.mp4',
-              poster: 'assets/player/liquid-splash.webp',
-              priority: ClipPriority.feature,
+          // The player's own artwork, which is what the website puts behind
+          // a word. assets/player/liquid-splash.webp is the still of the
+          // same film — a picture here rather than a decoder, because this
+          // page is for reading.
+          Positioned.fill(
+            child: Image.asset(
+              'assets/player/liquid-splash.webp',
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: NwsbColors.deep),
             ),
           ),
           const Positioned.fill(
@@ -50,7 +51,7 @@ class WordDetail extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0x66060C18), Color(0xB3060C18)],
+                  colors: [Color(0xB3060C18), Color(0xFA060C18)],
                 ),
               ),
             ),
@@ -63,34 +64,7 @@ class WordDetail extends StatelessWidget {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
                     children: [
-                      if (word.img.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 18),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.network(
-                              word.img,
-                              height: 190,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                            ),
-                          ),
-                        ),
                       _Headline(word: word),
-                      const SizedBox(height: 18),
-                      FilledButton.icon(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => PlayerScreen(word: word)),
-                        ),
-                        icon: const Icon(Icons.play_circle_outline),
-                        label: const Text('Open player · listen and record'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: NwsbColors.ink,
-                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                        ),
-                      ),
                       const SizedBox(height: 26),
                       if (word.parts.isNotEmpty) ...[
                         const _SectionLabel('HOW TO SAY IT'),
@@ -175,8 +149,8 @@ class _TopBar extends StatelessWidget {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back,
-                  size: 20, color: NwsbColors.ink),
+              child:
+                  const Icon(Icons.arrow_back, size: 20, color: NwsbColors.ink),
             ),
           ),
           const SizedBox(width: 14),
@@ -328,9 +302,8 @@ class _Parts extends StatelessWidget {
                   style: TextStyle(
                     fontSize: p.deva.isEmpty ? 22 : 15,
                     fontWeight: FontWeight.w700,
-                    color: p.deva.isEmpty
-                        ? Colors.white
-                        : const Color(0xB3FFFFFF),
+                    color:
+                        p.deva.isEmpty ? Colors.white : const Color(0xB3FFFFFF),
                   ),
                 ),
                 const SizedBox(height: 6),
