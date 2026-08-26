@@ -30,7 +30,6 @@ const FOLDERS = [
   'video',        // the clips and their posters
   'frames',       // the device bezels — see lib/widgets/tv_frame.dart
   'icons',        // the logo disc, the search mark
-  'media/image',  // restored repository images; videos remain R2-only
   'store',        // the intro-page artwork, and the collection covers
   'fashion',      // the Fashion Plus intro and its icon
   'player',       // the player's own artwork

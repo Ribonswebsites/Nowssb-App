@@ -51,11 +51,11 @@ window.addEventListener('nwsb-library', () => {
 // deterministically from these pools (same word → same look, different words
 // → different looks). Add more video URLs here as Ribon shares them.
 const PW_VIDEO_POOL = [
-  './assets/video/remote-90550ee5f40f4a2a62154d960a717de8e53798a9901dd04aba92fc3bd358ba4c.mp4',
-  './assets/video/remote-1e9a0c8d452a809f4a536d634acae5e78e9275425b71c640f109d57ea54beac7.mp4',
-  './assets/video/remote-3c8eebc74d743135d122f46573bed601fbf2261eca520f1b5f1e81aee494bbc6.mp4',
-  './assets/video/remote-3376b48971b038f63b4cad412f16877305b17e8e48169c4740c0dea542decbe9.mp4',
-  './assets/video/remote-4ce3c9019dd56ccdf4e23823d334ebc231eadb0bdde19b0bb1c2259ff07fe394.mp4'
+  'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4',
+  'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/v1778061531/grok_video_2026-05-06-15-27-23_zhylbe.mp4',
+  'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/f_auto/v1778511160/grok_video_2026-05-11-19-06-52_e67kc6.mp4',
+  'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4',
+  'https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4'
 ];
 const PW_ACCENT_POOL = [
   '200,232,245',  // glacial blue

@@ -107,7 +107,7 @@ var MS_CARD_IMG = 'assets/media/image/7d685b7d65d637af84e27ddf980efb377ebea1b05c
    the same one whichever meaning is open. A real <video>, so
    app/js/part051.js warms it into the media cache like every other clip
    in the app and sw.js serves it from there offline. */
-var MS_MEANING_VID = './assets/video/remote-4c1c17d70f5656d48438620681f91a5a03c9cbef907f4c865ceb4bc1e2b56ed2.mp4';
+var MS_MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4';
 /* The page is built only when a meaning is opened, so this has to be
    registered for warming rather than left to be discovered in the DOM. */
 window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat([MS_MEANING_VID]);
@@ -194,7 +194,7 @@ window.msBuy = function(key, wordDisplay, price, img) {
            raced the visibility controller pausing it — play() interrupted
            by pause() on every open. The controller owns it now, the same
            way it owns every other clip in the app. */
-        '<video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="./assets/video/remote-67e02704e83fbf194197567571df98364b45c8b87444564dbb1c7833e21d4fb5.mp4"></video>' +
+        '<video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
         '<div class="nss-vid-banner-fade"></div>' +
         '<div class="nss-vid-banner-pill-wrap">' +
           '<div class="nss-vid-banner-pill">' +

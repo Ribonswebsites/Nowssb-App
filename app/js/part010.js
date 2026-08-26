@@ -43,9 +43,9 @@
         // <video> tags, so app/js/part051.js warms them into the media cache
         // with every other clip in the app and sw.js serves them offline.
         var ROW_VIDS=[
-          "./assets/video/remote-4fa2cc8a3160b9456bbf64b27a8b10c69078ffc8445ccc12e7e712e060116e8c.mp4",
-          "./assets/video/remote-b1e2c78385f45657a14cdb868324167b2b2c449d9660e390118e119022bed65b.mp4",
-          "./assets/video/remote-8949dec81b7a28d78ad8cbc77fd0f36c7294288813ed10f13ea0c1f18a3466fb.mp4"
+          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511425/grok_video_2026-07-31-15-36-41_blygoz.mp4",
+          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4",
+          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511500/grok_video_2026-07-31-20-40-30_vxozmt.mp4"
         ];
         /* The shipped catalogue, and the one thing that draws it. Both are
            handed out so app/js/part069.js can redraw the shelf when the
