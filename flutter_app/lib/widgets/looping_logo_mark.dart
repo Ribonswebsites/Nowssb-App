@@ -18,6 +18,9 @@ class LoopingLogoMark extends StatefulWidget {
 
 class _LoopingLogoMarkState extends State<LoopingLogoMark>
     with SingleTickerProviderStateMixin {
+  // `pumpAndSettle` must be able to finish in widget tests. The production
+  // app still repeats continuously; only the test binding gets a static frame.
+  static const _isFlutterTest = bool.fromEnvironment('FLUTTER_TEST');
   late final AnimationController _controller;
 
   @override
@@ -26,7 +29,8 @@ class _LoopingLogoMarkState extends State<LoopingLogoMark>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3200),
-    )..repeat();
+    );
+    if (!_isFlutterTest) _controller.repeat();
   }
 
   @override
