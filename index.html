@@ -139,10 +139,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <link rel="stylesheet" href="nowssb-social.css?v=210">
 <link rel="stylesheet" href="nowssb-connect-live.css?v=1">
 <link rel="stylesheet" href="nowssb-nm.css?v=796">
-	<link rel="stylesheet" href="app/widgets.css?v=8">
-	<link rel="stylesheet" href="app/steps.css?v=9">
-	<link rel="stylesheet" href="nowssb-player.css?v=216">
-	<link rel="stylesheet" href="app/coach-dashboard.css?v=1">
+<link rel="stylesheet" href="app/widgets.css?v=8">
+<link rel="stylesheet" href="app/steps.css?v=9">
+<link rel="stylesheet" href="nowssb-player.css?v=216">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -1180,42 +1179,26 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 
-      <!-- Dashboard supplied for the Connect home. It remains inside the
-           Where to Begin block so it is always placed directly beneath it,
-           regardless of the home-layout editor’s section order. -->
-      <section class="nwsb-coach-dashboard" aria-labelledby="nwsbCoachDashboardTitle">
-        <div class="nwsb-coach-focus-card">
-          <div class="nwsb-coach-orb" aria-hidden="true"></div>
-          <div class="nwsb-coach-kicker">Today’s coaching focus</div>
-          <h3 class="nwsb-coach-focus-title" id="nwsbCoachDashboardTitle">Make one gentle step count.</h3>
-          <p class="nwsb-coach-focus-copy">Choose a simple practice, notice how you feel, and build your rhythm one return at a time.</p>
-          <div class="nwsb-coach-actions">
-            <button class="nwsb-coach-primary" type="button" onclick="openPersonalCoach()">Open Coach&nbsp; →</button>
-            <button class="nwsb-coach-secondary" type="button" onclick="openPersonalCoachPractice()">Start practice</button>
-          </div>
-        </div>
-
-        <div class="nwsb-coach-section-head">
-          <h3>Your progress</h3>
-          <button class="nwsb-coach-link" type="button" onclick="openSub('my-progress')">View all →</button>
-        </div>
-        <div class="nwsb-coach-progress-card" role="group" aria-label="Your practice progress">
-          <div class="nwsb-coach-stat"><div class="nwsb-coach-stat-icon">✓</div><strong>12</strong><span>Words explored</span></div>
-          <div class="nwsb-coach-stat"><div class="nwsb-coach-stat-icon">◷</div><strong>8h 45m</strong><span>Practice time</span></div>
-          <div class="nwsb-coach-stat"><div class="nwsb-coach-stat-icon">♨</div><strong>5</strong><span>Day streak</span></div>
-          <div class="nwsb-coach-stat"><div class="nwsb-coach-stat-icon">◎</div><strong>78%</strong><span>Weekly rhythm</span></div>
-        </div>
-
-        <div class="nwsb-coach-section-head"><h3>Up next</h3></div>
-        <div class="nwsb-coach-next-card">
-          <button class="nwsb-coach-next-row" type="button" onclick="openPersonalCoachPractice()">
-            <span class="nwsb-coach-next-icon">◉</span><span class="nwsb-coach-next-copy"><strong>Choose today’s practice</strong><span>A focused session for this moment</span></span><span class="nwsb-coach-next-arrow">›</span>
-          </button>
-          <button class="nwsb-coach-next-row" type="button" onclick="openPersonalCoach()">
-            <span class="nwsb-coach-next-icon">✦</span><span class="nwsb-coach-next-copy"><strong>Reflect with your coach</strong><span>Plan, reset, or find clarity</span></span><span class="nwsb-coach-next-arrow">›</span>
-          </button>
-        </div>
-      </section>
+    <iframe
+      id="nwsbActionBar"
+      src="app/widgets/neomorphic-action-bar.html"
+      title="How can we help today"
+      loading="lazy"
+      style="display:block;width:100%;height:390px;margin:24px 0 0;border:0;"
+    ></iframe>
+    <script>
+      (function () {
+        var actionBar = document.getElementById('nwsbActionBar');
+        if (!actionBar) return;
+        actionBar.addEventListener('load', function () {
+          var coachButton = actionBar.contentDocument && actionBar.contentDocument.querySelector('[aria-label="Personal coach"]');
+          if (!coachButton) return;
+          coachButton.addEventListener('click', function () {
+            window.location.assign('app/widgets/personal-coach.html');
+          });
+        });
+      })();
+    </script>
 
     <!-- Reader — pill rail, then the clip, then the copy, then the black
          banner, all in one wrapper. Nothing is laid over the clip. -->
@@ -5915,7 +5898,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      ═══════════════════════════════════════════════════════════ -->
 <script src="app/js/part019.js?v=166"></script>
 <script src="app/js/part023-assistant.js?v=1"></script>
-<script src="app/js/part085-personal-coach.js?v=1"></script>
 
 <!-- ══════════════════════════════════════════
      EXPLORE OVERLAY
@@ -6211,45 +6193,6 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </form>
       <div class="nwsb-assistant-note">Free Cloudflare assistant. General wellbeing guidance only—not medical, emergency, billing, or professional therapy support.</div>
     </div>
-  </section>
-</div>
-
-<!-- ══════════════════════════════════════════
-     PERSONAL COACH — dedicated dashboard and working chat
-══════════════════════════════════════════ -->
-<div id="nwsbPersonalCoach" class="nwsb-personal-coach-screen" aria-hidden="true">
-  <div class="nwsb-assistant-overlay" onclick="closePersonalCoach()"></div>
-  <section class="nwsb-personal-coach-panel" role="dialog" aria-modal="true" aria-labelledby="nwsbPersonalCoachTitle">
-    <header class="nwsb-personal-coach-topbar">
-      <button class="nwsb-personal-coach-back" type="button" onclick="closePersonalCoach()" aria-label="Close Personal Coach">←</button>
-      <div class="nwsb-personal-coach-avatar"><img src="assets/media/image/logo-disc-8b052034.webp" alt="NowssB"></div>
-    </header>
-    <div class="nwsb-personal-coach-hero">
-      <div class="nwsb-personal-coach-hero-copy">
-        <div class="nwsb-personal-coach-eyebrow">NowssB companion</div>
-        <h2 id="nwsbPersonalCoachTitle">Personal<br>Coach</h2>
-        <p>A calm space to choose a practice, reflect on your day, and keep moving at your own pace.</p>
-      </div>
-    </div>
-    <div class="nwsb-personal-coach-summary">
-      <div class="nwsb-personal-coach-card"><div class="nwsb-personal-coach-card-label">Weekly rhythm</div><div class="nwsb-personal-coach-card-value">68%</div><div class="nwsb-personal-coach-card-copy">On track. Keep showing up.</div></div>
-      <div class="nwsb-personal-coach-card"><div class="nwsb-personal-coach-card-label">Focus</div><div class="nwsb-personal-coach-card-value">7 / 10</div><div class="nwsb-personal-coach-card-copy">Small practices completed.</div></div>
-    </div>
-    <div class="nwsb-personal-coach-quote"><p>“Discipline today,<br>freedom tomorrow.”</p></div>
-    <section class="nwsb-personal-coach-chat" aria-labelledby="nwsbPersonalCoachChatTitle">
-      <h3 class="nwsb-personal-coach-chat-label" id="nwsbPersonalCoachChatTitle">Chat with your coach</h3>
-      <div class="nwsb-personal-coach-messages" id="nwsbPersonalCoachMessages" aria-live="polite"></div>
-      <form class="nwsb-personal-coach-composer" onsubmit="sendPersonalCoachMessage(event)">
-        <input id="nwsbPersonalCoachInput" type="text" autocomplete="off" maxlength="4000" placeholder="How can I help you today?" aria-label="Message your personal coach">
-        <button class="nwsb-personal-coach-send" id="nwsbPersonalCoachSend" type="submit" aria-label="Send message">↑</button>
-      </form>
-      <div class="nwsb-personal-coach-chips">
-        <button class="nwsb-personal-coach-chip" type="button" data-prompt="I need clarity right now" onclick="sendPersonalCoachPreset(this)">Need clarity</button>
-        <button class="nwsb-personal-coach-chip" type="button" data-prompt="Help me plan my day" onclick="sendPersonalCoachPreset(this)">Plan my day</button>
-        <button class="nwsb-personal-coach-chip" type="button" data-prompt="Help me stay motivated" onclick="sendPersonalCoachPreset(this)">Stay motivated</button>
-      </div>
-      <p class="nwsb-personal-coach-note">Uses the existing managed NowssB assistant when available. Guidance is for general wellbeing and practice support, not medical, emergency, or professional therapy advice.</p>
-    </section>
   </section>
 </div>
 
