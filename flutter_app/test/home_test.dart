@@ -20,6 +20,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/media/nwsb_video.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/home_normal.dart';
+import 'package:nowssb/screens/shared_sections.dart';
+import 'package:nowssb/widgets/home_parts.dart';
+import 'package:nowssb/widgets/nwsb_icon.dart';
 
 import 'fake_video_platform.dart';
 
@@ -55,9 +58,34 @@ void main() {
     // is the only way a clip gets a decoder in this app.
     expect(find.byType(NwsbVideo), findsWidgets);
     expect(VideoPool.instance.leaseCount, greaterThan(0));
+    expect(
+        find.byWidgetPredicate((widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName ==
+                'assets/media/image/logo-disc-8b052034.webp'),
+        findsOneWidget);
 
     debugPrint('home: ${tester.widgetList(find.byType(NwsbVideo)).length} '
         'clips built, ${VideoPool.instance.leaseCount} leases');
+  });
+
+  testWidgets('wayfinding uses the intended banner, not support artwork',
+      (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: MainOptionsSection()),
+    );
+    await tester.pump();
+
+    expect(find.text('Where to Begin'), findsOneWidget);
+    expect(find.text('Find Your Way Around'), findsOneWidget);
+    expect(find.text('Every screen in the app, and what each one is for'),
+        findsOneWidget);
+    expect(find.text('Chat Support'), findsNothing);
+    expect(find.byType(SecBanner), findsOneWidget);
+    final banner = tester.widget<SecBanner>(find.byType(SecBanner));
+    expect(banner.art, isNull);
+    expect(banner.mark, NwsbMarks.sliders);
   });
 
   testWidgets('every clip on the home is a bundled asset under the pool',
