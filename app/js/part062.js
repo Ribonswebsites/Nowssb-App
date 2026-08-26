@@ -129,6 +129,8 @@
            re-appended around it — which puts the stray one at the TOP of the
            home no matter where it was written. That is exactly what happened
            to this card. */
+        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
+        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 , kind:'blk' },
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' , kind:'tab' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'sec' },
@@ -145,8 +147,6 @@
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science', vb:1, defOff:1 },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 , kind:'blk' },
-        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
-        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1 , kind:'blk' },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 , kind:'blk' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' , kind:'blk', defOff:1 },
@@ -179,8 +179,11 @@
            on a card means — it means "not now". Anyone whose streak was
            taken away by the old behaviour gets it back here, once.
        5 — The time-aware dashboard and Your essentials become registry items
-           so saved home layouts do not strand them above the greeting. */
-  var LAYOUT_V = 7;
+           so saved home layouts do not strand them above the greeting.
+       8 — Personalized Healing and Choose Your Path move directly before
+           Experience · Fashion Mode (Fashion Plus), preventing the healing
+           block from being hoisted to the top by a saved Fashion layout. */
+  var LAYOUT_V = 8;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -235,6 +238,18 @@
           ti = order.indexOf('tiles');
           order.splice(ti + 1, 0, 'store');
         }
+      }
+      /* v8: healing and its injected Choose Your Path banner belong directly
+         above Fashion Plus. Reposition both entries for existing saved layouts
+         while leaving every other user-selected section in its chosen order. */
+      if (which === 'fash' && (raw.v || 0) < 8) {
+        ['healing', 'genderpath'].forEach(function (k) {
+          var old = order.indexOf(k);
+          if (old >= 0) order.splice(old, 1);
+        });
+        var fashionPlusAt = order.indexOf('fashplus');
+        if (fashionPlusAt < 0) fashionPlusAt = order.length;
+        order.splice(fashionPlusAt, 0, 'healing', 'genderpath');
       }
       try {
         localStorage.setItem(LSKEY(which), JSON.stringify({ order: order, off: off, v: LAYOUT_V }));
