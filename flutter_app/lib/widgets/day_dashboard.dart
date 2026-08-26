@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../shell/go.dart';
@@ -752,7 +753,8 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(item.asset, fit: BoxFit.cover),
+            NwsbImage(url: item.asset, fit: BoxFit.cover),
+
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -985,7 +987,7 @@ class _NwsbDayDashboardState extends State<NwsbDayDashboard> {
             children: [
               SizedBox(
                 height: 124,
-                child: Image.asset(item.asset, fit: BoxFit.cover),
+                child: NwsbImage(url: item.asset, fit: BoxFit.cover),
               ),
               Expanded(
                 child: Padding(
