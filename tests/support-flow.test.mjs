@@ -16,6 +16,8 @@ assert.match(index, /nwsbMySupportCases/, "The Help and Support flow must includ
 assert.match(index, /nwsbMySupportCasesFilter/, "My Support Cases must include a filter dropdown");
 assert.match(index, /Active cases/, "The support-case filter must offer active cases");
 assert.match(index, /Resolved cases/, "The support-case filter must offer resolved cases");
+assert.match(index, /nwsbMySupportCasesSearch/, "My Support Cases must include a case-reference search field");
+assert.match(index, /Search case reference/, "The support-case search field must clearly describe its purpose");
 assert.match(flow, /\/api\/assistant\/chat/, "Support messages must use the existing secured AI route");
 assert.match(flow, /Submitting your support case/, "Escalation must show a loading message while submission is in progress");
 assert.match(flow, /submitted successfully/, "Escalation must show a clear success confirmation");
@@ -28,6 +30,8 @@ assert.match(flow, /In Progress/, "Users must see an In Progress badge for activ
 assert.match(flow, /supportCaseState/, "My Support Cases must normalize Open, In Progress, and Resolved states");
 assert.match(flow, /filterMySupportCases/, "My Support Cases must re-render when the user changes the case filter");
 assert.match(flow, /filterSupportRows/, "My Support Cases must filter cached rows without widening Firestore access");
+assert.match(flow, /mySupportReferenceSearch/, "My Support Cases must read the reference-number search query");
+assert.match(flow, /caseReference \|\| row\.id/, "The reference search must use each case reference with an ID fallback");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");
