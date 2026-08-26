@@ -13,6 +13,9 @@ assert.match(index, /app\/widgets\/help-support\.html/, "The supplied Help and S
 assert.match(index, /nwsbSupportChat/, "The dark support chat container must be present");
 assert.match(index, /nwsbSupportCaseStatus/, "The support chat must expose a case-submission status region");
 assert.match(index, /nwsbMySupportCases/, "The Help and Support flow must include a My Support Cases screen");
+assert.match(index, /nwsbMySupportCasesFilter/, "My Support Cases must include a filter dropdown");
+assert.match(index, /Active cases/, "The support-case filter must offer active cases");
+assert.match(index, /Resolved cases/, "The support-case filter must offer resolved cases");
 assert.match(flow, /\/api\/assistant\/chat/, "Support messages must use the existing secured AI route");
 assert.match(flow, /Submitting your support case/, "Escalation must show a loading message while submission is in progress");
 assert.match(flow, /submitted successfully/, "Escalation must show a clear success confirmation");
@@ -23,6 +26,8 @@ assert.match(flow, /openMySupportCases/, "Users must be able to open their suppo
 assert.match(flow, /View conversation history/, "Users must be able to view each case conversation history");
 assert.match(flow, /In Progress/, "Users must see an In Progress badge for active cases");
 assert.match(flow, /supportCaseState/, "My Support Cases must normalize Open, In Progress, and Resolved states");
+assert.match(flow, /filterMySupportCases/, "My Support Cases must re-render when the user changes the case filter");
+assert.match(flow, /filterSupportRows/, "My Support Cases must filter cached rows without widening Firestore access");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");
