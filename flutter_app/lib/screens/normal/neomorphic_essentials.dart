@@ -174,7 +174,7 @@ class _HeroEssential extends StatelessWidget {
                 const SizedBox(height: 14),
                 Row(children: [Icon(icon, size: 17, color: const Color(0xFF4A2A09)), const SizedBox(width: 8), Expanded(child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF4A2A09))))]),
                 const SizedBox(height: 8),
-                Row(children: [const Icon(Icons.volume_up_outlined, size: 15, color: Color(0xFF5C3812)), const SizedBox(width: 6), Expanded(child: Text(subtitle, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Color(0xFF5C3812)))]),
+                Row(children: [const Icon(Icons.volume_up_outlined, size: 15, color: Color(0xFF5C3812)), const SizedBox(width: 6), Expanded(child: Text(subtitle, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Color(0xFF5C3812))))]),
                 Padding(padding: const EdgeInsets.only(left: 22, top: 2), child: Text(duration, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: Color(0xFF5C3812)))),
               ]),
             ),
