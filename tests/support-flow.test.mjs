@@ -35,6 +35,8 @@ assert.match(flow, /mySupportReferenceSearch/, "My Support Cases must read the r
 assert.match(flow, /caseReference \|\| row\.id/, "The reference search must use each case reference with an ID fallback");
 assert.match(flow, /loadMoreMySupportCases/, "My Support Cases must expose a Load more action");
 assert.match(flow, /_fbGetMySupportReportsPage/, "My Support Cases must use the paginated Firestore helper");
+assert.match(flow, /nwsb-load-more-spinner/, "The Load more control must render a loading spinner while the next page is requested");
+assert.match(flow, /aria-busy="true"/, "The Load more control must announce its busy state while loading");
 assert.match(index, /nwsb-support-case-status/, "The submission status region must use dedicated presentation styles");
 assert.match(flow, /body\.needsHuman \|\| state\.intent === 'feedback'/, "Reports must escalate only when the AI cannot resolve them");
 assert.doesNotMatch(flow, /state\.intent === 'report'/, "Report selection alone must not bypass AI-first support");
@@ -47,6 +49,7 @@ assert.match(firebase, /where\('reporterUid', '==', user\.uid\)/, "User support 
 assert.match(firebase, /window\._fbGetMySupportReportsPage/, "Firebase must expose a cursor-backed support-case page query");
 assert.match(firebase, /startAfter\(options\.cursor\)/, "Support report pages must advance using a Firestore cursor");
 assert.match(firebase, /limit\(pageSize \+ 1\)/, "Support report pages must efficiently detect whether another page exists");
+assert.match(readFileSync(new URL("../app/support-flow.css", import.meta.url), "utf8"), /@keyframes nwsb-case-spin/, "The Load more spinner must have an animation");
 assert.match(rules, /allow list: if isAdmin\(\) \|\| \(signedIn\(\) && resource\.data\.reporterUid == request\.auth\.uid\);/, "Firestore rules must allow a signed-in user to list only their own support cases");
 assert.match(admin, /SUPPORT CASES/, "The admin dashboard must contain a Support Cases inbox");
 assert.match(admin, /watchSupportCases\(\)/, "The admin dashboard must watch incoming support cases");

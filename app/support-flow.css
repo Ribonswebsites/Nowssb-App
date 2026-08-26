@@ -48,8 +48,10 @@
 .nwsb-my-cases-search input:focus{outline:2px solid #8cc8ff;outline-offset:2px}
 .nwsb-my-cases-list{display:grid;gap:12px;padding-bottom:18px}
 .nwsb-my-cases-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0 22px;color:#92929a;font-size:12px;font-weight:700}
-.nwsb-my-cases-pagination button{min-height:38px;border:1px solid #3b3b42;border-radius:12px;background:#191a1d;color:#f4f4f5;padding:0 13px;font:800 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.nwsb-my-cases-pagination button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;border:1px solid #3b3b42;border-radius:12px;background:#191a1d;color:#f4f4f5;padding:0 13px;font:800 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .nwsb-my-cases-pagination button:disabled{opacity:.58}
+.nwsb-load-more-spinner{width:14px;height:14px;box-sizing:border-box;border:2px solid rgba(244,244,245,.32);border-top-color:#f4f4f5;border-radius:50%;animation:nwsb-case-spin .7s linear infinite}
+@keyframes nwsb-case-spin{to{transform:rotate(360deg)}}
 .nwsb-my-cases-empty{padding:28px 18px;border:1px solid #29292e;border-radius:18px;background:#111214;color:#aaaab1;font-size:14px;line-height:1.5;text-align:center}
 .nwsb-my-case-card{overflow:hidden;border:1px solid #2b2b31;border-radius:18px;background:#111214}
 .nwsb-my-case-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 12px}
