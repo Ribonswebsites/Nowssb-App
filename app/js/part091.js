@@ -47,8 +47,8 @@
     if (expand) {
       expand.hidden = ITEMS.length <= 3;
       expand.setAttribute('aria-expanded', isExpanded(root) ? 'true' : 'false');
-      expand.querySelector('span').textContent = isExpanded(root) ? 'Show less' : 'See more';
-      expand.querySelector('b').textContent = isExpanded(root) ? '⌃' : '⌄';
+      expand.querySelector('.nwsb-essential-expand-label').textContent = isExpanded(root) ? 'Show less' : 'See more';
+      expand.classList.toggle('is-expanded', isExpanded(root));
     }
     root.querySelectorAll('[data-essential-action]').forEach(function (el) {
       el.addEventListener('click', function () { action(el.getAttribute('data-essential-action')); });
@@ -65,7 +65,7 @@
           '</div>' +
           '<div data-essential-list></div>' +
         '</div>' +
-        '<button type="button" class="nwsb-essential-expand" data-essential-expand aria-expanded="false"><span>See more</span><b>⌄</b></button>' +
+        '<button type="button" class="nwsb-essential-expand" data-essential-expand aria-expanded="false"><span class="nwsb-essential-expand-label">See more</span><span class="nwsb-essential-expand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>' +
       '</div>' +
     '</section>';
   }
