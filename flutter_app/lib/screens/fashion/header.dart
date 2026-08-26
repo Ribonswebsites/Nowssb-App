@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/looping_logo_mark.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
@@ -58,21 +59,7 @@ class HomeHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(shape: BoxShape.circle),
-                child: Image.asset(
-                  'assets/icons/logo-disc.webp',
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const ColoredBox(
-                    color: Color(0xFF14141C),
-                    child:
-                        Icon(Icons.headphones, size: 22, color: Colors.white),
-                  ),
-                ),
-              ),
+              const LoopingLogoMark(size: 48),
               const SizedBox(width: 12),
               // `Nowsb` heavy, `ansiu` light — one word with a break in the
               // weight, the way the mark is drawn everywhere else.

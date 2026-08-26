@@ -48,6 +48,7 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/home_skin.dart';
+import '../widgets/looping_logo_mark.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
@@ -302,23 +303,9 @@ class _TopRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // The app's own mark, out of assets/icons. This was an empty
-        // neumorphic disc — the logo has been in the repository all along.
-        Container(
-          width: 46,
-          height: 46,
-          decoration: const BoxDecoration(
-            color: NwsbColors.surface,
-            shape: BoxShape.circle,
-            boxShadow: NwsbShadows.raisedXs,
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Image.asset(
-            'assets/icons/logo-disc.webp',
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-          ),
-        ),
+        // The app's own mark, kept small and continuously alive in the
+        // fixed header. The full-screen launch animation remains in Splash.
+        const LoopingLogoMark(size: 46),
         const SizedBox(width: 12),
         // Flexible, not a bare Column: 'NOWSBANSIU EDITION' at 2pt of letter
         // spacing is wider than it looks, and on a 412pt screen it pushed
