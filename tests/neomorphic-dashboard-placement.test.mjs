@@ -30,6 +30,7 @@ assert.match(directSections, /attachShadow/, "Direct renderer must mount supplie
 assert.match(directSections, /neomorphic_dashboard\.html/, "Direct renderer must use the supplied dashboard document");
 assert.match(directSections, /neumorphic-essentials\.html/, "Direct renderer must use the supplied essentials document");
 assert.match(directSections, /neomorphic-action-bar-1\.html/, "Direct renderer must use the supplied action-bar document");
+assert.match(directSections, /transparentHost/, "Direct renderer must remove the Essentials host background");
 assert.doesNotMatch(styles, /\.nmh-supplied-dashboard\s*\{[^}]*height:/s, "Host must not reserve a fixed empty height");
 assert.doesNotMatch(styles, /\.nmh-supplied-dashboard\s*\{[^}]*box-shadow:/s, "Host must not add another dashboard wrapper shadow");
 assert.doesNotMatch(styles, /\.nmh-supplied-essentials\s*\{[^}]*height:/s, "Essentials host must not reserve a fixed empty height");
@@ -42,6 +43,7 @@ assert.match(directSections, /nowssbDirectDashboardRender/, "Direct renderer mus
 assert.match(directSections, /runDashboardAction/, "Direct renderer must route dashboard actions in the page");
 assert.match(directSections, /See less/, "Direct renderer must preserve the supplied essentials expand behavior");
 assert.match(directSections, /wireActionBar/, "Direct renderer must wire the supplied action-bar controls");
+assert.match(directSections, /placeActionBar/, "Direct renderer must force the coach bar below Where to Begin");
 assert.match(directSections, /startDashboardPractice/, "Dashboard actions must start the playable practice session");
 assert.match(index, /part094-dashboard-live\.js/, "Normal Home must load the live dashboard controller");
 assert.match(registry, /k:'dashboard'[\s\S]*sel:\['\.nmh-supplied-dashboard'\][\s\S]*after:'search'/, "Dashboard must remain anchored below search");

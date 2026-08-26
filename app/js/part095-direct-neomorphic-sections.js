@@ -5,17 +5,18 @@
 (function () {
   'use strict';
 
-  function sourceParts(source) {
+  function sourceParts(source, transparentHost) {
     var documentNode = new DOMParser().parseFromString(source, 'text/html');
     var style = documentNode.querySelector('style');
     Array.prototype.slice.call(documentNode.querySelectorAll('script')).forEach(function (node) { node.remove(); });
     var css = style ? style.textContent : '';
     css = css.replace(/:root\s*\{/g, ':host{').replace(/\bbody\s*\{/g, ':host{');
+    if (transparentHost) css += '\n:host{background:transparent !important;}';
     return { css: css, markup: documentNode.body.innerHTML };
   }
 
-  function mount(host, source) {
-    var parts = sourceParts(source);
+  function mount(host, source, transparentHost) {
+    var parts = sourceParts(source, transparentHost);
     var root = host.attachShadow({ mode: 'open' });
     root.innerHTML = '<style>:host{display:block;width:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}\n' + parts.css + '</style>' + parts.markup;
     return root;
@@ -108,6 +109,13 @@
     });
   }
 
+  function placeActionBar(host) {
+    var mainOps = document.querySelector('#home-nm .mainops-blk.nmh-sec-wrap');
+    if (!mainOps || !mainOps.parentNode) return;
+    host.classList.remove('hl-off');
+    mainOps.parentNode.insertBefore(host, mainOps.nextSibling);
+  }
+
   async function start() {
     var dashboardHost = document.querySelector('[data-direct-neomorphic="dashboard"]');
     var essentialsHost = document.querySelector('[data-direct-neomorphic="essentials"]');
@@ -120,11 +128,13 @@
         fetch('app/widgets/neomorphic-action-bar-1.html').then(function (response) { return response.text(); })
       ]);
       var dashboardRoot = mount(dashboardHost, sources[0]);
-      var essentialsRoot = mount(essentialsHost, sources[1]);
+      var essentialsRoot = mount(essentialsHost, sources[1], true);
       var actionBarRoot = mount(actionBarHost, sources[2]);
       wireDashboard(dashboardRoot);
       wireEssentials(essentialsRoot);
       wireActionBar(actionBarRoot);
+      placeActionBar(actionBarHost);
+      window.addEventListener('load', function () { placeActionBar(actionBarHost); }, { once: true });
       window.nowssbDirectDashboardRender = function (data) { renderDashboard(dashboardRoot, data); };
       if (typeof window.nowssbDashboardRefresh === 'function') window.nowssbDashboardRefresh();
     } catch (error) {
