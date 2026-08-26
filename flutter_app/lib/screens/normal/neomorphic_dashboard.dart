@@ -15,6 +15,13 @@ import '../practice.dart';
 
 typedef DashboardPracticeLauncher = void Function(List<Word> words, String title);
 
+const _dashboardSlotTitles = <String, String>{
+  'morning': 'Morning Ritual',
+  'afternoon': 'Afternoon Session',
+  'evening': 'Evening Practice',
+  'night': 'Night Restoration',
+};
+
 class NmSuppliedDashboard extends StatelessWidget {
   const NmSuppliedDashboard({super.key, this.onStart, this.onProgress});
 
@@ -35,7 +42,7 @@ class NmSuppliedDashboard extends StatelessWidget {
         final active = all.where((word) => word.time == slot || word.time == 'any').toList();
         final nextSlot = slot == 'morning' ? 'afternoon' : slot == 'afternoon' ? 'evening' : 'night';
         final next = all.where((word) => word.time == nextSlot || word.time == 'any').toList();
-        final title = _slotTitle[slot] ?? 'Practice';
+        final title = _dashboardSlotTitles[slot] ?? 'Practice';
         final progress = PracticeProgress.instance;
         final completed = progress.completedTodayFor(active);
         final goal = active.isEmpty ? 0 : (completed / active.length * 100).round().clamp(0, 100).toInt();
@@ -53,7 +60,7 @@ class NmSuppliedDashboard extends StatelessWidget {
               const SizedBox(height: 26),
               _SectionHeader(title: 'Up next', onTap: launch),
               const SizedBox(height: 14),
-              _UpNextCard(activeTitle: '$title Word Ritual', activeSub: _routineSummary(active), nextTitle: '${_slotTitle[nextSlot] ?? 'Next'} Word Ritual', nextSub: _routineSummary(next), onTap: launch),
+              _UpNextCard(activeTitle: '$title Word Ritual', activeSub: _routineSummary(active), nextTitle: '${_dashboardSlotTitles[nextSlot] ?? 'Next'} Word Ritual', nextSub: _routineSummary(next), onTap: launch),
             ],
           ),
         );
