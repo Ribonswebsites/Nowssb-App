@@ -218,9 +218,9 @@ const res = join(android, 'app', 'src', 'main', 'res');
 }
 
 // ── the manifest ───────────────────────────────────────────────────────
-// See note 4 at the head of this file. Without INTERNET in the MAIN manifest
-// a release build has no network at all, and the failure looks like empty
-// pages rather than like a permission.
+// Without INTERNET in the MAIN manifest a release build has no network at
+// all. The TTS query makes the device speech engine discoverable on Android
+// 11+ for the real native practice player.
 const manifest = join(android, 'app', 'src', 'main', 'AndroidManifest.xml');
 if (!existsSync(manifest)) {
   console.error(`missing ${manifest}`);
@@ -241,9 +241,26 @@ if (m.includes('android.permission.INTERNET')) {
       '    <uses-permission android:name="android.permission.INTERNET"/>\n' +
       '    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n\n',
   );
-  writeFileSync(manifest, m);
   done.push('added INTERNET and ACCESS_NETWORK_STATE');
 }
+
+if (m.includes('android.speech.tts.engine.TTS_SERVICE')) {
+  already.push('text-to-speech engine query present');
+} else {
+  const open = m.match(/<manifest[^>]*>\s*/);
+  if (!open) throw new Error('AndroidManifest.xml: no <manifest> element');
+  m = m.replace(
+    open[0],
+    open[0] +
+      '    <queries>\n' +
+      '        <intent>\n' +
+      '            <action android:name="android.speech.tts.engine.TTS_SERVICE"/>\n' +
+      '        </intent>\n' +
+      '    </queries>\n\n',
+  );
+  done.push('declared text-to-speech engine query');
+}
+writeFileSync(manifest, m);
 
 // ── the config itself ──────────────────────────────────────────────────
 // Not a secret: google-services.json ships inside every copy of the APK and

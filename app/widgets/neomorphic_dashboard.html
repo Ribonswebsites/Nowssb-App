@@ -257,14 +257,14 @@
 
   <!-- Today's focus -->
   <div class="focus-card neo-raised">
-    <div class="focus-label">Today's focus</div>
-    <div class="focus-title">Deep work session</div>
+    <div class="focus-label" id="dashboardFocusLabel">Loading your practice</div>
+    <div class="focus-title" id="dashboardFocusTitle">Your practice</div>
     <div class="focus-meta">
-      <span class="dot"></span><span class="bold">2h 0m</span>
-      <span class="dot"></span><span>High priority</span>
+      <span class="dot"></span><span class="bold" id="dashboardFocusMeta">Preparing session</span>
+      <span class="dot"></span><span id="dashboardFocusDetail">Using your saved routine</span>
     </div>
-    <button class="start-btn neo-pill-dark" data-dashboard-action="practice">
-      Start session
+    <button class="start-btn neo-pill-dark" data-dashboard-action="practice" aria-label="Play your current practice session">
+      Play session
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </button>
 
@@ -289,7 +289,7 @@
   <!-- Your progress -->
   <div class="section-header">
     <h2>Your progress</h2>
-    <div class="view-all" role="button" tabindex="0" data-dashboard-action="practice">View all
+    <div class="view-all" role="button" tabindex="0" data-dashboard-action="progress">View all
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
   </div>
@@ -302,9 +302,9 @@
           <path d="M17 27 L23 33 L35 20" fill="none" stroke="#3ba55d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div class="progress-value">12</div>
-      <div class="progress-label">Tasks done</div>
-      <div class="progress-delta" style="color:#3ba55d;">+20% ↑</div>
+      <div class="progress-value" id="dashboardMetricToday">—</div>
+      <div class="progress-label" id="dashboardMetricTodayLabel">Sessions today</div>
+      <div class="progress-delta" id="dashboardMetricTodayDetail" style="color:#3ba55d;">Loading</div>
     </div>
 
     <div class="progress-item">
@@ -314,9 +314,9 @@
           <path d="M26 20 L26 26 L30 29" fill="none" stroke="#8a8a8a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div class="progress-value">8h 45m</div>
-      <div class="progress-label">Focused time</div>
-      <div class="progress-delta" style="color:#767676;">+15% ↑</div>
+      <div class="progress-value" id="dashboardMetricTotal">—</div>
+      <div class="progress-label" id="dashboardMetricTotalLabel">Total sessions</div>
+      <div class="progress-delta" id="dashboardMetricTotalDetail" style="color:#767676;">Loading</div>
     </div>
 
     <div class="progress-item">
@@ -325,9 +325,9 @@
           <path d="M26 15 C29 21 33 23 33 29 C33 34.5 29.9 38 26 38 C22.1 38 19 34.5 19 29 C19 26 20.5 24.5 21.5 27 C22 23 24 20 26 15 Z" fill="#e78a3e"/>
         </svg>
       </div>
-      <div class="progress-value">5</div>
+      <div class="progress-value" id="dashboardMetricStreak">—</div>
       <div class="progress-label">Day streak</div>
-      <div class="progress-delta" style="color:#e78a3e;">+1 ↑</div>
+      <div class="progress-delta" id="dashboardMetricStreakDetail" style="color:#e78a3e;">Loading</div>
     </div>
 
     <div class="progress-item">
@@ -338,9 +338,9 @@
           <circle cx="26" cy="26" r="1.3" fill="#8a6fe0"/>
         </svg>
       </div>
-      <div class="progress-value">78%</div>
-      <div class="progress-label">Goal progress</div>
-      <div class="progress-delta" style="color:#8a6fe0;">+8% ↑</div>
+      <div class="progress-value" id="dashboardMetricGoal">—</div>
+      <div class="progress-label">Today’s goal</div>
+      <div class="progress-delta" id="dashboardMetricGoalDetail" style="color:#8a6fe0;">Loading</div>
     </div>
 
   </div>
@@ -348,14 +348,14 @@
   <!-- Up next -->
   <div class="section-header" style="margin-top:26px;">
     <h2>Up next</h2>
-    <div class="view-all" role="button" tabindex="0" data-dashboard-action="practice">View all
+    <div class="view-all" role="button" tabindex="0" data-dashboard-action="routines">View all
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
   </div>
 
   <div class="upnext-card neo-raised">
 
-    <div class="upnext-row" role="button" tabindex="0" data-dashboard-action="practice">
+    <div class="upnext-row" role="button" tabindex="0" data-dashboard-action="practice" data-dashboard-routine-id="">
       <div class="icon-circle-wrap-sm">
         <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
           <rect x="14" y="14" width="16" height="14" rx="2.5" fill="none" stroke="#e78a3e" stroke-width="1.8"/>
@@ -366,15 +366,15 @@
       </div>
       <div class="icon-divider"></div>
       <div class="upnext-text">
-        <div class="upnext-title">Team stand-up</div>
-        <div class="upnext-sub">10:00 AM · 30 min</div>
+        <div class="upnext-title" id="dashboardRoutineOneTitle">Loading routine</div>
+        <div class="upnext-sub" id="dashboardRoutineOneSub">Your saved practice will appear here</div>
       </div>
       <div class="status-soon">
-        <span class="status-dot"></span>Soon
+        <span class="status-dot"></span><span id="dashboardRoutineOneStatus">Loading</span>
       </div>
     </div>
 
-    <div class="upnext-row" role="button" tabindex="0" data-dashboard-action="practice">
+    <div class="upnext-row" role="button" tabindex="0" data-dashboard-action="practice" data-dashboard-routine-id="">
       <div class="icon-circle-wrap-sm">
         <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
           <rect x="15" y="12" width="14" height="18" rx="2" fill="none" stroke="#8a8a8a" stroke-width="1.8"/>
@@ -385,8 +385,8 @@
       </div>
       <div class="icon-divider"></div>
       <div class="upnext-text">
-        <div class="upnext-title">Design review</div>
-        <div class="upnext-sub">2:00 PM · 1h 0m</div>
+        <div class="upnext-title" id="dashboardRoutineTwoTitle">Loading routine</div>
+        <div class="upnext-sub" id="dashboardRoutineTwoSub">Your saved practice will appear here</div>
       </div>
       <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
@@ -394,18 +394,56 @@
   </div>
 
 <script>
-  function dashboardAction(action) {
-    window.parent.postMessage({ type: 'nowssb-dashboard-action', action: action }, window.location.origin);
+  function dashboardAction(action, routineId) {
+    window.parent.postMessage({ type: 'nowssb-dashboard-action', action: action, routineId: routineId || '' }, window.location.origin);
   }
   document.querySelectorAll('[data-dashboard-action]').forEach(function(control) {
-    control.addEventListener('click', function() { dashboardAction(control.dataset.dashboardAction); });
+    control.addEventListener('click', function() { dashboardAction(control.dataset.dashboardAction, control.dataset.dashboardRoutineId); });
     control.addEventListener('keydown', function(event) {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        dashboardAction(control.dataset.dashboardAction);
+        dashboardAction(control.dataset.dashboardAction, control.dataset.dashboardRoutineId);
       }
     });
   });
+  function dashboardText(id, value) {
+    var element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+  function dashboardRoutine(prefix, routine) {
+    dashboardText(prefix + 'Title', routine.title);
+    dashboardText(prefix + 'Sub', routine.subtitle);
+    var status = document.getElementById(prefix + 'Status');
+    if (status) status.textContent = routine.status;
+    var title = document.getElementById(prefix + 'Title');
+    var row = title && title.closest('.upnext-row');
+    if (row) {
+      row.dataset.dashboardRoutineId = routine.id || '';
+      row.setAttribute('aria-label', 'Play ' + routine.title);
+    }
+  }
+  window.addEventListener('message', function(event) {
+    if (event.origin !== window.location.origin || !event.data || event.data.type !== 'nowssb-dashboard-data') return;
+    var data = event.data.dashboard;
+    if (!data) return;
+    dashboardText('dashboardFocusLabel', data.focus.label);
+    dashboardText('dashboardFocusTitle', data.focus.title);
+    dashboardText('dashboardFocusMeta', data.focus.meta);
+    dashboardText('dashboardFocusDetail', data.focus.detail);
+    dashboardText('dashboardMetricToday', data.metrics.today.value);
+    dashboardText('dashboardMetricTodayLabel', data.metrics.today.label);
+    dashboardText('dashboardMetricTodayDetail', data.metrics.today.detail);
+    dashboardText('dashboardMetricTotal', data.metrics.total.value);
+    dashboardText('dashboardMetricTotalLabel', data.metrics.total.label);
+    dashboardText('dashboardMetricTotalDetail', data.metrics.total.detail);
+    dashboardText('dashboardMetricStreak', data.metrics.streak.value);
+    dashboardText('dashboardMetricStreakDetail', data.metrics.streak.detail);
+    dashboardText('dashboardMetricGoal', data.metrics.goal.value);
+    dashboardText('dashboardMetricGoalDetail', data.metrics.goal.detail);
+    dashboardRoutine('dashboardRoutineOne', data.routines[0]);
+    dashboardRoutine('dashboardRoutineTwo', data.routines[1]);
+  });
+  window.parent.postMessage({ type: 'nowssb-dashboard-ready' }, window.location.origin);
 </script>
 </body>
 </html>

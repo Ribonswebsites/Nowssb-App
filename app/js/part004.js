@@ -1084,14 +1084,21 @@ async function pwCompleteSession() {
   const today = new Date().toISOString().split('T')[0];
   const w = PRACTICE_WORDS[_pwIdx];
   if (w && w.word) {
+    const session = { date:today, word:w.word, repsCompleted:_pwRepCount, repTarget:_pwRepTarget, completedAt:new Date().toISOString() };
+    const sessionKey = today + '_' + w.word;
     try {
+      const offlineSessions = JSON.parse(localStorage.getItem('nwsb_local_sessions') || '{}');
+      offlineSessions[sessionKey] = session;
+      localStorage.setItem('nwsb_local_sessions', JSON.stringify(offlineSessions));
       if (window._fbSetDoc && window._currentUid) {
         await window._fbSetDoc(window._currentUid, {
-          [`sessions.${today}_${w.word}`]: { date:today, word:w.word, repsCompleted:_pwRepCount, repTarget:_pwRepTarget, completedAt:new Date().toISOString() },
+          [`sessions.${sessionKey}`]: session,
           lastPractice: today
         });
       }
     } catch(e) { console.warn('Practice save:', e.message); }
+    if (window._mpData) window._mpData.sessions = Object.assign({}, window._mpData.sessions || {}, { [sessionKey]: session });
+    window.dispatchEvent(new CustomEvent('nwsb-practice-complete', { detail: Object.assign({ key:sessionKey }, session) }));
     if (window._hbmRecordWord) window._hbmRecordWord(w.word);
   }
   _pwDone = true;
@@ -1100,4 +1107,3 @@ async function pwCompleteSession() {
 } // end pwCompleteSession
 
 if (typeof window._currentUid === 'undefined') window._currentUid = null;
-

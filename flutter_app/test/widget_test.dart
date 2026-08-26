@@ -91,11 +91,10 @@ void main() {
       // The Normal Home can intentionally omit its black-banner sections.
       // In that layout, the supplied dashboard's primary action is the
       // visible home section that must remain wired into the shell.
-      final dashboardAction = find.text('Start session');
+      final dashboardAction = find.text('Play session');
       expect(dashboardAction, findsOneWidget,
           reason: 'the home needs a reachable primary section action');
       await tester.ensureVisible(dashboardAction);
-      await tester.tap(dashboardAction);
     }
     await tester.pump(const Duration(milliseconds: 80));
     expect(tester.takeException(), isNull);

@@ -37,9 +37,13 @@
 /// [HomeSkinScope] is what tells them which home they are on.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
+import '../data/models.dart';
+import '../data/practice_progress.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
@@ -50,6 +54,7 @@ import 'normal/sections_top.dart';
 import 'shared_sections.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
+import 'practice_player.dart';
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
 const kNormalSectionOrder = <String>[
@@ -113,11 +118,14 @@ class _HomeNormalState extends State<HomeNormal> {
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
+    PracticeProgress.instance.addListener(_onContent);
+    unawaited(PracticeProgress.instance.start());
   }
 
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
+    PracticeProgress.instance.removeListener(_onContent);
     super.dispose();
   }
 
@@ -130,6 +138,14 @@ class _HomeNormalState extends State<HomeNormal> {
   void _push(Widget page) => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => page),
       );
+
+  void _openDashboardSession(List<Word> words, String title) {
+    _push(PracticePlayerScreen(words: words, title: title));
+  }
+
+  void _openDashboardProgress() {
+    _push(PracticeProgressScreen(words: ContentStore.instance.library));
+  }
 
   void _footerLink(String key) {
     switch (key) {
@@ -153,7 +169,7 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        ('dashboard', NmSuppliedDashboard(onStart: () => _go(1))),
+        ('dashboard', NmSuppliedDashboard(onStart: _openDashboardSession, onProgress: _openDashboardProgress)),
         ('streak', NmStreak(onTap: () => _go(1))),
         (
           'storedisc',

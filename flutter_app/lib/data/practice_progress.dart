@@ -1,0 +1,98 @@
+/// Per-device practice history used by the native dashboard and player.
+///
+/// A completed word is recorded once per day, matching the WebView session
+/// key convention (`YYYY-MM-DD_WORD`). No fabricated totals are shown: every
+/// count below comes from an actual completed native playback session.
+library;
+
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'models.dart';
+
+class PracticeProgress extends ChangeNotifier {
+  PracticeProgress._();
+  static final PracticeProgress instance = PracticeProgress._();
+
+  static const _storageKey = 'nwsb_native_sessions';
+  final Map<String, Map<String, dynamic>> _sessions = {};
+  bool _started = false;
+
+  Future<void> start() async {
+    if (_started) return;
+    _started = true;
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      final raw = preferences.getString(_storageKey);
+      if (raw != null && raw.isNotEmpty) {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) {
+          for (final entry in decoded.entries) {
+            if (entry.value is Map) {
+              _sessions['${entry.key}'] = Map<String, dynamic>.from(entry.value as Map);
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // The player still works if device persistence is temporarily unavailable.
+    }
+    notifyListeners();
+  }
+
+  int get totalSessions => _sessions.length;
+
+  int get todaySessions {
+    final today = _day(DateTime.now());
+    return _sessions.values.where((session) => session['date'] == today).length;
+  }
+
+  int get streak {
+    final days = <String>{
+      for (final session in _sessions.values)
+        if (session['date'] is String) session['date'] as String,
+    };
+    var cursor = DateTime.now();
+    if (!days.contains(_day(cursor))) cursor = cursor.subtract(const Duration(days: 1));
+    var value = 0;
+    while (days.contains(_day(cursor)) && value < 365) {
+      value += 1;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    return value;
+  }
+
+  int completedTodayFor(Iterable<Word> words) {
+    final today = _day(DateTime.now());
+    final wordSet = words.map((word) => word.word).toSet();
+    return _sessions.values
+        .where((session) => session['date'] == today && wordSet.contains(session['word']))
+        .length;
+  }
+
+  Future<void> recordCompletedWord(Word word) async {
+    final today = _day(DateTime.now());
+    final key = '${today}_${word.word}';
+    _sessions[key] = {
+      'date': today,
+      'word': word.word,
+      'completedAt': DateTime.now().toIso8601String(),
+      'source': 'native-player',
+    };
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setString(_storageKey, jsonEncode(_sessions));
+    } catch (_) {
+      // Keep the in-memory session even if storage cannot complete.
+    }
+    notifyListeners();
+  }
+
+  static String _day(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
+  }
+}

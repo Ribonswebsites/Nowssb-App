@@ -6,13 +6,20 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../data/content.dart';
+import '../../data/models.dart';
+import '../../data/practice_progress.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/neumorphic.dart';
+import '../practice.dart';
+
+typedef DashboardPracticeLauncher = void Function(List<Word> words, String title);
 
 class NmSuppliedDashboard extends StatelessWidget {
-  const NmSuppliedDashboard({super.key, this.onStart});
+  const NmSuppliedDashboard({super.key, this.onStart, this.onProgress});
 
-  final VoidCallback? onStart;
+  final DashboardPracticeLauncher? onStart;
+  final VoidCallback? onProgress;
 
   static const _surface = Color(0xFFF5F5F5);
   static const _textDark = Color(0xFF1C1C1C);
@@ -20,29 +27,47 @@ class NmSuppliedDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      // This is the requested breathing room directly beneath the search bar.
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _FocusCard(onStart: onStart),
-          const SizedBox(height: 26),
-          _SectionHeader(title: 'Your progress', onTap: onStart),
-          const SizedBox(height: 14),
-          const _ProgressCard(),
-          const SizedBox(height: 26),
-          _SectionHeader(title: 'Up next', onTap: onStart),
-          const SizedBox(height: 14),
-          _UpNextCard(onTap: onStart),
-        ],
-      ),
+    return AnimatedBuilder(
+      animation: Listenable.merge([ContentStore.instance, PracticeProgress.instance]),
+      builder: (context, _) {
+        final slot = nwsbSlot();
+        final all = ContentStore.instance.library;
+        final active = all.where((word) => word.time == slot || word.time == 'any').toList();
+        final nextSlot = slot == 'morning' ? 'afternoon' : slot == 'afternoon' ? 'evening' : 'night';
+        final next = all.where((word) => word.time == nextSlot || word.time == 'any').toList();
+        final title = _slotTitle[slot] ?? 'Practice';
+        final progress = PracticeProgress.instance;
+        final completed = progress.completedTodayFor(active);
+        final goal = active.isEmpty ? 0 : (completed / active.length * 100).round().clamp(0, 100).toInt();
+        final launch = () => onStart?.call(active, title);
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _FocusCard(title: title, count: active.length, onStart: launch),
+              const SizedBox(height: 26),
+              _SectionHeader(title: 'Your progress', onTap: onProgress),
+              const SizedBox(height: 14),
+              _ProgressCard(today: progress.todaySessions, total: progress.totalSessions, streak: progress.streak, goal: goal, completed: completed, target: active.length),
+              const SizedBox(height: 26),
+              _SectionHeader(title: 'Up next', onTap: launch),
+              const SizedBox(height: 14),
+              _UpNextCard(activeTitle: '$title Word Ritual', activeSub: _routineSummary(active), nextTitle: '${_slotTitle[nextSlot] ?? 'Next'} Word Ritual', nextSub: _routineSummary(next), onTap: launch),
+            ],
+          ),
+        );
+      },
     );
   }
+
+  static String _routineSummary(List<Word> words) => words.isEmpty ? 'No words available yet' : '${words.length} word${words.length == 1 ? '' : 's'} ready to play';
 }
 
 class _FocusCard extends StatelessWidget {
-  const _FocusCard({this.onStart});
+  const _FocusCard({required this.title, required this.count, this.onStart});
+  final String title;
+  final int count;
   final VoidCallback? onStart;
 
   @override
@@ -60,12 +85,12 @@ class _FocusCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Today's focus",
+                  "Today's practice",
                   style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Deep work session',
+                Text(
+                  title,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
@@ -74,19 +99,19 @@ class _FocusCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Wrap(
+                Wrap(
                   spacing: 8,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    _FocusDot(),
-                    Text('2h 0m', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: NmSuppliedDashboard._textDark)),
-                    _FocusDot(),
-                    Text('High priority', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
+                    const _FocusDot(),
+                    Text(count == 0 ? 'No words yet' : '$count word${count == 1 ? '' : 's'}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: NmSuppliedDashboard._textDark)),
+                    const _FocusDot(),
+                    const Text('Plays aloud', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
                   ],
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
-                  onTap: onStart,
+                  onTap: count == 0 ? null : onStart,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
                     decoration: BoxDecoration(
@@ -103,9 +128,9 @@ class _FocusCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('Start session', style: TextStyle(color: Color(0xFFF3F0FF), fontSize: 14, fontWeight: FontWeight.w600)),
+                          Text('Play session', style: TextStyle(color: Color(0xFFF3F0FF), fontSize: 14, fontWeight: FontWeight.w600)),
                           SizedBox(width: 10),
-                          Icon(Icons.arrow_forward, size: 16, color: Color(0xFFF3F0FF)),
+                          Icon(Icons.play_arrow_rounded, size: 17, color: Color(0xFFF3F0FF)),
                         ],
                       ),
                     ),
@@ -200,23 +225,29 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _ProgressCard extends StatelessWidget {
-  const _ProgressCard();
+  const _ProgressCard({required this.today, required this.total, required this.streak, required this.goal, required this.completed, required this.target});
+  final int today;
+  final int total;
+  final int streak;
+  final int goal;
+  final int completed;
+  final int target;
 
   @override
   Widget build(BuildContext context) {
-    return const NeuCard(
+    return NeuCard(
       color: NmSuppliedDashboard._surface,
       radius: 24,
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 6),
-      child: const Row(
+      child: Row(
         children: [
-          Expanded(child: _Metric(icon: Icons.check, iconColor: Color(0xFF3BA55D), value: '12', label: 'Tasks done', delta: '+20% ↑', deltaColor: Color(0xFF3BA55D))),
-          _MetricDivider(),
-          Expanded(child: _Metric(icon: Icons.schedule_outlined, iconColor: Color(0xFF8A8A8A), value: '8h 45m', label: 'Focused time', delta: '+15% ↑', deltaColor: Color(0xFF767676))),
-          _MetricDivider(),
-          Expanded(child: _Metric(icon: Icons.local_fire_department_outlined, iconColor: Color(0xFFE78A3E), value: '5', label: 'Day streak', delta: '+1 ↑', deltaColor: Color(0xFFE78A3E))),
-          _MetricDivider(),
-          Expanded(child: _Metric(icon: Icons.track_changes, iconColor: Color(0xFF8A6FE0), value: '78%', label: 'Goal progress', delta: '+8% ↑', deltaColor: Color(0xFF8A6FE0))),
+          Expanded(child: _Metric(icon: Icons.check, iconColor: const Color(0xFF3BA55D), value: '$today', label: 'Today', delta: today == 0 ? 'Start now' : 'Completed', deltaColor: const Color(0xFF3BA55D))),
+          const _MetricDivider(),
+          Expanded(child: _Metric(icon: Icons.schedule_outlined, iconColor: const Color(0xFF8A8A8A), value: '$total', label: 'Sessions', delta: total == 0 ? 'None yet' : 'All time', deltaColor: NmSuppliedDashboard._textMid)),
+          const _MetricDivider(),
+          Expanded(child: _Metric(icon: Icons.local_fire_department_outlined, iconColor: const Color(0xFFE78A3E), value: '$streak', label: 'Day streak', delta: streak == 0 ? 'Start today' : 'In a row', deltaColor: const Color(0xFFE78A3E))),
+          const _MetricDivider(),
+          Expanded(child: _Metric(icon: Icons.track_changes, iconColor: const Color(0xFF8A6FE0), value: target == 0 ? '—' : '$goal%', label: 'Today’s goal', delta: target == 0 ? 'No routine' : '$completed of $target', deltaColor: const Color(0xFF8A6FE0))),
         ],
       ),
     );
@@ -261,7 +292,11 @@ class _Metric extends StatelessWidget {
 }
 
 class _UpNextCard extends StatelessWidget {
-  const _UpNextCard({this.onTap});
+  const _UpNextCard({required this.activeTitle, required this.activeSub, required this.nextTitle, required this.nextSub, this.onTap});
+  final String activeTitle;
+  final String activeSub;
+  final String nextTitle;
+  final String nextSub;
   final VoidCallback? onTap;
 
   @override
@@ -271,9 +306,9 @@ class _UpNextCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
           children: [
-            _UpNextRow(icon: Icons.calendar_today_outlined, color: const Color(0xFFE78A3E), title: 'Team stand-up', subtitle: '10:00 AM · 30 min', status: 'Soon', onTap: onTap),
+            _UpNextRow(icon: Icons.play_circle_outline, color: const Color(0xFFE78A3E), title: activeTitle, subtitle: activeSub, status: 'Now', onTap: onTap),
             const Divider(height: 1, color: Color(0x99D9D9D9)),
-            _UpNextRow(icon: Icons.description_outlined, color: const Color(0xFF8A8A8A), title: 'Design review', subtitle: '2:00 PM · 1h 0m', onTap: onTap),
+            _UpNextRow(icon: Icons.schedule_outlined, color: const Color(0xFF8A8A8A), title: nextTitle, subtitle: nextSub, onTap: onTap),
           ],
         ),
       );
