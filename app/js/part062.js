@@ -92,11 +92,9 @@
            keeps it off until someone turns it on. The Fashion home's own
            healing entry is untouched. */
         { k:'healing',  sel:['.nmh-healing-wrap'],                                        t:S, label:'Personalised Healing',  sub:'Choose your health journey', defOff:1 },
-        /* Choose Your Path is its own section now — it used to live inside
-           the wrapper above. A direct child of the home wrap that this
-           registry does not know about gets stranded at the top of the page
-           while every registered one is re-appended around it. */
-        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1, locked:1, before:'fashsw' },
+        /* Choose Your Path is its own section now — it sits directly below
+           Fashion Mode, never at the top of the home. */
+        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male, on the laptop', vb:1, locked:1, after:'fashsw' },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name', defOff:1 },
         { k:'fashsw',   sel:['#nmhFashSwitch'],                                            t:S, label:'Fashion Mode',          sub:'Switch to the Fashion home' },
@@ -185,8 +183,10 @@
            block from being hoisted to the top by a saved Fashion layout.
        9 — Choose Your Path moves immediately before Experience · Fashion Mode
            on the Normal home as well, matching the injected HTML order and
-           correcting existing WebView layouts stored on device. */
-  var LAYOUT_V = 11;
+           correcting existing WebView layouts stored on device.
+       13 — Choose Your Path moves directly below Fashion Mode on the Normal
+            home, never above it or at the top of the page. */
+  var LAYOUT_V = 13;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -270,6 +270,10 @@
         if (fashionSwitchAt < 0) fashionSwitchAt = order.length;
         order.splice(fashionSwitchAt, 0, 'genderpath');
       }
+      /* v13: the Normal Home's Choose Your Path section belongs directly
+         below Fashion Mode. It is locked in the registry, so the final
+         `after` relationship above enforces the same placement for fresh,
+         saved, and newly injected WebView layouts. */
       try {
         localStorage.setItem(LSKEY(which), JSON.stringify({ order: order, off: off, v: LAYOUT_V }));
       } catch (e) {}
