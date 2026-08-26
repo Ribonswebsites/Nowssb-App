@@ -519,6 +519,8 @@ window._fbCreateSupportReport = async function (payload) {
   if (!user) throw new Error('Sign in to securely send a support case.');
   const allowedTypes = ['report', 'feedback', 'support', 'help'];
   const type = allowedTypes.includes(String(payload?.type || '')) ? String(payload.type) : 'support';
+  const caseReference = String(payload?.caseReference || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 40);
+  if (!caseReference) throw new Error('Support case reference required.');
   const messages = Array.isArray(payload?.messages) ? payload.messages.slice(-10).map((entry) => ({
     role: entry?.role === 'assistant' ? 'assistant' : 'user',
     content: String(entry?.content || '').replace(/\0/g, '').slice(0, 1200),
@@ -526,6 +528,7 @@ window._fbCreateSupportReport = async function (payload) {
   return addDoc(collection(db, 'reports'), {
     reporterUid: user.uid,
     reporterName: String(user.displayName || '').slice(0, 120),
+    caseReference,
     type,
     reason: String(payload?.reason || 'support_follow_up').slice(0, 120),
     messages,
@@ -535,7 +538,7 @@ window._fbCreateSupportReport = async function (payload) {
     source: 'support_chat',
     createdAt: serverTimestamp(),
     createdAtClient: Date.now(),
-  });
+  }).then(() => ({ caseReference }));
 };
 
 window._fbGetReels = async (opts) => {

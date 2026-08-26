@@ -1586,6 +1586,7 @@ function renderSupportCases(rows) {
     return '<div class="wl-card">' +
       '<span class="wl-status ' + (done ? 'approved' : 'pending') + '">' + (done ? 'Resolved' : 'New') + '</span>' +
       '<div class="wl-name">' + esc(row.type || 'Support') + '</div>' +
+      '<div class="wl-phonetic">Case ' + esc(row.caseReference || row.id || 'pending') + '</div>' +
       '<div class="wl-phonetic">' + esc(row.reason || 'follow-up') + '</div>' +
       '<div class="wl-meta">' + esc(row.reporterName || row.reporterUid || 'member') + ' · ' + supportCaseWhen(row.createdAt || row.createdAtClient) + '</div>' +
       transcript +

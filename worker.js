@@ -373,6 +373,7 @@ async function escalateSupport(env, body) {
   if (!messages.length) throw new Error('Support messages required');
   const type = ['report', 'feedback', 'support', 'help'].includes(body.type) ? body.type : 'support';
   const reason = clampString(body.reason, 120) || 'assistant_unresolved';
+  const caseReference = clampString(body.caseReference, 40).replace(/[^A-Za-z0-9-]/g, '').toUpperCase() || 'UNASSIGNED';
   const context = clampString(body.context, MAX_ASSISTANT_CONTEXT_CHARS);
   const screen = clampString(body.screen, 120);
   const rows = messages.map(message => `<p><strong>${escapeSupportEmail(message.role)}:</strong><br>${escapeSupportEmail(message.content).replace(/\n/g, '<br>')}</p>`).join('');
@@ -382,15 +383,15 @@ async function escalateSupport(env, body) {
     body: JSON.stringify({
       from: env.SUPPORT_FROM_EMAIL || 'NowssB Support <onboarding@resend.dev>',
       to: [env.SUPPORT_TO_EMAIL],
-      subject: `[NowssB] ${type === 'report' ? 'Problem report' : 'Support escalation'}`,
-      html: `<h2>NowssB support escalation</h2><p><strong>Type:</strong> ${escapeSupportEmail(type)}<br><strong>Reason:</strong> ${escapeSupportEmail(reason)}<br><strong>Screen:</strong> ${escapeSupportEmail(screen || 'unknown')}</p><h3>Conversation</h3>${rows}<h3>App context</h3><p>${escapeSupportEmail(context)}</p>`,
+      subject: `[NowssB ${caseReference}] ${type === 'report' ? 'Problem report' : 'Support escalation'}`,
+      html: `<h2>NowssB support escalation</h2><p><strong>Case reference:</strong> ${escapeSupportEmail(caseReference)}<br><strong>Type:</strong> ${escapeSupportEmail(type)}<br><strong>Reason:</strong> ${escapeSupportEmail(reason)}<br><strong>Screen:</strong> ${escapeSupportEmail(screen || 'unknown')}</p><h3>Conversation</h3>${rows}<h3>App context</h3><p>${escapeSupportEmail(context)}</p>`,
     }),
   });
   if (!response.ok) {
     console.error('Support escalation email failed', response.status);
     throw new Error('Support escalation delivery failed');
   }
-  return { accepted: true };
+  return { accepted: true, caseReference };
 }
 
 async function groqComplete(env, body) {
