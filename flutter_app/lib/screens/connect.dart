@@ -61,7 +61,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
       child: Row(
         children: [
           ClipOval(
-            child: Image.asset('assets/media/image/logo-disc-8b052034.webp', width: 48, height: 48, fit: BoxFit.cover),
+            child: Image.asset('assets/icons/logo-disc.webp', width: 48, height: 48, fit: BoxFit.cover),
           ),
           const SizedBox(width: 12),
           const Expanded(

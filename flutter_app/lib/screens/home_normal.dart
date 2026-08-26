@@ -283,7 +283,7 @@ class _TopRow extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: const NwsbImage(
-            asset: 'assets/media/image/logo-disc-8b052034.webp',
+            asset: 'assets/icons/logo-disc.webp',
             fit: BoxFit.cover,
             error: SizedBox.shrink(),
           ),

@@ -63,7 +63,7 @@ void main() {
             widget is Image &&
             widget.image is AssetImage &&
             (widget.image as AssetImage).assetName ==
-                'assets/media/image/logo-disc-8b052034.webp'),
+                'assets/icons/logo-disc.webp'),
         findsOneWidget);
 
     debugPrint('home: ${tester.widgetList(find.byType(NwsbVideo)).length} '
