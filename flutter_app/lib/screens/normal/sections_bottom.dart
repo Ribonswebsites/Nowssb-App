@@ -310,7 +310,7 @@ class NmFashionSwitch extends StatelessWidget {
           const Row(children: [
             _FashionCircle(size: 44, icon: Icons.auto_awesome_rounded),
             SizedBox(width: 14),
-            Expanded(child: Text('Discover the experience', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: .2, color: Color(0xFF2B2F3A))),
+            Expanded(child: Text('Discover the experience', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: .2, color: Color(0xFF2B2F3A)))),
           ]),
           const Padding(padding: EdgeInsets.fromLTRB(4, 18, 4, 18), child: Divider(height: 1, thickness: 1, color: Color(0x1F2B2F3A))),
           GestureDetector(
