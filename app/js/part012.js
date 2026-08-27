@@ -1519,9 +1519,12 @@ window.addEventListener('beforeinstallprompt', e => {
 // helper: the freshest available prompt (head listener may have caught it first)
 function _getInstallPrompt() { return deferredInstallPrompt || window._bipEvent || null; }
 
-// ── DETECT iOS SAFARI ──
+// ── DEVICE DETECTION ──
 function isIOS() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+function isAndroid() {
+  return /android/i.test(navigator.userAgent);
 }
 function isInStandaloneMode() {
   return (('standalone' in window.navigator) && window.navigator.standalone) ||
@@ -1534,6 +1537,9 @@ function openDlPopup() {
   const overlay  = document.getElementById('dlOverlay');
   const viewInstall = document.getElementById('dlViewInstall');
   const viewIOS  = document.getElementById('dlViewIOS');
+  const installButton = document.getElementById('dlInstallBtn');
+  const installSub = document.getElementById('dlInstallSub');
+  const androidNote = document.getElementById('dlAndroidInstallNote');
 
   if (isIOS() && !isInStandaloneMode()) {
     viewInstall.style.display = 'none';
@@ -1541,10 +1547,17 @@ function openDlPopup() {
   } else {
     viewInstall.style.display = 'block';
     viewIOS.style.display     = 'none';
-    // Keep the label as "Download App" regardless of native-prompt availability
-    if (!_getInstallPrompt()) {
-      const btn = document.getElementById('dlInstallBtn');
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.6" stroke-linecap="round"/></svg> Download App`;
+    if (isAndroid()) {
+      if (installButton) installButton.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Download Android App`;
+      if (installSub) installSub.textContent = 'Direct WebView APK · separate NowssB app';
+      if (androidNote) androidNote.style.display = 'none';
+    } else {
+      if (installSub) installSub.textContent = 'Natural Origin of Word Science · Shabdapathy';
+      if (androidNote) androidNote.style.display = 'none';
+      // Keep the label as "Download App" regardless of native-prompt availability.
+      if (!_getInstallPrompt() && installButton) {
+        installButton.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Download App`;
+      }
     }
   }
 
@@ -1586,6 +1599,26 @@ function _waitForInstallPrompt(ms) {
 }
 
 async function triggerInstall() {
+  // Android receives the actual WebView package, never a GitHub Actions ZIP
+  // or the browser PWA. The `webview-latest` release tag is overwritten only
+  // after a successful main-branch Android build in android-apk.yml.
+  if (isAndroid()) {
+    const btn = document.getElementById('dlInstallBtn');
+    const note = document.getElementById('dlAndroidInstallNote');
+    if (btn) { btn.disabled = true; btn.textContent = 'Starting APK download…'; }
+    if (note) note.style.display = 'block';
+    const link = document.createElement('a');
+    link.href = 'https://github.com/Ribonswebsites/Nowssb-App/releases/download/webview-latest/NowssB-WebView.apk';
+    link.download = 'NowssB-WebView.apk';
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => {
+      if (btn) { btn.disabled = false; btn.textContent = 'Download Android App'; }
+    }, 900);
+    return;
+  }
   // Already installed → nothing to download.
   if (isInStandaloneMode()) { showManualInstallInstructions(); return; }
   let prompt = _getInstallPrompt();

@@ -4729,12 +4729,12 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
 
-    <!-- ANDROID / DESKTOP: native install prompt -->
+    <!-- ANDROID: direct WebView APK; desktop: native PWA install prompt -->
     <div id="dlViewInstall">
       <div class="dl-icon-wrap"><img loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779717856/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt="NowssB" class="dl-app-logo"></div>
       <div class="dl-eyebrow">NOWSBANSIU EDITION</div>
       <div class="dl-title">NowssB</div>
-      <div class="dl-sub">Natural Origin of Word Science · Shabdapathy</div>
+      <div class="dl-sub" id="dlInstallSub">Natural Origin of Word Science · Shabdapathy</div>
       <div class="dl-features">
         <div class="dl-feat"><span class="dl-feat-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></span><span class="dl-feat-lbl">Instant</span></div>
         <div class="dl-feat"><span class="dl-feat-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14 0M8.5 16.05a6 6 0 0 1 7 0M2 8.82a15 15 0 0 1 20 0M12 20h.01"/></svg></span><span class="dl-feat-lbl">Offline</span></div>
@@ -4747,6 +4747,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         </svg>
         Download App
       </button>
+      <div id="dlAndroidInstallNote" style="display:none;margin:13px 4px 0;color:rgba(255,255,255,.62);font:11px/1.55 'DM Sans',sans-serif;text-align:center;">When the APK finishes downloading, tap it and allow installation from this browser if Android asks.</div>
       <button class="dl-cancel" onclick="closeDlSheet()">Maybe Later</button>
     </div>
 

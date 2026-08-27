@@ -30,6 +30,9 @@ concurrency:
   group: apk-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   debug-apk:
     name: Debug APK (sideloadable)
@@ -76,6 +79,20 @@ jobs:
           name: nowssb-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      # This is the stable, direct website-download file. Actions artifacts
+      # are ZIP wrappers and expire; the release asset is the installable APK.
+      - name: Publish direct WebView APK
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=webview-latest
+          FILE=android/app/build/outputs/apk/debug/app-debug.apk
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "NowssB Android WebView" --notes "Latest direct Android WebView APK. Download the APK itself, then install it from Android Downloads."
+          fi
+          gh release upload "$TAG" "$FILE#NowssB-WebView.apk" --repo "$GITHUB_REPOSITORY" --clobber
 
   release-bundle:
     name: Signed release bundle (Play Store)
