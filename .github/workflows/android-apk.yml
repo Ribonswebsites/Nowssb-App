@@ -66,6 +66,9 @@ jobs:
       - name: Create the Android project
         run: npx cap add android
 
+      - name: Add native APK download installer
+        run: node tools/capacitor-android-installer.mjs
+
       - name: Generate NowssB launcher assets
         run: npm run android:assets
 
@@ -158,6 +161,7 @@ jobs:
         if: steps.guard.outputs.ok == 'true'
         run: |
           npx cap add android
+          node tools/capacitor-android-installer.mjs
           npm run android:assets
           npx cap sync android
 

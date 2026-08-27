@@ -539,17 +539,27 @@
   };
 
   if (!install) return;
-  const download = () => {
+  const download = async () => {
     install.setAttribute('aria-busy', 'true');
     if (status) status.textContent = 'Starting download…';
-    // Open the APK outside the native WebView. This lets Android’s download
-    // manager hand the finished package to the system installer instead of
-    // leaving the WebView on a binary response page.
+    // In the native WebView, DownloadManager downloads the APK and launches
+    // Android's installer when the file completes. This avoids sending the
+    // user to GitHub or leaving the WebView on a binary response page.
     if (inCapacitorWebView) {
       try {
+        const nativeInstaller = capacitor && capacitor.Plugins && capacitor.Plugins.NativeInstaller;
+        if (nativeInstaller && typeof nativeInstaller.downloadAndInstall === 'function') {
+          const result = await nativeInstaller.downloadAndInstall({ url: apk, filename });
+          if (status) {
+            status.textContent = result && result.installerPermissionRequired
+              ? 'Allow “Install unknown apps” for NowssB in Android settings, then tap Install again.'
+              : 'Downloading… Android will open the installer when ready.';
+          }
+          return;
+        }
         const browser = capacitor && capacitor.Plugins && capacitor.Plugins.Browser;
         if (browser && typeof browser.open === 'function') {
-          browser.open({ url: apk, toolbarColor: '#000000' }).catch(() => window.location.assign(apk));
+          await browser.open({ url: apk, toolbarColor: '#000000' });
         } else {
           window.location.assign(apk);
         }

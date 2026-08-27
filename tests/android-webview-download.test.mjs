@@ -49,3 +49,21 @@ test('website and WebView downloads use the supplied listing and the correct lat
   assert.match(middleware, /Content-Disposition/);
   assert.match(middleware, /application\/vnd\.android\.package-archive/);
 });
+
+
+test('Fashion Plus keeps one live film behind every page and menu', () => {
+  const page = read('index.html');
+  const playback = read('app/js/part051.js');
+  const fashion = read('app/js/part076.js');
+  const css = read('nowssb-nm.css');
+
+  assert.match(page, /part051\.js\?v=25/);
+  assert.match(page, /part076\.js\?v=115/);
+  assert.match(page, /nowssb-nm\.css\?v=793/);
+  assert.match(playback, /v\.id === 'fpBgVideo' \|\| v\.id === 'fpPageVid'/);
+  assert.match(fashion, /document\.getElementById\('fpBgVideo'\)/);
+  assert.match(fashion, /v\.play\(\)/);
+  assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) \.sub-screen\.open/);
+  assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) #menuDrawer\.menu-drawer/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
+});

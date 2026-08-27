@@ -101,11 +101,26 @@
     var i = parseInt(raw, 10);
     return (isFinite(i) && i >= 0 && i < FILMS.length) ? i : BG_DEFAULT;
   }
+  function syncFashionPageVideo(autoplay) {
+    var v = document.getElementById('fpPageVid');
+    if (!v) return;
+    var src = isOn() ? FILMS[bgChoice()].vid : FILMS[0].vid;
+    if (v.getAttribute('src') !== src) {
+      v.setAttribute('src', src);
+      try { v.load(); } catch (e) {}
+    }
+    if (autoplay && isOn()) {
+      v.muted = true;
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    }
+  }
+
   function setBgChoice(i) {
     if (i < 0 || i >= FILMS.length || i === bgChoice()) return;
     try { localStorage.setItem(BGKEY, String(i)); } catch (e) {}
     var v = document.getElementById('fpBgVideo');
     if (v) { v.setAttribute('src', FILMS[i].vid); try { v.load(); } catch (e) {} playState(); }
+    syncFashionPageVideo(isOn());
     paintPicker();
   }
   window.fpBgChoice = bgChoice;
@@ -142,7 +157,7 @@
     v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
     v.src = FILMS[bgChoice()].vid;
     v.addEventListener('loadeddata', function () {
-      if (isOn() && !reducedMotion() && document.visibilityState === 'visible') {
+      if (isOn() && document.visibilityState === 'visible') {
         var p = v.play(); if (p && p.catch) p.catch(function () {});
       }
     });
@@ -241,7 +256,7 @@
   function playState() {
     var v = bgVideo(false);
     if (!v) return;
-    var want = isOn() && bgPartOn() && !reducedMotion() && !batteryLow &&
+    var want = isOn() && bgPartOn() && !batteryLow &&
                document.visibilityState === 'visible';
     if (want) { v.play().catch(function () {}); }
     else { try { v.pause(); } catch (e) {} }
@@ -252,7 +267,7 @@
      page, instead of only the pages that existed when the switch first ran.
      The body class avoids relying on CSS :has support in older WebViews. */
   function syncOpenPageBackdrop() {
-    var on = isOn() && bgPartOn() && !reducedMotion();
+    var on = isOn() && bgPartOn() && !batteryLow;
     var hasOpenPage = !!document.querySelector('.sub-screen.open');
     document.body.classList.toggle('nwsb-sub-open', hasOpenPage);
     document.body.classList.toggle(
@@ -325,7 +340,7 @@
        tagged pages their photographs back — pausing alone left a frozen
        frame covering them. */
     document.body.classList.toggle('fp-bg-off', !on);
-    if (on && !reducedMotion()) { bgVideo(true); markImageBacked(); }
+    if (on) { bgVideo(true); markImageBacked(); }
     playState();
     syncOpenPageBackdrop();
     /* The phone shows the stills when the mode is off and the clips when it
@@ -538,10 +553,11 @@
     ['The four home tiles start moving', 'Sound Library, My Progress, Word Science and Profile play their own clips instead of showing a still.'],
     ['Today’s Practice becomes a film', 'The card gets a clip behind it, its Enter pill moves to the right edge, and the routines banner runs above it.'],
     ['The app background becomes the film', 'Home, login, onboarding, analysis — every screen whose background is a still photograph plays the clip instead.'],
-    ['Photo-backed pages move too', 'The inside pages carrying a photograph — My Progress, Word Science, Health, the Signature — take the same clip.'],
-    ['Pages already running video are untouched', 'The Word Atelier, the Meaning Store and every section with its own clip keep exactly what they have. Nothing is replaced twice.'],
+    ['Every page background moves', 'Photo-backed pages and solid pages both become transparent over the same live Fashion Plus film.'],
+    ['Every open page gets the same film', 'The hamburger, stores, progress, profile, settings and every other screen use the exact Fashion Plus background while it is on.'],
     ['It stops when you are not looking', 'Everything pauses the moment the app goes to the background or the screen locks, and starts again when you come back.'],
-    ['It gets out of the way on low battery', 'Below 15% and not charging, the backgrounds pause themselves until you plug in — and Reduce Motion keeps them still however this switch is set.']
+          ['It gets out of the way on low battery', 'Below 15% and not charging, the backgrounds pause themselves until you plug in.']
+
   ];
 
   /* ── The page behind the section's Enter ──────────────────────────
@@ -627,8 +643,7 @@
       intro.style.opacity = '0'; intro.style.pointerEvents = 'none';
       setTimeout(function () { intro.style.display = 'none'; }, 460);
     }
-    var v = document.getElementById('fpPageVid');
-    if (v && !reducedMotion()) { v.muted = true; v.play().catch(function () {}); }
+    syncFashionPageVideo(true);
   };
   window.fpClosePage = function () {
     var sc = document.getElementById('sub-fashion-plus');

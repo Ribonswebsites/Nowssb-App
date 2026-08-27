@@ -421,6 +421,11 @@
 
   function track() {
     document.querySelectorAll('video').forEach(function (v) {
+      /* Fashion Plus owns one fixed film that deliberately sits outside the
+         active page/menu stacking context. It is not decoration inside a
+         screen, so the normal top-layer/decoder budget must never pause or
+         unmount it when navigation changes. */
+      if (v.id === 'fpBgVideo' || v.id === 'fpPageVid') return;
       /* The frame goes on FIRST, and on every clip — including the ones
          this file does not otherwise manage. The hero rail owns its own
          cells and fills them in later, from a file that may well have run

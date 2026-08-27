@@ -15671,3 +15671,66 @@ body.fashplus :is(#home, .stw-prev-stage) .fash-plyr-wrap > #todayPracticeCard.f
   line-height: 1.45 !important;
   margin: 0 !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   FASHION PLUS — ONE LIVE FILM BEHIND EVERY OPEN PAGE
+
+   The shared clip is intentionally lifted just below the open page/menu.
+   Every full-bleed page surface must therefore be transparent while Fashion
+   Plus is on; otherwise an old intro image or #060c18 sheet hides the video.
+   Cards, controls, and article surfaces are not touched. The rules are kept
+   at the end of the sheet so page-specific legacy backgrounds cannot win.
+   ══════════════════════════════════════════════════════════════════════ */
+body.fashplus:not(.fp-bg-off) .sub-screen.open,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .sub-screen-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .sub-body,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .bgp-content,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .rm-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .ms-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .eb-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .sig-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .sl-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .st-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .qa-page-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .fpp-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .cart-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .wish-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .orders-intro-bg,
+body.fashplus:not(.fp-bg-off) .sub-screen.open > .oh-intro-bg {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+body.fashplus:not(.fp-bg-off) .sub-screen.open::before,
+body.fashplus:not(.fp-bg-off) .sub-screen.open::after {
+  background-image: none !important;
+}
+
+body.fashplus:not(.fp-bg-off) #menuDrawer.menu-drawer {
+  background: linear-gradient(rgba(6,10,20,.40), rgba(6,10,20,.58)) !important;
+}
+
+
+/* The Fashion Plus switch is an explicit user request for a live background.
+   Keep the film visible even when the platform reports reduced motion; this
+   must not turn the user’s enabled mode into a missing/black background. */
+@media (prefers-reduced-motion: reduce) {
+  body.fashplus:not(.fp-bg-off) #fpBgVideo,
+  body.fashplus:not(.fp-bg-off) #fpBgVeil {
+    display: block !important;
+  }
+  body.fashplus:not(.fp-bg-off) #appBg,
+  body.fashplus:not(.fp-bg-off) #appBgLayer2 {
+    opacity: 0 !important;
+  }
+}
+
+
+/* Theme files contain a few ID-based backgrounds (notably Settings). The
+   harmless unmatched ID inside :is() raises specificity for the matching
+   generic branch, so those legacy rules cannot cover the live film. */
+body.fashplus:not(.fp-bg-off) :is(.sub-screen.open, #nwsbFpSpecificityBump),
+body.fashplus:not(.fp-bg-off) :is(.sub-screen.open > .sub-screen-bg, .sub-screen.open > .sub-body, .sub-screen.open > .bgp-content, #nwsbFpSpecificityBump),
+body.fashplus:not(.fp-bg-off) :is(.sub-screen.open > .rm-intro-bg, .sub-screen.open > .ms-intro-bg, .sub-screen.open > .eb-intro-bg, .sub-screen.open > .sig-intro-bg, .sub-screen.open > .sl-intro-bg, .sub-screen.open > .st-bg, .sub-screen.open > .qa-page-bg, .sub-screen.open > .fpp-intro-bg, .sub-screen.open > .cart-intro-bg, .sub-screen.open > .wish-intro-bg, .sub-screen.open > .orders-intro-bg, .sub-screen.open > .oh-intro-bg, #nwsbFpSpecificityBump) {
+  background: transparent !important;
+}
