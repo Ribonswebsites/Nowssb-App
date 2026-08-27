@@ -125,6 +125,7 @@
 
   function postDashboard() {
     var state = dashboardState(cachedData);
+    window.nowssbDashboardState = state;
     if (typeof window.nowssbDirectDashboardRender === 'function') {
       window.nowssbDirectDashboardRender(state);
     }

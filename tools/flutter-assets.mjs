@@ -30,6 +30,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const FOLDERS = [
   'video',        // the clips and their posters
   'frames',       // the device bezels — see lib/widgets/tv_frame.dart
+  'coach',        // Personal Coach hero artwork
   'icons',        // the logo disc, the search mark
   'store',        // the intro-page artwork, and the collection covers
   'fashion',      // the Fashion Plus intro and its icon

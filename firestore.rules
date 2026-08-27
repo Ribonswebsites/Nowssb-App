@@ -79,7 +79,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    /* ── Requests from the app ───────────────────────────────────────
+    /* ── Personal Coach ───────────────────────────────────────────────
+       Chat history is private to the signed-in owner. The webview and native
+       clients use the same path, while the API verifies ownership again. */
+    match /users/{uid}/coachConversations/{conversationId} {
+      allow read, create, update, delete: if signedIn() && request.auth.uid == uid;
+      match /messages/{messageId} {
+        allow read, create, update, delete: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    /* ── Requests from the app ────────────────────────────────────────
        Somebody asks for a meaning; the studio answers it. Anyone signed in
        may raise one, and may read back their own to see where it got to.
        Only an admin sees the whole queue or marks anything done — a

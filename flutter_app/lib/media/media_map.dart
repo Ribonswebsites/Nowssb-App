@@ -8,4 +8,5 @@
 //   node tools/flutter-assets.mjs              rebuilds this
 library;
 
-const Map<String, String> kNowssbMedia = {};
+const Map<String, String> kNowssbMedia = {
+};

@@ -26,6 +26,7 @@ dependencies:
 
   shared_preferences: ^2.3.2
   cached_network_image: ^3.4.1
+  http: ^1.2.2
   video_player: ^2.9.2
   flutter_tts: ^4.2.5
 
@@ -61,6 +62,7 @@ flutter:
     # device bezels the televisions are drawn from, the intro-page
     # paintings, the logo disc, the collection banners.
     - assets/frames/
+    - assets/coach/
     - assets/icons/
     - assets/store/
     - assets/store/collections/
