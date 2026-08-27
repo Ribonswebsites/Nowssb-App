@@ -17,7 +17,13 @@ test('website and WebView downloads use the supplied listing and the correct lat
   assert.match(listing, /nowssb-android\/NowssB-Android\.apk/);
   assert.match(listing, /nowssb-flutter-android\/NowssB-Flutter-Android\.apk/);
   assert.match(listing, /inCapacitorWebView/);
+  assert.match(listing, /window\.location\.assign\(apk\)/);
+  assert.match(listing, /window\.goBack/);
+  assert.match(listing, /role="button"/);
+  assert.match(listing, /assets\/app-listing\/listing-01\.webp/);
+  assert.match(listing, /loading="lazy"/);
   assert.match(listing, /NowssB-Flutter-Android\.apk/);
+  assert.doesNotMatch(listing, /data:image/);
   assert.doesNotMatch(listing, /artifacts\/download/);
   assert.match(workflow, /permissions:\s*\n\s+contents: write/);
   assert.match(workflow, /Publish direct NowssB APK/);
