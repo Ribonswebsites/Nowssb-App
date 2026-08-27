@@ -699,7 +699,32 @@ class _RadialOption extends StatelessWidget {
   final Color accent;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => Align(alignment: alignment, child: Padding(padding: const EdgeInsets.all(14), child: InkResponse(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: 70, height: 70, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0x2BFFFFFF), border: Border.all(color: accent.withOpacity(.8))), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(label, style: const TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1)), Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))]))));
+  Widget build(BuildContext context) => Align(
+    alignment: alignment,
+    child: Padding(
+      padding: const EdgeInsets.all(14),
+      child: InkResponse(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Container(
+          width: 70,
+          height: 70,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0x2BFFFFFF),
+            border: Border.all(color: accent.withOpacity(.8)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1)),
+              Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class _PlayerInfoSheet extends StatelessWidget {
