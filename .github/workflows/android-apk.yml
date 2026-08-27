@@ -82,16 +82,16 @@ jobs:
 
       # This is the stable, direct website-download file. Actions artifacts
       # are ZIP wrappers and expire; the release asset is the installable APK.
-      - name: Publish direct WebView APK
+      - name: Publish direct NowssB APK
         if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG=webview-latest
+          TAG=nowssb-android
           FILE=android/app/build/outputs/apk/debug/app-debug.apk
-          PUBLIC_FILE=NowssB-WebView.apk
+          PUBLIC_FILE=NowssB-Android.apk
           if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "NowssB Android WebView" --notes "Latest direct Android WebView APK. Download the APK itself, then install it from Android Downloads."
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "NowssB Android" --notes "Latest direct NowssB Android APK. Download the APK itself, then install it from Android Downloads."
           fi
           cp "$FILE" "$PUBLIC_FILE"
           gh release upload "$TAG" "$PUBLIC_FILE" --repo "$GITHUB_REPOSITORY" --clobber

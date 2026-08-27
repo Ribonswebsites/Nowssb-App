@@ -1548,8 +1548,8 @@ function openDlPopup() {
     viewInstall.style.display = 'block';
     viewIOS.style.display     = 'none';
     if (isAndroid()) {
-      if (installButton) installButton.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Download Android App`;
-      if (installSub) installSub.textContent = 'Direct WebView APK · separate NowssB app';
+      if (installButton) installButton.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L5 8M8 11L11 8" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14H14" stroke="#07101f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Download NowssB APK`;
+      if (installSub) installSub.textContent = 'Direct Android app download';
       if (androidNote) androidNote.style.display = 'none';
     } else {
       if (installSub) installSub.textContent = 'Natural Origin of Word Science · Shabdapathy';
@@ -1599,8 +1599,8 @@ function _waitForInstallPrompt(ms) {
 }
 
 async function triggerInstall() {
-  // Android receives the actual WebView package, never a GitHub Actions ZIP
-  // or the browser PWA. The `webview-latest` release tag is overwritten only
+  // Android receives the actual NowssB APK, never a GitHub Actions ZIP
+  // or the browser PWA. The `nowssb-android` release tag is overwritten only
   // after a successful main-branch Android build in android-apk.yml.
   if (isAndroid()) {
     const btn = document.getElementById('dlInstallBtn');
@@ -1608,14 +1608,14 @@ async function triggerInstall() {
     if (btn) { btn.disabled = true; btn.textContent = 'Starting APK download…'; }
     if (note) note.style.display = 'block';
     const link = document.createElement('a');
-    link.href = 'https://github.com/Ribonswebsites/Nowssb-App/releases/download/webview-latest/NowssB-WebView.apk';
-    link.download = 'NowssB-WebView.apk';
+    link.href = 'https://github.com/Ribonswebsites/Nowssb-App/releases/download/nowssb-android/NowssB-Android.apk';
+    link.download = 'NowssB-Android.apk';
     link.rel = 'noopener';
     document.body.appendChild(link);
     link.click();
     link.remove();
     window.setTimeout(() => {
-      if (btn) { btn.disabled = false; btn.textContent = 'Download Android App'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Download NowssB APK'; }
     }, 900);
     return;
   }

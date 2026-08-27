@@ -76,22 +76,42 @@ try { localStorage.setItem('nwsb_home_mode', 'nm'); } catch(e){}
 // _authNavigating: lock to prevent double-navigation (e.g. Google popup + onAuthStateChanged)
 window._authNavigating = false;
 
-/* A credential promise may resolve after Firebase has already emitted its
-   auth-state event. Previously the email path then made the loader visible
-   again after _doNavigate had hidden it, leaving the looping film over the
-   authenticated home. This bounded fallback makes completion idempotent. */
+function _authTransitionActive() {
+  var active = document.querySelector('.screen.active');
+  return !!(active && (active.id === 'login' || active.id === 'splash'));
+}
+
+function _hideAuthLoader() {
+  var loader = document.getElementById('authLoader');
+  if (loader) loader.classList.remove('visible');
+}
+
+/* A credential promise can resolve before, after, or without the auth-state
+   callback on an embedded WebView. Never depend on the stale currentScreen
+   variable to leave the loader: the active DOM screen is the source of truth.
+   The immediate fallback gives a completed account selection a visible exit;
+   the profile lookup may refine the destination afterwards. */
 function _ensureLoginExit(user) {
+  if (!user || !auth.currentUser || auth.currentUser.uid !== user.uid) return;
+  var fallbackDest = _isNewUser(user) ? 'ob-intro' : 'home';
+  _hideAuthLoader();
+  setTimeout(function () {
+    if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+    _hideAuthLoader();
+    if (_authTransitionActive()) _doNavigate(fallbackDest);
+  }, 350);
   setTimeout(async function () {
-    if (!user || !auth.currentUser || auth.currentUser.uid !== user.uid || currentScreen !== 'login') return;
-    var dest = _isNewUser(user) ? 'ob-intro' : 'home';
+    if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+    var dest = fallbackDest;
     try {
       dest = await Promise.race([
         _resolveUserRoute(user),
-        new Promise(function (resolve) { setTimeout(function () { resolve(dest); }, 3500); })
+        new Promise(function (resolve) { setTimeout(function () { resolve(fallbackDest); }, 3500); })
       ]);
     } catch (e) {}
-    if (currentScreen === 'login') _doNavigate(dest || 'home');
-  }, 1200);
+    _hideAuthLoader();
+    if (_authTransitionActive()) _doNavigate(dest || fallbackDest);
+  }, 650);
 }
 
 async function _resolveUserRoute(user) {
@@ -156,12 +176,18 @@ onAuthStateChanged(auth, async user => {
     // video before profile routing so a slow Firestore read cannot leave it
     // covering the authenticated destination.
     const authLoader = document.getElementById('authLoader');
-    if (authLoader) authLoader.classList.remove('visible');
+    const wasWaitingForCredential = !!(authLoader && authLoader.classList.contains('visible'));
+    _hideAuthLoader();
     window._currentUid = user.uid;
     window._currentUser = user;                          // fix: was never set
     window._userName = user.displayName || '';           // fix: was never set
     // Fire-and-forget lastLogin update — don't block routing on it
     saveUser(user).catch(() => {});
+
+    // Popup/WebView account selection can race the screen router. If this
+    // credential arrived while the sign-in loader was shown, exit through the
+    // DOM-backed fallback now instead of awaiting Firestore before any route.
+    if (wasWaitingForCredential) _ensureLoginExit(user);
 
     // ── DURING SPLASH: logged-in users go to home or onboarding ──
     if (currentScreen === 'splash') {
@@ -211,7 +237,8 @@ onAuthStateChanged(auth, async user => {
     window._authNavigating = true;
     // Safety net: if routing stalls beyond 8s, force-navigate based on user type
     var _authStuckTimer = setTimeout(function() {
-      if (currentScreen === 'login' || currentScreen === 'splash') {
+      _hideAuthLoader();
+      if (_authTransitionActive()) {
         _doNavigate(_isNewUser(user) ? 'signup2' : 'home');
       }
       window._authNavigating = false;
@@ -327,10 +354,11 @@ getRedirectResult(auth).then(async result => {
     window._splashRoute = _rDest;
     window._splashDone  = true;
     saveUser(result.user).catch(() => {});
+    _ensureLoginExit(result.user);
     // Let onAuthStateChanged fire first (it will also route correctly);
     // this setTimeout is only a fallback if it hasn't fired within 300ms.
     setTimeout(function() {
-      if (currentScreen === 'splash' || currentScreen === 'login') {
+      if (_authTransitionActive()) {
         _doNavigate(_rDest);
       }
     }, 300);

@@ -35,7 +35,12 @@ class _AuthGateState extends State<AuthGate> {
     if (_busy) return;
     setState(() { _busy = true; _error = null; });
     try {
-      await action();
+      await action().timeout(
+        const Duration(seconds: 20),
+        onTimeout: () => throw const _AuthMessage(
+          'Sign-in is taking too long. Please check your connection and try again.',
+        ),
+      );
     } on _AuthMessage catch (error) {
       if (mounted) setState(() => _error = error.message);
     } on FirebaseAuthException catch (error) {
