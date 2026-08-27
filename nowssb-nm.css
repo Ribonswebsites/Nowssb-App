@@ -15620,3 +15620,54 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-top {
     background: rgba(6, 12, 24, 0.42);
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MORNING RITUAL — KEEP THE VIDEO AND COPY IN ONE REAL CARD
+
+   The practice clip is an absolute layer, while the title and description are
+   live children. The earlier 16:9/aspect and bottom-flex overrides could let
+   the live children escape the card's measured height, leaving the film high
+   and an empty-looking strip underneath. Give the card one responsive height,
+   keep both content blocks inside it, and let the clip fill that exact box.
+═══════════════════════════════════════════════════════════════ */
+body.fashplus :is(#home, .stw-prev-stage) .fash-plyr-wrap > #todayPracticeCard.fp-card {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: clamp(230px, 50vw, 360px) !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+  padding: 0 14px 12px !important;
+}
+body.fashplus :is(#home, .stw-prev-stage) .fash-plyr-wrap > #todayPracticeCard.fp-card > .fp-media {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: 0 !important;
+}
+body.fashplus :is(#home, .stw-prev-stage) .fash-plyr-wrap > #todayPracticeCard.fp-card .home-card-top {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  margin-top: 0 !important;
+  padding: 16px 0 2px !important;
+}
+body.fashplus :is(#home, .stw-prev-stage) .fash-plyr-wrap > #todayPracticeCard.fp-card .home-card-bottom {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  padding: 0 0 0 !important;
+  margin: 0 !important;
+}
+body.fashplus :is(#home, .stw-prev-stage) .fash-plyr-wrap > #todayPracticeCard.fp-card .home-card-sub {
+  max-width: 68% !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+}
