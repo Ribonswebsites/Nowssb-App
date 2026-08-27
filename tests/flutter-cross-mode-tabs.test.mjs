@@ -20,6 +20,10 @@ test('Flutter provides all five primary tabs in both Normal and Fashion home mod
   assert.match(shell, /const LibraryScreen\(\)/);
   assert.match(shell, /const StoreScreen\(\)/);
   assert.match(shell, /const ProfileScreen\(\)/);
+  assert.match(normal, /MainOptionsSection\(onGo: _go, onAction: _openMainOption\)/);
+  assert.match(fashion, /MainOptionsSection\(onGo: _go, onAction: _openMainOption\)/);
+  assert.match(normal, /case 'Sound Library':[\s\S]*SoundLibraryScreen/);
+  assert.match(fashion, /case 'My Progress':[\s\S]*PracticeProgressScreen/);
 });
 
 test('Flutter pages do not advertise unavailable tab actions and Sound Library opens the real Player', () => {

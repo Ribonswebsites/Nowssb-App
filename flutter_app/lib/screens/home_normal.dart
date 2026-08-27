@@ -154,6 +154,17 @@ class _HomeNormalState extends State<HomeNormal> {
     _push(PracticeProgressScreen(words: ContentStore.instance.library));
   }
 
+  void _openMainOption(String label, int tab) {
+    switch (label) {
+      case 'Sound Library':
+        _push(const SoundLibraryScreen());
+      case 'My Progress':
+        _openDashboardProgress();
+      default:
+        _go(tab);
+    }
+  }
+
   void _footerLink(String key) {
     switch (key) {
       case 'about':
@@ -188,7 +199,7 @@ class _HomeNormalState extends State<HomeNormal> {
           )
         ),
         ('practice', NmPractice(onTap: () => _go(1))),
-        ('mainops', MainOptionsSection(onGo: _go)),
+        ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         ('actionbar', NmSuppliedActionBar(onSupport: () => _go(4), onCoach: () => _push(const PersonalCoachScreen()))),
         ('tiles', NmTiles(onTile: _go)),
         ('store', NmStore(onTap: () => _go(3))),

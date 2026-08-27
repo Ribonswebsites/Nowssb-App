@@ -39,6 +39,7 @@ import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import 'fashion_plus.dart';
+import 'practice_player.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 import 'word_detail.dart';
@@ -128,6 +129,17 @@ class _HomeFashionState extends State<HomeFashion> {
     _push(WordDetail(word: all[i]));
   }
 
+  void _openMainOption(String label, int tab) {
+    switch (label) {
+      case 'Sound Library':
+        _push(const SoundLibraryScreen());
+      case 'My Progress':
+        _push(PracticeProgressScreen(words: ContentStore.instance.library));
+      default:
+        _go(tab);
+    }
+  }
+
   void _footerLink(String key) {
     switch (key) {
       case 'about':
@@ -157,7 +169,7 @@ class _HomeFashionState extends State<HomeFashion> {
           )
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
-        ('mainops', MainOptionsSection(onGo: _go)),
+        ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         ('reader', FashReader(onTap: () => _go(2))),
         ('herovid', FashStreakVideo(onTap: () => _go(1))),
         ('streak', FashStreak(onTap: () => _go(1))),

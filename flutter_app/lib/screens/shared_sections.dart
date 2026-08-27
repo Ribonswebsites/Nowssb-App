@@ -225,10 +225,14 @@ class _PromoOffer extends StatelessWidget {
 /// the whole panel is about the height of one banner, because a menu that
 /// pushes the page down is a menu that gets scrolled past.
 class MainOptionsSection extends StatelessWidget {
-  const MainOptionsSection({super.key, this.onGo});
+  const MainOptionsSection({super.key, this.onGo, this.onAction});
 
   /// Called with the tab the option opens.
   final void Function(int tab)? onGo;
+
+  /// Optional direct destination for an option whose label has a dedicated
+  /// usable page rather than only a broad tab category.
+  final void Function(String label, int tab)? onAction;
 
   /// A row's height. Deliberately tight: the whole panel is a menu, and a
   /// menu that pushes the page down is one that gets scrolled past.
@@ -269,8 +273,18 @@ class MainOptionsSection extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _OptRow(options.sublist(0, 3), fashion: fashion, onGo: onGo),
-                _OptRow(options.sublist(3, 6), fashion: fashion, onGo: onGo),
+                _OptRow(
+                  options.sublist(0, 3),
+                  fashion: fashion,
+                  onGo: onGo,
+                  onAction: onAction,
+                ),
+                _OptRow(
+                  options.sublist(3, 6),
+                  fashion: fashion,
+                  onGo: onGo,
+                  onAction: onAction,
+                ),
               ],
             ),
           ),
@@ -289,11 +303,13 @@ class MainOptionsSection extends StatelessWidget {
 
 /// Three cells with a hairline between each.
 class _OptRow extends StatelessWidget {
-  const _OptRow(this.items, {required this.fashion, this.onGo});
+  const _OptRow(this.items,
+      {required this.fashion, this.onGo, this.onAction});
 
   final List<(String, double, String, int)> items;
   final bool fashion;
   final void Function(int tab)? onGo;
+  final void Function(String label, int tab)? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -305,7 +321,12 @@ class _OptRow extends StatelessWidget {
           for (var i = 0; i < items.length; i++) ...[
             if (i > 0) Container(width: 1, height: 34, color: rule),
             Expanded(
-              child: _Opt(items[i], fashion: fashion, onGo: onGo),
+              child: _Opt(
+                items[i],
+                fashion: fashion,
+                onGo: onGo,
+                onAction: onAction,
+              ),
             ),
           ],
         ],
@@ -316,17 +337,25 @@ class _OptRow extends StatelessWidget {
 
 /// One door: the mark, and the word under it.
 class _Opt extends StatelessWidget {
-  const _Opt(this.item, {required this.fashion, this.onGo});
+  const _Opt(this.item,
+      {required this.fashion, this.onGo, this.onAction});
 
   final (String, double, String, int) item;
   final bool fashion;
   final void Function(int tab)? onGo;
+  final void Function(String label, int tab)? onAction;
 
   @override
   Widget build(BuildContext context) {
     final (mark, box, label, tab) = item;
     return GestureDetector(
-      onTap: () => onGo?.call(tab),
+      onTap: () {
+        if (onAction != null) {
+          onAction!(label, tab);
+        } else {
+          onGo?.call(tab);
+        }
+      },
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
