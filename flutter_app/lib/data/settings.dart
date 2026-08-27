@@ -66,6 +66,7 @@ class Settings extends ChangeNotifier {
   bool _fashionHome = false;
   int _fashionVideo = 5;
   int _fashionImage = -1;
+  int _backgroundTransition = 0;
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
@@ -78,6 +79,7 @@ class Settings extends ChangeNotifier {
   String get fashionVideoAsset => fashionVideos[_fashionVideo];
   String? get fashionImageAsset =>
       _fashionImage < 0 ? null : fashionImages[_fashionImage];
+  int get backgroundTransition => _backgroundTransition;
 
   Future<void> load() async {
     try {
@@ -100,14 +102,14 @@ class Settings extends ChangeNotifier {
   Future<void> setFashionPlus(bool on) async {
     if (_fashionPlus == on) return;
     _fashionPlus = on;
-    notifyListeners();
+    _advanceBackgroundTransition();
     await _save(_kPlus, on);
   }
 
   Future<void> setFashionHome(bool on) async {
     if (_fashionHome == on) return;
     _fashionHome = on;
-    notifyListeners();
+    _advanceBackgroundTransition();
     await _save(_kHome, on);
   }
 
@@ -115,7 +117,7 @@ class Settings extends ChangeNotifier {
     final next = _validIndex(index, fashionVideos.length, fallback: 5);
     if (_fashionVideo == next) return;
     _fashionVideo = next;
-    notifyListeners();
+    _advanceBackgroundTransition();
     await _saveInt(_kVideo, next);
   }
 
@@ -123,7 +125,7 @@ class Settings extends ChangeNotifier {
     final next = index == null ? -1 : _validImageIndex(index);
     if (_fashionImage == next) return;
     _fashionImage = next;
-    notifyListeners();
+    _advanceBackgroundTransition();
     await _saveInt(_kImage, next);
   }
 
@@ -132,6 +134,15 @@ class Settings extends ChangeNotifier {
 
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
+
+  /// A tab does not change the selected asset, but it should still make the
+  /// background arrive gently rather than appearing as a hard cut.
+  void fadeBackgroundForNavigation() => _advanceBackgroundTransition();
+
+  void _advanceBackgroundTransition() {
+    _backgroundTransition++;
+    notifyListeners();
+  }
 
   Future<void> _save(String k, bool v) async {
     try {

@@ -61,6 +61,12 @@ class _NavShellState extends State<NavShell> {
     if (mounted) setState(() {});
   }
 
+  void _goToTab(int tab) {
+    if (tab == _i) return;
+    Settings.instance.fadeBackgroundForNavigation();
+    setState(() => _i = tab);
+  }
+
   static const _tabs = [
     ('Connect', Icons.groups_outlined),
     ('Practice', Icons.headphones_outlined),
@@ -72,7 +78,7 @@ class _NavShellState extends State<NavShell> {
   @override
   Widget build(BuildContext context) {
     return NavScope(
-      go: (i) => setState(() => _i = i),
+      go: _goToTab,
       child: _build(context),
     );
   }
@@ -166,7 +172,7 @@ class _NavShellState extends State<NavShell> {
                       Expanded(
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
-                          onTap: () => setState(() => _i = i),
+                          onTap: () => _goToTab(i),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

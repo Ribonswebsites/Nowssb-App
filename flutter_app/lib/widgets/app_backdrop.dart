@@ -22,25 +22,44 @@ class AppBackdrop extends StatelessWidget {
       animation: Settings.instance,
       builder: (_, __) {
         final settings = Settings.instance;
-        if (settings.fashionPlus) {
-          return NwsbVideo(
-            asset: settings.fashionVideoAsset,
-            priority: ClipPriority.feature,
-            autoplay: true,
-          );
-        }
-        final image = settings.fashionImageAsset;
-        if (image != null) {
-          return Image.asset(
-            image,
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            errorBuilder: (_, __, ___) =>
-                const ColoredBox(color: NwsbColors.deep),
-          );
-        }
-        return const ColoredBox(color: NwsbColors.deep);
+        final key = ValueKey(
+          '${settings.backgroundTransition}-${settings.fashionPlus}-'
+          '${settings.fashionVideoIndex}-${settings.fashionImageIndex}',
+        );
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            const ColoredBox(color: NwsbColors.deep),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 360),
+              reverseDuration: const Duration(milliseconds: 150),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              child: KeyedSubtree(key: key, child: _visual(settings)),
+            ),
+          ],
+        );
       },
     );
+  }
+
+  Widget _visual(Settings settings) {
+    if (settings.fashionPlus) {
+      return NwsbVideo(
+        asset: settings.fashionVideoAsset,
+        priority: ClipPriority.feature,
+        autoplay: true,
+      );
+    }
+    final image = settings.fashionImageAsset;
+    if (image != null) {
+      return Image.asset(
+        image,
+        fit: BoxFit.cover,
+        alignment: Alignment.center,
+        errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep),
+      );
+    }
+    return const ColoredBox(color: NwsbColors.deep);
   }
 }

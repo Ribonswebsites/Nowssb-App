@@ -13,10 +13,14 @@ test('Flutter resolves every primary-page backdrop from the selected Fashion Plu
   assert.match(settings, /static const _kImage = 'nwsb_fashplus_image'/);
   assert.match(settings, /String get fashionVideoAsset => fashionVideos\[_fashionVideo\]/);
   assert.match(settings, /String\? get fashionImageAsset/);
+  assert.match(settings, /int get backgroundTransition => _backgroundTransition/);
+  assert.match(settings, /void fadeBackgroundForNavigation\(\)/);
   assert.match(backdrop, /if \(settings\.fashionPlus\)/);
   assert.match(backdrop, /asset: settings\.fashionVideoAsset/);
   assert.match(backdrop, /final image = settings\.fashionImageAsset/);
   assert.match(backdrop, /const ColoredBox\(color: NwsbColors\.deep\)/);
+  assert.match(backdrop, /AnimatedSwitcher\(/);
+  assert.match(backdrop, /Duration\(milliseconds: 360\)/);
 
   for (const file of [
     'flutter_app/lib/widgets/page_shell.dart',
@@ -39,14 +43,21 @@ test('WebView refreshes selected Fashion Plus video and image backgrounds for ev
 
   assert.match(fashion, /window\.fpBgVid = function \(\) \{ return FILMS\[bgChoice\(\)\]\.vid; \}/);
   assert.match(fashion, /function syncOpenPageBackdrop\(\)/);
+  assert.match(fashion, /window\.nwsbFpFadeBackground = function \(\)/);
   assert.match(fashion, /document\.body\.classList\.toggle\('nwsb-sub-open', hasOpenPage\)/);
   assert.match(navigation, /window\.nwsbFpSyncPageBackdrop\(\)/);
+  assert.match(navigation, /document\.body\.classList\.add\('nwsb-menu-open'\)/);
+  assert.match(navigation, /document\.body\.classList\.remove\('nwsb-menu-open'\)/);
+  assert.match(navigation, /window\.nwsbFpFadeBackground\(\)/);
   assert.match(navigation, /requestAnimationFrame\(function \(\) \{ _playScreenVideos\(sub\.id\); \}\)/);
   assert.match(navigation, /v\.muted = true/);
   assert.match(css, /\.fp-sub-open #fpBgVideo/);
   assert.match(css, /\.nwsb-sub-open #appBg/);
+  assert.match(css, /\.nwsb-menu-open #fpBgVideo/);
+  assert.match(css, /\.nwsb-menu-open #appBg/);
+  assert.match(css, /nwsb-bg-fade-out/);
   assert.match(css, /body\.nwsb-custom-fashion-bg:not\(\.fashplus\) #appBg/);
-  assert.match(html, /nowssb-nm\.css\?v=791/);
-  assert.match(html, /part012\.js\?v=255/);
-  assert.match(html, /part076\.js\?v=113/);
+  assert.match(html, /nowssb-nm\.css\?v=792/);
+  assert.match(html, /part012\.js\?v=256/);
+  assert.match(html, /part076\.js\?v=114/);
 });

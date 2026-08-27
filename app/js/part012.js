@@ -175,6 +175,10 @@ function goTo(id) {
     return;
   }
 
+  if (typeof window.nwsbFpFadeBackground === 'function') {
+    window.nwsbFpFadeBackground();
+  }
+
   // Force-close all SS panels so they never bleed into other screens
   document.querySelectorAll('.ss-panel').forEach(function(p) {
     p.style.transform = 'translateX(100%)';
@@ -1682,9 +1686,13 @@ window.addEventListener('appinstalled', () => {
 
 // ── HAMBURGER MENU ──
 function openMenu() {
+  if (typeof window.nwsbFpFadeBackground === 'function') {
+    window.nwsbFpFadeBackground();
+  }
   document.getElementById('menuOverlay').classList.add('open');
   var drawer = document.getElementById('menuDrawer');
   drawer.classList.add('open');
+  document.body.classList.add('nwsb-menu-open');
   // Explicit kick tied directly to the actual open action — same pattern as
   // meaning-store's banner video. preload="metadata" + autoplay isn't
   // reliably enough on its own to start playback for a video that's been
@@ -1695,6 +1703,7 @@ function openMenu() {
 function closeMenu() {
   document.getElementById('menuOverlay').classList.remove('open');
   document.getElementById('menuDrawer').classList.remove('open');
+  document.body.classList.remove('nwsb-menu-open');
 }
 // NowssB Connect intro — pops ONCE per session, and only via the Fashion-home
 // Connect section (which is the only caller). Any later tap goes straight in.
@@ -1731,6 +1740,9 @@ function applyHealthGenderHighlight(gender) {
 function openSub(id) {
   const sub = document.getElementById('sub-' + id);
   if (!sub) return;
+  if (typeof window.nwsbFpFadeBackground === 'function') {
+    window.nwsbFpFadeBackground();
+  }
   sub.classList.add('open');
   if (typeof window.nwsbFpSyncPageBackdrop === 'function') {
     window.nwsbFpSyncPageBackdrop();

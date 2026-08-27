@@ -10848,6 +10848,7 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   position: fixed; inset: 0; z-index: 0; display: none;
   width: 100%; height: 100%; object-fit: cover;
   transform: translateZ(0); backface-visibility: hidden;
+  transition: opacity 360ms cubic-bezier(.22,.61,.36,1);
 }
 body.fashplus #fpBgVideo { display: block; }
 
@@ -10877,6 +10878,12 @@ body.fashplus.fp-bg-off #fpBgVeil { display: none !important; }
 body.fashplus #appBg { opacity: 0 !important; }
 body.fashplus #appBgLayer2 { opacity: 0 !important; }
 
+/* Route changes fade the backdrop only. The app’s cards, controls and text
+   never receive this class, so a navigation tap is not delayed by motion. */
+#appBg { transition: opacity 360ms cubic-bezier(.22,.61,.36,1); }
+body.nwsb-bg-fade-out #fpBgVideo,
+body.nwsb-bg-fade-out #appBg { opacity: 0 !important; }
+
 /* The film on every page was tried three ways and every one of them cost
    more than it gave: pages went dark, entry screens lost their artwork,
    and the extra clip made the app heavy. It is gone. Fashion Plus keeps
@@ -10896,7 +10903,7 @@ body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] {
   background-color: transparent !important;
   background-image: none !important;
 }
-body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] > .sub-screen-bg[data-fp-img] { background-image: none !important; }
+body.fashplus:not(.fp-bg-off) .sub-screen[data-fp-img] [data-fp-img] { background-image: none !important; }
 
 /* ── The solid pages ──
    The pages with no photograph of their own — Word Science, My Progress,
@@ -15220,6 +15227,9 @@ body.fashplus:not(.fp-bg-off).fp-sub-open #fpBgVideo {
 body.fashplus:not(.fp-bg-off):has(.menu-drawer.open) #fpBgVideo {
   z-index: 490 !important;
 }
+body.fashplus:not(.fp-bg-off).nwsb-menu-open #fpBgVideo {
+  z-index: 490 !important;
+}
 
 /* With the film up there, the pages that were forced black can stop being
    black. Only the page actually open — a closed one is display:none and
@@ -15242,6 +15252,10 @@ body.fashplus:not(.fp-bg-off).fp-sub-open
   background-color: transparent !important;
   background-image: none !important;
 }
+body.fashplus:not(.fp-bg-off) .sub-screen.open[data-fp-img] [data-fp-img] {
+  background-image: none !important;
+  background-color: transparent !important;
+}
 
 /* Fashion Plus off: a reader-selected still becomes the shared page
    background. It is lifted under an open sub-screen in the same way as the
@@ -15254,6 +15268,12 @@ body.nwsb-custom-fashion-bg:not(.fashplus) #appBg {
 body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open) #appBg,
 body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open #appBg {
   z-index: 590 !important;
+}
+body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-menu-open #appBg {
+  z-index: 490 !important;
+}
+body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-menu-open #menuDrawer.menu-drawer {
+  background: linear-gradient(rgba(6,10,20,0.62), rgba(6,10,20,0.76)) !important;
 }
 body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open) .sub-screen.open,
 body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open .sub-screen.open {
@@ -15281,6 +15301,35 @@ body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open
   .sub-screen.open::before {
   content: ''; position: absolute; inset: 0; z-index: -1;
   pointer-events: none; background: rgba(6,12,24,0.72);
+}
+body.nwsb-custom-fashion-bg:not(.fashplus) .sub-screen.open[data-fp-img] [data-fp-img] {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+/* No saved image and no Fashion Plus motion intentionally means a plain
+   black application backdrop. The same rule reaches page-specific intro art
+   after part076 tags it, rather than allowing a random old poster to win. */
+body:not(.fashplus):not(.nwsb-custom-fashion-bg) #appBg {
+  opacity: 1 !important;
+  background-image: none !important;
+  background-color: #000 !important;
+}
+body:not(.fashplus):not(.nwsb-custom-fashion-bg):has(.sub-screen.open) #appBg,
+body:not(.fashplus):not(.nwsb-custom-fashion-bg).nwsb-sub-open #appBg {
+  z-index: 590 !important;
+}
+body:not(.fashplus):not(.nwsb-custom-fashion-bg):has(.sub-screen.open)
+  .sub-screen.open[data-fp-img],
+body:not(.fashplus):not(.nwsb-custom-fashion-bg).nwsb-sub-open
+  .sub-screen.open[data-fp-img] {
+  background-image: none !important;
+  background-color: transparent !important;
+}
+body:not(.fashplus):not(.nwsb-custom-fashion-bg)
+  .sub-screen.open[data-fp-img] [data-fp-img] {
+  background-image: none !important;
+  background-color: transparent !important;
 }
 
 /* ── The AI Prescription card gets its gap ────────────────────────

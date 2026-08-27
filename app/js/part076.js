@@ -177,7 +177,10 @@
       /* Re-read each pass, because several of these layers are filled by
          their own page's code the first time it opens (rmBg, msBg, ebBg…)
          and hold no image at all before that. */
-      var layers = s.querySelectorAll('.sub-screen-bg');
+      var layers = s.querySelectorAll(
+        '.sub-screen-bg, .rm-intro-bg, .ms-intro-bg, .eb-intro-bg, ' +
+        '.sig-intro-bg, .sl-intro-bg, .st-bg'
+      );
       var hit = null;
       for (var j = 0; j < layers.length; j++) {
         var bg = '';
@@ -248,13 +251,34 @@
       'fp-sub-open',
       on && hasOpenPage
     );
+    // Marking has no visual effect by itself. Doing it in both states lets
+    // the off-mode black/image rules make the same decision for a page whose
+    // own backdrop was created only when it opened.
+    markImageBacked();
     if (on) {
       bgVideo(true);
-      markImageBacked();
       playState();
     }
   }
   window.nwsbFpSyncPageBackdrop = syncOpenPageBackdrop;
+
+  /* Fade only the fixed background layers during a route change. Page content
+     stays live while the old frame dips away and the selected film/image comes
+     back, so navigation feels deliberate without blocking a tap. */
+  var fadeTimer = null;
+  window.nwsbFpFadeBackground = function () {
+    document.body.classList.remove('nwsb-bg-fade-in');
+    document.body.classList.add('nwsb-bg-fade-out');
+    if (fadeTimer) clearTimeout(fadeTimer);
+    fadeTimer = setTimeout(function () {
+      document.body.classList.remove('nwsb-bg-fade-out');
+      document.body.classList.add('nwsb-bg-fade-in');
+      fadeTimer = setTimeout(function () {
+        document.body.classList.remove('nwsb-bg-fade-in');
+        fadeTimer = null;
+      }, 380);
+    }, 150);
+  };
 
   /* Called by part066.js's apply(), which is the single source of truth. */
   window.nwsbFpBackgrounds = function (on) {
