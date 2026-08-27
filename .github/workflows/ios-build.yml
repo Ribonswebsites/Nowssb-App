@@ -53,4 +53,4 @@ jobs:
       - name: Create and sync iOS wrapper
         run: npm run ios:add || npm run ios:sync
       - name: Compile unsigned iOS wrapper
-        run: xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO build
+        run: xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO build

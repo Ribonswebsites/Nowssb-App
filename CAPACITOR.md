@@ -297,7 +297,7 @@ you the first time.
 
 ```bash
 npm run ios:sync
-npm run ios:open           # opens ios/App/App.xcworkspace in Xcode
+npm run ios:open           # opens the generated iOS project in Xcode
 ```
 
 In Xcode: choose **Any iOS Device (arm64)** as the destination, then
