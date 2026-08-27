@@ -1,0 +1,17 @@
+# Cloudflare Pages environment variables for /api/coach.
+# Add these in the Pages dashboard as encrypted secrets/variables.
+# Never commit a real API key.
+
+FIREBASE_PROJECT_ID=nowssb-34f1b
+COACH_LLM_API_URL=https://api.openai.com/v1/chat/completions
+COACH_LLM_API_KEY=replace-with-server-only-provider-key
+COACH_LLM_MODEL=gpt-5-mini
+
+# Recommended production smoke test after deployment:
+# 1. Sign in at https://nowssb.com.
+# 2. Open Personal Coach.
+# 3. Send: "I have 10 minutes. What should I practice next?"
+# 4. Confirm a real answer appears and remains after closing/reopening.
+# 5. Confirm the Start Practice action opens the existing practice flow.
+# 6. Remove/blank COACH_LLM_API_KEY in a staging deployment and confirm
+#    the client shows a configuration error instead of a canned answer.
