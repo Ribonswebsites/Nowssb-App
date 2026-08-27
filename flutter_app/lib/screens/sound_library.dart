@@ -19,6 +19,7 @@ import '../data/models.dart';
 import '../theme/tokens.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/page_shell.dart';
+import 'practice_player.dart';
 import 'word_detail.dart';
 
 class SoundLibraryScreen extends StatefulWidget {
@@ -78,6 +79,29 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
             sliver: SliverList.list(children: [
               const _AudioNote(),
               const SizedBox(height: 20),
+              if (all.isNotEmpty) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => PracticePlayerScreen(
+                          words: all,
+                          title: 'Sound Library Player',
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: const Text('Start library player'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: NwsbColors.goldLight,
+                      foregroundColor: NwsbColors.deep,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+              ],
               if (all.isEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 50),
@@ -138,9 +162,9 @@ class _AudioNote extends StatelessWidget {
           SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Playback is not built yet. A word marked with a waveform has '
-              'a recording in its record and will play as soon as it is — '
-              'the rest carry only their written form.',
+              'Start the library player to hear and practise the words in '
+              'your collection. A waveform means the word also has a '
+              'recorded source in its published record.',
               style: TextStyle(
                 fontSize: 12,
                 color: Color(0x99FFFFFF),

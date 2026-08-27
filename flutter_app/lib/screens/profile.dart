@@ -126,19 +126,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               'decode at once, which is what keeps the app from stuttering '
               'the way the website did.',
             ),
-            const SizedBox(height: 22),
-            const DarkHead(
-              eyebrow: 'Not built yet',
-              title: 'Coming',
-              icon: Icons.construction_outlined,
-            ),
-            const SizedBox(height: 14),
-            const _Soon('Sign in and your account'),
-            const _Soon('My Routines'),
-            const _Soon('Cart, wishlist and orders'),
-            const _Soon('NowssB Connect and chat'),
-            const _Soon('Notifications'),
-            const _Soon('Word audio — hearing a word, not only reading it'),
           ]),
         ),
       ],
@@ -320,36 +307,6 @@ class _Note extends StatelessWidget {
           color: Color(0x8CFFFFFF),
           height: 1.55,
         ),
-      ),
-    );
-  }
-}
-
-class _Soon extends StatelessWidget {
-  const _Soon(this.label);
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-      decoration: BoxDecoration(
-        color: const Color(0x0AFFFFFF),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x0FFFFFFF)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.schedule, size: 15, color: Color(0x66FFFFFF)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(fontSize: 13, color: Color(0x8CFFFFFF)),
-            ),
-          ),
-        ],
       ),
     );
   }

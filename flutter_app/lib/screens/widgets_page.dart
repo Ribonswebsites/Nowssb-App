@@ -100,28 +100,6 @@ class _WidgetsPageState extends State<WidgetsPage> {
               go: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const FashionPlusScreen())),
             ),
-            const SizedBox(height: 24),
-            const DarkHead(
-              eyebrow: 'Named rather than faked',
-              title: 'Not built yet',
-              icon: Icons.construction_outlined,
-            ),
-            const SizedBox(height: 14),
-            const _Pending(
-              'Reordering the home',
-              'The homes are written out in order rather than built from a '
-                  'stored list, so there is nothing yet for a drag handle to '
-                  'move.',
-            ),
-            const _Pending(
-              'Hiding a section',
-              'Same reason — it is a change to the homes, not to this page.',
-            ),
-            const _Pending(
-              'Notifications',
-              'The sending side already exists on the server; the app has no '
-                  'token to give it yet.',
-            ),
           ]),
         ),
       ],
@@ -266,53 +244,6 @@ class _Door extends StatelessWidget {
             const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Pending extends StatelessWidget {
-  const _Pending(this.title, this.why);
-  final String title;
-  final String why;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: const Color(0x0AFFFFFF),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x0FFFFFFF)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.schedule, size: 14, color: Color(0x66FFFFFF)),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xB3FFFFFF),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 7),
-          Text(
-            why,
-            style: const TextStyle(
-              fontSize: 11.5,
-              color: Color(0x66FFFFFF),
-              height: 1.5,
-            ),
-          ),
-        ],
       ),
     );
   }
