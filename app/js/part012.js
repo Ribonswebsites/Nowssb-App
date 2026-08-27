@@ -1547,6 +1547,11 @@ function isInStandaloneMode() {
 
 // ── DOWNLOAD POPUP ──
 function openDlPopup() {
+  // The standalone listing is the single source of truth for website and
+  // WebView downloads. Its Install control points at the latest Flutter APK.
+  window.location.href = './nowssb-listing-2.html';
+  return;
+
   const overlay  = document.getElementById('dlOverlay');
   const viewInstall = document.getElementById('dlViewInstall');
   const viewIOS  = document.getElementById('dlViewIOS');

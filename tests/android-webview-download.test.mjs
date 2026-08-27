@@ -5,19 +5,23 @@ import { test } from 'node:test';
 const root = new URL('..', import.meta.url).pathname;
 const read = (relative) => readFileSync(`${root}/${relative}`, 'utf8');
 
-test('Android download sends visitors to the direct NowssB APK, not a PWA prompt or ZIP', () => {
+test('website and WebView downloads use the supplied listing and the correct latest APK', () => {
   const page = read('index.html');
   const install = read('app/js/part012.js');
+  const listing = read('nowssb-listing-2.html');
   const workflow = read('.github/workflows/android-apk.yml');
+  const flutterWorkflow = read('.github/workflows/flutter-apk.yml');
 
-  assert.match(page, /id="dlAndroidInstallNote"/);
-  assert.match(install, /function isAndroid\(\)/);
-  assert.match(install, /if \(isAndroid\(\)\) \{[\s\S]*?nowssb-android\/NowssB-Android\.apk/);
-  assert.match(install, /Download NowssB APK/);
-  assert.doesNotMatch(install, /Direct WebView APK/);
-  assert.doesNotMatch(install, /artifacts\/download/);
+  assert.match(page, /nowssb-listing-2\.html/);
+  assert.match(install, /window\.location\.href = '\.\/nowssb-listing-2\.html'/);
+  assert.match(listing, /nowssb-android\/NowssB-Android\.apk/);
+  assert.match(listing, /nowssb-flutter-android\/NowssB-Flutter-Android\.apk/);
+  assert.match(listing, /inCapacitorWebView/);
+  assert.match(listing, /NowssB-Flutter-Android\.apk/);
+  assert.doesNotMatch(listing, /artifacts\/download/);
   assert.match(workflow, /permissions:\s*\n\s+contents: write/);
   assert.match(workflow, /Publish direct NowssB APK/);
   assert.match(workflow, /PUBLIC_FILE=NowssB-Android\.apk/);
-  assert.match(workflow, /gh release upload .*\$PUBLIC_FILE/);
+  assert.match(flutterWorkflow, /Publish direct Flutter APK and update manifest/);
+  assert.match(flutterWorkflow, /PUBLIC_FILE=NowssB-Flutter-Android\.apk/);
 });
