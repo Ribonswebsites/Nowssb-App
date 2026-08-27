@@ -13,6 +13,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../data/content.dart';
 import '../data/firebase.dart';
+import '../data/models.dart';
 import '../data/practice_progress.dart';
 import 'practice_player.dart';
 
@@ -251,21 +252,62 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
 
   Widget _composer(_CoachData data, bool signedIn) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: const Color(0xFF111114), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white.withOpacity(.09))),
-        child: Column(children: [
-          Row(children: [
-            Expanded(child: TextField(controller: _input, enabled: !_sending, onSubmitted: (_) => _send(data), style: const TextStyle(color: Colors.white, fontSize: 17), decoration: const InputDecoration(border: InputBorder.none, hintText: 'How can I help you today?', hintStyle: TextStyle(color: Color(0xFF797980)))),
-            const SizedBox(width: 10),
-            SizedBox(height: 50, width: 50, child: FilledButton(onPressed: _sending ? null : () => _send(data), style: FilledButton.styleFrom(padding: EdgeInsets.zero, shape: const CircleBorder(), backgroundColor: const Color(0xFF242429)), child: _sending ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.arrow_upward_rounded))),
-          ]),
-          const SizedBox(height: 10),
-          Wrap(spacing: 8, runSpacing: 8, children: [
-            _CoachChip(Icons.chat_bubble_outline_rounded, 'Need clarity', () => _send(data, 'Need clarity')),
-            _CoachChip(Icons.gps_fixed_rounded, 'Plan my day', () => _planDay(data)),
-            _CoachChip(Icons.star_outline_rounded, 'Stay motivated', () => _send(data, 'Stay motivated')),
-            if (!signedIn) _CoachChip(Icons.login_rounded, 'Sign in to save', _signIn),
-          ]),
-        ]),
+        decoration: BoxDecoration(
+          color: const Color(0xFF111114),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(.09)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _input,
+                    enabled: !_sending,
+                    onSubmitted: (_) => _send(data),
+                    style: const TextStyle(color: Colors.white, fontSize: 17),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'How can I help you today?',
+                      hintStyle: TextStyle(color: Color(0xFF797980)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: FilledButton(
+                    onPressed: _sending ? null : () => _send(data),
+                    style: FilledButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      shape: const CircleBorder(),
+                      backgroundColor: const Color(0xFF242429),
+                    ),
+                    child: _sending
+                        ? const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : const Icon(Icons.arrow_upward_rounded),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _CoachChip(Icons.chat_bubble_outline_rounded, 'Need clarity', () => _send(data, 'Need clarity')),
+                _CoachChip(Icons.gps_fixed_rounded, 'Plan my day', () => _planDay(data)),
+                _CoachChip(Icons.star_outline_rounded, 'Stay motivated', () => _send(data, 'Stay motivated')),
+                if (!signedIn) _CoachChip(Icons.login_rounded, 'Sign in to save', _signIn),
+              ],
+            ),
+          ],
+        ),
       );
 
   Widget _bubble(_CoachMessage item) => Container(
