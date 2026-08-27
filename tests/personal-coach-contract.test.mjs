@@ -17,30 +17,30 @@ test('coach API is authenticated, persisted, and provider-backed', () => {
   assert.match(source, /request\.method === 'POST'/);
 });
 
-test('web coach calls the real API and has no canned response', () => {
-  const source = read('app/js/part095-direct-neomorphic-sections.js');
-  assert.match(source, /fetch\('\/api\/coach'/);
+test('WebView coach calls the active secure Worker and has no canned response', () => {
+  const source = read('app/js/personal-coach-live.js');
+  const renderer = read('app/js/part095-direct-neomorphic-sections.js');
+  assert.match(source, /nowssb-api\.ribonpatil2\.workers\.dev\/api\/assistant\/chat/);
   assert.match(source, /getIdToken/);
-  assert.match(source, /loadHistory/);
-  assert.match(source, /conversationId/);
-  assert.match(source, /start_practice/);
+  assert.match(source, /mode: 'coach'/);
+  assert.match(source, /saveMessages/);
+  assert.match(source, /Plan my day/);
+  assert.match(renderer, /NowssbPersonalCoach\.mount/);
   assert.doesNotMatch(source, /start with one focused practice now/);
 });
 
-test('Flutter coach is native, authenticated, persistent-by-server, and asset-backed', () => {
+test('Flutter coach is native, authenticated, persistent, and asset-backed', () => {
   const screen = read('flutter_app/lib/screens/personal_coach.dart');
-  const api = read('flutter_app/lib/data/coach_api.dart');
   const pubspec = read('flutter_app/pubspec.yaml');
-  assert.match(screen, /CoachApi/);
-  assert.match(screen, /assets\/coach\/coach-orb\.png/);
-  assert.match(screen, /completedTodayFor/);
-  assert.match(api, /getIdToken/);
-  assert.match(api, /\/api\/coach/);
-  assert.match(api, /loadHistory/);
-  assert.match(api, /conversationId/);
+  assert.match(screen, /GoogleSignIn/);
+  assert.match(screen, /FirebaseAuth/);
+  assert.match(screen, /getIdToken/);
+  assert.match(screen, /FirebaseFirestore/);
+  assert.match(screen, /PracticeProgress/);
+  assert.match(screen, /nowssb-api\.ribonpatil2\.workers\.dev\/api\/assistant\/chat/);
+  assert.match(screen, /assets\/coach\/personal_coach_hero\.jpg/);
   assert.match(pubspec, /- assets\/coach\//);
-  assert.ok(existsSync(`${root}/assets/coach/coach-orb.png`));
-  assert.ok(existsSync(`${root}/flutter_app/assets/coach/coach-orb.png`));
+  assert.ok(existsSync(`${root}/flutter_app/assets/coach/personal_coach_hero.jpg`));
 });
 
 test('Firestore rules keep coach history owner-only', () => {
