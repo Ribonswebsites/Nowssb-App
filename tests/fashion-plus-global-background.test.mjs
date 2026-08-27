@@ -43,6 +43,9 @@ test('WebView refreshes selected Fashion Plus video and image backgrounds for ev
 
   assert.match(fashion, /window\.fpBgVid = function \(\) \{ return FILMS\[bgChoice\(\)\]\.vid; \}/);
   assert.match(fashion, /function syncOpenPageBackdrop\(\)/);
+  assert.match(fashion, /function observePageOpenState\(\)/);
+  assert.match(fashion, /new MutationObserver/);
+  assert.match(fashion, /target\.classList\.contains\('sub-screen'\)/);
   assert.match(fashion, /window\.nwsbFpFadeBackground = function \(\)/);
   assert.match(fashion, /document\.body\.classList\.toggle\('nwsb-sub-open', hasOpenPage\)/);
   assert.match(navigation, /window\.nwsbFpSyncPageBackdrop\(\)/);

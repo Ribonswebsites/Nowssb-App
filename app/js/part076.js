@@ -262,6 +262,35 @@
   }
   window.nwsbFpSyncPageBackdrop = syncOpenPageBackdrop;
 
+  /* Some older page scripts open their sub-screen by toggling the class
+     directly instead of going through part012's openSub(). Observe that
+     single state change so every Settings, Fashion and hamburger-linked page
+     gets the same selected-film/image decision. */
+  function observePageOpenState() {
+    if (!window.MutationObserver || !document.body) return;
+    var queued = false;
+    new MutationObserver(function (records) {
+      for (var i = 0; i < records.length; i++) {
+        var target = records[i].target;
+        if (!target || !target.classList ||
+            (!target.classList.contains('sub-screen') &&
+             target.id !== 'menuDrawer')) continue;
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(function () {
+          queued = false;
+          syncOpenPageBackdrop();
+        });
+        return;
+      }
+    }).observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  }
+  observePageOpenState();
+
   /* Fade only the fixed background layers during a route change. Page content
      stays live while the old frame dips away and the selected film/image comes
      back, so navigation feels deliberate without blocking a tap. */
