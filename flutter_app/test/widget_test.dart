@@ -1,4 +1,4 @@
-/// A smoke test for the shell — and the reason this file has to exist.
+/// Flutter widget tests for the actual navigation shell.
 ///
 /// `flutter create` writes a default test/widget_test.dart when there is not
 /// one, and the one it writes builds `MyApp`. This app's root is `NowssbApp`,
@@ -11,7 +11,11 @@
 /// file after the fact.
 library;
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
@@ -19,6 +23,29 @@ import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/home_parts.dart';
 
 import 'fake_video_platform.dart';
+
+/// Widget tests exercise layout and navigation, rather than the native image
+/// decoder. APK builds still package the actual visual files via
+/// tools/flutter-assets.mjs; this bundle keeps tests deterministic when the
+/// generated, ignored asset directories are unavailable to the test runner.
+class _TestAssetBundle extends CachingAssetBundle {
+  static final Uint8List _transparentPixel = base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLqTwAAAABJRU5ErkJggg==',
+  );
+
+  @override
+  Future<ByteData> load(String key) async {
+    if (key.startsWith('assets/')) {
+      return ByteData.sublistView(_transparentPixel);
+    }
+    return rootBundle.load(key);
+  }
+}
+
+Widget _testShell() => DefaultAssetBundle(
+      bundle: _TestAssetBundle(),
+      child: const MaterialApp(home: NavShell()),
+    );
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +70,7 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(const MaterialApp(home: NavShell()));
+    await tester.pumpWidget(_testShell());
     await tester.pump(const Duration(milliseconds: 50));
     expect(tester.takeException(), isNull);
 
@@ -68,7 +95,7 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(const MaterialApp(home: NavShell()));
+    await tester.pumpWidget(_testShell());
     await tester.pump(const Duration(milliseconds: 50));
 
     // Every black bar on the home must DO something. Invoked directly rather
@@ -105,7 +132,7 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(const MaterialApp(home: NavShell()));
+    await tester.pumpWidget(_testShell());
     await tester.pump(const Duration(milliseconds: 50));
 
     // The Normal home is the pale one and shows the greeting; the Fashion
