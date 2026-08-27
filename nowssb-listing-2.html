@@ -83,12 +83,6 @@
     object-fit:cover;
     display:block;
   }
-  .header-divider{
-    width:1px;
-    height:94px;
-    background:var(--line);
-    flex-shrink:0;
-  }
   .app-titleblock{
     padding-top:2px;
     min-width:0;
@@ -245,14 +239,21 @@
 
   /* ---------- CAROUSEL (screenshots) ---------- */
   .scroll-row{
-    display:flex;
-    gap:14px;
     overflow-x:auto;
+    cursor:grab;
     margin-top:30px;
     padding-bottom:6px;
     scrollbar-width:none;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scroll-behavior:auto;
   }
   .scroll-row::-webkit-scrollbar{display:none;}
+  .scroll-track{
+    display:flex;
+    gap:14px;
+    width:max-content;
+  }
   .shot-card{
     flex:0 0 auto;
     width:220px;
@@ -329,13 +330,20 @@
     margin-bottom:14px;
   }
   .gallery-row{
-    display:flex;
-    gap:16px;
     overflow-x:auto;
+    cursor:grab;
     padding-bottom:8px;
     scrollbar-width:none;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scroll-behavior:auto;
   }
   .gallery-row::-webkit-scrollbar{display:none;}
+  .gallery-track{
+    display:flex;
+    gap:16px;
+    width:max-content;
+  }
   .gallery-card{
     flex:0 0 auto;
     width:200px;
@@ -388,7 +396,6 @@
     <div class="app-icon">
       <img src="assets/app-listing/listing-01.webp" alt="NowssB logo">
     </div>
-    <div class="header-divider" aria-hidden="true"></div>
     <div class="app-titleblock">
       <div class="app-name">NowssB</div>
       <div class="app-tagline">
@@ -439,11 +446,13 @@
   <div class="download-status" id="downloadStatus" role="status" aria-live="polite"></div>
 
   <!-- SCREENSHOT CAROUSEL -->
-  <div class="scroll-row">
-    <div class="shot-card"><img loading="lazy" src="assets/app-listing/listing-02.webp" alt="NowssB — the future of meditation"></div>
-    <div class="shot-card"><img loading="lazy" src="assets/app-listing/listing-03.webp" alt="New Fashion Trend"></div>
-    <div class="shot-card"><img loading="lazy" src="assets/app-listing/listing-04.webp" alt="Sound. Science. You."></div>
-    <div class="shot-card"><img loading="lazy" src="assets/app-listing/listing-05.webp" alt="Track your journey"></div>
+  <div class="scroll-row" data-auto-direction="1" aria-label="NowssB app screenshots">
+    <div class="scroll-track">
+      <div class="shot-card"><img loading="lazy" src="assets/app-listing/listing-02.webp" alt="NowssB — the future of meditation"></div>
+      <div class="shot-card"><img loading="lazy" src="assets/app-listing/listing-03.webp" alt="New Fashion Trend"></div>
+      <div class="shot-card"><img loading="lazy" src="assets/app-listing/listing-04.webp" alt="Sound. Science. You."></div>
+      <div class="shot-card"><img loading="lazy" src="assets/app-listing/listing-05.webp" alt="Track your journey"></div>
+    </div>
   </div>
 
   <!-- ABOUT -->
@@ -486,14 +495,16 @@
   <!-- NEW GALLERY SECTION -->
   <div class="gallery-section">
     <h2>Inside the experience</h2>
-    <div class="gallery-row">
-      <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-06.webp" alt="Home — Begin Your Healing Path"></div>
-      <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-07.webp" alt="Fashion Plus — AI prescription"></div>
-      <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-08.webp" alt="30 Days Free subscription"></div>
-      <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-09.webp" alt="Practice — Shakti solar plexus"></div>
-      <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-10.webp" alt="Sound Library"></div>
-      <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-11.webp" alt="Your essentials — daily rituals"></div>
-      <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-12.webp" alt="NowssB Connect community"></div>
+    <div class="gallery-row" data-auto-direction="-1" aria-label="More NowssB app screens">
+      <div class="gallery-track">
+        <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-06.webp" alt="Home — Begin Your Healing Path"></div>
+        <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-07.webp" alt="Fashion Plus — AI prescription"></div>
+        <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-08.webp" alt="30 Days Free subscription"></div>
+        <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-09.webp" alt="Practice — Shakti solar plexus"></div>
+        <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-10.webp" alt="Sound Library"></div>
+        <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-11.webp" alt="Your essentials — daily rituals"></div>
+        <div class="gallery-card"><img loading="lazy" src="assets/app-listing/listing-12.webp" alt="NowssB Connect community"></div>
+      </div>
     </div>
     <div class="gallery-caption">
       From your first word to your evening ritual, every screen is tuned to how you move through the day —
@@ -565,6 +576,65 @@
       event.preventDefault();
       download();
     }
+  });
+
+  // Two opposing, seamless card loops. Pointer interaction pauses the loop
+  // so the rows remain fully swipeable on phones and draggable on desktop.
+  document.querySelectorAll('[data-auto-direction]').forEach((row) => {
+    const track = row.firstElementChild;
+    if (!track || !track.children.length) return;
+    [...track.children].forEach((card) => {
+      const clone = card.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      clone.querySelectorAll('img').forEach((img) => img.setAttribute('alt', ''));
+      track.appendChild(clone);
+    });
+
+    const direction = Number(row.dataset.autoDirection) || 1;
+    const speed = 18;
+    let loopWidth = 0;
+    let paused = false;
+    let last = performance.now();
+    let resumeTimer = 0;
+
+    const measure = () => {
+      loopWidth = track.scrollWidth / 2;
+      if (direction < 0 && row.scrollLeft < loopWidth) row.scrollLeft = loopWidth;
+    };
+    const pause = () => {
+      paused = true;
+      row.style.cursor = 'grabbing';
+      window.clearTimeout(resumeTimer);
+    };
+    const resume = () => {
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        paused = false;
+        row.style.cursor = 'grab';
+        last = performance.now();
+      }, 350);
+    };
+    const tick = (now) => {
+      const elapsed = Math.min(now - last, 50);
+      last = now;
+      if (!paused && loopWidth > 0) {
+        row.scrollLeft += direction * speed * elapsed / 1000;
+        if (direction > 0 && row.scrollLeft >= loopWidth) row.scrollLeft -= loopWidth;
+        if (direction < 0 && row.scrollLeft <= 0) row.scrollLeft += loopWidth;
+      }
+      window.requestAnimationFrame(tick);
+    };
+
+    measure();
+    window.requestAnimationFrame(measure);
+    row.addEventListener('pointerdown', pause, { passive: true });
+    row.addEventListener('pointerup', resume, { passive: true });
+    row.addEventListener('pointercancel', resume, { passive: true });
+    row.addEventListener('mouseenter', pause, { passive: true });
+    row.addEventListener('mouseleave', resume, { passive: true });
+    row.addEventListener('touchend', resume, { passive: true });
+    window.addEventListener('resize', measure, { passive: true });
+    window.requestAnimationFrame(tick);
   });
 })();
 </script>
