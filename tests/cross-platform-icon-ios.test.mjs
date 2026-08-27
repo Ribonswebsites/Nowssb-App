@@ -10,7 +10,11 @@ const hash = (relative) => createHash('sha256').update(readFileSync(`${root}/${r
 test('Flutter copies the exact working WebView adaptive launcher resources', () => {
   const generator = read('tools/flutter-android.mjs');
   assert.match(generator, /adaptive-res/);
-  assert.match(generator, /cpSync\(ICON_SRC, res/);
+  assert.match(generator, /for \(const folder of \[/);
+  assert.match(generator, /'drawable-v24'/);
+  assert.match(generator, /'mipmap-anydpi-v26'/);
+  assert.match(generator, /'mipmap-xxxhdpi'/);
+  assert.doesNotMatch(generator, /cpSync\(ICON_SRC, res/);
   for (const relative of [
     'mipmap-xxxhdpi/ic_launcher.png',
     'mipmap-xxxhdpi/ic_launcher_foreground.png',

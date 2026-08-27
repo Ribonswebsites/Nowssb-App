@@ -188,7 +188,25 @@ const res = join(android, 'app', 'src', 'main', 'res');
     );
     process.exit(1);
   }
-  cpSync(ICON_SRC, res, { recursive: true, force: true });
+  // Do not copy values/styles.xml. Capacitor's generated theme would replace
+  // Flutter's Theme.SplashScreen and colors, preventing Android resource
+  // linking. Launcher artwork lives entirely in these drawable/mipmap paths.
+  for (const folder of [
+    'drawable',
+    'drawable-v24',
+    'mipmap-anydpi-v26',
+    'mipmap-ldpi',
+    'mipmap-mdpi',
+    'mipmap-hdpi',
+    'mipmap-xhdpi',
+    'mipmap-xxhdpi',
+    'mipmap-xxxhdpi',
+  ]) {
+    cpSync(join(ICON_SRC, folder), join(res, folder), {
+      recursive: true,
+      force: true,
+    });
+  }
   done.push('copied WebView-compatible adaptive launcher resources');
 }
 
