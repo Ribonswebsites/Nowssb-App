@@ -17,5 +17,6 @@ test('Android download sends visitors to the direct WebView APK, not a PWA promp
   assert.doesNotMatch(install, /artifacts\/download/);
   assert.match(workflow, /permissions:\s*\n\s+contents: write/);
   assert.match(workflow, /Publish direct WebView APK/);
-  assert.match(workflow, /gh release upload .*NowssB-WebView\.apk/);
+  assert.match(workflow, /PUBLIC_FILE=NowssB-WebView\.apk/);
+  assert.match(workflow, /gh release upload .*\$PUBLIC_FILE/);
 });
