@@ -109,9 +109,9 @@ class EditionSection extends StatelessWidget {
             priority: ClipPriority.decoration,
             onTap: onTap,
             overlay: const Align(
-              alignment: Alignment.topLeft,
+              alignment: Alignment.bottomLeft,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(18, 16, 18, 0),
+                padding: EdgeInsets.fromLTRB(18, 0, 18, 18),
                 child: _PromoOffer(),
               ),
             ),

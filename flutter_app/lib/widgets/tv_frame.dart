@@ -255,6 +255,7 @@ class TvFrame extends StatelessWidget {
                             asset: asset,
                             priority: priority,
                             autoplay: autoplay,
+                            showPoster: false,
                           ),
                           if (overlay != null) overlay!,
                         ],

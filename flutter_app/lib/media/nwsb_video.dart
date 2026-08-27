@@ -28,6 +28,7 @@ class NwsbVideo extends StatefulWidget {
     this.loop = true,
     this.autoplay = true,
     this.alignment = Alignment.center,
+    this.showPoster = true,
   });
 
   /// Bundled path, e.g. 'assets/video/store-section.mp4'.
@@ -43,6 +44,10 @@ class NwsbVideo extends StatefulWidget {
   final bool autoplay;
   final Alignment alignment;
 
+  /// TV-frame clips deliberately show only the moving video through the
+  /// bezel. Other app surfaces can retain their loading poster.
+  final bool showPoster;
+
   /// True when [asset] is a URL rather than a bundled file.
   bool get isRemote =>
       asset.startsWith('http://') || asset.startsWith('https://');
@@ -53,6 +58,7 @@ class NwsbVideo extends StatefulWidget {
   /// until it opens, so a remote clip simply has no poster unless one is
   /// given.
   String? get _poster {
+    if (!showPoster) return null;
     if (poster != null) return poster;
     if (isRemote) return null;
     return asset.replaceAll(RegExp(r'\.mp4$'), '-poster.webp');
