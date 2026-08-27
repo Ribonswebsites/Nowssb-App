@@ -11,11 +11,12 @@ test('website and WebView downloads use the supplied listing and the correct lat
   const listing = read('nowssb-listing-2.html');
   const workflow = read('.github/workflows/android-apk.yml');
   const flutterWorkflow = read('.github/workflows/flutter-apk.yml');
+  const middleware = read('functions/_middleware.js');
 
   assert.match(page, /nowssb-listing-2\.html/);
   assert.match(install, /window\.location\.href = '\.\/nowssb-listing-2\.html'/);
   assert.match(listing, /nowssb-android\/NowssB-Android\.apk/);
-  assert.match(listing, /nowssb-flutter-android\/NowssB-Flutter-Android\.apk/);
+  assert.match(listing, /nowssb\.com\/download\/flutter\.apk/);
   assert.match(listing, /inCapacitorWebView/);
   assert.match(listing, /window\.nwsbIsNative/);
   assert.match(listing, /Plugins && capacitor\.Plugins\.Browser/);
@@ -39,4 +40,7 @@ test('website and WebView downloads use the supplied listing and the correct lat
   assert.match(workflow, /PUBLIC_FILE=NowssB-Android\.apk/);
   assert.match(flutterWorkflow, /Publish direct Flutter APK and update manifest/);
   assert.match(flutterWorkflow, /PUBLIC_FILE=NowssB-Flutter-Android\.apk/);
+  assert.match(middleware, /url\.pathname === '\/download\/flutter\.apk'/);
+  assert.match(middleware, /Content-Disposition/);
+  assert.match(middleware, /application\/vnd\.android\.package-archive/);
 });

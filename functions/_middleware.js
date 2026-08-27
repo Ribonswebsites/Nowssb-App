@@ -16,6 +16,7 @@
 // and nowssb.com must be in Firebase Auth → Settings → Authorized domains.
 
 const FIREBASE_HOST = 'nowssb-34f1b.firebaseapp.com';
+const FLUTTER_APK_UPSTREAM = 'https://github.com/Ribonswebsites/Nowssb-App/releases/download/nowssb-flutter-android/NowssB-Flutter-Android.apk';
 
 // Hosts the same-origin image proxy below is allowed to fetch — keeps it
 // from becoming an open proxy for arbitrary URLs.
@@ -43,6 +44,33 @@ const AUTH_LOADER = `
 export async function onRequest(context) {
   const { request, next } = context;
   const url = new URL(request.url);
+
+  // Same-domain Flutter APK download. The release asset is fetched at the
+  // edge and streamed with an APK content type, so the WebView never opens a
+  // GitHub release page or exposes the upstream redirect to the user.
+  if (url.pathname === '/download/flutter.apk') {
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
+    }
+    const upstream = await fetch(FLUTTER_APK_UPSTREAM, {
+      cf: { cacheTtl: 300, cacheEverything: true },
+    });
+    if (!upstream.ok) {
+      return new Response('Flutter APK is temporarily unavailable', {
+        status: 502,
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    }
+    const headers = new Headers(upstream.headers);
+    headers.set('Content-Type', 'application/vnd.android.package-archive');
+    headers.set('Content-Disposition', 'attachment; filename="NowssB-Flutter-Android.apk"');
+    headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+    headers.delete('content-encoding');
+    return new Response(request.method === 'HEAD' ? null : upstream.body, {
+      status: 200,
+      headers,
+    });
+  }
 
   if (url.pathname.startsWith('/__/')) {
     const target = 'https://' + FIREBASE_HOST + url.pathname + url.search;
