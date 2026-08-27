@@ -12174,11 +12174,19 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   width: 100%;
   margin: 0 0 18px;
   background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 #home-nm .nmh-supplied-actionbar {
   width: 100%;
   margin: 0 0 20px;
   display: block !important;
+  visibility: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 .nwsb-personal-coach-overlay {
   display: none;

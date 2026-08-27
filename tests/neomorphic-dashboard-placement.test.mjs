@@ -36,9 +36,10 @@ assert.match(directSections, /transparentHost/, "Direct renderer must remove the
 assert.doesNotMatch(styles, /\.nmh-supplied-dashboard\s*\{[^}]*height:/s, "Host must not reserve a fixed empty height");
 assert.doesNotMatch(styles, /\.nmh-supplied-dashboard\s*\{[^}]*box-shadow:/s, "Host must not add another dashboard wrapper shadow");
 assert.doesNotMatch(styles, /\.nmh-supplied-essentials\s*\{[^}]*height:/s, "Essentials host must not reserve a fixed empty height");
-assert.doesNotMatch(styles, /\.nmh-supplied-essentials\s*\{[^}]*box-shadow:/s, "Essentials host must not add another wrapper shadow");
+assert.match(styles, /\.nmh-supplied-essentials\s*\{[^}]*box-shadow:\s*none\s*!important/s, "Essentials host must explicitly remove any outer wrapper shadow");
 assert.doesNotMatch(dashboard, /class="phone"/, "Dashboard must not retain the large outer phone wrapper");
 assert.doesNotMatch(essentials, /class="phone"/, "Essentials must not retain the large outer phone wrapper");
+assert.match(essentials, /body\s*\{[\s\S]*background:\s*transparent/, "Essentials must not paint a page-background wrapper");
 assert.doesNotMatch(actionBar, /min-height:\s*100vh/, "Action bar must not retain the supplied document's full-page outer wrapper");
 assert.match(dashboard, /dashboardMetricToday/, "Dashboard must expose a live sessions-today metric");
 assert.match(directSections, /nowssbDirectDashboardRender/, "Direct renderer must receive live dashboard values");
@@ -48,6 +49,7 @@ assert.match(directSections, /wireActionBar/, "Direct renderer must wire the sup
 assert.match(directSections, /openPersonalCoach/, "Direct renderer must open the supplied Personal Coach page");
 assert.match(directSections, /wirePersonalCoach/, "WebView Personal Coach chat controls must be interactive");
 assert.match(directSections, /placeActionBar/, "Direct renderer must force the coach bar below Where to Begin");
+assert.match(directSections, /MutationObserver/, "Direct renderer must keep the coach bar in place after saved-layout reorders");
 assert.match(directSections, /startDashboardPractice/, "Dashboard actions must start the playable practice session");
 assert.match(index, /part094-dashboard-live\.js/, "Normal Home must load the live dashboard controller");
 assert.match(registry, /k:'dashboard'[\s\S]*sel:\['\.nmh-supplied-dashboard'\][\s\S]*after:'search'/, "Dashboard must remain anchored below search");

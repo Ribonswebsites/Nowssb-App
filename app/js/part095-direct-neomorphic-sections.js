@@ -192,6 +192,11 @@
   function placeActionBar(host) {
     var mainOps = document.querySelector('#home-nm .mainops-blk.nmh-sec-wrap');
     if (!mainOps || !mainOps.parentNode) return;
+    host.hidden = false;
+    host.classList.remove('hl-off');
+    host.style.setProperty('display', 'block', 'important');
+    host.style.setProperty('visibility', 'visible', 'important');
+    if (mainOps.nextElementSibling === host) return;
     host.classList.remove('hl-off');
     mainOps.parentNode.insertBefore(host, mainOps.nextSibling);
   }
@@ -215,6 +220,11 @@
       wireActionBar(actionBarRoot);
       placeActionBar(actionBarHost);
       window.addEventListener('load', function () { placeActionBar(actionBarHost); }, { once: true });
+      var mainOps = document.querySelector('#home-nm .mainops-blk.nmh-sec-wrap');
+      if (mainOps && mainOps.parentNode) {
+        new MutationObserver(function () { placeActionBar(actionBarHost); })
+          .observe(mainOps.parentNode, { childList: true });
+      }
       window.nowssbDirectDashboardRender = function (data) { renderDashboard(dashboardRoot, data); };
       if (typeof window.nowssbDashboardRefresh === 'function') window.nowssbDashboardRefresh();
     } catch (error) {
