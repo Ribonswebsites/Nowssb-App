@@ -59,6 +59,8 @@ jobs:
       # part070.js) would end up inside the bundle. That check is the reason
       # this step can be trusted to ship.
       - name: Build the web bundle
+        env:
+          NWSB_BUILD_NUMBER: ${{ github.run_number }}
         run: npm run build:native
 
       - name: Create the Android project
@@ -69,6 +71,14 @@ jobs:
 
       - name: Sync
         run: npx cap sync android
+
+      # The release manifest tells an existing installation that this build is
+      # newer. Stamp the same higher versionCode before assembling, otherwise
+      # Android would reject the downloaded APK as an equal-version install.
+      - name: Stamp installable package version
+        env:
+          NWSB_BUILD_NUMBER: ${{ github.run_number }}
+        run: node tools/capacitor-android-version.mjs
 
       - name: Assemble
         working-directory: android
@@ -90,11 +100,18 @@ jobs:
           TAG=nowssb-android
           FILE=android/app/build/outputs/apk/debug/app-debug.apk
           PUBLIC_FILE=NowssB-Android.apk
+          UPDATE_FILE=NowssB-WebView-update.json
           if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "NowssB Android" --notes "Latest direct NowssB Android APK. Download the APK itself, then install it from Android Downloads."
           fi
           cp "$FILE" "$PUBLIC_FILE"
+          cat > "$UPDATE_FILE" <<EOF
+          {"channel":"webview-android","build":${GITHUB_RUN_NUMBER},"websiteUrl":"https://ribonswebsites.github.io/Nowssb-App/","apkUrl":"https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${PUBLIC_FILE}"}
+          EOF
+          # The manifest is uploaded last. An installed app only prompts after
+          # the corresponding replacement APK is already available.
           gh release upload "$TAG" "$PUBLIC_FILE" --repo "$GITHUB_REPOSITORY" --clobber
+          gh release upload "$TAG" "$UPDATE_FILE" --repo "$GITHUB_REPOSITORY" --clobber
 
   release-bundle:
     name: Signed release bundle (Play Store)

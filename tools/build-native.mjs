@@ -106,6 +106,16 @@ if (html === before) {
 }
 await writeFile(indexPath, html);
 
+/* This file is copied only into the native WebView bundle. Its build number
+   is supplied by the successful GitHub Actions run that produces the APK, so
+   an installed app can compare itself with the release manifest without
+   guessing from cached HTML or a JavaScript query string. */
+const buildNumber = Number.parseInt(process.env.NWSB_BUILD_NUMBER || '0', 10) || 0;
+await writeFile(
+  join(OUT, 'app-build.json'),
+  JSON.stringify({ channel: 'webview-android', build: buildNumber }, null, 2) + '\n',
+);
+
 /* The check that actually decides. Walk what was written, not what we
    meant to write. */
 const leaked = [];

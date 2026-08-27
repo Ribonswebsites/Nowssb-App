@@ -259,3 +259,112 @@
   else setTimeout(boot, 400);
 
 })();
+
+/* ══════════════════════════════════════════════════════════════════════
+   INSTALLED WEBVIEW UPDATE CHECK
+
+   Android packages are static once installed. The bundle carries a concrete
+   build number; the stable release manifest is uploaded only after the new
+   APK asset is available. A newer manifest therefore means there is a real
+   newer download, not merely a refreshed banner or cached script.
+   ══════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var MANIFEST = 'https://github.com/Ribonswebsites/Nowssb-App/releases/download/nowssb-android/NowssB-WebView-update.json';
+  var shownBuild = 0;
+  var checking = false;
+
+  function nativeWebView() {
+    try {
+      return !!(window.nwsbIsNative ||
+        (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()));
+    } catch (e) { return false; }
+  }
+
+  function buildOf(v) {
+    var n = Number.parseInt(v && v.build, 10);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function removeDialog() {
+    var el = document.getElementById('nwsbUpdateDialog');
+    if (el) el.remove();
+  }
+
+  function openUpdatePage(url) {
+    /* Capacitor Browser opens the public update page outside the application
+       shell. A fallback makes this usable if a host deliberately omits that
+       optional native plugin. */
+    try {
+      var browser = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
+      if (browser && typeof browser.open === 'function') {
+        browser.open({ url: url, toolbarColor: '#060c18' }).catch(function () { window.location.assign(url); });
+        return;
+      }
+    } catch (e) {}
+    window.location.assign(url);
+  }
+
+  function showUpdate(remote) {
+    removeDialog();
+    var el = document.createElement('div');
+    el.id = 'nwsbUpdateDialog';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', 'NowssB update available');
+    el.style.cssText = 'position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,7,16,.78);font-family:DM Sans,system-ui,sans-serif;';
+    el.innerHTML =
+      '<div style="width:min(100%,360px);padding:26px 22px 20px;border:1px solid rgba(255,255,255,.24);border-radius:25px;background:linear-gradient(145deg,#14233a,#080f1d);box-shadow:0 24px 72px rgba(0,0,0,.58);color:#fff;text-align:center;">' +
+        '<div style="width:48px;height:48px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;background:#e8d5a3;color:#07101f;font-size:27px;font-weight:900;">↑</div>' +
+        '<div style="font-size:21px;font-weight:800;letter-spacing:-.3px;">A new NowssB update is ready</div>' +
+        '<p style="margin:10px 4px 21px;color:rgba(255,255,255,.72);font-size:13px;line-height:1.5;">Open the official NowssB download page to get the latest Android package.</p>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button data-update-later style="flex:1;border:1px solid rgba(255,255,255,.22);border-radius:13px;padding:13px 8px;background:transparent;color:#fff;font:700 13px DM Sans,sans-serif;">Later</button>' +
+          '<button data-update-now style="flex:1;border:0;border-radius:13px;padding:13px 8px;background:#e8d5a3;color:#07101f;font:800 13px DM Sans,sans-serif;">Get update</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(el);
+    el.querySelector('[data-update-later]').addEventListener('click', function () {
+      try { localStorage.setItem('nwsb_update_later_webview', String(buildOf(remote))); } catch (e) {}
+      removeDialog();
+    });
+    el.querySelector('[data-update-now]').addEventListener('click', function () {
+      removeDialog();
+      openUpdatePage(String(remote.websiteUrl || remote.apkUrl || 'https://ribonswebsites.github.io/Nowssb-App/'));
+    });
+  }
+
+  async function checkForUpdates() {
+    if (checking || !nativeWebView()) return false;
+    checking = true;
+    try {
+      var pair = await Promise.all([
+        fetch('./app-build.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : { build: 0 }; }),
+        fetch(MANIFEST + '?t=' + Date.now(), { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }).then(function (r) { if (!r.ok) throw new Error('manifest unavailable'); return r.json(); })
+      ]);
+      var local = buildOf(pair[0]);
+      var remote = pair[1] || {};
+      var next = buildOf(remote);
+      var deferred = 0;
+      try { deferred = Number.parseInt(localStorage.getItem('nwsb_update_later_webview') || '0', 10) || 0; } catch (e) {}
+      if (next > local && next > shownBuild && next > deferred) {
+        shownBuild = next;
+        showUpdate(remote);
+        return true;
+      }
+    } catch (e) {
+      /* Offline leaves the installed package usable; a later foreground
+         return performs another lightweight check. */
+    } finally {
+      checking = false;
+    }
+    return false;
+  }
+
+  window.nwsbCheckForUpdates = checkForUpdates;
+  window.addEventListener('load', function () { setTimeout(checkForUpdates, 2400); });
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) setTimeout(checkForUpdates, 700);
+  });
+})();

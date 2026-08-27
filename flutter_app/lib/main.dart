@@ -17,7 +17,9 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'app_update.dart';
 import 'data/content.dart';
 import 'data/firebase.dart';
 import 'data/settings.dart';
@@ -65,6 +67,10 @@ class NowssbApp extends StatefulWidget {
 }
 
 class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  bool _checkingForUpdate = false;
+  int _shownUpdateBuild = 0;
+
   @override
   void initState() {
     super.initState();
@@ -85,6 +91,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       VideoPool.instance.resume();
+      _checkForUpdate();
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
@@ -97,9 +104,53 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   /// is already laid out and there is no second wait.
   bool _splashDone = false;
 
+  Future<void> _checkForUpdate() async {
+    if (_checkingForUpdate || !_splashDone) return;
+    _checkingForUpdate = true;
+    try {
+      final update = await NwsbAppUpdate.findNewer();
+      if (!mounted || update == null || update.build <= _shownUpdateBuild) return;
+      final context = _navigatorKey.currentContext;
+      if (context == null) return;
+      _shownUpdateBuild = update.build;
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF102037),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('A new NowssB update is ready', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          content: const Text('Open the official NowssB download page to get the latest Android package.', style: TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Later')),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: NwsbColors.deep),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                final opened = await launchUrl(update.apkUrl, mode: LaunchMode.externalApplication);
+                if (!opened && mounted) {
+                  final root = _navigatorKey.currentContext;
+                  if (root != null) {
+                    ScaffoldMessenger.of(root).showSnackBar(
+                      const SnackBar(content: Text('Could not open the update. Please try again when you are online.')),
+                    );
+                  }
+                }
+              },
+              child: const Text('Get update'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      _checkingForUpdate = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'NowssB',
       debugShowCheckedModeBanner: false,
       theme: NwsbTheme.light,
@@ -113,6 +164,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
             Splash(onDone: () {
               VideoPool.instance.unhold();
               setState(() => _splashDone = true);
+              unawaited(_checkForUpdate());
             }),
         ],
       ),
