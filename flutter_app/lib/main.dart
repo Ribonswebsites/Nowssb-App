@@ -22,6 +22,7 @@ import 'data/content.dart';
 import 'data/firebase.dart';
 import 'data/settings.dart';
 import 'media/video_pool.dart';
+import 'screens/auth_gate.dart';
 import 'screens/splash.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
@@ -107,7 +108,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
       color: NwsbColors.deep,
       home: Stack(
         children: [
-          const NavShell(),
+          const AuthGate(child: NavShell()),
           if (!_splashDone)
             Splash(onDone: () {
               VideoPool.instance.unhold();

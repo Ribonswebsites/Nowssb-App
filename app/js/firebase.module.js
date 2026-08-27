@@ -76,6 +76,24 @@ try { localStorage.setItem('nwsb_home_mode', 'nm'); } catch(e){}
 // _authNavigating: lock to prevent double-navigation (e.g. Google popup + onAuthStateChanged)
 window._authNavigating = false;
 
+/* A credential promise may resolve after Firebase has already emitted its
+   auth-state event. Previously the email path then made the loader visible
+   again after _doNavigate had hidden it, leaving the looping film over the
+   authenticated home. This bounded fallback makes completion idempotent. */
+function _ensureLoginExit(user) {
+  setTimeout(async function () {
+    if (!user || !auth.currentUser || auth.currentUser.uid !== user.uid || currentScreen !== 'login') return;
+    var dest = _isNewUser(user) ? 'ob-intro' : 'home';
+    try {
+      dest = await Promise.race([
+        _resolveUserRoute(user),
+        new Promise(function (resolve) { setTimeout(function () { resolve(dest); }, 3500); })
+      ]);
+    } catch (e) {}
+    if (currentScreen === 'login') _doNavigate(dest || 'home');
+  }, 1200);
+}
+
 async function _resolveUserRoute(user) {
   // Returns 'home', 'signup2' based on Firestore profile
   // Device-level fast path: once this device has finished onboarding (questions +
@@ -134,6 +152,11 @@ function _isNewUser(user) {
 
 onAuthStateChanged(auth, async user => {
   if (user) {
+    // A completed Firebase credential is authoritative. Remove the transition
+    // video before profile routing so a slow Firestore read cannot leave it
+    // covering the authenticated destination.
+    const authLoader = document.getElementById('authLoader');
+    if (authLoader) authLoader.classList.remove('visible');
     window._currentUid = user.uid;
     window._currentUser = user;                          // fix: was never set
     window._userName = user.displayName || '';           // fix: was never set
@@ -334,8 +357,9 @@ window.fbGoogleLogin = async () => {
   // redirect if the browser explicitly blocks popups (PWA standalone, some WebViews).
   if (loader) loader.classList.add('visible');
   try {
-    await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
     // onAuthStateChanged fires and handles navigation — nothing to do here
+    _ensureLoginExit(result.user);
   } catch(e) {
     _googleSignInInProgress = false;
     if (loader) loader.classList.remove('visible');
@@ -377,9 +401,10 @@ window.fbEmailLogin = async () => {
   const btn = document.querySelector('#nm-login-email .nm-btn-gold');
   const loader = document.getElementById('authLoader');
   if (btn) { btn.textContent = 'Please wait…'; btn.disabled = true; }
+  if (loader) loader.classList.add('visible');
   try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    if (loader) loader.classList.add('visible');
+    const result = await signInWithEmailAndPassword(auth, email, pass);
+    _ensureLoginExit(result.user);
   } catch(signInErr) {
     // These codes all mean "user doesn't exist with that email" — create new account
     const notFound = ['auth/user-not-found','auth/invalid-credential','auth/invalid-email'];
@@ -389,10 +414,11 @@ window.fbEmailLogin = async () => {
         window._su2Method   = 'email';
         window._su2Email    = email;
         window._su2Password = pass;
-        await createUserWithEmailAndPassword(auth, email, pass);
-        if (loader) loader.classList.add('visible');
+        const result = await createUserWithEmailAndPassword(auth, email, pass);
+        _ensureLoginExit(result.user);
       } catch(createErr) {
         if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
+        if (loader) loader.classList.remove('visible');
         if (createErr.code === 'auth/email-already-in-use') {
           alert('This email is already registered. Check your password and try again.');
         } else if (createErr.code === 'auth/weak-password') {
@@ -403,9 +429,11 @@ window.fbEmailLogin = async () => {
       }
     } else if (signInErr.code === 'auth/wrong-password') {
       if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
+      if (loader) loader.classList.remove('visible');
       alert('Wrong password. Try again or tap "Forgot password" below.');
     } else {
       if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
+      if (loader) loader.classList.remove('visible');
       alert('Sign-in failed: ' + signInErr.message);
     }
   }
