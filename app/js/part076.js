@@ -236,6 +236,26 @@
     else { try { v.pause(); } catch (e) {} }
   }
 
+  /* A sub-screen may create or fill its own backdrop only when it opens.
+     Reclassify at that moment so the selected Fashion Plus film reaches every
+     page, instead of only the pages that existed when the switch first ran.
+     The body class avoids relying on CSS :has support in older WebViews. */
+  function syncOpenPageBackdrop() {
+    var on = isOn() && bgPartOn() && !reducedMotion();
+    var hasOpenPage = !!document.querySelector('.sub-screen.open');
+    document.body.classList.toggle('nwsb-sub-open', hasOpenPage);
+    document.body.classList.toggle(
+      'fp-sub-open',
+      on && hasOpenPage
+    );
+    if (on) {
+      bgVideo(true);
+      markImageBacked();
+      playState();
+    }
+  }
+  window.nwsbFpSyncPageBackdrop = syncOpenPageBackdrop;
+
   /* Called by part066.js's apply(), which is the single source of truth. */
   window.nwsbFpBackgrounds = function (on) {
     /* part066.js passes `isOn && partOn('bg')`, so this covers both the
@@ -246,6 +266,7 @@
     document.body.classList.toggle('fp-bg-off', !on);
     if (on && !reducedMotion()) { bgVideo(true); markImageBacked(); }
     playState();
+    syncOpenPageBackdrop();
     /* The phone shows the stills when the mode is off and the clips when it
        is on, so the switch has to restage it. */
     if (typeof window.nwsbFpRestage === 'function') {

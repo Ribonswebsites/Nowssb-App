@@ -102,13 +102,22 @@ function _playScreenVideos(screenId) {
   const el = document.getElementById(screenId);
   if (!el) return;
   el.querySelectorAll('video').forEach(v => {
-    if (v.paused) {
-      // Set src if not yet set (lazy load)
-      const src = v.dataset.lazySrc;
-      if (src && !v.src && !v.querySelector('source[src]')) {
-        v.src = src;
-      }
-      v.play().catch(() => {});
+    // Android only allows autoplay for an explicitly muted inline video.
+    // Some banners are inserted later by their page renderer, so normalize
+    // those properties on every page entry rather than trusting old markup.
+    v.muted = true;
+    v.defaultMuted = true;
+    v.playsInline = true;
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
+    const src = v.dataset.lazySrc;
+    if (src && !v.getAttribute('src') && !v.querySelector('source[src]')) {
+      v.src = src;
+    }
+    const start = () => v.play().catch(() => {});
+    start();
+    if (v.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      v.addEventListener('canplay', start, { once: true });
     }
   });
 }
@@ -1720,7 +1729,14 @@ function applyHealthGenderHighlight(gender) {
 }
 
 function openSub(id) {
-  document.getElementById('sub-' + id).classList.add('open');
+  const sub = document.getElementById('sub-' + id);
+  if (!sub) return;
+  sub.classList.add('open');
+  if (typeof window.nwsbFpSyncPageBackdrop === 'function') {
+    window.nwsbFpSyncPageBackdrop();
+  }
+  requestAnimationFrame(function () { _playScreenVideos(sub.id); });
+  setTimeout(function () { _playScreenVideos(sub.id); }, 260);
   if (id === 'health-journey') {
     if (window._userGender !== undefined) {
       applyHealthGenderHighlight(window._userGender);
@@ -1863,7 +1879,11 @@ function closeSub(id) {
   if (window._pgTimer) { clearTimeout(window._pgTimer); window._pgTimer = null; }
   if (typeof window._pgTimerToken !== 'undefined') window._pgTimerToken++;
   if (typeof pgClose === 'function') pgClose(false);
-  document.getElementById('sub-' + id).classList.remove('open');
+  const sub = document.getElementById('sub-' + id);
+  if (sub) sub.classList.remove('open');
+  if (typeof window.nwsbFpSyncPageBackdrop === 'function') {
+    setTimeout(window.nwsbFpSyncPageBackdrop, 0);
+  }
   // Reset real-meaning intro so it shows again next time
   if (id === 'real-meaning') {
     setTimeout(() => {

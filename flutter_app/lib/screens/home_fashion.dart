@@ -29,10 +29,9 @@ import 'package:flutter/material.dart';
 
 import '../data/content.dart';
 import '../data/settings.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
+import '../widgets/app_backdrop.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
@@ -226,14 +225,9 @@ class _HomeFashionState extends State<HomeFashion> {
       backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
-          // The page's own film, behind everything. Fixed in effect: it is
-          // outside the scroller, so it does not move with the list.
-          const Positioned.fill(
-            child: NwsbVideo(
-              asset: 'assets/video/fashion-plus-bg-6.mp4',
-              priority: ClipPriority.feature,
-            ),
-          ),
+          // One selected Fashion Plus film is shared with every destination;
+          // with motion off this resolves to the chosen still or black.
+          const Positioned.fill(child: AppBackdrop()),
           // `#fpBgVeil` — nowssb-nm.css:10853. TWO layers, and the point of
           // both is that the MIDDLE OF THE SCREEN IS LEFT ALONE: a radial
           // that pulls only the corners down, and a light top-and-bottom

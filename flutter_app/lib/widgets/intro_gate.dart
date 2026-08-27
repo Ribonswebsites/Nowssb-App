@@ -19,9 +19,8 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import 'app_backdrop.dart';
 
 class IntroGate extends StatefulWidget {
   const IntroGate({
@@ -92,8 +91,9 @@ class _IntroGateState extends State<IntroGate> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        widget.child,
-        if (!_open)
+        if (_open)
+          widget.child
+        else
           Positioned.fill(
             child: _Intro(
               tag: widget.tag,
@@ -136,31 +136,12 @@ class _Intro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Still unless motion mode is on. autoplay:false is what makes an
-    // unmoving background genuinely free — the pool is never even asked.
-    final moving = Settings.instance.fashionPlus;
-
     return Material(
       color: NwsbColors.deep,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (art != null)
-            Image.asset(
-              art!,
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
-              errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: NwsbColors.deep),
-            )
-          else if (film != null)
-            NwsbVideo(
-              asset: film!,
-              autoplay: moving,
-              priority: ClipPriority.feature,
-            )
-          else
-            const ColoredBox(color: NwsbColors.deep),
+          const AppBackdrop(),
           // The vignette. Deep enough at the foot that a title and a
           // paragraph hold their contrast over any frame of any clip.
           const DecoratedBox(

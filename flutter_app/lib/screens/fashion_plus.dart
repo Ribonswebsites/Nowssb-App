@@ -84,6 +84,8 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
                 on: on,
                 onChanged: (v) => Settings.instance.setFashionPlus(v),
               ),
+              const SizedBox(height: 14),
+              const _BackgroundChooser(),
               const SizedBox(height: 24),
               const DarkHead(
                 eyebrow: 'What the switch touches',
@@ -167,6 +169,113 @@ class _Switch extends StatelessWidget {
       ),
     );
   }
+}
+
+class _BackgroundChooser extends StatelessWidget {
+  const _BackgroundChooser();
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Settings.instance,
+      builder: (_, __) {
+        final settings = Settings.instance;
+        final motionOn = settings.fashionPlus;
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0x0FFFFFFF),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0x1FFFFFFF)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                motionOn
+                    ? 'Selected Fashion Plus video'
+                    : 'Background when motion is off',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                motionOn
+                    ? 'This video plays behind every page.'
+                    : 'Choose one still for every page, or keep default black.',
+                style: const TextStyle(
+                  color: Color(0x99FFFFFF),
+                  fontSize: 11.5,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (motionOn)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (var i = 0; i < Settings.fashionVideos.length; i++)
+                      _BackgroundChoice(
+                        label: Settings.fashionVideoNames[i],
+                        selected: settings.fashionVideoIndex == i,
+                        onTap: () => Settings.instance.setFashionVideo(i),
+                      ),
+                  ],
+                )
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _BackgroundChoice(
+                      label: 'Default black',
+                      selected: settings.fashionImageIndex < 0,
+                      onTap: () => Settings.instance.setFashionImage(null),
+                    ),
+                    for (var i = 0; i < Settings.fashionImages.length; i++)
+                      _BackgroundChoice(
+                        label: Settings.fashionImageNames[i],
+                        selected: settings.fashionImageIndex == i,
+                        onTap: () => Settings.instance.setFashionImage(i),
+                      ),
+                  ],
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _BackgroundChoice extends StatelessWidget {
+  const _BackgroundChoice({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => ChoiceChip(
+        label: Text(label),
+        selected: selected,
+        onSelected: (_) => onTap(),
+        selectedColor: NwsbColors.goldLight,
+        backgroundColor: const Color(0x1FFFFFFF),
+        labelStyle: TextStyle(
+          color: selected ? NwsbColors.deep : Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+        ),
+      );
 }
 
 class _ChangeRow extends StatelessWidget {

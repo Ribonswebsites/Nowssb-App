@@ -15,6 +15,7 @@ import '../data/content.dart';
 import '../data/firebase.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
+import '../widgets/app_backdrop.dart';
 import 'practice_player.dart';
 
 const _coachApi = 'https://nowssb-api.ribonpatil2.workers.dev/api/assistant/chat';
@@ -155,22 +156,33 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (!NwsbFirebase.ready) return Scaffold(backgroundColor: Colors.black, body: SafeArea(child: _body(_CoachData.local(), false)));
+    if (!NwsbFirebase.ready) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(children: [
+          const Positioned.fill(child: AppBackdrop()),
+          SafeArea(child: _body(_CoachData.local(), false)),
+        ]),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (_, auth) {
-            final user = auth.data;
-            if (user == null) return _body(_CoachData.local(), false);
-            return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
-              builder: (_, document) => _body(_CoachData.profile(document.data?.data() ?? const {}), true),
-            );
-          },
+      body: Stack(children: [
+        const Positioned.fill(child: AppBackdrop()),
+        SafeArea(
+          child: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (_, auth) {
+              final user = auth.data;
+              if (user == null) return _body(_CoachData.local(), false);
+              return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+                builder: (_, document) => _body(_CoachData.profile(document.data?.data() ?? const {}), true),
+              );
+            },
+          ),
         ),
-      ),
+      ]),
     );
   }
 

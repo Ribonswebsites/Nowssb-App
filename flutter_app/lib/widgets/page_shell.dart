@@ -9,9 +9,8 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import 'app_backdrop.dart';
 
 class PageShell extends StatefulWidget {
   const PageShell({
@@ -62,14 +61,7 @@ class _PageShellState extends State<PageShell> {
       body: Stack(
         children: [
           Positioned.fill(
-            // Still unless motion mode is on. autoplay:false is what makes an
-            // unmoving background genuinely free — with it off the pool is
-            // never even asked for a decoder, so the page costs one picture.
-            child: NwsbVideo(
-              asset: widget.film,
-              autoplay: Settings.instance.fashionPlus,
-              priority: ClipPriority.feature,
-            ),
+            child: const AppBackdrop(),
           ),
           const Positioned.fill(
             child: DecoratedBox(

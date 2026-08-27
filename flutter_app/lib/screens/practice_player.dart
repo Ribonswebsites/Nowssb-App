@@ -13,6 +13,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../theme/tokens.dart';
+import '../widgets/app_backdrop.dart';
 
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({super.key, required this.words, required this.title});
@@ -97,8 +98,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
         foregroundColor: Colors.white,
         title: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
       ),
-      body: SafeArea(
-        child: Padding(
+      body: Stack(
+        children: [
+          const Positioned.fill(child: AppBackdrop()),
+          SafeArea(
+            child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -144,7 +148,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
               ),
             ],
           ),
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

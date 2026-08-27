@@ -47,6 +47,7 @@ import '../data/practice_progress.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
+import '../widgets/app_backdrop.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/looping_logo_mark.dart';
 import 'normal/neomorphic_action_bar.dart';
@@ -262,11 +263,14 @@ class _HomeNormalState extends State<HomeNormal> {
 
     return HomeSkinScope(
       skin: HomeSkin.normal,
-      child: Scaffold(
-        backgroundColor: NwsbColors.surface,
-        body: SafeArea(
-          child: Column(
-            children: [
+      child: Stack(
+        children: [
+          const Positioned.fill(child: AppBackdrop()),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              child: Column(
+                children: [
               // `.nmh-toprow` — pinned to the top, never scrolls. It is
               // outside the list rather than its first row, which is what
               // "never scrolls" means.
@@ -274,7 +278,7 @@ class _HomeNormalState extends State<HomeNormal> {
                 padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
                 child: _TopRow(),
               ),
-              Expanded(
+                  Expanded(
                 // No horizontal padding: the sections carry their own
                 // `margin: 16px 0` inside `.nmh-wrap`'s 20px, and a raised
                 // card needs room around it for its own shadow.
@@ -286,10 +290,12 @@ class _HomeNormalState extends State<HomeNormal> {
                   itemCount: shown.length,
                   itemBuilder: (context, i) => shown[i],
                 ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

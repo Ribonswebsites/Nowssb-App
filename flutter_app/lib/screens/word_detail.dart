@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 
 import '../data/models.dart';
 import '../theme/tokens.dart';
+import '../widgets/app_backdrop.dart';
 
 class WordDetail extends StatelessWidget {
   const WordDetail({super.key, required this.word});
@@ -33,18 +34,7 @@ class WordDetail extends StatelessWidget {
       backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
-          // The player's own artwork, which is what the website puts behind
-          // a word. assets/player/liquid-splash.webp is the still of the
-          // same film — a picture here rather than a decoder, because this
-          // page is for reading.
-          Positioned.fill(
-            child: Image.asset(
-              'assets/player/liquid-splash.webp',
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: NwsbColors.deep),
-            ),
-          ),
+          const Positioned.fill(child: AppBackdrop()),
           const Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(

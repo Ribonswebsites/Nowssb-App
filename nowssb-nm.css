@@ -15214,6 +15214,9 @@ body.fashplus:not(.nm-mode) #menuDrawer.menu-drawer {
 body.fashplus:not(.fp-bg-off):has(.sub-screen.open) #fpBgVideo {
   z-index: 590 !important;
 }
+body.fashplus:not(.fp-bg-off).fp-sub-open #fpBgVideo {
+  z-index: 590 !important;
+}
 body.fashplus:not(.fp-bg-off):has(.menu-drawer.open) #fpBgVideo {
   z-index: 490 !important;
 }
@@ -15224,9 +15227,60 @@ body.fashplus:not(.fp-bg-off):has(.menu-drawer.open) #fpBgVideo {
 body.fashplus:not(.fp-bg-off):has(.sub-screen.open) .sub-screen.open[data-fp-img] {
   background: transparent !important;
 }
+body.fashplus:not(.fp-bg-off).fp-sub-open .sub-screen.open[data-fp-img],
+body.fashplus:not(.fp-bg-off).fp-sub-open .sub-screen.open[data-fp-solid] {
+  background: transparent !important;
+}
 body.fashplus:not(.fp-bg-off):has(.sub-screen.open)
   .sub-screen.open[data-fp-img] > .sub-screen-bg[data-fp-img] {
   background-color: transparent !important;
+}
+body.fashplus:not(.fp-bg-off).fp-sub-open
+  .sub-screen.open[data-fp-img] > .sub-screen-bg[data-fp-img],
+body.fashplus:not(.fp-bg-off).fp-sub-open
+  .sub-screen.open[data-fp-solid] > .sub-screen-bg {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Fashion Plus off: a reader-selected still becomes the shared page
+   background. It is lifted under an open sub-screen in the same way as the
+   global video, while an unselected app remains its normal black. */
+body.nwsb-custom-fashion-bg:not(.fashplus) #appBg {
+  opacity: 1 !important;
+  background-image: var(--nwsb-custom-bg-url) !important;
+  background-color: var(--nwsb-custom-bg-color, #000) !important;
+}
+body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open) #appBg,
+body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open #appBg {
+  z-index: 590 !important;
+}
+body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open) .sub-screen.open,
+body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open .sub-screen.open {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open)
+  .sub-screen.open > .sub-screen-bg,
+body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open)
+  .sub-screen.open > .sub-body,
+body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open)
+  .sub-screen.open > .bgp-content,
+body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open
+  .sub-screen.open > .sub-screen-bg,
+body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open
+  .sub-screen.open > .sub-body,
+body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open
+  .sub-screen.open > .bgp-content {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open)
+  .sub-screen.open::before,
+body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open
+  .sub-screen.open::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  pointer-events: none; background: rgba(6,12,24,0.72);
 }
 
 /* ── The AI Prescription card gets its gap ────────────────────────
