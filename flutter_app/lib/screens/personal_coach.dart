@@ -384,7 +384,7 @@ class _CoachData {
   final String goal; final List<_CoachTask> tasks; final List<_CoachMessage> messages; final int streak; final int totalSessions;
   int get target => tasks.length;
   int get done => math.min(target, math.max(tasks.where((task) => task.status == 'completed').length, PracticeProgress.instance.todaySessions));
-  int get percent => target == 0 ? 0 : ((done / target) * 100).round().clamp(0, 100) as int;
+  int get percent => target == 0 ? 0 : ((done / target) * 100).round().clamp(0, 100);
   Map<String, dynamic> get context => {'activeGoal': goal, 'todayCompleted': done, 'todayTarget': target, 'openTasks': tasks.where((task) => task.status != 'completed').length, 'streakDays': streak, 'completedSessions': totalSessions};
   factory _CoachData.local() { final progress = PracticeProgress.instance; return _CoachData(goal: 'Your practice', tasks: const [], messages: const [], streak: progress.streak, totalSessions: progress.totalSessions); }
   factory _CoachData.profile(Map<String, dynamic> profile) {
