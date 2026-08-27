@@ -40,5 +40,6 @@ test('iOS targets preserve NowssB identity and authenticated sign-in configurati
   assert.match(flutterScript, /const appId = 'com\.nowssb\.app'/);
   assert.match(flutterScript, /replace\(\/PRODUCT_BUNDLE_IDENTIFIER = \[\^;\]\+;\/g/);
   assert.match(webAuth, /isCapacitorIOS/);
-  assert.match(webAuth, /if \(isCapacitorIOS\)[\s\S]*?signInWithRedirect/);
+  assert.match(webAuth, /const isNativeShell =/);
+  assert.match(webAuth, /if \(isNativeShell \|\| isCapacitorIOS\)[\s\S]*?signInWithRedirect/);
 });

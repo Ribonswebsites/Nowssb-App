@@ -14,6 +14,10 @@ test('WebView sign-in has an idempotent exit from the loader video', () => {
   assert.match(source, /function _hideAuthLoader\(\)[\s\S]*?loader\.classList\.remove\('visible'\)/);
   assert.match(source, /const result = await signInWithEmailAndPassword/);
   assert.match(source, /const result = await createUserWithEmailAndPassword/);
+  assert.match(source, /const isNativeShell =/);
+  assert.match(source, /if \(isNativeShell \|\| isCapacitorIOS\)/);
+  assert.match(source, /await signInWithRedirect\(auth, provider\)/);
+  assert.match(source, /const notFound = \['auth\/user-not-found','auth\/invalid-credential'\]/);
   assert.match(source, /_ensureLoginExit\(result\.user\)/);
 });
 
@@ -25,5 +29,9 @@ test('Flutter has a credential gate rather than leaving a user on video', () => 
   assert.match(gate, /GoogleSignIn/);
   assert.match(gate, /signInWithEmailAndPassword/);
   assert.match(gate, /Sign-in is taking too long/);
-  assert.doesNotMatch(gate, /VideoPlayer/);
+  assert.match(gate, /VideoPlayer/);
+  assert.match(gate, /assets\/video\/login-phone\.mp4/);
+  assert.match(gate, /Continue with Phone/);
+  assert.match(gate, /verifyPhoneNumber/);
+  assert.match(gate, /serverClientId/);
 });

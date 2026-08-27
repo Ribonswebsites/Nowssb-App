@@ -1081,7 +1081,18 @@ async function sendOtp() {
     if (otpInput) otpInput.closest('.glass-input-wrap') && (otpInput.closest('.glass-input-wrap').style.display='block');
     btn.textContent = 'Verify OTP'; btn.disabled = false;
     alert('OTP sent to ' + full);
-  } catch(e) { btn.textContent = 'Send OTP'; btn.disabled = false; alert('Failed: ' + e.message); }
+  } catch(e) {
+    btn.textContent = 'Send OTP'; btn.disabled = false;
+    const code = e && e.code;
+    const message = String(e && (e.message || e) || '');
+    if (code === 'auth/billing-not-enabled' || message.includes('BILLING_NOT_ENABLED')) {
+      alert('Phone sign-in is not enabled for this Firebase project yet. Use Google or Email, or enable billing for SMS verification.');
+    } else if (code === 'auth/operation-not-allowed') {
+      alert('Phone sign-in is not enabled in Firebase yet. Use Google or Email instead.');
+    } else {
+      alert('Failed: ' + message);
+    }
+  }
 }
 
 // ── ONBOARDING DATA ──

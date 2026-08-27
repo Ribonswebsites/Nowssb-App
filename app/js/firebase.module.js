@@ -382,12 +382,16 @@ window.fbGoogleLogin = async () => {
   const isCapacitorIOS = !!(window.Capacitor &&
     typeof window.Capacitor.getPlatform === 'function' &&
     window.Capacitor.getPlatform() === 'ios');
+  const isNativeShell = !!(window.nwsbIsNative ||
+    (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' &&
+      window.Capacitor.isNativePlatform()));
 
-  // WKWebView cannot reliably keep a popup window alive through Google's account
-  // chooser. On the Capacitor iOS target use the existing redirect-resume handler
-  // directly; Chrome and Android retain the normal popup-first behavior.
+  // Embedded WebViews cannot reliably keep a popup window alive through Google's
+  // account chooser. Use the redirect-resume path for both Capacitor platforms;
+  // regular browsers retain popup-first behavior. `getRedirectResult` above
+  // completes the return trip and routes the authenticated user.
   if (loader) loader.classList.add('visible');
-  if (isCapacitorIOS) {
+  if (isNativeShell || isCapacitorIOS) {
     try {
       await signInWithRedirect(auth, provider);
       return;
@@ -451,7 +455,7 @@ window.fbEmailLogin = async () => {
     _ensureLoginExit(result.user);
   } catch(signInErr) {
     // These codes all mean "user doesn't exist with that email" — create new account
-    const notFound = ['auth/user-not-found','auth/invalid-credential','auth/invalid-email'];
+    const notFound = ['auth/user-not-found','auth/invalid-credential'];
     if (notFound.some(c => signInErr.code === c || signInErr.message?.includes('no user'))) {
       try {
         if (btn) btn.textContent = 'Creating account…';

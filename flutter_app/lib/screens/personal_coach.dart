@@ -30,7 +30,11 @@ class PersonalCoachScreen extends StatefulWidget {
 
 class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
   final _input = TextEditingController();
-  final _google = GoogleSignIn(scopes: const ['email']);
+  static const _googleWebClientId = '1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com';
+  final _google = GoogleSignIn(
+    scopes: const ['email'],
+    serverClientId: _googleWebClientId,
+  );
   bool _sending = false;
   bool _signingIn = false;
   String? _notice;
