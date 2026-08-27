@@ -23,7 +23,12 @@ test('website and WebView downloads use the supplied listing and the correct lat
   assert.match(listing, /window\.location\.assign\(apk\)/);
   assert.match(listing, /window\.goBack/);
   assert.match(listing, /role="button"/);
-  assert.match(listing, /page-title/);
+  assert.match(listing, /listing-hero/);
+  assert.match(listing, /assets\/app-listing\/listing-hero-banner\.png/);
+  assert.match(listing, /hero-back-btn/);
+  assert.match(listing, /background:#fff/);
+  assert.doesNotMatch(listing, /Download the app<br>/);
+  assert.doesNotMatch(listing, /class="page-title"/);
   assert.doesNotMatch(listing, /header-divider/);
   assert.match(listing, /scroll-track/);
   assert.match(listing, /gallery-track/);
