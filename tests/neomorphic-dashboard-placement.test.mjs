@@ -14,6 +14,7 @@ const dashboard = readFileSync(new URL("../app/widgets/neomorphic_dashboard.html
 const essentials = readFileSync(new URL("../app/widgets/neumorphic-essentials.html", import.meta.url), "utf8");
 const actionBar = readFileSync(new URL("../app/widgets/neomorphic-action-bar-1.html", import.meta.url), "utf8");
 const coachPage = readFileSync(new URL("../app/widgets/personal-coach.html", import.meta.url), "utf8");
+const fashionMode = readFileSync(new URL("../app/widgets/fashion-mode-neumorphic-white.html", import.meta.url), "utf8");
 
 const searchAt = index.indexOf('class="nmh-search"');
 const dashboardAt = index.indexOf('class="nmh-supplied-dashboard"');
@@ -26,6 +27,7 @@ assert.ok(actionBarAt > mainOpsAt, "WebView action bar must follow Normal Home W
 assert.match(index, /data-direct-neomorphic="dashboard"/, "WebView must reserve a direct dashboard host");
 assert.match(index, /data-direct-neomorphic="essentials"/, "WebView must reserve a direct essentials host");
 assert.match(index, /data-direct-neomorphic="actionbar"/, "WebView must reserve a direct action-bar host");
+assert.match(index, /data-direct-neomorphic="fashion"/, "WebView must reserve the supplied direct Fashion Mode host");
 assert.doesNotMatch(index, /<iframe\b/, "WebView must not use external iframes for the supplied sections");
 assert.match(index, /part095-direct-neomorphic-sections\.js/, "WebView must load the direct section renderer");
 assert.match(directSections, /attachShadow/, "Direct renderer must mount supplied styles inside the page");
@@ -48,6 +50,7 @@ assert.match(directSections, /See less/, "Direct renderer must preserve the supp
 assert.match(directSections, /wireActionBar/, "Direct renderer must wire the supplied action-bar controls");
 assert.match(directSections, /openPersonalCoach/, "Direct renderer must open the supplied Personal Coach page");
 assert.match(directSections, /wirePersonalCoach/, "WebView Personal Coach chat controls must be interactive");
+assert.match(directSections, /wireFashionMode/, "Direct renderer must wire the supplied Fashion Mode control");
 assert.match(directSections, /placeActionBar/, "Direct renderer must force the coach bar below Where to Begin");
 assert.match(directSections, /MutationObserver/, "Direct renderer must keep the coach bar in place after saved-layout reorders");
 assert.match(directSections, /startDashboardPractice/, "Dashboard actions must start the playable practice session");
@@ -71,5 +74,8 @@ assert.match(coachPage, /Personal Coach/, "WebView must ship the supplied Person
 assert.match(flutter, /PersonalCoachScreen/, "Flutter action bar must open a real Personal Coach screen");
 assert.match(flutterCoach, /Start focused practice/, "Flutter coach must start a real practice flow");
 assert.match(flutterActionBar, /Personal Coach/, "Flutter action bar must visibly label Personal Coach");
+assert.doesNotMatch(fashionMode, /class="wrapper"[^>]*style=/, "Supplied Fashion Mode must not add an inline outer wrapper");
+assert.match(fashionMode, /\.wrapper\s*\{[\s\S]*box-shadow:\s*none/, "Fashion Mode source must remove the supplied outer wrapper shadow");
+assert.match(flutter, /NmFashionSwitch/, "Flutter Normal Home must retain the replacement Fashion Mode control");
 
 console.log("Supplied dashboard is anchored below Normal Home search in WebView and Flutter.");

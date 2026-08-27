@@ -293,8 +293,9 @@ class NmTrendShop extends StatelessWidget {
   }
 }
 
-/// 28 · fashsw — index.html:1608. `#nmhFashSwitch` — the door to the other
-/// home. The one dark card on a pale page, which is what it is offering.
+/// 28 · fashsw — the supplied pale neumorphic Fashion Mode control.
+/// It deliberately has no outer panel: only its heading, action row, and
+/// individual mini controls carry the supplied surfaces and shadows.
 class NmFashionSwitch extends StatelessWidget {
   const NmFashionSwitch({super.key, this.onTap});
   final VoidCallback? onTap;
@@ -303,29 +304,24 @@ class NmFashionSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-          decoration: BoxDecoration(
-            color: NwsbColors.ink,
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x59000000),
-                offset: Offset(6, 6),
-                blurRadius: 16,
-              ),
-              BoxShadow(
-                color: Color(0x333C3C64),
-                offset: Offset(-3, -3),
-                blurRadius: 8,
-              ),
-            ],
-          ),
-          child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Row(children: [
+            _FashionCircle(size: 44, icon: Icons.auto_awesome_rounded),
+            SizedBox(width: 14),
+            Text('Discover the experience', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: .2, color: Color(0xFF2B2F3A))),
+          ]),
+          const Padding(padding: EdgeInsets.fromLTRB(4, 18, 4, 18), child: Divider(height: 1, thickness: 1, color: Color(0x1F2B2F3A))),
+          GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Row(
             children: [
+              const _FashionCircle(size: 50, icon: Icons.checkroom_outlined),
+              const SizedBox(width: 14),
+              const SizedBox(width: 1, height: 34, child: DecoratedBox(decoration: BoxDecoration(color: Color(0x242B2F3A)))),
+              const SizedBox(width: 14),
               const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,7 +333,7 @@ class NmFashionSwitch extends StatelessWidget {
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 2,
-                        color: Color(0xA6E8D5A3),
+                        color: Color(0xFF8B8F9D),
                       ),
                     ),
                     SizedBox(height: 4),
@@ -347,7 +343,7 @@ class NmFashionSwitch extends StatelessWidget {
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.2,
-                        color: Colors.white,
+                        color: Color(0xFF2B2F3A),
                       ),
                     ),
                     SizedBox(height: 3),
@@ -356,28 +352,49 @@ class NmFashionSwitch extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w300,
-                        color: Color(0x73FFFFFF),
+                        color: Color(0xFF9297A5),
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 14),
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0x1FE8D5A3),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0x40E8D5A3)),
-                ),
-                child: const NwsbIcon(NwsbMarks.arrow,
-                    size: 16, color: Color(0xD9E8D5A3)),
-              ),
+              const _FashionCircle(size: 50, icon: Icons.arrow_forward_rounded),
             ],
           ),
-        ),
+          ),
+          const SizedBox(height: 18),
+          SizedBox(
+            height: 98,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: 6,
+              separatorBuilder: (_, __) => const SizedBox(width: 14),
+              itemBuilder: (_, index) {
+                const labels = ['New', 'Recent', 'Grid', 'Style', 'Trending', 'Saved'];
+                const icons = [Icons.star_outline_rounded, Icons.access_time_rounded, Icons.grid_view_rounded, Icons.person_outline_rounded, Icons.trending_flat_rounded, Icons.favorite_border_rounded];
+                return GestureDetector(onTap: onTap, child: _FashionMini(label: labels[index], icon: icons[index]));
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+class _FashionCircle extends StatelessWidget {
+  const _FashionCircle({required this.size, required this.icon});
+  final double size;
+  final IconData icon;
+  @override
+  Widget build(BuildContext context) => Container(width: size, height: size, decoration: const BoxDecoration(color: Color(0xFFECEFF4), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x8CA3AABD), offset: Offset(6, 6), blurRadius: 12), BoxShadow(color: Color(0xE6FFFFFF), offset: Offset(-6, -6), blurRadius: 12)]), child: Icon(icon, size: size == 50 ? 24 : 20, color: const Color(0xFFC9A24A)));
+}
+
+class _FashionMini extends StatelessWidget {
+  const _FashionMini({required this.label, required this.icon});
+  final String label;
+  final IconData icon;
+  @override
+  Widget build(BuildContext context) => Container(width: 84, height: 84, decoration: BoxDecoration(color: const Color(0xFFECEFF4), borderRadius: BorderRadius.circular(18), boxShadow: const [BoxShadow(color: Color(0x73A3AABD), offset: Offset(5, 5), blurRadius: 10), BoxShadow(color: Color(0xB3FFFFFF), offset: Offset(-5, -5), blurRadius: 10)]), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 20, color: const Color(0xFFC9A24A)), const SizedBox(height: 6), Text(label, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, letterSpacing: .2, color: Color(0xFF6B7080)))]));
 }

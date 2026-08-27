@@ -12188,6 +12188,16 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   border-radius: 0 !important;
   box-shadow: none !important;
 }
+#home-nm .nmh-supplied-fashion-mode {
+  width: 100%;
+  margin: 16px 0 8px;
+  padding: 0;
+  display: block;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
 .nwsb-personal-coach-overlay {
   display: none;
   position: fixed;

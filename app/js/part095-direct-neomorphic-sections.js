@@ -115,6 +115,23 @@
     document.body.classList.remove('nwsb-personal-coach-open');
   }
 
+  function wireFashionMode(root) {
+    root.querySelectorAll('[data-fashion-mode-action], .mini-box').forEach(function (control) {
+      if (control.tagName !== 'BUTTON') {
+        control.setAttribute('role', 'button');
+        control.setAttribute('tabindex', '0');
+      }
+      function openFashion() {
+        try { localStorage.setItem('nwsb_home_mode', 'home'); } catch (_) {}
+        if (typeof window.goTo === 'function') window.goTo('home');
+      }
+      control.addEventListener('click', openFashion);
+      control.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openFashion(); }
+      });
+    });
+  }
+
   function wirePersonalCoach(root) {
     var placeholder = root.querySelector('.chat-placeholder');
     var send = root.querySelector('.send-btn');
@@ -205,19 +222,23 @@
     var dashboardHost = document.querySelector('[data-direct-neomorphic="dashboard"]');
     var essentialsHost = document.querySelector('[data-direct-neomorphic="essentials"]');
     var actionBarHost = document.querySelector('[data-direct-neomorphic="actionbar"]');
-    if (!dashboardHost || !essentialsHost || !actionBarHost) return;
+    var fashionHost = document.querySelector('[data-direct-neomorphic="fashion"]');
+    if (!dashboardHost || !essentialsHost || !actionBarHost || !fashionHost) return;
     try {
       var sources = await Promise.all([
         fetch('app/widgets/neomorphic_dashboard.html').then(function (response) { return response.text(); }),
         fetch('app/widgets/neumorphic-essentials.html').then(function (response) { return response.text(); }),
-        fetch('app/widgets/neomorphic-action-bar-1.html').then(function (response) { return response.text(); })
+        fetch('app/widgets/neomorphic-action-bar-1.html').then(function (response) { return response.text(); }),
+        fetch('app/widgets/fashion-mode-neumorphic-white.html').then(function (response) { return response.text(); })
       ]);
       var dashboardRoot = mount(dashboardHost, sources[0]);
       var essentialsRoot = mount(essentialsHost, sources[1], true);
       var actionBarRoot = mount(actionBarHost, sources[2]);
+      var fashionRoot = mount(fashionHost, sources[3], true);
       wireDashboard(dashboardRoot);
       wireEssentials(essentialsRoot);
       wireActionBar(actionBarRoot);
+      wireFashionMode(fashionRoot);
       placeActionBar(actionBarHost);
       window.addEventListener('load', function () { placeActionBar(actionBarHost); }, { once: true });
       var mainOps = document.querySelector('#home-nm .mainops-blk.nmh-sec-wrap');
