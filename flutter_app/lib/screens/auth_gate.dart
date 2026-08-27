@@ -295,7 +295,7 @@ class _AuthGateState extends State<AuthGate> {
   Widget _glassContent({String? unavailable}) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final minHeight = math.max(0, constraints.maxHeight - 24);
+        final minHeight = math.max(0.0, constraints.maxHeight - 24.0).toDouble();
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: ConstrainedBox(
