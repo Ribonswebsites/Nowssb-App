@@ -165,7 +165,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         final words = ContentStore.instance.library.take(6).toList(growable: false);
         final progress = PracticeProgress.instance;
         final completed = progress.completedTodayFor(words);
-        final percent = words.isEmpty ? 0 : (completed / words.length * 100).round().clamp(0, 100);
+        final percent = words.isEmpty ? 0 : (completed / words.length * 100).round().clamp(0, 100).toInt();
         return Scaffold(
           backgroundColor: Colors.black,
           body: SafeArea(
