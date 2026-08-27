@@ -38,11 +38,15 @@ test('Flutter resolves every primary-page backdrop from the selected Fashion Plu
 test('WebView refreshes selected Fashion Plus video and image backgrounds for every opened page', () => {
   const navigation = read('app/js/part012.js');
   const fashion = read('app/js/part076.js');
+  const mode = read('app/js/part066.js');
   const css = read('nowssb-nm.css');
   const html = read('index.html');
 
   assert.match(fashion, /window\.fpBgVid = function \(\) \{ return FILMS\[bgChoice\(\)\]\.vid; \}/);
   assert.match(fashion, /function syncOpenPageBackdrop\(\)/);
+  assert.match(mode, /window\.nwsbFpBackgrounds\(isOn\)/);
+  assert.match(fashion, /function bgPartOn\(\) \{ return isOn\(\); \}/);
+  assert.match(fashion, /addEventListener\('loadeddata'/);
   assert.match(fashion, /function observePageOpenState\(\)/);
   assert.match(fashion, /new MutationObserver/);
   assert.match(fashion, /target\.classList\.contains\('sub-screen'\)/);

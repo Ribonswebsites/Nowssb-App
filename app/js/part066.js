@@ -274,7 +274,12 @@
        toggle: the Customize card, the banner below the player and the
        switch in the Fashion Plus section are all this same function. */
     if (typeof window.nwsbFpBackgrounds === 'function') {
-      try { window.nwsbFpBackgrounds(isOn && partOn('bg')); } catch (e) {}
+      /* Fashion Plus on means the exact Fashion Home film is the page
+         background everywhere, including the hamburger menu. The old `bg`
+         sub-switch could leave a saved `0` behind and make the menu show the
+         frozen app image instead of the live film. The master mode is now the
+         single source of truth for the shared backdrop. */
+      try { window.nwsbFpBackgrounds(isOn); } catch (e) {}
     }
     if (window.cuPaintModes) window.cuPaintModes();
     if (typeof window.nwsbFpPaint === 'function') { try { window.nwsbFpPaint(); } catch (e) {} }

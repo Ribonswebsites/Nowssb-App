@@ -121,7 +121,10 @@
      backgrounds is one of the parts. playState() only ever asked the master
      one, so turning Page backgrounds off left the film playing — the switch
      said off and the phone kept running the clip. */
-  function bgPartOn() { return typeof window.fpPartOn === 'function' ? window.fpPartOn('bg') : true; }
+  /* The master Fashion Plus switch owns the shared film. Page-specific
+     appearance switches must never turn the hamburger or another open page
+     back into a still frame. */
+  function bgPartOn() { return isOn(); }
   function reducedMotion() {
     try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   }
@@ -138,6 +141,11 @@
     v.setAttribute('muted', ''); v.setAttribute('loop', '');
     v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
     v.src = FILMS[bgChoice()].vid;
+    v.addEventListener('loadeddata', function () {
+      if (isOn() && !reducedMotion() && document.visibilityState === 'visible') {
+        var p = v.play(); if (p && p.catch) p.catch(function () {});
+      }
+    });
     document.body.insertBefore(v, document.body.firstChild);
     /* The vignette. A fixed veil immediately after the clip — the clip is at
        z-index 0 and every .screen is at 10, so this sits between them at 1
