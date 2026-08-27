@@ -512,10 +512,10 @@
   const capacitor = window.Capacitor;
   let inCapacitorWebView = false;
   try {
-    inCapacitorWebView = !!(capacitor && (
+    inCapacitorWebView = !!(window.nwsbIsNative || (capacitor && (
       (typeof capacitor.isNativePlatform === 'function' && capacitor.isNativePlatform()) ||
       (typeof capacitor.getPlatform === 'function' && capacitor.getPlatform() !== 'web')
-    ));
+    )));
   } catch (_) {}
   const apk = inCapacitorWebView ? flutterApk : webViewApk;
   const filename = inCapacitorWebView ? 'NowssB-Flutter-Android.apk' : 'NowssB-Android.apk';
@@ -531,10 +531,20 @@
   const download = () => {
     install.setAttribute('aria-busy', 'true');
     if (status) status.textContent = 'Starting download…';
-    // A native WebView must navigate to the APK URL directly; synthetic
-    // download attributes are ignored by several Android WebView versions.
+    // Open the APK outside the native WebView. This lets Android’s download
+    // manager hand the finished package to the system installer instead of
+    // leaving the WebView on a binary response page.
     if (inCapacitorWebView) {
-      window.location.assign(apk);
+      try {
+        const browser = capacitor && capacitor.Plugins && capacitor.Plugins.Browser;
+        if (browser && typeof browser.open === 'function') {
+          browser.open({ url: apk, toolbarColor: '#000000' }).catch(() => window.location.assign(apk));
+        } else {
+          window.location.assign(apk);
+        }
+      } catch (_) {
+        window.location.assign(apk);
+      }
       return;
     }
     const link = document.createElement('a');
