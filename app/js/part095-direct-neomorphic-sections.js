@@ -133,6 +133,10 @@
   }
 
   function wirePersonalCoach(root) {
+    if (window.NowssbPersonalCoach && typeof window.NowssbPersonalCoach.mount === 'function') {
+      window.NowssbPersonalCoach.mount(root);
+      return;
+    }
     var placeholder = root.querySelector('.chat-placeholder');
     var send = root.querySelector('.send-btn');
     var chatBox = root.querySelector('.chat-box');

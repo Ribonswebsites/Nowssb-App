@@ -2,7 +2,7 @@
 
 // ── NowssB API (Cloudflare Worker — free, universal) ───────
 // Deploy worker.js to Cloudflare Workers and replace this URL
-const NOWSSB_API       = 'https://nowssb-api.nowssb.workers.dev';
+const NOWSSB_API       = 'https://nowssb-api.ribonpatil2.workers.dev';
 const GROQ_CHAT_URL    = NOWSSB_API + '/api/groq/complete';
 const GROQ_WHISPER_URL = NOWSSB_API + '/api/groq/transcribe';
 const CLAUDE_URL       = NOWSSB_API + '/api/claude/complete';
@@ -527,4 +527,3 @@ Every word that appears in the sentence must be in highlights with exact case ma
 };
 
 console.log('%cNowssB Groq Engine ready ✓', 'color:#e8d5a3;font-weight:800;font-size:13px;');
-

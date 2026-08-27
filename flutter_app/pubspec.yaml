@@ -64,6 +64,7 @@ flutter:
     - assets/frames/
     - assets/coach/
     - assets/icons/
+    - assets/coach/
     - assets/store/
     - assets/store/collections/
     - assets/fashion/
