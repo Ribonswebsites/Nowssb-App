@@ -556,7 +556,24 @@ class _TransportTube extends StatelessWidget {
   Widget build(BuildContext context) => AspectRatio(
     aspectRatio: 352 / 86,
     child: Stack(alignment: Alignment.center, children: [
-      Positioned.fill(child: Image.asset('assets/player/lgp-control-tube.png', fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
+      Positioned.fill(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(46),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xE8FFFFFF), Color(0xCCD8D2D2), Color(0xD66F6D70)],
+              stops: [0, .26, 1],
+            ),
+            border: Border.all(color: const Color(0xCCFFFFFF), width: 1.2),
+            boxShadow: const [
+              BoxShadow(color: Color(0x44000000), blurRadius: 14, offset: Offset(0, 7)),
+              BoxShadow(color: Color(0x55FFFFFF), blurRadius: 8, offset: Offset(0, -2)),
+            ],
+          ),
+        ),
+      ),
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         _ImageControl(asset: 'assets/player/lgp-library.png', label: 'Library', onTap: onLibrary, size: 45),
         _ImageControl(asset: 'assets/player/lgp-prev.png', label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 45),
