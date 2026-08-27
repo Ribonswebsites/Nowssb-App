@@ -13,6 +13,7 @@ import '../data/content.dart';
 import '../data/models.dart';
 import '../theme/tokens.dart';
 import '../widgets/page_shell.dart';
+import 'practice_player.dart';
 import 'word_detail.dart';
 
 String nwsbSlot([DateTime? at]) {
@@ -64,6 +65,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
     // the page is never three rows long on a thin library.
     final now = all.where((w) => w.time == slot || w.time == 'any').toList();
     final rest = all.where((w) => !now.contains(w)).toList();
+    final sessionWords = now.isEmpty ? rest : now;
 
     return PageShell(
       eyebrow: 'Today',
@@ -76,7 +78,18 @@ class _PracticeScreenState extends State<PracticeScreen> {
             if (all.isEmpty)
               const _Empty()
             else ...[
-              _SessionCard(count: now.length, slot: slot),
+              _SessionCard(
+                count: sessionWords.length,
+                slot: slot,
+                onStart: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => PracticePlayerScreen(
+                      words: sessionWords,
+                      title: _slotTitle[slot] ?? 'Practice',
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 22),
               const DarkHead(
                 eyebrow: 'Tap a word to open it',
@@ -113,9 +126,14 @@ class _PracticeScreenState extends State<PracticeScreen> {
 }
 
 class _SessionCard extends StatelessWidget {
-  const _SessionCard({required this.count, required this.slot});
+  const _SessionCard({
+    required this.count,
+    required this.slot,
+    required this.onStart,
+  });
   final int count;
   final String slot;
+  final VoidCallback onStart;
 
   @override
   Widget build(BuildContext context) {
@@ -153,14 +171,31 @@ class _SessionCard extends StatelessWidget {
           ),
           const SizedBox(width: 20),
           Expanded(
-            child: Text(
-              'Aligned to your $slot — say each one on the exhale, and hold '
-              'the last sound.',
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xCCFFFFFF),
-                height: 1.5,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Aligned to your $slot — say each one on the exhale, and hold '
+                  'the last sound.',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xCCFFFFFF),
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                ElevatedButton.icon(
+                  onPressed: onStart,
+                  icon: const Icon(Icons.play_arrow_rounded, size: 19),
+                  label: const Text('Start Player'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: NwsbColors.goldLight,
+                    foregroundColor: NwsbColors.deep,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
