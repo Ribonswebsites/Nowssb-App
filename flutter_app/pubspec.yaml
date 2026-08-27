@@ -39,6 +39,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # Generates every iOS app-icon size from the exact website/WebView image.
+  flutter_launcher_icons: ^0.14.3
   flutter_lints: ^4.0.0
 
   # test/fake_video_platform.dart stands in for ExoPlayer so the video pool's
@@ -47,6 +49,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+flutter_launcher_icons:
+  android: false
+  ios: true
+  image_path: ../assets/icons/app-icon-512.png
 
   assets:
     # Every clip and its poster, on the phone after the download — no

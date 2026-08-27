@@ -1,0 +1,48 @@
+name: Flutter iOS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'flutter_app/**'
+      - 'tools/flutter-ios.mjs'
+      - 'assets/icons/app-icon-512.png'
+      - '.github/workflows/flutter-ios.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios-build:
+    name: Unsigned iOS build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Bundle shipped Flutter assets
+        run: node tools/flutter-assets.mjs
+      - name: Create and configure the iOS target
+        run: |
+          cd flutter_app
+          flutter create --platforms=ios --org com.nowssb --project-name nowssb .
+          cd ..
+          node tools/flutter-ios.mjs
+      - name: Install dependencies and create matching iOS icon assets
+        run: |
+          cd flutter_app
+          flutter pub get
+          dart run flutter_launcher_icons
+      - name: Analyze and compile iOS without signing
+        run: |
+          cd flutter_app
+          flutter analyze --no-fatal-infos
+          flutter build ios --debug --no-codesign
+      - name: Upload unsigned iOS application bundle for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: nowssb-flutter-ios-unsigned-app
+          path: flutter_app/build/ios/iphoneos/Runner.app
+          if-no-files-found: error

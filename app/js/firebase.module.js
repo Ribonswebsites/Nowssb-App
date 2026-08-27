@@ -351,11 +351,27 @@ window.fbGoogleLogin = async () => {
   _googleSignInInProgress = true;
   const provider = new GoogleAuthProvider();
   const loader = document.getElementById('authLoader');
+  const isCapacitorIOS = !!(window.Capacitor &&
+    typeof window.Capacitor.getPlatform === 'function' &&
+    window.Capacitor.getPlatform() === 'ios');
 
-  // Always try popup first — on mobile Chrome this shows the native account picker
-  // overlay without leaving the page (same as Manus / Claude). Only fall back to
-  // redirect if the browser explicitly blocks popups (PWA standalone, some WebViews).
+  // WKWebView cannot reliably keep a popup window alive through Google's account
+  // chooser. On the Capacitor iOS target use the existing redirect-resume handler
+  // directly; Chrome and Android retain the normal popup-first behavior.
   if (loader) loader.classList.add('visible');
+  if (isCapacitorIOS) {
+    try {
+      await signInWithRedirect(auth, provider);
+      return;
+    } catch (error) {
+      _googleSignInInProgress = false;
+      if (loader) loader.classList.remove('visible');
+      alert(error.code === 'auth/unauthorized-domain'
+        ? 'Google sign-in is not available here. Please use Email or Phone instead.'
+        : 'Sign-in failed: ' + error.message);
+      return;
+    }
+  }
   try {
     const result = await signInWithPopup(auth, provider);
     // onAuthStateChanged fires and handles navigation — nothing to do here

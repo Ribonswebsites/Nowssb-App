@@ -172,65 +172,25 @@ if (a.includes('coreLibraryDesugaring(')) {
 
 writeFileSync(appGradle, a);
 
-// ── the launcher icon ──────────────────────────────────────────────────
-// The SAME file the PWA installs under. manifest.json names
-// assets/icons/app-icon-512.png as the 512 icon, so the phone shows one mark
-// whichever of the two the reader installed — which is the point of them
-// being one app.
-//
-// The five sizes are CUT AHEAD OF TIME and committed under
-// flutter_app/android-config/mipmap/, and this step only copies them.
-//
-// It used to resize assets/icons/app-icon-512.png here with Pillow. That
-// worked on a machine that happens to have Pillow and failed on every build
-// runner that does not — `ModuleNotFoundError: No module named 'PIL'`, exit
-// 1, no APK (run 136). A build step must not need a toolchain the build
-// image was never asked to carry; google-services.json below is copied for
-// exactly the same reason. To re-cut the icons after changing the source,
-// run `node tools/flutter-icons.mjs` on a machine with Pillow and commit
-// what it writes.
-const ICON_SRC = join(root, 'flutter_app', 'android-config', 'mipmap');
-const ADAPTIVE_ICON_SRC = join(root, 'flutter_app', 'android-config', 'adaptive');
-/** Android's five launcher densities. */
-const MIPMAPS = [
-  'mipmap-mdpi',
-  'mipmap-hdpi',
-  'mipmap-xhdpi',
-  'mipmap-xxhdpi',
-  'mipmap-xxxhdpi',
-];
+// ── launcher icon ──────────────────────────────────────────────────────
+// Copy the WebView's complete adaptive-icon resource set, generated from the
+// website mark. A legacy Flutter `mipmap/ic_launcher.png` is normalized and
+// inset by Android launchers, which made the same artwork look visibly smaller
+// than the WebView install. The v26 adaptive XML, foreground, background,
+// round icon, and legacy fallbacks below are byte-for-byte the WebView set.
+const ICON_SRC = join(root, 'flutter_app', 'android-config', 'adaptive-res');
 const res = join(android, 'app', 'src', 'main', 'res');
 {
-  const missing = MIPMAPS.filter(
-    (d) => !existsSync(join(ICON_SRC, d, 'ic_launcher.png')),
-  );
-  if (missing.length) {
+  if (!existsSync(join(ICON_SRC, 'mipmap-anydpi-v26', 'ic_launcher.xml')) ||
+      !existsSync(join(ICON_SRC, 'mipmap-xxxhdpi', 'ic_launcher_foreground.png'))) {
     console.error(
-      `missing launcher icons under ${ICON_SRC}: ${missing.join(', ')}\n` +
-        `run: node tools/flutter-icons.mjs`,
+      `missing WebView-compatible adaptive launcher resources under ${ICON_SRC}`,
     );
     process.exit(1);
   }
-  for (const d of MIPMAPS) {
-    mkdirSync(join(res, d), { recursive: true });
-    copyFileSync(
-      join(ICON_SRC, d, 'ic_launcher.png'),
-      join(res, d, 'ic_launcher.png'),
-    );
-  }
-  done.push('copied ic_launcher at five densities');
+  cpSync(ICON_SRC, res, { recursive: true, force: true });
+  done.push('copied WebView-compatible adaptive launcher resources');
 }
-
-// Flutter's standard mipmap PNGs are only the fallback for pre-Android 8
-// devices. Modern launchers apply an adaptive icon mask and were showing the
-// Flutter build as a small inset. Copy the adaptive resources generated from
-// the canonical PWA/webview image so it fills the same masked tile.
-if (!existsSync(ADAPTIVE_ICON_SRC)) {
-  console.error(`missing adaptive launcher resources under ${ADAPTIVE_ICON_SRC}\nrun: node tools/flutter-icons.mjs`);
-  process.exit(1);
-}
-cpSync(ADAPTIVE_ICON_SRC, res, { recursive: true, force: true });
-done.push('copied adaptive launcher icon resources');
 
 // ── the manifest ───────────────────────────────────────────────────────
 // Without INTERNET in the MAIN manifest a release build has no network at
