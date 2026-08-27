@@ -228,16 +228,27 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
         fit: StackFit.expand,
         children: [
           if (widget._poster case final p?)
-            Image.asset(
-              p,
-              fit: widget.fit,
-              alignment: widget.alignment,
-              // A missing poster must never be an exception in a list that
-              // is scrolling. Nothing is a worse picture than a red error
-              // box.
-              errorBuilder: (_, __, ___) =>
-                  const ColoredBox(color: Colors.black),
-            )
+            p.startsWith('http://') || p.startsWith('https://')
+                ? Image.network(
+                    p,
+                    fit: widget.fit,
+                    alignment: widget.alignment,
+                    // The WebView Player uses a paired image beneath each
+                    // remote motion theme. Keep that image visible while
+                    // Flutter's decoder opens rather than flashing black.
+                    errorBuilder: (_, __, ___) =>
+                        const ColoredBox(color: Colors.black),
+                  )
+                : Image.asset(
+                    p,
+                    fit: widget.fit,
+                    alignment: widget.alignment,
+                    // A missing poster must never be an exception in a list
+                    // that is scrolling. Nothing is a worse picture than a
+                    // red error box.
+                    errorBuilder: (_, __, ___) =>
+                        const ColoredBox(color: Colors.black),
+                  )
           else
             const ColoredBox(color: Colors.black),
           // 220ms, which is long enough that a decoder arriving mid-scroll

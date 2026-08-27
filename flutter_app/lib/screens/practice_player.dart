@@ -1,19 +1,27 @@
-/// A real audible native practice session.
+/// The native counterpart to www/nowssb-player.js.
 ///
-/// The player uses the device text-to-speech engine to voice each current
-/// practice word. Completion is persisted only after speech finishes, so the
-/// dashboard reflects completed playback rather than a static placeholder.
+/// It uses the same ordered image/video theme pairs, the local liquid-splash
+/// assets, word-action clip, and the same five-item control treatment as the
+/// WebView Player. Speech remains native text-to-speech and completed words
+/// are recorded locally, so the visual port does not replace a real session
+/// with a mock screen.
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/models.dart';
 import '../data/practice_progress.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import 'sound_library.dart';
+import 'store.dart';
 
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({super.key, required this.words, required this.title});
@@ -26,18 +34,26 @@ class PracticePlayerScreen extends StatefulWidget {
 }
 
 class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
+  static const _likedWordsKey = 'nwsb_liked_words';
+
   final FlutterTts _tts = FlutterTts();
   var _index = 0;
   var _playing = false;
   var _completed = false;
+  var _liked = false;
+  var _loop = false;
+  var _volume = 1.0;
+  var _railsVisible = true;
   String? _error;
 
   Word get _word => widget.words[_index];
+  _PlayerTheme get _theme => _playerThemes[_index % _playerThemes.length];
 
   @override
   void initState() {
     super.initState();
     unawaited(PracticeProgress.instance.start());
+    unawaited(_loadLiked());
     unawaited(_prepareAndPlay());
   }
 
@@ -45,6 +61,24 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   void dispose() {
     unawaited(_tts.stop());
     super.dispose();
+  }
+
+  Future<void> _loadLiked() async {
+    final prefs = await SharedPreferences.getInstance();
+    final liked = prefs.getStringList(_likedWordsKey) ?? const <String>[];
+    if (mounted) setState(() => _liked = liked.contains(_word.word));
+  }
+
+  Future<void> _toggleLike() async {
+    final prefs = await SharedPreferences.getInstance();
+    final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[]).toSet();
+    if (liked.contains(_word.word)) {
+      liked.remove(_word.word);
+    } else {
+      liked.add(_word.word);
+    }
+    await prefs.setStringList(_likedWordsKey, liked.toList()..sort());
+    if (mounted) setState(() => _liked = liked.contains(_word.word));
   }
 
   Future<void> _prepareAndPlay() async {
@@ -59,25 +93,168 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
       await _tts.setLanguage('en-US');
       await _tts.setSpeechRate(0.34);
       await _tts.setPitch(1.0);
-      await _tts.setVolume(1.0);
+      await _tts.setVolume(_volume);
       await _tts.stop();
       await _tts.speak(_word.word);
       await PracticeProgress.instance.recordCompletedWord(_word);
       if (mounted) setState(() => _completed = true);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Your device could not start voice playback. Check that text-to-speech is enabled.');
+      if (mounted) {
+        setState(() => _error =
+            'Your device could not start voice playback. Check that text-to-speech is enabled.');
+      }
     } finally {
       if (mounted) setState(() => _playing = false);
     }
   }
 
-  Future<void> _next() async {
-    if (_index >= widget.words.length - 1) {
-      Navigator.of(context).pop();
+  Future<void> _togglePlay() async {
+    if (_playing) {
+      await _tts.stop();
+      if (mounted) setState(() => _playing = false);
       return;
     }
-    setState(() => _index += 1);
     await _prepareAndPlay();
+  }
+
+  Future<void> _move(int direction) async {
+    final next = _index + direction;
+    if (next < 0 || next >= widget.words.length) return;
+    await _tts.stop();
+    setState(() {
+      _index = next;
+      _liked = false;
+      _completed = false;
+      _error = null;
+    });
+    await _loadLiked();
+    await _prepareAndPlay();
+  }
+
+  void _openInfo() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => _PlayerInfoSheet(word: _word, accent: _theme.accent),
+    );
+  }
+
+  void _openNotes() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xF10A101B),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 22, 24, 34),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text('PRONUNCIATION NOTES', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.7)),
+            const SizedBox(height: 14),
+            Text(_word.word, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
+            if (_word.tip.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(_word.tip, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
+            ],
+            if (_word.parts.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: _word.parts
+                    .map((part) => _PronunciationChip(part: part, accent: _theme.accent))
+                    .toList(),
+              ),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+
+  void _openSettings() {
+    showDialog<void>(
+      context: context,
+      barrierColor: const Color(0xB8060C18),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.all(28),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xE6172334),
+              border: Border.all(color: const Color(0x66FFFFFF), width: 1.5),
+              boxShadow: [BoxShadow(color: _theme.accent.withOpacity(.35), blurRadius: 44)],
+            ),
+            child: Stack(children: [
+              Center(
+                child: Container(
+                  width: 106,
+                  height: 106,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0x33FFFFFF),
+                    border: Border.all(color: const Color(0x88FFFFFF)),
+                  ),
+                  child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Icon(Icons.settings_rounded, color: Colors.white, size: 34),
+                    SizedBox(height: 4),
+                    Text('SETTINGS', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
+                  ]),
+                ),
+              ),
+              _RadialOption(
+                alignment: Alignment.topCenter,
+                label: 'VOICE',
+                value: 'Device',
+                accent: _theme.accent,
+                onTap: () => ScaffoldMessenger.of(this.context).showSnackBar(
+                  const SnackBar(content: Text('NowssB uses your selected device voice.')),
+                ),
+              ),
+              _RadialOption(
+                alignment: Alignment.centerRight,
+                label: 'LOOP',
+                value: _loop ? 'On' : 'Off',
+                accent: _theme.accent,
+                onTap: () => setState(() => _loop = !_loop),
+              ),
+              _RadialOption(
+                alignment: Alignment.bottomCenter,
+                label: 'REPLAY',
+                value: 'Word',
+                accent: _theme.accent,
+                onTap: _prepareAndPlay,
+              ),
+              _RadialOption(
+                alignment: Alignment.centerLeft,
+                label: 'LIBRARY',
+                value: 'Open',
+                accent: _theme.accent,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(this.context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen()));
+                },
+              ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -90,119 +267,533 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
       );
     }
 
-    final progress = '${_index + 1} of ${widget.words.length}';
+    final theme = _theme;
     return Scaffold(
       backgroundColor: NwsbColors.deep,
-      appBar: AppBar(
-        backgroundColor: NwsbColors.deep,
-        foregroundColor: Colors.white,
-        title: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-      ),
-      body: Stack(
-        children: [
-          const Positioned.fill(child: AppBackdrop()),
-          SafeArea(
-            child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(progress.toUpperCase(), style: const TextStyle(color: NwsbColors.goldLight, letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.w700)),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  color: const Color(0x14FFFFFF),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: const Color(0x24FFFFFF)),
-                ),
-                child: Column(
-                  children: [
-                    Icon(_playing ? Icons.volume_up_rounded : Icons.play_circle_fill_rounded, size: 54, color: NwsbColors.goldLight),
-                    const SizedBox(height: 22),
-                    Text(_word.word, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
-                    const SizedBox(height: 10),
-                    Text(_word.phonetic.isEmpty ? 'Listen, then repeat at your own pace.' : _word.phonetic, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 15)),
-                    const SizedBox(height: 18),
-                    Text(_playing ? 'Playing now…' : _completed ? 'Completed and added to your progress.' : 'Ready to play.', textAlign: TextAlign.center, style: const TextStyle(color: Color(0x8CFFFFFF), height: 1.5)),
-                    if (_error != null) ...[
-                      const SizedBox(height: 14),
-                      Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFFFB4B4), height: 1.4)),
-                    ],
-                  ],
-                ),
+      body: Stack(children: [
+        // The application-wide selected Fashion Plus layer stays mounted on
+        // this route. The liquid Player visual is the route's own supplied
+        // skin, exactly as it is in the WebView Player, rather than a second
+        // generic practice-card background.
+        const Positioned.fill(child: AppBackdrop()),
+        Positioned.fill(child: _PlayerThemeArtwork(theme: theme)),
+        const Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0x48060A19), Color(0x74060A19), Color(0xC4060A19)],
               ),
-              const Spacer(),
-              OutlinedButton.icon(
-                onPressed: _playing ? null : _prepareAndPlay,
-                icon: const Icon(Icons.replay_rounded),
-                label: const Text('Play again'),
-                style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: Color(0x66FFFFFF)), padding: const EdgeInsets.symmetric(vertical: 16)),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: _playing ? null : _next,
-                icon: Icon(_index >= widget.words.length - 1 ? Icons.check_rounded : Icons.arrow_forward_rounded),
-                label: Text(_index >= widget.words.length - 1 ? 'Finish session' : 'Next word'),
-                style: ElevatedButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: NwsbColors.deep, padding: const EdgeInsets.symmetric(vertical: 17)),
-              ),
-            ],
-          ),
             ),
           ),
-        ],
-      ),
+        ),
+        SafeArea(
+          child: LayoutBuilder(builder: (context, constraints) {
+            final stageWidth = math.min(constraints.maxWidth - 48, 360.0);
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
+                  const SizedBox(height: 10),
+                  _TickerBanner(title: widget.title, index: _index, total: widget.words.length),
+                  const SizedBox(height: 10),
+                  SizedBox(width: stageWidth, child: _VisualStage(
+                    word: _word,
+                    theme: theme,
+                    playing: _playing,
+                    liked: _liked,
+                    railsVisible: _railsVisible,
+                    volume: _volume,
+                    onInfo: _openInfo,
+                    onReplay: _prepareAndPlay,
+                    onNotes: _openNotes,
+                    onLike: _toggleLike,
+                    onToggleRails: () => setState(() => _railsVisible = !_railsVisible),
+                    onVolumeChanged: (volume) async {
+                      setState(() => _volume = volume);
+                      await _tts.setVolume(volume);
+                    },
+                  )),
+                  const SizedBox(height: 14),
+                  SizedBox(width: math.min(stageWidth - 16, 340), child: _ProgressPanel(
+                    index: _index,
+                    total: widget.words.length,
+                    playing: _playing,
+                    accent: theme.accent,
+                  )),
+                  const SizedBox(height: 14),
+                  SizedBox(width: math.min(stageWidth, 352), child: _TransportTube(
+                    playing: _playing,
+                    hasPrevious: _index > 0,
+                    hasNext: _index < widget.words.length - 1,
+                    onLibrary: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
+                    onPrevious: () => _move(-1),
+                    onPlay: _togglePlay,
+                    onNext: () => _move(1),
+                    onReplay: _prepareAndPlay,
+                  )),
+                  if (_completed || _error != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _error ?? 'Completed and added to your progress.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
+                    ),
+                  ],
+                  const SizedBox(height: 18),
+                  SizedBox(width: stageWidth, child: _WordActionStrip(
+                    accent: theme.accent,
+                    onSentence: _openInfo,
+                    onPractice: _prepareAndPlay,
+                    onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
+                  )),
+                ]),
+              ),
+            );
+          }),
+        ),
+      ]),
     );
   }
 }
 
-class PracticeProgressScreen extends StatelessWidget {
-  const PracticeProgressScreen({super.key, required this.words});
-
-  final List<Word> words;
+class _PlayerThemeArtwork extends StatelessWidget {
+  const _PlayerThemeArtwork({required this.theme});
+  final _PlayerTheme theme;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: PracticeProgress.instance,
-      builder: (context, _) {
-        final progress = PracticeProgress.instance;
-        final completed = progress.completedTodayFor(words);
-        final goal = words.isEmpty ? 0 : (completed / words.length * 100).round().clamp(0, 100);
-        return Scaffold(
-          backgroundColor: NwsbColors.deep,
-          appBar: AppBar(backgroundColor: NwsbColors.deep, foregroundColor: Colors.white, title: const Text('Your progress')),
-          body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                const Text('LIVE PRACTICE DATA', style: TextStyle(color: NwsbColors.goldLight, letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 18),
-                Text(progress.totalSessions == 0 ? 'Your first completed playback will appear here.' : 'Your progress is built from completed sessions on this device.', style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 17, height: 1.45)),
-                const SizedBox(height: 26),
-                _ProgressStat(value: '${progress.todaySessions}', label: 'Sessions today'),
-                _ProgressStat(value: '${progress.totalSessions}', label: 'Total sessions'),
-                _ProgressStat(value: '${progress.streak}', label: 'Day streak'),
-                _ProgressStat(value: words.isEmpty ? '—' : '$goal%', label: words.isEmpty ? 'Today’s goal' : '$completed of ${words.length} words today'),
-              ]),
-            ),
-          ),
-        );
-      },
-    );
+    if (theme.image.startsWith('http')) {
+      return Image.network(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep));
+    }
+    return Image.asset(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep));
   }
+}
+
+class _PlayerHeader extends StatelessWidget {
+  const _PlayerHeader({required this.onBack, required this.onSettings});
+  final VoidCallback onBack;
+  final VoidCallback onSettings;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 46,
+    child: Stack(alignment: Alignment.center, children: [
+      Align(alignment: Alignment.centerLeft, child: _RoundIconButton(icon: Icons.arrow_back_ios_new_rounded, onTap: onBack)),
+      const Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(Icons.spa_rounded, color: Colors.white, size: 24),
+        SizedBox(width: 7),
+        Text('NowssB', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800, letterSpacing: -.5)),
+      ]),
+      Align(alignment: Alignment.centerRight, child: _RoundIconButton(icon: Icons.settings_rounded, onTap: onSettings)),
+    ]),
+  );
+}
+
+class _TickerBanner extends StatelessWidget {
+  const _TickerBanner({required this.title, required this.index, required this.total});
+  final String title;
+  final int index;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(16)),
+    child: Row(children: [
+      const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 28),
+      const SizedBox(width: 12),
+      Container(width: 1, height: 30, color: const Color(0x33FFFFFF)),
+      const SizedBox(width: 12),
+      Expanded(child: Text(index.isEven ? 'The new fashion trend of meditation' : '$title · ${index + 1} of $total', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800))),
+    ]),
+  );
+}
+
+class _VisualStage extends StatelessWidget {
+  const _VisualStage({
+    required this.word, required this.theme, required this.playing, required this.liked,
+    required this.railsVisible, required this.volume, required this.onInfo,
+    required this.onReplay, required this.onNotes, required this.onLike,
+    required this.onToggleRails, required this.onVolumeChanged,
+  });
+
+  final Word word;
+  final _PlayerTheme theme;
+  final bool playing;
+  final bool liked;
+  final bool railsVisible;
+  final double volume;
+  final VoidCallback onInfo;
+  final VoidCallback onReplay;
+  final VoidCallback onNotes;
+  final VoidCallback onLike;
+  final VoidCallback onToggleRails;
+  final ValueChanged<double> onVolumeChanged;
+
+  @override
+  Widget build(BuildContext context) => AspectRatio(
+    aspectRatio: 1 / 1.02,
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: Stack(fit: StackFit.expand, children: [
+        NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
+        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
+        Positioned(top: 10, left: 10, right: 10, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          _GlassTag(label: _timeLabel()),
+          Row(children: [
+            _Equalizer(active: playing, accent: theme.accent),
+            const SizedBox(width: 7),
+            const _InfoPill(),
+            const SizedBox(width: 6),
+            _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36),
+          ]),
+        ])),
+        if (railsVisible) ...[
+          Positioned(left: 10, top: 64, child: _GlassRail(children: [
+            _RailButton(icon: Icons.replay_rounded, onTap: onReplay),
+            _RailButton(icon: Icons.description_outlined, onTap: onNotes),
+            _RailButton(icon: liked ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: liked ? theme.accent : Colors.white, onTap: onLike),
+          ])),
+          Positioned(right: 10, top: 64, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
+        ],
+        Positioned(right: 10, top: railsVisible ? 154 : 64, child: _RoundIconButton(icon: Icons.tune_rounded, onTap: onToggleRails, size: 34)),
+        Positioned(left: 0, right: 0, bottom: 0, child: _WordOverlay(word: word, accent: theme.accent)),
+      ]),
+    ),
+  );
+
+  String _timeLabel() {
+    final hour = DateTime.now().hour;
+    return hour < 10 ? 'Morning' : hour < 13 ? 'Midday' : hour < 17 ? 'Afternoon' : hour < 20 ? 'Evening' : 'Night';
+  }
+}
+
+class _WordOverlay extends StatelessWidget {
+  const _WordOverlay({required this.word, required this.accent});
+  final Word word;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(56, 36, 56, 34),
+    decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00060A16), Color(0xA8060A16), Color(0xF0060A16)])),
+    child: Column(mainAxisSize: MainAxisSize.min, children: [
+      Text(word.word, textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 33, fontWeight: FontWeight.w800, letterSpacing: 1.3, shadows: [Shadow(color: accent.withOpacity(.8), blurRadius: 22)])),
+      if (word.deva.isNotEmpty) ...[
+        const SizedBox(height: 5),
+        Text(word.deva, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w600, height: 1.25)),
+      ],
+      if (word.parts.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        Wrap(spacing: 6, runSpacing: 6, alignment: WrapAlignment.center, children: word.parts.map((part) => _PronunciationChip(part: part, accent: accent, compact: true)).toList()),
+      ],
+      if (word.organ.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        Text('—  ${word.organ.toUpperCase()}  —', style: const TextStyle(color: Color(0xC2FFFFFF), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 2)),
+      ],
+    ]),
+  );
+}
+
+class _PronunciationChip extends StatelessWidget {
+  const _PronunciationChip({required this.part, required this.accent, this.compact = false});
+  final WordPart part;
+  final Color accent;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: EdgeInsets.symmetric(horizontal: compact ? 9 : 13, vertical: compact ? 5 : 8),
+    decoration: BoxDecoration(color: const Color(0x2EFFFFFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0x66FFFFFF))),
+    child: Column(mainAxisSize: MainAxisSize.min, children: [
+      if (part.deva.isNotEmpty) Text(part.deva, style: TextStyle(color: Colors.white, fontSize: compact ? 12 : 16, height: 1.2)),
+      Text(part.roman.isEmpty ? part.deva : part.roman, style: TextStyle(color: Colors.white, fontSize: compact ? 10 : 13, fontWeight: FontWeight.w800, letterSpacing: .4)),
+      if (!compact) Text('${part.hold.toStringAsFixed(part.hold.truncateToDouble() == part.hold ? 0 : 1)}s', style: TextStyle(color: accent, fontSize: 9, fontWeight: FontWeight.w800)),
+    ]),
+  );
+}
+
+class _ProgressPanel extends StatelessWidget {
+  const _ProgressPanel({required this.index, required this.total, required this.playing, required this.accent});
+  final int index;
+  final int total;
+  final bool playing;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+    decoration: BoxDecoration(color: const Color(0x82060A16), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x2AFFFFFF))),
+    child: Row(children: [
+      _Equalizer(active: playing, accent: accent),
+      const SizedBox(width: 11),
+      Container(width: 1, height: 20, color: const Color(0x66FFFFFF)),
+      const SizedBox(width: 11),
+      Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(99), child: LinearProgressIndicator(value: (index + 1) / total, minHeight: 5, color: accent, backgroundColor: const Color(0x33FFFFFF)))),
+      const SizedBox(width: 10),
+      Text('${index + 1}/$total', style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w800)),
+    ]),
+  );
+}
+
+class _TransportTube extends StatelessWidget {
+  const _TransportTube({required this.playing, required this.hasPrevious, required this.hasNext, required this.onLibrary, required this.onPrevious, required this.onPlay, required this.onNext, required this.onReplay});
+  final bool playing;
+  final bool hasPrevious;
+  final bool hasNext;
+  final VoidCallback onLibrary;
+  final VoidCallback onPrevious;
+  final VoidCallback onPlay;
+  final VoidCallback onNext;
+  final VoidCallback onReplay;
+
+  @override
+  Widget build(BuildContext context) => AspectRatio(
+    aspectRatio: 352 / 86,
+    child: Stack(alignment: Alignment.center, children: [
+      Positioned.fill(child: Image.asset('assets/player/lgp-control-tube.png', fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        _ImageControl(asset: 'assets/player/lgp-library.png', label: 'Library', onTap: onLibrary, size: 45),
+        _ImageControl(asset: 'assets/player/lgp-prev.png', label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 45),
+        _ImageControl(asset: playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png', label: playing ? 'Pause' : 'Play', onTap: onPlay, size: 63),
+        _ImageControl(asset: 'assets/player/lgp-next.png', label: 'Next', onTap: hasNext ? onNext : null, size: 45),
+        _ImageControl(asset: 'assets/player/lgp-replay.png', label: 'Replay', onTap: onReplay, size: 45),
+      ]),
+    ]),
+  );
+}
+
+class _WordActionStrip extends StatelessWidget {
+  const _WordActionStrip({required this.accent, required this.onSentence, required this.onPractice, required this.onStore});
+  final Color accent;
+  final VoidCallback onSentence;
+  final VoidCallback onPractice;
+  final VoidCallback onStore;
+
+  @override
+  Widget build(BuildContext context) => AspectRatio(
+    aspectRatio: 1371 / 317,
+    child: Stack(fit: StackFit.expand, children: [
+      NwsbVideo(asset: 'assets/video/word-acts.mp4', priority: ClipPriority.decoration, autoplay: true),
+      IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill)),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence),
+        _WordAction(icon: Icons.mic_none_rounded, label: 'Practice', onTap: onPractice, accent: accent),
+        _WordAction(icon: Icons.shopping_bag_outlined, label: 'Store', onTap: onStore),
+      ]),
+    ]),
+  );
+}
+
+class _WordAction extends StatelessWidget {
+  const _WordAction({required this.icon, required this.label, required this.onTap, this.accent});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? accent;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: label,
+    child: GestureDetector(
+      onTap: onTap,
+      child: SizedBox(width: 78, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Icon(icon, color: Colors.white, size: 25, shadows: [Shadow(color: (accent ?? Colors.black).withOpacity(.85), blurRadius: 12)]),
+        const SizedBox(height: 3),
+        Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w800, letterSpacing: 1.1)),
+      ])),
+    ),
+  );
+}
+
+class _RoundIconButton extends StatelessWidget {
+  const _RoundIconButton({required this.icon, required this.onTap, this.size = 42});
+  final IconData icon;
+  final VoidCallback onTap;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: const Color(0x2EFFFFFF),
+    shape: const CircleBorder(side: BorderSide(color: Color(0x66FFFFFF))),
+    child: InkWell(customBorder: const CircleBorder(), onTap: onTap, child: SizedBox(width: size, height: size, child: Icon(icon, color: Colors.white, size: size * .48))),
+  );
+}
+
+class _GlassTag extends StatelessWidget {
+  const _GlassTag({required this.label});
+  final String label;
+  @override
+  Widget build(BuildContext context) => Container(
+    constraints: const BoxConstraints(maxWidth: 132),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    decoration: BoxDecoration(color: const Color(0x3DFFFFFF), borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x55FFFFFF))),
+    child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.circle, color: Color(0xFFB9F3EA), size: 7), const SizedBox(width: 6), Flexible(child: Text(label, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)))]),
+  );
+}
+
+class _InfoPill extends StatelessWidget {
+  const _InfoPill();
+  @override
+  Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), decoration: BoxDecoration(color: const Color(0x2BFFFFFF), borderRadius: BorderRadius.circular(99)), child: const Text('Learn more', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)));
+}
+
+class _Equalizer extends StatelessWidget {
+  const _Equalizer({required this.active, required this.accent});
+  final bool active;
+  final Color accent;
+  @override
+  Widget build(BuildContext context) => Row(crossAxisAlignment: CrossAxisAlignment.center, children: List.generate(4, (i) => AnimatedContainer(duration: Duration(milliseconds: active ? 300 + i * 90 : 180), curve: Curves.easeInOut, width: 2.5, height: active ? 8.0 + (i.isEven ? 8 : 3) : 7.0 + i * 2, margin: const EdgeInsets.symmetric(horizontal: 1), decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(3), boxShadow: [BoxShadow(color: accent.withOpacity(.7), blurRadius: 5)]))));
+}
+
+class _GlassRail extends StatelessWidget {
+  const _GlassRail({required this.children});
+  final List<Widget> children;
+  @override
+  Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(vertical: 4), decoration: BoxDecoration(color: const Color(0x2BFFFFFF), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x55FFFFFF))), child: Column(children: children));
+}
+
+class _RailButton extends StatelessWidget {
+  const _RailButton({required this.icon, required this.onTap, this.color});
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color? color;
+  @override
+  Widget build(BuildContext context) => IconButton(onPressed: onTap, icon: Icon(icon, color: color ?? Colors.white, size: 19), visualDensity: VisualDensity.compact, tooltip: 'Player control');
+}
+
+class _VolumeRail extends StatelessWidget {
+  const _VolumeRail({required this.value, required this.onChanged});
+  final double value;
+  final ValueChanged<double> onChanged;
+  @override
+  Widget build(BuildContext context) => Container(width: 36, height: 128, decoration: BoxDecoration(color: const Color(0x2BFFFFFF), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x55FFFFFF))), child: Column(children: [
+    const SizedBox(height: 4),
+    Expanded(child: RotatedBox(quarterTurns: 3, child: Slider(value: value, onChanged: onChanged, activeColor: Colors.white, inactiveColor: const Color(0x55FFFFFF))),),
+    Icon(value == 0 ? Icons.volume_off_rounded : Icons.volume_up_rounded, color: Colors.white, size: 17),
+    const SizedBox(height: 8),
+  ]));
+}
+
+class _ImageControl extends StatelessWidget {
+  const _ImageControl({required this.asset, required this.label, required this.onTap, required this.size});
+  final String asset;
+  final String label;
+  final VoidCallback? onTap;
+  final double size;
+  @override
+  Widget build(BuildContext context) => Semantics(button: true, label: label, child: Opacity(opacity: onTap == null ? .35 : 1, child: InkResponse(onTap: onTap, radius: size * .62, child: SizedBox(width: size, height: size, child: Image.asset(asset, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Icon(label == 'Play' ? Icons.play_arrow_rounded : Icons.circle_outlined, color: Colors.white, size: size * .68))))));
+}
+
+class _RadialOption extends StatelessWidget {
+  const _RadialOption({required this.alignment, required this.label, required this.value, required this.accent, required this.onTap});
+  final Alignment alignment;
+  final String label;
+  final String value;
+  final Color accent;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Align(alignment: alignment, child: Padding(padding: const EdgeInsets.all(14), child: InkResponse(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: 70, height: 70, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0x2BFFFFFF), border: Border.all(color: accent.withOpacity(.8))), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text(label, style: const TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1)), Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))]))));
+}
+
+class _PlayerInfoSheet extends StatelessWidget {
+  const _PlayerInfoSheet({required this.word, required this.accent});
+  final Word word;
+  final Color accent;
+  @override
+  Widget build(BuildContext context) => SafeArea(top: false, child: Container(
+    constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * .78),
+    padding: const EdgeInsets.fromLTRB(24, 16, 24, 30),
+    decoration: const BoxDecoration(color: Color(0xF00B1321), borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+    child: ListView(children: [
+      Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(99)))),
+      const SizedBox(height: 18),
+      Row(children: [Expanded(child: Text(word.word, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800))), Icon(Icons.spa_rounded, color: accent)]),
+      if (word.phonetic.isNotEmpty) Text(word.phonetic, style: const TextStyle(color: Colors.white60)),
+      const SizedBox(height: 20),
+      _InfoFact(label: 'WHAT’S HAPPENING', value: word.benefit.isEmpty ? 'Listen, then repeat at your own pace.' : word.benefit, accent: accent),
+      if (word.meaning.isNotEmpty) _InfoFact(label: 'MEANING', value: word.meaning, accent: accent),
+      if (word.organ.isNotEmpty) _InfoFact(label: 'TARGET ORGAN', value: word.organ, accent: accent),
+      if (word.resonance.isNotEmpty) _InfoFact(label: 'RESONANCE POINT', value: word.resonance, accent: accent),
+      if (word.mouthPos.isNotEmpty) _InfoFact(label: 'MOUTH POSITION', value: word.mouthPos, accent: accent),
+    ]),
+  ));
+}
+
+class _InfoFact extends StatelessWidget {
+  const _InfoFact({required this.label, required this.value, required this.accent});
+  final String label;
+  final String value;
+  final Color accent;
+  @override
+  Widget build(BuildContext context) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0x1AFFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x24FFFFFF))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: TextStyle(color: accent, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2)), const SizedBox(height: 5), Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.35))]));
+}
+
+class _PlayerTheme {
+  const _PlayerTheme({required this.image, required this.video, required this.accent});
+  final String image;
+  final String video;
+  final Color accent;
+}
+
+const _playerThemes = <_PlayerTheme>[
+  _PlayerTheme(image: 'assets/player/liquid-splash.webp', video: 'assets/video/player-liquid-splash.mp4', accent: Color(0xFFFFCF4D)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656918/grok_image_1782656676834_rzp2cz.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782656947/grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656710977_nj5r6x.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782656870/grok_video_2026-06-28-19-55-09_otgbxd.mp4', accent: Color(0xFF9BB8FF)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656704854_cfsah3.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782656923/grok_video_2026-06-28-19-55-02_of5fwh.mp4', accent: Color(0xFFBD7BFF)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782657140/grok_image_1782656684101_o9vc93.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782656932/grok_video_2026-06-28-19-54-43_it2bur.mp4', accent: Color(0xFFA6DCFF)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782795978/grok_image_1782795582310_llvpix.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782795956/grok_video_2026-06-30-10-29-43_hzxyun.mp4', accent: Color(0xFFB9A6FF)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796537731_vzyhwn.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782796761/grok_video_2026-06-30-10-45-45_dg2ohg.mp4', accent: Color(0xFFA6C8FF)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796725/grok_image_1782796641824_izkh09.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782796770/grok_video_2026-06-30-10-47-20_rljghs.mp4', accent: Color(0xFFB9A6FF)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796519587_thrrws.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782796770/grok_video_2026-06-30-10-45-34_pg2y2j.mp4', accent: Color(0xFFE8D5A3)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796924745_nmksmi.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782797027/grok_video_2026-06-30-10-52-07_gvffol.mp4', accent: Color(0xFFF0D9A8)),
+  _PlayerTheme(image: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796933792_qwzfgx.jpg', video: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/vc_h264,q_auto,ac_none,w_720/v1782796996/grok_video_2026-06-30-10-52-20_zk87yh.mp4', accent: Color(0xFF8FE6FF)),
+];
+
+class PracticeProgressScreen extends StatelessWidget {
+  const PracticeProgressScreen({super.key, required this.words});
+  final List<Word> words;
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: PracticeProgress.instance,
+    builder: (context, _) {
+      final progress = PracticeProgress.instance;
+      final completed = progress.completedTodayFor(words);
+      final goal = words.isEmpty ? 0 : (completed / words.length * 100).round().clamp(0, 100);
+      return Scaffold(
+        backgroundColor: NwsbColors.deep,
+        appBar: AppBar(backgroundColor: NwsbColors.deep, foregroundColor: Colors.white, title: const Text('Your progress')),
+        body: SafeArea(child: Padding(padding: const EdgeInsets.all(24), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const Text('LIVE PRACTICE DATA', style: TextStyle(color: NwsbColors.goldLight, letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 18),
+          Text(progress.totalSessions == 0 ? 'Your first completed playback will appear here.' : 'Your progress is built from completed sessions on this device.', style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 17, height: 1.45)),
+          const SizedBox(height: 26),
+          _ProgressStat(value: '${progress.todaySessions}', label: 'Sessions today'),
+          _ProgressStat(value: '${progress.totalSessions}', label: 'Total sessions'),
+          _ProgressStat(value: '${progress.streak}', label: 'Day streak'),
+          _ProgressStat(value: words.isEmpty ? '—' : '$goal%', label: words.isEmpty ? 'Today’s goal' : '$completed of ${words.length} words today'),
+        ]))),
+      );
+    },
+  );
 }
 
 class _ProgressStat extends StatelessWidget {
   const _ProgressStat({required this.value, required this.label});
   final String value;
   final String label;
-
   @override
   Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-        decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x24FFFFFF))),
-        child: Row(children: [Text(value, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 26, fontWeight: FontWeight.w800)), const SizedBox(width: 16), Expanded(child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)))]),
-      );
+    margin: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+    decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x24FFFFFF))),
+    child: Row(children: [Text(value, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 26, fontWeight: FontWeight.w800)), const SizedBox(width: 16), Expanded(child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)))]),
+  );
 }
