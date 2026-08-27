@@ -55,6 +55,9 @@ test('WebView refreshes selected Fashion Plus video and image backgrounds for ev
   assert.match(navigation, /requestAnimationFrame\(function \(\) \{ _playScreenVideos\(sub\.id\); \}\)/);
   assert.match(navigation, /v\.muted = true/);
   assert.match(css, /\.fp-sub-open #fpBgVideo/);
+  assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) \.sub-screen\.open/);
+  assert.match(css, /sub-screen\.open > \.sub-screen-bg video/);
+  assert.match(css, /display: none !important/);
   assert.match(css, /\.nwsb-sub-open #appBg/);
   assert.match(css, /\.nwsb-menu-open #fpBgVideo/);
   assert.match(css, /\.nwsb-menu-open #appBg/);

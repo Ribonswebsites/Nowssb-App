@@ -15572,3 +15572,51 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-bottom,
 body.fashplus :is(#home, .stw-prev-stage) .fp-card .home-card-top {
   background: transparent !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FASHION PLUS — THE HOME FILM ON EVERY OPEN PAGE
+
+   When Fashion Plus is on, #fpBgVideo is the exact film currently playing
+   behind the Fashion Home. Every open page shares that fixed layer. Individual
+   page artwork and background clips must not cover it, but cards, text, and
+   controls remain untouched above the scrim.
+═══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  body.fashplus:not(.fp-bg-off) .sub-screen.open {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .sub-screen-bg,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .rm-intro-bg,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .ms-intro-bg,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .eb-intro-bg,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .sig-intro-bg,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .sl-intro-bg,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .st-bg {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* Do not let a page-owned backdrop video hide the one exact home film. */
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .sub-screen-bg video,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .rm-intro-bg video,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .ms-intro-bg video,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .eb-intro-bg video,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .sig-intro-bg video,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .sl-intro-bg video,
+  body.fashplus:not(.fp-bg-off) .sub-screen.open > .st-bg video {
+    display: none !important;
+  }
+
+  /* A light veil keeps white and gold text readable without covering cards. */
+  body.fashplus:not(.fp-bg-off) .sub-screen.open::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: rgba(6, 12, 24, 0.42);
+  }
+}
