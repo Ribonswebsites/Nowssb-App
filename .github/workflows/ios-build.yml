@@ -1,0 +1,56 @@
+name: iOS Build Validation
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter-ios:
+    name: Flutter iOS (unsigned validation)
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: flutter_app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Bundle shipped Flutter assets
+        working-directory: .
+        run: node tools/flutter-assets.mjs
+      - name: Create the iOS and Android projects
+        run: flutter create --platforms=ios,android --org com.nowssb --project-name nowssb .
+      - name: Configure Android, shared icons, and iOS assets
+        working-directory: .
+        run: |
+          node tools/flutter-android.mjs
+          node tools/flutter-ios.mjs
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Analyze Flutter sources
+        run: flutter analyze --no-fatal-infos
+      - name: Compile unsigned iOS app
+        run: flutter build ios --release --no-codesign
+
+  webview-ios:
+    name: Capacitor iOS (unsigned validation)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install webview dependencies
+        run: npm ci
+      - name: Create and sync iOS wrapper
+        run: npm run ios:add || npm run ios:sync
+      - name: Compile unsigned iOS wrapper
+        run: xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO build

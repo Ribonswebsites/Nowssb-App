@@ -119,8 +119,8 @@ Three real bugs were found by these rather than by reading the code:
 ```bash
 node tools/flutter-assets.mjs     # REQUIRED before pub get — see below
 cd flutter_app
-flutter create --platforms=android --org com.nowssb --project-name nowssb .
-cd .. && node tools/flutter-android.mjs && cd flutter_app
+flutter create --platforms=ios,android --org com.nowssb --project-name nowssb .
+cd .. && node tools/flutter-android.mjs && node tools/flutter-ios.mjs && cd flutter_app
 flutter pub get
 flutter analyze --no-fatal-infos
 flutter test
@@ -131,6 +131,12 @@ flutter build apk --debug
 writes the shipped content JSON. **It has to run before `flutter pub get`**:
 `pubspec.yaml` declares `assets/video/`, and a declared asset directory that
 does not exist fails pub get outright.
+
+### iOS and the installable IPA
+
+The Flutter project is prepared for Android and iOS. `node tools/flutter-icons.mjs` produces Android adaptive-icon resources and the iOS `AppIcon.appiconset` from one canonical source: `assets/icons/app-icon-512.png`. Flutter and the Capacitor/webview app therefore use the identical launcher artwork rather than different crops.
+
+An installable iOS `.ipa` has to be signed by an Apple Developer team. Register `com.nowssb.app` as an iOS Firebase app, retain `GoogleService-Info.plist` locally in `flutter_app/ios-config/`, run `node tools/flutter-ios.mjs` after generating iOS, then add the plist to the Runner target in Xcode. The Apple Developer account provides the certificate and provisioning profile; neither can be made from source code.
 
 `flutter_app/assets/video/` is **not committed**. The clips are in this
 repository once, at `assets/video/`, because the website and the app show the
@@ -224,6 +230,12 @@ the two the reader installed — which is the point of them being one app.
 `tools/flutter-android.mjs` resizes it into all five Android mipmap
 densities on the way into every build, because `android/res` is generated
 and `flutter create` fills it with the blue Flutter logo otherwise.
+
+On Android 8 and later, launchers use an **adaptive icon mask**. The Flutter
+generator therefore installs `android-config/adaptive/` as well as the legacy
+mipmaps. Both derive from `app-icon-512.png`; this prevents the small, padded
+Flutter launcher image that appears when only legacy `ic_launcher.png` files
+are replaced.
 
 Two more that are NOT in the repository and are fetched:
 

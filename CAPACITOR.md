@@ -126,7 +126,8 @@ button as the web app, on the Notifications page.
 
 - App name: `android/app/src/main/res/values/strings.xml` → `app_name`.
 - Launcher icon: **res → New → Image Asset → Launcher Icons**, from
-  `assets/icons/app-icon-512.png`.
+  `assets/icons/app-icon-512.png`. This is the canonical image shared with
+  the Flutter app; do not substitute `logo-disc.webp` or a copied crop.
 - Splash background is `#060c18`, already set in `capacitor.config.json`.
 
 ---
@@ -243,6 +244,13 @@ npm run ios:add            # builds www/, then `npx cap add ios`
 `ios/` is generated and git-ignored, exactly like `android/`. Rebuild it
 whenever you like; nothing of yours lives there.
 
+Before each Android or iOS asset generation, the packaging scripts copy the
+single canonical mark at `assets/icons/app-icon-512.png` into
+`resources/icon.png`. Capacitor then creates the platform asset catalog from
+that exact source. This keeps the webview, PWA, Flutter adaptive icon, and
+iOS AppIcon visually aligned; never replace the generated `resources/icon.png`
+with `logo-disc.webp` or a manually cropped variation.
+
 After any change to the web app:
 
 ```bash
@@ -273,6 +281,11 @@ notification screen serve all three platforms without changes.
 it identifies your project — it is covered by the same rule as
 `google-services.json`: it lives in the generated `ios/` folder, which git
 never sees.
+
+The iOS wrapper deliberately does **not** use App-Bound Domains. Firebase's
+Google sign-in redirect must be able to navigate to Google and the configured
+Firebase auth handler; restricting the embedded browser to an app-bound list
+causes an otherwise valid iOS login to fail before the credential returns.
 
 ## 3. Signing
 

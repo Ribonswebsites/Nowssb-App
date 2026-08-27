@@ -25,7 +25,7 @@
   },
   "ios": {
     "contentInset": "always",
-    "limitsNavigationsToAppBoundDomains": true,
+    "limitsNavigationsToAppBoundDomains": false,
     "scheme": "NowssB"
   }
 }

@@ -1,7 +1,8 @@
 # Builds the Flutter APK and hands it back as a download.
 #
-# This is the one that gets you a file to upload. flutter_app/android is
-# generated, not committed, so `flutter create --platforms=android .`
+# This is the one that gets you a file to upload. flutter_app/android and
+# flutter_app/ios are generated, not committed, so
+# `flutter create --platforms=ios,android .`
 # recreates it on the runner before building. Nothing has to be installed on
 # your machine: push, open the Actions tab, download the APK from the run's
 # Artifacts.
@@ -66,10 +67,10 @@ jobs:
         working-directory: .
         run: node tools/flutter-assets.mjs
 
-      # android/ is generated. This writes it without touching lib/ or
+      # android/ and ios/ are generated. This writes them without touching lib/ or
       # pubspec.yaml, which flutter create leaves alone when they exist.
-      - name: Create the Android project
-        run: flutter create --platforms=android --org com.nowssb --project-name nowssb .
+      - name: Create the Android and iOS projects
+        run: flutter create --platforms=ios,android --org com.nowssb --project-name nowssb .
 
       # android/ as generated does not build this app: the application id has
       # to be the one Firebase issued the config for, flutter_local_notifications
@@ -78,6 +79,10 @@ jobs:
       - name: Configure the Android project
         working-directory: .
         run: node tools/flutter-android.mjs
+
+      - name: Install shared iOS branding
+        working-directory: .
+        run: node tools/flutter-ios.mjs
 
       - name: Dependencies
         run: flutter pub get
@@ -137,14 +142,19 @@ jobs:
         working-directory: .
         run: node tools/flutter-assets.mjs
 
-      - name: Create the Android project
+      - name: Create the Android and iOS projects
         if: steps.guard.outputs.ok == 'true'
-        run: flutter create --platforms=android --org com.nowssb --project-name nowssb .
+        run: flutter create --platforms=ios,android --org com.nowssb --project-name nowssb .
 
       - name: Configure the Android project
         if: steps.guard.outputs.ok == 'true'
         working-directory: .
         run: node tools/flutter-android.mjs
+
+      - name: Install shared iOS branding
+        if: steps.guard.outputs.ok == 'true'
+        working-directory: .
+        run: node tools/flutter-ios.mjs
 
       # Written into the runner for this run only. .gitignore already refuses
       # *.keystore, *.jks and key.properties, so it cannot reach the repo.

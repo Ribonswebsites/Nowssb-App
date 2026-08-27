@@ -3,6 +3,7 @@ node_modules/
 www/
 android/
 ios/
+resources/
 
 # The downloaded copies of every image and video (tools/asset-manifest.mjs
 # --download). Hundreds of megabytes, all re-fetchable from the manifest,
@@ -16,6 +17,7 @@ assets/media/
 *.jks
 *service-account*.json
 key.properties
+flutter_app/ios-config/GoogleService-Info.plist
 
 .DS_Store
 

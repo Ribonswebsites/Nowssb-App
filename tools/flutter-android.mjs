@@ -48,6 +48,7 @@ import {
   writeFileSync,
   existsSync,
   copyFileSync,
+  cpSync,
   mkdirSync,
 } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -189,6 +190,7 @@ writeFileSync(appGradle, a);
 // run `node tools/flutter-icons.mjs` on a machine with Pillow and commit
 // what it writes.
 const ICON_SRC = join(root, 'flutter_app', 'android-config', 'mipmap');
+const ADAPTIVE_ICON_SRC = join(root, 'flutter_app', 'android-config', 'adaptive');
 /** Android's five launcher densities. */
 const MIPMAPS = [
   'mipmap-mdpi',
@@ -218,6 +220,17 @@ const res = join(android, 'app', 'src', 'main', 'res');
   }
   done.push('copied ic_launcher at five densities');
 }
+
+// Flutter's standard mipmap PNGs are only the fallback for pre-Android 8
+// devices. Modern launchers apply an adaptive icon mask and were showing the
+// Flutter build as a small inset. Copy the adaptive resources generated from
+// the canonical PWA/webview image so it fills the same masked tile.
+if (!existsSync(ADAPTIVE_ICON_SRC)) {
+  console.error(`missing adaptive launcher resources under ${ADAPTIVE_ICON_SRC}\nrun: node tools/flutter-icons.mjs`);
+  process.exit(1);
+}
+cpSync(ADAPTIVE_ICON_SRC, res, { recursive: true, force: true });
+done.push('copied adaptive launcher icon resources');
 
 // ── the manifest ───────────────────────────────────────────────────────
 // Without INTERNET in the MAIN manifest a release build has no network at

@@ -6,13 +6,15 @@
   "type": "module",
   "scripts": {
     "build:native": "node tools/build-native.mjs",
-    "android:assets": "capacitor-assets generate --android --iconBackgroundColor '#060c18' --iconBackgroundColorDark '#060c18' --splashBackgroundColor '#060c18' --splashBackgroundColorDark '#060c18'",
+    "native:icon-source": "node tools/native-icon-source.mjs",
+    "android:assets": "npm run native:icon-source && capacitor-assets generate --android --iconBackgroundColor '#060c18' --iconBackgroundColorDark '#060c18' --splashBackgroundColor '#060c18' --splashBackgroundColorDark '#060c18'",
     "android:add": "npm run build:native && npx cap add android",
     "android:sync": "npm run build:native && npx cap sync android",
     "android:open": "npx cap open android",
     "android:run": "npm run build:native && npx cap run android",
-    "ios:add": "npm run build:native && npx cap add ios",
-    "ios:sync": "npm run build:native && npx cap sync ios",
+    "ios:assets": "npm run native:icon-source && capacitor-assets generate --ios --iconBackgroundColor '#060c18' --iconBackgroundColorDark '#060c18' --splashBackgroundColor '#060c18' --splashBackgroundColorDark '#060c18'",
+    "ios:add": "npm run build:native && npx cap add ios && npm run ios:assets && npx cap sync ios",
+    "ios:sync": "npm run build:native && npm run ios:assets && npx cap sync ios",
     "ios:open": "npx cap open ios",
     "ios:run": "npm run build:native && npx cap run ios",
     "sync": "npm run build:native && npx cap sync"

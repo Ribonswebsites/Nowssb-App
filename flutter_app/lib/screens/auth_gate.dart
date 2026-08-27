@@ -39,7 +39,7 @@ class _AuthGateState extends State<AuthGate> {
     } on _AuthMessage catch (error) {
       if (mounted) setState(() => _error = error.message);
     } on FirebaseAuthException catch (error) {
-      if (mounted) setState(() => _error = error.message ?? 'Sign-in could not be completed.');
+      if (mounted) setState(() => _error = _friendlyAuthError(error));
     } catch (_) {
       if (mounted) setState(() => _error = 'Sign-in could not be completed. Check your connection and try again.');
     } finally {
@@ -48,14 +48,36 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Future<void> _googleLogin() => _run(() async {
+    if (!NwsbFirebase.ready) {
+      throw const _AuthMessage('Sign-in is not configured in this build yet. Use a build that includes the Firebase platform configuration.');
+    }
     final account = await _google.signIn();
     if (account == null) return;
     final credentials = await account.authentication;
+    if (credentials.idToken == null && credentials.accessToken == null) {
+      throw const _AuthMessage('Google did not return a sign-in credential. Confirm the app package and signing certificate are registered in Firebase.');
+    }
     await FirebaseAuth.instance.signInWithCredential(GoogleAuthProvider.credential(
       accessToken: credentials.accessToken,
       idToken: credentials.idToken,
     ));
   });
+
+  String _friendlyAuthError(FirebaseAuthException error) {
+    switch (error.code) {
+      case 'network-request-failed':
+        return 'No network connection is available. Reconnect and try again.';
+      case 'invalid-credential':
+      case 'account-exists-with-different-credential':
+        return 'This account needs a different sign-in method. Try the email option below.';
+      case 'operation-not-allowed':
+        return 'This sign-in method has not been enabled in Firebase for this app yet.';
+      case 'app-not-authorized':
+        return 'This app is not authorised for Google sign-in. Confirm the package ID and signing certificate in Firebase.';
+      default:
+        return error.message ?? 'Sign-in could not be completed.';
+    }
+  }
 
   Future<void> _emailLogin() => _run(() async {
     final email = _email.text.trim();
