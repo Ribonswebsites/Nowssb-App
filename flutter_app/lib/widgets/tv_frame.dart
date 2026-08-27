@@ -321,17 +321,13 @@ class _Bezel extends StatelessWidget {
               right: 0,
               top: 0,
               bottom: railBottom,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: ExactAssetImage(
-                      'assets/frames/tv-l-mid.webp',
-                      scale: _tvRailNaturalWidth / c.maxWidth,
-                    ),
-                    repeat: ImageRepeat.repeatY,
-                    alignment: Alignment.topCenter,
-                  ),
-                ),
+              child: Image.asset(
+                'assets/frames/tv-l-mid.webp',
+                scale: _tvRailNaturalWidth / c.maxWidth,
+                fit: BoxFit.none,
+                repeat: ImageRepeat.repeatY,
+                alignment: Alignment.topCenter,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
             Positioned(
