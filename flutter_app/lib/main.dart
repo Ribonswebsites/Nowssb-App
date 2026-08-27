@@ -15,6 +15,7 @@
 ///     lib/media/video_pool.dart is where that ceiling is enforced.
 library;
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
