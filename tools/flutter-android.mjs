@@ -66,6 +66,8 @@ if (!existsSync(configJson)) {
 }
 const APP_ID = JSON.parse(readFileSync(configJson, 'utf8'))
   .client[0].client_info.android_client_info.package_name;
+/** Public launcher label used by the website title and PWA short name. */
+const DISPLAY_NAME = 'NowssB';
 
 if (!existsSync(android)) {
   console.error(`missing ${android} — run \`flutter create --platforms=android\` first`);
@@ -227,6 +229,18 @@ if (!existsSync(manifest)) {
   process.exit(1);
 }
 let m = readFileSync(manifest, 'utf8');
+
+// flutter create derives a lower-case label from the package name. Keep the
+// Android home-screen label consistent with the website and PWA instead.
+if (m.includes(`android:label="${DISPLAY_NAME}"`)) {
+  already.push(`application label ${DISPLAY_NAME}`);
+} else {
+  const before = m;
+  m = m.replace(/android:label="[^"]*"/, `android:label="${DISPLAY_NAME}"`);
+  if (m === before) throw new Error('AndroidManifest.xml: no application label');
+  done.push(`application label → ${DISPLAY_NAME}`);
+}
+
 if (m.includes('android.permission.INTERNET')) {
   already.push('INTERNET permission present');
 } else {
