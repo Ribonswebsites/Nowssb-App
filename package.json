@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build:native": "node tools/build-native.mjs",
+    "android:assets": "capacitor-assets generate --android --iconBackgroundColor '#060c18' --iconBackgroundColorDark '#060c18' --splashBackgroundColor '#060c18' --splashBackgroundColorDark '#060c18'",
     "android:add": "npm run build:native && npx cap add android",
     "android:sync": "npm run build:native && npx cap sync android",
     "android:open": "npx cap open android",
@@ -26,6 +27,7 @@
     "@capacitor/status-bar": "^8.0.3"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.5.0"
   }
 }
