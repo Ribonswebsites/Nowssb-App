@@ -17,7 +17,7 @@
     practice: '<img src="https://media.nowssb.com/migrated-images/a8a2eb1bb04d59d1_27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
     library: '<img src="https://media.nowssb.com/migrated-images/643dd804e986b5f6_3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
     settings: '<img src="https://media.nowssb.com/migrated-images/909b614a4f984b77_f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
-    store: '<img src="https://res.r2.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    store: '<img src="https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
     flame: '<svg width="40" height="40" viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.85"/></svg>',
     playerReady: '<img src="https://media.nowssb.com/migrated-images/dc638b945c082954_file_000000003254720aab81c7118e7cc24a_ohsba3.png" style="width:70px;height:70px;object-fit:contain;" alt="">'
   };

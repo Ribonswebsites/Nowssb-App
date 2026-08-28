@@ -23,7 +23,7 @@
     var cart = window.nssCart || [];
     var coupons = window.NSS_COUPONS || {};
     var qualifyFn = window.chkQualifyingItems || function (c) { return c; };
-    var couponImg = 'https://res.r2.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png';
+    var couponImg = 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png';
     couponsBox.innerHTML = Object.keys(coupons).map(function (code) {
       var c = coupons[code];
       var qualifying = qualifyFn(cart, c);
@@ -62,7 +62,7 @@
       return;
     }
 
-    var wordImg = 'https://res.r2.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png';
+    var wordImg = 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png';
     gridBox.innerHTML = discounted.map(function (word, i) {
       var t = tiers[wordTier[word]] || {};
       return '<div class="bgp-offer-card' + (i >= 6 ? ' bgp-hidden-extra' : '') + '" onclick="nwsbOpenStoreWord(\'' + String(word).replace(/'/g, '') + '\')">' +

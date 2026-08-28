@@ -12,7 +12,6 @@
 (function () {
   'use strict';
 
-  var V = 'https://res.r2.com/eenvubod/video/upload/';
 
   /* before: the banner is inserted as the element's previous sibling.
      top:    the banner is inserted as the element's first child.
@@ -69,13 +68,13 @@
        app/js/part062.js as 'genderpath'; a direct child of the home wrap
        that the registry does not know about gets stranded at the top of the
        page while everything registered is re-appended around it. */
-    { after: '#home-nm .nmh-healing-wrap',         vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
+    { after: '#home-nm .nmh-healing-wrap',         vid: './assets/video/healing-path-bg.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
               banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
                                    else if (typeof openSub === 'function') openSub('health-category'); } } },
-    { after: '#home .fash-healing-wrap',           vid: V + 'v1785402957/grok_video_2026-07-30-14-42-14_ihmhi7.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
+    { after: '#home .fash-healing-wrap',           vid: './assets/video/healing-path-bg.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
@@ -92,11 +91,11 @@
     { top:    '#home .nc-blk-vid',                 vid: './assets/video/connect-banner.mp4?v=1', frame: 'dev-tabc-l' },
 
     // Trending
-    { top:    '#home-nm .nmh-trend-shop-wrap',     vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
-    { top:    '#home .fash-storevid-wrap',         vid: V + 'v1785402931/grok_video_2026-07-30-14-43-11_gjhfww.mp4' },
+    { top:    '#home-nm .nmh-trend-shop-wrap',     vid: './assets/video/store-section.mp4' },
+    { top:    '#home .fash-storevid-wrap',         vid: './assets/video/store-section.mp4' },
 
     // Meaning — a different clip in each place it appears
-    { before: '#home-nm .krm-section',             vid: V + 'v1785402917/grok_video_2026-07-30-14-44-14_cqj4qc.mp4', frame: 'dev-tab-l', wrap: 'nvb-blk' },
+    { before: '#home-nm .krm-section',             vid: './assets/video/orb-loop.mp4', frame: 'dev-tab-l', wrap: 'nvb-blk' },
     /* The clip this tablet used to carry never arrived — the tablet above
        Meaning Search on the Fashion home was a black screen. It ships in
        the repo now rather than coming from a CDN, which is also why it
@@ -105,14 +104,14 @@
     /* Below the store's own cinematic hero (#msBanner), not above it — a
        `top` placement into #msMeaningBody had been landing it before the
        hero as that host's first child instead. */
-    { after:  '#msBanner',                         vid: V + 'v1785406069/grok_video_2026-07-30-15-36-38_uq9l5d.mp4' },
+    { after:  '#msBanner',                         vid: './assets/video/orb-loop.mp4' },
 
     /* These two pages hang their scroller off `position: absolute; inset: 0`,
        so a banner at the top of the page box sits behind it. It goes at the
        top of the scrolling content instead, below the hero and clear of the
        fixed header. */
-    { top:    '#sub-offers .bgp-content',          vid: V + 'v1785402975/grok_video_2026-07-30-14-43-34_lqppzd.mp4' },
-    { top:    '#sub-quick-access .bgp-content',    vid: V + 'v1785402945/grok_video_2026-07-30-14-43-00_ft8o8u.mp4' },
+    { top:    '#sub-offers .bgp-content',          vid: './assets/video/coupon-a.mp4' },
+    { top:    '#sub-quick-access .bgp-content',    vid: './assets/video/connect-banner.mp4' },
 
     // Every word's own page, above About This Word — a player banner, so it
     // carries the player mark on the right and opens the practice.
@@ -160,7 +159,7 @@
      underneath it inside one glass wrapper, and it goes in three places: the
      home sections, above the shelf on the store page, and above the copy on
      every book's own page. */
-  var EB_VID  = V + 'v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4';
+  var EB_VID  = './assets/video/store-section.mp4';
   var EB_ICON = 'https://media.nowssb.com/migrated-images/2a57d6d66570597b_file_00000000ae5882089bc97a56b7368777_l4cq7e.png';
 
   /* The subscription clip was the same one in several places. The two home
@@ -182,10 +181,10 @@
        here, and the new one. Added rather than swapped: the existing clip
        is the one the banner was designed around. */
     { sel: '#home-nm .nmh-vb-tall video, #home .fash-vb-tall video',
-      vid: [V + 'v1785403503/grok_video_2026-07-30-14-44-37_jufhyx.mp4',
+      vid: ['./assets/video/subscription-a.mp4',
             './assets/video/subscription-a.mp4'] },
     { sel: '.ss-plan-banner-vid',
-      vid: V + 'v1785406071/grok_video_2026-07-30-15-36-45_ihftsp.mp4' },
+      vid: './assets/video/subscription-promo.mp4' },
     /* The Edition section — the card that carries the plan and Upgrade,
        not the Subscribe Today banner above it. A different cloud from the
        rest, so the full URL rather than the V prefix. */
@@ -197,15 +196,14 @@
      Every icon here is a file the app already ships and already uses for
      that section — the Quick Links rail's own map — so a chip reads as the
      same thing the user taps elsewhere. ── */
-  var I = 'https://res.r2.com/';
   var CHIP_IC = {
-    meaning: I + 'eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png',
-    words:   I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
-    ebooks:  I + 'eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png',
-    connect: I + 'eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
-    chat:    I + 'ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
-    profile: I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
-    offer:   I + 'eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png'
+    meaning: 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png',
+    words:   'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
+    ebooks:  'https://media.nowssb.com/migrated-images/2a57d6d66570597b_file_00000000ae5882089bc97a56b7368777_l4cq7e.png',
+    connect: 'https://media.nowssb.com/migrated-images/8ed93fdc651b43c3_file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+    chat:    'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
+    profile: 'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+    offer:   'https://media.nowssb.com/migrated-images/5972de26815c527d_file_000000006b20820b84961321dcdcaaa8_be9meu.png'
   };
   var STORE_CHIPS = [
     ['meaning', 'Meanings', 'The origin behind any word'],

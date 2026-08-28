@@ -13,16 +13,7 @@ var WS_IMG_OWN     = '';   // own-your-word image (3:2)
 // Just add the URL and textColor. Detection runs once and is cached forever.
 // ══════════════════════════════════════════════════════
 var WS_CHAR_TEMPLATES = [
-  // PASTE YOUR R2 URLs HERE — example format:
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../tribal-warrior.jpg', textColor: 'white' },
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../roman-emperor.jpg',  textColor: 'gold'  },
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../zeus-lightning.jpg', textColor: 'gold'  },
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../white-suit.jpg',     textColor: 'white' },
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../egyptian-queen.jpg', textColor: 'gold'  },
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../purple-suit.jpg',    textColor: 'gold'  },
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../viking-thor.jpg',    textColor: 'silver'},
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../scientist.jpg',      textColor: 'white' },
-  // { url: 'https://res.r2.com/dfc8lwj22/image/upload/q_auto/f_auto/v.../buddha.jpg',         textColor: 'gold'  },
+  // Add migrated media.nowssb.com image URLs here when new character art arrives.
 ];
 
 // Cache key prefix for localStorage
