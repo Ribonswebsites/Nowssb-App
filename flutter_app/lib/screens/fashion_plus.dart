@@ -74,7 +74,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
       child: PageShell(
         eyebrow: 'Experience',
         title: 'Fashion Plus',
-        film: 'assets/video/fashion-plus-bg.mp4',
+        film: 'assets/video/fashion-plus-bg-6.mp4',
         onBack: () => Navigator.of(context).maybePop(),
         slivers: [
           SliverPadding(

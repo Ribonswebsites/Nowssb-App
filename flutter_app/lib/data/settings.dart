@@ -29,18 +29,10 @@ class Settings extends ChangeNotifier {
   /// One selected Fashion Plus film plays behind every primary page while
   /// motion mode is enabled.
   static const fashionVideos = <String>[
-    'assets/video/fashion-plus-bg.mp4',
-    'assets/video/fashion-plus-bg-1.mp4',
-    'assets/video/fashion-plus-bg-2.mp4',
-    'assets/video/fashion-plus-bg-3.mp4',
     'assets/video/fashion-plus-bg-5.mp4',
     'assets/video/fashion-plus-bg-6.mp4',
   ];
   static const fashionVideoNames = <String>[
-    'Shattered Glass',
-    'Background Two',
-    'Background Three',
-    'Background Four',
     'Falling Diamonds',
     'Violet Silk',
   ];
@@ -64,7 +56,7 @@ class Settings extends ChangeNotifier {
 
   bool _fashionPlus = false;
   bool _fashionHome = false;
-  int _fashionVideo = 5;
+  int _fashionVideo = 1;
   int _fashionImage = -1;
   int _backgroundTransition = 0;
 
@@ -89,7 +81,7 @@ class Settings extends ChangeNotifier {
       _fashionVideo = _validIndex(
         p.getInt(_kVideo) ?? _fashionVideo,
         fashionVideos.length,
-        fallback: 5,
+        fallback: 1,
       );
       _fashionImage = _validImageIndex(p.getInt(_kImage) ?? _fashionImage);
       notifyListeners();
@@ -114,7 +106,7 @@ class Settings extends ChangeNotifier {
   }
 
   Future<void> setFashionVideo(int index) async {
-    final next = _validIndex(index, fashionVideos.length, fallback: 5);
+    final next = _validIndex(index, fashionVideos.length, fallback: 1);
     if (_fashionVideo == next) return;
     _fashionVideo = next;
     _advanceBackgroundTransition();
