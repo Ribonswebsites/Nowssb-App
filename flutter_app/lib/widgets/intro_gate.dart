@@ -89,7 +89,10 @@ class _IntroGateState extends State<IntroGate> {
   }
 
   void _openContent() {
-    Navigator.of(context, rootNavigator: true).pushReplacement(
+    // IntroGate can live inside the tab shell's IndexedStack. Push on the
+    // navigator that owns this screen so the content route is visible above
+    // the shell instead of replacing the shell's root route.
+    Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => widget.child),
     );
   }
