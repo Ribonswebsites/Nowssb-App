@@ -61,7 +61,9 @@ class StoreScreen extends StatelessWidget {
   }
 
   static void _open(BuildContext context, Widget page) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
+    Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute<void>(builder: (_) => page),
+    );
   }
 }
 
@@ -120,15 +122,19 @@ class _DepartmentCard extends StatelessWidget {
   final String art, eyebrow, title, body;
   final void Function(BuildContext) onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () => onTap(context),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          height: 142,
-          margin: const EdgeInsets.only(bottom: 12),
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x1FFFFFFF))),
-          child: Stack(fit: StackFit.expand, children: [
+  Widget build(BuildContext context) => Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => onTap(context),
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            height: 142,
+            margin: const EdgeInsets.only(bottom: 12),
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x1FFFFFFF))),
+            child: Stack(fit: StackFit.expand, children: [
             Image.asset(art, fit: BoxFit.cover),
             const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xF0060C18), Color(0xB0060C18), Color(0x33060C18)]))),
             Padding(
@@ -142,7 +148,8 @@ class _DepartmentCard extends StatelessWidget {
               ]),
             ),
             const Positioned(right: 18, bottom: 18, child: Icon(Icons.arrow_forward, size: 18, color: Color(0xD9FFFFFF))),
-          ]),
+            ]),
+          ),
         ),
       );
 }
