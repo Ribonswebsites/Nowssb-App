@@ -10504,7 +10504,14 @@ body.homecorner-round #home-nm .nmh-sec-wrap > *:last-child { border-radius: 0 0
   background: #060c18; overflow: hidden;
   transition: opacity 0.48s cubic-bezier(0.4,0,0.2,1);
 }
-.sig-intro-page.sig-intro-hidden { opacity: 0; pointer-events: none; }
+.sig-intro-page.sig-intro-hidden,
+.rm-intro-page.rm-intro-hidden,
+.ms-intro-page.ms-intro-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
 
 .sig-intro-bg {
   position: absolute; inset: 0; z-index: 0;
