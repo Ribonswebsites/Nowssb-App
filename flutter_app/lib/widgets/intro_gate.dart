@@ -205,8 +205,9 @@ class _Intro extends StatelessWidget {
                               size: 18, color: Color(0xBFFFFFFF)),
                         ),
                       ),
-                      Expanded(
-                        child: Center(
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Text(
                             tag,
                             maxLines: 1,
@@ -242,6 +243,8 @@ class _Intro extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(
                         title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 42,
                           fontWeight: FontWeight.w300,
@@ -258,6 +261,8 @@ class _Intro extends StatelessWidget {
                       const SizedBox(height: 18),
                       Text(
                         body,
+                        maxLines: 5,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 13.5,
                           color: Color(0xB3FFFFFF),
@@ -294,22 +299,26 @@ class _Intro extends StatelessWidget {
                           height: 54,
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           color: Colors.white,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                enterLabel,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.5,
-                                  color: NwsbColors.ink,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  enterLabel,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.5,
+                                    color: NwsbColors.ink,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 14),
-                              const Icon(Icons.arrow_forward,
-                                  size: 17, color: NwsbColors.ink),
-                            ],
+                                const SizedBox(width: 14),
+                                const Icon(Icons.arrow_forward,
+                                    size: 17, color: NwsbColors.ink),
+                              ],
+                            ),
                           ),
                         ),
                       ),

@@ -109,11 +109,13 @@ void main() {
 
   testWidgets('Flutter Store exposes the WebView Store departments', (tester) async {
     await pump(tester, const StoreScreen());
+    await tester.scrollUntilVisible(find.text('SIGNATURE STORE'), 260,
+        scrollable: find.byType(Scrollable).first);
 
-    expect(find.text('Word Atelier'), findsOneWidget);
-    expect(find.text('Meaning Store'), findsOneWidget);
-    expect(find.text('Signature Store'), findsOneWidget);
-    expect(find.text('Shabdapathy · Library'), findsOneWidget);
+    expect(find.text('WORD ATELIER'), findsOneWidget);
+    expect(find.text('MEANING STORE'), findsOneWidget);
+    expect(find.text('SIGNATURE STORE'), findsOneWidget);
+    expect(find.text('SHABDAPATHY · LIBRARY'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
