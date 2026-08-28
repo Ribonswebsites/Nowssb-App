@@ -24,11 +24,12 @@ test('website and WebView downloads use the supplied listing and the correct lat
   assert.match(listing, /window\.goBack/);
   assert.match(listing, /role="button"/);
   assert.match(listing, /listing-hero-wrap/);
-  assert.match(listing, /padding:0 12px/);
-  assert.match(listing, /height:clamp\(180px, 34vw, 270px\)/);
+  assert.match(listing, /padding:0 16px/);
+  assert.match(listing, /height:clamp\(140px, 28vw, 220px\)/);
   assert.match(listing, /assets\/app-listing\/listing-hero-banner\.png/);
   assert.match(listing, /hero-back-btn/);
-  assert.match(listing, /right:12px/);
+  assert.match(listing, /left:12px/);
+  assert.match(listing, /right:auto/);
   assert.match(listing, /hero-back-btn/);
   assert.match(listing, /background:#fff/);
   assert.doesNotMatch(listing, /Download the app<br>/);
