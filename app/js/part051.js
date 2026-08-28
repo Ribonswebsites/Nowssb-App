@@ -205,7 +205,10 @@
     } catch (err) {}
   }, true);
 
-  var MAX_PLAYING = 6;
+  /* Website/WebView requirement: every decorative video stays mounted and loops.
+     Do not cap playback by viewport; a capped decoder set makes banners appear as
+     black boxes when a Store screen opens over the Home. */
+  var MAX_PLAYING = Number.MAX_SAFE_INTEGER;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();
   var shownCache = new WeakMap();   // element -> boolean, cleared on class changes
@@ -352,14 +355,10 @@
       var v = m.target;
       var cur = v.getAttribute('src');
       if (!cur) return;
-      if (near.has(v)) { v.setAttribute(STASH, cur); poster(v); return; }
+      /* Keep externally assigned sources live. Removing them while a Store
+         banner is being injected leaves a black video box in WebView. */
       v.setAttribute(STASH, cur);
-      poster(v);                       /* the new clip's frame, not the old one's */
-      try { v.pause(); } catch (e) {}
-      mine = true;
-      v.removeAttribute('src');
-      mine = false;
-      try { v.load(); } catch (e) {}
+      poster(v);
     });
   }) : null;
 
@@ -435,17 +434,9 @@
       v.setAttribute(MARK, '1');
       tracked.push(v);
       if (io) io.observe(v);
-      /* Off the moment it is seen, and back on only when it comes near.
-         A page that starts with every source attached is a page that has
-         already paid for every decoder before anyone has scrolled. */
-      if (mountIo && manageable(v)) {
-        unmount(v);
-        mountIo.observe(v);
-        if (srcWatch) srcWatch.observe(v, { attributes: true, attributeFilter: ['src'] });
-      }
-      /* The browser's own autoplay attribute is a standing instruction that
-         survives a JS pause, so it is stripped and playback is driven here. */
-      v.removeAttribute('autoplay');
+      /* Keep the source mounted. The website/WebView surfaces require every
+         decorative clip to remain available and loop simultaneously. */
+      if (srcWatch) srcWatch.observe(v, { attributes: true, attributeFilter: ['src'] });
     });
   }
 
@@ -468,7 +459,7 @@
     for (var i = tracked.length - 1; i >= 0; i--) {
       var v = tracked[i];
       if (!v.isConnected) { tracked.splice(i, 1); continue; }
-      if ((io ? onScreen.has(v) : true) && shown(v)) live.push(v);
+      if (shown(v)) live.push(v);
     }
     /* Nearest the middle of the screen wins the decoders — except for a clip
        that IS its section rather than decoration behind one. The television
@@ -502,9 +493,6 @@
           autoPaused.delete(v);
           var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
         }
-      } else if (!v.paused) {
-        v.pause();
-        autoPaused.add(v);
       }
     });
   }

@@ -15862,3 +15862,61 @@ body.nwsb-store-open #sub-signature-store .sig-intro-page {
   background-color: #000 !important;
   opacity: 1 !important;
 }
+
+/* ══ STORE-WIDE 3D BACKGROUND PARALLAX ══
+   UI stays fixed; only page-owned artwork and video layers drift beneath it. */
+.nss-store-parallax {
+  perspective: 1100px;
+  perspective-origin: 50% 45%;
+  --nss-parallax-x: 0px;
+  --nss-parallax-y: 0px;
+  --nss-parallax-scroll: 0px;
+}
+.nss-store-parallax > .nss-intro-page,
+.nss-store-parallax > .rm-intro-page,
+.nss-store-parallax > .ms-intro-page,
+.nss-store-parallax > .sig-intro-page,
+.nss-store-parallax > #rmMainContent,
+.nss-store-parallax > #msMcontent,
+.nss-store-parallax > #ebMcontent,
+.nss-store-parallax > #nssBody,
+.nss-store-parallax > .sub-header,
+.nss-store-parallax > .sub-body,
+.nss-store-parallax > .bgp-content { transform-style: preserve-3d; }
+.nss-store-parallax > .nss-intro-page > .nss-intro-img,
+.nss-store-parallax > .rm-intro-page > .rm-intro-bg,
+.nss-store-parallax > .ms-intro-page > .ms-intro-bg,
+.nss-store-parallax > .sig-intro-page > .sig-intro-bg,
+.nss-store-parallax .sub-screen-bg,
+.nss-store-parallax .ms-hero-img,
+.nss-store-parallax .rm-banner-img,
+.nss-store-parallax .nss-intro-img,
+.nss-store-parallax .nss-store-bg,
+.nss-store-parallax .sig-store-bg {
+  will-change: transform;
+  transform: translate3d(var(--nss-parallax-x), calc(var(--nss-parallax-y) + var(--nss-parallax-scroll)), 22px) scale(1.08);
+  transform-origin: 50% 50%;
+  transition: transform 120ms ease-out;
+}
+.nss-store-parallax .sub-screen-bg,
+.nss-store-parallax .ms-hero-img,
+.nss-store-parallax .rm-banner-img {
+  transform: translate3d(var(--nss-parallax-x), calc(var(--nss-parallax-y) + var(--nss-parallax-scroll)), 16px) scale(1.075);
+}
+.nss-store-parallax .nss-intro-vignette,
+.nss-store-parallax .rm-intro-vignette,
+.nss-store-parallax .sl-intro-vignette,
+.nss-store-parallax .sig-intro-vignette,
+.nss-store-parallax .ms-hero-fade { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .nss-store-parallax > .nss-intro-page > .nss-intro-img,
+  .nss-store-parallax > .rm-intro-page > .rm-intro-bg,
+  .nss-store-parallax > .ms-intro-page > .ms-intro-bg,
+  .nss-store-parallax > .sig-intro-page > .sig-intro-bg,
+  .nss-store-parallax .sub-screen-bg,
+  .nss-store-parallax .ms-hero-img,
+  .nss-store-parallax .rm-banner-img,
+  .nss-store-parallax .nss-intro-img,
+  .nss-store-parallax .nss-store-bg,
+  .nss-store-parallax .sig-store-bg { transform: none; transition: none; }
+}

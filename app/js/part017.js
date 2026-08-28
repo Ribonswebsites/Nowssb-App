@@ -70,8 +70,9 @@ function nssEnterStore() {
     var v = document.getElementById(id);
     if (v) { v.muted = true; v.play().catch(function(){}); }
   });
-  // Init 3D banner scroll + tilt
+  // Init 3D banner scroll + tilt and refresh the shared page background layer.
   setTimeout(nssInitBanner3D, 80);
+  if (typeof window.nssStoreParallaxRefresh === 'function') window.nssStoreParallaxRefresh();
 }
 
 // ════════════════════════════════════════════
@@ -502,6 +503,7 @@ function nssOpenSub(id) {
   target.classList.add('open');
   target.setAttribute('aria-hidden', 'false');
   if (typeof window.nwsbFpSyncPageBackdrop === 'function') window.nwsbFpSyncPageBackdrop();
+  if (typeof window.nssStoreParallaxRefresh === 'function') window.nssStoreParallaxRefresh();
 
   if (id === 'meaning-store') {
     var msVid = document.getElementById('msBannerImg');
@@ -735,4 +737,76 @@ window.ebEnterFromIntro = function () {
     if (id === 'nowssb-store') { nssClose(); return; }
     if (typeof _prevC === 'function') _prevC.apply(this, arguments);
   };
+})();
+
+
+// ── ALL STORE PAGES: background-only 3D parallax ──
+(function () {
+  var STORE_PARALLAX_IDS = [
+    'sub-nowssb-store', 'sub-real-meaning', 'sub-meaning-store',
+    'sub-ebooks-store', 'sub-ebook-detail', 'sub-signature-store'
+  ];
+  var bound = false;
+  var raf = 0;
+  var pending = null;
+
+  function activeScreen() {
+    for (var i = STORE_PARALLAX_IDS.length - 1; i >= 0; i--) {
+      var el = document.getElementById(STORE_PARALLAX_IDS[i]);
+      if (el && el.classList.contains('open')) return el;
+    }
+    return null;
+  }
+  function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+  function applyPoint(x, y) {
+    var screen = activeScreen();
+    if (!screen) return;
+    var rect = screen.getBoundingClientRect();
+    var nx = clamp((x - (rect.left + rect.width / 2)) / Math.max(rect.width / 2, 1), -1, 1);
+    var ny = clamp((y - (rect.top + rect.height / 2)) / Math.max(rect.height / 2, 1), -1, 1);
+    screen.style.setProperty('--nss-parallax-x', (nx * 14).toFixed(2) + 'px');
+    screen.style.setProperty('--nss-parallax-y', (ny * 10).toFixed(2) + 'px');
+  }
+  function schedulePoint(x, y) {
+    pending = { x: x, y: y };
+    if (raf) return;
+    raf = requestAnimationFrame(function () {
+      raf = 0;
+      if (pending) { applyPoint(pending.x, pending.y); pending = null; }
+    });
+  }
+  function updateScroll(screen) {
+    if (!screen) return;
+    var host = screen.querySelector('.sub-body, #nssBody, #msMeaningBody, #rmSubBody, #ebSubBody, #sigSubBody') || screen;
+    var amount = Math.min((host.scrollTop || 0) * -0.12, 0);
+    screen.style.setProperty('--nss-parallax-scroll', amount.toFixed(2) + 'px');
+  }
+  function bind() {
+    if (bound) return;
+    bound = true;
+    STORE_PARALLAX_IDS.forEach(function (id) {
+      var screen = document.getElementById(id);
+      if (!screen) return;
+      screen.classList.add('nss-store-parallax');
+      var host = screen.querySelector('.sub-body, #nssBody, #msMeaningBody, #rmSubBody, #ebSubBody, #sigSubBody');
+      if (host) host.addEventListener('scroll', function () { updateScroll(screen); }, { passive: true });
+    });
+    window.addEventListener('pointermove', function (e) { schedulePoint(e.clientX, e.clientY); }, { passive: true });
+    window.addEventListener('touchmove', function (e) {
+      if (e.touches && e.touches[0]) schedulePoint(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    window.addEventListener('pointerleave', function () {
+      var screen = activeScreen();
+      if (screen) { screen.style.setProperty('--nss-parallax-x', '0px'); screen.style.setProperty('--nss-parallax-y', '0px'); }
+    }, { passive: true });
+    window.addEventListener('deviceorientation', function (e) {
+      var screen = activeScreen();
+      if (!screen || e.gamma == null || e.beta == null) return;
+      screen.style.setProperty('--nss-parallax-x', (clamp(e.gamma / 30, -1, 1) * 12).toFixed(2) + 'px');
+      screen.style.setProperty('--nss-parallax-y', (clamp((e.beta - 45) / 35, -1, 1) * 9).toFixed(2) + 'px');
+    }, { passive: true });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, { once: true });
+  else bind();
+  window.nssStoreParallaxRefresh = bind;
 })();
