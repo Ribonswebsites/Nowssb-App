@@ -79,8 +79,11 @@ class _PageShellState extends State<PageShell> {
             ),
           ),
           SafeArea(
-            child: CustomScrollView(
-              slivers: [
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 860),
+                child: CustomScrollView(
+                  slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
@@ -136,8 +139,9 @@ class _PageShellState extends State<PageShell> {
                 ),
                 ...widget.slivers,
                 // Clear of the bottom nav.
-                const SliverToBoxAdapter(child: SizedBox(height: 108)),
-              ],
+                  const SliverToBoxAdapter(child: SizedBox(height: 108)),
+                ],
+              ),
             ),
           ),
         ],

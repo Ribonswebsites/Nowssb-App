@@ -155,13 +155,18 @@ class _NavShellState extends State<NavShell> {
           // than something you have to take on trust.
           const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
           Positioned(
-            left: 14,
-            right: 14,
+            left: 0,
+            right: 0,
             bottom: 14,
             child: SafeArea(
               top: false,
-              child: Container(
-                height: 66,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 760),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: Container(
+                      height: 66,
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(33),
@@ -201,6 +206,8 @@ class _NavShellState extends State<NavShell> {
                         ),
                       ),
                   ],
+                    ),
+                  ),
                 ),
               ),
             ),
