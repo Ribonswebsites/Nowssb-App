@@ -187,7 +187,9 @@ class VideoPool {
   /// else has to change: every test asserts against this constant rather
   /// than against the literal, so the invariant holds at whatever it is set
   /// to.
-  static const int maxLive = 8;
+  /// All mounted videos remain live so they can autoplay and loop together.
+  /// This is intentionally higher than the normal visible viewport count.
+  static const int maxLive = 128;
 
   /// How long a clip gets to open before it counts as failed.
   ///
@@ -547,7 +549,7 @@ class VideoPool {
         // is the whole point, and it is why a hundred idle clips now cost a
         // hundred pictures instead of a hundred ExoPlayers.
         final want = _leases
-            .where((l) => l._distance != double.infinity && l._eligible)
+            .where((l) => l._eligible)
             .toList()
           ..sort((a, b) {
             if (a.priority != b.priority) {
@@ -557,7 +559,9 @@ class VideoPool {
           });
 
         // Held: nothing is kept, so the pass becomes a pure give-back.
-        final keep = _held ? <VideoLease>{} : want.take(maxLive).toSet();
+        // Keep every mounted lease. Distance remains useful for stable
+        // opening order, but never evicts a video that should keep playing.
+        final keep = _held ? <VideoLease>{} : want.toSet();
 
         // GIVE BACK FIRST, AND WAIT FOR IT.
         //

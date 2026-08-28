@@ -84,7 +84,9 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    if (widget.autoplay) _take();
+    // Every mounted video is live in the normal home. Keep the legacy flag
+    // accepted for compatibility, but do not let it disable playback.
+    _take();
     _pump();
   }
 
@@ -143,9 +145,9 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     super.didUpdateWidget(old);
     // A changed clip, or the motion switch moving under it. Both are the
     // same thing here: let go of what was held, take what is now wanted.
-    if (old.asset != widget.asset || old.autoplay != widget.autoplay) {
+    if (old.asset != widget.asset) {
       _drop();
-      if (widget.autoplay) _take();
+      _take();
       if (mounted) setState(() {});
     }
   }
