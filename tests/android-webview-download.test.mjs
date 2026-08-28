@@ -63,14 +63,19 @@ test('Fashion Plus keeps one live film behind every page and menu', () => {
   const css = read('nowssb-nm.css');
 
   assert.match(page, /part051\.js\?v=25/);
-  assert.match(page, /part076\.js\?v=116/);
-  assert.match(page, /nowssb-nm\.css\?v=794/);
+  assert.match(page, /part076\.js\?v=117/);
+  assert.match(page, /nowssb-nm\.css\?v=795/);
   assert.match(playback, /v\.id === 'fpBgVideo' \|\| v\.id === 'fpPageVid'/);
   assert.match(fashion, /document\.getElementById\('fpBgVideo'\)/);
   assert.match(fashion, /v\.play\(\)/);
+  assert.match(fashion, /nwsb-settings-open/);
+  assert.match(fashion, /settingsOpen/);
   assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) \.sub-screen\.open/);
   assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) #menuDrawer\.menu-drawer/);
   assert.match(css, /prefers-reduced-motion: reduce/);
+  assert.match(css, /body\.nwsb-settings-open #fpBgVideo/);
+  assert.match(css, /body\.nwsb-settings-open #sub-social/);
+  assert.match(css, /background: #f0f2f7 !important/);
 });
 
 

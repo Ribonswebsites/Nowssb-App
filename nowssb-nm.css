@@ -15776,3 +15776,32 @@ body.fashplus:not(.fp-bg-off) .sub-screen.open :is(
 ) {
   background: transparent !important;
 }
+
+
+/* Normal Settings is deliberately not part of Fashion Plus cinema. Keep its
+   white neumorphic surface opaque and stop the shared film while it is open,
+   even if the Fashion Plus master switch remains enabled for other pages. */
+body.nwsb-settings-open #fpBgVideo,
+body.nwsb-settings-open #fpBgVeil {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+body.nwsb-settings-open #sub-social,
+body.nwsb-settings-open #sub-social > .ss-wrap,
+body.nwsb-settings-open #sub-social .ss-tab-content,
+body.nwsb-settings-open #sub-social #ss-main-view {
+  background: #f0f2f7 !important;
+  background-image: none !important;
+}
+body.nwsb-settings-open #sub-social .sub-header {
+  background: #f0f2f7 !important;
+  border-bottom-color: rgba(0,0,0,.07) !important;
+}
+body.nwsb-settings-open #sub-social .sub-header,
+body.nwsb-settings-open #sub-social .sub-header * {
+  color: #1a1a2e !important;
+}
+body.nwsb-settings-open #sub-social .sub-back svg {
+  stroke: #1a1a2e !important;
+}

@@ -298,6 +298,7 @@
     var v = bgVideo(false);
     if (!v) return;
     var want = isOn() && bgPartOn() && !batteryLow &&
+               !document.body.classList.contains('nwsb-settings-open') &&
                document.visibilityState === 'visible';
     if (want) { v.play().catch(function () {}); }
     else { try { v.pause(); } catch (e) {} }
@@ -309,7 +310,9 @@
      The body class avoids relying on CSS :has support in older WebViews. */
   function syncOpenPageBackdrop() {
     var on = isOn() && bgPartOn() && !batteryLow;
+    var settingsOpen = !!document.querySelector('#sub-social.sub-screen.open');
     var hasOpenPage = !!document.querySelector('.sub-screen.open');
+    document.body.classList.toggle('nwsb-settings-open', settingsOpen);
     document.body.classList.toggle('nwsb-sub-open', hasOpenPage);
     document.body.classList.toggle(
       'fp-sub-open',
@@ -319,10 +322,14 @@
     // the off-mode black/image rules make the same decision for a page whose
     // own backdrop was created only when it opened.
     markImageBacked();
-    if (on) {
+    if (on && !settingsOpen) {
       restoreIntroArtwork();
       bgVideo(true);
       playState();
+    } else if (settingsOpen) {
+      // Settings is the normal white neumorphic surface, never a Fashion Plus
+      // cinema. Stop the shared decoder while this screen is open.
+      bgVideo(false);
     }
   }
   window.nwsbFpSyncPageBackdrop = syncOpenPageBackdrop;
