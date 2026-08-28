@@ -345,10 +345,13 @@
   window.sigOpenStore = function () {
     var s = document.getElementById('sub-signature-store');
     if (!s) return;
+    if (typeof window.nssCloseOtherSubScreens === 'function') window.nssCloseOtherSubScreens('sub-signature-store');
+    if (typeof window.nwsbResetStoreIntro === 'function') window.nwsbResetStoreIntro('sub-signature-store');
     render();
     var intro = document.getElementById('sigIntroPage');
     if (intro) intro.classList.remove('sig-intro-hidden');
     s.classList.add('open');
+    if (typeof window.nwsbFpSyncPageBackdrop === 'function') window.nwsbFpSyncPageBackdrop();
     crossfade(true);
     try { if (navigator.vibrate) navigator.vibrate(22); } catch (e) {}
   };

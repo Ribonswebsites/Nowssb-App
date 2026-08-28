@@ -1785,20 +1785,19 @@ function openSub(id) {
   }
   if (id === 'word-science') initLetterChips();
   if (id === 'real-meaning') {
-    if (typeof shouldShowIntro === 'function' && !shouldShowIntro('word-store')) {
-      setTimeout(function() {
-        var intro = document.getElementById('rmIntroPage');
-        if (intro) intro.classList.add('rm-intro-hidden');
-        if (typeof window.rmEnterFromIntro === 'function') window.rmEnterFromIntro();
-      }, 100);
-    }
+    // Word Atelier always opens on its own intro page; it is a Store cover,
+    // not a one-time onboarding screen.
+    var rmIntroOpen = document.getElementById('rmIntroPage');
+    var rmMainOpen = document.getElementById('rmMainContent');
+    if (rmIntroOpen) { rmIntroOpen.classList.remove('rm-intro-hidden'); rmIntroOpen.style.display = ''; rmIntroOpen.style.opacity = ''; rmIntroOpen.style.pointerEvents = ''; }
+    if (rmMainOpen) rmMainOpen.style.display = 'none';
   }
   if (id === 'meaning-store') {
-    if (typeof shouldShowIntro === 'function' && !shouldShowIntro('meaning-store')) {
-      setTimeout(function() {
-        if (typeof window.msEnterFromIntro === 'function') window.msEnterFromIntro();
-      }, 100);
-    }
+    // Meaning Store always opens on its own intro page.
+    var msIntroOpen = document.getElementById('msIntroPage');
+    var msMainOpen = document.getElementById('msMcontent');
+    if (msIntroOpen) { msIntroOpen.classList.remove('ms-intro-hidden'); msIntroOpen.style.display = ''; msIntroOpen.style.opacity = ''; msIntroOpen.style.pointerEvents = ''; }
+    if (msMainOpen) msMainOpen.style.display = 'none';
     setTimeout(msRenderStore, 80);
     setTimeout(msInitParallax, 200);
     // Kick video playback on mobile (autoplay blocked until user gesture)

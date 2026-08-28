@@ -1,12 +1,46 @@
 
 // ── NowssB Store — all logic uses direct DOM, no openSub chain dependency ──
 
+// Store pages are standalone screens. Close any previous sub-screen first so
+// an older page cannot remain visible through a Store intro.
+function nssCloseOtherSubScreens(exceptId) {
+  document.querySelectorAll('.sub-screen.open').forEach(function (screen) {
+    if (screen.id !== exceptId) screen.classList.remove('open');
+  });
+}
+window.nwsbResetStoreIntro = function (id) {
+  var map = {
+    'sub-real-meaning': ['rmIntroPage', 'rmMainContent'],
+    'sub-nowssb-store': ['nssIntroPage', 'nssBody'],
+    'sub-meaning-store': ['msIntroPage', 'msMcontent'],
+    'sub-ebooks-store': ['ebIntroPage', 'ebMcontent'],
+    'sub-signature-store': ['sigIntroPage', null]
+  };
+  var pair = map[id];
+  if (!pair) return;
+  var intro = document.getElementById(pair[0]);
+  var main = pair[1] ? document.getElementById(pair[1]) : null;
+  if (intro) {
+    intro.classList.remove('rm-intro-hidden', 'ms-intro-hidden', 'sig-intro-hidden', 'nss-intro-hidden');
+    intro.style.opacity = '';
+    intro.style.pointerEvents = '';
+    intro.style.display = '';
+  }
+  if (main) {
+    if (id === 'sub-nowssb-store') main.classList.remove('visible');
+    else main.style.display = 'none';
+  }
+};
+
 // Open / close the NowssB Store sub-screen directly
 function nssOpen() {
   var s = document.getElementById('sub-nowssb-store');
+  nssCloseOtherSubScreens('sub-nowssb-store');
+  window.nwsbResetStoreIntro('sub-nowssb-store');
   if (s) s.classList.add('open');
   var iv = document.getElementById('nssIntroVid');
-  if (iv) { iv.muted = true; iv.play().catch(function(){}); }
+  if (iv) { try { iv.pause(); } catch (e) {} }
+  if (typeof window.nwsbFpSyncPageBackdrop === 'function') window.nwsbFpSyncPageBackdrop();
 }
 
 function nssClose() {
@@ -662,7 +696,19 @@ window.ebEnterFromIntro = function () {
 (function(){
   var _prev = window.openSub;
   window.openSub = function(id) {
-    if (id === 'nowssb-store') { nssOpen(); return; }
+    var storeIds = {
+      'real-meaning': 'sub-real-meaning',
+      'nowssb-store': 'sub-nowssb-store',
+      'meaning-store': 'sub-meaning-store',
+      'ebooks-store': 'sub-ebooks-store',
+      'signature-store': 'sub-signature-store'
+    };
+    if (storeIds[id]) {
+      var screenId = storeIds[id];
+      nssCloseOtherSubScreens(screenId);
+      window.nwsbResetStoreIntro(screenId);
+      if (id === 'nowssb-store') { nssOpen(); return; }
+    }
     if (typeof _prev === 'function') _prev.apply(this, arguments);
   };
   var _prevC = window.closeSub;

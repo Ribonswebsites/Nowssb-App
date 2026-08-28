@@ -64,8 +64,8 @@ test('Fashion Plus keeps one live film behind every page and menu', () => {
   const css = read('nowssb-nm.css');
 
   assert.match(page, /part051\.js\?v=25/);
-  assert.match(page, /part076\.js\?v=118/);
-  assert.match(page, /nowssb-nm\.css\?v=796/);
+  assert.match(page, /part076\.js\?v=119/);
+  assert.match(page, /nowssb-nm\.css\?v=797/);
   assert.match(playback, /v\.id === 'fpBgVideo' \|\| v\.id === 'fpPageVid'/);
   assert.match(fashion, /document\.getElementById\('fpBgVideo'\)/);
   assert.match(fashion, /v\.play\(\)/);
@@ -73,6 +73,9 @@ test('Fashion Plus keeps one live film behind every page and menu', () => {
   assert.match(fashion, /settingsOpen/);
   assert.match(fashion, /isStoreScreen/);
   assert.match(fashion, /nwsb-store-open/);
+  assert.match(fashion, /restoreStoreIntroArtwork/);
+  assert.match(fashion, /intro-signature\.webp/);
+  assert.match(fashion, /sub-real-meaning/);
   assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) \.sub-screen\.open/);
   assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) #menuDrawer\.menu-drawer/);
   assert.match(css, /prefers-reduced-motion: reduce/);
@@ -84,6 +87,8 @@ test('Fashion Plus keeps one live film behind every page and menu', () => {
   assert.match(css, /#sub-meaning-store/);
   assert.match(css, /#sub-ebooks-store/);
   assert.match(css, /#sub-signature-store/);
+  assert.match(css, /body\.nwsb-store-open #sub-real-meaning/);
+  assert.match(css, /background: #000 !important/);
 });
 
 
@@ -107,4 +112,6 @@ test('login has no transition video and Fashion Plus restores intro artwork abov
   assert.match(css, /\.fp-intro-art/);
   assert.match(css, /\.sl-intro-page/);
   assert.match(css, /background: transparent !important/);
+  assert.match(read('app/js/part017.js'), /nssCloseOtherSubScreens/);
+  assert.match(read('app/js/part017.js'), /nwsbResetStoreIntro/);
 });

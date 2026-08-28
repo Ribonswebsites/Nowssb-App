@@ -178,7 +178,27 @@
   }
 
   function isStoreScreen(screen) {
-    return !!screen && /^(sub-nowssb-store|sub-meaning-store|sub-ebooks-store|sub-signature-store)$/.test(screen.id);
+    return !!screen && /^(sub-real-meaning|sub-nowssb-store|sub-meaning-store|sub-ebooks-store|sub-signature-store)$/.test(screen.id);
+  }
+
+  function restoreStoreIntroArtwork() {
+    var artwork = {
+      'nssIntroPage .nss-intro-img': './assets/store/intro-store.webp',
+      'rmIntroPage .rm-intro-bg': './assets/store/intro-words.webp',
+      'msIntroPage .ms-intro-bg': './assets/store/intro-meanings.webp',
+      'ebIntroPage .ms-intro-bg': './assets/store/intro-ebooks.webp',
+      'sigIntroPage .sig-intro-bg': './assets/store/intro-signature.webp'
+    };
+    Object.keys(artwork).forEach(function (selector) {
+      var parts = selector.split(' ');
+      var layer = document.querySelector('#' + parts[0] + ' ' + parts[1]);
+      if (!layer) return;
+      layer.style.setProperty('background-image', "url('" + artwork[selector] + "')", 'important');
+      layer.style.setProperty('background-color', '#000', 'important');
+      layer.style.setProperty('background-repeat', 'no-repeat', 'important');
+      layer.style.setProperty('background-position', 'center top', 'important');
+      layer.style.setProperty('background-size', 'contain', 'important');
+    });
   }
 
   function restoreIntroArtwork() {
@@ -190,7 +210,7 @@
     var selectors = '.sub-screen-bg, .rm-intro-bg, .ms-intro-bg, .eb-intro-bg, ' +
       '.sig-intro-bg, .sl-intro-bg, .st-bg, .qa-page-bg, .fpp-intro-bg, ' +
       '.cart-intro-bg, .wish-intro-bg, .orders-intro-bg, .oh-intro-bg';
-    document.querySelectorAll('.sub-screen.open:not(#sub-nowssb-store):not(#sub-meaning-store):not(#sub-ebooks-store):not(#sub-signature-store) :is(' + selectors + ')').forEach(function (layer) {
+    document.querySelectorAll('.sub-screen.open:not(#sub-real-meaning):not(#sub-nowssb-store):not(#sub-meaning-store):not(#sub-ebooks-store):not(#sub-signature-store) :is(' + selectors + ')').forEach(function (layer) {
       if (layer.querySelector(':scope > .fp-intro-art') || layer.querySelector(':scope > video')) return;
       var raw = '';
       try { raw = layer.style.backgroundImage || ''; } catch (e) {}
@@ -321,11 +341,12 @@
   function syncOpenPageBackdrop() {
     var on = isOn() && bgPartOn() && !batteryLow;
     var settingsOpen = !!document.querySelector('#sub-social.sub-screen.open');
-    var storeOpen = !!document.querySelector('#sub-nowssb-store.sub-screen.open, #sub-meaning-store.sub-screen.open, #sub-ebooks-store.sub-screen.open, #sub-signature-store.sub-screen.open');
+    var storeOpen = !!document.querySelector('#sub-real-meaning.sub-screen.open, #sub-nowssb-store.sub-screen.open, #sub-meaning-store.sub-screen.open, #sub-ebooks-store.sub-screen.open, #sub-signature-store.sub-screen.open');
     var hasOpenPage = !!document.querySelector('.sub-screen.open');
     document.body.classList.toggle('nwsb-settings-open', settingsOpen);
     document.body.classList.toggle('nwsb-store-open', storeOpen);
     document.body.classList.toggle('nwsb-sub-open', hasOpenPage);
+    if (storeOpen) restoreStoreIntroArtwork();
     document.body.classList.toggle(
       'fp-sub-open',
       on && hasOpenPage

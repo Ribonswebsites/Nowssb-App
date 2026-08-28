@@ -15833,3 +15833,25 @@ body.nwsb-store-open :is(
 ) {
   background-color: #060c18 !important;
 }
+
+
+/* Store intros are standalone black screens. Keep Word Atelier included with
+   the four Store departments and prevent any older open page from showing
+   through the Store shell. */
+body.nwsb-store-open #sub-real-meaning,
+body.nwsb-store-open #sub-nowssb-store,
+body.nwsb-store-open #sub-meaning-store,
+body.nwsb-store-open #sub-ebooks-store,
+body.nwsb-store-open #sub-signature-store {
+  background: #000 !important;
+  background-image: none !important;
+  opacity: 1 !important;
+}
+body.nwsb-store-open #sub-real-meaning .rm-intro-page,
+body.nwsb-store-open #sub-nowssb-store .nss-intro-page,
+body.nwsb-store-open #sub-meaning-store .ms-intro-page,
+body.nwsb-store-open #sub-ebooks-store .ms-intro-page,
+body.nwsb-store-open #sub-signature-store .sig-intro-page {
+  background-color: #000 !important;
+  opacity: 1 !important;
+}
