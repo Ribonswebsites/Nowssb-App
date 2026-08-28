@@ -116,7 +116,12 @@ test('login has no transition video and Fashion Plus restores intro artwork abov
   assert.match(css, /\.sl-intro-page/);
   assert.match(css, /background: transparent !important/);
   assert.match(read('app/js/part017.js'), /nssCloseOtherSubScreens/);
-  assert.match(read('app/js/part017.js'), /nwsbResetStoreIntro/);
+  const store = read('app/js/part017.js');
+  assert.match(store, /nwsbResetStoreIntro/);
+  assert.match(store, /word-atelier.*real-meaning/);
+  assert.match(store, /nssCloseOtherSubScreens\(screenId\)/);
+  assert.match(store, /target\.classList\.add\('open'\)/);
+  assert.match(page, /part017\.js\?v=207/);
   const pkg = JSON.parse(read('package.json'));
   assert.match(pkg.scripts.dev, /http\.server 5173/);
   assert.match(pkg.scripts.start, /http\.server 5173/);

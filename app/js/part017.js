@@ -475,26 +475,45 @@ function nssInitBanner3D() {
   banner.addEventListener('mouseleave', resetTilt);
 }
 
-// Open sub-screens from inside NowssB Store — direct DOM, bypasses chain
+// Open sub-screens from inside NowssB Store. This deliberately bypasses the
+// long openSub wrapper chain: Store cards must not depend on whichever module
+// happened to wrap navigation last.
 function nssOpenSub(id) {
-  var s = document.getElementById('sub-' + id);
-  if (s) s.classList.add('open');
-  // Init meaning-store
+  var aliases = {
+    'word-atelier': 'real-meaning',
+    'word-store': 'real-meaning',
+    'meaning': 'meaning-store',
+    'ebooks': 'ebooks-store',
+    'signature': 'signature-store'
+  };
+  id = aliases[id] || id;
+  var screenId = 'sub-' + id;
+  var target = document.getElementById(screenId);
+  if (!target) {
+    console.warn('[NowssB] Store route not found:', id, screenId);
+    return false;
+  }
+
+  // Close the hub and every older overlay before opening the destination.
+  nssCloseOtherSubScreens(screenId);
+  var hub = document.getElementById('sub-nowssb-store');
+  if (hub && hub !== target) hub.classList.remove('open');
+  if (typeof window.nwsbResetStoreIntro === 'function') window.nwsbResetStoreIntro(screenId);
+  target.classList.add('open');
+  target.setAttribute('aria-hidden', 'false');
+  if (typeof window.nwsbFpSyncPageBackdrop === 'function') window.nwsbFpSyncPageBackdrop();
+
   if (id === 'meaning-store') {
     var msVid = document.getElementById('msBannerImg');
     if (msVid) { msVid.muted = true; msVid.play().catch(function(){}); }
-    if (typeof msRenderStore   === 'function') setTimeout(msRenderStore,   80);
-    if (typeof msInitParallax  === 'function') setTimeout(msInitParallax, 200);
+    if (typeof msRenderStore === 'function') setTimeout(msRenderStore, 80);
+    if (typeof msInitParallax === 'function') setTimeout(msInitParallax, 200);
   }
-  // Init real-meaning (Word Store)
-  if (id === 'real-meaning') {
-    // Reset banner to first image every time the page is opened
-    if (typeof window.rmBannerReset === 'function') window.rmBannerReset();
-  }
-  // social (needed by the Subscription quick-access card on the store
-  // chooser, which opens 'social' then immediately opens the subscription
-  // panel inside it — mirrors what openSub('social') itself does)
+  if (id === 'real-meaning' && typeof window.rmBannerReset === 'function') window.rmBannerReset();
+  if (id === 'ebooks-store' && typeof ebRenderStore === 'function') setTimeout(ebRenderStore, 80);
+  if (id === 'signature-store' && typeof sigSyncProfile === 'function') sigSyncProfile();
   if (id === 'social' && typeof ssSyncProfile === 'function') ssSyncProfile();
+  return true;
 }
 
 /* ══ EBOOKS STORE ══════════════════════════════════════════
