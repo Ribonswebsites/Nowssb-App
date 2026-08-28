@@ -5,6 +5,8 @@
   "description": "NowssB — Shabdapathy. The web app, and the Capacitor shell that puts the same code in the Play Store and the App Store.",
   "type": "module",
   "scripts": {
+    "dev": "python3 -m http.server 5173 --bind 0.0.0.0",
+    "start": "python3 -m http.server 5173 --bind 0.0.0.0",
     "build:native": "node tools/build-native.mjs",
     "native:icon-source": "node tools/native-icon-source.mjs",
     "android:assets": "npm run native:icon-source && capacitor-assets generate --android --iconBackgroundColor '#060c18' --iconBackgroundColorDark '#060c18' --splashBackgroundColor '#060c18' --splashBackgroundColorDark '#060c18'",

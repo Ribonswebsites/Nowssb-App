@@ -99,11 +99,14 @@ test('login has no transition video and Fashion Plus restores intro artwork abov
   const fashion = read('app/js/part076.js');
   const css = read('nowssb-nm.css');
 
-  assert.match(page, /firebase\.module\.js\?v=266/);
+  assert.match(page, /firebase\.module\.js\?v=267/);
   assert.doesNotMatch(page.match(/<div id="login"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/)?.[0] || '', /<video/);
   assert.match(page, /login-phone-poster\.webp/);
   assert.match(auth, /signInWithEmailAndPassword/);
   assert.match(auth, /auth\/invalid-credential/);
+  assert.match(auth, /Login is strictly sign-in/);
+  assert.doesNotMatch(auth, /Creating account…/);
+  assert.match(auth, /nwsbAuthReady/);
   assert.doesNotMatch(middleware, /loading\.mp4/);
   assert.doesNotMatch(middleware, /AUTH_LOADER/);
   assert.match(fashion, /restoreIntroArtwork/);
@@ -114,4 +117,7 @@ test('login has no transition video and Fashion Plus restores intro artwork abov
   assert.match(css, /background: transparent !important/);
   assert.match(read('app/js/part017.js'), /nssCloseOtherSubScreens/);
   assert.match(read('app/js/part017.js'), /nwsbResetStoreIntro/);
+  const pkg = JSON.parse(read('package.json'));
+  assert.match(pkg.scripts.dev, /http\.server 5173/);
+  assert.match(pkg.scripts.start, /http\.server 5173/);
 });

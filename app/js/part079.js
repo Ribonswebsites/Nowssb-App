@@ -51,6 +51,7 @@
     if (el) el.classList.remove('show');
   }
   window.nwsbAuthNote = note;
+  window.nwsbAuthReady = clearNote;
 
   /* A stub is only ever installed over a name nothing has claimed yet, so
      this can never shadow the real thing. */

@@ -453,35 +453,20 @@ window.fbEmailLogin = async () => {
     const result = await signInWithEmailAndPassword(auth, email, pass);
     _ensureLoginExit(result.user);
   } catch(signInErr) {
-    // These codes all mean "user doesn't exist with that email" — create new account
-    const notFound = ['auth/user-not-found'];
-    if (notFound.some(c => signInErr.code === c || signInErr.message?.includes('no user'))) {
-      try {
-        if (btn) btn.textContent = 'Creating account…';
-        window._su2Method   = 'email';
-        window._su2Email    = email;
-        window._su2Password = pass;
-        const result = await createUserWithEmailAndPassword(auth, email, pass);
-        _ensureLoginExit(result.user);
-      } catch(createErr) {
-        if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
-        if (loader) loader.classList.remove('visible');
-        if (createErr.code === 'auth/email-already-in-use') {
-          alert('This email is already registered. Check your password and try again.');
-        } else if (createErr.code === 'auth/weak-password') {
-          alert('Password must be at least 6 characters.');
-        } else {
-          alert('Could not create account: ' + createErr.message);
-        }
-      }
-    } else if (signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/invalid-credential') {
-      if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
-      if (loader) loader.classList.remove('visible');
+    // Login is strictly sign-in. Account creation belongs to the signup flow;
+    // silently creating an account here made mistyped credentials look like a
+    // successful login and sent users down the wrong onboarding path.
+    if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
+    if (loader) loader.classList.remove('visible');
+    const code = signInErr && signInErr.code || '';
+    if (code === 'auth/user-not-found') {
+      alert('No account was found for this email. Use Sign up first, or check the email address.');
+    } else if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials') {
       alert('Incorrect email or password. Try again or use the reset link below.');
+    } else if (code === 'auth/too-many-requests') {
+      alert('Too many failed attempts. Please wait a few minutes and try again.');
     } else {
-      if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
-      if (loader) loader.classList.remove('visible');
-      alert('Sign-in failed: ' + signInErr.message);
+      alert('Sign-in failed: ' + (signInErr && signInErr.message || 'Please check your connection and try again.'));
     }
   }
 };
@@ -531,6 +516,7 @@ window._fbServerTimestamp = () => serverTimestamp();
 window._fbAddReelDoc = (reelData) =>
   addDoc(collection(db, 'reels'), { ...reelData, createdAt: serverTimestamp(), likes: 0 });
 
+if (typeof window.nwsbAuthReady === 'function') window.nwsbAuthReady();
 window._fbGetReels = async (opts) => {
   opts = opts || {};
   var constraints = [orderBy('createdAt', 'desc'), limit(opts.limit || 30)];
