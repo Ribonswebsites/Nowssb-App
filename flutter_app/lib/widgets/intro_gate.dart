@@ -21,6 +21,8 @@ import 'package:flutter/material.dart';
 import '../data/settings.dart';
 import '../theme/tokens.dart';
 import 'app_backdrop.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 
 class IntroGate extends StatefulWidget {
   const IntroGate({
@@ -142,6 +144,29 @@ class _Intro extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           const AppBackdrop(),
+          if (art != null)
+            Positioned(
+              top: 78,
+              left: 16,
+              right: 16,
+              height: 300,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Image.asset(
+                  art!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            )
+          else if (film != null)
+            Positioned.fill(
+              child: NwsbVideo(
+                asset: film!,
+                priority: ClipPriority.feature,
+                autoplay: true,
+              ),
+            ),
           // The vignette. Deep enough at the foot that a title and a
           // paragraph hold their contrast over any frame of any clip.
           const DecoratedBox(

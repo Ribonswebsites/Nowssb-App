@@ -106,4 +106,26 @@ void main() {
     expect(VideoPool.instance.liveCount, 0,
         reason: 'a still background must not hold a decoder');
   });
+
+  testWidgets('Flutter Store exposes the WebView Store departments', (tester) async {
+    await pump(tester, const StoreScreen());
+
+    expect(find.text('Word Atelier'), findsOneWidget);
+    expect(find.text('Meaning Store'), findsOneWidget);
+    expect(find.text('Signature Store'), findsOneWidget);
+    expect(find.text('Shabdapathy · Library'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Flutter Store department intros build with foreground artwork', (tester) async {
+    for (final screen in <Widget>[
+      const WordAtelierScreen(),
+      const MeaningStoreScreen(),
+      const SignatureStoreScreen(),
+      const EbooksStoreScreen(),
+    ]) {
+      await pump(tester, screen);
+      expect(tester.takeException(), isNull);
+    }
+  });
 }
