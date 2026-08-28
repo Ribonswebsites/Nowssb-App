@@ -23,8 +23,12 @@ test('website and WebView downloads use the supplied listing and the correct lat
   assert.match(listing, /window\.location\.assign\(apk\)/);
   assert.match(listing, /window\.goBack/);
   assert.match(listing, /role="button"/);
-  assert.match(listing, /listing-hero/);
+  assert.match(listing, /listing-hero-wrap/);
+  assert.match(listing, /padding:0 12px/);
+  assert.match(listing, /height:clamp\(180px, 34vw, 270px\)/);
   assert.match(listing, /assets\/app-listing\/listing-hero-banner\.png/);
+  assert.match(listing, /hero-back-btn/);
+  assert.match(listing, /right:12px/);
   assert.match(listing, /hero-back-btn/);
   assert.match(listing, /background:#fff/);
   assert.doesNotMatch(listing, /Download the app<br>/);
@@ -58,12 +62,33 @@ test('Fashion Plus keeps one live film behind every page and menu', () => {
   const css = read('nowssb-nm.css');
 
   assert.match(page, /part051\.js\?v=25/);
-  assert.match(page, /part076\.js\?v=115/);
-  assert.match(page, /nowssb-nm\.css\?v=793/);
+  assert.match(page, /part076\.js\?v=116/);
+  assert.match(page, /nowssb-nm\.css\?v=794/);
   assert.match(playback, /v\.id === 'fpBgVideo' \|\| v\.id === 'fpPageVid'/);
   assert.match(fashion, /document\.getElementById\('fpBgVideo'\)/);
   assert.match(fashion, /v\.play\(\)/);
   assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) \.sub-screen\.open/);
   assert.match(css, /body\.fashplus:not\(\.fp-bg-off\) #menuDrawer\.menu-drawer/);
   assert.match(css, /prefers-reduced-motion: reduce/);
+});
+
+
+test('login has no transition video and Fashion Plus restores intro artwork above the film', () => {
+  const page = read('index.html');
+  const auth = read('app/js/firebase.module.js');
+  const middleware = read('functions/_middleware.js');
+  const fashion = read('app/js/part076.js');
+  const css = read('nowssb-nm.css');
+
+  assert.match(page, /firebase\.module\.js\?v=266/);
+  assert.doesNotMatch(page.match(/<div id="login"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/)?.[0] || '', /<video/);
+  assert.match(page, /login-phone-poster\.webp/);
+  assert.match(auth, /signInWithEmailAndPassword/);
+  assert.match(auth, /auth\/invalid-credential/);
+  assert.doesNotMatch(middleware, /loading\.mp4/);
+  assert.doesNotMatch(middleware, /AUTH_LOADER/);
+  assert.match(fashion, /restoreIntroArtwork/);
+  assert.match(fashion, /fp-intro-art/);
+  assert.match(css, /\.fp-intro-layer/);
+  assert.match(css, /\.fp-intro-art/);
 });

@@ -177,7 +177,48 @@
     return v;
   }
 
+  function restoreIntroArtwork() {
+    var fallback = {
+      'rm-intro-bg': './assets/store/intro-words.webp',
+      'ms-intro-bg': './assets/store/intro-meanings.webp',
+      'sl-intro-bg': 'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778224442/grok_image_1778224339812_jhranv.jpg'
+    };
+    var selectors = '.sub-screen-bg, .rm-intro-bg, .ms-intro-bg, .eb-intro-bg, ' +
+      '.sig-intro-bg, .sl-intro-bg, .st-bg, .qa-page-bg, .fpp-intro-bg, ' +
+      '.cart-intro-bg, .wish-intro-bg, .orders-intro-bg, .oh-intro-bg';
+    document.querySelectorAll('.sub-screen.open :is(' + selectors + ')').forEach(function (layer) {
+      if (layer.querySelector(':scope > .fp-intro-art') || layer.querySelector(':scope > video')) return;
+      var raw = '';
+      try { raw = layer.style.backgroundImage || ''; } catch (e) {}
+      var match = raw.match(/url\(["']?([^"')]+)["']?\)/i);
+      var src = match ? match[1] : fallback[layer.className.split(/\s+/).find(function (c) { return fallback[c]; })];
+      if (!src) return;
+      var art = document.createElement('img');
+      layer.setAttribute('data-fp-original-bg', raw);
+      art.className = 'fp-intro-art';
+      art.src = src;
+      art.alt = '';
+      art.setAttribute('aria-hidden', 'true');
+      layer.appendChild(art);
+      layer.classList.add('fp-intro-layer');
+      layer.style.backgroundImage = 'none';
+    });
+  }
+
+  function clearIntroArtwork() {
+    document.querySelectorAll('.fp-intro-layer').forEach(function (layer) {
+      var art = layer.querySelector(':scope > .fp-intro-art');
+      if (art) art.remove();
+      var original = layer.getAttribute('data-fp-original-bg');
+      if (original !== null) layer.style.backgroundImage = original;
+      layer.removeAttribute('data-fp-original-bg');
+      layer.classList.remove('fp-intro-layer');
+    });
+  }
+
   function markImageBacked() {
+    if (isOn() && bgPartOn() && !batteryLow) restoreIntroArtwork();
+    else clearIntroArtwork();
     var subs = document.querySelectorAll('.sub-screen');
     var n = 0;
     for (var i = 0; i < subs.length; i++) {
@@ -279,6 +320,7 @@
     // own backdrop was created only when it opened.
     markImageBacked();
     if (on) {
+      restoreIntroArtwork();
       bgVideo(true);
       playState();
     }

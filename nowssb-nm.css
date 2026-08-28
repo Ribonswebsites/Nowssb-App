@@ -15734,3 +15734,28 @@ body.fashplus:not(.fp-bg-off) :is(.sub-screen.open > .sub-screen-bg, .sub-screen
 body.fashplus:not(.fp-bg-off) :is(.sub-screen.open > .rm-intro-bg, .sub-screen.open > .ms-intro-bg, .sub-screen.open > .eb-intro-bg, .sub-screen.open > .sig-intro-bg, .sub-screen.open > .sl-intro-bg, .sub-screen.open > .st-bg, .sub-screen.open > .qa-page-bg, .sub-screen.open > .fpp-intro-bg, .sub-screen.open > .cart-intro-bg, .sub-screen.open > .wish-intro-bg, .sub-screen.open > .orders-intro-bg, .sub-screen.open > .oh-intro-bg, #nwsbFpSpecificityBump) {
   background: transparent !important;
 }
+
+
+/* Intro artwork is content, not the page backdrop. Fashion Plus keeps the
+   page shell transparent for the shared home film, then restores each supplied
+   intro image as a bounded foreground panel above that film. */
+body.fashplus:not(.fp-bg-off) .sub-screen.open .fp-intro-layer {
+  background: transparent !important;
+  z-index: 0 !important;
+}
+body.fashplus:not(.fp-bg-off) .sub-screen.open .fp-intro-layer > .fp-intro-art {
+  position: absolute !important;
+  top: max(72px, env(safe-area-inset-top, 16px) + 56px) !important;
+  left: 16px !important;
+  right: 16px !important;
+  width: calc(100% - 32px) !important;
+  height: clamp(180px, 38vh, 300px) !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border-radius: 22px !important;
+  opacity: .96 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  box-shadow: 0 14px 38px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.16) !important;
+}

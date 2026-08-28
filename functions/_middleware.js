@@ -22,24 +22,7 @@ const FLUTTER_APK_UPSTREAM = 'https://github.com/Ribonswebsites/Nowssb-App/relea
 // from becoming an open proxy for arbitrary URLs.
 const IMG_PROXY_ALLOWED_HOSTS = ['res.cloudinary.com'];
 
-/* What goes over Firebase's blank auth handler. Same-origin video, so it is
-   the file the app already caches — nothing extra to fetch and nothing that
-   can fail independently. Fixed and above everything, muted and inline so
-   it plays without a gesture, with the poster colour showing instantly in
-   case the first frame has not decoded yet. */
-const AUTH_LOADER = `
-<style>
-  #nwsbAuthWait{position:fixed;inset:0;z-index:2147483647;background:#060c18;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
-    font-family:'DM Sans',system-ui,-apple-system,sans-serif;}
-  #nwsbAuthWait video{width:min(78vw,340px);aspect-ratio:1080/411;object-fit:cover;
-    border-radius:16px;display:block;background:#060c18;}
-  #nwsbAuthWait .t{font-size:13px;font-weight:300;letter-spacing:1px;color:rgba(255,255,255,0.62);}
-</style>
-<div id="nwsbAuthWait">
-  <video src="/assets/video/loading.mp4" autoplay muted loop playsinline preload="auto"></video>
-  <div class="t">Signing you in…</div>
-</div>`;
+
 
 export async function onRequest(context) {
   const { request, next } = context;
@@ -78,19 +61,10 @@ export async function onRequest(context) {
     // browser (not the edge) follows the OAuth redirects.
     const res = await fetch(new Request(target, request), { redirect: 'manual' });
 
-    /* ── The blank white page during Google sign-in ──────────────────
-       /__/auth/handler is Firebase's own page. It paints nothing — it is
-       a script that bounces you to Google and back — so the reader sits
-       looking at a white screen with a Chrome address bar over it, which
-       reads as the app having died mid sign-in.
+        /* Firebase's handler is returned untouched. The app owns the visible
+       login transition; injecting a second loading page or video here breaks
+       redirect completion in embedded WebViews and obscures the login flow. */
 
-       It comes through this proxy, so the loader can go on it: the app's
-       own loading video, over the blank, while Firebase's script runs
-       underneath exactly as before. Injected only into the HTML of the
-       handler itself — never the /__/firebase/* helper scripts, never a
-       redirect — and only appended before </body>, so nothing Firebase
-       serves is rewritten or reordered. If the markup ever changes shape
-       and the anchor is missing, the page is returned untouched. */
     const ct = res.headers.get('content-type') || '';
     if (url.pathname === '/__/auth/handler' && res.status === 200 && ct.includes('text/html')) {
       const html = await res.text();
@@ -101,11 +75,8 @@ export async function onRequest(context) {
       headers.delete('content-encoding');
       /* Rebuilt from the text in BOTH branches. Returning `res` here after
          calling .text() on it would hand back an already-consumed body and
-         the sign-in page would fail to load at all — worse than the blank
-         screen this is here to fix. */
-      const body = html.includes('</body>')
-        ? html.replace('</body>', AUTH_LOADER + '</body>')
-        : html;
+         the sign-in page would fail to load at all. */
+      const body = html;
       return new Response(body, { status: res.status, statusText: res.statusText, headers });
     }
     return res;

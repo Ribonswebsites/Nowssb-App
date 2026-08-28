@@ -454,7 +454,7 @@ window.fbEmailLogin = async () => {
     _ensureLoginExit(result.user);
   } catch(signInErr) {
     // These codes all mean "user doesn't exist with that email" — create new account
-    const notFound = ['auth/user-not-found','auth/invalid-credential'];
+    const notFound = ['auth/user-not-found'];
     if (notFound.some(c => signInErr.code === c || signInErr.message?.includes('no user'))) {
       try {
         if (btn) btn.textContent = 'Creating account…';
@@ -474,10 +474,10 @@ window.fbEmailLogin = async () => {
           alert('Could not create account: ' + createErr.message);
         }
       }
-    } else if (signInErr.code === 'auth/wrong-password') {
+    } else if (signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/invalid-credential') {
       if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
       if (loader) loader.classList.remove('visible');
-      alert('Wrong password. Try again or tap "Forgot password" below.');
+      alert('Incorrect email or password. Try again or use the reset link below.');
     } else {
       if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
       if (loader) loader.classList.remove('visible');
