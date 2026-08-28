@@ -1,9 +1,9 @@
 
       (function(){
-        var IMG="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778571475/grok_image_1778520937416_jazknf.jpg";
+        var IMG="https://media.nowssb.com/migrated-images/35423222df3850a9_grok_image_1778520937416_jazknf.jpg";
         window.RM_WORD_IMG = IMG; // the real Word Atelier card image — the canonical "word image" for cart/wishlist/checkout
         /* The disc every collection banner wears on its left — Premium,
-           Mythical Edition, Nature and the rest. It was a Cloudinary URL
+           Mythical Edition, Nature and the rest. It was a R2 URL
            that had stopped resolving, so every one of those banners was
            drawing a broken-image glyph. It is a file in the repo now,
            which cannot go missing on us again. */
@@ -14,7 +14,7 @@
         // discarding it, and sits as a gold-glass card at the end of the
         // row. Keep in sync with part012.js's RM_DISPLAY_NAME/RM_SIGNATURE_TIER.
         // Every signature word shares the same gold NowssB product shot.
-        var SIG_IMG='https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png';
+        var SIG_IMG='https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png';
         var SIGNATURE={
           off50:    {key:'sale',                 name:'Sale',                  img:SIG_IMG},
           elements: {key:'elements',              name:'Elements',              img:SIG_IMG},
@@ -43,9 +43,9 @@
         // <video> tags, so app/js/part051.js warms them into the media cache
         // with every other clip in the app and sw.js serves them offline.
         var ROW_VIDS=[
-          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511425/grok_video_2026-07-31-15-36-41_blygoz.mp4",
-          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4",
-          "https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511500/grok_video_2026-07-31-20-40-30_vxozmt.mp4"
+          "assets/videos/4fa2cc8a3160b945_grok_video_2026-07-31-15-36-41_blygoz.mp4",
+          "assets/videos/b1e2c78385f45657_grok_video_2026-07-31-20-44-13_jlsimw.mp4",
+          "assets/videos/8949dec81b7a28d7_grok_video_2026-07-31-20-40-30_vxozmt.mp4"
         ];
         /* The shipped catalogue, and the one thing that draws it. Both are
            handed out so app/js/part069.js can redraw the shelf when the

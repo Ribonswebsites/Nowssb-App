@@ -11,7 +11,7 @@
 // rewrite a URL whose file is not actually there, so a half-finished
 // download cannot leave the app pointing at nothing.
 //
-// WHAT IT REWRITES. Every https://res.cloudinary.com/… (and any other remote
+// WHAT IT REWRITES. Every https://res.r2.com/… (and any other remote
 // media the manifest found) becomes ./assets/media/<kind>/<name>, which is
 // the path tools/asset-manifest.mjs already chose and already downloaded to.
 // The name is derived from the URL, so the same URL always lands on the same
@@ -58,7 +58,7 @@ if (missing) {
 }
 if (!map.size) process.exit(missing ? 1 : 0);
 
-/* Longest URL first. Cloudinary serves the same asset under several
+/* Longest URL first. R2 serves the same asset under several
    transforms, and some of those URLs are prefixes of others — rewriting the
    short one first would corrupt the long one into a local path with a
    transform tail still hanging off it. */

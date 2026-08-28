@@ -90,7 +90,7 @@ class FashShabdapathy extends StatelessWidget {
           PhotoCard(
             background: const NwsbImage(
               url:
-                  'https://res.cloudinary.com/eenvubod/image/upload/v1785054819/file_000000002a1481fbae984a694c298783_lkwus2.png',
+                  'https://media.nowssb.com/migrated-images/ed00ad1316e7a4d3_file_000000002a1481fbae984a694c298783_lkwus2.png',
               fallback: ColoredBox(color: Color(0xFF060C18)),
             ),
             label: 'Featured',
@@ -155,7 +155,7 @@ class FashWordSearch extends StatelessWidget {
             child: ClipRect(
               child: NwsbImage(
                 url:
-                    'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778656121/grok_image_1778655491471_ss3vax.jpg',
+                    'https://media.nowssb.com/migrated-images/d28e15ab1538eb5f_grok_image_1778655491471_ss3vax.jpg',
                 fallback: ColoredBox(color: Color(0xFF0A0F1C)),
               ),
             ),
@@ -193,7 +193,7 @@ class FashMeaningSearch extends StatelessWidget {
             child: ClipRect(
               child: NwsbImage(
                 url:
-                    'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778656146/grok_image_1778656028544_cih9iy.jpg',
+                    'https://media.nowssb.com/migrated-images/59930cdf0d0e23bb_grok_image_1778656028544_cih9iy.jpg',
                 fallback: ColoredBox(color: Color(0xFF0A0F1C)),
               ),
             ),

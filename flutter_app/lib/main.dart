@@ -8,7 +8,7 @@
 /// Two things are true at once and both matter:
 ///
 ///   · The clips are all on the phone. Nothing streams, nothing buffers,
-///     nothing depends on Cloudinary being up or the signal being good.
+///     nothing depends on R2 being up or the signal being good.
 ///   · At most four of them decode at any moment. A phone has a handful of
 ///     hardware decoders and the website was asking for a hundred, which is
 ///     what the lag, the black banners and the crashes actually were.

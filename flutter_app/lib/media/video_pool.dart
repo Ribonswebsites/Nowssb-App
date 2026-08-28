@@ -75,7 +75,7 @@ class VideoLease extends ChangeNotifier {
   /// This used to be a hard cap: three failures and the clip was struck off
   /// for the life of the app. On a phone that is the wrong rule — the three
   /// failures are usually the first three seconds after launch, before the
-  /// radio has a route, and every Cloudinary clip on the page would be
+  /// radio has a route, and every R2 clip on the page would be
   /// permanently dead because of a network that came back a moment later.
   /// So it backs off instead of giving up, and a clip that opens resets to
   /// zero.
@@ -595,7 +595,7 @@ class VideoPool {
         // A slot is claimed by `_live.add` on the line above — synchronously,
         // before anything asynchronous starts — so the ceiling is already
         // enforced and waiting here buys nothing. What it cost was the pool
-        // itself: _bringUp awaits initialize(), initialize() on a Cloudinary
+        // itself: _bringUp awaits initialize(), initialize() on a R2
         // URL can stall indefinitely, and one stalled clip held this pass
         // open forever. _rebalancing stays true, every later request just
         // sets _again and returns, and the pool never grants another decoder
@@ -635,7 +635,7 @@ class VideoPool {
     if (l._disposed || l._controller != null) return;
 
     // A bundled file OR a URL. The website plays most of these straight
-    // from Cloudinary, and until now this could only open an asset — so
+    // from R2, and until now this could only open an asset — so
     // every remote clip had been quietly replaced with whatever local file
     // was nearest in meaning, and the app was playing the wrong film in
     // half its sections.
@@ -645,7 +645,7 @@ class VideoPool {
     l._controller = c;
 
     try {
-      // WITH A DEADLINE. A local asset opens in milliseconds; a Cloudinary
+      // WITH A DEADLINE. A local asset opens in milliseconds; a R2
       // URL opens in a second or two on a good connection and NEVER on a bad
       // one — initialize() does not time out on its own, it simply does not
       // return. An un-deadlined await here is the difference between "this

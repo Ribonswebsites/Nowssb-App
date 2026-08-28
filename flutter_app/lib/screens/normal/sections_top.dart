@@ -383,26 +383,26 @@ class NmPromoDisc extends StatefulWidget {
 
   static const storeSlides = [
     (
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto,w_240/v1778571518/1000038291_no_bg-1778521337465_slhlrx.png',
+      'https://media.nowssb.com/migrated-images/3cccf351ff9cc39f_1000038291_no_bg-1778521337465_slhlrx.png',
       ['Enter the NowssB Store.', 'Own words that heal — yours alone.'],
     ),
     (
-      'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto,w_240/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png',
+      'https://media.nowssb.com/migrated-images/256d08a157cfa2a2_c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png',
       ['Your cart is waiting.', 'Coupons up to 50% off today.'],
     ),
   ];
 
   static const connectSlides = [
     (
-      'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_240/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+      'https://media.nowssb.com/migrated-images/8ed93fdc651b43c3_file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
       ['Your circle just got bigger.', 'Connect with learners like you.'],
     ),
     (
-      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783162597/file_00000000029c71fa8c210e0f09870964_uwh8sc.png',
+      'https://media.nowssb.com/migrated-images/4941ad0e531fcc53_file_00000000029c71fa8c210e0f09870964_uwh8sc.png',
       ['Stand out with a badge.', 'Blue, Silver, Gold or Diamond — your pick.'],
     ),
     (
-      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png',
+      'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png',
       ['New voices, new stories.', 'Discover creators worth following.'],
     ),
   ];
@@ -695,28 +695,28 @@ class NmTiles extends StatelessWidget {
     (
       'Sound Library',
       'Root frequencies',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
+      'https://media.nowssb.com/migrated-images/7fa4063875d35e04_file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
       Icons.graphic_eq,
       2,
     ),
     (
       'My Progress',
       'Healing journey',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899471/file_00000000345481faafd2bea97c8320ab_oknybe.png',
+      'https://media.nowssb.com/migrated-images/14f6230703172bda_file_00000000345481faafd2bea97c8320ab_oknybe.png',
       Icons.show_chart,
       4,
     ),
     (
       'Word Science',
       'NOWSBANSIU texts',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
+      'https://media.nowssb.com/migrated-images/47036d4cd4790929_file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
       Icons.science_outlined,
       2,
     ),
     (
       'My Profile',
       'Your settings',
-      'https://res.cloudinary.com/eenvubod/image/upload/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png',
+      'https://media.nowssb.com/migrated-images/09748604e7de55fa_file_0000000080688207a9599e17a28e7710_oefkxy.png',
       Icons.person_outline,
       4,
     ),
@@ -1057,7 +1057,7 @@ class NmReader extends StatelessWidget {
                 aspectRatio: 16 / 9,
                 child: NwsbImage(
                   url:
-                      'https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4',
+                      'assets/videos/3a1f74f98d7a0d18_grok_video_2026-07-30-14-57-37_tbzpox.mp4',
                   fallback: NwsbVideo(
                     asset: 'assets/video/word-acts.mp4',
                     priority: ClipPriority.decoration,
@@ -1129,7 +1129,7 @@ class NmTrending extends StatelessWidget {
                 children: [
                   const NwsbImage(
                     url:
-                        'https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
+                        'assets/videos/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
                     fallback: NwsbVideo(
                       asset: 'assets/video/word-acts.mp4',
                       priority: ClipPriority.decoration,

@@ -8,10 +8,10 @@
   /* ── NowssB Verified IMAGE badge (the headphone check-mark seal images),
      shown as a neumorphic circle — replaces the old teal headphone SVG ── */
   var VB_IMG = {
-    blue:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png',
-    silver:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png',
-    gold:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png',
-    diamond: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782635219/1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png'
+    blue:    'https://media.nowssb.com/migrated-images/1eb628997d943cba_fdb78570-72c6-11f1-bcbf-fb86e1a7c55f_ns1hnq.png',
+    silver:  'https://media.nowssb.com/migrated-images/03903b4c656873e3_417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png',
+    gold:    'https://media.nowssb.com/migrated-images/33017c6a53892db5_311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png',
+    diamond: 'https://media.nowssb.com/migrated-images/084c2a7f3f2c85dc_1aeee4a0-72ca-11f1-bcbf-fb86e1a7c55f_xc3v9h.png'
   };
   function imgBadge(tier, size) {
     size = size || 18;
@@ -361,10 +361,10 @@
       /* Image-explainer slots — placeholders for the user's own evolution/origin imagery */
       '<div class="nwsb-section-hd">The New Fashion Trend</div>' +
       '<div class="nwsb-explainer-grid">' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/grok_image_1782620063491_op58of.jpg)"><span>Origin</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/image_qg7ro5.jpg)"><span>Evolution</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/image_dtmprf.jpg)"><span>Frequency</span></div>' +
-        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782620614/grok_image_1782620475749_fgncxl.jpg)"><span>Healing</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://media.nowssb.com/migrated-images/8a4d334229f9ff55_grok_image_1782620063491_op58of.jpg)"><span>Origin</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://media.nowssb.com/migrated-images/b0d670b6066b0c49_image_qg7ro5.jpg)"><span>Evolution</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://media.nowssb.com/migrated-images/d143c72a353c7f2e_image_dtmprf.jpg)"><span>Frequency</span></div>' +
+        '<div class="nwsb-explainer-slot has-img" style="background-image:url(https://media.nowssb.com/migrated-images/c061be5a902cf11b_grok_image_1782620475749_fgncxl.jpg)"><span>Healing</span></div>' +
       '</div>' +
 
       (people.length
@@ -1089,9 +1089,9 @@
     var p = new Promise(function (resolve) {
       var img = new Image();
       // Load through our own same-origin proxy (functions/_middleware.js)
-      // instead of crossOrigin='anonymous' straight to Cloudinary — canvas
+      // instead of crossOrigin='anonymous' straight to R2 — canvas
       // pixel access throws a SecurityError unless the image was served
-      // with CORS headers, which Cloudinary doesn't reliably send. A
+      // with CORS headers, which R2 doesn't reliably send. A
       // same-origin image never has that problem.
       img.src = '/img-proxy?u=' + encodeURIComponent(url);
       img.onload = function () {
@@ -1143,8 +1143,8 @@
   }
   window.nwsbApplyStrippedBg = nwsbApplyStrippedBg;
 
-  var NWSB_THEME_IMG_NEU   = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png';
-  var NWSB_THEME_IMG_GLASS = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png';
+  var NWSB_THEME_IMG_NEU   = 'https://media.nowssb.com/migrated-images/f7ab49ce96814d9d_file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png';
+  var NWSB_THEME_IMG_GLASS = 'https://media.nowssb.com/migrated-images/4ab7671cefecf91e_file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png';
   nwsbApplyStrippedBg(NWSB_THEME_IMG_NEU,   '#nwsbcsThemeNeu .nwsb-theme-opt-img, #nch-theme-neu .nwsb-theme-opt-img, #nwsb-theme-neu .nwsb-theme-opt-img');
   nwsbApplyStrippedBg(NWSB_THEME_IMG_GLASS, '#nwsbcsThemeGlass .nwsb-theme-opt-img, #nch-theme-glass .nwsb-theme-opt-img, #nwsb-theme-glass .nwsb-theme-opt-img');
 
@@ -1159,19 +1159,19 @@
      4 existing Connect glass photos (feed/reels/discover/home) with the
      9 Fashion Home photos for 13 choices total. ── */
   var NWSB_CONNECT_BGS = [
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177099346_a7zq1m.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177245304_ihjubs.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177237514_bbhcec.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784177300/grok_image_1784177200001_clr7h6.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261485118_fnnndw.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263702345_zlt99m.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263836740_qclr5g.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261493254_szhsuw.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263881946_zespcn.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263699783_tyf4l8.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263996/grok_image_1784263979789_doxtcp.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263836740_atjk35.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg'
+    'https://media.nowssb.com/migrated-images/73f211886e12a197_grok_image_1784177099346_a7zq1m.jpg',
+    'https://media.nowssb.com/migrated-images/a2275fd4ed909e2a_grok_image_1784177245304_ihjubs.jpg',
+    'https://media.nowssb.com/migrated-images/84e9f5b8d55a43ee_grok_image_1784177237514_bbhcec.jpg',
+    'https://media.nowssb.com/migrated-images/416f48f6733b9b4c_grok_image_1784177200001_clr7h6.jpg',
+    'https://media.nowssb.com/migrated-images/7faefee62e30b487_grok_image_1784261485118_fnnndw.jpg',
+    'https://media.nowssb.com/migrated-images/c771dc2fac1db73d_grok_image_1784263702345_zlt99m.jpg',
+    'https://media.nowssb.com/migrated-images/c8ba2816200e306a_grok_image_1784263836740_qclr5g.jpg',
+    'https://media.nowssb.com/migrated-images/1ed28e3e65f10514_grok_image_1784261493254_szhsuw.jpg',
+    'https://media.nowssb.com/migrated-images/83f500ce2239fab2_grok_image_1784263881946_zespcn.jpg',
+    'https://media.nowssb.com/migrated-images/70dff54c281619bd_grok_image_1784263699783_tyf4l8.jpg',
+    'https://media.nowssb.com/migrated-images/b61051b0901b1215_grok_image_1784263979789_doxtcp.jpg',
+    'https://media.nowssb.com/migrated-images/6a172050c86e14a8_grok_image_1784263836740_atjk35.jpg',
+    'https://media.nowssb.com/migrated-images/89223ef1f18d6a9e_grok_image_1784263778179_okskwb.jpg'
   ];
 
   window.nwsbSetConnectBg = function (url) {

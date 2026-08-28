@@ -68,13 +68,13 @@ window.ohOpenListFromIntro = function(type) {
 
   if (type === 'words') {
     _ohSetBanners([
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891277/image-143_pfuqmd.jpg',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891320/image-213_sggc81.jpg'
+      'https://media.nowssb.com/migrated-images/4153f130e7a6764a_image-143_pfuqmd.jpg',
+      'https://media.nowssb.com/migrated-images/0ac103578b4ce074_image-213_sggc81.jpg'
     ]);
   } else {
     _ohSetBanners([
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778848483/image-148_zfrtqg.jpg',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/v1778891248/image-101_pppzbn.jpg'
+      'https://media.nowssb.com/migrated-images/8d7fdfb575f4e0bc_image-148_zfrtqg.jpg',
+      'https://media.nowssb.com/migrated-images/537005b8862b2be0_image-101_pppzbn.jpg'
     ]);
   }
 

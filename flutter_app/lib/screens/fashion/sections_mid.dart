@@ -44,28 +44,28 @@ class FashTiles extends StatelessWidget {
     (
       'Sound Library',
       'Root frequencies',
-      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
+      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
           'v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
       2,
     ),
     (
       'My Progress',
       'Healing journey',
-      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
+      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
           'v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png',
       4,
     ),
     (
       'Word Science',
       'NOWSBANSIU texts',
-      'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
+      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
           'v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
       2,
     ),
     (
       'My Profile',
       'Your settings',
-      'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/'
+      'https://res.r2.com/ds6duqabl/image/upload/f_auto,q_auto/'
           'v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
       4,
     ),
@@ -554,7 +554,7 @@ class FashTrending extends StatelessWidget {
                   children: [
                     const NwsbImage(
                       url:
-                          'https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784370276/grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
+                          'assets/videos/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
                       fallback: NwsbVideo(
                         asset: 'assets/video/word-acts.mp4',
                       ),
@@ -956,7 +956,7 @@ class FashConnect extends StatelessWidget {
                   children: [
                     const NwsbImage(
                       url:
-                          'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784144639/grok_image_1784144472932_h242ko.jpg',
+                          'https://media.nowssb.com/migrated-images/b20d675b826ef760_grok_image_1784144472932_h242ko.jpg',
                       fallback: NwsbVideo(
                         asset: 'assets/video/connect-banner.mp4',
                       ),

@@ -35,7 +35,7 @@ const SKIP_DIRS = new Set(['.git', '.claude', 'node_modules', 'www', 'android', 
    website and wrong inside an APK.
 
    assets/banners is 71 MB of PNG and WebP that nothing in the app actually
-   asks for — every banner the app draws comes from Cloudinary, and a search
+   asks for — every banner the app draws comes from R2, and a search
    across the HTML, CSS and JS finds no reference to this directory at all.
    On a CDN that costs nothing because it is never requested; bundled into an
    app it is 71 MB of the download, which is most of it. If something starts

@@ -29,15 +29,15 @@
               '<rect x="13" y="13" width="5" height="5" rx="1.5" fill="rgba(200,232,245,0.12)" stroke="rgba(200,232,245,0.3)" stroke-width="1"/>' +
             '</svg>' },
     { k: 'bg',      label: 'Background',     sub: 'Fashion backdrop',     run: 'nwsbOpenFashionBgOverlay()',
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png">' },
     { k: 'startbg', label: 'Start Image',    sub: 'Art behind the start', run: "SS.open('startbg')",
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1785014506/file_000000009f10820bb6872a5ed8007148_pvqjaa.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png">' },
     { k: 'qa',      label: 'Quick Access',   sub: 'Bottom nav bar',       run: "openSub('quick-access')",
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + ';border-radius:50%;" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + ';border-radius:50%;" src="https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png">' },
     { k: 'qlinks',  label: 'Quick Links',    sub: 'One-tap shortcuts',    run: 'qlOpen()',
       icon: '<svg viewBox="0 0 22 22" fill="none"><path d="M12 2 4 13h6l-1 7 9-11h-6l1-7Z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
     { k: 'tiles',   label: 'Home Tiles',     sub: 'The four buttons',     run: 'htOpen()',
-      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png">' },
+      icon: '<img loading="lazy" decoding="async" alt="" style="' + IMG + '" src="https://media.nowssb.com/migrated-images/909b614a4f984b77_f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png">' },
     { k: 'layout',  label: 'Set As You Like', sub: 'Order the sections',  run: 'hlOpen()',
       icon: '<svg viewBox="0 0 22 22" fill="none">' +
               '<rect x="3" y="2.5" width="16" height="4.2" rx="1" stroke="#fff" stroke-width="1.5"/>' +
@@ -71,7 +71,7 @@
       '<div class="cu-box">' +
         '<div class="cu-head">' +
           '<div class="cu-head-icon"><img loading="lazy" decoding="async" alt="" style="' + IMG + '" ' +
-            'src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png"></div>' +
+            'src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png"></div>' +
           '<div class="cu-head-txt">' +
             '<div class="cu-head-title">Customize</div>' +
             '<div class="cu-head-sub">Everything you can change, in one place</div>' +

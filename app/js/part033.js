@@ -47,14 +47,14 @@
   ];
   // Banner pool — every placeholder person gets a profile banner
   var PEOPLE_BANNERS = [
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591933705_qq3l9g.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591857840_tbznap.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782592051446_womamz.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592067/grok_image_1782591669371_kqnaf9.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591627828_lmde11.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591559591_yxgud5.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592066/grok_image_1782591561380_ytpn3b.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782592260/grok_image_1782591732123_epmpiu.jpg'
+    'https://media.nowssb.com/migrated-images/76d721a8c81960e8_grok_image_1782591933705_qq3l9g.jpg',
+    'https://media.nowssb.com/migrated-images/321c92a4017fe5a4_grok_image_1782591857840_tbznap.jpg',
+    'https://media.nowssb.com/migrated-images/baba44183d3a4a73_grok_image_1782592051446_womamz.jpg',
+    'https://media.nowssb.com/migrated-images/d6081e9b4d8b38ec_grok_image_1782591669371_kqnaf9.jpg',
+    'https://media.nowssb.com/migrated-images/cebd14700ebc78cf_grok_image_1782591627828_lmde11.jpg',
+    'https://media.nowssb.com/migrated-images/a89e63e77e16bf28_grok_image_1782591559591_yxgud5.jpg',
+    'https://media.nowssb.com/migrated-images/5f085c5317fa4bb2_grok_image_1782591561380_ytpn3b.jpg',
+    'https://media.nowssb.com/migrated-images/2945c0de16858ec7_grok_image_1782591732123_epmpiu.jpg'
   ];
   PEOPLE.forEach(function(p,i){
     p.highlights = [{label:'Practice',img:img('p'+i+'a',150)},{label:'Words',img:img('p'+i+'b',150)},{label:'Journey',img:img('p'+i+'c',150)}];
@@ -68,10 +68,10 @@
 
   // ── NowssB Verified — tiers (the headphone check-mark badges) ──
   var VERIFY_TIERS = [
-    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://res.cloudinary.com/eenvubod/image/upload/v1784356872/file_00000000de10820b822213b89af7be7f_fpjdrh.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792072386_d8fifm.jpg', req:['1,000 followers','20 words purchased','100-day practice streak'], price:'$1.99', priceN:199, per:'/mo'},
-    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792074543_iasker.jpg', req:['2,000 followers','40 words purchased','200-day practice streak'], price:'$4.99', priceN:499, per:'/mo'},
-    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782635218/311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792076655_amox3t.jpg', req:['4,000 followers','80 words purchased','400-day practice streak'], price:'$9.99', priceN:999, per:'/mo'},
-    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://res.cloudinary.com/eenvubod/image/upload/v1784356872/file_000000000418820690feafe33ae6f12a_idrvna.png', promo:'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782792269/grok_image_1782792148248_tpzn1r.jpg', req:['10,000 followers','200 words purchased','800-day practice streak'], price:'$49.99', priceN:4999, per:'/mo', yearly:'$200', yearlyN:20000, yearlyPer:'/yr'}
+    {key:'blue',   name:'Verified', tag:'Confirmed Practitioner', img:'https://media.nowssb.com/migrated-images/84c3f96842d2320f_file_00000000de10820b822213b89af7be7f_fpjdrh.png', promo:'https://media.nowssb.com/migrated-images/d319fece3ca9ff77_grok_image_1782792072386_d8fifm.jpg', req:['1,000 followers','20 words purchased','100-day practice streak'], price:'$1.99', priceN:199, per:'/mo'},
+    {key:'silver', name:'Silver',   tag:'Sound Healer',           img:'https://media.nowssb.com/migrated-images/a2b98d70a527ff46_417b2090-72c8-11f1-bcbf-fb86e1a7c55f_cf2eyw.png', promo:'https://media.nowssb.com/migrated-images/0d7e4528ecbdb557_grok_image_1782792074543_iasker.jpg', req:['2,000 followers','40 words purchased','200-day practice streak'], price:'$4.99', priceN:499, per:'/mo'},
+    {key:'gold',   name:'Gold',     tag:'Frequency Master',       img:'https://media.nowssb.com/migrated-images/f2628d03827d828f_311b1480-72c8-11f1-bcbf-fb86e1a7c55f_blupbs.png', promo:'https://media.nowssb.com/migrated-images/422d807e7b45bc59_grok_image_1782792076655_amox3t.jpg', req:['4,000 followers','80 words purchased','400-day practice streak'], price:'$9.99', priceN:999, per:'/mo'},
+    {key:'diamond',name:'Diamond',  tag:'Iced Out · Top 1%',      img:'https://media.nowssb.com/migrated-images/a4712137757f5791_file_000000000418820690feafe33ae6f12a_idrvna.png', promo:'https://media.nowssb.com/migrated-images/74f44fa8c1c5fc2f_grok_image_1782792148248_tpzn1r.jpg', req:['10,000 followers','200 words purchased','800-day practice streak'], price:'$49.99', priceN:4999, per:'/mo', yearly:'$200', yearlyN:20000, yearlyPer:'/yr'}
   ];
   var VERIFY_ORDER = ['', 'blue', 'silver', 'gold', 'diamond'];
   // Universal country list (ISO short names) — the app is global, not region-locked.
@@ -547,9 +547,9 @@
 
       screen.innerHTML='<style>'+css+'</style>'+
         '<div class="nwsbf-scroll">'+
-          '<div class="nwsbf-top"><div class="nwsbf-brand"><img class="nwsbf-brandlogo" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt=""><span class="nwsbf-logo">NowssB <span style="color:#c8a96e;">Connect</span></span></div>'+
-            '<button class="nwsbf-icon" aria-label="Messages" onclick="if(typeof chatInboxOpen===\'function\')chatInboxOpen()"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png" alt="Chat"></button>'+
-            '<button class="nwsbf-icon" aria-label="Home" onclick="IG.socialNav(\'home\')"><img class="nwsbf-iconimg" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1779639661/569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" alt="Home"></button>'+
+          '<div class="nwsbf-top"><div class="nwsbf-brand"><img class="nwsbf-brandlogo" decoding="async" src="https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt=""><span class="nwsbf-logo">NowssB <span style="color:#c8a96e;">Connect</span></span></div>'+
+            '<button class="nwsbf-icon" aria-label="Messages" onclick="if(typeof chatInboxOpen===\'function\')chatInboxOpen()"><img class="nwsbf-iconimg" decoding="async" src="https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png" alt="Chat"></button>'+
+            '<button class="nwsbf-icon" aria-label="Home" onclick="IG.socialNav(\'home\')"><img class="nwsbf-iconimg" decoding="async" src="https://media.nowssb.com/migrated-images/4815ce65fb831cbf_569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png" alt="Home"></button>'+
           '</div>'+
           '<div class="nwsbf-stories">'+stories+'</div>'+
           posts+
@@ -690,7 +690,7 @@
         var owned = cur && VERIFY_ORDER.indexOf(cur) >= VERIFY_ORDER.indexOf(t.key);
         var reqs = t.req.map(function(r){ return '<div class="nwsb-vr-req"><span class="nwsb-vr-tick">✓</span><span>'+r+'</span></div>'; }).join('');
         return '<div class="nwsb-vr-loop">'+
-              '<div class="nwsb-vr-loop-left"><img class="nwsb-vr-loop-icon" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt=""></div>'+
+              '<div class="nwsb-vr-loop-left"><img class="nwsb-vr-loop-icon" src="https://media.nowssb.com/migrated-images/d475adb4c532fd11_file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt=""></div>'+
               '<div class="nwsb-vr-loop-divider"></div>'+
               '<div class="nwsb-vr-loop-body"><div class="nwsb-vr-loop-text" id="nwsbVrLoop_'+t.key+'"></div></div>'+
               '<img class="nwsb-vr-loop-badge" src="'+t.img+'" alt="">'+
@@ -785,15 +785,15 @@
       ov.id='nwsb-verify';
       ov.innerHTML='<style>'+css+'</style>'+
         '<div class="nwsb-vr-bgimg" id="nwsbVrBg"></div><div class="nwsb-vr-bgscrim"></div>'+
-        '<div class="nwsb-vr-bar"><img class="nwsb-vr-bar-ic" src="https://res.cloudinary.com/eenvubod/image/upload/v1784349702/file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt=""><span class="nwsb-vr-h">NowssB Verified</span>'+
-          '<button class="nwsb-vr-bg-btn" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background"><img src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></button>'+
+        '<div class="nwsb-vr-bar"><img class="nwsb-vr-bar-ic" src="https://media.nowssb.com/migrated-images/d475adb4c532fd11_file_000000004a88820bb7dc8e1daa118ea6_h2coem.png" alt=""><span class="nwsb-vr-h">NowssB Verified</span>'+
+          '<button class="nwsb-vr-bg-btn" onclick="nwsbOpenFashionBgOverlay()" aria-label="Customize background"><img src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></button>'+
           '<button class="nwsb-vr-x" aria-label="Close" onclick="var p=document.getElementById(\'nwsb-verify\');if(p)p.remove();if(window._nwsbVrLoopTimer){clearInterval(window._nwsbVrLoopTimer);window._nwsbVrLoopTimer=null;}if(window._nwsbVrBannerTimer){clearInterval(window._nwsbVrBannerTimer);window._nwsbVrBannerTimer=null;}">&times;</button></div>'+
         '<div class="nwsb-vr-scroll">'+
           '<div class="nwsb-vr-banner-outer"><div class="nwsb-vr-banner-wrap" id="nwsbVrBannerWrap"><div class="nwsb-vr-banner-track" id="nwsbVrBannerTrack">'+
-            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648338/grok_image_1778648156568_qdbaux.jpg" alt="Banner 1"></div>'+
-            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648270/grok_image_1778647948774_mntgip.jpg" alt="Banner 2"></div>'+
-            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648317/grok_image_1778648109536_exlolv.jpg" alt="Banner 3"></div>'+
-            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778648290/grok_image_1778647959913_fdzsgc.jpg" alt="Banner 4"></div>'+
+            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/59651aec2ea68b62_grok_image_1778648156568_qdbaux.jpg" alt="Banner 1"></div>'+
+            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/a29db359fb02881c_grok_image_1778647948774_mntgip.jpg" alt="Banner 2"></div>'+
+            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/b9eaab8caa23a0a6_grok_image_1778648109536_exlolv.jpg" alt="Banner 3"></div>'+
+            '<div class="nwsb-vr-banner-slide"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/7e61f4bd994ba37c_grok_image_1778647959913_fdzsgc.jpg" alt="Banner 4"></div>'+
           '</div></div></div>'+
           '<div class="nwsb-vr-intro">Wear the headphone check-mark. Show the world you\'re a real NowssB practitioner — and climb from Blue all the way to Diamond.</div>'+
           (curName ? '<div class="nwsb-vr-cur">Your badge: '+curName+'</div>' : '<div class="nwsb-vr-cur">You\'re not verified yet</div>')+
@@ -1410,7 +1410,7 @@
     menu:function(){ this.openVerify(); },
     refreshNavAvatar:function(){
       var ud = window._userDataCache;
-      var DEFAULT_AVATAR = 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780065459/a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png';
+      var DEFAULT_AVATAR = 'https://media.nowssb.com/migrated-images/f3c5528e9b4b7777_a84616f0-5b6b-11f1-b4b5-35b4f5e67a31_mureko.png';
       var photoURL = (ud && ud.photoURL) || ME.avatar || '';
       var imgEl  = document.getElementById('ignav-avatar');
       var initEl = document.getElementById('ignav-avatar-init');

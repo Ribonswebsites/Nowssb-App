@@ -14,15 +14,15 @@ document.addEventListener('dragstart', function (e) {
 const bgImages = {
   splash:     null, // splash uses its own inline bg
   login:      null,
-  signup1:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584943/grok_image_1777580530017_nftrrb.jpg',
-  signup1phone: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777584978/grok_image_1777580577245_s0oftf.jpg',
-  signup2:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777591568/grok_image_1777591433417_rx2whb.jpg',
-  'profile-setup': 'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778309102/grok_image_1778309033334_fza02n.jpg',
-  onboarding: 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto,w_900/v1779804089/3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png',
-  onboarding2: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777615898/grok_image_1777615621529_xdxfj6.jpg',
-  onboarding3: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto,w_900/v1777616006/grok_image_1777615631154_yddgyh.jpg',
-  analysis:   'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850607/1000033084-ezremove_ybzuzs.png',
-  home:       'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776850550/1000033096-ezremove_eb2gnu.png'
+  signup1:    'https://media.nowssb.com/migrated-images/1d120725db6cc68c_grok_image_1777580530017_nftrrb.jpg',
+  signup1phone: 'https://media.nowssb.com/migrated-images/01c5e8d3ccc47371_grok_image_1777580577245_s0oftf.jpg',
+  signup2:    'https://media.nowssb.com/migrated-images/4512d94334f1b450_grok_image_1777591433417_rx2whb.jpg',
+  'profile-setup': 'https://media.nowssb.com/migrated-images/97525eab36ee558e_grok_image_1778309033334_fza02n.jpg',
+  onboarding: 'https://media.nowssb.com/migrated-images/667061151c6a8185_3cca01a0-590b-11f1-8540-43cf58c6068c_ke31me.png',
+  onboarding2: 'https://media.nowssb.com/migrated-images/d4fb09f1e5840449_grok_image_1777615621529_xdxfj6.jpg',
+  onboarding3: 'https://media.nowssb.com/migrated-images/44e9c65ffa0a765f_grok_image_1777615631154_yddgyh.jpg',
+  analysis:   'https://media.nowssb.com/migrated-images/ba60077416a73a16_1000033084-ezremove_ybzuzs.png',
+  home:       'https://media.nowssb.com/migrated-images/0dcec127e42cd343_1000033096-ezremove_eb2gnu.png'
 };
 
 // Per-screen background positions — new image is well-centered, characters top half, panel bottom
@@ -80,7 +80,7 @@ const _videoMap = {
   'sub-meaning-search':['krm-video', 'nssMeaningVid', 'msBannerImg'],
 };
 // Step screens share same video src — just one preload needed
-const _stepVideoSrc = 'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/f_auto/v1777979792/grok_video_2026-05-05-16-46-09_dpauwg.mp4';
+const _stepVideoSrc = 'assets/videos/90550ee5f40f4a2a_grok_video_2026-05-05-16-46-09_dpauwg.mp4';
 const _stepScreens = ['sub-shabdapathy','sub-pronunciation','sub-namasmaran','sub-electricity','sub-moral','sub-birthday'];
 
 // Preload a video src silently in background
@@ -133,14 +133,14 @@ function _pauseScreenVideos(screenId) {
 function _runSequentialPreload() {
   const queue = [
     // Home video first — most likely destination
-    'https://res.cloudinary.com/dfc8lwj22/video/upload/q_auto/v1778061531/grok_video_2026-05-06-15-27-23_zhylbe.mp4',
+    'assets/videos/1e9a0c8d452a809f_grok_video_2026-05-06-15-27-23_zhylbe.mp4',
     // Step screen video (shared)
     _stepVideoSrc,
     // Word search
-    'https://res.cloudinary.com/dkzxw33ln/video/upload/q_auto/f_auto/v1776800800/InShot_20260422_000025290_xqdxey.mp4',
+    'assets/videos/4ce3c9019dd56ccd_InShot_20260422_000025290_xqdxey.mp4',
     // Meaning search
-    'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/v1778677278/grok_video_2026-05-13-17-16-28_e4m4vr.mp4',
-    'https://res.cloudinary.com/dcbs8xr1l/video/upload/q_auto/f_auto/v1778511160/grok_video_2026-05-11-19-06-52_e67kc6.mp4',
+    'assets/videos/3376b48971b038f6_grok_video_2026-05-13-17-16-28_e4m4vr.mp4',
+    'assets/videos/3c8eebc74d743135_grok_video_2026-05-11-19-06-52_e67kc6.mp4',
   ];
   let i = 0;
   function next() {
@@ -301,16 +301,16 @@ let _psSelectedAvatarUrl = null;
 let _psUploadedPhotoUrl  = null;
 let _psGridBuilt = false;
 
-// ── REAL AVATAR IMAGES — your 8 Cloudinary characters ──
+// ── REAL AVATAR IMAGES — your 8 R2 characters ──
 const _AVATAR_URLS = [
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-131_jyrnhx.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-135_hziacn.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-92_rfnjut.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-190_jqulqk.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418246/image-240_wxgthb.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418327/image-156_awwho5.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418357/image-162_vl3unq.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778418383/image-167_qbyiji.jpg',
+  'https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg',
+  'https://media.nowssb.com/migrated-images/17587b3f27c8e7d8_image-135_hziacn.jpg',
+  'https://media.nowssb.com/migrated-images/f681259af0c4f876_image-92_rfnjut.jpg',
+  'https://media.nowssb.com/migrated-images/9147b52d3315a74e_image-190_jqulqk.jpg',
+  'https://media.nowssb.com/migrated-images/6d0c1f1bf3f99533_image-240_wxgthb.jpg',
+  'https://media.nowssb.com/migrated-images/22b21387760ef082_image-156_awwho5.jpg',
+  'https://media.nowssb.com/migrated-images/8c19d1f70b15463a_image-162_vl3unq.jpg',
+  'https://media.nowssb.com/migrated-images/fd4c15348fdba199_image-167_qbyiji.jpg',
 ];
 function _genAvatarURI(idx) {
   return _AVATAR_URLS[idx % _AVATAR_URLS.length];
@@ -410,7 +410,7 @@ async function psHandlePhoto(file) {
   reader.readAsDataURL(file);
 
   try {
-    const url = await _profileUploadToCloudinary(file);
+    const url = await _profileUploadToR2(file);
     _psUploadedPhotoUrl = url;
     _psSelectedAvatarUrl = null;
     document.querySelectorAll('.ps-sheet-cell').forEach(c => c.classList.remove('selected'));
@@ -544,7 +544,7 @@ window.psSkip = psSkip;
 // When the Word Search section scrolls into view on the home screen,
 // the background cross-fades to the left footer image (primal/nature figure).
 // Scrolling back restores the original home background.
-const HOME_BG_SCROLL = 'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png';
+const HOME_BG_SCROLL = 'https://media.nowssb.com/migrated-images/d614abe902eccd10_1000033052-ezremove_vx4rib.png';
 const appBgLayer2 = document.getElementById('appBgLayer2');
 (new Image()).src = HOME_BG_SCROLL;
 appBgLayer2.style.backgroundImage = `url('${HOME_BG_SCROLL}')`;
@@ -621,11 +621,11 @@ function nmhSwitchMode() {
    (#home-nm, img #nmhFashImg) and the Fashion home (#home, img #homeFashImg).
    Preloads once, seamless crossfade, rotates only while its host is visible. */
 window._FASH_SEQ = window._FASH_SEQ || [
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783179785/grok_image_1783178874949_zcbb28.jpg',
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783179785/grok_image_1783179042580_kdfmbl.jpg',
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783179785/grok_image_1783179567035_qgupmu.jpg',
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783179785/grok_image_1783179620064_quvp6x.jpg',
-  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_1000/v1783082388/image-22_ns2jhx.jpg'
+  'https://media.nowssb.com/migrated-images/3518217e6d223506_grok_image_1783178874949_zcbb28.jpg',
+  'https://media.nowssb.com/migrated-images/13a2880e21702514_grok_image_1783179042580_kdfmbl.jpg',
+  'https://media.nowssb.com/migrated-images/06d563e70f0181ce_grok_image_1783179567035_qgupmu.jpg',
+  'https://media.nowssb.com/migrated-images/eac94e724e6ce1c9_grok_image_1783179620064_quvp6x.jpg',
+  'https://media.nowssb.com/migrated-images/68fbe327cf237416_image-22_ns2jhx.jpg'
 ];
 /* one animated caption per image (same order as _FASH_SEQ); last image = no text */
 window._FASH_CAPS = window._FASH_CAPS || [
@@ -769,9 +769,9 @@ function nmhRefresh() {
 
   // Store COUPON banners — rotate one by one (greeting was removed by request).
   var GREET_SEQ = [
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
+    'https://media.nowssb.com/migrated-images/456a2a7e485bf504_grok_image_1784044846126_pyqsll.jpg',
+    'https://media.nowssb.com/migrated-images/d5411443f5aa8dd1_grok_image_1784044843386_iarpg7.jpg',
+    'https://media.nowssb.com/migrated-images/473c3c5fea866477_grok_image_1784044844917_ocvbli.jpg'
   ];
   var gimg = document.getElementById('nmhGreetImg');
   // Shop Now is VISIBLE by default; hide it ONLY while the 1st image shows.
@@ -1102,31 +1102,31 @@ const questions = [
     label:'What Calls You',
     q:'What calls you to heal?',
     opts:['Voice & Vocal power','Inner calm & peace','Ancient wisdom & knowledge','Physical strength & vitality'],
-    bg: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto/v1782622024/grok_image_1782621969038_uvugj1.jpg'
+    bg: 'https://media.nowssb.com/migrated-images/229db89b43010de7_grok_image_1782621969038_uvugj1.jpg'
   },
   {
     label:'What Feels Broken',
     q:'What feels most out of balance?',
     opts:['My confidence & self-expression','My sleep & recovery','My focus & clarity','My relationships & connection'],
-    bg: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777615898/grok_image_1777615621529_xdxfj6.jpg'
+    bg: 'https://media.nowssb.com/migrated-images/20dbc325a4def42f_grok_image_1777615621529_xdxfj6.jpg'
   },
   {
     label:'Your Signature Moment',
     q:'When do you meet yourself?',
     opts:['In the quiet of the morning','In the heat of midday','In the stillness of the night','Whenever the feeling comes'],
-    bg: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777616006/grok_image_1777615631154_yddgyh.jpg'
+    bg: 'https://media.nowssb.com/migrated-images/e4cc8c4a635397f7_grok_image_1777615631154_yddgyh.jpg'
   },
   {
     label:'Your Depth',
     q:'Where are you in your journey?',
     opts:['A seeker — just beginning','I have touched this before','I practice regularly','I want to go much deeper'],
-    bg: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777748690/grok_image_1777748446479_lotpls.jpg'
+    bg: 'https://media.nowssb.com/migrated-images/312a7db06c655cfa_grok_image_1777748446479_lotpls.jpg'
   },
   {
     label:'Personalise Further',
     q:'What is your gender?',
     opts:['Male','Female'],
-    bg: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777748597/grok_image_1777747756281_j10yta.jpg'
+    bg: 'https://media.nowssb.com/migrated-images/3509a9601ff38f98_grok_image_1777747756281_j10yta.jpg'
   }
 ];
 
@@ -1394,11 +1394,11 @@ function obnSkip() {
 
 // ── HERO HEADER ──
 const HERO_IMGS = [
-  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776753853585_luk2yh.jpg',
-  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776754047350_m02pef.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778662189/image-84_bqpkid.jpg',
-  'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto,w_900/v1776800798/grok_image_1776754188034_snzcgu.jpg',
-  'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto,w_900/v1778662207/image-202_yktk8y.jpg'
+  'https://media.nowssb.com/migrated-images/42c33a65bdd23d28_grok_image_1776753853585_luk2yh.jpg',
+  'https://media.nowssb.com/migrated-images/d6206dd1fd0f4a9a_grok_image_1776754047350_m02pef.jpg',
+  'https://media.nowssb.com/migrated-images/0fb4a6948bc6655e_image-84_bqpkid.jpg',
+  'https://media.nowssb.com/migrated-images/b44c7964ae52f97c_grok_image_1776754188034_snzcgu.jpg',
+  'https://media.nowssb.com/migrated-images/bad91e0961198e04_image-202_yktk8y.jpg'
 ];
 const HERO_WORDS = ['VIBRATION','FREQUENCIES','MIND','NEURONS','RESONANCE'];
 
@@ -2022,16 +2022,16 @@ function _nwsbSetupFooterCarousel(carouselId, bgImgId) {
 
   // Image URLs in same order as .fci cards
   var IMGS = [
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931241446_2_oqn7z0.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931251298_2_nuhjin.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931991083_2_eyvogv.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776932343988_3_bofj1s.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931659181_2_l3dxyi.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931253654_2_hrtsra.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934920/grok_image_1776932830246_2_x0yyb6.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776933033268_2_m3fmo9.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932933365_2_jb1lch.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932486772_2_spplq4.jpg'
+    'https://media.nowssb.com/migrated-images/de6f1331af862c18_grok_image_1776931241446_2_oqn7z0.jpg',
+    'https://media.nowssb.com/migrated-images/c63fd60894cef334_grok_image_1776931251298_2_nuhjin.jpg',
+    'https://media.nowssb.com/migrated-images/7b69c8d374502725_grok_image_1776931991083_2_eyvogv.jpg',
+    'https://media.nowssb.com/migrated-images/ef785a342307f508_grok_image_1776932343988_3_bofj1s.jpg',
+    'https://media.nowssb.com/migrated-images/f67dedbd317ef3c3_grok_image_1776931659181_2_l3dxyi.jpg',
+    'https://media.nowssb.com/migrated-images/43cdce970c2897dd_grok_image_1776931253654_2_hrtsra.jpg',
+    'https://media.nowssb.com/migrated-images/e4a21614b9e3d1c0_grok_image_1776932830246_2_x0yyb6.jpg',
+    'https://media.nowssb.com/migrated-images/378e89b2f157b2a9_grok_image_1776933033268_2_m3fmo9.jpg',
+    'https://media.nowssb.com/migrated-images/4ef4e116dedc8ef6_grok_image_1776932933365_2_jb1lch.jpg',
+    'https://media.nowssb.com/migrated-images/c37c1f7e2c2a1fa0_grok_image_1776932486772_2_spplq4.jpg'
   ];
 
   function updateBg(idx) {
@@ -2189,81 +2189,81 @@ function nssVidBannerCycle() {
 // badge) — same role as Meaning Store's own MS_CAT_LOGO, used as the
 // cart/wishlist/checkout thumbnail for every Word Atelier item since
 // words don't have a genuine per-word image.
-const RM_CAT_LOGO = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png';
+const RM_CAT_LOGO = 'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png';
 
 // ── WORD ORIGINS: TIER DEFINITIONS ──
 const RM_TIERS = {
   basic_a: {
     price: '$0.80', priceVal: 80, origPrice: null, discount: null,
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971604/ffec7380-516c-11f1-9b86-d16f5852128e_1_xdqlio.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971603/ffc4a030-516c-11f1-9b86-d16f5852128e_oahwvn.png'
+      'https://media.nowssb.com/migrated-images/4b4cbb2511bf4d7d_ffec7380-516c-11f1-9b86-d16f5852128e_1_xdqlio.png',
+      'https://media.nowssb.com/migrated-images/a75688c2154787e1_ffc4a030-516c-11f1-9b86-d16f5852128e_oahwvn.png'
     ]
   },
   basic_b: {
     price: '$0.80', priceVal: 80, origPrice: null, discount: null,
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb6c750-516c-11f1-9b86-d16f5852128e_appn0v.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb519a0-516c-11f1-9b86-d16f5852128e_1_lnqxkr.png'
+      'https://media.nowssb.com/migrated-images/db9491e3b008daf8_7bb6c750-516c-11f1-9b86-d16f5852128e_appn0v.png',
+      'https://media.nowssb.com/migrated-images/f4b74b584cee3405_7bb519a0-516c-11f1-9b86-d16f5852128e_1_lnqxkr.png'
     ]
   },
   discount_40: {
     price: '$0.40', priceVal: 40, origPrice: '$0.80', discount: '50% off',
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971512/ffbb0340-516c-11f1-9b86-d16f5852128e_ekdtma.png'
+      'https://media.nowssb.com/migrated-images/b5467f3b48dae5c4_ffbb0340-516c-11f1-9b86-d16f5852128e_ekdtma.png'
     ]
   },
   standard_50: {
     price: '$0.50', priceVal: 50, origPrice: '$1.00', discount: '50% off',
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778971513/7bb17020-516c-11f1-9b86-d16f5852128e_1_bbzls6.png'
+      'https://media.nowssb.com/migrated-images/2fb5a6fbaffaf0b9_7bb17020-516c-11f1-9b86-d16f5852128e_1_bbzls6.png'
     ]
   },
   premium_140: {
     price: '$1.40', priceVal: 140, origPrice: '$2.00', discount: '30% off',
     banners: [
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/a3447b70-516f-11f1-9b86-d16f5852128e_q0eye7.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972781/a345db00-516f-11f1-9b86-d16f5852128e_s3mxiu.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778973115/5c8e9a00-517c-11f1-a3dd-d923e87f1895_qggn8o.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/fd7c24e0-516e-11f1-9b86-d16f5852128e_bticry.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/c36f0950-517a-11f1-9d12-25df0fdf84f2_jwiys1.png',
-      'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778972614/a7215cf0-516e-11f1-9b86-d16f5852128e_edvhiv.png'
+      'https://media.nowssb.com/migrated-images/8df48eeb6b9ccb6a_a3447b70-516f-11f1-9b86-d16f5852128e_q0eye7.png',
+      'https://media.nowssb.com/migrated-images/5959653386992e33_a345db00-516f-11f1-9b86-d16f5852128e_s3mxiu.png',
+      'https://media.nowssb.com/migrated-images/8bc89e814fad7a72_5c8e9a00-517c-11f1-a3dd-d923e87f1895_qggn8o.png',
+      'https://media.nowssb.com/migrated-images/48d08275f4cff469_fd7c24e0-516e-11f1-9b86-d16f5852128e_bticry.png',
+      'https://media.nowssb.com/migrated-images/28d1531672b200de_c36f0950-517a-11f1-9d12-25df0fdf84f2_jwiys1.png',
+      'https://media.nowssb.com/migrated-images/7ac9c5cf57a1deeb_a7215cf0-516e-11f1-9b86-d16f5852128e_edvhiv.png'
     ]
   },
   // ── ELITE TIERS — $1.00 each, unique banner per word ──
-  elite_spirit:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/46d6afc0-517e-11f1-9c9e-43067f971164_l7lezo.png'] },
-  elite_life:     { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png'] },
-  elite_death:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c7830-517e-11f1-9c9e-43067f971164_qzbtnk.png'] },
-  elite_power:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/480348e0-517e-11f1-9c9e-43067f971164_1_uiieto.png'] },
-  elite_star:     { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/49427fa0-517e-11f1-9c9e-43067f971164_1_qlepve.png'] },
-  elite_dream:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c5120-517e-11f1-9c9e-43067f971164_igwnf1.png'] },
-  elite_voice:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/ae3d15c0-516d-11f1-9b86-d16f5852128e_1_v9xplj.png'] },
-  elite_heart:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/4d2f7140-517e-11f1-9c9e-43067f971164_kcheth.png'] },
-  elite_peace:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/4b208e70-517e-11f1-9c9e-43067f971164_tcsrzl.png'] },
-  elite_wisdom:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974063/b2064b60-5170-11f1-9b86-d16f5852128e_bo7cug.png'] },
-  elite_strength: { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974063/b2067270-5170-11f1-9b86-d16f5852128e_ajcacg.png'] },
-  elite_grace:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974064/f1849ab0-517c-11f1-9c9e-43067f971164_gyqpko.png'] },
-  elite_freedom:  { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974065/f185ac20-517c-11f1-9c9e-43067f971164_vfyfa0.png'] },
-  elite_karma:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974067/ffbb0340-516c-11f1-9b86-d16f5852128e_aavqzy.png'] },
-  elite_energy:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png'] },
+  elite_spirit:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/bf120d616c1898af_46d6afc0-517e-11f1-9c9e-43067f971164_l7lezo.png'] },
+  elite_life:     { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/62259f3d4829e13e_411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png'] },
+  elite_death:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/92e372835a2253fc_411c7830-517e-11f1-9c9e-43067f971164_qzbtnk.png'] },
+  elite_power:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/c1ba7d9f29a308da_480348e0-517e-11f1-9c9e-43067f971164_1_uiieto.png'] },
+  elite_star:     { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/57e2e1a12a293c2a_49427fa0-517e-11f1-9c9e-43067f971164_1_qlepve.png'] },
+  elite_dream:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/a759cde2ca2708aa_411c5120-517e-11f1-9c9e-43067f971164_igwnf1.png'] },
+  elite_voice:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/a1be33e84b6ab9cb_ae3d15c0-516d-11f1-9b86-d16f5852128e_1_v9xplj.png'] },
+  elite_heart:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/e2636f5524ba119a_4d2f7140-517e-11f1-9c9e-43067f971164_kcheth.png'] },
+  elite_peace:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/172465875284bc31_4b208e70-517e-11f1-9c9e-43067f971164_tcsrzl.png'] },
+  elite_wisdom:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/98916be36842110e_b2064b60-5170-11f1-9b86-d16f5852128e_bo7cug.png'] },
+  elite_strength: { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/0cb893f9dc2a7f6a_b2067270-5170-11f1-9b86-d16f5852128e_ajcacg.png'] },
+  elite_grace:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/619c72fd4864c35e_f1849ab0-517c-11f1-9c9e-43067f971164_gyqpko.png'] },
+  elite_freedom:  { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/86194fd1d231304b_f185ac20-517c-11f1-9c9e-43067f971164_vfyfa0.png'] },
+  elite_karma:    { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/73f056dd81d40c2c_ffbb0340-516c-11f1-9b86-d16f5852128e_aavqzy.png'] },
+  elite_energy:   { price: '$1.00', priceVal: 100, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/62259f3d4829e13e_411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png'] },
   // ── SIGNATURE TIERS — $2.99, the most expensive word in each category.
   // One per category section (see part010.js's SIGNATURE map) — every
   // signature word shares the same gold NowssB product shot as its image. ──
-  sig_off50:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_elements: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_sacred:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_identity: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_cosmos:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_nature:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_family:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_elite:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_premium:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_mythical: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_warriors: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_ancient:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_peace:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_white:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
-  sig_black:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784438406/file_00000000d39081faa073bf17312d89fc_q9ehat.png'] }
+  sig_off50:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_elements: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_sacred:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_identity: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_cosmos:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_nature:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_family:   { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_elite:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_premium:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_mythical: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_warriors: { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_ancient:  { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_peace:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_white:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] },
+  sig_black:    { price: '$2.99', priceVal: 299, origPrice: null, discount: null, banners: ['https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png'] }
 };
 
 // ── SIGNATURE WORDS — display-name overrides (loadWordOrigin only
@@ -2286,21 +2286,21 @@ const RM_SIGNATURE_TIER = {
 
 // ── ELITE WORDS — each has its own single banner ──
 const RM_ELITE = [
-  { key:'elite1',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/46d6afc0-517e-11f1-9c9e-43067f971164_l7lezo.png' },
-  { key:'elite2',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png' },
-  { key:'elite3',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c7830-517e-11f1-9c9e-43067f971164_qzbtnk.png' },
-  { key:'elite4',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/480348e0-517e-11f1-9c9e-43067f971164_1_uiieto.png' },
-  { key:'elite5',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/49427fa0-517e-11f1-9c9e-43067f971164_1_qlepve.png' },
-  { key:'elite6',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c7830-517e-11f1-9c9e-43067f971164_qzbtnk.png' },
-  { key:'elite7',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974061/411c5120-517e-11f1-9c9e-43067f971164_igwnf1.png' },
-  { key:'elite8',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/ae3d15c0-516d-11f1-9b86-d16f5852128e_1_v9xplj.png' },
-  { key:'elite9',  banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/4d2f7140-517e-11f1-9c9e-43067f971164_kcheth.png' },
-  { key:'elite10', banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974062/4b208e70-517e-11f1-9c9e-43067f971164_tcsrzl.png' },
-  { key:'elite11', banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974063/b2064b60-5170-11f1-9b86-d16f5852128e_bo7cug.png' },
-  { key:'elite12', banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974063/b2067270-5170-11f1-9b86-d16f5852128e_ajcacg.png' },
-  { key:'elite13', banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974064/f1849ab0-517c-11f1-9c9e-43067f971164_gyqpko.png' },
-  { key:'elite14', banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974065/f185ac20-517c-11f1-9c9e-43067f971164_vfyfa0.png' },
-  { key:'elite15', banner:'https://res.cloudinary.com/ds15pgoy2/image/upload/q_auto/f_auto/v1778974067/ffbb0340-516c-11f1-9b86-d16f5852128e_aavqzy.png' }
+  { key:'elite1',  banner:'https://media.nowssb.com/migrated-images/bf120d616c1898af_46d6afc0-517e-11f1-9c9e-43067f971164_l7lezo.png' },
+  { key:'elite2',  banner:'https://media.nowssb.com/migrated-images/62259f3d4829e13e_411c2a10-517e-11f1-9c9e-43067f971164_cdezmw.png' },
+  { key:'elite3',  banner:'https://media.nowssb.com/migrated-images/92e372835a2253fc_411c7830-517e-11f1-9c9e-43067f971164_qzbtnk.png' },
+  { key:'elite4',  banner:'https://media.nowssb.com/migrated-images/c1ba7d9f29a308da_480348e0-517e-11f1-9c9e-43067f971164_1_uiieto.png' },
+  { key:'elite5',  banner:'https://media.nowssb.com/migrated-images/57e2e1a12a293c2a_49427fa0-517e-11f1-9c9e-43067f971164_1_qlepve.png' },
+  { key:'elite6',  banner:'https://media.nowssb.com/migrated-images/92e372835a2253fc_411c7830-517e-11f1-9c9e-43067f971164_qzbtnk.png' },
+  { key:'elite7',  banner:'https://media.nowssb.com/migrated-images/a759cde2ca2708aa_411c5120-517e-11f1-9c9e-43067f971164_igwnf1.png' },
+  { key:'elite8',  banner:'https://media.nowssb.com/migrated-images/a1be33e84b6ab9cb_ae3d15c0-516d-11f1-9b86-d16f5852128e_1_v9xplj.png' },
+  { key:'elite9',  banner:'https://media.nowssb.com/migrated-images/e2636f5524ba119a_4d2f7140-517e-11f1-9c9e-43067f971164_kcheth.png' },
+  { key:'elite10', banner:'https://media.nowssb.com/migrated-images/172465875284bc31_4b208e70-517e-11f1-9c9e-43067f971164_tcsrzl.png' },
+  { key:'elite11', banner:'https://media.nowssb.com/migrated-images/98916be36842110e_b2064b60-5170-11f1-9b86-d16f5852128e_bo7cug.png' },
+  { key:'elite12', banner:'https://media.nowssb.com/migrated-images/0cb893f9dc2a7f6a_b2067270-5170-11f1-9b86-d16f5852128e_ajcacg.png' },
+  { key:'elite13', banner:'https://media.nowssb.com/migrated-images/619c72fd4864c35e_f1849ab0-517c-11f1-9c9e-43067f971164_gyqpko.png' },
+  { key:'elite14', banner:'https://media.nowssb.com/migrated-images/86194fd1d231304b_f185ac20-517c-11f1-9c9e-43067f971164_vfyfa0.png' },
+  { key:'elite15', banner:'https://media.nowssb.com/migrated-images/73f056dd81d40c2c_ffbb0340-516c-11f1-9b86-d16f5852128e_aavqzy.png' }
 ];
 
 // ── WORD → TIER MAPPING ──
@@ -2441,8 +2441,8 @@ var _rmdCurrentKey = null;
    media cache with every other clip in the app and sw.js serves them
    from there offline. */
 var RMD_VIDS = [
-  'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-43-13_qh2qjg.mp4',
-  'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785512057/grok_video_2026-07-31-20-42-54_we5gke.mp4'
+  'assets/videos/928f93861b9beb26_grok_video_2026-07-31-20-43-13_qh2qjg.mp4',
+  'assets/videos/ee4719e03b541a08_grok_video_2026-07-31-20-42-54_we5gke.mp4'
 ];
 var _rmdVidIdx = -1;
 /* Built only when a word is opened, so the pre-warmer cannot find them by
@@ -2579,7 +2579,7 @@ function rmdPopulateSimilar(key) {
      many unrelated words (same tier = same banner), which made several
      "similar words" show the exact same picture. This is the one image
      that's actually meant to represent "a word" consistently. */
-  var img = 'https://res.cloudinary.com/dcbs8xr1l/image/upload/q_auto/f_auto/v1778571475/grok_image_1778520937416_jazknf.jpg';
+  var img = 'https://media.nowssb.com/migrated-images/35423222df3850a9_grok_image_1778520937416_jazknf.jpg';
   row.innerHTML = matches.map(function(k) {
     var w = rmDisplayName(k);
     var t = RM_TIERS[RM_WORD_TIER[k] || 'basic_a'];

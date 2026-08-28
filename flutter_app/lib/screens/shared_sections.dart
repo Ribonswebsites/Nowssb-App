@@ -464,7 +464,7 @@ class RoutinesSection extends StatelessWidget {
           PhotoCard(
             background: const NwsbImage(
               url:
-                  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778078302/grok_image_1778070967319_ys14eq.jpg',
+                  'https://media.nowssb.com/migrated-images/4f13105270db8787_grok_image_1778070967319_ys14eq.jpg',
               fallback: ColoredBox(color: Color(0xFF060C18)),
             ),
             label: 'My Routines',
@@ -642,7 +642,7 @@ class EbooksSection extends StatelessWidget {
               child: ClipRect(
                 child: NwsbImage(
                   url:
-                      'https://res.cloudinary.com/eenvubod/video/upload/v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+                      'assets/videos/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
                   fallback: NwsbVideo(
                     asset: 'assets/video/word-acts.mp4',
                     priority: ClipPriority.decoration,
@@ -761,7 +761,7 @@ class HealingSection extends StatelessWidget {
               children: [
                 const NwsbImage(
                   url:
-                      'https://res.cloudinary.com/eenvubod/video/upload/v1784888091/grok_video_2026-07-24-15-42-55_lknomr.mp4',
+                      'assets/videos/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4',
                   fallback: NwsbVideo(
                     asset: 'assets/video/healing-path-bg.mp4',
                   ),
@@ -953,16 +953,16 @@ class HomeFooterSection extends StatefulWidget {
 class _HomeFooterSectionState extends State<HomeFooterSection> {
   /// The ten in `#footerTrack` — index.html:2596.
   static const _shots = [
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931241446_2_oqn7z0.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931251298_2_nuhjin.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931991083_2_eyvogv.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776932343988_3_bofj1s.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931659181_2_l3dxyi.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934919/grok_image_1776931253654_2_hrtsra.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934920/grok_image_1776932830246_2_x0yyb6.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776933033268_2_m3fmo9.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932933365_2_jb1lch.jpg',
-    'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776934921/grok_image_1776932486772_2_spplq4.jpg',
+    'https://media.nowssb.com/migrated-images/de6f1331af862c18_grok_image_1776931241446_2_oqn7z0.jpg',
+    'https://media.nowssb.com/migrated-images/c63fd60894cef334_grok_image_1776931251298_2_nuhjin.jpg',
+    'https://media.nowssb.com/migrated-images/7b69c8d374502725_grok_image_1776931991083_2_eyvogv.jpg',
+    'https://media.nowssb.com/migrated-images/ef785a342307f508_grok_image_1776932343988_3_bofj1s.jpg',
+    'https://media.nowssb.com/migrated-images/f67dedbd317ef3c3_grok_image_1776931659181_2_l3dxyi.jpg',
+    'https://media.nowssb.com/migrated-images/43cdce970c2897dd_grok_image_1776931253654_2_hrtsra.jpg',
+    'https://media.nowssb.com/migrated-images/e4a21614b9e3d1c0_grok_image_1776932830246_2_x0yyb6.jpg',
+    'https://media.nowssb.com/migrated-images/378e89b2f157b2a9_grok_image_1776933033268_2_m3fmo9.jpg',
+    'https://media.nowssb.com/migrated-images/4ef4e116dedc8ef6_grok_image_1776932933365_2_jb1lch.jpg',
+    'https://media.nowssb.com/migrated-images/c37c1f7e2c2a1fa0_grok_image_1776932486772_2_spplq4.jpg',
   ];
 
   static const _links = [

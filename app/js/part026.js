@@ -13,34 +13,34 @@ function msMoneyLabel(inr) {
 /* ── DATA ── */
 var MS_BASE_MEANINGS = [
   // Elements
-  { word:'Earth',   key:'earth',   root:'Proto-Germanic · erþō',        category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030389/grok_image_1777030001969_2_mpmpu2.jpg' },
-  { word:'Water',   key:'water',   root:'Proto-Indo-European · wódr̥',   category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030372/grok_image_1777029845867_2_abtxad.jpg' },
-  { word:'Fire',    key:'fire',    root:'Proto-Indo-European · péh₂wr̥', category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png' },
-  { word:'Sun',     key:'sun',     root:'Proto-Indo-European · séh₂wl̥', category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png' },
-  { word:'Moon',    key:'moon',    root:'Proto-Germanic · mēnô',         category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
-  { word:'Light',   key:'light',   root:'Proto-Indo-European · leuk-',   category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png' },
-  { word:'Dark',    key:'dark',    root:'Proto-Germanic · derkaz',       category:'Elements',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
+  { word:'Earth',   key:'earth',   root:'Proto-Germanic · erþō',        category:'Elements',          price:49, img:'https://media.nowssb.com/migrated-images/41f5e532b0c0e661_grok_image_1777030001969_2_mpmpu2.jpg' },
+  { word:'Water',   key:'water',   root:'Proto-Indo-European · wódr̥',   category:'Elements',          price:49, img:'https://media.nowssb.com/migrated-images/0d9f29f0abec0ed5_grok_image_1777029845867_2_abtxad.jpg' },
+  { word:'Fire',    key:'fire',    root:'Proto-Indo-European · péh₂wr̥', category:'Elements',          price:49, img:'https://media.nowssb.com/migrated-images/fe881b289d00730d_1000033063-ezremove_r22cph.png' },
+  { word:'Sun',     key:'sun',     root:'Proto-Indo-European · séh₂wl̥', category:'Elements',          price:49, img:'https://media.nowssb.com/migrated-images/fe881b289d00730d_1000033063-ezremove_r22cph.png' },
+  { word:'Moon',    key:'moon',    root:'Proto-Germanic · mēnô',         category:'Elements',          price:49, img:'https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png' },
+  { word:'Light',   key:'light',   root:'Proto-Indo-European · leuk-',   category:'Elements',          price:49, img:'https://media.nowssb.com/migrated-images/fe881b289d00730d_1000033063-ezremove_r22cph.png' },
+  { word:'Dark',    key:'dark',    root:'Proto-Germanic · derkaz',       category:'Elements',          price:49, img:'https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png' },
   // Human
-  { word:'Body',    key:'body',    root:'Old English · bodig',           category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850607/1000033084-ezremove_ybzuzs.png' },
-  { word:'Mind',    key:'mind',    root:'Proto-Indo-European · men-',    category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850607/1000033084-ezremove_ybzuzs.png' },
-  { word:'Soul',    key:'soul',    root:'Proto-Germanic · saiwalō',      category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png' },
-  { word:'Blood',   key:'blood',   root:'Proto-Indo-European · bhel-',   category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850648/1000033063-ezremove_r22cph.png' },
-  { word:'Breath',  key:'breath',  root:'Proto-Germanic · brǣþ',         category:'Human',             price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850631/1000033052-ezremove_vx4rib.png' },
+  { word:'Body',    key:'body',    root:'Old English · bodig',           category:'Human',             price:49, img:'https://media.nowssb.com/migrated-images/5c4551501630cd00_1000033084-ezremove_ybzuzs.png' },
+  { word:'Mind',    key:'mind',    root:'Proto-Indo-European · men-',    category:'Human',             price:49, img:'https://media.nowssb.com/migrated-images/5c4551501630cd00_1000033084-ezremove_ybzuzs.png' },
+  { word:'Soul',    key:'soul',    root:'Proto-Germanic · saiwalō',      category:'Human',             price:49, img:'https://media.nowssb.com/migrated-images/d614abe902eccd10_1000033052-ezremove_vx4rib.png' },
+  { word:'Blood',   key:'blood',   root:'Proto-Indo-European · bhel-',   category:'Human',             price:49, img:'https://media.nowssb.com/migrated-images/fe881b289d00730d_1000033063-ezremove_r22cph.png' },
+  { word:'Breath',  key:'breath',  root:'Proto-Germanic · brǣþ',         category:'Human',             price:49, img:'https://media.nowssb.com/migrated-images/d614abe902eccd10_1000033052-ezremove_vx4rib.png' },
   // Emotions
-  { word:'Love',    key:'love',    root:'Proto-Indo-European · leubh-',  category:'Emotions',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800798/grok_image_1776753853585_luk2yh.jpg' },
-  { word:'Fear',    key:'fear',    root:'Proto-Germanic · feraz',        category:'Emotions',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
-  { word:'Joy',     key:'joy',     root:'Old French · joie',             category:'Emotions',          price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776800798/grok_image_1776753853585_luk2yh.jpg' },
+  { word:'Love',    key:'love',    root:'Proto-Indo-European · leubh-',  category:'Emotions',          price:49, img:'https://media.nowssb.com/migrated-images/dd23331ed4a9b751_grok_image_1776753853585_luk2yh.jpg' },
+  { word:'Fear',    key:'fear',    root:'Proto-Germanic · feraz',        category:'Emotions',          price:49, img:'https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png' },
+  { word:'Joy',     key:'joy',     root:'Old French · joie',             category:'Emotions',          price:49, img:'https://media.nowssb.com/migrated-images/dd23331ed4a9b751_grok_image_1776753853585_luk2yh.jpg' },
   // Cosmos
-  { word:'God',     key:'god',     root:'Proto-Germanic · ǵʰew-',        category:'Cosmos',            price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
-  { word:'Time',    key:'time',    root:'Proto-Indo-European · dī-',     category:'Cosmos',            price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030423/grok_image_1777030062742_2_f7k7eo.jpg' },
-  { word:'Space',   key:'space',   root:'Latin · spatium',               category:'Cosmos',            price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850550/1000033096-ezremove_eb2gnu.png' },
-  { word:'Truth',   key:'truth',   root:'Proto-Germanic · trewwþō',      category:'Cosmos',            price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030389/grok_image_1777030001969_2_mpmpu2.jpg' },
+  { word:'God',     key:'god',     root:'Proto-Germanic · ǵʰew-',        category:'Cosmos',            price:49, img:'https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png' },
+  { word:'Time',    key:'time',    root:'Proto-Indo-European · dī-',     category:'Cosmos',            price:49, img:'https://media.nowssb.com/migrated-images/d59e474dabdaa2a5_grok_image_1777030062742_2_f7k7eo.jpg' },
+  { word:'Space',   key:'space',   root:'Latin · spatium',               category:'Cosmos',            price:49, img:'https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png' },
+  { word:'Truth',   key:'truth',   root:'Proto-Germanic · trewwþō',      category:'Cosmos',            price:49, img:'https://media.nowssb.com/migrated-images/41f5e532b0c0e661_grok_image_1777030001969_2_mpmpu2.jpg' },
   // Nations & People
-  { word:'Country', key:'country', root:'Latin · contra',                category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg' },
-  { word:'India',   key:'india',   root:'Natural Origin · Sindhu',             category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1776850589/1000033069-ezremove_hz5p0s.png' },
-  { word:'Mother',  key:'mother',  root:'Proto-Indo-European · méh₂tēr', category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg' },
-  { word:'Father',  key:'father',  root:'Proto-Indo-European · ph₂tḗr',  category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030423/grok_image_1777030062742_2_f7k7eo.jpg' },
-  { word:'Name',    key:'name',    root:'Proto-Indo-European · h₁nómn̥', category:'Nations & People',  price:49, img:'https://res.cloudinary.com/dkzxw33ln/image/upload/q_auto/f_auto/v1777030357/grok_image_1777029510370_2_lilo5x.jpg' },
+  { word:'Country', key:'country', root:'Latin · contra',                category:'Nations & People',  price:49, img:'https://media.nowssb.com/migrated-images/99dfe1e72e000cd5_grok_image_1777029510370_2_lilo5x.jpg' },
+  { word:'India',   key:'india',   root:'Natural Origin · Sindhu',             category:'Nations & People',  price:49, img:'https://media.nowssb.com/migrated-images/22792c141d392143_1000033069-ezremove_hz5p0s.png' },
+  { word:'Mother',  key:'mother',  root:'Proto-Indo-European · méh₂tēr', category:'Nations & People',  price:49, img:'https://media.nowssb.com/migrated-images/99dfe1e72e000cd5_grok_image_1777029510370_2_lilo5x.jpg' },
+  { word:'Father',  key:'father',  root:'Proto-Indo-European · ph₂tḗr',  category:'Nations & People',  price:49, img:'https://media.nowssb.com/migrated-images/d59e474dabdaa2a5_grok_image_1777030062742_2_f7k7eo.jpg' },
+  { word:'Name',    key:'name',    root:'Proto-Indo-European · h₁nómn̥', category:'Nations & People',  price:49, img:'https://media.nowssb.com/migrated-images/99dfe1e72e000cd5_grok_image_1777029510370_2_lilo5x.jpg' },
 ];
 window.MS_BASE_MEANINGS = MS_BASE_MEANINGS; // exposed for the AI Prescription page's "Recommended Meanings" row (app/js/part053.js)
 
@@ -101,13 +101,13 @@ window.msOpenDetailFromPlayer = function(key, wordDisplay) {
   if (window.msIsPurchased(key)) { window.msShowDetail(key, wordDisplay); }
 };
 
-var MS_CARD_IMG = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
+var MS_CARD_IMG = 'https://media.nowssb.com/migrated-images/ee0598260fbb63ea_7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
 
 /* The clip that heads every meaning's page, directly under the header —
    the same one whichever meaning is open. A real <video>, so
    app/js/part051.js warms it into the media cache like every other clip
    in the app and sw.js serves it from there offline. */
-var MS_MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4';
+var MS_MEANING_VID = 'assets/videos/4c1c17d70f5656d4_grok_video_2026-07-31-15-41-50_oxszei.mp4';
 /* The page is built only when a meaning is opened, so this has to be
    registered for warming rather than left to be discovered in the DOM. */
 window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat([MS_MEANING_VID]);
@@ -194,11 +194,11 @@ window.msBuy = function(key, wordDisplay, price, img) {
            raced the visibility controller pausing it — play() interrupted
            by pause() on every open. The controller owns it now, the same
            way it owns every other clip in the app. */
-        '<video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784431622/grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
+        '<video class="nss-vid-banner-vid" data-nwsb-auto muted loop playsinline preload="none" src="assets/videos/67e02704e83fbf19_grok_video_2026-07-19-08-55-10_omybbr.mp4"></video>' +
         '<div class="nss-vid-banner-fade"></div>' +
         '<div class="nss-vid-banner-pill-wrap">' +
           '<div class="nss-vid-banner-pill">' +
-            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">' +
+            '<img class="nss-vid-banner-pill-icon" decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="">' +
             '<span class="nss-vid-banner-pill-text">Subscribe Today</span>' +
           '</div>' +
         '</div>' +
@@ -272,7 +272,7 @@ window.msBuyNow = function(itemId, name, price, img) {
 
 /* ── Category banners — same black-banner-with-logo-and-divider treatment
    as the Word Atelier (reuses its rm-cat-banner* CSS directly). ── */
-var MS_CAT_LOGO = 'https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png';
+var MS_CAT_LOGO = 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png';
 window.MS_CAT_LOGO = MS_CAT_LOGO; // exposed for the AI Prescription page (app/js/part053.js) — same reason as MS_BASE_MEANINGS
 var MS_CAT_SUB = {
   'Elements':          'The original sounds of the natural world',
@@ -292,7 +292,7 @@ var MS_SIGNATURE = {
   'Cosmos':             { key:'cosmossignature',    word:'Cosmos Signature',         root:'Most Exclusive' },
   'Nations & People':   { key:'nationssignature',   word:'Nations Signature',        root:'Most Exclusive' }
 };
-var MS_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784460713/file_000000008eb081fba87f16fe9146e413_mk9wbe.png';
+var MS_SIGNATURE_IMG = 'https://media.nowssb.com/migrated-images/a7c5f95b3e9029e5_file_000000008eb081fba87f16fe9146e413_mk9wbe.png';
 var MS_SIGNATURE_PRICE = 299;
 // Reused by the coupon/bundle pages (app/js/part055.js) for the Signature
 // page's "Meanings" side of the toggle.

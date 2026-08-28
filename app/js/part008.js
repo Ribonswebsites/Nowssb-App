@@ -390,12 +390,12 @@ function profileEnterFromIntro() {
 // (Tilt/parallax removed — the banner now fades cleanly into the solid background.)
 
 // ══════════════════════════════════════════════════════════════════
-// PROFILE PHOTO — select, upload to Cloudinary, save to Firestore
+// PROFILE PHOTO — select, upload to R2, save to Firestore
 // ══════════════════════════════════════════════════════════════════
 
-// Cloudinary config — uses the same cloud as the rest of the app
-const _CLOUDINARY_CLOUD  = 'dfc8lwj22';  // active account
-const _CLOUDINARY_PRESET = 'nowssb_profiles'; // unsigned upload preset (create this in your Cloudinary dashboard)
+// R2 config — uses the same cloud as the rest of the app
+const _R2_CLOUD  = 'dfc8lwj22';  // active account
+const _R2_PRESET = 'nowssb_profiles'; // unsigned upload preset (create this in your R2 dashboard)
 
 // ── Update avatar display: show photo img or fallback to initial ──
 function profileUpdateAvatarDisplay(photoURL, name) {
@@ -512,7 +512,7 @@ async function profileHandlePhotoFile(file) {
     _profileShowToast('Please choose a JPG, PNG, WebP or GIF image');
     return;
   }
-  // 5 MB hard limit (Cloudinary free tier is generous but no need to allow large files)
+  // 5 MB hard limit (R2 free tier is generous but no need to allow large files)
   if (file.size > 5 * 1024 * 1024) { _profileShowToast('Image too large — please choose one under 5 MB'); return; }
 
   // Show local preview immediately so it feels instant
@@ -523,9 +523,9 @@ async function profileHandlePhotoFile(file) {
   _profileShowToast('Uploading…');
 
   try {
-    const url = await _profileUploadToCloudinary(file);
+    const url = await _profileUploadToR2(file);
     await _profileSavePhotoURL(url);
-    // Show the final Cloudinary URL
+    // Show the final R2 URL
     profileUpdateAvatarDisplay(url, null);
     _profileShowToast('Photo saved ✓');
   } catch(err) {
@@ -538,26 +538,26 @@ async function profileHandlePhotoFile(file) {
   }
 }
 
-// ── Upload file to Cloudinary via unsigned upload ──
-async function _profileUploadToCloudinary(file) {
+// ── Upload file to R2 via unsigned upload ──
+async function _profileUploadToR2(file) {
   const fd = new FormData();
   fd.append('file',           file);
-  fd.append('upload_preset',  _CLOUDINARY_PRESET);
+  fd.append('upload_preset',  _R2_PRESET);
   fd.append('folder',         'nowssb_user_profiles');
   fd.append('public_id',      'user_' + (window._currentUid || Date.now()));
 
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${_CLOUDINARY_CLOUD}/image/upload`,
+    `https://api.r2.com/v1_1/${_R2_CLOUD}/image/upload`,
     { method: 'POST', body: fd }
   );
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.error && err.error.message ? err.error.message : 'Cloudinary upload failed');
+    throw new Error(err.error && err.error.message ? err.error.message : 'R2 upload failed');
   }
 
   const data = await res.json();
-  if (!data.secure_url) throw new Error('No URL returned from Cloudinary');
+  if (!data.secure_url) throw new Error('No URL returned from R2');
 
   // Use auto-optimized delivery URL
   return data.secure_url.replace('/upload/', '/upload/q_auto/f_auto/');
@@ -606,10 +606,10 @@ async function profileHandleBannerFile(file) {
   try {
     var fd = new FormData();
     fd.append('file', file);
-    fd.append('upload_preset', _CLOUDINARY_PRESET);
+    fd.append('upload_preset', _R2_PRESET);
     fd.append('folder', 'nowssb_user_banners');
     fd.append('public_id', 'banner_' + (window._currentUid || Date.now()));
-    var res = await fetch('https://api.cloudinary.com/v1_1/' + _CLOUDINARY_CLOUD + '/image/upload', { method: 'POST', body: fd });
+    var res = await fetch('https://api.r2.com/v1_1/' + _R2_CLOUD + '/image/upload', { method: 'POST', body: fd });
     if (!res.ok) { var err = await res.json().catch(function(){ return {}; }); throw new Error(err.error && err.error.message ? err.error.message : 'Upload failed'); }
     var data = await res.json();
     if (!data.secure_url) throw new Error('No URL returned');

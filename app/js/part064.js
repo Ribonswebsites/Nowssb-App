@@ -29,20 +29,20 @@
   function img(u) { return '<img loading="lazy" decoding="async" alt="" src="' + u + '">'; }
 
   var A = {
-    chat:     'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
-    reels:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/10d7afe0-5bf2-11f1-8248-b91d5cd919c2_b0bff9.png',
-    connect:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/04d5f4e0-5bf2-11f1-8248-b91d5cd919c2_mcohzv.png',
-    profile:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
-    store:    'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
-    cart:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png',
-    library:  'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png',
-    offer:    'https://res.cloudinary.com/eenvubod/image/upload/v1784915420/file_000000006b20820b84961321dcdcaaa8_be9meu.png',
-    wordsci:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
-    routines: 'https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png',
-    ai:       'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png',
-    streak:   'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png',
-    every:    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png',
-    settings: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
+    chat:     'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png',
+    reels:    'https://media.nowssb.com/migrated-images/1b075adfd52b4af8_10d7afe0-5bf2-11f1-8248-b91d5cd919c2_b0bff9.png',
+    connect:  'https://media.nowssb.com/migrated-images/a0b5196292b572ab_04d5f4e0-5bf2-11f1-8248-b91d5cd919c2_mcohzv.png',
+    profile:  'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+    store:    'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
+    cart:     'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png',
+    library:  'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png',
+    offer:    'https://media.nowssb.com/migrated-images/5972de26815c527d_file_000000006b20820b84961321dcdcaaa8_be9meu.png',
+    wordsci:  'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png',
+    routines: 'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png',
+    ai:       'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png',
+    streak:   'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png',
+    every:    'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png',
+    settings: 'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
   };
 
   var IC = {

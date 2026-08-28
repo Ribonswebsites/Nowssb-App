@@ -386,9 +386,9 @@
      which frame it is:
 
        ./assets/video/NAME.mp4?v=2  →  ./assets/video/NAME-poster.webp
-       cloudinary /video/upload/…/NAME.mp4  →  /image/upload/…/f_auto/…/NAME.jpg
+       r2 /video/upload/…/NAME.mp4  →  /image/upload/…/f_auto/…/NAME.jpg
 
-     Every local clip has a -poster.webp beside it. Cloudinary renders the
+     Every local clip has a -poster.webp beside it. R2 renders the
      first frame of any video it holds at the image URL for it, which is
      where the handful of posters already in the markup point. If either
      ever misses, the element paints nothing — which is exactly what it
@@ -397,7 +397,7 @@
     if (!src) return '';
     var clean = src.split('#')[0].split('?')[0];
     if (/assets\/video\/[^/]+\.mp4$/i.test(clean)) return clean.replace(/\.mp4$/i, '-poster.webp');
-    if (clean.indexOf('res.cloudinary.com') >= 0 && clean.indexOf('/video/upload/') >= 0) {
+    if (clean.indexOf('res.r2.com') >= 0 && clean.indexOf('/video/upload/') >= 0) {
       return clean.replace('/video/upload/', '/image/upload/f_auto/').replace(/\.(mp4|webm|mov)$/i, '.jpg');
     }
     return '';

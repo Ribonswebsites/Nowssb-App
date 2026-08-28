@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var V = 'https://res.cloudinary.com/eenvubod/video/upload/';
+  var V = 'https://res.r2.com/eenvubod/video/upload/';
 
   /* before: the banner is inserted as the element's previous sibling.
      top:    the banner is inserted as the element's first child.
@@ -116,7 +116,7 @@
 
     // Every word's own page, above About This Word — a player banner, so it
     // carries the player mark on the right and opens the practice.
-    { before: '.rmd-desc-block',                   vid: 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438349/grok_video_2026-07-31-00-34-23_ouxhic.mp4',
+    { before: '.rmd-desc-block',                   vid: 'assets/videos/b0f763363402ac03_grok_video_2026-07-31-00-34-23_ouxhic.mp4',
       player: 1, go: 'openPracticeIntro()' }
   ];
 
@@ -130,7 +130,7 @@
      either. The two new ones are local files — they ship with the app and
      the cache warms them like everything else. */
   var COUPON_VIDS = [
-    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785438343/grok_video_2026-07-31-00-34-06_c2fuko.mp4',
+    'assets/videos/e1c631d8fc5d325a_grok_video_2026-07-31-00-34-06_c2fuko.mp4',
     './assets/video/coupon-a.mp4',
     './assets/video/coupon-b.mp4'
   ];
@@ -154,21 +154,21 @@
      finally appear. See collectVideoUrls() in app/js/part051.js. */
   window.NWSB_EXTRA_VIDEO_URLS = (window.NWSB_EXTRA_VIDEO_URLS || []).concat(COUPON_VIDS);
   var COUPON_HOSTS = '#nmhGreetImg, #fashCouponImg, #rmdCouponBanner, #msdCouponBanner';
-  var PLAYER_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png';
+  var PLAYER_ICON = 'https://media.nowssb.com/migrated-images/93cdeb591c49c96f_file_000000003254720aab81c7118e7cc24a_ohsba3.png';
 
   /* The eBooks clip is not a plain banner — it carries its own black banner
      underneath it inside one glass wrapper, and it goes in three places: the
      home sections, above the shelf on the store page, and above the copy on
      every book's own page. */
   var EB_VID  = V + 'v1785406073/grok_video_2026-07-30-15-35-40_xwm1ei.mp4';
-  var EB_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/v1784974211/file_00000000ae5882089bc97a56b7368777_l4cq7e.png';
+  var EB_ICON = 'https://media.nowssb.com/migrated-images/2a57d6d66570597b_file_00000000ae5882089bc97a56b7368777_l4cq7e.png';
 
   /* The subscription clip was the same one in several places. The two home
      banners keep a clip of their own; the plan banner on the subscription
      page and the Edition cards each get their own. */
   /* Alternates that are not in the DOM until they are chosen — same reason
      as the coupon list above. */
-  /* Two more that live in the repo rather than on Cloudinary: the login
+  /* Two more that live in the repo rather than on R2: the login
      phone, and the Word Science tile's clip. Listed here so part051.js
      warms them into VIDEO_CACHE during idle time like every other clip —
      the login one especially, because it is the first thing a new reader
@@ -190,14 +190,14 @@
        not the Subscribe Today banner above it. A different cloud from the
        rest, so the full URL rather than the V prefix. */
     { sel: '.fsec-video',
-      vid: 'https://res.cloudinary.com/dkzxw33ln/video/upload/v1785518003/grok_video_2026-07-31-22-26-26_xiytvf.mp4' }
+      vid: 'assets/videos/bd608efe4ad901c6_grok_video_2026-07-31-22-26-26_xiytvf.mp4' }
   ];
 
   /* ── What a banner leads to, named down its right-hand side ────────
      Every icon here is a file the app already ships and already uses for
      that section — the Quick Links rail's own map — so a chip reads as the
      same thing the user taps elsewhere. ── */
-  var I = 'https://res.cloudinary.com/';
+  var I = 'https://res.r2.com/';
   var CHIP_IC = {
     meaning: I + 'eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png',
     words:   I + 'ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',

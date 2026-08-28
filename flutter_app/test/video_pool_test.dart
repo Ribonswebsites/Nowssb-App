@@ -218,7 +218,7 @@ void main() {
   test('one clip that never opens does not stop the rest', () async {
     // THE `decoders 1/8  playing 1` BUG, kept.
     //
-    // A Cloudinary clip on a bad connection is created and then says
+    // A R2 clip on a bad connection is created and then says
     // nothing — initialize() does not fail, it does not return. The pool
     // used to await every bring-up before finishing its pass, so that one
     // clip held the pass open; _rebalancing stayed true, every later
@@ -252,7 +252,7 @@ void main() {
   test('a clip that fails is tried again rather than struck off', () async {
     // Three failures used to blacklist a clip for the life of the app, and
     // on a phone the first three failures are usually the first seconds
-    // after launch, before the radio has a route. Every Cloudinary clip on
+    // after launch, before the radio has a route. Every R2 clip on
     // the page would be permanently dead because of a network that came
     // back a moment later.
     platform.stalling.add('flaky');

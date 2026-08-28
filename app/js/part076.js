@@ -205,7 +205,7 @@
     var fallback = {
       'rm-intro-bg': './assets/store/intro-words.webp',
       'ms-intro-bg': './assets/store/intro-meanings.webp',
-      'sl-intro-bg': 'https://res.cloudinary.com/dcbs8xr1l/image/upload/f_auto,q_auto/v1778224442/grok_image_1778224339812_jhranv.jpg'
+      'sl-intro-bg': 'https://media.nowssb.com/migrated-images/88671556b2e1fc0b_grok_image_1778224339812_jhranv.jpg'
     };
     var selectors = '.sub-screen-bg, .rm-intro-bg, .ms-intro-bg, .eb-intro-bg, ' +
       '.sig-intro-bg, .sl-intro-bg, .st-bg, .qa-page-bg, .fpp-intro-bg, ' +

@@ -21,18 +21,18 @@
   /* One entry per tile, keyed by the sub-screen it opens — that is the only
      stable handle the markup gives us. `img` means a still, `vid` a loop. */
   var TILES = [
-    { open: 'sound-library', vid: 'https://res.cloudinary.com/eenvubod/video/upload/v1785402438/grok_video_2026-07-30-14-35-20_lju6u7.mp4' },
-    { open: 'my-progress',   vid: 'https://res.cloudinary.com/eenvubod/video/upload/v1785402440/grok_video_2026-07-30-14-35-18_kucgwh.mp4' },
+    { open: 'sound-library', vid: 'assets/videos/09aedc60417dbf0a_grok_video_2026-07-30-14-35-20_lju6u7.mp4' },
+    { open: 'my-progress',   vid: 'assets/videos/4e7c79be02308383_grok_video_2026-07-30-14-35-18_kucgwh.mp4' },
     /* Word Science was the one tile still showing a still while the other
        three played — so with Fashion Plus on, three tiles moved and one
-       sat there. Its clip lives in the repo rather than on Cloudinary
+       sat there. Its clip lives in the repo rather than on R2
        because it was supplied as a file; mediaEl() already builds a
        <video> for `vid` and an <img> for `img`, so this is the only line
        that had to change. */
     { open: 'word-science',  vid: './assets/video/fp-word-science.mp4' },
-    { open: 'profile',       vid: 'https://res.cloudinary.com/eenvubod/video/upload/v1785402435/grok_video_2026-07-30-14-35-16_j5tr1g.mp4' }
+    { open: 'profile',       vid: 'assets/videos/8d7a2d4192fa1dfd_grok_video_2026-07-30-14-35-16_j5tr1g.mp4' }
   ];
-  var PRACTICE_VID = 'https://res.cloudinary.com/eenvubod/video/upload/v1785403502/grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
+  var PRACTICE_VID = 'assets/videos/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
 
   /* The clip above My Routines. It belongs to this file rather than the
      banner table in part067.js because it is a Fashion Plus concern: on the
@@ -44,9 +44,9 @@
      the position kept in localStorage, so it alternates from one session
      to the next instead of being the same clip forever. */
   var RT_VIDS = [
-    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511505/grok_video_2026-07-31-20-44-24_cgt3mc.mp4',
-    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511503/grok_video_2026-07-31-20-44-17_ebayxd.mp4',
-    'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511504/grok_video_2026-07-31-20-44-13_jlsimw.mp4'
+    'assets/videos/49d09283f71e97f0_grok_video_2026-07-31-20-44-24_cgt3mc.mp4',
+    'assets/videos/4b99766dec9f4c40_grok_video_2026-07-31-20-44-17_ebayxd.mp4',
+    'assets/videos/b1e2c78385f45657_grok_video_2026-07-31-20-44-13_jlsimw.mp4'
   ];
   var RT_KEY = 'nwsb_rtvid_i';
   /* Only whichever one is playing is ever in the document, so the other two

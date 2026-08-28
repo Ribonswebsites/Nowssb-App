@@ -348,11 +348,11 @@
     { v: 'subscription-a',       t: 'Subscription',     s: 'Unlock the full word library',    go: 'subscription' },
     { v: 'coupon-a',             t: 'Offers & bundles', s: 'Coupons on words and meanings',   go: 'store' }
   ];
-  var MEANING_VID = 'https://res.cloudinary.com/yvi3d7ov/video/upload/v1785511438/grok_video_2026-07-31-15-41-50_oxszei.mp4';
+  var MEANING_VID = 'assets/videos/4c1c17d70f5656d4_grok_video_2026-07-31-15-41-50_oxszei.mp4';
   function storeVideos() {
     return '<section class="slm-sec">' + head('From the Store', chevron("slmStore()")) +
       '<div class="slm-hscroll">' + STORE_VIDS.map(function (x) {
-        /* The meaning clip lives on Cloudinary and part026.js owns it — read
+        /* The meaning clip lives on R2 and part026.js owns it — read
            it from there so there is one URL, with the literal as a fallback
            for the case where that file has not run yet. It has no local
            poster; the screen behind it is already black, which is what a

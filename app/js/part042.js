@@ -31,13 +31,13 @@
     el.innerHTML = `
     <!-- Video banner — below the header -->
     <div class="fash-video-banner">
-      <video autoplay muted loop playsinline preload="metadata" src="https://res.cloudinary.com/eenvubod/video/upload/f_auto,q_auto/v1784272381/grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
+      <video autoplay muted loop playsinline preload="metadata" src="assets/videos/4e72457832f1696f_grok_video_2026-07-17-12-42-01_sz9agw.mp4"></video>
     </div>
     <!-- ── ACCOUNT ── -->
     <div class="ss-section-title">ACCOUNT</div>
     <div class="ss-section">
       <div class="sr" onclick="SS.open('profile-edit')">
-        <div class="sr-icon gold"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon gold"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/28756f50b55ff792_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label" id="ss-prof-name">Practitioner</div><div class="sr-sub" id="ss-prof-email">—</div></div>
         <span class="sub-badge starter" id="ss-prof-badge" style="font-size:9px;padding:3px 8px;border-radius:6px;font-weight:700;font-family:'DM Sans',sans-serif;">FREE</span>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
@@ -99,13 +99,13 @@
     <div class="ss-section-title">AUDIO</div>
     <div class="ss-section">
       <div class="sr" onclick="SS.open('ambient')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/33f3bd904f27f83e_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Ambient Sound</div><div class="sr-sub">Practice background audio</div></div>
         <span class="sr-val" id="ss-ambient-val">None</span>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr last" onclick="SS.toggle('notif')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657311/e3815a20-57ad-11f1-ae7e-3f26811e4481_y2zb7t.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/fe4c46fcbba0f43c_e3815a20-57ad-11f1-ae7e-3f26811e4481_y2zb7t.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Practice Reminders</div><div class="sr-sub">Daily routine notifications</div></div>
         <div class="stgl" id="sstgl-notif" style="background:#e8d5a3;"><div class="stgl-knob" style="left:24px;background:#060c18;"></div></div>
       </div>
@@ -116,7 +116,7 @@
     <div class="ss-section">
       <div class="sr" onclick="cuOpen()">
         <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Customize</div><div class="sr-sub">Every appearance control in one place</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
@@ -136,20 +136,20 @@
       </div>
       <div class="sr" onclick="SS.open('fashionbg')">
         <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/1568bbd5dc719a6b_file_00000000b11472098a225d3703b04a60_phr6ph.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Fashion Background</div><div class="sr-sub">Backdrop for the Fashion home</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="SS.open('startbg')">
         <div class="sr-icon" style="background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.25);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1785014506/file_000000009f10820bb6872a5ed8007148_pvqjaa.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Start Page Image</div><div class="sr-sub">Art behind the start animation</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="openSub('quick-access')">
-        <div class="sr-icon gold" style="overflow:hidden;"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;" alt=""></div>
+        <div class="sr-icon gold" style="overflow:hidden;"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Quick Access</div><div class="sr-sub">Customize your bottom navigation bar</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
@@ -183,7 +183,7 @@
       </div>
       <div class="sr last" onclick="htOpen()">
         <div class="sr-icon" style="background:#000;border:1px solid rgba(255,255,255,.18);overflow:hidden;">
-          <img loading="lazy" decoding="async" src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
+          <img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/909b614a4f984b77_f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">
         </div>
         <div class="sr-body"><div class="sr-label">Home Tiles</div><div class="sr-sub">Restyle your four home buttons</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
@@ -211,18 +211,18 @@
         <div class="stgl" id="sstgl-visible" style="background:#e8d5a3;"><div class="stgl-knob" style="left:24px;background:#060c18;"></div></div>
       </div>
       <div class="sr" onclick="SS.open('chatperm')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657309/7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/896366e4cefdcb89_7153c4b0-57ad-11f1-ae7e-3f26811e4481_rn0wwi.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Chat Permissions</div><div class="sr-sub">Who can message you</div></div>
         <span class="sr-val" id="ss-chatperm-val">Everyone</span>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr" onclick="SS.open('privacy')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/e_background_removal/v1779657311/25bb3d70-57ae-11f1-ae7e-3f26811e4481_fhfzwy.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/51195850138e6b6b_25bb3d70-57ae-11f1-ae7e-3f26811e4481_fhfzwy.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Privacy Settings</div><div class="sr-sub">Profile visibility &amp; data</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr last" onclick="SS.downloadData()">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657311/6f8d5c90-57ad-11f1-ae7e-3f26811e4481_y6etkn.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/8b459d37b9f17c38_6f8d5c90-57ad-11f1-ae7e-3f26811e4481_y6etkn.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Download My Data</div><div class="sr-sub">Export everything as JSON</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
@@ -232,12 +232,12 @@
     <div class="ss-section-title">ABOUT</div>
     <div class="ss-section">
       <div class="sr" onclick="SS.open('about')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779657309/fdd80ef0-57ad-11f1-ae7e-3f26811e4481_lfscbr.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/38c7a0ab10ea5186_fdd80ef0-57ad-11f1-ae7e-3f26811e4481_lfscbr.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">About NowssB</div><div class="sr-sub">Version 1.0.0 · nowssb.com</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="sr last" onclick="SS.open('terms')">
-        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/ds6duqabl/image/upload/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
+        <div class="sr-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/b73ddd7693659aef_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png" style="width:24px;height:24px;object-fit:contain;display:block;" alt=""></div>
         <div class="sr-body"><div class="sr-label">Terms &amp; Privacy Policy</div></div>
         <svg class="sr-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
       </div>

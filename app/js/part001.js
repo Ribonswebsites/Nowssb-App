@@ -2,7 +2,7 @@
   // Performance optimizations
   (function() {
     // 1. Pre-resolve critical domains
-    const domains = ['res.cloudinary.com', 'fonts.googleapis.com', 'www.gstatic.com', 'firestore.googleapis.com'];
+    const domains = ['res.r2.com', 'fonts.googleapis.com', 'www.gstatic.com', 'firestore.googleapis.com'];
     domains.forEach(d => {
       const link = document.createElement('link');
       link.rel = 'preconnect';

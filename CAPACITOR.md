@@ -54,7 +54,7 @@ actually wrote and fails the build if any of them are there, rather than
 trusting its own exclusion list.
 
 It also skips `assets/banners/` — 71 MB of images that nothing in the app
-references (every banner comes from Cloudinary). Bundled it would be most of
+references (every banner comes from R2). Bundled it would be most of
 the download. With it out, `www/` is about 4.4 MB.
 
 `www/` and `android/` are both generated and both git-ignored. Rebuild them
@@ -188,7 +188,7 @@ Worth knowing, because it is not obvious from the code:
 - **Service worker.** `app/js/part012.js` registers `sw.js` and catches the
   failure. Inside the shell the files are already local, so the caching layer
   it provides is not needed; the idle video pre-warm in `part051.js` becomes
-  a no-op and videos stream from Cloudinary as normal.
+  a no-op and videos stream from R2 as normal.
 - **Notifications** go through FCM, not Web Push — `part072.js`. The
   notifications page, the master switch and all sixteen per-kind switches are
   the same page driving a different pipe.

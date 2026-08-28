@@ -74,12 +74,12 @@ NowssB is a personalized daily word & sentence practice app built on **Shabdapat
 ### Image Rules
 - Every new section needs its own unique banner + background image from Ribon — never reuse images across sections
 - Never add any image without Ribon approval
-- Cloudinary CDN (account: `dfc8lwj22`) for all web images — **old account `dkzxw33ln` is RETIRED**
+- R2 CDN (account: `dfc8lwj22`) for all web images — **old account `dkzxw33ln` is RETIRED**
 - Cloudflare R2 for all audio and video
 - NO Firebase Storage — use Cloudflare R2 for all media
 
 ### Performance Rules — NEVER BREAK THESE
-- NEVER reduce image or video quality — upscale using Cloudinary `e_upscale/q_100/f_auto/`
+- NEVER reduce image or video quality — upscale using R2 `e_upscale/q_100/f_auto/`
 - NEVER remove design elements to improve speed — optimize the code underneath instead
 - All animation intervals must be gated to their screen only — never run on inactive screens
 
@@ -408,7 +408,7 @@ For the **web version**, the best improvement is **Google One Tap**:
 <img loading="lazy" src="..." alt="">
 ```
 
-**2. Cloudinary image sizing — always use transformation parameters**
+**2. R2 image sizing — always use transformation parameters**
 ```
 /w_400,q_auto,f_auto/   ← mobile images
 /w_800,q_auto,f_auto/   ← desktop/tablet
@@ -688,7 +688,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 32. Leaderboard on home screen
 33. 50-100 background videos from Ribon → Cloudflare R2
 34. ElevenLabs client voice clone setup (client records 2-3 min sample once)
-35. Clean up all old Cloudinary account (`dkzxw33ln`) URLs
+35. Clean up all old R2 account (`dkzxw33ln`) URLs
 
 ---
 

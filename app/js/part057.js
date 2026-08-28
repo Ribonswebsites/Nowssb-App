@@ -21,23 +21,23 @@
        is IG.nav('profile'), NOT 'home': routing it to 'home' just bounced the
        user to the home screen, which is why Connect stopped working once a
        nav customization had been applied. */
-    { id: 'connect',      label: 'Connect',    img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_120/v1784218818/file_00000000b84c7209ab496862cacd6a7f_kagsie.png', run: function () { if (window.IG) IG.nav('profile'); } },
-    { id: 'practice',     label: 'Practice',   img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563281/38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png', run: function () { if (window.IG) IG.nav('practice'); else if (typeof openPracticeIntro === 'function') openPracticeIntro(); } },
-    { id: 'library',      label: 'Library',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png', run: function () { if (window.IG) IG.nav('library'); else openSub('sound-library'); } },
-    { id: 'store',        label: 'Store',      img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png', run: function () { if (window.IG) IG.nav('store'); else openSub('nowssb-store'); } },
-    { id: 'profile',      label: 'Profile',    img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png', run: function () { if (window.IG) IG.nav('myprofile'); else openSub('profile'); } },
-    { id: 'progress',     label: 'Progress',   img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png', run: function () { openSub('my-progress'); } },
-    { id: 'wordscience',  label: 'Word Sci',   img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png', run: function () { openSub('word-science'); } },
-    { id: 'meaningstore', label: 'Meaning',    img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784460474/file_00000000854881fa9a548a68fae59c15_w1utya.png', run: function () { openSub('meaning-store'); } },
-    { id: 'search',       label: 'Search',     img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000029c7208b5e915d9af2c480c_tuccwo.png', run: function () { openSub('search-choice'); } },
-    { id: 'cart',         label: 'Cart',       img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_00000000f02c72088cd128f3f4b08af5_vskoom.png', run: function () { openSub('cart'); } },
-    { id: 'wishlist',     label: 'Wishlist',   img: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157830/file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png', run: function () { openSub('wishlist'); } },
-    { id: 'routines',     label: 'Routines',   img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png', run: function () { openSub('routines'); } },
-    { id: 'chat',         label: 'Chat',       img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1780123160/1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png', run: function () { if (typeof chatInboxOpen === 'function') chatInboxOpen(); } },
-    { id: 'ai',           label: 'AI Rx',      img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000062a882089abd27eb90ea3945_ngqyu6.png', run: function () { openSub('ai-prescription'); } },
-    { id: 'streak',       label: 'Streak',     img: 'https://res.cloudinary.com/eenvubod/image/upload/v1784895543/file_0000000010fc820891f9e15a38316d2b_ffffhq.png', run: function () { openSub('streak'); } },
-    { id: 'settings',     label: 'Settings',   img: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563283/260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png', run: function () { openSub('social'); } },
-    { id: 'everything',   label: 'Everything', img: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_220/v1784256220/file_00000000be547207aaa56f43cfef4f67_nxhvw0.png', run: function () { openSub('features'); } }
+    { id: 'connect',      label: 'Connect',    img: 'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png', run: function () { if (window.IG) IG.nav('profile'); } },
+    { id: 'practice',     label: 'Practice',   img: 'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png', run: function () { if (window.IG) IG.nav('practice'); else if (typeof openPracticeIntro === 'function') openPracticeIntro(); } },
+    { id: 'library',      label: 'Library',    img: 'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png', run: function () { if (window.IG) IG.nav('library'); else openSub('sound-library'); } },
+    { id: 'store',        label: 'Store',      img: 'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png', run: function () { if (window.IG) IG.nav('store'); else openSub('nowssb-store'); } },
+    { id: 'profile',      label: 'Profile',    img: 'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png', run: function () { if (window.IG) IG.nav('myprofile'); else openSub('profile'); } },
+    { id: 'progress',     label: 'Progress',   img: 'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png', run: function () { openSub('my-progress'); } },
+    { id: 'wordscience',  label: 'Word Sci',   img: 'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png', run: function () { openSub('word-science'); } },
+    { id: 'meaningstore', label: 'Meaning',    img: 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png', run: function () { openSub('meaning-store'); } },
+    { id: 'search',       label: 'Search',     img: 'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png', run: function () { openSub('search-choice'); } },
+    { id: 'cart',         label: 'Cart',       img: 'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png', run: function () { openSub('cart'); } },
+    { id: 'wishlist',     label: 'Wishlist',   img: 'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png', run: function () { openSub('wishlist'); } },
+    { id: 'routines',     label: 'Routines',   img: 'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png', run: function () { openSub('routines'); } },
+    { id: 'chat',         label: 'Chat',       img: 'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png', run: function () { if (typeof chatInboxOpen === 'function') chatInboxOpen(); } },
+    { id: 'ai',           label: 'AI Rx',      img: 'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png', run: function () { openSub('ai-prescription'); } },
+    { id: 'streak',       label: 'Streak',     img: 'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png', run: function () { openSub('streak'); } },
+    { id: 'settings',     label: 'Settings',   img: 'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png', run: function () { openSub('social'); } },
+    { id: 'everything',   label: 'Everything', img: 'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png', run: function () { openSub('features'); } }
   ];
   var DEFAULT_SLOTS = ['connect', 'practice', 'library', 'store', 'profile'];
 
@@ -164,7 +164,7 @@
 
   // ── Toast ─────────────────────────────────────────────────────
   var _toastT = null;
-  var QA_TOAST_ICON = 'https://res.cloudinary.com/eenvubod/image/upload/v1784911241/file_000000002cf4820b865caf6fc0554959_k7drqx.png';
+  var QA_TOAST_ICON = 'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png';
   function toast(msg) {
     var scr = document.getElementById('sub-quick-access'); if (!scr) return;
     var t = document.getElementById('qaToast');

@@ -12,17 +12,17 @@
   /* ═══════════════════════════════════════════════════════════════
      ORGAN VISUALIZATION VIDEOS (1:1) — shown in the INFO panel (NOT the
      player). Mapped by ORGAN/CATEGORY, so every word in that category
-     automatically shows its organ video. Drop each Cloudinary URL in as
+     automatically shows its organ video. Drop each R2 URL in as
      you send it (lungs first). Leave '' to keep the "coming soon"
      placeholder for organs not wired yet. ═══════════════════════════ */
   var ORGAN_VIDEOS = {
-    lungs:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991520/grok_video_2026-07-02-16-52-38_pehfcr.mp4',   // ← lungs / breath / respiratory
-    heart:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991522/grok_video_2026-07-02-16-51-54_zpffyf.mp4',   // ← heart / cardiac / circulation
-    kidney: 'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991521/grok_video_2026-07-02-16-52-19_mlfgei.mp4',   // ← kidney / renal / bladder
-    liver:  'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782991522/grok_video_2026-07-02-16-51-43_gilelq.mp4'    // ← liver / hepatic / detox
+    lungs:  'assets/videos/aa7be224940a8451_grok_video_2026-07-02-16-52-38_pehfcr.mp4',   // ← lungs / breath / respiratory
+    heart:  'assets/videos/9020d24aadc3adc3_grok_video_2026-07-02-16-51-54_zpffyf.mp4',   // ← heart / cardiac / circulation
+    kidney: 'assets/videos/6355694c6db62e0d_grok_video_2026-07-02-16-52-19_mlfgei.mp4',   // ← kidney / renal / bladder
+    liver:  'assets/videos/421bc4d59cb1bfcf_grok_video_2026-07-02-16-51-43_gilelq.mp4'    // ← liver / hepatic / detox
   };
-  /* Cloudinary on-the-fly compression — the raw grok mp4s are huge and lag /
-     take forever. Inject q_auto,f_auto (+ a width cap) so Cloudinary serves a
+  /* R2 on-the-fly compression — the raw grok mp4s are huge and lag /
+     take forever. Inject q_auto,f_auto (+ a width cap) so R2 serves a
      small, fast, hardware-friendly clip instead of the multi-MB source. */
   function cldVid(url, w) {
     if (!url || url.indexOf('/video/upload/') < 0) return url;
@@ -53,41 +53,41 @@
   var LGP_THEMES = [
     /* Liquid splash goes FIRST — it is what the first word of a session
        opens on. The only look that ships WITH the app rather than coming
-       from Cloudinary, which is also why it is the one worth having
+       from R2, which is also why it is the one worth having
        before anything else: cldVid() leaves a path with no
        /video/upload/ in it alone, so it reaches the <video> untouched. */
     { img:'./assets/player/liquid-splash.webp',
       video:'./assets/video/player-liquid-splash.mp4',
       accent:'#ffcf4d' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656918/grok_image_1782656676834_rzp2cz.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656947/grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
+    { img:'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
+      video:'assets/videos/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
       accent:'#7fe9da' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656710977_nj5r6x.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656870/grok_video_2026-06-28-19-55-09_otgbxd.mp4',
+    { img:'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
+      video:'assets/videos/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4',
       accent:'#9bb8ff' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782656917/grok_image_1782656704854_cfsah3.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656923/grok_video_2026-06-28-19-55-02_of5fwh.mp4',
+    { img:'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
+      video:'assets/videos/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4',
       accent:'#bd7bff' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782657140/grok_image_1782656684101_o9vc93.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782656932/grok_video_2026-06-28-19-54-43_it2bur.mp4',
+    { img:'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
+      video:'assets/videos/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4',
       accent:'#a6dcff' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782795978/grok_image_1782795582310_llvpix.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782795956/grok_video_2026-06-30-10-29-43_hzxyun.mp4',
+    { img:'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
+      video:'assets/videos/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4',
       accent:'#b9a6ff' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796537731_vzyhwn.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796761/grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
+    { img:'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
+      video:'assets/videos/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
       accent:'#a6c8ff' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796725/grok_image_1782796641824_izkh09.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796770/grok_video_2026-06-30-10-47-20_rljghs.mp4',
+    { img:'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
+      video:'assets/videos/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4',
       accent:'#b9a6ff' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796726/grok_image_1782796519587_thrrws.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796770/grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
+    { img:'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
+      video:'assets/videos/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
       accent:'#e8d5a3' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796924745_nmksmi.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782797027/grok_video_2026-06-30-10-52-07_gvffol.mp4',
+    { img:'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
+      video:'assets/videos/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4',
       accent:'#f0d9a8' },
-    { img:'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782796983/grok_image_1782796933792_qwzfgx.jpg',
-      video:'https://res.cloudinary.com/dc4nsi3xs/video/upload/v1782796996/grok_video_2026-06-30-10-52-20_zk87yh.mp4',
+    { img:'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
+      video:'assets/videos/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4',
       accent:'#8fe6ff' },
   ];
 
@@ -250,19 +250,19 @@
     /* ── Custom glass-sphere icons (background-removed PNGs). Each sphere IS the
        button — the round glass button background is dropped in CSS. ── */
     var IC = {
-      play:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718777/e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png',
-      pause:    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718776/e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png',
-      prev:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718778/ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png',
-      next:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718778/c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png',
-      replay:   'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/file_00000000a484720aa71b5f34f8539f05_amesbb.png',
-      mic:      'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png',
-      library:  'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
-      settings: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png',
-      info:     'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782986898/file_000000002038722fac63c79466d73f0f_jnhjvg.png',
-      brand:    'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png',
+      play:     'https://media.nowssb.com/migrated-images/74d38b3c7b69b30b_e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png',
+      pause:    'https://media.nowssb.com/migrated-images/f073aa60452e1cb9_e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png',
+      prev:     'https://media.nowssb.com/migrated-images/2f091c1083cd0b65_ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png',
+      next:     'https://media.nowssb.com/migrated-images/71a2d8954b5e6209_c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png',
+      replay:   'https://media.nowssb.com/migrated-images/982488a58a8e453e_file_00000000a484720aa71b5f34f8539f05_amesbb.png',
+      mic:      'https://media.nowssb.com/migrated-images/a8a2eb1bb04d59d1_27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png',
+      library:  'https://media.nowssb.com/migrated-images/643dd804e986b5f6_3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png',
+      settings: 'https://media.nowssb.com/migrated-images/909b614a4f984b77_f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png',
+      info:     'https://media.nowssb.com/migrated-images/924446cd8446dc7b_file_000000002038722fac63c79466d73f0f_jnhjvg.png',
+      brand:    'https://media.nowssb.com/migrated-images/93cdeb591c49c96f_file_000000003254720aab81c7118e7cc24a_ohsba3.png',
       /* Only the two black banners use this. The top bar, the corner mark
          and the info sheet keep IC.brand — same icon there as before. */
-      banner:   'https://res.cloudinary.com/eenvubod/image/upload/v1785070108/1000002027_o74vwe.png'
+      banner:   'https://media.nowssb.com/migrated-images/aece3225c7dc8d27_1000002027_o74vwe.png'
     };
     /* render every icon as a background-image SPAN (never an <img>) so the
        browser can't open/zoom it on tap and taps always hit the button */
@@ -277,7 +277,7 @@
     var libBtn = '<button class="lgp-side" onclick="lgpToggleArc&&document.getElementById(\'lgpArc\')&&document.getElementById(\'lgpArc\').classList.remove(\'open\');openWalkmanLib&&openWalkmanLib()" aria-label="Library">' + libSvg + '<span>Library</span></button>';
     var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
-    /* central waveform = the pair's looping video (compressed via Cloudinary).
+    /* central waveform = the pair's looping video (compressed via R2).
        We REUSE the existing <video> element across re-renders (detach before
        innerHTML, re-insert after) so it never reloads/seeks — recreating it on
        every phase/rep change was the real cause of the constant stutter. */
@@ -368,7 +368,7 @@
     var arc =
       '<div class="lgp-arc" id="lgpArc" style="--lg-accent:' + th.accent + '">' +
         '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
-        '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
+        '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'https://media.nowssb.com/migrated-images/7ee8439eec0e17a8_file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
         '<div class="lgp-arc-brand"><span class="lgp-arc-brand-txt">NowssB Player</span></div>' +
         '<span class="lgp-arc-brand-ico-corner" style="background-image:url(\'' + IC.brand + '\')"></span>' +
         '<div class="lgp-arc-radial">' +
@@ -392,7 +392,7 @@
     /* NOTE: no autoplay + preload="none" — the info video must NOT load or play
        while the panel is closed (it was loading hidden on every render and
        fighting the main player video for bandwidth). It's started on open by
-       lgpToggleInfo, paused/reset on close. Also compressed via Cloudinary. */
+       lgpToggleInfo, paused/reset on close. Also compressed via R2. */
     var _organVid = organVideoFor(w);
     var infoVideo = _organVid
       ? '<video class="lgp-info-video" loop muted playsinline preload="none" src="' + cldVid(_organVid, 640) + '"></video>'
@@ -421,7 +421,7 @@
         '<div class="lgp-info-sheet">' +
           '<div class="lgp-info-sheet-top">' +
             '<button class="lgp-info-close lgp-imgbtn" onclick="lgpToggleInfo()" aria-label="Back">' +
-              '<span class="lgp-bgico" style="background-image:url(\'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782728734/file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
+              '<span class="lgp-bgico" style="background-image:url(\'https://media.nowssb.com/migrated-images/7ee8439eec0e17a8_file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span>' +
             '</button>' +
             '<div class="lgp-info-sheet-title">' + (w.word || '') + '</div>' +
             '<div class="lgp-info-sheet-brand" style="background-image:url(\'' + IC.brand + '\')"></div>' +

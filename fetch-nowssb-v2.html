@@ -66,7 +66,7 @@ async function fetchAll() {
 
   try {
     do {
-      let url = `https://api.cloudinary.com/v1_1/${cloud}/resources/image?prefix=${folder}&max_results=100&type=upload`;
+      let url = `https://api.r2.com/v1_1/${cloud}/resources/image?prefix=${folder}&max_results=100&type=upload`;
       if (nextCursor) url += `&next_cursor=${encodeURIComponent(nextCursor)}`;
 
       const res = await fetch(url, { headers: { 'Authorization': 'Basic ' + creds } });
@@ -75,7 +75,7 @@ async function fetchAll() {
       if (data.error) { status.textContent = '❌ Error: ' + data.error.message; btn.disabled = false; return; }
 
       data.resources.forEach(r => {
-        allUrls.push(`https://res.cloudinary.com/${cloud}/image/upload/${r.public_id}.${r.format || 'jpg'}`);
+        allUrls.push(`https://res.r2.com/${cloud}/image/upload/${r.public_id}.${r.format || 'jpg'}`);
       });
 
       status.textContent = `⏳ Loaded ${allUrls.length} so far...`;

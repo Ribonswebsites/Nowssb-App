@@ -12,34 +12,34 @@
   // user will tap. "playerBrand" is the same icon used for the "NowssB
   // Player" row on the Quick Access menu — the guide's own identity.
   var PWG_ICONS = {
-    playerBrand: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
-    listen: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718777/e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
-    practice: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
-    library: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718780/3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
-    settings: '<img src="https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
-    store: '<img src="https://res.cloudinary.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    playerBrand: '<img src="https://media.nowssb.com/migrated-images/2ab8b4bbd1a045b0_file_0000000039c8720893ebc07bba4d3afd_iq64ts.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    listen: '<img src="https://media.nowssb.com/migrated-images/74d38b3c7b69b30b_e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    practice: '<img src="https://media.nowssb.com/migrated-images/a8a2eb1bb04d59d1_27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    library: '<img src="https://media.nowssb.com/migrated-images/643dd804e986b5f6_3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    settings: '<img src="https://media.nowssb.com/migrated-images/909b614a4f984b77_f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
+    store: '<img src="https://res.r2.com/eenvubod/image/upload/v1784436916/file_000000003a70820783900e4c58acea82_nlzav4.png" style="width:70px;height:70px;object-fit:contain;" alt="">',
     flame: '<svg width="40" height="40" viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 5 6.5 5 10a4 4 0 008 0c0-2-1.5-4-4-8z" fill="#e8d5a3" opacity="0.9"/><path d="M9 10c0 0-1.5 1-1.5 2.5a1.5 1.5 0 003 0C10.5 11 9 10 9 10z" fill="#fff" opacity="0.85"/></svg>',
-    playerReady: '<img src="https://res.cloudinary.com/eenvubod/image/upload/v1784130176/file_000000003254720aab81c7118e7cc24a_ohsba3.png" style="width:70px;height:70px;object-fit:contain;" alt="">'
+    playerReady: '<img src="https://media.nowssb.com/migrated-images/dc638b945c082954_file_000000003254720aab81c7118e7cc24a_ohsba3.png" style="width:70px;height:70px;object-fit:contain;" alt="">'
   };
 
   // Illustration card background — placeholder for now (reusing an
   // existing app asset, the Today's Practice "Morning" banner) until real
   // per-slide photography is supplied; swap PWG_SLIDES[i].img then.
-  var PWG_PLACEHOLDER_IMG = 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg';
+  var PWG_PLACEHOLDER_IMG = 'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg';
   // Same "NowssB Player" art as the header badge — used as the final
   // slide's card image too (raw URL, since the card sets it via CSS
   // background-image rather than an <img> tag).
-  var PWG_PLAYER_BRAND_IMG = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png';
+  var PWG_PLAYER_BRAND_IMG = 'https://media.nowssb.com/migrated-images/2ab8b4bbd1a045b0_file_0000000039c8720893ebc07bba4d3afd_iq64ts.png';
   // Per-slide illustration photography, supplied for the welcome,
   // Signature Word, Player Store and Player Ready slides.
-  var PWG_WELCOME_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1785069853/file_00000000d7e88209a05b0cd46d3c9204_yylblf.png';
-  var PWG_SIGNATURE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876918/file_0000000035ac81fa8d163588e627b067_xjpm5r.png';
-  var PWG_READY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876917/file_00000000b6c481fab8074cb5a1d16756_thikfl.png';
-  var PWG_STORE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784876916/file_00000000c70081faab87b58c23b3edcb_yzyrbf.png';
-  var PWG_PRACTICE_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877225/file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png';
-  var PWG_LISTEN_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784877426/file_00000000e0948207852ee99ed468fbb0_gon5be.png';
-  var PWG_SETTINGS_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1784878540/file_00000000cf00820b83f17dc392a0071d_hhm18g.png';
-  var PWG_LIBRARY_IMG = 'https://res.cloudinary.com/eenvubod/image/upload/v1785069871/file_00000000bc3481fba068b600e71ed418_xt5arr.png';
+  var PWG_WELCOME_IMG = 'https://media.nowssb.com/migrated-images/2ec9ad4747c6b76d_file_00000000d7e88209a05b0cd46d3c9204_yylblf.png';
+  var PWG_SIGNATURE_IMG = 'https://media.nowssb.com/migrated-images/f3c17b36e07098ec_file_0000000035ac81fa8d163588e627b067_xjpm5r.png';
+  var PWG_READY_IMG = 'https://media.nowssb.com/migrated-images/9f4113b898ea8bfe_file_00000000b6c481fab8074cb5a1d16756_thikfl.png';
+  var PWG_STORE_IMG = 'https://media.nowssb.com/migrated-images/5808c91d1975b9fa_file_00000000c70081faab87b58c23b3edcb_yzyrbf.png';
+  var PWG_PRACTICE_IMG = 'https://media.nowssb.com/migrated-images/2c3aae23bdda443d_file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png';
+  var PWG_LISTEN_IMG = 'https://media.nowssb.com/migrated-images/8f6e22d3e27e8f82_file_00000000e0948207852ee99ed468fbb0_gon5be.png';
+  var PWG_SETTINGS_IMG = 'https://media.nowssb.com/migrated-images/db763251a11604b4_file_00000000cf00820b83f17dc392a0071d_hhm18g.png';
+  var PWG_LIBRARY_IMG = 'https://media.nowssb.com/migrated-images/d21b96de1967b542_file_00000000bc3481fba068b600e71ed418_xt5arr.png';
 
   var PWG_SLIDES = [
     {

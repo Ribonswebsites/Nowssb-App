@@ -30,8 +30,8 @@ let _wlSentenceData = null;
 let _wlSpeaking     = false;
 
 const _wlBanners = [
-  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777884920/grok_image_1777884641742_yowydl.jpg',
-  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777884965/grok_image_1777884736477_wbarcd.jpg'
+  'https://media.nowssb.com/migrated-images/4a592e40a7fc3862_grok_image_1777884641742_yowydl.jpg',
+  'https://media.nowssb.com/migrated-images/d7df86bbe8e877c5_grok_image_1777884736477_wbarcd.jpg'
 ];
 let _wlBannerIdx = 0;
 let _wlBannerTimer = null;
@@ -95,7 +95,7 @@ function wlSwitchTab(tab) {
 }
 
 // ── GENRE → BG IMAGE MAP ──
-// Swap these URLs after uploading your 8 images to Cloudinary:
+// Swap these URLs after uploading your 8 images to R2:
 //   all        → white-coat-phonetics (image 4)
 //   immunity   → red-hair-shields     (image 3)
 //   energy     → white-suit-arms-up   (image 2)
@@ -105,14 +105,14 @@ function wlSwitchTab(tab) {
 //   calm       → floating-blonde      (image 6)
 //   healing    → lotus-mandala-light  (image 5)
 const _wlGenreImages = {
-  all:        'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777892128/grok_image_1777891642236_lacz8v.jpg',
-  immunity:   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888701/grok_image_1777888420816_bkrtzw.jpg',
-  energy:     'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887443893_xvupmc.jpg',
-  mind:       'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887770266_zyexqb.jpg',
-  confidence: 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777887913840_z9mkmd.jpg',
-  fitness:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888701/grok_image_1777887990036_wmmmjt.jpg',
-  calm:       'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777888044011_sx7km5.jpg',
-  healing:    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777888700/grok_image_1777888311729_kmtnzu.jpg',
+  all:        'https://media.nowssb.com/migrated-images/7bb4ee1b9a0fece4_grok_image_1777891642236_lacz8v.jpg',
+  immunity:   'https://media.nowssb.com/migrated-images/39650786257c6c65_grok_image_1777888420816_bkrtzw.jpg',
+  energy:     'https://media.nowssb.com/migrated-images/02d5c8f3c11ed46e_grok_image_1777887443893_xvupmc.jpg',
+  mind:       'https://media.nowssb.com/migrated-images/7a1f9d0b92965d0c_grok_image_1777887770266_zyexqb.jpg',
+  confidence: 'https://media.nowssb.com/migrated-images/13640441c78bc3e9_grok_image_1777887913840_z9mkmd.jpg',
+  fitness:    'https://media.nowssb.com/migrated-images/fe5f2e96ba86e0fd_grok_image_1777887990036_wmmmjt.jpg',
+  calm:       'https://media.nowssb.com/migrated-images/6b17c62bfdb69175_grok_image_1777888044011_sx7km5.jpg',
+  healing:    'https://media.nowssb.com/migrated-images/5d09420fdb73dfa6_grok_image_1777888311729_kmtnzu.jpg',
 };
 
 // ── PLAYLIST ──

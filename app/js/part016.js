@@ -110,12 +110,12 @@ setTimeout(initGSAP, 400);
 
 // ── HEALTH BANNER ROTATION ──
 const maleBanners = [
-  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706672/grok_image_1777706360035_kdvj3e.jpg',
-  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706671/grok_image_1777706008418_slbqza.jpg'
+  'https://media.nowssb.com/migrated-images/a2ad0fe279aaea00_grok_image_1777706360035_kdvj3e.jpg',
+  'https://media.nowssb.com/migrated-images/651aea1619f75cfe_grok_image_1777706008418_slbqza.jpg'
 ];
 const femaleBanners = [
-  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706671/grok_image_1777706116245_awevjm.jpg',
-  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777706672/grok_image_1777706263630_mahjss.jpg'
+  'https://media.nowssb.com/migrated-images/1ecf1fbd58edba8e_grok_image_1777706116245_awevjm.jpg',
+  'https://media.nowssb.com/migrated-images/58198a4884965cc6_grok_image_1777706263630_mahjss.jpg'
 ];
 let maleIdx = 0, femaleIdx = 0;
 function rotateBanner(el, banners, idxRef, setIdx) {

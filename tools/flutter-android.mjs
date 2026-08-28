@@ -33,7 +33,7 @@
 //   6. THE INTERNET PERMISSION.  flutter create writes it into the debug and
 //      profile manifests ONLY, so everything this app does over a network
 //      works while you develop and is dead in the APK you ship: Firestore,
-//      sign-in, notifications, and the Cloudinary artwork the pages are drawn
+//      sign-in, notifications, and the R2 artwork the pages are drawn
 //      from. It has to be in the main manifest, and the main manifest is
 //      generated, so it has to be added here.
 //

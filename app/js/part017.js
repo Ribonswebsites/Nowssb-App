@@ -373,7 +373,7 @@ function nssUpdateHomeBadges() {
   var cartIconEls = document.querySelectorAll('#subCartIcon, #homeCwCartIcon');
   var cartCount = window._nssCart ? window._nssCart.length : 0;
   cartIconEls.forEach(function(el){
-    el.src = cartCount > 0 ? 'https://res.cloudinary.com/ds6duqabl/image/upload/v1779558988/cb456de0-56cf-11f1-8fad-095787cce754_zplzrc.png' : 'https://res.cloudinary.com/ds6duqabl/image/upload/v1779558987/c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png';
+    el.src = cartCount > 0 ? 'https://media.nowssb.com/migrated-images/571754e057038606_cb456de0-56cf-11f1-8fad-095787cce754_zplzrc.png' : 'https://media.nowssb.com/migrated-images/f0b0ce0012f71cff_c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png';
   });
   var hcb = document.getElementById('homeCwCartBadge');
   var hcs = document.getElementById('homeCwCartSub');
@@ -530,7 +530,7 @@ var EB_BOOKS = [
     title: 'The Shabdapathy Codex',
     sub: 'The complete origin science, in one volume.',
     price: 499,
-    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007fec81f4b097aaae4e7ac297_ohtqy9.png',
+    cover: 'https://media.nowssb.com/migrated-images/4ee1d0740a290ecc_file_000000007fec81f4b097aaae4e7ac297_ohtqy9.png',
     about: 'The foundational text of Shabdapathy — how sound carried meaning long before dictionaries existed, and why the human body still responds to the original vibration of a word rather than its spelling.',
     contents: [
       'What Shabdapathy is, and what it is not',
@@ -545,7 +545,7 @@ var EB_BOOKS = [
     title: 'Phonetic Origins: A Field Guide',
     sub: 'Trace any word back to its first sound.',
     price: 399,
-    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784974929/file_000000007af081f49748cd0a1b77c566_f8qslq.png',
+    cover: 'https://media.nowssb.com/migrated-images/741bfd1ea84543f4_file_000000007af081f49748cd0a1b77c566_f8qslq.png',
     about: 'A practical companion for tracing any word back through its phonetic ancestry. Built as a working field guide rather than a theory book — open it mid-practice and follow the method on whatever word you are holding.',
     contents: [
       'The tracing method, step by step',
@@ -560,7 +560,7 @@ var EB_BOOKS = [
     title: 'The Sound Healing Atlas',
     sub: 'Which sounds reach which parts of the body.',
     price: 599,
-    cover: 'https://res.cloudinary.com/eenvubod/image/upload/v1784975675/file_00000000ee688208950f4126ed15d9b3_esohnw.png',
+    cover: 'https://media.nowssb.com/migrated-images/2f10e08211dd8561_file_00000000ee688208950f4126ed15d9b3_esohnw.png',
     about: 'A mapped reference of sound to the body — which syllables carry to which regions, why speaking aloud lands differently than thinking a word, and how to build a session around the area you actually want to work on.',
     contents: [
       'The body map: sound to region',
@@ -574,7 +574,7 @@ var EB_BOOKS = [
 /* One disclaimer, shown under every book and on every detail page. */
 var EB_DISCLAIMER = 'For educational and wellness purposes only — not medical advice, and not a replacement for professional diagnosis or treatment.';
 /* Fallback only — every book above ships its own cover. */
-var EB_COVER = 'https://res.cloudinary.com/ds6duqabl/image/upload/q_auto/f_auto/v1780065459/7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
+var EB_COVER = 'https://media.nowssb.com/migrated-images/ee0598260fbb63ea_7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png';
 function ebCoverFor(key) {
   for (var i = 0; i < EB_BOOKS.length; i++) if (EB_BOOKS[i].key === key) return EB_BOOKS[i].cover || EB_COVER;
   return EB_COVER;

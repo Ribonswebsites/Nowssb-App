@@ -135,7 +135,7 @@
   function getTiers()    { try { return (typeof RM_TIERS         !== 'undefined') ? RM_TIERS         : {}; } catch (e) { return {}; } }
   function getWordTier() { try { return (typeof RM_WORD_TIER     !== 'undefined') ? RM_WORD_TIER     : {}; } catch (e) { return {}; } }
 
-  var STORE_ICON_URL = 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563284/ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png';
+  var STORE_ICON_URL = 'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png';
   var _trendVidTimer = null;
   var _trendShopTimer = null;
   window._nwsbTrendPicks = [];
@@ -485,7 +485,7 @@
 
   /* ══════════════════════════════════════════════════════════
      RELIABLE avatar / banner upload — resize → save to Firestore
-     (works without Cloudinary; overrides the existing handlers)
+     (works without R2; overrides the existing handlers)
   ══════════════════════════════════════════════════════════ */
   function nwsbResize(file, maxW, cb) {
     var ALLOWED = ['image/jpeg','image/png','image/webp','image/gif'];
@@ -611,14 +611,14 @@
 
   /* ── Prebuilt banner library (in-built banners, matched to the avatars) ── */
   var NWSB_BANNERS = [
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591933705_qq3l9g.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591857840_tbznap.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782592051446_womamz.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592067/grok_image_1782591669371_kqnaf9.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591627828_lmde11.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591559591_yxgud5.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592066/grok_image_1782591561380_ytpn3b.jpg',
-    'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782592260/grok_image_1782591732123_epmpiu.jpg'
+    'https://media.nowssb.com/migrated-images/fc3d4da65185cd05_grok_image_1782591933705_qq3l9g.jpg',
+    'https://media.nowssb.com/migrated-images/b0311b51f4665417_grok_image_1782591857840_tbznap.jpg',
+    'https://media.nowssb.com/migrated-images/e5c7f3703725755d_grok_image_1782592051446_womamz.jpg',
+    'https://media.nowssb.com/migrated-images/df58ad45365e63d0_grok_image_1782591669371_kqnaf9.jpg',
+    'https://media.nowssb.com/migrated-images/89c64c87db948180_grok_image_1782591627828_lmde11.jpg',
+    'https://media.nowssb.com/migrated-images/517802ba6a6c3a6c_grok_image_1782591559591_yxgud5.jpg',
+    'https://media.nowssb.com/migrated-images/671fd0928171078a_grok_image_1782591561380_ytpn3b.jpg',
+    'https://media.nowssb.com/migrated-images/58d0a40a97d4a693_grok_image_1782591732123_epmpiu.jpg'
   ];
   window.NWSB_BANNERS = NWSB_BANNERS;
 
@@ -640,7 +640,7 @@
     w.innerHTML =
       '<div class="pps-backdrop" onclick="nwsbCloseBannerUI()"></div>' +
       '<div class="pps-card" style="padding-bottom:' + navH + ';">' +
-        '<img class="pps-banner" decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784368347/grok_image_1784368231258_qti4xe.jpg" alt="">' +
+        '<img class="pps-banner" decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/b6abe443d711a2e4_grok_image_1784368231258_qti4xe.jpg" alt="">' +
         '<div class="pps-inner">' +
           '<div class="pps-handle"></div>' +
           '<div class="pps-title">Change Banner</div>' +
@@ -763,8 +763,8 @@
   // a gold checkmark badge. Same shape as fbgApplyToast (part047.js) for
   // the Fashion Background picker, kept separate since this one always
   // shows a theme-specific image rather than one fixed icon.
-  var NWSB_THEME_TOAST_IMG_NEU   = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png';
-  var NWSB_THEME_TOAST_IMG_GLASS = 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784257659/file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png';
+  var NWSB_THEME_TOAST_IMG_NEU   = 'https://media.nowssb.com/migrated-images/f7ab49ce96814d9d_file_00000000a718720aaba9aef2f7b1e757_sdk2a8.png';
+  var NWSB_THEME_TOAST_IMG_GLASS = 'https://media.nowssb.com/migrated-images/4ab7671cefecf91e_file_00000000cf8c720a89a1fb6f44fe8c55_xwdwnz.png';
   function nwsbShowThemeToast(theme) {
     var img = (theme === 'glass') ? NWSB_THEME_TOAST_IMG_GLASS : NWSB_THEME_TOAST_IMG_NEU;
     var msg = (theme === 'glass') ? 'NowssB Fashion theme ✓' : 'NowssB theme ✓';

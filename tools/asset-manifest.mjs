@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════════
    Every image and every video the app uses, as a list.
 
-   Right now they all live on Cloudinary and arrive over the network. That
+   Right now they all live on R2 and arrive over the network. That
    is right for a website and wrong for an app you download once: the ask
    is that after the install, the pictures and the clips are already on the
    phone. Flutter does that by declaring assets in pubspec.yaml and reading
@@ -40,7 +40,7 @@ const SKIP_DIRS = new Set(['.git', '.claude', 'node_modules', 'www', 'android', 
 const SCAN_EXT = new Set(['.html', '.js', '.mjs', '.css', '.json']);
 
 /* Bare http(s) URLs, stopped at the first character that cannot be in one.
-   Deliberately greedy about hosts — the app uses six Cloudinary clouds and
+   Deliberately greedy about hosts — the app uses six R2 clouds and
    may use more tomorrow — and strict about extensions, because a link to a
    documentation page is not an asset. */
 const URL_RE = /https?:\/\/[^\s'"`)\\<>]+/g;
@@ -50,7 +50,7 @@ const VIDEO_EXT = new Set(['.mp4', '.webm', '.mov', '.m4v']);
 const AUDIO_EXT = new Set(['.mp3', '.m4a', '.wav', '.ogg', '.webm']);
 
 function kindOf(url) {
-  /* Cloudinary puts the kind in the path, which is more reliable than the
+  /* R2 puts the kind in the path, which is more reliable than the
      extension — f_auto URLs often carry the wrong one or none at all. */
   if (/\/video\/upload\//.test(url)) return 'video';
   if (/\/image\/upload\//.test(url)) return 'image';
@@ -117,7 +117,7 @@ console.log('assets/media-manifest.json —',
 /* ── The Dart map, for the Flutter port ──────────────────────────────
    Every screen in the port that has a URL in it looks it up here and gets
    a bundled path, so the port never has to care which of the six
-   Cloudinary clouds something came from. Anything not in the map falls
+   R2 clouds something came from. Anything not in the map falls
    through to the network, which is the right behaviour for a URL added
    after the last build. ── */
 if (process.argv.includes('--dart')) {

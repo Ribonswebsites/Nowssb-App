@@ -4,9 +4,9 @@
   // banner — reused here so every word/meaning detail page can show one at
   // random instead of needing its own dedicated art.
   var COUPON_BANNERS = [
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044846126_pyqsll.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044843386_iarpg7.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_900/v1784044991/grok_image_1784044844917_ocvbli.jpg'
+    'https://media.nowssb.com/migrated-images/456a2a7e485bf504_grok_image_1784044846126_pyqsll.jpg',
+    'https://media.nowssb.com/migrated-images/d5411443f5aa8dd1_grok_image_1784044843386_iarpg7.jpg',
+    'https://media.nowssb.com/migrated-images/473c3c5fea866477_grok_image_1784044844917_ocvbli.jpg'
   ];
   window.nwsbSetRandomCouponBanner = function (elId) {
     var el = document.getElementById(elId);
@@ -51,7 +51,7 @@
     if (theme === 'black' && !window._beBgPreloaded) {
       window._beBgPreloaded = true;
       var _pre = new Image();
-      _pre.src = 'https://res.cloudinary.com/ds6duqabl/image/upload/v1780209363/grok_image_1780209143800_i8lcry.jpg';
+      _pre.src = 'https://media.nowssb.com/migrated-images/9ed0b7a998986b73_grok_image_1780209143800_i8lcry.jpg';
     }
 
     // Fashion intro only when user explicitly selects Black — never on page-load restore
@@ -92,15 +92,15 @@
      active (see nowssb-nm.css). Picking a theme card clears it again, so
      the two controls never fight silently. */
   var NWSB_FASHION_BGS = [
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261485118_fnnndw.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263702345_zlt99m.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263836740_qclr5g.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784261493254_szhsuw.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263881946_zespcn.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263977/grok_image_1784263699783_tyf4l8.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784263996/grok_image_1784263979789_doxtcp.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263836740_atjk35.jpg',
-    'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg'
+    'https://media.nowssb.com/migrated-images/7faefee62e30b487_grok_image_1784261485118_fnnndw.jpg',
+    'https://media.nowssb.com/migrated-images/c771dc2fac1db73d_grok_image_1784263702345_zlt99m.jpg',
+    'https://media.nowssb.com/migrated-images/c8ba2816200e306a_grok_image_1784263836740_qclr5g.jpg',
+    'https://media.nowssb.com/migrated-images/1ed28e3e65f10514_grok_image_1784261493254_szhsuw.jpg',
+    'https://media.nowssb.com/migrated-images/83f500ce2239fab2_grok_image_1784263881946_zespcn.jpg',
+    'https://media.nowssb.com/migrated-images/70dff54c281619bd_grok_image_1784263699783_tyf4l8.jpg',
+    'https://media.nowssb.com/migrated-images/b61051b0901b1215_grok_image_1784263979789_doxtcp.jpg',
+    'https://media.nowssb.com/migrated-images/6a172050c86e14a8_grok_image_1784263836740_atjk35.jpg',
+    'https://media.nowssb.com/migrated-images/89223ef1f18d6a9e_grok_image_1784263778179_okskwb.jpg'
   ];
   window.NWSB_FASHION_BGS = NWSB_FASHION_BGS;
   // The first curated image is the permanent default for Fashion home and
@@ -122,7 +122,7 @@
     var t = document.createElement('div');
     t.className = 'fbg-toast';
     t.innerHTML =
-      '<div class="fbg-toast-icon"><img loading="lazy" decoding="async" src="https://res.cloudinary.com/eenvubod/image/upload/v1784318203/file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>' +
+      '<div class="fbg-toast-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/1568bbd5dc719a6b_file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>' +
       '<div class="fbg-toast-text"></div>' +
       '<div class="fbg-toast-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>';
     t.querySelector('.fbg-toast-text').textContent = msg;

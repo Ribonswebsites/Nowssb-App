@@ -187,9 +187,9 @@ moment it reaches the website, with no Play release.
 bezels, the intro paintings, the collection banners — were in this
 repository all along and are bundled now. What is still Material is the
 small furniture: the section head marks, the tile icons, the nav. Those come
-from the ~446 Cloudinary images, which `tools/asset-manifest.mjs --download`
+from the ~446 R2 images, which `tools/asset-manifest.mjs --download`
 fetches and `tools/localise-media.mjs` rewrites the web app to match; that
-download cannot run from a sandbox with no route to Cloudinary.
+download cannot run from a sandbox with no route to R2.
 
 **Audio.** A word carries `audioMale`, `audioFemale` and a recording per
 part, and none of it plays yet. That is the practice player's heart and it is
@@ -240,6 +240,6 @@ are replaced.
 Two more that are NOT in the repository and are fetched:
 
 - the header's headphones disc —
-  `res.cloudinary.com/ds6duqabl/…/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png`
+  `res.r2.com/ds6duqabl/…/30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png`
 - the browser-tab favicon and the share card, both crops of one photograph —
-  `res.cloudinary.com/dkzxw33ln/…/grok_image_1776871816898_3_ll7c0m.jpg`
+  `res.r2.com/dkzxw33ln/…/grok_image_1776871816898_3_ll7c0m.jpg`

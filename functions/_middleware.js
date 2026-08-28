@@ -20,7 +20,7 @@ const FLUTTER_APK_UPSTREAM = 'https://github.com/Ribonswebsites/Nowssb-App/relea
 
 // Hosts the same-origin image proxy below is allowed to fetch — keeps it
 // from becoming an open proxy for arbitrary URLs.
-const IMG_PROXY_ALLOWED_HOSTS = ['res.cloudinary.com'];
+const IMG_PROXY_ALLOWED_HOSTS = ['res.r2.com'];
 
 
 
@@ -85,7 +85,7 @@ export async function onRequest(context) {
   // Same-origin image proxy — client-side canvas work (e.g. background
   // removal on the theme preview images) needs to read pixel data back out
   // of an <img>, which the browser blocks with a SecurityError unless the
-  // image was served with CORS headers. Cloudinary doesn't reliably send
+  // image was served with CORS headers. R2 doesn't reliably send
   // Access-Control-Allow-Origin for every delivery URL, so this fetches the
   // image server-side and re-serves it from our own origin instead —
   // canvas access "just works" on a same-origin image, no CORS needed.

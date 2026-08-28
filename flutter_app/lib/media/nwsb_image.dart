@@ -1,6 +1,6 @@
 /// A picture that may or may not be in the bundle yet.
 ///
-/// The Fashion home names 190 images that live on Cloudinary and 23 that are
+/// The Fashion home names 190 images that live on R2 and 23 that are
 /// in the repository. `tools/asset-manifest.mjs --download` fetches the
 /// remote ones and `tools/flutter-assets.mjs` copies them into the bundle
 /// with a stable, URL-derived name — but that download needs a network this
@@ -17,7 +17,7 @@
 ///
 /// AND UNTIL IT DOES, THE PICTURE IS FETCHED. A phone has the network the
 /// build sandbox does not, and the website has always drawn these straight
-/// from Cloudinary — so a URL that is not in the bundle is loaded over the
+/// from R2 — so a URL that is not in the bundle is loaded over the
 /// network and cached on the device, which is exactly what the browser does
 /// with the same address.
 ///

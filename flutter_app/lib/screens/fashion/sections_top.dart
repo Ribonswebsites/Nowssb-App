@@ -139,7 +139,7 @@ class _StreakBoxes extends StatelessWidget {
         aspectRatio: 1536 / 450,
         child: NwsbImage(
           url:
-              'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_900/v1783180890/file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png',
+              'https://media.nowssb.com/migrated-images/8bed0983f1e9348c_file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png',
           fit: BoxFit.contain,
           fallback: Row(
             children: [
@@ -285,7 +285,7 @@ class FashPractice extends StatelessWidget {
           PhotoCard(
             background: const NwsbImage(
               url:
-                  'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1778052547/grok_image_1778052232385_qpdmgh.jpg',
+                  'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg',
               fallback: NwsbVideo(
                 asset: 'assets/video/player-liquid-splash.mp4',
                 autoplay: false,
@@ -329,7 +329,7 @@ class FashReader extends StatelessWidget {
               child: ClipRect(
                 child: NwsbImage(
                   url:
-                      'https://res.cloudinary.com/eenvubod/video/upload/v1785403688/grok_video_2026-07-30-14-57-37_tbzpox.mp4',
+                      'assets/videos/3a1f74f98d7a0d18_grok_video_2026-07-30-14-57-37_tbzpox.mp4',
                   fallback: NwsbVideo(
                     asset: 'assets/video/word-acts.mp4',
                   ),

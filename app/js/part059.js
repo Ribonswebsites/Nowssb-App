@@ -24,25 +24,25 @@
 
   var HOME_TILES = [
     { name: 'Sound Library', sub: 'Root frequencies', tip: 'Root frequencies to practice with',
-      icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
-      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899463/file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
-      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784119058739_g0ihh7.jpg', photoPos: 'center',
-      art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123006/file_00000000048471f4ab69afc37df973c0_iab33r.png' },
+      icon: 'https://media.nowssb.com/migrated-images/2ab8b4bbd1a045b0_file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
+      cover: 'https://media.nowssb.com/migrated-images/400ebe1682b0732c_file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
+      photo: 'https://media.nowssb.com/migrated-images/ba2d2a83c5403a04_grok_image_1784119058739_g0ihh7.jpg', photoPos: 'center',
+      art: 'https://media.nowssb.com/migrated-images/028b990f41355c39_file_00000000048471f4ab69afc37df973c0_iab33r.png' },
     { name: 'My Progress', sub: 'Healing journey', tip: 'Your healing journey and body map',
-      icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png',
-      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899471/file_00000000345481faafd2bea97c8320ab_oknybe.png',
-      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784120246538_thvpik.jpg', photoPos: 'center top',
-      art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_000000009f8871f48dbd29b870dbdc9e_z9idoj.png' },
+      icon: 'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png',
+      cover: 'https://media.nowssb.com/migrated-images/076a2ef7f1f17898_file_00000000345481faafd2bea97c8320ab_oknybe.png',
+      photo: 'https://media.nowssb.com/migrated-images/434cdbab4a7b7499_grok_image_1784120246538_thvpik.jpg', photoPos: 'center top',
+      art: 'https://media.nowssb.com/migrated-images/da3c80ce8cd0b2d9_file_000000009f8871f48dbd29b870dbdc9e_z9idoj.png' },
     { name: 'Word Science', sub: 'NOWSBANSIU texts', tip: 'The NOWSBANSIU word science texts',
-      icon: 'https://res.cloudinary.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
-      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784899472/file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
-      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130175/grok_image_1784120203500_t6zwrf.jpg', photoPos: 'center',
-      art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_0000000015b071f48397d34be0129b36_bx9cur.png' },
+      icon: 'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png',
+      cover: 'https://media.nowssb.com/migrated-images/f41b35ba35ef9ce3_file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
+      photo: 'https://media.nowssb.com/migrated-images/6031f350a977f478_grok_image_1784120203500_t6zwrf.jpg', photoPos: 'center',
+      art: 'https://media.nowssb.com/migrated-images/60c6f00060118c72_file_0000000015b071f48397d34be0129b36_bx9cur.png' },
     { name: 'My Profile', sub: 'Your settings', tip: 'Your profile and app settings',
-      icon: 'https://res.cloudinary.com/ds6duqabl/image/upload/f_auto,q_auto/v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
-      cover: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784896734/file_0000000080688207a9599e17a28e7710_oefkxy.png',
-      photo: 'https://res.cloudinary.com/eenvubod/image/upload/f_auto,q_auto,w_400/v1784130232/grok_image_1784119291881_s6pws0.jpg', photoPos: 'center',
-      art: 'https://res.cloudinary.com/eenvubod/image/upload/e_trim,f_auto,q_auto,w_180/v1784123007/file_00000000536071f4bf5172014811968f_jkt450.png' }
+      icon: 'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+      cover: 'https://media.nowssb.com/migrated-images/847c9eaf465684e3_file_0000000080688207a9599e17a28e7710_oefkxy.png',
+      photo: 'https://media.nowssb.com/migrated-images/0db5697371f7be6b_grok_image_1784119291881_s6pws0.jpg', photoPos: 'center',
+      art: 'https://media.nowssb.com/migrated-images/3fa85b1df77818ae_file_00000000536071f4bf5172014811968f_jkt450.png' }
   ];
 
   /* The Normal Home's identity is the soft raised card the rest of that page is
@@ -146,7 +146,7 @@
   };
 
   // ── Toast ─────────────────────────────────────────────────────
-  var HT_ICON = 'https://res.cloudinary.com/dc4nsi3xs/image/upload/v1782718779/f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png';
+  var HT_ICON = 'https://media.nowssb.com/migrated-images/909b614a4f984b77_f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png';
   var _toastT = null;
   function toast(msg) {
     var scr = document.getElementById('sub-home-tiles'); if (!scr) return;

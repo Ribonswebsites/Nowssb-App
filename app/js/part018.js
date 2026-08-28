@@ -96,10 +96,10 @@ function renderRoutines() {
 
   body.innerHTML = `
     <div class="rt-screen" style="position:relative;overflow:hidden;">
-      <div class="rt-bg" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989351/grok_image_1777989145016_rkszz4.jpg');background-size:cover;background-position:center top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>
+      <div class="rt-bg" style="background-image:url('https://media.nowssb.com/migrated-images/41d76c00d1a3dcea_grok_image_1777989145016_rkszz4.jpg');background-size:cover;background-position:center top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>
       <div class="rt-bg-overlay"></div>
       <div class="rt-banner">
-        <div class="rt-banner-img" style="background-image:url('https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777982340/grok_image_1777982257091_q5lkbb.jpg');"></div>
+        <div class="rt-banner-img" style="background-image:url('https://media.nowssb.com/migrated-images/f1ea22d4d0b022f8_grok_image_1777982257091_q5lkbb.jpg');"></div>
         <div class="rt-banner-fade"></div>
         <div class="rt-banner-header">
           <button onclick="closeSub('routines')" style="width:38px;height:38px;border-radius:50% !important;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;backdrop-filter:none;-webkit-backdrop-filter:none;">
@@ -107,7 +107,7 @@ function renderRoutines() {
           </button>
           <div class="rt-banner-title">My Routines</div>
           <div style="width:38px;height:38px;border-radius:50% !important;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            <img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:26px;height:26px;object-fit:contain;display:block;">
+            <img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:26px;height:26px;object-fit:contain;display:block;">
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@ function renderRoutineIntro() {
   body.innerHTML =
     '<div class="rt-screen" style="position:relative;overflow:hidden;background:#060c18;">' +
     '<div style="position:absolute;top:0;left:0;right:0;bottom:0;' +
-      'background-image:url(https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965419/grok_image_1777891898700_zzskwn.jpg);' +
+      'background-image:url(https://media.nowssb.com/migrated-images/a7fbeb97ac863b8d_grok_image_1777891898700_zzskwn.jpg);' +
       'background-size:cover;background-position:center center;"></div>' +
 
     '<div style="position:absolute;top:0;left:0;right:0;bottom:0;' +
@@ -214,7 +214,7 @@ function renderRoutineIntro() {
           'display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:8px;">' +
-          '<img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;">' +
+          '<img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;">' +
           '<span style="font-size:9px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.35);">NOWSBANSIU</span>' +
         '</div>' +
         '<button onclick="openIntroSetting()" style="width:40px;height:40px;background:rgba(6,12,24,0.42);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;">' +
@@ -355,17 +355,17 @@ function renderRoutineDetail_inline() {
     }).join('');
 
   var inlineBanners = {
-    'Morning':   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989351/grok_image_1777988498025_yn2kwz.jpg',
-    'Midday':    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988498991_vr7cc3.jpg',
-    'Afternoon': 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988560596_ihjsc6.jpg',
-    'Evening':   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988562428_tddkze.jpg',
-    'Night':     'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989351/grok_image_1777988401110_loe5xq.jpg'
+    'Morning':   'https://media.nowssb.com/migrated-images/8f5a03313006f006_grok_image_1777988498025_yn2kwz.jpg',
+    'Midday':    'https://media.nowssb.com/migrated-images/587e1bb2f67f6ef3_grok_image_1777988498991_vr7cc3.jpg',
+    'Afternoon': 'https://media.nowssb.com/migrated-images/cca341c230dc12b5_grok_image_1777988560596_ihjsc6.jpg',
+    'Evening':   'https://media.nowssb.com/migrated-images/946cac311ac8df34_grok_image_1777988562428_tddkze.jpg',
+    'Night':     'https://media.nowssb.com/migrated-images/1f7dfa55c4b428c0_grok_image_1777988401110_loe5xq.jpg'
   };
   var inlineBannerUrl = inlineBanners[r.time] || inlineBanners['Evening'];
 
   body.innerHTML =
     '<div class="rtd-screen" style="position:relative;overflow:hidden;">' +
-      '<div class="rt-bg" style="background-image:url(https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965473/grok_image_1777891938824_cxuhwm.jpg);background-size:cover;background-position:center top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>' +
+      '<div class="rt-bg" style="background-image:url(https://media.nowssb.com/migrated-images/71885f2b3e946b9a_grok_image_1777891938824_cxuhwm.jpg);background-size:cover;background-position:center top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>' +
       '<div class="rt-bg-overlay"></div>' +
       '<div class="rt-banner" style="flex-shrink:0;position:relative;">' +
         '<div class="rt-banner-img" style="background-image:url(\'' + inlineBannerUrl + '\');"></div>' +
@@ -374,7 +374,7 @@ function renderRoutineDetail_inline() {
           '<button class="rtd-inline-back" style="width:42px;height:42px;cursor:pointer;padding:0;border-radius:50% !important;background:#fff url(\'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\'%3E%3Cpath d=\'M15 5l-7 7 7 7\' stroke=\'%230a0a12\' stroke-width=\'2.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E\') center/21px no-repeat;border:none;box-shadow:0 8px 20px rgba(0,0,0,.34),0 2px 6px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
           '</button>' +
           '<button class="rtd-myroutines-btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:100px;cursor:pointer;padding:6px 14px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.65);">' +
-            '<img decoding="async" loading="lazy" src="https://res.cloudinary.com/eenvubod/image/upload/v1784361579/file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:16px;height:16px;object-fit:contain;display:block;">' +
+            '<img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png" alt="" style="width:16px;height:16px;object-fit:contain;display:block;">' +
             'My Routines' +
           '</button>' +
         '</div>' +
@@ -531,17 +531,17 @@ function renderRoutineDetail() {
       : '<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.25);font-size:13px;">No sessions yet</div>'}`;
 
   const ROUTINE_BANNERS = {
-    'Morning':   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989351/grok_image_1777988498025_yn2kwz.jpg',
-    'Midday':    'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988498991_vr7cc3.jpg',
-    'Afternoon': 'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988560596_ihjsc6.jpg',
-    'Evening':   'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989352/grok_image_1777988562428_tddkze.jpg',
-    'Night':     'https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777989351/grok_image_1777988401110_loe5xq.jpg'
+    'Morning':   'https://media.nowssb.com/migrated-images/8f5a03313006f006_grok_image_1777988498025_yn2kwz.jpg',
+    'Midday':    'https://media.nowssb.com/migrated-images/587e1bb2f67f6ef3_grok_image_1777988498991_vr7cc3.jpg',
+    'Afternoon': 'https://media.nowssb.com/migrated-images/cca341c230dc12b5_grok_image_1777988560596_ihjsc6.jpg',
+    'Evening':   'https://media.nowssb.com/migrated-images/946cac311ac8df34_grok_image_1777988562428_tddkze.jpg',
+    'Night':     'https://media.nowssb.com/migrated-images/1f7dfa55c4b428c0_grok_image_1777988401110_loe5xq.jpg'
   };
   const bannerUrl = ROUTINE_BANNERS[r.time] || ROUTINE_BANNERS['Evening'];
 
   body.innerHTML = `
     <div class="rtd-screen" style="position:relative;overflow:hidden;">
-      <div class="rt-bg" style="background-image:url(https://res.cloudinary.com/dfc8lwj22/image/upload/q_auto/f_auto/v1777965473/grok_image_1777891938824_cxuhwm.jpg);background-size:cover;background-position:center top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>
+      <div class="rt-bg" style="background-image:url(https://media.nowssb.com/migrated-images/71885f2b3e946b9a_grok_image_1777891938824_cxuhwm.jpg);background-size:cover;background-position:center top;top:240px;left:0;right:0;bottom:0;position:absolute;"></div>
       <div class="rt-bg-overlay"></div>
       <div class="rt-banner" style="flex-shrink:0;position:relative;">
         <div class="rt-banner-img" style="background-image:url('${bannerUrl}');"></div>

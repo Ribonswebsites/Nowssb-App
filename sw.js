@@ -205,7 +205,7 @@ self.addEventListener('fetch', e => {
 
   const sameOrigin = url.startsWith(self.location.origin);
   if (!sameOrigin) {
-    // Cross-origin (Cloudinary, fonts, etc.): plain network, cache only as offline fallback.
+    // Cross-origin (R2, fonts, etc.): plain network, cache only as offline fallback.
     e.respondWith(fetch(req).catch(() => caches.match(req)));
     return;
   }
