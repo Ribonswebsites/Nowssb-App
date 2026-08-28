@@ -95,11 +95,10 @@ function _ensureLoginExit(user) {
   if (!user || !auth.currentUser || auth.currentUser.uid !== user.uid) return;
   var fallbackDest = _isNewUser(user) ? 'ob-intro' : 'home';
   _hideAuthLoader();
-  setTimeout(function () {
-    if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
-    _hideAuthLoader();
-    if (_authTransitionActive()) _doNavigate(fallbackDest);
-  }, 350);
+  // Leave the login screen immediately after Firebase has accepted the
+  // credential. Never hold the authenticated user behind Firestore or media;
+  // the bounded profile lookup below can only refine an already-open route.
+  if (_authTransitionActive()) _doNavigate(fallbackDest);
   setTimeout(async function () {
     if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
     var dest = fallbackDest;

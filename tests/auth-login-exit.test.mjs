@@ -12,6 +12,11 @@ test('WebView sign-in has an idempotent exit from the loader video', () => {
   assert.match(source, /document\.querySelector\('\.screen\.active'\)/);
   assert.match(source, /if \(_authTransitionActive\(\)\) _doNavigate\(fallbackDest\)/);
   assert.match(source, /function _hideAuthLoader\(\)[\s\S]*?loader\.classList\.remove\('visible'\)/);
+  const html = read('index.html');
+  assert.match(html, /id="authLoader"[\s\S]*?auth-loader-ring/);
+  assert.doesNotMatch(html.match(/<div id="authLoader">[\s\S]*?<\/div>/)?.[0] || '', /<video/);
+  assert.match(html, /id="login"[\s\S]*?login-phone-poster\.webp/);
+  assert.doesNotMatch(html.match(/id="login"[\s\S]*?<\/div>\s*<!--/s)?.[0] || '', /login-phone\.mp4/);
   assert.match(source, /const result = await signInWithEmailAndPassword/);
   assert.match(source, /const result = await createUserWithEmailAndPassword/);
   assert.match(source, /const isNativeShell =/);

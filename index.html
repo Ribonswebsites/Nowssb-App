@@ -151,16 +151,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="app-bg" id="appBg"></div>
 
 <!-- Auth transition loader — shown between login and home while Firestore
-     resolves. Two videos alternate while it's visible (app/js/part058.js);
-     the sub-line auto-escalates to "a few minutes" if it runs long. -->
-<div id="authLoader">
+     resolves. It is deliberately video-free so authentication cannot be
+     obscured by a loading film; the credential flow owns navigation. -->
+<div id="authLoader" aria-live="polite" aria-busy="true">
+  <div class="auth-loader-ring" aria-hidden="true"></div>
   <div class="auth-loader-text-wrap">
     <div class="auth-loader-please">Please wait</div>
-    <div class="auth-loader-sub" id="authLoaderSub">This might take a few seconds</div>
-  </div>
-  <div class="auth-loader-vid-wrap" id="authLoaderVidWrap">
-    <video class="auth-loader-video active" data-nwsb-auto muted loop playsinline preload="auto" src="./assets/video/loading.mp4"></video>
-    <video class="auth-loader-video" data-nwsb-auto muted loop playsinline preload="auto" src="./assets/video/loading.mp4"></video>
+    <div class="auth-loader-sub" id="authLoaderSub">Signing you in…</div>
   </div>
 </div>
 <!-- SECONDARY BG LAYER — cross-fades in when Word Search scrolls into view -->
@@ -373,20 +370,13 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="nm-wrap lg-wrap">
 
 
-    <!-- The phone. It is a clip now, not a still: the same render, moving.
-         Its aspect ratio is the file's own (720 x 1264), so nothing is
-         stretched, cropped or zoomed — the box is the shape of the footage
-         and the content scrolls within the glass instead of pushing the
-         bezel out of shape. The poster is the clip's OWN first frame, so
-         there is nothing to see between paint and play.
-
-         Muted, looped and inline, which is what lets it autoplay without a
-         tap on every browser that has a policy about it. -->
+    <!-- The login phone uses the exact first-frame artwork without a
+         background video, so login remains immediately visible and cannot be
+         held behind an autoplay or network media load. -->
     <div class="lg-phone nwsb-inframe dev-phone">
-      <video class="lg-phone-vid" autoplay muted loop playsinline
-             preload="auto" poster="./assets/video/login-phone-poster.webp"
-             aria-hidden="true" tabindex="-1"
-             src="./assets/video/login-phone.mp4"></video>
+      <img class="lg-phone-vid" loading="eager" decoding="async"
+           src="./assets/video/login-phone-poster.webp"
+           alt="NowssB sign-in preview">
       <div class="lg-glass">
 
     <!-- The mark, at the top of the screen: logo, a hairline, then the
@@ -10526,7 +10516,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script src="app/js/part054.js?v=15"></script>
 <script src="app/js/part056.js?v=5"></script>
 <script src="app/js/part057.js?v=10"></script>
-<script src="app/js/part058.js?v=1"></script>
+<script src="app/js/part058.js?v=2"></script>
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=15"></script>
 <script src="app/js/part061.js?v=8"></script>
