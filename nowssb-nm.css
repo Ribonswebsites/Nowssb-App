@@ -15805,3 +15805,31 @@ body.nwsb-settings-open #sub-social .sub-header * {
 body.nwsb-settings-open #sub-social .sub-back svg {
   stroke: #1a1a2e !important;
 }
+
+
+/* Store pages use their own normal black/static backgrounds. They are not
+   Fashion Plus cinema pages: do not make their shell transparent and do not
+   let the shared home film show through. */
+body.nwsb-store-open #fpBgVideo,
+body.nwsb-store-open #fpBgVeil {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+body.nwsb-store-open :is(
+  #sub-nowssb-store,
+  #sub-meaning-store,
+  #sub-ebooks-store,
+  #sub-signature-store
+) {
+  background: #060c18 !important;
+  background-image: none !important;
+}
+body.nwsb-store-open :is(
+  #sub-nowssb-store .nss-intro-page,
+  #sub-meaning-store .ms-intro-page,
+  #sub-ebooks-store .ms-intro-page,
+  #sub-signature-store .sig-intro-page
+) {
+  background-color: #060c18 !important;
+}

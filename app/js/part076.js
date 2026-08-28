@@ -177,6 +177,10 @@
     return v;
   }
 
+  function isStoreScreen(screen) {
+    return !!screen && /^(sub-nowssb-store|sub-meaning-store|sub-ebooks-store|sub-signature-store)$/.test(screen.id);
+  }
+
   function restoreIntroArtwork() {
     var fallback = {
       'rm-intro-bg': './assets/store/intro-words.webp',
@@ -186,7 +190,7 @@
     var selectors = '.sub-screen-bg, .rm-intro-bg, .ms-intro-bg, .eb-intro-bg, ' +
       '.sig-intro-bg, .sl-intro-bg, .st-bg, .qa-page-bg, .fpp-intro-bg, ' +
       '.cart-intro-bg, .wish-intro-bg, .orders-intro-bg, .oh-intro-bg';
-    document.querySelectorAll('.sub-screen.open :is(' + selectors + ')').forEach(function (layer) {
+    document.querySelectorAll('.sub-screen.open:not(#sub-nowssb-store):not(#sub-meaning-store):not(#sub-ebooks-store):not(#sub-signature-store) :is(' + selectors + ')').forEach(function (layer) {
       if (layer.querySelector(':scope > .fp-intro-art') || layer.querySelector(':scope > video')) return;
       var raw = '';
       try { raw = layer.style.backgroundImage || ''; } catch (e) {}
@@ -223,6 +227,11 @@
     var n = 0;
     for (var i = 0; i < subs.length; i++) {
       var s = subs[i];
+      if (isStoreScreen(s)) {
+        s.removeAttribute('data-fp-img');
+        s.removeAttribute('data-fp-solid');
+        continue;
+      }
 
       /* Already decided. This is not an optimisation, it is required: the
          CSS answer to being tagged is `background-image: none` on that very
@@ -299,6 +308,7 @@
     if (!v) return;
     var want = isOn() && bgPartOn() && !batteryLow &&
                !document.body.classList.contains('nwsb-settings-open') &&
+               !document.body.classList.contains('nwsb-store-open') &&
                document.visibilityState === 'visible';
     if (want) { v.play().catch(function () {}); }
     else { try { v.pause(); } catch (e) {} }
@@ -311,8 +321,10 @@
   function syncOpenPageBackdrop() {
     var on = isOn() && bgPartOn() && !batteryLow;
     var settingsOpen = !!document.querySelector('#sub-social.sub-screen.open');
+    var storeOpen = !!document.querySelector('#sub-nowssb-store.sub-screen.open, #sub-meaning-store.sub-screen.open, #sub-ebooks-store.sub-screen.open, #sub-signature-store.sub-screen.open');
     var hasOpenPage = !!document.querySelector('.sub-screen.open');
     document.body.classList.toggle('nwsb-settings-open', settingsOpen);
+    document.body.classList.toggle('nwsb-store-open', storeOpen);
     document.body.classList.toggle('nwsb-sub-open', hasOpenPage);
     document.body.classList.toggle(
       'fp-sub-open',
@@ -322,11 +334,11 @@
     // the off-mode black/image rules make the same decision for a page whose
     // own backdrop was created only when it opened.
     markImageBacked();
-    if (on && !settingsOpen) {
+    if (on && !settingsOpen && !storeOpen) {
       restoreIntroArtwork();
       bgVideo(true);
       playState();
-    } else if (settingsOpen) {
+    } else if (settingsOpen || storeOpen) {
       // Settings is the normal white neumorphic surface, never a Fashion Plus
       // cinema. Stop the shared decoder while this screen is open.
       bgVideo(false);
