@@ -154,6 +154,20 @@ class _HomeNormalState extends State<HomeNormal> {
     _push(PracticeProgressScreen(words: ContentStore.instance.library));
   }
 
+  void _openHomeMenu(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black26,
+      builder: (sheetContext) => _NormalHomeMenu(
+        onSelect: (tab) {
+          Navigator.of(sheetContext).pop();
+          _go(tab);
+        },
+      ),
+    );
+  }
+
   void _openMainOption(String label, int tab) {
     switch (label) {
       case 'Sound Library':
@@ -285,9 +299,9 @@ class _HomeNormalState extends State<HomeNormal> {
               // `.nmh-toprow` — pinned to the top, never scrolls. It is
               // outside the list rather than its first row, which is what
               // "never scrolls" means.
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
-                child: _TopRow(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+                child: _TopRow(onMenu: () => _openHomeMenu(context)),
               ),
                   Expanded(
                 // No horizontal padding: the sections carry their own
@@ -314,12 +328,16 @@ class _HomeNormalState extends State<HomeNormal> {
 
 /// .nmh-toprow — the logo, the wordmark, and the three embossed buttons.
 class _TopRow extends StatelessWidget {
-  const _TopRow();
+  const _TopRow({required this.onMenu});
+
+  final VoidCallback onMenu;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        _HamburgerButton(onTap: onMenu),
+        const SizedBox(width: 12),
         // The app's own mark, kept small and continuously alive in the
         // fixed header. The full-screen launch animation remains in Splash.
         const LoopingLogoMark(size: 46),
@@ -371,6 +389,96 @@ class _TopRow extends StatelessWidget {
           onTap: () => Settings.instance.setFashionHome(true),
         ),
       ],
+    );
+  }
+}
+
+class _HamburgerButton extends StatelessWidget {
+  const _HamburgerButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: NwsbShadows.raisedSm,
+        ),
+        child: const Icon(Icons.menu_rounded, size: 25, color: NwsbColors.ink),
+      ),
+    );
+  }
+}
+
+class _NormalHomeMenu extends StatelessWidget {
+  const _NormalHomeMenu({required this.onSelect});
+
+  final ValueChanged<int> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    const items = <(String, IconData, int)>[
+      ('Home', Icons.home_outlined, 0),
+      ('Practice', Icons.record_voice_over_outlined, 1),
+      ('Library', Icons.menu_book_outlined, 2),
+      ('Store', Icons.storefront_outlined, 3),
+      ('Profile', Icons.person_outline, 4),
+    ];
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: NwsbShadows.raised,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 38,
+              height: 4,
+              decoration: BoxDecoration(
+                color: NwsbColors.surfaceDim,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 12),
+            for (final (label, icon, tab) in items)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Material(
+                  color: NwsbColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => onSelect(tab),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      child: Row(
+                        children: [
+                          Icon(icon, color: NwsbColors.ink, size: 22),
+                          const SizedBox(width: 14),
+                          Text(label, style: const TextStyle(color: NwsbColors.ink, fontWeight: FontWeight.w700)),
+                          const Spacer(),
+                          const Icon(Icons.chevron_right, color: NwsbColors.inkSoft),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
