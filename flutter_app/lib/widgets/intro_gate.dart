@@ -209,9 +209,12 @@ class _Intro extends StatelessWidget {
                         child: Center(
                           child: Text(
                             tag,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                             style: const TextStyle(
-                              fontSize: 11,
-                              letterSpacing: 2.5,
+                              fontSize: 10,
+                              letterSpacing: 2.0,
                               color: Color(0xBFFFFFFF),
                             ),
                           ),

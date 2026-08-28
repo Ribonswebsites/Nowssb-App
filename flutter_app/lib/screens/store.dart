@@ -133,12 +133,12 @@ class _DepartmentCard extends StatelessWidget {
             const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xF0060C18), Color(0xB0060C18), Color(0x33060C18)]))),
             Padding(
               padding: const EdgeInsets.all(18),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(eyebrow.toUpperCase(), style: const TextStyle(fontSize: 9, letterSpacing: 2.2, color: NwsbColors.gold)),
-                const SizedBox(height: 6),
-                Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
-                const SizedBox(height: 5),
-                Text(body, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11.5, height: 1.4, color: Color(0xB3FFFFFF))),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
+                Text(eyebrow.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 8.5, letterSpacing: 2.0, color: NwsbColors.gold)),
+                const SizedBox(height: 4),
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
+                const SizedBox(height: 4),
+                Text(body, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, height: 1.25, color: Color(0xB3FFFFFF))),
               ]),
             ),
             const Positioned(right: 18, bottom: 18, child: Icon(Icons.arrow_forward, size: 18, color: Color(0xD9FFFFFF))),
