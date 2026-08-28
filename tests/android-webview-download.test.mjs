@@ -91,4 +91,6 @@ test('login has no transition video and Fashion Plus restores intro artwork abov
   assert.match(fashion, /fp-intro-art/);
   assert.match(css, /\.fp-intro-layer/);
   assert.match(css, /\.fp-intro-art/);
+  assert.match(css, /\.sl-intro-page/);
+  assert.match(css, /background: transparent !important/);
 });

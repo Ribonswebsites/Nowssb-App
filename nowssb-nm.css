@@ -15759,3 +15759,20 @@ body.fashplus:not(.fp-bg-off) .sub-screen.open .fp-intro-layer > .fp-intro-art {
   pointer-events: none !important;
   box-shadow: 0 14px 38px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.16) !important;
 }
+
+
+/* Word Atelier and the other intro pages have their own opaque wrapper. Open
+   that wrapper only while Fashion Plus is enabled; the restored artwork sits
+   above the shared home film, and the intro’s own normal background returns
+   when the mode is off. */
+body.fashplus:not(.fp-bg-off) .sub-screen.open :is(
+  .sl-intro-page,
+  .rm-intro-page,
+  .ms-intro-page,
+  .eb-intro-page,
+  #rmIntroPage,
+  #msIntroPage,
+  #ebIntroPage
+) {
+  background: transparent !important;
+}
