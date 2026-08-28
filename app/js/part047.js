@@ -103,6 +103,10 @@
     'https://res.cloudinary.com/eenvubod/image/upload/v1784264037/grok_image_1784263778179_okskwb.jpg'
   ];
   window.NWSB_FASHION_BGS = NWSB_FASHION_BGS;
+  // The first curated image is the permanent default for Fashion home and
+  // hamburger whenever Fashion Plus is off. User selections still override it.
+  var NWSB_DEFAULT_FASHION_BG = NWSB_FASHION_BGS[0];
+  window.NWSB_DEFAULT_FASHION_BG = NWSB_DEFAULT_FASHION_BG;
 
   // Sentinel stored in localStorage when "Black" is picked instead of a
   // real photo — lets every consumer (this file's own CSS var, rmStoreBgSync,
@@ -155,16 +159,16 @@
     _nwsbSyncBgConsumers();
   };
 
-  // "Default" toggle — clears all customization, back to the built-in look.
+  // "Default" toggle — returns to the curated shared default image.
   window.nwsbClearFashionBg = function () {
-    document.body.classList.remove('nwsb-custom-fashion-bg');
-    document.body.style.removeProperty('--nwsb-custom-bg-url');
-    document.body.style.removeProperty('--nwsb-custom-bg-color');
-    try { localStorage.removeItem('nwsb_fashion_bg_custom'); } catch (e) {}
+    document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + NWSB_DEFAULT_FASHION_BG + "')");
+    document.body.style.setProperty('--nwsb-custom-bg-color', 'transparent');
+    document.body.classList.add('nwsb-custom-fashion-bg');
+    try { localStorage.setItem('nwsb_fashion_bg_custom', NWSB_DEFAULT_FASHION_BG); } catch (e) {}
     if (window._currentUid && window._fbSetDoc) {
-      window._fbSetDoc(window._currentUid, { fashionBgCustom: null }).catch(function () {});
+      window._fbSetDoc(window._currentUid, { fashionBgCustom: NWSB_DEFAULT_FASHION_BG }).catch(function () {});
     }
-    fbgApplyToast('Background reset to default');
+    fbgApplyToast('Default background restored');
     _nwsbSyncBgConsumers();
   };
 
@@ -225,6 +229,12 @@
     } else if (saved2) {
       document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + saved2 + "')");
       document.body.classList.add('nwsb-custom-fashion-bg');
+    } else {
+      // No prior choice: apply the curated image immediately on first launch.
+      document.body.style.setProperty('--nwsb-custom-bg-url', "url('" + NWSB_DEFAULT_FASHION_BG + "')");
+      document.body.style.setProperty('--nwsb-custom-bg-color', 'transparent');
+      document.body.classList.add('nwsb-custom-fashion-bg');
+      try { localStorage.setItem('nwsb_fashion_bg_custom', NWSB_DEFAULT_FASHION_BG); } catch (e) {}
     }
   })();
 
