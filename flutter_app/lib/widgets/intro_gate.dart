@@ -71,7 +71,6 @@ class IntroGate extends StatefulWidget {
 }
 
 class _IntroGateState extends State<IntroGate> {
-  bool _open = false;
 
   @override
   void initState() {
@@ -89,15 +88,18 @@ class _IntroGateState extends State<IntroGate> {
     if (mounted) setState(() {});
   }
 
+  void _openContent() {
+    Navigator.of(context, rootNavigator: true).pushReplacement(
+      MaterialPageRoute<void>(builder: (_) => widget.child),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        if (_open)
-          widget.child
-        else
-          Positioned.fill(
-            child: _Intro(
+        Positioned.fill(
+          child: _Intro(
               tag: widget.tag,
               eyebrow: widget.eyebrow,
               title: widget.title,
@@ -107,9 +109,9 @@ class _IntroGateState extends State<IntroGate> {
               film: widget.film,
               enterLabel: widget.enterLabel,
               onBack: widget.onBack,
-              onEnter: () => setState(() => _open = true),
+              onEnter: _openContent,
             ),
-          ),
+        ),
       ],
     );
   }
