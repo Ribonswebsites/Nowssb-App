@@ -227,7 +227,9 @@ class _Intro extends StatelessWidget {
                 ),
                 const Spacer(),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+                  // The NavShell bottom bar overlays every tab. Keep the
+                  // Enter action above it so the bar cannot intercept taps.
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 124),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -292,14 +294,15 @@ class _Intro extends StatelessWidget {
                         ),
                       ],
                       const SizedBox(height: 28),
-                      GestureDetector(
-                        onTap: onEnter,
-                        behavior: HitTestBehavior.opaque,
-                        child: Container(
-                          height: 54,
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          color: Colors.white,
-                          child: FittedBox(
+                      Material(
+                        color: Colors.white,
+                        child: InkWell(
+                          onTap: onEnter,
+                          child: SizedBox(
+                            height: 54,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: FittedBox(
                             fit: BoxFit.scaleDown,
                             alignment: Alignment.centerLeft,
                             child: Row(
@@ -318,10 +321,12 @@ class _Intro extends StatelessWidget {
                                 const Icon(Icons.arrow_forward,
                                     size: 17, color: NwsbColors.ink),
                               ],
+                              ),
                             ),
                           ),
                         ),
                       ),
+                    ),
                     ],
                   ),
                 ),
