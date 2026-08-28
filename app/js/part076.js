@@ -33,7 +33,7 @@
 (function () {
   'use strict';
 
-  var VID = './assets/video/fashion-plus-bg.mp4';
+  var VID = './assets/video/fashion-plus-bg-6.mp4';
 
   /* What moves through the phone.
 
@@ -56,20 +56,8 @@
     { img: './assets/store/intro-signature.webp', t: ['The Signature', 'Still, today'] },
     { img: './assets/fashion/fp-intro.webp',      t: ['Fashion Plus', 'Still, today'] }
   ];
-  /* The backgrounds you can choose between. Add one here and it appears in
-     the phone and in the picker on its own — nothing else to touch. */
+  /* These are the only two backgrounds available in Fashion Plus. */
   var FILMS = [
-    { vid: './assets/video/fashion-plus-bg.mp4',   name: 'Shattered Glass' },
-    { vid: './assets/video/fashion-plus-bg-1.mp4', name: 'Background Two' },
-    { vid: './assets/video/fashion-plus-bg-2.mp4', name: 'Background Three' },
-    { vid: './assets/video/fashion-plus-bg-3.mp4', name: 'Background Four' },
-    /* Words Science used to sit here. It is the clip that belongs to the
-       Word Science button, not a wallpaper, and at 0.03 bits per pixel it
-       was the worst-looking thing in the list as well. Removing it shifts
-       the indices after it by one, so anyone who had it saved lands on
-       Falling Diamonds — which is the point.
-       These two are encoded at 720x1280 / ~0.19 bits per pixel, against
-       0.08-0.11 for the four above. */
     { vid: './assets/video/fashion-plus-bg-5.mp4', name: 'Falling Diamonds' },
     { vid: './assets/video/fashion-plus-bg-6.mp4', name: 'Violet Silk' }
   ];
@@ -93,7 +81,9 @@
   /* Which one is the app's background. The phone is the picker: whatever
      film you swipe to becomes the choice, so there is no separate Apply to
      forget to press. */
-  var BGKEY = 'nwsb_fp_bgvid';
+  var BGKEY = 'nwsb_fp_bgvid_v2';
+  // Do not reinterpret a selection saved for the removed background set.
+  try { localStorage.removeItem('nwsb_fp_bgvid'); } catch (e) {}
   function bgChoice() {
     var raw = null;
     try { raw = localStorage.getItem(BGKEY); } catch (e) {}
