@@ -42,7 +42,7 @@
     background:#050609;
     box-shadow:0 12px 30px rgba(0,0,0,.26);
   }
-  .listing-hero img{
+  .listing-hero video{
     width:100%;
     height:100%;
     display:block;
@@ -394,7 +394,9 @@
   <!-- SUPPLIED BANNER -->
   <div class="listing-hero-wrap">
     <div class="listing-hero" role="banner" aria-label="NowssB welcome banner">
-      <img src="assets/app-listing/listing-hero-banner.png" alt="Redefine. Reimagined. Rise.">
+      <video autoplay muted loop playsinline preload="auto" aria-label="NowssB welcome banner">
+        <source src="assets/app-listing/nowssb-hero-banner.mp4" type="video/mp4">
+      </video>
       <button class="hero-back-btn" type="button" onclick="goBack()" aria-label="Go back">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
