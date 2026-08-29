@@ -476,8 +476,10 @@ window.fbSignUp = async () => {
   const email = (document.getElementById('su1Email') || document.getElementById('loginEmail') || {}).value?.trim();
   const pass  = (document.getElementById('su1Password') || document.getElementById('pwInput') || {}).value?.trim();
   if (!email || !pass) return alert('Enter email and password');
-  try { await createUserWithEmailAndPassword(auth, email, pass); }
-  catch(e) { alert('Sign up failed: ' + e.message); }
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, pass);
+    _ensureLoginExit(result.user);
+  } catch(e) { alert('Sign up failed: ' + e.message); }
 };
 
 window.fbMagicLink = async () => {

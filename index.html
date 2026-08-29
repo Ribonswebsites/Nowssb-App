@@ -246,6 +246,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         vid.webkitPreservesPitch = true;
         /* Once. Said here as well as in the markup so nothing can put it back. */
         vid.loop = false;
+        vid.muted = true;
+        vid.defaultMuted = true;
+        vid.volume = 0;
         /* Set the rate ONCE, when the source has loaded — that is the only
            moment it gets reset to defaultPlaybackRate, so that is the only
            moment it needs saying again.
@@ -275,42 +278,51 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
            hold immediately. */
         vid.addEventListener('error', function () { window._splashClipDone = true; });
 
-        /* SOUND. A browser will not autoplay an unmuted video without a
-           gesture; it rejects play() instead. So: try with sound, and if it
-           is refused fall back to muted — which always plays — and unmute on
-           the first touch. That is the most sound anyone can get here; a
-           silent-but-playing start beats a start that does not play. */
-        var unmuteOnGesture = function () {
-          try {
-            vid.muted = false;
-            vid.volume = 1;
-            /* a gesture also lifts the block on playing at all, so if the
-               muted fallback never got going either, this starts it */
-            if (vid.paused && !window._splashClipDone) vid.play().catch(function () {});
-          } catch (e) {}
+        /* The start clip is decorative and must never produce audio. Keep
+           both the media element and its volume muted; the global video guard
+           also re-applies this whenever any video emits a play event. */
+        var silence = function () {
+          try { vid.muted = true; vid.defaultMuted = true; vid.volume = 0; } catch (e) {}
         };
-        ['touchstart', 'pointerdown', 'click', 'keydown'].forEach(function (ev) {
-          document.addEventListener(ev, unmuteOnGesture, { once: true, passive: true });
-        });
+        silence();
 
         var startIt = function () {
           vid.classList.add('vis');
-          vid.muted = false;
-          try { vid.volume = 1; } catch (e) {}
+          silence();
           var p = null;
           try { p = vid.play(); } catch (e) {}
           if (p && p.catch) {
             p.catch(function () {
-              /* Refused because it is not muted — the usual policy. Muted
-                 always plays, and the listeners above turn the sound on the
-                 moment anything is touched. In the packaged app the WebView
-                 has no such policy, so there it starts with sound. */
-              vid.muted = true;
+              silence();
               try { vid.play().catch(function () { window._splashClipDone = true; }); }
               catch (e) { window._splashClipDone = true; }
             });
           }
         };
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden) {
+            try { vid.pause(); } catch (e) {}
+          } else if (!window._splashClipDone && vid.classList.contains('vis')) {
+            silence();
+            try { vid.play().catch(function () {}); } catch (e) {}
+          }
+        });
+        window.addEventListener('pagehide', function () {
+          try { vid.pause(); } catch (e) {}
+          silence();
+        });
+        /* Navigation removes .active from #splash while the element remains
+           mounted. Stop the decoder immediately so the intro cannot continue
+           audibly or invisibly behind the next screen. */
+        var splashScreen = document.getElementById('splash');
+        if (splashScreen) {
+          new MutationObserver(function () {
+            if (!splashScreen.classList.contains('active')) {
+              try { vid.pause(); } catch (e) {}
+              silence();
+            }
+          }).observe(splashScreen, { attributes: true, attributeFilter: ['class'] });
+        }
         setTimeout(startIt, 1000);
       }
       if (img) img.style.backgroundImage = 'none';
