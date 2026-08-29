@@ -435,7 +435,7 @@
              already, and the bars beside the bar say when it is playing.
              The id stays on a hidden node — other code writes to it. */
           '<div class="lgp-status" id="spAutoStatus" hidden></div>' +
-          '<div class="lgp-tube lgp-tube-round">' +
+          '<div class="lgp-playrow">' +
             '<div class="lgp-controls">' +
               '<div class="lgp-transport">' +
                 '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
@@ -737,7 +737,6 @@
           '</div>' +
         '</div>' +   /* end .lgp-visual-overlay */
         '</div>' +   /* end .lgp-visual */
-        center +
         (function () {
           var next = words[idx + 1];
           if (!next) {
@@ -763,6 +762,7 @@
             '</div>' +
           '</div>';
         })() +
+        center +
         /* Sentence · Practice · Store — back at the bottom. */
         prow +
       '</div>';

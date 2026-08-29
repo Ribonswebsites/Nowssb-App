@@ -1730,38 +1730,61 @@
   width:1px; height:16px; background:rgba(255,255,255,.35); flex-shrink:0;
 }
 
-/* White circular play — not the oval glass capsule */
-.lgp .lgp-tube-round {
+/* White circular play — no oval glass capsule. The old .lgp-tube PNG is not used. */
+.lgp .lgp-playrow {
   background:none !important;
   filter:none !important;
   min-height:0 !important;
+  width:auto !important;
+  max-width:none !important;
   padding:8px 0 !important;
-  max-width:280px;
   margin-top:10px;
+  display:flex; align-items:center; justify-content:center;
 }
-.lgp .lgp-tube-round::before { display:none !important; }
-.lgp .lgp-tube-round .lgp-controls { justify-content:center; gap:18px; }
-.lgp .lgp-tube-round .lgp-transport { display:flex; align-items:center; justify-content:center; gap:18px; }
-.lgp .lgp-tube-round .lgp-play {
+.lgp .lgp-playrow::before { display:none !important; }
+.lgp .lgp-playrow .lgp-controls,
+.lgp .lgp-playrow .lgp-transport {
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  width:auto !important;
+  max-width:none !important;
+  margin:0;
+}
+.lgp .lgp-playrow .lgp-play {
   width:74px !important; height:74px !important;
+  min-width:74px !important; min-height:74px !important;
+  max-width:74px !important; max-height:74px !important;
+  padding:0 !important;
+  flex:0 0 74px !important;
+  aspect-ratio:1 / 1 !important;
+  box-sizing:border-box !important;
   border-radius:50% !important;
+  overflow:hidden;
   background:#fff !important;
   color:#0a0a12;
   box-shadow:0 10px 28px rgba(0,0,0,.4), 0 0 0 5px rgba(255,255,255,.14);
-  display:flex; align-items:center; justify-content:center;
+  display:flex !important; align-items:center; justify-content:center;
+  border:none !important;
 }
-.lgp .lgp-tube-round .lgp-play .lgp-img { display:none !important; }
+.lgp .lgp-playrow .lgp-play .lgp-img { display:none !important; }
 .lgp .lgp-play-svg {
   width:28px; height:28px; display:block; fill:#0a0a12;
   margin-left:2px;
 }
 .lgp .lgp-play.playing .lgp-play-svg { margin-left:0; }
-.lgp .lgp-tube-round .lgp-ctrl {
-  width:52px; height:52px; border-radius:50% !important;
+.lgp .lgp-playrow .lgp-ctrl {
+  width:52px !important; height:52px !important;
+  min-width:52px !important; min-height:52px !important;
+  max-width:52px !important; max-height:52px !important;
+  padding:0 !important;
+  border-radius:50% !important;
+  flex:0 0 52px !important;
 }
 
-/* Next Up sits directly under the circular play */
-.lgp .lgp-nextup { margin-top:10px; }
+/* Next Up sits directly under the video box */
+.lgp .lgp-nextup { margin-top:8px; }
 .lgp .lgp-nextup-play {
   background:#fff; color:#0a0a12;
   box-shadow:0 0 0 3px rgba(255,255,255,.12), 0 6px 16px rgba(0,0,0,.3);

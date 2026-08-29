@@ -337,7 +337,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                       await _tts.setVolume(volume);
                     },
                   )),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
+                  SizedBox(width: stageWidth, child: _NextUpCard(
+                    next: _index < widget.words.length - 1 ? widget.words[_index + 1] : null,
+                    art: _index < widget.words.length - 1
+                        ? _playerThemes[(_index + 1) % _playerThemes.length].image
+                        : null,
+                    onPlay: () => _move(1),
+                    onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
+                  )),
+                  const SizedBox(height: 12),
                   SizedBox(width: math.min(stageWidth, 352), child: _TransportTube(
                     playing: _playing,
                     hasPrevious: _index > 0,
@@ -347,15 +356,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     onPlay: _togglePlay,
                     onNext: () => _move(1),
                     onReplay: _prepareAndPlay,
-                  )),
-                  const SizedBox(height: 12),
-                  SizedBox(width: stageWidth, child: _NextUpCard(
-                    next: _index < widget.words.length - 1 ? widget.words[_index + 1] : null,
-                    art: _index < widget.words.length - 1
-                        ? _playerThemes[(_index + 1) % _playerThemes.length].image
-                        : null,
-                    onPlay: () => _move(1),
-                    onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
                   )),
                   if (_completed || _error != null) ...[
                     const SizedBox(height: 12),

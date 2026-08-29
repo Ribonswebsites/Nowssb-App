@@ -42,12 +42,12 @@ test('Flutter player matches the web stats / profile / next-up surgery', () => {
 test('Website and WebView cache-bust pins the rebuilt player, not the old files', () => {
   const html = read('index.html');
   const sw = read('sw.js');
-  assert.match(html, /nowssb-player\.css\?v=220/);
-  assert.match(html, /nowssb-player\.js\?v=313/);
-  assert.doesNotMatch(html, /nowssb-player\.css\?v=219/);
-  assert.doesNotMatch(html, /nowssb-player\.js\?v=312/);
-  assert.match(sw, /nowsbansiu-v956/);
-  assert.doesNotMatch(sw, /nowsbansiu-v955/);
+  assert.match(html, /nowssb-player\.css\?v=221/);
+  assert.match(html, /nowssb-player\.js\?v=314/);
+  assert.doesNotMatch(html, /nowssb-player\.css\?v=220/);
+  assert.doesNotMatch(html, /nowssb-player\.js\?v=313/);
+  assert.match(sw, /nowsbansiu-v957/);
+  assert.doesNotMatch(sw, /nowsbansiu-v956/);
 });
 
 test('Profile is a big Image-2 header outside the video, play is a white circle', () => {
@@ -55,11 +55,12 @@ test('Profile is a big Image-2 header outside the video, play is a white circle'
   const css = read('nowssb-player.css');
   assert.match(js, /lgp-profile-hero/);
   assert.match(js, /lgp-acts/);
-  assert.match(js, /lgp-tube-round/);
+  assert.match(js, /lgp-playrow/);
   assert.match(js, /lgp-play-svg/);
   assert.doesNotMatch(js, /lgp-rail-l/);
-  assert.match(css, /\.lgp-profile-hero/);
-  assert.match(css, /background:#fff !important/);
+  assert.doesNotMatch(js, /lgp-tube-round/);
+  assert.match(css, /\.lgp-playrow/);
+  assert.match(css, /border-radius:50% !important/);
 });
 
 test('Level opens a 1–12 glass list; stats sit in the tab; video is a glass box', () => {
