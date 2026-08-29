@@ -51,20 +51,13 @@
   /* ── Style pairs (image background + waveform video). One per word, rotating.
      Add each pair as you send it; the player cycles through them by word index. ── */
   var LGP_THEMES = [
-    /* Liquid splash goes FIRST — it is what the first word of a session
-       opens on. The only look that ships WITH the app rather than coming
-       from R2, which is also why it is the one worth having
-       before anything else: cldVid() leaves a path with no
-       /video/upload/ in it alone, so it reaches the <video> untouched. */
-    { img:'./assets/player/liquid-splash.webp',
-      video:'./assets/video/player-liquid-splash.mp4',
-      accent:'#ffcf4d' },
-    { img:'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
-      video:'assets/videos/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
-      accent:'#7fe9da' },
+    /* The former third visual is now the first/default look for a session. */
     { img:'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
       video:'assets/videos/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4',
       accent:'#9bb8ff' },
+    { img:'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
+      video:'assets/videos/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
+      accent:'#7fe9da' },
     { img:'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
       video:'assets/videos/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4',
       accent:'#bd7bff' },

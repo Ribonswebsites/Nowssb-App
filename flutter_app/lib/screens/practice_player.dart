@@ -44,6 +44,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   var _loop = false;
   var _volume = 1.0;
   var _railsVisible = true;
+  var _level = 1;
   String? _error;
 
   Word get _word => widget.words[_index];
@@ -54,6 +55,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     super.initState();
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
+    unawaited(_loadLevel());
     unawaited(_prepareAndPlay());
   }
 
@@ -67,6 +69,50 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     final prefs = await SharedPreferences.getInstance();
     final liked = prefs.getStringList(_likedWordsKey) ?? const <String>[];
     if (mounted) setState(() => _liked = liked.contains(_word.word));
+  }
+
+  Future<void> _loadLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = _word.word.toLowerCase().replaceAll(RegExp(r'[^a-z0-9_-]'), '-');
+    final level = prefs.getInt('nowssb_level_$id') ?? 1;
+    if (mounted) setState(() => _level = level.clamp(1, 10).toInt());
+  }
+
+  Future<void> _chooseLevel() async {
+    final chosen = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: const Color(0xF00B1321),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('REFERENCE PACE', style: TextStyle(color: NwsbColors.goldLight, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 2)),
+            const SizedBox(height: 6),
+            const Text('Choose your level', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 16),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              mainAxisSpacing: 9,
+              crossAxisSpacing: 9,
+              childAspectRatio: 3.5,
+              children: List.generate(_levelMeta.length, (i) => OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(i + 1),
+                style: OutlinedButton.styleFrom(side: BorderSide(color: i + 1 == _level ? NwsbColors.goldLight : Colors.white24), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                child: Align(alignment: Alignment.centerLeft, child: Text('${i + 1}  ${_levelMeta[i]}', style: const TextStyle(fontSize: 11))),
+              )),
+            ),
+          ]),
+        ),
+      ),
+    );
+    if (chosen == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final id = _word.word.toLowerCase().replaceAll(RegExp(r'[^a-z0-9_-]'), '-');
+    await prefs.setInt('nowssb_level_$id', chosen);
+    if (mounted) setState(() => _level = chosen);
+    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Level $chosen — ${_levelMeta[chosen - 1]}.')));
   }
 
   Future<void> _toggleLike() async {
@@ -298,6 +344,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
                   const SizedBox(height: 10),
+                  _NativeStatsCard(),
+                  const SizedBox(height: 10),
                   _TickerBanner(title: widget.title, index: _index, total: widget.words.length),
                   const SizedBox(height: 10),
                   SizedBox(width: stageWidth, child: _VisualStage(
@@ -308,6 +356,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     railsVisible: _railsVisible,
                     volume: _volume,
                     onInfo: _openInfo,
+                    onLevel: _chooseLevel,
+                    level: _level,
                     onReplay: _prepareAndPlay,
                     onNotes: _openNotes,
                     onLike: _toggleLike,
@@ -417,7 +467,7 @@ class _TickerBanner extends StatelessWidget {
 class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word, required this.theme, required this.playing, required this.liked,
-    required this.railsVisible, required this.volume, required this.onInfo,
+    required this.railsVisible, required this.volume, required this.onInfo, required this.onLevel, required this.level,
     required this.onReplay, required this.onNotes, required this.onLike,
     required this.onToggleRails, required this.onVolumeChanged,
   });
@@ -429,6 +479,8 @@ class _VisualStage extends StatelessWidget {
   final bool railsVisible;
   final double volume;
   final VoidCallback onInfo;
+  final VoidCallback onLevel;
+  final int level;
   final VoidCallback onReplay;
   final VoidCallback onNotes;
   final VoidCallback onLike;
@@ -447,6 +499,8 @@ class _VisualStage extends StatelessWidget {
           _GlassTag(label: _timeLabel()),
           Row(children: [
             _Equalizer(active: playing, accent: theme.accent),
+            const SizedBox(width: 7),
+            _LevelPill(level: level, onTap: onLevel),
             const SizedBox(width: 7),
             const _InfoPill(),
             const SizedBox(width: 6),
@@ -777,6 +831,54 @@ class _InfoFact extends StatelessWidget {
   Widget build(BuildContext context) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0x1AFFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x24FFFFFF))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: TextStyle(color: accent, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2)), const SizedBox(height: 5), Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.35))]));
 }
 
+const _levelMeta = <String>['Whisper', 'Slow', 'Gentle', 'Steady', 'Clear', 'Natural', 'Confident', 'Fluent', 'Sharp', 'Mastery'];
+
+class _NativeStatsCard extends StatelessWidget {
+  const _NativeStatsCard();
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: PracticeProgress.instance,
+    builder: (context, _) {
+      final progress = PracticeProgress.instance;
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(color: const Color(0xB8060A16), borderRadius: BorderRadius.circular(22), border: Border.all(color: const Color(0x2AFFFFFF))),
+        child: Row(children: [
+          _NativeStat(icon: Icons.local_fire_department_outlined, value: '${progress.streak}', label: 'STREAK DAYS'),
+          const _NativeStatDivider(),
+          _NativeStat(icon: Icons.bar_chart_rounded, value: '${progress.totalSessions}', label: 'SESSIONS'),
+          const _NativeStatDivider(),
+          _NativeStat(icon: Icons.schedule_rounded, value: '${progress.todaySessions}', label: 'TODAY'),
+        ]),
+      );
+    },
+  );
+}
+
+class _NativeStat extends StatelessWidget {
+  const _NativeStat({required this.icon, required this.value, required this.label});
+  final IconData icon;
+  final String value;
+  final String label;
+  @override
+  Widget build(BuildContext context) => Expanded(child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(icon, color: NwsbColors.goldLight, size: 18), const SizedBox(height: 3), Text(value, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)), Text(label, style: const TextStyle(color: Colors.white60, fontSize: 7, fontWeight: FontWeight.w700, letterSpacing: 1.1))]));
+}
+
+class _NativeStatDivider extends StatelessWidget {
+  const _NativeStatDivider();
+  @override
+  Widget build(BuildContext context) => Container(width: 1, height: 45, color: Colors.white12);
+}
+
+class _LevelPill extends StatelessWidget {
+  const _LevelPill({required this.level, required this.onTap});
+  final int level;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(99), child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7), decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(99), border: Border.all(color: Colors.white38)), child: Text('LVL $level  ›', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: .7))));
+}
+
 class _PlayerTheme {
   const _PlayerTheme({required this.image, required this.video, required this.accent});
   final String image;
@@ -785,9 +887,9 @@ class _PlayerTheme {
 }
 
 const _playerThemes = <_PlayerTheme>[
-  _PlayerTheme(image: 'assets/player/liquid-splash.webp', video: 'assets/video/player-liquid-splash.mp4', accent: Color(0xFFFFCF4D)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'assets/videos/3628088cee108d9e_grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
+  // The former third visual is now the first/default look for a session.
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg', video: 'assets/videos/31cbc323e2d03dbb_grok_video_2026-06-28-19-55-09_otgbxd.mp4', accent: Color(0xFF9BB8FF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'assets/videos/3628088cee108d9e_grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg', video: 'assets/videos/f36df7528f8d741b_grok_video_2026-06-28-19-55-02_of5fwh.mp4', accent: Color(0xFFBD7BFF)),
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg', video: 'assets/videos/9207084d44a79e06_grok_video_2026-06-28-19-54-43_it2bur.mp4', accent: Color(0xFFA6DCFF)),
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg', video: 'assets/videos/874f8fcfb0e6ea6d_grok_video_2026-06-30-10-29-43_hzxyun.mp4', accent: Color(0xFFB9A6FF)),
