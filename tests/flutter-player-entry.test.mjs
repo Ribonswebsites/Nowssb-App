@@ -21,11 +21,9 @@ test('Flutter Player uses the same liquid-glass media structure as the WebView P
   const player = read('flutter_app/lib/screens/practice_player.dart');
   const video = read('flutter_app/lib/media/nwsb_video.dart');
 
-  assert.match(player, /assets\/player\/liquid-splash\.webp/);
-  assert.match(player, /assets\/video\/player-liquid-splash\.mp4/);
+  assert.match(player, /NwsbVideo\(asset: theme\.video, poster: theme\.image/);
   assert.match(player, /assets\/video\/word-acts\.mp4/);
   assert.match(player, /assets\/frames\/word-acts-tab\.webp/);
-  assert.match(player, /NwsbVideo\(asset: theme\.video, poster: theme\.image/);
   assert.match(player, /_TransportTube/);
   assert.match(player, /_WordActionStrip/);
   assert.match(player, /_PlayerInfoSheet/);

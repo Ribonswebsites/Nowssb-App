@@ -52,6 +52,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   @override
   void initState() {
     super.initState();
+    PracticeProgress.instance.addListener(_onProgress);
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
     unawaited(_prepareAndPlay());
@@ -59,8 +60,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
 
   @override
   void dispose() {
+    PracticeProgress.instance.removeListener(_onProgress);
     unawaited(_tts.stop());
     super.dispose();
+  }
+
+  void _onProgress() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadLiked() async {
@@ -95,8 +101,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
       await _tts.setPitch(1.0);
       await _tts.setVolume(_volume);
       await _tts.stop();
+      final started = DateTime.now();
       await _tts.speak(_word.word);
-      await PracticeProgress.instance.recordCompletedWord(_word);
+      final elapsed = DateTime.now().difference(started).inSeconds;
+      await PracticeProgress.instance.recordCompletedWord(_word, durationSec: elapsed > 0 ? elapsed : 1);
       if (mounted) setState(() => _completed = true);
     } catch (_) {
       if (mounted) {
@@ -298,7 +306,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
                   const SizedBox(height: 10),
-                  _TickerBanner(title: widget.title, index: _index, total: widget.words.length),
+                  SizedBox(width: stageWidth, child: const _StatsRow()),
                   const SizedBox(height: 10),
                   SizedBox(width: stageWidth, child: _VisualStage(
                     word: _word,
@@ -318,13 +326,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     },
                   )),
                   const SizedBox(height: 14),
-                  SizedBox(width: math.min(stageWidth - 16, 340), child: _ProgressPanel(
-                    index: _index,
-                    total: widget.words.length,
-                    playing: _playing,
-                    accent: theme.accent,
-                  )),
-                  const SizedBox(height: 14),
                   SizedBox(width: math.min(stageWidth, 352), child: _TransportTube(
                     playing: _playing,
                     hasPrevious: _index > 0,
@@ -334,6 +335,15 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     onPlay: _togglePlay,
                     onNext: () => _move(1),
                     onReplay: _prepareAndPlay,
+                  )),
+                  const SizedBox(height: 12),
+                  SizedBox(width: stageWidth, child: _NextUpCard(
+                    next: _index < widget.words.length - 1 ? widget.words[_index + 1] : null,
+                    art: _index < widget.words.length - 1
+                        ? _playerThemes[(_index + 1) % _playerThemes.length].image
+                        : null,
+                    onPlay: () => _move(1),
+                    onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
                   )),
                   if (_completed || _error != null) ...[
                     const SizedBox(height: 12),
@@ -393,25 +403,165 @@ class _PlayerHeader extends StatelessWidget {
   );
 }
 
-class _TickerBanner extends StatelessWidget {
-  const _TickerBanner({required this.title, required this.index, required this.total});
-  final String title;
-  final int index;
-  final int total;
+class _StatsRow extends StatelessWidget {
+  const _StatsRow();
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(16)),
-    child: Row(children: [
-      const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 28),
-      const SizedBox(width: 12),
-      Container(width: 1, height: 30, color: const Color(0x33FFFFFF)),
-      const SizedBox(width: 12),
-      Expanded(child: Text(index.isEven ? 'The new fashion trend of meditation' : '$title · ${index + 1} of $total', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800))),
+  Widget build(BuildContext context) {
+    final progress = PracticeProgress.instance;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0x14FFFFFF),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0x1FFFFFFF)),
+      ),
+      child: Row(children: [
+        _StatCell(icon: Icons.local_fire_department_outlined, value: '${progress.streak}', label: 'Days Streak'),
+        _statDivider(),
+        _StatCell(icon: Icons.graphic_eq_rounded, value: '${progress.totalSessions}', label: 'Sessions'),
+        _statDivider(),
+        _StatCell(icon: Icons.schedule_rounded, value: progress.timeLabel, label: 'Time Meditated'),
+      ]),
+    );
+  }
+
+  Widget _statDivider() => Container(width: 1, height: 28, color: const Color(0x24FFFFFF));
+}
+
+class _StatCell extends StatelessWidget {
+  const _StatCell({required this.icon, required this.value, required this.label});
+  final IconData icon;
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+    child: Column(children: [
+      Icon(icon, color: const Color(0xFFE8D5A3), size: 16),
+      const SizedBox(height: 4),
+      Text(value, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
+      const SizedBox(height: 2),
+      Text(label.toUpperCase(), style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 8.5, fontWeight: FontWeight.w700, letterSpacing: 1)),
     ]),
   );
+}
+
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = PracticeProgress.instance;
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        width: 40,
+        height: 40,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8E8F5)]),
+        ),
+        alignment: Alignment.center,
+        child: const Text('H', style: TextStyle(color: Color(0xFF0A0A12), fontSize: 14, fontWeight: FontWeight.w800)),
+      ),
+      const SizedBox(width: 9),
+      Expanded(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('Healer', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 2),
+          const Text('LISTEN · SPEAK · HEAL', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 8, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0x1FE8D5A3),
+              borderRadius: BorderRadius.circular(99),
+              border: Border.all(color: const Color(0x59E8D5A3)),
+            ),
+            child: Text('Level ${progress.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 10, fontWeight: FontWeight.w700)),
+          ),
+        ]),
+      ),
+    ]);
+  }
+}
+
+class _NextUpCard extends StatelessWidget {
+  const _NextUpCard({required this.next, required this.art, required this.onPlay, required this.onAdd});
+  final Word? next;
+  final String? art;
+  final VoidCallback onPlay;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    final word = next;
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0x14FFFFFF),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0x1FFFFFFF)),
+      ),
+      child: word == null
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+              child: Column(children: [
+                const Text('No more sessions queued', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12)),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: onAdd,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x2EFFFFFF))),
+                    child: const Text('Add a session', style: TextStyle(color: Colors.white, fontSize: 11)),
+                  ),
+                ),
+              ]),
+            )
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+              child: Row(children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: art != null && art!.isNotEmpty
+                        ? (art!.startsWith('http')
+                            ? Image.network(art!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                            : Image.asset(art!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
+                        : const ColoredBox(color: Color(0xFF111111)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Text('NEXT UP', style: TextStyle(color: Color(0x80FFFFFF), fontSize: 8.5, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
+                    Text(word.word, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+                    Text(
+                      word.organ.isNotEmpty ? word.organ : (word.categories.isNotEmpty ? word.categories.first : 'Next word'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 10, letterSpacing: .8),
+                    ),
+                  ]),
+                ),
+                GestureDetector(
+                  onTap: onPlay,
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC9A86A)]),
+                    ),
+                    child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A12), size: 22),
+                  ),
+                ),
+              ]),
+            ),
+    );
+  }
 }
 
 class _VisualStage extends StatelessWidget {
@@ -443,47 +593,44 @@ class _VisualStage extends StatelessWidget {
       child: Stack(fit: StackFit.expand, children: [
         NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
         const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
-        Positioned(top: 10, left: 10, right: 10, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          _GlassTag(label: _timeLabel()),
+        Positioned(top: 10, left: 10, right: 10, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Expanded(child: _ProfileHeader()),
+          const SizedBox(width: 6),
           Row(children: [
-            _Equalizer(active: playing, accent: theme.accent),
-            const SizedBox(width: 7),
             const _InfoPill(),
             const SizedBox(width: 6),
             _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36),
           ]),
         ])),
         if (railsVisible) ...[
-          Positioned(left: 10, top: 64, child: _GlassRail(children: [
+          Positioned(left: 10, top: 78, child: _GlassRail(children: [
             _RailButton(icon: Icons.replay_rounded, onTap: onReplay),
             _RailButton(icon: Icons.description_outlined, onTap: onNotes),
             _RailButton(icon: liked ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: liked ? theme.accent : Colors.white, onTap: onLike),
           ])),
-          Positioned(right: 10, top: 64, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
+          Positioned(right: 10, top: 78, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
         ],
-        Positioned(right: 10, top: railsVisible ? 154 : 64, child: _RoundIconButton(icon: Icons.tune_rounded, onTap: onToggleRails, size: 34)),
-        Positioned(left: 0, right: 0, bottom: 0, child: _WordOverlay(word: word, accent: theme.accent)),
+        Positioned(right: 10, top: railsVisible ? 168 : 78, child: _RoundIconButton(icon: Icons.tune_rounded, onTap: onToggleRails, size: 34)),
+        Positioned(left: 0, right: 0, bottom: 0, child: _WordOverlay(word: word, accent: theme.accent, playing: playing)),
       ]),
     ),
   );
-
-  String _timeLabel() {
-    final hour = DateTime.now().hour;
-    return hour < 10 ? 'Morning' : hour < 13 ? 'Midday' : hour < 17 ? 'Afternoon' : hour < 20 ? 'Evening' : 'Night';
-  }
 }
 
 class _WordOverlay extends StatelessWidget {
-  const _WordOverlay({required this.word, required this.accent});
+  const _WordOverlay({required this.word, required this.accent, required this.playing});
   final Word word;
   final Color accent;
+  final bool playing;
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(56, 36, 56, 34),
+    padding: const EdgeInsets.fromLTRB(56, 28, 56, 34),
     decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00060A16), Color(0xA8060A16), Color(0xF0060A16)])),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Text(word.word, textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 33, fontWeight: FontWeight.w800, letterSpacing: 1.3, shadows: [Shadow(color: accent.withOpacity(.8), blurRadius: 22)])),
+      _Equalizer(active: playing, accent: accent),
+      const SizedBox(height: 6),
+      Text(word.word.toUpperCase(), textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: 6.2, height: 1.05, shadows: [Shadow(color: accent.withOpacity(.8), blurRadius: 22)])),
       if (word.deva.isNotEmpty) ...[
         const SizedBox(height: 5),
         Text(word.deva, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w600, height: 1.25)),
@@ -494,7 +641,7 @@ class _WordOverlay extends StatelessWidget {
       ],
       if (word.organ.isNotEmpty) ...[
         const SizedBox(height: 12),
-        Text('—  ${word.organ.toUpperCase()}  —', style: const TextStyle(color: Color(0xC2FFFFFF), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 2)),
+        Text(word.organ.toUpperCase(), style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 3.6)),
       ],
     ]),
   );
@@ -514,29 +661,6 @@ class _PronunciationChip extends StatelessWidget {
       if (part.deva.isNotEmpty) Text(part.deva, style: TextStyle(color: Colors.white, fontSize: compact ? 12 : 16, height: 1.2)),
       Text(part.roman.isEmpty ? part.deva : part.roman, style: TextStyle(color: Colors.white, fontSize: compact ? 10 : 13, fontWeight: FontWeight.w800, letterSpacing: .4)),
       if (!compact) Text('${part.hold.toStringAsFixed(part.hold.truncateToDouble() == part.hold ? 0 : 1)}s', style: TextStyle(color: accent, fontSize: 9, fontWeight: FontWeight.w800)),
-    ]),
-  );
-}
-
-class _ProgressPanel extends StatelessWidget {
-  const _ProgressPanel({required this.index, required this.total, required this.playing, required this.accent});
-  final int index;
-  final int total;
-  final bool playing;
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
-    decoration: BoxDecoration(color: const Color(0x82060A16), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x2AFFFFFF))),
-    child: Row(children: [
-      _Equalizer(active: playing, accent: accent),
-      const SizedBox(width: 11),
-      Container(width: 1, height: 20, color: const Color(0x66FFFFFF)),
-      const SizedBox(width: 11),
-      Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(99), child: LinearProgressIndicator(value: (index + 1) / total, minHeight: 5, color: accent, backgroundColor: const Color(0x33FFFFFF)))),
-      const SizedBox(width: 10),
-      Text('${index + 1}/$total', style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w800)),
     ]),
   );
 }
@@ -640,18 +764,6 @@ class _RoundIconButton extends StatelessWidget {
     color: const Color(0x2EFFFFFF),
     shape: const CircleBorder(side: BorderSide(color: Color(0x66FFFFFF))),
     child: InkWell(customBorder: const CircleBorder(), onTap: onTap, child: SizedBox(width: size, height: size, child: Icon(icon, color: Colors.white, size: size * .48))),
-  );
-}
-
-class _GlassTag extends StatelessWidget {
-  const _GlassTag({required this.label});
-  final String label;
-  @override
-  Widget build(BuildContext context) => Container(
-    constraints: const BoxConstraints(maxWidth: 132),
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-    decoration: BoxDecoration(color: const Color(0x3DFFFFFF), borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x55FFFFFF))),
-    child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.circle, color: Color(0xFFB9F3EA), size: 7), const SizedBox(width: 6), Flexible(child: Text(label, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)))]),
   );
 }
 

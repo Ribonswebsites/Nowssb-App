@@ -64,6 +64,32 @@ class PracticeProgress extends ChangeNotifier {
     return value;
   }
 
+  /// Accumulated practice time from recorded sessions. Sessions without a
+  /// stored duration contribute nothing — the UI shows `0m` until real
+  /// playback length has been written.
+  int get totalMinutes {
+    var seconds = 0;
+    for (final session in _sessions.values) {
+      final duration = session['durationSec'];
+      if (duration is num && duration > 0) {
+        seconds += duration.round();
+      }
+    }
+    return (seconds / 60).round();
+  }
+
+  String get timeLabel {
+    if (_sessions.isEmpty) return '0m';
+    final m = totalMinutes;
+    if (m < 60) return '${m}m';
+    final h = m ~/ 60;
+    final r = m % 60;
+    return r == 0 ? '${h}h' : '${h}h ${r}m';
+  }
+
+  /// One level per 30 minutes meditated, minimum 1 — same curve as the web player.
+  int get level => (totalMinutes / 30).floor() + 1;
+
   int completedTodayFor(Iterable<Word> words) {
     final today = _day(DateTime.now());
     final wordSet = words.map((word) => word.word).toSet();
@@ -72,7 +98,7 @@ class PracticeProgress extends ChangeNotifier {
         .length;
   }
 
-  Future<void> recordCompletedWord(Word word) async {
+  Future<void> recordCompletedWord(Word word, {int durationSec = 0}) async {
     final today = _day(DateTime.now());
     final key = '${today}_${word.word}';
     _sessions[key] = {
@@ -80,6 +106,7 @@ class PracticeProgress extends ChangeNotifier {
       'word': word.word,
       'completedAt': DateTime.now().toIso8601String(),
       'source': 'native-player',
+      if (durationSec > 0) 'durationSec': durationSec,
     };
     try {
       final preferences = await SharedPreferences.getInstance();

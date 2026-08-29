@@ -199,7 +199,8 @@
 .lgp .lgp-visual-overlay > * { pointer-events:auto; }
 /* title / syllables / organ */
 .lgp .lgp-title {
-  margin-top:0; font-size:34px; font-weight:800; letter-spacing:1.6px; text-align:center; line-height:1.02;
+  margin-top:4px; font-size:34px; font-weight:800; letter-spacing:.22em; text-align:center; line-height:1.02;
+  text-transform:uppercase;
   text-shadow:0 2px 26px rgba(0,0,0,.6), 0 0 32px var(--lg-accent);
 }
 /* The word as it is actually written. Devanagari is taller than latin at
@@ -250,8 +251,8 @@
    rules would show as two stray dashes on a word with no organ, so an
    empty line draws nothing at all. */
 .lgp .lgp-organ {
-  margin-top:15px; font-size:9.5px; font-weight:700; letter-spacing:2.6px; text-transform:uppercase;
-  color:rgba(255,255,255,.74);
+  margin-top:15px; font-size:11px; font-weight:600; letter-spacing:.28em; text-transform:uppercase;
+  color:rgba(255,255,255,.55);
   display:flex; align-items:center; justify-content:center; gap:11px; max-width:100%;
 }
 .lgp .lgp-organ:empty { display:none; }
@@ -1525,3 +1526,136 @@
 .pn-dots i:nth-child(2) { animation-delay:.16s; }
 .pn-dots i:nth-child(3) { animation-delay:.32s; }
 @keyframes pnDot { 0%,100% { opacity:.25; } 50% { opacity:1; } }
+
+/* ── ACTUAL TASK: stats / profile / next-up / title eq ── */
+.lgp .lgp-banner-tab,
+.lgp .lgp-info-banner,
+.lgp .lgp-visual-tag,
+.lgp .lgp-barwrap { display:none !important; }
+
+.lgp .lgp-stats {
+  position:relative; width:100%; max-width:360px; margin:10px auto 0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 8px; flex-shrink:0;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  box-shadow:0 8px 22px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.lgp .lgp-stat {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0;
+}
+.lgp .lgp-stat-ico {
+  width:16px; height:16px; color:#e8d5a3; filter:drop-shadow(0 0 6px rgba(232,213,163,.45));
+}
+.lgp .lgp-stat-num {
+  font-size:17px; font-weight:700; letter-spacing:.02em; color:#f2f2f0; line-height:1.1;
+}
+.lgp .lgp-stat-lbl {
+  font-size:8.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+.lgp .lgp-stat-div {
+  width:1px; height:28px; background:rgba(255,255,255,.14); flex-shrink:0;
+}
+
+.lgp .lgp-profile {
+  display:flex; align-items:flex-start; gap:9px;
+  flex:1 1 auto; min-width:0;
+}
+.lgp .lgp-avatar {
+  width:40px; height:40px; border-radius:50% !important; flex-shrink:0;
+  background:linear-gradient(135deg, #e8d5a3, #c8e8f5);
+  color:#0a0a12; display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  box-shadow:0 0 14px rgba(232,213,163,.35);
+  border:1px solid rgba(255,255,255,.35);
+}
+.lgp .lgp-avatar-img { width:100%; height:100%; object-fit:cover; display:block; }
+.lgp .lgp-avatar-init { font-size:13px; font-weight:800; letter-spacing:.04em; }
+.lgp .lgp-id { min-width:0; flex:1; }
+.lgp .lgp-uname {
+  font-size:14px; font-weight:700; color:#fff; line-height:1.15;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.lgp .lgp-tagline {
+  margin-top:2px; font-size:8px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:rgba(255,255,255,.55);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.lgp .lgp-level {
+  margin-top:6px; display:inline-flex; align-items:center; gap:3px;
+  height:22px; padding:0 9px; border-radius:999px !important; cursor:pointer;
+  font-size:10px; font-weight:700; color:#e8d5a3;
+  background:rgba(232,213,163,.12);
+  border:1px solid rgba(232,213,163,.35);
+  box-shadow:0 0 10px rgba(232,213,163,.22);
+}
+.lgp .lgp-level:active { transform:scale(.96); }
+
+.lgp .lgp-eq-title {
+  height:16px; padding:0; margin:0 auto 2px;
+  background:none; border:none; box-shadow:none;
+  align-self:center;
+}
+.lgp .lgp-eq-title i {
+  width:2.5px;
+}
+.lgp .lgp-eq-title i:nth-child(1) { height:7px; }
+.lgp .lgp-eq-title i:nth-child(2) { height:14px; }
+.lgp .lgp-eq-title i:nth-child(3) { height:9px; }
+.lgp .lgp-eq-title i:nth-child(4) { height:16px; }
+.lgp .lgp-eq-title i:nth-child(5) { height:8px; animation-delay:1.05s; }
+
+.lgp .lgp-nextup {
+  width:100%; max-width:360px; margin:12px auto 0; flex-shrink:0;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  box-shadow:0 8px 22px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14);
+  overflow:hidden;
+}
+.lgp .lgp-nextup-item {
+  display:flex; align-items:center; gap:12px; padding:10px 12px;
+}
+.lgp .lgp-nextup-art {
+  width:44px; height:44px; border-radius:14px !important; flex-shrink:0;
+  background:#111 center/cover no-repeat;
+  border:1px solid rgba(255,255,255,.18);
+}
+.lgp .lgp-nextup-mid { flex:1; min-width:0; }
+.lgp .lgp-nextup-eye {
+  font-size:8.5px; font-weight:800; letter-spacing:.16em;
+  color:rgba(255,255,255,.5); text-transform:uppercase;
+}
+.lgp .lgp-nextup-title {
+  font-size:14px; font-weight:700; color:#fff;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.lgp .lgp-nextup-sub {
+  font-size:10px; color:rgba(255,255,255,.55);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  text-transform:uppercase; letter-spacing:.08em;
+}
+.lgp .lgp-nextup-play {
+  width:36px; height:36px; border-radius:50% !important; flex-shrink:0;
+  border:none; cursor:pointer;
+  background:linear-gradient(135deg, #e8d5a3, #c9a86a); color:#0a0a12;
+  box-shadow:0 0 14px rgba(232,213,163,.45);
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-nextup-play svg { width:16px; height:16px; margin-left:1px; }
+.lgp .lgp-nextup-play:active { transform:scale(.94); }
+.lgp .lgp-nextup-empty {
+  padding:16px 12px; text-align:center; font-size:12px; color:rgba(255,255,255,.55);
+  display:flex; flex-direction:column; gap:10px; align-items:center;
+}
+.lgp .lgp-nextup-empty button {
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06); color:#f2f2f0;
+  border-radius:999px !important; padding:6px 14px; font-size:11px; cursor:pointer;
+}
+
+.lgp .lgp-visual-top { align-items:flex-start; }

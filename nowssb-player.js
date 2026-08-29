@@ -118,6 +118,98 @@
   }
   function active() { return ONLY_SUBSCRIBERS ? isSubscribed() : true; }
 
+  /* ── Real stats / profile / next-up (from actual session logs, never fake) ── */
+  function lgpEsc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
+      .replace(/"/g, '"').replace(/'/g, '&#39;');
+  }
+  function lgpFmtMinutes(totalMinutes) {
+    var m = Math.max(0, Math.round(totalMinutes || 0));
+    if (m < 60) return m + 'm';
+    var h = Math.floor(m / 60);
+    var r = m % 60;
+    return r ? (h + 'h ' + r + 'm') : (h + 'h');
+  }
+  function lgpReadSessions() {
+    var map = {};
+    function ingest(obj) {
+      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
+      Object.keys(obj).forEach(function (k) {
+        var e = obj[k];
+        if (e && typeof e === 'object') map[k] = e;
+      });
+    }
+    function parse(key) {
+      try { ingest(JSON.parse(localStorage.getItem(key) || '{}')); } catch (e) {}
+    }
+    parse('nwsb_local_sessions');
+    parse('nwsb_native_sessions');
+    parse('nwsb_sessions_v1');
+    var ud = window._userDataCache || {};
+    ingest(ud.sessions);
+    if (window._mpData) ingest(window._mpData.sessions);
+    return map;
+  }
+  function lgpSessionStats() {
+    var map = lgpReadSessions();
+    var keys = Object.keys(map);
+    var minutes = 0;
+    keys.forEach(function (k) {
+      var e = map[k] || {};
+      if (typeof e.durationSec === 'number' && e.durationSec > 0) minutes += e.durationSec / 60;
+      else if (typeof e.durationMin === 'number' && e.durationMin > 0) minutes += e.durationMin;
+      else if (typeof e.repsCompleted === 'number' && e.repsCompleted > 0) minutes += (e.repsCompleted * 8) / 60;
+    });
+    var days = {};
+    keys.forEach(function (k) {
+      var e = map[k] || {};
+      var d = String(e.date || k.split('_')[0] || '').slice(0, 10);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) days[d] = true;
+    });
+    var iso = function (dt) {
+      var y = dt.getFullYear();
+      var m = String(dt.getMonth() + 1).padStart(2, '0');
+      var d = String(dt.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    };
+    var cursor = new Date();
+    if (!days[iso(cursor)]) cursor.setDate(cursor.getDate() - 1);
+    var streak = 0;
+    while (days[iso(cursor)] && streak < 365) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return {
+      streak: streak,
+      sessions: keys.length,
+      minutes: minutes,
+      timeLabel: keys.length ? lgpFmtMinutes(minutes) : '0m',
+      level: Math.max(1, Math.floor(minutes / 30) + 1)
+    };
+  }
+  function lgpUserProfile() {
+    var ud = window._userDataCache || {};
+    var cu = window._currentUser || {};
+    var name = String(ud.displayName || cu.displayName || window._userName || '').trim();
+    if (!name) name = 'Guest';
+    var photo = ud.photoURL || cu.photoURL || '';
+    var parts = name.split(/\s+/).filter(Boolean);
+    var initials = parts.map(function (p) { return p.charAt(0); }).join('').slice(0, 2).toUpperCase() || 'G';
+    return { name: name, photo: photo, initials: initials };
+  }
+  window.lgpPlayNext = function () {
+    if (typeof pwNextWord === 'function') pwNextWord();
+  };
+  window.lgpOpenQueue = function () {
+    if (typeof openWalkmanLib === 'function') openWalkmanLib();
+    else if (typeof openSub === 'function') openSub('practice');
+  };
+  window.lgpOpenLevel = function () {
+    if (typeof openSub === 'function') openSub('profile');
+  };
+
+
   /* ── Liked words ───────────────────────────────────────────────────────
      localStorage is the source of truth so the heart is right the instant
      the player opens, with no round trip and nothing to wait for. When
@@ -486,16 +578,29 @@
             '</button>' +
           '</div>' +
         '</div>' +
-        /* The ticker banner, back above the picture — and the black bar
-           IS the tab's aperture now, so it reads as the same object as
-           the two rows below it. */
-        '<div class="lgp-banner-tab">' +
-          '<div class="lgp-info-banner">' +
-            '<div class="lgp-info-banner-icon" style="background-image:url(\'' + IC.banner + '\')"></div>' +
-            '<div class="lgp-info-banner-divider"></div>' +
-            '<div class="lgp-info-banner-text" id="lgpBannerText"></div>' +
-          '</div>' +
-        '</div>' +
+        /* Stats row — real streak / sessions / time from the session log. */
+        (function () {
+          var st = lgpSessionStats();
+          return '<div class="lgp-stats" id="lgpStats">' +
+            '<div class="lgp-stat">' +
+              '<svg class="lgp-stat-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3s4 4.2 4 8a4 4 0 1 1-8 0c0-2.4 1.6-4.6 4-8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.6 14.5c.6 1.8 2 3 3.9 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
+              '<div class="lgp-stat-num" id="lgpStatStreak">' + st.streak + '</div>' +
+              '<div class="lgp-stat-lbl">Days Streak</div>' +
+            '</div>' +
+            '<div class="lgp-stat-div" aria-hidden="true"></div>' +
+            '<div class="lgp-stat">' +
+              '<svg class="lgp-stat-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
+              '<div class="lgp-stat-num" id="lgpStatSessions">' + st.sessions + '</div>' +
+              '<div class="lgp-stat-lbl">Sessions</div>' +
+            '</div>' +
+            '<div class="lgp-stat-div" aria-hidden="true"></div>' +
+            '<div class="lgp-stat">' +
+              '<svg class="lgp-stat-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/><path d="M12 8.2V12l2.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+              '<div class="lgp-stat-num" id="lgpStatTime">' + st.timeLabel + '</div>' +
+              '<div class="lgp-stat-lbl">Time Meditated</div>' +
+            '</div>' +
+          '</div>';
+        })() +
         '<div class="lgp-visual">' + visual +
           /* ONE row across the top of the panel, not two islands pinned to
              the corners. Pinned, they overlapped the moment either side got
@@ -503,11 +608,22 @@
              the ritual is the only thing that can shrink, and it ellipsises
              instead of running under the bars. */
           '<div class="lgp-visual-top">' +
-            '<div class="lgp-visual-tag"><span class="lgp-visual-tag-dot"></span><span class="lgp-visual-tag-txt">' + _e(ritual) + '</span></div>' +
+            (function () {
+              var p = lgpUserProfile();
+              var st = lgpSessionStats();
+              var av = p.photo
+                ? '<img class="lgp-avatar-img" src="' + lgpEsc(p.photo) + '" alt="">'
+                : '<span class="lgp-avatar-init">' + lgpEsc(p.initials) + '</span>';
+              return '<div class="lgp-profile">' +
+                '<div class="lgp-avatar" aria-hidden="true">' + av + '</div>' +
+                '<div class="lgp-id">' +
+                  '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
+                  '<div class="lgp-tagline">LISTEN · SPEAK · HEAL</div>' +
+                  '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()">Level ' + st.level + ' <span aria-hidden="true">›</span></button>' +
+                '</div>' +
+              '</div>';
+            })() +
             '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
-            /* the sound, shown rather than described — the bars idle slowly
-               and run at full tilt while the word is playing (.lgp.playing) */
-            '<span class="lgp-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
               '<span class="lgp-bgico" style="background-image:url(\'' + IC.info + '\')"></span>' +
@@ -578,6 +694,7 @@
         /* The bottom of the picture: the word. */
         '<div class="lgp-visual-overlay">' +
         '<div class="lgp-wordblock">' +
+          '<span class="lgp-eq lgp-eq-title" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' +
           '<div class="lgp-title">' + (w.word || '') + '</div>' +
             /* The word as it is actually written. The roman title above is
                the reading aid, not the word. */
@@ -587,27 +704,32 @@
         '</div>' +
         '</div>' +   /* end .lgp-visual-overlay */
         '</div>' +   /* end .lgp-visual */
-        /* The Replay/Notes/Like tab used to sit here. Its clip moved
-           into the Sentence · Practice · Store tab at the bottom, and the
-           three buttons went into the picture. */
-        /* The Listen · Learn · Practice · Heal ticker used to sit here. */
-        /* The bar, in a wrapper with room around it, and the four bars on
-           its left that move while the word is being spoken. */
-        '<div class="lgp-barwrap">' +
-          /* A waveform, not four bouncing sticks: nine bars whose resting
-             heights already draw a wave, and a travelling phase while the
-             word is being spoken. */
-          '<span class="lgp-bar-wave" aria-hidden="true">' +
-            '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>' +
-          '</span>' +
-          '<span class="lgp-bar-sep" aria-hidden="true"></span>' +
-          '<div class="lgp-progress' + (playing ? ' running' : '') + '" role="progressbar"' +
-            ' aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"' +
-            ' aria-label="Playback">' +
-            '<div class="lgp-progress-fill" style="width:0%"></div>' +
-          '</div>' +
-        '</div>' +
         center +
+        (function () {
+          var next = words[idx + 1];
+          if (!next) {
+            return '<div class="lgp-nextup" id="lgpNextUp">' +
+              '<div class="lgp-nextup-empty">No more sessions queued' +
+                '<button type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()">Add a session</button>' +
+              '</div>' +
+            '</div>';
+          }
+          var art = next.img || th.img || '';
+          var sub = (next.organ || (next.categories && next.categories[0]) || 'Next word').toString();
+          return '<div class="lgp-nextup" id="lgpNextUp">' +
+            '<div class="lgp-nextup-item">' +
+              '<div class="lgp-nextup-art"' + (art ? ' style="background-image:url(\'' + lgpEsc(art) + '\')"' : '') + '></div>' +
+              '<div class="lgp-nextup-mid">' +
+                '<div class="lgp-nextup-eye">NEXT UP</div>' +
+                '<div class="lgp-nextup-title">' + lgpEsc(next.word || '') + '</div>' +
+                '<div class="lgp-nextup-sub">' + lgpEsc(sub) + '</div>' +
+              '</div>' +
+              '<button class="lgp-nextup-play" type="button" onclick="window.lgpPlayNext&&window.lgpPlayNext()" aria-label="Play next">' +
+                '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        })() +
         /* Sentence · Practice · Store — back at the bottom. */
         prow +
       '</div>';
