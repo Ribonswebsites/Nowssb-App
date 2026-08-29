@@ -185,7 +185,14 @@
       sessions: keys.length,
       minutes: minutes,
       timeLabel: keys.length ? lgpFmtMinutes(minutes) : '0m',
-      level: Math.max(1, Math.floor(minutes / 30) + 1)
+      level: (function () {
+        var earned = Math.max(1, Math.min(12, Math.floor(minutes / 30) + 1));
+        try {
+          var o = parseInt(localStorage.getItem('nwsb_player_level') || '', 10);
+          if (o >= 1 && o <= 12) return o;
+        } catch (e) {}
+        return earned;
+      })()
     };
   }
   function lgpUserProfile() {
@@ -198,6 +205,12 @@
     var initials = parts.map(function (p) { return p.charAt(0); }).join('').slice(0, 2).toUpperCase() || 'G';
     return { name: name, photo: photo, initials: initials };
   }
+  var _lgpLevelsOpen = false;
+  function lgpSetLevel(n) {
+    n = Math.max(1, Math.min(12, parseInt(n, 10) || 1));
+    try { localStorage.setItem('nwsb_player_level', String(n)); } catch (e) {}
+    return n;
+  }
   window.lgpPlayNext = function () {
     if (typeof pwNextWord === 'function') pwNextWord();
   };
@@ -206,7 +219,26 @@
     else if (typeof openSub === 'function') openSub('practice');
   };
   window.lgpOpenLevel = function () {
-    if (typeof openSub === 'function') openSub('profile');
+    _lgpLevelsOpen = !_lgpLevelsOpen;
+    var el = document.getElementById('lgpLevels');
+    if (!el) return;
+    if (_lgpLevelsOpen) el.removeAttribute('hidden');
+    else el.setAttribute('hidden', '');
+  };
+  window.lgpPickLevel = function (n) {
+    n = lgpSetLevel(n);
+    _lgpLevelsOpen = false;
+    var list = document.getElementById('lgpLevels');
+    if (list) {
+      list.setAttribute('hidden', '');
+      var items = list.querySelectorAll('.lgp-levels-item');
+      for (var i = 0; i < items.length; i++) {
+        if (parseInt(items[i].getAttribute('data-level'), 10) === n) items[i].classList.add('is-on');
+        else items[i].classList.remove('is-on');
+      }
+    }
+    var pill = document.querySelector('.lgp-profile-hero .lgp-level');
+    if (pill) pill.innerHTML = 'Level ' + n + ' <span aria-hidden="true">›</span>';
   };
 
 
@@ -378,15 +410,17 @@
         if (cur.parentNode) cur.parentNode.removeChild(cur); // survive the innerHTML wipe
       }
     })();
-    /* Same trick for the clip inside the tab under the picture. Its source
-       never changes, so after the first render it is always carried across
-       — otherwise every phase change reloaded it and it stuttered back to
-       frame one while you were looking at it. */
+    /* Same trick for the clip inside the tab under the picture. It now
+       plays the current word's theme video — the same clip as the box
+       above — so we only keep the element when the source still matches. */
     var _keepWaVid = null;
     (function () {
       var ex = document.getElementById('practiceBody');
       var cur = ex ? ex.querySelector('.lgp-wa-vid') : null;
-      if (cur) { _keepWaVid = cur; if (cur.parentNode) cur.parentNode.removeChild(cur); }
+      if (cur && _newVidSrc && cur.getAttribute('src') === _newVidSrc) {
+        _keepWaVid = cur;
+        if (cur.parentNode) cur.parentNode.removeChild(cur);
+      }
     })();
     var visual = th.video
       ? (_keepVid ? '<span class="lgp-video-slot"></span>'
@@ -539,8 +573,10 @@
         '<div class="lgp-pr-glass">' +
           (_keepWaVid
             ? '<span class="lgp-wa-vid-slot"></span>'
-            : '<video class="lgp-wa-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
-              ' src="./assets/video/word-acts.mp4"></video>') +
+            : (_newVidSrc
+                ? '<video class="lgp-wa-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
+                  ' src="' + _newVidSrc + '"></video>'
+                : '')) +
         '</div>' +
         '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
           '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7.5 9.5h9M7.5 12.6h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
@@ -590,9 +626,19 @@
             '<div class="lgp-id">' +
               '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
               '<div class="lgp-tagline">LISTEN · SPEAK · HEAL</div>' +
-              '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()">Level ' + st.level + ' <span aria-hidden="true">›</span></button>' +
+              '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">Level ' + st.level + ' <span aria-hidden="true">›</span></button>' +
             '</div>' +
-          '</div>';
+          '</div>' +
+          (function () {
+            var cur = st.level;
+            var items = '';
+            for (var i = 1; i <= 12; i++) {
+              items += (i > 1 ? '<span class="lgp-levels-sep" aria-hidden="true"></span>' : '') +
+                '<button class="lgp-levels-item' + (i === cur ? ' is-on' : '') + '" type="button" data-level="' + i + '"' +
+                ' onclick="window.lgpPickLevel&&window.lgpPickLevel(' + i + ')">Level ' + i + '</button>';
+            }
+            return '<div class="lgp-levels" id="lgpLevels"' + (_lgpLevelsOpen ? '' : ' hidden') + '>' + items + '</div>';
+          })();
         })() +
         /* Stats row — real streak / sessions / time from the session log. */
         (function () {
@@ -617,6 +663,7 @@
             '</div>' +
           '</div>';
         })() +
+        '<div class="lgp-visual-tab">' +
         '<div class="lgp-visual">' + visual +
           /* ONE row across the top of the panel, not two islands pinned to
              the corners. Pinned, they overlapped the moment either side got
@@ -691,6 +738,7 @@
           '</div>' +
         '</div>' +   /* end .lgp-visual-overlay */
         '</div>' +   /* end .lgp-visual */
+        '</div>' +   /* end .lgp-visual-tab */
         center +
         (function () {
           var next = words[idx + 1];

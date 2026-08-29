@@ -17,8 +17,10 @@ class PracticeProgress extends ChangeNotifier {
   static final PracticeProgress instance = PracticeProgress._();
 
   static const _storageKey = 'nwsb_native_sessions';
+  static const _levelKey = 'nwsb_player_level';
   final Map<String, Map<String, dynamic>> _sessions = {};
   bool _started = false;
+  int? _levelOverride;
 
   Future<void> start() async {
     if (_started) return;
@@ -35,6 +37,10 @@ class PracticeProgress extends ChangeNotifier {
             }
           }
         }
+      }
+      final storedLevel = preferences.getInt(_levelKey);
+      if (storedLevel != null && storedLevel >= 1 && storedLevel <= 12) {
+        _levelOverride = storedLevel;
       }
     } catch (_) {
       // The player still works if device persistence is temporarily unavailable.
@@ -87,8 +93,29 @@ class PracticeProgress extends ChangeNotifier {
     return r == 0 ? '${h}h' : '${h}h ${r}m';
   }
 
-  /// One level per 30 minutes meditated, minimum 1 — same curve as the web player.
-  int get level => (totalMinutes / 30).floor() + 1;
+  /// One level per 30 minutes meditated, minimum 1, cap 12 — same curve as the web player.
+  int get earnedLevel {
+    final value = (totalMinutes / 30).floor() + 1;
+    if (value < 1) return 1;
+    if (value > 12) return 12;
+    return value;
+  }
+
+  int get level {
+    final override = _levelOverride;
+    if (override != null && override >= 1 && override <= 12) return override;
+    return earnedLevel;
+  }
+
+  Future<void> setLevel(int value) async {
+    final next = value < 1 ? 1 : (value > 12 ? 12 : value);
+    _levelOverride = next;
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setInt(_levelKey, next);
+    } catch (_) {}
+    notifyListeners();
+  }
 
   int completedTodayFor(Iterable<Word> words) {
     final today = _day(DateTime.now());

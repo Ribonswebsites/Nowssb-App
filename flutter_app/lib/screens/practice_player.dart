@@ -138,6 +138,19 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     await _prepareAndPlay();
   }
 
+  void _openLevel() {
+    showDialog<void>(
+      context: context,
+      barrierColor: const Color(0xB8060C18),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
+        child: const _LevelList(),
+      ),
+    );
+  }
+
   void _openInfo() {
     showModalBottomSheet<void>(
       context: context,
@@ -305,7 +318,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
                   const SizedBox(height: 14),
-                  SizedBox(width: stageWidth, child: const _ProfileHeader()),
+                  SizedBox(width: stageWidth, child: _ProfileHeader(onLevel: _openLevel)),
                   const SizedBox(height: 12),
                   SizedBox(width: stageWidth, child: const _StatsRow()),
                   const SizedBox(height: 10),
@@ -355,6 +368,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                   const SizedBox(height: 18),
                   SizedBox(width: stageWidth, child: _WordActionStrip(
                     accent: theme.accent,
+                    video: theme.video,
                     onSentence: _openInfo,
                     onPractice: _prepareAndPlay,
                     onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
@@ -447,7 +461,8 @@ class _StatCell extends StatelessWidget {
 }
 
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader();
+  const _ProfileHeader({required this.onLevel});
+  final VoidCallback onLevel;
 
   @override
   Widget build(BuildContext context) {
@@ -475,18 +490,80 @@ class _ProfileHeader extends StatelessWidget {
           const SizedBox(height: 4),
           const Text('LISTEN · SPEAK · HEAL', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 9.5, fontWeight: FontWeight.w700, letterSpacing: 1.6)),
           const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color(0x1FE8D5A3),
-              borderRadius: BorderRadius.circular(99),
-              border: Border.all(color: const Color(0x66E8D5A3)),
+          GestureDetector(
+            onTap: onLevel,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0x1FE8D5A3),
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(color: const Color(0x66E8D5A3)),
+              ),
+              child: Text('Level ${progress.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700)),
             ),
-            child: Text('Level ${progress.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700)),
           ),
         ]),
       ),
     ]);
+  }
+}
+
+class _LevelList extends StatelessWidget {
+  const _LevelList();
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: PracticeProgress.instance,
+      builder: (context, _) {
+        final current = PracticeProgress.instance.level;
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360, maxHeight: 420),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: const Color(0xD1060A16),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0x38FFFFFF)),
+              boxShadow: const [
+                BoxShadow(color: Color(0x66000000), blurRadius: 28, offset: Offset(0, 12)),
+              ],
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: 12,
+              separatorBuilder: (_, __) => const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 14),
+                child: ColoredBox(color: Color(0x47FFFFFF), child: SizedBox(height: 1, width: double.infinity)),
+              ),
+              itemBuilder: (context, index) {
+                final n = index + 1;
+                final on = n == current;
+                return GestureDetector(
+                  onTap: () async {
+                    await PracticeProgress.instance.setLevel(n);
+                    if (context.mounted) Navigator.of(context).pop();
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                    child: Text(
+                      'Level $n',
+                      style: TextStyle(
+                        color: on ? const Color(0xFFE8D5A3) : Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: .4,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -589,23 +666,21 @@ class _VisualStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 1 / 1.02,
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(30),
-      child: Stack(fit: StackFit.expand, children: [
-        NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
-        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
-        Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
-        Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
-        Positioned(
-          left: 0, right: 0, bottom: 0,
-          child: _WordOverlay(
-            word: word, accent: theme.accent, playing: playing, liked: liked,
-            onReplay: onReplay, onNotes: onNotes, onLike: onLike,
-          ),
+    aspectRatio: 5 / 4,
+    child: Stack(fit: StackFit.expand, children: [
+      NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
+      const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
+      Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
+      Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
+      Positioned(
+        left: 0, right: 0, bottom: 0,
+        child: _WordOverlay(
+          word: word, accent: theme.accent, playing: playing, liked: liked,
+          onReplay: onReplay, onNotes: onNotes, onLike: onLike,
         ),
-      ]),
-    ),
+      ),
+      IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill)),
+    ]),
   );
 }
 
@@ -624,12 +699,12 @@ class _WordOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(16, 40, 16, 12),
+    padding: const EdgeInsets.fromLTRB(14, 22, 14, 8),
     decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00060A16), Color(0xA8060A16), Color(0xF0060A16)])),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
       _Equalizer(active: playing, accent: accent),
       const SizedBox(height: 6),
-      Text(word.word.toUpperCase(), textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: 6.2, height: 1.05, shadows: [Shadow(color: accent.withOpacity(.8), blurRadius: 22)])),
+      Text(word.word.toUpperCase(), textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: 5.4, height: 1.05, shadows: [Shadow(color: accent.withOpacity(.8), blurRadius: 22)])),
       if (word.deva.isNotEmpty) ...[
         const SizedBox(height: 5),
         Text(word.deva, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w600, height: 1.25)),
@@ -736,8 +811,9 @@ class _TransportTube extends StatelessWidget {
 }
 
 class _WordActionStrip extends StatelessWidget {
-  const _WordActionStrip({required this.accent, required this.onSentence, required this.onPractice, required this.onStore});
+  const _WordActionStrip({required this.accent, required this.video, required this.onSentence, required this.onPractice, required this.onStore});
   final Color accent;
+  final String video;
   final VoidCallback onSentence;
   final VoidCallback onPractice;
   final VoidCallback onStore;
@@ -746,7 +822,7 @@ class _WordActionStrip extends StatelessWidget {
   Widget build(BuildContext context) => AspectRatio(
     aspectRatio: 1371 / 317,
     child: Stack(fit: StackFit.expand, children: [
-      NwsbVideo(asset: 'assets/video/word-acts.mp4', priority: ClipPriority.decoration, autoplay: true),
+      NwsbVideo(asset: video, priority: ClipPriority.decoration, autoplay: true),
       IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill)),
       Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence),

@@ -1429,7 +1429,7 @@
   /* The waves live in the lower part of the frame and the aperture is a
      thin strip, so centring it showed the black above them. Anchored near
      the bottom of the source instead — the same crop, lifted. */
-  object-fit:cover; object-position:center 88%; display:block; pointer-events:none;
+  object-fit:cover; object-position:center; display:block; pointer-events:none;
   transform:translateZ(0); backface-visibility:hidden;
 }
 
@@ -1764,4 +1764,68 @@
   background:#fff; color:#0a0a12;
   box-shadow:0 0 0 3px rgba(255,255,255,.12), 0 6px 16px rgba(0,0,0,.3);
 }
+
+/* ── Compact tab-framed visual (same chrome as Sentence · Practice · Store) ── */
+.lgp .lgp-visual-tab {
+  position:relative;
+  width:100%; max-width:360px;
+  margin:8px auto 0;
+  aspect-ratio:5/4;
+  max-height:32vh;
+  flex-shrink:0;
+  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
+  border-radius:10px !important;
+}
+.lgp .lgp-visual-tab::before {
+  content:''; position:absolute;
+  left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
+  background:#000; border-radius:6px !important; z-index:0;
+}
+.lgp .lgp-visual-tab .lgp-visual {
+  position:absolute;
+  left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
+  width:auto; height:auto; max-width:none; max-height:none;
+  margin:0; aspect-ratio:auto;
+  border-radius:6px !important;
+  border:none;
+  background:#000;
+}
+.lgp .lgp-visual-tab .lgp-video,
+.lgp .lgp-visual-tab .lgp-video-fallback {
+  border-radius:6px !important;
+}
+.lgp .lgp-visual-tab .lgp-visual-overlay {
+  padding:18px 12px 8px;
+}
+.lgp .lgp-visual-tab .lgp-title { font-size:26px; letter-spacing:.18em; }
+.lgp .lgp-visual-tab .lgp-acts { margin-top:8px; }
+
+/* Level 1–12 glass list — black glass, white type, hairlines like Replay · Notes · Like */
+.lgp .lgp-levels {
+  width:100%; max-width:360px;
+  margin:8px auto 0; flex-shrink:0;
+  display:flex; flex-direction:column;
+  max-height:min(42vh, 380px); overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  background:rgba(6,10,22,.82);
+  -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:22px !important;
+  box-shadow:0 12px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.lgp .lgp-levels[hidden] { display:none !important; }
+.lgp .lgp-levels-item {
+  width:100%; min-height:38px;
+  padding:10px 18px;
+  border:none !important; background:transparent; cursor:pointer;
+  color:#fff; font-size:14px; font-weight:700; letter-spacing:.04em;
+  text-align:left; font-family:inherit;
+}
+.lgp .lgp-levels-item.is-on { color:#e8d5a3; }
+.lgp .lgp-levels-item:active { background:rgba(255,255,255,.06); }
+.lgp .lgp-levels-sep {
+  display:block; width:calc(100% - 28px); height:1px; margin:0 14px;
+  background:rgba(255,255,255,.28); flex-shrink:0;
+}
+
 
