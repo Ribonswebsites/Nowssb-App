@@ -43,7 +43,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   var _liked = false;
   var _loop = false;
   var _volume = 1.0;
-  var _railsVisible = true;
   String? _error;
 
   Word get _word => widget.words[_index];
@@ -305,7 +304,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 14),
+                  SizedBox(width: stageWidth, child: const _ProfileHeader()),
+                  const SizedBox(height: 12),
                   SizedBox(width: stageWidth, child: const _StatsRow()),
                   const SizedBox(height: 10),
                   SizedBox(width: stageWidth, child: _VisualStage(
@@ -313,13 +314,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     theme: theme,
                     playing: _playing,
                     liked: _liked,
-                    railsVisible: _railsVisible,
                     volume: _volume,
                     onInfo: _openInfo,
                     onReplay: _prepareAndPlay,
                     onNotes: _openNotes,
                     onLike: _toggleLike,
-                    onToggleRails: () => setState(() => _railsVisible = !_railsVisible),
                     onVolumeChanged: (volume) async {
                       setState(() => _volume = volume);
                       await _tts.setVolume(volume);
@@ -453,32 +452,37 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = PracticeProgress.instance;
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
       Container(
-        width: 40,
-        height: 40,
-        decoration: const BoxDecoration(
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8E8F5)]),
+          gradient: const LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8E8F5)]),
+          border: Border.all(color: const Color(0xB3E8D5A3), width: 2),
+          boxShadow: const [
+            BoxShadow(color: Color(0x6BE8D5A3), blurRadius: 22),
+            BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 8)),
+          ],
         ),
         alignment: Alignment.center,
-        child: const Text('H', style: TextStyle(color: Color(0xFF0A0A12), fontSize: 14, fontWeight: FontWeight.w800)),
+        child: const Text('H', style: TextStyle(color: Color(0xFF0A0A12), fontSize: 22, fontWeight: FontWeight.w800)),
       ),
-      const SizedBox(width: 9),
+      const SizedBox(width: 14),
       Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Healer', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          const Text('LISTEN · SPEAK · HEAL', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 8, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
-          const SizedBox(height: 6),
+          const Text('Healer', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700, height: 1.15)),
+          const SizedBox(height: 4),
+          const Text('LISTEN · SPEAK · HEAL', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 9.5, fontWeight: FontWeight.w700, letterSpacing: 1.6)),
+          const SizedBox(height: 10),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
               color: const Color(0x1FE8D5A3),
               borderRadius: BorderRadius.circular(99),
-              border: Border.all(color: const Color(0x59E8D5A3)),
+              border: Border.all(color: const Color(0x66E8D5A3)),
             ),
-            child: Text('Level ${progress.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 10, fontWeight: FontWeight.w700)),
+            child: Text('Level ${progress.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700)),
           ),
         ]),
       ),
@@ -567,22 +571,20 @@ class _NextUpCard extends StatelessWidget {
 class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word, required this.theme, required this.playing, required this.liked,
-    required this.railsVisible, required this.volume, required this.onInfo,
+    required this.volume, required this.onInfo,
     required this.onReplay, required this.onNotes, required this.onLike,
-    required this.onToggleRails, required this.onVolumeChanged,
+    required this.onVolumeChanged,
   });
 
   final Word word;
   final _PlayerTheme theme;
   final bool playing;
   final bool liked;
-  final bool railsVisible;
   final double volume;
   final VoidCallback onInfo;
   final VoidCallback onReplay;
   final VoidCallback onNotes;
   final VoidCallback onLike;
-  final VoidCallback onToggleRails;
   final ValueChanged<double> onVolumeChanged;
 
   @override
@@ -593,39 +595,36 @@ class _VisualStage extends StatelessWidget {
       child: Stack(fit: StackFit.expand, children: [
         NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
         const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
-        Positioned(top: 10, left: 10, right: 10, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Expanded(child: _ProfileHeader()),
-          const SizedBox(width: 6),
-          Row(children: [
-            const _InfoPill(),
-            const SizedBox(width: 6),
-            _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36),
-          ]),
-        ])),
-        if (railsVisible) ...[
-          Positioned(left: 10, top: 78, child: _GlassRail(children: [
-            _RailButton(icon: Icons.replay_rounded, onTap: onReplay),
-            _RailButton(icon: Icons.description_outlined, onTap: onNotes),
-            _RailButton(icon: liked ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: liked ? theme.accent : Colors.white, onTap: onLike),
-          ])),
-          Positioned(right: 10, top: 78, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
-        ],
-        Positioned(right: 10, top: railsVisible ? 168 : 78, child: _RoundIconButton(icon: Icons.tune_rounded, onTap: onToggleRails, size: 34)),
-        Positioned(left: 0, right: 0, bottom: 0, child: _WordOverlay(word: word, accent: theme.accent, playing: playing)),
+        Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
+        Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
+        Positioned(
+          left: 0, right: 0, bottom: 0,
+          child: _WordOverlay(
+            word: word, accent: theme.accent, playing: playing, liked: liked,
+            onReplay: onReplay, onNotes: onNotes, onLike: onLike,
+          ),
+        ),
       ]),
     ),
   );
 }
 
 class _WordOverlay extends StatelessWidget {
-  const _WordOverlay({required this.word, required this.accent, required this.playing});
+  const _WordOverlay({
+    required this.word, required this.accent, required this.playing,
+    required this.liked, required this.onReplay, required this.onNotes, required this.onLike,
+  });
   final Word word;
   final Color accent;
   final bool playing;
+  final bool liked;
+  final VoidCallback onReplay;
+  final VoidCallback onNotes;
+  final VoidCallback onLike;
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(56, 28, 56, 34),
+    padding: const EdgeInsets.fromLTRB(16, 40, 16, 12),
     decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00060A16), Color(0xA8060A16), Color(0xF0060A16)])),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
       _Equalizer(active: playing, accent: accent),
@@ -643,7 +642,39 @@ class _WordOverlay extends StatelessWidget {
         const SizedBox(height: 12),
         Text(word.organ.toUpperCase(), style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 3.6)),
       ],
+      const SizedBox(height: 12),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        decoration: BoxDecoration(
+          color: const Color(0x8C060A16),
+          borderRadius: BorderRadius.circular(99),
+          border: Border.all(color: const Color(0x38FFFFFF)),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          _ActBtn(icon: Icons.replay_rounded, onTap: onReplay),
+          Container(width: 1, height: 16, color: const Color(0x59FFFFFF)),
+          _ActBtn(icon: Icons.description_outlined, onTap: onNotes),
+          Container(width: 1, height: 16, color: const Color(0x59FFFFFF)),
+          _ActBtn(icon: liked ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: liked ? accent : Colors.white, onTap: onLike),
+        ]),
+      ),
     ]),
+  );
+}
+
+class _ActBtn extends StatelessWidget {
+  const _ActBtn({required this.icon, required this.onTap, this.color});
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: onTap,
+    child: SizedBox(
+      width: 40, height: 40,
+      child: Icon(icon, color: color ?? Colors.white, size: 20),
+    ),
   );
 }
 
@@ -677,34 +708,29 @@ class _TransportTube extends StatelessWidget {
   final VoidCallback onReplay;
 
   @override
-  Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 352 / 86,
-    child: Stack(alignment: Alignment.center, children: [
-      Positioned.fill(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(46),
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xE8FFFFFF), Color(0xCCD8D2D2), Color(0xD66F6D70)],
-              stops: [0, .26, 1],
-            ),
-            border: Border.all(color: const Color(0xCCFFFFFF), width: 1.2),
-            boxShadow: const [
-              BoxShadow(color: Color(0x44000000), blurRadius: 14, offset: Offset(0, 7)),
-              BoxShadow(color: Color(0x55FFFFFF), blurRadius: 8, offset: Offset(0, -2)),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      _ImageControl(asset: 'assets/player/lgp-prev.png', label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 48),
+      const SizedBox(width: 18),
+      GestureDetector(
+        onTap: onPlay,
+        child: Container(
+          width: 74,
+          height: 74,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(color: Color(0x66000000), blurRadius: 22, offset: Offset(0, 8)),
+              BoxShadow(color: Color(0x24FFFFFF), blurRadius: 0, spreadRadius: 5),
             ],
           ),
+          child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, color: const Color(0xFF0A0A12), size: 36),
         ),
       ),
-      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        _ImageControl(asset: 'assets/player/lgp-library.png', label: 'Library', onTap: onLibrary, size: 45),
-        _ImageControl(asset: 'assets/player/lgp-prev.png', label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 45),
-        _ImageControl(asset: playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png', label: playing ? 'Pause' : 'Play', onTap: onPlay, size: 63),
-        _ImageControl(asset: 'assets/player/lgp-next.png', label: 'Next', onTap: hasNext ? onNext : null, size: 45),
-        _ImageControl(asset: 'assets/player/lgp-replay.png', label: 'Replay', onTap: onReplay, size: 45),
-      ]),
+      const SizedBox(width: 18),
+      _ImageControl(asset: 'assets/player/lgp-next.png', label: 'Next', onTap: hasNext ? onNext : null, size: 48),
     ]),
   );
 }

@@ -1658,4 +1658,110 @@
   border-radius:999px !important; padding:6px 14px; font-size:11px; cursor:pointer;
 }
 
-.lgp .lgp-visual-top { align-items:flex-start; }
+.lgp .lgp-visual-top { align-items:flex-start; justify-content:flex-end; }
+
+/* ── Image 2 layout: big profile, acts under organ, white circular play ── */
+.lgp .lgp-profile-hero {
+  width:100%; max-width:360px; margin:14px auto 0; flex-shrink:0;
+  display:flex; align-items:center; gap:14px;
+  padding:2px 4px 2px 2px;
+}
+.lgp .lgp-profile-hero .lgp-avatar {
+  width:72px; height:72px; border-radius:50% !important; flex-shrink:0;
+  background:linear-gradient(135deg, #e8d5a3, #c8e8f5);
+  color:#0a0a12; display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  border:2px solid rgba(232,213,163,.7);
+  box-shadow:0 0 22px rgba(232,213,163,.42), 0 8px 22px rgba(0,0,0,.4);
+}
+.lgp .lgp-profile-hero .lgp-avatar-init { font-size:22px; font-weight:800; letter-spacing:.04em; }
+.lgp .lgp-profile-hero .lgp-id { min-width:0; flex:1; }
+.lgp .lgp-profile-hero .lgp-uname {
+  font-size:22px; font-weight:700; color:#fff; line-height:1.15;
+  letter-spacing:-.02em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.lgp .lgp-profile-hero .lgp-tagline {
+  margin-top:4px; font-size:9.5px; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:rgba(255,255,255,.55);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.lgp .lgp-profile-hero .lgp-level {
+  margin-top:10px; display:inline-flex; align-items:center; gap:4px;
+  height:26px; padding:0 12px; border-radius:999px !important; cursor:pointer;
+  font-size:12px; font-weight:700; color:#e8d5a3;
+  background:rgba(232,213,163,.12);
+  border:1px solid rgba(232,213,163,.4);
+  box-shadow:0 0 12px rgba(232,213,163,.28);
+}
+.lgp .lgp-stats { margin-top:12px; }
+
+/* Title block sits higher so the action bar has room under the organ */
+.lgp .lgp-visual-overlay {
+  padding:40px 16px 12px;
+}
+.lgp .lgp-wordblock { padding-bottom:0; }
+
+.lgp .lgp-acts {
+  margin-top:12px;
+  display:flex; align-items:center; justify-content:center; gap:2px;
+  padding:5px 8px;
+  border-radius:999px !important;
+  background:rgba(6,10,22,.55);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2);
+  pointer-events:auto;
+}
+.lgp .lgp-acts .lgp-wa {
+  width:40px !important; height:40px !important;
+  min-width:40px !important; min-height:40px !important;
+  border:none !important; background:none !important; color:#fff !important;
+  display:flex !important; align-items:center; justify-content:center; cursor:pointer;
+  border-radius:50% !important; padding:0;
+}
+.lgp .lgp-acts .lgp-wa svg { width:20px; height:20px; display:block; }
+.lgp .lgp-acts .lgp-wa:active { transform:scale(.92); }
+.lgp .lgp-acts .lgp-like svg { fill:none; stroke:currentColor; stroke-width:1.7; stroke-linejoin:round; }
+.lgp .lgp-acts .lgp-like.liked { color:var(--lg-accent,#e8d5a3); }
+.lgp .lgp-acts .lgp-like.liked svg { fill:currentColor; }
+.lgp .lgp-acts .lgp-wa-sep {
+  width:1px; height:16px; background:rgba(255,255,255,.35); flex-shrink:0;
+}
+
+/* White circular play — not the oval glass capsule */
+.lgp .lgp-tube-round {
+  background:none !important;
+  filter:none !important;
+  min-height:0 !important;
+  padding:8px 0 !important;
+  max-width:280px;
+  margin-top:10px;
+}
+.lgp .lgp-tube-round::before { display:none !important; }
+.lgp .lgp-tube-round .lgp-controls { justify-content:center; gap:18px; }
+.lgp .lgp-tube-round .lgp-transport { display:flex; align-items:center; justify-content:center; gap:18px; }
+.lgp .lgp-tube-round .lgp-play {
+  width:74px !important; height:74px !important;
+  border-radius:50% !important;
+  background:#fff !important;
+  color:#0a0a12;
+  box-shadow:0 10px 28px rgba(0,0,0,.4), 0 0 0 5px rgba(255,255,255,.14);
+  display:flex; align-items:center; justify-content:center;
+}
+.lgp .lgp-tube-round .lgp-play .lgp-img { display:none !important; }
+.lgp .lgp-play-svg {
+  width:28px; height:28px; display:block; fill:#0a0a12;
+  margin-left:2px;
+}
+.lgp .lgp-play.playing .lgp-play-svg { margin-left:0; }
+.lgp .lgp-tube-round .lgp-ctrl {
+  width:52px; height:52px; border-radius:50% !important;
+}
+
+/* Next Up sits directly under the circular play */
+.lgp .lgp-nextup { margin-top:10px; }
+.lgp .lgp-nextup-play {
+  background:#fff; color:#0a0a12;
+  box-shadow:0 0 0 3px rgba(255,255,255,.12), 0 6px 16px rgba(0,0,0,.3);
+}
+

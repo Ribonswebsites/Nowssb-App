@@ -352,7 +352,9 @@
     /* render every icon as a background-image SPAN (never an <img>) so the
        browser can't open/zoom it on tap and taps always hit the button */
     function bgi(cls, url) { return '<span class="' + cls + '" style="background-image:url(\'' + url + '\')"></span>'; }
-    var playIco = bgi('lgp-img', playing ? IC.pause : IC.play);
+    var playIco = playing
+      ? '<svg class="lgp-play-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg>'
+      : '<svg class="lgp-play-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2v13.6l11-6.8z"/></svg>';
     var prevSvg = bgi('lgp-img', IC.prev);
     var nextSvg = bgi('lgp-img', IC.next);
 
@@ -399,15 +401,13 @@
              already, and the bars beside the bar say when it is playing.
              The id stays on a hidden node — other code writes to it. */
           '<div class="lgp-status" id="spAutoStatus" hidden></div>' +
-          '<div class="lgp-tube">' +
+          '<div class="lgp-tube lgp-tube-round">' +
             '<div class="lgp-controls">' +
-              libBtn +
               '<div class="lgp-transport">' +
                 '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
                 '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" onclick="pwTogglePlay&&pwTogglePlay()">' + playIco + '</button>' +
                 '<button class="lgp-ctrl" id="lgpNext" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
               '</div>' +
-              replayBtn +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -578,6 +578,22 @@
             '</button>' +
           '</div>' +
         '</div>' +
+        /* Big profile — Image 2 layout: avatar + name + tagline + level, OUTSIDE the video. */
+        (function () {
+          var p = lgpUserProfile();
+          var st = lgpSessionStats();
+          var av = p.photo
+            ? '<img class="lgp-avatar-img" src="' + lgpEsc(p.photo) + '" alt="">'
+            : '<span class="lgp-avatar-init">' + lgpEsc(p.initials) + '</span>';
+          return '<div class="lgp-profile lgp-profile-hero">' +
+            '<div class="lgp-avatar" aria-hidden="true">' + av + '</div>' +
+            '<div class="lgp-id">' +
+              '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
+              '<div class="lgp-tagline">LISTEN · SPEAK · HEAL</div>' +
+              '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()">Level ' + st.level + ' <span aria-hidden="true">›</span></button>' +
+            '</div>' +
+          '</div>';
+        })() +
         /* Stats row — real streak / sessions / time from the session log. */
         (function () {
           var st = lgpSessionStats();
@@ -608,21 +624,6 @@
              the ritual is the only thing that can shrink, and it ellipsises
              instead of running under the bars. */
           '<div class="lgp-visual-top">' +
-            (function () {
-              var p = lgpUserProfile();
-              var st = lgpSessionStats();
-              var av = p.photo
-                ? '<img class="lgp-avatar-img" src="' + lgpEsc(p.photo) + '" alt="">'
-                : '<span class="lgp-avatar-init">' + lgpEsc(p.initials) + '</span>';
-              return '<div class="lgp-profile">' +
-                '<div class="lgp-avatar" aria-hidden="true">' + av + '</div>' +
-                '<div class="lgp-id">' +
-                  '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
-                  '<div class="lgp-tagline">LISTEN · SPEAK · HEAL</div>' +
-                  '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()">Level ' + st.level + ' <span aria-hidden="true">›</span></button>' +
-                '</div>' +
-              '</div>';
-            })() +
             '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
@@ -630,11 +631,41 @@
             '</button>' +
             '</div>' +
           '</div>' +
-          /* ── The two rails, inside the picture ──
-             Replay · Notes · Like stand in a vertical pill down the left;
-             the volume runs down the right. Both fold away behind the
-             toggle under the volume, and that choice is remembered. */
-          '<div class="lgp-rail lgp-rail-l">' +
+          /* Volume stays on the right. Replay / Notes / Like moved under the organ. */
+          /* The volume is a speaker until you press it. The slider is what
+             it opens into, and it stays open until you press it again. */
+          '<div class="lgp-rail lgp-rail-r' + (lgpVolOpen() ? ' vol-open' : '') + '" id="lgpVolRail">' +
+            '<div class="lgp-vol-wrap">' +
+              '<span class="lgp-vol-val" id="lgpVolVal">' + Math.round(lgpVolume() * 100) + '</span>' +
+              '<div class="lgp-vol" id="lgpVol" role="slider" tabindex="0"' +
+                ' aria-label="Volume" aria-valuemin="0" aria-valuemax="100"' +
+                ' aria-valuenow="' + Math.round(lgpVolume() * 100) + '">' +
+                '<span class="lgp-vol-fill" id="lgpVolFill" style="height:' + (lgpVolume() * 100) + '%"></span>' +
+              '</div>' +
+            '</div>' +
+            '<button class="lgp-vol-btn" id="lgpVolBtn" type="button"' +
+              ' onclick="window.lgpToggleVol&&window.lgpToggleVol()"' +
+              ' aria-expanded="' + (lgpVolOpen() ? 'true' : 'false') + '" aria-label="Volume">' +
+              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+                '<path d="M4 9.2h3.4L12 5.2v13.6L7.4 14.8H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
+                '<path class="lgp-vol-w1" d="M15.6 9.4a3.6 3.6 0 0 1 0 5.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+                '<path class="lgp-vol-w2" d="M18.2 7a7.2 7.2 0 0 1 0 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+                '<path class="lgp-vol-mute" d="M16 9.5l5 5M21 9.5l-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
+              '</svg>' +
+            '</button>' +
+          '</div>' +
+        /* The bottom of the picture: the word. */
+        '<div class="lgp-visual-overlay">' +
+        '<div class="lgp-wordblock">' +
+          '<span class="lgp-eq lgp-eq-title" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' +
+          '<div class="lgp-title">' + (w.word || '') + '</div>' +
+            /* The word as it is actually written. The roman title above is
+               the reading aid, not the word. */
+          (w.deva ? '<div class="lgp-deva nwsb-deva">' + _e(w.deva) + '</div>' : '') +
+          '<div class="lgp-syls">' + syl + '</div>' +
+          '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
+        '</div>' +
+          '<div class="lgp-acts">' +
             '<button class="lgp-wa lgp-wa-replay" type="button"' +
               ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
               '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
@@ -658,50 +689,6 @@
               '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
             '</button>' +
           '</div>' +
-          /* The volume is a speaker until you press it. The slider is what
-             it opens into, and it stays open until you press it again. */
-          '<div class="lgp-rail lgp-rail-r' + (lgpVolOpen() ? ' vol-open' : '') + '" id="lgpVolRail">' +
-            '<div class="lgp-vol-wrap">' +
-              '<span class="lgp-vol-val" id="lgpVolVal">' + Math.round(lgpVolume() * 100) + '</span>' +
-              '<div class="lgp-vol" id="lgpVol" role="slider" tabindex="0"' +
-                ' aria-label="Volume" aria-valuemin="0" aria-valuemax="100"' +
-                ' aria-valuenow="' + Math.round(lgpVolume() * 100) + '">' +
-                '<span class="lgp-vol-fill" id="lgpVolFill" style="height:' + (lgpVolume() * 100) + '%"></span>' +
-              '</div>' +
-            '</div>' +
-            '<button class="lgp-vol-btn" id="lgpVolBtn" type="button"' +
-              ' onclick="window.lgpToggleVol&&window.lgpToggleVol()"' +
-              ' aria-expanded="' + (lgpVolOpen() ? 'true' : 'false') + '" aria-label="Volume">' +
-              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-                '<path d="M4 9.2h3.4L12 5.2v13.6L7.4 14.8H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
-                '<path class="lgp-vol-w1" d="M15.6 9.4a3.6 3.6 0 0 1 0 5.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
-                '<path class="lgp-vol-w2" d="M18.2 7a7.2 7.2 0 0 1 0 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
-                '<path class="lgp-vol-mute" d="M16 9.5l5 5M21 9.5l-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
-              '</svg>' +
-            '</button>' +
-          '</div>' +
-          /* Fold both away. The picture is the thing; some of the time you
-             want to see it with nothing on top of it. */
-          '<button class="lgp-rail-toggle" id="lgpRailToggle" type="button"' +
-            ' onclick="window.lgpToggleRails&&window.lgpToggleRails()"' +
-            ' aria-label="Hide the controls">' +
-            '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-              '<path d="M4 8h10M18 8h2M4 16h4M12 16h8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>' +
-              '<circle cx="16" cy="8" r="2.1" stroke="currentColor" stroke-width="1.9"/>' +
-              '<circle cx="10" cy="16" r="2.1" stroke="currentColor" stroke-width="1.9"/>' +
-            '</svg>' +
-          '</button>' +
-        /* The bottom of the picture: the word. */
-        '<div class="lgp-visual-overlay">' +
-        '<div class="lgp-wordblock">' +
-          '<span class="lgp-eq lgp-eq-title" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' +
-          '<div class="lgp-title">' + (w.word || '') + '</div>' +
-            /* The word as it is actually written. The roman title above is
-               the reading aid, not the word. */
-          (w.deva ? '<div class="lgp-deva nwsb-deva">' + _e(w.deva) + '</div>' : '') +
-          '<div class="lgp-syls">' + syl + '</div>' +
-          '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
-        '</div>' +
         '</div>' +   /* end .lgp-visual-overlay */
         '</div>' +   /* end .lgp-visual */
         center +
