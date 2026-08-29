@@ -121,8 +121,8 @@
   /* ── Real stats / profile / next-up (from actual session logs, never fake) ── */
   function lgpEsc(s) {
     return String(s == null ? '' : s)
-      .replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
-      .replace(/"/g, '"').replace(/'/g, '&#39;');
+      .replace(/&/g, '\x26amp;').replace(/</g, '\x26lt;').replace(/>/g, '\x26gt;')
+      .replace(/"/g, '\x26quot;').replace(/'/g, '\x26#39;');
   }
   function lgpFmtMinutes(totalMinutes) {
     var m = Math.max(0, Math.round(totalMinutes || 0));
