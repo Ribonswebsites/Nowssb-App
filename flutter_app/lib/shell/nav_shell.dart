@@ -212,6 +212,7 @@ class _NavShellState extends State<NavShell> {
               ),
             ),
           ),
+          ),
         ],
       ),
     );
