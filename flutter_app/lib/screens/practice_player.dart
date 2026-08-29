@@ -785,9 +785,9 @@ class _PlayerTheme {
 }
 
 const _playerThemes = <_PlayerTheme>[
-  _PlayerTheme(image: 'assets/player/liquid-splash.webp', video: 'assets/video/player-liquid-splash.mp4', accent: Color(0xFFFFCF4D)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'assets/videos/3628088cee108d9e_grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
+  // The former third visual is now the first/default look for a session.
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg', video: 'assets/videos/31cbc323e2d03dbb_grok_video_2026-06-28-19-55-09_otgbxd.mp4', accent: Color(0xFF9BB8FF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'assets/videos/3628088cee108d9e_grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg', video: 'assets/videos/f36df7528f8d741b_grok_video_2026-06-28-19-55-02_of5fwh.mp4', accent: Color(0xFFBD7BFF)),
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg', video: 'assets/videos/9207084d44a79e06_grok_video_2026-06-28-19-54-43_it2bur.mp4', accent: Color(0xFFA6DCFF)),
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg', video: 'assets/videos/874f8fcfb0e6ea6d_grok_video_2026-06-30-10-29-43_hzxyun.mp4', accent: Color(0xFFB9A6FF)),
