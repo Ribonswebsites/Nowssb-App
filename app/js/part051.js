@@ -205,10 +205,10 @@
     } catch (err) {}
   }, true);
 
-  /* Website/WebView requirement: every decorative video stays mounted and loops.
-     Do not cap playback by viewport; a capped decoder set makes banners appear as
-     black boxes when a Store screen opens over the Home. */
-  var MAX_PLAYING = Number.MAX_SAFE_INTEGER;
+  /* WebView and mobile browsers become unstable when many H.264 decoders run
+     at once. Keep the visible page responsive while allowing the key background
+     film plus a few nearby clips to play. */
+  var MAX_PLAYING = 4;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();
   var shownCache = new WeakMap();   // element -> boolean, cleared on class changes
@@ -434,8 +434,23 @@
       v.setAttribute(MARK, '1');
       tracked.push(v);
       if (io) io.observe(v);
-      /* Keep the source mounted. The website/WebView surfaces require every
-         decorative clip to remain available and loop simultaneously. */
+      /* Mount only clips near the viewport. Releasing the src from distant
+         videos is the important memory fix: an idle video must not retain a
+         demuxer, frame buffer, and decoder in WebView. */
+      if (mountIo && manageable(v)) {
+        var initialSrc = v.getAttribute('src');
+        if (initialSrc && !v.getAttribute(STASH)) {
+          v.setAttribute(STASH, initialSrc);
+          poster(v);
+          if (!near.has(v)) {
+            mine = true;
+            v.removeAttribute('src');
+            mine = false;
+            try { v.load(); } catch (e) {}
+          }
+        }
+        mountIo.observe(v);
+      }
       if (srcWatch) srcWatch.observe(v, { attributes: true, attributeFilter: ['src'] });
     });
   }
@@ -488,11 +503,14 @@
     var play = live.slice(0, MAX_PLAYING);
     var playSet = new Set(play);
     tracked.forEach(function (v) {
-      if (playSet.has(v)) {
-        if (v.paused && !v.classList.contains('lgp-video')) {
-          autoPaused.delete(v);
-          var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
-        }
+      if (!playSet.has(v)) {
+        if (!v.paused) { try { v.pause(); } catch (e) {} autoPaused.add(v); }
+        return;
+      }
+      if (manageable(v) && near.has(v)) mount(v);
+      if (v.paused && !v.classList.contains('lgp-video')) {
+        autoPaused.delete(v);
+        var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
       }
     });
   }
