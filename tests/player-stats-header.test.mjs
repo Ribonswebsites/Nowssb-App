@@ -38,3 +38,14 @@ test('Flutter player matches the web stats / profile / next-up surgery', () => {
   assert.match(progress, /totalMinutes/);
   assert.match(progress, /int get level/);
 });
+
+test('Website and WebView cache-bust pins the rebuilt player, not the old files', () => {
+  const html = read('index.html');
+  const sw = read('sw.js');
+  assert.match(html, /nowssb-player\.css\?v=217/);
+  assert.match(html, /nowssb-player\.js\?v=310/);
+  assert.doesNotMatch(html, /nowssb-player\.css\?v=216/);
+  assert.doesNotMatch(html, /nowssb-player\.js\?v=309/);
+  assert.match(sw, /nowsbansiu-v953/);
+  assert.doesNotMatch(sw, /nowsbansiu-v952/);
+});
