@@ -643,7 +643,7 @@
         /* Stats row — real streak / sessions / time from the session log. */
         (function () {
           var st = lgpSessionStats();
-          return '<div class="lgp-stats" id="lgpStats">' +
+          return '<div class="lgp-stats-tab"><div class="lgp-stats" id="lgpStats">' +
             '<div class="lgp-stat">' +
               '<svg class="lgp-stat-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3s4 4.2 4 8a4 4 0 1 1-8 0c0-2.4 1.6-4.6 4-8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.6 14.5c.6 1.8 2 3 3.9 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
               '<div class="lgp-stat-num" id="lgpStatStreak">' + st.streak + '</div>' +
@@ -661,9 +661,8 @@
               '<div class="lgp-stat-num" id="lgpStatTime">' + st.timeLabel + '</div>' +
               '<div class="lgp-stat-lbl">Time Meditated</div>' +
             '</div>' +
-          '</div>';
+          '</div></div>';
         })() +
-        '<div class="lgp-visual-tab">' +
         '<div class="lgp-visual">' + visual +
           /* ONE row across the top of the panel, not two islands pinned to
              the corners. Pinned, they overlapped the moment either side got
@@ -738,7 +737,6 @@
           '</div>' +
         '</div>' +   /* end .lgp-visual-overlay */
         '</div>' +   /* end .lgp-visual */
-        '</div>' +   /* end .lgp-visual-tab */
         center +
         (function () {
           var next = words[idx + 1];

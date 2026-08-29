@@ -422,19 +422,21 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = PracticeProgress.instance;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0x14FFFFFF),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x1FFFFFFF)),
-      ),
-      child: Row(children: [
-        _StatCell(icon: Icons.local_fire_department_outlined, value: '${progress.streak}', label: 'Days Streak'),
-        _statDivider(),
-        _StatCell(icon: Icons.graphic_eq_rounded, value: '${progress.totalSessions}', label: 'Sessions'),
-        _statDivider(),
-        _StatCell(icon: Icons.schedule_rounded, value: progress.timeLabel, label: 'Time Meditated'),
+    return AspectRatio(
+      aspectRatio: 1371 / 317,
+      child: Stack(fit: StackFit.expand, children: [
+        const ColoredBox(color: Colors.black),
+        IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill)),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+          child: Row(children: [
+            _StatCell(icon: Icons.local_fire_department_outlined, value: '${progress.streak}', label: 'Days Streak'),
+            _statDivider(),
+            _StatCell(icon: Icons.graphic_eq_rounded, value: '${progress.totalSessions}', label: 'Sessions'),
+            _statDivider(),
+            _StatCell(icon: Icons.schedule_rounded, value: progress.timeLabel, label: 'Time Meditated'),
+          ]),
+        ),
       ]),
     );
   }
@@ -666,21 +668,23 @@ class _VisualStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 5 / 4,
-    child: Stack(fit: StackFit.expand, children: [
-      NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
-      const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
-      Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
-      Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
-      Positioned(
-        left: 0, right: 0, bottom: 0,
-        child: _WordOverlay(
-          word: word, accent: theme.accent, playing: playing, liked: liked,
-          onReplay: onReplay, onNotes: onNotes, onLike: onLike,
+    aspectRatio: 1 / 0.92,
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: Stack(fit: StackFit.expand, children: [
+        NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
+        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
+        Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
+        Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
+        Positioned(
+          left: 0, right: 0, bottom: 0,
+          child: _WordOverlay(
+            word: word, accent: theme.accent, playing: playing, liked: liked,
+            onReplay: onReplay, onNotes: onNotes, onLike: onLike,
+          ),
         ),
-      ),
-      IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill)),
-    ]),
+      ]),
+    ),
   );
 }
 
@@ -699,12 +703,12 @@ class _WordOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(14, 22, 14, 8),
+    padding: const EdgeInsets.fromLTRB(16, 36, 16, 12),
     decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00060A16), Color(0xA8060A16), Color(0xF0060A16)])),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
       _Equalizer(active: playing, accent: accent),
       const SizedBox(height: 6),
-      Text(word.word.toUpperCase(), textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: 5.4, height: 1.05, shadows: [Shadow(color: accent.withOpacity(.8), blurRadius: 22)])),
+      Text(word.word.toUpperCase(), textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: 6.2, height: 1.05, shadows: [Shadow(color: accent.withOpacity(.8), blurRadius: 22)])),
       if (word.deva.isNotEmpty) ...[
         const SizedBox(height: 5),
         Text(word.deva, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w600, height: 1.25)),

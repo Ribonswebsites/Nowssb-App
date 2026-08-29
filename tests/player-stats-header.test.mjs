@@ -42,12 +42,12 @@ test('Flutter player matches the web stats / profile / next-up surgery', () => {
 test('Website and WebView cache-bust pins the rebuilt player, not the old files', () => {
   const html = read('index.html');
   const sw = read('sw.js');
-  assert.match(html, /nowssb-player\.css\?v=219/);
-  assert.match(html, /nowssb-player\.js\?v=312/);
-  assert.doesNotMatch(html, /nowssb-player\.css\?v=218/);
-  assert.doesNotMatch(html, /nowssb-player\.js\?v=311/);
-  assert.match(sw, /nowsbansiu-v955/);
-  assert.doesNotMatch(sw, /nowsbansiu-v954/);
+  assert.match(html, /nowssb-player\.css\?v=220/);
+  assert.match(html, /nowssb-player\.js\?v=313/);
+  assert.doesNotMatch(html, /nowssb-player\.css\?v=219/);
+  assert.doesNotMatch(html, /nowssb-player\.js\?v=312/);
+  assert.match(sw, /nowsbansiu-v956/);
+  assert.doesNotMatch(sw, /nowsbansiu-v955/);
 });
 
 test('Profile is a big Image-2 header outside the video, play is a white circle', () => {
@@ -62,16 +62,18 @@ test('Profile is a big Image-2 header outside the video, play is a white circle'
   assert.match(css, /background:#fff !important/);
 });
 
-test('Level opens a 1–12 glass list; bottom tab uses the theme video; visual is a compact tab', () => {
+test('Level opens a 1–12 glass list; stats sit in the tab; video is a glass box', () => {
   const js = read('nowssb-player.js');
   const css = read('nowssb-player.css');
   assert.match(js, /lgpPickLevel/);
   assert.match(js, /lgp-levels/);
   assert.match(js, /nwsb_player_level/);
-  assert.match(js, /lgp-visual-tab/);
+  assert.match(js, /lgp-stats-tab/);
+  assert.doesNotMatch(js, /lgp-visual-tab/);
   assert.doesNotMatch(js, /src="\.\/assets\/video\/word-acts\.mp4"/);
   assert.match(js, /class="lgp-wa-vid"/);
-  assert.match(css, /\.lgp-visual-tab/);
+  assert.match(css, /\.lgp-stats-tab/);
+  assert.doesNotMatch(css, /\.lgp-visual-tab/);
   assert.match(css, /\.lgp-levels/);
-  assert.match(css, /max-height:32vh/);
+  assert.match(css, /max-height:36vh/);
 });

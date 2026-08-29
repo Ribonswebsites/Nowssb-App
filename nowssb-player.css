@@ -1697,6 +1697,8 @@
 .lgp .lgp-stats { margin-top:12px; }
 
 /* Title block sits higher so the action bar has room under the organ */
+
+/* Title block sits higher so the action bar has room under the organ */
 .lgp .lgp-visual-overlay {
   padding:40px 16px 12px;
 }
@@ -1765,40 +1767,36 @@
   box-shadow:0 0 0 3px rgba(255,255,255,.12), 0 6px 16px rgba(0,0,0,.3);
 }
 
-/* ── Compact tab-framed visual (same chrome as Sentence · Practice · Store) ── */
-.lgp .lgp-visual-tab {
+/* ── Stats sit in the lit tab (same chrome as Sentence · Practice · Store).
+   The video box stays a rounded glass panel — not this frame. ── */
+.lgp .lgp-stats-tab {
   position:relative;
   width:100%; max-width:360px;
-  margin:8px auto 0;
-  aspect-ratio:5/4;
-  max-height:32vh;
-  flex-shrink:0;
+  margin:10px auto 0;
+  aspect-ratio:1371/317;
   background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
-  border-radius:10px !important;
+  border-radius:9px !important;
+  flex-shrink:0;
 }
-.lgp .lgp-visual-tab::before {
+.lgp .lgp-stats-tab::before {
   content:''; position:absolute;
   left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
-  background:#000; border-radius:6px !important; z-index:0;
+  background:#000; border-radius:5px !important;
 }
-.lgp .lgp-visual-tab .lgp-visual {
+.lgp .lgp-stats-tab .lgp-stats {
   position:absolute;
   left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
-  width:auto; height:auto; max-width:none; max-height:none;
-  margin:0; aspect-ratio:auto;
-  border-radius:6px !important;
-  border:none;
-  background:#000;
+  margin:0; width:auto; max-width:none;
+  background:transparent; border:none; box-shadow:none;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  padding:0 8px; z-index:1;
+  border-radius:5px !important;
 }
-.lgp .lgp-visual-tab .lgp-video,
-.lgp .lgp-visual-tab .lgp-video-fallback {
-  border-radius:6px !important;
+
+/* Video box is the glass pill — shorter, rounded, no tablet bezel */
+.lgp .lgp-visual {
+  aspect-ratio:1/0.92; max-height:36vh; margin-top:8px;
 }
-.lgp .lgp-visual-tab .lgp-visual-overlay {
-  padding:18px 12px 8px;
-}
-.lgp .lgp-visual-tab .lgp-title { font-size:26px; letter-spacing:.18em; }
-.lgp .lgp-visual-tab .lgp-acts { margin-top:8px; }
 
 /* Level 1–12 glass list — black glass, white type, hairlines like Replay · Notes · Like */
 .lgp .lgp-levels {
