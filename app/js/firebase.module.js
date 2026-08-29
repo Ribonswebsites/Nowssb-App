@@ -10,18 +10,13 @@ import { getFirestore, doc, setDoc, getDoc, serverTimestamp,
   collection, addDoc, getDocs, query, orderBy, limit, where }
   from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-/* The custom domain is correct in production, where /__/auth/* is
-   reverse-proxied by Cloudflare Pages. Localhost cannot use that production
-   callback origin reliably, so use Firebase's standard auth domain for local
-   popup/redirect sign-in. */
-const isLocalAuthHost = /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(window.location.hostname);
-const firebaseAuthDomain = isLocalAuthHost
-  ? "nowssb-34f1b.firebaseapp.com"
-  : "nowssb.com";
-
+/* Always use the branded auth domain. Firebase's OAuth handler is
+   reverse-proxied at nowssb.com by functions/_middleware.js, so Google and
+   mobile redirect flows return through the NowssB domain instead of exposing
+   the raw Firebase project hostname. */
 const app = initializeApp({
   apiKey: "AIzaSyBly5XnqNnpVom11thjlvT5q_BfxNJBfgQ",
-  authDomain: firebaseAuthDomain,
+  authDomain: "nowssb.com",
   projectId: "nowssb-34f1b",
   storageBucket: "nowssb-34f1b.firebasestorage.app",
   messagingSenderId: "1024709686012",
