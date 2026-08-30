@@ -135,7 +135,7 @@
     sec = Math.max(0, Math.round(Number(sec) || 0));
     var m = Math.floor(sec / 60);
     var s = sec % 60;
-    return m + ':' + (s < 10 ? '0' : '') + s;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
   }
   function lgpWordSecs(word) {
     if (!word) return 321;
@@ -146,7 +146,7 @@
       if (h > 0) sec += h;
     }
     if (sec < 8 && word.syllables && word.syllables.length) sec = word.syllables.length * 4;
-    return sec < 8 ? 321 : Math.round(sec);
+    return sec < 8 ? 12 : Math.round(sec);
   }
   function lgpReadSessions() {
     var map = {};
@@ -229,6 +229,32 @@
     return n;
   }
   window.lgpPlayNext = function () {
+    if (typeof pwNextWord === 'function') pwNextWord();
+  };
+  window.lgpShuffle = function () {
+    try { return localStorage.getItem('nwsb_player_shuffle') === '1'; } catch (e) { return false; }
+  };
+  window.lgpToggleShuffle = function () {
+    var on = !window.lgpShuffle();
+    try { localStorage.setItem('nwsb_player_shuffle', on ? '1' : '0'); } catch (e) {}
+    var btn = document.querySelector('.lgp-mode-shuffle');
+    if (btn) {
+      if (on) btn.classList.add('is-on'); else btn.classList.remove('is-on');
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  };
+  window.lgpGoNext = function () {
+    if (window.lgpShuffle()) {
+      var list = (typeof PRACTICE_WORDS !== 'undefined') ? PRACTICE_WORDS : [];
+      var cur = (typeof _pwIdx !== 'undefined') ? _pwIdx : 0;
+      if (list.length > 1) {
+        var n = cur, guard = 0;
+        while (n === cur && guard++ < 24) n = Math.floor(Math.random() * list.length);
+        try { _pwIdx = n; } catch (e) {}
+        if (typeof renderPractice === 'function') renderPractice();
+        return;
+      }
+    }
     if (typeof pwNextWord === 'function') pwNextWord();
   };
   window.lgpOpenQueue = function () {
@@ -402,10 +428,13 @@
        browser can't open/zoom it on tap and taps always hit the button */
     function bgi(cls, url) { return '<span class="' + cls + '" style="background-image:url(\'' + url + '\')"></span>'; }
     var playIco = playing
-      ? bgi('lgp-img', IC.pause)
-      : bgi('lgp-img', IC.play);
-    var prevSvg = bgi('lgp-img', IC.prev);
-    var nextSvg = bgi('lgp-img', IC.next);
+      ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10.15" stroke="currentColor" stroke-width="1.15"/><path d="M9.15 8h2.05v8H9.15zM12.8 8h2.05v8H12.8z" fill="currentColor"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10.15" stroke="currentColor" stroke-width="1.15"/><path d="M10 8.15v7.7L16.5 12z" fill="currentColor"/></svg>';
+    var prevSvg = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h1.8v12H6zM18.2 6v12L9.2 12z"/></svg>';
+    var nextSvg = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.2 6H18v12h-1.8zM5.8 6v12l9-6z"/></svg>';
+    var shuffleSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m18 14 4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="m18 2 4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 18h1.88a6 6 0 0 0 4.5-2.13l6.24-7.74A6 6 0 0 1 16.12 6H22" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 6h1.88a6 6 0 0 1 4.5 2.13l6.24 7.74A6 6 0 0 0 16.12 18H22" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var repeatSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m17 2 4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11V9a4 4 0 0 1 4-4h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="m7 22-4-4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 13v2a4 4 0 0 1-4 4H3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var queueSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16 5H3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M16 12H3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 19H3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M21 15V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="18.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>';
 
     /* Library (left, image icon) + Replay (right) flank the transport */
     var replaySvg = bgi('lgp-side-ico', IC.replay);
@@ -458,18 +487,14 @@
              already, and the bars beside the bar say when it is playing.
              The id stays on a hidden node — other code writes to it. */
           '<div class="lgp-status" id="spAutoStatus" hidden></div>' +
-          '<div class="lgp-tube-row">' +
-          '<span class="lgp-t0">0:00</span>' +
-          '<div class="lgp-tube">' +
-            '<div class="lgp-controls">' +
-              '<div class="lgp-transport">' +
-                '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
-                '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" onclick="pwTogglePlay&&pwTogglePlay()">' + playIco + '</button>' +
-                '<button class="lgp-ctrl" id="lgpNext" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
-              '</div>' +
+          '<div class="lgp-np-transport">' +
+            '<button class="lgp-mode lgp-mode-shuffle' + (window.lgpShuffle() ? ' is-on' : '') + '" type="button" onclick="window.lgpToggleShuffle&&window.lgpToggleShuffle()" aria-label="Shuffle" aria-pressed="' + (window.lgpShuffle() ? 'true' : 'false') + '">' + shuffleSvg + '</button>' +
+            '<div class="lgp-np-ctrls">' +
+              '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
+              '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" onclick="pwTogglePlay&&pwTogglePlay()">' + playIco + '</button>' +
+              '<button class="lgp-ctrl" id="lgpNext" onclick="window.lgpGoNext&&window.lgpGoNext()" ' + (idx >= total - 1 && !window.lgpShuffle() ? 'disabled' : '') + '>' + nextSvg + '</button>' +
             '</div>' +
-          '</div>' +
-          '<span class="lgp-t1">' + _dur + '</span>' +
+            '<button class="lgp-mode lgp-mode-repeat' + (loop ? ' is-on' : '') + '" type="button" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()" aria-label="Repeat" aria-pressed="' + (loop ? 'true' : 'false') + '">' + repeatSvg + '</button>' +
           '</div>' +
         '</div>' +
         /* The "Word played · your turn" page used to sit here — a whole
@@ -637,34 +662,14 @@
             '</button>' +
           '</div>' +
         '</div>' +
-        '<div class="lgp-np-meta">' +
-          '<h1 class="lgp-np-name">' + _e(w.word || '') + '</h1>' +
-          '<p class="lgp-np-sub">NowssB</p>' +
-        '</div>' +
-        /* Stats row — real streak / sessions / time from the session log. */
         (function () {
           var st = lgpSessionStats();
           return '<div class="lgp-stats-tab"><div class="lgp-stats" id="lgpStats">' +
-            '<div class="lgp-stat">' +
-              '<svg class="lgp-stat-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3s4 4.2 4 8a4 4 0 1 1-8 0c0-2.4 1.6-4.6 4-8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.6 14.5c.6 1.8 2 3 3.9 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
-              '<div class="lgp-stat-num" id="lgpStatStreak">' + st.streak + '</div>' +
-              '<div class="lgp-stat-lbl">Days Streak</div>' +
-            '</div>' +
-            '<div class="lgp-stat-div" aria-hidden="true"></div>' +
-            '<div class="lgp-stat">' +
-              '<svg class="lgp-stat-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
-              '<div class="lgp-stat-num" id="lgpStatSessions">' + st.sessions + '</div>' +
-              '<div class="lgp-stat-lbl">Sessions</div>' +
-            '</div>' +
-            '<div class="lgp-stat-div" aria-hidden="true"></div>' +
-            '<div class="lgp-stat">' +
-              '<svg class="lgp-stat-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/><path d="M12 8.2V12l2.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-              '<div class="lgp-stat-num" id="lgpStatTime">' + st.timeLabel + '</div>' +
-              '<div class="lgp-stat-lbl">Time Meditated</div>' +
-            '</div>' +
+            '<div class="lgp-stat"><div class="lgp-stat-num" id="lgpStatStreak">' + st.streak + '</div><div class="lgp-stat-lbl">Days Streak</div></div>' +
+            '<div class="lgp-stat"><div class="lgp-stat-num" id="lgpStatSessions">' + st.sessions + '</div><div class="lgp-stat-lbl">Sessions</div></div>' +
+            '<div class="lgp-stat"><div class="lgp-stat-num" id="lgpStatTime">' + st.timeLabel + '</div><div class="lgp-stat-lbl">Time Meditated</div></div>' +
           '</div></div>';
         })() +
-        /* Level list opens under the stats tab, next to the in-card pill. */
         (function () {
           var st = lgpSessionStats();
           var cur = st.level;
@@ -677,65 +682,42 @@
           return '<div class="lgp-levels" id="lgpLevels"' + (_lgpLevelsOpen ? '' : ' hidden') + '>' + items + '</div>';
         })() +
         '<div class="lgp-visual">' + visual +
-          /* ONE row across the top of the panel, not two islands pinned to
-             the corners. Pinned, they overlapped the moment either side got
-             long — "Afternoon" plus "Learn your score" was enough. In a row
-             the ritual is the only thing that can shrink, and it ellipsises
-             instead of running under the bars. */
-          '<div class="lgp-visual-top">' +
-            '<div class="lgp-art-avatar" aria-hidden="true">' + _av + '</div>' +
-            '<div class="lgp-art-dur">' + _dur + '</div>' +
-            '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
+          '<div class="lgp-art-shade" aria-hidden="true"></div>' +
+          '<p class="lgp-art-kicker">' + _e(String(w.word || '').toUpperCase()) + '</p>' +
+          '<svg class="lgp-wave" viewBox="0 0 320 36" preserveAspectRatio="none" aria-hidden="true">' +
+            '<path class="' + (playing ? 'is-on' : '') + '" d="M0 22 C 18 22 22 16 32 16 C 48 16 52 28 68 20 C 84 12 92 8 108 14 C 128 22 132 30 152 18 C 168 8 176 4 192 12 C 208 20 214 26 232 18 C 248 10 260 16 276 20 C 292 24 304 22 320 22" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"/>' +
+          '</svg>' +
+          '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
               '<span class="lgp-bgico" style="background-image:url(\'' + IC.info + '\')"></span>' +
             '</button>' +
-            '</div>' +
           '</div>' +
-          /* Volume stays on the right. Replay / Notes / Like moved under the organ. */
-          /* The volume is a speaker until you press it. The slider is what
-             it opens into, and it stays open until you press it again. */
-          '<div class="lgp-rail lgp-rail-r' + (lgpVolOpen() ? ' vol-open' : '') + '" id="lgpVolRail">' +
-            '<div class="lgp-vol-wrap">' +
-              '<span class="lgp-vol-val" id="lgpVolVal">' + Math.round(lgpVolume() * 100) + '</span>' +
-              '<div class="lgp-vol" id="lgpVol" role="slider" tabindex="0"' +
-                ' aria-label="Volume" aria-valuemin="0" aria-valuemax="100"' +
-                ' aria-valuenow="' + Math.round(lgpVolume() * 100) + '">' +
-                '<span class="lgp-vol-fill" id="lgpVolFill" style="height:' + (lgpVolume() * 100) + '%"></span>' +
-              '</div>' +
-            '</div>' +
-            '<button class="lgp-vol-btn" id="lgpVolBtn" type="button"' +
-              ' onclick="window.lgpToggleVol&&window.lgpToggleVol()"' +
-              ' aria-expanded="' + (lgpVolOpen() ? 'true' : 'false') + '" aria-label="Volume">' +
-              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-                '<path d="M4 9.2h3.4L12 5.2v13.6L7.4 14.8H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>' +
-                '<path class="lgp-vol-w1" d="M15.6 9.4a3.6 3.6 0 0 1 0 5.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
-                '<path class="lgp-vol-w2" d="M18.2 7a7.2 7.2 0 0 1 0 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
-                '<path class="lgp-vol-mute" d="M16 9.5l5 5M21 9.5l-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>' +
-              '</svg>' +
+        '</div>' +
+        '<div class="lgp-np-meta">' +
+          '<div class="lgp-title-row">' +
+            '<h1 class="lgp-np-name">' + _e(w.word || '') + '</h1>' +
+            '<button class="lgp-heart lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
+              ' onclick="window.lgpToggleLike&&window.lgpToggleLike()"' +
+              ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
+              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
             '</button>' +
           '</div>' +
-        /* The bottom of the picture: tagline + level, matching the mockup. */
-        '<div class="lgp-visual-overlay">' +
-        (function () {
-          var st = lgpSessionStats();
-          return '<div class="lgp-profile lgp-profile-hero lgp-hero-foot">' +
-            '<div class="lgp-tagline">Healing through words</div>' +
-            '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">' +
-              '<svg class="lgp-level-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>' +
-              'Level ' + st.level +
-              ' <span aria-hidden="true">›</span>' +
-            '</button>' +
-          '</div>';
-        })() +
-        '</div>' +   /* end .lgp-visual-overlay */
-        '</div>' +   /* end .lgp-visual */
+          '<p class="lgp-np-sub">NowssB<span aria-hidden="true"> · </span>Words Without Dictionary</p>' +
+        '</div>' +
+        '<div class="lgp-progress" role="slider" tabindex="0" aria-label="Playback position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">' +
+          '<div class="lgp-bar"><i class="lgp-progress-fill"></i><b class="lgp-progress-knob"></b></div>' +
+          '<div class="lgp-times"><span class="lgp-time-now">0:00</span><span class="lgp-time-end">' + _dur + '</span></div>' +
+        '</div>' +
         center +
         (function () {
           var next = words[idx + 1];
           if (!next) {
             return '<div class="lgp-nextup" id="lgpNextUp">' +
-              '<div class="lgp-nextup-empty">No more sessions queued' +
+              '<div class="lgp-nextup-head"><span>Up Next</span>' +
+                '<button class="lgp-queue-btn" type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
+              '</div>' +
+              '<div class="lgp-nextup-empty">End of queue' +
                 '<button type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()">Add a session</button>' +
               '</div>' +
             '</div>';
@@ -743,15 +725,17 @@
           var art = next.img || th.img || '';
           var nextDur = lgpFmtClock(lgpWordSecs(next));
           return '<div class="lgp-nextup" id="lgpNextUp">' +
-            '<div class="lgp-nextup-head"><span>Up Next</span></div>' +
+            '<div class="lgp-nextup-head"><span>Up Next</span>' +
+              '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
+            '</div>' +
             '<div class="lgp-nextup-item" onclick="window.lgpPlayNext&&window.lgpPlayNext()">' +
               '<div class="lgp-nextup-art"' + (art ? ' style="background-image:url(\'' + lgpEsc(art) + '\')"' : '') + '></div>' +
               '<div class="lgp-nextup-mid">' +
                 '<div class="lgp-nextup-title">' + lgpEsc(next.word || '') + '</div>' +
-                '<div class="lgp-nextup-sub">' + nextDur + '</div>' +
+                '<div class="lgp-nextup-sub">NowssB · ' + nextDur + '</div>' +
               '</div>' +
-              '<button class="lgp-nextup-more" type="button" onclick="event.stopPropagation();window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' +
-                '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>' +
+              '<button class="lgp-nextup-play" type="button" onclick="event.stopPropagation();window.lgpPlayNext&&window.lgpPlayNext()" aria-label="Play next">' +
+                '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.2 5.4v13.2L19 12z"/></svg>' +
               '</button>' +
             '</div>' +
           '</div>';
@@ -780,12 +764,6 @@
                 '<path d="M14 3.5V8h4.6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
                 '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
               '</svg>' +
-            '</button>' +
-            '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
-            '<button class="lgp-wa lgp-like' + (lgpIsLiked(w.word) ? ' liked' : '') + '" id="lgpLikeBtn" type="button"' +
-              ' onclick="window.lgpToggleLike&&window.lgpToggleLike()"' +
-              ' aria-pressed="' + (lgpIsLiked(w.word) ? 'true' : 'false') + '" aria-label="Like this word">' +
-              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
             '</button>' +
           '</div>' +
         '</div>' +
@@ -922,8 +900,17 @@
         if (!el) { window._lgpProgRaf = 0; return; }
         var p = pct();
         el.style.width = p + '%';
-        var bar = el.parentNode;
+        var knob = document.querySelector('.lgp-progress-knob');
+        if (knob) knob.style.left = p + '%';
+        var bar = el.parentNode && el.parentNode.parentNode;
         if (bar && bar.setAttribute) bar.setAttribute('aria-valuenow', Math.round(p));
+        var S = window._lgpSound;
+        var durMs = S ? (S.dur || S.est || 2000) : (lgpWordSecs(w) * 1000);
+        if (S && S.total) durMs = (S.dur || S.est || 2000) * S.total;
+        var t0 = document.querySelector('.lgp-time-now');
+        var t1 = document.querySelector('.lgp-time-end');
+        if (t0) t0.textContent = lgpFmtClock((durMs * p) / 100000);
+        if (t1) t1.textContent = lgpFmtClock(durMs / 1000);
         if (!stillPlaying) { window._lgpProgRaf = 0; return; }
         window._lgpProgRaf = requestAnimationFrame(step);
       }

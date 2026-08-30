@@ -27,17 +27,19 @@ String _fmtClock(num sec) {
   final s = sec.round().clamp(0, 24 * 3600);
   final m = s ~/ 60;
   final r = s % 60;
-  return '$m:${r.toString().padLeft(2, '0')}';
+  return '${m.toString().padLeft(2, '0')}:${r.toString().padLeft(2, '0')}';
 }
 
-String _wordClock(Word word) {
+double _wordSecs(Word word) {
   var sec = 0.0;
   for (final part in word.parts) {
     sec += part.hold;
   }
-  if (sec < 8) sec = 321;
-  return _fmtClock(sec);
+  if (sec < 8) sec = 12;
+  return sec;
 }
+
+String _wordClock(Word word) => _fmtClock(_wordSecs(word));
 
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({super.key, required this.words, required this.title});
@@ -51,6 +53,7 @@ class PracticePlayerScreen extends StatefulWidget {
 
 class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   static const _likedWordsKey = 'nwsb_liked_words';
+  static const _shuffleKey = 'nwsb_player_shuffle';
 
   final FlutterTts _tts = FlutterTts();
   var _index = 0;
@@ -58,6 +61,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   var _completed = false;
   var _liked = false;
   var _loop = false;
+  var _shuffle = false;
   var _volume = 1.0;
   String? _error;
 
@@ -70,6 +74,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     PracticeProgress.instance.addListener(_onProgress);
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
+    unawaited(_loadShuffle());
     unawaited(_prepareAndPlay());
   }
 
@@ -82,6 +87,18 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
 
   void _onProgress() {
     if (mounted) setState(() {});
+  }
+
+  Future<void> _loadShuffle() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) setState(() => _shuffle = prefs.getBool(_shuffleKey) ?? false);
+  }
+
+  Future<void> _toggleShuffle() async {
+    final next = !_shuffle;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_shuffleKey, next);
+    if (mounted) setState(() => _shuffle = next);
   }
 
   Future<void> _loadLiked() async {
@@ -141,7 +158,17 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   }
 
   Future<void> _move(int direction) async {
-    final next = _index + direction;
+    if (widget.words.isEmpty) return;
+    int next;
+    if (_shuffle && direction > 0 && widget.words.length > 1) {
+      next = _index;
+      var guard = 0;
+      while (next == _index && guard++ < 24) {
+        next = math.Random().nextInt(widget.words.length);
+      }
+    } else {
+      next = _index + direction;
+    }
     if (next < 0 || next >= widget.words.length) return;
     await _tts.stop();
     setState(() {
@@ -305,13 +332,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
 
     final theme = _theme;
     return Scaffold(
-      backgroundColor: NwsbColors.deep,
+      backgroundColor: const Color(0xFF050505),
       body: Stack(children: [
-        // The application-wide selected Fashion Plus layer stays mounted on
-        // this route. The liquid Player visual is the route's own supplied
-        // skin, exactly as it is in the WebView Player, rather than a second
-        // generic practice-card background.
-        const Positioned.fill(child: AppBackdrop()),
         Positioned.fill(child: _PlayerThemeArtwork(theme: theme)),
         const Positioned.fill(
           child: DecoratedBox(
@@ -319,7 +341,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0x48060A19), Color(0x74060A19), Color(0xC4060A19)],
+                colors: [Color(0xD1050505), Color(0xEB050505), Color(0xFF050505)],
               ),
             ),
           ),
@@ -331,46 +353,40 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
-                  const SizedBox(height: 14),
-                  Text(
-                    _word.word,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 46, fontWeight: FontWeight.w600, height: 1.02, letterSpacing: -1.1, fontFamily: 'Georgia', shadows: [Shadow(color: Color(0x73000000), blurRadius: 22)]),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text('NowssB', style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 15, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
                   SizedBox(width: stageWidth, child: _VisualStage(
                     word: _word,
                     theme: theme,
                     playing: _playing,
-                    liked: _liked,
-                    volume: _volume,
-                    onLevel: _openLevel,
-                    onInfo: _openInfo,
-                    onReplay: _prepareAndPlay,
-                    onNotes: _openNotes,
-                    onLike: _toggleLike,
-                    onVolumeChanged: (volume) async {
-                      setState(() => _volume = volume);
-                      await _tts.setVolume(volume);
-                    },
                   )),
-                  const SizedBox(height: 10),
-                  SizedBox(width: math.min(stageWidth, 360), child: _TransportTube(
+                  const SizedBox(height: 22),
+                  Row(children: [
+                    Expanded(child: Text(_word.word, style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 28, fontWeight: FontWeight.w600, height: 1.1, letterSpacing: -0.6))),
+                    GestureDetector(
+                      onTap: _toggleLike,
+                      child: Icon(_liked ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: _liked ? const Color(0xFFF5F5F7) : const Color(0xFFC7C7CC), size: 26),
+                    ),
+                  ]),
+                  const SizedBox(height: 6),
+                  const Text('NowssB  ·  Words Without Dictionary', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14)),
+                  const SizedBox(height: 20),
+                  _ProgressBar(playing: _playing, durationSec: _wordSecs(_word)),
+                  const SizedBox(height: 8),
+                  _TransportRow(
                     playing: _playing,
+                    loop: _loop,
+                    shuffle: _shuffle,
                     hasPrevious: _index > 0,
-                    hasNext: _index < widget.words.length - 1,
-                    durationLabel: _wordClock(_word),
-                    onLibrary: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
+                    hasNext: _shuffle || _index < widget.words.length - 1,
+                    onShuffle: _toggleShuffle,
                     onPrevious: () => _move(-1),
                     onPlay: _togglePlay,
                     onNext: () => _move(1),
-                    onReplay: _prepareAndPlay,
-                  )),
-                  const SizedBox(height: 10),
+                    onLoop: () => setState(() => _loop = !_loop),
+                  ),
+                  const SizedBox(height: 16),
                   SizedBox(width: stageWidth, child: _NextUpCard(
                     next: _index < widget.words.length - 1 ? widget.words[_index + 1] : null,
                     art: _index < widget.words.length - 1
@@ -379,7 +395,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     onPlay: () => _move(1),
                     onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
                   )),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   SizedBox(
                     width: stageWidth,
                     child: _WordOverlay(
@@ -437,9 +453,12 @@ class _PlayerHeader extends StatelessWidget {
     child: Stack(alignment: Alignment.center, children: [
       Align(alignment: Alignment.centerLeft, child: _BareIconButton(icon: Icons.keyboard_arrow_down_rounded, onTap: onBack)),
       const Column(mainAxisSize: MainAxisSize.min, children: [
-        Text('Now Playing', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: .3)),
-        SizedBox(height: 6),
-        ColoredBox(color: Color(0xFFE8D5A3), child: SizedBox(width: 28, height: 2)),
+        Text('NOW PLAYING', style: TextStyle(color: Color(0xFF9A9A9E), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 3.4)),
+        SizedBox(height: 8),
+        DecoratedBox(
+          decoration: BoxDecoration(color: Color(0xFFECECED), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x73FFFFFF), blurRadius: 8)]),
+          child: SizedBox(width: 4, height: 4),
+        ),
       ]),
       Align(alignment: Alignment.centerRight, child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onSettings)),
     ]),
@@ -619,15 +638,16 @@ class _NextUpCard extends StatelessWidget {
     final word = next;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0x14FFFFFF),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x1FFFFFFF)),
+        color: const Color(0xD1161618),
+        borderRadius: BorderRadius.circular(23),
+        border: Border.all(color: const Color(0x14FFFFFF)),
+        boxShadow: const [BoxShadow(color: Color(0x0DFFFFFF), blurRadius: 0, offset: Offset(0, 1))],
       ),
       child: word == null
           ? Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
               child: Column(children: [
-                const Text('No more sessions queued', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12)),
+                const Text('End of queue', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13)),
                 const SizedBox(height: 10),
                 GestureDetector(
                   onTap: onAdd,
@@ -640,129 +660,276 @@ class _NextUpCard extends StatelessWidget {
               ]),
             )
           : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(14, 10, 14, 0),
-                child: Text('UP NEXT', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
+                child: Row(children: [
+                  const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 2.8))),
+                  GestureDetector(
+                    onTap: onAdd,
+                    child: const SizedBox(width: 36, height: 36, child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 20)),
+                  ),
+                ]),
               ),
               Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 8, 12),
-              child: Row(children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: SizedBox(
-                    width: 44,
-                    height: 44,
-                    child: art != null && art!.isNotEmpty
-                        ? (art!.startsWith('http')
-                            ? Image.network(art!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                            : Image.asset(art!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
-                        : const ColoredBox(color: Color(0xFF111111)),
-                  ),
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                child: GestureDetector(
+                  onTap: onPlay,
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: art != null && art!.isNotEmpty
+                            ? (art!.startsWith('http')
+                                ? Image.network(art!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                                : Image.asset(art!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
+                            : const ColoredBox(color: Color(0xFF111111)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(word.word, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: -0.15)),
+                        const SizedBox(height: 3),
+                        Text('NowssB  ·  ${_wordClock(word)}', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
+                      ]),
+                    ),
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF5F5F7),
+                        shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: Color(0x59000000), blurRadius: 16, offset: Offset(0, 6))],
+                      ),
+                      child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A0C), size: 22),
+                    ),
+                  ]),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: onPlay,
-                    behavior: HitTestBehavior.opaque,
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(word.word, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-                      Text(_wordClock(word), style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, letterSpacing: .2)),
-                    ]),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: onAdd,
-                  child: const SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Icon(Icons.more_horiz_rounded, color: Color(0xBFFFFFFF), size: 22),
-                  ),
-                ),
-              ]),
-            ),
+              ),
             ]),
     );
   }
 }
 
 class _VisualStage extends StatelessWidget {
-  const _VisualStage({
-    required this.word, required this.theme, required this.playing, required this.liked,
-    required this.volume, required this.onLevel, required this.onInfo,
-    required this.onReplay, required this.onNotes, required this.onLike,
-    required this.onVolumeChanged,
-  });
+  const _VisualStage({required this.word, required this.theme, required this.playing});
 
   final Word word;
   final _PlayerTheme theme;
   final bool playing;
-  final bool liked;
-  final double volume;
-  final VoidCallback onLevel;
-  final VoidCallback onInfo;
-  final VoidCallback onReplay;
-  final VoidCallback onNotes;
-  final VoidCallback onLike;
-  final ValueChanged<double> onVolumeChanged;
 
   @override
   Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 1 / 0.92,
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(30),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: const Color(0x4DFFFFFF)),
-        ),
+    aspectRatio: 1,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(34),
+        border: Border.all(color: const Color(0x29FFFFFF)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x0FFFFFFF), blurRadius: 42),
+          BoxShadow(color: Color(0x94000000), blurRadius: 60, offset: Offset(0, 28)),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(34),
         child: Stack(fit: StackFit.expand, children: [
           NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
-          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xC8060A16)]))),
+          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x14FFFFFF), Color(0x00000000), Color(0x00000000), Color(0x8C000000)], stops: [0, 0.2, 0.58, 1]))),
           Positioned(
-            top: 12, left: 12,
-            child: Container(
-              width: 34, height: 34,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8E8F5)]),
-                border: Border.all(color: const Color(0xB3FFFFFF), width: 1.5),
-                boxShadow: const [BoxShadow(color: Color(0x59000000), blurRadius: 14)],
-              ),
-              child: const Text('H', style: TextStyle(color: Color(0xFF0A0A12), fontSize: 11, fontWeight: FontWeight.w800)),
+            left: 0, right: 0, bottom: 42,
+            child: Text(
+              word.word.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xEBF5F5F7), fontSize: 12, fontWeight: FontWeight.w400, letterSpacing: 6, shadows: [Shadow(color: Color(0xB3000000), blurRadius: 18)]),
             ),
           ),
           Positioned(
-            top: 14, right: 14,
-            child: Text(_wordClock(word), style: const TextStyle(color: Color(0xEBFFFFFF), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: .4, shadows: [Shadow(color: Color(0xCC000000), blurRadius: 8)])),
-          ),
-          Positioned(right: 10, bottom: 52, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
-          Positioned(
-            left: 14, right: 14, bottom: 12,
-            child: Row(children: [
-              const Expanded(child: Text('Healing through words', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, shadows: [Shadow(color: Color(0xCC000000), blurRadius: 8)]))),
-              GestureDetector(
-                onTap: onLevel,
-                child: Container(
-                  height: 26,
-                  padding: const EdgeInsets.fromLTRB(10, 0, 12, 0),
-                  decoration: BoxDecoration(
-                    color: const Color(0x29E8D5A3),
-                    borderRadius: BorderRadius.circular(99),
-                    border: Border.all(color: const Color(0x73E8D5A3)),
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 12),
-                    const SizedBox(width: 6),
-                    Text('Level ${PracticeProgress.instance.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700)),
-                  ]),
-                ),
-              ),
-            ]),
+            left: 28, right: 28, bottom: 12, height: 28,
+            child: CustomPaint(painter: _ArtWavePainter(active: playing)),
           ),
         ]),
       ),
     ),
+  );
+}
+
+class _ArtWavePainter extends CustomPainter {
+  const _ArtWavePainter({required this.active});
+  final bool active;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final sx = size.width / 320;
+    final sy = size.height / 36;
+    final path = Path()
+      ..moveTo(0 * sx, 22 * sy)
+      ..cubicTo(18 * sx, 22 * sy, 22 * sx, 16 * sy, 32 * sx, 16 * sy)
+      ..cubicTo(48 * sx, 16 * sy, 52 * sx, 28 * sy, 68 * sx, 20 * sy)
+      ..cubicTo(84 * sx, 12 * sy, 92 * sx, 8 * sy, 108 * sx, 14 * sy)
+      ..cubicTo(128 * sx, 22 * sy, 132 * sx, 30 * sy, 152 * sx, 18 * sy)
+      ..cubicTo(168 * sx, 8 * sy, 176 * sx, 4 * sy, 192 * sx, 12 * sy)
+      ..cubicTo(208 * sx, 20 * sy, 214 * sx, 26 * sy, 232 * sx, 18 * sy)
+      ..cubicTo(248 * sx, 10 * sy, 260 * sx, 16 * sy, 276 * sx, 20 * sy)
+      ..cubicTo(292 * sx, 24 * sy, 304 * sx, 22 * sy, 320 * sx, 22 * sy);
+    final paint = Paint()
+      ..color = const Color(0xD1FFFFFF)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.15
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 0.4);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ArtWavePainter oldDelegate) => oldDelegate.active != active;
+}
+
+class _ProgressBar extends StatefulWidget {
+  const _ProgressBar({required this.playing, required this.durationSec});
+  final bool playing;
+  final double durationSec;
+
+  @override
+  State<_ProgressBar> createState() => _ProgressBarState();
+}
+
+class _ProgressBarState extends State<_ProgressBar> with SingleTickerProviderStateMixin {
+  late final AnimationController _c;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = AnimationController(vsync: this, duration: Duration(milliseconds: (widget.durationSec * 1000).round().clamp(400, 120000)));
+    if (widget.playing) _c.forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProgressBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _c.duration = Duration(milliseconds: (widget.durationSec * 1000).round().clamp(400, 120000));
+    if (widget.playing && !oldWidget.playing) {
+      _c.forward(from: 0);
+    } else if (!widget.playing && oldWidget.playing) {
+      _c.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _c,
+    builder: (context, _) {
+      final t = _c.value.clamp(0.0, 1.0);
+      return Column(children: [
+        SizedBox(
+          height: 14,
+          child: LayoutBuilder(builder: (context, constraints) {
+            final x = t * constraints.maxWidth;
+            return Stack(alignment: Alignment.centerLeft, children: [
+              Container(height: 3, decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(99))),
+              Container(width: x, height: 3, decoration: BoxDecoration(color: const Color(0xFFF5F5F7), borderRadius: BorderRadius.circular(99))),
+              Positioned(
+                left: (x - 5.5).clamp(0.0, math.max(0.0, constraints.maxWidth - 11)),
+                child: Container(
+                  width: 11, height: 11,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F7),
+                    shape: BoxShape.circle,
+                    boxShadow: const [BoxShadow(color: Color(0x59050505), blurRadius: 0, spreadRadius: 3)],
+                  ),
+                ),
+              ),
+            ]);
+          }),
+        ),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(_fmtClock(widget.durationSec * t), style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11)),
+          Text(_fmtClock(widget.durationSec), style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11)),
+        ]),
+      ]);
+    },
+  );
+}
+
+class _TransportRow extends StatelessWidget {
+  const _TransportRow({
+    required this.playing, required this.loop, required this.shuffle,
+    required this.hasPrevious, required this.hasNext,
+    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onLoop,
+  });
+  final bool playing;
+  final bool loop;
+  final bool shuffle;
+  final bool hasPrevious;
+  final bool hasNext;
+  final VoidCallback onShuffle;
+  final VoidCallback onPrevious;
+  final VoidCallback onPlay;
+  final VoidCallback onNext;
+  final VoidCallback onLoop;
+
+  @override
+  Widget build(BuildContext context) => Row(children: [
+    _ModeBtn(icon: Icons.shuffle_rounded, on: shuffle, onTap: onShuffle),
+    Expanded(
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Opacity(
+          opacity: hasPrevious ? 1 : .28,
+          child: IconButton(
+            onPressed: hasPrevious ? onPrevious : null,
+            iconSize: 32,
+            color: const Color(0xFFF5F5F7),
+            icon: const Icon(Icons.skip_previous_rounded),
+          ),
+        ),
+        GestureDetector(
+          onTap: onPlay,
+          child: Container(
+            width: 72, height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFF5F5F7), width: 1.6),
+            ),
+            child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, color: const Color(0xFFF5F5F7), size: 34),
+          ),
+        ),
+        Opacity(
+          opacity: hasNext ? 1 : .28,
+          child: IconButton(
+            onPressed: hasNext ? onNext : null,
+            iconSize: 32,
+            color: const Color(0xFFF5F5F7),
+            icon: const Icon(Icons.skip_next_rounded),
+          ),
+        ),
+      ]),
+    ),
+    _ModeBtn(icon: Icons.repeat_rounded, on: loop, onTap: onLoop),
+  ]);
+}
+
+class _ModeBtn extends StatelessWidget {
+  const _ModeBtn({required this.icon, required this.on, required this.onTap});
+  final IconData icon;
+  final bool on;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+    onPressed: onTap,
+    iconSize: 22,
+    color: on ? const Color(0xFFF5F5F7) : const Color(0xFFCFCFD2),
+    icon: Icon(icon),
   );
 }
 
