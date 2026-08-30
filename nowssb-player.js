@@ -598,21 +598,21 @@
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
-          /* A white disc with a plain arrow, not the glass sphere. */
-          '<button class="lgp-back lgp-white-btn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
+          '<button class="lgp-back lgp-now-btn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
             '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-              '<path d="M15 5l-7 7 7 7" stroke="#0a0a12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+              '<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
             '</svg>' +
           '</button>' +
-          '<div class="lgp-brand"><span class="lgp-brand-ico" style="background-image:url(\'' + IC.brand + '\')"></span><span class="lgp-brand-txt">NowssB</span></div>' +
+          '<div class="lgp-now" aria-hidden="true"><span>Now Playing</span><i></i></div>' +
           '<div class="lgp-top-right">' +
-            /* The heart used to live here. It sits in the band below now,
-               beside Notes, because that band was carrying nothing and
-               this row was already full. */
-            '<button class="lgp-settings lgp-imgbtn" type="button" aria-label="Settings">' +
-              '<span class="lgp-bgico" style="background-image:url(\'' + IC.settings + '\')"></span>' +
+            '<button class="lgp-settings lgp-now-btn" type="button" aria-label="More">' +
+              '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>' +
             '</button>' +
           '</div>' +
+        '</div>' +
+        '<div class="lgp-np-meta">' +
+          '<h1 class="lgp-np-name">' + _e(w.word || '') + '</h1>' +
+          '<p class="lgp-np-sub">NowssB</p>' +
         '</div>' +
         /* Stats row — real streak / sessions / time from the session log. */
         (function () {
@@ -656,24 +656,7 @@
              the ritual is the only thing that can shrink, and it ellipsises
              instead of running under the bars. */
           '<div class="lgp-visual-top">' +
-            (function () {
-              var p = lgpUserProfile();
-              var st = lgpSessionStats();
-              var av = p.photo
-                ? '<img class="lgp-avatar-img" src="' + lgpEsc(p.photo) + '" alt="">'
-                : '<span class="lgp-avatar-init">' + lgpEsc(p.initials) + '</span>';
-              return '<div class="lgp-profile lgp-profile-hero">' +
-                '<div class="lgp-avatar" aria-hidden="true">' + av + '</div>' +
-                '<div class="lgp-id">' +
-                  '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
-                  '<div class="lgp-tagline">LISTEN · SPEAK · HEAL</div>' +
-                  '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">' +
-                    '<svg class="lgp-level-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>' +
-                    'Level ' + st.level + ' <span aria-hidden="true">›</span>' +
-                  '</button>' +
-                '</div>' +
-              '</div>';
-            })() +
+            '<p class="lgp-art-kicker">' + _e(w.word || '') + '</p>' +
             '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
@@ -706,6 +689,24 @@
           '</div>' +
         /* The bottom of the picture: the word. */
         '<div class="lgp-visual-overlay">' +
+        (function () {
+          var p = lgpUserProfile();
+          var st = lgpSessionStats();
+          var av = p.photo
+            ? '<img class="lgp-avatar-img" src="' + lgpEsc(p.photo) + '" alt="">'
+            : '<span class="lgp-avatar-init">' + lgpEsc(p.initials) + '</span>';
+          return '<div class="lgp-profile lgp-profile-hero">' +
+            '<div class="lgp-avatar" aria-hidden="true">' + av + '</div>' +
+            '<div class="lgp-id">' +
+              '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
+              '<div class="lgp-tagline">Healing through words</div>' +
+              '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">' +
+                '<svg class="lgp-level-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>' +
+                'Level ' + st.level +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        })() +
         '<div class="lgp-wordblock">' +
           '<span class="lgp-eq lgp-eq-title" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' +
           '<div class="lgp-title">' + (w.word || '') + '</div>' +
@@ -753,6 +754,7 @@
           var art = next.img || th.img || '';
           var sub = (next.organ || (next.categories && next.categories[0]) || 'Next word').toString();
           return '<div class="lgp-nextup" id="lgpNextUp">' +
+            '<div class="lgp-nextup-head"><span>Up Next</span></div>' +
             '<div class="lgp-nextup-item">' +
               '<div class="lgp-nextup-art"' + (art ? ' style="background-image:url(\'' + lgpEsc(art) + '\')"' : '') + '></div>' +
               '<div class="lgp-nextup-mid">' +

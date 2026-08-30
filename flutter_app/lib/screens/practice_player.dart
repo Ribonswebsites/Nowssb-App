@@ -317,9 +317,15 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
-                  const SizedBox(height: 10),
-                  SizedBox(width: stageWidth, child: const _StatsRow()),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
+                  Text(
+                    _word.word,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 44, fontWeight: FontWeight.w800, height: 1.02, letterSpacing: -1.2, shadows: [Shadow(color: Color(0x73000000), blurRadius: 22)]),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text('NowssB', style: TextStyle(color: Color(0x9EFFFFFF), fontSize: 15, fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 12),
                   SizedBox(width: stageWidth, child: _VisualStage(
                     word: _word,
                     theme: theme,
@@ -404,13 +410,16 @@ class _PlayerHeader extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
     height: 46,
     child: Stack(alignment: Alignment.center, children: [
-      Align(alignment: Alignment.centerLeft, child: _RoundIconButton(icon: Icons.arrow_back_ios_new_rounded, onTap: onBack)),
+      Align(alignment: Alignment.centerLeft, child: _RoundIconButton(icon: Icons.keyboard_arrow_down_rounded, onTap: onBack)),
       const Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.spa_rounded, color: Colors.white, size: 24),
-        SizedBox(width: 7),
-        Text('NowssB', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800, letterSpacing: -.5)),
+        Text('Now Playing', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: .3)),
+        SizedBox(width: 8),
+        DecoratedBox(
+          decoration: BoxDecoration(color: Color(0xFFE8D5A3), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0xE8E8D5A3), blurRadius: 10)]),
+          child: SizedBox(width: 7, height: 7),
+        ),
       ]),
-      Align(alignment: Alignment.centerRight, child: _RoundIconButton(icon: Icons.settings_rounded, onTap: onSettings)),
+      Align(alignment: Alignment.centerRight, child: _RoundIconButton(icon: Icons.more_horiz_rounded, onTap: onSettings)),
     ]),
   );
 }
@@ -491,7 +500,7 @@ class _ProfileHeader extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Healer', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: compact ? 18 : 22, fontWeight: FontWeight.w700, height: 1.15, shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 10)])),
           const SizedBox(height: 2),
-          Text('LISTEN · SPEAK · HEAL', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: const Color(0x8CFFFFFF), fontSize: compact ? 8.5 : 9.5, fontWeight: FontWeight.w700, letterSpacing: 1.6, shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 8)])),
+          Text('Healing through words', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: const Color(0xB8FFFFFF), fontSize: compact ? 11 : 12, fontWeight: FontWeight.w500, shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 8)])),
           const SizedBox(height: 6),
           GestureDetector(
             onTap: onLevel,
@@ -691,15 +700,19 @@ class _VisualStage extends StatelessWidget {
         child: Stack(fit: StackFit.expand, children: [
           NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
           const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
-          Positioned(top: 10, left: 10, right: 52, child: _ProfileHeader(onLevel: onLevel, compact: true)),
+          Positioned(top: 14, left: 16, child: Text(word.word.toUpperCase(), style: const TextStyle(color: Color(0xDBFFFFFF), fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 2.2, shadows: [Shadow(color: Color(0xCC000000), blurRadius: 10)]))),
           Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
           Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
           Positioned(
-            left: 0, right: 0, bottom: 0,
-            child: _WordOverlay(
-              word: word, accent: theme.accent, playing: playing, liked: liked,
-              onReplay: onReplay, onNotes: onNotes, onLike: onLike,
-            ),
+            left: 12, right: 52, bottom: 12,
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _ProfileHeader(onLevel: onLevel, compact: true),
+              const SizedBox(height: 10),
+              _WordOverlay(
+                word: word, accent: theme.accent, playing: playing, liked: liked,
+                onReplay: onReplay, onNotes: onNotes, onLike: onLike,
+              ),
+            ]),
           ),
         ]),
       ),
@@ -725,13 +738,6 @@ class _WordOverlay extends StatelessWidget {
     padding: const EdgeInsets.fromLTRB(16, 36, 16, 12),
     decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00060A16), Color(0xA8060A16), Color(0xF0060A16)])),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
-      _Equalizer(active: playing, accent: accent),
-      const SizedBox(height: 6),
-      Text(word.word.toUpperCase(), textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: 6.2, height: 1.05, shadows: [Shadow(color: accent.withOpacity(.8), blurRadius: 22)])),
-      if (word.deva.isNotEmpty) ...[
-        const SizedBox(height: 5),
-        Text(word.deva, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w600, height: 1.25)),
-      ],
       if (word.parts.isNotEmpty) ...[
         const SizedBox(height: 12),
         Wrap(spacing: 6, runSpacing: 6, alignment: WrapAlignment.center, children: word.parts.map((part) => _PronunciationChip(part: part, accent: accent, compact: true)).toList()),
