@@ -365,6 +365,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     word: _word,
                     theme: theme,
                     playing: _playing,
+                    accent: theme.accent,
+                    onReplay: _prepareAndPlay,
+                    onNotes: _openNotes,
                   )),
                   const SizedBox(height: 22),
                   Row(children: [
@@ -402,14 +405,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     onPlay: () => _move(1),
                     onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
                   )),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: stageWidth,
-                    child: _WordOverlay(
-                      word: _word, accent: theme.accent, playing: _playing, liked: _liked,
-                      onReplay: _prepareAndPlay, onNotes: _openNotes, onLike: _toggleLike,
-                    ),
-                  ),
                   if (_completed || _error != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -711,11 +706,17 @@ class _NextUpCard extends StatelessWidget {
 }
 
 class _VisualStage extends StatelessWidget {
-  const _VisualStage({required this.word, required this.theme, required this.playing});
+  const _VisualStage({
+    required this.word, required this.theme, required this.playing,
+    required this.accent, required this.onReplay, required this.onNotes,
+  });
 
   final Word word;
   final _PlayerTheme theme;
   final bool playing;
+  final Color accent;
+  final VoidCallback onReplay;
+  final VoidCallback onNotes;
 
   @override
   Widget build(BuildContext context) => AspectRatio(
@@ -736,18 +737,25 @@ class _VisualStage extends StatelessWidget {
           theme.image.startsWith('http')
             ? Image.network(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black))
             : Image.asset(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)),
-          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x14FFFFFF), Color(0x00000000), Color(0x00000000), Color(0x8C000000)], stops: [0, 0.2, 0.58, 1]))),
+          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x14FFFFFF), Color(0x00000000), Color(0x00000000), Color(0xD2000000)], stops: [0, 0.2, 0.52, 1]))),
           Positioned(
-            left: 0, right: 0, bottom: 42,
-            child: Text(
-              word.word.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xEBF5F5F7), fontSize: 12, fontWeight: FontWeight.w400, letterSpacing: 6, shadows: [Shadow(color: Color(0xB3000000), blurRadius: 18)]),
+            left: 0, right: 0, bottom: 0,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 28, 14, 14),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                  word.word.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xEBF5F5F7), fontSize: 12, fontWeight: FontWeight.w400, letterSpacing: 6, shadows: [Shadow(color: Color(0xB3000000), blurRadius: 18)]),
+                ),
+                const SizedBox(height: 8),
+                _WordOverlay(
+                  word: word, accent: accent, playing: playing, liked: false,
+                  onReplay: onReplay, onNotes: onNotes, onLike: () {},
+                  embedded: true,
+                ),
+              ]),
             ),
-          ),
-          Positioned(
-            left: 28, right: 28, bottom: 12, height: 28,
-            child: CustomPaint(painter: _ArtWavePainter(active: playing)),
           ),
         ]),
       ),
@@ -919,6 +927,7 @@ class _WordOverlay extends StatelessWidget {
   const _WordOverlay({
     required this.word, required this.accent, required this.playing,
     required this.liked, required this.onReplay, required this.onNotes, required this.onLike,
+    this.embedded = false,
   });
   final Word word;
   final Color accent;
@@ -927,12 +936,13 @@ class _WordOverlay extends StatelessWidget {
   final VoidCallback onReplay;
   final VoidCallback onNotes;
   final VoidCallback onLike;
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) => Container(
     width: double.infinity,
-    padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
-    decoration: BoxDecoration(
+    padding: embedded ? EdgeInsets.zero : const EdgeInsets.fromLTRB(14, 16, 14, 14),
+    decoration: embedded ? null : BoxDecoration(
       color: const Color(0xD1161618),
       borderRadius: BorderRadius.circular(23),
       border: Border.all(color: const Color(0x14FFFFFF)),

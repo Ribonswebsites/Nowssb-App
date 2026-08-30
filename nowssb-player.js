@@ -709,10 +709,32 @@
         '<div class="lgp-visual">' +
           '<div class="lgp-art-photo" style="background-image:url(\'' + th.img + '\')"></div>' +
           '<div class="lgp-art-shade" aria-hidden="true"></div>' +
-          '<p class="lgp-art-kicker">' + _e(String(w.word || '').toUpperCase()) + '</p>' +
-          '<svg class="lgp-wave" viewBox="0 0 320 36" preserveAspectRatio="none" aria-hidden="true">' +
-            '<path class="' + (playing ? 'is-on' : '') + '" d="M0 22 C 18 22 22 16 32 16 C 48 16 52 28 68 20 C 84 12 92 8 108 14 C 128 22 132 30 152 18 C 168 8 176 4 192 12 C 208 20 214 26 232 18 C 248 10 260 16 276 20 C 292 24 304 22 320 22" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"/>' +
-          '</svg>' +
+          '<div class="lgp-visual-overlay">' +
+            '<p class="lgp-art-kicker">' + _e(String(w.word || '').toUpperCase()) + '</p>' +
+            '<div class="lgp-wordblock">' +
+              (w.deva ? '<div class="lgp-deva nwsb-deva">' + _e(w.deva) + '</div>' : '') +
+              '<div class="lgp-syls">' + syl + '</div>' +
+              '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
+            '</div>' +
+            '<div class="lgp-acts">' +
+              '<button class="lgp-wa lgp-wa-replay" type="button"' +
+                ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
+                '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+                  '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+                  '<path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+                '</svg>' +
+              '</button>' +
+              '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
+              '<button class="lgp-wa lgp-wa-notes" id="lgpNotesBtn" type="button"' +
+                ' onclick="window.lgpOpenNotes&&window.lgpOpenNotes()" aria-label="Pronunciation notes">' +
+                '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+                  '<path d="M6 3.5h8.5L19 8v12.5H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+                  '<path d="M14 3.5V8h4.6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+                  '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
+                '</svg>' +
+              '</button>' +
+            '</div>' +
+          '</div>' +
           '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
@@ -764,35 +786,6 @@
             '</button>' +
           '</div>';
         })() +
-        '<div class="lgp-under">' +
-        '<div class="lgp-under-card">' +
-        '<div class="lgp-wordblock">' +
-          '<span class="lgp-eq lgp-eq-title" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' +
-          '<div class="lgp-title">' + (w.word || '') + '</div>' +
-          (w.deva ? '<div class="lgp-deva nwsb-deva">' + _e(w.deva) + '</div>' : '') +
-          '<div class="lgp-syls">' + syl + '</div>' +
-          '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
-        '</div>' +
-          '<div class="lgp-acts">' +
-            '<button class="lgp-wa lgp-wa-replay" type="button"' +
-              ' onclick="_pwPhase=\'idle\';pwPlay&&pwPlay()" aria-label="Replay">' +
-              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-                '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
-                '<path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-              '</svg>' +
-            '</button>' +
-            '<span class="lgp-wa-sep" aria-hidden="true"></span>' +
-            '<button class="lgp-wa lgp-wa-notes" id="lgpNotesBtn" type="button"' +
-              ' onclick="window.lgpOpenNotes&&window.lgpOpenNotes()" aria-label="Pronunciation notes">' +
-              '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-                '<path d="M6 3.5h8.5L19 8v12.5H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
-                '<path d="M14 3.5V8h4.6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
-                '<path d="M9 12h6M9 15.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
-              '</svg>' +
-            '</button>' +
-          '</div>' +
-        '</div>' +
-        '</div>' +
         /* Sentence · Practice · Store — back at the bottom. */
         prow +
       '</div>';

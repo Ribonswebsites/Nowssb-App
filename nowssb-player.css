@@ -1880,7 +1880,6 @@
 .lgp .lgp-levels,
 .lgp .lgp-info-cluster,
 .lgp .lgp-rail,
-.lgp .lgp-visual-overlay,
 .lgp .lgp-art-avatar,
 .lgp .lgp-art-dur,
 .lgp .lgp-profile-hero,
@@ -1927,13 +1926,7 @@
   padding-left: .5em; pointer-events: none;
   text-shadow: 0 2px 18px rgba(0,0,0,.7);
 }
-.lgp .lgp-wave {
-  position: absolute; left: 8%; right: 8%; bottom: 12px; z-index: 3;
-  height: 28px; width: 84%;
-  color: rgba(255,255,255,.82);
-  pointer-events: none;
-  filter: drop-shadow(0 0 6px rgba(255,255,255,.32));
-}
+.lgp .lgp-wave { display: none !important; }
 .lgp .lgp-wave .is-on { animation: lgpNpWave 2.4s ease-in-out infinite; transform-origin: center; }
 @keyframes lgpNpWave { 50% { transform: scaleY(1.18) translateY(-1px); } }
 
@@ -2065,14 +2058,18 @@
 }
 .lgp .lgp-tube .lgp-img {
   display: block !important;
-  width: 100% !important; height: 100% !important;
+  width: 48px !important; height: 48px !important;
+  min-width: 48px !important; min-height: 48px !important;
   background-size: contain !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
   filter: drop-shadow(0 8px 16px rgba(0,0,0,.55));
   pointer-events: none;
+  flex-shrink: 0;
 }
 .lgp .lgp-tube .lgp-play .lgp-img {
+  width: 64px !important; height: 64px !important;
+  min-width: 64px !important; min-height: 64px !important;
   filter: drop-shadow(0 10px 22px rgba(0,0,0,.6)) drop-shadow(0 0 16px rgba(255,255,255,.22));
 }
 .lgp .lgp-mode {
@@ -2368,4 +2365,77 @@
 }
 .lgp .lgp-tube .lgp-tube-svg svg { width: 20px; height: 20px; display: block; }
 .lgp .lgp-tube { max-width: 264px !important; padding: 6px 8px !important; }
+
+/* syllables + organ + acts live IN the artwork. wave is gone. */
+.lgp .lgp-visual-overlay {
+  display: flex !important;
+  position: absolute !important;
+  left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important;
+  z-index: 4;
+  padding: 28px 14px 14px !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 38%, rgba(0,0,0,.82) 100%) !important;
+  pointer-events: none;
+}
+.lgp .lgp-visual-overlay > * { pointer-events: auto; }
+.lgp .lgp-visual-overlay .lgp-art-kicker {
+  position: static !important;
+  left: auto; right: auto; bottom: auto !important;
+  margin: 0 0 2px !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  letter-spacing: .5em !important;
+  padding-left: .5em;
+  color: rgba(245,245,247,.92) !important;
+  text-shadow: 0 2px 18px rgba(0,0,0,.7);
+}
+.lgp .lgp-visual-overlay .lgp-wordblock {
+  display: flex; flex-direction: column; align-items: center; width: 100%;
+  padding: 0 !important; margin: 0 !important;
+}
+.lgp .lgp-visual-overlay .lgp-deva {
+  margin: 0 0 6px; font-size: 20px !important; line-height: 1.2;
+  text-shadow: 0 2px 16px rgba(0,0,0,.7);
+}
+.lgp .lgp-visual-overlay .lgp-syls {
+  margin: 0 !important; gap: 6px !important;
+}
+.lgp .lgp-visual-overlay .lgp-syl {
+  padding: 6px 13px !important;
+  min-width: 0 !important;
+  font-size: 13px;
+}
+.lgp .lgp-visual-overlay .lgp-syl-deva { font-size: 14px !important; }
+.lgp .lgp-visual-overlay .lgp-syl-rom { font-size: 13px !important; }
+.lgp .lgp-visual-overlay .lgp-syl-hold { display: none !important; }
+.lgp .lgp-visual-overlay .lgp-organ {
+  margin: 8px 0 0 !important;
+  font-size: 10px !important;
+  letter-spacing: .28em !important;
+  color: rgba(255,255,255,.62) !important;
+}
+.lgp .lgp-visual-overlay .lgp-acts {
+  margin: 8px 0 0 !important;
+}
+.lgp .lgp-under,
+.lgp .lgp-under-card { display: none !important; }
+
+.lgp .lgp-tube { max-width: 280px !important; padding: 6px 10px !important; overflow: visible !important; }
+.lgp .lgp-tube .lgp-ctrl,
+.lgp .lgp-tube .lgp-play,
+.lgp .lgp-tube .lgp-tube-svg { flex-shrink: 0 !important; }
+.lgp .lgp-tube .lgp-ctrl {
+  width: 48px !important; height: 48px !important;
+  min-width: 48px !important; min-height: 48px !important;
+  max-width: 48px !important; max-height: 48px !important;
+}
+.lgp .lgp-tube .lgp-play,
+.lgp .lgp-tube .lgp-play[onclick],
+.lgp .lgp-tube button.lgp-play {
+  width: 64px !important; height: 64px !important;
+  min-width: 64px !important; min-height: 64px !important;
+  max-width: 64px !important; max-height: 64px !important;
+}
 
