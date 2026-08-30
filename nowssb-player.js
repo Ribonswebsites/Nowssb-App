@@ -238,7 +238,7 @@
       }
     }
     var pill = document.querySelector('.lgp-profile-hero .lgp-level');
-    if (pill) pill.innerHTML = 'Level ' + n + ' <span aria-hidden="true">›</span>';
+    if (pill) pill.innerHTML = '<svg class="lgp-level-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>Level ' + n + ' <span aria-hidden="true">›</span>';
   };
 
 
@@ -385,8 +385,8 @@
        browser can't open/zoom it on tap and taps always hit the button */
     function bgi(cls, url) { return '<span class="' + cls + '" style="background-image:url(\'' + url + '\')"></span>'; }
     var playIco = playing
-      ? '<svg class="lgp-play-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg>'
-      : '<svg class="lgp-play-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2v13.6l11-6.8z"/></svg>';
+      ? bgi('lgp-img', IC.pause)
+      : bgi('lgp-img', IC.play);
     var prevSvg = bgi('lgp-img', IC.prev);
     var nextSvg = bgi('lgp-img', IC.next);
 
@@ -435,7 +435,7 @@
              already, and the bars beside the bar say when it is playing.
              The id stays on a hidden node — other code writes to it. */
           '<div class="lgp-status" id="spAutoStatus" hidden></div>' +
-          '<div class="lgp-playrow">' +
+          '<div class="lgp-tube">' +
             '<div class="lgp-controls">' +
               '<div class="lgp-transport">' +
                 '<button class="lgp-ctrl" id="lgpPrev" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + '>' + prevSvg + '</button>' +
@@ -614,32 +614,6 @@
             '</button>' +
           '</div>' +
         '</div>' +
-        /* Big profile — Image 2 layout: avatar + name + tagline + level, OUTSIDE the video. */
-        (function () {
-          var p = lgpUserProfile();
-          var st = lgpSessionStats();
-          var av = p.photo
-            ? '<img class="lgp-avatar-img" src="' + lgpEsc(p.photo) + '" alt="">'
-            : '<span class="lgp-avatar-init">' + lgpEsc(p.initials) + '</span>';
-          return '<div class="lgp-profile lgp-profile-hero">' +
-            '<div class="lgp-avatar" aria-hidden="true">' + av + '</div>' +
-            '<div class="lgp-id">' +
-              '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
-              '<div class="lgp-tagline">LISTEN · SPEAK · HEAL</div>' +
-              '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">Level ' + st.level + ' <span aria-hidden="true">›</span></button>' +
-            '</div>' +
-          '</div>' +
-          (function () {
-            var cur = st.level;
-            var items = '';
-            for (var i = 1; i <= 12; i++) {
-              items += (i > 1 ? '<span class="lgp-levels-sep" aria-hidden="true"></span>' : '') +
-                '<button class="lgp-levels-item' + (i === cur ? ' is-on' : '') + '" type="button" data-level="' + i + '"' +
-                ' onclick="window.lgpPickLevel&&window.lgpPickLevel(' + i + ')">Level ' + i + '</button>';
-            }
-            return '<div class="lgp-levels" id="lgpLevels"' + (_lgpLevelsOpen ? '' : ' hidden') + '>' + items + '</div>';
-          })();
-        })() +
         /* Stats row — real streak / sessions / time from the session log. */
         (function () {
           var st = lgpSessionStats();
@@ -663,6 +637,18 @@
             '</div>' +
           '</div></div>';
         })() +
+        /* Level list opens under the stats tab, next to the in-card pill. */
+        (function () {
+          var st = lgpSessionStats();
+          var cur = st.level;
+          var items = '';
+          for (var i = 1; i <= 12; i++) {
+            items += (i > 1 ? '<span class="lgp-levels-sep" aria-hidden="true"></span>' : '') +
+              '<button class="lgp-levels-item' + (i === cur ? ' is-on' : '') + '" type="button" data-level="' + i + '"' +
+              ' onclick="window.lgpPickLevel&&window.lgpPickLevel(' + i + ')">Level ' + i + '</button>';
+          }
+          return '<div class="lgp-levels" id="lgpLevels"' + (_lgpLevelsOpen ? '' : ' hidden') + '>' + items + '</div>';
+        })() +
         '<div class="lgp-visual">' + visual +
           /* ONE row across the top of the panel, not two islands pinned to
              the corners. Pinned, they overlapped the moment either side got
@@ -670,6 +656,24 @@
              the ritual is the only thing that can shrink, and it ellipsises
              instead of running under the bars. */
           '<div class="lgp-visual-top">' +
+            (function () {
+              var p = lgpUserProfile();
+              var st = lgpSessionStats();
+              var av = p.photo
+                ? '<img class="lgp-avatar-img" src="' + lgpEsc(p.photo) + '" alt="">'
+                : '<span class="lgp-avatar-init">' + lgpEsc(p.initials) + '</span>';
+              return '<div class="lgp-profile lgp-profile-hero">' +
+                '<div class="lgp-avatar" aria-hidden="true">' + av + '</div>' +
+                '<div class="lgp-id">' +
+                  '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
+                  '<div class="lgp-tagline">LISTEN · SPEAK · HEAL</div>' +
+                  '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">' +
+                    '<svg class="lgp-level-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>' +
+                    'Level ' + st.level + ' <span aria-hidden="true">›</span>' +
+                  '</button>' +
+                '</div>' +
+              '</div>';
+            })() +
             '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +

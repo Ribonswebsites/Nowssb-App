@@ -30,5 +30,9 @@ test('Flutter Player uses the same liquid-glass media structure as the WebView P
   assert.match(player, /_PlayerInfoSheet/);
   assert.match(player, /SoundLibraryScreen/);
   assert.match(player, /StoreScreen/);
+  assert.match(player, /compact: true/);
+  assert.match(player, /Icons\.star_rounded/);
+  assert.match(player, /lgp-play\.png/);
+  assert.match(player, /gwttc6\.png/);
   assert.match(video, /p\.startsWith\('http:\/\/'\)/);
 });

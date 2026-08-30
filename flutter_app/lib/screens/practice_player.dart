@@ -317,17 +317,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
-                  const SizedBox(height: 14),
-                  SizedBox(width: stageWidth, child: _ProfileHeader(onLevel: _openLevel)),
-                  const SizedBox(height: 12),
-                  SizedBox(width: stageWidth, child: const _StatsRow()),
                   const SizedBox(height: 10),
+                  SizedBox(width: stageWidth, child: const _StatsRow()),
+                  const SizedBox(height: 8),
                   SizedBox(width: stageWidth, child: _VisualStage(
                     word: _word,
                     theme: theme,
                     playing: _playing,
                     liked: _liked,
                     volume: _volume,
+                    onLevel: _openLevel,
                     onInfo: _openInfo,
                     onReplay: _prepareAndPlay,
                     onNotes: _openNotes,
@@ -463,16 +462,18 @@ class _StatCell extends StatelessWidget {
 }
 
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.onLevel});
+  const _ProfileHeader({required this.onLevel, this.compact = false});
   final VoidCallback onLevel;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final progress = PracticeProgress.instance;
-    return Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+    final avatar = compact ? 56.0 : 72.0;
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
-        width: 72,
-        height: 72,
+        width: avatar,
+        height: avatar,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: const LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8E8F5)]),
@@ -483,25 +484,31 @@ class _ProfileHeader extends StatelessWidget {
           ],
         ),
         alignment: Alignment.center,
-        child: const Text('H', style: TextStyle(color: Color(0xFF0A0A12), fontSize: 22, fontWeight: FontWeight.w800)),
+        child: Text('H', style: TextStyle(color: const Color(0xFF0A0A12), fontSize: compact ? 18 : 22, fontWeight: FontWeight.w800)),
       ),
-      const SizedBox(width: 14),
+      SizedBox(width: compact ? 10 : 14),
       Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Healer', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700, height: 1.15)),
-          const SizedBox(height: 4),
-          const Text('LISTEN · SPEAK · HEAL', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 9.5, fontWeight: FontWeight.w700, letterSpacing: 1.6)),
-          const SizedBox(height: 10),
+          Text('Healer', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: compact ? 18 : 22, fontWeight: FontWeight.w700, height: 1.15, shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 10)])),
+          const SizedBox(height: 2),
+          Text('LISTEN · SPEAK · HEAL', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: const Color(0x8CFFFFFF), fontSize: compact ? 8.5 : 9.5, fontWeight: FontWeight.w700, letterSpacing: 1.6, shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 8)])),
+          const SizedBox(height: 6),
           GestureDetector(
             onTap: onLevel,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              height: 26,
+              padding: const EdgeInsets.fromLTRB(10, 0, 12, 0),
               decoration: BoxDecoration(
-                color: const Color(0x1FE8D5A3),
+                color: const Color(0x29E8D5A3),
                 borderRadius: BorderRadius.circular(99),
-                border: Border.all(color: const Color(0x66E8D5A3)),
+                border: Border.all(color: const Color(0x73E8D5A3)),
+                boxShadow: const [BoxShadow(color: Color(0x47E8D5A3), blurRadius: 12)],
               ),
-              child: Text('Level ${progress.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 12),
+                const SizedBox(width: 6),
+                Text('Level ${progress.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700)),
+              ]),
             ),
           ),
         ]),
@@ -632,11 +639,15 @@ class _NextUpCard extends StatelessWidget {
                 GestureDetector(
                   onTap: onPlay,
                   child: Container(
-                    width: 36,
-                    height: 36,
+                    width: 44,
+                    height: 44,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC9A86A)]),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(color: Color(0x1FFFFFFF), blurRadius: 0, spreadRadius: 3),
+                        BoxShadow(color: Color(0x4D000000), blurRadius: 16, offset: Offset(0, 6)),
+                      ],
                     ),
                     child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A12), size: 22),
                   ),
@@ -650,7 +661,7 @@ class _NextUpCard extends StatelessWidget {
 class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word, required this.theme, required this.playing, required this.liked,
-    required this.volume, required this.onInfo,
+    required this.volume, required this.onLevel, required this.onInfo,
     required this.onReplay, required this.onNotes, required this.onLike,
     required this.onVolumeChanged,
   });
@@ -660,6 +671,7 @@ class _VisualStage extends StatelessWidget {
   final bool playing;
   final bool liked;
   final double volume;
+  final VoidCallback onLevel;
   final VoidCallback onInfo;
   final VoidCallback onReplay;
   final VoidCallback onNotes;
@@ -671,19 +683,26 @@ class _VisualStage extends StatelessWidget {
     aspectRatio: 1 / 0.92,
     child: ClipRRect(
       borderRadius: BorderRadius.circular(30),
-      child: Stack(fit: StackFit.expand, children: [
-        NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
-        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
-        Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
-        Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
-        Positioned(
-          left: 0, right: 0, bottom: 0,
-          child: _WordOverlay(
-            word: word, accent: theme.accent, playing: playing, liked: liked,
-            onReplay: onReplay, onNotes: onNotes, onLike: onLike,
-          ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: const Color(0x4DFFFFFF)),
         ),
-      ]),
+        child: Stack(fit: StackFit.expand, children: [
+          NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
+          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
+          Positioned(top: 10, left: 10, right: 52, child: _ProfileHeader(onLevel: onLevel, compact: true)),
+          Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
+          Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
+          Positioned(
+            left: 0, right: 0, bottom: 0,
+            child: _WordOverlay(
+              word: word, accent: theme.accent, playing: playing, liked: liked,
+              onReplay: onReplay, onNotes: onNotes, onLike: onLike,
+            ),
+          ),
+        ]),
+      ),
     ),
   );
 }
@@ -765,12 +784,16 @@ class _PronunciationChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.symmetric(horizontal: compact ? 9 : 13, vertical: compact ? 5 : 8),
-    decoration: BoxDecoration(color: const Color(0x2EFFFFFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0x66FFFFFF))),
+    padding: EdgeInsets.symmetric(horizontal: compact ? 13 : 13, vertical: compact ? 8 : 8),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(99),
+      boxShadow: const [BoxShadow(color: Color(0x47000000), blurRadius: 16, offset: Offset(0, 6))],
+    ),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
-      if (part.deva.isNotEmpty) Text(part.deva, style: TextStyle(color: Colors.white, fontSize: compact ? 12 : 16, height: 1.2)),
-      Text(part.roman.isEmpty ? part.deva : part.roman, style: TextStyle(color: Colors.white, fontSize: compact ? 10 : 13, fontWeight: FontWeight.w800, letterSpacing: .4)),
-      if (!compact) Text('${part.hold.toStringAsFixed(part.hold.truncateToDouble() == part.hold ? 0 : 1)}s', style: TextStyle(color: accent, fontSize: 9, fontWeight: FontWeight.w800)),
+      if (part.deva.isNotEmpty) Text(part.deva, style: TextStyle(color: const Color(0xFF0A0A12), fontSize: compact ? 12 : 16, height: 1.2)),
+      Text(part.roman.isEmpty ? part.deva : part.roman, style: TextStyle(color: const Color(0xFF0A0A12), fontSize: compact ? 10 : 13, fontWeight: FontWeight.w800, letterSpacing: .4)),
+      if (!compact) Text('${part.hold.toStringAsFixed(part.hold.truncateToDouble() == part.hold ? 0 : 1)}s', style: const TextStyle(color: Color(0x8C0A0A12), fontSize: 9, fontWeight: FontWeight.w800)),
     ]),
   );
 }
@@ -786,30 +809,34 @@ class _TransportTube extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onReplay;
 
+  static const _tube = 'https://media.nowssb.com/migrated-images/19432211f0f348fc_file_0000000016bc71fab1ae5a054ac772af_gwttc6.png';
+  static const _play = 'https://media.nowssb.com/migrated-images/74d38b3c7b69b30b_e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png';
+  static const _pause = 'https://media.nowssb.com/migrated-images/f073aa60452e1cb9_e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png';
+  static const _prev = 'https://media.nowssb.com/migrated-images/2f091c1083cd0b65_ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png';
+  static const _next = 'https://media.nowssb.com/migrated-images/71a2d8954b5e6209_c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png';
+
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      _ImageControl(asset: 'assets/player/lgp-prev.png', label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 48),
-      const SizedBox(width: 18),
+  Widget build(BuildContext context) => Container(
+    constraints: const BoxConstraints(maxWidth: 352, minHeight: 86),
+    padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 11),
+    decoration: const BoxDecoration(
+      image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
+    ),
+    child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 48),
       GestureDetector(
         onTap: onPlay,
-        child: Container(
-          width: 74,
-          height: 74,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(color: Color(0x66000000), blurRadius: 22, offset: Offset(0, 8)),
-              BoxShadow(color: Color(0x24FFFFFF), blurRadius: 0, spreadRadius: 5),
-            ],
+        child: SizedBox(
+          width: 66,
+          height: 66,
+          child: Image.asset(
+            playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => Image.network(playing ? _pause : _play, fit: BoxFit.contain),
           ),
-          child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, color: const Color(0xFF0A0A12), size: 36),
         ),
       ),
-      const SizedBox(width: 18),
-      _ImageControl(asset: 'assets/player/lgp-next.png', label: 'Next', onTap: hasNext ? onNext : null, size: 48),
+      _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: hasNext ? onNext : null, size: 48),
     ]),
   );
 }
@@ -917,13 +944,16 @@ class _VolumeRail extends StatelessWidget {
 }
 
 class _ImageControl extends StatelessWidget {
-  const _ImageControl({required this.asset, required this.label, required this.onTap, required this.size});
+  const _ImageControl({required this.asset, required this.label, required this.onTap, required this.size, this.network});
   final String asset;
   final String label;
   final VoidCallback? onTap;
   final double size;
+  final String? network;
   @override
-  Widget build(BuildContext context) => Semantics(button: true, label: label, child: Opacity(opacity: onTap == null ? .35 : 1, child: InkResponse(onTap: onTap, radius: size * .62, child: SizedBox(width: size, height: size, child: Image.asset(asset, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Icon(label == 'Play' ? Icons.play_arrow_rounded : Icons.circle_outlined, color: Colors.white, size: size * .68))))));
+  Widget build(BuildContext context) => Semantics(button: true, label: label, child: Opacity(opacity: onTap == null ? .35 : 1, child: InkResponse(onTap: onTap, radius: size * .62, child: SizedBox(width: size, height: size, child: Image.asset(asset, fit: BoxFit.contain, errorBuilder: (_, __, ___) => network != null
+    ? Image.network(network!, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Icon(label == 'Play' ? Icons.play_arrow_rounded : Icons.circle_outlined, color: Colors.white, size: size * .68))
+    : Icon(label == 'Play' ? Icons.play_arrow_rounded : Icons.circle_outlined, color: Colors.white, size: size * .68))))));
 }
 
 class _RadialOption extends StatelessWidget {
