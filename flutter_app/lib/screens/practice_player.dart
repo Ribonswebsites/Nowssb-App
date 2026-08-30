@@ -23,6 +23,22 @@ import '../widgets/app_backdrop.dart';
 import 'sound_library.dart';
 import 'store.dart';
 
+String _fmtClock(num sec) {
+  final s = sec.round().clamp(0, 24 * 3600);
+  final m = s ~/ 60;
+  final r = s % 60;
+  return '$m:${r.toString().padLeft(2, '0')}';
+}
+
+String _wordClock(Word word) {
+  var sec = 0.0;
+  for (final part in word.parts) {
+    sec += part.hold;
+  }
+  if (sec < 8) sec = 321;
+  return _fmtClock(sec);
+}
+
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({super.key, required this.words, required this.title});
 
@@ -317,14 +333,14 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   Text(
                     _word.word,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white, fontSize: 44, fontWeight: FontWeight.w800, height: 1.02, letterSpacing: -1.2, shadows: [Shadow(color: Color(0x73000000), blurRadius: 22)]),
+                    style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 46, fontWeight: FontWeight.w600, height: 1.02, letterSpacing: -1.1, fontFamily: 'Georgia', shadows: [Shadow(color: Color(0x73000000), blurRadius: 22)]),
                   ),
-                  const SizedBox(height: 6),
-                  const Text('NowssB', style: TextStyle(color: Color(0x9EFFFFFF), fontSize: 15, fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 4),
+                  const Text('NowssB', style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 15, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
                   SizedBox(width: stageWidth, child: _VisualStage(
                     word: _word,
@@ -343,6 +359,18 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     },
                   )),
                   const SizedBox(height: 10),
+                  SizedBox(width: math.min(stageWidth, 360), child: _TransportTube(
+                    playing: _playing,
+                    hasPrevious: _index > 0,
+                    hasNext: _index < widget.words.length - 1,
+                    durationLabel: _wordClock(_word),
+                    onLibrary: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
+                    onPrevious: () => _move(-1),
+                    onPlay: _togglePlay,
+                    onNext: () => _move(1),
+                    onReplay: _prepareAndPlay,
+                  )),
+                  const SizedBox(height: 10),
                   SizedBox(width: stageWidth, child: _NextUpCard(
                     next: _index < widget.words.length - 1 ? widget.words[_index + 1] : null,
                     art: _index < widget.words.length - 1
@@ -352,16 +380,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                     onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
                   )),
                   const SizedBox(height: 12),
-                  SizedBox(width: math.min(stageWidth, 352), child: _TransportTube(
-                    playing: _playing,
-                    hasPrevious: _index > 0,
-                    hasNext: _index < widget.words.length - 1,
-                    onLibrary: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
-                    onPrevious: () => _move(-1),
-                    onPlay: _togglePlay,
-                    onNext: () => _move(1),
-                    onReplay: _prepareAndPlay,
-                  )),
+                  SizedBox(
+                    width: stageWidth,
+                    child: _WordOverlay(
+                      word: _word, accent: theme.accent, playing: _playing, liked: _liked,
+                      onReplay: _prepareAndPlay, onNotes: _openNotes, onLike: _toggleLike,
+                    ),
+                  ),
                   if (_completed || _error != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -410,16 +435,13 @@ class _PlayerHeader extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
     height: 46,
     child: Stack(alignment: Alignment.center, children: [
-      Align(alignment: Alignment.centerLeft, child: _RoundIconButton(icon: Icons.keyboard_arrow_down_rounded, onTap: onBack)),
-      const Row(mainAxisSize: MainAxisSize.min, children: [
+      Align(alignment: Alignment.centerLeft, child: _BareIconButton(icon: Icons.keyboard_arrow_down_rounded, onTap: onBack)),
+      const Column(mainAxisSize: MainAxisSize.min, children: [
         Text('Now Playing', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: .3)),
-        SizedBox(width: 8),
-        DecoratedBox(
-          decoration: BoxDecoration(color: Color(0xFFE8D5A3), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0xE8E8D5A3), blurRadius: 10)]),
-          child: SizedBox(width: 7, height: 7),
-        ),
+        SizedBox(height: 6),
+        ColoredBox(color: Color(0xFFE8D5A3), child: SizedBox(width: 28, height: 2)),
       ]),
-      Align(alignment: Alignment.centerRight, child: _RoundIconButton(icon: Icons.more_horiz_rounded, onTap: onSettings)),
+      Align(alignment: Alignment.centerRight, child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onSettings)),
     ]),
   );
 }
@@ -617,8 +639,13 @@ class _NextUpCard extends StatelessWidget {
                 ),
               ]),
             )
-          : Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+          : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(14, 10, 14, 0),
+                child: Text('UP NEXT', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
+              ),
+              Padding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 8, 12),
               child: Row(children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(14),
@@ -634,35 +661,26 @@ class _NextUpCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('NEXT UP', style: TextStyle(color: Color(0x80FFFFFF), fontSize: 8.5, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
-                    Text(word.word, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-                    Text(
-                      word.organ.isNotEmpty ? word.organ : (word.categories.isNotEmpty ? word.categories.first : 'Next word'),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 10, letterSpacing: .8),
-                    ),
-                  ]),
+                  child: GestureDetector(
+                    onTap: onPlay,
+                    behavior: HitTestBehavior.opaque,
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(word.word, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+                      Text(_wordClock(word), style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, letterSpacing: .2)),
+                    ]),
+                  ),
                 ),
                 GestureDetector(
-                  onTap: onPlay,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(color: Color(0x1FFFFFFF), blurRadius: 0, spreadRadius: 3),
-                        BoxShadow(color: Color(0x4D000000), blurRadius: 16, offset: Offset(0, 6)),
-                      ],
-                    ),
-                    child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A12), size: 22),
+                  onTap: onAdd,
+                  child: const SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Icon(Icons.more_horiz_rounded, color: Color(0xBFFFFFFF), size: 22),
                   ),
                 ),
               ]),
             ),
+            ]),
     );
   }
 }
@@ -699,18 +717,46 @@ class _VisualStage extends StatelessWidget {
         ),
         child: Stack(fit: StackFit.expand, children: [
           NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
-          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xE6060A16)]))),
-          Positioned(top: 14, left: 16, child: Text(word.word.toUpperCase(), style: const TextStyle(color: Color(0xDBFFFFFF), fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 2.2, shadows: [Shadow(color: Color(0xCC000000), blurRadius: 10)]))),
-          Positioned(top: 10, right: 10, child: _RoundIconButton(icon: Icons.info_outline_rounded, onTap: onInfo, size: 36)),
-          Positioned(right: 10, bottom: 10, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
+          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x09060A16), Color(0x00060A16), Color(0xC8060A16)]))),
           Positioned(
-            left: 12, right: 52, bottom: 12,
-            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _ProfileHeader(onLevel: onLevel, compact: true),
-              const SizedBox(height: 10),
-              _WordOverlay(
-                word: word, accent: theme.accent, playing: playing, liked: liked,
-                onReplay: onReplay, onNotes: onNotes, onLike: onLike,
+            top: 12, left: 12,
+            child: Container(
+              width: 34, height: 34,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8E8F5)]),
+                border: Border.all(color: const Color(0xB3FFFFFF), width: 1.5),
+                boxShadow: const [BoxShadow(color: Color(0x59000000), blurRadius: 14)],
+              ),
+              child: const Text('H', style: TextStyle(color: Color(0xFF0A0A12), fontSize: 11, fontWeight: FontWeight.w800)),
+            ),
+          ),
+          Positioned(
+            top: 14, right: 14,
+            child: Text(_wordClock(word), style: const TextStyle(color: Color(0xEBFFFFFF), fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: .4, shadows: [Shadow(color: Color(0xCC000000), blurRadius: 8)])),
+          ),
+          Positioned(right: 10, bottom: 52, child: _VolumeRail(value: volume, onChanged: onVolumeChanged)),
+          Positioned(
+            left: 14, right: 14, bottom: 12,
+            child: Row(children: [
+              const Expanded(child: Text('Healing through words', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, shadows: [Shadow(color: Color(0xCC000000), blurRadius: 8)]))),
+              GestureDetector(
+                onTap: onLevel,
+                child: Container(
+                  height: 26,
+                  padding: const EdgeInsets.fromLTRB(10, 0, 12, 0),
+                  decoration: BoxDecoration(
+                    color: const Color(0x29E8D5A3),
+                    borderRadius: BorderRadius.circular(99),
+                    border: Border.all(color: const Color(0x73E8D5A3)),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 12),
+                    const SizedBox(width: 6),
+                    Text('Level ${PracticeProgress.instance.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700)),
+                  ]),
+                ),
               ),
             ]),
           ),
@@ -734,19 +780,15 @@ class _WordOverlay extends StatelessWidget {
   final VoidCallback onLike;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(16, 36, 16, 12),
-    decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00060A16), Color(0xA8060A16), Color(0xF0060A16)])),
-    child: Column(mainAxisSize: MainAxisSize.min, children: [
+  Widget build(BuildContext context) => Column(mainAxisSize: MainAxisSize.min, children: [
       if (word.parts.isNotEmpty) ...[
-        const SizedBox(height: 12),
         Wrap(spacing: 6, runSpacing: 6, alignment: WrapAlignment.center, children: word.parts.map((part) => _PronunciationChip(part: part, accent: accent, compact: true)).toList()),
       ],
       if (word.organ.isNotEmpty) ...[
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Text(word.organ.toUpperCase(), style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 3.6)),
       ],
-      const SizedBox(height: 12),
+      const SizedBox(height: 10),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         decoration: BoxDecoration(
@@ -762,8 +804,7 @@ class _WordOverlay extends StatelessWidget {
           _ActBtn(icon: liked ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: liked ? accent : Colors.white, onTap: onLike),
         ]),
       ),
-    ]),
-  );
+    ]);
 }
 
 class _ActBtn extends StatelessWidget {
@@ -805,10 +846,11 @@ class _PronunciationChip extends StatelessWidget {
 }
 
 class _TransportTube extends StatelessWidget {
-  const _TransportTube({required this.playing, required this.hasPrevious, required this.hasNext, required this.onLibrary, required this.onPrevious, required this.onPlay, required this.onNext, required this.onReplay});
+  const _TransportTube({required this.playing, required this.hasPrevious, required this.hasNext, required this.durationLabel, required this.onLibrary, required this.onPrevious, required this.onPlay, required this.onNext, required this.onReplay});
   final bool playing;
   final bool hasPrevious;
   final bool hasNext;
+  final String durationLabel;
   final VoidCallback onLibrary;
   final VoidCallback onPrevious;
   final VoidCallback onPlay;
@@ -822,29 +864,35 @@ class _TransportTube extends StatelessWidget {
   static const _next = 'https://media.nowssb.com/migrated-images/71a2d8954b5e6209_c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png';
 
   @override
-  Widget build(BuildContext context) => Container(
-    constraints: const BoxConstraints(maxWidth: 352, minHeight: 86),
-    padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 11),
-    decoration: const BoxDecoration(
-      image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
-    ),
-    child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 48),
-      GestureDetector(
-        onTap: onPlay,
-        child: SizedBox(
-          width: 66,
-          height: 66,
-          child: Image.asset(
-            playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => Image.network(playing ? _pause : _play, fit: BoxFit.contain),
-          ),
+  Widget build(BuildContext context) => Row(children: [
+    SizedBox(width: 36, child: Text('0:00', style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600))),
+    Expanded(
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 86),
+        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 11),
+        decoration: const BoxDecoration(
+          image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
         ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 48),
+          GestureDetector(
+            onTap: onPlay,
+            child: SizedBox(
+              width: 66,
+              height: 66,
+              child: Image.asset(
+                playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => Image.network(playing ? _pause : _play, fit: BoxFit.contain),
+              ),
+            ),
+          ),
+          _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: hasNext ? onNext : null, size: 48),
+        ]),
       ),
-      _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: hasNext ? onNext : null, size: 48),
-    ]),
-  );
+    ),
+    SizedBox(width: 36, child: Text(durationLabel, textAlign: TextAlign.right, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600))),
+  ]);
 }
 
 class _WordActionStrip extends StatelessWidget {
@@ -903,6 +951,19 @@ class _RoundIconButton extends StatelessWidget {
     color: const Color(0x2EFFFFFF),
     shape: const CircleBorder(side: BorderSide(color: Color(0x66FFFFFF))),
     child: InkWell(customBorder: const CircleBorder(), onTap: onTap, child: SizedBox(width: size, height: size, child: Icon(icon, color: Colors.white, size: size * .48))),
+  );
+}
+
+class _BareIconButton extends StatelessWidget {
+  const _BareIconButton({required this.icon, required this.onTap});
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: SizedBox(width: 42, height: 42, child: Icon(icon, color: Colors.white, size: 26)),
   );
 }
 

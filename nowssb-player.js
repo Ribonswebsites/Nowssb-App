@@ -131,6 +131,23 @@
     var r = m % 60;
     return r ? (h + 'h ' + r + 'm') : (h + 'h');
   }
+  function lgpFmtClock(sec) {
+    sec = Math.max(0, Math.round(Number(sec) || 0));
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+  function lgpWordSecs(word) {
+    if (!word) return 321;
+    var parts = (word.parts && word.parts.length) ? word.parts : [];
+    var sec = 0;
+    for (var i = 0; i < parts.length; i++) {
+      var h = parseFloat(parts[i].hold);
+      if (h > 0) sec += h;
+    }
+    if (sec < 8 && word.syllables && word.syllables.length) sec = word.syllables.length * 4;
+    return sec < 8 ? 321 : Math.round(sec);
+  }
   function lgpReadSessions() {
     var map = {};
     function ingest(obj) {
@@ -427,6 +444,12 @@
                   : '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + _newVidSrc + '"></video>')
       : '<div class="lgp-video-fallback"></div>';
 
+    var _prof = lgpUserProfile();
+    var _dur = lgpFmtClock(lgpWordSecs(w));
+    var _av = _prof.photo
+      ? '<img class="lgp-avatar-img" src="' + lgpEsc(_prof.photo) + '" alt="">'
+      : '<span class="lgp-avatar-init">' + lgpEsc(_prof.initials) + '</span>';
+
     /* phase-aware center block — preserves the original IDs so play/record/score work */
     var center =
       '<div class="lgp-phase">' +
@@ -435,6 +458,8 @@
              already, and the bars beside the bar say when it is playing.
              The id stays on a hidden node — other code writes to it. */
           '<div class="lgp-status" id="spAutoStatus" hidden></div>' +
+          '<div class="lgp-tube-row">' +
+          '<span class="lgp-t0">0:00</span>' +
           '<div class="lgp-tube">' +
             '<div class="lgp-controls">' +
               '<div class="lgp-transport">' +
@@ -443,6 +468,8 @@
                 '<button class="lgp-ctrl" id="lgpNext" onclick="pwNextWord&&pwNextWord()" ' + (idx >= total - 1 ? 'disabled' : '') + '>' + nextSvg + '</button>' +
               '</div>' +
             '</div>' +
+          '</div>' +
+          '<span class="lgp-t1">' + _dur + '</span>' +
           '</div>' +
         '</div>' +
         /* The "Word played · your turn" page used to sit here — a whole
@@ -656,7 +683,8 @@
              the ritual is the only thing that can shrink, and it ellipsises
              instead of running under the bars. */
           '<div class="lgp-visual-top">' +
-            '<p class="lgp-art-kicker">' + _e(w.word || '') + '</p>' +
+            '<div class="lgp-art-avatar" aria-hidden="true">' + _av + '</div>' +
+            '<div class="lgp-art-dur">' + _dur + '</div>' +
             '<div class="lgp-info-cluster" id="lgpInfoCluster">' +
             '<div class="lgp-info-pill"><span class="lgp-info-pill-txt" id="lgpInfoPillTxt">Learn more</span></div>' +
             '<button class="lgp-info-btn" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
@@ -687,31 +715,51 @@
               '</svg>' +
             '</button>' +
           '</div>' +
-        /* The bottom of the picture: the word. */
+        /* The bottom of the picture: tagline + level, matching the mockup. */
         '<div class="lgp-visual-overlay">' +
         (function () {
-          var p = lgpUserProfile();
           var st = lgpSessionStats();
-          var av = p.photo
-            ? '<img class="lgp-avatar-img" src="' + lgpEsc(p.photo) + '" alt="">'
-            : '<span class="lgp-avatar-init">' + lgpEsc(p.initials) + '</span>';
-          return '<div class="lgp-profile lgp-profile-hero">' +
-            '<div class="lgp-avatar" aria-hidden="true">' + av + '</div>' +
-            '<div class="lgp-id">' +
-              '<div class="lgp-uname">' + lgpEsc(p.name) + '</div>' +
-              '<div class="lgp-tagline">Healing through words</div>' +
-              '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">' +
-                '<svg class="lgp-level-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>' +
-                'Level ' + st.level +
+          return '<div class="lgp-profile lgp-profile-hero lgp-hero-foot">' +
+            '<div class="lgp-tagline">Healing through words</div>' +
+            '<button class="lgp-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">' +
+              '<svg class="lgp-level-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>' +
+              'Level ' + st.level +
+              ' <span aria-hidden="true">›</span>' +
+            '</button>' +
+          '</div>';
+        })() +
+        '</div>' +   /* end .lgp-visual-overlay */
+        '</div>' +   /* end .lgp-visual */
+        center +
+        (function () {
+          var next = words[idx + 1];
+          if (!next) {
+            return '<div class="lgp-nextup" id="lgpNextUp">' +
+              '<div class="lgp-nextup-empty">No more sessions queued' +
+                '<button type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()">Add a session</button>' +
+              '</div>' +
+            '</div>';
+          }
+          var art = next.img || th.img || '';
+          var nextDur = lgpFmtClock(lgpWordSecs(next));
+          return '<div class="lgp-nextup" id="lgpNextUp">' +
+            '<div class="lgp-nextup-head"><span>Up Next</span></div>' +
+            '<div class="lgp-nextup-item" onclick="window.lgpPlayNext&&window.lgpPlayNext()">' +
+              '<div class="lgp-nextup-art"' + (art ? ' style="background-image:url(\'' + lgpEsc(art) + '\')"' : '') + '></div>' +
+              '<div class="lgp-nextup-mid">' +
+                '<div class="lgp-nextup-title">' + lgpEsc(next.word || '') + '</div>' +
+                '<div class="lgp-nextup-sub">' + nextDur + '</div>' +
+              '</div>' +
+              '<button class="lgp-nextup-more" type="button" onclick="event.stopPropagation();window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' +
+                '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>' +
               '</button>' +
             '</div>' +
           '</div>';
         })() +
+        '<div class="lgp-under">' +
         '<div class="lgp-wordblock">' +
           '<span class="lgp-eq lgp-eq-title" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' +
           '<div class="lgp-title">' + (w.word || '') + '</div>' +
-            /* The word as it is actually written. The roman title above is
-               the reading aid, not the word. */
           (w.deva ? '<div class="lgp-deva nwsb-deva">' + _e(w.deva) + '</div>' : '') +
           '<div class="lgp-syls">' + syl + '</div>' +
           '<div class="lgp-organ">' + (w.organ || '') + '</div>' +
@@ -740,35 +788,7 @@
               '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z"/></svg>' +
             '</button>' +
           '</div>' +
-        '</div>' +   /* end .lgp-visual-overlay */
-        '</div>' +   /* end .lgp-visual */
-        (function () {
-          var next = words[idx + 1];
-          if (!next) {
-            return '<div class="lgp-nextup" id="lgpNextUp">' +
-              '<div class="lgp-nextup-empty">No more sessions queued' +
-                '<button type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()">Add a session</button>' +
-              '</div>' +
-            '</div>';
-          }
-          var art = next.img || th.img || '';
-          var sub = (next.organ || (next.categories && next.categories[0]) || 'Next word').toString();
-          return '<div class="lgp-nextup" id="lgpNextUp">' +
-            '<div class="lgp-nextup-head"><span>Up Next</span></div>' +
-            '<div class="lgp-nextup-item">' +
-              '<div class="lgp-nextup-art"' + (art ? ' style="background-image:url(\'' + lgpEsc(art) + '\')"' : '') + '></div>' +
-              '<div class="lgp-nextup-mid">' +
-                '<div class="lgp-nextup-eye">NEXT UP</div>' +
-                '<div class="lgp-nextup-title">' + lgpEsc(next.word || '') + '</div>' +
-                '<div class="lgp-nextup-sub">' + lgpEsc(sub) + '</div>' +
-              '</div>' +
-              '<button class="lgp-nextup-play" type="button" onclick="window.lgpPlayNext&&window.lgpPlayNext()" aria-label="Play next">' +
-                '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' +
-              '</button>' +
-            '</div>' +
-          '</div>';
-        })() +
-        center +
+        '</div>' +
         /* Sentence · Practice · Store — back at the bottom. */
         prow +
       '</div>';
