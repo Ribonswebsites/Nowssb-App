@@ -142,11 +142,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     showDialog<void>(
       context: context,
       barrierColor: const Color(0xB8060C18),
-      builder: (context) => Dialog(
+      builder: (context) => const Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
-        child: const _LevelList(),
+        insetPadding: EdgeInsets.symmetric(horizontal: 28, vertical: 48),
+        child: _LevelList(),
       ),
     );
   }
@@ -900,34 +900,12 @@ class _RoundIconButton extends StatelessWidget {
   );
 }
 
-class _InfoPill extends StatelessWidget {
-  const _InfoPill();
-  @override
-  Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), decoration: BoxDecoration(color: const Color(0x2BFFFFFF), borderRadius: BorderRadius.circular(99)), child: const Text('Learn more', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)));
-}
-
 class _Equalizer extends StatelessWidget {
   const _Equalizer({required this.active, required this.accent});
   final bool active;
   final Color accent;
   @override
   Widget build(BuildContext context) => Row(crossAxisAlignment: CrossAxisAlignment.center, children: List.generate(4, (i) => AnimatedContainer(duration: Duration(milliseconds: active ? 300 + i * 90 : 180), curve: Curves.easeInOut, width: 2.5, height: active ? 8.0 + (i.isEven ? 8 : 3) : 7.0 + i * 2, margin: const EdgeInsets.symmetric(horizontal: 1), decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(3), boxShadow: [BoxShadow(color: accent.withOpacity(.7), blurRadius: 5)]))));
-}
-
-class _GlassRail extends StatelessWidget {
-  const _GlassRail({required this.children});
-  final List<Widget> children;
-  @override
-  Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(vertical: 4), decoration: BoxDecoration(color: const Color(0x2BFFFFFF), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x55FFFFFF))), child: Column(children: children));
-}
-
-class _RailButton extends StatelessWidget {
-  const _RailButton({required this.icon, required this.onTap, this.color});
-  final IconData icon;
-  final VoidCallback onTap;
-  final Color? color;
-  @override
-  Widget build(BuildContext context) => IconButton(onPressed: onTap, icon: Icon(icon, color: color ?? Colors.white, size: 19), visualDensity: VisualDensity.compact, tooltip: 'Player control');
 }
 
 class _VolumeRail extends StatelessWidget {

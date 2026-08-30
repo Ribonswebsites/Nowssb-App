@@ -1523,7 +1523,7 @@ if ('serviceWorker' in navigator) {
   // through sw.js's own fetch handler, and every asset URL carries its own
   // ?v= cache-busting query string, so the very next natural navigation
   // already gets fully fresh content without forcing a reload mid-session.
-  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+  navigator.serviceWorker.register('./sw.js?v=959', { updateViaCache: 'none' }).then(reg => {
     try { reg.update(); } catch (e) {}
   }).catch(err => {
     console.info('PWA service worker not registered:', err.message);

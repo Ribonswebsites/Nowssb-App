@@ -42,12 +42,12 @@ test('Flutter player matches the web stats / profile / next-up surgery', () => {
 test('Website and WebView cache-bust pins the rebuilt player, not the old files', () => {
   const html = read('index.html');
   const sw = read('sw.js');
-  assert.match(html, /nowssb-player\.css\?v=222/);
-  assert.match(html, /nowssb-player\.js\?v=315/);
-  assert.doesNotMatch(html, /nowssb-player\.css\?v=221/);
-  assert.doesNotMatch(html, /nowssb-player\.js\?v=314/);
-  assert.match(sw, /nowsbansiu-v958/);
-  assert.doesNotMatch(sw, /nowsbansiu-v957/);
+  assert.match(html, /nowssb-player\.css\?v=223/);
+  assert.match(html, /nowssb-player\.js\?v=316/);
+  assert.doesNotMatch(html, /nowssb-player\.css\?v=222/);
+  assert.doesNotMatch(html, /nowssb-player\.js\?v=315/);
+  assert.match(sw, /nowsbansiu-v959/);
+  assert.doesNotMatch(sw, /nowsbansiu-v958/);
 });
 
 test('Profile and level sit inside the video; play is the sphere image in the glass tube', () => {

@@ -71,6 +71,6 @@ test('WebView refreshes selected Fashion Plus video and image backgrounds for ev
   assert.match(css, /nwsb-bg-fade-out/);
   assert.match(css, /body\.nwsb-custom-fashion-bg:not\(\.fashplus\) #appBg/);
   assert.match(html, /nowssb-nm\.css\?v=792/);
-  assert.match(html, /part012\.js\?v=256/);
+  assert.match(html, /part012\.js\?v=257/);
   assert.match(html, /part076\.js\?v=114/);
 });
