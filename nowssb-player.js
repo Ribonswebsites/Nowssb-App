@@ -453,7 +453,8 @@
     var nextIco = bgi('lgp-img', IC.next);
     var prevSvg = prevIco;
     var nextSvg = nextIco;
-    var rewindSvg = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.5 12 20 6.2v11.6L11.5 12zm-7.3 5.8V6.2h1.9v11.6z"/></svg>';
+    var rewindSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m11 12 9-5.4v10.8L11 12z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M2 12 11 6.6v10.8L2 12z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
+    var replayTubeSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M3 3v5h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     var shuffleSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m18 14 4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="m18 2 4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 18h1.88a6 6 0 0 0 4.5-2.13l6.24-7.74A6 6 0 0 1 16.12 6H22" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 6h1.88a6 6 0 0 1 4.5 2.13l6.24 7.74A6 6 0 0 0 16.12 18H22" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     var repeatSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m17 2 4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11V9a4 4 0 0 1 4-4h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="m7 22-4-4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 13v2a4 4 0 0 1-4 4H3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     var queueSvg = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16 5H3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M16 12H3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 19H3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M21 15V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="18.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>';
@@ -512,9 +513,11 @@
           '<div class="lgp-np-transport">' +
             '<button class="lgp-mode lgp-mode-shuffle' + (window.lgpShuffle() ? ' is-on' : '') + '" type="button" onclick="window.lgpToggleShuffle&&window.lgpToggleShuffle()" aria-label="Shuffle" aria-pressed="' + (window.lgpShuffle() ? 'true' : 'false') + '">' + shuffleSvg + '</button>' +
             '<div class="lgp-tube">' +
+              '<button class="lgp-tube-svg lgp-rewind" type="button" onclick="window.lgpRewind&&window.lgpRewind()" aria-label="Rewind">' + rewindSvg + '</button>' +
               '<button class="lgp-ctrl" id="lgpPrev" type="button" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + ' aria-label="Previous">' + prevIco + '</button>' +
               '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" type="button" onclick="pwTogglePlay&&pwTogglePlay()" aria-label="' + (playing ? 'Pause' : 'Play') + '">' + playIco + '</button>' +
               '<button class="lgp-ctrl" id="lgpNext" type="button" onclick="window.lgpGoNext&&window.lgpGoNext()" ' + (idx >= total - 1 && !window.lgpShuffle() ? 'disabled' : '') + ' aria-label="Next">' + nextIco + '</button>' +
+              '<button class="lgp-tube-svg lgp-replay-top" type="button" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replayTubeSvg + '</button>' +
             '</div>' +
             '<button class="lgp-mode lgp-mode-repeat' + (loop ? ' is-on' : '') + '" type="button" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()" aria-label="Repeat" aria-pressed="' + (loop ? 'true' : 'false') + '">' + repeatSvg + '</button>' +
           '</div>' +
@@ -679,9 +682,9 @@
           '</button>' +
           '<div class="lgp-now" aria-hidden="true"><span>Now Playing</span><i></i></div>' +
           '<div class="lgp-top-right">' +
-            '<button class="lgp-now-btn lgp-rewind" type="button" onclick="window.lgpRewind&&window.lgpRewind()" aria-label="Rewind">' + rewindSvg + '</button>' +
-            '<button class="lgp-now-btn lgp-replay-top" type="button" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + bgi('lgp-top-ico', IC.replay) + '</button>' +
-            '<button class="lgp-settings lgp-now-btn" type="button" aria-label="Settings">' + bgi('lgp-top-ico', IC.settings) + '</button>' +
+            '<button class="lgp-settings lgp-now-btn" type="button" aria-label="More">' +
+              '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>' +
+            '</button>' +
           '</div>' +
         '</div>' +
         (function () {
@@ -740,9 +743,7 @@
               '<div class="lgp-nextup-head"><span>Up Next</span>' +
                 '<button class="lgp-queue-btn" type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
               '</div>' +
-              '<div class="lgp-nextup-empty">End of queue' +
-                '<button type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()">Add a session</button>' +
-              '</div>' +
+              '<p class="lgp-nextup-empty">End of queue</p>' +
             '</div>';
           }
           var art = next.img || th.img || '';
@@ -751,16 +752,16 @@
             '<div class="lgp-nextup-head"><span>Up Next</span>' +
               '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
             '</div>' +
-            '<div class="lgp-nextup-item" onclick="window.lgpPlayNext&&window.lgpPlayNext()">' +
-              '<div class="lgp-nextup-art"' + (art ? ' style="background-image:url(\'' + lgpEsc(art) + '\')"' : '') + '></div>' +
-              '<div class="lgp-nextup-mid">' +
-                '<div class="lgp-nextup-title">' + lgpEsc(next.word || '') + '</div>' +
-                '<div class="lgp-nextup-sub">NowssB · ' + nextDur + '</div>' +
-              '</div>' +
-              '<button class="lgp-nextup-play" type="button" onclick="event.stopPropagation();window.lgpPlayNext&&window.lgpPlayNext()" aria-label="Play next">' +
-                '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.2 5.4v13.2L19 12z"/></svg>' +
-              '</button>' +
-            '</div>' +
+            '<button class="lgp-nextup-item" type="button" onclick="window.lgpPlayNext&&window.lgpPlayNext()">' +
+              '<span class="lgp-nextup-art"' + (art ? ' style="background-image:url(\'' + lgpEsc(art) + '\')"' : '') + '></span>' +
+              '<span class="lgp-nextup-mid">' +
+                '<b>' + lgpEsc(next.word || '') + '</b>' +
+                '<em>NowssB<span aria-hidden="true"> · </span>' + nextDur + '</em>' +
+              '</span>' +
+              '<span class="lgp-nextup-play" aria-hidden="true">' +
+                '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.2 5.4v13.2L19 12z"/></svg>' +
+              '</span>' +
+            '</button>' +
           '</div>';
         })() +
         '<div class="lgp-under">' +
