@@ -1884,27 +1884,35 @@
 .lgp .lgp-art-dur,
 .lgp .lgp-profile-hero,
 .lgp .lgp-hero-foot,
-.lgp .lgp-tube,
 .lgp .lgp-tube-row,
 .lgp .lgp-t0,
 .lgp .lgp-t1,
-.lgp .lgp-visual-top { display: none !important; }
+.lgp .lgp-visual-top,
+.lgp .lgp-video,
+.lgp .lgp-pr-glass,
+.lgp .lgp-wa-vid { display: none !important; }
 
 .lgp .lgp-visual {
-  width: 100%; max-width: 360px;
-  aspect-ratio: 1 / 1;
-  max-height: min(46vh, 380px);
-  margin: 12px auto 0 !important;
+  width: min(100%, 340px) !important;
+  max-width: 340px !important;
+  aspect-ratio: 1 / 1 !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 14px auto 0 !important;
   border-radius: 2.15rem !important;
   overflow: hidden;
   background: #000;
+  flex: 0 0 auto !important;
+  align-self: center;
   border: 1px solid rgba(255,255,255,.16) !important;
   box-shadow: 0 0 0 1px rgba(255,255,255,.05) inset, 0 0 42px rgba(255,255,255,.06), 0 28px 60px rgba(0,0,0,.58);
 }
-.lgp .lgp-video {
-  mix-blend-mode: screen; opacity: .92;
-  border-radius: 2.15rem !important;
+.lgp .lgp-art-photo {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  z-index: 1;
 }
+.lgp .lgp-video { display: none !important; }
 .lgp .lgp-art-shade {
   position: absolute; inset: 0; pointer-events: none; z-index: 2;
   background: linear-gradient(180deg, rgba(255,255,255,.08) 0%, transparent 20%, transparent 58%, rgba(0,0,0,.55) 100%);
@@ -1969,24 +1977,41 @@
   width: 100%; max-width: 360px; margin: 20px auto 0 !important;
   height: auto !important; background: none !important;
   flex: 0 0 auto !important; outline: none;
+  overflow: visible !important;
+  border-radius: 0 !important;
 }
 .lgp .lgp-bar {
-  position: relative; height: 3px; border-radius: 99px;
-  background: #2c2c2e; overflow: visible;
+  position: relative; height: 3px; border-radius: 99px !important;
+  background: #2c2c2e; overflow: visible !important;
 }
 .lgp .lgp-progress-fill {
   position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+  height: 3px !important;
   background: #f5f5f7 !important; box-shadow: none !important;
   border-radius: 99px !important;
+  min-width: 0 !important;
 }
-.lgp .lgp-progress-fill::after { display: none !important; }
-.lgp .lgp-progress-knob {
-  position: absolute; top: 50%; width: 11px; height: 11px;
-  margin-left: -5.5px; border-radius: 99px;
-  background: #f5f5f7;
-  transform: translateY(-50%);
-  box-shadow: 0 0 0 3px rgba(5,5,5,.35);
+.lgp .lgp-progress-fill::after { display: none !important; content: none !important; }
+.lgp .lgp-progress-knob,
+.lgp span.lgp-progress-knob,
+.lgp b.lgp-progress-knob {
+  position: absolute !important;
+  top: 50% !important;
+  left: 0;
+  width: 12px !important; height: 12px !important;
+  min-width: 12px !important; min-height: 12px !important;
+  max-width: 12px !important; max-height: 12px !important;
+  margin: 0 0 0 -6px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #f5f5f7 !important;
+  transform: translateY(-50%) !important;
+  box-shadow: 0 0 0 3px #050505 !important;
   pointer-events: none;
+  display: block !important;
+  overflow: visible !important;
+  font-size: 0 !important; line-height: 0 !important;
 }
 .lgp .lgp-times {
   display: flex; justify-content: space-between;
@@ -1999,7 +2024,55 @@
 
 .lgp .lgp-np-transport {
   width: 100%; display: flex; align-items: center; justify-content: space-between;
-  gap: 2px; margin-top: 6px;
+  gap: 2px; margin-top: 2px;
+}
+.lgp .lgp-tube {
+  display: flex !important;
+  position: relative;
+  flex: 1 1 auto;
+  width: auto !important;
+  max-width: 268px !important;
+  min-height: 88px !important;
+  margin: 0 2px !important;
+  padding: 8px 16px !important;
+  align-items: center;
+  justify-content: space-evenly;
+  background: url('https://media.nowssb.com/migrated-images/19432211f0f348fc_file_0000000016bc71fab1ae5a054ac772af_gwttc6.png') center / 100% 100% no-repeat !important;
+  filter: drop-shadow(0 14px 24px rgba(0,0,0,.5));
+}
+.lgp .lgp-tube .lgp-ctrl,
+.lgp .lgp-tube .lgp-ctrl[onclick] {
+  width: 54px !important; height: 54px !important;
+  min-width: 54px !important; min-height: 54px !important;
+  max-width: 54px !important; max-height: 54px !important;
+  border: none !important; background: transparent !important;
+  box-shadow: none !important; padding: 0 !important;
+  display: grid !important; place-items: center;
+  cursor: pointer;
+}
+.lgp .lgp-tube .lgp-play,
+.lgp .lgp-tube .lgp-play[onclick],
+.lgp .lgp-tube button.lgp-play {
+  width: 72px !important; height: 72px !important;
+  min-width: 72px !important; min-height: 72px !important;
+  max-width: 72px !important; max-height: 72px !important;
+  border: none !important; background: none !important;
+  box-shadow: none !important; padding: 0 !important;
+  display: grid !important; place-items: center;
+  overflow: visible !important;
+  cursor: pointer;
+}
+.lgp .lgp-tube .lgp-img {
+  display: block !important;
+  width: 100% !important; height: 100% !important;
+  background-size: contain !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,.55));
+  pointer-events: none;
+}
+.lgp .lgp-tube .lgp-play .lgp-img {
+  filter: drop-shadow(0 10px 22px rgba(0,0,0,.6)) drop-shadow(0 0 16px rgba(255,255,255,.22));
 }
 .lgp .lgp-mode {
   width: 44px !important; height: 44px !important;
@@ -2040,12 +2113,13 @@
 .lgp .lgp-ctrl:disabled { opacity: .28; }
 
 .lgp .lgp-nextup {
-  width: 100%; max-width: 360px; margin-top: auto !important;
+  width: 100%; max-width: 360px; margin: 10px auto 0 !important;
   border-radius: 1.45rem !important;
   background: rgba(22,22,24,.82) !important;
   border: 1px solid rgba(255,255,255,.08) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
   -webkit-backdrop-filter: none; backdrop-filter: none;
+  overflow: hidden;
 }
 .lgp .lgp-nextup-head {
   display: flex; align-items: center; justify-content: space-between;
@@ -2090,12 +2164,55 @@
 .lgp .lgp-wordblock .lgp-eq-title { display: none !important; }
 
 @media (max-height: 720px) {
-  .lgp .lgp-visual { max-height: 34vh; margin-top: 6px !important; }
+  .lgp .lgp-visual { max-height: none !important; width: min(100%, 280px) !important; margin-top: 8px !important; }
   .lgp .lgp-np-meta { margin-top: 12px; }
   .lgp .lgp-np-name { font-size: 24px !important; }
   .lgp .lgp-progress { margin-top: 12px !important; }
   .lgp .lgp-art-kicker { bottom: 34px; font-size: 11px; }
+  .lgp .lgp-tube { min-height: 80px !important; }
 }
 
+.lgp .lgp-top {
+  position: sticky; top: 0; z-index: 8;
+  min-height: 48px; flex-shrink: 0;
+  background: transparent;
+}
+.lgp .lgp-top-right { display: flex; align-items: center; gap: 2px; }
+.lgp .lgp-top-ico {
+  display: block; width: 28px; height: 28px;
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.45));
+}
+.lgp .lgp-rewind svg { width: 22px; height: 22px; display: block; }
+.lgp .lgp-settings .lgp-top-ico { width: 32px; height: 32px; }
 
+.lgp .lgp-under-card {
+  width: 100%;
+  padding: 16px 14px 14px;
+  border-radius: 1.45rem !important;
+  background: rgba(22,22,24,.82) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
+  display: flex; flex-direction: column; align-items: center;
+}
+.lgp .lgp-under-card .lgp-syls { margin-top: 0; }
+.lgp .lgp-under-card .lgp-organ { margin: 12px 0 8px; }
+.lgp .lgp-under-card .lgp-acts {
+  margin-top: 4px;
+  background: rgba(6,10,22,.55);
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+.lgp .lgp-nextup-art {
+  width: 48px !important; height: 48px !important;
+  border-radius: 12px !important;
+  background-size: cover; background-position: center;
+  flex-shrink: 0;
+}
+.lgp .lgp-nextup-mid { flex: 1; min-width: 0; text-align: left; }
+.lgp .lgp-nextup-title {
+  font-size: 15px; font-weight: 600; letter-spacing: -.01em;
+  color: #f5f5f7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 

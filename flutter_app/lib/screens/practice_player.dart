@@ -157,6 +157,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     await _prepareAndPlay();
   }
 
+  Future<void> _rewind() async {
+    await _tts.stop();
+    if (mounted) setState(() { _playing = false; _completed = false; });
+  }
+
   Future<void> _move(int direction) async {
     if (widget.words.isEmpty) return;
     int next;
@@ -354,7 +359,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
+                  _PlayerHeader(
+                    onBack: () => Navigator.of(context).pop(),
+                    onSettings: _openSettings,
+                    onReplay: _prepareAndPlay,
+                    onRewind: _rewind,
+                  ),
                   const SizedBox(height: 12),
                   SizedBox(width: stageWidth, child: _VisualStage(
                     word: _word,
@@ -443,9 +453,14 @@ class _PlayerThemeArtwork extends StatelessWidget {
 }
 
 class _PlayerHeader extends StatelessWidget {
-  const _PlayerHeader({required this.onBack, required this.onSettings});
+  const _PlayerHeader({required this.onBack, required this.onSettings, required this.onReplay, required this.onRewind});
   final VoidCallback onBack;
   final VoidCallback onSettings;
+  final VoidCallback onReplay;
+  final VoidCallback onRewind;
+
+  static const _settings = 'https://media.nowssb.com/migrated-images/909b614a4f984b77_f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png';
+  static const _replay = 'https://media.nowssb.com/migrated-images/982488a58a8e453e_file_00000000a484720aa71b5f34f8539f05_amesbb.png';
 
   @override
   Widget build(BuildContext context) => SizedBox(
@@ -460,8 +475,34 @@ class _PlayerHeader extends StatelessWidget {
           child: SizedBox(width: 4, height: 4),
         ),
       ]),
-      Align(alignment: Alignment.centerRight, child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onSettings)),
+      Align(
+        alignment: Alignment.centerRight,
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          _BareIconButton(icon: Icons.fast_rewind_rounded, onTap: onRewind),
+          _TopGlassIcon(url: _replay, onTap: onReplay, size: 28),
+          _TopGlassIcon(url: _settings, onTap: onSettings, size: 32),
+        ]),
+      ),
     ]),
+  );
+}
+
+class _TopGlassIcon extends StatelessWidget {
+  const _TopGlassIcon({required this.url, required this.onTap, required this.size});
+  final String url;
+  final VoidCallback onTap;
+  final double size;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: SizedBox(
+      width: 42, height: 42,
+      child: Center(
+        child: Image.network(url, width: size, height: size, fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => Icon(Icons.settings_rounded, color: Colors.white, size: size * .7)),
+      ),
+    ),
   );
 }
 
@@ -737,7 +778,9 @@ class _VisualStage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(34),
         child: Stack(fit: StackFit.expand, children: [
-          NwsbVideo(asset: theme.video, poster: theme.image, priority: ClipPriority.feature, autoplay: true),
+          theme.image.startsWith('http')
+            ? Image.network(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black))
+            : Image.asset(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)),
           const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x14FFFFFF), Color(0x00000000), Color(0x00000000), Color(0x8C000000)], stops: [0, 0.2, 0.58, 1]))),
           Positioned(
             left: 0, right: 0, bottom: 42,
@@ -840,11 +883,11 @@ class _ProgressBarState extends State<_ProgressBar> with SingleTickerProviderSta
               Positioned(
                 left: (x - 5.5).clamp(0.0, math.max(0.0, constraints.maxWidth - 11)),
                 child: Container(
-                  width: 11, height: 11,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F7),
+                  width: 12, height: 12,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF5F5F7),
                     shape: BoxShape.circle,
-                    boxShadow: const [BoxShadow(color: Color(0x59050505), blurRadius: 0, spreadRadius: 3)],
+                    boxShadow: [BoxShadow(color: Color(0xFF050505), blurRadius: 0, spreadRadius: 3)],
                   ),
                 ),
               ),
@@ -882,37 +925,17 @@ class _TransportRow extends StatelessWidget {
   Widget build(BuildContext context) => Row(children: [
     _ModeBtn(icon: Icons.shuffle_rounded, on: shuffle, onTap: onShuffle),
     Expanded(
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Opacity(
-          opacity: hasPrevious ? 1 : .28,
-          child: IconButton(
-            onPressed: hasPrevious ? onPrevious : null,
-            iconSize: 32,
-            color: const Color(0xFFF5F5F7),
-            icon: const Icon(Icons.skip_previous_rounded),
-          ),
-        ),
-        GestureDetector(
-          onTap: onPlay,
-          child: Container(
-            width: 72, height: 72,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFF5F5F7), width: 1.6),
-            ),
-            child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, color: const Color(0xFFF5F5F7), size: 34),
-          ),
-        ),
-        Opacity(
-          opacity: hasNext ? 1 : .28,
-          child: IconButton(
-            onPressed: hasNext ? onNext : null,
-            iconSize: 32,
-            color: const Color(0xFFF5F5F7),
-            icon: const Icon(Icons.skip_next_rounded),
-          ),
-        ),
-      ]),
+      child: _TransportTube(
+        playing: playing,
+        hasPrevious: hasPrevious,
+        hasNext: hasNext,
+        durationLabel: '',
+        onLibrary: () {},
+        onPrevious: onPrevious,
+        onPlay: onPlay,
+        onNext: onNext,
+        onReplay: onPlay,
+      ),
     ),
     _ModeBtn(icon: Icons.repeat_rounded, on: loop, onTap: onLoop),
   ]);
@@ -947,12 +970,20 @@ class _WordOverlay extends StatelessWidget {
   final VoidCallback onLike;
 
   @override
-  Widget build(BuildContext context) => Column(mainAxisSize: MainAxisSize.min, children: [
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
+    decoration: BoxDecoration(
+      color: const Color(0xD1161618),
+      borderRadius: BorderRadius.circular(23),
+      border: Border.all(color: const Color(0x14FFFFFF)),
+    ),
+    child: Column(mainAxisSize: MainAxisSize.min, children: [
       if (word.parts.isNotEmpty) ...[
         Wrap(spacing: 6, runSpacing: 6, alignment: WrapAlignment.center, children: word.parts.map((part) => _PronunciationChip(part: part, accent: accent, compact: true)).toList()),
       ],
       if (word.organ.isNotEmpty) ...[
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         Text(word.organ.toUpperCase(), style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 3.6)),
       ],
       const SizedBox(height: 10),
@@ -967,11 +998,10 @@ class _WordOverlay extends StatelessWidget {
           _ActBtn(icon: Icons.replay_rounded, onTap: onReplay),
           Container(width: 1, height: 16, color: const Color(0x59FFFFFF)),
           _ActBtn(icon: Icons.description_outlined, onTap: onNotes),
-          Container(width: 1, height: 16, color: const Color(0x59FFFFFF)),
-          _ActBtn(icon: liked ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: liked ? accent : Colors.white, onTap: onLike),
         ]),
       ),
-    ]);
+    ]),
+  );
 }
 
 class _ActBtn extends StatelessWidget {
@@ -1031,35 +1061,29 @@ class _TransportTube extends StatelessWidget {
   static const _next = 'https://media.nowssb.com/migrated-images/71a2d8954b5e6209_c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png';
 
   @override
-  Widget build(BuildContext context) => Row(children: [
-    SizedBox(width: 36, child: Text('0:00', style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600))),
-    Expanded(
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 86),
-        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 11),
-        decoration: const BoxDecoration(
-          image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
-        ),
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 48),
-          GestureDetector(
-            onTap: onPlay,
-            child: SizedBox(
-              width: 66,
-              height: 66,
-              child: Image.asset(
-                playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Image.network(playing ? _pause : _play, fit: BoxFit.contain),
-              ),
-            ),
-          ),
-          _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: hasNext ? onNext : null, size: 48),
-        ]),
-      ),
+  Widget build(BuildContext context) => Container(
+    constraints: const BoxConstraints(minHeight: 88, maxWidth: 268),
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    decoration: const BoxDecoration(
+      image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
     ),
-    SizedBox(width: 36, child: Text(durationLabel, textAlign: TextAlign.right, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600))),
-  ]);
+    child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 54),
+      GestureDetector(
+        onTap: onPlay,
+        child: SizedBox(
+          width: 72,
+          height: 72,
+          child: Image.asset(
+            playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => Image.network(playing ? _pause : _play, fit: BoxFit.contain),
+          ),
+        ),
+      ),
+      _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: hasNext ? onNext : null, size: 54),
+    ]),
+  );
 }
 
 class _WordActionStrip extends StatelessWidget {
