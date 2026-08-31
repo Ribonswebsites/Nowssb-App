@@ -1407,8 +1407,30 @@
     var y1 = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : y0;
     if (y0 - y1 > 48) {
       var card = e.target && e.target.closest ? e.target.closest('.lgp-nextup') : document.getElementById('lgpNextUp');
-      if (card) card.classList.add('lgp-nextup-tab-open');
+      if (card) window.lgpOpenSoundLibrary43&&window.lgpOpenSoundLibrary43(card);
     }
     y0 = null;
   }, {passive: true});
+})();
+
+
+/* Unified Sound Library 4-3 expansion panel for UP NEXT and its grab handle. */
+(function () {
+  if (window.lgpOpenSoundLibrary43) return;
+  window.lgpOpenSoundLibrary43 = function (origin) {
+    if (document.getElementById('lgpSoundLibrary43Sheet')) return;
+    var sheet = document.createElement('div');
+    sheet.id = 'lgpSoundLibrary43Sheet';
+    sheet.className = 'lgp-sound-library-43-sheet';
+    sheet.innerHTML = '<div class="lgp-sound-library-43-backdrop"></div>' +
+      '<div class="lgp-sound-library-43-panel" role="dialog" aria-label="Sound Library">' +
+      '<div class="lgp-sound-library-43-grab"></div>' +
+      '<button class="lgp-sound-library-43-close" aria-label="Close">×</button>' +
+      '<iframe title="Sound Library 4-3" src="sound-library-4-3.html?from=expanded" loading="eager"></iframe>' +
+      '</div>';
+    document.body.appendChild(sheet);
+    requestAnimationFrame(function () { sheet.classList.add('is-open'); });
+    sheet.querySelector('.lgp-sound-library-43-close').onclick = function () { sheet.classList.remove('is-open'); setTimeout(function(){sheet.remove();}, 340); };
+    sheet.querySelector('.lgp-sound-library-43-backdrop').onclick = function () { sheet.querySelector('.lgp-sound-library-43-close').click(); };
+  };
 })();

@@ -722,7 +722,7 @@ class _NextUpCard extends StatelessWidget {
             context: context,
             backgroundColor: const Color(0xFF14171E),
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-            builder: (_) => const SafeArea(child: SizedBox(height: 120, child: Center(child: Text('UP NEXT', style: TextStyle(color: Colors.white, letterSpacing: 3, fontSize: 12))))),
+            builder: (_) => const SafeArea(child: AuraSoundLibraryScreen()),
           );
         }
       },

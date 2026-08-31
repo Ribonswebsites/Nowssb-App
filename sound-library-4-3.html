@@ -351,10 +351,11 @@
   @media (prefers-reduced-motion: reduce){
     .waveform span { animation: none !important; }
   }
+.sound-library-43-grab{width:44px;height:4px;border-radius:99px;background:rgba(255,255,255,.72);margin:0 auto 10px;box-shadow:0 0 12px rgba(255,255,255,.25)}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app"><div class="sound-library-43-grab" id="soundLibrary43Grab" aria-label="Expand Sound Library"></div>
 
   <header>
     <div class="title-block">
@@ -534,6 +535,8 @@
       syncMiniPlayer();
     }
   });
+document.getElementById('soundLibrary43Grab')?.addEventListener('touchend',function(e){if(this._y0-e.changedTouches[0].clientY>36) window.parent&&window.parent.lgpOpenSoundLibrary43&&window.parent.lgpOpenSoundLibrary43(this);});
+document.getElementById('soundLibrary43Grab')?.addEventListener('touchstart',function(e){this._y0=e.touches[0].clientY},{passive:true});
 </script>
 </body>
 </html>
