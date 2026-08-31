@@ -745,3 +745,15 @@ document.addEventListener('keydown',e=>{
 </script>
 </body>
 </html>
+
+<script>
+/* In the Player sheet, the parent owns the single Back control. */
+if (window.parent !== window) document.documentElement.classList.add('embedded-player-sheet');
+</script>
+<style>
+.embedded-player-sheet .back-btn{display:none!important}
+</style>
+
+<style>
+.embedded-player-sheet .sound-library-43-close{display:none!important}
+</style>

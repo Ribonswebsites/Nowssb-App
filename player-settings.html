@@ -628,3 +628,11 @@ if(navigator.getBattery){
 </script>
 </body>
 </html>
+
+<script>
+/* The integrated Player sheet owns navigation while embedded. */
+if (window.parent !== window) document.documentElement.classList.add('embedded-player-sheet');
+</script>
+<style>
+.embedded-player-sheet .nav-back{display:none!important}
+</style>
