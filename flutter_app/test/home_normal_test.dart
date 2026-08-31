@@ -19,6 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/home_normal.dart';
 import 'package:nowssb/shell/nav_shell.dart';
+import 'package:nowssb/theme/tokens.dart';
+import 'package:nowssb/widgets/app_backdrop.dart';
 import 'package:nowssb/widgets/glass_wrap.dart';
 import 'package:nowssb/widgets/home_parts.dart';
 import 'package:nowssb/widgets/neu_wrap.dart';
@@ -89,6 +91,14 @@ void main() {
       (tester) async {
     await pump(tester);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the Normal home is pale neumorphism with no film backdrop',
+      (tester) async {
+    await pump(tester);
+    expect(find.byType(AppBackdrop), findsNothing);
+    final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
+    expect(scaffold.backgroundColor, NwsbColors.surface);
   });
 
   testWidgets('the whole page scrolls end to end', (tester) async {

@@ -11,6 +11,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,7 +20,6 @@ import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
-import '../widgets/app_backdrop.dart';
 import 'sound_library.dart';
 import 'store.dart';
 
@@ -40,6 +40,12 @@ double _wordSecs(Word word) {
 }
 
 String _wordClock(Word word) => _fmtClock(_wordSecs(word));
+
+String _prettyTitle(String title) {
+  final t = title.trim();
+  if (t.isEmpty) return t;
+  return '${t[0].toUpperCase()}${t.substring(1).toLowerCase()}';
+}
 
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({super.key, required this.words, required this.title});
@@ -63,6 +69,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   var _loop = false;
   var _shuffle = false;
   var _volume = 1.0;
+  DateTime? _startedAt;
   String? _error;
 
   Word get _word => widget.words[_index];
@@ -125,6 +132,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
       _playing = true;
       _completed = false;
       _error = null;
+      _startedAt = DateTime.now();
     });
     try {
       await _tts.awaitSpeakCompletion(true);
@@ -157,9 +165,46 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     await _prepareAndPlay();
   }
 
-  Future<void> _rewind() async {
+  Future<void> _skipPrev() async {
+    final elapsed = _startedAt == null
+        ? 0.0
+        : DateTime.now().difference(_startedAt!).inMilliseconds / 1000;
+    if (elapsed > 1.5) {
+      await _tts.stop();
+      if (mounted) setState(() { _playing = false; _completed = false; });
+      await _prepareAndPlay();
+      return;
+    }
+    await _move(-1);
+  }
+
+  Future<void> _playRandom() async {
+    if (widget.words.length < 2) {
+      await _prepareAndPlay();
+      return;
+    }
+    var next = _index;
+    var guard = 0;
+    while (next == _index && guard++ < 24) {
+      next = math.Random().nextInt(widget.words.length);
+    }
     await _tts.stop();
-    if (mounted) setState(() { _playing = false; _completed = false; });
+    setState(() {
+      _index = next;
+      _liked = false;
+      _completed = false;
+      _error = null;
+    });
+    await _loadLiked();
+    await _prepareAndPlay();
+  }
+
+  Future<void> _copyWord() async {
+    final syllables = _word.syllables.join(' · ');
+    final organ = _word.organ.trim().isEmpty ? '' : ' — ${_word.organ.toUpperCase()}';
+    await Clipboard.setData(ClipboardData(
+      text: '${_word.word}$organ\n$syllables\n${_word.meaning}',
+    ));
   }
 
   Future<void> _move(int direction) async {
@@ -172,9 +217,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
         next = math.Random().nextInt(widget.words.length);
       }
     } else {
-      next = _index + direction;
+      next = (_index + direction) % widget.words.length;
+      if (next < 0) next += widget.words.length;
     }
-    if (next < 0 || next >= widget.words.length) return;
     await _tts.stop();
     setState(() {
       _index = next;
@@ -336,97 +381,118 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     }
 
     final theme = _theme;
+    final nextIndex = widget.words.isEmpty ? 0 : (_index + 1) % widget.words.length;
+    final nextWord = widget.words.isEmpty ? null : widget.words[nextIndex];
     return Scaffold(
-      backgroundColor: const Color(0xFF050505),
-      body: Stack(children: [
-        Positioned.fill(child: _PlayerThemeArtwork(theme: theme)),
-        const Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xD1050505), Color(0xEB050505), Color(0xFF050505)],
-              ),
-            ),
-          ),
-        ),
-        SafeArea(
-          child: LayoutBuilder(builder: (context, constraints) {
-            final stageWidth = math.min(constraints.maxWidth - 48, 360.0);
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
-                  const SizedBox(height: 12),
-                  SizedBox(width: stageWidth, child: _VisualStage(
-                    word: _word,
-                    theme: theme,
-                    playing: _playing,
-                    accent: theme.accent,
-                    onReplay: _prepareAndPlay,
-                    onNotes: _openNotes,
-                  )),
-                  const SizedBox(height: 22),
-                  Row(children: [
-                    Expanded(child: Text(_word.word, style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 28, fontWeight: FontWeight.w600, height: 1.1, letterSpacing: -0.6))),
-                    GestureDetector(
-                      onTap: _toggleLike,
-                      child: Icon(_liked ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: _liked ? const Color(0xFFF5F5F7) : const Color(0xFFC7C7CC), size: 26),
+      backgroundColor: const Color(0xFF000000),
+      body: SafeArea(
+        child: LayoutBuilder(builder: (context, constraints) {
+          final stageWidth = math.min(constraints.maxWidth - 24, 300.0);
+          return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
+                const SizedBox(height: 12),
+                Center(
+                  child: SizedBox(
+                    width: stageWidth,
+                    child: _VisualStage(
+                      word: _word,
+                      theme: theme,
+                      playing: _playing,
+                      accent: theme.accent,
+                      onReplay: _prepareAndPlay,
+                      onCopy: _copyWord,
+                      onSyllable: (part) async {
+                        await _tts.stop();
+                        await _tts.speak(part.roman.isNotEmpty ? part.roman : part.deva);
+                      },
                     ),
-                  ]),
-                  const SizedBox(height: 6),
-                  const Text('NowssB  ·  Words Without Dictionary', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14)),
-                  const SizedBox(height: 20),
-                  _ProgressBar(playing: _playing, durationSec: _wordSecs(_word)),
-                  const SizedBox(height: 8),
-                  _TransportRow(
-                    playing: _playing,
-                    loop: _loop,
-                    shuffle: _shuffle,
-                    hasPrevious: _index > 0,
-                    hasNext: _shuffle || _index < widget.words.length - 1,
-                    onShuffle: _toggleShuffle,
-                    onPrevious: () => _move(-1),
-                    onPlay: _togglePlay,
-                    onNext: () => _move(1),
-                    onLoop: () => setState(() => _loop = !_loop),
-                    onReplay: _prepareAndPlay,
-                    onRewind: _rewind,
                   ),
-                  const SizedBox(height: 16),
-                  SizedBox(width: stageWidth, child: _NextUpCard(
-                    next: _index < widget.words.length - 1 ? widget.words[_index + 1] : null,
-                    art: _index < widget.words.length - 1
-                        ? _playerThemes[(_index + 1) % _playerThemes.length].image
-                        : null,
-                    onPlay: () => _move(1),
-                    onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
-                  )),
-                  if (_completed || _error != null) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      _error ?? 'Completed and added to your progress.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
+                ),
+                const SizedBox(height: 18),
+                Stack(children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 48),
+                    child: Column(children: [
+                      Text(
+                        _prettyTitle(_word.word),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFFF4F4F5),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          height: 1.15,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'NowssB  ·  Words Without Dictionary',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Color(0xFF8B8B90), fontSize: 14),
+                      ),
+                    ]),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: GestureDetector(
+                      onTap: _toggleLike,
+                      child: SizedBox(
+                        width: 44,
+                        height: 44,
+                        child: Icon(
+                          _liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: _liked ? const Color(0xFFF5F5F7) : const Color(0xFF8B8B90),
+                          size: 22,
+                        ),
+                      ),
                     ),
-                  ],
-                  const SizedBox(height: 18),
-                  SizedBox(width: stageWidth, child: _WordActionStrip(
-                    accent: theme.accent,
-                    video: theme.video,
-                    onSentence: _openInfo,
-                    onPractice: _prepareAndPlay,
-                    onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
-                  )),
+                  ),
                 ]),
-              ),
-            );
-          }),
-        ),
-      ]),
+                const SizedBox(height: 16),
+                _ProgressBar(playing: _playing, durationSec: _wordSecs(_word)),
+                const SizedBox(height: 8),
+                _TransportRow(
+                  playing: _playing,
+                  shuffle: _shuffle,
+                  onShuffle: _toggleShuffle,
+                  onPrevious: _skipPrev,
+                  onPlay: _togglePlay,
+                  onNext: () => _move(1),
+                  onRandom: _playRandom,
+                ),
+                const SizedBox(height: 16),
+                SizedBox(width: stageWidth, child: _NextUpCard(
+                  next: nextWord,
+                  art: nextWord == null ? null : _playerThemes[(nextIndex) % _playerThemes.length].image,
+                  onPlay: () => _move(1),
+                  onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
+                )),
+                if (_completed || _error != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    _error ?? 'Completed and added to your progress.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
+                  ),
+                ],
+                const SizedBox(height: 18),
+                SizedBox(width: stageWidth, child: _WordActionStrip(
+                  accent: theme.accent,
+                  video: theme.video,
+                  onSentence: _openInfo,
+                  onPractice: _prepareAndPlay,
+                  onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
+                )),
+              ]),
+            ),
+          );
+        }),
+      ),
     );
   }
 }
@@ -455,12 +521,9 @@ class _PlayerHeader extends StatelessWidget {
     child: Stack(alignment: Alignment.center, children: [
       Align(alignment: Alignment.centerLeft, child: _BareIconButton(icon: Icons.keyboard_arrow_down_rounded, onTap: onBack)),
       const Column(mainAxisSize: MainAxisSize.min, children: [
-        Text('NOW PLAYING', style: TextStyle(color: Color(0xFF9A9A9E), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 3.4)),
-        SizedBox(height: 8),
-        DecoratedBox(
-          decoration: BoxDecoration(color: Color(0xFFECECED), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x73FFFFFF), blurRadius: 8)]),
-          child: SizedBox(width: 4, height: 4),
-        ),
+        Text('NOW PLAYING', style: TextStyle(color: Color(0xFF9A9A9E), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 3.8)),
+        SizedBox(height: 6),
+        SizedBox(width: 28, height: 1, child: ColoredBox(color: Color(0x8CF4F4F5))),
       ]),
       Align(alignment: Alignment.centerRight, child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onSettings)),
     ]),
@@ -654,12 +717,16 @@ class _NextUpCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
                 child: Row(children: [
-                  const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 2.8))),
+                  const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 2.8))),
                   GestureDetector(
                     onTap: onAdd,
                     child: const SizedBox(width: 36, height: 36, child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 20)),
                   ),
                 ]),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 10, 16, 0),
+                child: ColoredBox(color: Color(0x1AFFFFFF), child: SizedBox(width: double.infinity, height: 1)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
@@ -708,7 +775,8 @@ class _NextUpCard extends StatelessWidget {
 class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word, required this.theme, required this.playing,
-    required this.accent, required this.onReplay, required this.onNotes,
+    required this.accent, required this.onReplay, required this.onCopy,
+    required this.onSyllable,
   });
 
   final Word word;
@@ -716,7 +784,8 @@ class _VisualStage extends StatelessWidget {
   final bool playing;
   final Color accent;
   final VoidCallback onReplay;
-  final VoidCallback onNotes;
+  final VoidCallback onCopy;
+  final ValueChanged<WordPart> onSyllable;
 
   @override
   Widget build(BuildContext context) => AspectRatio(
@@ -724,34 +793,61 @@ class _VisualStage extends StatelessWidget {
     child: DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(34),
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(color: const Color(0x29FFFFFF)),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0FFFFFFF), blurRadius: 42),
-          BoxShadow(color: Color(0x94000000), blurRadius: 60, offset: Offset(0, 28)),
-        ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(34),
+        borderRadius: BorderRadius.circular(28),
         child: Stack(fit: StackFit.expand, children: [
           theme.image.startsWith('http')
-            ? Image.network(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black))
-            : Image.asset(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)),
-          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x14FFFFFF), Color(0x00000000), Color(0x00000000), Color(0xD2000000)], stops: [0, 0.2, 0.52, 1]))),
+            ? Image.network(theme.image, fit: BoxFit.cover, alignment: const Alignment(0, -0.24), errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black))
+            : Image.asset(theme.image, fit: BoxFit.cover, alignment: const Alignment(0, -0.24), errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)),
+          NwsbVideo(
+            asset: theme.video,
+            fit: BoxFit.cover,
+            alignment: const Alignment(0, -0.24),
+            priority: ClipPriority.feature,
+            autoplay: true,
+            loop: true,
+            showPoster: false,
+          ),
+          const IgnorePointer(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 12, 0, 0),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  height: 150,
+                  child: CustomPaint(painter: _ArtWavePainter(active: true), child: SizedBox.expand()),
+                ),
+              ),
+            ),
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0x00000000), Color(0x00000000), Color(0xD9000000)],
+                stops: [0, 0.42, 1],
+              ),
+            ),
+          ),
           Positioned(
             left: 0, right: 0, bottom: 0,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 28, 14, 14),
+              padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Text(
                   word.word.toUpperCase(),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xEBF5F5F7), fontSize: 12, fontWeight: FontWeight.w400, letterSpacing: 6, shadows: [Shadow(color: Color(0xB3000000), blurRadius: 18)]),
+                  style: const TextStyle(color: Color(0xE6F4F4F5), fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 6),
                 ),
                 const SizedBox(height: 8),
                 _WordOverlay(
                   word: word, accent: accent, playing: playing, liked: false,
-                  onReplay: onReplay, onNotes: onNotes, onLike: () {},
+                  onReplay: onReplay, onNotes: onCopy, onLike: () {},
+                  onSyllable: onSyllable,
                   embedded: true,
                 ),
               ]),
@@ -869,43 +965,130 @@ class _ProgressBarState extends State<_ProgressBar> with SingleTickerProviderSta
 
 class _TransportRow extends StatelessWidget {
   const _TransportRow({
-    required this.playing, required this.loop, required this.shuffle,
-    required this.hasPrevious, required this.hasNext,
-    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onLoop,
-    required this.onReplay, required this.onRewind,
+    required this.playing, required this.shuffle,
+    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRandom,
   });
   final bool playing;
-  final bool loop;
   final bool shuffle;
-  final bool hasPrevious;
-  final bool hasNext;
   final VoidCallback onShuffle;
   final VoidCallback onPrevious;
   final VoidCallback onPlay;
   final VoidCallback onNext;
-  final VoidCallback onLoop;
-  final VoidCallback onReplay;
-  final VoidCallback onRewind;
+  final VoidCallback onRandom;
 
   @override
-  Widget build(BuildContext context) => Row(children: [
-    _ModeBtn(icon: Icons.shuffle_rounded, on: shuffle, onTap: onShuffle),
-    Expanded(
-      child: _TransportTube(
-        playing: playing,
-        hasPrevious: hasPrevious,
-        hasNext: hasNext,
-        durationLabel: '',
-        onLibrary: () {},
-        onPrevious: onPrevious,
-        onPlay: onPlay,
-        onNext: onNext,
-        onReplay: onReplay,
-        onRewind: onRewind,
+  Widget build(BuildContext context) => _GlassTube(
+    playing: playing,
+    shuffle: shuffle,
+    onShuffle: onShuffle,
+    onPrevious: onPrevious,
+    onPlay: onPlay,
+    onNext: onNext,
+    onRandom: onRandom,
+  );
+}
+
+class _GlassTube extends StatelessWidget {
+  const _GlassTube({
+    required this.playing, required this.shuffle,
+    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRandom,
+  });
+  final bool playing;
+  final bool shuffle;
+  final VoidCallback onShuffle;
+  final VoidCallback onPrevious;
+  final VoidCallback onPlay;
+  final VoidCallback onNext;
+  final VoidCallback onRandom;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 118,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF3A3A42), Color(0xFF141418), Color(0xFF070708)],
+            stops: [0, 0.38, 1],
+          ),
+          boxShadow: [
+            const BoxShadow(color: Color(0x8C000000), blurRadius: 40, offset: Offset(0, 18)),
+            BoxShadow(color: playing ? const Color(0x33C8DCFF) : const Color(0x14FFFFFF), blurRadius: playing ? 32 : 0, spreadRadius: 1),
+          ],
+        ),
+        child: Stack(children: [
+          const Positioned(
+            top: 8, left: 36, right: 36, height: 34,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(999)),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x6BFFFFFF), Color(0x0AFFFFFF)],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              _GlassOrb(icon: Icons.shuffle_rounded, on: shuffle, onTap: onShuffle, label: 'Shuffle'),
+              _GlassOrb(icon: Icons.skip_previous_rounded, filled: true, onTap: onPrevious, label: 'Previous'),
+              _GlassOrb(icon: playing ? Icons.pause_rounded : Icons.play_arrow_rounded, filled: true, play: true, onTap: onPlay, label: playing ? 'Pause' : 'Play'),
+              _GlassOrb(icon: Icons.skip_next_rounded, filled: true, onTap: onNext, label: 'Next'),
+              _GlassOrb(icon: Icons.casino_outlined, onTap: onRandom, label: 'Random'),
+            ]),
+          ),
+        ]),
       ),
-    ),
-    _ModeBtn(icon: Icons.repeat_rounded, on: loop, onTap: onLoop),
-  ]);
+    );
+  }
+}
+
+class _GlassOrb extends StatelessWidget {
+  const _GlassOrb({
+    required this.icon, required this.onTap, required this.label,
+    this.on = false, this.filled = false, this.play = false,
+  });
+  final IconData icon;
+  final VoidCallback onTap;
+  final String label;
+  final bool on;
+  final bool filled;
+  final bool play;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = play ? 58.0 : 44.0;
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              begin: Alignment(-0.4, -0.6),
+              end: Alignment(0.4, 0.8),
+              colors: [Color(0xB346464E), Color(0xE60A0A0C)],
+            ),
+            boxShadow: [
+              const BoxShadow(color: Color(0x59000000), blurRadius: 14, offset: Offset(0, 6)),
+              BoxShadow(color: on ? const Color(0x47DCE6FF) : const Color(0x1FFFFFFF), blurRadius: on ? 16 : 0, spreadRadius: 1),
+            ],
+          ),
+          child: Icon(icon, color: const Color(0xFFF4F4F5), size: play ? 26 : 18),
+        ),
+      ),
+    );
+  }
 }
 
 class _ModeBtn extends StatelessWidget {
@@ -927,6 +1110,7 @@ class _WordOverlay extends StatelessWidget {
   const _WordOverlay({
     required this.word, required this.accent, required this.playing,
     required this.liked, required this.onReplay, required this.onNotes, required this.onLike,
+    this.onSyllable,
     this.embedded = false,
   });
   final Word word;
@@ -936,6 +1120,7 @@ class _WordOverlay extends StatelessWidget {
   final VoidCallback onReplay;
   final VoidCallback onNotes;
   final VoidCallback onLike;
+  final ValueChanged<WordPart>? onSyllable;
   final bool embedded;
 
   @override
@@ -948,29 +1133,86 @@ class _WordOverlay extends StatelessWidget {
       border: Border.all(color: const Color(0x14FFFFFF)),
     ),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
-      if (word.parts.isNotEmpty) ...[
-        Wrap(spacing: 6, runSpacing: 6, alignment: WrapAlignment.center, children: word.parts.map((part) => _PronunciationChip(part: part, accent: accent, compact: true)).toList()),
-      ],
+      if (word.parts.isNotEmpty)
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            for (var i = 0; i < word.parts.length; i++) ...[
+              if (i > 0) Container(width: 4, height: 4, decoration: const BoxDecoration(color: Color(0xCCF4F4F5), shape: BoxShape.circle)),
+              _SyllablePill(part: word.parts[i], onTap: onSyllable == null ? null : () => onSyllable!(word.parts[i])),
+            ],
+          ],
+        )
+      else if (word.syllables.isNotEmpty)
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            for (var i = 0; i < word.syllables.length; i++) ...[
+              if (i > 0) Container(width: 4, height: 4, decoration: const BoxDecoration(color: Color(0xCCF4F4F5), shape: BoxShape.circle)),
+              _SyllablePill(label: word.syllables[i]),
+            ],
+          ],
+        ),
       if (word.organ.isNotEmpty) ...[
-        const SizedBox(height: 12),
-        Text(word.organ.toUpperCase(), style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 3.6)),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          const SizedBox(width: 28, height: 1, child: ColoredBox(color: Color(0x2EFFFFFF))),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(word.organ.toUpperCase(), style: const TextStyle(color: Color(0xFF8B8B90), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 4.2)),
+          ),
+          const SizedBox(width: 28, height: 1, child: ColoredBox(color: Color(0x2EFFFFFF))),
+        ]),
       ],
-      const SizedBox(height: 10),
+      const SizedBox(height: 8),
       Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
-          color: const Color(0x8C060A16),
+          color: const Color(0xE6222226),
           borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: const Color(0x38FFFFFF)),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           _ActBtn(icon: Icons.replay_rounded, onTap: onReplay),
-          Container(width: 1, height: 16, color: const Color(0x59FFFFFF)),
-          _ActBtn(icon: Icons.description_outlined, onTap: onNotes),
+          Container(width: 1, height: 16, color: const Color(0x2EFFFFFF)),
+          _ActBtn(icon: Icons.copy_rounded, onTap: onNotes),
         ]),
       ),
     ]),
   );
+}
+
+class _SyllablePill extends StatelessWidget {
+  const _SyllablePill({this.part, this.label, this.onTap});
+  final WordPart? part;
+  final String? label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = (part == null)
+        ? (label ?? '')
+        : (part!.roman.isNotEmpty ? part!.roman : part!.deva);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(99),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(color: Color(0xFF0A0A0B), fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0.1),
+        ),
+      ),
+    );
+  }
 }
 
 class _ActBtn extends StatelessWidget {
