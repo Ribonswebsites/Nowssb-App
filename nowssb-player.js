@@ -772,7 +772,7 @@
           if (!next) {
             return '<div class="lgp-nextup" id="lgpNextUp">' +
               '<div class="lgp-nextup-head"><span>Up Next</span>' +
-                '<button class="lgp-queue-btn" type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
+                '<button class="lgp-queue-btn" type="button" onclick="window.location.assign(\'sound_library_ui_world_class-3.html?from=up-next\')" aria-label="Queue">' + queueSvg + '</button>' +
               '</div>' +
               '<div class="lgp-nextup-line" aria-hidden="true"></div>' +
               '<p class="lgp-nextup-empty">End of queue</p>' +
@@ -782,7 +782,7 @@
           var nextDur = lgpFmtClock(lgpWordSecs(next));
           return '<div class="lgp-nextup" id="lgpNextUp">' +
             '<div class="lgp-nextup-head"><span>Up Next</span>' +
-              '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
+              '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.location.assign(\'sound_library_ui_world_class-3.html?from=up-next\')" aria-label="Queue">' + queueSvg + '</button>' +
             '</div>' +
             '<div class="lgp-nextup-line" aria-hidden="true"></div>' +
             '<button class="lgp-nextup-item" type="button" onclick="window.lgpPlayNext&&window.lgpPlayNext()">' +

@@ -478,7 +478,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                   next: nextWord,
                   art: nextWord == null ? null : _playerThemes[(nextIndex) % _playerThemes.length].image,
                   onPlay: () => _move(1),
-                  onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())),
+                  onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AuraSoundLibraryScreen())),
                 )),
                 if (_completed || _error != null) ...[
                   const SizedBox(height: 12),
