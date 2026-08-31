@@ -67,6 +67,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   var _completed = false;
   var _liked = false;
   var _loop = false;
+  var _repTarget = 7;
   var _shuffle = false;
   var _volume = 1.0;
   DateTime? _startedAt;
@@ -293,78 +294,64 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     showDialog<void>(
       context: context,
       barrierColor: const Color(0xB8060C18),
-      builder: (context) => Dialog(
+      builder: (dialogContext) => Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        insetPadding: const EdgeInsets.all(28),
-        child: AspectRatio(
-          aspectRatio: 1,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xE6172334),
-              border: Border.all(color: const Color(0x66FFFFFF), width: 1.5),
-              boxShadow: [BoxShadow(color: _theme.accent.withOpacity(.35), blurRadius: 44)],
+        insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+        child: SizedBox(
+          width: 360,
+          height: 560,
+          child: Stack(children: [
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: const Color(0xE6060C18),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0x44C8E8F5)),
+                  boxShadow: [BoxShadow(color: _theme.accent.withOpacity(.26), blurRadius: 42)],
+                ),
+                child: CustomPaint(painter: _AuraSettingsPainter(accent: _theme.accent)),
+              ),
             ),
-            child: Stack(children: [
-              Center(
-                child: Container(
-                  width: 106,
-                  height: 106,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0x33FFFFFF),
-                    border: Border.all(color: const Color(0x88FFFFFF)),
-                  ),
-                  child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Icon(Icons.settings_rounded, color: Colors.white, size: 34),
-                    SizedBox(height: 4),
-                    Text('SETTINGS', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
-                  ]),
+            Positioned(
+              top: 18,
+              left: 22,
+              right: 22,
+              child: Row(children: [
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  icon: const Icon(Icons.close_rounded, color: Colors.white70, size: 22),
                 ),
-              ),
-              _RadialOption(
-                alignment: Alignment.topCenter,
-                label: 'VOICE',
-                value: 'Device',
-                accent: _theme.accent,
-                onTap: () => ScaffoldMessenger.of(this.context).showSnackBar(
-                  const SnackBar(content: Text('NowssB uses your selected device voice.')),
+                const Expanded(child: Text('NowssB Player', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: .2))),
+                const SizedBox(width: 36),
+              ]),
+            ),
+            Center(
+              child: Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0x331D3448),
+                  border: Border.all(color: _theme.accent.withOpacity(.75), width: 1.2),
+                  boxShadow: [BoxShadow(color: _theme.accent.withOpacity(.18), blurRadius: 26)],
                 ),
+                child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(Icons.settings_rounded, color: Colors.white, size: 30),
+                  SizedBox(height: 5),
+                  Text('SETTINGS', style: TextStyle(color: Colors.white70, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
+                ]),
               ),
-              _RadialOption(
-                alignment: Alignment.centerRight,
-                label: 'LOOP',
-                value: _loop ? 'On' : 'Off',
-                accent: _theme.accent,
-                onTap: () => setState(() => _loop = !_loop),
-              ),
-              _RadialOption(
-                alignment: Alignment.bottomCenter,
-                label: 'REPLAY',
-                value: 'Word',
-                accent: _theme.accent,
-                onTap: _prepareAndPlay,
-              ),
-              _RadialOption(
-                alignment: Alignment.centerLeft,
-                label: 'LIBRARY',
-                value: 'Open',
-                accent: _theme.accent,
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(this.context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen()));
-                },
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                ),
-              ),
-            ]),
-          ),
+            ),
+            _RadialOption(alignment: const Alignment(0, -.62), label: 'VOICE', value: 'Device', icon: Icons.record_voice_over_rounded, accent: _theme.accent, onTap: () => ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Text('NowssB uses your selected device voice.')))),
+            _RadialOption(alignment: const Alignment(.72, -.2), label: 'LOOP', value: _loop ? 'On' : 'Off', icon: Icons.all_inclusive_rounded, accent: _theme.accent, onTap: () => setState(() => _loop = !_loop)),
+            _RadialOption(alignment: const Alignment(.45, .62), label: 'REPS', value: '${_repTarget}×', icon: Icons.repeat_rounded, accent: _theme.accent, onTap: () => setState(() => _repTarget = _repTarget == 3 ? 7 : _repTarget == 7 ? 11 : _repTarget == 11 ? 21 : 3)),
+            _RadialOption(alignment: const Alignment(-.45, .62), label: 'LIBRARY', value: 'Open', icon: Icons.library_music_rounded, accent: _theme.accent, onTap: () { Navigator.of(dialogContext).pop(); Navigator.of(this.context).push(MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen())); }),
+            _RadialOption(alignment: const Alignment(-.72, -.2), label: 'REPLAY', value: 'Word', icon: Icons.replay_rounded, accent: _theme.accent, onTap: _prepareAndPlay),
+            const Positioned(left: 24, right: 24, bottom: 20, child: Text('Choose a player control', textAlign: TextAlign.center, style: TextStyle(color: Colors.white38, fontSize: 10, letterSpacing: 1.4))),
+          ]),
         ),
       ),
     );
@@ -1552,41 +1539,62 @@ class _ImageControl extends StatelessWidget {
 }
 
 class _RadialOption extends StatelessWidget {
-  const _RadialOption({required this.alignment, required this.label, required this.value, required this.accent, required this.onTap});
+  const _RadialOption({required this.alignment, required this.label, required this.value, required this.icon, required this.accent, required this.onTap});
   final Alignment alignment;
   final String label;
   final String value;
+  final IconData icon;
   final Color accent;
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => Align(
     alignment: alignment,
-    child: Padding(
-      padding: const EdgeInsets.all(14),
-      child: InkResponse(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: Container(
-          width: 70,
-          height: 70,
+    child: InkResponse(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      radius: 48,
+      child: SizedBox(
+        width: 86,
+        height: 86,
+        child: DecoratedBox(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: const Color(0x2BFFFFFF),
-            border: Border.all(color: accent.withOpacity(.8)),
+            color: const Color(0x241D3448),
+            border: Border.all(color: accent.withOpacity(.62)),
+            boxShadow: [BoxShadow(color: accent.withOpacity(.10), blurRadius: 16)],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1)),
-              Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
-            ],
-          ),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(icon, color: accent, size: 20),
+            const SizedBox(height: 4),
+            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1)),
+            Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
+          ]),
         ),
       ),
     ),
   );
 }
 
+class _AuraSettingsPainter extends CustomPainter {
+  const _AuraSettingsPainter({required this.accent});
+  final Color accent;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = size.shortestSide * .34;
+    final paint = Paint()..style = PaintingStyle.stroke..strokeWidth = 1;
+    for (var i = 0; i < 4; i++) {
+      paint.color = accent.withOpacity(.12 - i * .02);
+      canvas.drawCircle(center, radius + i * 27, paint);
+    }
+    paint.color = accent.withOpacity(.32);
+    paint.strokeWidth = 2;
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius + 82), -.8, 1.35, false, paint);
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius + 82), 2.4, 1.05, false, paint);
+  }
+  @override
+  bool shouldRepaint(covariant _AuraSettingsPainter oldDelegate) => oldDelegate.accent != accent;
+}
 class _PlayerInfoSheet extends StatelessWidget {
   const _PlayerInfoSheet({required this.word, required this.accent});
   final Word word;
