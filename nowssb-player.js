@@ -203,10 +203,10 @@
       minutes: minutes,
       timeLabel: keys.length ? lgpFmtMinutes(minutes) : '0m',
       level: (function () {
-        var earned = Math.max(1, Math.min(12, Math.floor(minutes / 30) + 1));
+        var earned = Math.max(1, Math.min(10, Math.floor(minutes / 30) + 1));
         try {
           var o = parseInt(localStorage.getItem('nwsb_player_level') || '', 10);
-          if (o >= 1 && o <= 12) return o;
+          if (o >= 1 && o <= 10) return o;
         } catch (e) {}
         return earned;
       })()
@@ -224,7 +224,7 @@
   }
   var _lgpLevelsOpen = false;
   function lgpSetLevel(n) {
-    n = Math.max(1, Math.min(12, parseInt(n, 10) || 1));
+    n = Math.max(1, Math.min(10, parseInt(n, 10) || 1));
     try { localStorage.setItem('nwsb_player_level', String(n)); } catch (e) {}
     return n;
   }
@@ -282,27 +282,32 @@
     if (typeof openWalkmanLib === 'function') openWalkmanLib();
     else if (typeof openSub === 'function') openSub('practice');
   };
-  window.lgpOpenLevel = function () {
-    _lgpLevelsOpen = !_lgpLevelsOpen;
+  window.lgpOpenLevel = function (force) {
+    if (force === true) _lgpLevelsOpen = true;
+    else if (force === false) _lgpLevelsOpen = false;
+    else _lgpLevelsOpen = !_lgpLevelsOpen;
     var el = document.getElementById('lgpLevels');
-    if (!el) return;
-    if (_lgpLevelsOpen) el.removeAttribute('hidden');
-    else el.setAttribute('hidden', '');
+    var pill = document.querySelector('.lgp-stage-level');
+    if (el) {
+      if (_lgpLevelsOpen) el.removeAttribute('hidden');
+      else el.setAttribute('hidden', '');
+    }
+    if (pill) pill.setAttribute('aria-expanded', _lgpLevelsOpen ? 'true' : 'false');
   };
   window.lgpPickLevel = function (n) {
     n = lgpSetLevel(n);
     _lgpLevelsOpen = false;
     var list = document.getElementById('lgpLevels');
-    if (list) {
-      list.setAttribute('hidden', '');
-      var items = list.querySelectorAll('.lgp-levels-item');
-      for (var i = 0; i < items.length; i++) {
-        if (parseInt(items[i].getAttribute('data-level'), 10) === n) items[i].classList.add('is-on');
-        else items[i].classList.remove('is-on');
-      }
+    if (list) list.setAttribute('hidden', '');
+    var pill = document.querySelector('.lgp-stage-level');
+    if (pill) pill.setAttribute('aria-expanded', 'false');
+    var pillN = document.querySelector('.lgp-stage-level-n');
+    if (pillN) pillN.textContent = 'Level ' + n;
+    var items = list ? list.querySelectorAll('.lgp-stage-lv') : [];
+    for (var i = 0; i < items.length; i++) {
+      if (parseInt(items[i].getAttribute('data-level'), 10) === n) items[i].classList.add('is-on');
+      else items[i].classList.remove('is-on');
     }
-    var pill = document.querySelector('.lgp-profile-hero .lgp-level');
-    if (pill) pill.innerHTML = '<svg class="lgp-level-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>Level ' + n + ' <span aria-hidden="true">›</span>';
   };
 
 
@@ -695,20 +700,41 @@
             '<div class="lgp-stat"><div class="lgp-stat-num" id="lgpStatTime">' + st.timeLabel + '</div><div class="lgp-stat-lbl">Time Meditated</div></div>' +
           '</div></div>';
         })() +
-        (function () {
-          var st = lgpSessionStats();
-          var cur = st.level;
-          var items = '';
-          for (var i = 1; i <= 12; i++) {
-            items += (i > 1 ? '<span class="lgp-levels-sep" aria-hidden="true"></span>' : '') +
-              '<button class="lgp-levels-item' + (i === cur ? ' is-on' : '') + '" type="button" data-level="' + i + '"' +
-              ' onclick="window.lgpPickLevel&&window.lgpPickLevel(' + i + ')">Level ' + i + '</button>';
-          }
-          return '<div class="lgp-levels" id="lgpLevels"' + (_lgpLevelsOpen ? '' : ' hidden') + '>' + items + '</div>';
-        })() +
         '<div class="lgp-visual">' +
           '<div class="lgp-art-photo" style="background-image:url(\'' + th.img + '\')"></div>' +
           '<div class="lgp-art-shade" aria-hidden="true"></div>' +
+          (function () {
+            var st = lgpSessionStats();
+            var cur = st.level;
+            var star = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4l2.2 6.6H21l-5.4 4 2.1 6.6L12 15.8 6.3 19.6l2.1-6.6L3 9h6.8z"/></svg>';
+            var items = '';
+            for (var i = 1; i <= 10; i++) {
+              items += (i > 1 ? '<span class="lgp-stage-sep" aria-hidden="true"></span>' : '') +
+                '<button class="lgp-stage-lv' + (i === cur ? ' is-on' : '') + '" type="button" data-level="' + i + '"' +
+                ' onclick="window.lgpPickLevel&&window.lgpPickLevel(' + i + ')">' + star + '<span>Level ' + i + '</span></button>';
+            }
+            return '' +
+              '<button class="lgp-stage-level" type="button" onclick="window.lgpOpenLevel&&window.lgpOpenLevel()" aria-label="Level ' + cur + '" aria-expanded="' + (_lgpLevelsOpen ? 'true' : 'false') + '">' +
+                star + '<span class="lgp-stage-level-n">Level ' + cur + '</span>' +
+              '</button>' +
+              '<div class="lgp-stage-glass">' +
+                '<button type="button" onclick="window.lgpToggleArc&&window.lgpToggleArc()" aria-label="Settings">' +
+                  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>' +
+                '</button>' +
+                '<button type="button" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
+                  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>' +
+                '</button>' +
+              '</div>' +
+              '<div class="lgp-stage-sheet" id="lgpLevels"' + (_lgpLevelsOpen ? '' : ' hidden') + '>' +
+                '<div class="lgp-stage-sheet-top">' +
+                  '<p>LEVEL</p>' +
+                  '<button type="button" class="lgp-stage-close" onclick="window.lgpOpenLevel&&window.lgpOpenLevel(false)" aria-label="Close">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+                  '</button>' +
+                '</div>' +
+                '<div class="lgp-stage-list">' + items + '</div>' +
+              '</div>';
+          })() +
           '<div class="lgp-visual-overlay">' +
             '<p class="lgp-art-kicker">' + _e(String(w.word || '').toUpperCase()) + '</p>' +
             '<div class="lgp-wordblock">' +
