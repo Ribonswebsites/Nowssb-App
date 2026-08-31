@@ -544,7 +544,10 @@ document.getElementById('soundLibrary43Grab')?.addEventListener('touchstart',fun
 
 <script>
 /* The integrated Player sheet owns the single Back control while embedded. */
-if (window.parent !== window) document.documentElement.classList.add('embedded-player-sheet');
+if (window.parent !== window) {
+  document.documentElement.classList.add('embedded-player-sheet');
+  document.querySelectorAll('#soundLibrary43Back').forEach(function (el) { el.remove(); });
+}
 </script>
 <style>
 .embedded-player-sheet #soundLibrary43Back{display:none!important}

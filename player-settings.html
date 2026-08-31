@@ -631,7 +631,10 @@ if(navigator.getBattery){
 
 <script>
 /* The integrated Player sheet owns navigation while embedded. */
-if (window.parent !== window) document.documentElement.classList.add('embedded-player-sheet');
+if (window.parent !== window) {
+  document.documentElement.classList.add('embedded-player-sheet');
+  document.querySelectorAll('.nav-back').forEach(function (el) { el.remove(); });
+}
 </script>
 <style>
 .embedded-player-sheet .nav-back{display:none!important}
