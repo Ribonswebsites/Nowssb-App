@@ -405,6 +405,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                       accent: theme.accent,
                       onReplay: _prepareAndPlay,
                       onCopy: _copyWord,
+                      onSettings: _openSettings,
+                      onInfo: _openInfo,
                       onSyllable: (part) async {
                         await _tts.stop();
                         await _tts.speak(part.roman.isNotEmpty ? part.roman : part.deva);
@@ -776,7 +778,7 @@ class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word, required this.theme, required this.playing,
     required this.accent, required this.onReplay, required this.onCopy,
-    required this.onSyllable,
+    required this.onSettings, required this.onInfo, required this.onSyllable,
   });
 
   final Word word;
@@ -785,6 +787,8 @@ class _VisualStage extends StatelessWidget {
   final Color accent;
   final VoidCallback onReplay;
   final VoidCallback onCopy;
+  final VoidCallback onSettings;
+  final VoidCallback onInfo;
   final ValueChanged<WordPart> onSyllable;
 
   @override
@@ -834,6 +838,11 @@ class _VisualStage extends StatelessWidget {
             ),
           ),
           Positioned(
+            top: 10,
+            right: 10,
+            child: _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
+          ),
+          Positioned(
             left: 0, right: 0, bottom: 0,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
@@ -854,6 +863,56 @@ class _VisualStage extends StatelessWidget {
             ),
           ),
         ]),
+      ),
+    ),
+  );
+}
+
+class _StageGlassChip extends StatelessWidget {
+  const _StageGlassChip({required this.onSettings, required this.onInfo});
+  final VoidCallback onSettings;
+  final VoidCallback onInfo;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(999),
+      gradient: const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
+      ),
+      boxShadow: const [
+        BoxShadow(color: Color(0x59000000), blurRadius: 18, offset: Offset(0, 8)),
+        BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
+      ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(4),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        _StageGlassBtn(icon: Icons.settings_rounded, label: 'Settings', onTap: onSettings),
+        _StageGlassBtn(icon: Icons.help_outline_rounded, label: 'Word info', onTap: onInfo),
+      ]),
+    ),
+  );
+}
+
+class _StageGlassBtn extends StatelessWidget {
+  const _StageGlassBtn({required this.icon, required this.label, required this.onTap});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: label,
+    child: GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 32,
+        height: 32,
+        child: Icon(icon, color: const Color(0xFFF4F4F5), size: 16),
       ),
     ),
   );
