@@ -15920,3 +15920,98 @@ body.nwsb-store-open #sub-signature-store .sig-intro-page {
   .nss-store-parallax .nss-store-bg,
   .nss-store-parallax .sig-store-bg { transform: none; transition: none; }
 }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   NOWSSB MOTION SYSTEM — AURA-inspired, app-wide
+   Keep movement on opacity and transform so transitions stay fast on phones.
+   The controller in app/js/part092-motion.js only observes existing state;
+   feature navigation remains authoritative.
+   ══════════════════════════════════════════════════════════════════ */
+:root {
+  --nwsb-motion-ease: cubic-bezier(.16, 1, .3, 1);
+  --nwsb-motion-ease-soft: cubic-bezier(.22, 1, .36, 1);
+  --nwsb-motion-fast: 180ms;
+  --nwsb-motion-page: 300ms;
+}
+
+html { scroll-behavior: smooth; }
+body { overscroll-behavior-y: none; }
+
+/* Top-level screens fade and lift their contents without transforming the
+   screen root, which keeps fixed overlays genuinely fixed on Android WebView. */
+.screen:not(#splash) {
+  opacity: 0;
+  transition: opacity var(--nwsb-motion-page) var(--nwsb-motion-ease-soft);
+  will-change: opacity;
+}
+.screen:not(#splash).active { opacity: 1; }
+.screen:not(#splash).exit { opacity: 0; }
+
+/* Every app page uses the same AURA-like short slide/fade rather than a
+   collection of unrelated modal timings. Visibility/pointer-events remain
+   controlled by app.css. */
+.sub-screen {
+  opacity: 0;
+  transform: translate3d(22px, 0, 0);
+  transition: opacity 260ms var(--nwsb-motion-ease-soft),
+              transform 320ms var(--nwsb-motion-ease);
+  will-change: opacity, transform;
+}
+.sub-screen.open {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Lightweight scroll direction response on the two homes. It is deliberately
+   tiny: the list remains native and momentum scrolling remains untouched. */
+#home .hero-section,
+#home-nm .nmh-toprow {
+  transition: transform 220ms var(--nwsb-motion-ease-soft);
+  will-change: transform;
+}
+#home.nwsb-scroll-forward .hero-section,
+#home-nm.nwsb-scroll-forward .nmh-toprow { transform: translate3d(0, -3px, 0); }
+#home.nwsb-scroll-back .hero-section,
+#home-nm.nwsb-scroll-back .nmh-toprow { transform: translate3d(0, 2px, 0); }
+
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+button:active,
+a:active,
+[role="button"]:active {
+  transform: scale(.985);
+  transition: transform var(--nwsb-motion-fast) var(--nwsb-motion-ease);
+}
+
+@keyframes nwsbMotionPageIn {
+  from { opacity: 0; transform: translate3d(12px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .screen:not(#splash),
+  .sub-screen,
+  #home .hero-section,
+  #home-nm .nmh-toprow {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.nwsb-motion-scroll-host {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+.nwsb-motion-ready .screen,
+.nwsb-motion-ready .sub-screen {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
