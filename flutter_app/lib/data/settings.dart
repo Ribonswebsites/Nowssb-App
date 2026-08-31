@@ -25,6 +25,15 @@ class Settings extends ChangeNotifier {
   static const _kHome = 'nwsb_home_mode';
   static const _kVideo = 'nwsb_fashplus_video';
   static const _kImage = 'nwsb_fashplus_image';
+  static const _kEq = 'nwsb_player_eq';
+  static const _kQuality = 'nwsb_player_quality';
+  static const _kBass = 'nwsb_player_bass';
+  static const _kSpeed = 'nwsb_player_speed';
+  static const _kCrossfade = 'nwsb_player_crossfade';
+  static const _kSleep = 'nwsb_player_sleep';
+  static const _kDownload = 'nwsb_player_download';
+  static const _kPlaylist = 'nwsb_player_playlist';
+  static const _kNowPlaying = 'nwsb_player_now_playing';
 
   /// One selected Fashion Plus film plays behind every primary page while
   /// motion mode is enabled.
@@ -59,6 +68,15 @@ class Settings extends ChangeNotifier {
   int _fashionVideo = 1;
   int _fashionImage = -1;
   int _backgroundTransition = 0;
+  String _eq = 'flat';
+  String _quality = 'Normal';
+  bool _bassBoost = false;
+  double _speed = 1.0;
+  String _crossfade = 'Off';
+  String _sleepTimer = 'Off';
+  bool _downloadOnly = false;
+  String _playlist = 'Classic';
+  String _nowPlaying = 'On';
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
@@ -72,6 +90,15 @@ class Settings extends ChangeNotifier {
   String? get fashionImageAsset =>
       _fashionImage < 0 ? null : fashionImages[_fashionImage];
   int get backgroundTransition => _backgroundTransition;
+  String get eq => _eq;
+  String get quality => _quality;
+  bool get bassBoost => _bassBoost;
+  double get speed => _speed;
+  String get crossfade => _crossfade;
+  String get sleepTimer => _sleepTimer;
+  bool get downloadOnly => _downloadOnly;
+  String get playlist => _playlist;
+  String get nowPlaying => _nowPlaying;
 
   Future<void> load() async {
     try {
@@ -84,6 +111,15 @@ class Settings extends ChangeNotifier {
         fallback: 1,
       );
       _fashionImage = _validImageIndex(p.getInt(_kImage) ?? _fashionImage);
+      _eq = p.getString(_kEq) ?? _eq;
+      _quality = p.getString(_kQuality) ?? _quality;
+      _bassBoost = p.getBool(_kBass) ?? _bassBoost;
+      _speed = p.getDouble(_kSpeed) ?? _speed;
+      _crossfade = p.getString(_kCrossfade) ?? _crossfade;
+      _sleepTimer = p.getString(_kSleep) ?? _sleepTimer;
+      _downloadOnly = p.getBool(_kDownload) ?? _downloadOnly;
+      _playlist = p.getString(_kPlaylist) ?? _playlist;
+      _nowPlaying = p.getString(_kNowPlaying) ?? _nowPlaying;
       notifyListeners();
     } catch (_) {
       // A platform that refuses storage is not a reason to fail to start.
@@ -127,6 +163,16 @@ class Settings extends ChangeNotifier {
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
 
+  Future<void> setEq(String value) async { _eq = value; await _save(_kEq, value); notifyListeners(); }
+  Future<void> setQuality(String value) async { _quality = value; await _save(_kQuality, value); notifyListeners(); }
+  Future<void> toggleBass() async { _bassBoost = !_bassBoost; await _save(_kBass, _bassBoost); notifyListeners(); }
+  Future<void> setSpeed(double value) async { _speed = value; await _saveDouble(_kSpeed, value); notifyListeners(); }
+  Future<void> setCrossfade(String value) async { _crossfade = value; await _save(_kCrossfade, value); notifyListeners(); }
+  Future<void> setSleepTimer(String value) async { _sleepTimer = value; await _save(_kSleep, value); notifyListeners(); }
+  Future<void> toggleDownloadOnly() async { _downloadOnly = !_downloadOnly; await _save(_kDownload, _downloadOnly); notifyListeners(); }
+  Future<void> setPlaylist(String value) async { _playlist = value; await _save(_kPlaylist, value); notifyListeners(); }
+  Future<void> setNowPlaying(String value) async { _nowPlaying = value; await _save(_kNowPlaying, value); notifyListeners(); }
+
   /// A tab does not change the selected asset, but it should still make the
   /// background arrive gently rather than appearing as a hard cut.
   void fadeBackgroundForNavigation() => _advanceBackgroundTransition();
@@ -140,6 +186,13 @@ class Settings extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       await p.setBool(k, v);
+    } catch (_) {}
+  }
+
+  Future<void> _saveDouble(String k, double v) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setDouble(k, v);
     } catch (_) {}
   }
 

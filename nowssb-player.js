@@ -1220,7 +1220,11 @@
     document.addEventListener('click', function (e) {
       var t = e.target;
       var hit = t && (t.closest ? t.closest('.lgp-settings') : null);
-      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpToggleArc(); }
+      if (hit) {
+        e.preventDefault(); e.stopPropagation();
+        try { sessionStorage.setItem('nwsb_return_to_player', JSON.stringify({ts:Date.now()})); } catch (_) {}
+        window.location.assign('player-settings.html?from=player');
+      }
     }, true);
   }
 

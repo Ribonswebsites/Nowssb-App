@@ -22,6 +22,7 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import 'sound_library.dart';
 import 'store.dart';
+import 'player_settings.dart';
 
 String _fmtClock(num sec) {
   final s = sec.round().clamp(0, 24 * 3600);
@@ -291,6 +292,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   }
 
   void _openSettings() {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()));
+  }
+
+  void _openSettingsLegacy() {
     showDialog<void>(
       context: context,
       barrierColor: const Color(0xB8060C18),
