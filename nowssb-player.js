@@ -498,7 +498,7 @@
     })();
     var visual = th.video
       ? (_keepVid ? '<span class="lgp-video-slot"></span>'
-                  : '<video class="lgp-video" autoplay loop muted playsinline preload="auto" src="' + _newVidSrc + '"></video>')
+                  : '<video class="lgp-video" autoplay loop muted playsinline webkit-playsinline preload="auto" src="' + _newVidSrc + '"></video>')
       : '<div class="lgp-video-fallback"></div>';
 
     var _prof = lgpUserProfile();
@@ -516,15 +516,13 @@
              The id stays on a hidden node — other code writes to it. */
           '<div class="lgp-status" id="spAutoStatus" hidden></div>' +
           '<div class="lgp-np-transport">' +
-            '<button class="lgp-mode lgp-mode-shuffle' + (window.lgpShuffle() ? ' is-on' : '') + '" type="button" onclick="window.lgpToggleShuffle&&window.lgpToggleShuffle()" aria-label="Shuffle" aria-pressed="' + (window.lgpShuffle() ? 'true' : 'false') + '">' + shuffleSvg + '</button>' +
             '<div class="lgp-tube">' +
-              '<button class="lgp-tube-svg lgp-rewind" type="button" onclick="window.lgpRewind&&window.lgpRewind()" aria-label="Rewind">' + rewindSvg + '</button>' +
+              '<button class="lgp-tube-svg lgp-mode lgp-mode-shuffle' + (window.lgpShuffle() ? ' is-on' : '') + '" type="button" onclick="window.lgpToggleShuffle&&window.lgpToggleShuffle()" aria-label="Shuffle" aria-pressed="' + (window.lgpShuffle() ? 'true' : 'false') + '">' + shuffleSvg + '</button>' +
               '<button class="lgp-ctrl" id="lgpPrev" type="button" onclick="pwPrevWord&&pwPrevWord()" ' + (idx === 0 ? 'disabled' : '') + ' aria-label="Previous">' + prevIco + '</button>' +
               '<button class="lgp-play' + (playing ? ' playing' : '') + '" id="spPlayBtn" type="button" onclick="pwTogglePlay&&pwTogglePlay()" aria-label="' + (playing ? 'Pause' : 'Play') + '">' + playIco + '</button>' +
               '<button class="lgp-ctrl" id="lgpNext" type="button" onclick="window.lgpGoNext&&window.lgpGoNext()" ' + (idx >= total - 1 && !window.lgpShuffle() ? 'disabled' : '') + ' aria-label="Next">' + nextIco + '</button>' +
-              '<button class="lgp-tube-svg lgp-replay-top" type="button" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replayTubeSvg + '</button>' +
+              '<button class="lgp-tube-svg lgp-mode lgp-mode-repeat' + (loop ? ' is-on' : '') + '" type="button" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()" aria-label="Repeat" aria-pressed="' + (loop ? 'true' : 'false') + '">' + repeatSvg + '</button>' +
             '</div>' +
-            '<button class="lgp-mode lgp-mode-repeat' + (loop ? ' is-on' : '') + '" type="button" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()" aria-label="Repeat" aria-pressed="' + (loop ? 'true' : 'false') + '">' + repeatSvg + '</button>' +
           '</div>' +
         '</div>' +
         /* The "Word played · your turn" page used to sit here — a whole
@@ -701,6 +699,7 @@
           '</div></div>';
         })() +
         '<div class="lgp-visual">' +
+          visual +
           '<div class="lgp-art-photo" style="background-image:url(\'' + th.img + '\')"></div>' +
           '<div class="lgp-art-shade" aria-hidden="true"></div>' +
           (function () {
@@ -791,6 +790,7 @@
               '<div class="lgp-nextup-head"><span>Up Next</span>' +
                 '<button class="lgp-queue-btn" type="button" onclick="window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
               '</div>' +
+              '<div class="lgp-nextup-line" aria-hidden="true"></div>' +
               '<p class="lgp-nextup-empty">End of queue</p>' +
             '</div>';
           }
@@ -800,6 +800,7 @@
             '<div class="lgp-nextup-head"><span>Up Next</span>' +
               '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
             '</div>' +
+            '<div class="lgp-nextup-line" aria-hidden="true"></div>' +
             '<button class="lgp-nextup-item" type="button" onclick="window.lgpPlayNext&&window.lgpPlayNext()">' +
               '<span class="lgp-nextup-art"' + (art ? ' style="background-image:url(\'' + lgpEsc(art) + '\')"' : '') + '></span>' +
               '<span class="lgp-nextup-mid">' +
@@ -892,7 +893,9 @@
     (function () {
       var v = body.querySelector('.lgp-video');
       if (!v) return;
-      v.muted = true; v.setAttribute('muted', ''); v.playsInline = true;
+      v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', 'true');
+      v.setAttribute('webkit-playsinline', 'true'); v.setAttribute('autoplay', '');
       function tryPlay() { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
       if (!v._lgpBound) {
         v._lgpBound = true;

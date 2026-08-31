@@ -387,7 +387,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
       backgroundColor: const Color(0xFF000000),
       body: SafeArea(
         child: LayoutBuilder(builder: (context, constraints) {
-          final stageWidth = math.min(constraints.maxWidth - 24, 300.0);
+          final stageWidth = math.min(constraints.maxWidth - 24, 340.0);
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
             child: ConstrainedBox(
@@ -395,7 +395,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
                 const SizedBox(height: 12),
-                Center(
                   child: SizedBox(
                     width: stageWidth,
                     child: _VisualStage(
@@ -462,11 +461,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 _TransportRow(
                   playing: _playing,
                   shuffle: _shuffle,
+                  loop: _loop,
                   onShuffle: _toggleShuffle,
                   onPrevious: _skipPrev,
                   onPlay: _togglePlay,
                   onNext: () => _move(1),
-                  onRandom: _playRandom,
+                  onRepeat: () => setState(() => _loop = !_loop),
                 ),
                 const SizedBox(height: 16),
                 SizedBox(width: stageWidth, child: _NextUpCard(
@@ -804,35 +804,26 @@ class _VisualStage extends StatelessWidget {
     child: DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x29FFFFFF)),
+        borderRadius: BorderRadius.circular(34),
+        border: Border.all(color: const Color(0x38FFFFFF)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x8C000000), blurRadius: 28, offset: Offset(0, 18)),
+          BoxShadow(color: Color(0x24FFFFFF), blurRadius: 0, spreadRadius: 1),
+        ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(34),
         child: Stack(fit: StackFit.expand, children: [
-          theme.image.startsWith('http')
-            ? Image.network(theme.image, fit: BoxFit.cover, alignment: const Alignment(0, -0.24), errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black))
-            : Image.asset(theme.image, fit: BoxFit.cover, alignment: const Alignment(0, -0.24), errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)),
+          const ColoredBox(color: Colors.black),
           NwsbVideo(
             asset: theme.video,
+            poster: theme.image,
             fit: BoxFit.cover,
             alignment: const Alignment(0, -0.24),
             priority: ClipPriority.feature,
             autoplay: true,
             loop: true,
-            showPoster: false,
-          ),
-          const IgnorePointer(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 12, 0, 0),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  height: 150,
-                  child: CustomPaint(painter: _ArtWavePainter(active: true), child: SizedBox.expand()),
-                ),
-              ),
-            ),
+            showPoster: true,
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
@@ -1078,88 +1069,128 @@ class _ProgressBarState extends State<_ProgressBar> with SingleTickerProviderSta
 
 class _TransportRow extends StatelessWidget {
   const _TransportRow({
-    required this.playing, required this.shuffle,
-    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRandom,
+    required this.playing, required this.shuffle, required this.loop,
+    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRepeat,
   });
   final bool playing;
   final bool shuffle;
+  final bool loop;
   final VoidCallback onShuffle;
   final VoidCallback onPrevious;
   final VoidCallback onPlay;
   final VoidCallback onNext;
-  final VoidCallback onRandom;
+  final VoidCallback onRepeat;
 
   @override
   Widget build(BuildContext context) => _GlassTube(
     playing: playing,
     shuffle: shuffle,
+    loop: loop,
     onShuffle: onShuffle,
     onPrevious: onPrevious,
     onPlay: onPlay,
     onNext: onNext,
-    onRandom: onRandom,
+    onRepeat: onRepeat,
   );
 }
 
 class _GlassTube extends StatelessWidget {
   const _GlassTube({
-    required this.playing, required this.shuffle,
-    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRandom,
+    required this.playing, required this.shuffle, required this.loop,
+    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRepeat,
   });
   final bool playing;
   final bool shuffle;
+  final bool loop;
   final VoidCallback onShuffle;
   final VoidCallback onPrevious;
   final VoidCallback onPlay;
   final VoidCallback onNext;
-  final VoidCallback onRandom;
+  final VoidCallback onRepeat;
+
+  static const _tube = 'https://media.nowssb.com/migrated-images/19432211f0f348fc_file_0000000016bc71fab1ae5a054ac772af_gwttc6.png';
+  static const _play = 'https://media.nowssb.com/migrated-images/74d38b3c7b69b30b_e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png';
+  static const _pause = 'https://media.nowssb.com/migrated-images/f073aa60452e1cb9_e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png';
+  static const _prev = 'https://media.nowssb.com/migrated-images/2f091c1083cd0b65_ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png';
+  static const _next = 'https://media.nowssb.com/migrated-images/71a2d8954b5e6209_c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png';
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 118,
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(999),
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF3A3A42), Color(0xFF141418), Color(0xFF070708)],
-            stops: [0, 0.38, 1],
-          ),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(999)),
+          image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
           boxShadow: [
-            const BoxShadow(color: Color(0x8C000000), blurRadius: 40, offset: Offset(0, 18)),
-            BoxShadow(color: playing ? const Color(0x33C8DCFF) : const Color(0x14FFFFFF), blurRadius: playing ? 32 : 0, spreadRadius: 1),
+            BoxShadow(color: Color(0x8C000000), blurRadius: 40, offset: Offset(0, 18)),
           ],
         ),
-        child: Stack(children: [
-          const Positioned(
-            top: 8, left: 36, right: 36, height: 34,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(999)),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0x6BFFFFFF), Color(0x0AFFFFFF)],
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+          child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            _TubeIcon(icon: Icons.shuffle_rounded, on: shuffle, onTap: onShuffle, label: 'Shuffle'),
+            _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: onPrevious, size: 48),
+            Semantics(
+              button: true,
+              label: playing ? 'Pause' : 'Play',
+              child: GestureDetector(
+                onTap: onPlay,
+                child: SizedBox(
+                  width: 64,
+                  height: 64,
+                  child: Image.network(
+                    playing ? _pause : _play,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Image.asset(
+                      playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Icon(
+                        playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                        color: Colors.white,
+                        size: 36,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              _GlassOrb(icon: Icons.shuffle_rounded, on: shuffle, onTap: onShuffle, label: 'Shuffle'),
-              _GlassOrb(icon: Icons.skip_previous_rounded, filled: true, onTap: onPrevious, label: 'Previous'),
-              _GlassOrb(icon: playing ? Icons.pause_rounded : Icons.play_arrow_rounded, filled: true, play: true, onTap: onPlay, label: playing ? 'Pause' : 'Play'),
-              _GlassOrb(icon: Icons.skip_next_rounded, filled: true, onTap: onNext, label: 'Next'),
-              _GlassOrb(icon: Icons.casino_outlined, onTap: onRandom, label: 'Random'),
-            ]),
-          ),
-        ]),
+            _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: onNext, size: 48),
+            _TubeIcon(icon: Icons.repeat_rounded, on: loop, onTap: onRepeat, label: 'Repeat'),
+          ]),
+        ),
       ),
     );
   }
+}
+
+class _TubeIcon extends StatelessWidget {
+  const _TubeIcon({required this.icon, required this.onTap, required this.label, this.on = false});
+  final IconData icon;
+  final VoidCallback onTap;
+  final String label;
+  final bool on;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: label,
+    child: GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 44,
+        height: 44,
+        child: Icon(
+          icon,
+          color: on ? const Color(0xFFFFFFFF) : const Color(0xFFF4F4F5),
+          size: 22,
+          shadows: on
+              ? const [Shadow(color: Color(0x8CDCE6FF), blurRadius: 12)]
+              : const [Shadow(color: Color(0x8C000000), blurRadius: 8)],
+        ),
+      ),
+    ),
+  );
 }
 
 class _GlassOrb extends StatelessWidget {
@@ -1596,17 +1627,18 @@ class _PlayerTheme {
 }
 
 const _playerThemes = <_PlayerTheme>[
-  // The former third visual is now the first/default look for a session.
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg', video: 'assets/videos/31cbc323e2d03dbb_grok_video_2026-06-28-19-55-09_otgbxd.mp4', accent: Color(0xFF9BB8FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'assets/videos/3628088cee108d9e_grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg', video: 'assets/videos/f36df7528f8d741b_grok_video_2026-06-28-19-55-02_of5fwh.mp4', accent: Color(0xFFBD7BFF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg', video: 'assets/videos/9207084d44a79e06_grok_video_2026-06-28-19-54-43_it2bur.mp4', accent: Color(0xFFA6DCFF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg', video: 'assets/videos/874f8fcfb0e6ea6d_grok_video_2026-06-30-10-29-43_hzxyun.mp4', accent: Color(0xFFB9A6FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg', video: 'assets/videos/c35616e766f6d146_grok_video_2026-06-30-10-45-45_dg2ohg.mp4', accent: Color(0xFFA6C8FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg', video: 'assets/videos/aca728b4c8b51a0e_grok_video_2026-06-30-10-47-20_rljghs.mp4', accent: Color(0xFFB9A6FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg', video: 'assets/videos/00212abd615fbd11_grok_video_2026-06-30-10-45-34_pg2y2j.mp4', accent: Color(0xFFE8D5A3)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg', video: 'assets/videos/93c66feecbddedb0_grok_video_2026-06-30-10-52-07_gvffol.mp4', accent: Color(0xFFF0D9A8)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg', video: 'assets/videos/5972626e2ce6c9a6_grok_video_2026-06-30-10-52-20_zk87yh.mp4', accent: Color(0xFF8FE6FF)),
+  // Same ordered clips as nowssb-player.js — streamed from the live site so
+  // the native player is not stuck on a missing bundled assets/videos path.
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg', video: 'https://nowssb.com/assets/videos/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4', accent: Color(0xFF9BB8FF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'https://nowssb.com/assets/videos/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg', video: 'https://nowssb.com/assets/videos/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4', accent: Color(0xFFBD7BFF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg', video: 'https://nowssb.com/assets/videos/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4', accent: Color(0xFFA6DCFF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg', video: 'https://nowssb.com/assets/videos/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4', accent: Color(0xFFB9A6FF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg', video: 'https://nowssb.com/assets/videos/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4', accent: Color(0xFFA6C8FF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg', video: 'https://nowssb.com/assets/videos/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4', accent: Color(0xFFB9A6FF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg', video: 'https://nowssb.com/assets/videos/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4', accent: Color(0xFFE8D5A3)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg', video: 'https://nowssb.com/assets/videos/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4', accent: Color(0xFFF0D9A8)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg', video: 'https://nowssb.com/assets/videos/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4', accent: Color(0xFF8FE6FF)),
 ];
 
 class PracticeProgressScreen extends StatelessWidget {
