@@ -395,6 +395,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
                 const SizedBox(height: 12),
+                Center(
                   child: SizedBox(
                     width: stageWidth,
                     child: _VisualStage(
