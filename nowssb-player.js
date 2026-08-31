@@ -467,7 +467,7 @@
     /* Library (left, image icon) + Replay (right) flank the transport */
     var replaySvg = bgi('lgp-side-ico', IC.replay);
     var libSvg = bgi('lgp-side-ico', IC.library);
-    var libBtn = '<button class="lgp-side" onclick="lgpToggleArc&&document.getElementById(\'lgpArc\')&&document.getElementById(\'lgpArc\').classList.remove(\'open\');openWalkmanLib&&openWalkmanLib()" aria-label="Library">' + libSvg + '<span>Library</span></button>';
+    var libBtn = '<button class="lgp-side" onclick="window.location.assign(\'sound_library_ui_world_class-3.html?from=player\')" aria-label="Library">' + libSvg + '<span>Library</span></button>';
     var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
     /* central waveform = the pair's looping video (compressed via R2).
@@ -575,7 +575,7 @@
           '<button class="lgp-arc-opt o1" onclick="pwSetVoice&&pwSetVoice(\'' + (voice === 'F' ? 'M' : 'F') + '\');renderPractice&&renderPractice()"><span class="lbl">Voice</span><span class="val">' + (voice === 'F' ? 'Female' : 'Male') + '</span></button>' +
           '<button class="lgp-arc-opt o2" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()"><span class="lbl">Loop</span><span class="val">' + (loop ? 'On' : 'Off') + '</span></button>' +
           '<button class="lgp-arc-opt o3" onclick="pwCycleRepTarget&&pwCycleRepTarget();renderPractice&&renderPractice()"><span class="lbl">Reps</span><span class="val">' + repTarget + '×</span></button>' +
-          '<button class="lgp-arc-opt o4" onclick="lgpToggleArc();openWalkmanLib&&openWalkmanLib()"><span class="ico" style="background-image:url(\'' + IC.library + '\')"></span><span class="lbl">Library</span></button>' +
+          '<button class="lgp-arc-opt o4" onclick="window.location.assign(\'sound_library_ui_world_class-3.html?from=player\')"><span class="ico" style="background-image:url(\'' + IC.library + '\')"></span><span class="lbl">Library</span></button>' +
           '<button class="lgp-arc-opt o5" onclick="lgpToggleArc();if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()"><span class="ico" style="background-image:url(\'' + IC.replay + '\')"></span><span class="lbl">Replay</span></button>' +
           '<div class="lgp-arc-center"><span class="lgp-arc-center-ico" style="background-image:url(\'' + IC.settings + '\')"></span><span class="lgp-arc-center-lbl">Settings</span></div>' +
         '</div>' +
