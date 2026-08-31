@@ -564,23 +564,7 @@
           ((w.categories && w.categories.length) ? '<div class="lgp-arc-info-row"><span class="k">Category</span><span class="v">' + w.categories.join(' · ') + '</span></div>' : (w.organ ? '<div class="lgp-arc-info-row"><span class="k">Category</span><span class="v">' + w.organ + '</span></div>' : '')) +
         '</div>' +
       '</div>';
-    var arc =
-      '<div class="lgp-arc" id="lgpArc" style="--lg-accent:' + th.accent + '">' +
-        '<div class="lgp-arc-back" onclick="lgpToggleArc()"></div>' +
-        '<button class="lgp-arc-close" onclick="lgpToggleArc()" aria-label="Back"><span class="lgp-arc-close-ico" style="background-image:url(\'https://media.nowssb.com/migrated-images/7ee8439eec0e17a8_file_00000000ae6071fa982c6eec401328c6_uvgfjs.png\')"></span></button>' +
-        '<div class="lgp-arc-brand"><span class="lgp-arc-brand-txt">NowssB Player</span></div>' +
-        '<span class="lgp-arc-brand-ico-corner" style="background-image:url(\'' + IC.brand + '\')"></span>' +
-        '<div class="lgp-arc-radial">' +
-          '<div class="lgp-arc-ring"></div>' +
-          '<button class="lgp-arc-opt o1" onclick="pwSetVoice&&pwSetVoice(\'' + (voice === 'F' ? 'M' : 'F') + '\');renderPractice&&renderPractice()"><span class="lbl">Voice</span><span class="val">' + (voice === 'F' ? 'Female' : 'Male') + '</span></button>' +
-          '<button class="lgp-arc-opt o2" onclick="pwToggleLoop&&pwToggleLoop();renderPractice&&renderPractice()"><span class="lbl">Loop</span><span class="val">' + (loop ? 'On' : 'Off') + '</span></button>' +
-          '<button class="lgp-arc-opt o3" onclick="pwCycleRepTarget&&pwCycleRepTarget();renderPractice&&renderPractice()"><span class="lbl">Reps</span><span class="val">' + repTarget + '×</span></button>' +
-          '<button class="lgp-arc-opt o4" onclick="window.location.assign(\'sound_library_ui_world_class-3.html?from=player\')"><span class="ico" style="background-image:url(\'' + IC.library + '\')"></span><span class="lbl">Library</span></button>' +
-          '<button class="lgp-arc-opt o5" onclick="lgpToggleArc();if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()"><span class="ico" style="background-image:url(\'' + IC.replay + '\')"></span><span class="lbl">Replay</span></button>' +
-          '<div class="lgp-arc-center"><span class="lgp-arc-center-ico" style="background-image:url(\'' + IC.settings + '\')"></span><span class="lgp-arc-center-lbl">Settings</span></div>' +
-        '</div>' +
-        wInfo +
-      '</div>';
+    var arc = '';
 
     /* ── INFO PANEL — full-screen liquid-glass overlay opened from the ⓘ icon
        on the video. Shows an organ-specific video (wired later per word via
@@ -717,7 +701,7 @@
                 star + '<span class="lgp-stage-level-n">Level ' + cur + '</span>' +
               '</button>' +
               '<div class="lgp-stage-glass">' +
-                '<button type="button" onclick="try{sessionStorage.setItem(\"nwsb_return_to_player\",JSON.stringify({ts:Date.now()}))}catch(_){};window.location.assign(\"player-settings.html?from=player\")" aria-label="Settings">' +
+                '<button type="button" onclick="try{sessionStorage.setItem(\'nwsb_return_to_player\',JSON.stringify({ts:Date.now()}))}catch(_){};window.location.assign(\'player-settings.html?from=player\')" aria-label="Settings">' +
                   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>' +
                 '</button>' +
                 '<button type="button" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
@@ -1220,7 +1204,7 @@
     document.addEventListener('click', function (e) {
       var t = e.target;
       var hit = t && (t.closest ? t.closest('.lgp-settings') : null);
-      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpToggleArc(); }
+      if (hit) { e.preventDefault(); e.stopPropagation(); window.location.assign('aura-player.html?from=player'); }
     }, true);
   }
 

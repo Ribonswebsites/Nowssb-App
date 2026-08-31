@@ -24,6 +24,7 @@ import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'store.dart';
 import 'player_settings.dart';
+import 'player_dial.dart';
 
 String _fmtClock(num sec) {
   final s = sec.round().clamp(0, 24 * 3600);
@@ -292,6 +293,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     );
   }
 
+  void _openAuraClock() {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PlayerDial(
+      word: _word.word,
+      playing: _playing,
+      onPlay: _togglePlay,
+      onClose: () => Navigator.of(context).pop(),
+      onSettings: _openSettings,
+    )));
+  }
+
   void _openSettings() {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()));
   }
@@ -386,7 +397,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings, onMore: _openSettingsLegacy),
+                _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings, onMore: _openAuraClock),
                 const SizedBox(height: 12),
                 Center(
                   child: SizedBox(
