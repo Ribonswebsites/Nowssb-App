@@ -10587,5 +10587,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   }
 })();
 </script>
+
+<!-- return-to-player bootstrap -->
+<script>
+(function(){
+  var q=new URLSearchParams(location.search);
+  if(q.get('returnTo')==='player'){
+    try{sessionStorage.removeItem('nwsb_return_to_player')}catch(e){}
+    var open=function(){ if(typeof window.openSub==='function'){ window.openSub('practice'); } else { setTimeout(open,120); } };
+    setTimeout(open,220);
+  }
+})();
+</script>
 </body>
 </html>

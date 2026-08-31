@@ -644,6 +644,11 @@ function openLibrary(){
 }
 
 function goBack(){
+ const fromPlayer = new URLSearchParams(location.search).get('from');
+ if(fromPlayer === 'player' || fromPlayer === 'up-next' || fromPlayer === 'expanded'){
+   location.replace('index.html?returnTo=player');
+   return;
+ }
  if(!library.classList.contains('hidden')){
    library.classList.add('hidden');home.classList.remove('hidden');
    window.scrollTo({top:0,behavior:'smooth'});showToast('Back to collections');

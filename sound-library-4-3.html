@@ -355,7 +355,7 @@
 </style>
 </head>
 <body>
-<div class="app"><div class="sound-library-43-grab" id="soundLibrary43Grab" aria-label="Expand Sound Library"></div>
+<div class="app"><button id="soundLibrary43Back" aria-label="Back to Player" style="position:fixed;top:14px;left:14px;z-index:5;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:22px">‹</button><div class="sound-library-43-grab" id="soundLibrary43Grab" aria-label="Expand Sound Library"></div>
 
   <header>
     <div class="title-block">
@@ -535,6 +535,7 @@
       syncMiniPlayer();
     }
   });
+document.getElementById('soundLibrary43Back')?.addEventListener('click',function(){(window.top||window).location.replace('index.html?returnTo=player')});
 document.getElementById('soundLibrary43Grab')?.addEventListener('touchend',function(e){if(this._y0-e.changedTouches[0].clientY>36) window.parent&&window.parent.lgpOpenSoundLibrary43&&window.parent.lgpOpenSoundLibrary43(this);});
 document.getElementById('soundLibrary43Grab')?.addEventListener('touchstart',function(e){this._y0=e.touches[0].clientY},{passive:true});
 </script>
