@@ -385,7 +385,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings),
+                _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings, onMore: _openSettingsLegacy),
                 const SizedBox(height: 12),
                 Center(
                   child: SizedBox(
@@ -507,9 +507,10 @@ class _PlayerThemeArtwork extends StatelessWidget {
 }
 
 class _PlayerHeader extends StatelessWidget {
-  const _PlayerHeader({required this.onBack, required this.onSettings});
+  const _PlayerHeader({required this.onBack, required this.onSettings, required this.onMore});
   final VoidCallback onBack;
   final VoidCallback onSettings;
+  final VoidCallback onMore;
 
   @override
   Widget build(BuildContext context) => SizedBox(
@@ -521,7 +522,7 @@ class _PlayerHeader extends StatelessWidget {
         SizedBox(height: 6),
         SizedBox(width: 28, height: 1, child: ColoredBox(color: Color(0x8CF4F4F5))),
       ]),
-      Align(alignment: Alignment.centerRight, child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onSettings)),
+      Align(alignment: Alignment.centerRight, child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onMore)),
     ]),
   );
 }
