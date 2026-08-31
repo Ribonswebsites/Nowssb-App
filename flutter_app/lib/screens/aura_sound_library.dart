@@ -65,11 +65,42 @@ class _AuraSoundLibraryScreenState extends State<AuraSoundLibraryScreen> {
                 const SizedBox(height: 30),
                 const Text('COLLECTIONS', style: TextStyle(color: Color(0xFF85817A), fontSize: 12, letterSpacing: 1.2)),
                 const SizedBox(height: 15),
-                SizedBox(height: 142, child: ListView.separated(scrollDirection: Axis.horizontal, itemCount: 4, separatorBuilder: (_, __) => const SizedBox(width: 10), itemBuilder: (_, i) => Container(width: 108, decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF171513 + i * 0x030303), Colors.black]), border: Border.all(color: const Color(0xFF1C1C1C))), padding: const EdgeInsets.fromLTRB(11, 0, 11, 10), alignment: Alignment.bottomLeft, child: Text(['Favorites', 'Daily Practice', 'Root Frequencies', 'Downloads'][i], style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600)))),
+                SizedBox(
+                  height: 142,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 4,
+                    separatorBuilder: (_, __) => const SizedBox(width: 10),
+                    itemBuilder: (_, i) => Container(
+                      width: 108,
+                      padding: const EdgeInsets.fromLTRB(11, 0, 11, 10),
+                      alignment: Alignment.bottomLeft,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF171513 + i * 0x030303), Colors.black],
+                        ),
+                        border: Border.all(color: const Color(0xFF1C1C1C)),
+                      ),
+                      child: Text(
+                        ['Favorites', 'Daily Practice', 'Root Frequencies', 'Downloads'][i],
+                        style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 30),
                 const Text('ALL SOUNDS', style: TextStyle(color: Color(0xFF85817A), fontSize: 12, letterSpacing: 1.2)),
                 const SizedBox(height: 15),
-                if (tracks.isEmpty) const Padding(padding: EdgeInsets.all(30), child: Center(child: Text('No sounds found', style: TextStyle(color: Colors.white54)))) else ...tracks.map((w) => _AuraTrack(word: w)),
+                if (tracks.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(30),
+                    child: Center(child: Text('No sounds found', style: TextStyle(color: Colors.white54))),
+                  )
+                else
+                  ...tracks.map((w) => _AuraTrack(word: w)),
               ],
             ),
           ),

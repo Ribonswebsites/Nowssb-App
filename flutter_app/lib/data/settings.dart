@@ -163,15 +163,17 @@ class Settings extends ChangeNotifier {
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
 
-  Future<void> setEq(String value) async { _eq = value; await _save(_kEq, value); notifyListeners(); }
-  Future<void> setQuality(String value) async { _quality = value; await _save(_kQuality, value); notifyListeners(); }
+  Future<void> setEq(String value) async { _eq = value; await _saveString(_kEq, value); notifyListeners(); }
+  Future<void> setQuality(String value) async { _quality = value; await _saveString(_kQuality, value); notifyListeners(); }
+  bool get qualityHigh => _quality.toLowerCase() == 'high';
+  Future<void> toggleQuality() async => setQuality(qualityHigh ? 'Normal' : 'High');
   Future<void> toggleBass() async { _bassBoost = !_bassBoost; await _save(_kBass, _bassBoost); notifyListeners(); }
   Future<void> setSpeed(double value) async { _speed = value; await _saveDouble(_kSpeed, value); notifyListeners(); }
-  Future<void> setCrossfade(String value) async { _crossfade = value; await _save(_kCrossfade, value); notifyListeners(); }
-  Future<void> setSleepTimer(String value) async { _sleepTimer = value; await _save(_kSleep, value); notifyListeners(); }
+  Future<void> setCrossfade(String value) async { _crossfade = value; await _saveString(_kCrossfade, value); notifyListeners(); }
+  Future<void> setSleepTimer(String value) async { _sleepTimer = value; await _saveString(_kSleep, value); notifyListeners(); }
   Future<void> toggleDownloadOnly() async { _downloadOnly = !_downloadOnly; await _save(_kDownload, _downloadOnly); notifyListeners(); }
-  Future<void> setPlaylist(String value) async { _playlist = value; await _save(_kPlaylist, value); notifyListeners(); }
-  Future<void> setNowPlaying(String value) async { _nowPlaying = value; await _save(_kNowPlaying, value); notifyListeners(); }
+  Future<void> setPlaylist(String value) async { _playlist = value; await _saveString(_kPlaylist, value); notifyListeners(); }
+  Future<void> setNowPlaying(String value) async { _nowPlaying = value; await _saveString(_kNowPlaying, value); notifyListeners(); }
 
   /// A tab does not change the selected asset, but it should still make the
   /// background arrive gently rather than appearing as a hard cut.
@@ -180,6 +182,13 @@ class Settings extends ChangeNotifier {
   void _advanceBackgroundTransition() {
     _backgroundTransition++;
     notifyListeners();
+  }
+
+  Future<void> _saveString(String k, String v) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(k, v);
+    } catch (_) {}
   }
 
   Future<void> _save(String k, bool v) async {
