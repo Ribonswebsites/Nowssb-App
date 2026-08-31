@@ -80,7 +80,14 @@
       "@id":"https://nowssb.com/#organization",
       "name":"NowssB",
       "url":"https://nowssb.com/",
-      "logo":"https://nowssb.com/assets/icons/app-icon-512.png",
+      "logo":{
+        "@type":"ImageObject",
+        "@id":"https://nowssb.com/#logo",
+        "url":"https://nowssb.com/assets/icons/app-icon-512.png",
+        "contentUrl":"https://nowssb.com/assets/icons/app-icon-512.png",
+        "width":512,
+        "height":512
+      },
       "description":"NowssB — The New Fashion Trend Of Meditation. NowssB creates a word, sound, and meditation practice experience with listening, pronunciation, progress, and Connect."
     },
     {
@@ -124,8 +131,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <meta name="apple-mobile-web-app-title" content="NowssB">
 <link rel="apple-touch-icon" href="./assets/icons/app-icon-512.png">
 <link rel="apple-touch-startup-image" href="./assets/icons/app-icon-512.png">
-<!-- Favicon (browser tab — unchanged, previous logo) -->
-<link rel="icon" type="image/jpeg" href="https://media.nowssb.com/migrated-images/9cb8c699706ca200_grok_image_1776871816898_3_ll7c0m.jpg">
+<!-- First-party favicon and platform icons: stable, crawlable, and consistent with the NowssB brand -->
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/app-icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/app-icon-512.png">
+<link rel="shortcut icon" type="image/png" href="./assets/icons/app-icon-192.png">
 
 <link href="https://fonts.googleapis.com/css2?DM+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 
