@@ -283,6 +283,10 @@
     else if (typeof openSub === 'function') openSub('practice');
   };
   window.lgpOpenLevel = function (force) {
+    if (force === false) return;
+    try { sessionStorage.setItem('nwsb_return_to_player', JSON.stringify({ts:Date.now()})); } catch (_) {}
+    window.location.assign('select-level.html?from=player');
+    return;
     if (force === true) _lgpLevelsOpen = true;
     else if (force === false) _lgpLevelsOpen = false;
     else _lgpLevelsOpen = !_lgpLevelsOpen;

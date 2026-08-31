@@ -24,6 +24,7 @@ import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'store.dart';
 import 'player_settings.dart';
+import 'select_level.dart';
 import 'player_dial.dart';
 
 String _fmtClock(num sec) {
@@ -236,16 +237,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   }
 
   void _openLevel() {
-    showDialog<void>(
-      context: context,
-      barrierColor: const Color(0xE6000000),
-      builder: (context) => const Dialog(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        insetPadding: EdgeInsets.symmetric(horizontal: 28, vertical: 48),
-        child: _LevelList(),
-      ),
-    );
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SelectLevelScreen(initialLevel: _progress.level)));
   }
 
   void _openInfo() {
