@@ -234,9 +234,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   void _openLevel() {
     showDialog<void>(
       context: context,
-      barrierColor: const Color(0xB8060C18),
+      barrierColor: const Color(0xE6000000),
       builder: (context) => const Dialog(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         elevation: 0,
         insetPadding: EdgeInsets.symmetric(horizontal: 28, vertical: 48),
         child: _LevelList(),
@@ -407,6 +407,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                       onCopy: _copyWord,
                       onSettings: _openSettings,
                       onInfo: _openInfo,
+                      onLevel: _openLevel,
                       onSyllable: (part) async {
                         await _tts.stop();
                         await _tts.speak(part.roman.isNotEmpty ? part.roman : part.deva);
@@ -642,25 +643,22 @@ class _LevelList extends StatelessWidget {
     return AnimatedBuilder(
       animation: PracticeProgress.instance,
       builder: (context, _) {
-        final current = PracticeProgress.instance.level;
+        final current = PracticeProgress.instance.level.clamp(1, 10);
         return ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 360, maxHeight: 420),
+          constraints: const BoxConstraints(maxWidth: 360, maxHeight: 440),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: const Color(0xD1060A16),
+              color: const Color(0xFF000000),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0x38FFFFFF)),
-              boxShadow: const [
-                BoxShadow(color: Color(0x66000000), blurRadius: 28, offset: Offset(0, 12)),
-              ],
+              border: Border.all(color: const Color(0x24FFFFFF)),
             ),
             child: ListView.separated(
               shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              itemCount: 12,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: 10,
               separatorBuilder: (_, __) => const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 14),
-                child: ColoredBox(color: Color(0x47FFFFFF), child: SizedBox(height: 1, width: double.infinity)),
+                child: ColoredBox(color: Color(0x1FFFFFFF), child: SizedBox(height: 1, width: double.infinity)),
               ),
               itemBuilder: (context, index) {
                 final n = index + 1;
@@ -672,16 +670,24 @@ class _LevelList extends StatelessWidget {
                   },
                   behavior: HitTestBehavior.opaque,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                    child: Text(
-                      'Level $n',
-                      style: TextStyle(
-                        color: on ? const Color(0xFFE8D5A3) : Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: .4,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(children: [
+                      Icon(
+                        Icons.star_rounded,
+                        color: on ? const Color(0xFFE8D5A3) : const Color(0xFFF4F4F5),
+                        size: 18,
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Level $n',
+                        style: TextStyle(
+                          color: on ? const Color(0xFFE8D5A3) : Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: .2,
+                        ),
+                      ),
+                    ]),
                   ),
                 );
               },
@@ -778,7 +784,7 @@ class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word, required this.theme, required this.playing,
     required this.accent, required this.onReplay, required this.onCopy,
-    required this.onSettings, required this.onInfo, required this.onSyllable,
+    required this.onSettings, required this.onInfo, required this.onLevel, required this.onSyllable,
   });
 
   final Word word;
@@ -789,6 +795,7 @@ class _VisualStage extends StatelessWidget {
   final VoidCallback onCopy;
   final VoidCallback onSettings;
   final VoidCallback onInfo;
+  final VoidCallback onLevel;
   final ValueChanged<WordPart> onSyllable;
 
   @override
@@ -839,6 +846,17 @@ class _VisualStage extends StatelessWidget {
           ),
           Positioned(
             top: 10,
+            left: 10,
+            child: AnimatedBuilder(
+              animation: PracticeProgress.instance,
+              builder: (context, _) => _LevelPill(
+                level: PracticeProgress.instance.level.clamp(1, 10),
+                onTap: onLevel,
+              ),
+            ),
+          ),
+          Positioned(
+            top: 10,
             right: 10,
             child: _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
           ),
@@ -861,6 +879,42 @@ class _VisualStage extends StatelessWidget {
                 ),
               ]),
             ),
+          ),
+        ]),
+      ),
+    ),
+  );
+}
+
+class _LevelPill extends StatelessWidget {
+  const _LevelPill({required this.level, required this.onTap});
+  final int level;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: onTap,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
+        ),
+        boxShadow: const [
+          BoxShadow(color: Color(0x59000000), blurRadius: 18, offset: Offset(0, 8)),
+          BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 14),
+          const SizedBox(width: 6),
+          Text(
+            'Level $level',
+            style: const TextStyle(color: Color(0xFFF4F4F5), fontSize: 12, fontWeight: FontWeight.w500),
           ),
         ]),
       ),

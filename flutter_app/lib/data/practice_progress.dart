@@ -39,7 +39,7 @@ class PracticeProgress extends ChangeNotifier {
         }
       }
       final storedLevel = preferences.getInt(_levelKey);
-      if (storedLevel != null && storedLevel >= 1 && storedLevel <= 12) {
+      if (storedLevel != null && storedLevel >= 1 && storedLevel <= 10) {
         _levelOverride = storedLevel;
       }
     } catch (_) {
@@ -93,22 +93,22 @@ class PracticeProgress extends ChangeNotifier {
     return r == 0 ? '${h}h' : '${h}h ${r}m';
   }
 
-  /// One level per 30 minutes meditated, minimum 1, cap 12 — same curve as the web player.
+  /// One level per 30 minutes meditated, minimum 1, cap 10.
   int get earnedLevel {
     final value = (totalMinutes / 30).floor() + 1;
     if (value < 1) return 1;
-    if (value > 12) return 12;
+    if (value > 10) return 10;
     return value;
   }
 
   int get level {
     final override = _levelOverride;
-    if (override != null && override >= 1 && override <= 12) return override;
+    if (override != null && override >= 1 && override <= 10) return override;
     return earnedLevel;
   }
 
   Future<void> setLevel(int value) async {
-    final next = value < 1 ? 1 : (value > 12 ? 12 : value);
+    final next = value < 1 ? 1 : (value > 10 ? 10 : value);
     _levelOverride = next;
     try {
       final preferences = await SharedPreferences.getInstance();
