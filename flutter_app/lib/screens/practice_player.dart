@@ -715,7 +715,18 @@ class _NextUpCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final word = next;
-    return Container(
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        if ((details.primaryVelocity ?? 0) < -250) {
+          showModalBottomSheet<void>(
+            context: context,
+            backgroundColor: const Color(0xFF14171E),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+            builder: (_) => const SafeArea(child: SizedBox(height: 120, child: Center(child: Text('UP NEXT', style: TextStyle(color: Colors.white, letterSpacing: 3, fontSize: 12))))),
+          );
+        }
+      },
+      child: Container(
       decoration: BoxDecoration(
         color: const Color(0xD1161618),
         borderRadius: BorderRadius.circular(23),
@@ -728,6 +739,7 @@ class _NextUpCard extends StatelessWidget {
               child: Text('End of queue', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13)),
             )
           : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Center(child: Container(width: 42, height: 4, margin: const EdgeInsets.only(top: 8, bottom: 2), decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99)))),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
                 child: Row(children: [
@@ -782,6 +794,7 @@ class _NextUpCard extends StatelessWidget {
                 ),
               ),
             ]),
+      ),
     );
   }
 }

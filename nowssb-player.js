@@ -771,6 +771,7 @@
           var next = words[idx + 1];
           if (!next) {
             return '<div class="lgp-nextup" id="lgpNextUp">' +
+              '<div class="lgp-nextup-grab" aria-hidden="true"></div>' +
               '<div class="lgp-nextup-head"><span>Up Next</span>' +
                 '<button class="lgp-queue-btn" type="button" onclick="window.location.assign(\'sound_library_ui_world_class-3.html?from=up-next\')" aria-label="Queue">' + queueSvg + '</button>' +
               '</div>' +
@@ -781,6 +782,7 @@
           var art = next.img || th.img || '';
           var nextDur = lgpFmtClock(lgpWordSecs(next));
           return '<div class="lgp-nextup" id="lgpNextUp">' +
+            '<div class="lgp-nextup-grab" aria-hidden="true"></div>' +
             '<div class="lgp-nextup-head"><span>Up Next</span>' +
               '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.location.assign(\'sound_library_ui_world_class-3.html?from=up-next\')" aria-label="Queue">' + queueSvg + '</button>' +
             '</div>' +
@@ -1389,4 +1391,24 @@
       if (navigator.vibrate) navigator.vibrate(18);
     } catch (e) {}
   };
+})();
+
+/* UP NEXT grab handle: an upward swipe opens the future tab surface. */
+(function () {
+  if (window._lgpNextUpSwipeBound) return;
+  window._lgpNextUpSwipeBound = true;
+  var y0 = null;
+  document.addEventListener('touchstart', function (e) {
+    var card = e.target && e.target.closest ? e.target.closest('.lgp-nextup') : null;
+    if (card) y0 = e.touches && e.touches[0] ? e.touches[0].clientY : null;
+  }, {passive: true});
+  document.addEventListener('touchend', function (e) {
+    if (y0 == null) return;
+    var y1 = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : y0;
+    if (y0 - y1 > 48) {
+      var card = e.target && e.target.closest ? e.target.closest('.lgp-nextup') : document.getElementById('lgpNextUp');
+      if (card) card.classList.add('lgp-nextup-tab-open');
+    }
+    y0 = null;
+  }, {passive: true});
 })();
