@@ -535,7 +535,7 @@
       syncMiniPlayer();
     }
   });
-document.getElementById('soundLibrary43Back')?.addEventListener('click',function(){(window.top||window).location.replace('index.html?returnTo=player')});
+document.getElementById('soundLibrary43Back')?.addEventListener('click',function(){window.parent!==window ? window.parent.postMessage({type:'close-player-sheet'},'*') : location.replace('index.html?returnTo=player')});
 document.getElementById('soundLibrary43Grab')?.addEventListener('touchend',function(e){if(this._y0-e.changedTouches[0].clientY>36) window.parent&&window.parent.lgpOpenSoundLibrary43&&window.parent.lgpOpenSoundLibrary43(this);});
 document.getElementById('soundLibrary43Grab')?.addEventListener('touchstart',function(e){this._y0=e.touches[0].clientY},{passive:true});
 </script>

@@ -285,7 +285,7 @@
   window.lgpOpenLevel = function (force) {
     if (force === false) return;
     try { sessionStorage.setItem('nwsb_return_to_player', JSON.stringify({ts:Date.now()})); } catch (_) {}
-    window.location.assign('select-level.html?from=player');
+    window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('select-level.html','Select Level');
     return;
     if (force === true) _lgpLevelsOpen = true;
     else if (force === false) _lgpLevelsOpen = false;
@@ -471,7 +471,7 @@
     /* Library (left, image icon) + Replay (right) flank the transport */
     var replaySvg = bgi('lgp-side-ico', IC.replay);
     var libSvg = bgi('lgp-side-ico', IC.library);
-    var libBtn = '<button class="lgp-side" onclick="window.location.assign(\'sound_library_ui_world_class-3.html?from=player\')" aria-label="Library">' + libSvg + '<span>Library</span></button>';
+    var libBtn = '<button class="lgp-side" onclick="window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage(\'sound_library_ui_world_class-3.html\',\'Sound Library\')" aria-label="Library">' + libSvg + '<span>Library</span></button>';
     var replayBtn = '<button class="lgp-side" onclick="if(typeof _pwPhase!==\'undefined\'){_pwPhase=\'idle\';}pwPlay&&pwPlay()" aria-label="Replay">' + replaySvg + '<span>Replay</span></button>';
 
     /* central waveform = the pair's looping video (compressed via R2).
@@ -705,7 +705,7 @@
                 star + '<span class="lgp-stage-level-n">Level ' + cur + '</span>' +
               '</button>' +
               '<div class="lgp-stage-glass">' +
-                '<button type="button" onclick="try{sessionStorage.setItem(\'nwsb_return_to_player\',JSON.stringify({ts:Date.now()}))}catch(_){};window.location.assign(\'player-settings.html?from=player\')" aria-label="Settings">' +
+                '<button type="button" onclick="window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage(\'player-settings.html\',\'Music Player Settings\')" aria-label="Settings">' +
                   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>' +
                 '</button>' +
                 '<button type="button" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
@@ -777,7 +777,7 @@
             return '<div class="lgp-nextup" id="lgpNextUp">' +
               '<div class="lgp-nextup-grab" aria-hidden="true"></div>' +
               '<div class="lgp-nextup-head"><span>Up Next</span>' +
-                '<button class="lgp-queue-btn" type="button" onclick="window.location.assign(\'sound_library_ui_world_class-3.html?from=up-next\')" aria-label="Queue">' + queueSvg + '</button>' +
+                '<button class="lgp-queue-btn" type="button" onclick="window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage(\'sound-library-4-3.html\',\'Sound Library\')" aria-label="Queue">' + queueSvg + '</button>' +
               '</div>' +
               '<div class="lgp-nextup-line" aria-hidden="true"></div>' +
               '<p class="lgp-nextup-empty">End of queue</p>' +
@@ -788,7 +788,7 @@
           return '<div class="lgp-nextup" id="lgpNextUp">' +
             '<div class="lgp-nextup-grab" aria-hidden="true"></div>' +
             '<div class="lgp-nextup-head"><span>Up Next</span>' +
-              '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.location.assign(\'sound_library_ui_world_class-3.html?from=up-next\')" aria-label="Queue">' + queueSvg + '</button>' +
+              '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage(\'sound-library-4-3.html\',\'Sound Library\')" aria-label="Queue">' + queueSvg + '</button>' +
             '</div>' +
             '<div class="lgp-nextup-line" aria-hidden="true"></div>' +
             '<button class="lgp-nextup-item" type="button" onclick="window.lgpPlayNext&&window.lgpPlayNext()">' +
@@ -1213,11 +1213,11 @@
       if (gear) {
         e.preventDefault(); e.stopPropagation();
         try { sessionStorage.setItem('nwsb_return_to_player', JSON.stringify({ts:Date.now()})); } catch (_) {}
-        window.location.assign('player-settings.html?from=player');
+        window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('player-settings.html','Music Player Settings');
         return;
       }
       var hit = t && (t.closest ? t.closest('.lgp-settings') : null);
-      if (hit) { e.preventDefault(); e.stopPropagation(); window.location.assign('aura-player.html?from=player'); }
+      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('aura-player.html','AURA Player'); }
     }, true);
   }
 
@@ -1411,7 +1411,7 @@
     var y1 = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : y0;
     if (y0 - y1 > 48) {
       var card = e.target && e.target.closest ? e.target.closest('.lgp-nextup') : document.getElementById('lgpNextUp');
-      if (card) window.lgpOpenSoundLibrary43&&window.lgpOpenSoundLibrary43(card);
+      if (card) window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('sound-library-4-3.html','Sound Library');
     }
     y0 = null;
   }, {passive: true});
@@ -1437,4 +1437,10 @@
     sheet.querySelector('.lgp-sound-library-43-close').onclick = function () { sheet.classList.remove('is-open'); setTimeout(function(){sheet.remove();}, 340); };
     sheet.querySelector('.lgp-sound-library-43-backdrop').onclick = function () { sheet.querySelector('.lgp-sound-library-43-close').click(); };
   };
+})();
+
+(function(){
+  window.lgpCloseIntegratedPage=function(){var x=document.getElementById('lgpIntegratedPageSheet');if(!x)return;x.classList.remove('is-open');setTimeout(function(){x.remove();},360);};
+  window.lgpOpenIntegratedPage=function(file,title){window.lgpCloseIntegratedPage();var x=document.createElement('div');x.id='lgpIntegratedPageSheet';x.className='lgp-integrated-sheet';x.innerHTML='<div class="lgp-integrated-backdrop"></div><div class="lgp-integrated-panel" role="dialog" aria-label="'+title+'"><div class="lgp-integrated-grab"></div><button class="lgp-integrated-close" aria-label="Back to Player">‹</button><iframe title="'+title+'" src="'+file+'?from=player-sheet" loading="eager"></iframe></div>';document.body.appendChild(x);requestAnimationFrame(function(){x.classList.add('is-open');});x.querySelector('.lgp-integrated-close').onclick=window.lgpCloseIntegratedPage;x.querySelector('.lgp-integrated-backdrop').onclick=window.lgpCloseIntegratedPage;};
+  window.addEventListener('message',function(e){if(e.data&&e.data.type==='close-player-sheet')window.lgpCloseIntegratedPage();});
 })();

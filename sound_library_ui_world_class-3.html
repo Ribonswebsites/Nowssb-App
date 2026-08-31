@@ -644,6 +644,7 @@ function openLibrary(){
 }
 
 function goBack(){
+ if(window.parent!==window){ window.parent.postMessage({type:'close-player-sheet'},'*'); return; }
  const fromPlayer = new URLSearchParams(location.search).get('from');
  if(fromPlayer === 'player' || fromPlayer === 'up-next' || fromPlayer === 'expanded'){
    location.replace('index.html?returnTo=player');

@@ -237,7 +237,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   }
 
   void _openLevel() {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SelectLevelScreen(initialLevel: _progress.level)));
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.62),
+      builder: (_) => const FractionallySizedBox(heightFactor: .96, child: SelectLevelScreen()),
+    );
   }
 
   void _openInfo() {
@@ -296,7 +302,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   }
 
   void _openSettings() {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()));
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.62),
+      builder: (_) => const FractionallySizedBox(heightFactor: .96, child: PlayerSettingsScreen()),
+    );
   }
 
   void _openSettingsLegacy() {
@@ -357,7 +369,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
             _RadialOption(alignment: const Alignment(0, -.62), label: 'VOICE', value: 'Device', icon: Icons.record_voice_over_rounded, accent: _theme.accent, onTap: () => ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Text('NowssB uses your selected device voice.')))),
             _RadialOption(alignment: const Alignment(.72, -.2), label: 'LOOP', value: _loop ? 'On' : 'Off', icon: Icons.all_inclusive_rounded, accent: _theme.accent, onTap: () => setState(() => _loop = !_loop)),
             _RadialOption(alignment: const Alignment(.45, .62), label: 'REPS', value: '${_repTarget}×', icon: Icons.repeat_rounded, accent: _theme.accent, onTap: () => setState(() => _repTarget = _repTarget == 3 ? 7 : _repTarget == 7 ? 11 : _repTarget == 11 ? 21 : 3)),
-            _RadialOption(alignment: const Alignment(-.45, .62), label: 'LIBRARY', value: 'Open', icon: Icons.library_music_rounded, accent: _theme.accent, onTap: () { Navigator.of(dialogContext).pop(); Navigator.of(this.context).push(MaterialPageRoute<void>(builder: (_) => const AuraSoundLibraryScreen())); }),
+            _RadialOption(alignment: const Alignment(-.45, .62), label: 'LIBRARY', value: 'Open', icon: Icons.library_music_rounded, accent: _theme.accent, onTap: () { Navigator.of(dialogContext).pop(); showModalBottomSheet<void>(context: this.context, isScrollControlled: true, backgroundColor: Colors.transparent, builder: (_) => const FractionallySizedBox(heightFactor: .96, child: AuraSoundLibraryScreen())); }),
             _RadialOption(alignment: const Alignment(-.72, -.2), label: 'REPLAY', value: 'Word', icon: Icons.replay_rounded, accent: _theme.accent, onTap: _prepareAndPlay),
             const Positioned(left: 24, right: 24, bottom: 20, child: Text('Choose a player control', textAlign: TextAlign.center, style: TextStyle(color: Colors.white38, fontSize: 10, letterSpacing: 1.4))),
           ]),

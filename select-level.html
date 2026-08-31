@@ -231,7 +231,7 @@
 </div>
 
 <script>
-  document.getElementById('selectLevelBack').addEventListener('click',()=>{ location.replace('index.html?returnTo=player'); });
+  document.getElementById('selectLevelBack').addEventListener('click',()=>{ if(window.parent!==window){window.parent.postMessage({type:'close-player-sheet'},'*');} else {location.replace('index.html?returnTo=player');} });
   const allLevels = [
     {num:"01", label:"LEVEL ONE"},
     {num:"02", label:"LEVEL TWO"},

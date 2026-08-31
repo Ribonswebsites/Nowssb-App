@@ -15,7 +15,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
   @override
   void initState() {
     super.initState();
-    _selected = widget.initialLevel.clamp(1, 10);
+    _selected = widget.initialLevel.clamp(1, 10).toInt();
   }
 
   @override

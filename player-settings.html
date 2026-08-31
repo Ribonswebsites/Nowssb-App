@@ -559,6 +559,7 @@ document.getElementById("clk-back").addEventListener("click", () => {
      live Player without a Home/splash restart. The query marker is only for a
      direct standalone visit where there is no prior app document. */
   try { sessionStorage.setItem("nwsb_return_to_player", JSON.stringify({ts:Date.now()})); } catch (e) {}
+  if(window.parent!==window){ window.parent.postMessage({type:'close-player-sheet'},'*'); return; }
   const fromPlayer = new URLSearchParams(location.search).get('from') === 'player';
   if (fromPlayer) location.replace('index.html?returnTo=player');
   else if (window.history.length > 1) window.history.back();
