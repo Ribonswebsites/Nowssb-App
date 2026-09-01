@@ -182,7 +182,7 @@ class _MiniStoreCard extends StatelessWidget {
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
   @override
-  Widget build(BuildContext context) => const _StoreContentPage(
+  Widget build(BuildContext context) => _StoreContentPage(
         title: 'The Word Atelier',
         film: 'assets/video/store-word-library.mp4',
         child: _WordsShelf(),
@@ -192,7 +192,7 @@ class WordAtelierScreen extends StatelessWidget {
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
   @override
-  Widget build(BuildContext context) => const _StoreContentPage(
+  Widget build(BuildContext context) => _StoreContentPage(
         title: 'The Meaning Store',
         film: 'assets/video/store-meaning-library.mp4',
         child: _MeaningsShelf(),
