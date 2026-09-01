@@ -55,7 +55,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                         filterQuality: FilterQuality.high,
                         semanticLabel: 'NowssB level ring',
                       ),
-                    ),
+                    );
                   },
                 ),
                 const SizedBox(height: 18),
