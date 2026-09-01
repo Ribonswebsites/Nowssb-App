@@ -34,10 +34,10 @@ class _StoreHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      _StoreBanner(),
-      _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg', height: 190),
+      const _StoreBanner(),
+      const _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg', height: 190),
       _StoreVideoSection(asset: 'assets/video/store-word-library.mp4', eyebrow: 'THE WORD LIBRARY', title: 'Build Your\nPersonal Library', sub: 'Each word targets a specific organ. The more words you own, the more healing sentences you can build.', chips: const ['HEART HEALTH', 'IMMUNITY', 'MENTAL CLARITY', 'GUT HEALTH', 'SKIN & GLOW', 'LUNG & BREATH'], button: 'Browse The Word Atelier', onTap: () => _push(context, const WordAtelierScreen())),
-      _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/16c653d97f27f932_file_00000000c81c81fba2f7377fc71229be_uvvxfz.png', height: 160, margin: const EdgeInsets.symmetric(vertical: 20)),
+      const _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/16c653d97f27f932_file_00000000c81c81fba2f7377fc71229be_uvvxfz.png', height: 160, margin: EdgeInsets.symmetric(vertical: 20)),
       _StoreVideoSection(asset: 'assets/video/store-meaning-library.mp4', eyebrow: 'THE MEANING LIBRARY', title: 'Unlock the\nTruth Behind Words', sub: 'Base meanings · Your purchased words · AI-decoded origins', chips: const ['COUNTRY', 'EARTH', 'BODY', 'MIND', 'SOUL', 'BLOOD'], button: 'Browse Meaning Store', onTap: () => _push(context, const MeaningStoreScreen())),
       _SignatureDoor(onTap: () => _push(context, const SignatureStoreScreen())),
       const _StoreVideoBanner(asset: 'assets/video/store-verify-banner.mp4', poster: 'assets/video/store-verify-banner-poster.webp'),
@@ -46,7 +46,7 @@ class _StoreHomeContent extends StatelessWidget {
       _MiniStoreCard(eyebrow: 'Read · Learn · Practice', title: 'NowssB Ebooks', sub: 'Deep-dive guides on word science and sound healing.', icon: Icons.menu_book_outlined, onTap: () => _push(context, const EbooksStoreScreen())),
       _MiniStoreCard(eyebrow: 'Resonance · Frequency · X', title: 'Subscription Plans', sub: 'More words, more features — see every tier.', icon: Icons.auto_awesome_outlined, onTap: () {}),
       const Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 0), child: Text('Disclaimer & Confidentiality\n\nWords, meanings, ebooks and verification badges shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.', style: TextStyle(fontSize: 11, height: 1.5, color: Color(0x73FFFFFF)))),
-      const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Center(child: Text('NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)))),
+      const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Text('NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF))),),
     ];
     return Scaffold(backgroundColor: NwsbColors.deep, body: SafeArea(child: ListView(children: items)));
   }
@@ -76,27 +76,71 @@ class _StoreVideoSection extends StatelessWidget {
   const _StoreVideoSection({required this.asset, required this.eyebrow, required this.title, required this.sub, required this.chips, required this.button, required this.onTap});
   final String asset, eyebrow, title, sub, button; final List<String> chips; final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => Container(height: 470, margin: const EdgeInsets.symmetric(horizontal: 20), clipBehavior: Clip.antiAlias, decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: Colors.black), child: Stack(fit: StackFit.expand, children: [
-    NwsbVideo(asset: asset, priority: ClipPriority.feature),
-    const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x22060C18), Color(0xF5060C18)]))),
-    Padding(padding: const EdgeInsets.fromLTRB(20, 22, 20, 20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(eyebrow, style: const TextStyle(fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)), const Spacer(),
-      Text(title, style: const TextStyle(fontSize: 28, height: 1.05, fontWeight: FontWeight.w300, color: Colors.white)), const SizedBox(height: 12),
-      Text(sub, style: const TextStyle(fontSize: 12, height: 1.45, color: Color(0xCCFFFFFF))), const SizedBox(height: 12),
-      Wrap(spacing: 7, runSpacing: 7, children: chips.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: const Color(0x18FFFFFF), border: Border.all(color: const Color(0x26FFFFFF))), child: Text(c, style: const TextStyle(fontSize: 8, letterSpacing: 1.5, color: Color(0xCCFFFFFF)))).toList()), const SizedBox(height: 16),
-      GestureDetector(onTap: onTap, child: Container(padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12), color: Colors.white, child: Row(mainAxisSize: MainAxisSize.min, children: [Text(button, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: NwsbColors.ink)), const SizedBox(width: 12), const Icon(Icons.arrow_forward, size: 15, color: NwsbColors.ink)]))),
-    ])),
-  ]));
+  Widget build(BuildContext context) {
+    return Container(
+      height: 470,
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: Colors.black),
+      child: Stack(fit: StackFit.expand, children: [
+        NwsbVideo(asset: asset, priority: ClipPriority.feature),
+        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x22060C18), Color(0xF5060C18)]))),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(eyebrow, style: const TextStyle(fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)),
+            const Spacer(),
+            Text(title, style: const TextStyle(fontSize: 28, height: 1.05, fontWeight: FontWeight.w300, color: Colors.white)),
+            const SizedBox(height: 12),
+            Text(sub, style: const TextStyle(fontSize: 12, height: 1.45, color: Color(0xCCFFFFFF))),
+            const SizedBox(height: 12),
+            Wrap(spacing: 7, runSpacing: 7, children: [for (final chip in chips) _StoreChip(chip)]),
+            const SizedBox(height: 16),
+            GestureDetector(onTap: onTap, child: Container(padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12), color: Colors.white, child: Row(mainAxisSize: MainAxisSize.min, children: [Text(button, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: NwsbColors.ink)), const SizedBox(width: 12), const Icon(Icons.arrow_forward, size: 15, color: NwsbColors.ink)]))),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+class _StoreChip extends StatelessWidget {
+  const _StoreChip(this.text);
+  final String text;
+  @override
+  Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: const Color(0x18FFFFFF), border: Border.all(color: const Color(0x26FFFFFF))), child: Text(text, style: const TextStyle(fontSize: 8, letterSpacing: 1.5, color: Color(0xCCFFFFFF))));
 }
 
 class _SignatureDoor extends StatelessWidget {
   const _SignatureDoor({required this.onTap}); final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(height: 230, margin: const EdgeInsets.fromLTRB(20, 20, 20, 0), clipBehavior: Clip.antiAlias, decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: Colors.black), child: Stack(fit: StackFit.expand, children: [
-    NwsbVideo(asset: 'assets/video/signature-store.mp4', poster: 'assets/video/signature-store-poster.webp', priority: ClipPriority.feature),
-    const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x33060C18), Color(0xEE060C18)]))),
-    const Padding(padding: EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('SHABDAPATHY · THE RAREST', style: TextStyle(fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)), Spacer(), Text('Words & Meanings', style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.w300)), SizedBox(height: 6), Text('One per category. Owned once, never restocked.', style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))), SizedBox(height: 12), Text('15 Words   ·   5 Meanings', style: TextStyle(fontSize: 10, letterSpacing: 1.5, color: Color(0xCCFFFFFF)))])),
-  ]));
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 230,
+        margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: Colors.black),
+        child: Stack(fit: StackFit.expand, children: [
+          NwsbVideo(asset: 'assets/video/signature-store.mp4', poster: 'assets/video/signature-store-poster.webp', priority: ClipPriority.feature),
+          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x33060C18), Color(0xEE060C18)]))),
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('SHABDAPATHY · THE RAREST', style: TextStyle(fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)),
+              Spacer(),
+              Text('Words & Meanings', style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.w300)),
+              SizedBox(height: 6),
+              Text('One per category. Owned once, never restocked.', style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))),
+              SizedBox(height: 12),
+              Text('15 Words   ·   5 Meanings', style: TextStyle(fontSize: 10, letterSpacing: 1.5, color: Color(0xCCFFFFFF))),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
 }
 
 class _StoreVideoBanner extends StatelessWidget {
@@ -109,7 +153,30 @@ class _MiniStoreCard extends StatelessWidget {
   const _MiniStoreCard({required this.eyebrow, required this.title, required this.sub, required this.icon, required this.onTap});
   final String eyebrow, title, sub; final IconData icon; final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(margin: const EdgeInsets.fromLTRB(20, 10, 20, 0), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0x0AFFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x1FFFFFFF))), child: Row(children: [Container(width: 44, height: 44, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0x14FFFFFF)), child: Icon(icon, color: NwsbColors.gold, size: 21)), const SizedBox(width: 14), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(eyebrow, style: const TextStyle(fontSize: 9, letterSpacing: 1.2, color: Color(0x99FFFFFF))), const SizedBox(height: 3), Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)), const SizedBox(height: 3), Text(sub, style: const TextStyle(fontSize: 11, height: 1.3, color: Color(0x8CFFFFFF)))])), const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF))]));
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(color: const Color(0x0AFFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x1FFFFFFF))),
+        child: Row(
+          children: [
+            Container(width: 44, height: 44, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0x14FFFFFF)), child: Icon(icon, color: NwsbColors.gold, size: 21)),
+            const SizedBox(width: 14),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(eyebrow, style: const TextStyle(fontSize: 9, letterSpacing: 1.2, color: Color(0x99FFFFFF))),
+              const SizedBox(height: 3),
+              Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
+              const SizedBox(height: 3),
+              Text(sub, style: const TextStyle(fontSize: 11, height: 1.3, color: Color(0x8CFFFFFF))),
+            ])),
+            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class WordAtelierScreen extends StatelessWidget {
