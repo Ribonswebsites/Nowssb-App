@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../data/content.dart';
 import '../media/nwsb_video.dart';
@@ -183,52 +184,55 @@ class _MiniStoreCard extends StatelessWidget {
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
   @override
-  Widget build(BuildContext context) => IntroGate(
-        tag: 'Shabdapathy · Word Science',
-        eyebrow: 'The Word Atelier',
-        title: '',
-        body: 'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.',
-        stats: const ['Unlimited Words', 'AI-Powered', 'Every Language'],
-        art: 'assets/store/intro-words.webp',
-        fullBleed: true,
-        enterLabel: 'Enter The Word Atelier',
-        onBack: () => Navigator.of(context).pop(),
-        child: _StoreContentPage(title: 'The Word Atelier', film: 'assets/video/store-word-library.mp4', child: _WordsShelf()),
-      );
+  Widget build(BuildContext context) => const StoreWebViewScreen(section: 'real-meaning');
 }
 
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
   @override
-  Widget build(BuildContext context) => IntroGate(
-        tag: 'Shabdapathy · True Origin',
-        eyebrow: 'The Meaning Store',
-        title: '',
-        body: 'Every word you know has a meaning you were never told. Before the dictionary — there was only vibration. Unlock the truth.',
-        stats: const ['Any Language', 'AI-Decoded', 'One Time Unlock'],
-        art: 'assets/store/intro-meanings.webp',
-        fullBleed: true,
-        enterLabel: 'Explore Meanings',
-        onBack: () => Navigator.of(context).pop(),
-        child: _StoreContentPage(title: 'The Meaning Store', film: 'assets/video/store-meaning-library.mp4', child: _MeaningsShelf()),
-      );
+  Widget build(BuildContext context) => const StoreWebViewScreen(section: 'meaning-store');
 }
 
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
   @override
-  Widget build(BuildContext context) => IntroGate(
-        tag: 'NowssB · Signature',
-        eyebrow: 'The Signature Store',
-        title: 'The rarest\nthings we carry.',
-        body: 'A premium shelf of signature words and meanings, chosen from the deepest collections in NowssB.',
-        stats: const ['Rare collection', 'Premium words', 'Yours forever'],
-        art: 'assets/store/intro-signature.webp',
-        fullBleed: true,
-        enterLabel: 'Browse Signatures',
-        onBack: () => Navigator.of(context).pop(),
-        child: _StoreContentPage(title: 'Signature Store', film: 'assets/video/signature-store.mp4', child: const _SignatureShelf()),
-      );
+  Widget build(BuildContext context) => const StoreWebViewScreen(section: 'signature-store');
+}
+
+class StoreWebViewScreen extends StatefulWidget {
+  const StoreWebViewScreen({super.key, required this.section});
+  final String section;
+
+  @override
+  State<StoreWebViewScreen> createState() => _StoreWebViewScreenState();
+}
+
+class _StoreWebViewScreenState extends State<StoreWebViewScreen> {
+  late final WebViewController _controller = WebViewController()
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setNavigationDelegate(NavigationDelegate(
+      onPageFinished: (_) => _enterWebViewStore(),
+    ))
+    ..loadRequest(Uri.parse('https://ribonswebsites.github.io/Nowssb-App/'));
+
+  Future<void> _enterWebViewStore() async {
+    final section = widget.section;
+    final script = switch (section) {
+      'real-meaning' => "if(window.nssOpenSub)nssOpenSub('real-meaning'); setTimeout(function(){if(window.rmSkipIntro)rmSkipIntro();},700);",
+      'meaning-store' => "if(window.nssOpenSub)nssOpenSub('meaning-store'); setTimeout(function(){if(window.msEnterFromIntro)msEnterFromIntro();},700);",
+      'signature-store' => "if(window.nssOpenSub)nssOpenSub('signature-store'); setTimeout(function(){if(window.sigEnterStore)sigEnterStore();},700);",
+      _ => '',
+    };
+    if (script.isNotEmpty) await _controller.runJavaScript(script);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(child: WebViewWidget(controller: _controller)),
+    );
+  }
 }
 
 class EbooksStoreScreen extends StatelessWidget {
