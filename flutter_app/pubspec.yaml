@@ -52,6 +52,7 @@ flutter:
     - assets/coach/
     - assets/icons/
     - assets/store/
+    - assets/profile/
     - assets/store/collections/
     - assets/fashion/
     - assets/player/

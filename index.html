@@ -3707,289 +3707,1110 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <!-- ══ SUB-SCREEN: PROFILE ══ -->
+<style id="supplied-profile-style">
+
+  :root{
+    --bg:#000;
+    --accent:#e3bd7d;
+    --accent-soft: rgba(227,189,125,.16);
+    --img-bg: url("assets/profile/profile-01.jpg");
+    --img-ring: url("assets/profile/profile-02.png");
+    --img-motto: url("assets/profile/profile-03.jpg");
+    --img-about: url("assets/profile/profile-04.jpg");
+    --img-quote: url("assets/profile/profile-05.jpg");
+    --img-qa: url("assets/profile/profile-06.jpg");
+    --img-act1: url("assets/profile/profile-07.jpg");
+    --img-act2: url("assets/profile/profile-08.jpg");
+    --img-act3: url("assets/profile/profile-09.jpg");
+    --surface: rgba(255,255,255,.045);
+    --border: rgba(255,255,255,.14);
+    --border-soft: rgba(255,255,255,.08);
+    --text: #f5f5f3;
+    --text-dim: #8c8c8c;
+    --text-faint: #565656;
+    --radius: 22px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    color-scheme: dark;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; background:var(--bg); }
+  body{
+    font-family: var(--font);
+    color: var(--text);
+    min-height:100vh;
+    -webkit-font-smoothing: antialiased;
+    position:relative;
+    overflow-x:hidden;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(0,0,0,.15), rgba(0,0,0,.72) 60%),
+      linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.75) 40%, rgba(0,0,0,.92)),
+      var(--img-bg);
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    pointer-events:none;
+    z-index:0;
+  }
+  .grain{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:2;
+    opacity:.035;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  a{ color:inherit; }
+  button{ font-family:inherit; }
+  :focus-visible{ outline: 1.5px solid rgba(255,255,255,.85); outline-offset: 3px; }
+
+  .page{ position:relative; z-index:1; max-width:460px; margin:0 auto; padding:0 20px; }
+
+  .eyebrow{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--text-dim); margin:0 0 10px; }
+  .section-label{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin:0 0 14px; }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding-top:calc(28px + env(safe-area-inset-top)); text-align:center; }
+  .hero-art{ width:100%; height:auto; display:block; margin-bottom:6px; color:#fff; }
+  .hero h1{ font-weight:200; font-size:clamp(46px,13vw,62px); letter-spacing:-.02em; margin:4px 0 6px; line-height:1; }
+  .hero .caption{ color:var(--text-dim); font-size:14px; margin:0 0 36px; }
+
+  /* ---------- CARD BASE ---------- */
+  .glass{
+    background:var(--surface);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+  }
+
+  /* ---------- PROFILE CARD (enso-ring style) ---------- */
+  .profile-card{ display:flex; align-items:stretch; gap:0; padding:0; margin-bottom:34px; overflow:hidden; }
+  .avatar-wrap{ position:relative; flex:0 0 132px; width:132px; min-height:138px; align-self:stretch; overflow:hidden; }
+  .avatar-ring{
+    position:absolute; inset:0;
+    background-image:var(--img-ring);
+    background-size:180% auto;
+    background-position:50% 42%;
+    background-repeat:no-repeat;
+    mix-blend-mode:screen;
+    opacity:.98;
+    pointer-events:none;
+    z-index:2;
+  }
+  .avatar{ position:absolute; inset:0; border-radius:0; background:#0a0a0a;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:24px; font-weight:600; color:var(--text);
+    background-size:cover; background-position:center;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); z-index:1; }
+  .edit-btn{ position:absolute; right:10px; bottom:10px; width:28px; height:28px; border-radius:50%;
+    background:rgba(20,20,20,.9); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text); z-index:3; }
+  .edit-btn svg{ width:14px; height:14px; }
+  .profile-meta{ flex:1; min-width:0; padding:22px 20px; }
+  .profile-role{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin:0 0 4px; font-weight:600; }
+  .profile-name-row{ display:flex; align-items:center; gap:8px; margin:0 0 6px; }
+  .profile-name{ font-size:22px; font-weight:600; outline:none; letter-spacing:-.01em; }
+  .profile-name:focus{ border-bottom:1px solid var(--border); }
+  .name-edit-btn{ background:none; border:none; color:var(--text-dim); cursor:pointer; padding:2px; display:inline-flex; }
+  .name-edit-btn svg{ width:13px; height:13px; }
+  .profile-tagline{ font-size:12.5px; color:var(--text-dim); line-height:1.45; margin:0 0 10px; max-width:220px; }
+  .plan-pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 13px; border:1px solid var(--border);
+    border-radius:999px; font-size:11.5px; letter-spacing:.04em; color:var(--text); background:rgba(255,255,255,.03); }
+  .plan-pill .dotlit{ width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent); }
+
+  /* ---------- PROGRESS ---------- */
+  .progress{ margin-bottom:36px; }
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .stat-card{ padding:18px; }
+  .stat-num{ font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:30px; font-weight:600; line-height:1; }
+  .stat-unit{ font-size:12px; color:var(--text-faint); margin-top:6px; }
+  .stat-label{ font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+
+  /* ---------- WEEK ---------- */
+  .week{ margin-bottom:44px; }
+  .week-row{ display:flex; justify-content:space-between; gap:6px; }
+  .day-chip{ flex:1; aspect-ratio:1; max-width:44px; border-radius:50%; border:1px solid var(--border-soft);
+    background:transparent; color:var(--text-dim); font-family:var(--mono); font-size:13px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:background .15s, border-color .15s, color .15s; }
+  .day-chip.is-done{ background:#f2f2f0; color:#000; border-color:transparent; }
+  .day-chip.is-today{ border:1.5px solid rgba(255,255,255,.85); color:var(--text); font-weight:600; }
+  .day-chip.is-future{ opacity:.32; cursor:default; }
+
+  /* ---------- BODY MAP ---------- */
+  .bodymap{ margin-bottom:44px; text-align:center; }
+  .bodymap-svg{ width:78%; max-width:260px; height:auto; margin:0 auto; display:block; }
+  .organ{ filter:drop-shadow(0 0 5px rgba(255,255,255,.85)) drop-shadow(0 0 14px rgba(255,255,255,.4));
+    animation:organPulse 4.2s ease-in-out infinite; }
+  .organ.o2{ animation-delay:.5s; } .organ.o3{ animation-delay:1s; }
+  .organ.o4{ animation-delay:1.5s; } .organ.o5{ animation-delay:2s; }
+  @keyframes organPulse{ 0%,100%{ opacity:.65; } 50%{ opacity:1; } }
+  .organ-legend{ list-style:none; padding:0; margin:20px 0 0; display:flex; flex-wrap:wrap; justify-content:center; gap:8px 18px; }
+  .organ-legend li{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); }
+  .organ-legend .dot{ width:5px; height:5px; border-radius:50%; background:#fff; box-shadow:0 0 6px rgba(255,255,255,.8); }
+  @media (prefers-reduced-motion: reduce){ .organ{ animation:none; opacity:.85; } }
+
+  /* ---------- ABOUT ---------- */
+  .about-card{
+    position:relative; overflow:hidden; padding:24px 22px; margin-bottom:40px;
+    background-image:
+      linear-gradient(150deg, rgba(0,0,0,.72), rgba(0,0,0,.38) 55%, rgba(0,0,0,.75)),
+      var(--img-about);
+    background-size:cover; background-position:60% 65%;
+  }
+  .about-head{ display:flex; align-items:center; gap:9px; margin:0 0 14px; position:relative; z-index:1; }
+  .about-head svg{ width:15px; height:15px; color:var(--text-dim); flex-shrink:0; }
+  .about-head span{ font-size:13.5px; font-weight:600; letter-spacing:.01em; }
+  .about-text{ font-size:14px; line-height:1.65; color:var(--text-dim); max-width:78%; position:relative; z-index:1; }
+
+  /* ---------- QUOTE ---------- */
+  .quote-card{
+    position:relative; overflow:hidden; padding:28px 24px; margin-bottom:34px; min-height:170px;
+    background-image:
+      linear-gradient(150deg, rgba(0,0,0,.7), rgba(0,0,0,.32) 55%, rgba(0,0,0,.78)),
+      var(--img-quote);
+    background-size:cover; background-position:65% 50%;
+  }
+  .quote-mark{ font-family:Georgia,"Times New Roman",serif; font-size:38px; line-height:1; color:var(--text-faint); margin:0 0 8px; position:relative; z-index:1; }
+  .quote-text{ font-size:17px; font-weight:400; line-height:1.5; max-width:70%; margin:0 0 16px; position:relative; z-index:1; }
+  .quote-attrib{ font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); position:relative; z-index:1; }
+
+  @media (max-width:360px){
+    .about-text, .quote-text{ max-width:100%; }
+  }
+
+  /* ---------- MY MOTTO ---------- */
+  .motto-card{
+    position:relative; overflow:hidden; padding:26px 24px; margin-bottom:40px; min-height:210px;
+    background-image:
+      linear-gradient(160deg, rgba(0,0,0,.55), rgba(0,0,0,.25) 55%, rgba(0,0,0,.6)),
+      var(--img-motto);
+    background-size:cover; background-position:60% 50%;
+  }
+  .motto-head{ display:flex; align-items:center; gap:8px; margin:0 0 16px; position:relative; z-index:1; }
+  .motto-head .quote-mark{ margin:0; font-size:26px; color:var(--accent); }
+  .motto-head span{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--text-dim); font-weight:600; }
+  .motto-text{ position:relative; z-index:1; font-size:28px; line-height:1.22; font-weight:300; letter-spacing:-.01em; max-width:70%; }
+  .motto-text .accent{ color:var(--accent); }
+
+  .quick-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; position:relative; z-index:1; }
+  .quick-card{ padding:16px; display:flex; flex-direction:column; gap:14px; cursor:default; background:rgba(0,0,0,.4); }
+  .quick-card .qc-top{ display:flex; align-items:center; justify-content:space-between; }
+  .quick-card .icon-chip{ background:var(--accent-soft); border-color:rgba(227,189,125,.35); color:var(--accent); }
+  .quick-card .qc-label{ font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); margin:0 0 3px; }
+  .quick-card .qc-value{ font-size:15px; font-weight:600; color:var(--text); }
+
+  /* ---------- SECTION LISTS ---------- */
+  .list-card{ padding:4px; margin-bottom:40px; }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px; border-bottom:1px solid var(--border-soft); }
+  .row:last-child{ border-bottom:none; }
+  .row[role="button"]{ cursor:pointer; }
+  .row[role="button"]:hover, .row[role="button"]:focus-visible{ background:rgba(255,255,255,.025); border-radius:16px; }
+  .row-label{ font-size:14.5px; }
+  .row-label.is-muted{ color:var(--text-faint); }
+  .row-value{ font-size:13px; color:var(--text-dim); }
+  .row-right-group{ display:flex; align-items:center; gap:10px; }
+
+  .toggle{ width:44px; height:26px; border-radius:999px; border:1px solid var(--border); background:rgba(255,255,255,.03); position:relative; cursor:pointer; flex-shrink:0; }
+  .toggle::after{ content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:var(--text-faint); transition:transform .18s ease, background .18s ease; }
+  .toggle.is-on{ background:rgba(255,255,255,.14); }
+  .toggle.is-on::after{ transform:translateX(18px); background:#fff; }
+
+  .stepper{ display:flex; align-items:center; gap:14px; }
+  .stepper button{ width:28px; height:28px; border-radius:50%; border:1px solid var(--border); background:transparent; color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .stepper button svg{ width:13px; height:13px; }
+  .stepper-value{ font-family:var(--mono); font-variant-numeric:tabular-nums; min-width:56px; text-align:center; font-size:14px; }
+
+  .time-chip{ border:1px solid var(--border); border-radius:999px; padding:6px 14px; background:rgba(255,255,255,.03); }
+  .time-chip input[type="time"]{ background:transparent; border:none; color:var(--text); font-family:var(--mono); font-size:13.5px; color-scheme:dark; }
+
+  .segmented{ display:flex; border:1px solid var(--border); border-radius:999px; padding:2px; gap:2px; }
+  .segmented button{ border:none; background:transparent; color:var(--text-dim); font-size:12.5px; padding:6px 13px; border-radius:999px; cursor:pointer; }
+  .segmented button.is-active{ background:#f2f2f0; color:#000; }
+
+  .icon-chip{ width:34px; height:34px; border-radius:11px; border:1px solid var(--border-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--text); }
+  .icon-chip svg{ width:16px; height:16px; }
+  .row-left{ display:flex; align-items:center; gap:13px; }
+  .row-count{ color:var(--text-faint); font-family:var(--mono); font-size:12.5px; margin-right:6px; }
+  .chev{ width:14px; height:14px; color:var(--text-faint); }
+
+  .upgrade-link{ font-size:13px; font-weight:600; color:var(--text); text-decoration:none; border-bottom:1px solid var(--text); padding-bottom:1px; }
+
+  .signout{ display:block; width:100%; padding:16px; margin-bottom:30px; border:1px solid var(--border); border-radius:var(--radius); background:rgba(255,255,255,.03); color:var(--text); font-size:15px; font-weight:500; cursor:pointer; }
+  .signout:active{ background:rgba(255,255,255,.08); }
+
+  .toast{ position:fixed; left:50%; bottom:26px; transform:translate(-50%,12px); padding:10px 18px; border-radius:999px; border:1px solid var(--border); background:rgba(20,20,20,.92); backdrop-filter:blur(16px); font-size:13px; opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:5; }
+  .toast.show{ opacity:1; transform:translate(-50%,0); }
+
+  /* ---------- SECTION HEAD (title + View All) ---------- */
+  .section-head{ display:flex; align-items:center; justify-content:space-between; margin:0 0 14px; }
+  .section-head .section-label{ margin:0; }
+  .view-all{ display:inline-flex; align-items:center; gap:4px; font-size:12px; color:var(--text-dim); text-decoration:none; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; }
+  .view-all svg{ width:13px; height:13px; }
+
+  /* ---------- QUICK ACCESS ---------- */
+  .quickaccess{ margin-bottom:38px; }
+  .qa-wrap{
+    position:relative; overflow:hidden; padding:20px 16px;
+    border:1px solid var(--border-soft); border-radius:var(--radius);
+    background-image:
+      linear-gradient(160deg, rgba(0,0,0,.78), rgba(0,0,0,.32) 55%, rgba(0,0,0,.8)),
+      var(--img-qa);
+    background-size:cover; background-position:50% 55%;
+  }
+  .qa-grid{ position:relative; z-index:1; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .qa-item{ background:rgba(255,255,255,.06); border:1px solid var(--border-soft); border-radius:16px;
+    backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+    padding:14px 3px 11px; display:flex; flex-direction:column; align-items:center; gap:8px;
+    cursor:pointer; color:var(--text); font-family:inherit; text-decoration:none; }
+  .qa-item:active{ background:rgba(255,255,255,.1); }
+  .qa-item .qa-icon{ width:34px; height:34px; border-radius:11px;
+    background:rgba(0,0,0,.35); border:1px solid var(--border-soft);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .qa-item .qa-icon svg{ width:16px; height:16px; }
+  .qa-item .qa-name{ font-size:10px; letter-spacing:.01em; color:var(--text-dim); text-align:center; }
+
+  /* ---------- RECENT ACTIVITY ---------- */
+  .recent{ margin-bottom:40px; }
+  .activity-list{ padding:6px; }
+  .activity-row{ display:flex; align-items:center; gap:13px; padding:14px 10px; border-bottom:1px solid var(--border-soft); }
+  .activity-row:last-child{ border-bottom:none; }
+  .activity-thumb{ width:48px; height:48px; border-radius:13px; flex-shrink:0;
+    background-size:cover; background-position:center; border:1px solid var(--border-soft); position:relative; overflow:hidden; }
+  .activity-thumb svg{ position:absolute; inset:0; margin:auto; width:20px; height:20px; color:rgba(255,255,255,.85); }
+  .activity-info{ flex:1; min-width:0; }
+  .activity-title{ font-size:14.5px; font-weight:600; margin:0 0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .activity-sub{ font-size:12.5px; color:var(--text-dim); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .activity-meta{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .activity-time{ font-size:12px; color:var(--text-faint); }
+  .activity-arrow{ width:30px; height:30px; border-radius:50%; border:1px solid var(--border);
+    background:rgba(255,255,255,.03); display:flex; align-items:center; justify-content:center;
+    color:var(--text); cursor:pointer; flex-shrink:0; }
+  .activity-arrow svg{ width:13px; height:13px; }
+
+  @media (max-width:360px){
+    .qa-item .qa-name{ font-size:9px; }
+    .qa-item .qa-icon{ width:30px; height:30px; }
+    .activity-title{ font-size:13.5px; }
+  }
+
+  /* ---------- PROFILE REFINEMENTS ---------- */
+  :root{--img-progress:url("assets/profile/profile-10.png");}
+
+  .progress{ margin-bottom:40px; }
+  .progress-wrap{
+    position:relative; overflow:hidden; padding:22px 16px 16px; border-radius:26px;
+    background-image:linear-gradient(145deg,rgba(2,2,4,.76),rgba(2,2,4,.42) 50%,rgba(2,2,4,.82)),var(--img-progress);
+    background-size:cover; background-position:center; box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 18px 45px rgba(0,0,0,.28);
+  }
+  .progress-wrap::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(circle at 80% 10%,rgba(255,255,255,.1),transparent 36%);
+  }
+  .progress-wrap .section-label,.progress-wrap .stat-grid{position:relative;z-index:1;}
+  .progress-wrap .section-label{margin-bottom:18px;}
+  .progress-wrap .stat-grid{gap:10px;}
+  .progress-wrap .stat-card{
+    padding:16px 14px; min-height:116px; border:1px solid rgba(255,255,255,.11); border-radius:20px;
+    background:rgba(12,12,14,.34); backdrop-filter:blur(20px) saturate(140%);
+    -webkit-backdrop-filter:blur(20px) saturate(140%); box-shadow:inset 0 1px 0 rgba(255,255,255,.055);
+  }
+  .progress-wrap .stat-num{font-size:29px;}
+  .progress-wrap .stat-unit{font-size:11px;}
+  .progress-wrap .stat-label{font-size:12px; line-height:1.25;}
+
+  /* Four compact cards in one horizontal row */
+  .motto-card{padding:24px 18px 18px;}
+  .motto-text{font-size:25px; max-width:66%; margin-bottom:14px;}
+  .quick-grid{grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin-top:14px;}
+  .quick-card{padding:10px 7px 9px; gap:9px; min-width:0; border-radius:16px; background:rgba(4,4,5,.52);}
+  .quick-card .icon-chip{width:30px;height:30px;border-radius:10px;}
+  .quick-card .icon-chip svg{width:14px;height:14px;}
+  .quick-card .chev{width:12px;height:12px;opacity:.65;}
+  .quick-card .qc-label{font-size:8px;letter-spacing:.09em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .quick-card .qc-value{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .recent-view-all{gap:7px;padding:6px 9px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.035);transition:.18s ease;}
+  .recent-view-all svg{width:16px;height:16px;}
+  .recent-view-all:hover,.recent-view-all:focus-visible{color:var(--text);background:rgba(255,255,255,.08);border-color:rgba(227,189,125,.38);outline:none;}
+
+  .activity-modal[hidden]{display:none;}
+  .activity-modal{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:16px;}
+  .activity-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+  .activity-modal-panel{position:relative;z-index:1;width:min(100%,620px);max-height:min(78vh,720px);overflow:auto;padding:20px;border-radius:28px;background:rgba(10,10,12,.9);box-shadow:0 -24px 70px rgba(0,0,0,.5);animation:recentSheet .22s ease-out;}
+  @keyframes recentSheet{from{transform:translateY(22px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .activity-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;}
+  .activity-modal-head .section-label{margin:0 0 6px;}
+  .activity-modal-head h2{margin:0;font-size:20px;font-weight:600;letter-spacing:-.02em;}
+  .modal-close{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);display:grid;place-items:center;cursor:pointer;}
+  .modal-close svg{width:18px;height:18px;}
+  .activity-tabs{display:flex;gap:7px;overflow:auto;padding-bottom:4px;margin-bottom:14px;}
+  .activity-tab{flex:0 0 auto;border:1px solid var(--border-soft);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.03);color:var(--text-dim);font:inherit;font-size:12px;cursor:pointer;}
+  .activity-tab.is-active{background:rgba(227,189,125,.15);border-color:rgba(227,189,125,.35);color:var(--accent);}
+  .more-activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .more-activity-card{text-align:left;padding:8px;border:1px solid var(--border-soft);border-radius:18px;background:rgba(255,255,255,.025);color:var(--text);display:grid;grid-template-columns:54px minmax(0,1fr) 24px;align-items:center;gap:10px;cursor:pointer;}
+  .more-activity-card:active{transform:scale(.985);}
+  .more-activity-image{width:54px;height:54px;border-radius:13px;background-size:cover;background-position:center;display:block;border:1px solid rgba(255,255,255,.08);}
+  .more-activity-copy{min-width:0;display:flex;flex-direction:column;gap:4px;}
+  .more-activity-copy strong{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .more-activity-copy small{font-size:10.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .more-activity-go{width:24px;height:24px;border-radius:50%;border:1px solid var(--border-soft);display:grid;place-items:center;color:var(--text-dim);font-size:12px;}
+  body.recent-open{overflow:hidden;}
+
+  @media (max-width:430px){
+    .motto-card{padding-left:14px;padding-right:14px;}
+    .quick-grid{gap:5px;}
+    .quick-card{padding:8px 5px;}
+    .quick-card .qc-label{font-size:7px;letter-spacing:.07em;}
+    .quick-card .qc-value{font-size:10.5px;}
+  }
+  @media (max-width:360px){
+    .more-activity-grid{grid-template-columns:1fr;}
+  }
+
+
+  /* Separate My Profile banner */
+  .profile-banner{
+    position:relative;
+    min-height:150px;
+    margin:20px 0 22px;
+    border:1px solid var(--border-soft);
+    border-radius:28px;
+    overflow:hidden;
+    background:#050505 url("assets/profile/profile-11.png") center/cover no-repeat;
+    display:flex;
+    align-items:flex-end;
+    padding:58px 22px 24px;
+    isolation:isolate;
+  }
+  .profile-banner-back{
+    position:absolute;
+    top:14px;
+    left:14px;
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    color:rgba(255,255,255,.92);
+    background:rgba(0,0,0,.32);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    cursor:pointer;
+    z-index:3;
+    transition:background .2s ease, transform .2s ease, border-color .2s ease;
+  }
+  .profile-banner-back:hover{
+    background:rgba(255,255,255,.1);
+    border-color:rgba(255,255,255,.28);
+    transform:translateX(-1px);
+  }
+  .profile-banner-back svg{width:18px;height:18px;}
+  .profile-banner::before{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.02) 15%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.82) 100%);
+    z-index:-1;
+  }
+  .profile-banner-title{
+    margin:0; color:#fff; font-size:clamp(27px,7vw,40px);
+    line-height:1; font-weight:500; letter-spacing:-.035em;
+    text-shadow:0 2px 18px rgba(0,0,0,.65);
+  }
+  .profile-banner-subtitle{
+    margin:7px 0 0; color:rgba(255,255,255,.62);
+    font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+  }
+  .profile-banner-copy{position:relative;z-index:1;}
+
+
+</style>
 <div class="sub-screen" id="sub-profile">
 
-  <!-- ══ PROFILE INTRO PAGE ══ -->
-  <div class="sl-intro-page" id="profileIntroPage">
+<div class="grain"></div>
+<main class="page">
 
-    <!-- Hero background — same image used in header -->
-    <div class="sl-intro-bg" style="background-image:url('https://media.nowssb.com/migrated-images/f33c90b73d194010_file_000000000e1481f48c725af03d03bb87_j6vlof.png'); background-position: center top;"></div>
-    <div class="sl-intro-vignette"></div>
+  <section class="profile-banner" aria-label="My Profile">
+    <button class="profile-banner-back" type="button" aria-label="Go back" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="profile-banner-copy">
+      <h1 class="profile-banner-title">My Profile</h1>
+      <p class="profile-banner-subtitle">Your personal space</p>
+    </div>
+  </section>
 
-    <!-- Top bar -->
-    <div class="sl-intro-top">
-      <div class="sl-intro-back" onclick="closeSub('profile')">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.8)" stroke-width="1.4" stroke-linecap="square"/></svg>
+  <section class="profile-card glass">
+    <div class="avatar-wrap">
+      <img class="avatar" id="profileAvatarImg" src="https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg" alt="">
+      <div class="avatar-ring"></div>
+      <button class="edit-btn" id="editPhotoBtn" aria-label="Change photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18.5 9.5a2.121 2.121 0 0 0-3-3L5 17v3Z"/><path d="M13.5 6.5l3 3"/></svg>
+      </button>
+      <input type="file" accept="image/*" id="photoInput" hidden>
+    </div>
+    <div class="profile-meta">
+      <p class="profile-role">Practitioner</p>
+      <p class="profile-name-row">
+        <span class="profile-name" id="profileMainName" spellcheck="false">Practitioner</span>
+        <button class="name-edit-btn" id="profileNameEditButton" aria-label="Edit name">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18.5 9.5a2.121 2.121 0 0 0-3-3L5 17v3Z"/><path d="M13.5 6.5l3 3"/></svg>
+        </button>
+      </p>
+      <p class="profile-tagline">Practicing daily, growing steadily.</p>
+      <span class="plan-pill"><span class="dotlit"></span>Free Plan</span>
+    </div>
+  </section>
+
+  <section class="progress">
+    <div class="progress-wrap glass">
+      <p class="section-label">Your Progress</p>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num">12</div><div class="stat-unit">days</div><div class="stat-label">Day Streak</div></div>
+        <div class="stat-card"><div class="stat-num">47</div><div class="stat-unit">total</div><div class="stat-label">Sessions</div></div>
+        <div class="stat-card"><div class="stat-num">128</div><div class="stat-unit">learned</div><div class="stat-label">Words Activated</div></div>
+        <div class="stat-card"><div class="stat-num">5</div><div class="stat-unit">of 5 mapped</div><div class="stat-label">Organs Reached</div></div>
       </div>
-      <div class="sl-intro-tag">Account &amp; Settings</div>
-      <button onclick="openIntroSetting()" style="width:44px;height:44px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;touch-action:manipulation;">
-        <svg width="4" height="16" viewBox="0 0 4 18" fill="none"><circle cx="2" cy="2" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="9" r="1.8" fill="rgba(255,255,255,0.7)"/><circle cx="2" cy="16" r="1.8" fill="rgba(255,255,255,0.7)"/></svg>
+    </div>
+  </section>
+
+  <section class="about">
+    <div class="about-card glass">
+      <p class="about-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-2M8 18v-8M12 20V6M16 18v-8M20 15v-2"/></svg>
+        <span>About NowssB</span>
+      </p>
+      <p class="about-text">Before a word had a spelling, it had a sound. NowssB works backward from the dictionary — past the meaning, past the letters — to the breath and vibration a word first came from, so you practice the origin, not just the definition.</p>
+          </div>
+  </section>
+
+  <section class="quickaccess">
+    <div class="section-head">
+      <p class="section-label">Quick Access</p>
+      <button class="view-all">View All <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="9"/><path d="M9 8l4 4-4 4"/></svg></button>
+    </div>
+    <div class="qa-wrap glass">
+      <div class="qa-grid">
+        <button class="qa-item" aria-label="Sessions">
+          <span class="qa-icon"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 2C9 6 8 9 8 12a4 4 0 0 0 8 0c0-1.2-.4-2-1-3 .1 1.5-.7 2.2-1.3 2.4C14.4 8 13 6.5 13 4c0 1.5-1 2.2-2 3.3C9.8 8.5 9 10 9 12"/></svg></span>
+          <span class="qa-name">Sessions</span>
+        </button>
+        <button class="qa-item" aria-label="Saved">
+          <span class="qa-icon"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6 3h12v18l-6-4-6 4V3Z"/></svg></span>
+          <span class="qa-name">Saved</span>
+        </button>
+        <button class="qa-item" aria-label="Liked">
+          <span class="qa-icon"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20s-7-4.35-9.5-8.5C.8 8 2 4.5 5.5 4c2-.3 3.7.8 4.5 2.2C10.8 4.8 12.5 3.7 14.5 4c3.5.5 4.7 4 3 7.5C19 15.65 12 20 12 20Z"/></svg></span>
+          <span class="qa-name">Liked</span>
+        </button>
+        <button class="qa-item" aria-label="Journal">
+          <span class="qa-icon"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6 3h11a2 2 0 0 1 2 2v16l-7.5-4L4 21V5a2 2 0 0 1 2-2Z"/></svg></span>
+          <span class="qa-name">Journal</span>
+        </button>
+        <button class="qa-item" aria-label="Settings">
+          <span class="qa-icon"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2.06 2.06 0 1 1-2.92 2.92l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56v.17a2.06 2.06 0 1 1-4.12 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2.06 2.06 0 1 1-2.92-2.92l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H4.5a2.06 2.06 0 1 1 0-4.12h.09A1.7 1.7 0 0 0 6.15 7.3a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2.06 2.06 0 1 1 8.67 2.45l.06.06a1.7 1.7 0 0 0 1.87.34h.09A1.7 1.7 0 0 0 11.7 1.3V1.13a2.06 2.06 0 1 1 4.12 0v.09a1.7 1.7 0 0 0 1.03 1.56h.09a1.7 1.7 0 0 0 1.87-.34l.06-.06a2.06 2.06 0 1 1 2.92 2.92l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.56 1.03h.17a2.06 2.06 0 1 1 0 4.12h-.09a1.7 1.7 0 0 0-1.56 1.03Z"/></svg></span>
+          <span class="qa-name">Settings</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="recent">
+    <div class="section-head">
+      <p class="section-label">Recent Activity</p>
+      <button class="view-all recent-view-all" id="recentViewAll" aria-haspopup="dialog" aria-controls="recentModal">
+        <span>View All</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M9 12h6"/><path d="M13 8l4 4-4 4"/></svg>
       </button>
     </div>
-
-    <!-- Bottom content -->
-    <div class="sl-intro-bottom">
-      <span class="sl-intro-eyebrow" id="profileIntroEyebrow">Shabdapathy · Practitioner</span>
-
-      <div class="sl-intro-title">Your<br>practice<br>space.</div>
-
-      <div class="sl-intro-divider"></div>
-
-      <div class="sl-intro-desc">
-        Your name, your practice settings, your membership — everything that makes this journey uniquely yours.
+    <div class="activity-list glass">
+      <div class="activity-row" tabindex="0" role="button">
+        <div class="activity-thumb" style="background-image:linear-gradient(150deg, rgba(0,0,0,.15), rgba(0,0,0,.55)), var(--img-act1);"></div>
+        <div class="activity-info">
+          <p class="activity-title">Morning Calm</p>
+          <p class="activity-sub">Guided Meditation</p>
+        </div>
+        <div class="activity-meta">
+          <span class="activity-time">2h ago</span>
+          <button class="activity-arrow" aria-label="Open Morning Calm"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+        </div>
       </div>
-
-      <!-- Live stat row — filled by JS -->
-      <div class="sl-intro-stats-row" id="profileIntroStats">
-        <div class="sl-intro-stat"><strong id="profileIntroName">—</strong></div>
-        <div class="sl-intro-stat-sep">·</div>
-        <div class="sl-intro-stat"><strong id="profileIntroTier">—</strong></div>
-        <div class="sl-intro-stat-sep">·</div>
-        <div class="sl-intro-stat">since <strong id="profileIntroSince">—</strong></div>
+      <div class="activity-row" tabindex="0" role="button">
+        <div class="activity-thumb" style="background-image:linear-gradient(150deg, rgba(0,0,0,.15), rgba(0,0,0,.55)), var(--img-act2);"></div>
+        <div class="activity-info">
+          <p class="activity-title">Deep Breathing</p>
+          <p class="activity-sub">Breathwork Session</p>
+        </div>
+        <div class="activity-meta">
+          <span class="activity-time">1d ago</span>
+          <button class="activity-arrow" aria-label="Open Deep Breathing"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+        </div>
       </div>
-
-      <!-- CTA -->
-      <div class="sl-intro-enter-btn" style="margin-top:24px;" onclick="profileEnterFromIntro()">
-        <span class="sl-intro-enter-label">Open Profile</span>
-        <span class="sl-intro-enter-icon">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8H13M9 4L13 8L9 12" stroke="rgba(200,232,245,0.8)" stroke-width="1.3" stroke-linecap="square"/>
-          </svg>
-        </span>
+      <div class="activity-row" tabindex="0" role="button">
+        <div class="activity-thumb" style="background-image:linear-gradient(150deg, rgba(0,0,0,.15), rgba(0,0,0,.55)), var(--img-act3);"></div>
+        <div class="activity-info">
+          <p class="activity-title">Body Scan</p>
+          <p class="activity-sub">Sleep Wind-Down</p>
+        </div>
+        <div class="activity-meta">
+          <span class="activity-time">3d ago</span>
+          <button class="activity-arrow" aria-label="Open Body Scan"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ══ MAIN PROFILE CONTENT (hidden until intro dismissed) ══ -->
-  <div id="profileMainContent" style="display:none; flex-direction:column; height:100%; overflow:hidden; position:relative; background:#060c18;">
-    <!-- Same background image as the Fashion home screen (bgImages.home in part012.js) -->
-    <!-- Only shows a background image when the user has actually picked a
-         custom Fashion background (SS.open('fashionbg')) — that selection
-         already lives in the --nwsb-custom-bg-url variable set on <body> by
-         nwsbSetFashionBg(). Nothing selected yet = plain #060c18 below, no
-         image, exactly like before. -->
-    <div class="sub-screen-bg" id="profileBgLayer" style="opacity:0.18;"></div>
-    <div class="sub-body" id="profileSubBody" style="padding-top:0; position:relative; z-index:1;">
-
-      <!-- ── CLEAN BANNER (matches Settings guide page) ── -->
-      <div class="menu-banner" style="height:240px;width:calc(100% + 40px);margin:0 -20px -78px;flex-shrink:0;position:relative;overflow:hidden;">
-        <img decoding="async" loading="eager" id="profileHeaderBannerImg"
-             src="https://media.nowssb.com/migrated-images/33989389d87e1531_grok_image_1777988386974_xbaic7.jpg"
-             alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,12,24,0.18) 0%,transparent 38%,#060c18 100%);"></div>
-        <div class="sub-back" onclick="closeSub('profile')" style="top:16px;left:20px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.18);backdrop-filter:none;-webkit-backdrop-filter:none;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 2L4 7L10 12" stroke="rgba(255,255,255,0.85)" stroke-width="1.4" stroke-linecap="square"/></svg></div>
+  <section class="motto">
+    <div class="motto-card glass">
+      <p class="motto-head"><span class="quote-mark">&ldquo;</span><span>My Motto</span></p>
+      <p class="motto-text">My Focus.<br>Breathe.<br>Let go.<br><span class="accent">Grow.</span></p>
+      <div class="quick-grid">
+      <div class="quick-card glass">
+        <div class="qc-top">
+          <span class="icon-chip"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 2C9 6 8 9 8 12a4 4 0 0 0 8 0c0-1.2-.4-2-1-3 .1 1.5-.7 2.2-1.3 2.4C14.4 8 13 6.5 13 4c0 1.5-1 2.2-2 3.3C9.8 8.5 9 10 9 12"/></svg></span>
+          <svg class="chev" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div><p class="qc-label">Practice</p><p class="qc-value" id="quickDuration">15 min</p></div>
       </div>
-
-      <!-- ── HEADER TITLE ── -->
-      <div style="position:relative;z-index:1;padding:0 0 18px;">
-        <div style="font-size:10px;letter-spacing:3px;color:var(--accent-gold);font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:6px;">NOWSBANSIU</div>
-        <div style="font-size:28px;font-weight:800;color:#fff;font-family:'DM Sans',sans-serif;line-height:1.05;">Profile</div>
-        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Settings &amp; Account</div>
+      <div class="quick-card glass">
+        <div class="qc-top">
+          <span class="icon-chip"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+          <svg class="chev" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div><p class="qc-label">Reminder</p><p class="qc-value" id="quickReminder">07:00</p></div>
       </div>
-
-      <!-- ── AVATAR + NAME ── -->
-      <!-- Hidden file input for photo selection -->
-      <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" onchange="profileHandlePhotoFile(this.files[0])">
-      <input type="file" id="profileBannerInput" accept="image/*" style="display:none;" onchange="profileHandleBannerFile(this.files[0])">
-
-      <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:28px;">
-        <!-- Avatar — border-radius on the IMG itself (Android WebView fix) -->
-        <div class="profile-avatar-ring" onclick="profileEditPhoto()">
-          <img decoding="async" loading="lazy" class="profile-avatar-ring-img" id="profileAvatarImg"
-               src="https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg"
-               alt="">
-          <!-- Pencil button — sits in relative parent, outside no overflow:hidden -->
-          <div id="profilePhotoPencil"
-               onclick="event.stopPropagation();profileEditPhoto();"
-               style="position:absolute;bottom:3px;right:3px;width:28px;height:28px;background:var(--accent);border-radius:50% !important;-webkit-border-radius:50% !important;border:2px solid rgba(6,12,24,0.9);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,0.45);">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z" stroke="#060c18" stroke-width="1.4" stroke-linejoin="round"/></svg>
-          </div>
+      <div class="quick-card glass">
+        <div class="qc-top">
+          <span class="icon-chip"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 3v18M7 8v8M17 8v8M3 11v2M21 11v2"/></svg></span>
+          <svg class="chev" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 6l6 6-6 6"/></svg>
         </div>
-
-        <!-- Name — tap to edit -->
-        <div id="profileNameDisplay" style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="profileStartEditName()">
-          <div id="profileMainName" style="font-family:'Quattrocento Sans','DM Sans',sans-serif;font-size:24px;font-weight:500;color:var(--text-primary);text-align:center;">Practitioner</div>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 1L10 3L4 9H2V7L8 1Z" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/></svg>
-        </div>
-
-        <!-- Name edit input (hidden by default) -->
-        <div id="profileNameEditWrap" style="display:none;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:260px;">
-          <input id="profileNameInput" type="text" maxlength="40"
-            style="width:100%;height:40px;background:rgba(200,232,245,0.07);border:1px solid rgba(200,232,245,0.35);color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;text-align:center;padding:0 14px;outline:none;-webkit-appearance:none;"
-            placeholder="Your name"
-            onkeydown="if(event.key==='Enter')profileSaveName();if(event.key==='Escape')profileCancelEditName();">
-          <div style="display:flex;gap:8px;width:100%;">
-            <button onclick="profileCancelEditName()" style="flex:1;height:36px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Cancel</button>
-            <button id="profileSaveNameBtn" onclick="profileSaveName()" style="flex:1;height:36px;background:rgba(200,232,245,0.15);border:1px solid rgba(200,232,245,0.38);color:var(--accent);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Save</button>
-          </div>
-        </div>
-
-        <!-- Email + plan badge -->
-        <div id="profileMainEmail" style="font-size:12px;font-weight:300;color:var(--text-secondary);text-align:center;margin-top:6px;">—</div>
-        <div id="profilePlanBadge" style="margin-top:8px;display:inline-block;padding:4px 12px;border:1px solid rgba(232,213,163,0.35);background:rgba(232,213,163,0.08);font-size:9px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--accent-gold);">Free</div>
-
-        <!-- Save feedback toast -->
-        <div id="profileSaveToast" style="margin-top:10px;font-size:11px;letter-spacing:1px;color:rgba(200,232,245,0.7);opacity:0;transition:opacity 0.4s;height:16px;"></div>
+        <div><p class="qc-label">Voice</p><p class="qc-value" id="quickVoice">Female</p></div>
       </div>
-
-      <!-- ── LIVE STATS ── -->
-      <span class="sub-section-label">Your Progress</span>
-      <div id="profileStatsBlock" style="margin-bottom:24px;">
-        <!-- 4-cell grid -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);margin-bottom:1px;">
-          <div style="background:#060c18;padding:16px 14px;">
-            <div id="pstat-streak" style="font-family:'Quattrocento Sans','DM Sans',sans-serif;font-size:32px;font-weight:500;color:var(--accent-gold);line-height:1;">—</div>
-            <div style="font-size:9px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Day Streak</div>
-          </div>
-          <div style="background:#060c18;padding:16px 14px;">
-            <div id="pstat-sessions" style="font-family:'Quattrocento Sans','DM Sans',sans-serif;font-size:32px;font-weight:500;color:var(--accent);line-height:1;">—</div>
-            <div style="font-size:9px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Sessions</div>
-          </div>
+      <div class="quick-card glass">
+        <div class="qc-top">
+          <span class="icon-chip"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.2L12 16.9 6.4 20l1.4-6.2-4.8-4.3 6.4-.6Z"/></svg></span>
+          <svg class="chev" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 6l6 6-6 6"/></svg>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);border-top:none;">
-          <div style="background:#060c18;padding:16px 14px;">
-            <div id="pstat-words" style="font-family:'Quattrocento Sans','DM Sans',sans-serif;font-size:32px;font-weight:500;color:var(--accent);line-height:1;">—</div>
-            <div style="font-size:9px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Words Activated</div>
-          </div>
-          <div style="background:#060c18;padding:16px 14px;">
-            <div id="pstat-organs" style="font-family:'Quattrocento Sans','DM Sans',sans-serif;font-size:32px;font-weight:500;color:var(--accent-gold);line-height:1;">—</div>
-            <div style="font-size:9px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-secondary);margin-top:4px;">Organs Reached</div>
-          </div>
-        </div>
-        <!-- Week practice dots -->
-        <div id="profileWeekGrid" style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px;padding:0 2px;"></div>
-        <!-- Last practiced -->
-        <div id="pstat-last" style="margin-top:10px;font-size:11px;font-weight:300;color:var(--text-tertiary);text-align:center;letter-spacing:0.5px;min-height:14px;"></div>
+        <div><p class="qc-label">Plan</p><p class="qc-value">Free</p></div>
       </div>
-
-      <!-- ── HEALING BODY MAP ── -->
-      <span class="sub-section-label">Healing Body Map</span>
-      <div id="hbm-profile-mini" style="margin-bottom:24px;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-        <div style="text-align:center;color:rgba(255,255,255,.28);font-size:12px;font-family:'DM Sans',sans-serif;padding:20px 0;">Practice words to activate your body map</div>
       </div>
-
-      <!-- ── PREFERENCES ── -->
-      <span class="sub-section-label">Preferences</span>
-
-      <!-- Sound Feedback toggle -->
-      <div class="profile-row" id="pref-sound-row">
-        <div class="profile-row-label">Sound Feedback</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span id="pref-sound-label" class="profile-row-val">On</span>
-          <div id="pref-sound-toggle" onclick="profileToggleSound()" style="width:42px;height:18px;border-radius:9px !important;background:rgba(200,232,245,0.22);border:1px solid rgba(200,232,245,0.38);position:relative;cursor:pointer;transition:background 0.25s;flex-shrink:0;">
-            <div id="pref-sound-knob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50% !important;background:var(--accent);transition:transform 0.25s;"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Practice Duration -->
-      <div class="profile-row">
-        <div class="profile-row-label">Practice Duration</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button onclick="profileChangeDuration(-3)" style="width:44px;height:44px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.7);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">−</button>
-          <span id="pref-duration-val" class="profile-row-val" style="min-width:38px;text-align:center;">18 min</span>
-          <button onclick="profileChangeDuration(3)" style="width:44px;height:44px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.7);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">+</button>
-        </div>
-      </div>
-
-      <!-- Daily Reminder -->
-      <div class="profile-row">
-        <div class="profile-row-label">Daily Reminder</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <input id="pref-reminder-input" type="time" value="06:00"
-            onchange="profileSaveReminder(this.value)"
-            style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;padding:4px 8px;outline:none;-webkit-appearance:none;cursor:pointer;width:84px;text-align:center;">
-        </div>
-      </div>
-
-      <!-- Voice Preference -->
-      <div class="profile-row">
-        <div class="profile-row-label">Playback Voice</div>
-        <div style="display:flex;gap:6px;">
-          <button id="voice-btn-female" onclick="profileSetVoice('female')" style="padding:5px 12px;background:rgba(200,232,245,0.15);border:1px solid rgba(200,232,245,0.38);color:var(--accent);font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:2px;cursor:pointer;transition:background 0.2s;">Female</button>
-          <button id="voice-btn-male" onclick="profileSetVoice('male')" style="padding:5px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);color:var(--text-secondary);font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:2px;cursor:pointer;transition:background 0.2s;">Male</button>
-        </div>
-      </div>
-
-      <!-- App Version — static -->
-      <div class="profile-row" style="border-bottom:none;">
-        <div class="profile-row-label">App Version</div>
-        <div class="profile-row-val">v9.5</div>
-      </div>
-
-      <!-- ── SHOP & ORDERS SECTION ── -->
-      <span class="sub-section-label" style="margin-top:28px;">Shop &amp; Orders</span>
-
-      <!-- Cart -->
-      <div class="profile-row" id="profileCartRow" onclick="openSub('cart')" style="cursor:pointer;">
-        <div style="display:flex;align-items:center;gap:11px;">
-          <div style="width:32px;height:32px;background:rgba(232,213,163,0.08);border:1px solid rgba(232,213,163,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <img loading="lazy" class="cw-svg-img" src="https://media.nowssb.com/migrated-images/1f1648c66e7ab8ae_c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png" alt="Cart" style="width:16px;height:16px;object-fit:contain;display:block;">
-          </div>
-          <div class="profile-row-label">My Cart</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span id="profileCartCount" class="profile-row-val">0 items</span>
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 1L7 5L3 9" stroke="rgba(255,255,255,0.3)" stroke-width="1.3" stroke-linecap="square"/></svg>
-        </div>
-      </div>
-
-      <!-- Wishlist -->
-      <div class="profile-row" id="profileWishRow" onclick="openSub('wishlist')" style="cursor:pointer;">
-        <div style="display:flex;align-items:center;gap:11px;">
-          <div style="width:32px;height:32px;background:rgba(220,80,80,0.07);border:1px solid rgba(220,80,80,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <img loading="lazy" class="cw-svg-img" src="https://media.nowssb.com/migrated-images/cd1ae186509a375a_20d73d50-56cc-11f1-9352-7b4e59e4b0d9_xp7xwq.png" alt="Wishlist" style="width:16px;height:16px;object-fit:contain;display:block;">
-          </div>
-          <div class="profile-row-label">Wishlist</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span id="profileWishCount" class="profile-row-val">0 saved</span>
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 1L7 5L3 9" stroke="rgba(255,255,255,0.3)" stroke-width="1.3" stroke-linecap="square"/></svg>
-        </div>
-      </div>
-
-      <!-- My Orders -->
-      <div class="profile-row" id="profileOrdersRow" onclick="openSub('orders')" style="cursor:pointer;border-bottom:none;">
-        <div style="display:flex;align-items:center;gap:11px;">
-          <div style="width:32px;height:32px;background:rgba(200,232,245,0.07);border:1px solid rgba(200,232,245,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-              <rect x="2" y="3" width="12" height="11" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M5 7H11M5 10H8" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M5 3V2a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
-          </div>
-          <div class="profile-row-label">My Orders</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span id="profileOrderCount" class="profile-row-val">0 purchased</span>
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 1L7 5L3 9" stroke="rgba(255,255,255,0.3)" stroke-width="1.3" stroke-linecap="square"/></svg>
-        </div>
-      </div>
-
-      <!-- ── ACCOUNT SECTION ── -->
-      <span class="sub-section-label" style="margin-top:28px;">Account</span>
-
-      <!-- Member Since -->
-      <div class="profile-row">
-        <div class="profile-row-label">Member Since</div>
-        <div id="profileMemberSince" class="profile-row-val">—</div>
-      </div>
-
-      <!-- Plan -->
-      <div class="profile-row" style="border-bottom:none;">
-        <div class="profile-row-label">Current Plan</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span id="profilePlanText" class="profile-row-val">Free</span>
-          <span onclick="closeSub('profile');" style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent-gold);cursor:pointer;border-bottom:1px solid rgba(232,213,163,0.35);">Upgrade</span>
-        </div>
-      </div>
-
-      <button class="btn-signout" onclick="fbSignOut()">Sign Out</button>
     </div>
+  </section>
+
+  <section class="week"><div class="week-row" id="weekChips"></div></section>
+
+  <!-- Current NowssB body map is rendered by the live profile integration. -->
+<section class="bodymap"><p class="section-label">Healing Body Map</p><div id="hbm-profile-mini" class="bodymap-current"></div></section>
+
+  <section class="prefs">
+    <p class="section-label">Preferences</p>
+    <div class="list-card glass">
+      <div class="row">
+        <span class="row-label">Sound Feedback</span>
+        <button class="toggle" id="soundToggle" role="switch" aria-checked="true" aria-label="Sound feedback"></button>
+      </div>
+      <div class="row">
+        <span class="row-label">Practice Duration</span>
+        <div class="stepper">
+          <button id="durMinus" aria-label="Decrease duration"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"><path d="M5 12h14"/></svg></button>
+          <span class="stepper-value" id="durationValue">15 min</span>
+          <button id="durPlus" aria-label="Increase duration"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="row-label">Daily Reminder</span>
+        <span class="time-chip"><input type="time" id="reminderTime" value="07:00"></span>
+      </div>
+      <div class="row">
+        <span class="row-label">Playback Voice</span>
+        <div class="segmented" id="voiceSeg">
+          <button data-voice="female" class="is-active" aria-pressed="true">Female</button>
+          <button data-voice="male" aria-pressed="false">Male</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="row-label is-muted">App Version</span>
+        <span class="row-value">v2.4.1</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="shop">
+    <p class="section-label">Shop &amp; Orders</p>
+    <div class="list-card glass">
+      <div class="row" tabindex="0" role="button">
+        <span class="row-left"><span class="icon-chip"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg></span><span class="row-label">Cart</span></span>
+        <span class="row-right-group"><span class="row-count">2</span><svg class="chev" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="row" tabindex="0" role="button">
+        <span class="row-left"><span class="icon-chip"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20s-7-4.35-9.5-8.5C.8 8 2 4.5 5.5 4c2-.3 3.7.8 4.5 2.2C10.8 4.8 12.5 3.7 14.5 4c3.5.5 4.7 4 3 7.5C19 15.65 12 20 12 20Z"/></svg></span><span class="row-label">Wishlist</span></span>
+        <span class="row-right-group"><span class="row-count">5</span><svg class="chev" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="row" tabindex="0" role="button">
+        <span class="row-left"><span class="icon-chip"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M3 8l9-4 9 4-9 4-9-4Z"/><path d="M3 8v8l9 4 9-4V8"/><path d="M12 12v8"/></svg></span><span class="row-label">Orders</span></span>
+        <span class="row-right-group"><span class="row-count">3</span><svg class="chev" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="account">
+    <p class="section-label">Account</p>
+    <div class="list-card glass">
+      <div class="row"><span class="row-label">Member Since</span><span class="row-value">Jan 2025</span></div>
+      <div class="row"><span class="row-label">Current Plan</span><span class="row-right-group"><span class="row-value">Free</span><a href="#" class="upgrade-link" id="upgradeLink">Upgrade</a></span></div>
+    </div>
+  </section>
+
+  <section class="quote">
+    <div class="quote-card glass">
+      <p class="quote-mark">&ldquo;</p>
+      <p class="quote-text">Long before there was language, there was only sound.</p>
+      <p class="quote-attrib">— The Idea Behind NowssB</p>
+          </div>
+  </section>
+
+  <button class="signout" id="signOutBtn">Sign Out</button>
+</main>
+
+
+
+  <div class="activity-modal" id="recentModal" role="dialog" aria-modal="true" aria-labelledby="recentModalTitle" hidden>
+    <div class="activity-modal-backdrop" data-close-recent></div>
+    <section class="activity-modal-panel glass">
+      <div class="activity-modal-head">
+        <div>
+          <p class="section-label">Activity Library</p>
+          <h2 id="recentModalTitle">More recent sessions</h2>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close recent activity" data-close-recent>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="activity-tabs" role="tablist" aria-label="Recent activity categories">
+        <button class="activity-tab is-active" type="button" role="tab" aria-selected="true">All</button>
+        <button class="activity-tab" type="button" role="tab" aria-selected="false">Meditation</button>
+        <button class="activity-tab" type="button" role="tab" aria-selected="false">Breathwork</button>
+        <button class="activity-tab" type="button" role="tab" aria-selected="false">Sleep</button>
+      </div>
+      <div class="more-activity-grid">
+        <button class="more-activity-card" type="button">
+          <span class="more-activity-image" style="background-image:linear-gradient(160deg,rgba(0,0,0,.08),rgba(0,0,0,.55)),var(--img-act1)"></span>
+          <span class="more-activity-copy"><strong>Evening Reset</strong><small>Guided Meditation · 4d ago</small></span>
+          <span class="more-activity-go">↗</span>
+        </button>
+        <button class="more-activity-card" type="button">
+          <span class="more-activity-image" style="background-image:linear-gradient(160deg,rgba(0,0,0,.08),rgba(0,0,0,.55)),var(--img-act2)"></span>
+          <span class="more-activity-copy"><strong>Box Breathing</strong><small>Breathwork · 5d ago</small></span>
+          <span class="more-activity-go">↗</span>
+        </button>
+        <button class="more-activity-card" type="button">
+          <span class="more-activity-image" style="background-image:linear-gradient(160deg,rgba(0,0,0,.08),rgba(0,0,0,.55)),var(--img-act3)"></span>
+          <span class="more-activity-copy"><strong>Night Drift</strong><small>Sleep Wind-Down · 6d ago</small></span>
+          <span class="more-activity-go">↗</span>
+        </button>
+        <button class="more-activity-card" type="button">
+          <span class="more-activity-image" style="background-image:linear-gradient(160deg,rgba(0,0,0,.1),rgba(0,0,0,.62)),var(--img-motto)"></span>
+          <span class="more-activity-copy"><strong>Focus Flow</strong><small>Mindfulness · 7d ago</small></span>
+          <span class="more-activity-go">↗</span>
+        </button>
+      </div>
+    </section>
   </div>
+
+<div class="toast" id="toast">Signed out</div>
+
+<script>
+(function(){
+  // Weekday tracker — Monday-first, driven by the real current date
+  var dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  var dayLetters = ['M','T','W','T','F','S','S'];
+  var todayIdx = (new Date().getDay() + 6) % 7;
+  var store = JSON.parse(localStorage.getItem('nowssb_week') || '{}');
+  var chipsEl = document.getElementById('weekChips');
+
+  dayLetters.forEach(function(letter, i){
+    var btn = document.createElement('button');
+    btn.className = 'day-chip';
+    btn.textContent = letter;
+    btn.setAttribute('aria-label', dayNames[i]);
+    var done = store[i] !== undefined ? store[i] : (i < todayIdx);
+    if (done) btn.classList.add('is-done');
+    if (i === todayIdx) btn.classList.add('is-today');
+    if (i > todayIdx) { btn.classList.add('is-future'); btn.disabled = true; }
+    btn.addEventListener('click', function(){
+      btn.classList.toggle('is-done');
+      store[i] = btn.classList.contains('is-done');
+      localStorage.setItem('nowssb_week', JSON.stringify(store));
+    });
+    chipsEl.appendChild(btn);
+  });
+
+  // Editable practitioner name
+  var nameEl = document.getElementById('profileMainName');
+  var avatarEl = document.getElementById('profileAvatarImg');
+  var hasPhoto = false;
+  var savedName = localStorage.getItem('nowssb_name');
+  if (savedName) nameEl.textContent = savedName;
+  avatarEl.textContent = nameEl.textContent.trim().charAt(0).toUpperCase() || 'P';
+
+  document.getElementById('profileNameEditButton').addEventListener('click', function(){
+    nameEl.contentEditable = 'true';
+    nameEl.focus();
+    document.getSelection().selectAllChildren(nameEl);
+  });
+  nameEl.addEventListener('blur', function(){
+    nameEl.contentEditable = 'false';
+    var val = nameEl.textContent.trim() || 'Practitioner';
+    nameEl.textContent = val;
+    if (!hasPhoto) avatarEl.textContent = val.charAt(0).toUpperCase();
+    localStorage.setItem('nowssb_name', val);
+  });
+  nameEl.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); }
+  });
+
+  // Avatar photo (local preview only, not persisted)
+  document.getElementById('editPhotoBtn').addEventListener('click', function(){
+    document.getElementById('photoInput').click();
+  });
+  document.getElementById('photoInput').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      avatarEl.style.backgroundImage = 'url(' + ev.target.result + ')';
+      avatarEl.textContent = '';
+      hasPhoto = true;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Sound feedback toggle
+  var soundToggle = document.getElementById('soundToggle');
+  var soundOn = localStorage.getItem('nowssb_sound') !== 'off';
+  function renderSound(){
+    soundToggle.classList.toggle('is-on', soundOn);
+    soundToggle.setAttribute('aria-checked', String(soundOn));
+  }
+  soundToggle.addEventListener('click', function(){
+    soundOn = !soundOn;
+    localStorage.setItem('nowssb_sound', soundOn ? 'on' : 'off');
+    renderSound();
+  });
+  renderSound();
+
+  // Practice duration stepper
+  var duration = parseInt(localStorage.getItem('nowssb_duration'), 10) || 15;
+  var durationValueEl = document.getElementById('durationValue');
+  var quickDurationEl = document.getElementById('quickDuration');
+  function renderDuration(){
+    durationValueEl.textContent = duration + ' min';
+    if (quickDurationEl) quickDurationEl.textContent = duration + ' min';
+  }
+  document.getElementById('durMinus').addEventListener('click', function(){
+    duration = Math.max(5, duration - 5);
+    localStorage.setItem('nowssb_duration', duration);
+    renderDuration();
+  });
+  document.getElementById('durPlus').addEventListener('click', function(){
+    duration = Math.min(60, duration + 5);
+    localStorage.setItem('nowssb_duration', duration);
+    renderDuration();
+  });
+  renderDuration();
+
+  // Daily reminder time
+  var reminderInput = document.getElementById('reminderTime');
+  var quickReminderEl = document.getElementById('quickReminder');
+  var savedTime = localStorage.getItem('nowssb_reminder');
+  if (savedTime) reminderInput.value = savedTime;
+  if (quickReminderEl) quickReminderEl.textContent = reminderInput.value || '07:00';
+  reminderInput.addEventListener('change', function(){
+    localStorage.setItem('nowssb_reminder', reminderInput.value);
+    if (quickReminderEl) quickReminderEl.textContent = reminderInput.value;
+  });
+
+  // Playback voice segmented control
+  var voiceBtns = document.querySelectorAll('#voiceSeg button');
+  var quickVoiceEl = document.getElementById('quickVoice');
+  var voice = localStorage.getItem('nowssb_voice') || 'female';
+  function renderVoice(){
+    voiceBtns.forEach(function(b){
+      var active = b.dataset.voice === voice;
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-pressed', String(active));
+    });
+    if (quickVoiceEl) quickVoiceEl.textContent = voice.charAt(0).toUpperCase() + voice.slice(1);
+  }
+  voiceBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      voice = b.dataset.voice;
+      localStorage.setItem('nowssb_voice', voice);
+      renderVoice();
+    });
+  });
+  renderVoice();
+
+  // Toast helper
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1800);
+  }
+
+  document.getElementById('upgradeLink').addEventListener('click', function(e){
+    e.preventDefault();
+    showToast('Upgrade flow not wired up yet');
+  });
+  document.getElementById('signOutBtn').addEventListener('click', function(){
+    showToast('Signed out');
+  });
+
+  // Recent Activity: open the expanded activity library.
+  const recentViewAll = document.getElementById('recentViewAll');
+  const recentModal = document.getElementById('recentModal');
+  if (recentViewAll && recentModal) {
+    const openRecent = () => {
+      recentModal.hidden = false;
+      document.body.classList.add('recent-open');
+      const closeBtn = recentModal.querySelector('.modal-close');
+      if (closeBtn) closeBtn.focus();
+    };
+    const closeRecent = () => {
+      recentModal.hidden = true;
+      document.body.classList.remove('recent-open');
+      recentViewAll.focus();
+    };
+    recentViewAll.addEventListener('click', openRecent);
+    recentModal.querySelectorAll('[data-close-recent]').forEach(btn => btn.addEventListener('click', closeRecent));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !recentModal.hidden) closeRecent();
+    });
+    recentModal.querySelectorAll('.activity-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        recentModal.querySelectorAll('.activity-tab').forEach(t => {
+          t.classList.remove('is-active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+      });
+    });
+  }
+
+})();
+</script>
 
 </div>
+<script id="supplied-profile-script">
 
+(function(){
+  // Weekday tracker — Monday-first, driven by the real current date
+  var dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  var dayLetters = ['M','T','W','T','F','S','S'];
+  var todayIdx = (new Date().getDay() + 6) % 7;
+  var store = JSON.parse(localStorage.getItem('nowssb_week') || '{}');
+  var chipsEl = document.getElementById('weekChips');
+
+  dayLetters.forEach(function(letter, i){
+    var btn = document.createElement('button');
+    btn.className = 'day-chip';
+    btn.textContent = letter;
+    btn.setAttribute('aria-label', dayNames[i]);
+    var done = store[i] !== undefined ? store[i] : (i < todayIdx);
+    if (done) btn.classList.add('is-done');
+    if (i === todayIdx) btn.classList.add('is-today');
+    if (i > todayIdx) { btn.classList.add('is-future'); btn.disabled = true; }
+    btn.addEventListener('click', function(){
+      btn.classList.toggle('is-done');
+      store[i] = btn.classList.contains('is-done');
+      localStorage.setItem('nowssb_week', JSON.stringify(store));
+    });
+    chipsEl.appendChild(btn);
+  });
+
+  // Editable practitioner name
+  var nameEl = document.getElementById('profileMainName');
+  var avatarEl = document.getElementById('profileAvatarImg');
+  var hasPhoto = false;
+  var savedName = localStorage.getItem('nowssb_name');
+  if (savedName) nameEl.textContent = savedName;
+  avatarEl.textContent = nameEl.textContent.trim().charAt(0).toUpperCase() || 'P';
+
+  document.getElementById('profileNameEditButton').addEventListener('click', function(){
+    nameEl.contentEditable = 'true';
+    nameEl.focus();
+    document.getSelection().selectAllChildren(nameEl);
+  });
+  nameEl.addEventListener('blur', function(){
+    nameEl.contentEditable = 'false';
+    var val = nameEl.textContent.trim() || 'Practitioner';
+    nameEl.textContent = val;
+    if (!hasPhoto) avatarEl.textContent = val.charAt(0).toUpperCase();
+    localStorage.setItem('nowssb_name', val);
+  });
+  nameEl.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); }
+  });
+
+  // Avatar photo (local preview only, not persisted)
+  document.getElementById('editPhotoBtn').addEventListener('click', function(){
+    document.getElementById('photoInput').click();
+  });
+  document.getElementById('photoInput').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      avatarEl.style.backgroundImage = 'url(' + ev.target.result + ')';
+      avatarEl.textContent = '';
+      hasPhoto = true;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Sound feedback toggle
+  var soundToggle = document.getElementById('soundToggle');
+  var soundOn = localStorage.getItem('nowssb_sound') !== 'off';
+  function renderSound(){
+    soundToggle.classList.toggle('is-on', soundOn);
+    soundToggle.setAttribute('aria-checked', String(soundOn));
+  }
+  soundToggle.addEventListener('click', function(){
+    soundOn = !soundOn;
+    localStorage.setItem('nowssb_sound', soundOn ? 'on' : 'off');
+    renderSound();
+  });
+  renderSound();
+
+  // Practice duration stepper
+  var duration = parseInt(localStorage.getItem('nowssb_duration'), 10) || 15;
+  var durationValueEl = document.getElementById('durationValue');
+  var quickDurationEl = document.getElementById('quickDuration');
+  function renderDuration(){
+    durationValueEl.textContent = duration + ' min';
+    if (quickDurationEl) quickDurationEl.textContent = duration + ' min';
+  }
+  document.getElementById('durMinus').addEventListener('click', function(){
+    duration = Math.max(5, duration - 5);
+    localStorage.setItem('nowssb_duration', duration);
+    renderDuration();
+  });
+  document.getElementById('durPlus').addEventListener('click', function(){
+    duration = Math.min(60, duration + 5);
+    localStorage.setItem('nowssb_duration', duration);
+    renderDuration();
+  });
+  renderDuration();
+
+  // Daily reminder time
+  var reminderInput = document.getElementById('reminderTime');
+  var quickReminderEl = document.getElementById('quickReminder');
+  var savedTime = localStorage.getItem('nowssb_reminder');
+  if (savedTime) reminderInput.value = savedTime;
+  if (quickReminderEl) quickReminderEl.textContent = reminderInput.value || '07:00';
+  reminderInput.addEventListener('change', function(){
+    localStorage.setItem('nowssb_reminder', reminderInput.value);
+    if (quickReminderEl) quickReminderEl.textContent = reminderInput.value;
+  });
+
+  // Playback voice segmented control
+  var voiceBtns = document.querySelectorAll('#voiceSeg button');
+  var quickVoiceEl = document.getElementById('quickVoice');
+  var voice = localStorage.getItem('nowssb_voice') || 'female';
+  function renderVoice(){
+    voiceBtns.forEach(function(b){
+      var active = b.dataset.voice === voice;
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-pressed', String(active));
+    });
+    if (quickVoiceEl) quickVoiceEl.textContent = voice.charAt(0).toUpperCase() + voice.slice(1);
+  }
+  voiceBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      voice = b.dataset.voice;
+      localStorage.setItem('nowssb_voice', voice);
+      renderVoice();
+    });
+  });
+  renderVoice();
+
+  // Toast helper
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1800);
+  }
+
+  document.getElementById('upgradeLink').addEventListener('click', function(e){
+    e.preventDefault();
+    showToast('Upgrade flow not wired up yet');
+  });
+  document.getElementById('signOutBtn').addEventListener('click', function(){
+    showToast('Signed out');
+  });
+
+  // Recent Activity: open the expanded activity library.
+  const recentViewAll = document.getElementById('recentViewAll');
+  const recentModal = document.getElementById('recentModal');
+  if (recentViewAll && recentModal) {
+    const openRecent = () => {
+      recentModal.hidden = false;
+      document.body.classList.add('recent-open');
+      const closeBtn = recentModal.querySelector('.modal-close');
+      if (closeBtn) closeBtn.focus();
+    };
+    const closeRecent = () => {
+      recentModal.hidden = true;
+      document.body.classList.remove('recent-open');
+      recentViewAll.focus();
+    };
+    recentViewAll.addEventListener('click', openRecent);
+    recentModal.querySelectorAll('[data-close-recent]').forEach(btn => btn.addEventListener('click', closeRecent));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !recentModal.hidden) closeRecent();
+    });
+    recentModal.querySelectorAll('.activity-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        recentModal.querySelectorAll('.activity-tab').forEach(t => {
+          t.classList.remove('is-active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+      });
+    });
+  }
+
+})();
+
+</script>
+
+<script id="supplied-profile-bridge">
+(function(){
+  var profileImg = document.getElementById('profileAvatarImg');
+  var profileName = document.getElementById('profileMainName');
+  var data = window._userDataCache || {};
+  if (profileImg && data.photoURL) profileImg.src = data.photoURL;
+  if (profileName && data.displayName) profileName.textContent = data.displayName;
+  var photo = document.getElementById('editPhotoBtn');
+  if (photo) photo.addEventListener('click', function(){ if(window.profileEditPhoto) window.profileEditPhoto(); });
+})();
+</script>
 <script src="app/js/part008.js?v=163"></script>
 
 <!-- ══ SUB-SCREEN: REAL MEANING ══ -->
