@@ -3743,9 +3743,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     position:relative;
     overflow-x:hidden;
     padding-bottom: calc(40px + env(safe-area-inset-bottom));
+    background-color:#000;
+    background-image:var(--img-bg);
+    background-size:cover;
+    background-position:center top;
+    background-attachment:fixed;
+    background-repeat:no-repeat;
   }
 #sub-profile::before {
     content:"";
+    display:none;
     position:fixed; inset:0;
     background-image:var(--img-bg);
     background-size: cover;
@@ -3754,6 +3761,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     background-repeat: no-repeat;
     pointer-events:none;
     z-index:0;
+  }
+#sub-profile .glass,
+#sub-profile .progress-wrap,
+#sub-profile .about-card,
+#sub-profile .motto-card,
+#sub-profile .quote-card,
+#sub-profile .qa-wrap,
+#sub-profile .activity-list,
+#sub-profile .list-card {
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius);
   }
 #sub-profile .grain {
     position:fixed; inset:0;
