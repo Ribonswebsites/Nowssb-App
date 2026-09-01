@@ -68,7 +68,7 @@ class _PlayerDialState extends State<PlayerDial> {
   @override
   Widget build(BuildContext context) {
     final h = _now.hour % 12 == 0 ? 12 : _now.hour % 12;
-    final hh = h.toString().padLeft(2, '0');
+    final hh = h.toString();
     final mm = _now.minute.toString().padLeft(2, '0');
     final ap = _now.hour >= 12 ? 'PM' : 'AM';
     const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -108,10 +108,16 @@ class _PlayerDialState extends State<PlayerDial> {
                   ],
                 ),
               ),
-              if (!_expanded)
-                LayoutBuilder(
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 320),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                child: _expanded
+                    ? const SizedBox(key: ValueKey('clock-collapsed'))
+                    : LayoutBuilder(
+                  key: const ValueKey('clock-visible'),
                   builder: (context, constraints) {
-                    final clockHeight = math.min(340.0, math.max(248.0, constraints.maxWidth * .82));
+                    final clockHeight = math.min(620.0, math.max(318.0, constraints.maxWidth * .92));
                     return SizedBox(
                       height: clockHeight,
                       child: Stack(
@@ -127,7 +133,7 @@ class _PlayerDialState extends State<PlayerDial> {
                             top: clockHeight * .43,
                             child: Row(
                           children: [
-                            Text(hh, style: const TextStyle(color: Colors.white, fontSize: 72, fontWeight: FontWeight.w500, height: 0.9, fontFeatures: [FontFeature.tabularFigures()])),
+                            Text(hh, style: const TextStyle(color: Colors.white, fontSize: 94, fontWeight: FontWeight.w400, height: 0.82, fontFeatures: [FontFeature.tabularFigures()])),
                             const SizedBox(width: 10),
                             Container(
                               height: 44,
@@ -164,6 +170,7 @@ class _PlayerDialState extends State<PlayerDial> {
                     ),
                   );
                 },
+                    ),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(22, _expanded ? 8 : 6, 22, 0),
