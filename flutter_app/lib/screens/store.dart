@@ -2,8 +2,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
 import '../data/content.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
@@ -184,58 +182,31 @@ class _MiniStoreCard extends StatelessWidget {
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
   @override
-  Widget build(BuildContext context) => const StoreWebViewScreen(section: 'real-meaning');
+  Widget build(BuildContext context) => const _StoreContentPage(
+        title: 'The Word Atelier',
+        film: 'assets/video/store-word-library.mp4',
+        child: _WordsShelf(),
+      );
 }
 
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
   @override
-  Widget build(BuildContext context) => const StoreWebViewScreen(section: 'meaning-store');
+  Widget build(BuildContext context) => const _StoreContentPage(
+        title: 'The Meaning Store',
+        film: 'assets/video/store-meaning-library.mp4',
+        child: _MeaningsShelf(),
+      );
 }
 
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
   @override
-  Widget build(BuildContext context) => const StoreWebViewScreen(section: 'signature-store');
-}
-
-class StoreWebViewScreen extends StatefulWidget {
-  const StoreWebViewScreen({super.key, required this.section});
-  final String section;
-
-  @override
-  State<StoreWebViewScreen> createState() => _StoreWebViewScreenState();
-}
-
-class _StoreWebViewScreenState extends State<StoreWebViewScreen> {
-  bool _entered = false;
-  late final WebViewController _controller = WebViewController()
-    ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    ..setNavigationDelegate(NavigationDelegate(
-      onPageFinished: (_) => _enterWebViewStore(),
-    ))
-    ..loadRequest(Uri.parse('https://ribonswebsites.github.io/Nowssb-App/'));
-
-  Future<void> _enterWebViewStore() async {
-    if (_entered) return;
-    _entered = true;
-    final section = widget.section;
-    final script = switch (section) {
-      'real-meaning' => "document.getElementById('splash')?.classList.remove('active'); document.getElementById('landing')?.classList.add('active'); if(window.nssOpenSub)nssOpenSub('real-meaning'); setTimeout(function(){if(window.rmSkipIntro)rmSkipIntro();},250);",
-      'meaning-store' => "document.getElementById('splash')?.classList.remove('active'); document.getElementById('landing')?.classList.add('active'); if(window.nssOpenSub)nssOpenSub('meaning-store'); setTimeout(function(){if(window.msEnterFromIntro)msEnterFromIntro();},250);",
-      'signature-store' => "document.getElementById('splash')?.classList.remove('active'); document.getElementById('landing')?.classList.add('active'); if(window.nssOpenSub)nssOpenSub('signature-store'); setTimeout(function(){if(window.sigEnterStore)sigEnterStore();},250);",
-      _ => '',
-    };
-    if (script.isNotEmpty) await _controller.runJavaScript(script);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(child: WebViewWidget(controller: _controller)),
-    );
-  }
+  Widget build(BuildContext context) => const _StoreContentPage(
+        title: 'Words & Meanings',
+        film: 'assets/video/signature-store.mp4',
+        child: _SignatureShelf(),
+      );
 }
 
 class EbooksStoreScreen extends StatelessWidget {
