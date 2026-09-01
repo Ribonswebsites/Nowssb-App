@@ -35,6 +35,7 @@ class IntroGate extends StatefulWidget {
     required this.child,
     this.art,
     this.film,
+    this.fullBleed = false,
     this.stats = const [],
     this.onBack,
   });
@@ -58,6 +59,7 @@ class IntroGate extends StatefulWidget {
   /// A film instead, for the pages whose backdrop genuinely moves. Ignored
   /// when [art] is given.
   final String? film;
+  final bool fullBleed;
 
   final String enterLabel;
 
@@ -110,6 +112,7 @@ class _IntroGateState extends State<IntroGate> {
               stats: widget.stats,
               art: widget.art,
               film: widget.film,
+              fullBleed: widget.fullBleed,
               enterLabel: widget.enterLabel,
               onBack: widget.onBack,
               onEnter: _openContent,
@@ -129,6 +132,7 @@ class _Intro extends StatelessWidget {
     required this.stats,
     required this.art,
     required this.film,
+    required this.fullBleed,
     required this.enterLabel,
     required this.onEnter,
     this.onBack,
@@ -137,6 +141,7 @@ class _Intro extends StatelessWidget {
   final String tag, eyebrow, title, body, enterLabel;
   final String? art;
   final String? film;
+  final bool fullBleed;
   final List<String> stats;
   final VoidCallback onEnter;
   final VoidCallback? onBack;
@@ -149,7 +154,9 @@ class _Intro extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           const AppBackdrop(),
-          if (art != null)
+          if (art != null && fullBleed)
+            Positioned.fill(child: Image.asset(art!, fit: BoxFit.cover))
+          else if (art != null)
             Positioned(
               top: 78,
               left: 16,
@@ -238,27 +245,11 @@ class _Intro extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        eyebrow,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          letterSpacing: 3,
-                          fontWeight: FontWeight.w700,
-                          color: NwsbColors.gold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.white,
-                          height: 1.05,
-                        ),
-                      ),
+                      if (!fullBleed) ...[
+                        Text(eyebrow, style: const TextStyle(fontSize: 10, letterSpacing: 3, fontWeight: FontWeight.w700, color: NwsbColors.gold)),
+                        const SizedBox(height: 12),
+                        Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w300, color: Colors.white, height: 1.05)),
+                      ],
                       const SizedBox(height: 18),
                       Container(
                         width: 46,

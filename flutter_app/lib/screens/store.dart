@@ -22,6 +22,7 @@ class StoreScreen extends StatelessWidget {
         body: 'Two libraries. One destination. Own the words that heal — unlock the origins that no dictionary ever told you.',
         stats: const ['Word Library', 'Meaning Library', 'AI-Decoded'],
         art: 'assets/store/intro-store.webp',
+        fullBleed: true,
         enterLabel: 'Enter Store',
         onBack: () => Navigator.of(context).maybePop(),
         child: const _StoreHomeContent(),
@@ -185,13 +186,14 @@ class WordAtelierScreen extends StatelessWidget {
   Widget build(BuildContext context) => IntroGate(
         tag: 'Shabdapathy · Word Science',
         eyebrow: 'The Word Atelier',
-        title: 'Explore the\norigin of words.',
+        title: '',
         body: 'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.',
-        stats: const ['Unlimited words', 'AI-powered', 'Every language'],
+        stats: const ['Unlimited Words', 'AI-Powered', 'Every Language'],
         art: 'assets/store/intro-words.webp',
+        fullBleed: true,
         enterLabel: 'Enter The Word Atelier',
         onBack: () => Navigator.of(context).pop(),
-        child: _StoreContentPage(title: 'The Word Atelier', child: _WordsShelf()),
+        child: _StoreContentPage(title: 'The Word Atelier', film: 'assets/video/store-word-library.mp4', child: _WordsShelf()),
       );
 }
 
@@ -201,13 +203,14 @@ class MeaningStoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => IntroGate(
         tag: 'Shabdapathy · True Origin',
         eyebrow: 'The Meaning Store',
-        title: 'Unlock what\nwords truly mean.',
-        body: 'Every word you know has a meaning you were never told. Before the dictionary — there was only vibration.',
-        stats: const ['Any language', 'AI-decoded', 'One-time unlock'],
+        title: '',
+        body: 'Every word you know has a meaning you were never told. Before the dictionary — there was only vibration. Unlock the truth.',
+        stats: const ['Any Language', 'AI-Decoded', 'One Time Unlock'],
         art: 'assets/store/intro-meanings.webp',
+        fullBleed: true,
         enterLabel: 'Explore Meanings',
         onBack: () => Navigator.of(context).pop(),
-        child: _StoreContentPage(title: 'The Meaning Store', child: _MeaningsShelf()),
+        child: _StoreContentPage(title: 'The Meaning Store', film: 'assets/video/store-meaning-library.mp4', child: _MeaningsShelf()),
       );
 }
 
@@ -221,9 +224,10 @@ class SignatureStoreScreen extends StatelessWidget {
         body: 'A premium shelf of signature words and meanings, chosen from the deepest collections in NowssB.',
         stats: const ['Rare collection', 'Premium words', 'Yours forever'],
         art: 'assets/store/intro-signature.webp',
+        fullBleed: true,
         enterLabel: 'Browse Signatures',
         onBack: () => Navigator.of(context).pop(),
-        child: _StoreContentPage(title: 'Signature Store', child: const _SignatureShelf()),
+        child: _StoreContentPage(title: 'Signature Store', film: 'assets/video/signature-store.mp4', child: const _SignatureShelf()),
       );
 }
 
@@ -235,25 +239,32 @@ class EbooksStoreScreen extends StatelessWidget {
         eyebrow: 'Read · Learn · Practice',
         title: 'The NowssB\nEbooks.',
         body: 'Deep-dive guides on word science, phonetic origin and sound healing — yours to keep, read anywhere, forever.',
-        stats: const ['Two titles', 'Instant access', 'Read forever'],
+        stats: const ['2 Titles', 'Instant Access', 'Read Forever'],
         art: 'assets/store/intro-ebooks.webp',
+        fullBleed: true,
         enterLabel: 'Browse Ebooks',
         onBack: () => Navigator.of(context).pop(),
-        child: _StoreContentPage(title: 'The NowssB Ebooks', child: _BooksShelf()),
+        child: _StoreContentPage(title: 'The NowssB Ebooks', film: 'assets/video/store-verify-banner.mp4', child: _BooksShelf()),
       );
 }
 
 class _StoreContentPage extends StatelessWidget {
-  const _StoreContentPage({required this.title, required this.child});
+  const _StoreContentPage({required this.title, required this.film, required this.child});
   final String title;
+  final String film;
   final Widget child;
   @override
   Widget build(BuildContext context) => PageShell(
         eyebrow: 'NowssB Store',
         title: title,
-        film: 'assets/video/store-section.mp4',
+        film: film,
         onBack: () => Navigator.of(context).pop(),
-        slivers: [SliverPadding(padding: const EdgeInsets.symmetric(horizontal: 20), sliver: SliverList.list(children: [child]))],
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(24, 18, 24, 0),
+            sliver: SliverList.list(children: [child]),
+          ),
+        ],
       );
 }
 
