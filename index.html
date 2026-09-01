@@ -3743,12 +3743,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     position:relative;
     overflow-x:hidden;
     padding-bottom: calc(40px + env(safe-area-inset-bottom));
-    background-color:#000;
-    background-image:var(--img-bg);
-    background-size:cover;
-    background-position:center top;
-    background-attachment:fixed;
-    background-repeat:no-repeat;
+    background:#000 url("assets/profile/profile-01.jpg") center top / cover no-repeat !important;
   }
 #sub-profile::before {
     content:"";
@@ -3780,6 +3775,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     opacity:.035;
     mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+#sub-profile .profile-bg-layer {
+    position:sticky;
+    top:0;
+    height:100vh;
+    margin-bottom:-100vh;
+    background:#000 url("assets/profile/profile-01.jpg") center top / cover no-repeat;
+    pointer-events:none;
+    z-index:0;
   }
 #sub-profile a { color:inherit; }
 #sub-profile button { font-family:inherit; }
@@ -4126,7 +4130,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <div class="sub-screen" id="sub-profile">
 <style id="supplied-profile-layout">#sub-profile{display:block;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;}</style>
 
-
+<div class="profile-bg-layer" aria-hidden="true"></div>
 <div class="grain"></div>
 <main class="page">
 
