@@ -2,7 +2,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-const _bg = AssetImage('assets/profile/profile-11.png');
+const _bg = AssetImage('assets/profile/profile-01.jpg');
 const _ink = Color(0xFFF4F2EE);
 const _muted = Color(0x99F4F2EE);
 const _gold = Color(0xFFE3BD7D);
