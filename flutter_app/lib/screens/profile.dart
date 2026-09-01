@@ -36,13 +36,13 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 20),
               _panel(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Stack(children: [
-                    Container(width: 70, height: 70, decoration: const BoxDecoration(shape: BoxShape.circle, image: DecorationImage(image: NetworkImage('https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg'), fit: BoxFit.cover))),
+                  SizedBox(width: 74, height: 74, child: Stack(children: [
+                    Positioned(left: 4, top: 4, right: 0, bottom: 0, child: ClipRRect(borderRadius: BorderRadius.circular(18), child: Image(image: const NetworkImage('https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg'), fit: BoxFit.cover, alignment: const Alignment(0.08, 0.16)))),
                     Positioned.fill(child: Image(image: _ring, fit: BoxFit.cover)),
-                  ]),
+                  ])),
                   const SizedBox(width: 16),
                   const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Practitioner', style: TextStyle(color: _muted, fontSize: 11, letterSpacing: 2)), SizedBox(height: 5), Text('Practitioner', style: TextStyle(color: _ink, fontSize: 25, fontWeight: FontWeight.w500)), SizedBox(height: 7), Text('Practicing daily, growing steadily.', style: TextStyle(color: _muted, fontSize: 12))])),
-                  const Icon(Icons.edit_outlined, color: _muted, size: 18),
+                  Container(width: 30, height: 30, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xE6141416), border: Border.all(color: const Color(0x33FFFFFF))), child: const Icon(Icons.edit_outlined, color: _muted, size: 16)),
                 ]),
                 const SizedBox(height: 14),
                 Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: const Color(0x1AE3BD7D), borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x55E3BD7D))), child: const Text('●  FREE PLAN', style: TextStyle(color: _gold, fontSize: 10, letterSpacing: 1.5))),
