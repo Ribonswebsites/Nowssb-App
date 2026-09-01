@@ -42,16 +42,21 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                   _CircleButton(icon: Icons.more_horiz_rounded, onTap: () {}),
                 ]),
                 const SizedBox(height: 12),
-                Container(
-                  width: 190,
-                  height: 190,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const RadialGradient(colors: [Color(0xFFE7E7E7), Color(0xFF4A4A4A), Color(0xFF050505)], stops: [0.1, 0.42, 1]),
-                    boxShadow: const [BoxShadow(color: Color(0x18FFFFFF), blurRadius: 40)],
-                    border: Border.all(color: const Color(0x26FFFFFF)),
-                  ),
-                  child: const Icon(Icons.all_inclusive_rounded, color: Colors.black, size: 70),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final orbSize = constraints.maxWidth.clamp(185.0, 220.0).toDouble();
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Image.asset(
+                        'assets/content/select-level-orb.png',
+                        width: orbSize,
+                        height: orbSize,
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.high,
+                        semanticLabel: 'NowssB level ring',
+                      ),
+                    ),
+                  },
                 ),
                 const SizedBox(height: 18),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: const [

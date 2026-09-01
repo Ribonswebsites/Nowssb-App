@@ -31,7 +31,7 @@ class PlayerDial extends StatefulWidget {
 
 class _PlayerDialState extends State<PlayerDial> {
   Timer? _tick;
-  DateTime _now = DateTime.now().toUtc().add(const Duration(hours: 5, minutes: 30));
+  DateTime _now = DateTime.now();
   bool _expanded = false;
   bool _bass = false;
   bool _download = false;
@@ -48,7 +48,7 @@ class _PlayerDialState extends State<PlayerDial> {
     _tick = Timer.periodic(const Duration(milliseconds: 80), (_) {
       if (!mounted) return;
       setState(() {
-        _now = DateTime.now().toUtc().add(const Duration(hours: 5, minutes: 30));
+        _now = DateTime.now();
       });
     });
   }
@@ -106,22 +106,23 @@ class _PlayerDialState extends State<PlayerDial> {
                 ),
               ),
               if (!_expanded)
-                SizedBox(
-                  height: 280,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: -140,
-                        top: -40,
-                        width: 460,
-                        height: 460,
-                        child: CustomPaint(painter: _ClockPainter(sweep)),
-                      ),
-                      Positioned(
-                        left: 20,
-                        top: 118,
-                        right: 16,
-                        child: Row(
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final clockHeight = math.min(340.0, math.max(248.0, constraints.maxWidth * .82));
+                    return SizedBox(
+                      height: clockHeight,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: CustomPaint(painter: _ClockPainter(sweep)),
+                          ),
+                          Positioned(
+                            left: 16,
+                            right: 16,
+                            top: clockHeight * .43,
+                            child: Row(
                           children: [
                             Text(hh, style: const TextStyle(color: Colors.white, fontSize: 72, fontWeight: FontWeight.w500, height: 0.9, fontFeatures: [FontFeature.tabularFigures()])),
                             const SizedBox(width: 10),
@@ -155,10 +156,11 @@ class _PlayerDialState extends State<PlayerDial> {
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      ],
+                    ),
+                  );
+                },
+              ),
               Padding(
                 padding: EdgeInsets.fromLTRB(22, _expanded ? 8 : 6, 22, 0),
                 child: Align(
